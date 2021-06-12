@@ -6,7 +6,7 @@ export const Hello: FunctionComponent = () => {
     <Box>
       <Center>
         <Heading size="m" mt={3}>
-          Example Extension
+          All codes334
         </Heading>
       </Center>
     </Box>

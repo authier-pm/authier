@@ -1,5 +1,5 @@
 import React, { FunctionComponent } from 'react'
-import './styles.scss'
+
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import { Button } from '@chakra-ui/button'
 import { Center, Flex } from '@chakra-ui/react'
@@ -18,7 +18,7 @@ const executeScript = async (code: string) => {
   // Query for the active tab in the current window
   const tabs: Tabs.Tab[] = await browser.tabs.query({
     active: true,
-    currentWindow: true,
+    currentWindow: true
   })
 
   // Pulls current tab from browser.tabs.query response
@@ -31,7 +31,7 @@ const executeScript = async (code: string) => {
 
   // Executes the script in the current tab
   return browser.tabs.executeScript(currentTab.id, {
-    code,
+    code
   })
 }
 

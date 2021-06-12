@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React from 'react'
 import { Hello } from '../component'
 import renderer from 'react-test-renderer'
 
