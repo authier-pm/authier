@@ -1,35 +1,42 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import React, {
+  createContext,
+  Dispatch,
+  FunctionComponent,
+  SetStateAction,
+  useEffect,
+  useState
+} from 'react'
 
 import { browser } from 'webextension-polyfill-ts'
 
 import {
-  Avatar,
   Box,
-  Button,
   ChakraProvider,
+  CircularProgress,
   Flex,
   Grid,
   Heading,
-  Stat,
-  StatLabel,
-  StatNumber
+  useInterval
 } from '@chakra-ui/react'
 
-import { authenticator } from 'otplib'
 import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
-import { executeScriptInCurrentTab } from '@src/executeScriptInCurrentTab'
+
 import { sharedBrowserEvents } from '@src/backgroundPage'
+import { AddAuthSecretButton } from './AddAuthSecretButton'
+import { AuthsList } from './AuthsList'
+import { authenticator } from 'otplib'
+
 i18n.activate('en')
 
-const auths = [
-  {
-    secret: 'JBSWY3DPEHPK3PXP',
-    label: 'bitfinex',
-    icon: 'https://chakra-ui.com/favicon.png'
-  }
-]
+export const AuthsContext = createContext<{
+  auths: Array<any>
+  setAuths: Dispatch<
+    SetStateAction<{ secret: string; label: string; icon: string }[]>
+  >
+}>({ auths: [] } as any)
+
 export const Popup: FunctionComponent = () => {
   useEffect(() => {
     browser.runtime.sendMessage({ popupMounted: true })
@@ -44,57 +51,44 @@ export const Popup: FunctionComponent = () => {
       }
     })
   }, [])
+  const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
+
+  useInterval(() => {
+    setRemainingSeconds(authenticator.timeRemaining())
+  }, 1000)
+
+  const [auths, setAuths] = useState([
+    {
+      secret: 'JBSWY3DPEHPK3PXP',
+      label: 'bitfinex',
+      icon: 'https://chakra-ui.com/favicon.png'
+    }
+  ])
 
   return (
     <ChakraProvider>
-      <I18nProvider i18n={i18n}>
-        <Box height={200} width={300} p={5}>
-          <Grid gap={3}>
-            <Heading>
-              <Trans>Your codes</Trans>
+      <AuthsContext.Provider value={{ auths, setAuths }}>
+        <I18nProvider i18n={i18n}>
+          <Flex position="sticky" align="center" p={4}>
+            <CircularProgress
+              min={1}
+              max={30}
+              value={30 - seconds}
+              valueText={seconds.toString()}
+              size="40px"
+            />
+            <AddAuthSecretButton />
+            <Heading size="sm">
+              <Trans>Logout</Trans>
             </Heading>
-            {auths.map((oauth) => {
-              return (
-                <Box boxShadow="2xl" p="4" rounded="md" bg="white">
-                  <Stat>
-                    <Flex justify="space-around">
-                      <Avatar src={oauth.icon}></Avatar>
-                      <Box ml={4}>
-                        <StatLabel>{oauth.label}</StatLabel>
-                        <StatNumber>
-                          {authenticator.generate(oauth.secret)}
-                        </StatNumber>
-                      </Box>
-                    </Flex>
-                  </Stat>
-                </Box>
-              )
-            })}
-
-            <Button
-              m={3}
-              className="btn btn-block btn-outline-dark"
-              onClick={async () =>
-                console.log(await executeScriptInCurrentTab('location.href'))
-              }
-            >
-              Add new code
-            </Button>
-          </Grid>
-        </Box>
-      </I18nProvider>
+          </Flex>
+          <Box height={200} width={300} p={5} mb={5}>
+            <Grid gap={3} mb={5}>
+              <AuthsList />
+            </Grid>
+          </Box>
+        </I18nProvider>
+      </AuthsContext.Provider>
     </ChakraProvider>
   )
 }
-
-// ;[
-//   {
-//     site: 'bitfinex.com',
-//     secret: 'JBSWY3DPEHPK3PXP'
-//   },
-//   {
-//     site: 'bitfinex.com',
-//     icon: null,
-//     secret: 'JBSWY3DPEHPK3PXP'
-//   }
-// ]
