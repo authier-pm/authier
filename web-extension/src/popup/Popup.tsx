@@ -7,6 +7,8 @@ import React, {
   useState
 } from 'react'
 
+import { MemoryRouter as Router, Switch, Route, Link } from 'react-router-dom'
+
 import { browser } from 'webextension-polyfill-ts'
 
 import {
@@ -16,8 +18,12 @@ import {
   Flex,
   Grid,
   Heading,
-  useInterval
+  useInterval,
+  Text
 } from '@chakra-ui/react'
+
+import { NavBar } from '@src/popup/NavBar'
+import { Home } from '../components/home/Home'
 
 import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
@@ -27,6 +33,7 @@ import { sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
+import { Settings } from '@src/components/settings/Settings'
 
 i18n.activate('en')
 
@@ -51,11 +58,6 @@ export const Popup: FunctionComponent = () => {
       }
     })
   }, [])
-  const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
-
-  useInterval(() => {
-    setRemainingSeconds(authenticator.timeRemaining())
-  }, 1000)
 
   const [auths, setAuths] = useState([
     {
@@ -67,28 +69,21 @@ export const Popup: FunctionComponent = () => {
 
   return (
     <ChakraProvider>
-      <AuthsContext.Provider value={{ auths, setAuths }}>
-        <I18nProvider i18n={i18n}>
-          <Flex position="sticky" align="center" p={4}>
-            <CircularProgress
-              min={1}
-              max={30}
-              value={30 - seconds}
-              valueText={seconds.toString()}
-              size="40px"
-            />
-            <AddAuthSecretButton />
-            <Heading size="sm">
-              <Trans>Logout</Trans>
-            </Heading>
-          </Flex>
-          <Box height={200} width={300} p={5} mb={5}>
-            <Grid gap={3} mb={5}>
-              <AuthsList />
-            </Grid>
-          </Box>
-        </I18nProvider>
-      </AuthsContext.Provider>
+      <Router>
+        <AuthsContext.Provider value={{ auths, setAuths }}>
+          <I18nProvider i18n={i18n}>
+            <NavBar />
+            <Switch>
+              <Route exact path="/">
+                <Home />
+              </Route>
+              <Route path="/settings">
+                <Settings />
+              </Route>
+            </Switch>
+          </I18nProvider>
+        </AuthsContext.Provider>
+      </Router>
     </ChakraProvider>
   )
 }
