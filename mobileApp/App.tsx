@@ -7,19 +7,12 @@
  *
  * @format
  */
-
-import 'react-native-gesture-handler';
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-
-import HomeScreen from './src/navigation/HomeScreen';
+import 'react-native-gesture-handler';
+import { Providers } from './src/Providers';
 
 const App = () => {
-  return (
-    <NavigationContainer>
-      <HomeScreen />
-    </NavigationContainer>
-  );
+  return <Providers />;
 };
 
 export default App;

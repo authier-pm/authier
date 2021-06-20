@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import {
+  FlatList,
   SafeAreaView,
   ScrollView,
   StatusBar,
@@ -8,77 +9,80 @@ import {
   useColorScheme,
   View,
 } from 'react-native';
+import OTP from 'otp-client';
+//import { authenticator } from 'otplib';
+import { AuthsContext } from '../Providers';
+import { Colors } from 'react-native/Libraries/NewAppScreen';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+// const Section: React.FC<{
+//   title: string;
+// }> = ({ children, title }) => {
+//   const isDarkMode = useColorScheme() === 'dark';
+//   return (
+//     <View style={styles.sectionContainer}>
+//       <Text
+//         style={[
+//           styles.sectionTitle,
+//           {
+//             color: isDarkMode ? Colors.white : Colors.black,
+//           },
+//         ]}
+//       >
+//         {title}
+//       </Text>
+//       <Text
+//         style={[
+//           styles.sectionDescription,
+//           {
+//             color: isDarkMode ? Colors.light : Colors.dark,
+//           },
+//         ]}
+//       >
+//         {children}
+//       </Text>
+//     </View>
+//   );
+// };
 
-const Section: React.FC<{
-  title: string;
-}> = ({ children, title }) => {
-  const isDarkMode = useColorScheme() === 'dark';
-  return (
-    <View style={styles.sectionContainer}>
-      <Text
-        style={[
-          styles.sectionTitle,
-          {
-            color: isDarkMode ? Colors.white : Colors.black,
-          },
-        ]}
-      >
-        {title}
-      </Text>
-      <Text
-        style={[
-          styles.sectionDescription,
-          {
-            color: isDarkMode ? Colors.light : Colors.dark,
-          },
-        ]}
-      >
-        {children}
-      </Text>
-    </View>
-  );
+const options = {
+  algorithm: 'sha1',
+  digits: 6,
 };
 
 const Home = () => {
+  const { auths } = useContext(AuthsContext);
+
+  const [seconds, setRemainingSeconds] = useState(0);
+
+  const RenderBox = ({ item }) => {
+    const otp = new OTP(item.secret, options);
+
+    setInterval(() => {
+      setRemainingSeconds(otp.getTimeUntilNextTick());
+    }, 1000);
+
+    return (
+      <View>
+        <Text>{item.label}</Text>
+        <Text>{otp.getToken()}</Text>
+      </View>
+    );
+  };
+
   const isDarkMode = useColorScheme() === 'dark';
 
   const backgroundStyle = {
     backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
   };
-
+  console.log(auths);
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <StatusBar barStyle={isDarkMode ? 'light-content' : 'dark-content'} />
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={backgroundStyle}
-      >
-        <Header />
-        <View
-          style={{
-            backgroundColor: isDarkMode ? Colors.black : Colors.white,
-          }}
-        >
-          <Section title="Step One">
-            Edit <Text style={styles.highlight}>App.js</Text> to change
-            thisfwefwe screen and then come back to see your edits.
-          </Section>
-          <Section title="See Your Changes">
-            <ReloadInstructions />
-          </Section>
-          <Section title="Debug">
-            <DebugInstructions />
-          </Section>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+    <View>
+      <FlatList
+        data={auths}
+        keyExtractor={(auth) => auth.label}
+        renderItem={RenderBox}
+      />
+    </View>
   );
 };
 
