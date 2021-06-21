@@ -1,25 +1,29 @@
 'use strict';
-import React from 'react';
+import React, { useContext } from 'react';
 
-import {
-  AppRegistry,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  Linking,
-} from 'react-native';
+import { AppRegistry, StyleSheet, Text, TouchableOpacity } from 'react-native';
 
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
+import { AuthsContext } from '../Providers';
 
 const Scan = ({ navigation }) => {
+  const { setAuths, auths } = useContext(AuthsContext);
+
   const onSuccess = (e: { data: string }) => {
-    navigation.navigate('Home');
+    const qrDataParts = e.data.split('?secret=');
+    setAuths([
+      {
+        secret: qrDataParts[1],
+        icon: 'test',
+        label: decodeURIComponent(
+          qrDataParts[0].replace('otpauth://totp/', '')
+        ),
+      },
+      ...auths,
+    ]);
+    navigation.navigate('AuthList');
     console.log(e);
-    // Linking.openURL(e.data).catch((err) =>
-    //   console.error('An error occured', err)
-    // );
-    console.log(decodeURIComponent(e.data.replace('otpauth://totp/', '')));
   };
 
   return (
