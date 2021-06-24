@@ -12,11 +12,21 @@ import { browser } from 'webextension-polyfill-ts'
 import { Flex, Text, IconButton } from '@chakra-ui/react'
 import { HamburgerIcon } from '@chakra-ui/icons'
 
-import { Link } from 'react-router-dom'
+import { Link, useRoute } from 'wouter'
 
 export const NavBar: FunctionComponent = () => {
   const [inSettings, SetInSettings] = useState(true)
 
+  const ActiveLink = (props) => {
+    const [isActive] = useRoute(props.href)
+
+    return (
+      <Link {...props}>
+        <a className={isActive ? 'active' : ''}>{props.children}</a>
+      </Link>
+    )
+  }
+  console.log(inSettings)
   return (
     <Flex
       height="38px"
@@ -27,7 +37,7 @@ export const NavBar: FunctionComponent = () => {
       borderBottomColor="gray.300"
       width={300}
     >
-      <Link to={inSettings ? '/settings' : '/'}>
+      <ActiveLink href={inSettings ? '/settings' : '/'}>
         <IconButton
           m="5px"
           size="sm"
@@ -35,7 +45,7 @@ export const NavBar: FunctionComponent = () => {
           icon={<HamburgerIcon />}
           onClick={() => SetInSettings(!inSettings)}
         />
-      </Link>
+      </ActiveLink>
     </Flex>
   )
 }

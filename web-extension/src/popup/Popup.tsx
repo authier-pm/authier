@@ -7,7 +7,7 @@ import React, {
   useState
 } from 'react'
 
-import { MemoryRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import { Route, Switch } from 'wouter'
 
 import { browser } from 'webextension-polyfill-ts'
 
@@ -69,21 +69,15 @@ export const Popup: FunctionComponent = () => {
 
   return (
     <ChakraProvider>
-      <Router>
-        <AuthsContext.Provider value={{ auths, setAuths }}>
-          <I18nProvider i18n={i18n}>
-            <NavBar />
-            <Switch>
-              <Route exact path="/">
-                <Home />
-              </Route>
-              <Route path="/settings">
-                <Settings />
-              </Route>
-            </Switch>
-          </I18nProvider>
-        </AuthsContext.Provider>
-      </Router>
+      <AuthsContext.Provider value={{ auths, setAuths }}>
+        <I18nProvider i18n={i18n}>
+          <NavBar />
+          <Switch location="/">
+            <Route path="/" component={Home} />
+            <Route path="/settings" component={Settings} />
+          </Switch>
+        </I18nProvider>
+      </AuthsContext.Provider>
     </ChakraProvider>
   )
 }

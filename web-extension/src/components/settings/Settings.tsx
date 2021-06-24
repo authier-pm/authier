@@ -14,12 +14,14 @@ import {
   ChakraProvider,
   CircularProgress,
   Flex,
-  Button
+  Button,
+  Text
 } from '@chakra-ui/react'
 
 export const Settings: FunctionComponent = () => {
   return (
     <Flex>
+      <Text>Ahoj</Text>
       <Button colorScheme="teal" size="xs">
         Button
       </Button>
