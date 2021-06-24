@@ -7,7 +7,7 @@ import React, {
   useState
 } from 'react'
 
-import { Route, Switch } from 'wouter'
+import { Route, Switch, useLocation } from 'wouter'
 
 import { browser } from 'webextension-polyfill-ts'
 
@@ -45,7 +45,9 @@ export const AuthsContext = createContext<{
 }>({ auths: [] } as any)
 
 export const Popup: FunctionComponent = () => {
+  const [location, setLocation] = useLocation()
   useEffect(() => {
+    setLocation('/')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -72,7 +74,7 @@ export const Popup: FunctionComponent = () => {
       <AuthsContext.Provider value={{ auths, setAuths }}>
         <I18nProvider i18n={i18n}>
           <NavBar />
-          <Switch location="/">
+          <Switch>
             <Route path="/" component={Home} />
             <Route path="/settings" component={Settings} />
           </Switch>
