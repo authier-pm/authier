@@ -7,24 +7,20 @@ import React, {
   useState
 } from 'react'
 
-import { browser } from 'webextension-polyfill-ts'
+import { Flex, Button, ButtonGroup } from '@chakra-ui/react'
 
-import {
-  Box,
-  ChakraProvider,
-  CircularProgress,
-  Flex,
-  Button,
-  Text
-} from '@chakra-ui/react'
+import { InfoOutlineIcon, AddIcon } from '@chakra-ui/icons'
 
 export const Settings: FunctionComponent = () => {
   return (
-    <Flex>
-      <Text>Ahoj</Text>
-      <Button colorScheme="teal" size="xs">
-        Button
-      </Button>
-    </Flex>
+    <ButtonGroup
+      display="flex"
+      variant="outline"
+      flexDirection="column"
+      mt="10px"
+    >
+      <Button leftIcon={<InfoOutlineIcon />}>About</Button>
+      <Button leftIcon={<AddIcon />}>Add device</Button>
+    </ButtonGroup>
   )
 }

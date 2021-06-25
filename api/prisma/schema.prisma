@@ -1,0 +1,40 @@
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model Auth {
+    id     Int    @id @default(autoincrement())
+    secret String @unique
+
+    User   User?   @relation(fields: [userId], references: [id])
+    userId String?
+}
+
+model User {
+    id       String  @id @default(uuid())
+    email    String  @unique
+    password String
+    name     String?
+    auths    Auth[]
+    Token    Token[]
+}
+
+model Token {
+    id         Int       @id @default(autoincrement())
+    createdAt  DateTime  @default(now())
+    updatedAt  DateTime  @updatedAt
+    type       TokenType
+    emailToken String?   @unique // Only used for short lived email tokens
+    valid      Boolean   @default(true)
+    expiration DateTime
+
+    // Relation fields
+    user   User   @relation(fields: [userId], references: [id])
+    userId String
+}
+
+enum TokenType {
+    EMAIL // used as a short-lived token sent to the user's email
+    API
+}
