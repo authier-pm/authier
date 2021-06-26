@@ -7,7 +7,7 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 
-export default function Login(): ReactElement {
+export default function Register(): ReactElement {
   const [show, setShow] = React.useState(false)
   const handleClick = () => setShow(!show)
 

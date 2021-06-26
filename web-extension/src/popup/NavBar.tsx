@@ -12,13 +12,26 @@ import { browser } from 'webextension-polyfill-ts'
 import { Flex, Text, IconButton } from '@chakra-ui/react'
 import { HamburgerIcon } from '@chakra-ui/icons'
 
-import { Link, useRoute } from 'wouter'
+import {
+  Link,
+  useRoute,
+  useLocation,
+  useRouter,
+  Router,
+  LinkProps,
+  LocationHook
+} from 'wouter'
 
 export const NavBar: FunctionComponent = () => {
   const [inSettings, SetInSettings] = useState(true)
+  const [location, setLocation] = useLocation()
+  const [lastPage, SetLastPage] = useState<string>('')
 
-  const ActiveLink = (props) => {
-    const [isActive] = useRoute(props.href)
+  const ActiveLink = (
+    props: JSX.IntrinsicAttributes &
+      React.PropsWithChildren<LinkProps<LocationHook>>
+  ) => {
+    const [isActive] = useRoute(props.href as string)
 
     return (
       <Link {...props}>
@@ -26,7 +39,13 @@ export const NavBar: FunctionComponent = () => {
       </Link>
     )
   }
-  console.log(inSettings)
+
+  useEffect(() => {
+    if (inSettings) {
+      SetLastPage(location)
+    }
+  })
+
   return (
     <Flex
       height="38px"
@@ -37,7 +56,7 @@ export const NavBar: FunctionComponent = () => {
       borderBottomColor="gray.300"
       width={300}
     >
-      <ActiveLink href={inSettings ? '/settings' : '/'}>
+      <ActiveLink href={inSettings ? '/settings' : lastPage}>
         <IconButton
           m="5px"
           size="sm"
