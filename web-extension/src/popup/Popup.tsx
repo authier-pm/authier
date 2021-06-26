@@ -34,6 +34,8 @@ import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
 import { Settings } from '@src/components/settings/Settings'
+import Login from '@src/components/login/Login'
+import Register from '@src/components/register/Register'
 
 i18n.activate('en')
 
@@ -47,7 +49,7 @@ export const AuthsContext = createContext<{
 export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   useEffect(() => {
-    setLocation('/')
+    setLocation('/login')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -77,6 +79,8 @@ export const Popup: FunctionComponent = () => {
           <Switch>
             <Route path="/" component={Home} />
             <Route path="/settings" component={Settings} />
+            <Route path="/login" component={Login} />
+            <Route path="/register" component={Register} />
           </Switch>
         </I18nProvider>
       </AuthsContext.Provider>

@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
 import mercurius from 'mercurius'
-import { schema } from './schema'
+import { schema } from './schemas/schema'
 import dotenv from 'dotenv'
 
 dotenv.config()

@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata'
 import { buildSchemaSync } from 'type-graphql'
 import { RecipeResolver } from './resolvers'
 
