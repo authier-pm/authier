@@ -1,4 +1,4 @@
-//import 'dotenv/config'
+import 'dotenv/config'
 import { printSchema } from 'graphql'
 import fs from 'mz/fs'
 
