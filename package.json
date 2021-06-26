@@ -1,0 +1,13 @@
+{
+  "name": "authier",
+  "private": true,
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/capaj/authier.git",
+  "author": "Petr <petrik.spac@gmail.com>",
+  "license": "MIT",
+  "workspaces": ["mobileApp", "web-extension", "server"],
+  "resolutions": {
+    "graphql": "^15.3.0"
+  }
+}

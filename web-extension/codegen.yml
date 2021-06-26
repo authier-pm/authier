@@ -2,12 +2,19 @@ overwrite: true
 schema: './gqlSchemas\authier.graphql'
 documents: 'src/**/*.graphql'
 generates:
-  ./generated/graphqlBaseTypes.ts:
+  src/generated/graphqlBaseTypes.ts:
     plugins:
-      - 'typescript'
-      - 'typescript-operations'
-      - 'typescript-react-apollo'
-      - 'fragment-matcher'
+      - typescript
+  src/generated:
+    plugins:
+      - typescript-operations
+      - typescript-react-apollo
+
+    preset: near-operation-file
+    presetConfig:
+      extension: .codegen.tsx
+      baseTypesPath: graphqlBaseTypes
+
   ./graphql.schema.json:
     plugins:
       - 'introspection'
