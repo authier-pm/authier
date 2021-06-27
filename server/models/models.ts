@@ -1,16 +1,4 @@
-import { Field, ID, ObjectType } from 'type-graphql'
-
-@ObjectType()
-export class Recipe {
-  @Field(() => ID)
-  id: string
-
-  @Field(() => String)
-  title: string
-
-  @Field(() => Number, { nullable: true })
-  averageRating?: number
-}
+import { Field, ObjectType } from 'type-graphql'
 
 @ObjectType()
 export class User {
@@ -29,6 +17,6 @@ export class User {
 
 @ObjectType()
 export class LoginResponce {
-  @Field()
+  @Field(() => String)
   accessToken: string
 }
