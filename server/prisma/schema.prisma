@@ -16,12 +16,13 @@ model Auth {
 }
 
 model User {
-    id       String  @id @default(uuid())
-    email    String  @unique
-    password String
-    name     String?
-    auths    Auth[]
-    Token    Token[]
+    id           String  @id @default(uuid())
+    email        String  @unique
+    password     String
+    tokenVersion Int     @default(0)
+    name         String?
+    auths        Auth[]
+    Token        Token[]
 }
 
 model Token {
