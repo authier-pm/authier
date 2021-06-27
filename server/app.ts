@@ -40,6 +40,10 @@ async function main() {
       return reply.send({ ok: false, accessToken: '' })
     }
 
+    if (user.tokenVersion !== payload.tokenVersion) {
+      return reply.send({ ok: false, accessToken: '' })
+    }
+
     sendRefreshToken(reply, createRefreshToken(user))
 
     return reply.send({ ok: true, accessToken: createAccessToken(user) })

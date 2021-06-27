@@ -76,6 +76,25 @@ export class RecipeResolver {
     }
   }
 
+  //For testing purposes
+  @Mutation(() => Boolean)
+  async revokeRefreshTokensForUser(
+    @Arg('userId', () => String) userId: string
+  ) {
+    await prisma.user.update({
+      data: {
+        tokenVersion: {
+          increment: 1
+        }
+      },
+      where: {
+        id: userId
+      }
+    })
+
+    return true
+  }
+
   @Mutation(() => LoginResponce)
   async login(
     @Arg('email') email: string,
@@ -99,10 +118,6 @@ export class RecipeResolver {
     }
 
     // //login successful
-    // Ctx.reply.setCookie('jid', createRefreshToken(user), {
-    //   httpOnly: true
-    // })
-
     sendRefreshToken(Ctx.reply, createRefreshToken(user))
 
     return {
