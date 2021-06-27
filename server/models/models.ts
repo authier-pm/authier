@@ -22,6 +22,9 @@ export class User {
 
   @Field(() => String)
   password: string
+
+  @Field(() => Number)
+  tokenVersion: number
 }
 
 @ObjectType()
