@@ -4,12 +4,24 @@ import {
   Flex,
   Input,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  Box,
+  Text
 } from '@chakra-ui/react'
+import { useLoginMutation } from './Login.codegen'
 
 export default function Login(): ReactElement {
   const [show, setShow] = React.useState(false)
   const handleClick = () => setShow(!show)
+  const [login, { data, loading, error }] = useLoginMutation()
+
+  if (loading || !data) {
+    return (
+      <Box>
+        <Text>Loading</Text>
+      </Box>
+    )
+  }
 
   return (
     <Flex flexDirection="column" m={5}>
@@ -27,7 +39,7 @@ export default function Login(): ReactElement {
         </InputRightElement>
       </InputGroup>
 
-      <Button colorScheme="teal" size="sm">
+      <Button colorScheme="teal" size="sm" onClick={() => {}}>
         Log in
       </Button>
     </Flex>

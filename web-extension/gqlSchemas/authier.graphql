@@ -1,9 +1,21 @@
 type Query {
-  recipes: [Recipe!]!
+  bye: String!
+  users: [User!]!
 }
 
-type Recipe {
-  id: ID!
-  title: String!
-  averageRating: Float
+type User {
+  id: String!
+  email: String!
+  password: String!
+  tokenVersion: Float!
+}
+
+type Mutation {
+  register(password: String!, email: String!): Boolean!
+  revokeRefreshTokensForUser(userId: String!): Boolean!
+  login(password: String!, email: String!): LoginResponce!
+}
+
+type LoginResponce {
+  accessToken: String!
 }
