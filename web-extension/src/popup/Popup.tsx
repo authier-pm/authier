@@ -22,8 +22,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
-import { NavBar } from '@src/popup/NavBar'
-import { Home } from '../components/home/Home'
+import { NavBar } from '@src/components/NavBar'
+import { Home } from '../pages/Home'
 
 import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
@@ -33,9 +33,9 @@ import { sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
-import { Settings } from '@src/components/settings/Settings'
-import Login from '@src/components/login/Login'
-import Register from '@src/components/register/Register'
+import { Settings } from '@src/pages/Settings'
+import Login from '@src/pages/Login'
+import Register from '@src/pages/Register'
 
 i18n.activate('en')
 

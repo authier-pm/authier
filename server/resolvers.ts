@@ -7,9 +7,6 @@ import {
   //   FieldResolver,
   //   Root,
   Resolver,
-  ObjectType,
-  Field,
-  ID,
   Mutation,
   Arg,
   Ctx,
@@ -18,7 +15,6 @@ import {
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
-//import cookie from 'fastify-cookie'
 
 import { LoginResponce, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
@@ -30,19 +26,7 @@ export interface IContext {
   payload?: { userId: string }
 }
 
-@ObjectType()
-class Recipe {
-  @Field(() => ID)
-  id: string
-
-  @Field(() => String)
-  title: string
-
-  @Field(() => Number, { nullable: true })
-  averageRating?: number
-}
-
-@Resolver(Recipe)
+@Resolver()
 export class RecipeResolver {
   @Query(() => String)
   @UseMiddleware(isAuth)
@@ -57,8 +41,8 @@ export class RecipeResolver {
 
   @Mutation(() => Boolean)
   async register(
-    @Arg('email') email: string,
-    @Arg('password') password: string
+    @Arg('email', () => String) email: string,
+    @Arg('password', () => String) password: string
   ) {
     const hashedPassword = await hash(password, 12)
 
@@ -97,8 +81,8 @@ export class RecipeResolver {
 
   @Mutation(() => LoginResponce)
   async login(
-    @Arg('email') email: string,
-    @Arg('password') password: string,
+    @Arg('email', () => String) email: string,
+    @Arg('password', () => String) password: string,
     @Ctx() Ctx: IContext
   ): Promise<LoginResponce> {
     const user = await prisma.user.findUnique({
