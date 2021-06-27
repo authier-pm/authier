@@ -1,3 +1,4 @@
+import { isAuth } from './isAuth'
 import {
   Query,
   //   Mutation,
@@ -11,19 +12,22 @@ import {
   ID,
   Mutation,
   Arg,
-  Ctx
+  Ctx,
+  UseMiddleware
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
-import { RequestGenericInterface, FastifyReply } from 'fastify'
+import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 //import cookie from 'fastify-cookie'
 
 import { LoginResponce, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
+import { sendRefreshToken } from './sendRefreshToken'
 
-interface IContext {
-  request: RequestGenericInterface
+export interface IContext {
+  request: RawRequestDefaultExpression
   reply: FastifyReply
+  payload?: { userId: string }
 }
 
 @ObjectType()
@@ -40,14 +44,10 @@ class Recipe {
 
 @Resolver(Recipe)
 export class RecipeResolver {
-  @Query(() => [Recipe])
-  recipes() {
-    return [
-      {
-        id: '1',
-        title: 'aaa354'
-      }
-    ]
+  @Query(() => String)
+  @UseMiddleware(isAuth)
+  bye(@Ctx() Ctx: IContext) {
+    return `your user ud is: ${Ctx.payload?.userId}`
   }
 
   @Query(() => [User])
@@ -98,10 +98,12 @@ export class RecipeResolver {
       throw new Error('Bad password')
     }
 
-    //login successful
-    Ctx.reply.setCookie('jid', createRefreshToken(user), {
-      httpOnly: true
-    })
+    // //login successful
+    // Ctx.reply.setCookie('jid', createRefreshToken(user), {
+    //   httpOnly: true
+    // })
+
+    sendRefreshToken(Ctx.reply, createRefreshToken(user))
 
     return {
       accessToken: createAccessToken(user)
