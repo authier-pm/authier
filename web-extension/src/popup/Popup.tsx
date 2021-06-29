@@ -22,8 +22,8 @@ import {
   Text
 } from '@chakra-ui/react'
 
-import { NavBar } from '@src/popup/NavBar'
-import { Home } from '../components/home/Home'
+import { NavBar } from '@src/components/NavBar'
+import { Home } from '../pages/Home'
 
 import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
@@ -34,7 +34,10 @@ import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
 import cryptoJS from 'crypto-js'
-import { Settings } from '@src/components/settings/Settings'
+
+import { Settings } from '@src/pages/Settings'
+import Login from '@src/pages/Login'
+import Register from '@src/pages/Register'
 
 i18n.activate('en')
 
@@ -64,7 +67,7 @@ export const Popup: FunctionComponent = () => {
   ])
 
   useEffect(() => {
-    setLocation('/')
+    setLocation('/login')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -90,32 +93,32 @@ export const Popup: FunctionComponent = () => {
 
   return (
     <ChakraProvider>
-      <Router>
-        <AuthsContext.Provider
-          value={{
-            auths,
-            setAuths: async (value) => {
-              const encrypted = cryptoJS.AES.encrypt(
-                JSON.stringify(value),
-                masterPassword
-              ).toString()
+      <AuthsContext.Provider
+        value={{
+          auths,
+          setAuths: async (value) => {
+            const encrypted = cryptoJS.AES.encrypt(
+              JSON.stringify(value),
+              masterPassword
+            ).toString()
 
-              await browser.storage.sync.set({
-                encryptedAuthsMasterPassword: encrypted
-              })
-              setAuths(value)
-            }
-          }}
-        >
-          <I18nProvider i18n={i18n}>
-            <NavBar />
-            <Switch>
-              <Route path="/" component={Home} />
-              <Route path="/settings" component={Settings} />
-            </Switch>
-          </I18nProvider>
-        </AuthsContext.Provider>
-      </Router>
+            await browser.storage.sync.set({
+              encryptedAuthsMasterPassword: encrypted
+            })
+            setAuths(value)
+          }
+        }}
+      >
+        <I18nProvider i18n={i18n}>
+          <NavBar />
+          <Switch>
+            <Route path="/" component={Home} />
+            <Route path="/settings" component={Settings} />
+            <Route path="/login" component={Login} />
+            <Route path="/register" component={Register} />
+          </Switch>
+        </I18nProvider>
+      </AuthsContext.Provider>
     </ChakraProvider>
   )
 }
