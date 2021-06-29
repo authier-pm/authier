@@ -22,8 +22,8 @@ import {
 
 import { Trans } from '@lingui/macro'
 
-import { AddAuthSecretButton } from '../../popup/AddAuthSecretButton'
-import { AuthsList } from '../../popup/AuthsList'
+import { AddAuthSecretButton } from '../popup/AddAuthSecretButton'
+import { AuthsList } from '../popup/AuthsList'
 import { authenticator } from 'otplib'
 
 export const Home: FunctionComponent = () => {
