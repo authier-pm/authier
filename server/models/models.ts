@@ -16,7 +16,7 @@ export class User {
 }
 
 @ObjectType()
-export class LoginResponce {
+export class LoginResponse {
   @Field(() => String)
   accessToken: string
 }
