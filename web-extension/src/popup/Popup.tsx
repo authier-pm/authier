@@ -33,6 +33,8 @@ import { sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
+import cryptoJS from 'crypto-js'
+
 import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
@@ -41,13 +43,29 @@ i18n.activate('en')
 
 export const AuthsContext = createContext<{
   auths: Array<any>
-  setAuths: Dispatch<
-    SetStateAction<{ secret: string; label: string; icon: string }[]>
-  >
+  setAuths: Dispatch<SetStateAction<IAuth[]>>
 }>({ auths: [] } as any)
+
+export interface IAuth {
+  secret: string
+  label: string
+  icon: string
+  lastUsed: Date | null
+}
 
 export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
+  const masterPassword = 'some_fake'
+
+  const [auths, setAuths] = useState<IAuth[]>([
+    {
+      secret: 'JBSWY3DPEHPK3PXP',
+      label: 'bitfinex',
+      icon: 'https://chakra-ui.com/favicon.png',
+      lastUsed: new Date()
+    }
+  ])
+
   useEffect(() => {
     setLocation('/register')
     browser.runtime.sendMessage({ popupMounted: true })
@@ -61,19 +79,36 @@ export const Popup: FunctionComponent = () => {
         console.log('new url', request.url) // new url is now in content scripts!
       }
     })
-  }, [])
+    ;(async () => {
+      const storage = await browser.storage.sync.get()
 
-  const [auths, setAuths] = useState([
-    {
-      secret: 'JBSWY3DPEHPK3PXP',
-      label: 'bitfinex',
-      icon: 'https://chakra-ui.com/favicon.png'
-    }
-  ])
+      const decryptedAuths = cryptoJS.AES.decrypt(
+        storage.encryptedAuthsMasterPassword,
+        masterPassword
+      ).toString(cryptoJS.enc.Utf8)
+
+      setAuths(JSON.parse(decryptedAuths))
+    })()
+  }, [])
 
   return (
     <ChakraProvider>
-      <AuthsContext.Provider value={{ auths, setAuths }}>
+      <AuthsContext.Provider
+        value={{
+          auths,
+          setAuths: async (value) => {
+            const encrypted = cryptoJS.AES.encrypt(
+              JSON.stringify(value),
+              masterPassword
+            ).toString()
+
+            await browser.storage.sync.set({
+              encryptedAuthsMasterPassword: encrypted
+            })
+            setAuths(value)
+          }
+        }}
+      >
         <I18nProvider i18n={i18n}>
           <NavBar />
           <Switch>
