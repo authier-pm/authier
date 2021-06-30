@@ -16,7 +16,7 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { LoginResponce, User } from './models/models'
+import { LoginResponse, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 
@@ -79,12 +79,12 @@ export class RecipeResolver {
     return true
   }
 
-  @Mutation(() => LoginResponce)
+  @Mutation(() => LoginResponse)
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
     @Ctx() Ctx: IContext
-  ): Promise<LoginResponce> {
+  ): Promise<LoginResponse> {
     const user = await prisma.user.findUnique({
       where: {
         email: email
