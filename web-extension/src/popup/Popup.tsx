@@ -49,7 +49,7 @@ export const AuthsContext = createContext<{
 export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   useEffect(() => {
-    setLocation('/login')
+    setLocation('/register')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
