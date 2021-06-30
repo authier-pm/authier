@@ -2,16 +2,15 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import { browser } from 'webextension-polyfill-ts'
 import { Popup } from './Popup'
-import ApolloClient from 'apollo-boost'
-import { ApolloProvider } from '@apollo/react-hooks'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 
 const client = new ApolloClient({
-  uri: 'http://localhost:5050/playground'
+  cache: new InMemoryCache(),
+  uri: 'http://localhost:5050/graphql'
 })
 
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
   ReactDOM.render(
-    //@ts-expect-error
     <ApolloProvider client={client}>
       <Popup />
     </ApolloProvider>,
