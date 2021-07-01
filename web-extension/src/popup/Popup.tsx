@@ -11,16 +11,7 @@ import { Route, Switch, useLocation } from 'wouter'
 
 import { browser } from 'webextension-polyfill-ts'
 
-import {
-  Box,
-  ChakraProvider,
-  CircularProgress,
-  Flex,
-  Grid,
-  Heading,
-  useInterval,
-  Text
-} from '@chakra-ui/react'
+import { ChakraProvider } from '@chakra-ui/react'
 
 import { NavBar } from '@src/components/NavBar'
 import { Home } from '../pages/Home'
@@ -67,7 +58,7 @@ export const Popup: FunctionComponent = () => {
   ])
 
   useEffect(() => {
-    setLocation('/register')
+    setLocation('/login')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {

@@ -11,8 +11,8 @@ export type Scalars = {
   Float: number;
 };
 
-export type LoginResponce = {
-  __typename?: 'LoginResponce';
+export type LoginResponse = {
+  __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
 };
 
@@ -20,7 +20,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
-  login: LoginResponce;
+  login: LoginResponse;
 };
 
 

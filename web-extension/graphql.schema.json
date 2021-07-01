@@ -10,7 +10,7 @@
     "types": [
       {
         "kind": "OBJECT",
-        "name": "LoginResponce",
+        "name": "LoginResponse",
         "description": null,
         "fields": [
           {
@@ -174,7 +174,7 @@
               "name": null,
               "ofType": {
                 "kind": "OBJECT",
-                "name": "LoginResponce",
+                "name": "LoginResponse",
                 "ofType": null
               }
             },
