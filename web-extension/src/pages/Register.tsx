@@ -2,23 +2,20 @@ import React, { ReactElement, useState } from 'react'
 import {
   Box,
   Button,
-  CircularProgress,
   Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
   Heading,
-  Icon,
   Input,
   InputGroup,
-  InputRightElement,
-  Text,
-  Spinner
+  InputRightElement
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useRegisterMutation } from './Register.codegen'
 import ErrorMessage from '@src/components/ErrorMessage'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
+import { useLocation } from 'wouter'
 
 interface Values {
   password: string
@@ -26,12 +23,16 @@ interface Values {
 }
 
 export default function Register(): ReactElement {
+  const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
 
   return (
     <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={6} boxShadow="lg">
+      <Flex alignItems="center" justifyContent="center">
+        <Heading>Create account</Heading>
+      </Flex>
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={async (
@@ -42,6 +43,7 @@ export default function Register(): ReactElement {
             variables: { email: values.email, password: values.password }
           })
           setSubmitting(false)
+          setLocation('/')
           console.log(response)
         }}
       >
