@@ -19,11 +19,18 @@ import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 import { LoginResponse, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
+import { verify } from 'jsonwebtoken'
 
 export interface IContext {
   request: RawRequestDefaultExpression
   reply: FastifyReply
   payload?: { userId: string }
+}
+
+export interface Payload {
+  userId: string
+  iat: number
+  exp: number
 }
 
 @Resolver()
@@ -37,6 +44,27 @@ export class RecipeResolver {
   @Query(() => [User])
   async users() {
     return await prisma.user.findMany()
+  }
+
+  // query for info about user
+  @Query(() => User, { nullable: true })
+  me(@Ctx() context: IContext) {
+    const authorization = context.request.headers['authorization']
+
+    if (!authorization) {
+      throw new Error('not authenticated')
+    }
+
+    try {
+      const token = authorization.split(' ')[1]
+      const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      context.payload = payload as Payload
+      //@ts-expect-error
+      return prisma.user.findUnique({ where: { id: payload.userId } })
+    } catch (err) {
+      console.log(err)
+      return null
+    }
   }
 
   @Mutation(() => Boolean)
