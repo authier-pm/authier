@@ -10,12 +10,26 @@ import React, {
 import { Flex, Button, ButtonGroup } from '@chakra-ui/react'
 
 import { InfoOutlineIcon, AddIcon } from '@chakra-ui/icons'
-import { useByeLazyQuery, useByeQuery } from './Settings.codegen'
+import { useByeQuery } from './Settings.codegen'
 
 export const Settings: FunctionComponent = () => {
-  const { data, loading, error } = useByeQuery()
+  const { data, loading, error } = useByeQuery({ fetchPolicy: 'network-only' })
 
-  console.log(data, loading, error)
+  if (data) {
+    console.log(data)
+  }
+
+  if (error) {
+    console.log(error)
+  }
+
+  if (loading) {
+    return <div>Loading</div>
+  }
+
+  if (!data) {
+    console.log('no data')
+  }
 
   return (
     <ButtonGroup

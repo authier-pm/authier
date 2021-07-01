@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
-    "nodemon": "^2.0.8",
+    "nodemon": "^2.0.9",
     "prisma": "^2.26.0"
   },
   "scripts": {
