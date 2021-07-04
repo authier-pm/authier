@@ -78,11 +78,17 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
     const tab = await getCurrentTab()
 
     const qrDataParts = qr.data.split('?secret=')
+    if (!tab) {
+      return
+    }
     setAuths([
       {
         secret: qrDataParts[1],
-        icon: tab?.favIconUrl,
-        label: decodeURIComponent(qrDataParts[0].replace('otpauth://totp/', ''))
+        icon: tab.favIconUrl,
+        label: decodeURIComponent(
+          qrDataParts[0].replace('otpauth://totp/', '')
+        ),
+        originalUrl: tab.url
       },
       ...auths
     ])
