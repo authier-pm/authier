@@ -6,7 +6,13 @@ export class User {
   id: string
 
   @Field(() => String)
-  email: string
+  email?: string
+
+  @Field(() => String)
+  phone_number?: string
+
+  @Field(() => String)
+  account_name?: string
 
   @Field(() => String)
   password: string
