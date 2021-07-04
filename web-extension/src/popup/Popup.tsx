@@ -76,13 +76,15 @@ export const Popup: FunctionComponent = () => {
     ;(async () => {
       const storage = await browser.storage.local.get()
 
-      const decryptedAuths = cryptoJS.AES.decrypt(
-        storage.encryptedAuthsMasterPassword,
-        masterPassword
-      ).toString(cryptoJS.enc.Utf8)
-      console.log('~ decryptedAuths', JSON.parse(decryptedAuths))
+      if (storage.encryptedAuthsMasterPassword) {
+        const decryptedAuths = cryptoJS.AES.decrypt(
+          storage.encryptedAuthsMasterPassword,
+          masterPassword
+        ).toString(cryptoJS.enc.Utf8)
+        console.log('~ decryptedAuths', JSON.parse(decryptedAuths))
 
-      setAuths(JSON.parse(decryptedAuths))
+        setAuths(JSON.parse(decryptedAuths))
+      }
     })()
   }, [])
 

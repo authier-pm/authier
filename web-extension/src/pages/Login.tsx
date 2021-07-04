@@ -14,9 +14,10 @@ import {
 } from '@chakra-ui/react'
 import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { useLocation } from 'wouter'
+import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { setAccessToken } from '@src/util/accessToken'
+import { Trans } from '@lingui/macro'
 
 interface Values {
   password: string
@@ -105,7 +106,11 @@ export default function Login(): ReactElement {
           </Form>
         )}
       </Formik>
-      <Text>Dont have account?</Text>
+      <Link to="/register">
+        <Text>
+          <Trans>Don't have account?</Trans>
+        </Text>
+      </Link>
     </Box>
   )
 }

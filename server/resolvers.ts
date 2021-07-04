@@ -34,10 +34,20 @@ export interface Payload {
 }
 
 @Resolver()
-export class RecipeResolver {
-  @Query(() => String)
+export class RootResolver {
+  @Query(() => String, {
+    description: 'you need to be authenticated to call this resolver'
+  })
   @UseMiddleware(isAuth)
-  bye(@Ctx() Ctx: IContext) {
+  authenticated(@Ctx() Ctx: IContext) {
+    return `your user ud is: ${Ctx.payload?.userId}`
+  }
+  @Mutation(() => String, {
+    description: 'you need to be authenticated to call this resolver',
+    name: 'authenticated'
+  })
+  @UseMiddleware(isAuth)
+  authenticatedMutations(@Ctx() Ctx: IContext) {
     return `your user ud is: ${Ctx.payload?.userId}`
   }
 
@@ -109,8 +119,8 @@ export class RecipeResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string,
+    @Arg('email') email: string,
+    @Arg('password') password: string,
     @Ctx() Ctx: IContext
   ): Promise<LoginResponse> {
     const user = await prisma.user.findUnique({

@@ -8,6 +8,7 @@ import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prisma } from './prisma'
 import { createAccessToken, createRefreshToken } from './auth'
 import { verify } from 'jsonwebtoken'
+import { User } from './models/models'
 
 dotenv.config()
 
@@ -44,13 +45,16 @@ async function main() {
       return reply.send({ ok: false, accessToken: '' })
     }
 
-    sendRefreshToken(reply, createRefreshToken(user))
+    sendRefreshToken(reply, createRefreshToken(user as User))
 
-    return reply.send({ ok: true, accessToken: createAccessToken(user) })
+    return reply.send({
+      ok: true,
+      accessToken: createAccessToken(user as User)
+    })
   })
 
   app.register(cookie, {
-    secret: 'my-secret', // for cookies signature
+    secret: process.env.COOKIE_SECRET, // for cookies signature
     parseOptions: {} // options for parsing cookies
   } as FastifyCookieOptions)
 
@@ -62,9 +66,9 @@ async function main() {
     }
   })
 
-  app.listen(5050)
+  app.listen(process.env.PORT!)
 }
 
 main().then(() => {
-  console.log(`Listening on ${process.env.API_URL}`)
+  console.log(`Listening on ${process.env.PORT}`)
 })
