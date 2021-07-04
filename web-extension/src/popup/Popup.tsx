@@ -46,6 +46,7 @@ export interface IAuth {
 
 export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
+
   const masterPassword = 'some_fake'
 
   const [auths, setAuths] = useState<IAuth[]>([
@@ -71,7 +72,7 @@ export const Popup: FunctionComponent = () => {
       }
     })
     ;(async () => {
-      const storage = await browser.storage.sync.get()
+      const storage = await browser.storage.local.get()
 
       const decryptedAuths = cryptoJS.AES.decrypt(
         storage.encryptedAuthsMasterPassword,
@@ -93,7 +94,7 @@ export const Popup: FunctionComponent = () => {
               masterPassword
             ).toString()
 
-            await browser.storage.sync.set({
+            await browser.storage.local.set({
               encryptedAuthsMasterPassword: encrypted
             })
             setAuths(value)
@@ -104,6 +105,7 @@ export const Popup: FunctionComponent = () => {
           <NavBar />
           <Switch>
             <Route path="/" component={Home} />
+            <Route path="/popup.html" component={Home} />
             <Route path="/settings" component={Settings} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
