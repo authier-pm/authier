@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "nodemon --exec ts-node --transpile-only app.ts",
-    "pgn": "prisma migrate dev && prisma db push --preview-feature && prisma generate",
+    "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate dev"
   }
