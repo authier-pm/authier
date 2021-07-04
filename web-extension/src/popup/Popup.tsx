@@ -33,15 +33,16 @@ import Register from '@src/pages/Register'
 i18n.activate('en')
 
 export const AuthsContext = createContext<{
-  auths: Array<any>
+  auths: Array<IAuth>
   setAuths: Dispatch<SetStateAction<IAuth[]>>
 }>({ auths: [] } as any)
 
 export interface IAuth {
   secret: string
   label: string
-  icon: string
-  lastUsed: Date | null
+  icon: string | undefined
+  lastUsed?: Date | null
+  originalUrl: string | undefined
 }
 
 export const Popup: FunctionComponent = () => {
@@ -54,12 +55,13 @@ export const Popup: FunctionComponent = () => {
       secret: 'JBSWY3DPEHPK3PXP',
       label: 'bitfinex',
       icon: 'https://chakra-ui.com/favicon.png',
-      lastUsed: new Date()
+      lastUsed: new Date(),
+      originalUrl: 'http://google.com'
     }
   ])
 
   useEffect(() => {
-    setLocation('/login')
+    // setLocation('/login')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -78,6 +80,7 @@ export const Popup: FunctionComponent = () => {
         storage.encryptedAuthsMasterPassword,
         masterPassword
       ).toString(cryptoJS.enc.Utf8)
+      console.log('~ decryptedAuths', JSON.parse(decryptedAuths))
 
       setAuths(JSON.parse(decryptedAuths))
     })()
