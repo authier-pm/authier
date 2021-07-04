@@ -34,10 +34,20 @@ export interface Payload {
 }
 
 @Resolver()
-export class RecipeResolver {
-  @Query(() => String)
+export class RootResolver {
+  @Query(() => String, {
+    description: 'you need to be authenticated to call this resolver'
+  })
   @UseMiddleware(isAuth)
-  bye(@Ctx() Ctx: IContext) {
+  authenticated(@Ctx() Ctx: IContext) {
+    return `your user ud is: ${Ctx.payload?.userId}`
+  }
+  @Mutation(() => String, {
+    description: 'you need to be authenticated to call this resolver',
+    name: 'authenticated'
+  })
+  @UseMiddleware(isAuth)
+  authenticatedMutations(@Ctx() Ctx: IContext) {
     return `your user ud is: ${Ctx.payload?.userId}`
   }
 
