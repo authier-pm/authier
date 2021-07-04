@@ -50,7 +50,7 @@ async function main() {
   })
 
   app.register(cookie, {
-    secret: 'my-secret', // for cookies signature
+    secret: process.env.COOKIE_SECRET, // for cookies signature
     parseOptions: {} // options for parsing cookies
   } as FastifyCookieOptions)
 
@@ -62,9 +62,9 @@ async function main() {
     }
   })
 
-  app.listen(5050)
+  app.listen(process.env.PORT!)
 }
 
 main().then(() => {
-  console.log(`Listening on ${process.env.API_URL}`)
+  console.log(`Listening on ${process.env.PORT}`)
 })
