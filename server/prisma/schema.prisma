@@ -33,9 +33,19 @@ model OTPCodeEvent {
     id        BigInt   @id @default(autoincrement())
     kind      String
     createdAt DateTime @default(now())
-    url       String
+    url       String   @db.VarChar(2048)
     User      User     @relation(fields: [userId], references: [id])
     userId    String   @db.Uuid
+}
+
+model WebOTPInput {
+    id              Int      @id @default(autoincrement())
+    kind            String
+    createdAt       DateTime @default(now())
+    url             String   @db.VarChar(2048)
+    domPath         String
+    createdByUser   User     @relation(fields: [createdByUserId], references: [id])
+    createdByUserId String   @db.Uuid
 }
 
 model User {
@@ -52,6 +62,7 @@ model User {
     updatedAt    DateTime        @updatedAt
     OTPCodeEvent OTPCodeEvent[]
     Device       Device[]
+    WebOTPInput  WebOTPInput[]
 }
 
 model Token {
