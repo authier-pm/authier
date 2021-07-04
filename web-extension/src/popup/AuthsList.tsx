@@ -14,7 +14,9 @@ import { AuthsContext, IAuth } from './Popup'
 import { CopyIcon, ViewIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
-
+import { browser } from 'webextension-polyfill-ts'
+import { getCurrentTab } from '@src/executeScriptInCurrentTab'
+import { extractHostname } from './extractHostname'
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const otpCode = authenticator.generate(auth.secret)
 
@@ -70,11 +72,29 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 export const AuthsList = () => {
   const { auths } = useContext(AuthsContext)
 
+  const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
+
+  useEffect(() => {
+    getCurrentTab().then((tab) => {
+      console.log('~ tab?.url', tab?.url)
+
+      setCurrentTabUrl(tab?.url ?? null)
+    })
+  }, [])
+
   return (
     <>
-      {auths.map((auth, i) => {
-        return <OtpCode auth={auth} key={auth.label + i} />
-      })}
+      {auths
+        .filter(({ originalUrl }) => {
+          if (!currentTabUrl || !originalUrl) {
+            return true
+          }
+
+          return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+        })
+        .map((auth, i) => {
+          return <OtpCode auth={auth} key={auth.label + i} />
+        })}
     </>
   )
 }
