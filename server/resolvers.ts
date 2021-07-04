@@ -109,8 +109,8 @@ export class RecipeResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string,
+    @Arg('email') email: string,
+    @Arg('password') password: string,
     @Ctx() Ctx: IContext
   ): Promise<LoginResponse> {
     const user = await prisma.user.findUnique({

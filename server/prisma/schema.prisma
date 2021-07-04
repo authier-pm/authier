@@ -7,22 +7,27 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Auth {
-    id     Int    @id @default(autoincrement())
-    secret String @unique
+model EncryptedAuths {
+    id        Int    @id @default(autoincrement())
+    encrypted String @db.Text
 
-    User   User?   @relation(fields: [userId], references: [id])
-    userId String?
+    User   User   @relation(fields: [userId], references: [id])
+    userId String @db.Uuid
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model User {
-    id           String  @id @default(uuid())
-    email        String  @unique
+    id           String          @id @default(uuid()) @db.Uuid
+    email        String          @unique
     password     String
-    tokenVersion Int     @default(0)
+    tokenVersion Int             @default(0)
     name         String?
-    auths        Auth[]
+    auths        EncryptedAuths?
     Token        Token[]
+    createdAt    DateTime        @default(now())
+    updatedAt    DateTime        @updatedAt
 }
 
 model Token {
@@ -36,7 +41,7 @@ model Token {
 
     // Relation fields
     user   User   @relation(fields: [userId], references: [id])
-    userId String
+    userId String @db.Uuid
 }
 
 enum TokenType {
