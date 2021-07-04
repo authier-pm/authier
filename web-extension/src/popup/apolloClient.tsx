@@ -10,7 +10,9 @@ import { onError } from '@apollo/client/link/error'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode from 'jwt-decode'
 
+// const apiUrl = process.env.API_URL //'http://localhost:5050'
 const apiUrl = 'http://localhost:5050'
+
 const httpLink = createHttpLink({
   uri: `${apiUrl}/graphql`
 })

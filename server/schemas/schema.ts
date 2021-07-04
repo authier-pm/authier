@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { buildSchemaSync } from 'type-graphql'
-import { RecipeResolver } from '../resolvers'
+import { RootResolver } from '../resolvers'
 
 export const schema = buildSchemaSync({
-  resolvers: [RecipeResolver]
+  resolvers: [RootResolver]
 })
