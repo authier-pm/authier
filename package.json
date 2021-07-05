@@ -6,7 +6,7 @@
   "repository": "https://github.com/capaj/authier.git",
   "author": "Petr <petrik.spac@gmail.com>",
   "license": "MIT",
-  "workspaces": ["web-extension", "server"],
+  "workspaces": ["web-extension", "backend", "frontend"],
   "resolutions": {
     "graphql": "^15.3.0"
   }
