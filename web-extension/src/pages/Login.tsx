@@ -16,7 +16,7 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { setAccessToken } from '../backgroundPage'
+import { setAccessToken } from '../util/accessToken'
 import { Trans } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 

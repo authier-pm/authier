@@ -10,14 +10,19 @@ import {
   useClipboard
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
-import { AuthsContext, IAuth } from './Popup'
+import { AuthsContext, IAuth } from '../popup/Popup'
 import { CopyIcon, ViewIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/executeScriptInCurrentTab'
-import { extractHostname } from './extractHostname'
+import { extractHostname } from '../popup/extractHostname'
+import {useAddOtpEventMutation} from './AuthList.codegen'
+import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
+
+
 const OtpCode = ({ auth }: { auth: IAuth }) => {
+  const [addOTPEvent, {data, loading, error}] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(auth.secret)
 
   useEffect(() => {
@@ -36,10 +41,19 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
             <StatLabel>{auth.label}</StatLabel>
 
             <StatNumber
-              onClick={() => {
+              onClick={async () => {
                 setShowWhole(!showWhole)
                 if (!showWhole) {
-                  // TODO log usage of this key to backend
+                  // CHECK
+                   let tabs =  await browser.tabs.query({active: true, lastFocusedWindow: true})
+                   let url =  tabs[0].url as string
+                   let unecryptedToken: any = await getUserFromToken()
+                    await addOTPEvent({variables: {
+                      kind: "show OTP",
+                      url: url,
+                      userId: unecryptedToken.userId as string 
+                    }})
+                  
                 }
               }}
             >

@@ -23,7 +23,7 @@ import {
 import { Trans } from '@lingui/macro'
 
 import { AddAuthSecretButton } from '../popup/AddAuthSecretButton'
-import { AuthsList } from '../popup/AuthsList'
+import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import {  useLocation } from 'wouter'
 

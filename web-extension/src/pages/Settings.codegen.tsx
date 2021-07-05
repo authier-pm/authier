@@ -8,13 +8,13 @@ export type ByeQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 export type ByeQuery = (
   { __typename?: 'Query' }
-  & Pick<Types.Query, 'bye'>
+  & Pick<Types.Query, 'authenticated'>
 );
 
 
 export const ByeDocument = gql`
     query bye {
-  bye
+  authenticated
 }
     `;
 

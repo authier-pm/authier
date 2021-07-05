@@ -18,9 +18,17 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  /** you need to be authenticated to call this resolver */
+  authenticated: Scalars['String'];
+  addOTPEvent: Scalars['Boolean'];
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
   login: LoginResponse;
+};
+
+
+export type MutationAddOtpEventArgs = {
+  data: OtpEvent;
 };
 
 
@@ -40,16 +48,26 @@ export type MutationLoginArgs = {
   email: Scalars['String'];
 };
 
+export type OtpEvent = {
+  kind: Scalars['String'];
+  url: Scalars['String'];
+  userId: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
-  bye: Scalars['String'];
+  /** you need to be authenticated to call this resolver */
+  authenticated: Scalars['String'];
   users: Array<User>;
+  me?: Maybe<User>;
 };
 
 export type User = {
   __typename?: 'User';
   id: Scalars['String'];
-  email: Scalars['String'];
+  email?: Maybe<Scalars['String']>;
+  phone_number: Scalars['String'];
+  account_name: Scalars['String'];
   password: Scalars['String'];
   tokenVersion: Scalars['Float'];
 };
