@@ -3,8 +3,8 @@
   "version": "0.0.1",
   "description": "A Chrome Extension starter kit built with React, TypeScript, SCSS, Bootstrap, EsLint, Prettier & Webpack",
   "scripts": {
-    "build": "webpack --config webpack.prod.js",
-    "dev": "webpack -w --config webpack.dev.js",
+    "prodbuild": "API_URL=https://api.authier.ml/graphql webpack --config webpack.prod.js",
+    "dev": "API_URL=http://localhost:5051/graphql webpack -w --config webpack.dev.js",
     "test": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
     "gfs": "graphql-codegen --config codegen.yml",

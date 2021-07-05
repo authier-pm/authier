@@ -95,7 +95,7 @@ export const Popup: FunctionComponent = () => {
           storage.encryptedAuthsMasterPassword,
           masterPassword
         ).toString(cryptoJS.enc.Utf8)
-        console.log('~ decryptedAuths', JSON.parse(decryptedAuths))
+        console.log('~ decryptedAuth23s', JSON.parse(decryptedAuths))
 
         setAuths(JSON.parse(decryptedAuths))
       }
