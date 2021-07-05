@@ -16,8 +16,9 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { setAccessToken } from '@src/util/accessToken'
+import { setAccessToken } from '../backgroundPage'
 import { Trans } from '@lingui/macro'
+import { browser } from 'webextension-polyfill-ts'
 
 interface Values {
   password: string
@@ -46,9 +47,11 @@ export default function Login(): ReactElement {
           })
           setSubmitting(false)
           if (response && response.data) {
+            await browser.storage.local.set({jid: response.data.login.accessToken})
             setAccessToken(response.data.login.accessToken)
+            setLocation('/')
           }
-          setLocation('/')
+          
           console.log(response)
         }}
       >

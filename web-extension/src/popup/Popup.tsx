@@ -20,7 +20,7 @@ import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
-import { sharedBrowserEvents } from '@src/backgroundPage'
+import { getAccessToken, sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
@@ -56,12 +56,20 @@ export const Popup: FunctionComponent = () => {
       label: 'bitfinex',
       icon: 'https://chakra-ui.com/favicon.png',
       lastUsed: new Date(),
-      originalUrl: 'http://google.com'
+      originalUrl: 'http://www.google.com'
     }
   ])
 
   useEffect(() => {
-    // setLocation('/login')
+   ;(async () => {
+     let token = await browser.storage.local.get('jid')
+
+     if(token) {
+       setLocation("/")
+     }else{
+       setLocation('/login')
+     }
+   })
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {

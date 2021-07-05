@@ -11,7 +11,7 @@ import { browser } from 'webextension-polyfill-ts'
 
 import {
   Box,
-  ChakraProvider,
+  Button,
   CircularProgress,
   Flex,
   Grid,
@@ -25,8 +25,10 @@ import { Trans } from '@lingui/macro'
 import { AddAuthSecretButton } from '../popup/AddAuthSecretButton'
 import { AuthsList } from '../popup/AuthsList'
 import { authenticator } from 'otplib'
+import {  useLocation } from 'wouter'
 
 export const Home: FunctionComponent = () => {
+  const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
 
   useInterval(() => {
@@ -45,7 +47,10 @@ export const Home: FunctionComponent = () => {
         />
         <AddAuthSecretButton />
         <Heading size="sm">
-          <Trans>Logout</Trans>
+          <Button colorScheme={"teal"} onClick={async () => {
+            await browser.storage.local.remove("jid")
+            setLocation('/login')
+          }}>Logout</Button>
         </Heading>
       </Flex>
       <Box height={200} width={300} p={5} mb={5}>
