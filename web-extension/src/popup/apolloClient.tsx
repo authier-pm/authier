@@ -5,10 +5,11 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { getAccessToken, setAccessToken } from '@src/util/accessToken'
+import { getAccessToken, setAccessToken } from '../backgroundPage'
 import { onError } from '@apollo/client/link/error'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode from 'jwt-decode'
+import { browser } from 'webextension-polyfill-ts'
 
 // const apiUrl = process.env.API_URL //'http://localhost:5050'
 const apiUrl = 'http://localhost:5050'
@@ -43,7 +44,8 @@ const tokenRefresh = new TokenRefreshLink({
       credentials: 'include'
     })
   },
-  handleFetch: (accessToken) => {
+  handleFetch: async (accessToken) => {
+    await browser.storage.local.set({jid: accessToken})
     setAccessToken(accessToken)
   },
   handleError: (err) => {
