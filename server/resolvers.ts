@@ -78,7 +78,7 @@ export class RootResolver {
   }
 
   @Mutation(() => Boolean)
-  async OTPEvent(@Arg("data") event: OTPEvent) {
+  async addOTPEvent(@Arg("data", () => OTPEvent) event: OTPEvent) {
     try {
       await prisma.oTPCodeEvent.create({
         data: {
@@ -135,8 +135,8 @@ export class RootResolver {
 
   @Mutation(() => LoginResponse)
   async login(
-    @Arg('email') email: string,
-    @Arg('password') password: string,
+    @Arg('email', () => String) email: string,
+    @Arg('password', () => String) password: string,
     @Ctx() Ctx: IContext
   ): Promise<LoginResponse> {
     const user = await prisma.user.findUnique({
@@ -156,9 +156,11 @@ export class RootResolver {
     }
 
     // //login successful
+    //@ts-expect-error
     sendRefreshToken(Ctx.reply, createRefreshToken(user))
 
     return {
+      //@ts-expect-error
       accessToken: createAccessToken(user)
     }
   }

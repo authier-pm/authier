@@ -22,7 +22,7 @@ import { i18n } from '@lingui/core'
 
 import { sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
-import { AuthsList } from './AuthsList'
+import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import cryptoJS from 'crypto-js'
 
@@ -60,17 +60,22 @@ export const Popup: FunctionComponent = () => {
     }
   ])
 
-  useEffect(() => {
-    // User auth
-   ;(async () => {
-     let token = await browser.storage.local.get('jid')
-
-     if(token) {
+  const isLoggedIn = async () => {
+    let token = await browser.storage.local.get("jid")
+      console.log(token)
+     if(token.jid) {
        setLocation("/")
+       return true
      }else{
        setLocation('/login')
+       return false
      }
-   })
+  }
+
+  useEffect(() => {
+    // User auth
+   isLoggedIn()
+  
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
