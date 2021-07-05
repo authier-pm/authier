@@ -13,7 +13,8 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    })
+    }),
+    new webpack.EnvironmentPlugin(['API_URL'])
   ],
   module: {
     rules: [
