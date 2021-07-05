@@ -23,8 +23,10 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
+
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
+
   return (
     <Box boxShadow="2xl" p="4" rounded="md" bg="white">
       <Stat>
@@ -71,7 +73,7 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 
 export const AuthsList = () => {
   const { auths } = useContext(AuthsContext)
-
+  
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -85,12 +87,11 @@ export const AuthsList = () => {
   return (
     <>
       {auths
-        .filter(({ originalUrl }) => {
+        .filter(({ originalUrl, secret }) => {
           if (!currentTabUrl || !originalUrl) {
             return true
           }
-
-          return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+         return extractHostname(originalUrl) === extractHostname(currentTabUrl)
         })
         .map((auth, i) => {
           return <OtpCode auth={auth} key={auth.label + i} />
