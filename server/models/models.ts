@@ -1,11 +1,11 @@
-import { Field, ObjectType } from 'type-graphql'
+import { Field, InputType, ObjectType } from 'type-graphql'
 
 @ObjectType()
 export class User {
   @Field(() => String)
   id: string
 
-  @Field(() => String)
+  @Field(() => String, {nullable: true})
   email?: string
 
   @Field(() => String)
@@ -25,4 +25,16 @@ export class User {
 export class LoginResponse {
   @Field(() => String)
   accessToken: string
+}
+
+@InputType()
+export class OTPEvent {
+  @Field(() => String)
+  kind: string
+
+  @Field(() => String)
+  url: string
+
+  @Field(() => String)
+  userId: string
 }

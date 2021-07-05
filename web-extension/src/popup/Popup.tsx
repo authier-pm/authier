@@ -20,7 +20,7 @@ import { Trans } from '@lingui/macro'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
-import { getAccessToken, sharedBrowserEvents } from '@src/backgroundPage'
+import { sharedBrowserEvents } from '@src/backgroundPage'
 import { AddAuthSecretButton } from './AddAuthSecretButton'
 import { AuthsList } from './AuthsList'
 import { authenticator } from 'otplib'
@@ -61,6 +61,7 @@ export const Popup: FunctionComponent = () => {
   ])
 
   useEffect(() => {
+    // User auth
    ;(async () => {
      let token = await browser.storage.local.get('jid')
 
