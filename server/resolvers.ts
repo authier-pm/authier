@@ -16,7 +16,7 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { LoginResponse, User } from './models/models'
+import { LoginResponse, OTPEvent, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
@@ -74,6 +74,22 @@ export class RootResolver {
     } catch (err) {
       console.log(err)
       return null
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async OTPEvent(@Arg("data") event: OTPEvent) {
+    try {
+      await prisma.oTPCodeEvent.create({
+        data: {
+          kind: event.kind,
+          url: event.url,
+          userId: event.userId,
+        }
+      })
+      return true
+    } catch (error) {
+      return false
     }
   }
 
