@@ -1,6 +1,6 @@
-import { Heading } from '@chakra-ui/react'
 import Head from 'next/head'
 import React from 'react'
+import { PageHeading } from '../components/PageHeading'
 
 export default function Features() {
   return (
@@ -8,7 +8,7 @@ export default function Features() {
       <Head>
         <title>Features</title>
       </Head>
-      <Heading> Features</Heading>
+      <PageHeading>Features</PageHeading>
     </>
   )
 }

@@ -105,9 +105,7 @@ export function ChakraLayout({ children }) {
         ) : null}
       </Box>
 
-      <Box p={4} mt={9}>
-        {children}
-      </Box>
+      {children}
     </ChakraProvider>
   )
 }

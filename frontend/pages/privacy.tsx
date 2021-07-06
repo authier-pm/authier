@@ -1,5 +1,6 @@
 import Head from 'next/head'
 import React from 'react'
+import { PageHeading } from '../components/PageHeading'
 
 export default function Privacy() {
   return (
@@ -7,7 +8,7 @@ export default function Privacy() {
       <Head>
         <title>Authier - privacy</title>
       </Head>
-      Privacy policy
+      <PageHeading>Privacy policy</PageHeading>
     </>
   )
 }

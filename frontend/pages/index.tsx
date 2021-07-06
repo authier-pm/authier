@@ -52,7 +52,14 @@ export default function Home() {
 
 const SignUpHero = () => {
   return (
-    <Box px={8} py={24} mx="auto">
+    <Center
+      px={8}
+      py={24}
+      mx="auto"
+      bg='linear-gradient(#0000007f, rgba(255,255,255,.5)), url("/assets/silas-kohler-C1P4wHhQbjM-unsplash.jpg")'
+      bgSize="cover"
+      minH="90vh"
+    >
       <SimpleGrid
         alignItems="center"
         w={{ base: 'full', xl: 11 / 12 }}
@@ -83,9 +90,20 @@ const SignUpHero = () => {
           ></chakra.p>
         </GridItem>
         <GridItem colSpan={{ base: 'auto', md: 4 }}>
-          <Box as="form" mb={6} rounded="lg" shadow="xl">
+          <Box
+            as="form"
+            mb={6}
+            rounded="lg"
+            shadow="xl"
+            bgColor="whiteAlpha.300"
+            bgBlendMode="darken"
+            boxShadow="dark-lg"
+            dropShadow="lg"
+          >
             <Center pb={0} color={useColorModeValue('gray.700', 'gray.600')}>
-              <Text pt={2}>Start talking now</Text>
+              <Text pt={2} fontSize="md" mt={3}>
+                Two fields should suffice
+              </Text>
             </Center>
             <SimpleGrid
               columns={1}
@@ -97,7 +115,13 @@ const SignUpHero = () => {
             >
               <Flex>
                 <VisuallyHidden>First Name</VisuallyHidden>
-                <Input mt={0} type="text" placeholder="First Name" required />
+                <Input
+                  mt={0}
+                  type="text"
+                  placeholder="First Name"
+                  required
+                  bgColor="white"
+                />
               </Flex>
               <Flex>
                 <VisuallyHidden>Email Address</VisuallyHidden>
@@ -106,13 +130,20 @@ const SignUpHero = () => {
                   type="email"
                   placeholder="Email Address"
                   required
+                  bgColor="white"
                 />
               </Flex>
               <Flex>
                 <VisuallyHidden>Password</VisuallyHidden>
-                <Input mt={0} type="password" placeholder="Password" required />
+                <Input
+                  mt={0}
+                  type="password"
+                  placeholder="Password"
+                  required
+                  bgColor="white"
+                />
               </Flex>
-              <Button colorScheme="green" w="full" py={2} type="submit">
+              <Button colorScheme="teal" w="full" py={2} type="submit">
                 Sign up for free
               </Button>
             </SimpleGrid>
@@ -123,6 +154,6 @@ const SignUpHero = () => {
           </chakra.p>
         </GridItem>
       </SimpleGrid>
-    </Box>
+    </Center>
   )
 }
