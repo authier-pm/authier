@@ -95,3 +95,8 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 - [Chrome Extension Developer Guide](https://developer.chrome.com/extensions/devguide)
 - [Firefox Extension Developer Guide](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Your_first_WebExtension)
 - [Eslint + Prettier + Typescript Guide](https://dev.to/robertcoopercode/using-eslint-and-prettier-in-a-typescript-project-53jb)
+
+## Two modes
+
+- strict: you never have your codes on another device other than your primary phone. One code only is sent to the device from your phone after every biometric verification.
+- lax: your codes are decrypted on your devices too. You can choose a timeout to lock the vault. When unlocked, all the OTP codes are filled effortlessly without the need for your primary phone.
