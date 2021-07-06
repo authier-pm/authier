@@ -78,13 +78,14 @@ export class RootResolver {
   }
 
   @Mutation(() => Boolean)
-  async addOTPEvent(@Arg("data", () => OTPEvent) event: OTPEvent) {
+  async addOTPEvent(@Arg('data', () => OTPEvent) event: OTPEvent) {
     try {
       await prisma.oTPCodeEvent.create({
         data: {
           kind: event.kind,
           url: event.url,
           userId: event.userId,
+          ipAdress: '1'
         }
       })
       return true
@@ -93,7 +94,7 @@ export class RootResolver {
     }
   }
 
-  @Mutation(() => Boolean)
+  @Mutation(() => LoginResponse)
   async register(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string
@@ -101,16 +102,19 @@ export class RootResolver {
     const hashedPassword = await hash(password, 12)
 
     try {
-      await prisma.user.create({
+      let user = await prisma.user.create({
         data: {
           email: email,
           password: hashedPassword
         }
       })
-      return true
+      return {
+        //@ts-expect-error
+        accessToken: createAccessToken(user)
+      }
     } catch (err) {
-      console.log(err)
-      return false
+      throw new Error('Register failed')
+      //return false
     }
   }
 

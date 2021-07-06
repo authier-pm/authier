@@ -18,7 +18,7 @@ type Mutation {
   """you need to be authenticated to call this resolver"""
   authenticated: String!
   addOTPEvent(data: OTPEvent!): Boolean!
-  register(password: String!, email: String!): Boolean!
+  register(password: String!, email: String!): LoginResponse!
   revokeRefreshTokensForUser(userId: String!): Boolean!
   login(password: String!, email: String!): LoginResponse!
 }

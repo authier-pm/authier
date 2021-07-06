@@ -5,7 +5,7 @@ export class User {
   @Field(() => String)
   id: string
 
-  @Field(() => String, {nullable: true})
+  @Field(() => String, { nullable: true })
   email?: string
 
   @Field(() => String)

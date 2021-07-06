@@ -1,13 +1,11 @@
-import jwtDecode from "jwt-decode"
-import { browser } from "webextension-polyfill-ts"
+import jwtDecode from 'jwt-decode'
+import { browser } from 'webextension-polyfill-ts'
 
 export let accessToken = ''
-export let tokenFromLocalStorage = async () => {
-  let obj = await browser.storage.local.get("jid")
-  
+export let tokenFromLocalStorage = async (): Promise<string> => {
+  let obj = await browser.storage.local.get('jid')
   return obj.jid
 }
-
 
 export const setAccessToken = (s: string) => {
   accessToken = s
