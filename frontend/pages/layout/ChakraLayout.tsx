@@ -111,3 +111,5 @@ export function ChakraLayout({ children }) {
     </ChakraProvider>
   )
 }
+
+export default ChakraLayout
