@@ -21,7 +21,7 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['String'];
   addOTPEvent: Scalars['Boolean'];
-  register: Scalars['Boolean'];
+  register: LoginResponse;
   revokeRefreshTokensForUser: Scalars['Boolean'];
   login: LoginResponse;
 };

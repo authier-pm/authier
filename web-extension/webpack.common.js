@@ -14,7 +14,9 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
-    new webpack.EnvironmentPlugin(['API_URL'])
+    new webpack.EnvironmentPlugin({
+      API_URL: 'http://localhost:5051/graphql'
+    })
   ],
   module: {
     rules: [

@@ -16,6 +16,8 @@ import { useRegisterMutation } from './Register.codegen'
 import ErrorMessage from '@src/components/ErrorMessage'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
+import { browser } from 'webextension-polyfill-ts'
+import { setAccessToken } from '@src/util/accessToken'
 
 interface Values {
   password: string
@@ -42,8 +44,15 @@ export default function Register(): ReactElement {
           const response = await register({
             variables: { email: values.email, password: values.password }
           })
-          setSubmitting(false)
-          setLocation('/')
+
+          if (response && response.data) {
+            await browser.storage.local.set({
+              jid: response.data.register.accessToken
+            })
+            setSubmitting(false)
+            setAccessToken(response.data.register.accessToken)
+            setLocation('/QRcode')
+          }
           console.log(response)
         }}
       >

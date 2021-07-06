@@ -29,6 +29,7 @@ import cryptoJS from 'crypto-js'
 import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
+import QRcode from '@src/pages/QRcode'
 
 i18n.activate('en')
 
@@ -61,21 +62,21 @@ export const Popup: FunctionComponent = () => {
   ])
 
   const isLoggedIn = async () => {
-    let token = await browser.storage.local.get("jid")
-      console.log(token)
-     if(token.jid) {
-       setLocation("/")
-       return true
-     }else{
-       setLocation('/login')
-       return false
-     }
+    let token = await browser.storage.local.get('jid')
+    //console.log(token)
+    if (token.jid) {
+      setLocation('/')
+      return true
+    } else {
+      setLocation('/login')
+      return false
+    }
   }
 
   useEffect(() => {
     // User auth
-   isLoggedIn()
-  
+    isLoggedIn()
+
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -128,6 +129,7 @@ export const Popup: FunctionComponent = () => {
             <Route path="/settings" component={Settings} />
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
+            <Route path="/QRcode" component={QRcode} />
           </Switch>
         </I18nProvider>
       </AuthsContext.Provider>
