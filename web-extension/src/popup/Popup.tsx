@@ -30,6 +30,8 @@ import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
+import { useIsLoggedInQuery } from './Popup.codegen'
+import { setAccessToken, tokenFromLocalStorage } from '@src/util/accessToken'
 
 i18n.activate('en')
 
@@ -47,6 +49,9 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
+  const { data, loading, error } = useIsLoggedInQuery({
+    fetchPolicy: 'network-only'
+  })
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
@@ -61,21 +66,15 @@ export const Popup: FunctionComponent = () => {
     }
   ])
 
-  const isLoggedIn = async () => {
-    let token = await browser.storage.local.get('jid')
-    //console.log(token)
-    if (token.jid) {
-      setLocation('/')
-      return true
-    } else {
-      setLocation('/login')
-      return false
-    }
-  }
+  //ADD LOADING SCREEN
 
   useEffect(() => {
     // User auth
-    isLoggedIn()
+    if (data) {
+      setLocation('/')
+    } else {
+      setLocation('/login')
+    }
 
     browser.runtime.sendMessage({ popupMounted: true })
 
@@ -90,7 +89,7 @@ export const Popup: FunctionComponent = () => {
     })
     ;(async () => {
       const storage = await browser.storage.local.get()
-
+      console.log(storage)
       if (storage.encryptedAuthsMasterPassword) {
         const decryptedAuths = cryptoJS.AES.decrypt(
           storage.encryptedAuthsMasterPassword,
@@ -101,7 +100,7 @@ export const Popup: FunctionComponent = () => {
         setAuths(JSON.parse(decryptedAuths))
       }
     })()
-  }, [])
+  }, [data])
 
   return (
     <ChakraProvider>

@@ -5,7 +5,11 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { getAccessToken, setAccessToken } from '../util/accessToken'
+import {
+  getAccessToken,
+  setAccessToken,
+  tokenFromLocalStorage
+} from '../util/accessToken'
 import { onError } from '@apollo/client/link/error'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode from 'jwt-decode'
@@ -63,9 +67,11 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
     )
   if (networkError) console.log(`[Network error]: ${networkError}`)
 })
-const authLink = setContext((_, { headers }) => {
+
+const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
-  const accessToken = getAccessToken()
+  const accessToken = await tokenFromLocalStorage()
+  console.log(accessToken)
   //return the headers to the context so httpLink can read them
   return {
     headers: {
