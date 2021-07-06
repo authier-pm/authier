@@ -1,18 +1,15 @@
 import React, { ReactNode } from 'react'
 
 import Head from 'next/head'
-import { extendTheme } from '@chakra-ui/react'
 import {
   chakra,
   Box,
   GridItem,
   useColorModeValue,
   Button,
-  Stack,
   Text,
   Center,
   Flex,
-  Icon,
   SimpleGrid,
   VisuallyHidden,
   Input

@@ -12,7 +12,6 @@ import {
   MenuItem,
   MenuDivider,
   useDisclosure,
-  useColorModeValue,
   Image,
   Stack
 } from '@chakra-ui/react'
@@ -37,7 +36,11 @@ export function ChakraLayout({ children }) {
           <HStack spacing={8} alignItems={'center'}>
             <Link href="/">
               <Box cursor="pointer" zIndex={100}>
-                <Image boxSize={'110px'} mt={30} src="/assets/logos/logo.png"></Image>
+                <Image
+                  boxSize={'110px'}
+                  mt={30}
+                  src="/assets/logos/logo.png"
+                ></Image>
               </Box>
             </Link>
 
@@ -102,7 +105,9 @@ export function ChakraLayout({ children }) {
         ) : null}
       </Box>
 
-      <Box p={4} mt={9}>{children}</Box>
+      <Box p={4} mt={9}>
+        {children}
+      </Box>
     </ChakraProvider>
   )
 }
