@@ -40,6 +40,7 @@ export const Settings: FunctionComponent = () => {
     >
       <Button leftIcon={<InfoOutlineIcon />}>About</Button>
       <Button leftIcon={<AddIcon />}>Add device</Button>
+      <Button>Register</Button>
     </ButtonGroup>
   )
 }

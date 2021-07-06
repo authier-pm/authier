@@ -11,13 +11,18 @@ export type RegisterMutationVariables = Types.Exact<{
 
 export type RegisterMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'register'>
+  & { register: (
+    { __typename?: 'LoginResponse' }
+    & Pick<Types.LoginResponse, 'accessToken'>
+  ) }
 );
 
 
 export const RegisterDocument = gql`
     mutation Register($email: String!, $password: String!) {
-  register(email: $email, password: $password)
+  register(email: $email, password: $password) {
+    accessToken
+  }
 }
     `;
 export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
