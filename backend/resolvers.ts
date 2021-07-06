@@ -114,7 +114,6 @@ export class RootResolver {
       }
     } catch (err) {
       throw new Error('Register failed')
-      //return false
     }
   }
 
