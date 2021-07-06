@@ -43,7 +43,7 @@ const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    return await fetch(`${apiUrl}/refresh_token`, {
+    return await fetch(`http://localhost:5051/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })
@@ -70,8 +70,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
-  const accessToken = await tokenFromLocalStorage()
-  console.log(accessToken)
+  const accessToken = getAccessToken() //await tokenFromLocalStorage() <=== choose what to use??
   //return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -81,6 +80,6 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 export const apolloClient = new ApolloClient({
-  link: ApolloLink.from([errorLink, tokenRefresh, authLink, httpLink]),
+  link: ApolloLink.from([tokenRefresh, errorLink, authLink, httpLink]),
   cache: new InMemoryCache()
 })

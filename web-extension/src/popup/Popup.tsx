@@ -31,7 +31,6 @@ import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
 import { useIsLoggedInQuery } from './Popup.codegen'
-import { setAccessToken, tokenFromLocalStorage } from '@src/util/accessToken'
 
 i18n.activate('en')
 

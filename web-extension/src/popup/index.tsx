@@ -9,7 +9,7 @@ import { apolloClient } from './apolloClient'
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
-      <Popup />
+      <App />
     </ApolloProvider>,
     document.getElementById('popup')
   )

@@ -77,6 +77,9 @@ export class RootResolver {
     }
   }
 
+  // @Mutation()
+  // async addDevice() {}
+
   @Mutation(() => Boolean)
   async addOTPEvent(@Arg('data', () => OTPEvent) event: OTPEvent) {
     try {
