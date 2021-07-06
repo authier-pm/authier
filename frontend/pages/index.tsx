@@ -89,7 +89,7 @@ const SignUpHero = () => {
             letterSpacing="wider"
           ></chakra.p>
         </GridItem>
-        <GridItem colSpan={{ base: 'auto', md: 4 }}>
+        <GridItem colSpan={{ base: 'auto', md: 4 }} maxW={550}>
           <Box
             as="form"
             mb={6}
