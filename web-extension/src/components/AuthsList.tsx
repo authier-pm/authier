@@ -17,20 +17,19 @@ import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/executeScriptInCurrentTab'
 import { extractHostname } from '../popup/extractHostname'
-import {useAddOtpEventMutation} from './AuthList.codegen'
+import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
 
-
 const OtpCode = ({ auth }: { auth: IAuth }) => {
-  const [addOTPEvent, {data, loading, error}] = useAddOtpEventMutation() //ignore results??
+  const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(auth.secret)
+
+  const [showWhole, setShowWhole] = useState(false)
+  const { onCopy } = useClipboard(otpCode)
 
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
-
-  const [showWhole, setShowWhole] = useState(false)
-  const { onCopy } = useClipboard(otpCode)
 
   return (
     <Box boxShadow="2xl" p="4" rounded="md" bg="white">
@@ -45,15 +44,19 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
                 setShowWhole(!showWhole)
                 if (!showWhole) {
                   // CHECK
-                   let tabs =  await browser.tabs.query({active: true, lastFocusedWindow: true})
-                   let url =  tabs[0].url as string
-                   let unecryptedToken: any = await getUserFromToken()
-                    await addOTPEvent({variables: {
-                      kind: "show OTP",
+                  let tabs = await browser.tabs.query({
+                    active: true,
+                    lastFocusedWindow: true
+                  })
+                  let url = tabs[0].url as string
+                  let unecryptedToken: any = await getUserFromToken()
+                  await addOTPEvent({
+                    variables: {
+                      kind: 'show OTP',
                       url: url,
-                      userId: unecryptedToken.userId as string 
-                    }})
-                  
+                      userId: unecryptedToken.userId as string
+                    }
+                  })
                 }
               }}
             >
@@ -87,7 +90,7 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 
 export const AuthsList = () => {
   const { auths } = useContext(AuthsContext)
-  
+
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
   useEffect(() => {
@@ -105,7 +108,7 @@ export const AuthsList = () => {
           if (!currentTabUrl || !originalUrl) {
             return true
           }
-         return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+          return extractHostname(originalUrl) === extractHostname(currentTabUrl)
         })
         .map((auth, i) => {
           return <OtpCode auth={auth} key={auth.label + i} />
