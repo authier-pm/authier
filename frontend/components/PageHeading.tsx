@@ -3,7 +3,7 @@ import React from 'react'
 
 export function PageHeading({ children }) {
   return (
-    <Heading ml={150} mt={6}>
+    <Heading ml={150} my={6}>
       {' '}
       {children}
     </Heading>
