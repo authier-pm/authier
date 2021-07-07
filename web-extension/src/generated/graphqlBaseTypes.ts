@@ -20,10 +20,18 @@ export type Mutation = {
   __typename?: 'Mutation';
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['String'];
+  addDevice: Scalars['Boolean'];
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
   revokeRefreshTokensForUser: Scalars['Boolean'];
   login: LoginResponse;
+};
+
+
+export type MutationAddDeviceArgs = {
+  userId: Scalars['String'];
+  firstIpAdress: Scalars['String'];
+  name: Scalars['String'];
 };
 
 
@@ -60,6 +68,12 @@ export type Query = {
   authenticated: Scalars['String'];
   users: Array<User>;
   me?: Maybe<User>;
+  DeviceCount: Scalars['Int'];
+};
+
+
+export type QueryDeviceCountArgs = {
+  userId: Scalars['String'];
 };
 
 export type User = {

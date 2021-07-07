@@ -3,6 +3,7 @@ type Query {
   authenticated: String!
   users: [User!]!
   me: User
+  DeviceCount(userId: String!): Int!
 }
 
 type User {
@@ -17,6 +18,7 @@ type User {
 type Mutation {
   """you need to be authenticated to call this resolver"""
   authenticated: String!
+  addDevice(userId: String!, firstIpAdress: String!, name: String!): Boolean!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(password: String!, email: String!): LoginResponse!
   revokeRefreshTokensForUser(userId: String!): Boolean!

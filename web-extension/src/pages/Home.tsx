@@ -25,7 +25,8 @@ import { Trans } from '@lingui/macro'
 import { AddAuthSecretButton } from '../popup/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
-import {  useLocation } from 'wouter'
+import { useLocation } from 'wouter'
+import { removeToken } from '@src/util/accessToken'
 
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
@@ -47,10 +48,16 @@ export const Home: FunctionComponent = () => {
         />
         <AddAuthSecretButton />
         <Heading size="sm">
-          <Button colorScheme={"teal"} onClick={async () => {
-            await browser.storage.local.remove("jid")
-            setLocation('/login')
-          }}>Logout</Button>
+          <Button
+            colorScheme={'teal'}
+            onClick={async () => {
+              await browser.storage.local.remove('jid')
+              removeToken()
+              setLocation('/login')
+            }}
+          >
+            Logout
+          </Button>
         </Heading>
       </Flex>
       <Box height={200} width={300} p={5} mb={5}>

@@ -6,23 +6,45 @@ import { AppRegistry, StyleSheet, Text, TouchableOpacity } from 'react-native';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AuthsContext } from '../Providers';
+import { useAddDeviceMutation } from './Scan.codegen';
+import { NetworkInfo } from 'react-native-network-info';
 
 const Scan = ({ navigation }) => {
+  const [addDevice, { data, error }] = useAddDeviceMutation();
   const { setAuths, auths } = useContext(AuthsContext);
 
-  const onSuccess = (e: { data: string }) => {
-    // const qrDataParts = e.data.split('?secret=');
-    // setAuths([
-    //   {
-    //     secret: qrDataParts[1],
-    //     icon: 'test',
-    //     label: decodeURIComponent(
-    //       qrDataParts[0].replace('otpauth://totp/', '')
-    //     ),
-    //   },
-    //   ...auths,
-    // ]);
-    // navigation.navigate('AuthList');
+  if (error) console.log(`Error! ${error}`);
+
+  const onSuccess = async (e: { data: string }) => {
+    if (e.data.search('secret')) {
+      const qrDataParts = e.data.split('?secret=');
+      setAuths([
+        {
+          secret: qrDataParts[1],
+          icon: 'test',
+          label: decodeURIComponent(
+            qrDataParts[0].replace('otpauth://totp/', '')
+          ),
+        },
+        ...auths,
+      ]);
+      navigation.navigate('Home');
+    } else {
+      let ip = await NetworkInfo.getIPV4Address().then((ipv4Address) => {
+        return ipv4Address;
+      });
+      // Save ID to storage
+      await addDevice({
+        variables: {
+          userId: e.data,
+          name: 'test',
+          firstIpAdress: ip as string,
+        },
+      });
+      console.log(data);
+      navigation.navigate('Home');
+    }
+
     console.log(e);
   };
 
