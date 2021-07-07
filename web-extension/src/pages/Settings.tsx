@@ -11,6 +11,7 @@ import { Flex, Button, ButtonGroup } from '@chakra-ui/react'
 
 import { InfoOutlineIcon, AddIcon } from '@chakra-ui/icons'
 import { useByeQuery } from './Settings.codegen'
+import { Link } from 'wouter'
 
 export const Settings: FunctionComponent = () => {
   const { data, loading, error } = useByeQuery({ fetchPolicy: 'network-only' })
@@ -39,7 +40,9 @@ export const Settings: FunctionComponent = () => {
       mt="10px"
     >
       <Button leftIcon={<InfoOutlineIcon />}>About</Button>
-      <Button leftIcon={<AddIcon />}>Add device</Button>
+      <Link to={'/QRcode'}>
+        <Button leftIcon={<AddIcon />}>Add device</Button>
+      </Link>
       <Button>Register</Button>
     </ButtonGroup>
   )

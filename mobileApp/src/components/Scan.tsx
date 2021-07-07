@@ -11,23 +11,24 @@ const Scan = ({ navigation }) => {
   const { setAuths, auths } = useContext(AuthsContext);
 
   const onSuccess = (e: { data: string }) => {
-    const qrDataParts = e.data.split('?secret=');
-    setAuths([
-      {
-        secret: qrDataParts[1],
-        icon: 'test',
-        label: decodeURIComponent(
-          qrDataParts[0].replace('otpauth://totp/', '')
-        ),
-      },
-      ...auths,
-    ]);
-    navigation.navigate('AuthList');
+    // const qrDataParts = e.data.split('?secret=');
+    // setAuths([
+    //   {
+    //     secret: qrDataParts[1],
+    //     icon: 'test',
+    //     label: decodeURIComponent(
+    //       qrDataParts[0].replace('otpauth://totp/', '')
+    //     ),
+    //   },
+    //   ...auths,
+    // ]);
+    // navigation.navigate('AuthList');
     console.log(e);
   };
 
   return (
     <QRCodeScanner
+      showMarker={true}
       onRead={onSuccess}
       //@ts-ignore
       flashMode={RNCamera.Constants.FlashMode.auto}

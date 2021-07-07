@@ -4,9 +4,15 @@ import React, {
   SetStateAction,
   useState,
 } from 'react';
+import {
+  ApolloClient,
+  ApolloProvider,
+  NormalizedCacheObject,
+} from '@apollo/client';
 import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from './navigation/HomeScreen';
+import { apoloCLient } from './ApolloClient';
 
 export const AuthsContext = createContext<{
   auths: Array<any>;
@@ -25,10 +31,14 @@ export const Providers: React.FC<{}> = () => {
   ]);
 
   return (
-    <AuthsContext.Provider value={{ auths, setAuths }}>
-      <NavigationContainer>
-        <HomeScreen />
-      </NavigationContainer>
-    </AuthsContext.Provider>
+    <ApolloProvider
+      client={apoloCLient as unknown as ApolloClient<NormalizedCacheObject>} //WTF IS THIS
+    >
+      <AuthsContext.Provider value={{ auths, setAuths }}>
+        <NavigationContainer>
+          <HomeScreen />
+        </NavigationContainer>
+      </AuthsContext.Provider>
+    </ApolloProvider>
   );
 };
