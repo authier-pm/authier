@@ -11,6 +11,10 @@ export const setAccessToken = (s: string) => {
   accessToken = s
 }
 
+export const removeToken = () => {
+  accessToken = ''
+}
+
 export const getAccessToken = () => {
   return accessToken
 }

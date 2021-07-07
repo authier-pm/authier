@@ -5,17 +5,17 @@ datasource db {
 }
 
 generator client {
-    provider = "prisma-client-js"
-    //previewFeatures = ["nApi"]
+    provider        = "prisma-client-js"
+    previewFeatures = ["selectRelationCount"]
 }
 
 model EncryptedAuths {
     id        Int    @id @default(autoincrement())
-    encrypted String @db.Text
+    encrypted String
     version   Int
 
     User   User   @relation(fields: [userId], references: [id])
-    userId String @db.Uuid
+    userId String
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -23,11 +23,11 @@ model EncryptedAuths {
 
 model Device {
     id            Int      @id @default(autoincrement())
-    firstIpAdress String   @db.Inet
-    lastIpAdress  String   @db.Inet
+    firstIpAdress String
+    lastIpAdress  String
     name          String
+    userId        String
     User          User     @relation(fields: [userId], references: [id])
-    userId        String   @db.Uuid
     createdAt     DateTime @default(now())
     updatedAt     DateTime @updatedAt
 }
@@ -36,10 +36,10 @@ model OTPCodeEvent {
     id            BigInt       @id @default(autoincrement())
     kind          String
     timestamp     DateTime     @default(now())
-    ipAdress      String       @db.Inet
-    url           String       @db.VarChar(2048)
+    ipAdress      String
+    url           String
     User          User         @relation(fields: [userId], references: [id])
-    userId        String       @db.Uuid
+    userId        String
     webOTPInputId Int?
     WebOTPInput   WebOTPInput? @relation(fields: [webOTPInputId], references: [id])
 }
@@ -48,15 +48,15 @@ model WebOTPInput {
     id              Int            @id @default(autoincrement())
     kind            String
     createdAt       DateTime       @default(now())
-    url             String         @db.VarChar(2048)
+    url             String
     domPath         String
     createdByUser   User           @relation(fields: [createdByUserId], references: [id])
-    createdByUserId String         @db.Uuid
+    createdByUserId String
     OTPCodeEvent    OTPCodeEvent[]
 }
 
 model User {
-    id           String          @id @default(uuid()) @db.Uuid
+    id           String          @id @default(uuid())
     email        String?         @unique
     phone_number String?         @unique
     account_name String?         @unique
@@ -83,7 +83,7 @@ model Token {
 
     // Relation fields
     user   User   @relation(fields: [userId], references: [id])
-    userId String @db.Uuid
+    userId String
 }
 
 enum TokenType {

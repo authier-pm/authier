@@ -90,7 +90,7 @@ export class RootResolver {
           name: name,
           userId: userId,
           firstIpAdress: firstIpAdress,
-          lastIpAdress: '?'
+          lastIpAdress: '192.168.100.128/25'
         }
       })
       return true
@@ -101,9 +101,13 @@ export class RootResolver {
   }
 
   @Query(() => Int)
-  async Devices() {
+  async DeviceCount(@Arg('userId', () => String) userId: string) {
     try {
-      return await prisma.device.count()
+      return await prisma.device.count({
+        where: {
+          userId: userId
+        }
+      })
     } catch (error) {
       console.log(error)
       return 0
@@ -123,6 +127,7 @@ export class RootResolver {
       })
       return true
     } catch (error) {
+      console.log(error)
       return false
     }
   }
