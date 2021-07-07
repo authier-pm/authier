@@ -44,12 +44,11 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
                 setShowWhole(!showWhole)
                 if (!showWhole) {
                   // CHECK
-                  let tabs = await browser.tabs.query({
-                    active: true,
-                    lastFocusedWindow: true
-                  })
+                  let tabs = await browser.tabs.query({ active: true })
+
                   let url = tabs[0].url as string
                   let unecryptedToken: any = await getUserFromToken()
+
                   await addOTPEvent({
                     variables: {
                       kind: 'show OTP',
@@ -57,6 +56,7 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
                       userId: unecryptedToken.userId as string
                     }
                   })
+                  console.log(data, error)
                 }
               }}
             >
