@@ -1,0 +1,36 @@
+type Query {
+  """you need to be authenticated to call this resolver"""
+  authenticated: String!
+  users: [User!]!
+  me: User
+  Devices: Int!
+}
+
+type User {
+  id: String!
+  email: String
+  phone_number: String!
+  account_name: String!
+  password: String!
+  tokenVersion: Float!
+}
+
+type Mutation {
+  """you need to be authenticated to call this resolver"""
+  authenticated: String!
+  addDevice(userId: String!, firstIpAdress: String!, name: String!): Boolean!
+  addOTPEvent(data: OTPEvent!): Boolean!
+  register(password: String!, email: String!): LoginResponse!
+  revokeRefreshTokensForUser(userId: String!): Boolean!
+  login(password: String!, email: String!): LoginResponse!
+}
+
+input OTPEvent {
+  kind: String!
+  url: String!
+  userId: String!
+}
+
+type LoginResponse {
+  accessToken: String!
+}

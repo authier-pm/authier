@@ -15,8 +15,10 @@ export default function QRcode() {
   }, [])
 
   return (
-    <Flex>
-      <Heading>Scan with mobile to sync profile</Heading>
+    <Flex flexDirection="column">
+      {/* <Heading size="md" as="h3">
+        Scan with mobile to sync profile
+      </Heading> */}
       <QRCode value={token} />
     </Flex>
   )
