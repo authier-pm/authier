@@ -1,0 +1,3 @@
+mutation addDevice($userId: String!, $name: String!, $firstIpAdress: String!) {
+  addDevice(userId: $userId, name: $name, firstIpAdress: $firstIpAdress)
+}

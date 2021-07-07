@@ -10,7 +10,8 @@ import {
   Mutation,
   Arg,
   Ctx,
-  UseMiddleware
+  UseMiddleware,
+  Int
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
@@ -77,8 +78,37 @@ export class RootResolver {
     }
   }
 
-  // @Mutation()
-  // async addDevice() {}
+  @Mutation(() => Boolean)
+  async addDevice(
+    @Arg('name', () => String) name: string,
+    @Arg('firstIpAdress', () => String) firstIpAdress: string,
+    @Arg('userId', () => String) userId: string
+  ) {
+    try {
+      await prisma.device.create({
+        data: {
+          name: name,
+          userId: userId,
+          firstIpAdress: firstIpAdress,
+          lastIpAdress: '?'
+        }
+      })
+      return true
+    } catch (error) {
+      console.log(error)
+      return false
+    }
+  }
+
+  @Query(() => Int)
+  async Devices() {
+    try {
+      return await prisma.device.count()
+    } catch (error) {
+      console.log(error)
+      return 0
+    }
+  }
 
   @Mutation(() => Boolean)
   async addOTPEvent(@Arg('data', () => OTPEvent) event: OTPEvent) {
