@@ -49,9 +49,10 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
-  const { data, loading, error } = useIsLoggedInQuery({
-    fetchPolicy: 'network-only'
-  })
+  // const { data, loading, error } = useIsLoggedInQuery({
+  //   fetchPolicy: 'network-only',
+  //   onError: (er) => console.log(er)
+  // })
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
@@ -69,12 +70,14 @@ export const Popup: FunctionComponent = () => {
   //ADD LOADING SCREEN
 
   useEffect(() => {
-    // User auth
-    if (data) {
-      setLocation('/')
-    } else {
-      setLocation('/login')
-    }
+    setLocation('/login')
+    // console.log(data)
+    // // //User auth
+    // if (data) {
+    //   setLocation('/')
+    // } else {
+    //   setLocation('/login')
+    // }
 
     browser.runtime.sendMessage({ popupMounted: true })
 
@@ -89,7 +92,7 @@ export const Popup: FunctionComponent = () => {
     })
     ;(async () => {
       const storage = await browser.storage.local.get()
-      console.log(storage)
+      //console.log(storage)
       if (storage.encryptedAuthsMasterPassword) {
         const decryptedAuths = cryptoJS.AES.decrypt(
           storage.encryptedAuthsMasterPassword,
@@ -100,7 +103,7 @@ export const Popup: FunctionComponent = () => {
         setAuths(JSON.parse(decryptedAuths))
       }
     })()
-  }, [data])
+  }, [])
 
   return (
     <ChakraProvider>

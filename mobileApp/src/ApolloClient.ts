@@ -2,7 +2,7 @@ import { onError } from '@apollo/client/link/error';
 import { ApolloClient, InMemoryCache, from } from '@apollo/client';
 import { createHttpLink } from 'apollo-link-http';
 import Config from 'react-native-config';
-
+//REVERSE PORTS adb reverse tcp:5051 tcp:5051
 const httpLink = createHttpLink({
   uri: Config.API_URL,
 });

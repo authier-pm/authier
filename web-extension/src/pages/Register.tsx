@@ -30,30 +30,33 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
 
+  if (registerError) {
+    console.log(registerError)
+  }
+
   return (
     <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={6} boxShadow="lg">
       <Flex alignItems="center" justifyContent="center">
         <Heading>Create account</Heading>
       </Flex>
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={{ email: 'bob@bob.com', password: 'bob' }}
         onSubmit={async (
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const response = await register({
+          let res = await register({
             variables: { email: values.email, password: values.password }
           })
-
-          if (response && response.data) {
+          console.log('register', res)
+          if (res) {
             await browser.storage.local.set({
-              jid: response.data.register.accessToken
+              jid: res.data?.register.accessToken
             })
+            setAccessToken(res.data?.register.accessToken as string)
             setSubmitting(false)
-            setAccessToken(response.data.register.accessToken)
             setLocation('/QRcode')
           }
-          console.log(response)
         }}
       >
         {(props) => (

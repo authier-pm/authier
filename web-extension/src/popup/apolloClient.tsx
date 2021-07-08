@@ -54,7 +54,7 @@ const tokenRefresh = new TokenRefreshLink({
   },
   handleError: (err) => {
     console.warn('Your refresh token is invalid. Try to login again')
-    console.error(err)
+    console.error('inApolo error', err)
   }
 })
 // Log any GraphQL errors or network error that occurred
@@ -70,7 +70,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
-  const accessToken = getAccessToken() //await tokenFromLocalStorage() <=== choose what to use??
+  const accessToken = await tokenFromLocalStorage() //<=== choose what to use??
   //return the headers to the context so httpLink can read them
   return {
     headers: {

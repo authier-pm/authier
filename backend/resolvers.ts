@@ -41,6 +41,7 @@ export class RootResolver {
   })
   @UseMiddleware(isAuth)
   authenticated(@Ctx() Ctx: IContext) {
+    console.log('good')
     return `your user ud is: ${Ctx.payload?.userId}`
   }
   @Mutation(() => String, {
@@ -146,6 +147,7 @@ export class RootResolver {
           password: hashedPassword
         }
       })
+      console.log('registered')
       return {
         //@ts-expect-error
         accessToken: createAccessToken(user)
