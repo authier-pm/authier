@@ -16,20 +16,18 @@ import { Link } from 'wouter'
 export const Settings: FunctionComponent = () => {
   const { data, loading, error } = useByeQuery({ fetchPolicy: 'network-only' })
 
-  if (data) {
-    console.log(data)
-  }
-
   if (error) {
     console.log(error)
   }
 
-  if (loading) {
-    return <div>Loading</div>
-  }
+  // if (loading) {
+  //   return <div>Loading</div>
+  // }
 
   if (!data) {
     console.log('no data')
+  } else {
+    console.log(data)
   }
 
   return (

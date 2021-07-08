@@ -13,10 +13,13 @@ const Scan = ({ navigation }) => {
   const [addDevice, { data, error }] = useAddDeviceMutation();
   const { setAuths, auths } = useContext(AuthsContext);
 
-  if (error) console.log(`Error! ${error}`);
+  if (error) {
+    console.log(`Error! ${error}`);
+  }
 
   const onSuccess = async (e: { data: string }) => {
-    if (e.data.search('secret')) {
+    if (e.data.includes('secret')) {
+      console.log('1');
       const qrDataParts = e.data.split('?secret=');
       setAuths([
         {
@@ -30,15 +33,16 @@ const Scan = ({ navigation }) => {
       ]);
       navigation.navigate('Home');
     } else {
-      let ip = await NetworkInfo.getIPV4Address().then((ipv4Address) => {
-        return ipv4Address;
-      });
+      // let ip = await NetworkInfo.getIPV4Address().then((ipv4Address) => {
+      //   return ipv4Address;
+      // });
+      // console.log(ip);
       // Save ID to storage
       await addDevice({
         variables: {
           userId: e.data,
           name: 'test',
-          firstIpAdress: ip as string,
+          firstIpAdress: 'test', //ip as string,
         },
       });
       console.log(data);

@@ -6,6 +6,7 @@ export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
   const authorization = context.request.headers['authorization']
 
   if (!authorization) {
+    console.log('nothing')
     throw new Error('not authenticated')
   }
 
@@ -14,7 +15,7 @@ export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
     context.payload = payload as any
   } catch (err) {
-    console.log(err)
+    console.log('nvm', err)
     throw new Error('not authenticated')
   }
 
