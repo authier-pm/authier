@@ -4,11 +4,7 @@ import React, {
   SetStateAction,
   useState,
 } from 'react';
-import {
-  ApolloClient,
-  ApolloProvider,
-  NormalizedCacheObject,
-} from '@apollo/client';
+import { ApolloProvider } from '@apollo/client';
 import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from './navigation/HomeScreen';
@@ -32,7 +28,7 @@ export const Providers: React.FC<{}> = () => {
 
   return (
     <ApolloProvider
-      client={apoloCLient as unknown as ApolloClient<NormalizedCacheObject>} //WTF IS THIS
+      client={apoloCLient} //WTF IS THIS
     >
       <AuthsContext.Provider value={{ auths, setAuths }}>
         <NavigationContainer>
