@@ -44,6 +44,8 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
     const imageSrcAndRemaining = await executeScriptInCurrentTab(
       '(' + getNextImageSrc.toString() + ')()'
     )
+
+    console.log(imageSrcAndRemaining)
     if (!imageSrcAndRemaining) {
       return null
     }
