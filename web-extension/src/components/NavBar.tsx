@@ -10,22 +10,14 @@ import React, {
 import { browser } from 'webextension-polyfill-ts'
 
 import { Flex, Text, IconButton } from '@chakra-ui/react'
-import { HamburgerIcon } from '@chakra-ui/icons'
+import { HamburgerIcon, ArrowBackIcon } from '@chakra-ui/icons'
 
-import {
-  Link,
-  useRoute,
-  useLocation,
-  useRouter,
-  Router,
-  LinkProps,
-  LocationHook
-} from 'wouter'
+import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 
 export const NavBar: FunctionComponent = () => {
-  const [inSettings, SetInSettings] = useState(true)
+  const [isOut, setIsOut] = useState(false)
   const [location, setLocation] = useLocation()
-  const [lastPage, SetLastPage] = useState<string>('')
+  const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (
     props: JSX.IntrinsicAttributes &
@@ -41,29 +33,39 @@ export const NavBar: FunctionComponent = () => {
   }
 
   useEffect(() => {
-    if (inSettings) {
-      SetLastPage(location)
-    }
-  })
+    SetLastPage(location)
+  }, [])
 
   return (
     <Flex
-      height="38px"
+      height="40px"
       textAlign="center"
       backgroundColor="whitesmoke"
       fontSize="16px"
       borderBottom="1px"
       borderBottomColor="gray.300"
-      width={300}
+      width="315px"
     >
-      <ActiveLink href={inSettings ? '/settings' : lastPage}>
-        <IconButton
-          m="5px"
-          size="sm"
-          aria-label="Settings"
-          icon={<HamburgerIcon />}
-          onClick={() => SetInSettings(!inSettings)}
-        />
+      <ActiveLink href={!isOut ? '/settings' : lastPage}>
+        {location !== '/' ? (
+          <IconButton
+            size="md"
+            aria-label="Settings"
+            icon={<ArrowBackIcon />}
+            onClick={() => {
+              setIsOut(!isOut)
+            }}
+          />
+        ) : (
+          <IconButton
+            size="md"
+            aria-label="Settings"
+            icon={<HamburgerIcon />}
+            onClick={() => {
+              setIsOut(!isOut)
+            }}
+          />
+        )}
       </ActiveLink>
     </Flex>
   )
