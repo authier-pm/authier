@@ -18,6 +18,7 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
+import cryptoJS from 'crypto-js'
 
 interface Values {
   password: string
@@ -50,6 +51,11 @@ export default function Register(): ReactElement {
           })
           console.log('register', res)
           if (res) {
+            //  const encrypted = cryptoJS.AES.encrypt(
+            //    JSON.stringify(res.data?.register),
+            //    masterPassword
+            //  ).toString()
+
             await browser.storage.local.set({
               jid: res.data?.register.accessToken
             })

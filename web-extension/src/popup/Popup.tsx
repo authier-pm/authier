@@ -32,6 +32,7 @@ import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
 import { useIsLoggedInQuery } from './Popup.codegen'
 import { getAccessToken } from '@src/util/accessToken'
+import Devices from '@src/pages/Devices'
 
 i18n.activate('en')
 
@@ -49,10 +50,6 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
-  // const { data, loading, error } = useIsLoggedInQuery({
-  //   fetchPolicy: 'network-only',
-  //   onError: (er) => console.log(er)
-  // })
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
@@ -63,21 +60,17 @@ export const Popup: FunctionComponent = () => {
       label: 'bitfinex',
       icon: 'https://chakra-ui.com/favicon.png',
       lastUsed: new Date(),
-      originalUrl: 'http://www.google.com'
+      originalUrl: 'https://www.bitfinex.com/login'
     }
   ])
 
-  //ADD LOADING SCREEN
-
   useEffect(() => {
-    setLocation('/login')
-    // console.log(data)
-    // // //User auth
-    // if (data) {
-    //   setLocation('/')
-    // } else {
-    //   setLocation('/login')
-    // }
+    // //User auth
+    if (getAccessToken()) {
+      setLocation('/')
+    } else {
+      setLocation('/login')
+    }
 
     browser.runtime.sendMessage({ popupMounted: true })
 
@@ -92,12 +85,14 @@ export const Popup: FunctionComponent = () => {
     })
     ;(async () => {
       const storage = await browser.storage.local.get()
-      //console.log(storage)
+      console.log('stroage', storage)
       if (storage.encryptedAuthsMasterPassword) {
         const decryptedAuths = cryptoJS.AES.decrypt(
           storage.encryptedAuthsMasterPassword,
           masterPassword
         ).toString(cryptoJS.enc.Utf8)
+
+        browser.runtime.sendMessage({ setAuths: decryptedAuths })
         console.log('~ decryptedAuth23s', JSON.parse(decryptedAuths))
 
         setAuths(JSON.parse(decryptedAuths))
@@ -119,6 +114,7 @@ export const Popup: FunctionComponent = () => {
             await browser.storage.local.set({
               encryptedAuthsMasterPassword: encrypted
             })
+
             setAuths(value)
           }
         }}
@@ -132,6 +128,7 @@ export const Popup: FunctionComponent = () => {
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/QRcode" component={QRcode} />
+            <Route path={'/devices'} component={Devices} />
           </Switch>
         </I18nProvider>
       </AuthsContext.Provider>
