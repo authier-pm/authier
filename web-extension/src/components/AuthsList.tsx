@@ -16,7 +16,7 @@ import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/executeScriptInCurrentTab'
-import { extractHostname } from '../popup/extractHostname'
+import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
 

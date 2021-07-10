@@ -22,7 +22,7 @@ import {
 
 import { Trans } from '@lingui/macro'
 
-import { AddAuthSecretButton } from '../popup/AddAuthSecretButton'
+import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import { useLocation } from 'wouter'
@@ -51,7 +51,7 @@ export const Home: FunctionComponent = () => {
           <Button
             colorScheme={'teal'}
             onClick={async () => {
-              await browser.storage.local.remove('jid')
+              await browser.storage.local.clear()
               removeToken()
               setLocation('/login')
             }}
