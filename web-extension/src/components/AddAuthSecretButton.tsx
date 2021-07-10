@@ -6,8 +6,8 @@ import {
 } from '@src/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
-import { getQrCodeFromUrl } from './getQrCodeFromUrl'
-import { AuthsContext } from './Popup'
+import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
+import { AuthsContext } from '../popup/Popup'
 import { browser } from 'webextension-polyfill-ts'
 
 function getNextImageSrc() {

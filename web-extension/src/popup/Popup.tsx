@@ -11,7 +11,7 @@ import { Route, Switch, useLocation } from 'wouter'
 
 import { browser } from 'webextension-polyfill-ts'
 
-import { ChakraProvider } from '@chakra-ui/react'
+import { ChakraProvider, Flex } from '@chakra-ui/react'
 
 import { NavBar } from '@src/components/NavBar'
 import { Home } from '../pages/Home'
@@ -21,11 +21,10 @@ import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
 import { sharedBrowserEvents } from '@src/backgroundPage'
-import { AddAuthSecretButton } from './AddAuthSecretButton'
+import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import cryptoJS from 'crypto-js'
-
 import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
@@ -33,6 +32,7 @@ import QRcode from '@src/pages/QRcode'
 import { useIsLoggedInQuery } from './Popup.codegen'
 import { getAccessToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
+import { useSaveAuthsMutation } from './Popup.codegen'
 
 i18n.activate('en')
 
@@ -50,6 +50,11 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
+  const [
+    saveAuthsMutation,
+    { data: saveAuthsData, loading: saveAuthsLoading, error: saveAuthsError }
+  ] = useSaveAuthsMutation()
+  const { data, loading, error } = useIsLoggedInQuery()
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
@@ -64,14 +69,21 @@ export const Popup: FunctionComponent = () => {
     }
   ])
 
+  // if (getAccessToken()) {
+  //   setLocation('/')
+  // } else {
+  //   setLocation('/login')
+  // }
+
   useEffect(() => {
-    // //User auth
-    if (getAccessToken()) {
+    if (!loading && data) {
       setLocation('/')
     } else {
       setLocation('/login')
     }
+  }, [data, loading])
 
+  useEffect(() => {
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -86,7 +98,7 @@ export const Popup: FunctionComponent = () => {
     ;(async () => {
       const storage = await browser.storage.local.get()
       console.log('stroage', storage)
-      if (storage.encryptedAuthsMasterPassword) {
+      if (storage.encryptedAuthsMasterPassword && masterPassword) {
         const decryptedAuths = cryptoJS.AES.decrypt(
           storage.encryptedAuthsMasterPassword,
           masterPassword
@@ -111,6 +123,13 @@ export const Popup: FunctionComponent = () => {
               masterPassword
             ).toString()
 
+            saveAuthsMutation({
+              variables: {
+                payload: encrypted,
+                userId: data?.authenticated as string
+              }
+            })
+
             await browser.storage.local.set({
               encryptedAuthsMasterPassword: encrypted
             })
@@ -128,7 +147,7 @@ export const Popup: FunctionComponent = () => {
             <Route path="/login" component={Login} />
             <Route path="/register" component={Register} />
             <Route path="/QRcode" component={QRcode} />
-            <Route path={'/devices'} component={Devices} />
+            <Route path="/devices" component={Devices} />
           </Switch>
         </I18nProvider>
       </AuthsContext.Provider>

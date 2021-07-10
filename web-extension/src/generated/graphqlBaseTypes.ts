@@ -11,9 +11,17 @@ export type Scalars = {
   Float: number;
 };
 
+export type EncryptedAuths = {
+  __typename?: 'EncryptedAuths';
+  id: Scalars['Int'];
+  encrypted: Scalars['String'];
+  version: Scalars['Int'];
+};
+
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
+  auths: EncryptedAuths;
 };
 
 export type Mutation = {
@@ -21,6 +29,7 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['String'];
   addDevice: Scalars['Boolean'];
+  saveAuths: Scalars['Boolean'];
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
   revokeRefreshTokensForUser: Scalars['Boolean'];
@@ -32,6 +41,12 @@ export type MutationAddDeviceArgs = {
   userId: Scalars['String'];
   firstIpAdress: Scalars['String'];
   name: Scalars['String'];
+};
+
+
+export type MutationSaveAuthsArgs = {
+  payload: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 

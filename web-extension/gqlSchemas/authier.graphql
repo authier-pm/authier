@@ -19,6 +19,7 @@ type Mutation {
   """you need to be authenticated to call this resolver"""
   authenticated: String!
   addDevice(userId: String!, firstIpAdress: String!, name: String!): Boolean!
+  saveAuths(payload: String!, userId: String!): Boolean!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(password: String!, email: String!): LoginResponse!
   revokeRefreshTokensForUser(userId: String!): Boolean!
@@ -33,4 +34,11 @@ input OTPEvent {
 
 type LoginResponse {
   accessToken: String!
+  auths: EncryptedAuths!
+}
+
+type EncryptedAuths {
+  id: Int!
+  encrypted: String!
+  version: Int!
 }
