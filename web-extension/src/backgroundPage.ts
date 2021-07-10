@@ -1,6 +1,7 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
 import { executeScriptInCurrentTab } from './executeScriptInCurrentTab'
+import { authenticator } from 'otplib'
 
 interface IAuth {
   secret: string
@@ -38,7 +39,7 @@ export enum sharedBrowserEvents {
 
 function fillInput() {
   const inputs = document.getElementsByTagName('input')
-  let filtered = []
+  let filtered: Array<HTMLInputElement> = []
   let fun = setInterval(() => {
     filtered = Array.from(inputs).filter((i) => {
       if (i.id.includes('otp') || i.className.includes('otp')) {
@@ -48,8 +49,9 @@ function fillInput() {
     })
 
     if (filtered[0]) {
-      console.log(filtered[0])
       clearInterval(fun)
+      //@ts-expect-error
+      filtered[0].defaultValue = otp
     }
   }, 1000)
 
@@ -73,8 +75,9 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     auths.map(async (i) => {
       console.log(i.originalUrl)
       if (_tab.url === i.originalUrl) {
+        const otpCode = authenticator.generate(i.secret)
         let a = await executeScriptInCurrentTab(
-          `(` + fillInput.toString() + `)()`
+          `let otp = "${otpCode}";` + `(` + fillInput.toString() + `)()`
         )
         console.log(a)
       }
