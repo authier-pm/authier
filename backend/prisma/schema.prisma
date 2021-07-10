@@ -15,7 +15,7 @@ model EncryptedAuths {
     version   Int
 
     User   User   @relation(fields: [userId], references: [id])
-    userId String
+    userId String @unique
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

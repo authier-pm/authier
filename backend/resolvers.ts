@@ -17,7 +17,7 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { LoginResponse, OTPEvent, User } from './models/models'
+import { EncryptedAuths, LoginResponse, OTPEvent, User } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
@@ -41,8 +41,9 @@ export class RootResolver {
   })
   @UseMiddleware(isAuth)
   authenticated(@Ctx() Ctx: IContext) {
-    return `your user ud is: ${Ctx.payload?.userId}`
+    return Ctx.payload?.userId
   }
+
   @Mutation(() => String, {
     description: 'you need to be authenticated to call this resolver',
     name: 'authenticated'
@@ -90,7 +91,7 @@ export class RootResolver {
           name: name,
           userId: userId,
           firstIpAdress: firstIpAdress,
-          lastIpAdress: '192.168.100.128/25'
+          lastIpAdress: '192.168.100.128/25' // <=== CHANGE
         }
       })
       return true
@@ -111,6 +112,32 @@ export class RootResolver {
     } catch (error) {
       console.log(error)
       return 0
+    }
+  }
+
+  @Mutation(() => Boolean)
+  async saveAuths(
+    @Arg('userId', () => String) userId: string,
+    @Arg('payload', () => String) payload: string
+  ) {
+    try {
+      await prisma.encryptedAuths.upsert({
+        create: {
+          encrypted: payload,
+          version: 1,
+          userId: userId
+        },
+        update: {
+          encrypted: payload
+        },
+        where: {
+          userId: userId
+        }
+      })
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
     }
   }
 
@@ -184,9 +211,13 @@ export class RootResolver {
     const user = await prisma.user.findUnique({
       where: {
         email: email
+      },
+      include: {
+        auths: true
       }
     })
 
+    console.log(user)
     if (!user) {
       throw new Error('Could not find user')
     }
@@ -203,7 +234,8 @@ export class RootResolver {
 
     return {
       //@ts-expect-error
-      accessToken: createAccessToken(user)
+      accessToken: createAccessToken(user),
+      auths: user.auths as EncryptedAuths
     }
   }
 }

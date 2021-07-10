@@ -1,4 +1,4 @@
-import { Field, InputType, ObjectType } from 'type-graphql'
+import { Field, InputType, Int, ObjectType } from 'type-graphql'
 
 @ObjectType()
 export class User {
@@ -22,9 +22,24 @@ export class User {
 }
 
 @ObjectType()
+export class EncryptedAuths {
+  @Field(() => Int)
+  id: number
+
+  @Field(() => String)
+  encrypted: string
+
+  @Field(() => Int)
+  version: number
+}
+
+@ObjectType()
 export class LoginResponse {
   @Field(() => String)
   accessToken: string
+
+  @Field(() => EncryptedAuths)
+  auths: EncryptedAuths
 }
 
 @InputType()

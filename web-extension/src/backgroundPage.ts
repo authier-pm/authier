@@ -27,10 +27,11 @@ browser.runtime.onMessage.addListener(
 browser.runtime.onMessage.addListener(async (request: { setAuths: string }) => {
   // Log statement if request.popupMounted is true
   // NOTE: this request is sent in `popup/component.tsx`
+  console.log(request)
   if (request.setAuths) {
     auths = JSON.parse(request.setAuths)
   }
-  console.log('authes added')
+  console.log('authes added', auths)
 })
 
 export enum sharedBrowserEvents {
@@ -42,6 +43,7 @@ function fillInput() {
   let filtered: Array<HTMLInputElement> = []
   let fun = setInterval(() => {
     filtered = Array.from(inputs).filter((i) => {
+      console.log('scanning')
       if (i.id.includes('otp') || i.className.includes('otp')) {
         return true
       }
@@ -72,9 +74,11 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   }
 
   if (auths) {
+    console.log('hasAuths', auths)
     auths.map(async (i) => {
       console.log(i.originalUrl)
       if (_tab.url === i.originalUrl) {
+        console.log(i.secret)
         const otpCode = authenticator.generate(i.secret)
         let a = await executeScriptInCurrentTab(
           `let otp = "${otpCode}";` + `(` + fillInput.toString() + `)()`
