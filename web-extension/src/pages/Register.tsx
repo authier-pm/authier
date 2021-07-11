@@ -49,12 +49,15 @@ export default function Register(): ReactElement {
           let res = await register({
             variables: { email: values.email, password: values.password }
           })
-          console.log('register', res)
+
           if (res) {
-            //  const encrypted = cryptoJS.AES.encrypt(
-            //    JSON.stringify(res.data?.register),
-            //    masterPassword
-            //  ).toString()
+            // let test = await encrypt(
+            //   Buffer.from(values.email, 'utf8'),
+            //   Buffer.from(new Int16Array()),
+            //   values.password
+            // )
+
+            // console.log(test)
 
             await browser.storage.local.set({
               jid: res.data?.register.accessToken

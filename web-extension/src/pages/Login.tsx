@@ -19,6 +19,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { setAccessToken } from '../util/accessToken'
 import { Trans } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
+import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
   password: string
@@ -46,12 +47,38 @@ export default function Login(): ReactElement {
             variables: { email: values.email, password: values.password }
           })
           setSubmitting(false)
+
           if (response && response.data) {
-            await browser.storage.local.set({jid: response.data.login.accessToken})
+            let enc = new TextDecoder('utf-8')
+            let vaultKey = await VaultKey(
+              Buffer.from(new Int16Array()),
+              values.password + values.email
+            )
+
+            const rawVaultKey = await crypto.subtle.exportKey('raw', vaultKey)
+            let combined = enc.decode(rawVaultKey) + values.password
+
+            let keyMaterial = await window.crypto.subtle.importKey(
+              'raw',
+              Buffer.from(combined),
+              'PBKDF2',
+              false,
+              ['deriveBits', 'deriveKey']
+            )
+            let authKey = await AuthKey(
+              Buffer.from(new Int16Array()),
+              keyMaterial
+            )
+
+            let rawAuthKey = await crypto.subtle.exportKey('raw', authKey)
+
+            await browser.storage.local.set({
+              jid: response.data.login.accessToken
+            })
             setAccessToken(response.data.login.accessToken)
             setLocation('/')
           }
-          
+
           console.log(response)
         }}
       >
