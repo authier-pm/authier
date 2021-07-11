@@ -29,7 +29,11 @@ import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
-import { useIsLoggedInQuery } from './Popup.codegen'
+import {
+  IsLoggedInQuery,
+  useIsLoggedInLazyQuery,
+  useIsLoggedInQuery
+} from './Popup.codegen'
 import { getAccessToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
@@ -50,11 +54,16 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
+  const [isAuth, setIsAuth] = useState<IsLoggedInQuery>()
   const [
     saveAuthsMutation,
     { data: saveAuthsData, loading: saveAuthsLoading, error: saveAuthsError }
   ] = useSaveAuthsMutation()
-  const { data, loading, error } = useIsLoggedInQuery()
+  const { data, loading, error } = useIsLoggedInQuery({
+    onCompleted: (e) => {
+      setIsAuth(e)
+    }
+  })
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
@@ -69,19 +78,13 @@ export const Popup: FunctionComponent = () => {
     }
   ])
 
-  // if (getAccessToken()) {
-  //   setLocation('/')
-  // } else {
-  //   setLocation('/login')
-  // }
-
   useEffect(() => {
-    if (!loading && data) {
+    if (isAuth?.authenticated) {
       setLocation('/')
     } else {
       setLocation('/login')
     }
-  }, [data, loading])
+  }, [isAuth])
 
   useEffect(() => {
     browser.runtime.sendMessage({ popupMounted: true })

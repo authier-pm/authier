@@ -8,9 +8,9 @@ function App(): ReactElement {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    console.log('app')
     async function token() {
       let s = await browser.storage.local.get('jid')
+      console.log('s', s)
       setAccessToken(s.jid)
       setLoading(false)
     }
