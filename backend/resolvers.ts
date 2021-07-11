@@ -217,7 +217,6 @@ export class RootResolver {
       }
     })
 
-    console.log(user)
     if (!user) {
       throw new Error('Could not find user')
     }
