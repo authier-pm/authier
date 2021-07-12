@@ -38,7 +38,7 @@ export class LoginResponse {
   @Field(() => String)
   accessToken: string
 
-  @Field(() => EncryptedAuths)
+  @Field(() => EncryptedAuths, { nullable: true })
   auths: EncryptedAuths
 }
 
