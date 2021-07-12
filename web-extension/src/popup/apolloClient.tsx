@@ -43,6 +43,7 @@ const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
+    console.log('refetch')
     return await fetch(`http://localhost:5051/refresh_token`, {
       method: 'POST',
       credentials: 'include'
@@ -60,11 +61,12 @@ const tokenRefresh = new TokenRefreshLink({
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError }) => {
   if (graphQLErrors)
-    graphQLErrors.map(({ message, locations, path }) =>
+    graphQLErrors.map(({ message, locations, path }) => {
+      console.log(JSON.stringify(locations))
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
-    )
+    })
   if (networkError) console.log(`[Network error]: ${networkError}`)
 })
 

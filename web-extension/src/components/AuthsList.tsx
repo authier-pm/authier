@@ -7,7 +7,8 @@ import {
   Stat,
   StatLabel,
   StatNumber,
-  useClipboard
+  useClipboard,
+  Text
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../popup/Popup'
@@ -19,6 +20,7 @@ import { getCurrentTab } from '@src/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
+import { LockIcon } from '@chakra-ui/icons'
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -103,16 +105,25 @@ export const AuthsList = () => {
 
   return (
     <>
-      {auths
-        .filter(({ originalUrl, secret }) => {
-          if (!currentTabUrl || !originalUrl) {
-            return true
-          }
-          return extractHostname(originalUrl) === extractHostname(currentTabUrl)
-        })
-        .map((auth, i) => {
-          return <OtpCode auth={auth} key={auth.label + i} />
-        })}
+      {auths ? (
+        auths
+          .filter(({ originalUrl, secret }) => {
+            if (!currentTabUrl || !originalUrl) {
+              return true
+            }
+            return (
+              extractHostname(originalUrl) === extractHostname(currentTabUrl)
+            )
+          })
+          .map((auth, i) => {
+            return <OtpCode auth={auth} key={auth.label + i} />
+          })
+      ) : (
+        <Flex flexDirection="row" justifyContent="center">
+          <LockIcon w={6} h={6} />
+          <Text fontSize="md"> Your OTP list is locked</Text>
+        </Flex>
+      )}
     </>
   )
 }

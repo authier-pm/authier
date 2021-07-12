@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react'
+import React, { ReactElement, useContext, useState } from 'react'
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
-import cryptoJS from 'crypto-js'
+import { UserContext } from '../popup/Popup'
 
 interface Values {
   password: string
@@ -30,6 +30,7 @@ export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
+  const { setPassword } = useContext(UserContext)
 
   if (registerError) {
     console.log(registerError)
@@ -51,18 +52,11 @@ export default function Register(): ReactElement {
           })
 
           if (res) {
-            // let test = await encrypt(
-            //   Buffer.from(values.email, 'utf8'),
-            //   Buffer.from(new Int16Array()),
-            //   values.password
-            // )
-
-            // console.log(test)
-
             await browser.storage.local.set({
               jid: res.data?.register.accessToken
             })
             setAccessToken(res.data?.register.accessToken as string)
+            //setPassword(values.password)
             setSubmitting(false)
             setLocation('/QRcode')
           }
