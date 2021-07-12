@@ -56,11 +56,15 @@ export default function Login(): ReactElement {
             variables: { email: values.email, password: values.password }
           })
 
-          if (response && response.data) {
+          if (response.data) {
             await browser.storage.local.set({
               jid: response.data.login.accessToken
             })
             setAccessToken(response.data.login.accessToken)
+
+            let id = await getUserFromToken()
+            //@ts-expect-error
+            setUserId(id.userId)
 
             if (response.data.login.auths?.encrypted && values.password) {
               const decryptedAuths = cryptoJS.AES.decrypt(
