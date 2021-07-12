@@ -37,6 +37,7 @@ import {
 import { getAccessToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
+import Verification from '@src/pages/Verification'
 
 i18n.activate('en')
 
@@ -49,6 +50,7 @@ export const UserContext = createContext<{
   password: string
   setPassword: Dispatch<SetStateAction<string>>
   setUserId: Dispatch<SetStateAction<string>>
+  setVerify: Dispatch<SetStateAction<Boolean>>
 }>({} as any)
 
 export interface IAuth {
@@ -60,6 +62,7 @@ export interface IAuth {
 }
 
 export const Popup: FunctionComponent = () => {
+  const [verify, setVerify] = useState<Boolean>(false)
   const [password, setPassword] = useState<string>('bob')
   const [userId, setUserId] = useState<string>('')
   const [isAuth, setIsAuth] = useState<IsLoggedInQuery>()
@@ -84,14 +87,27 @@ export const Popup: FunctionComponent = () => {
   //   }
 
   useEffect(() => {
-    if (isAuth) {
+    chrome.runtime.sendMessage(
+      { wasClosed: true },
+      function (res: { wasClosed: Boolean }) {
+        if (res.wasClosed) {
+          setVerify(true)
+        }
+      }
+    )
+
+    if (isAuth?.authenticated && !verify) {
       setLocation('/')
-    } else {
+    } else if (!isAuth?.authenticated) {
       setLocation('/login')
+    } else if (isAuth.authenticated && verify) {
+      setLocation('/verify')
     }
   }, [isAuth])
 
   useEffect(() => {
+    //Asking background script if is safe open
+
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -109,16 +125,22 @@ export const Popup: FunctionComponent = () => {
       if (request.safe === 'closed') {
         console.log('closed', request.safe)
         setPassword('')
+        setLocation('/verify')
       }
     })
   }, [])
 
   useEffect(() => {
-    console.log(auths, password)
+    console.log('start', auths, password)
     chrome.runtime.sendMessage(
       { GiveMeAuths: true },
       function (res: { auths: Array<IAuth> }) {
-        setAuths(res.auths)
+        if (res.auths) {
+          setAuths(res.auths)
+        } else if (res.auths === undefined && !password) {
+          //Reenter password
+          setLocation('/verify')
+        }
       }
     )
     // ;(async () => {
@@ -143,12 +165,15 @@ export const Popup: FunctionComponent = () => {
 
   return (
     <ChakraProvider>
-      <UserContext.Provider value={{ password, setPassword, setUserId }}>
+      <UserContext.Provider
+        value={{ password, setPassword, setUserId, setVerify }}
+      >
         <AuthsContext.Provider
           value={{
             auths,
+            // Split saving to DB, local storage and background script
             setAuths: async (value) => {
-              console.log('saving', password, value, isAuth?.authenticated)
+              console.log('saving with', password)
               await chrome.runtime.sendMessage({
                 auths: value,
                 lockTime: 28800000
@@ -159,12 +184,14 @@ export const Popup: FunctionComponent = () => {
                 password
               ).toString()
 
-              await saveAuthsMutation({
-                variables: {
-                  payload: encrypted,
-                  userId: isAuth?.authenticated as string
-                }
-              })
+              if (isAuth?.authenticated) {
+                await saveAuthsMutation({
+                  variables: {
+                    payload: encrypted,
+                    userId: isAuth?.authenticated as string
+                  }
+                })
+              }
 
               await browser.storage.local.set({
                 encryptedAuthsMasterPassword: encrypted
@@ -184,6 +211,7 @@ export const Popup: FunctionComponent = () => {
               <Route path="/register" component={Register} />
               <Route path="/QRcode" component={QRcode} />
               <Route path="/devices" component={Devices} />
+              <Route path="/verify" component={Verification} />
             </Switch>
           </I18nProvider>
         </AuthsContext.Provider>

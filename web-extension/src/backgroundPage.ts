@@ -17,6 +17,7 @@ export enum sharedBrowserEvents {
 
 let auths: Array<IAuth> | null
 let stopped = false
+let safeClosed = false
 
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
@@ -40,14 +41,29 @@ chrome.runtime.onMessage.addListener(function (
   }
 })
 
+chrome.runtime.onMessage.addListener(function (
+  request: { close: Boolean; wasClosed: Boolean },
+  sender,
+  sendResponse
+) {
+  if (request.close) {
+    safeClosed = true
+  } else if (request.wasClosed) {
+    console.log('asked')
+    sendResponse({ wasClosed: safeClosed })
+  }
+})
+
 chrome.runtime.onMessage.addListener(
   async (request: { auths: any; lockTime: number }) => {
     console.log('saving', auths, request.auths)
     if (request.auths) {
       console.log('called')
+      safeClosed = false
       auths = request.auths //JSON.parse(request.auths)
 
       let close = setTimeout(() => {
+        safeClosed = true
         stopped = true
         auths = null
         chrome.runtime.sendMessage({ safe: 'closed' })
@@ -63,6 +79,12 @@ chrome.runtime.onMessage.addListener(
 chrome.runtime.onMessage.addListener((request: { clear: Boolean }) => {
   if (request.clear) {
     auths = null
+  }
+})
+
+chrome.runtime.onMessage.addListener((request: { startTimeout: Boolean }) => {
+  if (request.startTimeout) {
+    stopped = false
   }
 })
 
