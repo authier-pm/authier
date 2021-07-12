@@ -11,7 +11,12 @@ interface IAuth {
   originalUrl: string | undefined
 }
 
-let auths: Array<IAuth>
+export enum sharedBrowserEvents {
+  URL_CHANGED = 'URL_CHANGED'
+}
+
+let auths: Array<IAuth> | null
+let stopped = false
 
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
@@ -24,19 +29,42 @@ browser.runtime.onMessage.addListener(
   }
 )
 
-browser.runtime.onMessage.addListener(async (request: { setAuths: string }) => {
-  // Log statement if request.popupMounted is true
-  // NOTE: this request is sent in `popup/component.tsx`
-  console.log(request)
-  if (request.setAuths) {
-    auths = JSON.parse(request.setAuths)
+chrome.runtime.onMessage.addListener(function (
+  request: { GiveMeAuths: Boolean },
+  sender,
+  sendResponse
+) {
+  if (request.GiveMeAuths) {
+    console.log('sending', auths)
+    sendResponse({ auths: auths })
   }
-  console.log('authes added', auths)
 })
 
-export enum sharedBrowserEvents {
-  URL_CHANGED = 'URL_CHANGED'
-}
+chrome.runtime.onMessage.addListener(
+  async (request: { auths: any; lockTime: number }) => {
+    console.log('saving', auths, request.auths)
+    if (request.auths) {
+      console.log('called')
+      auths = request.auths //JSON.parse(request.auths)
+
+      let close = setTimeout(() => {
+        stopped = true
+        auths = null
+        chrome.runtime.sendMessage({ safe: 'closed' })
+      }, request.lockTime)
+
+      if (stopped) {
+        clearTimeout(close)
+      }
+    }
+  }
+)
+
+chrome.runtime.onMessage.addListener((request: { clear: Boolean }) => {
+  if (request.clear) {
+    auths = null
+  }
+})
 
 function fillInput() {
   const inputs = document.getElementsByTagName('input')
@@ -63,28 +91,24 @@ function fillInput() {
 // https://stackoverflow.com/questions/34957319/how-to-listen-for-url-change-with-chrome-extension
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   console.log('~ changeInfo', changeInfo)
-
   if (changeInfo.url) {
     chrome.tabs.sendMessage(tabId, {
       message: sharedBrowserEvents.URL_CHANGED,
       url: changeInfo.url
     })
-
-    // TODO if the url is in user's list of auth secrets we should execute the autofill here
   }
 
   if (auths) {
     console.log('hasAuths', auths)
     auths.map(async (i) => {
-      console.log(i.originalUrl)
       if (_tab.url === i.originalUrl) {
-        console.log(i.secret)
         const otpCode = authenticator.generate(i.secret)
         let a = await executeScriptInCurrentTab(
           `let otp = "${otpCode}";` + `(` + fillInput.toString() + `)()`
         )
-        console.log(a)
       }
     })
+  } else if (auths === null) {
+    return 'locked'
   }
 })

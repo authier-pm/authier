@@ -34,7 +34,7 @@ input OTPEvent {
 
 type LoginResponse {
   accessToken: String!
-  auths: EncryptedAuths!
+  auths: EncryptedAuths
 }
 
 type EncryptedAuths {

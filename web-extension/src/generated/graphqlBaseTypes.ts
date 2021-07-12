@@ -21,7 +21,7 @@ export type EncryptedAuths = {
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
-  auths: EncryptedAuths;
+  auths?: Maybe<EncryptedAuths>;
 };
 
 export type Mutation = {

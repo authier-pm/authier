@@ -64,7 +64,7 @@ export class RootResolver {
     const authorization = context.request.headers['authorization']
 
     if (!authorization) {
-      throw new Error('not authenticated')
+      throw new Error('You are missing a token')
     }
 
     try {

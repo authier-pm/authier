@@ -3,6 +3,7 @@ import React, {
   Dispatch,
   FunctionComponent,
   SetStateAction,
+  useContext,
   useEffect,
   useState
 } from 'react'
@@ -53,6 +54,9 @@ export const Home: FunctionComponent = () => {
             onClick={async () => {
               await browser.storage.local.clear()
               removeToken()
+              await chrome.runtime.sendMessage({
+                clear: true
+              })
               setLocation('/login')
             }}
           >

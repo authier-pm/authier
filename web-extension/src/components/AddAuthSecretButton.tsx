@@ -83,17 +83,32 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
     if (!tab) {
       return
     }
-    setAuths([
-      {
-        secret: qrDataParts[1],
-        icon: tab.favIconUrl,
-        label: decodeURIComponent(
-          qrDataParts[0].replace('otpauth://totp/', '')
-        ),
-        originalUrl: tab.url
-      },
-      ...auths
-    ])
+    console.log('test', auths)
+
+    if (auths === undefined) {
+      setAuths([
+        {
+          secret: qrDataParts[1],
+          icon: tab.favIconUrl,
+          label: decodeURIComponent(
+            qrDataParts[0].replace('otpauth://totp/', '')
+          ),
+          originalUrl: tab.url
+        }
+      ])
+    } else {
+      setAuths([
+        {
+          secret: qrDataParts[1],
+          icon: tab.favIconUrl,
+          label: decodeURIComponent(
+            qrDataParts[0].replace('otpauth://totp/', '')
+          ),
+          originalUrl: tab.url
+        },
+        ...auths
+      ])
+    }
 
     toast({
       title: 'Successfully added',
