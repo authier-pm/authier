@@ -83,7 +83,8 @@ export class RootResolver {
   async addDevice(
     @Arg('name', () => String) name: string,
     @Arg('firstIpAdress', () => String) firstIpAdress: string,
-    @Arg('userId', () => String) userId: string
+    @Arg('userId', () => String) userId: string,
+    @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
     try {
       await prisma.device.create({
@@ -91,7 +92,8 @@ export class RootResolver {
           name: name,
           userId: userId,
           firstIpAdress: firstIpAdress,
-          lastIpAdress: '192.168.100.128/25' // <=== CHANGE
+          lastIpAdress: '192.168.100.128/25', // <=== CHANGE
+          firebaseToken: firebaseToken
         }
       })
       return true
