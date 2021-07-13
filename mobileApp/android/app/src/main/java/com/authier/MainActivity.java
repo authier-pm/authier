@@ -1,4 +1,4 @@
-package com.mobileapp;
+package com.authier;
 
 import com.facebook.react.ReactActivity;
 
