@@ -7,11 +7,14 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AuthsContext } from '../Providers';
 import { useAddDeviceMutation } from './Scan.codegen';
-import { NetworkInfo } from 'react-native-network-info';
+import { getDeviceNameSync, getIpAddressSync } from 'react-native-device-info';
+import { GetTokenProvider } from '../TokenProvider';
 
+//@ts-expect-error
 const Scan = ({ navigation }) => {
   const [addDevice, { data, error }] = useAddDeviceMutation();
   const { setAuths, auths } = useContext(AuthsContext);
+  const { token } = useContext(GetTokenProvider);
 
   if (error) {
     console.log(`Error! ${error}`);
@@ -33,16 +36,13 @@ const Scan = ({ navigation }) => {
       ]);
       navigation.navigate('Home');
     } else {
-      // let ip = await NetworkInfo.getIPV4Address().then((ipv4Address) => {
-      //   return ipv4Address;
-      // });
-      // console.log(ip);
       // Save ID to storage
       await addDevice({
         variables: {
           userId: e.data,
-          name: 'test',
-          firstIpAdress: 'test', //ip as string,
+          name: getDeviceNameSync(),
+          firstIpAdress: getIpAddressSync(),
+          firebaseToken: token as string,
         },
       });
       console.log(data);

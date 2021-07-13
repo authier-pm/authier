@@ -9,6 +9,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 import HomeScreen from './navigation/HomeScreen';
 import { apoloCLient } from './ApolloClient';
+import TokenProvider from './TokenProvider';
 
 export const AuthsContext = createContext<{
   auths: Array<any>;
@@ -29,9 +30,11 @@ export const Providers: React.FC<{}> = () => {
   return (
     <ApolloProvider client={apoloCLient}>
       <AuthsContext.Provider value={{ auths, setAuths }}>
-        <NavigationContainer>
-          <HomeScreen />
-        </NavigationContainer>
+        <TokenProvider>
+          <NavigationContainer>
+            <HomeScreen />
+          </NavigationContainer>
+        </TokenProvider>
       </AuthsContext.Provider>
     </ApolloProvider>
   );

@@ -26,6 +26,7 @@ model Device {
     id            Int      @id @default(autoincrement())
     firstIpAdress String
     lastIpAdress  String
+    firebaseToken String
     name          String
     userId        String
     User          User     @relation(fields: [userId], references: [id])
