@@ -56,9 +56,8 @@ chrome.runtime.onMessage.addListener(function (
 
 chrome.runtime.onMessage.addListener(
   async (request: { auths: any; lockTime: number }) => {
-    console.log('saving', auths, request.auths)
     if (request.auths) {
-      console.log('called')
+      console.log('saving', auths, request.auths)
       safeClosed = false
       auths = request.auths //JSON.parse(request.auths)
 
