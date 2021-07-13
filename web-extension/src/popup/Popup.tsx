@@ -106,8 +106,6 @@ export const Popup: FunctionComponent = () => {
   }, [isAuth])
 
   useEffect(() => {
-    //Asking background script if is safe open
-
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
@@ -137,6 +135,7 @@ export const Popup: FunctionComponent = () => {
       function (res: { auths: Array<IAuth> }) {
         if (res.auths) {
           setAuths(res.auths)
+          console.log('got', auths)
         } else if (res.auths === undefined && !password) {
           //Reenter password
           setLocation('/verify')
