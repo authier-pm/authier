@@ -1,3 +1,13 @@
-mutation addDevice($userId: String!, $name: String!, $firstIpAdress: String!) {
-  addDevice(userId: $userId, name: $name, firstIpAdress: $firstIpAdress)
+mutation addDevice(
+  $userId: String!
+  $name: String!
+  $firstIpAdress: String!
+  $firebaseToken: String!
+) {
+  addDevice(
+    userId: $userId
+    name: $name
+    firstIpAdress: $firstIpAdress
+    firebaseToken: $firebaseToken
+  )
 }
