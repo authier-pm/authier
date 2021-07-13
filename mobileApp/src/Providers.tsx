@@ -27,9 +27,7 @@ export const Providers: React.FC<{}> = () => {
   ]);
 
   return (
-    <ApolloProvider
-      client={apoloCLient} //WTF IS THIS
-    >
+    <ApolloProvider client={apoloCLient}>
       <AuthsContext.Provider value={{ auths, setAuths }}>
         <NavigationContainer>
           <HomeScreen />
