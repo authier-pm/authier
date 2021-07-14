@@ -16,8 +16,8 @@ export enum sharedBrowserEvents {
 }
 
 let auths: Array<IAuth> | null
-let stopped = false
-let safeClosed = false
+let stopped = false // To stop timeout function, when user has to re enter passwrod
+let safeClosed = false // Is safe Closed ?
 
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
@@ -94,6 +94,9 @@ function fillInput() {
     filtered = Array.from(inputs).filter((i) => {
       console.log('scanning')
       if (i.id.includes('otp') || i.className.includes('otp')) {
+        //Send message to content scrit for query, where it will send notification to users main device
+        //Device will send back the authorization
+
         return true
       }
       return false
