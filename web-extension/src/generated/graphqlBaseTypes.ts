@@ -11,6 +11,14 @@ export type Scalars = {
   Float: number;
 };
 
+export type Device = {
+  __typename?: 'Device';
+  firstIpAdress: Scalars['String'];
+  lastIpAdress: Scalars['String'];
+  firebaseToken: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type EncryptedAuths = {
   __typename?: 'EncryptedAuths';
   id: Scalars['Int'];
@@ -38,6 +46,7 @@ export type Mutation = {
 
 
 export type MutationAddDeviceArgs = {
+  firebaseToken: Scalars['String'];
   userId: Scalars['String'];
   firstIpAdress: Scalars['String'];
   name: Scalars['String'];
@@ -83,7 +92,13 @@ export type Query = {
   authenticated: Scalars['String'];
   users: Array<User>;
   me?: Maybe<User>;
+  myDevices: Array<Device>;
   DeviceCount: Scalars['Int'];
+};
+
+
+export type QueryMyDevicesArgs = {
+  userId: Scalars['String'];
 };
 
 

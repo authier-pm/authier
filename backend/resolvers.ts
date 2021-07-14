@@ -17,7 +17,13 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { EncryptedAuths, LoginResponse, OTPEvent, User } from './models/models'
+import {
+  Device,
+  EncryptedAuths,
+  LoginResponse,
+  OTPEvent,
+  User
+} from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
@@ -84,8 +90,10 @@ export class RootResolver {
     @Arg('name', () => String) name: string,
     @Arg('firstIpAdress', () => String) firstIpAdress: string,
     @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() context: IContext
   ) {
+    console.log(context.request.connection.remoteAddress)
     try {
       await prisma.device.create({
         data: {
@@ -100,6 +108,20 @@ export class RootResolver {
     } catch (error) {
       console.log(error)
       return false
+    }
+  }
+
+  @Query(() => [Device])
+  async myDevices(@Arg('userId', () => String) userId: string) {
+    try {
+      return await prisma.device.findMany({
+        where: {
+          userId: userId
+        }
+      })
+    } catch (err) {
+      console.log(err)
+      return err
     }
   }
 

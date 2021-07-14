@@ -12,6 +12,7 @@
     "dotenv": "^10.0.0",
     "fastify": "^3.18.1",
     "fastify-cookie": "^5.3.1",
+    "firebase-admin": "^9.10.0",
     "graphql": "^15.5.1",
     "jsonwebtoken": "^8.5.1",
     "mercurius": "^7.9.1",
