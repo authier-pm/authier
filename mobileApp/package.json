@@ -20,6 +20,7 @@
     "@react-navigation/native": "^5.9.4",
     "@react-navigation/stack": "^5.14.5",
     "apollo-link-http": "^1.5.17",
+    "graphql": "^15.5.1",
     "mz": "^2.7.0",
     "otp-client": "^1.0.3",
     "react": "17.0.1",
