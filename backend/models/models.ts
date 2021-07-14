@@ -53,3 +53,18 @@ export class OTPEvent {
   @Field(() => String)
   userId: string
 }
+
+@ObjectType()
+export class Device {
+  @Field(() => String)
+  firstIpAdress: string
+
+  @Field(() => String)
+  lastIpAdress: string
+
+  @Field(() => String)
+  firebaseToken: string
+
+  @Field(() => String)
+  name: string
+}
