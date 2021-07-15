@@ -1,6 +1,6 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
-import { executeScriptInCurrentTab } from './executeScriptInCurrentTab'
+import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 
 interface IAuth {

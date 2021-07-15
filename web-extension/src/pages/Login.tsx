@@ -24,7 +24,8 @@ import {
 } from '../util/accessToken'
 import { Trans } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
-import { UserContext, AuthsContext } from '../popup/Popup'
+import { AuthsContext } from '../providers/AuthsProvider'
+import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
@@ -37,7 +38,7 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setPassword, setUserId } = useContext(UserContext)
+  const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
 
   return (
