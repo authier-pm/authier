@@ -2,6 +2,23 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
 import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
+import { initializeApp } from 'firebase/app'
+
+const firebaseConfig = {
+  apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
+  authDomain: 'authier-bc184.firebaseapp.com',
+  projectId: 'authier-bc184',
+  storageBucket: 'authier-bc184.appspot.com',
+  messagingSenderId: '500382892914',
+  appId: '1:500382892914:web:6b202f90d6c0c6bcc213eb',
+  measurementId: 'G-0W2MW55WVF'
+}
+
+try {
+  const firebaseApp = initializeApp(firebaseConfig)
+} catch (err) {
+  console.log(err)
+}
 
 interface IAuth {
   secret: string

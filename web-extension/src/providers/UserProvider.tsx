@@ -36,7 +36,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   const [isAuth, setIsAuth] = useState<IsLoggedInQuery>()
 
   useEffect(() => {
-    console.log('ef', data, loading, error)
     if (data?.authenticated && !loading) {
       setUserId(data.authenticated)
       setIsAuth(data)
