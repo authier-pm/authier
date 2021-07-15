@@ -37,35 +37,13 @@ import { useSaveAuthsMutation } from './Popup.codegen'
 import Verification from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
+import { getMessaging, getToken } from 'firebase/messaging'
+
+const messaging = getMessaging()
 
 i18n.activate('en')
 
-// export const AuthsContext = createContext<{
-//   auths: Array<IAuth>
-//   setAuths: Dispatch<SetStateAction<IAuth[]>>
-// }>({ auths: [] } as any)
-
-// export const UserContext = createContext<{
-//   password: string
-//   setPassword: Dispatch<SetStateAction<string>>
-//   setUserId: Dispatch<SetStateAction<string>>
-//   setVerify: Dispatch<SetStateAction<Boolean>>
-// }>({} as any)
-
-// export interface IAuth {
-//   secret: string
-//   label: string
-//   icon: string | undefined
-//   lastUsed?: Date | null
-//   originalUrl: string | undefined
-// }
-
 export const Popup: FunctionComponent = () => {
-  // const [verify, setVerify] = useState<Boolean>(false)
-  // const [password, setPassword] = useState<string>('bob')
-  // const [userId, setUserId] = useState<string>('')
-  // const [isAuth, setIsAuth] = useState<IsLoggedInQuery>()
-  // const [saveAuthsMutation] = useSaveAuthsMutation()
   const { password, isAuth, userId, verify, setVerify, setPassword } =
     useContext(UserContext)
   const { auths, setAuths } = useContext(AuthsContext)
@@ -73,16 +51,6 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
 
   const masterPassword = 'some_fake'
-
-  //const [auths, setAuths] = useState<IAuth[]>([])
-
-  // {
-  //     secret: 'JBSWY3DPEHPK3PXP',
-  //     label: 'bitfinex',
-  //     icon: 'https://chakra-ui.com/favicon.png',
-  //     lastUsed: new Date(),
-  //     originalUrl: 'https://www.bitfinex.com/login'
-  //   }
 
   useEffect(() => {
     chrome.runtime.sendMessage(
@@ -127,6 +95,15 @@ export const Popup: FunctionComponent = () => {
   }, [])
 
   useEffect(() => {
+    async function test() {
+      let t = await getToken(messaging, {
+        vapidKey:
+          'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
+      })
+      console.log(t)
+      return t
+    }
+    test()
     console.log('start', auths, 'password: ', password, 'userId: ', userId)
     chrome.runtime.sendMessage(
       { GiveMeAuths: true },
@@ -161,43 +138,6 @@ export const Popup: FunctionComponent = () => {
   }, [])
 
   return (
-    // <ChakraProvider>
-    //   <UserContext.Provider
-    //     value={{ password, setPassword, setUserId, setVerify }}
-    //   >
-    //     <AuthsContext.Provider
-    //       value={{
-    //         auths,
-    //         // Split saving to DB, local storage and background script
-    //         setAuths: async (value) => {
-    //           console.log('saving with', password)
-    //           await chrome.runtime.sendMessage({
-    //             auths: value,
-    //             lockTime: 28800000
-    //           })
-
-    //           const encrypted = cryptoJS.AES.encrypt(
-    //             JSON.stringify(value),
-    //             password
-    //           ).toString()
-
-    //           if (isAuth?.authenticated) {
-    //             await saveAuthsMutation({
-    //               variables: {
-    //                 payload: encrypted,
-    //                 userId: isAuth?.authenticated as string
-    //               }
-    //             })
-    //           }
-
-    //           await browser.storage.local.set({
-    //             encryptedAuthsMasterPassword: encrypted
-    //           })
-
-    //           setAuths(value)
-    //         }
-    //       }}
-    //     >
     <I18nProvider i18n={i18n}>
       <NavBar />
       <Switch>
@@ -211,8 +151,5 @@ export const Popup: FunctionComponent = () => {
         <Route path="/verify" component={Verification} />
       </Switch>
     </I18nProvider>
-    //     </AuthsContext.Provider>
-    //   </UserContext.Provider>
-    // </ChakraProvider>
   )
 }
