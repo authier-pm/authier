@@ -3,11 +3,11 @@ import { t } from '@lingui/macro'
 import {
   executeScriptInCurrentTab,
   getCurrentTab
-} from '@src/executeScriptInCurrentTab'
+} from '@src/util/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
-import { AuthsContext } from '../popup/Popup'
+import { AuthsContext } from '../providers/AuthsProvider'
 import { browser } from 'webextension-polyfill-ts'
 
 function getNextImageSrc() {

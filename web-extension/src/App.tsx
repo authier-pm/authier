@@ -2,7 +2,8 @@ import { Flex } from '@chakra-ui/react'
 import { setAccessToken } from '@src/util/accessToken'
 import React, { createContext, ReactElement, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
-import { Popup } from './Popup'
+import { Popup } from './popup/Popup'
+import Providers from './Providers'
 
 function App(): ReactElement {
   const [loading, setLoading] = useState(true)
@@ -21,7 +22,7 @@ function App(): ReactElement {
     return <Flex>Loading...</Flex>
   }
 
-  return <Popup />
+  return <Providers />
 }
 
 export default App
