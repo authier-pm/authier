@@ -18,7 +18,8 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
-import { UserContext } from '../popup/Popup'
+import { AuthsContext } from '../providers/AuthsProvider'
+import { UserContext } from '../providers/UserProvider'
 
 interface Values {
   password: string
