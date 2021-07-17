@@ -1,0 +1,19 @@
+version: '3.4'
+
+services:
+  db:
+    image: postgres
+    container_name: postgresprisma
+    environment:
+      POSTGRES_PASSWORD: auth133r
+      POSTGRES_USER: authier
+      POSTGRES_DB: authier
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    ports:
+      - '6432:5432'
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
