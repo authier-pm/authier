@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, useColorScheme, View } from 'react-native';
+import { Text, useColorScheme } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
 
 // const Section: React.FC<{
@@ -40,9 +41,9 @@ const Home = () => {
   };
 
   return (
-    <View style={backgroundStyle}>
+    <SafeAreaView style={backgroundStyle}>
       <Text>Notification here</Text>
-    </View>
+    </SafeAreaView>
   );
 };
 

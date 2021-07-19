@@ -6,6 +6,7 @@ import React, {
 } from 'react';
 import { ApolloProvider } from '@apollo/client';
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import HomeScreen from './navigation/HomeScreen';
 import { apoloCLient } from './ApolloClient';
@@ -28,14 +29,16 @@ export const Providers: React.FC<{}> = () => {
   ]);
 
   return (
-    <ApolloProvider client={apoloCLient}>
-      <AuthsContext.Provider value={{ auths, setAuths }}>
-        <TokenProvider>
-          <NavigationContainer>
-            <HomeScreen />
-          </NavigationContainer>
-        </TokenProvider>
-      </AuthsContext.Provider>
-    </ApolloProvider>
+    <SafeAreaProvider>
+      <ApolloProvider client={apoloCLient}>
+        <AuthsContext.Provider value={{ auths, setAuths }}>
+          <TokenProvider>
+            <NavigationContainer>
+              <HomeScreen />
+            </NavigationContainer>
+          </TokenProvider>
+        </AuthsContext.Provider>
+      </ApolloProvider>
+    </SafeAreaProvider>
   );
 };
