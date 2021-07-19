@@ -1,6 +1,5 @@
-import React, { createRef, RefObject, useContext, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import {
-  Easing,
   FlatList,
   StatusBar,
   StyleSheet,
@@ -11,6 +10,7 @@ import {
 import OTP from 'otp-client';
 import { AuthsContext } from '../Providers';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
+import { SafeAreaView } from 'react-native-safe-area-context';
 //import { AnimatedCircularProgress } from 'react-native-circular-progress';
 
 // const Section: React.FC<{
@@ -83,13 +83,13 @@ export const AuthList = (): JSX.Element => {
   };
 
   return (
-    <View style={[styles.container, backgroundStyle]}>
+    <SafeAreaView style={[styles.container, backgroundStyle]}>
       <FlatList
         data={auths}
         keyExtractor={(auth) => auth.label}
         renderItem={ListItem}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 
