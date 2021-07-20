@@ -13,39 +13,61 @@ model EncryptedAuths {
     id        Int    @id @default(autoincrement())
     encrypted String
     version   Int
-    userId    String @unique
+    userId    String @unique @db.Uuid
 
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @updatedAt
 
     user User @relation(fields: [userId], references: [id])
 }
 
 model Device {
-    id            Int      @id @default(autoincrement())
-    firstIpAdress String
-    lastIpAdress  String
+    id            Int    @id @default(autoincrement())
+    firstIpAdress String @db.Inet
+    lastIpAdress  String @db.Inet
     firebaseToken String
     name          String
-    userId        String
-    User          User     @relation(fields: [userId], references: [id])
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime? @updatedAt
+
+    VaultUnlockEvents         VaultUnlockEvents[] @relation("device")
+    VaultUnlockEventsApproved VaultUnlockEvents[] @relation("approvedFromDevice")
+
+    userId String @db.Uuid
+    User   User   @relation("devices", fields: [userId], references: [id])
+
+    UserPrimary User? @relation("primaryDevice")
 }
 
+// recorded when user shows a code for manual entry or when the code is filled into input by authier extension
 model OTPCodeEvent {
     id            BigInt       @id @default(autoincrement())
     kind          String
     timestamp     DateTime     @default(now())
-    ipAdress      String
+    ipAdress      String       @db.Inet
     url           String
     User          User         @relation(fields: [userId], references: [id])
-    userId        String
-    webOTPInputId Int?
+    userId        String       @db.Uuid
+    webOTPInputId Int? // this will be null when it was inputted manually
     WebOTPInput   WebOTPInput? @relation(fields: [webOTPInputId], references: [id])
 }
 
+// recorded whenever user unlocks vault
+model VaultUnlockEvents {
+    id             Int       @id @default(autoincrement())
+    deviceIp       String    @db.Inet
+    approvedFromIp String?   @db.Inet
+    approvedAt     DateTime?
+
+    deviceId             Int
+    device               Device  @relation("device", fields: [deviceId], references: [id])
+    approvedFromDeviceId Int? // when non null it means user unlocked by using another device
+    approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+
+}
+
+// a map of all inputs publicly available on the internet
 model WebOTPInput {
     id              Int            @id @default(autoincrement())
     kind            String
@@ -53,25 +75,28 @@ model WebOTPInput {
     url             String
     domPath         String
     createdByUser   User           @relation(fields: [createdByUserId], references: [id])
-    createdByUserId String
+    createdByUserId String         @db.Uuid
     OTPCodeEvent    OTPCodeEvent[]
 }
 
 model User {
-    id           String          @id @default(uuid())
-    email        String?         @unique
-    phone_number String?         @unique
-    account_name String?         @unique
-    password     String
-    tokenVersion Int             @default(0)
-    name         String?
-    auths        EncryptedAuths?
-    Token        Token[]
-    createdAt    DateTime        @default(now())
-    updatedAt    DateTime        @updatedAt
-    OTPCodeEvent OTPCodeEvent[]
-    Device       Device[]
-    WebOTPInput  WebOTPInput[]
+    id              String          @id @default(uuid()) @db.Uuid
+    email           String?         @unique
+    phone_number    String?         @unique
+    account_name    String?         @unique
+    password        String
+    tokenVersion    Int             @default(0)
+    name            String?
+    auths           EncryptedAuths?
+    Token           Token[]
+    createdAt       DateTime        @default(now())
+    updatedAt       DateTime        @updatedAt
+    primaryDevice   Device          @relation("primaryDevice", fields: [primaryDeviceId], references: [id])
+    primaryDeviceId Int
+
+    OTPCodeEvents OTPCodeEvent[]
+    Devices       Device[]       @relation("devices")
+    WebOTPInputs  WebOTPInput[]
 }
 
 model Token {
@@ -85,7 +110,7 @@ model Token {
 
     // Relation fields
     user   User   @relation(fields: [userId], references: [id])
-    userId String
+    userId String @db.Uuid
 }
 
 enum TokenType {
