@@ -1,47 +1,24 @@
 import React, { useContext, useState } from 'react';
-import {
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
-} from 'react-native';
+import { StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
 import OTP from 'otp-client';
 import { AuthsContext } from '../Providers';
 import { Colors } from 'react-native/Libraries/NewAppScreen';
-import { SafeAreaView } from 'react-native-safe-area-context';
-//import { AnimatedCircularProgress } from 'react-native-circular-progress';
-
-// const Section: React.FC<{
-//   title: string;
-// }> = ({ children, title }) => {
-//   const isDarkMode = useColorScheme() === 'dark';
-//   return (
-//     <View style={styles.sectionContainer}>
-//       <Text
-//         style={[
-//           styles.sectionTitle,
-//           {
-//             color: isDarkMode ? Colors.white : Colors.black,
-//           },
-//         ]}
-//       >
-//         {title}
-//       </Text>
-//       <Text
-//         style={[
-//           styles.sectionDescription,
-//           {
-//             color: isDarkMode ? Colors.light : Colors.dark,
-//           },
-//         ]}
-//       >
-//         {children}
-//       </Text>
-//     </View>
-//   );
-// };
+import {
+  Box,
+  FlatList,
+  Icon as NativeIcon,
+  IconButton,
+  View,
+  Text,
+  Button,
+  Pressable,
+  AddIcon,
+  Avatar,
+  Flex,
+  Heading,
+  CircularProgress,
+} from 'native-base';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 interface Item {
   secret: string;
@@ -57,13 +34,7 @@ const options = {
 export const AuthList = (): JSX.Element => {
   const { auths } = useContext(AuthsContext);
 
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  const [seconds, setRemainingSeconds] = useState(0); // render some other way??
+  const [seconds, setRemainingSeconds] = useState(0);
 
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options);
@@ -73,40 +44,88 @@ export const AuthList = (): JSX.Element => {
     }, 1000);
 
     return (
-      <View style={styles.item}>
-        <View style={styles.flexBox}>
-          <Text>{otp.getToken()}</Text>
-          <Text>{item.label}</Text>
-        </View>
+      <View
+        backgroundColor="#ffffff"
+        p={9}
+        flexDirection="row"
+        borderBottomWidth={0.5}
+        borderBottomRadius={25}
+        borderBottomColor="#a7a7a7"
+        justifyContent="space-between"
+      >
+        <Flex>
+          <Avatar
+            size="lg"
+            source={{
+              uri: 'https://via.placeholder.com/150',
+            }}
+          >
+            NB
+          </Avatar>
+        </Flex>
+        <Flex flexDirection="column">
+          <Text fontSize={20}>{item.label}</Text>
+          <Text>nick name</Text>
+          <Flex flexDirection="row" alignItems="center">
+            <Text fontSize={35}>{otp.getToken()}</Text>
+            <NativeIcon
+              color="red"
+              size="sm"
+              as={<Icon name="copy-outline" />}
+            />
+          </Flex>
+        </Flex>
+        <IconButton
+          alignSelf="flex-start"
+          variant="unstyled"
+          icon={
+            <NativeIcon
+              color="#949090"
+              size="sm"
+              as={<Icon name="ellipsis-vertical-outline" />}
+            />
+          }
+          onPress={() => console.log('Pressed')}
+        />
       </View>
     );
   };
 
   return (
-    <SafeAreaView style={[styles.container, backgroundStyle]}>
+    <View flex={1} safeArea backgroundColor="white">
+      <Flex flexDirection="row" justifyContent="space-between">
+        <Heading pl={5} pt={5}>
+          Your tokens
+        </Heading>
+        <CircularProgress
+          margin={5}
+          mt={6}
+          value={seconds}
+          size={8}
+          min={0}
+          max={30}
+          thickness={3}
+          color="teal"
+        >
+          <Text>{seconds}</Text>
+        </CircularProgress>
+      </Flex>
+
       <FlatList
         data={auths}
         keyExtractor={(auth) => auth.label}
         renderItem={ListItem}
       />
-    </SafeAreaView>
+      <Flex justifyContent="flex-end" alignItems="flex-end">
+        <IconButton
+          p={3}
+          margin={10}
+          borderRadius={60}
+          variant="solid"
+          icon={<AddIcon size={8} />}
+          onPress={() => console.log('Pressed')}
+        />
+      </Flex>
+    </View>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: StatusBar.currentHeight || 0,
-  },
-  item: {
-    backgroundColor: '#f9c2ff',
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    flexDirection: 'row',
-  },
-  flexBox: {
-    display: 'flex',
-    flexDirection: 'column',
-  },
-});
