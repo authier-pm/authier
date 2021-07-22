@@ -1,40 +1,66 @@
 import * as React from 'react';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import Home from '../components/Home';
-import Icon from 'react-native-vector-icons/Ionicons';
 import Scan from '../components/Scan';
 import { AuthList } from '../components/AuthList';
+import { IconButton, Icon as NativeIcon } from 'native-base';
+import Icon from 'react-native-vector-icons/Ionicons';
 
-const Tab = createBottomTabNavigator();
+//const Tab = createBottomTabNavigator();
+const Drawer = createDrawerNavigator();
 
 function HomeScreen() {
   return (
-    <Tab.Navigator
-      screenOptions={({ route }) => ({
-        tabBarIcon: ({ focused, color, size }) => {
-          let iconName;
-
-          if (route.name === 'Home') {
-            iconName = focused ? 'home' : 'home-outline';
-          } else if (route.name === 'Scan') {
-            iconName = focused ? 'scan' : 'scan';
-          } else if (route.name === 'AuthList') {
-            iconName = focused ? 'list' : 'list';
-          }
-
-          // You can return any component that you like here!
-          return <Icon name={iconName as string} size={size} color={color} />;
-        },
-      })}
-      tabBarOptions={{
-        activeTintColor: 'tomato',
-        inactiveTintColor: 'gray',
-      }}
+    <Drawer.Navigator
+      screenOptions={{ headerShown: true }}
+      initialRouteName="Home"
     >
-      <Tab.Screen name="Home" component={Home} />
-      <Tab.Screen options={{}} name="Scan" component={Scan} />
-      <Tab.Screen options={{}} name="AuthList" component={AuthList} />
-    </Tab.Navigator>
+      <Drawer.Screen
+        options={{
+          headerLeft: () => (
+            <IconButton
+              ml={3}
+              variant="ghost"
+              icon={
+                <NativeIcon
+                  color="#636363"
+                  size="sm"
+                  as={<Icon name="settings-outline" />}
+                />
+              }
+              onPress={() => console.log('Pressed')}
+            />
+          ),
+        }}
+        name="Home"
+        component={Home}
+      />
+      <Drawer.Screen name="Scan" component={Scan} />
+      <Drawer.Screen
+        options={{
+          headerStyle: {
+            backgroundColor: '#ebebeb',
+          },
+
+          headerLeft: () => (
+            <IconButton
+              ml={3}
+              variant="ghost"
+              icon={
+                <NativeIcon
+                  color="#636363"
+                  size="sm"
+                  as={<Icon name="settings-outline" />}
+                />
+              }
+              onPress={() => console.log('Pressed')}
+            />
+          ),
+        }}
+        name="AuthList"
+        component={AuthList}
+      />
+    </Drawer.Navigator>
   );
 }
 export default HomeScreen;
