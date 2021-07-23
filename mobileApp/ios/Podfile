@@ -6,6 +6,10 @@ platform :ios, '12.0'
 target 'authier' do
   config = use_native_modules!
 
+  pod 'DoubleConversion', :podspec => '../node_modules/react-native/third-party-podspecs/DoubleConversion.podspec'
+  pod 'glog', :podspec => '../node_modules/react-native/third-party-podspecs/glog.podspec'
+  #pod 'RCT-Folly', :podspec => '../node_modules/react-native/third-party-podspecs/RCT-Folly.podspec'
+
   pod 'Firebase/Analytics'
   pod 'Firebase/Messaging'
 
@@ -27,17 +31,7 @@ target 'authier' do
   # you should disable the next line.
   #use_flipper!()
 
-  post_install do |installer|
-    react_native_post_install(installer)
-  end
-end
-
-#use_flipper!({ 'Flipper' => '0.95.0', 'Flipper-Folly' => '2.6.7', 'Flipper-DoubleConversion' => '3.1.7' })
   #post_install do |installer|
-   # installer.pods_project.build_configurations.each do |config|
-   #   config.build_settings["EXCLUDED_ARCHS[sdk=iphonesimulator*]"] = "arm64"
-   #   config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '12.1'
-  #  end
-  #  react_native_post_install(installer)
- # end
-#end
+    #react_native_post_install(installer)
+  #end
+end

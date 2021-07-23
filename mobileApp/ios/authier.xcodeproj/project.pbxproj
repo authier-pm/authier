@@ -14,7 +14,6 @@
 		1AD57F5604570F5ED56FDF6B /* libPods-authier-authierTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = AAF9527B481F3EDEFBAC38C1 /* libPods-authier-authierTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		9D6747E46567C5A8F8E624E9 /* libPods-authier.a in Frameworks */ = {isa = PBXBuildFile; fileRef = BA201B2C96F4F6E5749C119E /* libPods-authier.a */; };
-		DF74965826A97FB40067203A /* BridgingFile.swift in Sources */ = {isa = PBXBuildFile; fileRef = DF74965726A97FB40067203A /* BridgingFile.swift */; };
 		DFDDFB0C26A1F0D8001D1397 /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DFDDFB0B26A1F0D8001D1397 /* GoogleService-Info.plist */; };
 /* End PBXBuildFile section */
 
@@ -44,8 +43,6 @@
 		905690224B4707488B9FEB1E /* Pods-authier-authierTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-authier-authierTests.debug.xcconfig"; path = "Target Support Files/Pods-authier-authierTests/Pods-authier-authierTests.debug.xcconfig"; sourceTree = "<group>"; };
 		AAF9527B481F3EDEFBAC38C1 /* libPods-authier-authierTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-authier-authierTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		BA201B2C96F4F6E5749C119E /* libPods-authier.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-authier.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		DF74965626A97FB40067203A /* authier-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "authier-Bridging-Header.h"; sourceTree = "<group>"; };
-		DF74965726A97FB40067203A /* BridgingFile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BridgingFile.swift; sourceTree = "<group>"; };
 		DFDDFB0B26A1F0D8001D1397 /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = "GoogleService-Info.plist"; path = "../../../../../Downloads/GoogleService-Info.plist"; sourceTree = "<group>"; };
 		DFDDFB0F26A1FB36001D1397 /* Ionicons.ttf */ = {isa = PBXFileReference; lastKnownFileType = file; name = Ionicons.ttf; path = "../node_modules/react-native-vector-icons/Fonts/Ionicons.ttf"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -124,14 +121,12 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				DF74965726A97FB40067203A /* BridgingFile.swift */,
 				13B07FAE1A68108700A75B9A /* authier */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* authierTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
 				D0C0E4F5C2B593635CE8CB83 /* Pods */,
-				DF74965626A97FB40067203A /* authier-Bridging-Header.h */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -408,7 +403,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
-				DF74965826A97FB40067203A /* BridgingFile.swift in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -428,7 +422,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 905690224B4707488B9FEB1E /* Pods-authier-authierTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				DEVELOPMENT_TEAM = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -457,7 +450,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = EEFF27A3123CF0FB5247DA3C /* Pods-authier-authierTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				DEVELOPMENT_TEAM = "";
@@ -490,7 +482,7 @@
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = authier/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -520,7 +512,7 @@
 				DEVELOPMENT_TEAM = Y78HVSKDV6;
 				FRAMEWORK_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = authier/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -589,7 +581,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
@@ -644,7 +636,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					/usr/lib/swift,
 					"$(inherited)",
