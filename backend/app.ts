@@ -60,7 +60,7 @@ async function main() {
 
   app.register(mercurius, {
     schema,
-    graphiql: 'playground',
+    graphiql: true,
     context: (request, reply) => {
       return { request, reply }
     }

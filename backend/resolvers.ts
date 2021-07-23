@@ -61,7 +61,7 @@ export class RootResolver {
 
   @Query(() => [User])
   async users() {
-    return await prisma.user.findMany()
+    return prisma.user.findMany()
   }
 
   // query for info about user
@@ -93,50 +93,33 @@ export class RootResolver {
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() context: IContext
   ) {
-    console.log(context.request.connection.remoteAddress)
-    try {
-      await prisma.device.create({
-        data: {
-          name: name,
-          userId: userId,
-          firstIpAdress: firstIpAdress,
-          lastIpAdress: '192.168.100.128/25', // <=== CHANGE
-          firebaseToken: firebaseToken
-        }
-      })
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
+    return prisma.device.create({
+      data: {
+        name: name,
+        userId: userId,
+        firstIpAdress: firstIpAdress,
+        lastIpAdress: '192.168.100.128/25', // <=== CHANGE
+        firebaseToken: firebaseToken
+      }
+    })
   }
 
   @Query(() => [Device])
   async myDevices(@Arg('userId', () => String) userId: string) {
-    try {
-      return await prisma.device.findMany({
-        where: {
-          userId: userId
-        }
-      })
-    } catch (err) {
-      console.log(err)
-      return err
-    }
+    return prisma.device.findMany({
+      where: {
+        userId: userId
+      }
+    })
   }
 
   @Query(() => Int)
   async DeviceCount(@Arg('userId', () => String) userId: string) {
-    try {
-      return await prisma.device.count({
-        where: {
-          userId: userId
-        }
-      })
-    } catch (error) {
-      console.log(error)
-      return 0
-    }
+    return prisma.device.count({
+      where: {
+        userId: userId
+      }
+    })
   }
 
   @Mutation(() => Boolean)
