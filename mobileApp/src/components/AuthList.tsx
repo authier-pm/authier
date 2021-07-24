@@ -1,8 +1,6 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, TouchableOpacity, useColorScheme } from 'react-native';
 import OTP from 'otp-client';
 import { AuthsContext } from '../Providers';
-import { Colors } from 'react-native/Libraries/NewAppScreen';
 import {
   Box,
   FlatList,
@@ -10,8 +8,6 @@ import {
   IconButton,
   View,
   Text,
-  Button,
-  Pressable,
   AddIcon,
   Avatar,
   Flex,
@@ -122,7 +118,7 @@ export const AuthList = (): JSX.Element => {
           margin={10}
           borderRadius={60}
           variant="solid"
-          icon={<AddIcon size={8} />}
+          icon={<AddIcon color="white" size={8} />}
           onPress={() => console.log('Pressed')}
         />
       </Flex>
