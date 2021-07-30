@@ -2,7 +2,7 @@ import React, { useContext, useState } from 'react';
 import OTP from 'otp-client';
 import { AuthsContext } from '../Providers';
 import {
-  Box,
+  Modal,
   FlatList,
   Icon as NativeIcon,
   IconButton,
@@ -13,6 +13,7 @@ import {
   Flex,
   Heading,
   CircularProgress,
+  Button,
 } from 'native-base';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -29,6 +30,9 @@ const options = {
 
 export const AuthList = (): JSX.Element => {
   const { auths } = useContext(AuthsContext);
+
+  const [showWhole, setShowWhole] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const [seconds, setRemainingSeconds] = useState(0);
 
@@ -63,7 +67,14 @@ export const AuthList = (): JSX.Element => {
           <Text fontSize={20}>{item.label}</Text>
           <Text>nick name</Text>
           <Flex flexDirection="row" alignItems="center">
-            <Text fontSize={35}>{otp.getToken()}</Text>
+            <Text
+              fontSize={35}
+              onPress={() => {
+                setShowWhole(true);
+              }}
+            >
+              {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
+            </Text>
             <NativeIcon
               color="red"
               size="sm"
@@ -81,8 +92,23 @@ export const AuthList = (): JSX.Element => {
               as={<Icon name="ellipsis-vertical-outline" />}
             />
           }
-          onPress={() => console.log('Pressed')}
+          onPress={() => setOpen(true)}
         />
+        <Modal isOpen={open} onClose={() => setOpen(false)} mt={12}>
+          <Modal.Content maxWidth={130} maxHeight={112}>
+            <Modal.CloseButton />
+            <Modal.Body>
+              <Button.Group
+                variant="ghost"
+                display="flex"
+                flexDirection="column"
+              >
+                <Button>Edit</Button>
+                <Button>Delete</Button>
+              </Button.Group>
+            </Modal.Body>
+          </Modal.Content>
+        </Modal>
       </View>
     );
   };
