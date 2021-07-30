@@ -94,6 +94,10 @@ export const Popup: FunctionComponent = () => {
     })
   }, [])
 
+  // 1. Safe device key of web to DB
+  // 2. On add device safe key to DB
+  // 3. On fill send message from web to (main) device
+  // 4. On accept send message from device back to web and fill
   useEffect(() => {
     async function test() {
       let t = await getToken(messaging, {

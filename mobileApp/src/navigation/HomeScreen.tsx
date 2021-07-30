@@ -5,6 +5,7 @@ import Scan from '../components/Scan';
 import { AuthList } from '../components/AuthList';
 import { IconButton, Icon as NativeIcon } from 'native-base';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useNavigation } from '@react-navigation/native';
 
 //const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator();
@@ -12,12 +13,12 @@ const Drawer = createDrawerNavigator();
 function HomeScreen() {
   return (
     <Drawer.Navigator
-      screenOptions={{ headerShown: true }}
-      initialRouteName="Home"
-    >
-      <Drawer.Screen
-        options={{
-          headerLeft: () => (
+      screenOptions={{
+        headerShown: true,
+        headerLeft: () => {
+          // eslint-disable-next-line react-hooks/rules-of-hooks
+          const navigation = useNavigation();
+          return (
             <IconButton
               ml={3}
               variant="ghost"
@@ -28,34 +29,21 @@ function HomeScreen() {
                   as={<Icon name="settings-outline" />}
                 />
               }
-              onPress={() => console.log('Pressed')}
+              //@ts-expect-error
+              onPress={() => navigation.openDrawer()}
             />
-          ),
-        }}
-        name="Home"
-        component={Home}
-      />
+          );
+        },
+      }}
+      initialRouteName="Home"
+    >
+      <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Scan" component={Scan} />
       <Drawer.Screen
         options={{
           headerStyle: {
             backgroundColor: '#ebebeb',
           },
-
-          headerLeft: () => (
-            <IconButton
-              ml={3}
-              variant="ghost"
-              icon={
-                <NativeIcon
-                  color="#636363"
-                  size="sm"
-                  as={<Icon name="settings-outline" />}
-                />
-              }
-              onPress={() => console.log('Pressed')}
-            />
-          ),
         }}
         name="AuthList"
         component={AuthList}
