@@ -50,12 +50,12 @@ const tokenRefresh = new TokenRefreshLink({
     })
   },
   handleFetch: async (accessToken) => {
+    console.log('token:', accessToken)
     await browser.storage.local.set({ jid: accessToken })
     setAccessToken(accessToken)
   },
   handleError: (err) => {
-    console.warn('Your refresh token is invalid. Try to login again')
-    console.error('inApolo error', err)
+    console.warn('Your refresh token is invalid. Try to login again', err)
   }
 })
 // Log any GraphQL errors or network error that occurred
