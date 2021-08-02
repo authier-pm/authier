@@ -90,18 +90,23 @@ export class RootResolver {
     @Arg('name', () => String) name: string,
     @Arg('firstIpAdress', () => String) firstIpAdress: string,
     @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
+    @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
-    return prisma.device.create({
-      data: {
-        name: name,
-        userId: userId,
-        firstIpAdress: firstIpAdress,
-        lastIpAdress: '192.168.100.128/25', // <=== CHANGE
-        firebaseToken: firebaseToken
-      }
-    })
+    try {
+      await prisma.device.create({
+        data: {
+          name: name,
+          firebaseToken: firebaseToken,
+          firstIpAdress: '192.168.1.5',
+          userId: userId,
+          lastIpAdress: '192.168.1.5'
+        }
+      })
+      return true
+    } catch (er) {
+      console.log(er)
+      return false
+    }
   }
 
   @Query(() => [Device])
@@ -169,7 +174,8 @@ export class RootResolver {
   @Mutation(() => LoginResponse)
   async register(
     @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string
+    @Arg('password', () => String) password: string,
+    @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
     const hashedPassword = await hash(password, 12)
 
@@ -177,15 +183,17 @@ export class RootResolver {
       let user = await prisma.user.create({
         data: {
           email: email,
-          password: hashedPassword
+          password: hashedPassword,
+          firebaseToken: firebaseToken
         }
       })
-
+      console.log('user:', user)
       return {
         //@ts-expect-error
         accessToken: createAccessToken(user)
       }
     } catch (err) {
+      console.log(err)
       throw new Error('Register failed')
     }
   }

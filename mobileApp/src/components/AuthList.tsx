@@ -36,6 +36,7 @@ export const AuthList = (): JSX.Element => {
 
   const [seconds, setRemainingSeconds] = useState(0);
 
+  //@ts-expect-error
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options);
 

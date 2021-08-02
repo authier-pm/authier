@@ -10,10 +10,7 @@ import React, {
 import { browser } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
 import { UserContext } from './UserProvider'
-import {
-  useIsLoggedInQuery,
-  useSaveAuthsMutation
-} from '../popup/Popup.codegen'
+import { useSaveAuthsMutation } from '../popup/Popup.codegen'
 
 export const AuthsContext = createContext<{
   auths: Array<IAuth>
@@ -40,6 +37,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
         // Split saving to DB, local storage and background script
         setAuths: async (value) => {
           console.log('saving with', password, 'userId: ', userId)
+          //After login!!!!!!!!!!!!
           await chrome.runtime.sendMessage({
             auths: value,
             lockTime: 28800000

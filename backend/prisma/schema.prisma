@@ -85,14 +85,15 @@ model User {
     phone_number    String?         @unique
     account_name    String?         @unique
     password        String
+    firebaseToken   String
     tokenVersion    Int             @default(0)
     name            String?
     auths           EncryptedAuths?
     Token           Token[]
     createdAt       DateTime        @default(now())
     updatedAt       DateTime        @updatedAt
-    primaryDevice   Device          @relation("primaryDevice", fields: [primaryDeviceId], references: [id])
-    primaryDeviceId Int
+    primaryDevice   Device?         @relation("primaryDevice", fields: [primaryDeviceId], references: [id])
+    primaryDeviceId Int?
 
     OTPCodeEvents OTPCodeEvent[]
     Devices       Device[]       @relation("devices")

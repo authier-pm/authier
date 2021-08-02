@@ -1,5 +1,4 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import cryptoJS from 'crypto-js'
 import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
@@ -16,6 +15,7 @@ const firebaseConfig = {
 
 try {
   const firebaseApp = initializeApp(firebaseConfig)
+  console.log(firebaseApp)
 } catch (err) {
   console.log(err)
 }
@@ -110,7 +110,11 @@ function fillInput() {
   let fun = setInterval(() => {
     filtered = Array.from(inputs).filter((i) => {
       console.log('scanning')
-      if (i.id.includes('otp') || i.className.includes('otp')) {
+      if (
+        i.id.includes('otp') ||
+        i.className.includes('otp') ||
+        i.className.includes('text-input')
+      ) {
         //Send message to content scrit for query, where it will send notification to users main device
         //Device will send back the authorization
 

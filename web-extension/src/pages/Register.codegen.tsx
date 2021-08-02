@@ -6,6 +6,7 @@ const defaultOptions =  {}
 export type RegisterMutationVariables = Types.Exact<{
   email: Types.Scalars['String'];
   password: Types.Scalars['String'];
+  firebaseToken: Types.Scalars['String'];
 }>;
 
 
@@ -19,8 +20,8 @@ export type RegisterMutation = (
 
 
 export const RegisterDocument = gql`
-    mutation Register($email: String!, $password: String!) {
-  register(email: $email, password: $password) {
+    mutation Register($email: String!, $password: String!, $firebaseToken: String!) {
+  register(email: $email, password: $password, firebaseToken: $firebaseToken) {
     accessToken
   }
 }
@@ -42,6 +43,7 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  *   variables: {
  *      email: // value for 'email'
  *      password: // value for 'password'
+ *      firebaseToken: // value for 'firebaseToken'
  *   },
  * });
  */
