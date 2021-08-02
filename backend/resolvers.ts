@@ -27,6 +27,8 @@ import {
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
+import * as admin from 'firebase-admin'
+let serviceAccount = require('./authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json')
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -39,6 +41,10 @@ export interface Payload {
   iat: number
   exp: number
 }
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount)
+})
 
 @Resolver()
 export class RootResolver {
@@ -127,6 +133,53 @@ export class RootResolver {
     })
   }
 
+  @Query(() => Boolean)
+  async sendAuthMessage(
+    @Arg('userId', () => String) userId: string,
+    @Arg('location', () => String) location: string,
+    @Arg('time', () => String) time: string,
+    @Arg('device', () => String) device: string,
+    @Arg('pageName', () => String) pageName: string
+  ) {
+    let user = await prisma.user.findFirst({
+      where: {
+        id: userId
+      },
+      include: {
+        Devices: true
+      }
+    })
+
+    if (user) {
+      try {
+        await admin.messaging().sendToDevice(
+          user.Devices[0].firebaseToken, // ['token_1', 'token_2', ...]
+          {
+            data: {
+              userId: userId,
+              location: location,
+              time: time,
+              device: device,
+              pageName: pageName
+            }
+          },
+          {
+            // Required for background/quit data-only messages on iOS
+            contentAvailable: true,
+            // Required for background/quit data-only messages on Android
+            priority: 'high'
+          }
+        )
+        return true
+      } catch (err) {
+        console.log(err)
+        return false
+      }
+    } else {
+      return false
+    }
+  }
+
   @Mutation(() => Boolean)
   async saveAuths(
     @Arg('userId', () => String) userId: string,
@@ -187,7 +240,7 @@ export class RootResolver {
           firebaseToken: firebaseToken
         }
       })
-      console.log('user:', user)
+
       return {
         //@ts-expect-error
         accessToken: createAccessToken(user)
