@@ -11,7 +11,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 import HomeScreen from './navigation/HomeScreen';
 import { apoloCLient } from './ApolloClient';
 import TokenProvider from './TokenProvider';
-import { Box, NativeBaseProvider } from 'native-base';
+import { NativeBaseProvider } from 'native-base';
 import { theme } from './Theme';
 
 export const AuthsContext = createContext<{

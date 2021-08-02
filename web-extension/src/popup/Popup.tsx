@@ -98,6 +98,12 @@ export const Popup: FunctionComponent = () => {
         setLocation('/verify')
       }
     })
+
+    browser.runtime.onMessage.addListener((request: { filling: Boolean }) => {
+      if (request.filling) {
+        //call api
+      }
+    })
   }, [])
 
   return (

@@ -35,6 +35,7 @@ export enum sharedBrowserEvents {
 let auths: Array<IAuth> | null
 let stopped = false // To stop timeout function, when user has to re enter passwrod
 let safeClosed = false // Is safe Closed ?
+let canFill = false
 
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
@@ -104,10 +105,16 @@ chrome.runtime.onMessage.addListener((request: { startTimeout: Boolean }) => {
   }
 })
 
+chrome.runtime.onMessage.addListener((request: { canFill: Boolean }) => {
+  if (request.canFill) {
+    canFill = true
+  }
+})
+
 function fillInput() {
   const inputs = document.getElementsByTagName('input')
   let filtered: Array<HTMLInputElement> = []
-  let fun = setInterval(() => {
+  let scan = setInterval(() => {
     filtered = Array.from(inputs).filter((i) => {
       console.log('scanning')
       if (
@@ -115,18 +122,25 @@ function fillInput() {
         i.className.includes('otp') ||
         i.className.includes('text-input')
       ) {
-        //Send message to content scrit for query, where it will send notification to users main device
-        //Device will send back the authorization
-
         return true
       }
       return false
     })
 
     if (filtered[0]) {
-      clearInterval(fun)
-      //@ts-expect-error
-      filtered[0].defaultValue = otp
+      clearInterval(scan)
+
+      //Send message to content scrit for query, where it will send notification to users main device
+      //Device will send back the authorization
+      chrome.runtime.sendMessage({ filling: true })
+      const mobileAuth = setInterval(() => {
+        console.log('CanFill??', canFill)
+        if (canFill) {
+          clearInterval(mobileAuth)
+          //@ts-expect-error
+          filtered[0].defaultValue = otp
+        }
+      }, 2000)
     }
   }, 1000)
 
