@@ -10,7 +10,8 @@ import {
   FormLabel,
   FormErrorMessage
 } from '@chakra-ui/react'
-import { AuthsContext, UserContext } from '@src/popup/Popup'
+import { UserContext } from '@src/providers/UserProvider'
+import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
@@ -24,8 +25,8 @@ interface Values {
 export default function Verification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const { setAuths } = useContext(AuthsContext)
-  const { setPassword, password } = useContext(UserContext)
+  const { setAuths, auths } = useContext(AuthsContext)
+  const { setPassword, password, setVerify } = useContext(UserContext)
 
   return (
     <Flex flexDirection="column">
@@ -36,20 +37,24 @@ export default function Verification() {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          setPassword(values.password)
-          console.log('pass', password)
+          console.log(auths)
+          await setPassword(values.password)
+
           const storage = await browser.storage.local.get()
 
           try {
-            const decryptedAuths = cryptoJS.AES.decrypt(
-              storage.encryptedAuthsMasterPassword,
-              values.password
-            ).toString(cryptoJS.enc.Utf8)
-            let parsed = JSON.parse(decryptedAuths)
+            if (storage.encryptedAuthsMasterPassword) {
+              const decryptedAuths = cryptoJS.AES.decrypt(
+                storage.encryptedAuthsMasterPassword,
+                values.password
+              ).toString(cryptoJS.enc.Utf8)
+              let parsed = JSON.parse(decryptedAuths)
+              setAuths(parsed)
+            }
 
             await chrome.runtime.sendMessage({ startTimeout: true })
             await chrome.runtime.sendMessage({ close: true })
-            setAuths(parsed)
+            setVerify(false)
             setLocation('/')
           } catch (err) {
             console.log(err)

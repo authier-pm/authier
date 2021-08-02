@@ -65,6 +65,7 @@ export type MutationAddOtpEventArgs = {
 
 
 export type MutationRegisterArgs = {
+  firebaseToken: Scalars['String'];
   password: Scalars['String'];
   email: Scalars['String'];
 };

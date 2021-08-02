@@ -38,7 +38,7 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setUserId } = useContext(UserContext)
+  const { setUserId, setPassword } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
 
   return (
@@ -68,12 +68,14 @@ export default function Login(): ReactElement {
             setUserId(id.userId)
 
             if (response.data.login.auths?.encrypted && values.password) {
+              console.log(response.data.login.auths?.encrypted)
               const decryptedAuths = cryptoJS.AES.decrypt(
                 response.data.login.auths?.encrypted as string,
                 values.password
               ).toString(cryptoJS.enc.Utf8)
               console.log('decr', decryptedAuths)
               let loaded = await JSON.parse(decryptedAuths)
+              //setPassword(values.password)
               setAuths(loaded)
             }
 

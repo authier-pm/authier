@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext, useState } from 'react'
+import React, { ReactElement, useContext, useEffect, useState } from 'react'
 import {
   Box,
   Button,
@@ -20,6 +20,9 @@ import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
+import { getMessaging, getToken } from 'firebase/messaging'
+
+const messaging = getMessaging()
 
 interface Values {
   password: string
@@ -27,6 +30,7 @@ interface Values {
 }
 
 export default function Register(): ReactElement {
+  const [fireToken, setFireToken] = useState<string | undefined>(undefined)
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
@@ -36,6 +40,18 @@ export default function Register(): ReactElement {
   if (registerError) {
     console.log(registerError)
   }
+
+  useEffect(() => {
+    async function save() {
+      let t = await getToken(messaging, {
+        vapidKey:
+          'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
+      })
+      console.log('fire: ', t)
+      setFireToken(t)
+    }
+    save()
+  })
 
   return (
     <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -49,15 +65,21 @@ export default function Register(): ReactElement {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           let res = await register({
-            variables: { email: values.email, password: values.password }
+            variables: {
+              email: values.email,
+              password: values.password,
+              firebaseToken: fireToken as string
+            }
           })
 
-          if (res) {
+          if (res.data?.register.accessToken) {
+            // is this righ, maybe rsomeone could use proxy and send random string
             await browser.storage.local.set({
               jid: res.data?.register.accessToken
             })
             setAccessToken(res.data?.register.accessToken as string)
-            //setPassword(values.password)
+            setPassword(values.password)
+
             setSubmitting(false)
             setLocation('/QRcode')
           }
