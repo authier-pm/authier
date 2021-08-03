@@ -13,6 +13,7 @@ import { apoloCLient } from './ApolloClient';
 import TokenProvider from './TokenProvider';
 import { NativeBaseProvider } from 'native-base';
 import { theme } from './Theme';
+import NotifyProvider from './NotifyProvider';
 
 export const AuthsContext = createContext<{
   auths: Array<any>;
@@ -34,13 +35,15 @@ export const Providers: React.FC<{}> = () => {
     <SafeAreaProvider>
       <NativeBaseProvider theme={theme}>
         <ApolloProvider client={apoloCLient}>
-          <AuthsContext.Provider value={{ auths, setAuths }}>
-            <TokenProvider>
-              <NavigationContainer>
-                <HomeScreen />
-              </NavigationContainer>
-            </TokenProvider>
-          </AuthsContext.Provider>
+          <NotifyProvider>
+            <AuthsContext.Provider value={{ auths, setAuths }}>
+              <TokenProvider>
+                <NavigationContainer>
+                  <HomeScreen />
+                </NavigationContainer>
+              </TokenProvider>
+            </AuthsContext.Provider>
+          </NotifyProvider>
         </ApolloProvider>
       </NativeBaseProvider>
     </SafeAreaProvider>

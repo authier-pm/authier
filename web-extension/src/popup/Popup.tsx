@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useContext, useEffect } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
 import { Route, Switch, useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
@@ -18,34 +23,32 @@ import { Settings } from '@src/pages/Settings'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
-import { IsLoggedInQuery, useIsLoggedInQuery } from './Popup.codegen'
+import {
+  IsLoggedInQuery,
+  useIsLoggedInQuery,
+  useSendAuthMessageLazyQuery
+} from './Popup.codegen'
 import { getAccessToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
 import Verification from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
+import { deviceDetect } from 'react-device-detect'
 
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
+  const [currURL, setCurrURL] = useState('')
   const { password, isAuth, userId, verify, setVerify, setPassword } =
     useContext(UserContext)
   const { auths, setAuths } = useContext(AuthsContext)
-
   const [location, setLocation] = useLocation()
+  const [sendAuthMessage, { data, error, loading }] =
+    useSendAuthMessageLazyQuery()
 
   useEffect(() => {
-    // chrome.runtime.sendMessage(
-    //   { wasClosed: true },
-    //   function (res: { wasClosed: Boolean }) {
-    //     if (res.wasClosed) {
-    //       console.log('wasClose res:', res)
-    //       setVerify(true)
-    //     }
-    //   }
-    // )
-
+    // Conditions for 'page' flow
     if (isAuth?.authenticated && !verify) {
       console.log('home')
       setLocation('/')
@@ -58,10 +61,7 @@ export const Popup: FunctionComponent = () => {
     }
   }, [isAuth?.authenticated])
 
-  // 1. Safe device key of web to DB
-  // 2. On add device safe key to DB
-  // 3. On fill send message from web to (main) device
-  // 4. On accept send message from device back to web and fill
+  // Effect for getting auths from bg script
   useEffect(() => {
     chrome.runtime.sendMessage(
       { GiveMeAuths: true },
@@ -87,10 +87,12 @@ export const Popup: FunctionComponent = () => {
       console.log(request)
       // listen for messages sent from background.js
       if (request.message === sharedBrowserEvents.URL_CHANGED) {
+        setCurrURL(request.url)
         console.log('new url', request.url) // new url is now in content scripts!
       }
     })
 
+    // Checking if is safe closed
     browser.runtime.onMessage.addListener((request: { safe: string }) => {
       if (request.safe === 'closed') {
         console.log('closed', request.safe)
@@ -99,11 +101,27 @@ export const Popup: FunctionComponent = () => {
       }
     })
 
-    browser.runtime.onMessage.addListener((request: { filling: Boolean }) => {
-      if (request.filling) {
-        //call api
+    chrome.runtime.onMessage.addListener(
+      (req: { filling: Boolean }, sender, sendresponse) => {
+        if (req.filling) {
+          console.log('What just happened')
+
+          let device = deviceDetect()
+
+          //TODO: get all variables
+          sendAuthMessage({
+            variables: {
+              userId: '45b2f51c-6ce6-4195-b705-dbccca297783',
+              device: device.osName + ' ' + device.browserName,
+              location: 'Test',
+              pageName: currURL,
+              time: 'time'
+            }
+          })
+          //After accept on mobile, send responce and set CanFill to True
+        }
       }
-    })
+    )
   }, [])
 
   return (
@@ -141,3 +159,14 @@ export const Popup: FunctionComponent = () => {
 //     setAuths(JSON.parse(decryptedAuths))
 //   }
 // })()
+
+// geolocation
+// let geo = navigator.geolocation.getCurrentPosition(
+//   (pos) => {
+//     console.log(pos)
+//   },
+//   (er) => {
+//     if (er) console.log(er)
+//   },
+//   { enableHighAccuracy: true }
+// )
