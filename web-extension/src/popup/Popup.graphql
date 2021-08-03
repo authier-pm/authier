@@ -5,3 +5,19 @@ query isLoggedIn {
 mutation saveAuths($userId: String!, $payload: String!) {
   saveAuths(userId: $userId, payload: $payload)
 }
+
+query sendAuthMessage(
+  $device: String!
+  $time: String!
+  $location: String!
+  $userId: String!
+  $pageName: String!
+) {
+  sendAuthMessage(
+    device: $device
+    time: $time
+    location: $location
+    userId: $userId
+    pageName: $pageName
+  )
+}

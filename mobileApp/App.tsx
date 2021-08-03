@@ -11,6 +11,7 @@ import React, { useEffect } from 'react';
 import 'react-native-gesture-handler';
 import { Providers } from './src/Providers';
 import messaging from '@react-native-firebase/messaging';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
   async function requestUserPermission() {
@@ -28,7 +29,10 @@ const App = () => {
   useEffect(() => {
     requestUserPermission();
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      console.log('A new FCM message arrived!', JSON.stringify(remoteMessage));
+      let data = JSON.stringify(remoteMessage);
+      await AsyncStorage.setItem('notifies', data, (e) => {
+        if (e) console.log(e);
+      });
     });
 
     return unsubscribe;

@@ -5,6 +5,7 @@ type Query {
   me: User
   myDevices(userId: String!): [Device!]!
   DeviceCount(userId: String!): Int!
+  sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!, userId: String!): Boolean!
 }
 
 type User {

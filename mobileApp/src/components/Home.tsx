@@ -8,41 +8,37 @@ import {
   IconButton,
   Modal,
   Text,
-  View,
   Pressable,
 } from 'native-base';
 import React, { useEffect, useState } from 'react';
 import { useContext } from 'react';
 import ReactNativeBiometrics from 'react-native-biometrics';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { AuthsContext } from '../Providers';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { NotifyContext } from '../NotifyProvider';
 
 const Home = () => {
-  const { auths, setAuths } = useContext(AuthsContext);
+  const { notifies, setNotifies } = useContext(NotifyContext);
   const [isBio, setIsBio] = useState(false);
   const [open, setOpen] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
 
-  useEffect(() => {
-    async function getbio() {
-      const { biometryType } = await ReactNativeBiometrics.isSensorAvailable();
-
-      if (biometryType === ReactNativeBiometrics.Biometrics) {
-        setIsBio(true);
-      }
-    }
-    getbio();
-  });
-
-  const authenticate = (label) => {
+  const authenticate = (page: string) => {
     if (isBio) {
       ReactNativeBiometrics.simplePrompt({
         promptMessage: 'Confirm fingerprint',
       })
-        .then((resultObject) => {
+        .then(async (resultObject) => {
           const { success } = resultObject;
           if (success) {
             //call here api, maybe wait on success confirmation
-            setAuths(auths.filter((el) => (el.label === label ? false : true)));
+
+            setNotifies(
+              notifies.filter((el) => (el.pageName === page ? false : true))
+            );
+            await AsyncStorage.removeItem('notifies', (e) => {
+              if (e) console.log(e);
+            });
           } else {
             console.log('user cancelled biometric prompt');
           }
@@ -53,16 +49,52 @@ const Home = () => {
     }
   };
 
+  const updateList = async () => {
+    const jsonValue = await AsyncStorage.getItem('notifies', (e) => {
+      if (e) console.log('error in async storage', e);
+    });
+
+    if (jsonValue) {
+      let data = JSON.parse(jsonValue as string);
+      setNotifies([data.data]);
+    } else {
+      setNotifies([]);
+    }
+
+    setRefreshing(false);
+  };
+
+  useEffect(() => {
+    async function getBio() {
+      const { biometryType } = await ReactNativeBiometrics.isSensorAvailable();
+
+      if (biometryType === ReactNativeBiometrics.Biometrics) {
+        setIsBio(true);
+      }
+    }
+
+    getBio();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleRefresh = () => {
+    setRefreshing(true);
+    updateList();
+  };
+
+  //@ts-expect-error
   const ListItem = ({ item }) => {
+    console.log('item', item);
     return (
       <Pressable
+        key={item.pageName}
         backgroundColor="#ffffff"
         p={7}
         flexDirection="row"
         borderBottomWidth={0.5}
         borderBottomRadius={25}
         borderBottomColor="#a7a7a7"
-        onPress={() => authenticate(item.label)}
+        onPress={() => authenticate(item.pageName)}
       >
         <Flex>
           <Avatar
@@ -76,18 +108,18 @@ const Home = () => {
           </Avatar>
         </Flex>
         <Flex flexDirection="column">
-          <Text fontSize={20}>{item.label}</Text>
+          <Text fontSize={20}>{item.pageName}</Text>
           <Flex flexDirection="row" alignItems="center">
             <Icon name="desktop" color="gray" />
-            <Text ml={1}>Chrome on Macbook</Text>
+            <Text ml={1}>{item.device}</Text>
           </Flex>
           <Flex flexDirection="row" alignItems="center">
             <Icon name="locate" color="gray" />
-            <Text ml={1}>Brno</Text>
+            <Text ml={1}>{item.location}</Text>
           </Flex>
           <Flex flexDirection="row" alignItems="center">
             <Icon name="time" color="gray" />
-            <Text ml={1}>15:45 AM</Text>
+            <Text ml={1}>{item.time}</Text>
           </Flex>
         </Flex>
         <Modal isOpen={open} onClose={() => setOpen(false)} mt={12}>
@@ -110,34 +142,17 @@ const Home = () => {
   };
 
   return (
-    <Box safeArea>
+    <Box safeArea flex={1}>
       <Text>notification here</Text>
-      <Button
-        onPress={() => {
-          if (isBio) {
-            ReactNativeBiometrics.simplePrompt({
-              promptMessage: 'Confirm fingerprint',
-            })
-              .then((resultObject) => {
-                const { success } = resultObject;
-                if (success) {
-                  console.log('successful biometrics provided');
-                } else {
-                  console.log('user cancelled biometric prompt');
-                }
-              })
-              .catch(() => {
-                console.log('biometrics failed');
-              });
-          }
-        }}
-      >
-        Test
-      </Button>
+
       <FlatList
-        data={auths}
-        keyExtractor={(auth) => auth.label}
+        data={notifies}
+        keyExtractor={(noti) => {
+          return noti.pageName;
+        }}
         renderItem={ListItem}
+        onRefresh={handleRefresh}
+        refreshing={refreshing}
       />
     </Box>
   );

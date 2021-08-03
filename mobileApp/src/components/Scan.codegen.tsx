@@ -2,7 +2,7 @@ import * as Types from '../generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {};
 export type AddDeviceMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
   name: Types.Scalars['String'];
@@ -10,24 +10,30 @@ export type AddDeviceMutationVariables = Types.Exact<{
   firebaseToken: Types.Scalars['String'];
 }>;
 
-
-export type AddDeviceMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'addDevice'>
-);
-
+export type AddDeviceMutation = { __typename?: 'Mutation' } & Pick<
+  Types.Mutation,
+  'addDevice'
+>;
 
 export const AddDeviceDocument = gql`
-    mutation addDevice($userId: String!, $name: String!, $firstIpAdress: String!, $firebaseToken: String!) {
-  addDevice(
-    userId: $userId
-    name: $name
-    firstIpAdress: $firstIpAdress
-    firebaseToken: $firebaseToken
-  )
-}
-    `;
-export type AddDeviceMutationFn = Apollo.MutationFunction<AddDeviceMutation, AddDeviceMutationVariables>;
+  mutation addDevice(
+    $userId: String!
+    $name: String!
+    $firstIpAdress: String!
+    $firebaseToken: String!
+  ) {
+    addDevice(
+      userId: $userId
+      name: $name
+      firstIpAdress: $firstIpAdress
+      firebaseToken: $firebaseToken
+    )
+  }
+`;
+export type AddDeviceMutationFn = Apollo.MutationFunction<
+  AddDeviceMutation,
+  AddDeviceMutationVariables
+>;
 
 /**
  * __useAddDeviceMutation__
@@ -49,10 +55,23 @@ export type AddDeviceMutationFn = Apollo.MutationFunction<AddDeviceMutation, Add
  *   },
  * });
  */
-export function useAddDeviceMutation(baseOptions?: Apollo.MutationHookOptions<AddDeviceMutation, AddDeviceMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddDeviceMutation, AddDeviceMutationVariables>(AddDeviceDocument, options);
-      }
-export type AddDeviceMutationHookResult = ReturnType<typeof useAddDeviceMutation>;
+export function useAddDeviceMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddDeviceMutation,
+    AddDeviceMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions };
+  return Apollo.useMutation<AddDeviceMutation, AddDeviceMutationVariables>(
+    AddDeviceDocument,
+    options
+  );
+}
+export type AddDeviceMutationHookResult = ReturnType<
+  typeof useAddDeviceMutation
+>;
 export type AddDeviceMutationResult = Apollo.MutationResult<AddDeviceMutation>;
-export type AddDeviceMutationOptions = Apollo.BaseMutationOptions<AddDeviceMutation, AddDeviceMutationVariables>;
+export type AddDeviceMutationOptions = Apollo.BaseMutationOptions<
+  AddDeviceMutation,
+  AddDeviceMutationVariables
+>;

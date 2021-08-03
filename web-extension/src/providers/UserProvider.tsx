@@ -30,6 +30,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   useEffect(() => {
     if (data?.authenticated && !loading) {
       setUserId(data.authenticated)
+      //Save user ID to storage
       setIsAuth(data)
     }
   }, [data?.authenticated])

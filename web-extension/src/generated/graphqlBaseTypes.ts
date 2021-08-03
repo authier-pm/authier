@@ -95,6 +95,7 @@ export type Query = {
   me?: Maybe<User>;
   myDevices: Array<Device>;
   DeviceCount: Scalars['Int'];
+  sendAuthMessage: Scalars['Boolean'];
 };
 
 
@@ -104,6 +105,15 @@ export type QueryMyDevicesArgs = {
 
 
 export type QueryDeviceCountArgs = {
+  userId: Scalars['String'];
+};
+
+
+export type QuerySendAuthMessageArgs = {
+  pageName: Scalars['String'];
+  device: Scalars['String'];
+  time: Scalars['String'];
+  location: Scalars['String'];
   userId: Scalars['String'];
 };
 
