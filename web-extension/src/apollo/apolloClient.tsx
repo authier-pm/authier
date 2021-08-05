@@ -43,14 +43,13 @@ const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    console.log('refetch')
+    console.log('refetch JWT token')
     return await fetch(`http://localhost:5051/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })
   },
   handleFetch: async (accessToken) => {
-    console.log('token:', accessToken)
     await browser.storage.local.set({ jid: accessToken })
     setAccessToken(accessToken)
   },

@@ -36,7 +36,6 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
         auths,
         // Split saving to DB, local storage and background script
         setAuths: async (value) => {
-          console.log('saving with', password, 'userId: ', userId)
           //After login!!!!!!!!!!!!
           await chrome.runtime.sendMessage({
             auths: value,
@@ -49,6 +48,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
           ).toString()
 
           if (isAuth) {
+            console.log('saving with', password, 'userId: ', userId)
             await saveAuthsMutation({
               variables: {
                 payload: encrypted,

@@ -2,6 +2,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
+import { getMessaging, onMessage } from 'firebase/messaging'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -13,11 +14,12 @@ const firebaseConfig = {
   measurementId: 'G-0W2MW55WVF'
 }
 
-try {
-  const firebaseApp = initializeApp(firebaseConfig)
-} catch (err) {
-  console.log(err)
-}
+const firebaseApp = initializeApp(firebaseConfig)
+const messaging = getMessaging(firebaseApp)
+onMessage(messaging, (payload) => {
+  console.log('Message received. ', payload)
+  // ...
+})
 
 interface IAuth {
   secret: string

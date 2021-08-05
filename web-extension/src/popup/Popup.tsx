@@ -28,19 +28,21 @@ import {
   useIsLoggedInQuery,
   useSendAuthMessageLazyQuery
 } from './Popup.codegen'
-import { getAccessToken } from '@src/util/accessToken'
+import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
 import Verification from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
+import { getMessaging, onMessage } from 'firebase/messaging'
 
 i18n.activate('en')
+const messaging = getMessaging()
 
 export const Popup: FunctionComponent = () => {
   const [currURL, setCurrURL] = useState('')
-  const { password, isAuth, userId, verify, setVerify, setPassword } =
+  const { isAuth, userId, verify, setVerify, setUserId } =
     useContext(UserContext)
   const { auths, setAuths } = useContext(AuthsContext)
   const [location, setLocation] = useLocation()
@@ -49,17 +51,17 @@ export const Popup: FunctionComponent = () => {
 
   useEffect(() => {
     // Conditions for 'page' flow
-    if (isAuth?.authenticated && !verify) {
+    if (isAuth && !verify) {
       console.log('home')
       setLocation('/')
-    } else if (!isAuth?.authenticated) {
+    } else if (!isAuth) {
       console.log('login')
       setLocation('/login')
-    } else if (isAuth.authenticated && verify) {
+    } else if (isAuth && verify) {
       console.log('verify')
       setLocation('/verify')
     }
-  }, [isAuth?.authenticated])
+  }, [isAuth])
 
   // Effect for getting auths from bg script
   useEffect(() => {
@@ -102,23 +104,31 @@ export const Popup: FunctionComponent = () => {
     })
 
     chrome.runtime.onMessage.addListener(
-      (req: { filling: Boolean }, sender, sendresponse) => {
+      async (req: { filling: Boolean }, sender, sendresponse) => {
         if (req.filling) {
           console.log('What just happened')
-
+          let id = await getUserFromToken()
           let device = deviceDetect()
+          let date = new Date()
 
           //TODO: get all variables
           sendAuthMessage({
             variables: {
-              userId: '45b2f51c-6ce6-4195-b705-dbccca297783',
-              device: device.osName + ' ' + device.browserName,
+              //@ts-expect-error
+              userId: id.userId,
+              device: device.browserName + ' on ' + device.osName,
               location: 'Test',
               pageName: currURL,
-              time: 'time'
+              time:
+                date.getHours().toString() + ':' + date.getMinutes().toString()
             }
           })
           //After accept on mobile, send responce and set CanFill to True
+
+          onMessage(messaging, (payload) => {
+            console.log('Message received. ', payload)
+            console.log(messaging)
+          })
         }
       }
     )

@@ -24,6 +24,7 @@
     "http://*/",
     "https://*/",
     "system.network"
-  ]
+  ],
+  "content_security_policy": "script-src 'self' https://www.gstatic.com/ https://*.firebaseio.com https://www.googleapis.com; object-src 'self'; connect-src 'self' wss://*.firebaseio.com;"
   
 }
