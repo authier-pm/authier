@@ -1,5 +1,6 @@
 import { Box } from '@chakra-ui/react'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { getUserFromToken } from '@src/util/accessToken'
 import React, {
   useState,
   createContext,
@@ -16,22 +17,22 @@ export const UserContext = createContext<{
   userId: string | undefined
   setVerify: Dispatch<SetStateAction<Boolean>>
   verify: Boolean
-  setIsAuth: Dispatch<SetStateAction<IsLoggedInQuery | undefined>>
-  isAuth: IsLoggedInQuery | undefined
+  setIsAuth: Dispatch<SetStateAction<Boolean>>
+  isAuth: Boolean
 }>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
   const [password, setPassword] = useState<string>('bob')
   const [verify, setVerify] = useState<Boolean>(false)
   const { data, loading, error } = useIsLoggedInQuery()
-  const [userId, setUserId] = useState<string | undefined>('')
-  const [isAuth, setIsAuth] = useState<IsLoggedInQuery>()
+  const [userId, setUserId] = useState<string | undefined>(undefined)
+  const [isAuth, setIsAuth] = useState<Boolean>(false)
 
   useEffect(() => {
     if (data?.authenticated && !loading) {
-      setUserId(data.authenticated)
       //Save user ID to storage
-      setIsAuth(data)
+      setIsAuth(true)
+      console.log('test: ', userId, isAuth)
     }
   }, [data?.authenticated])
 

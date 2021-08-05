@@ -11,6 +11,14 @@ export type Scalars = {
   Float: number;
 };
 
+export type Device = {
+  __typename?: 'Device';
+  firstIpAdress: Scalars['String'];
+  lastIpAdress: Scalars['String'];
+  firebaseToken: Scalars['String'];
+  name: Scalars['String'];
+};
+
 export type EncryptedAuths = {
   __typename?: 'EncryptedAuths';
   id: Scalars['Int'];
@@ -57,6 +65,7 @@ export type MutationAddOtpEventArgs = {
 
 
 export type MutationRegisterArgs = {
+  firebaseToken: Scalars['String'];
   password: Scalars['String'];
   email: Scalars['String'];
 };
@@ -84,11 +93,34 @@ export type Query = {
   authenticated: Scalars['String'];
   users: Array<User>;
   me?: Maybe<User>;
+  myDevices: Array<Device>;
   DeviceCount: Scalars['Int'];
+  sendAuthMessage: Scalars['Boolean'];
+  sendConfirmation: Scalars['Boolean'];
+};
+
+
+export type QueryMyDevicesArgs = {
+  userId: Scalars['String'];
 };
 
 
 export type QueryDeviceCountArgs = {
+  userId: Scalars['String'];
+};
+
+
+export type QuerySendAuthMessageArgs = {
+  pageName: Scalars['String'];
+  device: Scalars['String'];
+  time: Scalars['String'];
+  location: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+
+export type QuerySendConfirmationArgs = {
+  success: Scalars['Boolean'];
   userId: Scalars['String'];
 };
 
