@@ -180,6 +180,36 @@ export class RootResolver {
     }
   }
 
+  @Query(() => Boolean)
+  async sendConfirmation(
+    @Arg('userId', () => String) userId: string,
+    @Arg('success', () => Boolean) success: Boolean
+  ) {
+    console.log(userId)
+    let user = await prisma.user.findFirst({
+      where: {
+        id: userId
+      }
+    })
+
+    try {
+      await admin.messaging().sendToDevice(
+        user?.firebaseToken as string,
+        {
+          data: {
+            success: success.toString()
+          }
+        },
+        {}
+      )
+      console.log('sended')
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
+  }
+
   @Mutation(() => Boolean)
   async saveAuths(
     @Arg('userId', () => String) userId: string,
