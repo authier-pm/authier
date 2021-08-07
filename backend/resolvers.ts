@@ -28,7 +28,7 @@ import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
-let serviceAccount = require('./authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json')
+import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -94,18 +94,23 @@ export class RootResolver {
   @Mutation(() => Boolean)
   async addDevice(
     @Arg('name', () => String) name: string,
-    @Arg('firstIpAdress', () => String) firstIpAdress: string,
     @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() context: IContext
   ) {
+    // @ts-expect-error
+    const ipAddress: string =
+      context.request.headers['x-forwarded-for'] ||
+      context.request.socket.remoteAddress
+
     try {
       await prisma.device.create({
         data: {
           name: name,
           firebaseToken: firebaseToken,
-          firstIpAdress: '192.168.1.5',
+          firstIpAdress: ipAddress,
           userId: userId,
-          lastIpAdress: '192.168.1.5'
+          lastIpAdress: ipAddress
         }
       })
       return true
