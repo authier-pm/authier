@@ -39,7 +39,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
           //After login!!!!!!!!!!!!
           await chrome.runtime.sendMessage({
             auths: value,
-            lockTime: 28800000
+            lockTime: 1000 * 60 * 60 * 8 // TODO customizable
           })
 
           const encrypted = cryptoJS.AES.encrypt(
