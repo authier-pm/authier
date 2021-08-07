@@ -16,10 +16,23 @@ const firebaseConfig = {
 
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
-onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload)
-  // ...
-})
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker
+    .register('/firebase-messaging-sw.js')
+    .then(function (registration) {
+      console.log(
+        'ServiceWorker registration successful with scope: ',
+        registration.scope
+      )
+    })
+    .catch(function (err) {
+      //registration failed :(
+      console.log('ServiceWorker registration failed: ', err)
+    })
+} else {
+  console.log('No service-worker on this browser')
+}
 
 interface IAuth {
   secret: string
@@ -72,6 +85,7 @@ chrome.runtime.onMessage.addListener(function (
   }
 })
 
+//Instead of timeouts set alarm API
 chrome.runtime.onMessage.addListener(
   async (request: { auths: any; lockTime: number }) => {
     if (request.auths) {

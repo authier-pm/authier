@@ -104,7 +104,7 @@ export const Popup: FunctionComponent = () => {
     })
 
     chrome.runtime.onMessage.addListener(
-      async (req: { filling: Boolean }, sender, sendresponse) => {
+      async (req: { filling: Boolean }, sender, sendResponse) => {
         if (req.filling) {
           console.log('What just happened')
           let id = await getUserFromToken()
@@ -124,11 +124,6 @@ export const Popup: FunctionComponent = () => {
             }
           })
           //After accept on mobile, send responce and set CanFill to True
-
-          onMessage(messaging, (payload) => {
-            console.log('Message received. ', payload)
-            console.log(messaging)
-          })
         }
       }
     )
