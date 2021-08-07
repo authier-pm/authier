@@ -48,7 +48,6 @@ export type Mutation = {
 export type MutationAddDeviceArgs = {
   firebaseToken: Scalars['String'];
   userId: Scalars['String'];
-  firstIpAdress: Scalars['String'];
   name: Scalars['String'];
 };
 
@@ -94,8 +93,9 @@ export type Query = {
   users: Array<User>;
   me?: Maybe<User>;
   myDevices: Array<Device>;
-  DeviceCount: Scalars['Int'];
+  devicesCount: Scalars['Int'];
   sendAuthMessage: Scalars['Boolean'];
+  sendConfirmation: Scalars['Boolean'];
 };
 
 
@@ -104,7 +104,7 @@ export type QueryMyDevicesArgs = {
 };
 
 
-export type QueryDeviceCountArgs = {
+export type QueryDevicesCountArgs = {
   userId: Scalars['String'];
 };
 
@@ -114,6 +114,12 @@ export type QuerySendAuthMessageArgs = {
   device: Scalars['String'];
   time: Scalars['String'];
   location: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+
+export type QuerySendConfirmationArgs = {
+  success: Scalars['Boolean'];
   userId: Scalars['String'];
 };
 
