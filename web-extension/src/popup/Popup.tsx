@@ -26,6 +26,7 @@ import QRcode from '@src/pages/QRcode'
 import {
   IsLoggedInQuery,
   useIsLoggedInQuery,
+  useSaveFirebaseTokenMutation,
   useSendAuthMessageLazyQuery
 } from './Popup.codegen'
 import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
@@ -35,21 +36,51 @@ import Verification from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
-import { getMessaging, onMessage } from 'firebase/messaging'
+import { getMessaging, getToken } from 'firebase/messaging'
+
+const messaging = getMessaging()
 
 i18n.activate('en')
-const messaging = getMessaging()
 
 export const Popup: FunctionComponent = () => {
   const [currURL, setCurrURL] = useState('')
-  const { isAuth, userId, verify, setVerify, setUserId } =
+  const { isAuth, verify, setVerify, userId, setUserId } =
     useContext(UserContext)
   const { auths, setAuths } = useContext(AuthsContext)
+  const [
+    saveFirebaseTokenMutation,
+    { data: tokenData, loading: tokenLoading, error: tokenError }
+  ] = useSaveFirebaseTokenMutation({})
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
+  const [fireToken, setFireToken] = useState<string>('')
+  //const [userId, setUserId] = useState('')
 
   useEffect(() => {
+    async function generateFireToken() {
+      let t = await getToken(messaging, {
+        vapidKey:
+          'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
+      })
+
+      setFireToken(t)
+      return t
+    }
+
+    generateFireToken()
+  }, [])
+
+  useEffect(() => {
+    if (isAuth) {
+      saveFirebaseTokenMutation({
+        variables: {
+          userId: userId as string,
+          firebaseToken: fireToken as string
+        }
+      })
+    }
+
     // Conditions for 'page' flow
     if (isAuth && !verify) {
       console.log('home')

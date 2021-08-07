@@ -6,6 +6,7 @@ type Query {
   myDevices(userId: String!): [Device!]!
   DeviceCount(userId: String!): Int!
   sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!, userId: String!): Boolean!
+  sendConfirmation(success: Boolean!, userId: String!): Boolean!
 }
 
 type User {
@@ -28,6 +29,7 @@ type Mutation {
   """you need to be authenticated to call this resolver"""
   authenticated: String!
   addDevice(firebaseToken: String!, userId: String!, firstIpAdress: String!, name: String!): Boolean!
+  firebaseToken(firebaseToken: String!, userId: String!): Boolean!
   saveAuths(payload: String!, userId: String!): Boolean!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!

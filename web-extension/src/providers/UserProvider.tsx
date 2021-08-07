@@ -10,6 +10,18 @@ import React, {
   useEffect
 } from 'react'
 
+// const onMessageListener = () =>
+//   new Promise((resolve) => {
+//     onMessage(messaging, (payload) => {
+//       resolve(payload)
+//     })
+//   })
+//   onMessageListener()
+//     .then((payload) => {
+//       console.log(payload)
+//     })
+//     .catch((err) => console.log('failed: ', err))
+
 export const UserContext = createContext<{
   setPassword: Dispatch<SetStateAction<string>>
   password: string
@@ -29,10 +41,18 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   const [isAuth, setIsAuth] = useState<Boolean>(false)
 
   useEffect(() => {
+    async function getId() {
+      let id = await getUserFromToken()
+      //@ts-expect-error
+      setUserId(id.userId)
+    }
+    getId()
+  }, [])
+
+  useEffect(() => {
     if (data?.authenticated && !loading) {
       //Save user ID to storage
       setIsAuth(true)
-      console.log('test: ', userId, isAuth)
     }
   }, [data?.authenticated])
 
