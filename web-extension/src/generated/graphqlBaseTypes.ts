@@ -37,6 +37,7 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['String'];
   addDevice: Scalars['Boolean'];
+  firebaseToken: Scalars['Boolean'];
   saveAuths: Scalars['Boolean'];
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
@@ -50,6 +51,12 @@ export type MutationAddDeviceArgs = {
   userId: Scalars['String'];
   firstIpAdress: Scalars['String'];
   name: Scalars['String'];
+};
+
+
+export type MutationFirebaseTokenArgs = {
+  firebaseToken: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 
@@ -96,6 +103,7 @@ export type Query = {
   myDevices: Array<Device>;
   DeviceCount: Scalars['Int'];
   sendAuthMessage: Scalars['Boolean'];
+  sendConfirmation: Scalars['Boolean'];
 };
 
 
@@ -114,6 +122,12 @@ export type QuerySendAuthMessageArgs = {
   device: Scalars['String'];
   time: Scalars['String'];
   location: Scalars['String'];
+  userId: Scalars['String'];
+};
+
+
+export type QuerySendConfirmationArgs = {
+  success: Scalars['Boolean'];
   userId: Scalars['String'];
 };
 

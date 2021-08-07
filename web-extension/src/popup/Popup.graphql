@@ -21,3 +21,7 @@ query sendAuthMessage(
     pageName: $pageName
   )
 }
+
+mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
+  firebaseToken(userId: $userId, firebaseToken: $firebaseToken)
+}

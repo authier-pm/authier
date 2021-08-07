@@ -115,6 +115,27 @@ export class RootResolver {
     }
   }
 
+  @Mutation(() => Boolean)
+  async firebaseToken(
+    @Arg('userId', () => String) userId: string,
+    @Arg('firebaseToken', () => String) firebaseToken: string
+  ) {
+    try {
+      await prisma.user.update({
+        data: {
+          firebaseToken: firebaseToken
+        },
+        where: {
+          id: userId
+        }
+      })
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
+  }
+
   @Query(() => [Device])
   async myDevices(@Arg('userId', () => String) userId: string) {
     return prisma.device.findMany({
