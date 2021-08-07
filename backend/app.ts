@@ -2,7 +2,7 @@ import { sendRefreshToken } from './sendRefreshToken'
 import 'reflect-metadata'
 import fastify from 'fastify'
 import mercurius from 'mercurius'
-import { schema } from './schemas/schema'
+import { gqlSchema } from './schemas/gqlSchema'
 import dotenv from 'dotenv'
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prisma } from './prisma'
@@ -59,7 +59,7 @@ async function main() {
   } as FastifyCookieOptions)
 
   app.register(mercurius, {
-    schema,
+    schema: gqlSchema,
     graphiql: true,
     context: (request, reply) => {
       return { request, reply }
