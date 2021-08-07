@@ -38,7 +38,7 @@ export default function Verification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           console.log(auths)
-          await setPassword(values.password)
+          setPassword(values.password)
 
           const storage = await browser.storage.local.get()
 
@@ -53,11 +53,12 @@ export default function Verification() {
             }
 
             await chrome.runtime.sendMessage({ startTimeout: true })
-            await chrome.runtime.sendMessage({ close: true })
+
             setVerify(false)
             setLocation('/')
           } catch (err) {
             console.log(err)
+            // Alert on wrong password
           }
 
           setSubmitting(false)
