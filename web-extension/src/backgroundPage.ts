@@ -2,7 +2,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
-import { getMessaging, onMessage } from 'firebase/messaging'
+import { getMessaging } from 'firebase/messaging'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
