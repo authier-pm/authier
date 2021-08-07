@@ -6,7 +6,6 @@ const defaultOptions =  {}
 export type AddDeviceMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
   name: Types.Scalars['String'];
-  firstIpAdress: Types.Scalars['String'];
   firebaseToken: Types.Scalars['String'];
 }>;
 
@@ -18,13 +17,8 @@ export type AddDeviceMutation = (
 
 
 export const AddDeviceDocument = gql`
-    mutation addDevice($userId: String!, $name: String!, $firstIpAdress: String!, $firebaseToken: String!) {
-  addDevice(
-    userId: $userId
-    name: $name
-    firstIpAdress: $firstIpAdress
-    firebaseToken: $firebaseToken
-  )
+    mutation addDevice($userId: String!, $name: String!, $firebaseToken: String!) {
+  addDevice(userId: $userId, name: $name, firebaseToken: $firebaseToken)
 }
     `;
 export type AddDeviceMutationFn = Apollo.MutationFunction<AddDeviceMutation, AddDeviceMutationVariables>;
@@ -44,7 +38,6 @@ export type AddDeviceMutationFn = Apollo.MutationFunction<AddDeviceMutation, Add
  *   variables: {
  *      userId: // value for 'userId'
  *      name: // value for 'name'
- *      firstIpAdress: // value for 'firstIpAdress'
  *      firebaseToken: // value for 'firebaseToken'
  *   },
  * });

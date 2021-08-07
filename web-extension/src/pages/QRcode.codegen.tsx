@@ -10,13 +10,13 @@ export type DeviceCountQueryVariables = Types.Exact<{
 
 export type DeviceCountQuery = (
   { __typename?: 'Query' }
-  & Pick<Types.Query, 'DeviceCount'>
+  & Pick<Types.Query, 'devicesCount'>
 );
 
 
 export const DeviceCountDocument = gql`
     query DeviceCount($userId: String!) {
-  DeviceCount(userId: $userId)
+  devicesCount(userId: $userId)
 }
     `;
 

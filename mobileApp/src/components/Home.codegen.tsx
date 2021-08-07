@@ -2,22 +2,24 @@ import * as Types from '../generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions = {};
+const defaultOptions =  {}
 export type SendConfirmationQueryVariables = Types.Exact<{
   userId: Types.Scalars['String'];
   success: Types.Scalars['Boolean'];
 }>;
 
-export type SendConfirmationQuery = { __typename?: 'Query' } & Pick<
-  Types.Query,
-  'sendConfirmation'
->;
+
+export type SendConfirmationQuery = (
+  { __typename?: 'Query' }
+  & Pick<Types.Query, 'sendConfirmation'>
+);
+
 
 export const SendConfirmationDocument = gql`
-  query sendConfirmation($userId: String!, $success: Boolean!) {
-    sendConfirmation(userId: $userId, success: $success)
-  }
-`;
+    query sendConfirmation($userId: String!, $success: Boolean!) {
+  sendConfirmation(userId: $userId, success: $success)
+}
+    `;
 
 /**
  * __useSendConfirmationQuery__
@@ -36,37 +38,14 @@ export const SendConfirmationDocument = gql`
  *   },
  * });
  */
-export function useSendConfirmationQuery(
-  baseOptions: Apollo.QueryHookOptions<
-    SendConfirmationQuery,
-    SendConfirmationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useQuery<SendConfirmationQuery, SendConfirmationQueryVariables>(
-    SendConfirmationDocument,
-    options
-  );
-}
-export function useSendConfirmationLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    SendConfirmationQuery,
-    SendConfirmationQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions };
-  return Apollo.useLazyQuery<
-    SendConfirmationQuery,
-    SendConfirmationQueryVariables
-  >(SendConfirmationDocument, options);
-}
-export type SendConfirmationQueryHookResult = ReturnType<
-  typeof useSendConfirmationQuery
->;
-export type SendConfirmationLazyQueryHookResult = ReturnType<
-  typeof useSendConfirmationLazyQuery
->;
-export type SendConfirmationQueryResult = Apollo.QueryResult<
-  SendConfirmationQuery,
-  SendConfirmationQueryVariables
->;
+export function useSendConfirmationQuery(baseOptions: Apollo.QueryHookOptions<SendConfirmationQuery, SendConfirmationQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SendConfirmationQuery, SendConfirmationQueryVariables>(SendConfirmationDocument, options);
+      }
+export function useSendConfirmationLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SendConfirmationQuery, SendConfirmationQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SendConfirmationQuery, SendConfirmationQueryVariables>(SendConfirmationDocument, options);
+        }
+export type SendConfirmationQueryHookResult = ReturnType<typeof useSendConfirmationQuery>;
+export type SendConfirmationLazyQueryHookResult = ReturnType<typeof useSendConfirmationLazyQuery>;
+export type SendConfirmationQueryResult = Apollo.QueryResult<SendConfirmationQuery, SendConfirmationQueryVariables>;
