@@ -130,7 +130,7 @@ export class RootResolver {
   }
 
   @Query(() => Int)
-  async DeviceCount(@Arg('userId', () => String) userId: string) {
+  async devicesCount(@Arg('userId', () => String) userId: string) {
     return prisma.device.count({
       where: {
         userId: userId
