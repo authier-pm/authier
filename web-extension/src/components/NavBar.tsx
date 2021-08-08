@@ -46,11 +46,11 @@ export const NavBar: FunctionComponent = () => {
       borderBottomColor="gray.300"
       width="315px"
     >
-      <ActiveLink href={!isOut ? '/settings' : lastPage}>
+      <ActiveLink href={!isOut ? '/menu' : lastPage}>
         {location !== '/' ? (
           <IconButton
             size="md"
-            aria-label="Settings"
+            aria-label="menu"
             icon={<ArrowBackIcon />}
             onClick={() => {
               setIsOut(!isOut)
@@ -59,7 +59,7 @@ export const NavBar: FunctionComponent = () => {
         ) : (
           <IconButton
             size="md"
-            aria-label="Settings"
+            aria-label="menu"
             icon={<HamburgerIcon />}
             onClick={() => {
               setIsOut(!isOut)

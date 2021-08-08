@@ -1,4 +1,4 @@
-import { Box } from '@chakra-ui/react'
+import { Box, Flex, Spinner } from '@chakra-ui/react'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
 import React, {
@@ -55,6 +55,14 @@ export const UserProvider: FunctionComponent = ({ children }) => {
       setIsAuth(true)
     }
   }, [data?.authenticated])
+
+  if (loading) {
+    return (
+      <Flex height={200} width={300} p={5} mb={5} justifyContent="center">
+        <Spinner size="xl" />
+      </Flex>
+    )
+  }
 
   return (
     <UserContext.Provider
