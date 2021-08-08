@@ -1,7 +1,18 @@
-import { Avatar, Box, Flex, Stat, Text, Icon, Button } from '@chakra-ui/react'
-import React from 'react'
+import {
+  Avatar,
+  Box,
+  Flex,
+  Stat,
+  Text,
+  Icon,
+  Button,
+  Spinner
+} from '@chakra-ui/react'
+import { UserContext } from '@src/providers/UserProvider'
+import React, { useContext } from 'react'
 import { IoIosPhonePortrait } from 'react-icons/io'
 import { useLocation } from 'wouter'
+import { useMyDevicesQuery } from './Devices.codegen'
 
 let devices = [
   { name: 'test', lastIp: '25', location: 'Brno' },
@@ -10,25 +21,36 @@ let devices = [
 
 export default function Devices() {
   const [location, setLocation] = useLocation()
+  const { userId } = useContext(UserContext)
+  const { data, loading, error } = useMyDevicesQuery({
+    variables: {
+      userId: userId as string
+    }
+  })
 
   return (
     <Box>
-      {devices.map((i) => {
-        return (
-          <Box key={i.lastIp} boxShadow="xl" p="5" bg="white" mb={2}>
-            <Stat>
-              <Flex justify="flex-start" align="center" flexDirection="row">
-                <Icon as={IoIosPhonePortrait} w={20} h={20} />
-                <Flex flexDirection="column" ml="5px" fontSize="md">
-                  <Text>{i.name}</Text>
-                  <Text>{i.lastIp}</Text>
-                  <Text>Location: {i.location}</Text>
+      {data && !loading ? (
+        data.myDevices.map((i) => {
+          return (
+            <Box key={i.lastIpAdress} boxShadow="xl" p="5" bg="white" mb={2}>
+              <Stat>
+                <Flex justify="flex-start" align="center" flexDirection="row">
+                  <Icon as={IoIosPhonePortrait} w={20} h={20} />
+                  <Flex flexDirection="column" ml="5px" fontSize="md">
+                    <Text>{i.name}</Text>
+                    <Text>{i.lastIpAdress}</Text>
+                    <Text>Location: </Text>
+                  </Flex>
                 </Flex>
-              </Flex>
-            </Stat>
-          </Box>
-        )
-      })}
+              </Stat>
+            </Box>
+          )
+        })
+      ) : (
+        <Spinner />
+      )}
+
       <Button
         onClick={() => {
           setLocation('/QRcode')

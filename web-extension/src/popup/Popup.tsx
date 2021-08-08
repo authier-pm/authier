@@ -19,7 +19,7 @@ import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import cryptoJS from 'crypto-js'
-import { Settings } from '@src/pages/Settings'
+import { Menu } from '@src/pages/Menu'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
 import QRcode from '@src/pages/QRcode'
@@ -37,6 +37,7 @@ import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
+import { Settings } from '@src/pages/Settings'
 
 const messaging = getMessaging()
 
@@ -161,12 +162,13 @@ export const Popup: FunctionComponent = () => {
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/popup.html" component={Home} />
-        <Route path="/settings" component={Settings} />
+        <Route path="/menu" component={Menu} />
         <Route path="/login" component={Login} />
         <Route path="/register" component={Register} />
         <Route path="/QRcode" component={QRcode} />
         <Route path="/devices" component={Devices} />
         <Route path="/verify" component={Verification} />
+        <Route path="/settings" component={Settings} />
       </Switch>
     </I18nProvider>
   )
