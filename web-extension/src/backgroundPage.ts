@@ -2,7 +2,7 @@ import { browser, Tabs } from 'webextension-polyfill-ts'
 import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
-import { getMessaging } from 'firebase/messaging'
+import { getMessaging, getToken } from 'firebase/messaging'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -14,8 +14,22 @@ const firebaseConfig = {
   measurementId: 'G-0W2MW55WVF'
 }
 
+interface IAuth {
+  secret: string
+  label: string
+  icon: string | undefined
+  lastUsed?: Date | null
+  originalUrl: string | undefined
+}
+
+export enum sharedBrowserEvents {
+  URL_CHANGED = 'URL_CHANGED'
+}
+
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
+
+const broadcast = new BroadcastChannel('test-channel')
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
@@ -34,22 +48,28 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
-interface IAuth {
-  secret: string
-  label: string
-  icon: string | undefined
-  lastUsed?: Date | null
-  originalUrl: string | undefined
-}
-
-export enum sharedBrowserEvents {
-  URL_CHANGED = 'URL_CHANGED'
-}
-
 let auths: Array<IAuth> | null
 let stopped = false // To stop timeout function, when user has to re enter passwrod
 let safeClosed = false // Is safe Closed ?
+let fireToken = ''
+var otpCode = ''
 
+broadcast.onmessage = (event) => {
+  if (event.data.data.success === 'true') {
+    console.log('sec', typeof otpCode)
+    let a = executeScriptInCurrentTab(
+      `const OTP = ${otpCode};` + `(` + fillInput.toString() + `)()`
+    )
+  }
+}
+
+async function generateFireToken() {
+  fireToken = await getToken(messaging, {
+    vapidKey:
+      'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
+  })
+}
+generateFireToken()
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
   async (request: { popupMounted: boolean }) => {
@@ -69,6 +89,16 @@ chrome.runtime.onMessage.addListener(function (
   if (request.GiveMeAuths) {
     console.log('sending', auths)
     sendResponse({ auths: auths })
+  }
+})
+
+chrome.runtime.onMessage.addListener(function (
+  req: { generateToken: Boolean },
+  sender,
+  sendResponse
+) {
+  if (req.generateToken) {
+    sendResponse({ t: fireToken })
   }
 })
 
@@ -120,7 +150,6 @@ chrome.runtime.onMessage.addListener((request: { startTimeout: Boolean }) => {
 })
 
 function fillInput() {
-  let canFill = false
   const inputs = document.getElementsByTagName('input')
   let filtered: Array<HTMLInputElement> = []
   let scan = setInterval(() => {
@@ -141,19 +170,22 @@ function fillInput() {
 
       //Send message to content scrit for query, where it will send notification to users main device
       //Device will send back the authorization
-      chrome.runtime.sendMessage({ filling: true }, (res) => {
-        if (res) {
-          canFill = true
-        }
-      })
+      //@ts-expect-error
+      if (OTP !== undefined) {
+        //@ts-expect-error
+        filtered[0].defaultValue = OTP
+      } else {
+        chrome.runtime.sendMessage({ filling: true })
+      }
 
-      const mobileAuth = setInterval(() => {
-        if (canFill) {
-          clearInterval(mobileAuth)
-          //@ts-expect-error
-          filtered[0].defaultValue = otp
-        }
-      }, 2000)
+      // const mobileAuth = setInterval(() => {
+      //   console.log('PLEASE', canFill)
+      //   if (canFill) {
+      //     clearInterval(mobileAuth)
+      //     //@ts-expect-error
+      //     filtered[0].defaultValue = otp
+      //   }
+      // }, 2000)
     }
   }, 1000)
 
@@ -174,9 +206,10 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     console.log('hasAuths', auths)
     auths.map(async (i) => {
       if (_tab.url === i.originalUrl) {
-        const otpCode = authenticator.generate(i.secret)
+        otpCode = authenticator.generate(i.secret)
+        console.log('first', otpCode)
         let a = await executeScriptInCurrentTab(
-          `let otp = "${otpCode}";` + `(` + fillInput.toString() + `)()`
+          `(` + fillInput.toString() + `)()`
         )
       }
     })

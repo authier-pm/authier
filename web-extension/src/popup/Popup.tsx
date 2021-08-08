@@ -55,24 +55,10 @@ export const Popup: FunctionComponent = () => {
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
   const [fireToken, setFireToken] = useState<string>('')
-  //const [userId, setUserId] = useState('')
-
-  useEffect(() => {
-    async function generateFireToken() {
-      let t = await getToken(messaging, {
-        vapidKey:
-          'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
-      })
-
-      setFireToken(t)
-      return t
-    }
-
-    generateFireToken()
-  }, [])
 
   useEffect(() => {
     if (isAuth) {
+      console.log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
           userId: userId as string,
@@ -80,7 +66,6 @@ export const Popup: FunctionComponent = () => {
         }
       })
     }
-
     // Conditions for 'page' flow
     if (isAuth && !verify) {
       console.log('home')
@@ -106,6 +91,14 @@ export const Popup: FunctionComponent = () => {
           //Reenter password
           setVerify(true)
         }
+      }
+    )
+
+    //Get firetoken from bg script
+    chrome.runtime.sendMessage(
+      { generateToken: true },
+      (res: { t: string }) => {
+        setFireToken(res.t)
       }
     )
   }, [])
@@ -137,7 +130,7 @@ export const Popup: FunctionComponent = () => {
     chrome.runtime.onMessage.addListener(
       async (req: { filling: Boolean }, sender, sendResponse) => {
         if (req.filling) {
-          console.log('What just happened')
+          console.log('Filling')
           let id = await getUserFromToken()
           let device = deviceDetect()
           let date = new Date()
@@ -154,7 +147,9 @@ export const Popup: FunctionComponent = () => {
                 date.getHours().toString() + ':' + date.getMinutes().toString()
             }
           })
+
           //After accept on mobile, send responce and set CanFill to True
+          // Listen to the response
         }
       }
     )

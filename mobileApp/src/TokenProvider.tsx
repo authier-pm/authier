@@ -18,6 +18,7 @@ export default function TokenProvider({ children }) {
         return;
       });
       const Token = await messaging().getToken();
+      console.log('t', Token);
       setToken(Token);
     }
 

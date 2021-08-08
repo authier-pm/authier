@@ -43,7 +43,7 @@ const Home = () => {
               //@ts-expect-error
               variables: { userId: notifies[0].userId, success: true },
             });
-            console.log(data);
+            console.log(data, error);
             setNotifies(
               notifies.filter((el) => (el.pageName === page ? false : true))
             );
