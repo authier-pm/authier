@@ -37,7 +37,6 @@ export default function Verification() {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          console.log(auths)
           setPassword(values.password)
 
           const storage = await browser.storage.local.get()

@@ -217,7 +217,7 @@ export class RootResolver {
         id: userId
       }
     })
-    console.log('firetoken ', user)
+
     try {
       await admin.messaging().sendToDevice(
         user?.firebaseToken as string,
@@ -228,7 +228,7 @@ export class RootResolver {
         },
         {}
       )
-      console.log('sended')
+
       return true
     } catch (err) {
       console.log(err)
