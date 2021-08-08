@@ -43,6 +43,7 @@ export interface Payload {
 }
 
 admin.initializeApp({
+  //@ts-expect-error
   credential: admin.credential.cert(serviceAccount)
 })
 
@@ -211,13 +212,12 @@ export class RootResolver {
     @Arg('userId', () => String) userId: string,
     @Arg('success', () => Boolean) success: Boolean
   ) {
-    console.log(userId)
     let user = await prisma.user.findFirst({
       where: {
         id: userId
       }
     })
-
+    console.log('firetoken ', user)
     try {
       await admin.messaging().sendToDevice(
         user?.firebaseToken as string,

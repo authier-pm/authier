@@ -14,14 +14,18 @@ var firebaseConfig = {
 }
 
 firebase.initializeApp(firebaseConfig)
-
+const broadcast = new BroadcastChannel('test-channel')
 // Retrieve firebase messaging
 const messaging = firebase.messaging()
 
 messaging.onBackgroundMessage(function (payload) {
   console.log('Received background message ', payload)
-
+  broadcast.postMessage(payload)
   self.registration.showNotification('test', {
     body: payload.data.success
   })
+})
+
+self.addEventListener('push', (event) => {
+  console.log('test', event)
 })
