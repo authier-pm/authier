@@ -20,9 +20,6 @@ import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
-import { getMessaging, getToken } from 'firebase/messaging'
-
-const messaging = getMessaging()
 
 interface Values {
   password: string
@@ -41,20 +38,8 @@ export default function Register(): ReactElement {
     console.log(registerError)
   }
 
-  useEffect(() => {
-    async function save() {
-      let t = await getToken(messaging, {
-        vapidKey:
-          'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
-      })
-      console.log('fire: ', t)
-      setFireToken(t)
-    }
-    save()
-  })
-
   return (
-    <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={6} boxShadow="lg">
+    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
       <Flex alignItems="center" justifyContent="center">
         <Heading>Create account</Heading>
       </Flex>

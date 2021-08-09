@@ -9,6 +9,7 @@ import React, {
   FunctionComponent,
   useEffect
 } from 'react'
+import { browser } from 'webextension-polyfill-ts'
 
 // const onMessageListener = () =>
 //   new Promise((resolve) => {
@@ -27,20 +28,36 @@ export const UserContext = createContext<{
   password: string
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
-  setVerify: Dispatch<SetStateAction<Boolean>>
-  verify: Boolean
   setIsAuth: Dispatch<SetStateAction<Boolean>>
   isAuth: Boolean
+  setVerify: Dispatch<SetStateAction<Boolean>>
+  verify: Boolean
+  localStorage: any
+  fireToken: string
 }>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
   const [password, setPassword] = useState<string>('bob')
-  const [verify, setVerify] = useState<Boolean>(false)
   const { data, loading, error } = useIsLoggedInQuery()
   const [userId, setUserId] = useState<string | undefined>(undefined)
   const [isAuth, setIsAuth] = useState<Boolean>(false)
+  const [verify, setVerify] = useState<Boolean>(false)
+  const [localStorage, setLocalStorage] = useState<any>()
+  const [fireToken, setFireToken] = useState<string>('')
 
   useEffect(() => {
+    chrome.runtime.sendMessage(
+      { generateToken: true },
+      (res: { t: string }) => {
+        setFireToken(res.t)
+      }
+    )
+
+    async function checkStorage() {
+      const storage = await browser.storage.local.get()
+      setLocalStorage(storage.encryptedAuthsMasterPassword)
+    }
+    checkStorage()
     async function getId() {
       let id = await getUserFromToken()
       //@ts-expect-error
@@ -56,25 +73,19 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     }
   }, [data?.authenticated])
 
-  if (loading) {
-    return (
-      <Flex height={200} width={300} p={5} mb={5} justifyContent="center">
-        <Spinner size="xl" />
-      </Flex>
-    )
-  }
-
   return (
     <UserContext.Provider
       value={{
         password,
         setPassword,
         setUserId,
-        setVerify,
-        verify,
         userId,
         setIsAuth,
-        isAuth
+        isAuth,
+        verify,
+        setVerify,
+        localStorage,
+        fireToken
       }}
     >
       {children}
