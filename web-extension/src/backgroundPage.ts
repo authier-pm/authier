@@ -98,6 +98,7 @@ chrome.runtime.onMessage.addListener(function (
   sendResponse
 ) {
   if (req.generateToken) {
+    console.log('fireToken in Bg script:', fireToken)
     sendResponse({ t: fireToken })
   }
 })

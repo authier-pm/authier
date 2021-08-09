@@ -38,11 +38,11 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setUserId, setPassword } = useContext(UserContext)
+  const { setUserId, setIsAuth } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
 
   return (
-    <Box p={8} maxWidth="500px" borderWidth={1} borderRadius={6} boxShadow="lg">
+    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
       <Flex alignItems="center" justifyContent="center">
         <Heading>Login</Heading>
       </Flex>
@@ -79,7 +79,7 @@ export default function Login(): ReactElement {
               setAuths(loaded)
             }
 
-            setLocation('/')
+            setIsAuth(true)
           }
 
           setSubmitting(false)

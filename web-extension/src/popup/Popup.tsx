@@ -45,9 +45,9 @@ i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
   const [currURL, setCurrURL] = useState('')
-  const { isAuth, verify, setVerify, userId, setUserId } =
+  const { isAuth, userId, setVerify, localStorage, fireToken } =
     useContext(UserContext)
-  const { auths, setAuths } = useContext(AuthsContext)
+  const { setAuths } = useContext(AuthsContext)
   const [
     saveFirebaseTokenMutation,
     { data: tokenData, loading: tokenLoading, error: tokenError }
@@ -55,10 +55,9 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const [fireToken, setFireToken] = useState<string>('')
 
   useEffect(() => {
-    if (isAuth) {
+    if (isAuth && fireToken.length > 1) {
       console.log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
@@ -67,18 +66,7 @@ export const Popup: FunctionComponent = () => {
         }
       })
     }
-    // Conditions for 'page' flow
-    if (isAuth && !verify) {
-      console.log('home')
-      setLocation('/')
-    } else if (!isAuth) {
-      console.log('login')
-      setLocation('/login')
-    } else if (isAuth && verify) {
-      console.log('verify')
-      setLocation('/verify')
-    }
-  }, [isAuth])
+  }, [isAuth, fireToken])
 
   // Effect for getting auths from bg script
   useEffect(() => {
@@ -89,17 +77,11 @@ export const Popup: FunctionComponent = () => {
           setAuths(res.auths)
           console.log('got', res.auths)
         } else if (res.auths === undefined) {
-          //Reenter password
-          setVerify(true)
+          if (localStorage) {
+            //reenter password
+            setVerify(true)
+          }
         }
-      }
-    )
-
-    //Get firetoken from bg script
-    chrome.runtime.sendMessage(
-      { generateToken: true },
-      (res: { t: string }) => {
-        setFireToken(res.t)
       }
     )
   }, [])
@@ -124,7 +106,7 @@ export const Popup: FunctionComponent = () => {
       if (request.safe === 'closed') {
         console.log('closed', request.safe)
         setVerify(true)
-        setLocation('/verify')
+        //setLocation('/verify')
       }
     })
 
@@ -157,20 +139,17 @@ export const Popup: FunctionComponent = () => {
   }, [])
 
   return (
-    <I18nProvider i18n={i18n}>
+    <>
       <NavBar />
       <Switch>
         <Route path="/" component={Home} />
         <Route path="/popup.html" component={Home} />
         <Route path="/menu" component={Menu} />
-        <Route path="/login" component={Login} />
-        <Route path="/register" component={Register} />
         <Route path="/QRcode" component={QRcode} />
         <Route path="/devices" component={Devices} />
-        <Route path="/verify" component={Verification} />
         <Route path="/settings" component={Settings} />
       </Switch>
-    </I18nProvider>
+    </>
   )
 }
 

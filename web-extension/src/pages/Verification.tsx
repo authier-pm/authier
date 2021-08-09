@@ -25,8 +25,8 @@ interface Values {
 export default function Verification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword, password, setVerify } = useContext(UserContext)
+  const { setAuths } = useContext(AuthsContext)
+  const { setPassword, setVerify, setIsAuth } = useContext(UserContext)
 
   return (
     <Flex flexDirection="column">
