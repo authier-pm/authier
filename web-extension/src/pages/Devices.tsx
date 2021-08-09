@@ -6,8 +6,11 @@ import {
   Text,
   Icon,
   Button,
-  Spinner
+  Spinner,
+  IconButton,
+  Tooltip
 } from '@chakra-ui/react'
+import { DeleteIcon, StarIcon } from '@chakra-ui/icons'
 import { UserContext } from '@src/providers/UserProvider'
 import React, { useContext } from 'react'
 import { IoIosPhonePortrait } from 'react-icons/io'
@@ -33,18 +36,44 @@ export default function Devices() {
       {data && !loading ? (
         data.myDevices.map((i) => {
           return (
-            <Box key={i.lastIpAdress} boxShadow="xl" p="5" bg="white" mb={2}>
-              <Stat>
-                <Flex justify="flex-start" align="center" flexDirection="row">
-                  <Icon as={IoIosPhonePortrait} w={20} h={20} />
-                  <Flex flexDirection="column" ml="5px" fontSize="md">
-                    <Text>{i.name}</Text>
-                    <Text>{i.lastIpAdress}</Text>
-                    <Text>Location: </Text>
-                  </Flex>
+            <Flex
+              key={i.lastIpAdress}
+              boxShadow="xl"
+              bg="white"
+              m={2}
+              pb={2}
+              flexDirection="column"
+              borderWidth="5px"
+            >
+              <Flex justifyContent="flex-end" mr={2}>
+                <Tooltip hasArrow label="Main device" fontSize="sm">
+                  <IconButton
+                    size="xs"
+                    variant="unstyled"
+                    aria-label="Main device"
+                    fontSize="17px"
+                    icon={<StarIcon color="gold" />}
+                  />
+                </Tooltip>
+                <Tooltip hasArrow label="Remove device" fontSize="sm">
+                  <IconButton
+                    size="xs"
+                    variant="unstyled"
+                    aria-label="Remove device"
+                    fontSize="17px"
+                    icon={<DeleteIcon />}
+                  />
+                </Tooltip>
+              </Flex>
+              <Flex justify="flex-start" align="center" flexDirection="row">
+                <Icon as={IoIosPhonePortrait} w={20} h={20} />
+                <Flex flexDirection="column" ml="5px" fontSize="md">
+                  <Text>{i.name}</Text>
+                  <Text>{i.lastIpAdress}</Text>
+                  <Text>Location: </Text>
                 </Flex>
-              </Stat>
-            </Box>
+              </Flex>
+            </Flex>
           )
         })
       ) : (

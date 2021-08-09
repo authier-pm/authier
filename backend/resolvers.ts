@@ -144,9 +144,16 @@ export class RootResolver {
 
   @Query(() => [Device])
   async myDevices(@Arg('userId', () => String) userId: string) {
-    return prisma.device.findMany({
+    return await prisma.device.findMany({
       where: {
         userId: userId
+      },
+      include: {
+        User: {
+          select: {
+            primaryDeviceId: true
+          }
+        }
       }
     })
   }
