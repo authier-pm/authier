@@ -11,11 +11,12 @@ import { browser } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
 import { UserContext } from './UserProvider'
 import { useSaveAuthsMutation } from '../popup/Popup.codegen'
+import { useBackground } from '@src/util/backgroundState'
 
 export const AuthsContext = createContext<{
-  auths: Array<IAuth>
-  setAuths: Dispatch<SetStateAction<IAuth[]>>
-}>({ auths: [] } as any)
+  auths: Array<IAuth> | undefined
+  setAuths: Dispatch<SetStateAction<IAuth[] | undefined>>
+}>({ auths: undefined } as any)
 
 export interface IAuth {
   secret: string
@@ -26,9 +27,10 @@ export interface IAuth {
 }
 
 export const AuthsProvider: FunctionComponent = ({ children }) => {
-  const [auths, setAuths] = useState<IAuth[]>([])
+  const [auths, setAuths] = useState<IAuth[]>()
   const { password, isAuth, userId } = useContext(UserContext)
   const [saveAuthsMutation] = useSaveAuthsMutation()
+  const { saveAuthsToBg } = useBackground()
 
   return (
     <AuthsContext.Provider
@@ -36,11 +38,9 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
         auths,
         // Split saving to DB, local storage and background script
         setAuths: async (value) => {
-          //After login!!!!!!!!!!!!
-          await chrome.runtime.sendMessage({
-            auths: value,
-            lockTime: 1000 * 60 * 60 * 8 // TODO customizable
-          })
+          console.log('saving', value)
+
+          saveAuthsToBg(value)
 
           const encrypted = cryptoJS.AES.encrypt(
             JSON.stringify(value),
