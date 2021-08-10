@@ -17,6 +17,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import { browser } from 'webextension-polyfill-ts'
 import { useLocation } from 'wouter'
+import { useBackground } from '../util/backgroundState'
 
 interface Values {
   password: string
@@ -25,11 +26,12 @@ interface Values {
 export default function Verification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const { setAuths } = useContext(AuthsContext)
-  const { setPassword, setVerify, setIsAuth } = useContext(UserContext)
+  const { setAuths, auths } = useContext(AuthsContext)
+  const { setPassword, setVerify } = useContext(UserContext)
+  const { startCount, setSafeLocked } = useBackground()
 
   return (
-    <Flex flexDirection="column">
+    <Flex flexDirection="column" width="315px">
       <Text>Re-enter you Master Password</Text>
       <Formik
         initialValues={{ password: 'bob' }}
@@ -48,10 +50,11 @@ export default function Verification() {
                 values.password
               ).toString(cryptoJS.enc.Utf8)
               let parsed = JSON.parse(decryptedAuths)
+              console.log('parsed', parsed)
               setAuths(parsed)
             }
 
-            await chrome.runtime.sendMessage({ startTimeout: true })
+            startCount()
 
             setVerify(false)
             setLocation('/')

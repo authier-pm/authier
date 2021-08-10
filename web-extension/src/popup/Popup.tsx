@@ -38,13 +38,13 @@ import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
+import { useBackground } from '@src/util/backgroundState'
 
 const messaging = getMessaging()
 
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const [currURL, setCurrURL] = useState('')
   const { isAuth, userId, setVerify, localStorage, fireToken } =
     useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
@@ -55,6 +55,7 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
+  const { currURL, bgAuths, isFilling, safeLocked } = useBackground()
 
   useEffect(() => {
     if (isAuth && fireToken.length > 1) {
@@ -68,23 +69,47 @@ export const Popup: FunctionComponent = () => {
     }
   }, [isAuth, fireToken])
 
-  // Effect for getting auths from bg script
   useEffect(() => {
-    chrome.runtime.sendMessage(
-      { GiveMeAuths: true },
-      function (res: { auths: Array<IAuth> }) {
-        if (res.auths) {
-          setAuths(res.auths)
-          console.log('got', res.auths)
-        } else if (res.auths === undefined) {
-          if (localStorage) {
-            //reenter password
-            setVerify(true)
-          }
-        }
+    if (bgAuths) {
+      console.log('got', bgAuths)
+      setAuths(bgAuths)
+    } else {
+      if (localStorage) {
+        //reenter password
+        setVerify(true)
       }
-    )
-  }, [])
+    }
+  }, [bgAuths])
+
+  useEffect(() => {
+    if (safeLocked) {
+      console.log('isLocked', safeLocked)
+      setVerify(true)
+    }
+  }, [safeLocked])
+
+  useEffect(() => {
+    if (isFilling) {
+      console.log('Filling')
+      let device = deviceDetect()
+      let date = new Date()
+
+      //TODO: get all variables
+      sendAuthMessage({
+        variables: {
+          //@ts-expect-error
+          userId: userId,
+          device: device.browserName + ' on ' + device.osName,
+          location: 'Test',
+          pageName: currURL,
+          time: date.getHours().toString() + ':' + date.getMinutes().toString()
+        }
+      })
+
+      //After accept on mobile, send responce and set CanFill to True
+      // Listen to the response
+    }
+  }, [isFilling])
 
   useEffect(() => {
     browser.runtime.sendMessage({ popupMounted: true })
@@ -93,49 +118,12 @@ export const Popup: FunctionComponent = () => {
       message: sharedBrowserEvents
       url: any
     }) {
-      console.log(request)
       // listen for messages sent from background.js
       if (request.message === sharedBrowserEvents.URL_CHANGED) {
-        setCurrURL(request.url)
+        //setCurrURL(request.url)
         console.log('new url', request.url) // new url is now in content scripts!
       }
     })
-
-    // Checking if is safe closed
-    browser.runtime.onMessage.addListener((request: { safe: string }) => {
-      if (request.safe === 'closed') {
-        console.log('closed', request.safe)
-        setVerify(true)
-        //setLocation('/verify')
-      }
-    })
-
-    chrome.runtime.onMessage.addListener(
-      async (req: { filling: Boolean }, sender, sendResponse) => {
-        if (req.filling) {
-          console.log('Filling')
-          let id = await getUserFromToken()
-          let device = deviceDetect()
-          let date = new Date()
-
-          //TODO: get all variables
-          sendAuthMessage({
-            variables: {
-              //@ts-expect-error
-              userId: id.userId,
-              device: device.browserName + ' on ' + device.osName,
-              location: 'Test',
-              pageName: currURL,
-              time:
-                date.getHours().toString() + ':' + date.getMinutes().toString()
-            }
-          })
-
-          //After accept on mobile, send responce and set CanFill to True
-          // Listen to the response
-        }
-      }
-    )
   }, [])
 
   return (
@@ -148,6 +136,7 @@ export const Popup: FunctionComponent = () => {
         <Route path="/QRcode" component={QRcode} />
         <Route path="/devices" component={Devices} />
         <Route path="/settings" component={Settings} />
+        <Route path="/verify" component={Verification} />
       </Switch>
     </>
   )
