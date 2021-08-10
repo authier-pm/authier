@@ -48,9 +48,10 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
-let auths: Array<IAuth> | null
-let stopped = false // To stop timeout function, when user has to re enter passwrod
+let auths: Array<IAuth> | null | undefined = undefined
 let safeClosed = false // Is safe Closed ?
+let lockTime = 1000 * 60 * 60 * 8
+let isCounting = false
 let fireToken = ''
 var otpCode = ''
 
@@ -116,39 +117,36 @@ chrome.runtime.onMessage.addListener(function (
   }
 })
 
-//Instead of timeouts set alarm API
-chrome.runtime.onMessage.addListener(
-  async (request: { auths: any; lockTime: number }) => {
-    if (request.auths) {
-      console.log('saving', auths, request.auths)
-      safeClosed = false
-      auths = request.auths //JSON.parse(request.auths)
+chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
+  if (req.lockTime) {
+    lockTime = req.lockTime
+  }
+})
 
-      let close = setTimeout(() => {
+//Instead of timeouts set alarm API
+chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
+  if (request.auths) {
+    console.log('saving', request.auths, 'in', auths)
+    safeClosed = false
+    auths = request.auths //JSON.parse(request.auths)
+  }
+})
+
+chrome.runtime.onMessage.addListener(
+  (req: { startCount: Boolean }, sender, sendResponse) => {
+    if (req.startCount && !isCounting) {
+      isCounting = true
+      setTimeout(() => {
+        isCounting = false
         safeClosed = true
-        stopped = true
         auths = null
         chrome.runtime.sendMessage({ safe: 'closed' })
-      }, request.lockTime)
-
-      if (stopped) {
-        clearTimeout(close)
-      }
+        console.log('locked', safeClosed)
+      }, lockTime)
+      sendResponse({ isCounting: true })
     }
   }
 )
-
-chrome.runtime.onMessage.addListener((request: { clear: Boolean }) => {
-  if (request.clear) {
-    auths = null
-  }
-})
-
-chrome.runtime.onMessage.addListener((request: { startTimeout: Boolean }) => {
-  if (request.startTimeout) {
-    stopped = false
-  }
-})
 
 function fillInput() {
   const inputs = document.getElementsByTagName('input')
@@ -171,13 +169,13 @@ function fillInput() {
 
       //Send message to content scrit for query, where it will send notification to users main device
       //Device will send back the authorization
-      //@ts-expect-error
-      if (OTP !== undefined) {
-        //@ts-expect-error
-        filtered[0].defaultValue = OTP
-      } else {
-        chrome.runtime.sendMessage({ filling: true })
-      }
+      chrome.runtime.sendMessage({ filling: true })
+      // if (OTP !== undefined) {
+      //   //@ts-expect-error
+      //   filtered[0].defaultValue = OTP
+      // } else {
+
+      // }
 
       // const mobileAuth = setInterval(() => {
       //   console.log('PLEASE', canFill)

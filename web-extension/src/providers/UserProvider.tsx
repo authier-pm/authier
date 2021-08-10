@@ -1,6 +1,7 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
+import { useBackground } from '@src/util/backgroundState'
 import React, {
   useState,
   createContext,
@@ -44,8 +45,16 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   const [verify, setVerify] = useState<Boolean>(false)
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
+  const { safeLocked } = useBackground()
 
   useEffect(() => {
+    async function checkStorage() {
+      const storage = await browser.storage.local.get()
+      setLocalStorage(storage.encryptedAuthsMasterPassword)
+      return storage
+    }
+    checkStorage()
+
     chrome.runtime.sendMessage(
       { generateToken: true },
       (res: { t: string }) => {
@@ -53,11 +62,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
       }
     )
 
-    async function checkStorage() {
-      const storage = await browser.storage.local.get()
-      setLocalStorage(storage.encryptedAuthsMasterPassword)
-    }
-    checkStorage()
     async function getId() {
       let id = await getUserFromToken()
       //@ts-expect-error
@@ -65,6 +69,13 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     }
     getId()
   }, [])
+
+  useEffect(() => {
+    if (safeLocked) {
+      console
+      setVerify(true)
+    }
+  }, [safeLocked])
 
   useEffect(() => {
     if (data?.authenticated && !loading) {

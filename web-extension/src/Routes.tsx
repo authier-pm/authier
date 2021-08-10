@@ -3,14 +3,22 @@ import React, { ReactElement, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router'
 import { browser } from 'webextension-polyfill-ts'
 import AuthPages from './AuthPages'
+import Verification from './pages/Verification'
 import { Popup } from './popup/Popup'
 import { useIsLoggedInQuery } from './popup/Popup.codegen'
 import { AuthsContext } from './providers/AuthsProvider'
 import { UserContext } from './providers/UserProvider'
+import { useBackground } from './util/backgroundState'
 
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
   const { isAuth, verify } = useContext(UserContext)
+  const { startCount, safeLocked } = useBackground()
+
+  if (isAuth && !safeLocked) {
+    console.log('started counting')
+    startCount()
+  }
 
   if (loading) {
     return (
@@ -18,6 +26,10 @@ export default function Routes(): ReactElement {
         <Spinner size="xl" />
       </Flex>
     )
+  }
+
+  if (verify) {
+    return <Verification />
   }
 
   return <>{isAuth && !verify ? <Popup /> : <AuthPages />}</>
