@@ -25,8 +25,14 @@ export const Settings = () => {
         initialValues={{ vaultTime: 'Sasuke', TwoFA: false }}
         onSubmit={(values, actions) => {
           setTimeout(() => {
-            if (values.vaultTime === '15 secconds') {
-              setSafeLockTime(10000)
+            if (values.vaultTime === 'On web close') {
+              setSafeLockTime(0)
+            } else if (values.vaultTime === '1 hour') {
+              setSafeLockTime(1000 * 60 * 60)
+            } else if (values.vaultTime === '8 hours') {
+              setSafeLockTime(1000 * 60 * 60 * 8)
+            } else if (values.vaultTime === '12 hours') {
+              setSafeLockTime(1000 * 60 * 60 * 12)
             }
             alert(JSON.stringify(values, null, 2))
             actions.setSubmitting(false)
@@ -46,8 +52,10 @@ export const Settings = () => {
                     id="vaultTime"
                     placeholder="Select country"
                   >
-                    <option>On close web</option>
-                    <option>15 secconds</option>
+                    <option>On web close</option>
+                    <option>1 hour</option>
+                    <option>8 hours</option>
+                    <option>12 hours</option>
                   </Select>
                   <FormErrorMessage>{form.errors.vaultTime}</FormErrorMessage>
                 </FormControl>
