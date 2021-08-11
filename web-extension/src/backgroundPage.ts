@@ -134,7 +134,7 @@ chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
 
 chrome.runtime.onMessage.addListener(
   (req: { startCount: Boolean }, sender, sendResponse) => {
-    if (req.startCount && !isCounting) {
+    if (req.startCount && !isCounting && lockTime > 0) {
       isCounting = true
       setTimeout(() => {
         isCounting = false
