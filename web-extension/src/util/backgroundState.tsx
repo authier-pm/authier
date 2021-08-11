@@ -12,7 +12,7 @@ export interface IAuth {
 
 export function useBackground() {
   const [currURL, setCurrURL] = useState<string>('')
-  const [safeLockTime, setSafeLockTime] = useState<number>(60)
+  const [safeLockTime, setSafeLockTime] = useState<number | null>(null)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
   const [bgAuths, setBgAuths] = useState<IAuth[] | undefined>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
@@ -57,15 +57,6 @@ export function useBackground() {
       }
     })
 
-    // chrome.runtime.sendMessage(
-    //   { wasClosed: true },
-    //   (res: { wasClosed: Boolean }) => {
-    //     if (res.wasClosed) {
-    //       setSafeLocked(true)
-    //     }
-    //   }
-    // )
-
     chrome.runtime.onMessage.addListener(
       async (req: { filling: Boolean }, sender, sendResponse) => {
         if (req.filling) {
@@ -80,7 +71,7 @@ export function useBackground() {
     safeLocked,
     setSafeLocked,
     isFilling,
-    setSafeLockTime: async (lockTime: number) => {
+    setSafeLockTime: async (lockTime: number | null) => {
       chrome.runtime.sendMessage({
         lockTime: lockTime
       })
