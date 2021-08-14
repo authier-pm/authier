@@ -34,7 +34,7 @@ import { UserContext } from '@src/providers/UserProvider'
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
-  const { setPassword, isAuth, setIsAuth } = useContext(UserContext)
+  const { setPassword, isApiLoggedIn, setIsAuth } = useContext(UserContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())

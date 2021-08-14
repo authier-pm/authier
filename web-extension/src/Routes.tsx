@@ -3,17 +3,17 @@ import React, { ReactElement, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router'
 import { browser } from 'webextension-polyfill-ts'
 import AuthPages from './AuthPages'
-import Verification from './pages/Verification'
+import { SafeUnlockVerification } from './pages/Verification'
 import { Popup } from './popup/Popup'
 import { useIsLoggedInQuery } from './popup/Popup.codegen'
 import { AuthsContext } from './providers/AuthsProvider'
 import { UserContext } from './providers/UserProvider'
-import { useBackground } from './util/backgroundState'
+import { useBackground } from './util/useBackground'
 
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
-  const { isAuth, verify } = useContext(UserContext)
-  const { startCount, safeLocked, isCounting } = useBackground()
+  const { isApiLoggedIn: isAuth } = useContext(UserContext)
+  const { startCount, isCounting, safeLocked } = useBackground()
 
   if (isAuth && !safeLocked && !isCounting) {
     console.log('started counting')
@@ -28,8 +28,8 @@ export default function Routes(): ReactElement {
     )
   }
 
-  if (verify) {
-    return <Verification />
+  if (safeLocked) {
+    return <SafeUnlockVerification />
   }
 
   return <>{isAuth && !verify ? <Popup /> : <AuthPages />}</>

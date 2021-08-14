@@ -1,4 +1,4 @@
-import { sharedBrowserEvents } from '@src/backgroundPage'
+import { MessageType, sharedBrowserEvents } from '@src/backgroundPage'
 import { useState, useEffect } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
@@ -21,9 +21,9 @@ export function useBackground() {
   useEffect(() => {
     //Get auth from bg
     chrome.runtime.sendMessage(
-      { GiveMeAuths: true },
+      MessageType.giveMeAuths,
       function (res: { auths: Array<IAuth> }) {
-        if (res.auths) {
+        if (res && res.auths) {
           setBgAuths(res.auths)
         }
       }
@@ -66,7 +66,7 @@ export function useBackground() {
     )
   }, [])
 
-  return {
+  const backgroundState = {
     currURL,
     safeLocked,
     setSafeLocked,
@@ -102,4 +102,7 @@ export function useBackground() {
     },
     isCounting
   }
+  // @ts-expect-error
+  window.backgroundState = backgroundState
+  return backgroundState
 }
