@@ -27,7 +27,7 @@ export function SafeUnlockVerification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword } = useContext(UserContext)
+  const { setPassword, setIsVaultLocked } = useContext(UserContext)
   const { startCount, setSafeLocked } = useBackground()
 
   return (
@@ -58,7 +58,7 @@ export function SafeUnlockVerification() {
 
             startCount()
 
-            // setVerify(false)
+            setIsVaultLocked(false)
             setSubmitting(false)
             //setLocation('/')
           } catch (err) {
