@@ -52,13 +52,13 @@ export default function Verification() {
               let parsed = JSON.parse(decryptedAuths)
               console.log('parsed', parsed)
               setAuths(parsed)
+            } else {
+              setAuths([])
             }
 
             startCount()
-
             setVerify(false)
             setSubmitting(false)
-            //setLocation('/')
           } catch (err) {
             console.log(err)
             // Alert on wrong password
