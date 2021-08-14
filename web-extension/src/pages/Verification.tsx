@@ -57,13 +57,12 @@ export default function Verification() {
             startCount()
 
             setVerify(false)
-            setLocation('/')
+            setSubmitting(false)
+            //setLocation('/')
           } catch (err) {
             console.log(err)
             // Alert on wrong password
           }
-
-          setSubmitting(false)
         }}
       >
         {(props) => (

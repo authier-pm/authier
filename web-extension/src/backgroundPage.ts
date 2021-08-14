@@ -55,6 +55,10 @@ let isCounting = false
 let fireToken = ''
 var otpCode = ''
 
+if (auths === undefined) {
+  safeClosed = true
+}
+
 broadcast.onmessage = (event) => {
   if (event.data.data.success === 'true') {
     console.log('sec', typeof otpCode)
@@ -112,7 +116,8 @@ chrome.runtime.onMessage.addListener(function (
   if (request.close) {
     safeClosed = true
   } else if (request.wasClosed) {
-    console.log('asked')
+    console.log('isClosed', safeClosed, 'lockTime', lockTime)
+
     sendResponse({ wasClosed: safeClosed })
   }
 })
@@ -126,15 +131,18 @@ chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
 //Instead of timeouts set alarm API
 chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
   if (request.auths) {
-    console.log('saving', request.auths, 'in', auths)
     safeClosed = false
     auths = request.auths //JSON.parse(request.auths)
+    console.log('saving', request.auths, 'in', auths)
   }
 })
 
 chrome.runtime.onMessage.addListener(
   (req: { startCount: Boolean }, sender, sendResponse) => {
-    if (req.startCount && !isCounting && lockTime > 0) {
+    if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
+      isCounting = false
+    }
+    if (req.startCount && !isCounting) {
       isCounting = true
       setTimeout(() => {
         isCounting = false

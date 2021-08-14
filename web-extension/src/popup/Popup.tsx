@@ -39,6 +39,7 @@ import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/backgroundState'
+//import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 const messaging = getMessaging()
 
@@ -47,7 +48,7 @@ i18n.activate('en')
 export const Popup: FunctionComponent = () => {
   const { isAuth, userId, setVerify, localStorage, fireToken } =
     useContext(UserContext)
-  const { setAuths } = useContext(AuthsContext)
+  const { setAuths, auths } = useContext(AuthsContext)
   const [
     saveFirebaseTokenMutation,
     { data: tokenData, loading: tokenLoading, error: tokenError }
@@ -70,14 +71,10 @@ export const Popup: FunctionComponent = () => {
   }, [isAuth, fireToken])
 
   useEffect(() => {
-    if (bgAuths) {
+    console.log(bgAuths)
+    if (bgAuths && !auths) {
       console.log('got', bgAuths)
       setAuths(bgAuths)
-    } else {
-      if (localStorage) {
-        //reenter password
-        setVerify(true)
-      }
     }
   }, [bgAuths])
 
@@ -129,7 +126,8 @@ export const Popup: FunctionComponent = () => {
   return (
     <>
       <NavBar />
-      <Switch>
+
+      <Switch location={location}>
         <Route path="/" component={Home} />
         <Route path="/popup.html" component={Home} />
         <Route path="/menu" component={Menu} />

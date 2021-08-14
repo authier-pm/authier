@@ -19,8 +19,7 @@ import {
   Flex,
   Grid,
   Heading,
-  useInterval,
-  Text
+  useInterval
 } from '@chakra-ui/react'
 
 import { Trans } from '@lingui/macro'
