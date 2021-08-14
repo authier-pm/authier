@@ -2,7 +2,7 @@ export async function AuthKey(salt: BufferSource, keyMaterial: CryptoKey) {
   let key = await crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt as ArrayBuffer,
       iterations: 100000,
       hash: 'SHA-256'
     },
@@ -32,7 +32,7 @@ export async function VaultKey(
   let key = await crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: salt,
+      salt: salt as ArrayBuffer,
       iterations: 100000,
       hash: 'SHA-256'
     },
