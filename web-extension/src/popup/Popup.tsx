@@ -32,13 +32,13 @@ import {
 import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
-import Verification from '@src/pages/Verification'
+import { SafeUnlockVerification } from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
-import { useBackground } from '@src/util/backgroundState'
+import { useBackground } from '@src/util/useBackground'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 const messaging = getMessaging()
@@ -46,8 +46,12 @@ const messaging = getMessaging()
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const { isAuth, userId, setVerify, localStorage, fireToken } =
-    useContext(UserContext)
+  const {
+    isApiLoggedIn: isAuth,
+    userId,
+    localStorage,
+    fireToken
+  } = useContext(UserContext)
   const { setAuths, auths } = useContext(AuthsContext)
   const [
     saveFirebaseTokenMutation,
@@ -77,13 +81,6 @@ export const Popup: FunctionComponent = () => {
       setAuths(bgAuths)
     }
   }, [bgAuths])
-
-  useEffect(() => {
-    if (safeLocked) {
-      console.log('isLocked', safeLocked)
-      setVerify(true)
-    }
-  }, [safeLocked])
 
   useEffect(() => {
     if (isFilling) {
@@ -134,7 +131,7 @@ export const Popup: FunctionComponent = () => {
         <Route path="/QRcode" component={QRcode} />
         <Route path="/devices" component={Devices} />
         <Route path="/settings" component={Settings} />
-        <Route path="/verify" component={Verification} />
+        <Route path="/verify" component={SafeUnlockVerification} />
       </Switch>
     </>
   )

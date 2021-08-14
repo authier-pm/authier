@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import React from 'react'
-import { useBackground } from '@src/util/backgroundState'
+import { useBackground } from '@src/util/useBackground'
 
 export const Settings = () => {
   const { setSafeLockTime } = useBackground()
