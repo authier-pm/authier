@@ -33,13 +33,15 @@ export const UserContext = createContext<{
   isApiLoggedIn: Boolean
   localStorage: any
   fireToken: string
+  isVaultLocked: Boolean
+  setIsVaultLocked: Dispatch<SetStateAction<Boolean>>
 }>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
   const [password, setPassword] = useState<string>('bob')
   const { data, loading, error } = useIsLoggedInQuery()
   const [userId, setUserId] = useState<string | undefined>(undefined)
-
+  const [isVaultLocked, setIsVaultLocked] = useState<Boolean>(false)
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
   const { safeLocked } = useBackground()
@@ -67,19 +69,24 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     getId()
   }, [])
 
-  return (
-    <UserContext.Provider
-      value={{
-        password,
-        setPassword,
-        setUserId,
-        userId,
-        isApiLoggedIn: !!(data?.authenticated && !loading),
-        localStorage,
-        fireToken
-      }}
-    >
-      {children}
-    </UserContext.Provider>
-  )
+  useEffect(() => {
+    console.log('isLocked', safeLocked)
+    if (safeLocked) {
+      setIsVaultLocked(true)
+    }
+  }, [safeLocked])
+
+  const value = {
+    password,
+    setPassword,
+    setUserId,
+    userId,
+    isApiLoggedIn: !!(data?.authenticated && !loading),
+    localStorage,
+    fireToken,
+    isVaultLocked,
+    setIsVaultLocked
+  }
+  console.log(value)
+  return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }

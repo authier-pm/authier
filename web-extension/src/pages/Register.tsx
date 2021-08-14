@@ -20,6 +20,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { setAccessToken } from '@src/util/accessToken'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
+import { useBackground } from '@src/util/useBackground'
 
 interface Values {
   password: string
@@ -32,6 +33,7 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
   const { setPassword, fireToken } = useContext(UserContext)
+
   console.log('~ fireToken', fireToken)
 
   if (registerError) {

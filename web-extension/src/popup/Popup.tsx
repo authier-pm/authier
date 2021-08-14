@@ -50,7 +50,8 @@ export const Popup: FunctionComponent = () => {
     isApiLoggedIn: isAuth,
     userId,
     localStorage,
-    fireToken
+    fireToken,
+    setIsVaultLocked
   } = useContext(UserContext)
   const { setAuths, auths } = useContext(AuthsContext)
   const [
@@ -81,6 +82,13 @@ export const Popup: FunctionComponent = () => {
       setAuths(bgAuths)
     }
   }, [bgAuths])
+
+  useEffect(() => {
+    if (safeLocked) {
+      console.log('isLocked', safeLocked)
+      setIsVaultLocked(true)
+    }
+  }, [safeLocked])
 
   useEffect(() => {
     if (isFilling) {
