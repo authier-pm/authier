@@ -22,11 +22,12 @@ model EncryptedAuths {
 }
 
 model Device {
-    id            Int    @id @default(autoincrement())
-    firstIpAdress String @db.Inet
-    lastIpAdress  String @db.Inet
-    firebaseToken String
-    name          String
+    id                      Int    @id @default(autoincrement())
+    firstIpAdress           String @db.Inet
+    lastIpAdress            String @db.Inet
+    firebaseToken           String
+    name                    String
+    vaultLockTimeoutSeconds Int
 
     createdAt DateTime  @default(now())
     updatedAt DateTime? @updatedAt

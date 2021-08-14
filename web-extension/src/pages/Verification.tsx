@@ -60,7 +60,6 @@ export function SafeUnlockVerification() {
 
             setIsVaultLocked(false)
             setSubmitting(false)
-            //setLocation('/')
           } catch (err) {
             console.log(err)
             // Alert on wrong password
