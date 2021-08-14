@@ -27,12 +27,12 @@ interface Values {
 }
 
 export default function Register(): ReactElement {
-  const [fireToken, setFireToken] = useState<string | undefined>(undefined)
+  //const [fireToken, setFireToken] = useState<string | undefined>(undefined)
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
-  const { setPassword } = useContext(UserContext)
+  const { setPassword, fireToken } = useContext(UserContext)
 
   if (registerError) {
     console.log(registerError)
@@ -53,7 +53,7 @@ export default function Register(): ReactElement {
             variables: {
               email: values.email,
               password: values.password,
-              firebaseToken: fireToken as string
+              firebaseToken: 'ds1a6d41s6ads' //fireToken as string
             }
           })
 
