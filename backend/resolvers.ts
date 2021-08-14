@@ -52,12 +52,14 @@ export class RootResolver {
   @Query(() => String, {
     description: 'you need to be authenticated to call this resolver'
   })
-  authenti2cated(@Ctx() ctx: IContext) {
+  authenticated(@Ctx() ctx: IContext) {
     const authorization = ctx.request.headers['authorization']
 
     try {
       const token = authorization?.split(' ')[1]
+      // @ts-expect-error
       const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      // @ts-expect-error
       return jwtPayload?.userId
     } catch (err) {
       return false
