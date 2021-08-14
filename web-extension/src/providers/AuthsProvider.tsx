@@ -39,7 +39,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
         // Split saving to DB, local storage and background script
         setAuths: async (value) => {
           console.log('saving', value)
-
+          //@ts-expect-error
           saveAuthsToBg(value)
 
           const encrypted = cryptoJS.AES.encrypt(

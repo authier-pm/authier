@@ -22,13 +22,13 @@ export const Settings = () => {
     <Flex flexDirection="column">
       <Heading>Security</Heading>
       <Formik
-        initialValues={{ vaultTime: 'Sasuke', TwoFA: false }}
+        initialValues={{ vaultTime: '1 hour', TwoFA: false }}
         onSubmit={(values, actions) => {
           setTimeout(() => {
             if (values.vaultTime === 'On web close') {
               setSafeLockTime(0)
-            } else if (values.vaultTime === '1 hour') {
-              setSafeLockTime(1000 * 60 * 60)
+            } else if (values.vaultTime === '10 secconds') {
+              setSafeLockTime(10000)
             } else if (values.vaultTime === '8 hours') {
               setSafeLockTime(1000 * 60 * 60 * 8)
             } else if (values.vaultTime === '12 hours') {
@@ -66,7 +66,9 @@ export const Settings = () => {
                 <FormControl
                   isInvalid={form.errors.TwoFA && form.touched.TwoFA}
                 >
-                  <FormLabel htmlFor="TwoFA">2FA with mobile phone</FormLabel>
+                  <FormLabel htmlFor="TwoFA">
+                    2FA with (main) mobile phone
+                  </FormLabel>
                   <Checkbox {...field} id="TwoFA" defaultIsChecked>
                     Checkbox
                   </Checkbox>
