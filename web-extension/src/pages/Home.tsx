@@ -30,11 +30,13 @@ import { authenticator } from 'otplib'
 import { useLocation } from 'wouter'
 import { removeToken } from '@src/util/accessToken'
 import { UserContext } from '@src/providers/UserProvider'
+import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
   const { setPassword, isApiLoggedIn } = useContext(UserContext)
+  const { refetch } = useIsLoggedInQuery()
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
@@ -61,6 +63,7 @@ export const Home: FunctionComponent = () => {
               await chrome.runtime.sendMessage({
                 clear: true
               })
+              refetch()
             }}
           >
             Logout

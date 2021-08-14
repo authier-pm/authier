@@ -49,7 +49,7 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
-  @Query(() => String, {
+  @Query(() => Boolean, {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
@@ -59,8 +59,8 @@ export class RootResolver {
       const token = authorization?.split(' ')[1]
       // @ts-expect-error
       const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      // @ts-expect-error
-      return jwtPayload?.userId
+
+      return true
     } catch (err) {
       return false
     }
