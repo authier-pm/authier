@@ -27,6 +27,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
+import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -35,6 +36,7 @@ interface Values {
 }
 
 export default function Login(): ReactElement {
+  const { refetch } = useIsLoggedInQuery()
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
@@ -62,7 +64,7 @@ export default function Login(): ReactElement {
               jid: response.data.login.accessToken
             })
             setAccessToken(response.data.login.accessToken)
-
+            refetch()
             let id = await getUserFromToken()
             //@ts-expect-error
             setUserId(id.userId)
