@@ -338,7 +338,7 @@ export class RootResolver {
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
     @Ctx() Ctx: IContext
-  ): Promise<LoginResponse> {
+  ): Promise<LoginResponse | null> {
     const user = await prisma.user.findUnique({
       where: {
         email: email
@@ -349,13 +349,14 @@ export class RootResolver {
     })
 
     if (!user) {
-      throw new Error('Could not find user')
+      console.log('Could not find user')
+      return null
     }
 
     const valid = await compare(password, user.password)
 
     if (!valid) {
-      throw new Error('Bad password')
+      return null
     }
 
     // //login successful
