@@ -40,6 +40,13 @@ model Device {
     UserPrimary User? @relation("primaryDevice")
 }
 
+model SettingsConfig {
+    id       Int     @id @default(autoincrement())
+    lockTime Int
+    TwoFA    Boolean
+
+}
+
 // recorded when user shows a code for manual entry or when the code is filled into input by authier extension
 model OTPCodeEvent {
     id            BigInt       @id @default(autoincrement())

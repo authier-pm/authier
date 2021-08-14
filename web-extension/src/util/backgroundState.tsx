@@ -14,7 +14,7 @@ export function useBackground() {
   const [currURL, setCurrURL] = useState<string>('')
   const [safeLockTime, setSafeLockTime] = useState<number | null>(null)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
-  const [bgAuths, setBgAuths] = useState<IAuth[] | undefined>([])
+  const [bgAuths, setBgAuths] = useState<IAuth[] | undefined>(undefined)
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
 
@@ -78,11 +78,16 @@ export function useBackground() {
       setSafeLockTime(lockTime)
     },
     safeLockTime,
-    saveAuthsToBg: (value: any) => {
+    saveAuthsToBg: (value: IAuth[] | undefined) => {
       chrome.runtime.sendMessage({
         auths: value
       })
-      setBgAuths(value)
+      //@ts-expect-error
+      if (value?.length > 0) {
+        setBgAuths(value)
+      } else {
+        setBgAuths([])
+      }
     },
     bgAuths,
     startCount: () => {
@@ -94,6 +99,7 @@ export function useBackground() {
           }
         }
       )
-    }
+    },
+    isCounting
   }
 }

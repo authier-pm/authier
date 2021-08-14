@@ -13,9 +13,9 @@ import { useBackground } from './util/backgroundState'
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
   const { isAuth, verify } = useContext(UserContext)
-  const { startCount, safeLocked } = useBackground()
+  const { startCount, safeLocked, isCounting } = useBackground()
 
-  if (isAuth && !safeLocked) {
+  if (isAuth && !safeLocked && !isCounting) {
     console.log('started counting')
     startCount()
   }
