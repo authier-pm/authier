@@ -12,7 +12,7 @@ import { useBackground } from './util/useBackground'
 
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
-  const { isApiLoggedIn } = useContext(UserContext)
+  const { isApiLoggedIn, isVaultLocked } = useContext(UserContext)
   const { startCount, isCounting, safeLocked } = useBackground()
 
   if (isApiLoggedIn && !safeLocked && !isCounting) {
@@ -28,7 +28,7 @@ export default function Routes(): ReactElement {
     )
   }
 
-  if (safeLocked) {
+  if (isVaultLocked) {
     return <SafeUnlockVerification />
   }
 

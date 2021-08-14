@@ -50,7 +50,7 @@ if ('serviceWorker' in navigator) {
 
 let auths: Array<IAuth> | null | undefined = undefined
 let safeClosed = false // Is safe Closed ?
-let lockTime = 1000 * 60 * 60 * 8
+let lockTime = 10000
 let isCounting = false
 let fireToken = ''
 let otpCode = ''
