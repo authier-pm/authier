@@ -27,7 +27,7 @@ export function SafeUnlockVerification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword, setVerify } = useContext(UserContext)
+  const { setPassword } = useContext(UserContext)
   const { startCount, setSafeLocked } = useBackground()
 
   return (
@@ -57,7 +57,8 @@ export function SafeUnlockVerification() {
             }
 
             startCount()
-            setVerify(false)
+
+            // setVerify(false)
             setSubmitting(false)
           } catch (err) {
             console.log(err)
