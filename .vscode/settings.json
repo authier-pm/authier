@@ -8,6 +8,7 @@
         "auths",
         "firebaseapp",
         "graphiql",
+        "mercurius",
         "otplib",
         "upsert",
         "webextension"
