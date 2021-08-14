@@ -17,17 +17,17 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import { browser } from 'webextension-polyfill-ts'
 import { useLocation } from 'wouter'
-import { useBackground } from '../util/backgroundState'
+import { useBackground } from '../util/useBackground'
 
 interface Values {
   password: string
 }
 
-export default function Verification() {
+export function SafeUnlockVerification() {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword, setVerify } = useContext(UserContext)
+  const { setPassword, setIsVaultLocked } = useContext(UserContext)
   const { startCount, setSafeLocked } = useBackground()
 
   return (
@@ -57,7 +57,8 @@ export default function Verification() {
             }
 
             startCount()
-            setVerify(false)
+
+            setIsVaultLocked(false)
             setSubmitting(false)
           } catch (err) {
             console.log(err)

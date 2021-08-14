@@ -2,9 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ]
+      "@src/*": ["src/*"]
     },
     "target": "es5",
     "module": "commonjs",
@@ -15,11 +13,9 @@
     "sourceMap": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "lib": [
-      "es2015",
-      "dom"
-    ],
+    "lib": ["es2015", "dom"],
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "skipLibCheck": true
   }
 }

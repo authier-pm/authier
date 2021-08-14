@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import React from 'react'
-import { useBackground } from '@src/util/backgroundState'
+import { useBackground } from '@src/util/useBackground'
 
 export const Settings = () => {
   const { setSafeLockTime } = useBackground()
@@ -42,6 +42,7 @@ export const Settings = () => {
         {(props) => (
           <Form>
             <Field name="vaultTime">
+              {/* @ts-expect-error */}
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.vaultTime && form.touched.vaultTime}
@@ -62,6 +63,7 @@ export const Settings = () => {
               )}
             </Field>
             <Field name="TwoFA">
+              {/* @ts-expect-error */}
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.TwoFA && form.touched.TwoFA}

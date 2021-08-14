@@ -34,7 +34,7 @@ import { UserContext } from '@src/providers/UserProvider'
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
-  const { setPassword, isAuth, setIsAuth } = useContext(UserContext)
+  const { setPassword, isApiLoggedIn } = useContext(UserContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
@@ -55,7 +55,7 @@ export const Home: FunctionComponent = () => {
           <Button
             colorScheme={'teal'}
             onClick={async () => {
-              setIsAuth(false)
+              // setIsAuth(false)
               await browser.storage.local.clear()
               removeToken()
               await chrome.runtime.sendMessage({
