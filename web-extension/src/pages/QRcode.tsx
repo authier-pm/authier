@@ -13,7 +13,7 @@ export default function QRcode() {
   const { data, error, startPolling, stopPolling } = useDeviceCountQuery({
     variables: { userId: token }
   })
-  const [count, setCount] = useState<number | undefined>()
+  const [count, setCount] = useState<number>(0)
   console.log(data)
   useEffect(() => {
     async function GetToken() {
@@ -27,11 +27,11 @@ export default function QRcode() {
       GetToken()
     }
 
-    setCount(data?.DeviceCount)
+    const devicesCount = data?.devicesCount ?? 0
+    setCount(devicesCount)
 
-    //@ts-expect-error
-    if (typeof count !== undefined && data?.DeviceCount > count) {
-      console.log('nenee')
+    if (typeof count !== undefined && devicesCount > count) {
+      console.log('no devices')
       stopPolling()
       setLocation('/')
     }

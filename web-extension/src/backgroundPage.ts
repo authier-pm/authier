@@ -50,10 +50,10 @@ if ('serviceWorker' in navigator) {
 
 let auths: Array<IAuth> | null | undefined = undefined
 let safeClosed = false // Is safe Closed ?
-let lockTime = 1000 * 60 * 60 * 8
+let lockTime = 10000
 let isCounting = false
 let fireToken = ''
-var otpCode = ''
+let otpCode = ''
 
 if (auths === undefined) {
   safeClosed = true
@@ -74,7 +74,9 @@ async function generateFireToken() {
       'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
   })
 }
-generateFireToken()
+generateFireToken().then(() => {
+  console.log('fireToken', fireToken)
+})
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
   async (request: { popupMounted: boolean }) => {
@@ -86,25 +88,30 @@ browser.runtime.onMessage.addListener(
   }
 )
 
-chrome.runtime.onMessage.addListener(function (
-  request: { GiveMeAuths: Boolean },
-  sender,
-  sendResponse
-) {
-  if (request.GiveMeAuths) {
-    console.log('sending', auths)
-    sendResponse({ auths: auths })
-  }
-})
+export enum MessageType {
+  giveMeAuths = 'GiveMeAuths',
+  getFirebaseToken = 'getFirebaseToken',
+  lockTime = 'lockTime'
+}
 
 chrome.runtime.onMessage.addListener(function (
-  req: { generateToken: Boolean },
+  req: MessageType,
   sender,
   sendResponse
 ) {
-  if (req.generateToken) {
-    console.log('fireToken in Bg script:', fireToken)
-    sendResponse({ t: fireToken })
+  switch (req) {
+    case MessageType.giveMeAuths:
+      console.log('sending', auths)
+      sendResponse({ auths: auths })
+      break
+
+    case MessageType.getFirebaseToken:
+      console.log('fireToken in Bg script:', fireToken)
+      sendResponse({ t: fireToken })
+    default:
+      if (typeof req === 'string') {
+        throw new Error(`${req} not supported`)
+      }
   }
 })
 
