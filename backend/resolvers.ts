@@ -33,7 +33,7 @@ import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.j
 export interface IContext {
   request: RawRequestDefaultExpression
   reply: FastifyReply
-  payload?: { userId: string }
+  jwtPayload?: { userId: string }
 }
 
 export interface Payload {
@@ -52,26 +52,34 @@ export class RootResolver {
   @Query(() => String, {
     description: 'you need to be authenticated to call this resolver'
   })
-  @UseMiddleware(isAuth)
-  authenticated(@Ctx() Ctx: IContext) {
-    return Ctx.payload?.userId
+  authenti2cated(@Ctx() ctx: IContext) {
+    const authorization = ctx.request.headers['authorization']
+
+    try {
+      const token = authorization?.split(' ')[1]
+      const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      return jwtPayload?.userId
+    } catch (err) {
+      return false
+    }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => String, {
     description: 'you need to be authenticated to call this resolver',
-    name: 'authenticated'
+    name: 'me'
   })
-  @UseMiddleware(isAuth)
-  authenticatedMutations(@Ctx() Ctx: IContext) {
-    return `your user ud is: ${Ctx.payload?.userId}`
+  authenticatedMe(@Ctx() Ctx: IContext) {
+    return `your user ud is: ${Ctx.jwtPayload?.userId}`
   }
 
-  @Query(() => [User])
-  async users() {
-    return prisma.user.findMany()
-  }
+  // @Query(() => [User])
+  // async users() {
+  //   return prisma.user.findMany()
+  // }
 
   // query for info about user
+  @UseMiddleware(isAuth)
   @Query(() => User, { nullable: true })
   me(@Ctx() context: IContext) {
     const authorization = context.request.headers['authorization']
@@ -83,7 +91,7 @@ export class RootResolver {
     try {
       const token = authorization.split(' ')[1]
       const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      context.payload = payload as Payload
+      context.jwtPayload = payload as Payload
       //@ts-expect-error
       return prisma.user.findUnique({ where: { id: payload.userId } })
     } catch (err) {
@@ -92,6 +100,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => Boolean)
   async addDevice(
     @Arg('name', () => String) name: string,
@@ -121,6 +130,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => Boolean)
   async firebaseToken(
     @Arg('userId', () => String) userId: string,
@@ -142,6 +152,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => [Device])
   async myDevices(@Arg('userId', () => String) userId: string) {
     return await prisma.device.findMany({
@@ -158,6 +169,7 @@ export class RootResolver {
     })
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => Int)
   async devicesCount(@Arg('userId', () => String) userId: string) {
     return prisma.device.count({
@@ -167,6 +179,7 @@ export class RootResolver {
     })
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendAuthMessage(
     @Arg('userId', () => String) userId: string,
@@ -214,6 +227,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendConfirmation(
     @Arg('userId', () => String) userId: string,
