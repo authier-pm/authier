@@ -38,7 +38,7 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setUserId, setIsAuth } = useContext(UserContext)
+  const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
 
   return (
@@ -78,8 +78,6 @@ export default function Login(): ReactElement {
               //setPassword(values.password)
               setAuths(loaded)
             }
-
-            setIsAuth(true)
           }
 
           setSubmitting(false)
