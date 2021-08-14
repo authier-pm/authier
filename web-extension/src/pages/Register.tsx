@@ -33,7 +33,6 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
   const { setPassword, fireToken } = useContext(UserContext)
-
   console.log('~ fireToken', fireToken)
 
   if (registerError) {
