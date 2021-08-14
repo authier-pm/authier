@@ -1,7 +1,8 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
+import { MessageType } from '@src/backgroundPage'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
-import { useBackground } from '@src/util/backgroundState'
+import { useBackground } from '@src/util/useBackground'
 import React, {
   useState,
   createContext,
@@ -29,10 +30,7 @@ export const UserContext = createContext<{
   password: string
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
-  setIsAuth: Dispatch<SetStateAction<Boolean>>
-  isAuth: Boolean
-  setVerify: Dispatch<SetStateAction<Boolean>>
-  verify: Boolean
+  isApiLoggedIn: Boolean
   localStorage: any
   fireToken: string
 }>({} as any)
@@ -41,8 +39,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   const [password, setPassword] = useState<string>('bob')
   const { data, loading, error } = useIsLoggedInQuery()
   const [userId, setUserId] = useState<string | undefined>(undefined)
-  const [isAuth, setIsAuth] = useState<Boolean>(false)
-  const [verify, setVerify] = useState<Boolean>(false)
+
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
   const { safeLocked } = useBackground()
@@ -56,7 +53,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     checkStorage()
 
     chrome.runtime.sendMessage(
-      { generateToken: true },
+      MessageType.getFirebaseToken,
       (res: { t: string }) => {
         setFireToken(res.t)
       }
@@ -70,20 +67,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     getId()
   }, [])
 
-  useEffect(() => {
-    console.log('isLocked', safeLocked)
-    if (safeLocked) {
-      setVerify(true)
-    }
-  }, [safeLocked])
-
-  useEffect(() => {
-    if (data?.authenticated && !loading) {
-      //Save user ID to storage
-      setIsAuth(true)
-    }
-  }, [data?.authenticated])
-
   return (
     <UserContext.Provider
       value={{
@@ -91,10 +74,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
         setPassword,
         setUserId,
         userId,
-        setIsAuth,
-        isAuth,
-        verify,
-        setVerify,
+        isApiLoggedIn: !!(data?.authenticated && !loading),
         localStorage,
         fireToken
       }}

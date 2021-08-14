@@ -27,12 +27,12 @@ interface Values {
 }
 
 export default function Register(): ReactElement {
-  const [fireToken, setFireToken] = useState<string | undefined>(undefined)
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
-  const { setPassword } = useContext(UserContext)
+  const { setPassword, fireToken } = useContext(UserContext)
+  console.log('~ fireToken', fireToken)
 
   if (registerError) {
     console.log(registerError)
@@ -53,12 +53,12 @@ export default function Register(): ReactElement {
             variables: {
               email: values.email,
               password: values.password,
-              firebaseToken: fireToken as string
+              firebaseToken: 'dasdasd' as string
             }
           })
 
           if (res.data?.register.accessToken) {
-            // is this righ, maybe rsomeone could use proxy and send random string
+            // is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
               jid: res.data?.register.accessToken
             })

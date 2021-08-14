@@ -5,7 +5,7 @@ import Login from './pages/Login'
 import Register from './pages/Register'
 import Verification from './pages/Verification'
 import { UserContext } from './providers/UserProvider'
-import { useBackground } from './util/backgroundState'
+import { useBackground } from './util/useBackground'
 
 function AuthPages(): ReactElement {
   const [location, setLocation] = useLocation()
