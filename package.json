@@ -9,5 +9,8 @@
   "workspaces": ["web-extension", "backend", "frontend", "authier-mobileapp"],
   "resolutions": {
     "graphql": "^15.3.0"
+  },
+  "scripts": {
+    "tar": "tar -czvf authier.tar.gz -C ./backend . "
   }
 }
