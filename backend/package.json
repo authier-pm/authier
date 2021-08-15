@@ -17,7 +17,9 @@
     "jsonwebtoken": "^8.5.1",
     "mercurius": "^8.0.0",
     "reflect-metadata": "^0.1.13",
-    "type-graphql": "^1.1.1"
+    "ts-node": "^10.2.0",
+    "type-graphql": "^1.1.1",
+    "typescript": "^4.3.5"
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
@@ -30,6 +32,7 @@
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate dev",
+    "build": "tsc",
     "deploy": "caprover deploy"
   }
 }
