@@ -1,49 +1,40 @@
 {
-    "compilerOptions": {
-        "target": "ES2019",
-        "lib": [
-            "esnext",
-            "esnext.asynciterable",
-            "dom"
-        ],
-        "outDir": "dist",
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "esModuleInterop": true,
-        "allowSyntheticDefaultImports": true,
-        "sourceMap": true,
-        "noImplicitAny": false,
-        "strict": true,
-        "inlineSources": true,
-        "types": [
-            "node",
-        ],
-        "forceConsistentCasingInFileNames": true,
-        "suppressImplicitAnyIndexErrors": true,
-        "noUnusedLocals": true,
-        "resolveJsonModule": true,
-        "noUnusedParameters": true,
-        "experimentalDecorators": true,
-        "emitDecoratorMetadata": true,
-        "strictPropertyInitialization": false,
-        "allowUnreachableCode": false,
-        "allowJs": true,
-        "downlevelIteration": true,
-        "jsx": "preserve",
-        "preserveConstEnums": true,
-        "skipLibCheck": true,
-        "noEmit": true,
-        "isolatedModules": true
-    },
-    "exclude": [
-        ".git",
-        "**/node_modules/**",
-        "**/dist/**",
-        "**/build/**",
-        "./node_modules/*",
-    ],
-    "include": [
-        "**/*.ts",
-        "**/*.tsx"
-    ]
+  "compilerOptions": {
+    "target": "ES2019",
+    "lib": ["esnext", "esnext.asynciterable", "dom"],
+    "outDir": "dist",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "sourceMap": true,
+    "noImplicitAny": false,
+    "strict": true,
+    "inlineSources": true,
+    "types": ["node"],
+    "forceConsistentCasingInFileNames": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "noUnusedLocals": true,
+    "resolveJsonModule": true,
+    "noUnusedParameters": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "strictPropertyInitialization": false,
+    "allowUnreachableCode": false,
+    "allowJs": true,
+    "downlevelIteration": true,
+    "jsx": "preserve",
+    "preserveConstEnums": true,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "isolatedModules": true
+  },
+  "exclude": [
+    ".git",
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "./node_modules/*"
+  ],
+  "include": ["**/*.ts", "**/*.tsx"]
 }
