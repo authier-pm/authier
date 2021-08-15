@@ -12,6 +12,7 @@ export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
   try {
     const token = authorization.split(' ')[1]
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+    // @ts-expect-error
     context.payload = payload as any
   } catch (err) {
     throw new Error('not authenticated')
