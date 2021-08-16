@@ -5,7 +5,7 @@
                         "FROM node:12-alpine",
                         "RUN mkdir -p /usr/src/app",
                         "COPY ./backend /usr/src/app",
-                        "RUN yarn install && yarn cache clean --force && prisma db push",
+                        "RUN yarn install && yarn cache clean --force",
                         "CMD [ \"yarn\", \"start\" ]"
                     ]
  }
