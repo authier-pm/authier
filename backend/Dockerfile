@@ -8,12 +8,11 @@ WORKDIR /usr/src/app
 ADD https://www.google.com /time.now
 COPY ./package.json /usr/src/app
 COPY ./yarn.lock /usr/src/app
-COPY ./tsconfig.json /usr/src/app
+#COPY ./tsconfig.json /usr/src/app
 COPY ./dist /usr/src/app/server
 COPY prisma ./prisma/
 
 RUN yarn
-RUN yarn build
 
 
 ENV NODE_ENV production
