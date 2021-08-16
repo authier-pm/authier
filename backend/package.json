@@ -33,7 +33,6 @@
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate deploy",
     "build": "tsc",
-    "postinstall": "tsc",
     "deploy": "caprover deploy",
     "DbPush": "prisma db push"
   }
