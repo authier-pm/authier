@@ -5,17 +5,18 @@
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^2.29.1",
-    "@react-native-firebase/app": "^12.2.0",
+    "@react-native-firebase/app": "^12.6.0",
     "@types/jsonwebtoken": "^8.5.4",
     "bcrypt": "^5.0.1",
     "class-validator": "^0.13.1",
+    "cpy": "^8.1.2",
     "dotenv": "^10.0.0",
-    "fastify": "^3.19.1",
+    "fastify": "^3.20.2",
     "fastify-cookie": "^5.3.1",
     "firebase-admin": "^9.11.0",
     "graphql": "^15.5.1",
     "jsonwebtoken": "^8.5.1",
-    "mercurius": "^8.0.0",
+    "mercurius": "^8.1.2",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.2.0",
     "type-graphql": "^1.1.1",
@@ -32,9 +33,11 @@
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate deploy",
-    "build": "tsc",
-    "deploy": "caprover deploy",
+    "build": "rm -rf dist && tsc && node scripts/build.js && yarn tar",
+    "deploy": "caprover deploy -t authier-api.tar.gz",
+    "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
-    "start": "yarn install && yarn DbPush && node app.js"
+    "start": "prisma migrate deploy && node app.js",
+    "tar": "tar -czvf authier-api.tar.gz -C ./dist ."
   }
 }

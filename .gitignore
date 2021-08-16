@@ -103,5 +103,5 @@ dist/js
 # TernJS port file
 .tern-port
 
-authier.tar.gz
+authier-api.tar.gz
 backend/dist

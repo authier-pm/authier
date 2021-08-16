@@ -28,7 +28,6 @@ jobs:
       #     restore-keys: |
       #       ${{ runner.os }}-yarn-
 
-
       - uses: AlexxNB/caprover-action@v1
         with:
           server: https://captain.caprover-root.subz.fun/
