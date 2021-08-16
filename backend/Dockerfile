@@ -13,7 +13,7 @@ COPY ./dist /usr/src/app/server
 COPY prisma ./prisma/
 
 RUN yarn
-
+RUN yarn build
 
 
 ENV NODE_ENV production
@@ -21,4 +21,4 @@ ENV DATABASE_URL "postgresql://authier:auth133r@postgresprisma:5432/authier?sche
 ENV PORT 80
 EXPOSE 80
 RUN printenv
-CMD yarn start
+CMD yarn caprover
