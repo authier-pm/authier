@@ -13,7 +13,9 @@ import { User } from './models/models'
 dotenv.config()
 
 async function main() {
-  const app = fastify()
+  const app = fastify({
+    logger: true
+  })
 
   app.post('/refresh_token', async (request, reply) => {
     const token = request.cookies.jid
