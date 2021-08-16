@@ -10,6 +10,5 @@
   "resolutions": {
     "graphql": "^15.3.0"
   },
-  "scripts": {
-  }
+  "scripts": {}
 }
