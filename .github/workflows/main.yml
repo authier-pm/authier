@@ -8,5 +8,6 @@ jobs:
     - uses: AlexxNB/caprover-action@45fdf55f3213582285394908e8a3a0d2df41e21d
       with:
         server: https://captain.caprover-root.subz.fun/
-        password: '${{ secrets.CAPROVER_PASSWORD }}'
+        password: pampeliska
         appname: authier-api
+        branch: github-actions
