@@ -35,4 +35,5 @@ jobs:
           server: https://captain.caprover-root.subz.fun/
           password: '${{ secrets.CAPROVER_PASSWORD }}'
           appname: authier-api
+          branch: ${GITHUB_REF##*/}
 
