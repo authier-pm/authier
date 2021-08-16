@@ -2,6 +2,6 @@ name: CI
 on: push
 uses: AlexxNB/caprover-action@v1
 with:
-  server: 'https://captain.root.domain.com'
-  password: '${{ secrets.CAPROVER_PASSWORD }}'
-  appname: 'my-app'
+  server: 'https://captain.caprover-root.subz.fun/'
+  password: '${{ pampeliska }}'
+  appname: 'authier-api'
