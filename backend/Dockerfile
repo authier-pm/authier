@@ -6,11 +6,11 @@ RUN mkdir -p /usr/src/app
 WORKDIR /usr/src/app
 
 ADD https://www.google.com /time.now
-COPY ./package.json /usr/src/app
-COPY ./yarn.lock /usr/src/app
-#COPY ./tsconfig.json /usr/src/app
-COPY ./dist /usr/src/app/server
-COPY prisma ./prisma/
+COPY ./backend/package.json /usr/src/app
+COPY ./backend/yarn.lock /usr/src/app
+COPY ./backend/tsconfig.json /usr/src/app
+COPY ./backend/dist /usr/src/app/server
+COPY ./backend/prisma ./prisma/
 
 RUN yarn
 
