@@ -122,7 +122,8 @@ export class RootResolver {
           firebaseToken: firebaseToken,
           firstIpAdress: ipAddress,
           userId: userId,
-          lastIpAdress: ipAddress
+          lastIpAdress: ipAddress,
+          vaultLockTimeoutSeconds: 60
         }
       })
       return true
