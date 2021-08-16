@@ -11,4 +11,3 @@ jobs:
         password: pampeliska
         appname: authier-api
         branch: main
-        node-version: 12
