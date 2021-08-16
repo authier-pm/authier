@@ -16,7 +16,7 @@ COPY ./backend/dist /usr/src/app
 COPY ./backend/prisma ./prisma/
 
 ENV NODE_ENV production
-ENV DATABASE_URL "postgresql://authier:auth133r@postgresprisma:5432/authier?schema=public"
+ENV DATABASE_URL "postgresql://authier:auth133r@localhost:5432/authier?schema=public"
 ENV PORT 80
 EXPOSE 80
 RUN printenv
