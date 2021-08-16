@@ -27,9 +27,19 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - run: yarn
-      - run: yarn tsc
-      - run: yarn test
+
+      - uses: dorny/paths-filter@v2
+        id: changes
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+        # run only if some file in 'src' folder was changed
+      - name: tests and tsc
+        if: steps.changes.outputs.backend == 'true'
+        run: yarn
+        run: yarn tsc
+        run: yarn test
         
 
       # - uses: AlexxNB/caprover-action@v1
