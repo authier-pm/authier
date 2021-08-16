@@ -104,3 +104,4 @@ dist/js
 .tern-port
 
 authier.tar.gz
+backend/dist

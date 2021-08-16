@@ -1,11 +1,11 @@
-name: Deloy to caprover
+name: Deploy to caprover
 on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
     name: Deploy
     steps:
-    - uses: sleaper/caprover-deploy@v1
+    - uses: AlexxNB/caprover-action@v1
       with:
         server: https://captain.caprover-root.subz.fun/
         password: '${{ secrets.CAPROVER_PASSWORD }}'
