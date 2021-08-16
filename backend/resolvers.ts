@@ -80,7 +80,7 @@ export class RootResolver {
   //   return prisma.user.findMany()
   // }
 
-  // query for info about user
+  //TODO query for info about user
   @UseMiddleware(isAuth)
   @Query(() => User, { nullable: true })
   me(@Ctx() context: IContext) {
