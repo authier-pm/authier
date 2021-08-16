@@ -1,7 +1,5 @@
 name: Deloy to caprover
-on:
-  push:
-    branches: [ main ]
+on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -10,7 +8,6 @@ jobs:
     - uses: AlexxNB/caprover-action@45fdf55f3213582285394908e8a3a0d2df41e21d
       with:
         server: https://captain.caprover-root.subz.fun/
-        password: pampeliska
+        password: '${{ secrets.CAPROVER_PASSWORD }}'
         appname: authier-api
         branch: main
-        node-version: 12
