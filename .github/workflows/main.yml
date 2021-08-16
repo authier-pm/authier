@@ -15,6 +15,7 @@ jobs:
       APPNAME : authier-api
 
     steps:
+      - run: cd backend
       - name: Install dependencies
         run: yarn
       - run: npm build
