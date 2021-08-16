@@ -9,11 +9,11 @@ ADD https://www.google.com /time.now
 COPY ./backend/package.json /usr/src/app
 COPY ./backend/yarn.lock /usr/src/app
 COPY ./backend/tsconfig.json /usr/src/app
-COPY ./backend/dist /usr/src/app/server
-COPY ./backend/prisma ./prisma/
-
 RUN yarn
+RUN yarn build
 
+COPY ./backend/dist /usr/src/app
+COPY ./backend/prisma ./prisma/
 
 ENV NODE_ENV production
 ENV DATABASE_URL "postgresql://authier:auth133r@postgresprisma:5432/authier?schema=public"
