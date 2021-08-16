@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "lib": ["esnext", "esnext.asynciterable", "dom"],
+    "lib": [
+      "esnext",
+      "esnext.asynciterable",
+      "dom"
+    ],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -11,7 +15,9 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
@@ -28,12 +34,18 @@
     "skipLibCheck": true,
     "isolatedModules": true
   },
-  "exclude": [
-    ".git",
-    "**/node_modules/**",
-    "**/dist/**",
-    "**/build/**",
-    "./node_modules/*"
-  ],
-  "include": ["**/*.ts", "**/*.tsx"]
 }
+// "exclude": [
+//   ".git",
+//   "**/node_modules/**",
+//   "**/dist/**",
+//   "**/build/**",
+//   "./node_modules/*",
+//   "/Dockerfile",
+//   "/docker-compose.yml",
+//   ".dockerignore"
+// ],
+// "include": [
+//   "**/*.ts",
+//   "**/*.tsx"
+// ]

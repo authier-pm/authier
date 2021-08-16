@@ -14,8 +14,10 @@ COPY prisma ./prisma/
 
 RUN yarn
 
+
+
 ENV NODE_ENV production
-ENV DATABASE_URL "postgresql://authier:auth133r@localhost:5432/authier?schema=public"
+ENV DATABASE_URL "postgresql://authier:auth133r@postgresprisma:5432/authier?schema=public"
 ENV PORT 80
 EXPOSE 80
 RUN printenv

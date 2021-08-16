@@ -1,27 +1,62 @@
-version: '3.4'
-
+# version: '3.4'
+# services:
+#   authier-api:
+#     build:
+#       context: .
+#       dockerfile: Dockerfile
+#     ports:
+#       - 80:80
+#     volumes:
+#       - ./:/app
+#   authierDb:
+#     image: postgres:latest
+#     container_name: postgresprisma
+#     environment:
+#       POSTGRES_PASSWORD: auth133r
+#       POSTGRES_USER: authier
+#       POSTGRES_DB: authier
+#     volumes:
+#       - ./pgdata:/var/lib/postgresql/data
+#     ports:
+#       - '5432:5432'
+#     healthcheck:
+#       test: ['CMD-SHELL', 'pg_isready -U postgres']
+#       interval: 5s
+#       timeout: 5s
+#       retries: 5
+version: '3.8'
 services:
   authier-api:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: authier-api
+    restart: always
     ports:
       - 80:80
-    # volumes:
-    #   - ./:/app
-  # authierDb:
-  #   image: postgres
-  #   container_name: postgresprisma
-  #   environment:
-  #     POSTGRES_PASSWORD: auth133r
-  #     POSTGRES_USER: authier
-  #     POSTGRES_DB: authier
-  #   volumes:
-  #     - ./pgdata:/var/lib/postgresql/data
-  #   ports:
-  #     - '6432:5432'
-  #   healthcheck:
-  #     test: ['CMD-SHELL', 'pg_isready -U postgres']
-  #     interval: 5s
-  #     timeout: 5s
-  #     retries: 5
+    depends_on:
+      - postgres
+    env_file:
+      - .env
+    volumes:
+      - ./:/app
+
+  authierDb:
+    image: postgres:13
+    container_name: postgresprisma
+    restart: always
+    ports:
+      - 5432:5432
+    env_file:
+      - .env
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres:
+    name: nest-prisma-docker-db
