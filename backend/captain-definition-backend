@@ -1,11 +1,4 @@
 {
   "schemaVersion": 2,
-  "templateId": "node/16.6.2"
-  "dockerfileLines": [
-                        "FROM node:12-alpine",
-                        "RUN mkdir -p /usr/src/app",
-                        "COPY ./backend /usr/src/app",
-                        "RUN yarn install && yarn cache clean --force",
-                        "CMD [ \"yarn\", \"start\" ]"
-                    ]
+  "dockerfilePath": "./Dockerfile"
  }
