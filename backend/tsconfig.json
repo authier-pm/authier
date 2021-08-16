@@ -14,9 +14,9 @@
     "types": ["node", "jest"],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "resolveJsonModule": true,
-    "noUnusedParameters": true,
+    "noUnusedParameters": false,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
@@ -34,7 +34,8 @@
     "**/node_modules/**",
     "**/dist/**",
     "**/build/**",
-    "./node_modules/*"
-  ],
-  "include": ["**/*.ts", "**/*.tsx"]
+    "./node_modules/*",
+    "./generated/typegraphql-prisma/resolvers/**/*"
+  ]
+  // "include": ["**/*.ts", "**/*.tsx"]
 }
