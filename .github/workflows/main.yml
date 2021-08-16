@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: Deploy to caprover
+    name: runs typescript and jest
     env:
       CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
       CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
@@ -16,22 +16,26 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-      # - name: Get yarn cache directory path
-      #   id: yarn-cache-dir-path
-      #   run: echo "::set-output name=dir::$(yarn cache dir)"
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
 
-      # - uses: actions/cache@v2
-      #   id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
-      #   with:
-      #     path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-      #     key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-      #     restore-keys: |
-      #       ${{ runner.os }}-yarn-
-
-      - uses: AlexxNB/caprover-action@v1
+      - uses: actions/cache@v2
+        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
         with:
-          server: https://captain.caprover-root.subz.fun/
-          password: '${{ secrets.CAPROVER_PASSWORD }}'
-          appname: authier-api
-          branch: ${GITHUB_REF##*/}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - run: yarn
+      - run: yarn tsc
+      - run: yarn test
+        
+
+      # - uses: AlexxNB/caprover-action@v1
+      #   with:
+      #     server: https://captain.caprover-root.subz.fun/
+      #     password: '${{ secrets.CAPROVER_PASSWORD }}'
+      #     appname: authier-api
+      #     branch: ${GITHUB_REF##*/}
 
