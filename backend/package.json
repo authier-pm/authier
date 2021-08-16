@@ -37,7 +37,7 @@
     "deploy": "caprover deploy -t authier-api.tar.gz",
     "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
-    "start": "prisma migrate deploy && node app.js",
+    "start": "prisma migrate deploy && prisma generate && node app.js",
     "tar": "tar -czvf authier-api.tar.gz -C ./dist ."
   }
 }
