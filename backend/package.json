@@ -41,6 +41,7 @@
     "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
     "generate": "prisma generate",
+    "test": "jest",
     "start": "prisma migrate deploy && prisma generate && node server.js",
     "tar": "tar -czvf authier-api.tar.gz -C ./dist ."
   }
