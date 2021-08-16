@@ -31,7 +31,7 @@
     "start": "yarn DbPush && ts-node --transpile-only app.ts",
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
-    "migrate": "prisma migrate dev",
+    "migrate": "prisma migrate deploy",
     "build": "tsc",
     "deploy": "caprover deploy",
     "DbPush": "npx prisma db push"
