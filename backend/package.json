@@ -28,11 +28,12 @@
   },
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only app.ts",
-    "start": "ts-node --transpile-only app.ts",
+    "start": "yarn DbPush && ts-node --transpile-only app.ts",
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate dev",
     "build": "tsc",
-    "deploy": "caprover deploy"
+    "deploy": "caprover deploy",
+    "DbPush": "npx prisma db push"
   }
 }
