@@ -14,7 +14,7 @@ module.exports = {
 
   setupFiles: ['./tests/setupJest.ts'],
 
-  testPathIgnorePatterns: ['/node_modules/', 'stories.tsx'],
+  testPathIgnorePatterns: ['/node_modules/', 'stories.tsx', '/dist/'],
 
   transform: {
     ...tsjPreset.transform
