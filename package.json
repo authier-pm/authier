@@ -11,6 +11,5 @@
     "graphql": "^15.3.0"
   },
   "scripts": {
-    "tar": "tar -czvf --exclude='./.env' authier.tar.gz -C ./backend ."
   }
 }
