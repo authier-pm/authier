@@ -62,9 +62,14 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     )
 
     async function getId() {
-      let id = await getUserFromToken()
+      try {
+        let id = await getUserFromToken()
       //@ts-expect-error
       setUserId(id.userId)
+      } catch(err) {
+        console.log(err)
+      }
+      
     }
     getId()
   }, [])

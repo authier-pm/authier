@@ -120,8 +120,7 @@ export const AuthsList = () => {
           })
       ) : (
         <Flex flexDirection="row" justifyContent="center">
-          <LockIcon w={6} h={6} />
-          <Text fontSize="md"> Your OTP list is locked</Text>
+          <Text fontSize="md"> Your Safe is emtpy</Text>
         </Flex>
       )}
     </>
