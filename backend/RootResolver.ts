@@ -146,63 +146,6 @@ export class RootResolver {
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => Boolean)
-  async firebaseToken(
-    @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
-  ) {
-    try {
-      let user = await prisma.user.findFirst({
-        where: {
-          id: userId
-        }
-      })
-
-      await prisma.device.update({
-        data: {
-          firebaseToken: firebaseToken
-        },
-        where: {
-          id: user?.primaryDeviceId as number
-        }
-      })
-
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
-  }
-
-  @UseMiddleware(isAuth)
-  @Query(() => [Device])
-  async myDevices(@Arg('userId', () => String) userId: string) {
-    return await prisma.device.findMany({
-      where: {
-        userId: userId
-      },
-      include: {
-        User: {
-          select: {
-            primaryDeviceId: true
-          }
-        }
-      }
-    })
-  }
-
-  @UseMiddleware(isAuth)
-  @Query(() => Int)
-  async devicesCount(@Arg('userId', () => String) userId: string) {
-    return prisma.device.count({
-      where: {
-        userId: userId
-      }
-    })
-  }
-
-  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendAuthMessage(
     @Arg('userId', () => String) userId: string,
@@ -279,32 +222,6 @@ export class RootResolver {
         {}
       )
 
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
-  }
-
-  @Mutation(() => Boolean)
-  async saveAuths(
-    @Arg('userId', () => String) userId: string,
-    @Arg('payload', () => String) payload: string
-  ) {
-    try {
-      await prisma.encryptedAuths.upsert({
-        create: {
-          encrypted: payload,
-          version: 1,
-          userId: userId
-        },
-        update: {
-          encrypted: payload
-        },
-        where: {
-          userId: userId
-        }
-      })
       return true
     } catch (err) {
       console.log(err)

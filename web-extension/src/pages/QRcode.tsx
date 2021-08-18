@@ -22,7 +22,7 @@ export default function QRcode() {
   }, [])
 
   useEffect(() => {
-    const devicesCount = data?.devicesCount ?? 0
+    const devicesCount = data?.user.devicesCount ?? 0
 
     if (typeof count !== undefined && devicesCount > count) {
       stopPolling()

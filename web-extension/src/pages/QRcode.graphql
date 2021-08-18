@@ -1,3 +1,5 @@
 query DeviceCount($userId: String!) {
-  devicesCount(userId: $userId)
+  user(userId: $userId) {
+    devicesCount
+  }
 }
