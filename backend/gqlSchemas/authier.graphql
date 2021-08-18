@@ -1,7 +1,8 @@
 type Query {
+  user(userId: String!): User!
+
   """you need to be authenticated to call this resolver"""
-  authenticated: String!
-  users: [User!]!
+  authenticated: Boolean!
   me: User
   myDevices(userId: String!): [Device!]!
   devicesCount(userId: String!): Int!
@@ -16,30 +17,11 @@ type User {
   account_name: String!
   password: String!
   tokenVersion: Float!
-}
-
-type Device {
-  firstIpAdress: String!
-  lastIpAdress: String!
-  firebaseToken: String!
-  name: String!
-}
-
-type Mutation {
-  """you need to be authenticated to call this resolver"""
-  authenticated: String!
-  addDevice(firebaseToken: String!, userId: String!, name: String!): Boolean!
-  saveAuths(payload: String!, userId: String!): Boolean!
-  addOTPEvent(data: OTPEvent!): Boolean!
-  register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
-  revokeRefreshTokensForUser(userId: String!): Boolean!
+  primaryDeviceId: Int!
   login(password: String!, email: String!): LoginResponse!
-}
-
-input OTPEvent {
-  kind: String!
-  url: String!
-  userId: String!
+  myDevices: [Device!]!
+  devicesCount: Int!
+  authenticated: Boolean!
 }
 
 type LoginResponse {
@@ -51,4 +33,61 @@ type EncryptedAuths {
   id: Int!
   encrypted: String!
   version: Int!
+}
+
+type Device {
+  id: Int!
+  firstIpAdress: String!
+  lastIpAdress: String!
+  firebaseToken: String!
+  name: String!
+  vaultLockTimeoutSeconds: Int
+  createdAt: DateTime!
+  updatedAt: DateTime
+  userId: String!
+  _count: DeviceCount
+}
+
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
+type DeviceCount {
+  VaultUnlockEvents: Int!
+  VaultUnlockEventsApproved: Int!
+}
+
+type Mutation {
+  user(userId: String!): UserMutation!
+
+  """you need to be authenticated to call this resolver"""
+  me: String!
+  addDevice(firebaseToken: String!, userId: String!, name: String!): Boolean!
+  firebaseToken(firebaseToken: String!, userId: String!): Boolean!
+  saveAuths(payload: String!, userId: String!): Boolean!
+  addOTPEvent(data: OTPEvent!): Boolean!
+  register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
+  revokeRefreshTokensForUser(userId: String!): Boolean!
+  login(password: String!, email: String!): LoginResponse!
+}
+
+type UserMutation {
+  id: String!
+  email: String
+  phone_number: String!
+  account_name: String!
+  password: String!
+  tokenVersion: Float!
+  primaryDeviceId: Int!
+  register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
+  addDevice(firebaseToken: String!, name: String!): Device!
+  saveAuths(payload: String!): Boolean!
+  updateFireToken(firebaseToken: String!): Boolean!
+}
+
+input OTPEvent {
+  kind: String!
+  url: String!
+  userId: String!
 }

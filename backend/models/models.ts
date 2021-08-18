@@ -1,7 +1,21 @@
-import { Field, InputType, Int, ObjectType } from 'type-graphql'
+import { prisma } from '../prisma'
+import {
+  Arg,
+  Ctx,
+  Field,
+  InputType,
+  Int,
+  ObjectType,
+  UseMiddleware
+} from 'type-graphql'
+import { IContext } from '../RootResolver'
+import { createAccessToken, createRefreshToken } from '../auth'
+import { sendRefreshToken } from '../sendRefreshToken'
+import { compare, hash } from 'bcrypt'
+import { isAuth } from '../isAuth'
 
 @ObjectType()
-export class User {
+export class UserBase {
   @Field(() => String)
   id: string
 
@@ -19,6 +33,9 @@ export class User {
 
   @Field(() => Number)
   tokenVersion: number
+
+  @Field(() => Int)
+  primaryDeviceId: number
 }
 
 @ObjectType()
@@ -52,19 +69,4 @@ export class OTPEvent {
 
   @Field(() => String)
   userId: string
-}
-
-@ObjectType()
-export class Device {
-  @Field(() => String)
-  firstIpAdress: string
-
-  @Field(() => String)
-  lastIpAdress: string
-
-  @Field(() => String)
-  firebaseToken: string
-
-  @Field(() => String)
-  name: string
 }

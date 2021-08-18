@@ -1,13 +1,13 @@
 import { sign } from 'jsonwebtoken'
-import { User } from './models/models'
+import { UserBase } from './models/user'
 
-export const createAccessToken = (user: User) => {
+export const createAccessToken = (user: UserBase) => {
   return sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
     expiresIn: '15m'
   })
 }
 
-export const createRefreshToken = (user: User) => {
+export const createRefreshToken = (user: UserBase) => {
   return sign(
     { userId: user.id, tokenVersion: user.tokenVersion },
     process.env.REFRESH_TOKEN_SECRET!,

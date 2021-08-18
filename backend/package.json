@@ -32,7 +32,7 @@
   },
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only server.ts",
-    "local": "ts-node --transpile-only server.ts",
+    "local": "nodemon server.ts",
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate deploy",

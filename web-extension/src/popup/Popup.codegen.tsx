@@ -19,7 +19,10 @@ export type SaveAuthsMutationVariables = Types.Exact<{
 
 export type SaveAuthsMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'saveAuths'>
+  & { user: (
+    { __typename?: 'UserMutation' }
+    & Pick<Types.UserMutation, 'saveAuths'>
+  ) }
 );
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
@@ -44,7 +47,10 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 
 export type SaveFirebaseTokenMutation = (
   { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'firebaseToken'>
+  & { user: (
+    { __typename?: 'UserMutation' }
+    & Pick<Types.UserMutation, 'updateFireToken'>
+  ) }
 );
 
 
@@ -82,7 +88,9 @@ export type IsLoggedInLazyQueryHookResult = ReturnType<typeof useIsLoggedInLazyQ
 export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLoggedInQueryVariables>;
 export const SaveAuthsDocument = gql`
     mutation saveAuths($userId: String!, $payload: String!) {
-  saveAuths(userId: $userId, payload: $payload)
+  user(userId: $userId) {
+    saveAuths(payload: $payload)
+  }
 }
     `;
 export type SaveAuthsMutationFn = Apollo.MutationFunction<SaveAuthsMutation, SaveAuthsMutationVariables>;
@@ -157,7 +165,9 @@ export type SendAuthMessageLazyQueryHookResult = ReturnType<typeof useSendAuthMe
 export type SendAuthMessageQueryResult = Apollo.QueryResult<SendAuthMessageQuery, SendAuthMessageQueryVariables>;
 export const SaveFirebaseTokenDocument = gql`
     mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
-  firebaseToken(userId: $userId, firebaseToken: $firebaseToken)
+  user(userId: $userId) {
+    updateFireToken(firebaseToken: $firebaseToken)
+  }
 }
     `;
 export type SaveFirebaseTokenMutationFn = Apollo.MutationFunction<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>;
