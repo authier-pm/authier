@@ -23,7 +23,7 @@ import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
-import { User, UserMutation } from './models/user'
+import { UserQuery, UserMutation } from './models/user'
 import { Device } from './generated/typegraphql-prisma/models'
 
 export interface IContext {
@@ -45,7 +45,7 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
-  @Query(() => User)
+  @Query(() => UserQuery)
   @Mutation(() => UserMutation)
   async user(@Arg('userId') userId: string) {
     const user = await prisma.user.findFirst({
@@ -94,7 +94,7 @@ export class RootResolver {
 
   //TODO query for info about user
   @UseMiddleware(isAuth)
-  @Query(() => User, { nullable: true })
+  @Query(() => UserQuery, { nullable: true })
   me(@Ctx() context: IContext) {
     const authorization = context.request.headers['authorization']
 
