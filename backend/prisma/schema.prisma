@@ -98,7 +98,6 @@ model User {
     phone_number    String?         @unique
     account_name    String?         @unique
     password        String
-    firebaseToken   String
     tokenVersion    Int             @default(0)
     name            String?
     auths           EncryptedAuths?

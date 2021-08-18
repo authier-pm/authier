@@ -17,18 +17,14 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import {
-  Device,
-  EncryptedAuths,
-  LoginResponse,
-  OTPEvent,
-  User
-} from './models/models'
+import { EncryptedAuths, LoginResponse, OTPEvent } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
+import { User, UserMutation } from './models/user'
+import { Device } from './generated/typegraphql-prisma/models'
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -49,6 +45,22 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
+  @Query(() => User)
+  @Mutation(() => UserMutation)
+  async user(@Arg('userId') userId: string) {
+    let data = await prisma.user.findFirst({
+      where: {
+        id: userId
+      },
+      include: {
+        Devices: true,
+        auths: true
+      }
+    })
+
+    return data
+  }
+
   @Query(() => Boolean, {
     description: 'you need to be authenticated to call this resolver'
   })
@@ -137,17 +149,25 @@ export class RootResolver {
   @Mutation(() => Boolean)
   async firebaseToken(
     @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() context: IContext
   ) {
     try {
-      await prisma.user.update({
-        data: {
-          firebaseToken: firebaseToken
-        },
+      let user = await prisma.user.findFirst({
         where: {
           id: userId
         }
       })
+
+      await prisma.device.update({
+        data: {
+          firebaseToken: firebaseToken
+        },
+        where: {
+          id: user?.primaryDeviceId as number
+        }
+      })
+
       return true
     } catch (err) {
       console.log(err)
@@ -242,9 +262,15 @@ export class RootResolver {
       }
     })
 
+    let device = await prisma.device.findFirst({
+      where: {
+        id: user?.primaryDeviceId as number
+      }
+    })
+
     try {
       await admin.messaging().sendToDevice(
-        user?.firebaseToken as string,
+        device?.firebaseToken as string,
         {
           data: {
             success: success.toString()
@@ -308,16 +334,41 @@ export class RootResolver {
   async register(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() context: IContext
   ) {
+    console.log(context)
     const hashedPassword = await hash(password, 12)
+
+    //@ts-expect-error
+    const ipAddress: string =
+      context.request.headers['x-forwarded-for'] ||
+      context.request.socket.remoteAddress
 
     try {
       let user = await prisma.user.create({
         data: {
           email: email,
-          password: hashedPassword,
-          firebaseToken: firebaseToken
+          password: hashedPassword
+        }
+      })
+
+      let device = await prisma.device.create({
+        data: {
+          firstIpAdress: ipAddress,
+          lastIpAdress: ipAddress,
+          firebaseToken: firebaseToken,
+          name: 'test',
+          userId: user.id
+        }
+      })
+      console.log(user)
+      await prisma.user.update({
+        where: {
+          id: user.id
+        },
+        data: {
+          primaryDeviceId: device.id
         }
       })
 

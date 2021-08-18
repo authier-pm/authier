@@ -55,9 +55,9 @@ let isCounting = false
 let fireToken = ''
 let otpCode = ''
 
-if (auths === undefined) {
-  safeClosed = true
-}
+// if (auths === undefined) {
+//   safeClosed = true
+// }
 
 broadcast.onmessage = (event) => {
   if (event.data.data.success === 'true') {

@@ -114,6 +114,7 @@ export const Popup: FunctionComponent = () => {
   }, [isFilling])
 
   useEffect(() => {
+    setLocation('/')
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
