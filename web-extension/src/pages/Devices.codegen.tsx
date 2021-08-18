@@ -10,19 +10,24 @@ export type MyDevicesQueryVariables = Types.Exact<{
 
 export type MyDevicesQuery = (
   { __typename?: 'Query' }
-  & { myDevices: Array<(
-    { __typename?: 'Device' }
-    & Pick<Types.Device, 'firstIpAdress' | 'lastIpAdress' | 'name'>
-  )> }
+  & { user: (
+    { __typename?: 'User' }
+    & { myDevices: Array<(
+      { __typename?: 'Device' }
+      & Pick<Types.Device, 'firstIpAdress' | 'lastIpAdress' | 'name'>
+    )> }
+  ) }
 );
 
 
 export const MyDevicesDocument = gql`
     query myDevices($userId: String!) {
-  myDevices(userId: $userId) {
-    firstIpAdress
-    lastIpAdress
-    name
+  user(userId: $userId) {
+    myDevices {
+      firstIpAdress
+      lastIpAdress
+      name
+    }
   }
 }
     `;
