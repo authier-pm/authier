@@ -48,7 +48,7 @@ export class RootResolver {
   @Query(() => User)
   @Mutation(() => UserMutation)
   async user(@Arg('userId') userId: string) {
-    let data = await prisma.user.findFirst({
+    const user = await prisma.user.findFirst({
       where: {
         id: userId
       },
@@ -58,7 +58,7 @@ export class RootResolver {
       }
     })
 
-    return data
+    return user
   }
 
   @Query(() => Boolean, {
