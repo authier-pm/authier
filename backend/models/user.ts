@@ -41,7 +41,7 @@ export class UserBase {
 }
 
 @ObjectType()
-export class User extends UserBase {
+export class UserQuery extends UserBase {
   @Field(() => [Device])
   @UseMiddleware(isAuth)
   async myDevices() {
