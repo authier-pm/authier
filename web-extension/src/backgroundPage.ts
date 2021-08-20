@@ -50,7 +50,7 @@ if ('serviceWorker' in navigator) {
 }
 
 let auths: Array<IAuth> | null | undefined = undefined
-let passwords: Array<Passwords> | null | undefined = undefined
+let passwords: Array<Passwords> | null | undefined = []
 let safeClosed = false // Is safe Closed ?
 let lockTime = 10000 * 60 * 60 * 8
 let isCounting = false
@@ -253,15 +253,37 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     })
   }
 
+  //Get username and password on register
   await executeScriptInCurrentTab(`(` + initWatch.toString() + `)()`)
 
-  setInterval(async () => {
-    let t = await executeScriptInCurrentTab(
-      `(` + getStoredCredentials.toString() + `)()`
-    )
-
-    console.log(t)
-  }, 10000)
+  const pswd = passwords?.find((item) => {
+    return item.originalUrl === changeInfo.url
+  })
+  console.log(pswd)
+  if (!pswd) {
+    const pageInfo = {
+      originalUrl: changeInfo.url,
+      icon: changeInfo.favIconUrl,
+      label: changeInfo.title as string
+    }
+    console.log('info', pageInfo)
+    let scanForItem = setInterval(async () => {
+      let payload = await executeScriptInCurrentTab(
+        `(` + getStoredCredentials.toString() + `)()`
+      )
+      if (payload) {
+        console.log('lol', payload)
+        clearInterval(scanForItem)
+        let item = JSON.parse(payload)
+        passwords?.push({
+          password: item.password,
+          username: item.username,
+          ...pageInfo
+        })
+        console.log(passwords)
+      }
+    }, 1000)
+  }
 
   // if (passwords) {
   //   passwords.map(async (i) => {

@@ -27,7 +27,11 @@ export const executeScriptInCurrentTab = async (code: string) => {
   const result = await browser.tabs.executeScript(currentTab.id, {
     code
   })
-  console.log('~ result', result)
+
+  if (result) {
+    console.log('~ result', result)
+  }
+
   return result[0]
   // Executes the script in the current tab
 }
