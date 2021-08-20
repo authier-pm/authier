@@ -17,14 +17,13 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { EncryptedAuths, LoginResponse, OTPEvent } from './models/models'
+import { LoginResponse, OTPEvent } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/user'
-import { Device } from './generated/typegraphql-prisma/models'
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -54,7 +53,7 @@ export class RootResolver {
       },
       include: {
         Devices: true,
-        auths: true
+        EncryptedSecrets: true
       }
     })
 
@@ -132,9 +131,9 @@ export class RootResolver {
         data: {
           name: name,
           firebaseToken: firebaseToken,
-          firstIpAdress: ipAddress,
+          firstIpAddress: ipAddress,
           userId: userId,
-          lastIpAdress: ipAddress,
+          lastIpAddress: ipAddress,
           vaultLockTimeoutSeconds: 60
         }
       })
@@ -207,7 +206,7 @@ export class RootResolver {
 
     let device = await prisma.device.findFirst({
       where: {
-        id: user?.primaryDeviceId as number
+        id: user?.masterDeviceId as number
       }
     })
 
@@ -272,8 +271,8 @@ export class RootResolver {
 
       let device = await prisma.device.create({
         data: {
-          firstIpAdress: ipAddress,
-          lastIpAdress: ipAddress,
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
           name: 'test',
           userId: user.id
@@ -285,12 +284,11 @@ export class RootResolver {
           id: user.id
         },
         data: {
-          primaryDeviceId: device.id
+          masterDeviceId: device.id
         }
       })
 
       return {
-        //@ts-expect-error
         accessToken: createAccessToken(user)
       }
     } catch (err) {
@@ -329,7 +327,7 @@ export class RootResolver {
         email: email
       },
       include: {
-        auths: true
+        EncryptedSecrets: true
       }
     })
 
@@ -345,13 +343,12 @@ export class RootResolver {
     }
 
     // //login successful
-    //@ts-expect-error
+
     sendRefreshToken(Ctx.reply, createRefreshToken(user))
 
     return {
-      //@ts-expect-error
       accessToken: createAccessToken(user),
-      auths: user.auths as EncryptedAuths
+      secrets: user.EncryptedSecrets
     }
   }
 }
