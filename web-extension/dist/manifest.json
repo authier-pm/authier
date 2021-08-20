@@ -8,7 +8,7 @@
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": ["js/backgroundPage.js", "firebase-messaging-sw.js"],
+    "scripts": ["js/backgroundPage.js"],
     "persistent": false
   },
   "icons": {
@@ -27,5 +27,4 @@
     "notifications"
   ],
   "content_security_policy": "script-src 'self' https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"
-  
 }

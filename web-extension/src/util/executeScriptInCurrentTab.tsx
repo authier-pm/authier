@@ -28,8 +28,8 @@ export const executeScriptInCurrentTab = async (code: string) => {
     code
   })
 
-  if (result) {
-    console.log('~ result', result)
+  if (result[0]) {
+    console.log('~ resul1t', result)
   }
 
   return result[0]
