@@ -3,6 +3,7 @@ import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
+import { Passwords } from './providers/PasswProvider'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -49,6 +50,7 @@ if ('serviceWorker' in navigator) {
 }
 
 let auths: Array<IAuth> | null | undefined = undefined
+let passwords: Array<Passwords> | null | undefined = undefined
 let safeClosed = false // Is safe Closed ?
 let lockTime = 10000 * 60 * 60 * 8
 let isCounting = false
@@ -91,15 +93,21 @@ browser.runtime.onMessage.addListener(
 export enum MessageType {
   giveMeAuths = 'GiveMeAuths',
   getFirebaseToken = 'getFirebaseToken',
-  lockTime = 'lockTime'
+  wasClosed = 'wasClosed',
+  giveMePasswords = 'giveMePasswords',
+  startCount = 'startCount',
+  lockTime = 'lockTime',
+  auths = 'auths'
 }
 
 chrome.runtime.onMessage.addListener(function (
-  req: MessageType,
+  req:
+    | { action: MessageType }
+    | { action: 'lockTime' | 'auths'; lockTime: number; auths: any },
   sender,
   sendResponse
 ) {
-  switch (req) {
+  switch (req.action) {
     case MessageType.giveMeAuths:
       console.log('sending', auths)
       sendResponse({ auths: auths })
@@ -108,6 +116,44 @@ chrome.runtime.onMessage.addListener(function (
     case MessageType.getFirebaseToken:
       console.log('fireToken in Bg script:', fireToken)
       sendResponse({ t: fireToken })
+      break
+
+    case MessageType.wasClosed:
+      console.log('isClosed', safeClosed, 'lockTime', lockTime)
+      sendResponse({ wasClosed: safeClosed })
+      break
+
+    case MessageType.giveMePasswords:
+      console.log('test', req)
+      break
+
+    case MessageType.startCount:
+      if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
+        isCounting = false
+      }
+      if (!isCounting) {
+        isCounting = true
+        setTimeout(() => {
+          isCounting = false
+          safeClosed = true
+          auths = null
+          chrome.runtime.sendMessage({ safe: 'closed' })
+          console.log('locked', safeClosed)
+        }, lockTime)
+        sendResponse({ isCounting: true })
+      }
+      break
+
+    case MessageType.lockTime:
+      //@ts-expect-error
+      lockTime = req.lockTime
+      break
+
+    case MessageType.auths:
+      safeClosed = false // ????? What is this why ?
+      //@ts-expect-error
+      auths = req.auths
+
     default:
       if (typeof req === 'string') {
         throw new Error(`${req} not supported`)
@@ -115,53 +161,20 @@ chrome.runtime.onMessage.addListener(function (
   }
 })
 
-chrome.runtime.onMessage.addListener(function (
-  request: { close: Boolean; wasClosed: Boolean },
-  sender,
-  sendResponse
-) {
-  if (request.close) {
-    safeClosed = true
-  } else if (request.wasClosed) {
-    console.log('isClosed', safeClosed, 'lockTime', lockTime)
-
-    sendResponse({ wasClosed: safeClosed })
-  }
-})
-
-chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
-  if (req.lockTime) {
-    lockTime = req.lockTime
-  }
-})
+// chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
+//   if (req.lockTime) {
+//     lockTime = req.lockTime
+//   }
+// })
 
 //Instead of timeouts set alarm API
-chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
-  if (request.auths) {
-    safeClosed = false
-    auths = request.auths //JSON.parse(request.auths)
-    console.log('saving', request.auths, 'in', auths)
-  }
-})
-
-chrome.runtime.onMessage.addListener(
-  (req: { startCount: Boolean }, sender, sendResponse) => {
-    if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
-      isCounting = false
-    }
-    if (req.startCount && !isCounting) {
-      isCounting = true
-      setTimeout(() => {
-        isCounting = false
-        safeClosed = true
-        auths = null
-        chrome.runtime.sendMessage({ safe: 'closed' })
-        console.log('locked', safeClosed)
-      }, lockTime)
-      sendResponse({ isCounting: true })
-    }
-  }
-)
+// chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
+//   if (request.auths) {
+//     safeClosed = false
+//     auths = request.auths //JSON.parse(request.auths)
+//     console.log('saving', request.auths, 'in', auths)
+//   }
+// })
 
 function fillInput() {
   const inputs = document.getElementsByTagName('input')
@@ -206,6 +219,30 @@ function fillInput() {
   return inputs
 }
 
+function initWatch() {
+  let username = document.querySelector("input[name='username']")
+  let password = document.querySelector("input[name='password']")
+  let submitButton = document.querySelector('#form')
+
+  submitButton?.addEventListener('submit', (e) => {
+    sessionStorage.setItem(
+      '__authier',
+      JSON.stringify({
+        //@ts-expect-error
+        username: username.value,
+        //@ts-expect-error
+        password: password.value
+      })
+    )
+  })
+}
+
+function getStoredCredentials() {
+  let values = sessionStorage.getItem('__authier')
+  sessionStorage.removeItem('__authier')
+  return values
+}
+
 // https://stackoverflow.com/questions/34957319/how-to-listen-for-url-change-with-chrome-extension
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   console.log('~ changeInfo', changeInfo)
@@ -215,6 +252,31 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
       url: changeInfo.url
     })
   }
+
+  await executeScriptInCurrentTab(`(` + initWatch.toString() + `)()`)
+
+  setInterval(async () => {
+    let t = await executeScriptInCurrentTab(
+      `(` + getStoredCredentials.toString() + `)()`
+    )
+
+    console.log(t)
+  }, 10000)
+
+  // if (passwords) {
+  //   passwords.map(async (i) => {
+  //     if (_tab.url === i.originalUrl) {
+  //       console.log('first', otpCode)
+  //       let a = await executeScriptInCurrentTab(
+  //         `const name = ${i.username};` +
+  //           `const psw = ${i.password};` +
+  //           `(` +
+  //           fillInput.toString() +
+  //           `)()`
+  //       )
+  //     }
+  //   })
+  // }
 
   if (auths) {
     console.log('hasAuths', auths)
