@@ -10,32 +10,47 @@ generator client {
 }
 
 generator typegraphql {
-    provider = "typegraphql-prisma"
-    output   = "../generated/typegraphql-prisma"
+    provider    = "typegraphql-prisma"
+    output      = "../generated/typegraphql-prisma"
+    noResolvers = true
 }
 
-model EncryptedAuths {
-    id        Int    @id @default(autoincrement())
+model EncryptedSecretsChangeAction {
+    id           Int                  @id @default(autoincrement())
+    encrypted    String
+    userId       String               @unique @db.Uuid
+    kind         EncryptedSecretsType
+    createdAt    DateTime             @default(now())
+    processedAt  DateTime? // master device sets this to a timestamp when it adds this change to
+    fromDeviceId Int
+    fromDevice   Device               @relation("fromDevice", fields: [fromDeviceId], references: [id])
+    user         User                 @relation(fields: [userId], references: [id])
+}
+
+// each row contains all of OTP
+model EncryptedSecrets {
+    id        Int                  @id @default(autoincrement())
     encrypted String
     version   Int
-    userId    String @unique @db.Uuid
-
-    createdAt DateTime  @default(now())
-    updatedAt DateTime? @updatedAt
+    userId    String               @unique @db.Uuid
+    kind      EncryptedSecretsType
+    createdAt DateTime             @default(now())
+    updatedAt DateTime?            @updatedAt
 
     user User @relation(fields: [userId], references: [id])
 }
 
 model Device {
     id                      Int    @id @default(autoincrement())
-    firstIpAdress           String @db.Inet
-    lastIpAdress            String @db.Inet
+    firstIpAddress          String @db.Inet
+    lastIpAddress           String @db.Inet
     firebaseToken           String
     name                    String
     vaultLockTimeoutSeconds Int?
 
-    createdAt DateTime  @default(now())
-    updatedAt DateTime? @updatedAt
+    createdAt              DateTime  @default(now())
+    updatedAt              DateTime? @updatedAt
+    registeredWithMasterAt DateTime?
 
     VaultUnlockEvents         VaultUnlockEvents[] @relation("device")
     VaultUnlockEventsApproved VaultUnlockEvents[] @relation("approvedFromDevice")
@@ -43,27 +58,27 @@ model Device {
     userId String @db.Uuid
     User   User   @relation("devices", fields: [userId], references: [id])
 
-    UserPrimary User? @relation("primaryDevice")
+    UserMaster       User?                          @relation("masterDevice")
+    EncryptedChanges EncryptedSecretsChangeAction[] @relation("fromDevice")
 }
 
 model SettingsConfig {
     id       Int     @id @default(autoincrement())
     lockTime Int
     TwoFA    Boolean
-
 }
 
 // recorded when user shows a code for manual entry or when the code is filled into input by authier extension
 model OTPCodeEvent {
-    id            BigInt       @id @default(autoincrement())
-    kind          String
-    timestamp     DateTime     @default(now())
-    ipAdress      String       @db.Inet
-    url           String
-    User          User         @relation(fields: [userId], references: [id])
-    userId        String       @db.Uuid
-    webOTPInputId Int? // this will be null when it was inputted manually
-    WebOTPInput   WebOTPInput? @relation(fields: [webOTPInputId], references: [id])
+    id          BigInt    @id @default(autoincrement())
+    kind        String
+    timestamp   DateTime  @default(now())
+    ipAdress    String    @db.Inet
+    url         String
+    User        User      @relation(fields: [userId], references: [id])
+    userId      String    @db.Uuid
+    webInputId  Int? // this will be null when it was inputted manually
+    WebOTPInput WebInput? @relation(fields: [webInputId], references: [id])
 }
 
 // recorded whenever user unlocks vault
@@ -80,36 +95,38 @@ model VaultUnlockEvents {
 
 }
 
-// a map of all inputs publicly available on the internet
-model WebOTPInput {
-    id              Int            @id @default(autoincrement())
-    kind            String
-    createdAt       DateTime       @default(now())
-    url             String
-    domPath         String
-    createdByUser   User           @relation(fields: [createdByUserId], references: [id])
-    createdByUserId String         @db.Uuid
-    OTPCodeEvent    OTPCodeEvent[]
+// a map of all inputs publicly available on the internet which we need to map in order for authier's automagic login to work
+model WebInput {
+    id            Int            @id @default(autoincrement())
+    layoutType    String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
+    createdAt     DateTime       @default(now())
+    url           String
+    kind          WebInputType
+    domPath       String
+    addedByUser   User           @relation(fields: [addedByUserId], references: [id])
+    addedByUserId String         @db.Uuid
+    OTPCodeEvent  OTPCodeEvent[]
 }
 
 model User {
-    id              String          @id @default(uuid()) @db.Uuid
-    email           String?         @unique
-    phone_number    String?         @unique
-    account_name    String?         @unique
-    password        String
-    tokenVersion    Int             @default(0)
-    name            String?
-    auths           EncryptedAuths?
-    Token           Token[]
-    createdAt       DateTime        @default(now())
-    updatedAt       DateTime        @updatedAt
-    primaryDevice   Device?         @relation("primaryDevice", fields: [primaryDeviceId], references: [id])
-    primaryDeviceId Int?
+    id               String            @id @default(uuid()) @db.Uuid
+    email            String?           @unique
+    phone_number     String?           @unique
+    account_name     String?           @unique
+    password         String
+    tokenVersion     Int               @default(0)
+    name             String?
+    EncryptedSecrets EncryptedSecrets?
+    Token            Token[]
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @updatedAt
+    masterDevice     Device?           @relation("masterDevice", fields: [masterDeviceId], references: [id])
+    masterDeviceId   Int?
 
-    OTPCodeEvents OTPCodeEvent[]
-    Devices       Device[]       @relation("devices")
-    WebOTPInputs  WebOTPInput[]
+    OTPCodeEvents    OTPCodeEvent[]
+    Devices          Device[]                       @relation("devices")
+    WebInputsAdded   WebInput[]
+    EncryptedChanges EncryptedSecretsChangeAction[]
 }
 
 model Token {
@@ -129,4 +146,17 @@ model Token {
 enum TokenType {
     EMAIL // used as a short-lived token sent to the user's email
     API
+}
+
+enum EncryptedSecretsType {
+    TOTP // used as a short-lived token sent to the user's email
+    LOGIN_CREDENTIALS
+}
+
+enum WebInputType {
+    TOTP
+    USERNAME
+    EMAIL
+    USERNAME_OR_EMAIL
+    PASSWORD
 }
