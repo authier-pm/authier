@@ -13,7 +13,7 @@ import { createAccessToken, createRefreshToken } from '../auth'
 import { sendRefreshToken } from '../sendRefreshToken'
 import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
-import { EncryptedAuths, LoginResponse } from './models'
+import { LoginResponse } from './models'
 import { Device, User } from '../generated/typegraphql-prisma/models'
 import { EncryptedSecretsType } from '@prisma/client'
 
