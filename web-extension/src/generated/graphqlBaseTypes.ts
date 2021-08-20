@@ -17,21 +17,14 @@ export type Scalars = {
 export type Device = {
   __typename?: 'Device';
   id: Scalars['Int'];
-  firstIpAdress: Scalars['String'];
-  lastIpAdress: Scalars['String'];
+  firstIpAddress: Scalars['String'];
+  lastIpAddress: Scalars['String'];
   firebaseToken: Scalars['String'];
   name: Scalars['String'];
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
-  _count?: Maybe<DeviceCount>;
-};
-
-export type DeviceCount = {
-  __typename?: 'DeviceCount';
-  VaultUnlockEvents: Scalars['Int'];
-  VaultUnlockEventsApproved: Scalars['Int'];
 };
 
 export type EncryptedAuths = {
@@ -53,8 +46,6 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   me: Scalars['String'];
   addDevice: Scalars['Boolean'];
-  firebaseToken: Scalars['Boolean'];
-  saveAuths: Scalars['Boolean'];
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
   revokeRefreshTokensForUser: Scalars['Boolean'];
@@ -71,18 +62,6 @@ export type MutationAddDeviceArgs = {
   firebaseToken: Scalars['String'];
   userId: Scalars['String'];
   name: Scalars['String'];
-};
-
-
-export type MutationFirebaseTokenArgs = {
-  firebaseToken: Scalars['String'];
-  userId: Scalars['String'];
-};
-
-
-export type MutationSaveAuthsArgs = {
-  payload: Scalars['String'];
-  userId: Scalars['String'];
 };
 
 
@@ -116,28 +95,16 @@ export type OtpEvent = {
 
 export type Query = {
   __typename?: 'Query';
-  user: User;
+  user: UserQuery;
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean'];
-  me?: Maybe<User>;
-  myDevices: Array<Device>;
-  devicesCount: Scalars['Int'];
+  me?: Maybe<UserQuery>;
   sendAuthMessage: Scalars['Boolean'];
   sendConfirmation: Scalars['Boolean'];
 };
 
 
 export type QueryUserArgs = {
-  userId: Scalars['String'];
-};
-
-
-export type QueryMyDevicesArgs = {
-  userId: Scalars['String'];
-};
-
-
-export type QueryDevicesCountArgs = {
   userId: Scalars['String'];
 };
 
@@ -156,47 +123,21 @@ export type QuerySendConfirmationArgs = {
   userId: Scalars['String'];
 };
 
-export type User = {
-  __typename?: 'User';
-  id: Scalars['String'];
-  email?: Maybe<Scalars['String']>;
-  phone_number: Scalars['String'];
-  account_name: Scalars['String'];
-  password: Scalars['String'];
-  tokenVersion: Scalars['Float'];
-  primaryDeviceId: Scalars['Int'];
-  login: LoginResponse;
-  myDevices: Array<Device>;
-  devicesCount: Scalars['Int'];
-  authenticated: Scalars['Boolean'];
-};
-
-
-export type UserLoginArgs = {
-  password: Scalars['String'];
-  email: Scalars['String'];
-};
-
 export type UserMutation = {
   __typename?: 'UserMutation';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number: Scalars['String'];
-  account_name: Scalars['String'];
+  phone_number?: Maybe<Scalars['String']>;
+  account_name?: Maybe<Scalars['String']>;
   password: Scalars['String'];
-  tokenVersion: Scalars['Float'];
-  primaryDeviceId: Scalars['Int'];
-  register: LoginResponse;
+  tokenVersion: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  masterDeviceId?: Maybe<Scalars['Int']>;
   addDevice: Device;
   saveAuths: Scalars['Boolean'];
   updateFireToken: Scalars['Boolean'];
-};
-
-
-export type UserMutationRegisterArgs = {
-  firebaseToken: Scalars['String'];
-  password: Scalars['String'];
-  email: Scalars['String'];
 };
 
 
@@ -213,4 +154,20 @@ export type UserMutationSaveAuthsArgs = {
 
 export type UserMutationUpdateFireTokenArgs = {
   firebaseToken: Scalars['String'];
+};
+
+export type UserQuery = {
+  __typename?: 'UserQuery';
+  id: Scalars['String'];
+  email?: Maybe<Scalars['String']>;
+  phone_number?: Maybe<Scalars['String']>;
+  account_name?: Maybe<Scalars['String']>;
+  password: Scalars['String'];
+  tokenVersion: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  masterDeviceId?: Maybe<Scalars['Int']>;
+  myDevices: Array<Device>;
+  devicesCount: Scalars['Int'];
 };
