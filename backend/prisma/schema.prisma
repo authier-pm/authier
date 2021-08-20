@@ -27,6 +27,7 @@ model EncryptedSecretsChangeAction {
     user         User                 @relation(fields: [userId], references: [id])
 }
 
+// each row contains all of OTP
 model EncryptedSecrets {
     id        Int                  @id @default(autoincrement())
     encrypted String
@@ -108,19 +109,19 @@ model WebInput {
 }
 
 model User {
-    id             String            @id @default(uuid()) @db.Uuid
-    email          String?           @unique
-    phone_number   String?           @unique
-    account_name   String?           @unique
-    password       String
-    tokenVersion   Int               @default(0)
-    name           String?
-    auths          EncryptedSecrets?
-    Token          Token[]
-    createdAt      DateTime          @default(now())
-    updatedAt      DateTime          @updatedAt
-    masterDevice   Device?           @relation("masterDevice", fields: [masterDeviceId], references: [id])
-    masterDeviceId Int?
+    id               String            @id @default(uuid()) @db.Uuid
+    email            String?           @unique
+    phone_number     String?           @unique
+    account_name     String?           @unique
+    password         String
+    tokenVersion     Int               @default(0)
+    name             String?
+    EncryptedSecrets EncryptedSecrets?
+    Token            Token[]
+    createdAt        DateTime          @default(now())
+    updatedAt        DateTime          @updatedAt
+    masterDevice     Device?           @relation("masterDevice", fields: [masterDeviceId], references: [id])
+    masterDeviceId   Int?
 
     OTPCodeEvents    OTPCodeEvent[]
     Devices          Device[]                       @relation("devices")
