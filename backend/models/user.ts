@@ -13,32 +13,12 @@ import { createAccessToken, createRefreshToken } from '../auth'
 import { sendRefreshToken } from '../sendRefreshToken'
 import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
-import { EncryptedAuths, LoginResponse } from './models'
-import { Device } from '../generated/typegraphql-prisma/models'
+import { LoginResponse } from './models'
+import { Device, User } from '../generated/typegraphql-prisma/models'
+import { EncryptedSecretsType } from '@prisma/client'
 
 @ObjectType()
-export class UserBase {
-  @Field(() => String)
-  id: string
-
-  @Field(() => String, { nullable: true })
-  email?: string
-
-  @Field(() => String)
-  phone_number?: string
-
-  @Field(() => String)
-  account_name?: string
-
-  @Field(() => String)
-  password: string
-
-  @Field(() => Number)
-  tokenVersion: number
-
-  @Field(() => Int)
-  primaryDeviceId: number
-}
+export class UserBase extends User {}
 
 @ObjectType()
 export class UserQuery extends UserBase {
@@ -52,7 +32,7 @@ export class UserQuery extends UserBase {
       include: {
         User: {
           select: {
-            primaryDeviceId: true
+            masterDeviceId: true
           }
         }
       }
@@ -88,9 +68,9 @@ export class UserMutation extends UserBase {
       data: {
         name: name,
         firebaseToken: firebaseToken,
-        firstIpAdress: ipAddress,
+        firstIpAddress: ipAddress,
         userId: this.id,
-        lastIpAdress: ipAddress,
+        lastIpAddress: ipAddress,
         vaultLockTimeoutSeconds: 60
       }
     })
@@ -99,8 +79,9 @@ export class UserMutation extends UserBase {
   @Field(() => Boolean)
   async saveAuths(@Arg('payload', () => String) payload: string) {
     try {
-      await prisma.encryptedAuths.upsert({
+      await prisma.encryptedSecrets.upsert({
         create: {
+          kind: EncryptedSecretsType.TOTP,
           encrypted: payload,
           version: 1,
           userId: this.id
@@ -124,13 +105,16 @@ export class UserMutation extends UserBase {
   async updateFireToken(
     @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
+    if (!this.masterDeviceId) {
+      throw new Error('Must have masterDeviceId')
+    }
     try {
       await prisma.device.update({
         data: {
           firebaseToken: firebaseToken
         },
         where: {
-          id: this.primaryDeviceId
+          id: this.masterDeviceId
         }
       })
 
