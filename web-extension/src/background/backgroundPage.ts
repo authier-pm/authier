@@ -50,7 +50,7 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
-let passwords: Array<Passwords> | null | undefined = []
+export let passwords: Array<Passwords> | null | undefined = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
@@ -155,6 +155,7 @@ type SessionStoredItem = {
 function initInputWatch(credentials?: string) {
   let username = document.querySelector("input[name='username']")
   let password = document.querySelector("input[name='password']")
+  let submit = document.querySelector('#submit')
   let form = document.querySelector('#form')
   console.log({ credentials, location })
 
@@ -179,6 +180,8 @@ function initInputWatch(credentials?: string) {
     username.value = credentials.username
     //@ts-expect-error
     password.value = credentials.password
+    //@ts-expect-error
+    submit.click()
   }
 }
 
