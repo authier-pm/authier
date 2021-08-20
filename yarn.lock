@@ -13688,10 +13688,10 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-"typegraphql-prisma@npm:@capaj/typegraphql-prisma@^0.14.8":
-  version "0.14.8"
-  resolved "https://registry.yarnpkg.com/@capaj/typegraphql-prisma/-/typegraphql-prisma-0.14.8.tgz#8a569c175e5b317235725b15197b5da3773f3064"
-  integrity sha512-nhsGsPZ+BMifYaYcTA8bYAQfoRndbfWjr5M0x1KLt1mT8f1G+Q/SADVowtvgqusC9GK9lTqrW1FMmBve7ADPaQ==
+"typegraphql-prisma@npm:@capaj/typegraphql-prisma@^0.14.10":
+  version "0.14.10"
+  resolved "https://registry.yarnpkg.com/@capaj/typegraphql-prisma/-/typegraphql-prisma-0.14.10.tgz#88481ac3fb80811177873139c3d1e824c8a66035"
+  integrity sha512-jojIH0JubMb24NVPZbYyi58HHM2hjgdTbiNz0fPcG/3zlx9hoeJ9/OY4AMIQRZdegMTwdhOlkCPP4cM/XHiHkw==
   dependencies:
     "@prisma/generator-helper" "~2.29.1"
     "@prisma/sdk" "~2.29.1"
