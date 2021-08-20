@@ -3160,7 +3160,7 @@
     temp-dir "^2.0.0"
     tempy "^1.0.0"
 
-"@prisma/generator-helper@2.29.1", "@prisma/generator-helper@~2.29.0":
+"@prisma/generator-helper@2.29.1", "@prisma/generator-helper@~2.29.1":
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/@prisma/generator-helper/-/generator-helper-2.29.1.tgz#7bd984f649ba830d11fdd514f8781c92a2782e41"
   integrity sha512-rba/mfxv1JtbAm51yXipYY7DVYB4L2DVVnnXOvSAhAqDLUVylT68WxLXQKiSBxNAlks5ngD2DeaH6qpGi+XnYw==
@@ -3177,7 +3177,7 @@
   dependencies:
     "@prisma/debug" "2.28.0"
 
-"@prisma/sdk@~2.29.0":
+"@prisma/sdk@~2.29.1":
   version "2.29.1"
   resolved "https://registry.yarnpkg.com/@prisma/sdk/-/sdk-2.29.1.tgz#1619f4f20847caa408c75b9e8175e6a2913c4184"
   integrity sha512-vtcF5jdUskjalL5Q9iagbcc+vfwUa+DAQnNdYg0PtmpaS2llWezptvEJd2ihMR7O5m2sAmI87QDiCn9Y5FxNjQ==
@@ -3307,10 +3307,10 @@
     invariant "^2.2.4"
     prop-types "^15.7.2"
 
-"@react-native-firebase/app@^12.6.0":
-  version "12.6.0"
-  resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-12.6.0.tgz#84bbd186f8979ee83f4a9ebae51bf93b943c4888"
-  integrity sha512-2DJG4LEto1lpcDxWo1Gen93+iDpCVd1KCaGuegqNOHozI7FRUEKN/rjqjgd3z+NnJWIhZaEmoQRVqx9Av4zYRw==
+"@react-native-firebase/app@^12.7.1":
+  version "12.7.1"
+  resolved "https://registry.yarnpkg.com/@react-native-firebase/app/-/app-12.7.1.tgz#8b6da14a1fc9344f788bd88efa1eef7de8e02f08"
+  integrity sha512-jkVoNZbvCz1QtS8ip12Sat/MNWTj2DiPg4dBKm+bLiJHdnw3p66ksl8eNM5PVLV8HlQGbx1w/j6qQsZKS8YoNQ==
   dependencies:
     "@expo/config-plugins" "^3.0.7"
     opencollective-postinstall "^2.0.1"
@@ -3656,10 +3656,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/jsonwebtoken@^8.5.4":
-  version "8.5.4"
-  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.5.4.tgz#50ccaf0aa6f5d7b9956e70fe323b76e582991913"
-  integrity sha512-4L8msWK31oXwdtC81RmRBAULd0ShnAHjBuKT9MRQpjP0piNrZdXyTRcKY9/UIfhGeKIT4PvF5amOOUbbT/9Wpg==
+"@types/jsonwebtoken@^8.5.5":
+  version "8.5.5"
+  resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.5.5.tgz#da5f2f4baee88f052ef3e4db4c1a0afb46cff22c"
+  integrity sha512-OGqtHQ7N5/Ap/TUwO6IgHDuLiAoTmHhGpNvgkCm/F4N6pKzx/RBSfr2OXZSwC6vkfnsEdb6+7DNZVtiXiwdwFw==
   dependencies:
     "@types/node" "*"
 
@@ -7400,10 +7400,10 @@ find-up@^4.0.0, find-up@^4.1.0:
     locate-path "^5.0.0"
     path-exists "^4.0.0"
 
-firebase-admin@^9.11.0:
-  version "9.11.0"
-  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-9.11.0.tgz#c0c72e4480b836fb4cd15e6d834ddfbfb9cc54ba"
-  integrity sha512-68fXdwcKF99LkWBE33M5hnLwjvGpbCRznIOtZVsiBqZdM9iwxlTfNEpAckh++o3GdJcSLRUWmIN+MKqPUsxoCA==
+firebase-admin@^9.11.1:
+  version "9.11.1"
+  resolved "https://registry.yarnpkg.com/firebase-admin/-/firebase-admin-9.11.1.tgz#b4f472ed51951937f333a4d88a0693ad37ffc90a"
+  integrity sha512-Y9fjelljy6MKqwsSbM/UN1k8gBQh5zfm5fCTe0Z6Gch2T3nDUIPsTcf+jfe4o40/MPYuybili9XJjTMmM2e5MQ==
   dependencies:
     "@firebase/database" "^0.10.0"
     "@firebase/database-types" "^0.7.2"
@@ -13516,10 +13516,10 @@ ts-node-dev@^1.1.8:
     ts-node "^9.0.0"
     tsconfig "^7.0.0"
 
-ts-node@^10.2.0:
-  version "10.2.0"
-  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.2.0.tgz#f1e88249a00e26aa95e9a93c50f70241a8a1c4bb"
-  integrity sha512-FstYHtQz6isj8rBtYMN4bZdnXN1vq4HCbqn9vdNQcInRqtB86PePJQIxE6es0PhxKWhj2PHuwbG40H+bxkZPmg==
+ts-node@^10.2.1:
+  version "10.2.1"
+  resolved "https://registry.yarnpkg.com/ts-node/-/ts-node-10.2.1.tgz#4cc93bea0a7aba2179497e65bb08ddfc198b3ab5"
+  integrity sha512-hCnyOyuGmD5wHleOQX6NIjJtYVIO8bPP8F2acWkB4W06wdlkgyvJtubO/I9NkI88hCFECbsEgoLc0VNkYmcSfw==
   dependencies:
     "@cspotcode/source-map-support" "0.6.1"
     "@tsconfig/node10" "^1.0.7"
@@ -13571,7 +13571,7 @@ tslib@^2, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@~2.3.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.0.tgz#803b8cdab3e12ba581a4ca41c8839bbb0dacb09e"
   integrity sha512-N82ooyxVNm6h1riLCoyS9e3fuJ3AMG2zIZs2Gd1ATcSFjSA23Q0fzjjZeh0jbJvWVDZ0cJT8yaNNaaXHzueNjg==
 
-tslib@^2.3.0:
+tslib@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
@@ -13688,17 +13688,17 @@ typedarray-to-buffer@^3.1.5:
   dependencies:
     is-typedarray "^1.0.0"
 
-typegraphql-prisma@^0.14.8:
+"typegraphql-prisma@npm:@capaj/typegraphql-prisma@^0.14.8":
   version "0.14.8"
-  resolved "https://registry.yarnpkg.com/typegraphql-prisma/-/typegraphql-prisma-0.14.8.tgz#824838fec5e1693de0f7c424c4e2ef140aa1ea04"
-  integrity sha512-pTYm/eZBhkOG1/voTvECfqgTosHGKXyXAfon4QQdPAzQAKMl3+8mY2X27cptl7DwbHeUzCNe2TVHKYr5eVd2yg==
+  resolved "https://registry.yarnpkg.com/@capaj/typegraphql-prisma/-/typegraphql-prisma-0.14.8.tgz#8a569c175e5b317235725b15197b5da3773f3064"
+  integrity sha512-nhsGsPZ+BMifYaYcTA8bYAQfoRndbfWjr5M0x1KLt1mT8f1G+Q/SADVowtvgqusC9GK9lTqrW1FMmBve7ADPaQ==
   dependencies:
-    "@prisma/generator-helper" "~2.29.0"
-    "@prisma/sdk" "~2.29.0"
+    "@prisma/generator-helper" "~2.29.1"
+    "@prisma/sdk" "~2.29.1"
     pluralize "^8.0.0"
     semver "^7.3.5"
     ts-morph "^11.0.3"
-    tslib "^2.3.0"
+    tslib "^2.3.1"
 
 typescript@^4.3.5:
   version "4.3.5"
