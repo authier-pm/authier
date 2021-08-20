@@ -155,11 +155,12 @@ type SessionStoredItem = {
 function initInputWatch(credentials?: string) {
   let username = document.querySelector("input[name='username']")
   let password = document.querySelector("input[name='password']")
-  let submitButton = document.querySelector('#form')
+  let form = document.querySelector('#form')
   console.log({ credentials, location })
 
   if (username && password) {
-    submitButton?.addEventListener('submit', (e) => {
+    console.log(username, password)
+    form?.addEventListener('submit', (e) => {
       const sessionStoredItem: SessionStoredItem = {
         // @ts-expect-error
         username: username.value,
@@ -167,12 +168,17 @@ function initInputWatch(credentials?: string) {
         password: password.value,
         originalUrl: location.href
       }
+      console.log(sessionStoredItem)
       sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
     })
   }
 
   if (credentials) {
     // TODO fill password & username
+    //@ts-expect-error
+    username.value = credentials.username
+    //@ts-expect-error
+    password.value = credentials.password
   }
 }
 
@@ -208,16 +214,23 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         let payload = await executeScriptInCurrentTab(
           `(` + getStoredCredentials.toString() + `)()`
         )
+
         if (payload) {
           clearInterval(scanForItem)
           const item: SessionStoredItem = JSON.parse(payload)
-          console.log('~ item', item)
-          passwords?.push({
-            password: item.password,
-            username: item.username,
-            originalUrl: item.originalUrl,
-            ...currentPageInfo
+          const alreadyExists = passwords?.find((credentialItem) => {
+            return item.originalUrl === credentialItem.originalUrl
           })
+          console.log('~ item', item)
+          if (!alreadyExists) {
+            passwords?.push({
+              password: item.password,
+              username: item.username,
+              originalUrl: item.originalUrl,
+              ...currentPageInfo
+            })
+          }
+
           console.log(passwords)
         }
       }, 1000)
