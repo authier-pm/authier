@@ -1,9 +1,10 @@
 import { browser, Tabs } from 'webextension-polyfill-ts'
-import { executeScriptInCurrentTab } from './util/executeScriptInCurrentTab'
+import { executeScriptInCurrentTab } from '../util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
-import { Passwords } from './providers/PasswProvider'
+import { Passwords } from '../providers/PasswProvider'
+import { twoFAs } from './chromeRuntimeListener'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -49,12 +50,9 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
-let auths: Array<IAuth> | null | undefined = undefined
 let passwords: Array<Passwords> | null | undefined = []
-let safeClosed = false // Is safe Closed ?
-let lockTime = 10000 * 60 * 60 * 8
-let isCounting = false
-let fireToken = ''
+export let lockTime = 10000 * 60 * 60 * 8
+export let fireToken = ''
 let otpCode = ''
 
 // if (auths === undefined) {
@@ -89,77 +87,6 @@ browser.runtime.onMessage.addListener(
     }
   }
 )
-
-export enum MessageType {
-  giveMeAuths = 'GiveMeAuths',
-  getFirebaseToken = 'getFirebaseToken',
-  wasClosed = 'wasClosed',
-  giveMePasswords = 'giveMePasswords',
-  startCount = 'startCount',
-  lockTime = 'lockTime',
-  auths = 'auths'
-}
-
-chrome.runtime.onMessage.addListener(function (
-  req:
-    | { action: MessageType }
-    | { action: 'lockTime' | 'auths'; lockTime: number; auths: any },
-  sender,
-  sendResponse
-) {
-  switch (req.action) {
-    case MessageType.giveMeAuths:
-      console.log('sending', auths)
-      sendResponse({ auths: auths })
-      break
-
-    case MessageType.getFirebaseToken:
-      console.log('fireToken in Bg script:', fireToken)
-      sendResponse({ t: fireToken })
-      break
-
-    case MessageType.wasClosed:
-      console.log('isClosed', safeClosed, 'lockTime', lockTime)
-      sendResponse({ wasClosed: safeClosed })
-      break
-
-    case MessageType.giveMePasswords:
-      console.log('test', req)
-      break
-
-    case MessageType.startCount:
-      if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
-        isCounting = false
-      }
-      if (!isCounting) {
-        isCounting = true
-        setTimeout(() => {
-          isCounting = false
-          safeClosed = true
-          auths = null
-          chrome.runtime.sendMessage({ safe: 'closed' })
-          console.log('locked', safeClosed)
-        }, lockTime)
-        sendResponse({ isCounting: true })
-      }
-      break
-
-    case MessageType.lockTime:
-      //@ts-expect-error
-      lockTime = req.lockTime
-      break
-
-    case MessageType.auths:
-      safeClosed = false // ????? What is this why ?
-      //@ts-expect-error
-      auths = req.auths
-
-    default:
-      if (typeof req === 'string') {
-        throw new Error(`${req} not supported`)
-      }
-  }
-})
 
 // chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
 //   if (req.lockTime) {
@@ -219,70 +146,84 @@ function fillInput() {
   return inputs
 }
 
-function initWatch() {
+type SessionStoredItem = {
+  username: any
+  password: any
+  originalUrl: string
+}
+
+function initInputWatch(credentials?: string) {
   let username = document.querySelector("input[name='username']")
   let password = document.querySelector("input[name='password']")
   let submitButton = document.querySelector('#form')
+  console.log({ credentials, location })
 
-  submitButton?.addEventListener('submit', (e) => {
-    sessionStorage.setItem(
-      '__authier',
-      JSON.stringify({
-        //@ts-expect-error
+  if (username && password) {
+    submitButton?.addEventListener('submit', (e) => {
+      const sessionStoredItem: SessionStoredItem = {
+        // @ts-expect-error
         username: username.value,
         //@ts-expect-error
-        password: password.value
-      })
-    )
-  })
+        password: password.value,
+        originalUrl: location.href
+      }
+      sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
+    })
+  }
+
+  if (credentials) {
+    // TODO fill password & username
+  }
 }
 
 function getStoredCredentials() {
-  let values = sessionStorage.getItem('__authier')
+  let __authier = sessionStorage.getItem('__authier')
   sessionStorage.removeItem('__authier')
-  return values
+  return __authier
 }
 
+const currentPageInfo: chrome.tabs.TabChangeInfo & {
+  originalUrl: string
+} & any = {}
 // https://stackoverflow.com/questions/34957319/how-to-listen-for-url-change-with-chrome-extension
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
-  console.log('~ changeInfo', changeInfo)
   if (changeInfo.url) {
     chrome.tabs.sendMessage(tabId, {
       message: sharedBrowserEvents.URL_CHANGED,
       url: changeInfo.url
     })
-  }
 
-  //Get username and password on register
-  await executeScriptInCurrentTab(`(` + initWatch.toString() + `)()`)
+    //Get username and password on register
 
-  const pswd = passwords?.find((item) => {
-    return item.originalUrl === changeInfo.url
-  })
-  console.log(pswd)
-  if (!pswd) {
-    const pageInfo = {
-      originalUrl: changeInfo.url,
-      icon: changeInfo.favIconUrl,
-      label: changeInfo.title as string
+    const pswd = passwords?.find((item) => {
+      return item.originalUrl === changeInfo.url
+    })
+    await executeScriptInCurrentTab(
+      `(` + initInputWatch.toString() + `)(${JSON.stringify(pswd)})`
+    )
+
+    console.log(pswd)
+    if (!pswd) {
+      let scanForItem = setInterval(async () => {
+        let payload = await executeScriptInCurrentTab(
+          `(` + getStoredCredentials.toString() + `)()`
+        )
+        if (payload) {
+          clearInterval(scanForItem)
+          const item: SessionStoredItem = JSON.parse(payload)
+          console.log('~ item', item)
+          passwords?.push({
+            password: item.password,
+            username: item.username,
+            originalUrl: item.originalUrl,
+            ...currentPageInfo
+          })
+          console.log(passwords)
+        }
+      }, 1000)
     }
-    console.log('info', pageInfo)
-    let scanForItem = setInterval(async () => {
-      let payload = await executeScriptInCurrentTab(
-        `(` + getStoredCredentials.toString() + `)()`
-      )
-      if (payload) {
-        console.log('lol', payload)
-        clearInterval(scanForItem)
-        let item = JSON.parse(payload)
-        passwords?.push({
-          password: item.password,
-          username: item.username,
-          ...pageInfo
-        })
-        console.log(passwords)
-      }
-    }, 1000)
+  } else {
+    Object.assign(currentPageInfo, changeInfo)
   }
 
   // if (passwords) {
@@ -300,9 +241,9 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   //   })
   // }
 
-  if (auths) {
-    console.log('hasAuths', auths)
-    auths.map(async (i) => {
+  if (twoFAs) {
+    console.log('hasAuths', twoFAs)
+    twoFAs.map(async (i) => {
       if (_tab.url === i.originalUrl) {
         otpCode = authenticator.generate(i.secret)
         console.log('first', otpCode)
@@ -311,7 +252,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         )
       }
     })
-  } else if (auths === null) {
+  } else if (twoFAs === null) {
     return 'locked'
   }
 })

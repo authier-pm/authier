@@ -1,4 +1,5 @@
-import { MessageType, sharedBrowserEvents } from '@src/backgroundPage'
+import { sharedBrowserEvents } from '@src/background/backgroundPage'
+import { MessageType } from '@src/background/chromeRuntimeListener'
 import { Passwords } from '@src/providers/PasswProvider'
 import { useState, useEffect } from 'react'
 import { browser } from 'webextension-polyfill-ts'

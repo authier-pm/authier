@@ -14,7 +14,7 @@ import { Home } from '../pages/Home'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
-import { sharedBrowserEvents } from '@src/backgroundPage'
+import { sharedBrowserEvents } from '@src/background/backgroundPage'
 import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
