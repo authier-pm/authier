@@ -24,20 +24,30 @@ export type Device = {
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
   updatedAt?: Maybe<Scalars['DateTime']>;
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
 };
 
-export type EncryptedAuths = {
-  __typename?: 'EncryptedAuths';
+export type EncryptedSecrets = {
+  __typename?: 'EncryptedSecrets';
   id: Scalars['Int'];
   encrypted: Scalars['String'];
   version: Scalars['Int'];
+  userId: Scalars['String'];
+  kind: EncryptedSecretsType;
+  createdAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
+
+export enum EncryptedSecretsType {
+  TOTP = 'TOTP',
+  LOGIN_CREDENTIALS = 'LOGIN_CREDENTIALS'
+}
 
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
-  auths?: Maybe<EncryptedAuths>;
+  secrets?: Maybe<EncryptedSecrets>;
 };
 
 export type Mutation = {

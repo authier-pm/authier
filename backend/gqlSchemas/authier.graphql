@@ -37,6 +37,7 @@ type Device {
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
+  registeredWithMasterAt: DateTime
   userId: String!
 }
 
@@ -76,11 +77,20 @@ input OTPEvent {
 
 type LoginResponse {
   accessToken: String!
-  auths: EncryptedAuths
+  secrets: EncryptedSecrets
 }
 
-type EncryptedAuths {
+type EncryptedSecrets {
   id: Int!
   encrypted: String!
   version: Int!
+  userId: String!
+  kind: EncryptedSecretsType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+enum EncryptedSecretsType {
+  TOTP
+  LOGIN_CREDENTIALS
 }

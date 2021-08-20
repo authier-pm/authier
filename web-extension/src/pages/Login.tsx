@@ -69,10 +69,10 @@ export default function Login(): ReactElement {
             //@ts-expect-error
             setUserId(id.userId)
 
-            if (response.data.login.auths?.encrypted && values.password) {
-              console.log(response.data.login.auths?.encrypted)
+            if (response.data.login.secrets?.encrypted && values.password) {
+              console.log(response.data.login.secrets?.encrypted)
               const decryptedAuths = cryptoJS.AES.decrypt(
-                response.data.login.auths?.encrypted as string,
+                response.data.login.secrets?.encrypted as string,
                 values.password
               ).toString(cryptoJS.enc.Utf8)
               console.log('decr', decryptedAuths)
