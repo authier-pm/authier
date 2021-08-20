@@ -19,10 +19,10 @@ import { useBackground } from '@src/util/useBackground'
 export const Settings = () => {
   const { setSafeLockTime } = useBackground()
   return (
-    <Flex flexDirection="column">
+    <Flex flexDirection="column" m={5}>
       <Heading>Security</Heading>
       <Formik
-        initialValues={{ vaultTime: '1 hour', TwoFA: false }}
+        initialValues={{ vaultTime: '12 hours', TwoFA: false }}
         onSubmit={(values, actions) => {
           setTimeout(() => {
             if (values.vaultTime === 'On web close') {
@@ -52,9 +52,10 @@ export const Settings = () => {
                     {...field}
                     id="vaultTime"
                     placeholder="Select country"
+                    mb={3}
                   >
                     <option>On web close</option>
-                    <option>1 hour</option>
+                    <option>10 secconds</option>
                     <option>8 hours</option>
                     <option>12 hours</option>
                   </Select>

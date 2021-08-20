@@ -55,7 +55,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     checkStorage()
 
     chrome.runtime.sendMessage(
-      MessageType.getFirebaseToken,
+      { action: MessageType.getFirebaseToken },
       (res: { t: string }) => {
         setFireToken(res.t)
       }
@@ -64,12 +64,11 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     async function getId() {
       try {
         let id = await getUserFromToken()
-      //@ts-expect-error
-      setUserId(id.userId)
-      } catch(err) {
+        //@ts-expect-error
+        setUserId(id.userId)
+      } catch (err) {
         console.log(err)
       }
-      
     }
     getId()
   }, [])
