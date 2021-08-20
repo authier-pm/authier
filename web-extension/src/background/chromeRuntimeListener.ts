@@ -1,5 +1,5 @@
 import { IAuth } from '@src/util/useBackground'
-import { fireToken, lockTime } from './backgroundPage'
+import { fireToken, lockTime, passwords } from './backgroundPage'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener(function (
 ) {
   switch (req.action) {
     case MessageType.giveMeAuths:
-      console.log('sending', twoFAs)
+      console.log('sending twoFAs', twoFAs)
       sendResponse({ auths: twoFAs })
       break
 
@@ -40,7 +40,8 @@ chrome.runtime.onMessage.addListener(function (
       break
 
     case MessageType.giveMePasswords:
-      console.log('test', req)
+      console.log('sending passwords', passwords)
+      sendResponse({ passwords: passwords })
       break
 
     case MessageType.startCount:
@@ -67,7 +68,6 @@ chrome.runtime.onMessage.addListener(function (
 
     case MessageType.auths:
       safeClosed = false // ????? What is this why ?
-
       //@ts-expect-error
       twoFAs = req.auths
 

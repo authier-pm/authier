@@ -14,9 +14,9 @@ export type LoginMutation = (
   & { login: (
     { __typename?: 'LoginResponse' }
     & Pick<Types.LoginResponse, 'accessToken'>
-    & { auths?: Types.Maybe<(
-      { __typename?: 'EncryptedAuths' }
-      & Pick<Types.EncryptedAuths, 'encrypted'>
+    & { secrets?: Types.Maybe<(
+      { __typename?: 'EncryptedSecrets' }
+      & Pick<Types.EncryptedSecrets, 'encrypted'>
     )> }
   ) }
 );
@@ -26,7 +26,7 @@ export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     accessToken
-    auths {
+    secrets {
       encrypted
     }
   }
