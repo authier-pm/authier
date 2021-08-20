@@ -17,15 +17,13 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
 
-import { EncryptedAuths, LoginResponse, OTPEvent } from './models/models'
+import { LoginResponse, OTPEvent } from './models/models'
 import { createAccessToken, createRefreshToken } from './auth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/user'
-import { Device } from './generated/typegraphql-prisma/models'
-import { User } from './generated/typegraphql-prisma'
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -55,7 +53,7 @@ export class RootResolver {
       },
       include: {
         Devices: true,
-        auths: true
+        EncryptedSecrets: true
       }
     })
 
@@ -329,7 +327,7 @@ export class RootResolver {
         email: email
       },
       include: {
-        auths: true
+        EncryptedSecrets: true
       }
     })
 
@@ -350,7 +348,7 @@ export class RootResolver {
 
     return {
       accessToken: createAccessToken(user),
-      secrets: user.auths as EncryptedAuths
+      secrets: user.EncryptedSecrets
     }
   }
 }
