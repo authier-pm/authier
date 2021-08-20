@@ -1,8 +1,8 @@
 query myDevices($userId: String!) {
   user(userId: $userId) {
     myDevices {
-      firstIpAdress
-      lastIpAdress
+      firstIpAddress
+      lastIpAddress
       name
     }
   }

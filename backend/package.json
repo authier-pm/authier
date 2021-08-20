@@ -28,7 +28,7 @@
     "@types/bcrypt": "^5.0.0",
     "nodemon": "^2.0.12",
     "prisma": "^2.29.1",
-    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma@^0.14.8"
+    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma@^0.14.10"
   },
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only server.ts",
