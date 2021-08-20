@@ -3,7 +3,7 @@ const webpack = require('webpack')
 
 module.exports = {
   entry: {
-    backgroundPage: path.join(__dirname, 'src/backgroundPage.ts'),
+    backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
     popup: path.join(__dirname, 'src/index.tsx')
   },
   output: {

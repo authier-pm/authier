@@ -13,6 +13,7 @@ import { createAccessToken, createRefreshToken } from '../auth'
 import { sendRefreshToken } from '../sendRefreshToken'
 import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
+import { EncryptedSecrets } from '../generated/typegraphql-prisma'
 
 @ObjectType()
 export class UserBase {
@@ -39,24 +40,12 @@ export class UserBase {
 }
 
 @ObjectType()
-export class EncryptedAuths {
-  @Field(() => Int)
-  id: number
-
-  @Field(() => String)
-  encrypted: string
-
-  @Field(() => Int)
-  version: number
-}
-
-@ObjectType()
 export class LoginResponse {
   @Field(() => String)
   accessToken: string
 
-  @Field(() => EncryptedAuths, { nullable: true })
-  auths: EncryptedAuths
+  @Field(() => EncryptedSecrets, { nullable: true })
+  secrets: EncryptedSecrets | null
 }
 
 @InputType()
