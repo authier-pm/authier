@@ -74,7 +74,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   }, [])
 
   useEffect(() => {
-    console.log('isLocked', safeLocked)
     if (safeLocked) {
       setIsVaultLocked(true)
     }

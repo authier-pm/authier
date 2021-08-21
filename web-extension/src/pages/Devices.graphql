@@ -1,6 +1,7 @@
 query myDevices($userId: String!) {
   user(userId: $userId) {
     myDevices {
+      id
       firstIpAddress
       lastIpAddress
       name
