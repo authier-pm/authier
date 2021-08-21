@@ -27,6 +27,7 @@ import {
   IsLoggedInQuery,
   useIsLoggedInQuery,
   useSaveFirebaseTokenMutation,
+  useSavePasswordsMutation,
   useSendAuthMessageLazyQuery
 } from './Popup.codegen'
 import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
@@ -39,6 +40,7 @@ import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/useBackground'
+import { PasswContext } from '@src/providers/PasswProvider'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 const messaging = getMessaging()
@@ -51,7 +53,8 @@ export const Popup: FunctionComponent = () => {
     userId,
     localStorage,
     fireToken,
-    setIsVaultLocked
+    setIsVaultLocked,
+    password
   } = useContext(UserContext)
   const { setAuths, auths } = useContext(AuthsContext)
   const [
@@ -61,7 +64,35 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const { currURL, bgAuths, isFilling, safeLocked } = useBackground()
+  const [savePasswordsMutation] = useSavePasswordsMutation()
+  const { currURL, bgAuths, isFilling, safeLocked, bgPasswords } =
+    useBackground()
+
+  useEffect(() => {
+    async function saveToLocal(encrypted: any) {
+      await browser.storage.local.set({
+        encryptedPswMasterPassword: encrypted
+      })
+    }
+    console.log('pls', bgPasswords)
+    //@ts-expect-error
+    if (isAuth && bgPasswords?.length > 0) {
+      console.log('encrypting', bgPasswords)
+      const encrypted = cryptoJS.AES.encrypt(
+        JSON.stringify(bgPasswords),
+        password
+      ).toString()
+
+      savePasswordsMutation({
+        variables: {
+          payload: encrypted,
+          userId: userId as string
+        }
+      })
+
+      saveToLocal(encrypted)
+    }
+  }, [isAuth, bgPasswords])
 
   useEffect(() => {
     if (isAuth && fireToken.length > 1) {
@@ -76,8 +107,8 @@ export const Popup: FunctionComponent = () => {
   }, [isAuth, fireToken])
 
   useEffect(() => {
-    console.log(bgAuths)
-    if (bgAuths && !auths) {
+    console.log('secrets in bg', bgAuths)
+    if (bgAuths) {
       console.log('got', bgAuths)
       setAuths(bgAuths)
     }

@@ -14,7 +14,7 @@ export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
   const { isApiLoggedIn, isVaultLocked } = useContext(UserContext)
   const { startCount, isCounting, safeLocked } = useBackground()
-  console.log('data123', data)
+
   if (isApiLoggedIn && !safeLocked && !isCounting) {
     console.log('started counting')
     startCount()

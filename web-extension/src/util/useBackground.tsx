@@ -1,7 +1,7 @@
 import { sharedBrowserEvents } from '@src/background/backgroundPage'
 import { MessageType } from '@src/background/chromeRuntimeListener'
-import { Passwords } from '@src/providers/PasswProvider'
-import { useState, useEffect } from 'react'
+import { PasswContext, Passwords } from '@src/providers/PasswProvider'
+import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
 export interface IAuth {
@@ -39,6 +39,7 @@ export function useBackground() {
       { action: MessageType.giveMePasswords },
       function (res: { passwords: Array<Passwords> }) {
         if (res && res.passwords) {
+          console.log('Test', res.passwords)
           setBgPasswords(res.passwords)
         }
       }
@@ -53,7 +54,7 @@ export function useBackground() {
       }
     )
 
-    //change URL
+    //CHange to switch
     browser.runtime.onMessage.addListener(function (request: {
       message: sharedBrowserEvents
       url: any
@@ -79,6 +80,15 @@ export function useBackground() {
         }
       }
     )
+
+    browser.runtime.onMessage.addListener(
+      (req: { passwords: Array<Passwords> }) => {
+        if (req.passwords) {
+          console.log('PSW', req.passwords)
+          setBgPasswords(req.passwords)
+        }
+      }
+    )
   }, [])
 
   const backgroundState = {
@@ -96,6 +106,7 @@ export function useBackground() {
     safeLockTime,
     savePasswodsToBg: (value: Passwords[] | undefined) => {
       chrome.runtime.sendMessage({
+        action: MessageType.passwords,
         passwords: value
       })
 
@@ -107,6 +118,7 @@ export function useBackground() {
       }
     },
     saveAuthsToBg: (value: IAuth[] | undefined) => {
+      console.log('saving 02', value)
       chrome.runtime.sendMessage({
         action: MessageType.auths,
         auths: value
@@ -129,7 +141,8 @@ export function useBackground() {
         }
       )
     },
-    isCounting
+    isCounting,
+    bgPasswords
   }
   // @ts-expect-error
   window.backgroundState = backgroundState

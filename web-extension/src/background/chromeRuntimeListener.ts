@@ -1,5 +1,5 @@
 import { IAuth } from '@src/util/useBackground'
-import { fireToken, lockTime, passwords } from './backgroundPage'
+import { fireToken, lockTime, passwords, setPasswords } from './backgroundPage'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -13,13 +13,20 @@ export enum MessageType {
   giveMePasswords = 'giveMePasswords',
   startCount = 'startCount',
   lockTime = 'lockTime',
-  auths = 'auths'
+  auths = 'auths',
+  clear = 'clear',
+  passwords = 'passwords'
 }
 
 chrome.runtime.onMessage.addListener(function (
   req:
     | { action: MessageType }
-    | { action: 'lockTime' | 'auths'; lockTime: number; auths: any },
+    | {
+        action: 'lockTime' | 'auths'
+        lockTime: number
+        auths: any
+        passwords: any
+      },
   sender,
   sendResponse
 ) {
@@ -70,6 +77,18 @@ chrome.runtime.onMessage.addListener(function (
       safeClosed = false // ????? What is this why ?
       //@ts-expect-error
       twoFAs = req.auths
+      console.log('was set on', twoFAs)
+      break
+
+    case MessageType.passwords:
+      //@ts-expect-error
+      setPasswords(req.passwords)
+      break
+
+    case MessageType.clear:
+      twoFAs = undefined
+      setPasswords([])
+      break
 
     default:
       if (typeof req === 'string') {

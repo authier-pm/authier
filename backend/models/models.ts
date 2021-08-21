@@ -44,8 +44,8 @@ export class LoginResponse {
   @Field(() => String)
   accessToken: string
 
-  @Field(() => EncryptedSecrets, { nullable: true })
-  secrets: EncryptedSecrets | null
+  @Field(() => [EncryptedSecrets], { nullable: true })
+  secrets: Array<EncryptedSecrets> | null
 }
 
 @InputType()

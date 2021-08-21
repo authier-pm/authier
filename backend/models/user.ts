@@ -90,9 +90,41 @@ export class UserMutation extends UserBase {
           encrypted: payload
         },
         where: {
-          userId: this.id
+          userId_kind: {
+            userId: this.id,
+            kind: EncryptedSecretsType.TOTP
+          }
         }
       })
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
+  }
+
+  @Field(() => Boolean)
+  async savePasswords(@Arg('payload', () => String) payload: string) {
+    console.log(payload, this.id)
+    try {
+      let test = await prisma.encryptedSecrets.upsert({
+        create: {
+          kind: EncryptedSecretsType.LOGIN_CREDENTIALS,
+          encrypted: payload,
+          version: 1,
+          userId: this.id
+        },
+        update: {
+          encrypted: payload
+        },
+        where: {
+          userId_kind: {
+            userId: this.id,
+            kind: EncryptedSecretsType.LOGIN_CREDENTIALS
+          }
+        }
+      })
+      console.log(test)
       return true
     } catch (err) {
       console.log(err)

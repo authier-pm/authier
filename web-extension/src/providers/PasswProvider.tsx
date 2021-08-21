@@ -10,7 +10,7 @@ import React, {
 import { browser } from 'webextension-polyfill-ts'
 import cryptoJS from 'crypto-js'
 import { UserContext } from './UserProvider'
-import { useSaveAuthsMutation } from '../popup/Popup.codegen'
+import { useSavePasswordsMutation } from '../popup/Popup.codegen'
 import { useBackground } from '@src/util/useBackground'
 
 export const PasswContext = createContext<{
@@ -30,35 +30,35 @@ export interface Passwords {
 export const PasswProvider: FunctionComponent = ({ children }) => {
   const [passwords, setPasswords] = useState<Passwords[]>()
   const { password, isApiLoggedIn: isAuth, userId } = useContext(UserContext)
-  const [saveAuthsMutation] = useSaveAuthsMutation()
-  const { saveAuthsToBg } = useBackground()
+  const [savePasswordsMutation] = useSavePasswordsMutation()
+  const { savePasswodsToBg } = useBackground()
 
   return (
     <PasswContext.Provider
       value={{
         passwords,
-        // Split saving to DB, local storage and background script
         setPasswords: async (value) => {
-          // console.log('saving', value)
-          // //@ts-expect-error
-          // saveAuthsToBg(value)
-          // const encrypted = cryptoJS.AES.encrypt(
-          //   JSON.stringify(value),
-          //   password
-          // ).toString()
-          // if (isAuth) {
-          //   console.log('saving with', password, 'userId: ', userId)
-          //   await saveAuthsMutation({
-          //     variables: {
-          //       payload: encrypted,
-          //       userId: userId as string
-          //     }
-          //   })
-          // }
-          // await browser.storage.local.set({
-          //   encryptedAuthsMasterPassword: encrypted
-          // })
-          // setPasswords(value)
+          console.log('saving passwords', value)
+
+          const encrypted = cryptoJS.AES.encrypt(
+            JSON.stringify(value),
+            password
+          ).toString()
+
+          console.log(isAuth)
+          if (isAuth) {
+            console.log('saving with', password, 'userId: ', userId)
+            await savePasswordsMutation({
+              variables: {
+                payload: encrypted,
+                userId: userId as string
+              }
+            })
+          }
+          await browser.storage.local.set({
+            encryptedPswMasterPassword: encrypted
+          })
+          setPasswords(value)
         }
       }}
     >
