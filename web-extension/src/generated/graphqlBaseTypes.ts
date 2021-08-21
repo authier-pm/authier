@@ -47,7 +47,7 @@ export enum EncryptedSecretsType {
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
-  secrets?: Maybe<EncryptedSecrets>;
+  secrets?: Maybe<Array<EncryptedSecrets>>;
 };
 
 export type Mutation = {
@@ -147,6 +147,7 @@ export type UserMutation = {
   masterDeviceId?: Maybe<Scalars['Int']>;
   addDevice: Device;
   saveAuths: Scalars['Boolean'];
+  savePasswords: Scalars['Boolean'];
   updateFireToken: Scalars['Boolean'];
 };
 
@@ -158,6 +159,11 @@ export type UserMutationAddDeviceArgs = {
 
 
 export type UserMutationSaveAuthsArgs = {
+  payload: Scalars['String'];
+};
+
+
+export type UserMutationSavePasswordsArgs = {
   payload: Scalars['String'];
 };
 

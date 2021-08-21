@@ -25,6 +25,20 @@ export type SaveAuthsMutation = (
   ) }
 );
 
+export type SavePasswordsMutationVariables = Types.Exact<{
+  userId: Types.Scalars['String'];
+  payload: Types.Scalars['String'];
+}>;
+
+
+export type SavePasswordsMutation = (
+  { __typename?: 'Mutation' }
+  & { user: (
+    { __typename?: 'UserMutation' }
+    & Pick<Types.UserMutation, 'savePasswords'>
+  ) }
+);
+
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
   time: Types.Scalars['String'];
@@ -120,6 +134,40 @@ export function useSaveAuthsMutation(baseOptions?: Apollo.MutationHookOptions<Sa
 export type SaveAuthsMutationHookResult = ReturnType<typeof useSaveAuthsMutation>;
 export type SaveAuthsMutationResult = Apollo.MutationResult<SaveAuthsMutation>;
 export type SaveAuthsMutationOptions = Apollo.BaseMutationOptions<SaveAuthsMutation, SaveAuthsMutationVariables>;
+export const SavePasswordsDocument = gql`
+    mutation savePasswords($userId: String!, $payload: String!) {
+  user(userId: $userId) {
+    savePasswords(payload: $payload)
+  }
+}
+    `;
+export type SavePasswordsMutationFn = Apollo.MutationFunction<SavePasswordsMutation, SavePasswordsMutationVariables>;
+
+/**
+ * __useSavePasswordsMutation__
+ *
+ * To run a mutation, you first call `useSavePasswordsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSavePasswordsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [savePasswordsMutation, { data, loading, error }] = useSavePasswordsMutation({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *      payload: // value for 'payload'
+ *   },
+ * });
+ */
+export function useSavePasswordsMutation(baseOptions?: Apollo.MutationHookOptions<SavePasswordsMutation, SavePasswordsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<SavePasswordsMutation, SavePasswordsMutationVariables>(SavePasswordsDocument, options);
+      }
+export type SavePasswordsMutationHookResult = ReturnType<typeof useSavePasswordsMutation>;
+export type SavePasswordsMutationResult = Apollo.MutationResult<SavePasswordsMutation>;
+export type SavePasswordsMutationOptions = Apollo.BaseMutationOptions<SavePasswordsMutation, SavePasswordsMutationVariables>;
 export const SendAuthMessageDocument = gql`
     query sendAuthMessage($device: String!, $time: String!, $location: String!, $userId: String!, $pageName: String!) {
   sendAuthMessage(

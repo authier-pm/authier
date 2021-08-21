@@ -79,7 +79,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
       setIsVaultLocked(true)
     }
   }, [safeLocked])
-  console.log(data)
+
   const value = {
     password,
     setPassword,
