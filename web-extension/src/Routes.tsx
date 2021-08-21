@@ -13,7 +13,8 @@ import { useBackground } from './util/useBackground'
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
   const { isApiLoggedIn, isVaultLocked } = useContext(UserContext)
-  const { startCount, isCounting, safeLocked } = useBackground()
+  const { startCount, isCounting, safeLocked, bgAuths, bgPasswords } =
+    useBackground()
 
   if (isApiLoggedIn && !safeLocked && !isCounting) {
     console.log('started counting')
