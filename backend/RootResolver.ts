@@ -46,7 +46,7 @@ admin.initializeApp({
 export class RootResolver {
   @Query(() => UserQuery)
   @Mutation(() => UserMutation)
-  async user(@Arg('userId') userId: string) {
+  async user(@Arg('userId', () => String) userId: string) {
     const user = await prisma.user.findFirst({
       where: {
         id: userId

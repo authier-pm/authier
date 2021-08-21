@@ -8,6 +8,12 @@ mutation saveAuths($userId: String!, $payload: String!) {
   }
 }
 
+mutation savePasswords($userId: String!, $payload: String!) {
+  user(userId: $userId) {
+    savePasswords(payload: $payload)
+  }
+}
+
 query sendAuthMessage(
   $device: String!
   $time: String!

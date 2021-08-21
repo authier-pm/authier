@@ -50,10 +50,14 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
-export let passwords: Array<Passwords> | null | undefined = []
+export let passwords: Array<Passwords> = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
+
+export function setPasswords(val: any) {
+  passwords = val
+}
 
 // if (auths === undefined) {
 //   safeClosed = true
@@ -150,6 +154,7 @@ type SessionStoredItem = {
   username: any
   password: any
   originalUrl: string
+  label: string
 }
 
 function initInputWatch(credentials?: string) {
@@ -167,7 +172,8 @@ function initInputWatch(credentials?: string) {
         username: username.value,
         //@ts-expect-error
         password: password.value,
-        originalUrl: location.href
+        originalUrl: location.href,
+        label: location.hostname
       }
       console.log(sessionStoredItem)
       sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
@@ -180,8 +186,8 @@ function initInputWatch(credentials?: string) {
     username.value = credentials.username
     //@ts-expect-error
     password.value = credentials.password
-    //@ts-expect-error
-    submit.click()
+    // //@ts-expect-error
+    // submit.click()
   }
 }
 
@@ -224,14 +230,18 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
           const alreadyExists = passwords?.find((credentialItem) => {
             return item.originalUrl === credentialItem.originalUrl
           })
+          console.log('exists', alreadyExists)
           console.log('~ item', item)
           if (!alreadyExists) {
             passwords?.push({
               password: item.password,
               username: item.username,
               originalUrl: item.originalUrl,
+              label: item.label,
               ...currentPageInfo
             })
+
+            chrome.runtime.sendMessage({ passwords: passwords })
           }
 
           console.log(passwords)
@@ -241,21 +251,6 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   } else {
     Object.assign(currentPageInfo, changeInfo)
   }
-
-  // if (passwords) {
-  //   passwords.map(async (i) => {
-  //     if (_tab.url === i.originalUrl) {
-  //       console.log('first', otpCode)
-  //       let a = await executeScriptInCurrentTab(
-  //         `const name = ${i.username};` +
-  //           `const psw = ${i.password};` +
-  //           `(` +
-  //           fillInput.toString() +
-  //           `)()`
-  //       )
-  //     }
-  //   })
-  // }
 
   if (twoFAs) {
     console.log('hasAuths', twoFAs)

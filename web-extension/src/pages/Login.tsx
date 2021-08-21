@@ -28,6 +28,7 @@ import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { useBackground } from '@src/util/useBackground'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -42,6 +43,7 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
+  const { savePasswodsToBg } = useBackground()
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -64,22 +66,43 @@ export default function Login(): ReactElement {
               jid: response.data.login.accessToken
             })
             setAccessToken(response.data.login.accessToken)
-            refetch()
+
             let id = await getUserFromToken()
             //@ts-expect-error
             setUserId(id.userId)
+            let decryptedAuths = ''
+            let decryptedPasswords = ''
+            console.log('res', response)
+            //@ts-expect-error
+            if (response.data.login.secrets[0] && values.password) {
+              response.data.login.secrets?.forEach((i) => {
+                if (i.kind === 'TOTP') {
+                  decryptedAuths = cryptoJS.AES.decrypt(
+                    i.encrypted as string,
+                    values.password
+                  ).toString(cryptoJS.enc.Utf8)
+                } else if ('LOGIN_CREDENTIALS') {
+                  decryptedPasswords = cryptoJS.AES.decrypt(
+                    i.encrypted as string,
+                    values.password
+                  ).toString(cryptoJS.enc.Utf8)
+                  console.log(decryptedPasswords)
+                }
+              })
 
-            if (response.data.login.secrets?.encrypted && values.password) {
-              console.log(response.data.login.secrets?.encrypted)
-              const decryptedAuths = cryptoJS.AES.decrypt(
-                response.data.login.secrets?.encrypted as string,
-                values.password
-              ).toString(cryptoJS.enc.Utf8)
-              console.log('decr', decryptedAuths)
-              let loaded = await JSON.parse(decryptedAuths)
-              //setPassword(values.password)
-              setAuths(loaded)
+              if (decryptedAuths) {
+                let loadedAuths = await JSON.parse(decryptedAuths)
+                setAuths(loadedAuths)
+              }
+
+              if (decryptedPasswords) {
+                let loadCredentials = await JSON.parse(decryptedPasswords)
+                savePasswodsToBg(loadCredentials)
+              }
+              console.log('decrSecrets', decryptedAuths)
+              console.log('decrSecrets', decryptedPasswords)
             }
+            refetch()
           }
 
           setSubmitting(false)
