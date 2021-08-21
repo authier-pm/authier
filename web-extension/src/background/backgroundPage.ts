@@ -3,8 +3,9 @@ import { executeScriptInCurrentTab } from '../util/executeScriptInCurrentTab'
 import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
-import { Passwords } from '../providers/PasswProvider'
 import { twoFAs } from './chromeRuntimeListener'
+import { Passwords } from '@src/util/useBackground'
+import { noHandsLogin } from './chromeRuntimeListener'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -186,8 +187,12 @@ function initInputWatch(credentials?: string) {
     username.value = credentials.username
     //@ts-expect-error
     password.value = credentials.password
-    // //@ts-expect-error
-    // submit.click()
+
+    //@ts-expect-error
+    if (credentials.noHandsLogin) {
+      //@ts-expect-error
+      submit.click()
+    }
   }
 }
 
@@ -214,7 +219,9 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
       return item.originalUrl === changeInfo.url
     })
     await executeScriptInCurrentTab(
-      `(` + initInputWatch.toString() + `)(${JSON.stringify(pswd)})`
+      `(` +
+        initInputWatch.toString() +
+        `)(${JSON.stringify({ ...pswd, noHandsLogin: noHandsLogin })})`
     )
 
     console.log(pswd)

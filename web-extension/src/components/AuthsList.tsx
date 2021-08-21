@@ -22,8 +22,7 @@ import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
 import { LockIcon } from '@chakra-ui/icons'
-import { PasswContext, Passwords } from '@src/providers/PasswProvider'
-import { useBackground } from '@src/util/useBackground'
+import { Passwords, useBackground } from '@src/util/useBackground'
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??

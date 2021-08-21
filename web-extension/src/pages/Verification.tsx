@@ -28,7 +28,7 @@ export function SafeUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
   const { setPassword, setIsVaultLocked } = useContext(UserContext)
-  const { startCount, setSafeLocked } = useBackground()
+  const { startCount, savePasswodsToBg } = useBackground()
 
   return (
     <Flex flexDirection="column" width="315px">
@@ -44,20 +44,33 @@ export function SafeUnlockVerification() {
           const storage = await browser.storage.local.get()
 
           try {
-            if (storage.encryptedAuthsMasterPassword) {
+            if (
+              storage.encryptedAuthsMasterPassword &&
+              storage.encryptedPswMasterPassword
+            ) {
               const decryptedAuths = cryptoJS.AES.decrypt(
                 storage.encryptedAuthsMasterPassword,
                 values.password
               ).toString(cryptoJS.enc.Utf8)
-              let parsed = JSON.parse(decryptedAuths)
-              console.log('parsed', parsed)
-              setAuths(parsed)
+
+              const decryptedPsw = cryptoJS.AES.decrypt(
+                storage.encryptedPswMasterPassword,
+                values.password
+              ).toString(cryptoJS.enc.Utf8)
+
+              let parsedAuths = JSON.parse(decryptedAuths)
+              let parsedPsw = JSON.parse(decryptedPsw)
+
+              console.log('parsed', parsedAuths)
+              console.log('02', parsedPsw)
+
+              setAuths(parsedAuths)
+              savePasswodsToBg(parsedPsw)
             } else {
               setAuths([])
             }
 
             startCount()
-
             setIsVaultLocked(false)
             setSubmitting(false)
           } catch (err) {

@@ -1,6 +1,6 @@
 import { sharedBrowserEvents } from '@src/background/backgroundPage'
 import { MessageType } from '@src/background/chromeRuntimeListener'
-import { PasswContext, Passwords } from '@src/providers/PasswProvider'
+import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
@@ -10,6 +10,15 @@ export interface IAuth {
   icon: string | undefined
   lastUsed?: Date | null
   originalUrl: string | undefined
+}
+
+export interface Passwords {
+  label: string
+  icon: string | undefined
+  lastUsed?: Date | null
+  originalUrl: string | undefined
+  password: string
+  username: string
 }
 
 export function useBackground() {
@@ -22,6 +31,11 @@ export function useBackground() {
   const [bgPasswords, setBgPasswords] = useState<Passwords[] | undefined>(
     undefined
   )
+  const [settingConfig, setSettingsConfig] = useState<Settings>({
+    NoHandsLogin: false,
+    TwoFA: false,
+    vaultTime: '12 hours'
+  })
 
   useEffect(() => {
     //Get auth from bg
@@ -39,7 +53,6 @@ export function useBackground() {
       { action: MessageType.giveMePasswords },
       function (res: { passwords: Array<Passwords> }) {
         if (res && res.passwords) {
-          console.log('Test', res.passwords)
           setBgPasswords(res.passwords)
         }
       }
@@ -84,7 +97,6 @@ export function useBackground() {
     browser.runtime.onMessage.addListener(
       (req: { passwords: Array<Passwords> }) => {
         if (req.passwords) {
-          console.log('PSW', req.passwords)
           setBgPasswords(req.passwords)
         }
       }
@@ -142,7 +154,10 @@ export function useBackground() {
       )
     },
     isCounting,
-    bgPasswords
+    bgPasswords,
+    setSettingsConfig: (config: Settings) => {
+      //Call bg script to save settings to bg, maybe Save it here to BD
+    }
   }
   // @ts-expect-error
   window.backgroundState = backgroundState

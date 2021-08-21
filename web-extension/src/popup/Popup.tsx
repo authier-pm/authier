@@ -40,7 +40,6 @@ import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/useBackground'
-import { PasswContext } from '@src/providers/PasswProvider'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 const messaging = getMessaging()
@@ -51,7 +50,6 @@ export const Popup: FunctionComponent = () => {
   const {
     isApiLoggedIn: isAuth,
     userId,
-    localStorage,
     fireToken,
     setIsVaultLocked,
     password
@@ -77,7 +75,6 @@ export const Popup: FunctionComponent = () => {
     console.log('pls', bgPasswords)
     //@ts-expect-error
     if (isAuth && bgPasswords?.length > 0) {
-      console.log('encrypting', bgPasswords)
       const encrypted = cryptoJS.AES.encrypt(
         JSON.stringify(bgPasswords),
         password

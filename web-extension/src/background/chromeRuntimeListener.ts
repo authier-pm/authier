@@ -5,6 +5,7 @@ export let twoFAs: Array<IAuth> | null | undefined = undefined
 
 let isCounting = false
 let safeClosed = false // Is safe Closed ?
+export let noHandsLogin = false
 
 export enum MessageType {
   giveMeAuths = 'GiveMeAuths',
@@ -15,7 +16,8 @@ export enum MessageType {
   lockTime = 'lockTime',
   auths = 'auths',
   clear = 'clear',
-  passwords = 'passwords'
+  passwords = 'passwords',
+  settings = 'settings'
 }
 
 chrome.runtime.onMessage.addListener(function (
@@ -26,6 +28,7 @@ chrome.runtime.onMessage.addListener(function (
         lockTime: number
         auths: any
         passwords: any
+        settings: any
       },
   sender,
   sendResponse

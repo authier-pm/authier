@@ -16,7 +16,7 @@ export type LoginMutation = (
     & Pick<Types.LoginResponse, 'accessToken'>
     & { secrets?: Types.Maybe<Array<(
       { __typename?: 'EncryptedSecrets' }
-      & Pick<Types.EncryptedSecrets, 'kind' | 'encrypted'>
+      & Pick<Types.EncryptedSecrets, 'id' | 'kind' | 'encrypted'>
     )>> }
   ) }
 );
@@ -27,6 +27,7 @@ export const LoginDocument = gql`
   login(email: $email, password: $password) {
     accessToken
     secrets {
+      id
       kind
       encrypted
     }
