@@ -12,9 +12,22 @@ import { useBackground } from './util/useBackground'
 
 export default function Routes(): ReactElement {
   const { data, loading, error } = useIsLoggedInQuery()
-  const { isApiLoggedIn, isVaultLocked } = useContext(UserContext)
-  const { startCount, isCounting, safeLocked, bgAuths, bgPasswords } =
-    useBackground()
+  const { isApiLoggedIn, isVaultLocked, setIsVaultLocked } =
+    useContext(UserContext)
+  const { startCount, isCounting, safeLocked, bgAuths } = useBackground()
+
+  //Change this is not ideal
+  useEffect(() => {
+    if (bgAuths === undefined) {
+      setIsVaultLocked(true)
+    } else {
+      setIsVaultLocked(false)
+    }
+  }, [bgAuths])
+
+  if (isVaultLocked) {
+    return <SafeUnlockVerification />
+  }
 
   if (isApiLoggedIn && !safeLocked && !isCounting) {
     console.log('started counting')
@@ -27,10 +40,6 @@ export default function Routes(): ReactElement {
         <Spinner size="xl" />
       </Flex>
     )
-  }
-
-  if (isVaultLocked) {
-    return <SafeUnlockVerification />
   }
 
   return <>{data?.authenticated ? <Popup /> : <AuthPages />}</>
