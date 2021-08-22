@@ -60,10 +60,6 @@ export function setPasswords(val: any) {
   passwords = val
 }
 
-// if (auths === undefined) {
-//   safeClosed = true
-// }
-
 broadcast.onmessage = (event) => {
   if (event.data.data.success === 'true') {
     console.log('sec', typeof otpCode)
@@ -93,22 +89,7 @@ browser.runtime.onMessage.addListener(
   }
 )
 
-// chrome.runtime.onMessage.addListener((req: { lockTime: number }) => {
-//   if (req.lockTime) {
-//     lockTime = req.lockTime
-//   }
-// })
-
-//Instead of timeouts set alarm API
-// chrome.runtime.onMessage.addListener(async (request: { auths: any }) => {
-//   if (request.auths) {
-//     safeClosed = false
-//     auths = request.auths //JSON.parse(request.auths)
-//     console.log('saving', request.auths, 'in', auths)
-//   }
-// })
-
-function fillInput() {
+function fillInput(credentials: string) {
   const inputs = document.getElementsByTagName('input')
   let filtered: Array<HTMLInputElement> = []
   let scan = setInterval(() => {
@@ -126,16 +107,15 @@ function fillInput() {
 
     if (filtered[0]) {
       clearInterval(scan)
-
+      console.log('OTP test', credentials)
       //Send message to content scrit for query, where it will send notification to users main device
       //Device will send back the authorization
-      chrome.runtime.sendMessage({ filling: true })
-      // if (OTP !== undefined) {
-      //   //@ts-expect-error
-      //   filtered[0].defaultValue = OTP
-      // } else {
-
-      // }
+      //chrome.runtime.sendMessage({ filling: true })
+      //@ts-expect-error
+      if (credentials.token) {
+        //@ts-expect-error
+        filtered[0].defaultValue = credentials.token
+      }
 
       // const mobileAuth = setInterval(() => {
       //   console.log('PLEASE', canFill)
@@ -276,11 +256,11 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         otpCode = authenticator.generate(i.secret)
         console.log('first', otpCode)
         let a = await executeScriptInCurrentTab(
-          `(` + fillInput.toString() + `)()`
+          `(` +
+            fillInput.toString() +
+            `)(${JSON.stringify({ token: otpCode })})`
         )
       }
     })
-  } else if (twoFAs === null) {
-    return 'locked'
   }
 })
