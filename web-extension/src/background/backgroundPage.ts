@@ -159,29 +159,39 @@ type SessionStoredItem = {
 }
 
 function initInputWatch(credentials?: string) {
-  let username = document.querySelector("input[name='username']")
-  let password = document.querySelector("input[name='password']")
+  let loginFields: any = []
+  let inputs = document.getElementsByTagName('input')
+  for (let j = 0; j < inputs.length; j++) {
+    if (inputs[j].type === 'password') {
+      loginFields = [inputs[j - 1], inputs[j]]
+    }
+  }
+
   let submit = document.querySelector('#submit')
-  let form = document.querySelector('#form')
+
+  let username = loginFields[0]
+  let password = loginFields[1]
+
   console.log({ credentials, location })
+  console.log(username, password)
 
   if (username && password) {
-    console.log(username, password)
-    form?.addEventListener('submit', (e) => {
-      const sessionStoredItem: SessionStoredItem = {
-        // @ts-expect-error
-        username: username.value,
-        //@ts-expect-error
-        password: password.value,
-        originalUrl: location.href,
-        label: location.hostname
+    document.body.addEventListener('click', (e) => {
+      if (username.value && password.value) {
+        const sessionStoredItem: SessionStoredItem = {
+          username: username.value,
+          password: password.value,
+          originalUrl: location.href,
+          label: location.hostname
+        }
+        console.log('test', sessionStoredItem)
+        sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
       }
-      console.log(sessionStoredItem)
-      sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
     })
   }
 
-  if (credentials) {
+  //@ts-expect-error
+  if (credentials.username) {
     // TODO fill password & username
     //@ts-expect-error
     username.value = credentials.username
@@ -189,7 +199,7 @@ function initInputWatch(credentials?: string) {
     password.value = credentials.password
 
     //@ts-expect-error
-    if (credentials.noHandsLogin) {
+    if (credentials.noHandsLogin && submit) {
       //@ts-expect-error
       submit.click()
     }

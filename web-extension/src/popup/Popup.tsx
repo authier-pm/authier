@@ -72,7 +72,7 @@ export const Popup: FunctionComponent = () => {
         encryptedPswMasterPassword: encrypted
       })
     }
-    console.log('pls', bgPasswords)
+
     //@ts-expect-error
     if (isAuth && bgPasswords?.length > 0) {
       const encrypted = cryptoJS.AES.encrypt(

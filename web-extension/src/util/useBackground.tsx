@@ -138,6 +138,7 @@ export function useBackground() {
       //@ts-expect-error
       if (value?.length > 0) {
         setBgAuths(value)
+        console.log('in', bgAuths)
       } else {
         setBgAuths([])
       }

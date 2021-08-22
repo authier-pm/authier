@@ -61,8 +61,8 @@ export function SafeUnlockVerification() {
               let parsedAuths = JSON.parse(decryptedAuths)
               let parsedPsw = JSON.parse(decryptedPsw)
 
-              console.log('parsed', parsedAuths)
-              console.log('02', parsedPsw)
+              console.log('parsedAuths', parsedAuths)
+              console.log('parsedPasswords', parsedPsw)
 
               setAuths(parsedAuths)
               savePasswodsToBg(parsedPsw)
