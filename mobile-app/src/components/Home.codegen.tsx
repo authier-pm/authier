@@ -9,10 +9,7 @@ export type SendConfirmationQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendConfirmationQuery = (
-  { __typename?: 'Query' }
-  & Pick<Types.Query, 'sendConfirmation'>
-);
+export type SendConfirmationQuery = { __typename?: 'Query', sendConfirmation: boolean };
 
 
 export const SendConfirmationDocument = gql`

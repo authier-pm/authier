@@ -28,7 +28,7 @@ export function SafeUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
   const { setPassword, setIsVaultLocked } = useContext(UserContext)
-  const { startCount, savePasswodsToBg } = useBackground()
+  const { startCount, savePasswordsToBg } = useBackground()
 
   return (
     <Flex flexDirection="column" width="315px">
@@ -65,7 +65,7 @@ export function SafeUnlockVerification() {
               console.log('parsedPasswords', parsedPsw)
 
               setAuths(parsedAuths)
-              savePasswodsToBg(parsedPsw)
+              savePasswordsToBg(parsedPsw)
             } else {
               setAuths([])
             }

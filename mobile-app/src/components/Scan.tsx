@@ -7,7 +7,7 @@ import QRCodeScanner from 'react-native-qrcode-scanner';
 import { RNCamera } from 'react-native-camera';
 import { AuthsContext } from '../Providers';
 import { useAddDeviceMutation } from './Scan.codegen';
-import { getDeviceNameSync, getIpAddressSync } from 'react-native-device-info';
+import { getDeviceNameSync } from 'react-native-device-info';
 import { GetTokenProvider } from '../TokenProvider';
 
 //@ts-expect-error
@@ -41,7 +41,6 @@ const Scan = ({ navigation }) => {
         variables: {
           userId: e.data,
           name: getDeviceNameSync(),
-          firstIpAdress: getIpAddressSync(),
           firebaseToken: token as string,
         },
       });
