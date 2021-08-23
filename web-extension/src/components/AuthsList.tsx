@@ -8,7 +8,8 @@ import {
   StatLabel,
   StatNumber,
   useClipboard,
-  Text
+  Text,
+  Heading
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
@@ -21,6 +22,7 @@ import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
 import { LockIcon } from '@chakra-ui/icons'
+import { Passwords, useBackground } from '@src/util/useBackground'
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -90,8 +92,38 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
   )
 }
 
+const Credentials = ({ psw }: { psw: Passwords }) => {
+  return (
+    <Box boxShadow="2xl" p="4" rounded="md" bg="white">
+      <Stat>
+        <Flex justify="flex-start" align="center">
+          <Avatar src={psw.icon} size="sm"></Avatar>
+          <Box ml={4} mr="auto">
+            <Heading size="sm">{psw.label}</Heading>
+            <Text fontSize="lg">{psw.username}</Text>
+          </Box>
+
+          <Button
+            size="md"
+            ml={2}
+            variant="outline"
+            onClick={() => {
+              //onCopy()
+              // TODO log usage of this token to backend
+            }}
+          >
+            <CopyIcon></CopyIcon>
+          </Button>
+        </Flex>
+      </Stat>
+    </Box>
+  )
+}
+
 export const AuthsList = () => {
+  const [changeList, setChangeList] = useState<'OTP' | 'PSW'>('OTP')
   const { auths } = useContext(AuthsContext)
+  const { bgPasswords } = useBackground()
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
@@ -105,24 +137,58 @@ export const AuthsList = () => {
 
   return (
     <>
-      {auths ? (
-        auths
-          .filter(({ originalUrl, secret }) => {
-            if (!currentTabUrl || !originalUrl) {
-              return true
-            }
-            return (
-              extractHostname(originalUrl) === extractHostname(currentTabUrl)
-            )
+      <Flex justifyContent="space-evenly">
+        <Heading
+          onClick={() => setChangeList('OTP')}
+          style={
+            changeList === 'OTP'
+              ? { fontWeight: 'bold' }
+              : { fontWeight: 'normal' }
+          }
+          size="md"
+        >
+          OTP
+        </Heading>
+        <Heading
+          onClick={() => setChangeList('PSW')}
+          style={
+            changeList === 'PSW'
+              ? { fontWeight: 'bold' }
+              : { fontWeight: 'normal' }
+          }
+          size="md"
+        >
+          Passwords
+        </Heading>
+      </Flex>
+
+      {auths && changeList === 'OTP'
+        ? auths
+            .filter(({ originalUrl, secret }) => {
+              if (!currentTabUrl || !originalUrl) {
+                return true
+              }
+              return (
+                extractHostname(originalUrl) === extractHostname(currentTabUrl)
+              )
+            })
+            .map((auth, i) => {
+              return <OtpCode auth={auth} key={auth.label + i} />
+            })
+        : bgPasswords && changeList == 'PSW'
+        ? bgPasswords.map((psw, i) => {
+            return <Credentials psw={psw} key={psw.label + i} />
           })
-          .map((auth, i) => {
-            return <OtpCode auth={auth} key={auth.label + i} />
-          })
-      ) : (
-        <Flex flexDirection="row" justifyContent="center">
-          <Text fontSize="md"> Your Safe is emtpy</Text>
-        </Flex>
-      )}
+        : null}
     </>
   )
 }
+
+// .filter(({ originalUrl }) => {
+//   if (!currentTabUrl || !originalUrl) {
+//     return true
+//   }
+//   return (
+//     extractHostname(originalUrl) === extractHostname(currentTabUrl)
+//   )
+// })

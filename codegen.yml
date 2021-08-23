@@ -1,11 +1,11 @@
 overwrite: true
-schema: '../backend/gqlSchemas/authier.graphql'
-documents: 'src/**/*.graphql'
+schema: './backend/gqlSchemas/authier.graphql'
+documents: ['mobile-app/**/*.gql', 'web-extension/**/*.gql','frontend/**/*.gql']
 generates:
-  src/generated/graphqlBaseTypes.ts:
+  shared/generated/graphqlBaseTypes.ts:
     plugins:
       - typescript
-  src/generated:
+  shared/generated:
     plugins:
       - typescript-operations
       - typescript-react-apollo
