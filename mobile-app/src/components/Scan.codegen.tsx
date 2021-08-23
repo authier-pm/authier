@@ -10,13 +10,7 @@ export type AddDeviceMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddDeviceMutation = (
-  { __typename?: 'Mutation' }
-  & { addDevice: (
-    { __typename?: 'Device' }
-    & Pick<Types.Device, 'id'>
-  ) }
-);
+export type AddDeviceMutation = { __typename?: 'Mutation', addDevice: { __typename?: 'Device', id: number } };
 
 
 export const AddDeviceDocument = gql`

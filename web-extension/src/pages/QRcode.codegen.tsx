@@ -8,13 +8,7 @@ export type DeviceCountQueryVariables = Types.Exact<{
 }>;
 
 
-export type DeviceCountQuery = (
-  { __typename?: 'Query' }
-  & { user: (
-    { __typename?: 'UserQuery' }
-    & Pick<Types.UserQuery, 'devicesCount'>
-  ) }
-);
+export type DeviceCountQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', devicesCount: number } };
 
 
 export const DeviceCountDocument = gql`

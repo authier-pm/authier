@@ -116,7 +116,7 @@ export function useBackground() {
       setSafeLockTime(lockTime)
     },
     safeLockTime,
-    savePasswodsToBg: (value: Passwords[] | undefined) => {
+    savePasswordsToBg: (value: Passwords[] | undefined) => {
       chrome.runtime.sendMessage({
         action: MessageType.passwords,
         passwords: value
