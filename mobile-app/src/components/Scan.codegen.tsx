@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -10,15 +10,14 @@ export type AddDeviceMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddDeviceMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'addDevice'>
-);
+export type AddDeviceMutation = { __typename?: 'Mutation', addDevice: { __typename?: 'Device', id: number } };
 
 
 export const AddDeviceDocument = gql`
     mutation addDevice($userId: String!, $name: String!, $firebaseToken: String!) {
-  addDevice(userId: $userId, name: $name, firebaseToken: $firebaseToken)
+  addDevice(userId: $userId, name: $name, firebaseToken: $firebaseToken) {
+    id
+  }
 }
     `;
 export type AddDeviceMutationFn = Apollo.MutationFunction<AddDeviceMutation, AddDeviceMutationVariables>;

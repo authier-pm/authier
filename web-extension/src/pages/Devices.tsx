@@ -37,7 +37,7 @@ export default function Devices() {
         data.user.myDevices.map((i) => {
           return (
             <Flex
-              key={i.lastIpAdress}
+              key={i.lastIpAddress}
               boxShadow="xl"
               bg="white"
               m={2}
@@ -69,7 +69,7 @@ export default function Devices() {
                 <Icon as={IoIosPhonePortrait} w={20} h={20} />
                 <Flex flexDirection="column" ml="5px" fontSize="md">
                   <Text>{i.name}</Text>
-                  <Text>{i.lastIpAdress}</Text>
+                  <Text>{i.lastIpAddress}</Text>
                   <Text>Location: </Text>
                 </Flex>
               </Flex>

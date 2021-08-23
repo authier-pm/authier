@@ -108,7 +108,6 @@ export type Query = {
   user: UserQuery;
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean'];
-  userForThrow: UserMutation;
   me?: Maybe<UserQuery>;
   sendAuthMessage: Scalars['Boolean'];
   sendConfirmation: Scalars['Boolean'];

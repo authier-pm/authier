@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -9,10 +9,7 @@ export type SendConfirmationQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendConfirmationQuery = (
-  { __typename?: 'Query' }
-  & Pick<Types.Query, 'sendConfirmation'>
-);
+export type SendConfirmationQuery = { __typename?: 'Query', sendConfirmation: boolean };
 
 
 export const SendConfirmationDocument = gql`

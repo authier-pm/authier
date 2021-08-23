@@ -1,0 +1,5 @@
+mutation addDevice($userId: String!, $name: String!, $firebaseToken: String!) {
+  addDevice(userId: $userId, name: $name, firebaseToken: $firebaseToken) {
+    id
+  }
+}

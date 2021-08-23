@@ -45,12 +45,12 @@ type Mutation {
   user(userId: String!): UserMutation!
 
   """you need to be authenticated to call this resolver"""
-  me: String!
-  addDevice(firebaseToken: String!, userId: String!, name: String!): Boolean!
+  me: UserMutation!
+  addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
   revokeRefreshTokensForUser(userId: String!): Boolean!
-  login(password: String!, email: String!): LoginResponse!
+  login(password: String!, email: String!): LoginResponse
 }
 
 type UserMutation {
@@ -65,20 +65,9 @@ type UserMutation {
   updatedAt: DateTime!
   masterDeviceId: Int
   addDevice(firebaseToken: String!, name: String!): Device!
-  saveAuths(payload: String!): Boolean!
-  savePasswords(payload: String!): Boolean!
-  updateFireToken(firebaseToken: String!): Boolean!
-}
-
-input OTPEvent {
-  kind: String!
-  url: String!
-  userId: String!
-}
-
-type LoginResponse {
-  accessToken: String!
-  secrets: [EncryptedSecrets!]
+  saveAuths(payload: String!): EncryptedSecrets!
+  savePasswords(payload: String!): EncryptedSecrets!
+  updateFireToken(firebaseToken: String!): Device!
 }
 
 type EncryptedSecrets {
@@ -94,4 +83,15 @@ type EncryptedSecrets {
 enum EncryptedSecretsType {
   TOTP
   LOGIN_CREDENTIALS
+}
+
+input OTPEvent {
+  kind: String!
+  url: String!
+  userId: String!
+}
+
+type LoginResponse {
+  accessToken: String!
+  secrets: [EncryptedSecrets!]
 }
