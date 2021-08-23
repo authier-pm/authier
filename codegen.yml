@@ -1,6 +1,6 @@
 overwrite: true
 schema: './backend/gqlSchemas/authier.graphql'
-documents: ['mobileApp/**/*.gql', 'web-extension/**/*.gql','frontend/**/*.gql']
+documents: ['mobile-app/**/*.gql', 'web-extension/**/*.gql','frontend/**/*.gql']
 generates:
   shared/generated/graphqlBaseTypes.ts:
     plugins:

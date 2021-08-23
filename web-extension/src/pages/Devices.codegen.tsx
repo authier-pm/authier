@@ -8,16 +8,7 @@ export type MyDevicesQueryVariables = Types.Exact<{
 }>;
 
 
-export type MyDevicesQuery = (
-  { __typename?: 'Query' }
-  & { user: (
-    { __typename?: 'UserQuery' }
-    & { myDevices: Array<(
-      { __typename?: 'Device' }
-      & Pick<Types.Device, 'id' | 'firstIpAddress' | 'lastIpAddress' | 'name'>
-    )> }
-  ) }
-);
+export type MyDevicesQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> } };
 
 
 export const MyDevicesDocument = gql`

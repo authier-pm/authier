@@ -1,5 +1,5 @@
 {
-  "name": "authier-chrome-extension",
+  "name": "authier-web-extension",
   "version": "0.0.1",
   "description": "A Chrome Extension starter kit built with React, TypeScript, SCSS, Bootstrap, EsLint, Prettier & Webpack",
   "scripts": {
@@ -10,10 +10,6 @@
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
     "generate": "graphql-codegen"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/aeksco/react-typescript-chrome-extension-starter.git"
-  },
   "keywords": [
     "react",
     "typescript",
@@ -21,12 +17,6 @@
     "extension",
     "boilerplate"
   ],
-  "author": "Alexander Schwartzberg",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/aeksco/react-typescript-chrome-extension-starter/issues"
-  },
-  "homepage": "https://github.com/aeksco/react-typescript-chrome-extension-starter#readme",
   "devDependencies": {
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
@@ -68,7 +58,7 @@
     "ts-loader": "^9.2.3",
     "ts-node-dev": "^1.1.8",
     "type-graphql": "^1.1.1",
-    "typescript": "^4.3.5",
+    "typescript": "^4.4.1-rc",
     "webextension-polyfill-ts": "^0.25.0",
     "webpack": "5.41.1",
     "webpack-cli": "^4.7.2",

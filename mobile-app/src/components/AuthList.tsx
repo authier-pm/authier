@@ -1,4 +1,5 @@
 import React, { useContext, useState } from 'react';
+// @ts-expect-error
 import OTP from 'otp-client';
 import { AuthsContext } from '../Providers';
 import {
