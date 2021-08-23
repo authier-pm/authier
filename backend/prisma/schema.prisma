@@ -32,12 +32,14 @@ model EncryptedSecrets {
     id        Int                  @id @default(autoincrement())
     encrypted String
     version   Int
-    userId    String               @unique @db.Uuid
+    userId    String               @db.Uuid
     kind      EncryptedSecretsType
     createdAt DateTime             @default(now())
     updatedAt DateTime?            @updatedAt
+    //uniqueFiled String               @unique
 
     user User @relation(fields: [userId], references: [id])
+    @@unique([userId, kind])
 }
 
 model Device {
@@ -73,7 +75,7 @@ model OTPCodeEvent {
     id          BigInt    @id @default(autoincrement())
     kind        String
     timestamp   DateTime  @default(now())
-    ipAdress    String    @db.Inet
+    ipAddress   String    @db.Inet
     url         String
     User        User      @relation(fields: [userId], references: [id])
     userId      String    @db.Uuid
@@ -109,18 +111,18 @@ model WebInput {
 }
 
 model User {
-    id               String            @id @default(uuid()) @db.Uuid
-    email            String?           @unique
-    phone_number     String?           @unique
-    account_name     String?           @unique
+    id               String             @id @default(uuid()) @db.Uuid
+    email            String?            @unique
+    phone_number     String?            @unique
+    account_name     String?            @unique
     password         String
-    tokenVersion     Int               @default(0)
+    tokenVersion     Int                @default(0)
     name             String?
-    EncryptedSecrets EncryptedSecrets?
+    EncryptedSecrets EncryptedSecrets[]
     Token            Token[]
-    createdAt        DateTime          @default(now())
-    updatedAt        DateTime          @updatedAt
-    masterDevice     Device?           @relation("masterDevice", fields: [masterDeviceId], references: [id])
+    createdAt        DateTime           @default(now())
+    updatedAt        DateTime           @updatedAt
+    masterDevice     Device?            @relation("masterDevice", fields: [masterDeviceId], references: [id])
     masterDeviceId   Int?
 
     OTPCodeEvents    OTPCodeEvent[]

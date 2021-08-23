@@ -31,6 +31,7 @@ import { useLocation } from 'wouter'
 import { removeToken } from '@src/util/accessToken'
 import { UserContext } from '@src/providers/UserProvider'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { MessageType } from '@src/background/chromeRuntimeListener'
 
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
@@ -61,7 +62,7 @@ export const Home: FunctionComponent = () => {
               await browser.storage.local.clear()
               removeToken()
               await chrome.runtime.sendMessage({
-                clear: true
+                action: MessageType.clear
               })
               refetch()
             }}

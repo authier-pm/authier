@@ -1,5 +1,5 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
-import { MessageType } from '@src/backgroundPage'
+import { MessageType } from '@src/background/chromeRuntimeListener'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
 import { useBackground } from '@src/util/useBackground'
@@ -55,7 +55,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     checkStorage()
 
     chrome.runtime.sendMessage(
-      MessageType.getFirebaseToken,
+      { action: MessageType.getFirebaseToken },
       (res: { t: string }) => {
         setFireToken(res.t)
       }
@@ -64,23 +64,21 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     async function getId() {
       try {
         let id = await getUserFromToken()
-      //@ts-expect-error
-      setUserId(id.userId)
-      } catch(err) {
+        //@ts-expect-error
+        setUserId(id.userId)
+      } catch (err) {
         console.log(err)
       }
-      
     }
     getId()
   }, [])
 
   useEffect(() => {
-    console.log('isLocked', safeLocked)
     if (safeLocked) {
       setIsVaultLocked(true)
     }
   }, [safeLocked])
-  console.log(data)
+
   const value = {
     password,
     setPassword,

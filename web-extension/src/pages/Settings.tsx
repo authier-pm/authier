@@ -16,27 +16,41 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import React from 'react'
 import { useBackground } from '@src/util/useBackground'
 
+export interface Settings {
+  vaultTime: string
+  TwoFA: boolean
+  NoHandsLogin: boolean
+}
+
 export const Settings = () => {
   const { setSafeLockTime } = useBackground()
   return (
-    <Flex flexDirection="column">
+    <Flex flexDirection="column" m={5}>
       <Heading>Security</Heading>
       <Formik
-        initialValues={{ vaultTime: '1 hour', TwoFA: false }}
-        onSubmit={(values, actions) => {
-          setTimeout(() => {
-            if (values.vaultTime === 'On web close') {
-              setSafeLockTime(0)
-            } else if (values.vaultTime === '10 secconds') {
-              setSafeLockTime(10000)
-            } else if (values.vaultTime === '8 hours') {
-              setSafeLockTime(1000 * 60 * 60 * 8)
-            } else if (values.vaultTime === '12 hours') {
-              setSafeLockTime(1000 * 60 * 60 * 12)
-            }
-            alert(JSON.stringify(values, null, 2))
-            actions.setSubmitting(false)
-          }, 1000)
+        initialValues={{
+          vaultTime: '12 hours',
+          TwoFA: false,
+          NoHandsLogin: false
+        }}
+        onSubmit={async (
+          values: Settings,
+          { setSubmitting }: FormikHelpers<Settings>
+        ) => {
+          if (values.vaultTime === 'On web close') {
+            setSafeLockTime(0)
+          } else if (values.vaultTime === '10 secconds') {
+            setSafeLockTime(10000)
+          } else if (values.vaultTime === '8 hours') {
+            setSafeLockTime(1000 * 60 * 60 * 8)
+          } else if (values.vaultTime === '12 hours') {
+            setSafeLockTime(1000 * 60 * 60 * 12)
+          }
+
+          if (values.NoHandsLogin) {
+          }
+          alert(JSON.stringify(values, null, 2))
+          setSubmitting(false)
         }}
       >
         {(props) => (
@@ -52,9 +66,10 @@ export const Settings = () => {
                     {...field}
                     id="vaultTime"
                     placeholder="Select country"
+                    mb={3}
                   >
                     <option>On web close</option>
-                    <option>1 hour</option>
+                    <option>10 secconds</option>
                     <option>8 hours</option>
                     <option>12 hours</option>
                   </Select>
@@ -69,12 +84,30 @@ export const Settings = () => {
                   isInvalid={form.errors.TwoFA && form.touched.TwoFA}
                 >
                   <FormLabel htmlFor="TwoFA">
-                    2FA with (main) mobile phone
+                    2FA with (master) mobile phone
                   </FormLabel>
-                  <Checkbox {...field} id="TwoFA" defaultIsChecked>
+                  <Checkbox {...field} id="TwoFA">
                     Checkbox
                   </Checkbox>
                   <FormErrorMessage>{form.errors.TwoFA}</FormErrorMessage>
+                </FormControl>
+              )}
+            </Field>
+            <Field name="NoHandsLogin">
+              {/* @ts-expect-error */}
+              {({ field, form }) => (
+                <FormControl
+                  isInvalid={
+                    form.errors.NoHandsLogin && form.touched.NoHandsLogin
+                  }
+                >
+                  <FormLabel htmlFor="NoHandsLogin">No Hands login</FormLabel>
+                  <Checkbox {...field} id="NoHandsLogin">
+                    Checkbox
+                  </Checkbox>
+                  <FormErrorMessage>
+                    {form.errors.NoHandsLogin}
+                  </FormErrorMessage>
                 </FormControl>
               )}
             </Field>
