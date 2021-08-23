@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -6,10 +6,7 @@ const defaultOptions =  {}
 export type IsLoggedInQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type IsLoggedInQuery = (
-  { __typename?: 'Query' }
-  & Pick<Types.Query, 'authenticated'>
-);
+export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 
 export type SaveAuthsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -17,13 +14,7 @@ export type SaveAuthsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveAuthsMutation = (
-  { __typename?: 'Mutation' }
-  & { user: (
-    { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'saveAuths'>
-  ) }
-);
+export type SaveAuthsMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } } };
 
 export type SavePasswordsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -31,13 +22,7 @@ export type SavePasswordsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SavePasswordsMutation = (
-  { __typename?: 'Mutation' }
-  & { user: (
-    { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'savePasswords'>
-  ) }
-);
+export type SavePasswordsMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } } };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -48,10 +33,7 @@ export type SendAuthMessageQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendAuthMessageQuery = (
-  { __typename?: 'Query' }
-  & Pick<Types.Query, 'sendAuthMessage'>
-);
+export type SendAuthMessageQuery = { __typename?: 'Query', sendAuthMessage: boolean };
 
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -59,13 +41,7 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveFirebaseTokenMutation = (
-  { __typename?: 'Mutation' }
-  & { user: (
-    { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'updateFireToken'>
-  ) }
-);
+export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } } };
 
 
 export const IsLoggedInDocument = gql`
@@ -103,7 +79,9 @@ export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLogged
 export const SaveAuthsDocument = gql`
     mutation saveAuths($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    saveAuths(payload: $payload)
+    saveAuths(payload: $payload) {
+      id
+    }
   }
 }
     `;
@@ -137,7 +115,9 @@ export type SaveAuthsMutationOptions = Apollo.BaseMutationOptions<SaveAuthsMutat
 export const SavePasswordsDocument = gql`
     mutation savePasswords($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    savePasswords(payload: $payload)
+    savePasswords(payload: $payload) {
+      id
+    }
   }
 }
     `;
@@ -214,7 +194,9 @@ export type SendAuthMessageQueryResult = Apollo.QueryResult<SendAuthMessageQuery
 export const SaveFirebaseTokenDocument = gql`
     mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
   user(userId: $userId) {
-    updateFireToken(firebaseToken: $firebaseToken)
+    updateFireToken(firebaseToken: $firebaseToken) {
+      id
+    }
   }
 }
     `;
