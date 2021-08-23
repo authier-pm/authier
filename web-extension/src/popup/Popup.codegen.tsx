@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -21,7 +21,10 @@ export type SaveAuthsMutation = (
   { __typename?: 'Mutation' }
   & { user: (
     { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'saveAuths'>
+    & { saveAuths: (
+      { __typename?: 'EncryptedSecrets' }
+      & Pick<Types.EncryptedSecrets, 'id'>
+    ) }
   ) }
 );
 
@@ -35,7 +38,10 @@ export type SavePasswordsMutation = (
   { __typename?: 'Mutation' }
   & { user: (
     { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'savePasswords'>
+    & { savePasswords: (
+      { __typename?: 'EncryptedSecrets' }
+      & Pick<Types.EncryptedSecrets, 'id'>
+    ) }
   ) }
 );
 
@@ -63,7 +69,10 @@ export type SaveFirebaseTokenMutation = (
   { __typename?: 'Mutation' }
   & { user: (
     { __typename?: 'UserMutation' }
-    & Pick<Types.UserMutation, 'updateFireToken'>
+    & { updateFireToken: (
+      { __typename?: 'Device' }
+      & Pick<Types.Device, 'id'>
+    ) }
   ) }
 );
 
@@ -103,7 +112,9 @@ export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLogged
 export const SaveAuthsDocument = gql`
     mutation saveAuths($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    saveAuths(payload: $payload)
+    saveAuths(payload: $payload) {
+      id
+    }
   }
 }
     `;
@@ -137,7 +148,9 @@ export type SaveAuthsMutationOptions = Apollo.BaseMutationOptions<SaveAuthsMutat
 export const SavePasswordsDocument = gql`
     mutation savePasswords($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    savePasswords(payload: $payload)
+    savePasswords(payload: $payload) {
+      id
+    }
   }
 }
     `;
@@ -214,7 +227,9 @@ export type SendAuthMessageQueryResult = Apollo.QueryResult<SendAuthMessageQuery
 export const SaveFirebaseTokenDocument = gql`
     mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
   user(userId: $userId) {
-    updateFireToken(firebaseToken: $firebaseToken)
+    updateFireToken(firebaseToken: $firebaseToken) {
+      id
+    }
   }
 }
     `;

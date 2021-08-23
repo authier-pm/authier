@@ -14,7 +14,11 @@ import { sendRefreshToken } from '../sendRefreshToken'
 import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
 import { LoginResponse } from './models'
-import { Device, User } from '../generated/typegraphql-prisma/models'
+import {
+  Device,
+  EncryptedSecrets,
+  User
+} from '../generated/typegraphql-prisma/models'
 import { EncryptedSecretsType } from '@prisma/client'
 
 @ObjectType()
@@ -25,7 +29,7 @@ export class UserQuery extends UserBase {
   @Field(() => [Device])
   @UseMiddleware(isAuth)
   async myDevices() {
-    return await prisma.device.findMany({
+    return prisma.device.findMany({
       where: {
         userId: this.id
       },
@@ -76,63 +80,49 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Boolean)
+  @Field(() => EncryptedSecrets)
   async saveAuths(@Arg('payload', () => String) payload: string) {
-    try {
-      await prisma.encryptedSecrets.upsert({
-        create: {
-          kind: EncryptedSecretsType.TOTP,
-          encrypted: payload,
-          version: 1,
-          userId: this.id
-        },
-        update: {
-          encrypted: payload
-        },
-        where: {
-          userId_kind: {
-            userId: this.id,
-            kind: EncryptedSecretsType.TOTP
-          }
+    return prisma.encryptedSecrets.upsert({
+      create: {
+        kind: EncryptedSecretsType.TOTP,
+        encrypted: payload,
+        version: 1,
+        userId: this.id
+      },
+      update: {
+        encrypted: payload
+      },
+      where: {
+        userId_kind: {
+          userId: this.id,
+          kind: EncryptedSecretsType.TOTP
         }
-      })
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
+      }
+    })
   }
 
-  @Field(() => Boolean)
+  @Field(() => EncryptedSecrets)
   async savePasswords(@Arg('payload', () => String) payload: string) {
-    console.log(payload, this.id)
-    try {
-      let test = await prisma.encryptedSecrets.upsert({
-        create: {
-          kind: EncryptedSecretsType.LOGIN_CREDENTIALS,
-          encrypted: payload,
-          version: 1,
-          userId: this.id
-        },
-        update: {
-          encrypted: payload
-        },
-        where: {
-          userId_kind: {
-            userId: this.id,
-            kind: EncryptedSecretsType.LOGIN_CREDENTIALS
-          }
+    return prisma.encryptedSecrets.upsert({
+      create: {
+        kind: EncryptedSecretsType.LOGIN_CREDENTIALS,
+        encrypted: payload,
+        version: 1,
+        userId: this.id
+      },
+      update: {
+        encrypted: payload
+      },
+      where: {
+        userId_kind: {
+          userId: this.id,
+          kind: EncryptedSecretsType.LOGIN_CREDENTIALS
         }
-      })
-      console.log(test)
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
+      }
+    })
   }
 
-  @Field(() => Boolean)
+  @Field(() => Device)
   @UseMiddleware(isAuth)
   async updateFireToken(
     @Arg('firebaseToken', () => String) firebaseToken: string
@@ -140,20 +130,13 @@ export class UserMutation extends UserBase {
     if (!this.masterDeviceId) {
       throw new Error('Must have masterDeviceId')
     }
-    try {
-      await prisma.device.update({
-        data: {
-          firebaseToken: firebaseToken
-        },
-        where: {
-          id: this.masterDeviceId
-        }
-      })
-
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
+    return prisma.device.update({
+      data: {
+        firebaseToken: firebaseToken
+      },
+      where: {
+        id: this.masterDeviceId
+      }
+    })
   }
 }

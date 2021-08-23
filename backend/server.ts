@@ -9,9 +9,10 @@ import { prisma } from './prisma'
 import { createAccessToken, createRefreshToken } from './auth'
 import { verify } from 'jsonwebtoken'
 import { UserBase } from './models/user'
-
+import chalk from 'chalk'
 dotenv.config()
 
+const { env } = process
 async function main() {
   const app = fastify({
     logger: true
@@ -65,6 +66,18 @@ async function main() {
     graphiql: true,
     context: (request, reply) => {
       return { request, reply }
+    },
+    errorFormatter: (res, ctx) => {
+      if (env.NODE_ENV === 'production') {
+        return mercurius.defaultErrorFormatter(res, ctx)
+      }
+      if (res.errors) {
+        console.log(chalk.bgRed('Graphql errors: '))
+        res.errors.map((err) => {
+          console.error(' ', err)
+        })
+      }
+      return mercurius.defaultErrorFormatter(res, null)
     }
   })
 

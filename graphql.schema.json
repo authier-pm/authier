@@ -811,22 +811,6 @@
             "deprecationReason": null
           },
           {
-            "name": "userForThrow",
-            "description": null,
-            "args": [],
-            "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UserMutation",
-                "ofType": null
-              }
-            },
-            "isDeprecated": false,
-            "deprecationReason": null
-          },
-          {
             "name": "me",
             "description": null,
             "args": [],

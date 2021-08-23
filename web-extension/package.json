@@ -8,7 +8,6 @@
     "tsc": "tsc",
     "test": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
-    "gfs": "graphql-codegen --config codegen.yml",
     "generate": "graphql-codegen"
   },
   "repository": {
@@ -32,13 +31,6 @@
     "@babel/core": "^7.14.6",
     "@babel/preset-env": "^7.14.7",
     "@babel/preset-typescript": "^7.14.5",
-    "@graphql-codegen/cli": "1.21.6",
-    "@graphql-codegen/fragment-matcher": "2.0.1",
-    "@graphql-codegen/introspection": "1.18.2",
-    "@graphql-codegen/near-operation-file-preset": "^1.18.4",
-    "@graphql-codegen/typescript": "1.22.4",
-    "@graphql-codegen/typescript-operations": "1.18.3",
-    "@graphql-codegen/typescript-react-apollo": "2.3.0",
     "@lingui/react": "^3.10.2",
     "@types/chrome": "^0.0.145",
     "@types/crypto-js": "^4.0.1",

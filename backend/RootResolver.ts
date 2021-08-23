@@ -24,6 +24,7 @@ import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/user'
+import { Device } from './generated/typegraphql-prisma'
 
 export interface IContext {
   request: RawRequestDefaultExpression
@@ -78,18 +79,21 @@ export class RootResolver {
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => String, {
+  @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me'
   })
   authenticatedMe(@Ctx() Ctx: IContext) {
-    return `your user ud is: ${Ctx.jwtPayload?.userId}`
+    return prisma.user.findFirst({
+      where: {
+        id: Ctx.jwtPayload?.userId
+      },
+      include: {
+        Devices: true,
+        EncryptedSecrets: true
+      }
+    })
   }
-
-  // @Query(() => [User])
-  // async users() {
-  //   return prisma.user.findMany()
-  // }
 
   //TODO query for info about user
   @UseMiddleware(isAuth)
@@ -114,7 +118,7 @@ export class RootResolver {
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => Boolean)
+  @Mutation(() => Device)
   async addDevice(
     @Arg('name', () => String) name: string,
     @Arg('userId', () => String) userId: string,
@@ -126,22 +130,16 @@ export class RootResolver {
       context.request.headers['x-forwarded-for'] ||
       context.request.socket.remoteAddress
 
-    try {
-      await prisma.device.create({
-        data: {
-          name: name,
-          firebaseToken: firebaseToken,
-          firstIpAddress: ipAddress,
-          userId: userId,
-          lastIpAddress: ipAddress,
-          vaultLockTimeoutSeconds: 60
-        }
-      })
-      return true
-    } catch (er) {
-      console.log(er)
-      return false
-    }
+    return prisma.device.create({
+      data: {
+        name: name,
+        firebaseToken: firebaseToken,
+        firstIpAddress: ipAddress,
+        userId: userId,
+        lastIpAddress: ipAddress,
+        vaultLockTimeoutSeconds: 60
+      }
+    })
   }
 
   @UseMiddleware(isAuth)
@@ -316,7 +314,7 @@ export class RootResolver {
     return true
   }
 
-  @Mutation(() => LoginResponse)
+  @Mutation(() => LoginResponse, { nullable: true })
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
