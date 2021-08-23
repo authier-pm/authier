@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -8,13 +8,7 @@ export type DeviceCountQueryVariables = Types.Exact<{
 }>;
 
 
-export type DeviceCountQuery = (
-  { __typename?: 'Query' }
-  & { user: (
-    { __typename?: 'UserQuery' }
-    & Pick<Types.UserQuery, 'devicesCount'>
-  ) }
-);
+export type DeviceCountQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', devicesCount: number } };
 
 
 export const DeviceCountDocument = gql`

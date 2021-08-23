@@ -6,7 +6,6 @@ import { AuthsProvider } from './providers/AuthsProvider'
 import { UserProvider } from './providers/UserProvider'
 import Routes from './Routes'
 import { i18n } from '@lingui/core'
-import { PasswProvider } from './providers/PasswProvider'
 
 export default function Providers() {
   return (

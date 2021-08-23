@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -8,22 +8,14 @@ export type MyDevicesQueryVariables = Types.Exact<{
 }>;
 
 
-export type MyDevicesQuery = (
-  { __typename?: 'Query' }
-  & { user: (
-    { __typename?: 'UserQuery' }
-    & { myDevices: Array<(
-      { __typename?: 'Device' }
-      & Pick<Types.Device, 'firstIpAddress' | 'lastIpAddress' | 'name'>
-    )> }
-  ) }
-);
+export type MyDevicesQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> } };
 
 
 export const MyDevicesDocument = gql`
     query myDevices($userId: String!) {
   user(userId: $userId) {
     myDevices {
+      id
       firstIpAddress
       lastIpAddress
       name

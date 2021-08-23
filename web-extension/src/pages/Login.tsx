@@ -43,7 +43,7 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const { savePasswodsToBg } = useBackground()
+  const { savePasswordsToBg: savePasswodsToBg } = useBackground()
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -61,11 +61,11 @@ export default function Login(): ReactElement {
             variables: { email: values.email, password: values.password }
           })
 
-          if (response.data) {
+          if (response.data?.login?.accessToken) {
             await browser.storage.local.set({
-              jid: response.data.login.accessToken
+              jid: response.data.login?.accessToken
             })
-            setAccessToken(response.data.login.accessToken)
+            setAccessToken(response.data.login?.accessToken)
 
             let id = await getUserFromToken()
             //@ts-expect-error
@@ -75,7 +75,7 @@ export default function Login(): ReactElement {
             console.log('res', response)
             //@ts-expect-error
             if (response.data.login.secrets[0] && values.password) {
-              response.data.login.secrets?.forEach((i) => {
+              response.data.login?.secrets?.forEach((i) => {
                 if (i.kind === 'TOTP') {
                   decryptedAuths = cryptoJS.AES.decrypt(
                     i.encrypted as string,

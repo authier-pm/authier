@@ -4,13 +4,17 @@ query isLoggedIn {
 
 mutation saveAuths($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    saveAuths(payload: $payload)
+    saveAuths(payload: $payload) {
+      id
+    }
   }
 }
 
 mutation savePasswords($userId: String!, $payload: String!) {
   user(userId: $userId) {
-    savePasswords(payload: $payload)
+    savePasswords(payload: $payload) {
+      id
+    }
   }
 }
 
@@ -32,6 +36,8 @@ query sendAuthMessage(
 
 mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
   user(userId: $userId) {
-    updateFireToken(firebaseToken: $firebaseToken)
+    updateFireToken(firebaseToken: $firebaseToken) {
+      id
+    }
   }
 }

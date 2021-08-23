@@ -75,7 +75,7 @@ model OTPCodeEvent {
     id          BigInt    @id @default(autoincrement())
     kind        String
     timestamp   DateTime  @default(now())
-    ipAdress    String    @db.Inet
+    ipAddress   String    @db.Inet
     url         String
     User        User      @relation(fields: [userId], references: [id])
     userId      String    @db.Uuid
