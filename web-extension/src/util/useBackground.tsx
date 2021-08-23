@@ -1,5 +1,7 @@
-import { MessageType, sharedBrowserEvents } from '@src/backgroundPage'
-import { useState, useEffect } from 'react'
+import { sharedBrowserEvents } from '@src/background/backgroundPage'
+import { MessageType } from '@src/background/chromeRuntimeListener'
+import { Settings } from '@src/pages/Settings'
+import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
 export interface IAuth {
@@ -10,6 +12,15 @@ export interface IAuth {
   originalUrl: string | undefined
 }
 
+export interface Passwords {
+  label: string
+  icon: string | undefined
+  lastUsed?: Date | null
+  originalUrl: string | undefined
+  password: string
+  username: string
+}
+
 export function useBackground() {
   const [currURL, setCurrURL] = useState<string>('')
   const [safeLockTime, setSafeLockTime] = useState<number | null>(null)
@@ -17,11 +28,19 @@ export function useBackground() {
   const [bgAuths, setBgAuths] = useState<IAuth[] | undefined>(undefined)
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
+  const [bgPasswords, setBgPasswords] = useState<Passwords[] | undefined>(
+    undefined
+  )
+  const [settingConfig, setSettingsConfig] = useState<Settings>({
+    NoHandsLogin: false,
+    TwoFA: false,
+    vaultTime: '12 hours'
+  })
 
   useEffect(() => {
     //Get auth from bg
     chrome.runtime.sendMessage(
-      MessageType.giveMeAuths,
+      { action: MessageType.giveMeAuths },
       function (res: { auths: Array<IAuth> }) {
         if (res && res.auths) {
           setBgAuths(res.auths)
@@ -29,8 +48,18 @@ export function useBackground() {
       }
     )
 
+    //Get passwords from bg
     chrome.runtime.sendMessage(
-      { wasClosed: true },
+      { action: MessageType.giveMePasswords },
+      function (res: { passwords: Array<Passwords> }) {
+        if (res && res.passwords) {
+          setBgPasswords(res.passwords)
+        }
+      }
+    )
+
+    chrome.runtime.sendMessage(
+      { action: MessageType.wasClosed },
       (res: { wasClosed: Boolean }) => {
         if (res.wasClosed) {
           setSafeLocked(true)
@@ -38,7 +67,7 @@ export function useBackground() {
       }
     )
 
-    //change URL
+    //CHange to switch
     browser.runtime.onMessage.addListener(function (request: {
       message: sharedBrowserEvents
       url: any
@@ -64,6 +93,14 @@ export function useBackground() {
         }
       }
     )
+
+    browser.runtime.onMessage.addListener(
+      (req: { passwords: Array<Passwords> }) => {
+        if (req.passwords) {
+          setBgPasswords(req.passwords)
+        }
+      }
+    )
   }, [])
 
   const backgroundState = {
@@ -73,18 +110,35 @@ export function useBackground() {
     isFilling,
     setSafeLockTime: async (lockTime: number | null) => {
       chrome.runtime.sendMessage({
+        action: MessageType.lockTime,
         lockTime: lockTime
       })
       setSafeLockTime(lockTime)
     },
     safeLockTime,
-    saveAuthsToBg: (value: IAuth[] | undefined) => {
+    savePasswordsToBg: (value: Passwords[] | undefined) => {
       chrome.runtime.sendMessage({
+        action: MessageType.passwords,
+        passwords: value
+      })
+
+      //@ts-expect-error
+      if (value?.length > 0) {
+        setBgPasswords(value)
+      } else {
+        setBgPasswords([])
+      }
+    },
+    saveAuthsToBg: (value: IAuth[] | undefined) => {
+      console.log('saving 02', value)
+      chrome.runtime.sendMessage({
+        action: MessageType.auths,
         auths: value
       })
       //@ts-expect-error
       if (value?.length > 0) {
         setBgAuths(value)
+        console.log('in', bgAuths)
       } else {
         setBgAuths([])
       }
@@ -92,7 +146,7 @@ export function useBackground() {
     bgAuths,
     startCount: () => {
       chrome.runtime.sendMessage(
-        { startCount: true },
+        { action: MessageType.startCount },
         (res: { isCounting: Boolean }) => {
           if (res.isCounting) {
             setIsCounting(true)
@@ -100,7 +154,11 @@ export function useBackground() {
         }
       )
     },
-    isCounting
+    isCounting,
+    bgPasswords,
+    setSettingsConfig: (config: Settings) => {
+      //Call bg script to save settings to bg, maybe Save it here to BD
+    }
   }
   // @ts-expect-error
   window.backgroundState = backgroundState

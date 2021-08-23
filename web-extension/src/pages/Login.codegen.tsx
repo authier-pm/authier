@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -9,24 +9,16 @@ export type LoginMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginMutation = (
-  { __typename?: 'Mutation' }
-  & { login: (
-    { __typename?: 'LoginResponse' }
-    & Pick<Types.LoginResponse, 'accessToken'>
-    & { auths?: Types.Maybe<(
-      { __typename?: 'EncryptedAuths' }
-      & Pick<Types.EncryptedAuths, 'encrypted'>
-    )> }
-  ) }
-);
+export type LoginMutation = { __typename?: 'Mutation', login?: Types.Maybe<{ __typename?: 'LoginResponse', accessToken: string, secrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }>> }> };
 
 
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     accessToken
-    auths {
+    secrets {
+      id
+      kind
       encrypted
     }
   }
