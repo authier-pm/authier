@@ -3,6 +3,7 @@
         "Authy",
         "Deduplication",
         "Fastify",
+        "TOTP",
         "appspot",
         "authier",
         "auths",
