@@ -39,6 +39,10 @@ module.exports = {
             plugins: ['macros']
           }
         }
+      },
+      {
+        test: /\.css$/i,
+        use: ['style-loader', 'css-loader']
       }
     ]
   },

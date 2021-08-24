@@ -1,17 +1,18 @@
 {
-    "cSpell.words": [
-        "Authy",
-        "Deduplication",
-        "Fastify",
-        "TOTP",
-        "appspot",
-        "authier",
-        "auths",
-        "firebaseapp",
-        "graphiql",
-        "mercurius",
-        "otplib",
-        "upsert",
-        "webextension"
-    ]
+  "cSpell.words": [
+    "Authy",
+    "Deduplication",
+    "Fastify",
+    "TOTP",
+    "appspot",
+    "authier",
+    "auths",
+    "firebaseapp",
+    "graphiql",
+    "mercurius",
+    "otplib",
+    "toastify",
+    "upsert",
+    "webextension"
+  ]
 }

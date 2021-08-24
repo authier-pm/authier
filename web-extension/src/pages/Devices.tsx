@@ -82,7 +82,7 @@ export default function Devices() {
 
       <Button
         onClick={() => {
-          setLocation('/QRcode')
+          setLocation('/qr-code')
         }}
       >
         Add device
