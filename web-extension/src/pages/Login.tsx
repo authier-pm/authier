@@ -22,13 +22,14 @@ import {
   setAccessToken,
   tokenFromLocalStorage
 } from '../util/accessToken'
-import { Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { useBackground } from '@src/util/useBackground'
+import { toast } from 'react-toastify'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -43,7 +44,7 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg: savePasswodsToBg } = useBackground()
+  const { savePasswordsToBg } = useBackground()
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -97,12 +98,14 @@ export default function Login(): ReactElement {
 
               if (decryptedPasswords) {
                 let loadCredentials = await JSON.parse(decryptedPasswords)
-                savePasswodsToBg(loadCredentials)
+                savePasswordsToBg(loadCredentials)
               }
               console.log('decrSecrets', decryptedAuths)
               console.log('decrSecrets', decryptedPasswords)
             }
             refetch()
+          } else {
+            toast.error(t`Login failed, check your password`)
           }
 
           setSubmitting(false)
@@ -170,26 +173,3 @@ export default function Login(): ReactElement {
     </Box>
   )
 }
-
-// let enc = new TextDecoder('utf-8')
-// let vaultKey = await VaultKey(
-//   Buffer.from(new Int16Array()),
-//   values.password + values.email
-// )
-
-// const rawVaultKey = await crypto.subtle.exportKey('raw', vaultKey)
-// let combined = enc.decode(rawVaultKey) + values.password
-
-// let keyMaterial = await window.crypto.subtle.importKey(
-//   'raw',
-//   Buffer.from(combined),
-//   'PBKDF2',
-//   false,
-//   ['deriveBits', 'deriveKey']
-// )
-// let authKey = await AuthKey(
-//   Buffer.from(new Int16Array()),
-//   keyMaterial
-// )
-
-// let rawAuthKey = await crypto.subtle.exportKey('raw', authKey)
