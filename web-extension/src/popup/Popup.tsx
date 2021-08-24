@@ -22,7 +22,7 @@ import cryptoJS from 'crypto-js'
 import { Menu } from '@src/pages/Menu'
 import Login from '@src/pages/Login'
 import Register from '@src/pages/Register'
-import QRcode from '@src/pages/QRcode'
+import { QRCode } from '@src/pages/QRcode'
 import {
   IsLoggedInQuery,
   useIsLoggedInQuery,
@@ -165,7 +165,7 @@ export const Popup: FunctionComponent = () => {
         <Route path="/" component={Home} />
         <Route path="/popup.html" component={Home} />
         <Route path="/menu" component={Menu} />
-        <Route path="/QRcode" component={QRcode} />
+        <Route path="/qr-code" component={QRCode} />
         <Route path="/devices" component={Devices} />
         <Route path="/settings" component={Settings} />
         <Route path="/verify" component={SafeUnlockVerification} />

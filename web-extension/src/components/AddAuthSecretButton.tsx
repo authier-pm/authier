@@ -1,4 +1,4 @@
-import { Button, useToast } from '@chakra-ui/react'
+import { Button } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import {
   executeScriptInCurrentTab,
@@ -9,6 +9,7 @@ import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { browser } from 'webextension-polyfill-ts'
+import { toast } from 'react-toastify'
 
 function getNextImageSrc() {
   const storageKey = 'authier.lastIndexOfScannedImage'
@@ -37,7 +38,6 @@ function getNextImageSrc() {
 }
 
 export const AddAuthSecretButton: React.FC<{}> = () => {
-  const toast = useToast()
   const { auths, setAuths } = useContext(AuthsContext)
 
   async function tryNextImage(): Promise<null | QRCode> {
@@ -66,10 +66,7 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
     }
 
     if (currentImageIndex === 0) {
-      toast({
-        title: t`could not find any QR code on the page`,
-        status: 'error'
-      })
+      toast.error(t`could not find any QR code on the page`)
       return null
     } else {
       return tryNextImage()
