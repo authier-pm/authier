@@ -1,5 +1,11 @@
 import { IAuth } from '@src/util/useBackground'
-import { fireToken, lockTime, passwords, setPasswords } from './backgroundPage'
+import {
+  fireToken,
+  lockTime,
+  passwords,
+  setLockTime,
+  setPasswords
+} from './backgroundPage'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -17,7 +23,8 @@ export enum MessageType {
   auths = 'auths',
   clear = 'clear',
   passwords = 'passwords',
-  settings = 'settings'
+  settings = 'settings',
+  giveMeSettings = 'giveMeSettings'
 }
 
 chrome.runtime.onMessage.addListener(function (
@@ -54,13 +61,20 @@ chrome.runtime.onMessage.addListener(function (
       sendResponse({ passwords: passwords })
       break
 
+    case MessageType.giveMeSettings:
+      sendResponse({
+        config: { vaultTime: lockTime, noHandsLogin: noHandsLogin }
+      })
+      break
+
     case MessageType.startCount:
       if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
         isCounting = false
       }
       if (!isCounting) {
         isCounting = true
-        setTimeout(() => {
+        let interval = setTimeout(() => {
+          clearTimeout(interval)
           isCounting = false
           safeClosed = true
           twoFAs = null
@@ -80,7 +94,7 @@ chrome.runtime.onMessage.addListener(function (
       safeClosed = false // ????? What is this why ?
       //@ts-expect-error
       twoFAs = req.auths
-      console.log('was set on', twoFAs)
+      console.log('Auths set on', twoFAs)
       break
 
     case MessageType.passwords:
@@ -91,6 +105,27 @@ chrome.runtime.onMessage.addListener(function (
     case MessageType.clear:
       twoFAs = undefined
       setPasswords([])
+      break
+
+    case MessageType.settings:
+      //@ts-expect-error
+      if (req.settings.vaultTime === 'On web close') {
+        setLockTime(0)
+        //@ts-expect-error
+      } else if (req.settings.vaultTime === '10 secconds') {
+        setLockTime(10000)
+        //@ts-expect-error
+      } else if (req.settings.vaultTime === '8 hours') {
+        setLockTime(1000 * 60 * 60 * 8)
+        //@ts-expect-error
+      } else if (req.settings.vaultTime === '12 hours') {
+        setLockTime(1000 * 60 * 60 * 12)
+      }
+
+      //@ts-expect-error
+      noHandsLogin = req.settings.noHandsLogin
+      //@ts-expect-error
+      console.log('config set on:', req.settings, lockTime, noHandsLogin)
       break
 
     default:
