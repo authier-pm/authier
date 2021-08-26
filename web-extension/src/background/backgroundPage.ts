@@ -60,6 +60,10 @@ export function setPasswords(val: any) {
   passwords = val
 }
 
+export function setLockTime(val: number) {
+  lockTime = val
+}
+
 broadcast.onmessage = (event) => {
   if (event.data.data.success === 'true') {
     console.log('sec', typeof otpCode)
@@ -147,7 +151,7 @@ function initInputWatch(credentials?: string) {
     }
   }
 
-  let submit = document.querySelector('#submit')
+  let submit = document.querySelector('#submit') // get the button with some diff way
 
   let username = loginFields[0]
   let password = loginFields[1]
