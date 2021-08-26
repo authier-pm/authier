@@ -1,6 +1,6 @@
 import { sharedBrowserEvents } from '@src/background/backgroundPage'
 import { MessageType } from '@src/background/chromeRuntimeListener'
-import { Settings } from '@src/pages/Settings'
+import { Config, Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
@@ -31,9 +31,8 @@ export function useBackground() {
   const [bgPasswords, setBgPasswords] = useState<Passwords[] | undefined>(
     undefined
   )
-  const [settingConfig, setSettingsConfig] = useState<Settings>({
-    NoHandsLogin: false,
-    TwoFA: false,
+  const [settingConfig, setSettingsConfig] = useState<Config>({
+    noHandsLogin: false,
     vaultTime: '12 hours'
   })
 
@@ -63,6 +62,16 @@ export function useBackground() {
       (res: { wasClosed: Boolean }) => {
         if (res.wasClosed) {
           setSafeLocked(true)
+        }
+      }
+    )
+
+    chrome.runtime.sendMessage(
+      { action: MessageType.giveMeSettings },
+      (res: { config: Config }) => {
+        if (res && res.config) {
+          console.log('test', res.config)
+          setSettingsConfig(res.config)
         }
       }
     )
@@ -156,9 +165,16 @@ export function useBackground() {
     },
     isCounting,
     bgPasswords,
-    setSettingsConfig: (config: Settings) => {
+    setSettingsConfig: (config: Config) => {
       //Call bg script to save settings to bg, maybe Save it here to BD
-    }
+      chrome.runtime.sendMessage({
+        action: MessageType.settings,
+        settings: config
+      })
+
+      setSettingsConfig(config)
+    },
+    settingConfig
   }
   // @ts-expect-error
   window.backgroundState = backgroundState

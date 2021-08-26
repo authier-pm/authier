@@ -19,11 +19,12 @@ export default function Routes(): ReactElement {
   //Change this is not ideal
   useEffect(() => {
     if (bgAuths === undefined && isApiLoggedIn) {
+      console.log('Help me pls')
       setIsVaultLocked(true)
     } else {
       setIsVaultLocked(false)
     }
-  }, [bgAuths])
+  }, [bgAuths, isApiLoggedIn])
 
   if (isVaultLocked) {
     return <SafeUnlockVerification />

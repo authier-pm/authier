@@ -16,40 +16,32 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import React from 'react'
 import { useBackground } from '@src/util/useBackground'
 
-export interface Settings {
+export interface Config {
   vaultTime: string
-  TwoFA: boolean
-  NoHandsLogin: boolean
+  noHandsLogin: boolean
 }
 
 export const Settings = () => {
-  const { setSafeLockTime } = useBackground()
+  const { setSettingsConfig } = useBackground()
+
   return (
     <Flex flexDirection="column" m={5}>
       <Heading>Security</Heading>
       <Formik
         initialValues={{
           vaultTime: '12 hours',
-          TwoFA: false,
-          NoHandsLogin: false
+          noHandsLogin: false
         }}
         onSubmit={async (
-          values: Settings,
-          { setSubmitting }: FormikHelpers<Settings>
+          values: Config,
+          { setSubmitting }: FormikHelpers<Config>
         ) => {
-          if (values.vaultTime === 'On web close') {
-            setSafeLockTime(0)
-          } else if (values.vaultTime === '10 secconds') {
-            setSafeLockTime(10000)
-          } else if (values.vaultTime === '8 hours') {
-            setSafeLockTime(1000 * 60 * 60 * 8)
-          } else if (values.vaultTime === '12 hours') {
-            setSafeLockTime(1000 * 60 * 60 * 12)
-          }
-
-          if (values.NoHandsLogin) {
-          }
           alert(JSON.stringify(values, null, 2))
+          setSettingsConfig({
+            vaultTime: values.vaultTime,
+            noHandsLogin: values.noHandsLogin
+          })
+
           setSubmitting(false)
         }}
       >
@@ -77,36 +69,19 @@ export const Settings = () => {
                 </FormControl>
               )}
             </Field>
-            <Field name="TwoFA">
-              {/* @ts-expect-error */}
-              {({ field, form }) => (
-                <FormControl
-                  isInvalid={form.errors.TwoFA && form.touched.TwoFA}
-                >
-                  <FormLabel htmlFor="TwoFA">
-                    2FA with (master) mobile phone
-                  </FormLabel>
-                  <Checkbox {...field} id="TwoFA">
-                    Checkbox
-                  </Checkbox>
-                  <FormErrorMessage>{form.errors.TwoFA}</FormErrorMessage>
-                </FormControl>
-              )}
-            </Field>
-            <Field name="NoHandsLogin">
+            <Field name="noHandsLogin">
               {/* @ts-expect-error */}
               {({ field, form }) => (
                 <FormControl
                   isInvalid={
-                    form.errors.NoHandsLogin && form.touched.NoHandsLogin
+                    form.errors.noHandsLogin && form.touched.noHandsLogin
                   }
                 >
-                  <FormLabel htmlFor="NoHandsLogin">No Hands login</FormLabel>
-                  <Checkbox {...field} id="NoHandsLogin">
-                    Checkbox
+                  <Checkbox {...field} id="noHandsLogin">
+                    No Hands login
                   </Checkbox>
                   <FormErrorMessage>
-                    {form.errors.NoHandsLogin}
+                    {form.errors.noHandsLogin}
                   </FormErrorMessage>
                 </FormControl>
               )}

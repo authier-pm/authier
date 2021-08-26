@@ -104,7 +104,6 @@ export const Popup: FunctionComponent = () => {
   }, [isAuth, fireToken])
 
   useEffect(() => {
-    console.log('secrets in bg', bgAuths)
     if (bgAuths) {
       console.log('got', bgAuths)
       setAuths(bgAuths)
