@@ -13,7 +13,7 @@ import React, { ReactElement } from 'react'
 interface Props {}
 
 export interface UISettings {
-  homeList: 'All' | 'TOTP' | 'Login credencials' | 'Current domain'
+  homeList: 'All' | 'TOTP & Login credencials' | 'Current domain'
 }
 
 export default function UI({}: Props): ReactElement {
@@ -44,8 +44,7 @@ export default function UI({}: Props): ReactElement {
                   <FormLabel htmlFor="homeList">Home list</FormLabel>
                   <Select {...field} id="homeList" mb={3}>
                     <option>All</option>
-                    <option>TOTP</option>
-                    <option>Login credencials</option>
+                    <option> TOTP & Login credencials</option>
                     <option>Current domain</option>
                   </Select>
                   <FormErrorMessage>{form.errors.homeList}</FormErrorMessage>
