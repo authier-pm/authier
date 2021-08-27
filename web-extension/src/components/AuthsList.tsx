@@ -23,6 +23,7 @@ import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
 import { LockIcon } from '@chakra-ui/icons'
 import { Passwords, useBackground } from '@src/util/useBackground'
+import { passwords } from '@src/background/backgroundPage'
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -123,7 +124,7 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
 export const AuthsList = () => {
   const [changeList, setChangeList] = useState<'OTP' | 'PSW'>('OTP')
   const { auths } = useContext(AuthsContext)
-  const { bgPasswords } = useBackground()
+  const { bgPasswords, UIConfig } = useBackground()
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
@@ -138,36 +139,85 @@ export const AuthsList = () => {
   return (
     <>
       <Flex justifyContent="space-evenly">
-        <Button
-          onClick={() => setChangeList('OTP')}
-          style={
-            changeList === 'OTP'
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          OTP
-        </Button>
-        <Button
-          onClick={() => setChangeList('PSW')}
-          style={
-            changeList === 'PSW'
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          Passwords
-        </Button>
+        {UIConfig.homeList === 'TOTP & Login credencials'
+          ? [
+              <Button
+                onClick={() => setChangeList('OTP')}
+                style={
+                  changeList === 'OTP'
+                    ? { fontWeight: 'bold' }
+                    : { fontWeight: 'normal' }
+                }
+                size="md"
+              >
+                OTP
+              </Button>,
+              <Button
+                onClick={() => setChangeList('PSW')}
+                style={
+                  changeList === 'PSW'
+                    ? { fontWeight: 'bold' }
+                    : { fontWeight: 'normal' }
+                }
+                size="md"
+              >
+                Passwords
+              </Button>
+            ]
+          : null}
       </Flex>
 
-      <Flex overflow="scroll" flexDirection="column" maxHeight={150}>
-        {auths && changeList === 'OTP'
+      <Flex overflow="auto" flexDirection="column" maxHeight={150}>
+        {UIConfig.homeList === 'All' && auths && bgPasswords
+          ? [
+              auths.map((auth, i) => {
+                console.log(auth)
+                return <OtpCode auth={auth} key={auth.label + i} />
+              }),
+              bgPasswords.map((psw, i) => {
+                return <Credentials psw={psw} key={psw.label + i} />
+              })
+            ]
+          : UIConfig.homeList === 'Current domain' && auths && bgPasswords
+          ? [
+              auths
+                .filter(({ originalUrl }) => {
+                  if (!currentTabUrl || !originalUrl) {
+                    return true
+                  }
+                  return (
+                    extractHostname(originalUrl) ===
+                    extractHostname(currentTabUrl)
+                  )
+                })
+                .map((auth, i) => {
+                  return <OtpCode auth={auth} key={auth.label + i} />
+                }),
+              bgPasswords
+                .filter(({ originalUrl }) => {
+                  if (!currentTabUrl || !originalUrl) {
+                    return true
+                  }
+                  return (
+                    extractHostname(originalUrl) ===
+                    extractHostname(currentTabUrl)
+                  )
+                })
+                .map((psw, i) => {
+                  return <Credentials psw={psw} key={psw.label + i} />
+                })
+            ]
+          : UIConfig.homeList === 'TOTP & Login credencials' &&
+            auths &&
+            bgPasswords &&
+            changeList === 'OTP'
           ? auths.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />
             })
-          : bgPasswords && changeList == 'PSW'
+          : UIConfig.homeList === 'TOTP & Login credencials' &&
+            auths &&
+            bgPasswords &&
+            changeList === 'PSW'
           ? bgPasswords.map((psw, i) => {
               return <Credentials psw={psw} key={psw.label + i} />
             })

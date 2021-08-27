@@ -13,7 +13,7 @@ export let twoFAs: Array<IAuth> | null | undefined = undefined
 let isCounting = false
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
-let homeList: 'All' | 'TOTP' | 'Login credencials' | 'Current domain' = 'All'
+let homeList: 'All' | 'TOTP & Login credencials' | 'Current domain' = 'All'
 
 export enum MessageType {
   giveMeAuths = 'GiveMeAuths',
