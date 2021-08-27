@@ -31,6 +31,19 @@ export enum MessageType {
   UISettings = 'UISettings'
 }
 
+const timeToString = (time: number) => {
+  console.log('lolo', time)
+  if (time === 0) {
+    return 'On web close'
+  } else if (time === 10000) {
+    return '10 secconds'
+  } else if (time === 28800000) {
+    return '8 hours'
+  } else if (time === 43200000) {
+    return '12 hours'
+  }
+}
+
 chrome.runtime.onMessage.addListener(function (
   req:
     | { action: MessageType }
@@ -67,9 +80,10 @@ chrome.runtime.onMessage.addListener(function (
 
     // Maybe connect to one bog config??
     case MessageType.giveSecuritySettings:
+      console.log(timeToString(lockTime))
       sendResponse({
         config: {
-          vaultTime: lockTime,
+          vaultTime: timeToString(lockTime),
           noHandsLogin: noHandsLogin
         }
       })

@@ -17,13 +17,12 @@ export interface UISettings {
 }
 
 export default function UI({}: Props): ReactElement {
-  const { setUISettings } = useBackground()
+  const { setUISettings, UIConfig } = useBackground()
   return (
     <>
       <Formik
-        initialValues={{
-          homeList: 'All'
-        }}
+        enableReinitialize
+        initialValues={UIConfig}
         onSubmit={async (
           values: UISettings,
           { setSubmitting }: FormikHelpers<UISettings>
