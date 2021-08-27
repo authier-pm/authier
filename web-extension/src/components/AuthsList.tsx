@@ -171,7 +171,6 @@ export const AuthsList = () => {
         {UIConfig.homeList === 'All' && auths && bgPasswords
           ? [
               auths.map((auth, i) => {
-                console.log(auth)
                 return <OtpCode auth={auth} key={auth.label + i} />
               }),
               bgPasswords.map((psw, i) => {
