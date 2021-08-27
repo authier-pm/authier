@@ -162,7 +162,7 @@ export const AuthsList = () => {
         </Button>
       </Flex>
 
-      <Flex overflow="auto" flexDirection="column" maxHeight={150}>
+      <Flex overflow="scroll" flexDirection="column" maxHeight={150}>
         {auths && changeList === 'OTP'
           ? auths.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />

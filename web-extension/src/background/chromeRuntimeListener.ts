@@ -1,4 +1,5 @@
-import { IAuth } from '@src/util/useBackground'
+import { UISettings } from '@src/components/setting-screens/UI'
+import { IAuth, SecuritySettings } from '@src/util/useBackground'
 import {
   fireToken,
   lockTime,
@@ -12,6 +13,7 @@ export let twoFAs: Array<IAuth> | null | undefined = undefined
 let isCounting = false
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
+let homeList: 'All' | 'TOTP' | 'Login credencials' | 'Current domain' = 'All'
 
 export enum MessageType {
   giveMeAuths = 'GiveMeAuths',
@@ -23,8 +25,10 @@ export enum MessageType {
   auths = 'auths',
   clear = 'clear',
   passwords = 'passwords',
-  settings = 'settings',
-  giveMeSettings = 'giveMeSettings'
+  securitySettings = 'securitySettings',
+  giveSecuritySettings = 'giveSecuritySettings',
+  giveUISettings = 'giveUISettings',
+  UISettings = 'UISettings'
 }
 
 chrome.runtime.onMessage.addListener(function (
@@ -61,11 +65,22 @@ chrome.runtime.onMessage.addListener(function (
       sendResponse({ passwords: passwords })
       break
 
-    case MessageType.giveMeSettings:
+    // Maybe connect to one bog config??
+    case MessageType.giveSecuritySettings:
       sendResponse({
-        config: { vaultTime: lockTime, noHandsLogin: noHandsLogin }
+        config: {
+          vaultTime: lockTime,
+          noHandsLogin: noHandsLogin
+        }
       })
       break
+
+    case MessageType.giveUISettings:
+      sendResponse({
+        config: {
+          homeList: homeList
+        }
+      })
 
     case MessageType.startCount:
       if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
@@ -107,7 +122,7 @@ chrome.runtime.onMessage.addListener(function (
       setPasswords([])
       break
 
-    case MessageType.settings:
+    case MessageType.securitySettings:
       //@ts-expect-error
       if (req.settings.vaultTime === 'On web close') {
         setLockTime(0)
@@ -126,6 +141,13 @@ chrome.runtime.onMessage.addListener(function (
       noHandsLogin = req.settings.noHandsLogin
       //@ts-expect-error
       console.log('config set on:', req.settings, lockTime, noHandsLogin)
+      break
+
+    case MessageType.UISettings:
+      //@ts-expect-error
+      homeList = req.config.homeList
+      //@ts-expect-error
+      console.log('UIconfig', req.config)
       break
 
     default:
