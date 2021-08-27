@@ -234,7 +234,7 @@ export class RootResolver {
           kind: event.kind,
           url: event.url,
           userId: event.userId,
-          ipAddress: '1'
+          ipAdress: '1'
         }
       })
       return true
