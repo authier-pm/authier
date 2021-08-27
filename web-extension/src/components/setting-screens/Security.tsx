@@ -13,14 +13,13 @@ import React, { ReactElement } from 'react'
 interface Props {}
 
 export default function Security({}: Props): ReactElement {
-  const { setSecuritySettings } = useBackground()
+  const { setSecuritySettings, securityConfig } = useBackground()
+
   return (
     <>
       <Formik
-        initialValues={{
-          vaultTime: '12 hours',
-          noHandsLogin: false
-        }}
+        enableReinitialize
+        initialValues={securityConfig}
         onSubmit={async (
           values: SecuritySettings,
           { setSubmitting }: FormikHelpers<SecuritySettings>
