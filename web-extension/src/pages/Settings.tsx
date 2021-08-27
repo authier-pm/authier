@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/layout'
 import {
-  Box,
+  Text,
   Button,
   Checkbox,
   FormControl,
