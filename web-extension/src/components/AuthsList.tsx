@@ -94,7 +94,7 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 
 const Credentials = ({ psw }: { psw: Passwords }) => {
   return (
-    <Box boxShadow="2xl" p="4" rounded="md" bg="white">
+    <Box p="4" rounded="md" bg="white">
       <Stat>
         <Flex justify="flex-start" align="center">
           <Avatar src={psw.icon} size="sm"></Avatar>
@@ -138,7 +138,7 @@ export const AuthsList = () => {
   return (
     <>
       <Flex justifyContent="space-evenly">
-        <Heading
+        <Button
           onClick={() => setChangeList('OTP')}
           style={
             changeList === 'OTP'
@@ -148,8 +148,8 @@ export const AuthsList = () => {
           size="md"
         >
           OTP
-        </Heading>
-        <Heading
+        </Button>
+        <Button
           onClick={() => setChangeList('PSW')}
           style={
             changeList === 'PSW'
@@ -159,27 +159,20 @@ export const AuthsList = () => {
           size="md"
         >
           Passwords
-        </Heading>
+        </Button>
       </Flex>
 
-      {auths && changeList === 'OTP'
-        ? auths
-            .filter(({ originalUrl, secret }) => {
-              if (!currentTabUrl || !originalUrl) {
-                return true
-              }
-              return (
-                extractHostname(originalUrl) === extractHostname(currentTabUrl)
-              )
-            })
-            .map((auth, i) => {
+      <Flex overflow="auto" flexDirection="column" maxHeight={150}>
+        {auths && changeList === 'OTP'
+          ? auths.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />
             })
-        : bgPasswords && changeList == 'PSW'
-        ? bgPasswords.map((psw, i) => {
-            return <Credentials psw={psw} key={psw.label + i} />
-          })
-        : null}
+          : bgPasswords && changeList == 'PSW'
+          ? bgPasswords.map((psw, i) => {
+              return <Credentials psw={psw} key={psw.label + i} />
+            })
+          : null}
+      </Flex>
     </>
   )
 }
