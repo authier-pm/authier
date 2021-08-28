@@ -13,17 +13,21 @@ import {
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
-import { CopyIcon, ViewIcon } from '@chakra-ui/icons'
+import { CopyIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
-import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
-import { LockIcon } from '@chakra-ui/icons'
+import { getUserFromToken } from '@src/util/accessToken'
 import { Passwords, useBackground } from '@src/util/useBackground'
-import { passwords } from '@src/background/backgroundPage'
+import { UIOptions } from './setting-screens/UI'
+
+enum Values {
+  passwords = 'PSW',
+  TOTP = 'OTP'
+}
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -122,7 +126,7 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
 }
 
 export const AuthsList = () => {
-  const [changeList, setChangeList] = useState<'OTP' | 'PSW'>('OTP')
+  const [changeList, setChangeList] = useState<Values>(Values.TOTP)
   const { auths } = useContext(AuthsContext)
   const { bgPasswords, UIConfig } = useBackground()
 
@@ -139,12 +143,12 @@ export const AuthsList = () => {
   return (
     <>
       <Flex justifyContent="space-evenly">
-        {UIConfig.homeList === 'TOTP & Login credencials'
+        {UIConfig.homeList === UIOptions.loginAndTOTP
           ? [
               <Button
-                onClick={() => setChangeList('OTP')}
+                onClick={() => setChangeList(Values.TOTP)}
                 style={
-                  changeList === 'OTP'
+                  changeList === Values.TOTP
                     ? { fontWeight: 'bold' }
                     : { fontWeight: 'normal' }
                 }
@@ -153,9 +157,9 @@ export const AuthsList = () => {
                 OTP
               </Button>,
               <Button
-                onClick={() => setChangeList('PSW')}
+                onClick={() => setChangeList(Values.passwords)}
                 style={
-                  changeList === 'PSW'
+                  changeList === Values.passwords
                     ? { fontWeight: 'bold' }
                     : { fontWeight: 'normal' }
                 }
@@ -168,7 +172,7 @@ export const AuthsList = () => {
       </Flex>
 
       <Flex overflow="auto" flexDirection="column" maxHeight={150}>
-        {UIConfig.homeList === 'All' && auths && bgPasswords
+        {UIConfig.homeList === UIOptions.all && auths && bgPasswords
           ? [
               auths.map((auth, i) => {
                 return <OtpCode auth={auth} key={auth.label + i} />
@@ -177,7 +181,7 @@ export const AuthsList = () => {
                 return <Credentials psw={psw} key={psw.label + i} />
               })
             ]
-          : UIConfig.homeList === 'Current domain' && auths && bgPasswords
+          : UIConfig.homeList === UIOptions.byDomain && auths && bgPasswords
           ? [
               auths
                 .filter(({ originalUrl }) => {
@@ -206,17 +210,17 @@ export const AuthsList = () => {
                   return <Credentials psw={psw} key={psw.label + i} />
                 })
             ]
-          : UIConfig.homeList === 'TOTP & Login credencials' &&
+          : UIConfig.homeList === UIOptions.loginAndTOTP &&
             auths &&
             bgPasswords &&
-            changeList === 'OTP'
+            changeList === Values.TOTP
           ? auths.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />
             })
-          : UIConfig.homeList === 'TOTP & Login credencials' &&
+          : UIConfig.homeList === UIOptions.loginAndTOTP &&
             auths &&
             bgPasswords &&
-            changeList === 'PSW'
+            changeList === Values.passwords
           ? bgPasswords.map((psw, i) => {
               return <Credentials psw={psw} key={psw.label + i} />
             })
