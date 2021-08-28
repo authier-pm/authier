@@ -43,8 +43,6 @@ import { useBackground } from '@src/util/useBackground'
 import { Flex } from '@chakra-ui/react'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
-const messaging = getMessaging()
-
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
