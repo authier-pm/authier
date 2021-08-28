@@ -45,7 +45,7 @@ export const Home: FunctionComponent = () => {
 
   return (
     <>
-      <Flex position="sticky" align="center" p={4}>
+      <Flex position="sticky" align="center" pl={4} pr={4}>
         <CircularProgress
           min={1}
           max={30}
