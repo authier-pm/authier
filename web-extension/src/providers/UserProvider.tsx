@@ -1,5 +1,5 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
-import { MessageType } from '@src/background/chromeRuntimeListener'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
 import { useBackground } from '@src/util/useBackground'
@@ -55,7 +55,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     checkStorage()
 
     chrome.runtime.sendMessage(
-      { action: MessageType.getFirebaseToken },
+      { action: BackgroundMessageType.getFirebaseToken },
       (res: { t: string }) => {
         setFireToken(res.t)
       }

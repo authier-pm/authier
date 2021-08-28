@@ -28,6 +28,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
+      - name: Yarn install
+        run: yarn --frozen-lockfile
+
       - uses: dorny/paths-filter@v2
         id: changes
         with:
@@ -42,11 +45,10 @@ jobs:
               - 'web-extension/**'
               
         # run only if some file in 'src' folder was changed
-      - name: api install deps, check TS and run jest
+      - name: backend install deps, check TS and run jest
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
           yarn test
 
@@ -54,17 +56,15 @@ jobs:
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
-          yarn test
+          npm test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
-          yarn test
+          npm test
 
       # - uses: AlexxNB/caprover-action@v1
       #   with:
