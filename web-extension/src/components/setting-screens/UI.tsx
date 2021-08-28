@@ -12,6 +12,12 @@ import Select from 'react-select'
 
 interface Props {}
 
+export enum UIOptions {
+  loginAndTOTP = 'TOTP & Login credencials',
+  all = 'All',
+  byDomain = 'Current domain'
+}
+
 export interface UISettings {
   homeList: 'All' | 'TOTP & Login credencials' | 'Current domain'
 }

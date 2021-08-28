@@ -8,6 +8,7 @@ import {
   setPasswords
 } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
+import { isObject } from 'formik'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -16,19 +17,20 @@ let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: 'All' | 'TOTP & Login credencials' | 'Current domain' = 'All'
 
-
-
 const timeToString = (time: number) => {
-  console.log('lolo', time)
-  if (time === 0) {
-    return 'On web close'
-  } else if (time === 10000) {
-    return '10 secconds'
-  } else if (time === 28800000) {
-    return '8 hours'
-  } else if (time === 43200000) {
-    return '12 hours'
+  const obj = {
+    'On web close': 0,
+    '10 secconds': 10000,
+    '8 hours': 28800000,
+    '12 hours': 43200000
   }
+
+  Object.keys(obj).map((key) => {
+    //@ts-expect-error
+    if (obj[key] === time) {
+      return key
+    }
+  })
 }
 
 chrome.runtime.onMessage.addListener(function (
