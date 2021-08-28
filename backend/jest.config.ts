@@ -2,7 +2,7 @@
 // https://jestjs.io/docs/en/configuration.html
 const { jsWithTs: tsjPreset } = require('ts-jest/presets')
 
-module.exports = {
+export default {
   moduleFileExtensions: ['js', 'json', 'jsx', 'ts', 'tsx', 'node'],
   // A map from regular expressions to module names that allow to stub out resources with a single module
   moduleNameMapper: {
@@ -18,5 +18,10 @@ module.exports = {
 
   transform: {
     ...tsjPreset.transform
+  },
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
   }
 }

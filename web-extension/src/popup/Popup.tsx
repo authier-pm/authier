@@ -14,7 +14,7 @@ import { Home } from '../pages/Home'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
-import { sharedBrowserEvents } from '@src/background/backgroundPage'
+import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
@@ -146,11 +146,11 @@ export const Popup: FunctionComponent = () => {
     browser.runtime.sendMessage({ popupMounted: true })
 
     browser.runtime.onMessage.addListener(function (request: {
-      message: sharedBrowserEvents
+      message: SharedBrowserEvents
       url: any
     }) {
       // listen for messages sent from background.js
-      if (request.message === sharedBrowserEvents.URL_CHANGED) {
+      if (request.message === SharedBrowserEvents.URL_CHANGED) {
         //setCurrURL(request.url)
         console.log('new url', request.url) // new url is now in content scripts!
       }
