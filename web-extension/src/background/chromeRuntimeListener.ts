@@ -7,6 +7,7 @@ import {
   setLockTime,
   setPasswords
 } from './backgroundPage'
+import { BackgroundMessageType } from './BackgroundMessageType'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -15,21 +16,7 @@ let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: 'All' | 'TOTP & Login credencials' | 'Current domain' = 'All'
 
-export enum MessageType {
-  giveMeAuths = 'GiveMeAuths',
-  getFirebaseToken = 'getFirebaseToken',
-  wasClosed = 'wasClosed',
-  giveMePasswords = 'giveMePasswords',
-  startCount = 'startCount',
-  lockTime = 'lockTime',
-  auths = 'auths',
-  clear = 'clear',
-  passwords = 'passwords',
-  securitySettings = 'securitySettings',
-  giveSecuritySettings = 'giveSecuritySettings',
-  giveUISettings = 'giveUISettings',
-  UISettings = 'UISettings'
-}
+
 
 const timeToString = (time: number) => {
   console.log('lolo', time)
@@ -46,7 +33,7 @@ const timeToString = (time: number) => {
 
 chrome.runtime.onMessage.addListener(function (
   req:
-    | { action: MessageType }
+    | { action: BackgroundMessageType }
     | {
         action: 'lockTime' | 'auths'
         lockTime: number
@@ -58,28 +45,28 @@ chrome.runtime.onMessage.addListener(function (
   sendResponse
 ) {
   switch (req.action) {
-    case MessageType.giveMeAuths:
+    case BackgroundMessageType.giveMeAuths:
       console.log('sending twoFAs', twoFAs)
       sendResponse({ auths: twoFAs })
       break
 
-    case MessageType.getFirebaseToken:
+    case BackgroundMessageType.getFirebaseToken:
       console.log('fireToken in Bg script:', fireToken)
       sendResponse({ t: fireToken })
       break
 
-    case MessageType.wasClosed:
+    case BackgroundMessageType.wasClosed:
       console.log('isClosed', safeClosed, 'lockTime', lockTime)
       sendResponse({ wasClosed: safeClosed })
       break
 
-    case MessageType.giveMePasswords:
+    case BackgroundMessageType.giveMePasswords:
       console.log('sending passwords', passwords)
       sendResponse({ passwords: passwords })
       break
 
     // Maybe connect to one bog config??
-    case MessageType.giveSecuritySettings:
+    case BackgroundMessageType.giveSecuritySettings:
       console.log(timeToString(lockTime))
       sendResponse({
         config: {
@@ -89,14 +76,14 @@ chrome.runtime.onMessage.addListener(function (
       })
       break
 
-    case MessageType.giveUISettings:
+    case BackgroundMessageType.giveUISettings:
       sendResponse({
         config: {
           homeList: homeList
         }
       })
 
-    case MessageType.startCount:
+    case BackgroundMessageType.startCount:
       if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
         isCounting = false
       }
@@ -114,29 +101,29 @@ chrome.runtime.onMessage.addListener(function (
       }
       break
 
-    case MessageType.lockTime:
+    case BackgroundMessageType.lockTime:
       //@ts-expect-error
       lockTime = req.lockTime
       break
 
-    case MessageType.auths:
+    case BackgroundMessageType.auths:
       safeClosed = false // ????? What is this why ?
       //@ts-expect-error
       twoFAs = req.auths
       console.log('Auths set on', twoFAs)
       break
 
-    case MessageType.passwords:
+    case BackgroundMessageType.passwords:
       //@ts-expect-error
       setPasswords(req.passwords)
       break
 
-    case MessageType.clear:
+    case BackgroundMessageType.clear:
       twoFAs = undefined
       setPasswords([])
       break
 
-    case MessageType.securitySettings:
+    case BackgroundMessageType.securitySettings:
       //@ts-expect-error
       if (req.settings.vaultTime === 'On web close') {
         setLockTime(0)
@@ -157,7 +144,7 @@ chrome.runtime.onMessage.addListener(function (
       console.log('config set on:', req.settings, lockTime, noHandsLogin)
       break
 
-    case MessageType.UISettings:
+    case BackgroundMessageType.UISettings:
       //@ts-expect-error
       homeList = req.config.homeList
       //@ts-expect-error

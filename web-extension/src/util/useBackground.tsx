@@ -1,6 +1,7 @@
-import { sharedBrowserEvents } from '@src/background/backgroundPage'
-import { MessageType } from '@src/background/chromeRuntimeListener'
 import { UISettings } from '@src/components/setting-screens/UI'
+import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 
@@ -44,7 +45,7 @@ export function useBackground() {
   useEffect(() => {
     //Get auth from bg
     chrome.runtime.sendMessage(
-      { action: MessageType.giveMeAuths },
+      { action: BackgroundMessageType.giveMeAuths },
       function (res: { auths: Array<IAuth> }) {
         if (res && res.auths) {
           setBgAuths(res.auths)
@@ -54,7 +55,7 @@ export function useBackground() {
 
     //Get passwords from bg
     chrome.runtime.sendMessage(
-      { action: MessageType.giveMePasswords },
+      { action: BackgroundMessageType.giveMePasswords },
       function (res: { passwords: Array<Passwords> }) {
         if (res && res.passwords) {
           setBgPasswords(res.passwords)
@@ -63,7 +64,7 @@ export function useBackground() {
     )
 
     chrome.runtime.sendMessage(
-      { action: MessageType.wasClosed },
+      { action: BackgroundMessageType.wasClosed },
       (res: { wasClosed: Boolean }) => {
         if (res.wasClosed) {
           setSafeLocked(true)
@@ -72,7 +73,7 @@ export function useBackground() {
     )
 
     chrome.runtime.sendMessage(
-      { action: MessageType.giveSecuritySettings },
+      { action: BackgroundMessageType.giveSecuritySettings },
       (res: { config: SecuritySettings }) => {
         if (res && res.config) {
           console.log('tesecuritySett:', res.config)
@@ -82,7 +83,7 @@ export function useBackground() {
     )
 
     chrome.runtime.sendMessage(
-      { action: MessageType.giveUISettings },
+      { action: BackgroundMessageType.giveUISettings },
       (res: { config: UISettings }) => {
         if (res.config) {
           console.log('UiSEttings', res.config)
@@ -93,12 +94,12 @@ export function useBackground() {
 
     //CHange to switch
     browser.runtime.onMessage.addListener(function (request: {
-      message: sharedBrowserEvents
+      message: SharedBrowserEvents
       url: any
     }) {
       console.log(request)
       // listen for messages sent from background.js
-      if (request.message === sharedBrowserEvents.URL_CHANGED) {
+      if (request.message === SharedBrowserEvents.URL_CHANGED) {
         setCurrURL(request.url)
       }
     })
@@ -134,7 +135,7 @@ export function useBackground() {
     isFilling,
     setSafeLockTime: async (lockTime: number | null) => {
       chrome.runtime.sendMessage({
-        action: MessageType.lockTime,
+        action: BackgroundMessageType.lockTime,
         lockTime: lockTime
       })
       setSafeLockTime(lockTime)
@@ -142,7 +143,7 @@ export function useBackground() {
     safeLockTime,
     savePasswordsToBg: (value: Passwords[] | undefined) => {
       chrome.runtime.sendMessage({
-        action: MessageType.passwords,
+        action: BackgroundMessageType.passwords,
         passwords: value
       })
 
@@ -156,7 +157,7 @@ export function useBackground() {
     saveAuthsToBg: (value: IAuth[] | undefined) => {
       console.log('saving 02', value)
       chrome.runtime.sendMessage({
-        action: MessageType.auths,
+        action: BackgroundMessageType.auths,
         auths: value
       })
       //@ts-expect-error
@@ -170,7 +171,7 @@ export function useBackground() {
     bgAuths,
     startCount: () => {
       chrome.runtime.sendMessage(
-        { action: MessageType.startCount },
+        { action: BackgroundMessageType.startCount },
         (res: { isCounting: Boolean }) => {
           if (res.isCounting) {
             setIsCounting(true)
@@ -184,7 +185,7 @@ export function useBackground() {
       setSecurityConfig(config)
       //Call bg script to save settings to bg, maybe Save it here to BD
       chrome.runtime.sendMessage({
-        action: MessageType.securitySettings,
+        action: BackgroundMessageType.securitySettings,
         settings: config
       })
     },
@@ -193,7 +194,7 @@ export function useBackground() {
       setUIConfig(config)
       console.log('sending', config)
       chrome.runtime.sendMessage({
-        action: MessageType.UISettings,
+        action: BackgroundMessageType.UISettings,
         config: config
       })
     },

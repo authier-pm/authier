@@ -6,6 +6,7 @@ import { getMessaging, getToken } from 'firebase/messaging'
 import { twoFAs } from './chromeRuntimeListener'
 import { Passwords } from '@src/util/useBackground'
 import { noHandsLogin } from './chromeRuntimeListener'
+import { SharedBrowserEvents } from './SharedBrowserEvents'
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -23,10 +24,6 @@ interface IAuth {
   icon: string | undefined
   lastUsed?: Date | null
   originalUrl: string | undefined
-}
-
-export enum sharedBrowserEvents {
-  URL_CHANGED = 'URL_CHANGED'
 }
 
 const firebaseApp = initializeApp(firebaseConfig)
@@ -203,7 +200,7 @@ const currentPageInfo: chrome.tabs.TabChangeInfo & {
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   if (changeInfo.url) {
     chrome.tabs.sendMessage(tabId, {
-      message: sharedBrowserEvents.URL_CHANGED,
+      message: SharedBrowserEvents.URL_CHANGED,
       url: changeInfo.url
     })
 
