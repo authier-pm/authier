@@ -13,16 +13,21 @@ import {
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
-import { CopyIcon, ViewIcon } from '@chakra-ui/icons'
+import { CopyIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
-import { getUserFromToken, tokenFromLocalStorage } from '@src/util/accessToken'
-import { LockIcon } from '@chakra-ui/icons'
+import { getUserFromToken } from '@src/util/accessToken'
 import { Passwords, useBackground } from '@src/util/useBackground'
+import { UIOptions } from './setting-screens/UI'
+
+enum Values {
+  passwords = 'PSW',
+  TOTP = 'OTP'
+}
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -94,7 +99,7 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 
 const Credentials = ({ psw }: { psw: Passwords }) => {
   return (
-    <Box boxShadow="2xl" p="4" rounded="md" bg="white">
+    <Box p="4" rounded="md" bg="white">
       <Stat>
         <Flex justify="flex-start" align="center">
           <Avatar src={psw.icon} size="sm"></Avatar>
@@ -121,9 +126,9 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
 }
 
 export const AuthsList = () => {
-  const [changeList, setChangeList] = useState<'OTP' | 'PSW'>('OTP')
+  const [changeList, setChangeList] = useState<Values>(Values.TOTP)
   const { auths } = useContext(AuthsContext)
-  const { bgPasswords } = useBackground()
+  const { bgPasswords, UIConfig } = useBackground()
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
@@ -138,48 +143,89 @@ export const AuthsList = () => {
   return (
     <>
       <Flex justifyContent="space-evenly">
-        <Heading
-          onClick={() => setChangeList('OTP')}
-          style={
-            changeList === 'OTP'
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          OTP
-        </Heading>
-        <Heading
-          onClick={() => setChangeList('PSW')}
-          style={
-            changeList === 'PSW'
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          Passwords
-        </Heading>
+        {UIConfig.homeList === UIOptions.loginAndTOTP
+          ? [
+              <Button
+                onClick={() => setChangeList(Values.TOTP)}
+                style={
+                  changeList === Values.TOTP
+                    ? { fontWeight: 'bold' }
+                    : { fontWeight: 'normal' }
+                }
+                size="md"
+              >
+                OTP
+              </Button>,
+              <Button
+                onClick={() => setChangeList(Values.passwords)}
+                style={
+                  changeList === Values.passwords
+                    ? { fontWeight: 'bold' }
+                    : { fontWeight: 'normal' }
+                }
+                size="md"
+              >
+                Passwords
+              </Button>
+            ]
+          : null}
       </Flex>
 
-      {auths && changeList === 'OTP'
-        ? auths
-            .filter(({ originalUrl, secret }) => {
-              if (!currentTabUrl || !originalUrl) {
-                return true
-              }
-              return (
-                extractHostname(originalUrl) === extractHostname(currentTabUrl)
-              )
-            })
-            .map((auth, i) => {
+      <Flex overflow="auto" flexDirection="column" maxHeight={150}>
+        {UIConfig.homeList === UIOptions.all && auths && bgPasswords
+          ? [
+              auths.map((auth, i) => {
+                return <OtpCode auth={auth} key={auth.label + i} />
+              }),
+              bgPasswords.map((psw, i) => {
+                return <Credentials psw={psw} key={psw.label + i} />
+              })
+            ]
+          : UIConfig.homeList === UIOptions.byDomain && auths && bgPasswords
+          ? [
+              auths
+                .filter(({ originalUrl }) => {
+                  if (!currentTabUrl || !originalUrl) {
+                    return true
+                  }
+                  return (
+                    extractHostname(originalUrl) ===
+                    extractHostname(currentTabUrl)
+                  )
+                })
+                .map((auth, i) => {
+                  return <OtpCode auth={auth} key={auth.label + i} />
+                }),
+              bgPasswords
+                .filter(({ originalUrl }) => {
+                  if (!currentTabUrl || !originalUrl) {
+                    return true
+                  }
+                  return (
+                    extractHostname(originalUrl) ===
+                    extractHostname(currentTabUrl)
+                  )
+                })
+                .map((psw, i) => {
+                  return <Credentials psw={psw} key={psw.label + i} />
+                })
+            ]
+          : UIConfig.homeList === UIOptions.loginAndTOTP &&
+            auths &&
+            bgPasswords &&
+            changeList === Values.TOTP
+          ? auths.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />
             })
-        : bgPasswords && changeList == 'PSW'
-        ? bgPasswords.map((psw, i) => {
-            return <Credentials psw={psw} key={psw.label + i} />
-          })
-        : null}
+          : UIConfig.homeList === UIOptions.loginAndTOTP &&
+            auths &&
+            bgPasswords &&
+            changeList === Values.passwords
+          ? bgPasswords.map((psw, i) => {
+              return <Credentials psw={psw} key={psw.label + i} />
+            })
+          : null}
+      </Flex>
     </>
   )
 }

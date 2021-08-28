@@ -8,5 +8,8 @@ export enum BackgroundMessageType {
   auths = 'auths',
   clear = 'clear',
   passwords = 'passwords',
-  settings = 'settings'
+  securitySettings = 'securitySettings',
+  giveSecuritySettings = 'giveSecuritySettings',
+  giveUISettings = 'giveUISettings',
+  UISettings = 'UISettings'
 }
