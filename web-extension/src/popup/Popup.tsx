@@ -40,6 +40,7 @@ import { deviceDetect } from 'react-device-detect'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/useBackground'
+import { Flex } from '@chakra-ui/react'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 const messaging = getMessaging()
@@ -104,7 +105,6 @@ export const Popup: FunctionComponent = () => {
   }, [isAuth, fireToken])
 
   useEffect(() => {
-    console.log('secrets in bg', bgAuths)
     if (bgAuths) {
       console.log('got', bgAuths)
       setAuths(bgAuths)
