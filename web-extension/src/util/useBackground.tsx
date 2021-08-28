@@ -1,3 +1,4 @@
+import { UISettings } from '@src/components/setting-screens/UI'
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { Settings } from '@src/pages/Settings'
@@ -20,6 +21,10 @@ export interface Passwords {
   password: string
   username: string
 }
+export interface SecuritySettings {
+  vaultTime: string
+  noHandsLogin: boolean
+}
 
 export function useBackground() {
   const [currURL, setCurrURL] = useState<string>('')
@@ -31,11 +36,11 @@ export function useBackground() {
   const [bgPasswords, setBgPasswords] = useState<Passwords[] | undefined>(
     undefined
   )
-  const [settingConfig, setSettingsConfig] = useState<Settings>({
-    NoHandsLogin: false,
-    TwoFA: false,
+  const [securityConfig, setSecurityConfig] = useState<SecuritySettings>({
+    noHandsLogin: false,
     vaultTime: '12 hours'
   })
+  const [UIConfig, setUIConfig] = useState<UISettings>({ homeList: 'All' })
 
   useEffect(() => {
     //Get auth from bg
@@ -63,6 +68,26 @@ export function useBackground() {
       (res: { wasClosed: Boolean }) => {
         if (res.wasClosed) {
           setSafeLocked(true)
+        }
+      }
+    )
+
+    chrome.runtime.sendMessage(
+      { action: BackgroundMessageType.giveSecuritySettings },
+      (res: { config: SecuritySettings }) => {
+        if (res && res.config) {
+          console.log('tesecuritySett:', res.config)
+          setSecurityConfig(res.config)
+        }
+      }
+    )
+
+    chrome.runtime.sendMessage(
+      { action: BackgroundMessageType.giveUISettings },
+      (res: { config: UISettings }) => {
+        if (res.config) {
+          console.log('UiSEttings', res.config)
+          setUIConfig(res.config)
         }
       }
     )
@@ -156,9 +181,24 @@ export function useBackground() {
     },
     isCounting,
     bgPasswords,
-    setSettingsConfig: (config: Settings) => {
+    setSecuritySettings: (config: SecuritySettings) => {
+      setSecurityConfig(config)
       //Call bg script to save settings to bg, maybe Save it here to BD
-    }
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.securitySettings,
+        settings: config
+      })
+    },
+    securityConfig,
+    setUISettings: (config: UISettings) => {
+      setUIConfig(config)
+      console.log('sending', config)
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.UISettings,
+        config: config
+      })
+    },
+    UIConfig
   }
   // @ts-expect-error
   window.backgroundState = backgroundState
