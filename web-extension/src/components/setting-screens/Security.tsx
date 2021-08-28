@@ -1,7 +1,6 @@
 import {
   FormControl,
   FormLabel,
-  Select,
   FormErrorMessage,
   Checkbox,
   Button
@@ -9,8 +8,16 @@ import {
 import { SecuritySettings, useBackground } from '@src/util/useBackground'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import React, { ReactElement } from 'react'
+import Select from 'react-select'
 
 interface Props {}
+
+const options = [
+  { value: 'On web close', label: 'On web close' },
+  { value: '10 secconds', label: '10 secconds' },
+  { value: '8 hours', label: '8 hours' },
+  { value: '12 hours', label: '12 hours' }
+]
 
 export default function Security({}: Props): ReactElement {
   const { setSecuritySettings, securityConfig } = useBackground()
@@ -43,16 +50,22 @@ export default function Security({}: Props): ReactElement {
                 >
                   <FormLabel htmlFor="vaultTime">Safe lock time</FormLabel>
                   <Select
-                    {...field}
+                    options={options}
+                    name={field.name}
+                    //@ts-expect-error
+                    value={
+                      options
+                        ? options.find((option) => option.value === field.value)
+                        : ''
+                    }
+                    onChange={(option) =>
+                      //@ts-expect-error
+                      form.setFieldValue(field.name, option.value)
+                    }
+                    onBlur={field.onBlur}
                     id="vaultTime"
-                    placeholder="Select country"
                     mb={3}
-                  >
-                    <option>On web close</option>
-                    <option>10 secconds</option>
-                    <option>8 hours</option>
-                    <option>12 hours</option>
-                  </Select>
+                  />
                   <FormErrorMessage>{form.errors.vaultTime}</FormErrorMessage>
                 </FormControl>
               )}
