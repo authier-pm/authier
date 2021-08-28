@@ -1,5 +1,4 @@
-import { UISettings } from '@src/components/setting-screens/UI'
-import { IAuth, SecuritySettings } from '@src/util/useBackground'
+import { IAuth } from '@src/util/useBackground'
 import {
   fireToken,
   lockTime,
@@ -8,7 +7,6 @@ import {
   setPasswords
 } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
-import { isObject } from 'formik'
 
 export let twoFAs: Array<IAuth> | null | undefined = undefined
 
@@ -67,9 +65,7 @@ chrome.runtime.onMessage.addListener(function (
       sendResponse({ passwords: passwords })
       break
 
-    // Maybe connect to one bog config??
     case BackgroundMessageType.giveSecuritySettings:
-      console.log(timeToString(lockTime))
       sendResponse({
         config: {
           vaultTime: timeToString(lockTime),
