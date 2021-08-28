@@ -14,3 +14,7 @@ or both at once
 ```shell
 yarn schemas
 ```
+
+## Getting started
+
+`yarn` in the root, yarn workspaces should install all deps even in subfolders.

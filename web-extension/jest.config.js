@@ -83,13 +83,13 @@ module.exports = {
   // Allows you to use a custom runner instead of Jest's default test runner
   // runner: "jest-runner",
   // The paths to modules that run some code to configure or set up the testing environment before each test
-  // setupFiles: [],
+  setupFilesAfterEnv: ['./test/setupTests.ts'],
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
   // setupFilesAfterEnv: [],
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
   // snapshotSerializers: [],
   // The test environment that will be used for testing
-  // testEnvironment: "jest-environment-jsdom",
+  testEnvironment: 'jest-environment-jsdom',
   // Options that will be passed to the testEnvironment
   // testEnvironmentOptions: {},
   // Adds a location field to test results
@@ -115,7 +115,7 @@ module.exports = {
   // transform: null,
   transform: {
     '\\.tsx?$': 'ts-jest'
-  }
+  },
   // An array of regexp pattern strings that are matched against all source file paths, matched files will skip transformation
   // transformIgnorePatterns: ["/node_modules/"],
   // An array of regexp pattern strings that are matched against all modules before the module loader will automatically return a mock for them
@@ -126,4 +126,9 @@ module.exports = {
   // watchPathIgnorePatterns: [],
   // Whether to use watchman for file crawling
   // watchman: true,
+  globals: {
+    'ts-jest': {
+      diagnostics: false
+    }
+  }
 }

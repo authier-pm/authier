@@ -1,0 +1,121 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`component renders 1`] = `
+Array [
+  <div
+    className="css-x8g1ll"
+  >
+    <a
+      className=""
+      href="/menu"
+      onClick={[Function]}
+      to={null}
+    >
+      <button
+        aria-label="menu"
+        className="chakra-button css-198bfjk"
+        onClick={[Function]}
+        type="button"
+      >
+        <svg
+          aria-hidden={true}
+          className="chakra-icon css-onkibi"
+          focusable={false}
+          viewBox="0 0 24 24"
+        >
+          <path
+            d="M 3 5 A 1.0001 1.0001 0 1 0 3 7 L 21 7 A 1.0001 1.0001 0 1 0 21 5 L 3 5 z M 3 11 A 1.0001 1.0001 0 1 0 3 13 L 21 13 A 1.0001 1.0001 0 1 0 21 11 L 3 11 z M 3 17 A 1.0001 1.0001 0 1 0 3 19 L 21 19 A 1.0001 1.0001 0 1 0 21 17 L 3 17 z"
+            fill="currentColor"
+          />
+        </svg>
+      </button>
+    </a>
+  </div>,
+  <div
+    className="css-1ix42a2"
+  >
+    <div
+      aria-valuemax={30}
+      aria-valuemin={1}
+      aria-valuenow={3}
+      aria-valuetext="27"
+      className="chakra-progress css-tjl1h7"
+      role="progressbar"
+    >
+      <svg
+        className="css-1ngw63v"
+        viewBox="0 0 100 100"
+      >
+        <circle
+          className="chakra-progress__track css-1bhxzgy"
+          cx={50}
+          cy={50}
+          r={42}
+          strokeWidth="10px"
+        />
+        <circle
+          className="chakra-progress__indicator css-5hfhx0"
+          cx={50}
+          cy={50}
+          r={42}
+          strokeDasharray="18.20689655172414 245.79310344827587"
+          strokeDashoffset={66}
+          strokeWidth="10px"
+        />
+      </svg>
+    </div>
+    <button
+      className="chakra-button btn btn-block btn-outline-dark css-1gnwiah"
+      onClick={[Function]}
+      type="button"
+    >
+      Add new code
+    </button>
+    <h2
+      className="chakra-heading css-0"
+    >
+      <button
+        className="chakra-button css-5c2176"
+        onClick={[Function]}
+        type="button"
+      >
+        Logout
+      </button>
+    </h2>
+  </div>,
+  <div
+    className="css-jl1hg7"
+  >
+    <div
+      className="css-7ljks2"
+    >
+      <div
+        className="css-102lqhp"
+      >
+        <h2
+          className="chakra-heading css-0"
+          onClick={[Function]}
+          style={
+            Object {
+              "fontWeight": "bold",
+            }
+          }
+        >
+          OTP
+        </h2>
+        <h2
+          className="chakra-heading css-0"
+          onClick={[Function]}
+          style={
+            Object {
+              "fontWeight": "normal",
+            }
+          }
+        >
+          Passwords
+        </h2>
+      </div>
+    </div>
+  </div>,
+]
+`;
