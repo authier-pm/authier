@@ -234,7 +234,7 @@ export class RootResolver {
           kind: event.kind,
           url: event.url,
           userId: event.userId,
-          ipAdress: '1'
+          ipAddress: '1' // TODO get from ctx.req
         }
       })
       return true

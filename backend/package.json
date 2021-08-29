@@ -20,7 +20,7 @@
     "graphql-scalars": "^1.10.0",
     "jsonwebtoken": "^8.5.1",
     "mercurius": "^8.1.3",
-    "prisma": "2.29.1",
+    "prisma": "2.30.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.2.1",
     "type-graphql": "^1.1.1",
@@ -28,8 +28,9 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "mz": "^2.7.0",
     "nodemon": "^2.0.12",
-    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma@^0.14.10"
+    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma@^0.14.11"
   },
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only server.ts",
@@ -43,6 +44,7 @@
     "DbPush": "prisma db push",
     "generate": "prisma generate",
     "test": "jest",
+    "tsc": "tsc",
     "start": "prisma migrate deploy && prisma generate && node server.js",
     "tar": "tar -czvf authier-api.tar.gz -C ./dist ."
   }

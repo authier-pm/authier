@@ -10,7 +10,8 @@ import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { gqlSchema } from '../../backend/schemas/gqlSchema'
+//@ts-expect-error
+import { gqlSchema } from 'gqlSchemas'
 import { i18n } from '@lingui/core'
 
 export const makeSsrClient = (ctx: any) => {
