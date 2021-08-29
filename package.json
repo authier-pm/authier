@@ -28,10 +28,12 @@
     "@graphql-codegen/typescript-react-apollo": "3.1.2",
     "@types/jest": "^27.0.1",
     "jest": "^27.1.0",
-    "ts-jest": "^27.0.5"
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.4.2"
   },
   "scripts": {
     "dev": "cd backend && npm run dev",
+    "tsc": "tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",
