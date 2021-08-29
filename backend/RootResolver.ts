@@ -30,6 +30,7 @@ export interface IContext {
   request: RawRequestDefaultExpression
   reply: FastifyReply
   jwtPayload?: { userId: string }
+  getIpAddress: () => string
 }
 
 export interface Payload {
@@ -125,10 +126,7 @@ export class RootResolver {
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() context: IContext
   ) {
-    // @ts-expect-error
-    const ipAddress: string =
-      context.request.headers['x-forwarded-for'] ||
-      context.request.socket.remoteAddress
+    const ipAddress = context.getIpAddress()
 
     return prisma.device.create({
       data: {
@@ -227,14 +225,17 @@ export class RootResolver {
   }
 
   @Mutation(() => Boolean)
-  async addOTPEvent(@Arg('data', () => OTPEvent) event: OTPEvent) {
+  async addOTPEvent(
+    @Arg('data', () => OTPEvent) event: OTPEvent,
+    @Ctx() context: IContext
+  ) {
     try {
       await prisma.oTPCodeEvent.create({
         data: {
           kind: event.kind,
           url: event.url,
           userId: event.userId,
-          ipAddress: '1' // TODO get from ctx.req
+          ipAddress: context.getIpAddress()
         }
       })
       return true
@@ -254,10 +255,7 @@ export class RootResolver {
     console.log(context)
     const hashedPassword = await hash(password, 12)
 
-    //@ts-expect-error
-    const ipAddress: string =
-      context.request.headers['x-forwarded-for'] ||
-      context.request.socket.remoteAddress
+    const ipAddress = context.getIpAddress()
 
     try {
       let user = await prisma.user.create({
