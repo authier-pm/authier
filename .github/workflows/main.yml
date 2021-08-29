@@ -49,13 +49,15 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
+          yarn --frozen-lockfile
           yarn tsc
-          yarn test
+          npm test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true' || steps.changes.outputs.backend == 'true'
         run: |
+          yarn --frozen-lockfile
           yarn tsc
           npm test
 
@@ -63,6 +65,7 @@ jobs:
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
+          yarn --frozen-lockfile
           yarn tsc
           npm test
 

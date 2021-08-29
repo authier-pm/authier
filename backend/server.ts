@@ -65,7 +65,12 @@ async function main() {
     schema: gqlSchema,
     graphiql: true,
     context: (request, reply) => {
-      return { request, reply }
+      const getIpAddress = () => {
+        return (
+          request.headers['x-forwarded-for'] || request.socket.remoteAddress
+        )
+      }
+      return { request, reply, getIpAddress }
     },
     errorFormatter: (res, ctx) => {
       if (env.NODE_ENV === 'production') {
