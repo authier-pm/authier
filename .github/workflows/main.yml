@@ -51,7 +51,7 @@ jobs:
         run: |
           yarn
           yarn tsc
-          yarn test
+          npm test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
