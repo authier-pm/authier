@@ -23,7 +23,6 @@
     "@types/react": "^17",
     "apollo-link-http": "^1.5.17",
     "graphql": "^15.5.1",
-    "mz": "^2.7.0",
     "native-base": "^3.0.6",
     "otp-client": "^1.0.3",
     "react": "17.0.1",
