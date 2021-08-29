@@ -8,7 +8,7 @@ import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
 import { AuthsContext } from '../providers/AuthsProvider'
-import { browser } from 'webextension-polyfill-ts'
+import { browser, Tabs } from 'webextension-polyfill-ts'
 import { toast } from 'react-toastify'
 
 function getNextImageSrc() {
@@ -76,35 +76,16 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
   const addToAuths = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
-    const qrDataParts = qr.data.split('?secret=')
     if (!tab) {
       return
     }
-    console.log('test', auths)
 
+    console.log('test', auths)
+    const twoFAItem = getTokenSecretFromQrCode(qr, tab)
     if (auths === undefined) {
-      setAuths([
-        {
-          secret: qrDataParts[1],
-          icon: tab.favIconUrl,
-          label: decodeURIComponent(
-            qrDataParts[0].replace('otpauth://totp/', '')
-          ),
-          originalUrl: tab.url
-        }
-      ])
+      setAuths([twoFAItem])
     } else {
-      setAuths([
-        {
-          secret: qrDataParts[1],
-          icon: tab.favIconUrl,
-          label: decodeURIComponent(
-            qrDataParts[0].replace('otpauth://totp/', '')
-          ),
-          originalUrl: tab.url
-        },
-        ...auths
-      ])
+      setAuths([twoFAItem, ...auths])
     }
 
     toast({
@@ -136,4 +117,15 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
       Add new code
     </Button>
   )
+}
+
+export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
+  const qrDataParts = qr.data.split('?secret=')
+
+  return {
+    secret: qrDataParts[1],
+    icon: tab.favIconUrl,
+    label: decodeURIComponent(qrDataParts[0].replace('otpauth://totp/', '')),
+    originalUrl: tab.url
+  }
 }
