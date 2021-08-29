@@ -10,10 +10,11 @@ import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
 import { MemoryRouter } from 'react-router-dom'
-import { gqlSchema } from '../../backend/schemas/gqlSchema'
+//@ts-expect-error
+import { gqlSchema } from 'gqlSchemas'
 import { i18n } from '@lingui/core'
 
-export const makeSsrClient = (ctx) => {
+export const makeSsrClient = (ctx: any) => {
   return new ApolloClient({
     cache: new InMemoryCache(),
     ssrMode: true,
@@ -27,7 +28,10 @@ export const makeSsrClient = (ctx) => {
 /**
  * almost all of our FE components need these providers
  */
-export const wrapInFEProviders = (jsx: JSX.Element, client) => {
+export const wrapInFEProviders = (
+  jsx: JSX.Element,
+  client: ApolloClient<any>
+) => {
   return (
     <ApolloProvider client={client}>
       <I18nProvider i18n={i18n}>

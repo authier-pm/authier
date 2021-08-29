@@ -32,7 +32,7 @@ Array [
     </a>
   </div>,
   <div
-    className="css-1ix42a2"
+    className="css-1ihsxyn"
   >
     <div
       aria-valuemax={30}
@@ -91,30 +91,10 @@ Array [
     >
       <div
         className="css-102lqhp"
-      >
-        <h2
-          className="chakra-heading css-0"
-          onClick={[Function]}
-          style={
-            Object {
-              "fontWeight": "bold",
-            }
-          }
-        >
-          OTP
-        </h2>
-        <h2
-          className="chakra-heading css-0"
-          onClick={[Function]}
-          style={
-            Object {
-              "fontWeight": "normal",
-            }
-          }
-        >
-          Passwords
-        </h2>
-      </div>
+      />
+      <div
+        className="css-17usjmq"
+      />
     </div>
   </div>,
 ]
