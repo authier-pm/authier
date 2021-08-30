@@ -10,6 +10,7 @@ import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { browser, Tabs } from 'webextension-polyfill-ts'
 import { toast } from 'react-toastify'
+import queryString from 'query-string'
 
 function getNextImageSrc() {
   const storageKey = 'authier.lastIndexOfScannedImage'
@@ -120,12 +121,18 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
 }
 
 export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
-  const qrDataParts = qr.data.split('?secret=')
+  const parsedQuery = queryString.parseUrl(qr.data)
 
+  if (!parsedQuery.query.secret) {
+    console.error('QR code does not have any secret', qr.data)
+    throw new Error('QR code does not have any secret')
+  }
   return {
-    secret: qrDataParts[1],
+    secret: parsedQuery.query.secret,
     icon: tab.favIconUrl,
-    label: decodeURIComponent(qrDataParts[0].replace('otpauth://totp/', '')),
+    label:
+      parsedQuery.query.issuer ??
+      decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
     originalUrl: tab.url
   }
 }
