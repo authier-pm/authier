@@ -29,7 +29,10 @@ jobs:
             ${{ runner.os }}-yarn-
 
       - name: Yarn install
-        run: yarn --frozen-lockfile
+        run: |
+          yarn --frozen-lockfile
+          cd backend
+          yarn --frozen-lockfile
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -49,7 +52,6 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
           npm test
 
