@@ -71,7 +71,7 @@ export const Home: FunctionComponent = () => {
           </Button>
         </Heading>
       </Flex>
-      <Box height={200} width={300} p={5} mb={5}>
+      <Box height={200} width={330} p={5} mb={5}>
         <Grid gap={3} mb={5}>
           <AuthsList />
         </Grid>
