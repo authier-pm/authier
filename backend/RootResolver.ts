@@ -235,7 +235,7 @@ export class RootResolver {
           kind: event.kind,
           url: event.url,
           userId: event.userId,
-          ipAddress: context.getIpAddress()
+          ipAdress: context.getIpAddress()
         }
       })
       return true

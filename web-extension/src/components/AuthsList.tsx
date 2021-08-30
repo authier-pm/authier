@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useEffect, useRef, useState } from 'react'
 import {
   Avatar,
   Box,
@@ -9,11 +9,18 @@ import {
   StatNumber,
   useClipboard,
   Text,
-  Heading
+  Heading,
+  IconButton,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
-import { CopyIcon } from '@chakra-ui/icons'
+import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
@@ -23,6 +30,7 @@ import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessToken'
 import { Passwords, useBackground } from '@src/util/useBackground'
 import { UIOptions } from './setting-screens/UI'
+import RemoveAlertDialog from './RemoveAlertDialog'
 
 enum Values {
   passwords = 'PSW',
@@ -30,11 +38,17 @@ enum Values {
 }
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
+  const { saveAuthsToBg, bgAuths } = useBackground()
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(auth.secret)
-
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
+  const [isOpen, setIsOpen] = useState(false)
+  const cancelRef = useRef()
+  const onClose = () => {
+    setIsOpen(false)
+    saveAuthsToBg(bgAuths?.filter((i) => i.originalUrl !== auth.originalUrl))
+  }
 
   useEffect(() => {
     setShowWhole(false)
@@ -44,7 +58,28 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
     <Box boxShadow="2xl" p="4" rounded="md" bg="white">
       <Stat>
         <Flex justify="flex-start" align="center">
-          <Avatar src={auth.icon} size="sm"></Avatar>
+          <Flex flexDirection="column">
+            <IconButton
+              colorScheme="red"
+              aria-label="Delete item"
+              icon={<DeleteIcon />}
+              size="sm"
+              variant="link"
+              position="absolute"
+              zIndex="overlay"
+              top={-1}
+              left={-15}
+              onClick={() => setIsOpen(true)}
+            />
+
+            <RemoveAlertDialog
+              isOpen={isOpen}
+              cancelRef={cancelRef}
+              onClose={onClose}
+            />
+
+            <Avatar src={auth.icon} size="sm"></Avatar>
+          </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{auth.label}</StatLabel>
 
@@ -98,11 +133,42 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
 }
 
 const Credentials = ({ psw }: { psw: Passwords }) => {
+  const { savePasswordsToBg, bgPasswords } = useBackground()
+  const [isOpen, setIsOpen] = useState(false)
+  const cancelRef = useRef()
+  const onClose = () => {
+    setIsOpen(false)
+    savePasswordsToBg(
+      bgPasswords?.filter((i) => i.originalUrl !== psw.originalUrl)
+    )
+  }
+
   return (
-    <Box p="4" rounded="md" bg="white">
+    <Flex key={psw.originalUrl} p="4" rounded="md" bg="white">
       <Stat>
         <Flex justify="flex-start" align="center">
-          <Avatar src={psw.icon} size="sm"></Avatar>
+          <Flex flexDirection="column">
+            <IconButton
+              colorScheme="red"
+              aria-label="Delete item"
+              icon={<DeleteIcon />}
+              size="sm"
+              variant="link"
+              position="absolute"
+              zIndex="overlay"
+              top={-1}
+              left={-15}
+              onClick={() => setIsOpen(true)}
+            />
+
+            <RemoveAlertDialog
+              isOpen={isOpen}
+              cancelRef={cancelRef}
+              onClose={onClose}
+            />
+
+            <Avatar src={psw.icon} size="sm"></Avatar>
+          </Flex>
           <Box ml={4} mr="auto">
             <Heading size="sm">{psw.label}</Heading>
             <Text fontSize="lg">{psw.username}</Text>
@@ -121,7 +187,7 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
           </Button>
         </Flex>
       </Stat>
-    </Box>
+    </Flex>
   )
 }
 
