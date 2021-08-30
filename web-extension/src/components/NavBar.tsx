@@ -44,7 +44,7 @@ export const NavBar: FunctionComponent = () => {
       fontSize="16px"
       borderBottom="1px"
       borderBottomColor="gray.300"
-      width="315px"
+      width="330px"
     >
       <ActiveLink href={!isOut ? '/menu' : lastPage}>
         {location !== '/' ? (
