@@ -1,4 +1,4 @@
-name: Deploy Authier services
+name: Authier monorepo CI
 on:
   push:
     branches: [ main ]
