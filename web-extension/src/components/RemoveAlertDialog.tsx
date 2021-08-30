@@ -11,8 +11,8 @@ import React, { ReactElement } from 'react'
 
 interface Props {
   isOpen: boolean
-  onClose: any
-  cancelRef: any
+  onClose: () => void
+  cancelRef: any //<<=== Cant type this
 }
 
 export default function RemoveAlertDialog({
