@@ -128,10 +128,10 @@ export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
     throw new Error('QR code does not have any secret')
   }
   return {
-    secret: parsedQuery.query.secret,
+    secret: parsedQuery.query.secret as string,
     icon: tab.favIconUrl,
     label:
-      parsedQuery.query.issuer ??
+      (parsedQuery.query.issuer as string) ??
       decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
     originalUrl: tab.url
   }
