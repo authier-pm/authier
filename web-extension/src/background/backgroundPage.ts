@@ -136,9 +136,11 @@ type SessionStoredItem = {
   password: any
   originalUrl: string
   label: string
+  willSafe: boolean
 }
 
 function initInputWatch(credentials?: string) {
+  let confirm: boolean
   let loginFields: any = []
   let inputs = document.getElementsByTagName('input')
   for (let j = 0; j < inputs.length; j++) {
@@ -156,15 +158,50 @@ function initInputWatch(credentials?: string) {
   console.log(username, password)
 
   if (username && password) {
+    //@ts-expect-error
+    if (!credentials.username) {
+      let div = document.createElement('div')
+      div.style.height = '42%'
+      div.style.width = '100%'
+      div.style.position = 'fixed'
+      div.style.top = '0px'
+      div.style.left = '0px'
+      div.style.padding = '0px'
+
+      let saveButton = document.createElement('button')
+      saveButton.id = 'save'
+      saveButton.textContent = 'save'
+      saveButton.onclick = function () {
+        confirm = true
+        console.log('save', confirm)
+        div.remove()
+      }
+      div.appendChild(saveButton)
+
+      let closeButton = document.createElement('button')
+      closeButton.id = 'close'
+      closeButton.textContent = 'close'
+      closeButton.onclick = function () {
+        confirm = false
+        console.log('close', confirm)
+        div.remove()
+      }
+      div.appendChild(closeButton)
+
+      document.body.appendChild(div)
+    }
+
     document.body.addEventListener('click', (e) => {
       if (username.value && password.value) {
         const sessionStoredItem: SessionStoredItem = {
           username: username.value,
           password: password.value,
           originalUrl: location.href,
-          label: location.hostname
+          label: location.hostname,
+          willSafe: confirm
         }
         console.log('test', sessionStoredItem)
+
         sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
       }
     })
@@ -204,10 +241,10 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     })
 
     //Get username and password on register
-
     const pswd = passwords?.find((item) => {
       return item.originalUrl === changeInfo.url
     })
+
     await executeScriptInCurrentTab(
       `(` +
         initInputWatch.toString() +
@@ -224,24 +261,26 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         if (payload) {
           clearInterval(scanForItem)
           const item: SessionStoredItem = JSON.parse(payload)
-          const alreadyExists = passwords?.find((credentialItem) => {
-            return item.originalUrl === credentialItem.originalUrl
-          })
-          console.log('exists', alreadyExists)
-          console.log('~ item', item)
-          if (!alreadyExists) {
-            passwords?.push({
-              password: item.password,
-              username: item.username,
-              originalUrl: item.originalUrl,
-              label: item.label,
-              ...currentPageInfo
+          if (item.willSafe) {
+            const alreadyExists = passwords?.find((credentialItem) => {
+              return item.originalUrl === credentialItem.originalUrl
             })
+            console.log('exists', alreadyExists)
+            console.log('~ item', item)
+            if (!alreadyExists) {
+              passwords?.push({
+                password: item.password,
+                username: item.username,
+                originalUrl: item.originalUrl,
+                label: item.label,
+                ...currentPageInfo
+              })
 
-            chrome.runtime.sendMessage({ passwords: passwords })
+              chrome.runtime.sendMessage({ passwords: passwords })
+            }
+
+            console.log(passwords)
           }
-
-          console.log(passwords)
         }
       }, 1000)
     }
@@ -252,7 +291,8 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   if (twoFAs) {
     console.log('hasAuths', twoFAs)
     twoFAs.map(async (i) => {
-      if (_tab.url === i.originalUrl) {
+      //@ts-expect-error
+      if (_tab.url.search(i.label) !== -1) {
         otpCode = authenticator.generate(i.secret)
         console.log('first', otpCode)
         let a = await executeScriptInCurrentTab(
