@@ -17,7 +17,8 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "incremental": true
   },
   "exclude": ["../backend/**", "dist/**"],
   "include": ["./src/**/*", "../shared/errorLink.tsx"]
