@@ -21,5 +21,9 @@
     "incremental": true
   },
   "exclude": ["../backend/**", "dist/**"],
-  "include": ["./src/**/*", "../shared/errorLink.tsx"]
+  "include": [
+    "./src/**/*",
+    "../shared/errorLink.tsx",
+    "../shared/toastifyConfig.ts"
+  ]
 }
