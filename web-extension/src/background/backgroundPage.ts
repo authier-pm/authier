@@ -195,6 +195,7 @@ function getStoredCredentials() {
 const currentPageInfo: chrome.tabs.TabChangeInfo & {
   originalUrl: string
 } & any = {}
+
 // https://stackoverflow.com/questions/34957319/how-to-listen-for-url-change-with-chrome-extension
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
   if (changeInfo.url) {
