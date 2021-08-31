@@ -20,5 +20,5 @@
     "skipLibCheck": true
   },
   "exclude": ["../backend/**", "dist/**"],
-  "include": ["./src/**/*"]
+  "include": ["./src/**/*", "../shared/errorLink.tsx"]
 }

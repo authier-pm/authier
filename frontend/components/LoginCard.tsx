@@ -11,8 +11,12 @@ import React from 'react'
 import { Link } from './Link'
 import { InputControl, SubmitButton } from 'formik-chakra-ui'
 import { t } from '@lingui/macro'
+import { useLoginCardMutation } from './LoginCard.codegen'
 
 export function LoginCard() {
+  const [login, { data }] = useLoginCardMutation()
+  console.log('~ data', data)
+
   return (
     <Flex
       minH={'100vh'}
@@ -37,6 +41,12 @@ export function LoginCard() {
             initialValues={{ password: '', username: '' }}
             onSubmit={async (data) => {
               console.log(data)
+              await login({
+                variables: {
+                  email: data.username,
+                  password: data.password
+                }
+              })
             }}
           >
             {({ handleSubmit }) => {
