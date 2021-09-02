@@ -47,6 +47,7 @@ if ('serviceWorker' in navigator) {
   console.log('No service-worker on this browser')
 }
 
+//Null for logout, undefined for Chrome refresh
 export let passwords: Array<Passwords> = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
@@ -136,7 +137,7 @@ type SessionStoredItem = {
   password: any
   originalUrl: string
   label: string
-  willSafe: boolean
+  willSave: boolean
 }
 
 function initInputWatch(credentials?: string) {
@@ -198,7 +199,7 @@ function initInputWatch(credentials?: string) {
           password: password.value,
           originalUrl: location.href,
           label: location.hostname,
-          willSafe: confirm
+          willSave: confirm
         }
         console.log('test', sessionStoredItem)
 
@@ -234,15 +235,23 @@ const currentPageInfo: chrome.tabs.TabChangeInfo & {
 } & any = {}
 // https://stackoverflow.com/questions/34957319/how-to-listen-for-url-change-with-chrome-extension
 chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
-  if (changeInfo.url) {
+  // if (changeInfo.url) {
+  if (_tab.status === 'complete') {
     chrome.tabs.sendMessage(tabId, {
       message: SharedBrowserEvents.URL_CHANGED,
-      url: changeInfo.url
+      url: _tab.url
     })
 
     //Get username and password on register
     const pswd = passwords?.find((item) => {
-      return item.originalUrl === changeInfo.url
+      if (
+        _tab.url
+          ?.toLocaleLowerCase()
+          .search(item.originalUrl?.toLocaleLowerCase()) !== -1
+      ) {
+        return true
+      }
+      return false
     })
 
     await executeScriptInCurrentTab(
@@ -261,7 +270,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         if (payload) {
           clearInterval(scanForItem)
           const item: SessionStoredItem = JSON.parse(payload)
-          if (item.willSafe) {
+          if (item.willSave) {
             const alreadyExists = passwords?.find((credentialItem) => {
               return item.originalUrl === credentialItem.originalUrl
             })
@@ -284,15 +293,19 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         }
       }, 1000)
     }
-  } else {
-    Object.assign(currentPageInfo, changeInfo)
   }
+
+  // } else {
+  //   Object.assign(currentPageInfo, changeInfo)
+  // }
 
   if (twoFAs) {
     console.log('hasAuths', twoFAs)
     twoFAs.map(async (i) => {
-      //@ts-expect-error
-      if (_tab.url.search(i.label) !== -1) {
+      if (
+        _tab.url?.toLocaleLowerCase().search(i.label.toLocaleLowerCase()) !== -1
+      ) {
+        console.log('testtestest')
         otpCode = authenticator.generate(i.secret)
         console.log('first', otpCode)
         let a = await executeScriptInCurrentTab(
@@ -304,3 +317,44 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     })
   }
 })
+
+// function insertConfirm() {
+//   let confirm = false
+//   let div = document.createElement('div')
+//   div.style.height = '42%'
+//   div.style.width = '100%'
+//   div.style.position = 'fixed'
+//   div.style.top = '0px'
+//   div.style.left = '0px'
+//   div.style.padding = '0px'
+
+//   let saveButton = document.createElement('button')
+//   saveButton.id = 'save'
+//   saveButton.textContent = 'save'
+//   saveButton.onclick = function () {
+//     confirm = true
+//     console.log('save', confirm)
+//     sessionStorage.setItem('_test', JSON.stringify({ willSave: confirm }))
+//     div.remove()
+//   }
+//   div.appendChild(saveButton)
+
+//   let closeButton = document.createElement('button')
+//   closeButton.id = 'close'
+//   closeButton.textContent = 'close'
+//   closeButton.onclick = function () {
+//     confirm = false
+//     console.log('close', confirm)
+//     sessionStorage.setItem('_test', JSON.stringify({ willSave: confirm }))
+//     div.remove()
+//   }
+//   div.appendChild(closeButton)
+
+//   document.body.appendChild(div)
+// }
+
+// function getConfirm() {
+//   let test = sessionStorage.getItem('_test')
+//   sessionStorage.removeItem('_test')
+//   return test
+// }

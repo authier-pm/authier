@@ -16,15 +16,13 @@ export default function Routes(): ReactElement {
     useContext(UserContext)
   const { startCount, isCounting, safeLocked, bgAuths } = useBackground()
 
-  // //Change this is not ideal
-  // useEffect(() => {
-  //   if (bgAuths === null && isApiLoggedIn) {
-  //     console.log('Help me pls')
-  //     setIsVaultLocked(true)
-  //   } else {
-  //     setIsVaultLocked(false)
-  //   }
-  // }, [bgAuths, isApiLoggedIn])
+  //Change this is not ideal
+  useEffect(() => {
+    if (bgAuths === undefined && isApiLoggedIn) {
+      console.log('Help me pls')
+      setIsVaultLocked(true)
+    }
+  }, [bgAuths, isApiLoggedIn])
 
   if (isVaultLocked) {
     return <SafeUnlockVerification />

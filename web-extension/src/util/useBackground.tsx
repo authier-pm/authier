@@ -17,7 +17,7 @@ export interface Passwords {
   label: string
   icon: string | undefined
   lastUsed?: Date | null
-  originalUrl: string | undefined
+  originalUrl: string
   password: string
   username: string
 }
