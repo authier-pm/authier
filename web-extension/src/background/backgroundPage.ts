@@ -247,7 +247,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
       if (
         _tab.url
           ?.toLocaleLowerCase()
-          .search(item.originalUrl?.toLocaleLowerCase()) !== -1
+          .search(item.label?.toLocaleLowerCase()) !== -1
       ) {
         return true
       }
@@ -287,8 +287,6 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
 
               chrome.runtime.sendMessage({ passwords: passwords })
             }
-
-            console.log(passwords)
           }
         }
       }, 1000)
