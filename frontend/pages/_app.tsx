@@ -1,19 +1,28 @@
+import { ApolloProvider } from '@apollo/client'
+import { useRouter } from 'next/dist/client/router'
 import React from 'react'
+import { toastifyConfig } from '../../shared/toastifyConfig'
+import { apolloClient } from '../graphql/apolloClient'
 import { ChakraLayout } from './layout/ChakraLayout'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 function MyApp({ Component, pageProps }) {
-  return (
-    <ChakraLayout>
-      <Component {...pageProps} />
-    </ChakraLayout>
-  )
-}
+  const router = useRouter()
+  if (!router.isReady) {
+    // A necessary hack as `const { appId } = router.query` is undefined on first render
+    return null
+  }
 
-MyApp.getInitialProps = async () => {
-  // A bit of a hack as `const { appId } = router.query` is undefined on first render
-  // https://nextjs.org/docs/messages/empty-object-getInitialProps
-  // https://github.com/vercel/next.js/discussions/11484
-  return {}
+  return (
+    <ApolloProvider client={apolloClient}>
+      <ChakraLayout>
+        <ToastContainer {...toastifyConfig('bottom-right')} />
+
+        <Component {...pageProps} />
+      </ChakraLayout>
+    </ApolloProvider>
+  )
 }
 
 export default MyApp
