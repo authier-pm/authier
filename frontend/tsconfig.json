@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "lib": ["esnext", "esnext.asynciterable", "dom"],
+    "lib": [
+      "esnext",
+      "esnext.asynciterable",
+      "dom"
+    ],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -11,7 +15,11 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": ["node", "jest", "@emotion/react/types/css-prop"],
+    "types": [
+      "node",
+      "jest",
+      "@emotion/react/types/css-prop"
+    ],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": true,
@@ -27,7 +35,8 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "noEmit": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "incremental": true
   },
   "exclude": [
     ".git",
@@ -37,5 +46,10 @@
     "./e2e/**",
     "./node_modules/*"
   ],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"]
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "next.config.js"
+  ]
 }

@@ -1,4 +1,4 @@
-import { ChakraProvider, theme } from '@chakra-ui/react'
+import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import {
   Box,
   Flex,
@@ -18,10 +18,33 @@ import {
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index'
 import Link from 'next/link'
+import { kebabCase } from 'lodash'
+
+const theme = extendTheme({
+  colors: {
+    brand: {
+      50: '#84CAE7',
+      100: '#68D5DD',
+      200: '#5ADBD8',
+      300: '#4CE0D2',
+      400: '#37C5BA',
+      500: '#22AAA1',
+      600: '#1B8D82',
+      700: '#136F63',
+      800: '#0C453C',
+      900: '#041B15'
+    }
+  }
+})
 
 export function ChakraLayout({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const navLinks = Links.map((link) => (
+    <NavLink key={link} href={kebabCase(link)}>
+      {link}
+    </NavLink>
+  ))
   return (
     <ChakraProvider theme={theme}>
       <Box bgColor={'gray.700'} px={4}>
@@ -37,8 +60,9 @@ export function ChakraLayout({ children }) {
             <Link href="/">
               <Box cursor="pointer" zIndex={100}>
                 <Image
-                  boxSize={'110px'}
-                  mt={30}
+                  boxSize={[null, null, 110]}
+                  height={['60px', '60px', null]}
+                  mt={[null, null, 30]}
                   src="/assets/logos/logo.png"
                 ></Image>
               </Box>
@@ -49,10 +73,7 @@ export function ChakraLayout({ children }) {
               spacing={4}
               display={{ base: 'none', md: 'flex' }}
             >
-              <NavLink href={'/features'}>Features</NavLink>
-              <NavLink href={'/pricing'}>Pricing</NavLink>
-              <NavLink href={'/privacy'}>Privacy policy</NavLink>
-              <NavLink href={'/faq'}>FAQ</NavLink>
+              {navLinks}
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
@@ -95,11 +116,7 @@ export function ChakraLayout({ children }) {
         {isOpen ? (
           <Box pb={4}>
             <Stack as={'nav'} spacing={4}>
-              {Links.map((link) => (
-                <NavLink key={link} href={'#'}>
-                  {link}
-                </NavLink>
-              ))}
+              {navLinks}
             </Stack>
           </Box>
         ) : null}

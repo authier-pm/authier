@@ -10,15 +10,15 @@ import {
   setAccessToken,
   tokenFromLocalStorage
 } from '../util/accessToken'
-import { onError } from '@apollo/client/link/error'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode from 'jwt-decode'
 import { browser } from 'webextension-polyfill-ts'
+import { errorLink } from '../../../shared/errorLink'
 
-const apiUrl = process.env.API_URL
+const API_URL = process.env.API_URL
 
 const httpLink = createHttpLink({
-  uri: apiUrl
+  uri: API_URL
 })
 const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
@@ -44,7 +44,7 @@ const tokenRefresh = new TokenRefreshLink({
   },
   fetchAccessToken: async () => {
     console.log('refetch JWT token')
-    return await fetch(`http://localhost:5051/refresh_token`, {
+    return await fetch(`${API_URL}/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })
@@ -57,18 +57,6 @@ const tokenRefresh = new TokenRefreshLink({
     console.warn('Your refresh token is invalid. Try to login again', err)
   }
 })
-// Log any GraphQL errors or network error that occurred
-const errorLink = onError(({ graphQLErrors, networkError }) => {
-  if (graphQLErrors)
-    graphQLErrors.map(({ message, locations, path }) => {
-      console.log(JSON.stringify(locations))
-      console.log(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
-    })
-  if (networkError) console.log(`[Network error]: ${networkError}`)
-})
-
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
   const accessToken = await tokenFromLocalStorage() //<=== choose what to use??
