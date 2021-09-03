@@ -72,7 +72,7 @@ export function LoginCard() {
                       ></CheckboxControl> */}
                       </Stack>
                       <SubmitButton
-                        bg={'blue.400'}
+                        bg={'#3EC1C9'}
                         color={'white'}
                         _hover={{
                           bg: 'blue.500'
