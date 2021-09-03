@@ -17,8 +17,15 @@
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
-    "skipLibCheck": true
+    "resolveJsonModule": true,
+    "noUnusedParameters": false,
+    "skipLibCheck": true,
+    "incremental": true
   },
   "exclude": ["../backend/**", "dist/**"],
-  "include": ["./src/**/*"]
+  "include": [
+    "./src/**/*",
+    "../shared/errorLink.tsx",
+    "../shared/toastifyConfig.ts"
+  ]
 }

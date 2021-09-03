@@ -26,7 +26,8 @@
     "jsx": "preserve",
     "preserveConstEnums": true,
     "skipLibCheck": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "incremental": true
   },
 
   "exclude": [
