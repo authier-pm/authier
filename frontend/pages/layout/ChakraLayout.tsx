@@ -18,6 +18,7 @@ import {
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index'
 import Link from 'next/link'
+import { kebabCase } from 'lodash'
 
 const theme = extendTheme({
   colors: {
@@ -39,6 +40,11 @@ const theme = extendTheme({
 export function ChakraLayout({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
+  const navLinks = Links.map((link) => (
+    <NavLink key={link} href={kebabCase(link)}>
+      {link}
+    </NavLink>
+  ))
   return (
     <ChakraProvider theme={theme}>
       <Box bgColor={'gray.700'} px={4}>
@@ -67,10 +73,7 @@ export function ChakraLayout({ children }) {
               spacing={4}
               display={{ base: 'none', md: 'flex' }}
             >
-              <NavLink href={'/features'}>Features</NavLink>
-              <NavLink href={'/pricing'}>Pricing</NavLink>
-              <NavLink href={'/privacy'}>Privacy policy</NavLink>
-              <NavLink href={'/faq'}>FAQ</NavLink>
+              {navLinks}
             </HStack>
           </HStack>
           <Flex alignItems={'center'}>
@@ -113,11 +116,7 @@ export function ChakraLayout({ children }) {
         {isOpen ? (
           <Box pb={4}>
             <Stack as={'nav'} spacing={4}>
-              {Links.map((link) => (
-                <NavLink key={link} href={'#'}>
-                  {link}
-                </NavLink>
-              ))}
+              {navLinks}
             </Stack>
           </Box>
         ) : null}
