@@ -5,12 +5,10 @@ import React from 'react'
 import { LoginCard } from '../components/LoginCard'
 
 export default function Test() {
-  const r = useRouter()
-
   return (
     <Box>
       <Head>
-        <title>Authier - FAQ</title>
+        <title>Authier - Login</title>
       </Head>
       <LoginCard />
     </Box>
