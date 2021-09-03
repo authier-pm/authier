@@ -54,8 +54,9 @@ export function ChakraLayout({ children }) {
             <Link href="/">
               <Box cursor="pointer" zIndex={100}>
                 <Image
-                  boxSize={'110px'}
-                  mt={30}
+                  boxSize={[null, null, 110]}
+                  height={['60px', '60px', null]}
+                  mt={[null, null, 30]}
                   src="/assets/logos/logo.png"
                 ></Image>
               </Box>
