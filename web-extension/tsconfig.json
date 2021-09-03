@@ -11,7 +11,7 @@
     "outDir": "dist/js",
     "strict": true,
     "sourceMap": true,
-    "jsx": "react",
+    "jsx": "preserve",
     "esModuleInterop": true,
     "lib": ["es2015", "dom"],
     "experimentalDecorators": true,
