@@ -52,8 +52,12 @@ export let passwords: Array<Passwords> = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
+let hasData = false
 
 export function setPasswords(val: any) {
+  if (val) {
+    hasData = true
+  }
   passwords = val
 }
 
@@ -158,7 +162,8 @@ function initInputWatch(credentials?: string) {
   console.log({ credentials, location })
   console.log(username, password)
 
-  if (username && password) {
+  //@ts-expect-error
+  if (username && password && credentials.hasData) {
     //@ts-expect-error
     if (!credentials.username) {
       let div = document.createElement('div')
@@ -257,7 +262,11 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     await executeScriptInCurrentTab(
       `(` +
         initInputWatch.toString() +
-        `)(${JSON.stringify({ ...pswd, noHandsLogin: noHandsLogin })})`
+        `)(${JSON.stringify({
+          ...pswd,
+          noHandsLogin: noHandsLogin,
+          hasData: hasData
+        })})`
     )
 
     console.log(pswd)
