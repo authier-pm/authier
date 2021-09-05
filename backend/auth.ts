@@ -1,13 +1,13 @@
 import { sign } from 'jsonwebtoken'
-import { UserBase } from './models/user'
+import { User } from './generated/typegraphql-prisma'
 
-export const createAccessToken = (user: UserBase) => {
+export const createAccessToken = (user: User) => {
   return sign({ userId: user.id }, process.env.ACCESS_TOKEN_SECRET!, {
-    expiresIn: '15m'
+    expiresIn: '20m'
   })
 }
 
-export const createRefreshToken = (user: UserBase) => {
+export const createRefreshToken = (user: User) => {
   return sign(
     { userId: user.id, tokenVersion: user.tokenVersion },
     process.env.REFRESH_TOKEN_SECRET!,
