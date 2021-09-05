@@ -6,9 +6,11 @@ import { gqlSchema } from './schemas/gqlSchema'
 import dotenv from 'dotenv'
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prisma } from './prisma'
-import { createAccessToken, createRefreshToken } from './auth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
+import { IContext } from './RootResolver'
+import { isProd } from './envUtils'
 dotenv.config()
 
 const { env } = process
@@ -29,7 +31,7 @@ async function main() {
       payload = verify(token, process.env.REFRESH_TOKEN_SECRET!)
     } catch (err) {
       console.log(err)
-      return reply.send({ ok: false, accessToken: '' })
+      return reply.clearCookie('jid').send({ ok: false, accessToken: '' })
     }
 
     //token is valid and we can send back access token
@@ -46,10 +48,11 @@ async function main() {
     if (user.tokenVersion !== payload.tokenVersion) {
       return reply.send({ ok: false, accessToken: '' })
     }
+    const ctx = { request, reply } as IContext
 
-    sendRefreshToken(reply, createRefreshToken(user))
+    setNewRefreshToken(user, ctx)
 
-    const accessToken = createAccessToken(user)
+    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
     return reply.send({
       ok: true,
@@ -74,7 +77,7 @@ async function main() {
       return { request, reply, getIpAddress }
     },
     errorFormatter: (res, ctx) => {
-      if (env.NODE_ENV === 'production') {
+      if (isProd) {
         return mercurius.defaultErrorFormatter(res, ctx)
       }
       if (res.errors) {
