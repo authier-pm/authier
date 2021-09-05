@@ -27,7 +27,6 @@ export class UserBase extends User {}
 @ObjectType()
 export class UserQuery extends UserBase {
   @Field(() => [Device])
-  @UseMiddleware(isAuth)
   async myDevices() {
     return prisma.device.findMany({
       where: {
@@ -44,7 +43,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => Int)
-  @UseMiddleware(isAuth)
   async devicesCount() {
     return prisma.device.count({
       where: {
@@ -57,7 +55,6 @@ export class UserQuery extends UserBase {
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => Device)
-  @UseMiddleware(isAuth)
   async addDevice(
     @Arg('name', () => String) name: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
@@ -123,7 +120,6 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => Device)
-  @UseMiddleware(isAuth)
   async updateFireToken(
     @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
