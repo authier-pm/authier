@@ -15,19 +15,19 @@ import {
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
-import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
+import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { LoginResponse, OTPEvent } from './models/models'
-import { createAccessToken, createRefreshToken } from './auth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { sendRefreshToken } from './sendRefreshToken'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
-import { UserQuery, UserMutation } from './models/user'
+import { UserQuery, UserMutation } from './models/User'
 import { Device } from './generated/typegraphql-prisma'
 
 export interface IContext {
-  request: RawRequestDefaultExpression
+  request: FastifyRequest
   reply: FastifyReply
   jwtPayload?: { userId: string }
   getIpAddress: () => string
@@ -282,7 +282,9 @@ export class RootResolver {
           masterDeviceId: device.id
         }
       })
-      const accessToken = createAccessToken(user)
+      setNewRefreshToken(user, ctx)
+
+      const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
       return {
         accessToken
@@ -291,25 +293,6 @@ export class RootResolver {
       console.log(err)
       throw new Error('Register failed')
     }
-  }
-
-  //For testing purposes
-  @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(
-    @Arg('userId', () => String) userId: string
-  ) {
-    await prisma.user.update({
-      data: {
-        tokenVersion: {
-          increment: 1
-        }
-      },
-      where: {
-        id: userId
-      }
-    })
-
-    return true
   }
 
   @Mutation(() => LoginResponse, { nullable: true })
@@ -340,8 +323,8 @@ export class RootResolver {
 
     // //login successful
 
-    sendRefreshToken(ctx.reply, createRefreshToken(user))
-    const accessToken = createAccessToken(user)
+    setNewRefreshToken(user, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
     return {
       accessToken,
