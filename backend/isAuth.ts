@@ -3,14 +3,23 @@ import { verify } from 'jsonwebtoken'
 import { IContext } from './RootResolver'
 
 export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
-  const authorization = context.request.headers['authorization']
+  // console.log('~ context.request.cookie', context.request.cookies)
+  let token: string | undefined
 
-  if (!authorization) {
+  // @ts-expect-error
+  if (context.request.cookies.jid) {
+    // @ts-expect-error
+    token = context.request.cookies.jid
+  } else {
+    const authorization = context.request.headers['authorization']
+    token = authorization?.split(' ')[1]
+  }
+
+  if (!token) {
     throw new Error('not authenticated')
   }
 
   try {
-    const token = authorization.split(' ')[1]
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
     // @ts-expect-error
     context.payload = payload as any

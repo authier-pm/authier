@@ -50,6 +50,7 @@ model Device {
     name                    String
     vaultLockTimeoutSeconds Int?
 
+
     createdAt              DateTime  @default(now())
     updatedAt              DateTime? @updatedAt
     registeredWithMasterAt DateTime?
