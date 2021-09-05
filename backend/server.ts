@@ -8,7 +8,6 @@ import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prisma } from './prisma'
 import { createAccessToken, createRefreshToken } from './auth'
 import { verify } from 'jsonwebtoken'
-import { UserBase } from './models/user'
 import chalk from 'chalk'
 dotenv.config()
 
@@ -48,11 +47,13 @@ async function main() {
       return reply.send({ ok: false, accessToken: '' })
     }
 
-    sendRefreshToken(reply, createRefreshToken(user as UserBase))
+    sendRefreshToken(reply, createRefreshToken(user))
+
+    const accessToken = createAccessToken(user)
 
     return reply.send({
       ok: true,
-      accessToken: createAccessToken(user as UserBase)
+      accessToken
     })
   })
 

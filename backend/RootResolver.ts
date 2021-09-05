@@ -84,10 +84,10 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver',
     name: 'me'
   })
-  authenticatedMe(@Ctx() Ctx: IContext) {
+  authenticatedMe(@Ctx() ctx: IContext) {
     return prisma.user.findFirst({
       where: {
-        id: Ctx.jwtPayload?.userId
+        id: ctx.jwtPayload?.userId
       },
       include: {
         Devices: true,
@@ -250,12 +250,11 @@ export class RootResolver {
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
+    @Ctx() ctx: IContext
   ) {
-    console.log(context)
     const hashedPassword = await hash(password, 12)
 
-    const ipAddress = context.getIpAddress()
+    const ipAddress = ctx.getIpAddress()
 
     try {
       let user = await prisma.user.create({
@@ -283,9 +282,10 @@ export class RootResolver {
           masterDeviceId: device.id
         }
       })
+      const accessToken = createAccessToken(user)
 
       return {
-        accessToken: createAccessToken(user)
+        accessToken
       }
     } catch (err) {
       console.log(err)
@@ -316,7 +316,7 @@ export class RootResolver {
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
-    @Ctx() Ctx: IContext
+    @Ctx() ctx: IContext
   ): Promise<LoginResponse | null> {
     const user = await prisma.user.findUnique({
       where: {
@@ -340,10 +340,11 @@ export class RootResolver {
 
     // //login successful
 
-    sendRefreshToken(Ctx.reply, createRefreshToken(user))
+    sendRefreshToken(ctx.reply, createRefreshToken(user))
+    const accessToken = createAccessToken(user)
 
     return {
-      accessToken: createAccessToken(user),
+      accessToken,
       secrets: user.EncryptedSecrets
     }
   }
