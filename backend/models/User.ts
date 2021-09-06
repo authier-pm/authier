@@ -9,9 +9,6 @@ import {
   UseMiddleware
 } from 'type-graphql'
 import { IContext } from '../RootResolver'
-import { createAccessToken, createRefreshToken } from '../auth'
-import { sendRefreshToken } from '../sendRefreshToken'
-import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
 import { LoginResponse } from './models'
 import {
@@ -19,7 +16,7 @@ import {
   EncryptedSecrets,
   SettingsConfig,
   User
-} from '../generated/typegraphql-prisma/models'
+} from '../generated/typegraphql-prisma/models/index'
 import { EncryptedSecretsType } from '@prisma/client'
 
 @ObjectType()
@@ -28,7 +25,6 @@ export class UserBase extends User {}
 @ObjectType()
 export class UserQuery extends UserBase {
   @Field(() => [Device])
-  @UseMiddleware(isAuth)
   async myDevices() {
     return prisma.device.findMany({
       where: {
@@ -45,7 +41,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => Int)
-  @UseMiddleware(isAuth)
   async devicesCount() {
     return prisma.device.count({
       where: {
@@ -68,16 +63,12 @@ export class UserQuery extends UserBase {
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => Device)
-  @UseMiddleware(isAuth)
   async addDevice(
     @Arg('name', () => String) name: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() context: IContext
   ) {
-    // @ts-expect-error
-    const ipAddress: string =
-      context.request.headers['x-forwarded-for'] ||
-      context.request.socket.remoteAddress
+    const ipAddress: string = context.getIpAddress()
 
     return await prisma.device.create({
       data: {
@@ -134,7 +125,6 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => Device)
-  @UseMiddleware(isAuth)
   async updateFireToken(
     @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
@@ -178,6 +168,21 @@ export class UserMutation extends UserBase {
         lockTime: lockTime,
         noHadsLogin: noHadsLogin,
         twoFA: twoFA
+      }
+    })
+  }
+
+  //For testing purposes
+  @Field(() => User)
+  async revokeRefreshTokensForUser() {
+    return prisma.user.update({
+      data: {
+        tokenVersion: {
+          increment: 1
+        }
+      },
+      where: {
+        id: this.id
       }
     })
   }

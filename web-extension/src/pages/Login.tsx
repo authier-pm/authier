@@ -17,11 +17,10 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
-  getAccessToken,
   getUserFromToken,
   setAccessToken,
-  tokenFromLocalStorage
-} from '../util/accessToken'
+  getTokenFromLocalStorage
+} from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
 import { browser } from 'webextension-polyfill-ts'
 import { AuthsContext } from '../providers/AuthsProvider'
@@ -69,7 +68,7 @@ export default function Login(): ReactElement {
             setAccessToken(response.data.login?.accessToken)
 
             let id = await getUserFromToken()
-            //@ts-expect-error
+
             setUserId(id.userId)
             let decryptedAuths = ''
             let decryptedPasswords = ''

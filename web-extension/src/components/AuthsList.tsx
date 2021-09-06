@@ -10,13 +10,7 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay
+  IconButton
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
@@ -27,7 +21,7 @@ import { browser } from 'webextension-polyfill-ts'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
-import { getUserFromToken } from '@src/util/accessToken'
+import { getUserFromToken } from '@src/util/accessTokenExtension'
 import { Passwords, useBackground } from '@src/util/useBackground'
 import { UIOptions } from './setting-screens/UI'
 import RemoveAlertDialog from './RemoveAlertDialog'
@@ -91,13 +85,13 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
                   let tabs = await browser.tabs.query({ active: true })
 
                   let url = tabs[0].url as string
-                  let unecryptedToken: any = await getUserFromToken()
+                  let unencryptedToken: any = await getUserFromToken()
 
                   await addOTPEvent({
                     variables: {
                       kind: 'show OTP',
                       url: url,
-                      userId: unecryptedToken.userId as string
+                      userId: unencryptedToken.userId as string
                     }
                   })
                   console.log(data, error)
@@ -205,7 +199,7 @@ export const AuthsList = () => {
       setCurrentTabUrl(tab?.url ?? null)
     })
   }, [])
-
+  console.log(bgPasswords)
   return (
     <>
       <Flex justifyContent="space-evenly">

@@ -1,5 +1,5 @@
 import { Box, Button, Flex, Heading } from '@chakra-ui/react'
-import { getUserFromToken } from '@src/util/accessToken'
+
 import React, { useContext, useEffect, useState } from 'react'
 import ReactQRCode from 'react-qr-code'
 import { useDeviceCountQuery } from './QRcode.codegen'
