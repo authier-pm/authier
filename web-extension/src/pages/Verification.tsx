@@ -24,7 +24,6 @@ interface Values {
 }
 
 export function SafeUnlockVerification() {
-  const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const { setAuths, auths } = useContext(AuthsContext)
   const { setPassword, setIsVaultLocked } = useContext(UserContext)

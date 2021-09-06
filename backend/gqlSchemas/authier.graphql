@@ -11,9 +11,6 @@ type Query {
 type UserQuery {
   id: String!
   email: String
-  phone_number: String
-  account_name: String
-  password: String!
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
@@ -50,14 +47,12 @@ type Mutation {
   addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
   login(password: String!, email: String!): LoginResponse
+  logout: Boolean
 }
 
 type UserMutation {
   id: String!
   email: String
-  phone_number: String
-  account_name: String
-  password: String!
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
@@ -88,9 +83,6 @@ enum EncryptedSecretsType {
 type User {
   id: String!
   email: String
-  phone_number: String
-  account_name: String
-  password: String!
   tokenVersion: Int!
   name: String
   createdAt: DateTime!

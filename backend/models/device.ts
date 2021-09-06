@@ -10,10 +10,6 @@ import {
 } from 'type-graphql'
 import { IContext } from '../RootResolver'
 
-import { compare, hash } from 'bcrypt'
-import { isAuth } from '../isAuth'
-import { LoginResponse } from './models'
-
 @ObjectType()
 export class Device {
   @Field(() => String)
