@@ -133,6 +133,16 @@ export type QuerySendConfirmationArgs = {
   userId: Scalars['String'];
 };
 
+export type SettingsConfig = {
+  __typename?: 'SettingsConfig';
+  id: Scalars['Int'];
+  userId: Scalars['String'];
+  lockTime: Scalars['Int'];
+  twoFA: Scalars['Boolean'];
+  noHadsLogin: Scalars['Boolean'];
+  homeUI: Scalars['String'];
+};
+
 export type UserMutation = {
   __typename?: 'UserMutation';
   id: Scalars['String'];
@@ -149,6 +159,7 @@ export type UserMutation = {
   saveAuths: EncryptedSecrets;
   savePasswords: EncryptedSecrets;
   updateFireToken: Device;
+  updateSettings: SettingsConfig;
 };
 
 
@@ -172,6 +183,14 @@ export type UserMutationUpdateFireTokenArgs = {
   firebaseToken: Scalars['String'];
 };
 
+
+export type UserMutationUpdateSettingsArgs = {
+  noHadsLogin: Scalars['Boolean'];
+  lockTime: Scalars['Int'];
+  homeUI: Scalars['String'];
+  twoFA: Scalars['Boolean'];
+};
+
 export type UserQuery = {
   __typename?: 'UserQuery';
   id: Scalars['String'];
@@ -186,4 +205,5 @@ export type UserQuery = {
   masterDeviceId?: Maybe<Scalars['Int']>;
   myDevices: Array<Device>;
   devicesCount: Scalars['Int'];
+  settings: SettingsConfig;
 };
