@@ -1,9 +1,4 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState
-} from 'react'
+import React, { FunctionComponent, useContext, useEffect } from 'react'
 
 import { Route, Switch, useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
@@ -11,36 +6,27 @@ import { browser } from 'webextension-polyfill-ts'
 import { NavBar } from '@src/components/NavBar'
 import { Home } from '../pages/Home'
 
-import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
-import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
-import { AuthsList } from '../components/AuthsList'
-import { authenticator } from 'otplib'
 import cryptoJS from 'crypto-js'
 import { Menu } from '@src/pages/Menu'
-import Login from '@src/pages/Login'
-import Register from '@src/pages/Register'
 import { QRCode } from '@src/pages/QRcode'
 import {
-  IsLoggedInQuery,
-  useIsLoggedInQuery,
   useSaveFirebaseTokenMutation,
   useSavePasswordsMutation,
-  useSendAuthMessageLazyQuery
+  useSendAuthMessageLazyQuery,
+  useSettingsLazyQuery
 } from './Popup.codegen'
-import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
 import Devices from '@src/pages/Devices'
-import { useSaveAuthsMutation } from './Popup.codegen'
 import { SafeUnlockVerification } from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
-import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
+import { AuthsContext } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
-import { getMessaging, getToken } from 'firebase/messaging'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/useBackground'
-import { Flex } from '@chakra-ui/react'
+import { timeToString } from '@src/background/chromeRuntimeListener'
+import { UISettings } from '@src/components/setting-screens/UI'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 i18n.activate('en')
@@ -53,7 +39,7 @@ export const Popup: FunctionComponent = () => {
     setIsVaultLocked,
     password
   } = useContext(UserContext)
-  const { setAuths, auths } = useContext(AuthsContext)
+  const { setAuths } = useContext(AuthsContext)
   const [
     saveFirebaseTokenMutation,
     { data: tokenData, loading: tokenLoading, error: tokenError }
@@ -62,8 +48,19 @@ export const Popup: FunctionComponent = () => {
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
   const [savePasswordsMutation] = useSavePasswordsMutation()
-  const { currURL, bgAuths, isFilling, safeLocked, bgPasswords } =
-    useBackground()
+  const [
+    getSettings,
+    { data: settingsData, loading: settingsLoading, error: settingsError }
+  ] = useSettingsLazyQuery()
+  const {
+    currURL,
+    bgAuths,
+    isFilling,
+    safeLocked,
+    bgPasswords,
+    setSecuritySettings,
+    setUISettings
+  } = useBackground()
 
   useEffect(() => {
     async function saveToLocal(encrypted: any) {
@@ -138,6 +135,21 @@ export const Popup: FunctionComponent = () => {
       // Listen to the response
     }
   }, [isFilling])
+
+  useEffect(() => {
+    if (isAuth) {
+      getSettings({ variables: { userId: userId as string } })
+
+      if (!!settingsData) {
+        setSecuritySettings({
+          noHandsLogin: settingsData.user.settings.noHadsLogin,
+          vaultTime: timeToString(settingsData.user.settings.lockTime) as string
+        })
+        //@ts-expect-error
+        setUISettings({ homeList: settingsData.user.settings.homeUI })
+      }
+    }
+  }, [isAuth])
 
   useEffect(() => {
     setLocation('/')
