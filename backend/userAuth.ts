@@ -28,7 +28,7 @@ export const setNewRefreshToken = (user: User, ctx: IContext) => {
       expiresIn: '7d'
     }
   )
-  ctx.reply.setCookie('jid', refreshToken, {
+  ctx.reply.setCookie('refresh-token', refreshToken, {
     secure: isProd, // send cookie over HTTPS only
     httpOnly: true,
     sameSite: true // alternative CSRF protection

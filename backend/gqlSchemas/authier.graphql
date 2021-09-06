@@ -49,7 +49,6 @@ type Mutation {
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
-  revokeRefreshTokensForUser(userId: String!): Boolean!
   login(password: String!, email: String!): LoginResponse
 }
 
@@ -68,6 +67,7 @@ type UserMutation {
   saveAuths(payload: String!): EncryptedSecrets!
   savePasswords(payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
+  revokeRefreshTokensForUser: User!
 }
 
 type EncryptedSecrets {
@@ -83,6 +83,19 @@ type EncryptedSecrets {
 enum EncryptedSecretsType {
   TOTP
   LOGIN_CREDENTIALS
+}
+
+type User {
+  id: String!
+  email: String
+  phone_number: String
+  account_name: String
+  password: String!
+  tokenVersion: Int!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  masterDeviceId: Int
 }
 
 input OTPEvent {

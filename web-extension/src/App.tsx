@@ -10,9 +10,9 @@ function App(): ReactElement {
 
   useEffect(() => {
     async function token() {
-      let s = await browser.storage.local.get('jid')
-      //console.log('s', s)
-      setAccessToken(s.jid)
+      let s = await browser.storage.local.get('access-token')
+
+      setAccessToken(s['access-token'])
       setLoading(false)
     }
 
@@ -38,7 +38,7 @@ export default App
 // })
 
 // async function token() {
-//   let s = await browser.storage.local.get('jid')
+//   let s = await browser.storage.local.get('access-token'')
 //   setAccessToken(s.jid)
 //   setLoading(false)
 // }

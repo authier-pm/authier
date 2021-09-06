@@ -9,7 +9,7 @@ import {
   UseMiddleware
 } from 'type-graphql'
 import { IContext } from '../RootResolver'
-import { sendRefreshToken } from '../sendRefreshToken'
+
 import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma'
