@@ -52,12 +52,8 @@ export let passwords: Array<Passwords> = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
-let hasData = false
 
 export function setPasswords(val: any) {
-  if (val) {
-    hasData = true
-  }
   passwords = val
 }
 
@@ -265,7 +261,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         `)(${JSON.stringify({
           ...pswd,
           noHandsLogin: noHandsLogin,
-          hasData: hasData
+          hasData: !!passwords
         })})`
     )
 
@@ -324,44 +320,3 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     })
   }
 })
-
-// function insertConfirm() {
-//   let confirm = false
-//   let div = document.createElement('div')
-//   div.style.height = '42%'
-//   div.style.width = '100%'
-//   div.style.position = 'fixed'
-//   div.style.top = '0px'
-//   div.style.left = '0px'
-//   div.style.padding = '0px'
-
-//   let saveButton = document.createElement('button')
-//   saveButton.id = 'save'
-//   saveButton.textContent = 'save'
-//   saveButton.onclick = function () {
-//     confirm = true
-//     console.log('save', confirm)
-//     sessionStorage.setItem('_test', JSON.stringify({ willSave: confirm }))
-//     div.remove()
-//   }
-//   div.appendChild(saveButton)
-
-//   let closeButton = document.createElement('button')
-//   closeButton.id = 'close'
-//   closeButton.textContent = 'close'
-//   closeButton.onclick = function () {
-//     confirm = false
-//     console.log('close', confirm)
-//     sessionStorage.setItem('_test', JSON.stringify({ willSave: confirm }))
-//     div.remove()
-//   }
-//   div.appendChild(closeButton)
-
-//   document.body.appendChild(div)
-// }
-
-// function getConfirm() {
-//   let test = sessionStorage.getItem('_test')
-//   sessionStorage.removeItem('_test')
-//   return test
-// }
