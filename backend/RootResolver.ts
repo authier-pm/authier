@@ -248,7 +248,7 @@ export class RootResolver {
       let user = await prisma.user.create({
         data: {
           email: email,
-          password: hashedPassword
+          passwordHash: hashedPassword
         }
       })
 
@@ -303,7 +303,7 @@ export class RootResolver {
       return null
     }
 
-    const valid = await compare(password, user.password)
+    const valid = await compare(password, user.passwordHash)
 
     if (!valid) {
       return null
