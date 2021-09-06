@@ -1,7 +1,7 @@
 import { Box, Flex, Spinner } from '@chakra-ui/react'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
-import { getUserFromToken } from '@src/util/accessToken'
+import { getUserFromToken } from '@src/util/accessTokenExtension'
 import { useBackground } from '@src/util/useBackground'
 import React, {
   useState,
