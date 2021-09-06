@@ -71,9 +71,6 @@ export default function Register(): ReactElement {
 
             refetch()
 
-            let id = await getUserFromToken()
-            //@ts-expect-error
-            setUserId(id.userId)
             setSubmitting(false)
           }
         }}

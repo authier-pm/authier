@@ -58,10 +58,7 @@ export class UserMutation extends UserBase {
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() context: IContext
   ) {
-    // @ts-expect-error
-    const ipAddress: string =
-      context.request.headers['x-forwarded-for'] ||
-      context.request.socket.remoteAddress
+    const ipAddress: string = context.getIpAddress()
 
     return await prisma.device.create({
       data: {

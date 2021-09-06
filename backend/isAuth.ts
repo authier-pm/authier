@@ -21,8 +21,7 @@ export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
   try {
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
 
-    // @ts-expect-error
-    context.payload = payload as any
+    context.jwtPayload = payload as { userId: string }
   } catch (err) {
     context.reply.clearCookie('access-token')
 

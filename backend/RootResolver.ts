@@ -19,7 +19,7 @@ import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { LoginResponse, OTPEvent } from './models/models'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
-import { sendRefreshToken } from './sendRefreshToken'
+
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
@@ -100,22 +100,9 @@ export class RootResolver {
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
   me(@Ctx() context: IContext) {
-    const authorization = context.request.headers['authorization']
+    const { jwtPayload } = context
 
-    if (!authorization) {
-      throw new Error('You are missing a token')
-    }
-
-    try {
-      const token = authorization.split(' ')[1]
-      const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      context.jwtPayload = payload as Payload
-      //@ts-expect-error
-      return prisma.user.findUnique({ where: { id: payload.userId } })
-    } catch (err) {
-      console.log(err)
-      return null
-    }
+    return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
   }
 
   @UseMiddleware(isAuth)
@@ -329,6 +316,26 @@ export class RootResolver {
     return {
       accessToken,
       secrets: user.EncryptedSecrets
+    }
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async logout(@Ctx() ctx: IContext) {
+    ctx.reply.clearCookie('refresh-token')
+    ctx.reply.clearCookie('access-token')
+    if (ctx.jwtPayload) {
+      const user = await prisma.user.update({
+        data: {
+          tokenVersion: {
+            increment: 1
+          }
+        },
+        where: {
+          id: ctx.jwtPayload.userId
+        }
+      })
+      return user.tokenVersion
     }
   }
 }

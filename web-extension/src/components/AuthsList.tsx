@@ -10,13 +10,7 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton,
-  AlertDialog,
-  AlertDialogBody,
-  AlertDialogContent,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogOverlay
+  IconButton
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
@@ -91,13 +85,13 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
                   let tabs = await browser.tabs.query({ active: true })
 
                   let url = tabs[0].url as string
-                  let unecryptedToken: any = await getUserFromToken()
+                  let unencryptedToken: any = await getUserFromToken()
 
                   await addOTPEvent({
                     variables: {
                       kind: 'show OTP',
                       url: url,
-                      userId: unecryptedToken.userId as string
+                      userId: unencryptedToken.userId as string
                     }
                   })
                   console.log(data, error)
