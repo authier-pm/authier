@@ -101,8 +101,9 @@ export class RootResolver {
   @Query(() => UserQuery, { nullable: true })
   me(@Ctx() context: IContext) {
     const { jwtPayload } = context
-
-    return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
+    if (jwtPayload) {
+      return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
+    }
   }
 
   @UseMiddleware(isAuth)
