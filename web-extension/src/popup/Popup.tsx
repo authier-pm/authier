@@ -30,7 +30,7 @@ import {
   useSavePasswordsMutation,
   useSendAuthMessageLazyQuery
 } from './Popup.codegen'
-import { getAccessToken, getUserFromToken } from '@src/util/accessToken'
+
 import Devices from '@src/pages/Devices'
 import { useSaveAuthsMutation } from './Popup.codegen'
 import { SafeUnlockVerification } from '@src/pages/Verification'
