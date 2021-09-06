@@ -117,8 +117,8 @@ chrome.runtime.onMessage.addListener(function (
       break
 
     case BackgroundMessageType.clear:
-      twoFAs = undefined
-      setPasswords([])
+      twoFAs = null
+      setPasswords(null)
       break
 
     case BackgroundMessageType.securitySettings:

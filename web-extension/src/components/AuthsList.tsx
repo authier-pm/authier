@@ -205,7 +205,7 @@ export const AuthsList = () => {
       setCurrentTabUrl(tab?.url ?? null)
     })
   }, [])
-
+  console.log(bgPasswords)
   return (
     <>
       <Flex justifyContent="space-evenly">
