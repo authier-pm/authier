@@ -22,7 +22,7 @@ export const timeObject: any = {
   '12 hours': 43200000
 }
 
-let timeToString = (time: number) => {
+export let timeToString = (time: number) => {
   return Object.keys(timeObject).find((key) => {
     if (timeObject[key] === time) {
       return timeObject[key]
