@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext, useEffect, useState } from 'react'
+import React, { ReactElement, useContext, useState } from 'react'
 import {
   Box,
   Button,
@@ -13,14 +13,11 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useRegisterMutation } from './Register.codegen'
-import ErrorMessage from '@src/components/ErrorMessage'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import { browser } from 'webextension-polyfill-ts'
-import { getUserFromToken, setAccessToken } from '@src/util/accessToken'
-import { AuthsContext } from '../providers/AuthsProvider'
+import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
-import { useBackground } from '@src/util/useBackground'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 
 interface Values {
@@ -29,7 +26,6 @@ interface Values {
 }
 
 export default function Register(): ReactElement {
-  const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
@@ -71,9 +67,6 @@ export default function Register(): ReactElement {
 
             refetch()
 
-            let id = await getUserFromToken()
-            //@ts-expect-error
-            setUserId(id.userId)
             setSubmitting(false)
           }
         }}

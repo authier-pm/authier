@@ -18,6 +18,7 @@ import {
   useSendAuthMessageLazyQuery,
   useSettingsLazyQuery
 } from './Popup.codegen'
+
 import Devices from '@src/pages/Devices'
 import { SafeUnlockVerification } from '@src/pages/Verification'
 import { UserContext } from '@src/providers/UserProvider'
@@ -26,7 +27,6 @@ import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { useBackground } from '@src/util/useBackground'
 import { timeToString } from '@src/background/chromeRuntimeListener'
-import { UISettings } from '@src/components/setting-screens/UI'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 i18n.activate('en')
