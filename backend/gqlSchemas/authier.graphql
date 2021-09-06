@@ -1,19 +1,24 @@
 type Query {
   user(userId: String!): UserQuery!
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   authenticated: Boolean!
   me: UserQuery
-  sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!, userId: String!): Boolean!
+  sendAuthMessage(
+    pageName: String!
+    device: String!
+    time: String!
+    location: String!
+    userId: String!
+  ): Boolean!
   sendConfirmation(success: Boolean!, userId: String!): Boolean!
 }
 
 type UserQuery {
   id: String!
   email: String
-  phone_number: String
-  account_name: String
-  password: String!
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
@@ -54,21 +59,24 @@ type SettingsConfig {
 type Mutation {
   user(userId: String!): UserMutation!
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   me: UserMutation!
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
   addOTPEvent(data: OTPEvent!): Boolean!
-  register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
-  revokeRefreshTokensForUser(userId: String!): Boolean!
+  register(
+    firebaseToken: String!
+    password: String!
+    email: String!
+  ): LoginResponse!
   login(password: String!, email: String!): LoginResponse
+  logout: Boolean
 }
 
 type UserMutation {
   id: String!
   email: String
-  phone_number: String
-  account_name: String
-  password: String!
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
@@ -78,7 +86,13 @@ type UserMutation {
   saveAuths(payload: String!): EncryptedSecrets!
   savePasswords(payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
-  updateSettings(noHadsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
+  updateSettings(
+    noHadsLogin: Boolean!
+    lockTime: Int!
+    homeUI: String!
+    twoFA: Boolean!
+  ): SettingsConfig!
+  revokeRefreshTokensForUser: User!
 }
 
 type EncryptedSecrets {
@@ -94,6 +108,16 @@ type EncryptedSecrets {
 enum EncryptedSecretsType {
   TOTP
   LOGIN_CREDENTIALS
+}
+
+type User {
+  id: String!
+  email: String
+  tokenVersion: Int!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  masterDeviceId: Int
 }
 
 input OTPEvent {

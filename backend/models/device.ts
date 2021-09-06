@@ -9,11 +9,6 @@ import {
   UseMiddleware
 } from 'type-graphql'
 import { IContext } from '../RootResolver'
-import { createAccessToken, createRefreshToken } from '../auth'
-import { sendRefreshToken } from '../sendRefreshToken'
-import { compare, hash } from 'bcrypt'
-import { isAuth } from '../isAuth'
-import { LoginResponse } from './models'
 
 @ObjectType()
 export class Device {

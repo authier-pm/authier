@@ -21,8 +21,6 @@ export default function Routes(): ReactElement {
     if (bgAuths === undefined && isApiLoggedIn) {
       console.log('Help me pls')
       setIsVaultLocked(true)
-    } else {
-      setIsVaultLocked(false)
     }
   }, [bgAuths, isApiLoggedIn])
 

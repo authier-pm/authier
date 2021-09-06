@@ -1,5 +1,5 @@
 import { Flex } from '@chakra-ui/react'
-import { setAccessToken } from '@src/util/accessToken'
+import { setAccessToken } from '@src/util/accessTokenExtension'
 import React, { createContext, ReactElement, useEffect, useState } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { Popup } from './popup/Popup'
@@ -10,9 +10,9 @@ function App(): ReactElement {
 
   useEffect(() => {
     async function token() {
-      let s = await browser.storage.local.get('jid')
-      //console.log('s', s)
-      setAccessToken(s.jid)
+      let s = await browser.storage.local.get('access-token')
+
+      setAccessToken(s['access-token'])
       setLoading(false)
     }
 
@@ -38,7 +38,7 @@ export default App
 // })
 
 // async function token() {
-//   let s = await browser.storage.local.get('jid')
+//   let s = await browser.storage.local.get('access-token'')
 //   setAccessToken(s.jid)
 //   setLoading(false)
 // }

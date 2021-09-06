@@ -50,6 +50,7 @@ model Device {
     name                    String
     vaultLockTimeoutSeconds Int?
 
+
     createdAt              DateTime  @default(now())
     updatedAt              DateTime? @updatedAt
     registeredWithMasterAt DateTime?
@@ -118,9 +119,8 @@ model WebInput {
 model User {
     id               String             @id @default(uuid()) @db.Uuid
     email            String?            @unique
-    phone_number     String?            @unique
-    account_name     String?            @unique
-    password         String
+    /// @TypeGraphQL.omit(output: true)
+    passwordHash     String
     tokenVersion     Int                @default(0)
     name             String?
     EncryptedSecrets EncryptedSecrets[]

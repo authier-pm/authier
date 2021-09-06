@@ -58,8 +58,8 @@ export type Mutation = {
   addDevice: Device;
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
-  revokeRefreshTokensForUser: Scalars['Boolean'];
   login?: Maybe<LoginResponse>;
+  logout?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -84,11 +84,6 @@ export type MutationRegisterArgs = {
   firebaseToken: Scalars['String'];
   password: Scalars['String'];
   email: Scalars['String'];
-};
-
-
-export type MutationRevokeRefreshTokensForUserArgs = {
-  userId: Scalars['String'];
 };
 
 
@@ -143,13 +138,21 @@ export type SettingsConfig = {
   homeUI: Scalars['String'];
 };
 
+export type User = {
+  __typename?: 'User';
+  id: Scalars['String'];
+  email?: Maybe<Scalars['String']>;
+  tokenVersion: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
+  createdAt: Scalars['DateTime'];
+  updatedAt: Scalars['DateTime'];
+  masterDeviceId?: Maybe<Scalars['Int']>;
+};
+
 export type UserMutation = {
   __typename?: 'UserMutation';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number?: Maybe<Scalars['String']>;
-  account_name?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
   tokenVersion: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
@@ -160,6 +163,7 @@ export type UserMutation = {
   savePasswords: EncryptedSecrets;
   updateFireToken: Device;
   updateSettings: SettingsConfig;
+  revokeRefreshTokensForUser: User;
 };
 
 
@@ -195,9 +199,6 @@ export type UserQuery = {
   __typename?: 'UserQuery';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number?: Maybe<Scalars['String']>;
-  account_name?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
   tokenVersion: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
