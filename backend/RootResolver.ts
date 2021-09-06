@@ -15,19 +15,19 @@ import {
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
-import { FastifyReply, RawRequestDefaultExpression } from 'fastify'
+import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { LoginResponse, OTPEvent } from './models/models'
-import { createAccessToken, createRefreshToken } from './auth'
-import { sendRefreshToken } from './sendRefreshToken'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
+
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
-import { UserQuery, UserMutation } from './models/user'
+import { UserQuery, UserMutation } from './models/User'
 import { Device } from './generated/typegraphql-prisma'
 
 export interface IContext {
-  request: RawRequestDefaultExpression
+  request: FastifyRequest
   reply: FastifyReply
   jwtPayload?: { userId: string }
   getIpAddress: () => string
@@ -84,10 +84,10 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver',
     name: 'me'
   })
-  authenticatedMe(@Ctx() Ctx: IContext) {
+  authenticatedMe(@Ctx() ctx: IContext) {
     return prisma.user.findFirst({
       where: {
-        id: Ctx.jwtPayload?.userId
+        id: ctx.jwtPayload?.userId
       },
       include: {
         Devices: true,
@@ -100,21 +100,9 @@ export class RootResolver {
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
   me(@Ctx() context: IContext) {
-    const authorization = context.request.headers['authorization']
-
-    if (!authorization) {
-      throw new Error('You are missing a token')
-    }
-
-    try {
-      const token = authorization.split(' ')[1]
-      const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      context.jwtPayload = payload as Payload
-      //@ts-expect-error
-      return prisma.user.findUnique({ where: { id: payload.userId } })
-    } catch (err) {
-      console.log(err)
-      return null
+    const { jwtPayload } = context
+    if (jwtPayload) {
+      return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
     }
   }
 
@@ -250,18 +238,17 @@ export class RootResolver {
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
+    @Ctx() ctx: IContext
   ) {
-    console.log(context)
     const hashedPassword = await hash(password, 12)
 
-    const ipAddress = context.getIpAddress()
+    const ipAddress = ctx.getIpAddress()
 
     try {
       let user = await prisma.user.create({
         data: {
           email: email,
-          password: hashedPassword
+          passwordHash: hashedPassword
         }
       })
 
@@ -283,9 +270,12 @@ export class RootResolver {
           masterDeviceId: device.id
         }
       })
+      setNewRefreshToken(user, ctx)
+
+      const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
       return {
-        accessToken: createAccessToken(user)
+        accessToken
       }
     } catch (err) {
       console.log(err)
@@ -293,30 +283,11 @@ export class RootResolver {
     }
   }
 
-  //For testing purposes
-  @Mutation(() => Boolean)
-  async revokeRefreshTokensForUser(
-    @Arg('userId', () => String) userId: string
-  ) {
-    await prisma.user.update({
-      data: {
-        tokenVersion: {
-          increment: 1
-        }
-      },
-      where: {
-        id: userId
-      }
-    })
-
-    return true
-  }
-
   @Mutation(() => LoginResponse, { nullable: true })
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
-    @Ctx() Ctx: IContext
+    @Ctx() ctx: IContext
   ): Promise<LoginResponse | null> {
     const user = await prisma.user.findUnique({
       where: {
@@ -332,7 +303,7 @@ export class RootResolver {
       return null
     }
 
-    const valid = await compare(password, user.password)
+    const valid = await compare(password, user.passwordHash)
 
     if (!valid) {
       return null
@@ -340,11 +311,32 @@ export class RootResolver {
 
     // //login successful
 
-    sendRefreshToken(Ctx.reply, createRefreshToken(user))
+    setNewRefreshToken(user, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
     return {
-      accessToken: createAccessToken(user),
+      accessToken,
       secrets: user.EncryptedSecrets
+    }
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => Boolean, { nullable: true })
+  async logout(@Ctx() ctx: IContext) {
+    ctx.reply.clearCookie('refresh-token')
+    ctx.reply.clearCookie('access-token')
+    if (ctx.jwtPayload) {
+      const user = await prisma.user.update({
+        data: {
+          tokenVersion: {
+            increment: 1
+          }
+        },
+        where: {
+          id: ctx.jwtPayload.userId
+        }
+      })
+      return user.tokenVersion
     }
   }
 }
