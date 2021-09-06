@@ -4,6 +4,9 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
+import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
+import { timeObject } from '@src/background/chromeRuntimeListener'
+import { UserContext } from '@src/providers/UserProvider'
 
 export interface IAuth {
   secret: string
@@ -41,6 +44,9 @@ export function useBackground() {
     vaultTime: '12 hours'
   })
   const [UIConfig, setUIConfig] = useState<UISettings>({ homeList: 'All' })
+  const [updateSettings, { data, loading, error }] = useUpdateSettingsMutation()
+  const { userId } = useContext(UserContext)
+  //TODO save settings to DB in set setSecuritySettings
 
   useEffect(() => {
     //Get auth from bg
@@ -155,7 +161,6 @@ export function useBackground() {
       }
     },
     saveAuthsToBg: (value: IAuth[] | undefined) => {
-      console.log('saving 02', value)
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.auths,
         auths: value
@@ -163,7 +168,6 @@ export function useBackground() {
       //@ts-expect-error
       if (value?.length > 0) {
         setBgAuths(value)
-        console.log('in', bgAuths)
       } else {
         setBgAuths([])
       }
@@ -182,8 +186,18 @@ export function useBackground() {
     isCounting,
     bgPasswords,
     setSecuritySettings: (config: SecuritySettings) => {
+      updateSettings({
+        variables: {
+          lockTime: timeObject[config.vaultTime],
+          noHadsLogin: config.noHandsLogin,
+          homeUI: UIConfig.homeList,
+          twoFA: true, //Not added in the settings yet
+          userId: userId as string
+        }
+      })
+
       setSecurityConfig(config)
-      //Call bg script to save settings to bg, maybe Save it here to BD
+      //Call bg script to save settings to bg
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config
@@ -191,8 +205,18 @@ export function useBackground() {
     },
     securityConfig,
     setUISettings: (config: UISettings) => {
+      updateSettings({
+        variables: {
+          lockTime: timeObject[securityConfig.vaultTime],
+          noHadsLogin: securityConfig.noHandsLogin,
+          homeUI: config.homeList,
+          twoFA: true, //Not added in the settings yet
+          userId: userId as string
+        }
+      })
+
       setUIConfig(config)
-      console.log('sending', config)
+
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.UISettings,
         config: config

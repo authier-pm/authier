@@ -17,6 +17,7 @@ import { LoginResponse } from './models'
 import {
   Device,
   EncryptedSecrets,
+  SettingsConfig,
   User
 } from '../generated/typegraphql-prisma/models'
 import { EncryptedSecretsType } from '@prisma/client'
@@ -47,6 +48,16 @@ export class UserQuery extends UserBase {
   @UseMiddleware(isAuth)
   async devicesCount() {
     return prisma.device.count({
+      where: {
+        userId: this.id
+      }
+    })
+  }
+
+  @Field(() => SettingsConfig)
+  @UseMiddleware(isAuth)
+  async settings() {
+    return prisma.settingsConfig.findFirst({
       where: {
         userId: this.id
       }
@@ -136,6 +147,37 @@ export class UserMutation extends UserBase {
       },
       where: {
         id: this.masterDeviceId
+      }
+    })
+  }
+
+  @Field(() => SettingsConfig)
+  async updateSettings(
+    @Arg('twoFA', () => Boolean) twoFA: boolean,
+    @Arg('homeUI', () => String) homeUI: string,
+    @Arg('lockTime', () => Int) lockTime: number,
+    @Arg('noHadsLogin', () => Boolean) noHadsLogin: boolean
+  ) {
+    if (!this.masterDeviceId) {
+      throw new Error('Must have masterDeviceId')
+    }
+    return prisma.settingsConfig.upsert({
+      where: {
+        userId: this.id
+      },
+      update: {
+        homeUI: homeUI,
+        lockTime: lockTime,
+        noHadsLogin: noHadsLogin,
+        twoFA: twoFA,
+        userId: this.id
+      },
+      create: {
+        userId: this.id,
+        homeUI: homeUI,
+        lockTime: lockTime,
+        noHadsLogin: noHadsLogin,
+        twoFA: twoFA
       }
     })
   }

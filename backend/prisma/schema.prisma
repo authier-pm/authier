@@ -65,9 +65,14 @@ model Device {
 }
 
 model SettingsConfig {
-    id       Int     @id @default(autoincrement())
-    lockTime Int
-    TwoFA    Boolean
+    id          Int     @id @default(autoincrement())
+    userId      String  @unique @db.Uuid
+    lockTime    Int
+    twoFA       Boolean
+    noHadsLogin Boolean
+    homeUI      String
+
+    user User @relation(fields: [userId], references: [id])
 }
 
 // recorded when user shows a code for manual entry or when the code is filled into input by authier extension
@@ -129,6 +134,7 @@ model User {
     Devices          Device[]                       @relation("devices")
     WebInputsAdded   WebInput[]
     EncryptedChanges EncryptedSecretsChangeAction[]
+    SettingsConfig   SettingsConfig[]
 }
 
 model Token {
