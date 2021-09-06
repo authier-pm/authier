@@ -9,14 +9,13 @@ import {
   UseMiddleware
 } from 'type-graphql'
 import { IContext } from '../RootResolver'
-import { compare, hash } from 'bcrypt'
 import { isAuth } from '../isAuth'
 import { LoginResponse } from './models'
 import {
   Device,
   EncryptedSecrets,
   User
-} from '../generated/typegraphql-prisma/models'
+} from '../generated/typegraphql-prisma/models/index'
 import { EncryptedSecretsType } from '@prisma/client'
 
 @ObjectType()
