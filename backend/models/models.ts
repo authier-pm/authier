@@ -44,6 +44,7 @@ export class LoginResponse {
   @Field(() => String)
   accessToken: string
 
+  //THis is just for login (not for register)
   @Field(() => [EncryptedSecrets], { nullable: true })
   secrets: Array<EncryptedSecrets> | null
 }

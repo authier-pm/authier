@@ -21,6 +21,7 @@ type UserQuery {
   masterDeviceId: Int
   myDevices: [Device!]!
   devicesCount: Int!
+  settings: SettingsConfig!
 }
 
 """
@@ -39,6 +40,15 @@ type Device {
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
   userId: String!
+}
+
+type SettingsConfig {
+  id: Int!
+  userId: String!
+  lockTime: Int!
+  twoFA: Boolean!
+  noHadsLogin: Boolean!
+  homeUI: String!
 }
 
 type Mutation {
@@ -68,6 +78,7 @@ type UserMutation {
   saveAuths(payload: String!): EncryptedSecrets!
   savePasswords(payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
+  updateSettings(noHadsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
 }
 
 type EncryptedSecrets {
