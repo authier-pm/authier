@@ -1,17 +1,7 @@
 import { prisma } from '../prisma'
-import {
-  Arg,
-  Ctx,
-  Field,
-  InputType,
-  Int,
-  ObjectType,
-  UseMiddleware
-} from 'type-graphql'
+import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
-import { LoginResponse } from './models'
-
 import { EncryptedSecretsType } from '@prisma/client'
 import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
@@ -147,9 +137,6 @@ export class UserMutation extends UserBase {
     @Arg('lockTime', () => Int) lockTime: number,
     @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean
   ) {
-    if (!this.masterDeviceId) {
-      throw new Error('Must have masterDeviceId')
-    }
     return prisma.settingsConfig.upsert({
       where: {
         userId: this.id
