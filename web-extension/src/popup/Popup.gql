@@ -7,7 +7,7 @@ query settings($userId: String!) {
     settings {
       lockTime
       twoFA
-      noHadsLogin
+      noHandsLogin
       homeUI
     }
   }
