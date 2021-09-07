@@ -11,13 +11,12 @@ import {
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
 import { LoginResponse } from './models'
-import {
-  Device,
-  EncryptedSecrets,
-  SettingsConfig,
-  User
-} from '../generated/typegraphql-prisma/models/index'
+
 import { EncryptedSecretsType } from '@prisma/client'
+import { User } from '../generated/typegraphql-prisma/models/User'
+import { Device } from '../generated/typegraphql-prisma/models/Device'
+import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
+import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
 
 @ObjectType()
 export class UserBase extends User {}
