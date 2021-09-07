@@ -139,9 +139,10 @@ type SessionStoredItem = {
   label: string
   willSave: boolean
 }
-const AUTHIER_SESSION_STORAGE_KEY = '__authier'
+//const AUTHIER_SESSION_STORAGE_KEY = '__authier'
 
 function initInputWatch(credentials?: string) {
+  const AUTHIER_SESSION_STORAGE_KEY = '__authier'
   let confirm: boolean
   let loginFields: any = []
   let inputs = document.getElementsByTagName('input')
@@ -160,7 +161,7 @@ function initInputWatch(credentials?: string) {
   console.log(username, password)
 
   //@ts-expect-error
-  if (username && password && credentials.hasData) {
+  if (username && password && !!credentials.hasData) {
     //@ts-expect-error
     if (!credentials.username) {
       let div = document.createElement('div')
@@ -193,25 +194,25 @@ function initInputWatch(credentials?: string) {
 
       document.body.appendChild(div)
     }
-
-    document.body.addEventListener('click', (e) => {
-      if (username.value && password.value) {
-        const sessionStoredItem: SessionStoredItem = {
-          username: username.value,
-          password: password.value,
-          originalUrl: location.href,
-          label: location.hostname,
-          willSave: confirm
-        }
-        console.log('test', sessionStoredItem)
-
-        sessionStorage.setItem(
-          AUTHIER_SESSION_STORAGE_KEY,
-          JSON.stringify(sessionStoredItem)
-        )
-      }
-    })
   }
+
+  document.body.addEventListener('click', (e) => {
+    if (username.value && password.value) {
+      const sessionStoredItem: SessionStoredItem = {
+        username: username.value,
+        password: password.value,
+        originalUrl: location.href,
+        label: location.hostname,
+        willSave: confirm
+      }
+      console.log('test', sessionStoredItem)
+
+      sessionStorage.setItem(
+        AUTHIER_SESSION_STORAGE_KEY,
+        JSON.stringify(sessionStoredItem)
+      )
+    }
+  })
 
   //@ts-expect-error
   if (credentials.username) {
@@ -230,6 +231,7 @@ function initInputWatch(credentials?: string) {
 }
 
 function getStoredCredentials() {
+  const AUTHIER_SESSION_STORAGE_KEY = '__authier'
   let __authier = sessionStorage.getItem(AUTHIER_SESSION_STORAGE_KEY)
   sessionStorage.removeItem(AUTHIER_SESSION_STORAGE_KEY)
   return __authier
@@ -266,11 +268,10 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
         `)(${JSON.stringify({
           ...password,
           noHandsLogin: noHandsLogin,
-          hasData: !!passwords
+          hasData: !!password
         })})`
     )
 
-    console.log(password)
     if (!password) {
       let scanForItem = setInterval(async () => {
         let payload = await executeScriptInCurrentTab(
