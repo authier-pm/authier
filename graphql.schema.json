@@ -1023,7 +1023,7 @@
             "deprecationReason": null
           },
           {
-            "name": "noHadsLogin",
+            "name": "noHandsLogin",
             "description": null,
             "args": [],
             "type": {
@@ -1429,7 +1429,7 @@
             "description": null,
             "args": [
               {
-                "name": "noHadsLogin",
+                "name": "noHandsLogin",
                 "description": null,
                 "type": {
                   "kind": "NON_NULL",
