@@ -52,7 +52,7 @@ type SettingsConfig {
   userId: String!
   lockTime: Int!
   twoFA: Boolean!
-  noHadsLogin: Boolean!
+  noHandsLogin: Boolean!
   homeUI: String!
 }
 
@@ -87,7 +87,7 @@ type UserMutation {
   savePasswords(payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
   updateSettings(
-    noHadsLogin: Boolean!
+    noHandsLogin: Boolean!
     lockTime: Int!
     homeUI: String!
     twoFA: Boolean!
