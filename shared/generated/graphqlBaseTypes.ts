@@ -134,7 +134,7 @@ export type SettingsConfig = {
   userId: Scalars['String'];
   lockTime: Scalars['Int'];
   twoFA: Scalars['Boolean'];
-  noHadsLogin: Scalars['Boolean'];
+  noHandsLogin: Scalars['Boolean'];
   homeUI: Scalars['String'];
 };
 
@@ -189,7 +189,7 @@ export type UserMutationUpdateFireTokenArgs = {
 
 
 export type UserMutationUpdateSettingsArgs = {
-  noHadsLogin: Scalars['Boolean'];
+  noHandsLogin: Scalars['Boolean'];
   lockTime: Scalars['Int'];
   homeUI: Scalars['String'];
   twoFA: Scalars['Boolean'];
