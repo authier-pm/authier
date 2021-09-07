@@ -5,7 +5,7 @@ import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type UpdateSettingsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
-  noHadsLogin: Types.Scalars['Boolean'];
+  noHandsLogin: Types.Scalars['Boolean'];
   lockTime: Types.Scalars['Int'];
   homeUI: Types.Scalars['String'];
   twoFA: Types.Scalars['Boolean'];
@@ -16,10 +16,10 @@ export type UpdateSettingsMutation = { __typename?: 'Mutation', user: { __typena
 
 
 export const UpdateSettingsDocument = gql`
-    mutation updateSettings($userId: String!, $noHadsLogin: Boolean!, $lockTime: Int!, $homeUI: String!, $twoFA: Boolean!) {
+    mutation updateSettings($userId: String!, $noHandsLogin: Boolean!, $lockTime: Int!, $homeUI: String!, $twoFA: Boolean!) {
   user(userId: $userId) {
     updateSettings(
-      noHadsLogin: $noHadsLogin
+      noHandsLogin: $noHandsLogin
       lockTime: $lockTime
       homeUI: $homeUI
       twoFA: $twoFA
@@ -45,7 +45,7 @@ export type UpdateSettingsMutationFn = Apollo.MutationFunction<UpdateSettingsMut
  * const [updateSettingsMutation, { data, loading, error }] = useUpdateSettingsMutation({
  *   variables: {
  *      userId: // value for 'userId'
- *      noHadsLogin: // value for 'noHadsLogin'
+ *      noHandsLogin: // value for 'noHandsLogin'
  *      lockTime: // value for 'lockTime'
  *      homeUI: // value for 'homeUI'
  *      twoFA: // value for 'twoFA'

@@ -267,7 +267,7 @@ export class RootResolver {
           twoFA: true,
           homeUI: 'all',
           lockTime: 28800000,
-          noHadsLogin: false,
+          noHandsLogin: false,
           userId: user.id
         }
       })

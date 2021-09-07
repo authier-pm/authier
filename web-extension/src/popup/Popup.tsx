@@ -131,7 +131,7 @@ export const Popup: FunctionComponent = () => {
         }
       })
 
-      //After accept on mobile, send responce and set CanFill to True
+      //After accept on mobile, send response and set CanFill to True
       // Listen to the response
     }
   }, [isFilling])
@@ -142,7 +142,7 @@ export const Popup: FunctionComponent = () => {
 
       if (!!settingsData) {
         setSecuritySettings({
-          noHandsLogin: settingsData.user.settings.noHadsLogin,
+          noHandsLogin: settingsData.user.settings.noHandsLogin,
           vaultTime: timeToString(settingsData.user.settings.lockTime) as string
         })
         //@ts-expect-error

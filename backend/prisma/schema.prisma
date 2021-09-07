@@ -66,12 +66,11 @@ model Device {
 }
 
 model SettingsConfig {
-    id          Int     @id @default(autoincrement())
-    userId      String  @unique @db.Uuid
-    lockTime    Int
-    twoFA       Boolean
-    noHadsLogin Boolean
-    homeUI      String
+    userId       String  @unique @db.Uuid
+    lockTime     Int
+    twoFA        Boolean
+    noHandsLogin Boolean
+    homeUI       String
 
     user User @relation(fields: [userId], references: [id])
 }
