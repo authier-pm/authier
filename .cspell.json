@@ -1,5 +1,7 @@
 {
-  "cSpell.words": [
+  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
+  "words": [
+    "typegraphql",
     "Authy",
     "Deduplication",
     "Fastify",
