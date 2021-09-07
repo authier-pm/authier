@@ -145,7 +145,7 @@ export class UserMutation extends UserBase {
     @Arg('twoFA', () => Boolean) twoFA: boolean,
     @Arg('homeUI', () => String) homeUI: string,
     @Arg('lockTime', () => Int) lockTime: number,
-    @Arg('noHadsLogin', () => Boolean) noHadsLogin: boolean
+    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean
   ) {
     if (!this.masterDeviceId) {
       throw new Error('Must have masterDeviceId')
@@ -157,7 +157,7 @@ export class UserMutation extends UserBase {
       update: {
         homeUI: homeUI,
         lockTime: lockTime,
-        noHadsLogin: noHadsLogin,
+        noHandsLogin: noHandsLogin,
         twoFA: twoFA,
         userId: this.id
       },
@@ -165,7 +165,7 @@ export class UserMutation extends UserBase {
         userId: this.id,
         homeUI: homeUI,
         lockTime: lockTime,
-        noHadsLogin: noHadsLogin,
+        noHandsLogin: noHandsLogin,
         twoFA: twoFA
       }
     })

@@ -13,7 +13,7 @@ export type SettingsQueryVariables = Types.Exact<{
 }>;
 
 
-export type SettingsQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHadsLogin: boolean, homeUI: string } } };
+export type SettingsQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } };
 
 export type SaveAuthsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -89,7 +89,7 @@ export const SettingsDocument = gql`
     settings {
       lockTime
       twoFA
-      noHadsLogin
+      noHandsLogin
       homeUI
     }
   }

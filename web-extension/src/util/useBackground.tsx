@@ -189,7 +189,7 @@ export function useBackground() {
       updateSettings({
         variables: {
           lockTime: timeObject[config.vaultTime],
-          noHadsLogin: config.noHandsLogin,
+          noHandsLogin: config.noHandsLogin,
           homeUI: UIConfig.homeList,
           twoFA: true, //Not added in the settings yet
           userId: userId as string
@@ -208,7 +208,7 @@ export function useBackground() {
       updateSettings({
         variables: {
           lockTime: timeObject[securityConfig.vaultTime],
-          noHadsLogin: securityConfig.noHandsLogin,
+          noHandsLogin: securityConfig.noHandsLogin,
           homeUI: config.homeList,
           twoFA: true, //Not added in the settings yet
           userId: userId as string

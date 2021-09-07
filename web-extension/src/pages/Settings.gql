@@ -1,13 +1,13 @@
 mutation updateSettings(
   $userId: String!
-  $noHadsLogin: Boolean!
+  $noHandsLogin: Boolean!
   $lockTime: Int!
   $homeUI: String!
   $twoFA: Boolean!
 ) {
   user(userId: $userId) {
     updateSettings(
-      noHadsLogin: $noHadsLogin
+      noHandsLogin: $noHandsLogin
       lockTime: $lockTime
       homeUI: $homeUI
       twoFA: $twoFA
