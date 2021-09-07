@@ -161,6 +161,7 @@ export function useBackground() {
       }
     },
     saveAuthsToBg: (value: IAuth[] | undefined) => {
+      //Maybe save to DB here because when you remove item you must close the popup
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.auths,
         auths: value
