@@ -1,0 +1,7 @@
+{
+  "recommendations": [
+    "capaj.graphql-codegen-vscode",
+    "graphql.vscode-graphql",
+    "streetsidesoftware.code-spell-checker"
+  ]
+}
