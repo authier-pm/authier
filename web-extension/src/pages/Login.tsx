@@ -63,13 +63,14 @@ export default function Login(): ReactElement {
 
           if (response.data?.login?.accessToken) {
             await browser.storage.local.set({
-              jid: response.data.login?.accessToken
+              'access-token': response.data.login?.accessToken
             })
             setAccessToken(response.data.login?.accessToken)
 
-            let id = await getUserFromToken()
+            let decodedToken = await getUserFromToken()
+            console.log('~ decodedToken', decodedToken)
 
-            setUserId(id.userId)
+            setUserId(decodedToken.userId)
             let decryptedAuths = ''
             let decryptedPasswords = ''
             console.log('res', response)
