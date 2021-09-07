@@ -138,9 +138,9 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
   }
 
   return (
-    <Flex key={psw.originalUrl} p="4" rounded="md" bg="white">
-      <Stat>
-        <Flex justify="flex-start" align="center">
+    <Flex key={psw.originalUrl} p="3" rounded="md" bg="white" minW="300px">
+      <Stat maxW="100%">
+        <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
             <IconButton
               colorScheme="red"
@@ -161,16 +161,16 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
               onClose={onClose}
             />
 
-            <Avatar src={psw.icon} size="sm"></Avatar>
+            <Avatar src={psw.icon} size="xs"></Avatar>
           </Flex>
-          <Box ml={4} mr="auto">
+          <Box ml={2} mr="auto" maxW="200px">
             <Heading size="sm">{psw.label}</Heading>
-            <Text fontSize="lg">{psw.username}</Text>
+            <Text fontSize="sm">{psw.username.substr(0, 50)}</Text>
           </Box>
 
           <Button
             size="md"
-            ml={2}
+            ml="auto"
             variant="outline"
             onClick={() => {
               //onCopy()
@@ -231,7 +231,7 @@ export const AuthsList = () => {
           : null}
       </Flex>
 
-      <Flex overflow="auto" flexDirection="column" maxHeight={150}>
+      <Flex overflow="auto" flexDirection="column">
         {UIConfig.homeList === UIOptions.all && auths && bgPasswords
           ? [
               auths.map((auth, i) => {
