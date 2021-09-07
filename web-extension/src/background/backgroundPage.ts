@@ -161,7 +161,7 @@ function initInputWatch(credentials?: string) {
   console.log(username, password)
 
   //@ts-expect-error
-  if (username && password && !!credentials.hasData) {
+  if (username && password && !credentials.hasData) {
     //@ts-expect-error
     if (!credentials.username) {
       let div = document.createElement('div')
