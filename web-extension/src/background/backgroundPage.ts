@@ -109,7 +109,7 @@ function fillInput(credentials: string) {
     if (filtered[0]) {
       clearInterval(scan)
       console.log('OTP test', credentials)
-      //Send message to content scrit for query, where it will send notification to users main device
+      //Send message to content script for query, where it will send notification to users main device
       //Device will send back the authorization
       //chrome.runtime.sendMessage({ filling: true })
       //@ts-expect-error
@@ -139,6 +139,7 @@ type SessionStoredItem = {
   label: string
   willSave: boolean
 }
+const AUTHIER_SESSION_STORAGE_KEY = '__authier'
 
 function initInputWatch(credentials?: string) {
   let confirm: boolean
@@ -204,7 +205,10 @@ function initInputWatch(credentials?: string) {
         }
         console.log('test', sessionStoredItem)
 
-        sessionStorage.setItem('__authier', JSON.stringify(sessionStoredItem))
+        sessionStorage.setItem(
+          AUTHIER_SESSION_STORAGE_KEY,
+          JSON.stringify(sessionStoredItem)
+        )
       }
     })
   }
@@ -226,8 +230,8 @@ function initInputWatch(credentials?: string) {
 }
 
 function getStoredCredentials() {
-  let __authier = sessionStorage.getItem('__authier')
-  sessionStorage.removeItem('__authier')
+  let __authier = sessionStorage.getItem(AUTHIER_SESSION_STORAGE_KEY)
+  sessionStorage.removeItem(AUTHIER_SESSION_STORAGE_KEY)
   return __authier
 }
 
@@ -245,7 +249,7 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     })
 
     //Get username and password on register
-    const pswd = passwords?.find((item) => {
+    const password = passwords?.find((item) => {
       if (
         _tab.url
           ?.toLocaleLowerCase()
@@ -260,14 +264,14 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
       `(` +
         initInputWatch.toString() +
         `)(${JSON.stringify({
-          ...pswd,
+          ...password,
           noHandsLogin: noHandsLogin,
           hasData: !!passwords
         })})`
     )
 
-    console.log(pswd)
-    if (!pswd) {
+    console.log(password)
+    if (!password) {
       let scanForItem = setInterval(async () => {
         let payload = await executeScriptInCurrentTab(
           `(` + getStoredCredentials.toString() + `)()`
@@ -299,17 +303,11 @@ chrome.tabs.onUpdated.addListener(async function (tabId, changeInfo, _tab) {
     }
   }
 
-  // } else {
-  //   Object.assign(currentPageInfo, changeInfo)
-  // }
-
   if (twoFAs) {
-    console.log('hasAuths', twoFAs)
     twoFAs.map(async (i) => {
       if (
         _tab.url?.toLocaleLowerCase().search(i.label.toLocaleLowerCase()) !== -1
       ) {
-        console.log('testtestest')
         otpCode = authenticator.generate(i.secret)
         console.log('first', otpCode)
         let a = await executeScriptInCurrentTab(
