@@ -1,22 +1,12 @@
 import { prisma } from '../prisma'
-import {
-  Arg,
-  Ctx,
-  Field,
-  InputType,
-  Int,
-  ObjectType,
-  UseMiddleware
-} from 'type-graphql'
+import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
-import { LoginResponse } from './models'
-import {
-  Device,
-  EncryptedSecrets,
-  User
-} from '../generated/typegraphql-prisma/models/index'
 import { EncryptedSecretsType } from '@prisma/client'
+import { User } from '../generated/typegraphql-prisma/models/User'
+import { Device } from '../generated/typegraphql-prisma/models/Device'
+import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
+import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -42,6 +32,16 @@ export class UserQuery extends UserBase {
   @Field(() => Int)
   async devicesCount() {
     return prisma.device.count({
+      where: {
+        userId: this.id
+      }
+    })
+  }
+
+  @Field(() => SettingsConfig)
+  @UseMiddleware(isAuth)
+  async settings() {
+    return prisma.settingsConfig.findFirst({
       where: {
         userId: this.id
       }
@@ -126,6 +126,34 @@ export class UserMutation extends UserBase {
       },
       where: {
         id: this.masterDeviceId
+      }
+    })
+  }
+
+  @Field(() => SettingsConfig)
+  async updateSettings(
+    @Arg('twoFA', () => Boolean) twoFA: boolean,
+    @Arg('homeUI', () => String) homeUI: string,
+    @Arg('lockTime', () => Int) lockTime: number,
+    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean
+  ) {
+    return prisma.settingsConfig.upsert({
+      where: {
+        userId: this.id
+      },
+      update: {
+        homeUI: homeUI,
+        lockTime: lockTime,
+        noHandsLogin: noHandsLogin,
+        twoFA: twoFA,
+        userId: this.id
+      },
+      create: {
+        userId: this.id,
+        homeUI: homeUI,
+        lockTime: lockTime,
+        noHandsLogin: noHandsLogin,
+        twoFA: twoFA
       }
     })
   }

@@ -6,6 +6,7 @@ import { Device } from "../models/Device";
 import { EncryptedSecrets } from "../models/EncryptedSecrets";
 import { EncryptedSecretsChangeAction } from "../models/EncryptedSecretsChangeAction";
 import { OTPCodeEvent } from "../models/OTPCodeEvent";
+import { SettingsConfig } from "../models/SettingsConfig";
 import { Token } from "../models/Token";
 import { WebInput } from "../models/WebInput";
 
@@ -63,4 +64,6 @@ export class User {
   WebInputsAdded?: WebInput[];
 
   EncryptedChanges?: EncryptedSecretsChangeAction[];
+
+  SettingsConfig?: SettingsConfig[];
 }

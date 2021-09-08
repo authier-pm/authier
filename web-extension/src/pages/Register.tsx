@@ -29,7 +29,7 @@ export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
-  const { setPassword, fireToken } = useContext(UserContext)
+  const { setPassword, fireToken, setUserId } = useContext(UserContext)
   const { refetch } = useIsLoggedInQuery()
   // console.log('~ fireToken', fireToken)
 

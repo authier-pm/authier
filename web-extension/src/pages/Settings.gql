@@ -1,0 +1,18 @@
+mutation updateSettings(
+  $userId: String!
+  $noHandsLogin: Boolean!
+  $lockTime: Int!
+  $homeUI: String!
+  $twoFA: Boolean!
+) {
+  user(userId: $userId) {
+    updateSettings(
+      noHandsLogin: $noHandsLogin
+      lockTime: $lockTime
+      homeUI: $homeUI
+      twoFA: $twoFA
+    ) {
+      userId
+    }
+  }
+}
