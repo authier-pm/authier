@@ -1,4 +1,7 @@
-import { UISettings } from '@src/components/setting-screens/UI'
+import {
+  UIOptions,
+  UISettings
+} from '@src/components/setting-screens/SettingsForm'
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { Settings } from '@src/pages/Settings'
@@ -43,7 +46,9 @@ export function useBackground() {
     noHandsLogin: false,
     vaultTime: '12 hours'
   })
-  const [UIConfig, setUIConfig] = useState<UISettings>({ homeList: 'All' })
+  const [UIConfig, setUIConfig] = useState<UISettings>({
+    homeList: UIOptions.all
+  })
 
   useEffect(() => {
     //Get auth from bg
