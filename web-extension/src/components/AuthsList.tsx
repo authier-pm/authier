@@ -23,7 +23,7 @@ import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
 import { Passwords, useBackground } from '@src/util/useBackground'
-import { UIOptions } from './setting-screens/UI'
+import { UIOptions } from './setting-screens/SettingsForm'
 import RemoveAlertDialog from './RemoveAlertDialog'
 
 enum Values {
