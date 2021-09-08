@@ -11,7 +11,7 @@ import React, {
   FunctionComponent,
   useEffect
 } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 // const onMessageListener = () =>
 //   new Promise((resolve) => {

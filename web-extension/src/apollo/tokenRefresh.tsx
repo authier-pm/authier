@@ -1,7 +1,7 @@
 import { getAccessToken, setAccessToken } from '../util/accessTokenExtension'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode from 'jwt-decode'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { API_URL } from './apolloClient'
 
 export const tokenRefresh = new TokenRefreshLink({

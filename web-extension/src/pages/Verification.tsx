@@ -15,7 +15,7 @@ import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { useLocation } from 'wouter'
 import { useBackground } from '../util/useBackground'
 

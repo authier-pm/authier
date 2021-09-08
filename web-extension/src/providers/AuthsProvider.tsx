@@ -7,7 +7,7 @@ import React, {
   SetStateAction,
   FunctionComponent
 } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import cryptoJS from 'crypto-js'
 import { UserContext } from './UserProvider'
 import { useSaveAuthsMutation } from '../popup/Popup.codegen'

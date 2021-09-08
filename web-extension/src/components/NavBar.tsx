@@ -7,7 +7,7 @@ import React, {
   useState
 } from 'react'
 
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 import { Flex, Text, IconButton } from '@chakra-ui/react'
 import { HamburgerIcon, ArrowBackIcon } from '@chakra-ui/icons'
