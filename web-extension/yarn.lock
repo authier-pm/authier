@@ -2955,14 +2955,6 @@
   dependencies:
     "@babel/types" "^7.3.0"
 
-"@types/chrome@^0.0.114":
-  version "0.0.114"
-  resolved "https://registry.npmjs.org/@types/chrome/-/chrome-0.0.114.tgz"
-  integrity sha512-i7qRr74IrxHtbnrZSKUuP5Uvd5EOKwlwJq/yp7+yTPihOXnPhNQO4Z5bqb1XTnrjdbUKEJicaVVbhcgtRijmLA==
-  dependencies:
-    "@types/filesystem" "*"
-    "@types/har-format" "*"
-
 "@types/chrome@^0.0.157":
   version "0.0.157"
   resolved "https://registry.yarnpkg.com/@types/chrome/-/chrome-0.0.157.tgz#5a50bd378f4f632383c6ebbc34c88fb87d501f58"
@@ -6565,13 +6557,6 @@ jest-changed-files@^27.1.0:
     execa "^5.0.0"
     throat "^6.0.1"
 
-jest-chrome@^0.7.2:
-  version "0.7.2"
-  resolved "https://registry.npmjs.org/jest-chrome/-/jest-chrome-0.7.2.tgz"
-  integrity sha512-RSRDi8qNX54Q3ltSC2rW25+47nwY4DoruHOjHR0JZxijITS2PZrQ3j0jZPP3ywC0GuX0JNNwsKD3+iaKzOJEAA==
-  dependencies:
-    "@types/chrome" "^0.0.114"
-
 jest-circus@^27.1.0:
   version "27.1.0"
   resolved "https://registry.npmjs.org/jest-circus/-/jest-circus-27.1.0.tgz"
@@ -6979,11 +6964,6 @@ jest-watcher@^27.1.0:
     chalk "^4.0.0"
     jest-util "^27.1.0"
     string-length "^4.0.1"
-
-jest-webextension-mock@^3.7.18:
-  version "3.7.18"
-  resolved "https://registry.yarnpkg.com/jest-webextension-mock/-/jest-webextension-mock-3.7.18.tgz#a0eb7cb9cdfc5b146939556a43ecc71db54ea792"
-  integrity sha512-1gICMog/YjnFsI7kBjbbZU7Av6fbvfYaTw6dzQFFs0pmp5kjYGg0KwD9l/67DxYmiw3RRUoN2Xv0O4jat5MSDA==
 
 jest-worker@^27.0.2:
   version "27.0.2"
