@@ -59,6 +59,7 @@ export type Mutation = {
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
   login?: Maybe<LoginResponse>;
+  logout?: Maybe<Scalars['Boolean']>;
 };
 
 
@@ -131,9 +132,6 @@ export type User = {
   __typename?: 'User';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number?: Maybe<Scalars['String']>;
-  account_name?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
   tokenVersion: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
@@ -145,9 +143,6 @@ export type UserMutation = {
   __typename?: 'UserMutation';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number?: Maybe<Scalars['String']>;
-  account_name?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
   tokenVersion: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
@@ -185,9 +180,6 @@ export type UserQuery = {
   __typename?: 'UserQuery';
   id: Scalars['String'];
   email?: Maybe<Scalars['String']>;
-  phone_number?: Maybe<Scalars['String']>;
-  account_name?: Maybe<Scalars['String']>;
-  password: Scalars['String'];
   tokenVersion: Scalars['Int'];
   name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];

@@ -8,6 +8,7 @@ import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 
 import browser from 'webextension-polyfill'
+
 import { UserContext } from '@src/providers/UserProvider'
 
 export interface IAuth {
