@@ -1,4 +1,4 @@
-{
+query useMe {
   me {
     id
     email

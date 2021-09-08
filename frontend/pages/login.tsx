@@ -1,5 +1,5 @@
 import { Box } from '@chakra-ui/react'
-import { useRouter } from 'next/dist/client/router'
+
 import Head from 'next/head'
 import React from 'react'
 import { LoginCard } from '../components/LoginCard'
