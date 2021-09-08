@@ -6,6 +6,7 @@ import { apolloClient } from '../graphql/apolloClient'
 import { ChakraLayout } from './layout/ChakraLayout'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import Crisp from 'react-crisp'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()
@@ -18,7 +19,7 @@ function MyApp({ Component, pageProps }) {
     <ApolloProvider client={apolloClient}>
       <ChakraLayout>
         <ToastContainer {...toastifyConfig('bottom-right')} />
-
+        {/* <Crisp crispWebsiteId="5389b5fe-117f-40e1-833d-4fcc6715908d" /> */}
         <Component {...pageProps} />
       </ChakraLayout>
     </ApolloProvider>
