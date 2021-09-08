@@ -40,9 +40,11 @@ type Device {
 }
 
 type SettingsConfig {
-  id: Int!
+  userId: String!
   lockTime: Int!
-  TwoFA: Boolean!
+  twoFA: Boolean!
+  noHandsLogin: Boolean!
+  homeUI: String!
 }
 
 type Mutation {
