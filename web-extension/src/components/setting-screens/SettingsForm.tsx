@@ -5,6 +5,7 @@ import {
   Checkbox,
   Button
 } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 import { useBackground } from '@src/util/useBackground'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import React, { ReactElement } from 'react'
@@ -13,22 +14,22 @@ import Select from 'react-select'
 interface Props {}
 
 export enum UIOptions {
-  loginAndTOTP = 'TOTP & Login credencials',
-  all = 'All',
-  byDomain = 'Current domain'
+  loginAndTOTP = 'loginAndTOTP',
+  all = 'all',
+  byDomain = 'byDomain'
 }
 
 export interface UISettings {
-  homeList: 'All' | 'TOTP & Login credencials' | 'Current domain'
+  homeList: 'All' | 'TOTP & Login credentials' | 'Current domain'
 }
 
 const options = [
-  { value: 'All', label: 'All' },
-  { value: 'TOTP & Login credencials', label: 'TOTP & Login credencials' },
-  { value: 'Current domain', label: 'Current domain' }
+  { value: UIOptions.all, label: t`'All` },
+  { value: UIOptions.loginAndTOTP, label: t`TOTP & Login credentials` },
+  { value: UIOptions.byDomain, label: t`Current domain` }
 ]
 
-export default function UI({}: Props): ReactElement {
+export function SettingsForm({}: Props): ReactElement {
   const { setUISettings, UIConfig } = useBackground()
   return (
     <>
