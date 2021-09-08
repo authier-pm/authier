@@ -20,7 +20,7 @@ export enum UIOptions {
 }
 
 export interface UISettings {
-  homeList: 'All' | 'TOTP & Login credentials' | 'Current domain'
+  homeList: UIOptions
 }
 
 const options = [
