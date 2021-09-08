@@ -14,7 +14,7 @@ import React, { useState } from 'react'
 import { useBackground } from '@src/util/useBackground'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import Security from '@src/components/setting-screens/Security'
-import UI from '@src/components/setting-screens/UI'
+import { SettingsForm } from '@src/components/setting-screens/SettingsForm'
 
 export const Settings = () => {
   const [currSett, setCurrSett] = useState<'Security' | 'UI'>('Security')
@@ -39,7 +39,7 @@ export const Settings = () => {
         {currSett === 'Security' ? (
           <Security />
         ) : currSett === 'UI' ? (
-          <UI />
+          <SettingsForm />
         ) : null}
       </Box>
     </Flex>
