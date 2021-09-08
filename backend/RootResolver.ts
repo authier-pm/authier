@@ -257,11 +257,21 @@ export class RootResolver {
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
-          name: 'test',
+          name: 'test', // NEED device name
           userId: user.id
         }
       })
-      console.log(user)
+
+      await prisma.settingsConfig.create({
+        data: {
+          twoFA: true,
+          homeUI: 'all',
+          lockTime: 28800000,
+          noHandsLogin: false,
+          userId: user.id
+        }
+      })
+
       await prisma.user.update({
         where: {
           id: user.id

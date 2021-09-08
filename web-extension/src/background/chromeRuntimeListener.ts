@@ -15,21 +15,22 @@ let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: 'All' | 'TOTP & Login credentials' | 'Current domain' = 'All'
 
-const timeToString = (time: number) => {
-  const obj = {
-    'On web close': 0,
-    '10 seconds': 10000,
-    '8 hours': 28800000,
-    '12 hours': 43200000
-  }
+export const timeObject: any = {
+  'On web close': 0,
+  '10 secconds': 10000,
+  '8 hours': 288000000,
+  '12 hours': 43200000
+}
 
-  Object.keys(obj).map((key) => {
-    //@ts-expect-error
-    if (obj[key] === time) {
-      return key
+export let timeToString = (time: number) => {
+  return Object.keys(timeObject).find((key) => {
+    if (timeObject[key] === time) {
+      return timeObject[key]
     }
   })
 }
+
+//Work on saving settings to DB
 
 chrome.runtime.onMessage.addListener(function (
   req:
@@ -123,19 +124,7 @@ chrome.runtime.onMessage.addListener(function (
 
     case BackgroundMessageType.securitySettings:
       //@ts-expect-error
-      if (req.settings.vaultTime === 'On web close') {
-        setLockTime(0)
-        //@ts-expect-error
-      } else if (req.settings.vaultTime === '10 secconds') {
-        setLockTime(10000)
-        //@ts-expect-error
-      } else if (req.settings.vaultTime === '8 hours') {
-        setLockTime(1000 * 60 * 60 * 8)
-        //@ts-expect-error
-      } else if (req.settings.vaultTime === '12 hours') {
-        setLockTime(1000 * 60 * 60 * 12)
-      }
-
+      setLockTime(timeObject[req.settings.vaultTime])
       //@ts-expect-error
       noHandsLogin = req.settings.noHandsLogin
       //@ts-expect-error

@@ -6,12 +6,9 @@ import {
   Menu,
   MenuButton,
   MenuItem,
-  MenuList,
-  Image
+  MenuList
 } from '@chakra-ui/react'
-import { Formik, Form, Field, FormikHelpers } from 'formik'
 import React, { useState } from 'react'
-import { useBackground } from '@src/util/useBackground'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import Security from '@src/components/setting-screens/Security'
 import { SettingsForm } from '@src/components/setting-screens/SettingsForm'
