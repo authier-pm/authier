@@ -1,6 +1,6 @@
 import { onError } from '@apollo/client/link/error'
 import { toastifyConfig } from './toastifyConfig'
-import { toast, Theme } from 'react-toastify'
+import { toast } from 'react-toastify'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(({ graphQLErrors, networkError }) => {
