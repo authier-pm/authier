@@ -1,9 +1,11 @@
 import * as TypeGraphQL from "type-graphql";
 
 export enum SettingsConfigScalarFieldEnum {
-  id = "id",
+  userId = "userId",
   lockTime = "lockTime",
-  TwoFA = "TwoFA"
+  twoFA = "twoFA",
+  noHandsLogin = "noHandsLogin",
+  homeUI = "homeUI"
 }
 TypeGraphQL.registerEnumType(SettingsConfigScalarFieldEnum, {
   name: "SettingsConfigScalarFieldEnum",

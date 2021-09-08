@@ -8,6 +8,13 @@ export type IsLoggedInQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 
+export type SettingsQueryVariables = Types.Exact<{
+  userId: Types.Scalars['String'];
+}>;
+
+
+export type SettingsQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } };
+
 export type SaveAuthsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
   payload: Types.Scalars['String'];
@@ -76,6 +83,46 @@ export function useIsLoggedInLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
 export type IsLoggedInQueryHookResult = ReturnType<typeof useIsLoggedInQuery>;
 export type IsLoggedInLazyQueryHookResult = ReturnType<typeof useIsLoggedInLazyQuery>;
 export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLoggedInQueryVariables>;
+export const SettingsDocument = gql`
+    query settings($userId: String!) {
+  user(userId: $userId) {
+    settings {
+      lockTime
+      twoFA
+      noHandsLogin
+      homeUI
+    }
+  }
+}
+    `;
+
+/**
+ * __useSettingsQuery__
+ *
+ * To run a query within a React component, call `useSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useSettingsQuery({
+ *   variables: {
+ *      userId: // value for 'userId'
+ *   },
+ * });
+ */
+export function useSettingsQuery(baseOptions: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
+      }
+export function useSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
+        }
+export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
+export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
+export type SettingsQueryResult = Apollo.QueryResult<SettingsQuery, SettingsQueryVariables>;
 export const SaveAuthsDocument = gql`
     mutation saveAuths($userId: String!, $payload: String!) {
   user(userId: $userId) {

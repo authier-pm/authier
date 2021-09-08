@@ -199,7 +199,7 @@ export const AuthsList = () => {
       setCurrentTabUrl(tab?.url ?? null)
     })
   }, [])
-  console.log(bgPasswords)
+
   return (
     <>
       <Flex justifyContent="space-evenly">
@@ -232,19 +232,19 @@ export const AuthsList = () => {
       </Flex>
 
       <Flex overflow="auto" flexDirection="column">
-        {UIConfig.homeList === UIOptions.all && auths && bgPasswords
+        {UIConfig.homeList === UIOptions.all
           ? [
-              auths.map((auth, i) => {
+              auths?.map((auth, i) => {
                 return <OtpCode auth={auth} key={auth.label + i} />
               }),
-              bgPasswords.map((psw, i) => {
+              bgPasswords?.map((psw, i) => {
                 return <Credentials psw={psw} key={psw.label + i} />
               })
             ]
-          : UIConfig.homeList === UIOptions.byDomain && auths && bgPasswords
+          : UIConfig.homeList === UIOptions.byDomain
           ? [
               auths
-                .filter(({ originalUrl }) => {
+                ?.filter(({ originalUrl }) => {
                   if (!currentTabUrl || !originalUrl) {
                     return true
                   }
@@ -257,7 +257,7 @@ export const AuthsList = () => {
                   return <OtpCode auth={auth} key={auth.label + i} />
                 }),
               bgPasswords
-                .filter(({ originalUrl }) => {
+                ?.filter(({ originalUrl }) => {
                   if (!currentTabUrl || !originalUrl) {
                     return true
                   }
@@ -271,17 +271,14 @@ export const AuthsList = () => {
                 })
             ]
           : UIConfig.homeList === UIOptions.loginAndTOTP &&
-            auths &&
-            bgPasswords &&
             changeList === Values.TOTP
-          ? auths.map((auth, i) => {
+          ? auths?.map((auth, i) => {
+              console.log('test', auth)
               return <OtpCode auth={auth} key={auth.label + i} />
             })
           : UIConfig.homeList === UIOptions.loginAndTOTP &&
-            auths &&
-            bgPasswords &&
             changeList === Values.passwords
-          ? bgPasswords.map((psw, i) => {
+          ? bgPasswords?.map((psw, i) => {
               return <Credentials psw={psw} key={psw.label + i} />
             })
           : null}
