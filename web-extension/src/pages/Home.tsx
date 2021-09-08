@@ -8,7 +8,7 @@ import React, {
   useState
 } from 'react'
 
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 // var str2ab = require('string-to-arraybuffer')
 // var ab2str = require('arraybuffer-to-string')
 

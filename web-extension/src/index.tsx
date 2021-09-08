@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { Popup } from './popup/Popup'
 import { ApolloProvider } from '@apollo/client'
 import App from './App'

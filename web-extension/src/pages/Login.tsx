@@ -22,7 +22,7 @@ import {
   getTokenFromLocalStorage
 } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
