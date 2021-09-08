@@ -1,12 +1,11 @@
-import { UISettings } from '@src/components/setting-screens/UI'
+import { UISettings } from '@src/components/setting-screens/SettingsForm'
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 
 import browser from 'webextension-polyfill'
-import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
-import { timeObject } from '@src/background/chromeRuntimeListener'
+
 import { UserContext } from '@src/providers/UserProvider'
 
 export interface IAuth {
