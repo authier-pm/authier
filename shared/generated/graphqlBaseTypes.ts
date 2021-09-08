@@ -130,7 +130,6 @@ export type QuerySendConfirmationArgs = {
 
 export type SettingsConfig = {
   __typename?: 'SettingsConfig';
-  id: Scalars['Int'];
   userId: Scalars['String'];
   lockTime: Scalars['Int'];
   twoFA: Scalars['Boolean'];
