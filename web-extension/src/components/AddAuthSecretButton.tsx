@@ -8,7 +8,8 @@ import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
 import { AuthsContext } from '../providers/AuthsProvider'
-import { browser, Tabs } from 'webextension-polyfill-ts'
+import browser, { Tabs } from 'webextension-polyfill'
+
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
 

@@ -6,7 +6,7 @@ import React, {
 } from 'react'
 
 import { Route, Switch, useLocation } from 'wouter'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 import { NavBar } from '@src/components/NavBar'
 import { Home } from '../pages/Home'

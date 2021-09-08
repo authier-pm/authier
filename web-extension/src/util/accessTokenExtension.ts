@@ -1,5 +1,5 @@
 import jwtDecode from 'jwt-decode'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 
 export let accessToken = ''
 export let getTokenFromLocalStorage = async (): Promise<string> => {

@@ -1,7 +1,7 @@
 import { Flex, Spinner } from '@chakra-ui/react'
 import React, { ReactElement, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import AuthPages from './AuthPages'
 import { SafeUnlockVerification } from './pages/Verification'
 import { Popup } from './popup/Popup'
