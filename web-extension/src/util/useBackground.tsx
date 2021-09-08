@@ -1,11 +1,13 @@
-import { UISettings } from '@src/components/setting-screens/SettingsForm'
+import {
+  UIOptions,
+  UISettings
+} from '@src/components/setting-screens/SettingsForm'
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { Settings } from '@src/pages/Settings'
 import { useState, useEffect, useContext } from 'react'
 
 import browser from 'webextension-polyfill'
-
 import { UserContext } from '@src/providers/UserProvider'
 
 export interface IAuth {
@@ -43,7 +45,9 @@ export function useBackground() {
     noHandsLogin: false,
     vaultTime: '12 hours'
   })
-  const [UIConfig, setUIConfig] = useState<UISettings>({ homeList: 'All' })
+  const [UIConfig, setUIConfig] = useState<UISettings>({
+    homeList: UIOptions.all
+  })
 
   useEffect(() => {
     //Get auth from bg
