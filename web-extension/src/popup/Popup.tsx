@@ -149,7 +149,7 @@ export const Popup: FunctionComponent = () => {
         setUISettings({ homeList: settingsData.user.settings.homeUI })
       }
     }
-  }, [isAuth])
+  }, [isAuth, settingsData])
 
   useEffect(() => {
     setLocation('/')

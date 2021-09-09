@@ -24,7 +24,7 @@ export interface UISettings {
 }
 
 const options = [
-  { value: UIOptions.all, label: t`'All` },
+  { value: UIOptions.all, label: t`All` },
   { value: UIOptions.loginAndTOTP, label: t`TOTP & Login credentials` },
   { value: UIOptions.byDomain, label: t`Current domain` }
 ]
