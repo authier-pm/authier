@@ -3,7 +3,7 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
-import { timeObject } from '@src/background/chromeRuntimeListener'
+import { timeObject, timeToString } from '@src/background/chromeRuntimeListener'
 import { UserContext } from '@src/providers/UserProvider'
 import {
   UIOptions,
@@ -28,6 +28,11 @@ export interface Passwords {
 }
 export interface SecuritySettings {
   vaultTime: string
+  noHandsLogin: boolean
+}
+
+export interface SecuritySettingsInBg {
+  vaultTime: number
   noHandsLogin: boolean
 }
 
@@ -84,10 +89,13 @@ export function useBackground() {
 
     chrome.runtime.sendMessage(
       { action: BackgroundMessageType.giveSecuritySettings },
-      (res: { config: SecuritySettings }) => {
+      (res: { config: SecuritySettingsInBg }) => {
         if (res && res.config) {
           console.log('tesecuritySett:', res.config)
-          setSecurityConfig(res.config)
+          setSecurityConfig({
+            noHandsLogin: res.config.noHandsLogin,
+            vaultTime: timeToString(res.config.vaultTime) as string
+          })
         }
       }
     )
