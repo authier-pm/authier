@@ -69,7 +69,7 @@ chrome.runtime.onMessage.addListener(function (
     case BackgroundMessageType.giveSecuritySettings:
       sendResponse({
         config: {
-          vaultTime: timeToString(lockTime),
+          vaultTime: lockTime,
           noHandsLogin: noHandsLogin
         }
       })
