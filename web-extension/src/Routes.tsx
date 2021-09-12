@@ -12,6 +12,7 @@ export default function Routes(): ReactElement {
   const { data, loading } = useIsLoggedInQuery()
 
   const { safeLocked } = useContext(BackgroundContext)
+  console.log('~ safeLocked', safeLocked)
 
   if (loading) {
     return (

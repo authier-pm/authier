@@ -21,9 +21,6 @@ import {
   useInterval
 } from '@chakra-ui/react'
 
-import { Trans } from '@lingui/macro'
-
-import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import { useLocation } from 'wouter'

@@ -34,9 +34,9 @@ export class SettingsConfig {
   homeUI!: string;
 
   @TypeGraphQL.Field(_type => Date, {
-    nullable: false
+    nullable: true
   })
-  updatedAt!: Date;
+  updatedAt?: Date | null;
 
   user?: User;
 }

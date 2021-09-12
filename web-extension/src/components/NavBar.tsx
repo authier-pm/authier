@@ -13,7 +13,7 @@ import { Flex, Text, IconButton, useDisclosure } from '@chakra-ui/react'
 import { HamburgerIcon, ArrowBackIcon, CloseIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
-import { Menu } from '@src/pages/Menu'
+import { NavMenu } from '@src/pages/NavMenu'
 
 export const NavBar: FunctionComponent = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -71,7 +71,7 @@ export const NavBar: FunctionComponent = () => {
         )}
       </Flex>
 
-      {isOpen && <Menu></Menu>}
+      {isOpen && <NavMenu />}
     </Flex>
   )
 }

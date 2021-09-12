@@ -235,7 +235,7 @@ export const AuthsList = () => {
           : null}
       </Flex>
 
-      <Flex overflow="auto" overflowY="hidden" flexDirection="column">
+      <Flex overflow="auto" overflowX="hidden" flexDirection="column">
         {UIConfig.homeList === UIOptions.all
           ? [
               auths?.map((auth, i) => {
