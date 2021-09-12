@@ -1,19 +1,23 @@
 {
-  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
+  "ignorePaths": [
+    "*/node_modules/**",
+    "*/dist/**"
+  ],
   "words": [
-    "typegraphql",
-    "Authy",
-    "Deduplication",
-    "Fastify",
-    "TOTP",
     "appspot",
     "authier",
     "auths",
+    "Authy",
+    "Deduplication",
+    "Fastify",
     "firebaseapp",
     "graphiql",
+    "ITOTP",
     "mercurius",
     "otplib",
     "toastify",
+    "TOTP",
+    "typegraphql",
     "upsert",
     "webextension"
   ]

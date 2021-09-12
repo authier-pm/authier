@@ -1,5 +1,5 @@
-query DeviceCount($userId: String!) {
-  user(userId: $userId) {
+query DeviceCount {
+  me {
     devicesCount
   }
 }

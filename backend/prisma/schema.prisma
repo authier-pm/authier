@@ -66,11 +66,12 @@ model Device {
 }
 
 model SettingsConfig {
-    userId       String  @unique @db.Uuid
+    userId       String    @id @unique @db.Uuid
     lockTime     Int
     twoFA        Boolean
     noHandsLogin Boolean
     homeUI       String
+    updatedAt    DateTime? @updatedAt
 
     user User @relation(fields: [userId], references: [id])
 }
@@ -125,7 +126,7 @@ model User {
     EncryptedSecrets EncryptedSecrets[]
     Token            Token[]
     createdAt        DateTime           @default(now())
-    updatedAt        DateTime           @updatedAt
+    updatedAt        DateTime?          @updatedAt
     masterDevice     Device?            @relation("masterDevice", fields: [masterDeviceId], references: [id])
     masterDeviceId   Int?
 
@@ -139,7 +140,7 @@ model User {
 model Token {
     id         Int       @id @default(autoincrement())
     createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
+    updatedAt  DateTime? @updatedAt
     type       TokenType
     emailToken String?   @unique // Only used for short lived email tokens
     valid      Boolean   @default(true)

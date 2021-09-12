@@ -84,7 +84,9 @@ async function main() {
           console.error(' ', err)
         })
       }
-      return mercurius.defaultErrorFormatter(res, null)
+      const errResponse = mercurius.defaultErrorFormatter(res, null)
+      errResponse.statusCode = 200 // mercurius returns 500 by default, but we want to use 200 as that aligns better with apollo-server
+      return errResponse
     }
   })
 
