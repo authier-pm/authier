@@ -25,16 +25,12 @@ let devices = [
 export default function Devices() {
   const [location, setLocation] = useLocation()
   const { userId } = useContext(UserContext)
-  const { data, loading, error } = useMyDevicesQuery({
-    variables: {
-      userId: userId as string
-    }
-  })
+  const { data, loading, error } = useMyDevicesQuery()
 
   return (
     <Box>
       {data && !loading ? (
-        data.user.myDevices.map((i) => {
+        data.me?.myDevices.map((i) => {
           return (
             <Flex
               key={i.lastIpAddress}

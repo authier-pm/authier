@@ -13,7 +13,7 @@ export type SettingsQueryVariables = Types.Exact<{
 }>;
 
 
-export type SettingsQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } };
+export type SettingsQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } }> };
 
 export type SaveAuthsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -21,7 +21,7 @@ export type SaveAuthsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveAuthsMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } } };
+export type SaveAuthsMutation = { __typename?: 'Mutation', user?: Types.Maybe<{ __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } }> };
 
 export type SavePasswordsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -29,7 +29,7 @@ export type SavePasswordsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SavePasswordsMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } } };
+export type SavePasswordsMutation = { __typename?: 'Mutation', user?: Types.Maybe<{ __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } }> };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -48,7 +48,7 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', user: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } } };
+export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', user?: Types.Maybe<{ __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } }> };
 
 
 export const IsLoggedInDocument = gql`

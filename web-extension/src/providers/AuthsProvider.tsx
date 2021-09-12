@@ -11,11 +11,11 @@ import browser from 'webextension-polyfill'
 import cryptoJS from 'crypto-js'
 import { UserContext } from './UserProvider'
 import { useSaveAuthsMutation } from '../popup/Popup.codegen'
-import { useBackground } from '@src/util/useBackground'
+import { BackgroundContext } from './BackgroundProvider'
 
 export const AuthsContext = createContext<{
-  auths: Array<IAuth> | undefined
-  setAuths: Dispatch<SetStateAction<IAuth[] | undefined>>
+  auths: Array<IAuth>
+  setAuths: Dispatch<SetStateAction<IAuth[]>>
 }>({ auths: undefined } as any)
 
 export interface IAuth {
@@ -27,10 +27,10 @@ export interface IAuth {
 }
 
 export const AuthsProvider: FunctionComponent = ({ children }) => {
-  const [auths, setAuths] = useState<IAuth[]>()
+  const [auths, setAuths] = useState<IAuth[]>([])
   const { password, isApiLoggedIn: isAuth, userId } = useContext(UserContext)
   const [saveAuthsMutation] = useSaveAuthsMutation()
-  const { saveAuthsToBg } = useBackground()
+  const { saveAuthsToBg } = useContext(BackgroundContext)
 
   return (
     <AuthsContext.Provider

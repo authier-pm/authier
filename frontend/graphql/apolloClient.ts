@@ -76,6 +76,7 @@ const httpLink = createHttpLink({
 })
 
 export const apolloClient = new ApolloClient({
+  //@ts-expect-error
   link: ApolloLink.from([tokenRefresh, errorLink, httpLink]),
   cache: new InMemoryCache(),
   queryDeduplication: true

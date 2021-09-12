@@ -52,9 +52,9 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  user: UserMutation;
+  user?: Maybe<UserMutation>;
   /** you need to be authenticated to call this resolver */
-  me: UserMutation;
+  me?: Maybe<UserMutation>;
   addDevice: Device;
   addOTPEvent: Scalars['Boolean'];
   register: LoginResponse;
@@ -100,7 +100,7 @@ export type OtpEvent = {
 
 export type Query = {
   __typename?: 'Query';
-  user: UserQuery;
+  user?: Maybe<UserQuery>;
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean'];
   me?: Maybe<UserQuery>;

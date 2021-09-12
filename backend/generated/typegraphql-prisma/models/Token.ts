@@ -20,9 +20,9 @@ export class Token {
   createdAt!: Date;
 
   @TypeGraphQL.Field(_type => Date, {
-    nullable: false
+    nullable: true
   })
-  updatedAt!: Date;
+  updatedAt?: Date | null;
 
   @TypeGraphQL.Field(_type => TokenType, {
     nullable: false

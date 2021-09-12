@@ -6,9 +6,9 @@ import {
   Button
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
-import { useBackground } from '@src/util/useBackground'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useContext } from 'react'
 import Select from 'react-select'
 
 interface Props {}
@@ -30,7 +30,7 @@ const options = [
 ]
 
 export function SettingsForm({}: Props): ReactElement {
-  const { setUISettings, UIConfig } = useBackground()
+  const { setUISettings, UIConfig } = useContext(BackgroundContext)
   return (
     <>
       <Formik

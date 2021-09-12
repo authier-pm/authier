@@ -27,8 +27,8 @@ import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
-import { useBackground } from '@src/util/useBackground'
 import { toast } from 'react-toastify'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -43,7 +43,7 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg } = useBackground()
+  const { savePasswordsToBg } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">

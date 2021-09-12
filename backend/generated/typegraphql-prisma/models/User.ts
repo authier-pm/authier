@@ -46,9 +46,9 @@ export class User {
   createdAt!: Date;
 
   @TypeGraphQL.Field(_type => Date, {
-    nullable: false
+    nullable: true
   })
-  updatedAt!: Date;
+  updatedAt?: Date | null;
 
   masterDevice?: Device | null;
 

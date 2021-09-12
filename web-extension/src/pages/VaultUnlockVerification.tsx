@@ -1,37 +1,43 @@
 import React, { useContext, useState } from 'react'
 import {
   Flex,
-  Text,
   Input,
   InputGroup,
   InputRightElement,
   Button,
   FormControl,
   FormLabel,
-  FormErrorMessage
+  FormErrorMessage,
+  Heading,
+  Center
 } from '@chakra-ui/react'
 import { UserContext } from '@src/providers/UserProvider'
-import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
+
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
-import { useLocation } from 'wouter'
-import { useBackground } from '../util/useBackground'
+
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { toast } from 'react-toastify'
+import { t } from '@lingui/macro'
 
 interface Values {
   password: string
 }
 
-export function SafeUnlockVerification() {
+export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
-  const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword, setIsVaultLocked } = useContext(UserContext)
-  const { startCount, savePasswordsToBg } = useBackground()
+
+  const { setPassword } = useContext(UserContext)
+  const { loginUser } = useContext(BackgroundContext)
 
   return (
-    <Flex flexDirection="column" width="315px">
-      <Text>Re-enter you Master Password</Text>
+    <Flex flexDirection="column" width="315px" p={4}>
+      <Center>
+        <LockIcon boxSize="50px" mx={20} my={3}></LockIcon>
+      </Center>
+
       <Formik
         initialValues={{ password: 'bob' }}
         onSubmit={async (
@@ -57,24 +63,19 @@ export function SafeUnlockVerification() {
                 values.password
               ).toString(cryptoJS.enc.Utf8)
 
-              let parsedAuths = JSON.parse(decryptedAuths)
+              let parsedTOTP = JSON.parse(decryptedAuths)
               let parsedPsw = JSON.parse(decryptedPsw)
 
-              console.log('parsedAuths', parsedAuths)
+              console.log('parsedAuths', parsedTOTP)
               console.log('parsedPasswords', parsedPsw)
-
-              setAuths(parsedAuths)
-              savePasswordsToBg(parsedPsw)
-            } else {
-              setAuths([])
+              loginUser(parsedTOTP, parsedPsw)
             }
 
-            startCount()
-            setIsVaultLocked(false)
             setSubmitting(false)
           } catch (err) {
             console.log(err)
-            // Alert on wrong password
+
+            toast.error(t`Wrong password`)
           }
         }}
       >
@@ -84,9 +85,10 @@ export function SafeUnlockVerification() {
               {({ field, form }: any) => (
                 <FormControl
                   isInvalid={form.errors.password && form.touched.password}
-                  isRequired
                 >
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <FormLabel htmlFor="password">
+                    <Heading size="md">Re-enter you Master Password</Heading>
+                  </FormLabel>
                   <InputGroup>
                     <Input
                       {...field}

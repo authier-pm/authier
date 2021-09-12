@@ -3,34 +3,16 @@ import React, { ReactElement, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router'
 import browser from 'webextension-polyfill'
 import AuthPages from './AuthPages'
-import { SafeUnlockVerification } from './pages/Verification'
+import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
 import { useIsLoggedInQuery } from './popup/Popup.codegen'
-import { AuthsContext } from './providers/AuthsProvider'
-import { UserContext } from './providers/UserProvider'
-import { useBackground } from './util/useBackground'
+import { BackgroundContext } from './providers/BackgroundProvider'
 
 export default function Routes(): ReactElement {
-  const { data, loading, error } = useIsLoggedInQuery()
-  const { isApiLoggedIn, isVaultLocked, setIsVaultLocked } =
-    useContext(UserContext)
-  const { startCount, isCounting, safeLocked, bgAuths } = useBackground()
+  const { data, loading } = useIsLoggedInQuery()
 
-  //Change this is not ideal
-  useEffect(() => {
-    if (bgAuths === undefined && isApiLoggedIn) {
-      setIsVaultLocked(true)
-    }
-  }, [bgAuths, isApiLoggedIn])
-
-  if (isVaultLocked) {
-    return <SafeUnlockVerification />
-  }
-
-  if (isApiLoggedIn && !safeLocked && !isCounting) {
-    console.log('started counting')
-    startCount()
-  }
+  const { safeLocked } = useContext(BackgroundContext)
+  console.log('~ safeLocked', safeLocked)
 
   if (loading) {
     return (
@@ -39,6 +21,12 @@ export default function Routes(): ReactElement {
       </Flex>
     )
   }
+  if (!data?.authenticated) {
+    return <AuthPages />
+  }
+  if (safeLocked) {
+    return <VaultUnlockVerification />
+  }
 
-  return <>{data?.authenticated ? <Popup /> : <AuthPages />}</>
+  return <Popup />
 }
