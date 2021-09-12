@@ -1,23 +1,26 @@
 import React, { useContext, useState } from 'react'
 import {
   Flex,
-  Text,
   Input,
   InputGroup,
   InputRightElement,
   Button,
   FormControl,
   FormLabel,
-  FormErrorMessage
+  FormErrorMessage,
+  Heading,
+  Center
 } from '@chakra-ui/react'
 import { UserContext } from '@src/providers/UserProvider'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { toast } from 'react-toastify'
+import { t } from '@lingui/macro'
 
 interface Values {
   password: string
@@ -30,8 +33,11 @@ export function VaultUnlockVerification() {
   const { loginUser } = useContext(BackgroundContext)
 
   return (
-    <Flex flexDirection="column" width="315px">
-      <Text>Re-enter you Master Password</Text>
+    <Flex flexDirection="column" width="315px" p={4}>
+      <Center>
+        <LockIcon boxSize="50px" mx={20} my={3}></LockIcon>
+      </Center>
+
       <Formik
         initialValues={{ password: 'bob' }}
         onSubmit={async (
@@ -68,7 +74,8 @@ export function VaultUnlockVerification() {
             setSubmitting(false)
           } catch (err) {
             console.log(err)
-            // Alert on wrong password
+
+            toast.error(t`Wrong password`)
           }
         }}
       >
@@ -78,9 +85,10 @@ export function VaultUnlockVerification() {
               {({ field, form }: any) => (
                 <FormControl
                   isInvalid={form.errors.password && form.touched.password}
-                  isRequired
                 >
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <FormLabel htmlFor="password">
+                    <Heading size="md">Re-enter you Master Password</Heading>
+                  </FormLabel>
                   <InputGroup>
                     <Input
                       {...field}
