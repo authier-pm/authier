@@ -1,4 +1,8 @@
-import { IAuth } from '@src/util/useBackground'
+import {
+  ITOTPSecret,
+  ILoginCredentials,
+  SecuritySettings
+} from '@src/util/useBackgroundState'
 import {
   fireToken,
   lockTime,
@@ -7,17 +11,21 @@ import {
   setPasswords
 } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
+import {
+  UIOptions,
+  UISettings
+} from '@src/components/setting-screens/SettingsForm'
 
-export let twoFAs: Array<IAuth> | null | undefined = undefined
+export let twoFAs: Array<ITOTPSecret> | null | undefined = undefined
 
 let isCounting = false
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
-let homeList: 'All' | 'TOTP & Login credentials' | 'Current domain' = 'All'
+let homeList: UIOptions
 
 export const timeObject: any = {
   'On web close': 0,
-  '10 secconds': 10000,
+  '10 seconds': 10000,
   '8 hours': 288000000,
   '12 hours': 43200000
 }
@@ -33,15 +41,14 @@ export let timeToString = (time: number) => {
 //Work on saving settings to DB
 
 chrome.runtime.onMessage.addListener(function (
-  req:
-    | { action: BackgroundMessageType }
-    | {
-        action: 'lockTime' | 'auths'
-        lockTime: number
-        auths: any
-        passwords: any
-        settings: any
-      },
+  req: {
+    action: BackgroundMessageType
+    lockTime: number
+    config: UISettings
+    auths: ITOTPSecret[]
+    passwords: ILoginCredentials[]
+    settings: SecuritySettings
+  },
   sender,
   sendResponse
 ) {
@@ -88,6 +95,8 @@ chrome.runtime.onMessage.addListener(function (
       }
       if (!isCounting) {
         isCounting = true
+        console.log('startCount', lockTime)
+
         let interval = setTimeout(() => {
           clearTimeout(interval)
           isCounting = false
@@ -103,17 +112,17 @@ chrome.runtime.onMessage.addListener(function (
     case BackgroundMessageType.lockTime:
       //@ts-expect-error
       lockTime = req.lockTime
+      setLockTime(lockTime)
       break
 
     case BackgroundMessageType.auths:
       safeClosed = false // ????? What is this why ?
-      //@ts-expect-error
+
       twoFAs = req.auths
       console.log('Auths set on', twoFAs)
       break
 
     case BackgroundMessageType.passwords:
-      //@ts-expect-error
       setPasswords(req.passwords)
       break
 
@@ -123,18 +132,16 @@ chrome.runtime.onMessage.addListener(function (
       break
 
     case BackgroundMessageType.securitySettings:
-      //@ts-expect-error
-      setLockTime(timeObject[req.settings.vaultTime])
-      //@ts-expect-error
+      setLockTime(req.settings.vaultLockTime)
+
       noHandsLogin = req.settings.noHandsLogin
-      //@ts-expect-error
+
       console.log('config set on:', req.settings, lockTime, noHandsLogin)
       break
 
     case BackgroundMessageType.UISettings:
-      //@ts-expect-error
       homeList = req.config.homeList
-      //@ts-expect-error
+
       console.log('UIconfig', req.config)
       break
 

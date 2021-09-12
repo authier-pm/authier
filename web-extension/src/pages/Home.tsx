@@ -8,7 +8,6 @@ import React, {
   useState
 } from 'react'
 
-import browser from 'webextension-polyfill'
 // var str2ab = require('string-to-arraybuffer')
 // var ab2str = require('arraybuffer-to-string')
 
@@ -28,16 +27,15 @@ import { AddAuthSecretButton } from '../components/AddAuthSecretButton'
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 import { useLocation } from 'wouter'
-import { removeToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '@src/providers/UserProvider'
-import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
   const { setPassword, isApiLoggedIn } = useContext(UserContext)
-  const { refetch } = useIsLoggedInQuery()
+  const { bgAuths } = useContext(BackgroundContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
@@ -46,30 +44,15 @@ export const Home: FunctionComponent = () => {
   return (
     <>
       <Flex position="sticky" align="center" pl={4} pr={4}>
-        <CircularProgress
-          min={1}
-          max={30}
-          value={30 - seconds}
-          valueText={seconds.toString()}
-          size="40px"
-        />
-        <AddAuthSecretButton />
-        <Heading size="sm">
-          <Button
-            colorScheme={'teal'}
-            onClick={async () => {
-              // setIsAuth(false)
-              await browser.storage.local.clear()
-              removeToken()
-              await chrome.runtime.sendMessage({
-                action: BackgroundMessageType.clear
-              })
-              refetch()
-            }}
-          >
-            Logout
-          </Button>
-        </Heading>
+        {bgAuths.length > 0 && (
+          <CircularProgress
+            min={1}
+            max={30}
+            value={30 - seconds}
+            valueText={seconds.toString()}
+            size="40px"
+          />
+        )}
       </Flex>
       <Box height={200} width={330} p={5} mb={5}>
         <Grid gap={3} mb={5}>

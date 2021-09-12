@@ -5,22 +5,23 @@ import {
   Checkbox,
   Button
 } from '@chakra-ui/react'
-import { SecuritySettings, useBackground } from '@src/util/useBackground'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { SecuritySettings } from '@src/util/useBackgroundState'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useContext } from 'react'
 import Select from 'react-select'
 
 interface Props {}
 
-const options = [
-  { value: 'On web close', label: 'On web close' },
-  { value: '10 secconds', label: '10 secconds' },
-  { value: '8 hours', label: '8 hours' },
-  { value: '12 hours', label: '12 hours' }
+export const vaultLockTimeOptions = [
+  { value: 0, label: 'On web close' },
+  { value: 10000, label: '10 seconds' },
+  { value: 288000000, label: '8 hours' },
+  { value: 432000000, label: '12 hours' }
 ]
 
 export default function Security({}: Props): ReactElement {
-  const { setSecuritySettings, securityConfig } = useBackground()
+  const { setSecuritySettings, securityConfig } = useContext(BackgroundContext)
 
   return (
     <>
@@ -33,7 +34,7 @@ export default function Security({}: Props): ReactElement {
         ) => {
           alert(JSON.stringify(values, null, 2))
           setSecuritySettings({
-            vaultTime: values.vaultTime,
+            vaultLockTime: values.vaultLockTime,
             noHandsLogin: values.noHandsLogin
           })
 
@@ -50,14 +51,11 @@ export default function Security({}: Props): ReactElement {
                 >
                   <FormLabel htmlFor="vaultTime">Safe lock time</FormLabel>
                   <Select
-                    options={options}
+                    options={vaultLockTimeOptions}
                     name={field.name}
-                    //@ts-expect-error
-                    value={
-                      options
-                        ? options.find((option) => option.value === field.value)
-                        : ''
-                    }
+                    value={vaultLockTimeOptions.find(
+                      (option) => option.value === field.value
+                    )}
                     onChange={(option) =>
                       //@ts-expect-error
                       form.setFieldValue(field.name, option.value)

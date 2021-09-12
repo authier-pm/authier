@@ -4,7 +4,7 @@ import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 import { twoFAs } from './chromeRuntimeListener'
-import { Passwords } from '@src/util/useBackground'
+import { ILoginCredentials } from '@src/util/useBackgroundState'
 import { noHandsLogin } from './chromeRuntimeListener'
 import { SharedBrowserEvents } from './SharedBrowserEvents'
 //import { initInputWatch } from './initInputWatch'
@@ -49,7 +49,7 @@ if ('serviceWorker' in navigator) {
 }
 
 //Null for logout, undefined for Chrome refresh
-export let passwords: Array<Passwords> = []
+export let passwords: Array<ILoginCredentials> = []
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
@@ -59,6 +59,10 @@ export function setPasswords(val: any) {
 }
 
 export function setLockTime(val: number) {
+  console.log('setLockTime', val)
+  if (typeof val !== 'number') {
+    throw new Error('setLockTime must have a number value')
+  }
   lockTime = val
 }
 

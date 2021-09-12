@@ -22,9 +22,13 @@ import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
-import { Passwords, useBackground } from '@src/util/useBackground'
+import {
+  ILoginCredentials,
+  useBackgroundState
+} from '@src/util/useBackgroundState'
 import { UIOptions } from './setting-screens/SettingsForm'
 import RemoveAlertDialog from './RemoveAlertDialog'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 enum Values {
   passwords = 'PSW',
@@ -32,7 +36,7 @@ enum Values {
 }
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
-  const { saveAuthsToBg, bgAuths } = useBackground()
+  const { saveAuthsToBg, bgAuths } = useContext(BackgroundContext)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(auth.secret)
   const [showWhole, setShowWhole] = useState(false)
@@ -126,8 +130,8 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
   )
 }
 
-const Credentials = ({ psw }: { psw: Passwords }) => {
-  const { savePasswordsToBg, bgPasswords } = useBackground()
+const Credentials = ({ psw }: { psw: ILoginCredentials }) => {
+  const { savePasswordsToBg, bgPasswords } = useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
   const onClose = () => {
@@ -188,7 +192,7 @@ const Credentials = ({ psw }: { psw: Passwords }) => {
 export const AuthsList = () => {
   const [changeList, setChangeList] = useState<Values>(Values.TOTP)
   const { auths } = useContext(AuthsContext)
-  const { bgPasswords, UIConfig } = useBackground()
+  const { bgPasswords, UIConfig } = useContext(BackgroundContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
@@ -231,7 +235,7 @@ export const AuthsList = () => {
           : null}
       </Flex>
 
-      <Flex overflow="auto" flexDirection="column">
+      <Flex overflow="auto" overflowY="hidden" flexDirection="column">
         {UIConfig.homeList === UIOptions.all
           ? [
               auths?.map((auth, i) => {

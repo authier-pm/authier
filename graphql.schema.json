@@ -413,13 +413,9 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UserMutation",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "UserMutation",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -429,13 +425,9 @@
             "description": "you need to be authenticated to call this resolver",
             "args": [],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UserMutation",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "UserMutation",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
@@ -762,13 +754,9 @@
               }
             ],
             "type": {
-              "kind": "NON_NULL",
-              "name": null,
-              "ofType": {
-                "kind": "OBJECT",
-                "name": "UserQuery",
-                "ofType": null
-              }
+              "kind": "OBJECT",
+              "name": "UserQuery",
+              "ofType": null
             },
             "isDeprecated": false,
             "deprecationReason": null
