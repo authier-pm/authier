@@ -6,7 +6,7 @@
     "prodbuild": "API_URL=https://api.authier.ml/graphql webpack --config webpack.prod.js",
     "dev": "webpack -w --config webpack.dev.js",
     "tsc": "tsc",
-    "test": "echo TODO",
+    "test": "echo",
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ./.eslintrc.js \"src/**/*.ts*\"",
     "generate": "graphql-codegen"
