@@ -1,17 +1,11 @@
 import { Box } from '@chakra-ui/layout'
-import React, { ReactElement, useContext, useEffect } from 'react'
+import React, { ReactElement, useContext } from 'react'
 import { Route, Switch, useLocation } from 'wouter'
 import Login from './pages/Login'
 import { QRCode } from './pages/QRcode'
 import Register from './pages/Register'
-import { UserContext } from './providers/UserProvider'
-import { useBackground } from './util/useBackground'
 
 function AuthPages(): ReactElement {
-  const [location, setLocation] = useLocation()
-
-  const { safeLocked } = useBackground()
-
   return (
     <>
       <Box width="315px">

@@ -36,7 +36,7 @@
     "pretty-quick": "^3.1.1",
     "react-toastify": "^8.0.2",
     "ts-jest": "^27.0.5",
-    "typescript": "^4.4.2"
+    "typescript": "^4.4.3"
   },
   "husky": {
     "hooks": {

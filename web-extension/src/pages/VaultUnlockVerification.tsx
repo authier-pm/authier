@@ -11,23 +11,23 @@ import {
   FormErrorMessage
 } from '@chakra-ui/react'
 import { UserContext } from '@src/providers/UserProvider'
-import { AuthsContext, IAuth } from '@src/providers/AuthsProvider'
+
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
-import { useLocation } from 'wouter'
-import { useBackground } from '../util/useBackground'
+
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 interface Values {
   password: string
 }
 
-export function SafeUnlockVerification() {
+export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
-  const { setAuths, auths } = useContext(AuthsContext)
-  const { setPassword, setIsVaultLocked } = useContext(UserContext)
-  const { startCount, savePasswordsToBg } = useBackground()
+
+  const { setPassword } = useContext(UserContext)
+  const { loginUser } = useContext(BackgroundContext)
 
   return (
     <Flex flexDirection="column" width="315px">
@@ -57,20 +57,14 @@ export function SafeUnlockVerification() {
                 values.password
               ).toString(cryptoJS.enc.Utf8)
 
-              let parsedAuths = JSON.parse(decryptedAuths)
+              let parsedTOTP = JSON.parse(decryptedAuths)
               let parsedPsw = JSON.parse(decryptedPsw)
 
-              console.log('parsedAuths', parsedAuths)
+              console.log('parsedAuths', parsedTOTP)
               console.log('parsedPasswords', parsedPsw)
-
-              setAuths(parsedAuths)
-              savePasswordsToBg(parsedPsw)
-            } else {
-              setAuths([])
+              loginUser(parsedTOTP, parsedPsw)
             }
 
-            startCount()
-            setIsVaultLocked(false)
             setSubmitting(false)
           } catch (err) {
             console.log(err)
