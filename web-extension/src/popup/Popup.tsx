@@ -10,7 +10,7 @@ import { i18n } from '@lingui/core'
 
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import cryptoJS from 'crypto-js'
-import { Menu } from '@src/pages/Menu'
+
 import { QRCode } from '@src/pages/QRcode'
 import {
   useSaveFirebaseTokenMutation,

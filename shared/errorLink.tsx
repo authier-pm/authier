@@ -14,9 +14,9 @@ export const errorLink = onError(({ graphQLErrors, networkError }) => {
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
     })
-    toast.error('There was API error.')
-  }
-  if (networkError) {
+
+    toast.error(graphQLErrors[0].message ?? 'There was API error.')
+  } else if (networkError) {
     console.error(`[Network error]: ${networkError}`)
     toast.error('There was network error.')
   }
