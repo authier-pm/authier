@@ -9,8 +9,9 @@ import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
 
-export interface IAuth {
+export interface ITOTPSecret {
   secret: string
   label: string
   icon: string | undefined
@@ -18,7 +19,7 @@ export interface IAuth {
   originalUrl: string | undefined
 }
 
-export interface Passwords {
+export interface ILoginCredentials {
   label: string
   icon: string | undefined
   lastUsed?: Date | null
@@ -27,7 +28,7 @@ export interface Passwords {
   username: string
 }
 export interface SecuritySettings {
-  vaultTime: string
+  vaultLockTime: number
   noHandsLogin: boolean
 }
 
@@ -36,32 +37,38 @@ export interface SecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
-export function useBackground() {
-  const [currURL, setCurrURL] = useState<string>('')
-  const [safeLockTime, setSafeLockTime] = useState<number | null>(null)
+let registered = false // we need to only register once
+
+export function useBackgroundState() {
+  //TODO use single useState hook for all of these
+  const [currentURL, setCurrentURL] = useState<string>('')
+
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
-  const [bgAuths, setBgAuths] = useState<IAuth[] | undefined>(undefined)
+  const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
-  const [bgPasswords, setBgPasswords] = useState<Passwords[] | undefined>(
-    undefined
-  )
+  const [bgPasswords, setBgPasswords] = useState<ILoginCredentials[]>([])
   const [securityConfig, setSecurityConfig] = useState<SecuritySettings>({
     noHandsLogin: false,
-    vaultTime: '12 hours'
+    vaultLockTime: vaultLockTimeOptions[2].value
   })
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
   })
   const [updateSettings, { data, loading, error }] = useUpdateSettingsMutation()
-  const { userId } = useContext(UserContext)
-  //TODO save settings to DB in set setSecuritySettings
 
+  //TODO move this whole thing into it' own hook
   useEffect(() => {
+    if (registered) {
+      return
+    }
+    registered = true
+    console.log('useEffect registering!!')
+
     //Get auth from bg
     chrome.runtime.sendMessage(
       { action: BackgroundMessageType.giveMeAuths },
-      function (res: { auths: Array<IAuth> }) {
+      (res: { auths: Array<ITOTPSecret> }) => {
         if (res && res.auths) {
           setBgAuths(res.auths)
         }
@@ -71,7 +78,7 @@ export function useBackground() {
     //Get passwords from bg
     chrome.runtime.sendMessage(
       { action: BackgroundMessageType.giveMePasswords },
-      function (res: { passwords: Array<Passwords> }) {
+      (res: { passwords: Array<ILoginCredentials> }) => {
         if (res && res.passwords) {
           setBgPasswords(res.passwords)
         }
@@ -91,10 +98,9 @@ export function useBackground() {
       { action: BackgroundMessageType.giveSecuritySettings },
       (res: { config: SecuritySettingsInBg }) => {
         if (res && res.config) {
-          console.log('tesecuritySett:', res.config)
           setSecurityConfig({
             noHandsLogin: res.config.noHandsLogin,
-            vaultTime: timeToString(res.config.vaultTime) as string
+            vaultLockTime: res.config.vaultTime
           })
         }
       }
@@ -104,7 +110,6 @@ export function useBackground() {
       { action: BackgroundMessageType.giveUISettings },
       (res: { config: UISettings }) => {
         if (res.config) {
-          console.log('UiSEttings', res.config)
           setUIConfig(res.config)
         }
       }
@@ -118,75 +123,50 @@ export function useBackground() {
       console.log(request)
       // listen for messages sent from background.js
       if (request.message === SharedBrowserEvents.URL_CHANGED) {
-        setCurrURL(request.url)
+        setCurrentURL(request.url)
       }
     })
 
     // Checking if is safe closed
-    browser.runtime.onMessage.addListener((request: { safe: string }) => {
-      if (request.safe === 'closed') {
-        setSafeLocked(true)
-      }
-    })
-
-    chrome.runtime.onMessage.addListener(
-      async (req: { filling: Boolean }, sender, sendResponse) => {
-        if (req.filling) {
-          setIsFilling(true)
-        }
-      }
-    )
-
     browser.runtime.onMessage.addListener(
-      (req: { passwords: Array<Passwords> }) => {
-        if (req.passwords) {
-          setBgPasswords(req.passwords)
+      (request: {
+        safe: string
+        filling: Boolean
+        passwords: Array<ILoginCredentials>
+      }) => {
+        if (request.filling) {
+          setIsFilling(true)
+        } else if (request.safe === 'closed') {
+          setSafeLocked(true)
+        } else if (request.passwords) {
+          setBgPasswords(request.passwords)
         }
       }
     )
   }, [])
 
   const backgroundState = {
-    currURL,
+    currentURL,
     safeLocked,
     setSafeLocked,
     isFilling,
-    setSafeLockTime: async (lockTime: number | null) => {
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.lockTime,
-        lockTime: lockTime
-      })
-      setSafeLockTime(lockTime)
-    },
-    safeLockTime,
-    savePasswordsToBg: (value: Passwords[] | undefined) => {
+    loginUser: async (totp: ITOTPSecret[], passwords: ILoginCredentials[]) => {
+      console.log('safe unclcsd2', passwords, bgPasswords, totp, bgAuths)
+
+      setSafeLocked(false)
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.passwords,
-        passwords: value
+        passwords
       })
 
-      //@ts-expect-error
-      if (value?.length > 0) {
-        setBgPasswords(value)
-      } else {
-        setBgPasswords([])
-      }
-    },
-    saveAuthsToBg: (value: IAuth[] | undefined) => {
-      //Maybe save to DB here because when you remove item you must close the popup
+      setBgPasswords(passwords)
+
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.auths,
-        auths: value
+        auths: totp
       })
-      //@ts-expect-error
-      if (value?.length > 0) {
-        setBgAuths(value)
-      } else {
-        setBgAuths([])
-      }
-    },
-    bgAuths,
-    startCount: () => {
+      setBgAuths(totp)
+
       chrome.runtime.sendMessage(
         { action: BackgroundMessageType.startCount },
         (res: { isCounting: Boolean }) => {
@@ -196,16 +176,32 @@ export function useBackground() {
         }
       )
     },
+    savePasswordsToBg: (passwords: ILoginCredentials[]) => {
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.passwords,
+        passwords
+      })
+
+      setBgPasswords(passwords)
+    },
+    saveAuthsToBg: (totpSecrets: ITOTPSecret[]) => {
+      //Maybe save to DB here because when you remove item you must close the popup
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.auths,
+        auths: totpSecrets
+      })
+      setBgAuths(totpSecrets)
+    },
+    bgAuths,
     isCounting,
     bgPasswords,
     setSecuritySettings: (config: SecuritySettings) => {
       updateSettings({
         variables: {
-          lockTime: timeObject[config.vaultTime],
+          lockTime: config.vaultLockTime,
           noHandsLogin: config.noHandsLogin,
           homeUI: UIConfig.homeList,
-          twoFA: true, //Not added in the settings yet
-          userId: userId as string
+          twoFA: true //Not added in the settings yet
         }
       })
 
@@ -220,11 +216,10 @@ export function useBackground() {
     setUISettings: (config: UISettings) => {
       updateSettings({
         variables: {
-          lockTime: timeObject[securityConfig.vaultTime],
+          lockTime: securityConfig.vaultLockTime,
           noHandsLogin: securityConfig.noHandsLogin,
           homeUI: config.homeList,
-          twoFA: true, //Not added in the settings yet
-          userId: userId as string
+          twoFA: true //Not added in the settings yet
         }
       })
 
@@ -237,6 +232,7 @@ export function useBackground() {
     },
     UIConfig
   }
+
   // @ts-expect-error
   window.backgroundState = backgroundState
   return backgroundState

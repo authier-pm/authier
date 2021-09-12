@@ -10,7 +10,7 @@ import { i18n } from '@lingui/core'
 
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import cryptoJS from 'crypto-js'
-import { Menu } from '@src/pages/Menu'
+
 import { QRCode } from '@src/pages/QRcode'
 import {
   useSaveFirebaseTokenMutation,
@@ -20,13 +20,13 @@ import {
 } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
-import { SafeUnlockVerification } from '@src/pages/Verification'
+import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
-import { useBackground } from '@src/util/useBackground'
-import { timeToString } from '@src/background/chromeRuntimeListener'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 i18n.activate('en')
@@ -36,7 +36,6 @@ export const Popup: FunctionComponent = () => {
     isApiLoggedIn: isAuth,
     userId,
     fireToken,
-    setIsVaultLocked,
     password
   } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
@@ -53,14 +52,14 @@ export const Popup: FunctionComponent = () => {
     { data: settingsData, loading: settingsLoading, error: settingsError }
   ] = useSettingsLazyQuery()
   const {
-    currURL,
+    currentURL,
     bgAuths,
     isFilling,
     safeLocked,
     bgPasswords,
     setSecuritySettings,
     setUISettings
-  } = useBackground()
+  } = useContext(BackgroundContext)
 
   useEffect(() => {
     async function saveToLocal(encrypted: any) {
@@ -69,8 +68,7 @@ export const Popup: FunctionComponent = () => {
       })
     }
 
-    //@ts-expect-error
-    if (isAuth && bgPasswords?.length > 0) {
+    if (isAuth && bgPasswords.length > 0) {
       const encrypted = cryptoJS.AES.encrypt(
         JSON.stringify(bgPasswords),
         password
@@ -107,13 +105,6 @@ export const Popup: FunctionComponent = () => {
   }, [bgAuths])
 
   useEffect(() => {
-    if (safeLocked) {
-      console.log('isLocked', safeLocked)
-      setIsVaultLocked(true)
-    }
-  }, [safeLocked])
-
-  useEffect(() => {
     if (isFilling) {
       console.log('Filling')
       let device = deviceDetect()
@@ -126,7 +117,7 @@ export const Popup: FunctionComponent = () => {
           userId: userId,
           device: device.browserName + ' on ' + device.osName,
           location: 'Test',
-          pageName: currURL,
+          pageName: currentURL,
           time: date.getHours().toString() + ':' + date.getMinutes().toString()
         }
       })
@@ -142,8 +133,10 @@ export const Popup: FunctionComponent = () => {
 
       if (!!settingsData) {
         setSecuritySettings({
-          noHandsLogin: settingsData.user.settings.noHandsLogin,
-          vaultTime: timeToString(settingsData.user.settings.lockTime) as string
+          noHandsLogin: !!settingsData.user?.settings.noHandsLogin,
+          vaultLockTime:
+            settingsData.user?.settings.lockTime ??
+            vaultLockTimeOptions[2].value
         })
         //@ts-expect-error
         setUISettings({ homeList: settingsData.user.settings.homeUI })
@@ -173,12 +166,11 @@ export const Popup: FunctionComponent = () => {
 
       <Switch location={location}>
         <Route path="/" component={Home} />
+        <Route path="/secrets" component={Home} />
         <Route path="/popup.html" component={Home} />
-        <Route path="/menu" component={Menu} />
         <Route path="/qr-code" component={QRCode} />
         <Route path="/devices" component={Devices} />
         <Route path="/settings" component={Settings} />
-        <Route path="/verify" component={SafeUnlockVerification} />
       </Switch>
     </>
   )

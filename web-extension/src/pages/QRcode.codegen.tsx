@@ -3,17 +3,15 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type DeviceCountQueryVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
-}>;
+export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DeviceCountQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', devicesCount: number } };
+export type DeviceCountQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', devicesCount: number }> };
 
 
 export const DeviceCountDocument = gql`
-    query DeviceCount($userId: String!) {
-  user(userId: $userId) {
+    query DeviceCount {
+  me {
     devicesCount
   }
 }
@@ -31,11 +29,10 @@ export const DeviceCountDocument = gql`
  * @example
  * const { data, loading, error } = useDeviceCountQuery({
  *   variables: {
- *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useDeviceCountQuery(baseOptions: Apollo.QueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
+export function useDeviceCountQuery(baseOptions?: Apollo.QueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
       }

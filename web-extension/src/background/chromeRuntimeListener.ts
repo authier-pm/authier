@@ -1,4 +1,8 @@
-import { IAuth } from '@src/util/useBackground'
+import {
+  ITOTPSecret,
+  ILoginCredentials,
+  SecuritySettings
+} from '@src/util/useBackgroundState'
 import {
   fireToken,
   lockTime,
@@ -7,17 +11,22 @@ import {
   setPasswords
 } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
+import {
+  UIOptions,
+  UISettings
+} from '@src/components/setting-screens/SettingsForm'
+import browser from 'webextension-polyfill'
 
-export let twoFAs: Array<IAuth> | null | undefined = undefined
+export let twoFAs: Array<ITOTPSecret> | null | undefined = undefined
 
-let isCounting = false
+let vaultLockInterval: NodeJS.Timeout | null = null
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
-let homeList: 'All' | 'TOTP & Login credentials' | 'Current domain' = 'All'
+let homeList: UIOptions
 
 export const timeObject: any = {
   'On web close': 0,
-  '10 secconds': 10000,
+  '10 seconds': 10000,
   '8 hours': 288000000,
   '12 hours': 43200000
 }
@@ -33,15 +42,14 @@ export let timeToString = (time: number) => {
 //Work on saving settings to DB
 
 chrome.runtime.onMessage.addListener(function (
-  req:
-    | { action: BackgroundMessageType }
-    | {
-        action: 'lockTime' | 'auths'
-        lockTime: number
-        auths: any
-        passwords: any
-        settings: any
-      },
+  req: {
+    action: BackgroundMessageType
+    lockTime: number
+    config: UISettings
+    auths: ITOTPSecret[]
+    passwords: ILoginCredentials[]
+    settings: SecuritySettings
+  },
   sender,
   sendResponse
 ) {
@@ -82,38 +90,14 @@ chrome.runtime.onMessage.addListener(function (
         }
       })
 
-    case BackgroundMessageType.startCount:
-      if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
-        isCounting = false
-      }
-      if (!isCounting) {
-        isCounting = true
-        let interval = setTimeout(() => {
-          clearTimeout(interval)
-          isCounting = false
-          safeClosed = true
-          twoFAs = null
-          chrome.runtime.sendMessage({ safe: 'closed' })
-          console.log('locked', safeClosed)
-        }, lockTime)
-        sendResponse({ isCounting: true })
-      }
-      break
-
-    case BackgroundMessageType.lockTime:
-      //@ts-expect-error
-      lockTime = req.lockTime
-      break
-
     case BackgroundMessageType.auths:
       safeClosed = false // ????? What is this why ?
-      //@ts-expect-error
+
       twoFAs = req.auths
       console.log('Auths set on', twoFAs)
       break
 
     case BackgroundMessageType.passwords:
-      //@ts-expect-error
       setPasswords(req.passwords)
       break
 
@@ -123,18 +107,16 @@ chrome.runtime.onMessage.addListener(function (
       break
 
     case BackgroundMessageType.securitySettings:
-      //@ts-expect-error
-      setLockTime(timeObject[req.settings.vaultTime])
-      //@ts-expect-error
+      setLockTime(req.settings.vaultLockTime)
+
       noHandsLogin = req.settings.noHandsLogin
-      //@ts-expect-error
+
       console.log('config set on:', req.settings, lockTime, noHandsLogin)
       break
 
     case BackgroundMessageType.UISettings:
-      //@ts-expect-error
       homeList = req.config.homeList
-      //@ts-expect-error
+
       console.log('UIconfig', req.config)
       break
 
@@ -142,5 +124,31 @@ chrome.runtime.onMessage.addListener(function (
       if (typeof req === 'string') {
         throw new Error(`${req} not supported`)
       }
+  }
+})
+
+/**
+ * when user open popup we clear the vault lock interval, when user closes it we always restart it again
+ */
+browser.runtime.onConnect.addListener(function (externalPort) {
+  externalPort.onDisconnect.addListener(function () {
+    console.log('onDisconnect')
+    // Do stuff that should happen when popup window closes here
+    if (vaultLockInterval) {
+      clearInterval(vaultLockInterval)
+    }
+    vaultLockInterval = setTimeout(() => {
+      vaultLockInterval && clearTimeout(vaultLockInterval)
+
+      safeClosed = true
+      twoFAs = null
+      chrome.runtime.sendMessage({ safe: 'closed' })
+      console.log('locked', safeClosed)
+    }, lockTime)
+  })
+
+  if (vaultLockInterval) {
+    clearTimeout(vaultLockInterval)
+    vaultLockInterval = null
   }
 })

@@ -5,7 +5,8 @@ export enum SettingsConfigScalarFieldEnum {
   lockTime = "lockTime",
   twoFA = "twoFA",
   noHandsLogin = "noHandsLogin",
-  homeUI = "homeUI"
+  homeUI = "homeUI",
+  updatedAt = "updatedAt"
 }
 TypeGraphQL.registerEnumType(SettingsConfigScalarFieldEnum, {
   name: "SettingsConfigScalarFieldEnum",

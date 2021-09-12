@@ -14,3 +14,5 @@ browser.tabs.query({ active: true, currentWindow: true }).then(() => {
     document.getElementById('popup')
   )
 })
+
+browser.runtime.connect({ name: 'popup' })
