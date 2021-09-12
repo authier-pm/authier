@@ -25,6 +25,7 @@ import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/User'
 import { Device } from './generated/typegraphql-prisma'
+import { GraphqlError } from './api/GraphqlError'
 
 export interface IContext {
   request: FastifyRequest
@@ -244,53 +245,56 @@ export class RootResolver {
     const hashedPassword = await hash(password, 12)
 
     const ipAddress = ctx.getIpAddress()
+    let user
 
     try {
-      let user = await prisma.user.create({
+      user = await prisma.user.create({
         data: {
           email: email,
           passwordHash: hashedPassword
         }
       })
-
-      let device = await prisma.device.create({
-        data: {
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: firebaseToken,
-          name: 'test', // NEED device name
-          userId: user.id
-        }
-      })
-
-      await prisma.settingsConfig.create({
-        data: {
-          twoFA: true,
-          homeUI: 'all',
-          lockTime: 28800000,
-          noHandsLogin: false,
-          userId: user.id
-        }
-      })
-
-      await prisma.user.update({
-        where: {
-          id: user.id
-        },
-        data: {
-          masterDeviceId: device.id
-        }
-      })
-      setNewRefreshToken(user, ctx)
-
-      const accessToken = setNewAccessTokenIntoCookie(user, ctx)
-
-      return {
-        accessToken
+    } catch (err: any) {
+      if (err.code === 'P2002') {
+        throw new GraphqlError('User with such email already exists.')
       }
-    } catch (err) {
-      console.log(err)
-      throw new Error('Register failed')
+      throw err
+    }
+
+    let device = await prisma.device.create({
+      data: {
+        firstIpAddress: ipAddress,
+        lastIpAddress: ipAddress,
+        firebaseToken: firebaseToken,
+        name: 'test', // NEED device name
+        userId: user.id
+      }
+    })
+
+    await prisma.settingsConfig.create({
+      data: {
+        twoFA: true,
+        homeUI: 'all',
+        lockTime: 28800000,
+        noHandsLogin: false,
+        userId: user.id
+      }
+    })
+
+    await prisma.user.update({
+      where: {
+        id: user.id
+      },
+      data: {
+        masterDeviceId: device.id
+      }
+    })
+    setNewRefreshToken(user, ctx)
+
+    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
+
+    return {
+      accessToken
     }
   }
 

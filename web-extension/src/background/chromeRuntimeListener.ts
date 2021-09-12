@@ -15,10 +15,11 @@ import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
+import browser from 'webextension-polyfill'
 
 export let twoFAs: Array<ITOTPSecret> | null | undefined = undefined
 
-let isCounting = false
+let vaultLockInterval: NodeJS.Timeout | null = null
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: UIOptions
@@ -89,32 +90,6 @@ chrome.runtime.onMessage.addListener(function (
         }
       })
 
-    case BackgroundMessageType.startCount:
-      if (lockTime !== 1000 * 60 * 60 * 8 && isCounting) {
-        isCounting = false
-      }
-      if (!isCounting) {
-        isCounting = true
-        console.log('startCount', lockTime)
-
-        let interval = setTimeout(() => {
-          clearTimeout(interval)
-          isCounting = false
-          safeClosed = true
-          twoFAs = null
-          chrome.runtime.sendMessage({ safe: 'closed' })
-          console.log('locked', safeClosed)
-        }, lockTime)
-        sendResponse({ isCounting: true })
-      }
-      break
-
-    case BackgroundMessageType.lockTime:
-      //@ts-expect-error
-      lockTime = req.lockTime
-      setLockTime(lockTime)
-      break
-
     case BackgroundMessageType.auths:
       safeClosed = false // ????? What is this why ?
 
@@ -149,5 +124,31 @@ chrome.runtime.onMessage.addListener(function (
       if (typeof req === 'string') {
         throw new Error(`${req} not supported`)
       }
+  }
+})
+
+/**
+ * when user open popup we clear the vault lock interval, when user closes it we always restart it again
+ */
+browser.runtime.onConnect.addListener(function (externalPort) {
+  externalPort.onDisconnect.addListener(function () {
+    console.log('onDisconnect')
+    // Do stuff that should happen when popup window closes here
+    if (vaultLockInterval) {
+      clearInterval(vaultLockInterval)
+    }
+    vaultLockInterval = setTimeout(() => {
+      vaultLockInterval && clearTimeout(vaultLockInterval)
+
+      safeClosed = true
+      twoFAs = null
+      chrome.runtime.sendMessage({ safe: 'closed' })
+      console.log('locked', safeClosed)
+    }, lockTime)
+  })
+
+  if (vaultLockInterval) {
+    clearTimeout(vaultLockInterval)
+    vaultLockInterval = null
   }
 })

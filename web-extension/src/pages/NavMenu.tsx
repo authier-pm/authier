@@ -17,12 +17,12 @@ import { AddAuthSecretButton } from '@src/components/AddAuthSecretButton'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 
-export const Menu: FunctionComponent = () => {
+export const NavMenu: FunctionComponent = () => {
   const { refetch } = useIsLoggedInQuery()
 
   return (
-    <Stack direction="row" bgColor="teal.200" justify="center" pt="10px">
-      <ButtonGroup spacing={4} m="10px">
+    <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
+      <ButtonGroup spacing={4}>
         <Stack>
           <Link to={'/'}>
             <Button colorScheme="blue">Secrets</Button>
