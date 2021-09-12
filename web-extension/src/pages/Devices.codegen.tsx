@@ -3,17 +3,15 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type MyDevicesQueryVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
-}>;
+export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', user: { __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> } };
+export type MyDevicesQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> }> };
 
 
 export const MyDevicesDocument = gql`
-    query myDevices($userId: String!) {
-  user(userId: $userId) {
+    query myDevices {
+  me {
     myDevices {
       id
       firstIpAddress
@@ -36,11 +34,10 @@ export const MyDevicesDocument = gql`
  * @example
  * const { data, loading, error } = useMyDevicesQuery({
  *   variables: {
- *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useMyDevicesQuery(baseOptions: Apollo.QueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
+export function useMyDevicesQuery(baseOptions?: Apollo.QueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MyDevicesQuery, MyDevicesQueryVariables>(MyDevicesDocument, options);
       }

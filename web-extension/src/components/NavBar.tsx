@@ -9,14 +9,17 @@ import React, {
 
 import browser from 'webextension-polyfill'
 
-import { Flex, Text, IconButton } from '@chakra-ui/react'
-import { HamburgerIcon, ArrowBackIcon } from '@chakra-ui/icons'
+import { Flex, Text, IconButton, useDisclosure } from '@chakra-ui/react'
+import { HamburgerIcon, ArrowBackIcon, CloseIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
+import { Menu } from '@src/pages/Menu'
 
 export const NavBar: FunctionComponent = () => {
-  const [isOut, setIsOut] = useState(false)
+  const { isOpen, onOpen, onClose } = useDisclosure()
+
   const [location, setLocation] = useLocation()
+  console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (
@@ -37,23 +40,23 @@ export const NavBar: FunctionComponent = () => {
   }, [])
 
   return (
-    <Flex
-      height="40px"
-      textAlign="center"
-      backgroundColor="whitesmoke"
-      fontSize="16px"
-      borderBottom="1px"
-      borderBottomColor="gray.300"
-      width="330px"
-    >
-      <ActiveLink href={!isOut ? '/menu' : lastPage}>
-        {location !== '/' ? (
+    <Flex flexDir="column">
+      <Flex
+        height="40px"
+        textAlign="center"
+        backgroundColor="whitesmoke"
+        fontSize="16px"
+        borderBottom="1px"
+        borderBottomColor="gray.300"
+        width="330px"
+      >
+        {isOpen ? (
           <IconButton
             size="md"
             aria-label="menu"
-            icon={<ArrowBackIcon />}
+            icon={<CloseIcon />}
             onClick={() => {
-              setIsOut(!isOut)
+              onClose()
             }}
           />
         ) : (
@@ -62,11 +65,13 @@ export const NavBar: FunctionComponent = () => {
             aria-label="menu"
             icon={<HamburgerIcon />}
             onClick={() => {
-              setIsOut(!isOut)
+              onOpen()
             }}
           />
         )}
-      </ActiveLink>
+      </Flex>
+
+      {isOpen && <Menu></Menu>}
     </Flex>
   )
 }

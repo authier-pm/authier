@@ -1,5 +1,5 @@
 type Query {
-  user(userId: String!): UserQuery!
+  user(userId: String!): UserQuery
 
   """you need to be authenticated to call this resolver"""
   authenticated: Boolean!
@@ -48,10 +48,10 @@ type SettingsConfig {
 }
 
 type Mutation {
-  user(userId: String!): UserMutation!
+  user(userId: String!): UserMutation
 
   """you need to be authenticated to call this resolver"""
-  me: UserMutation!
+  me: UserMutation
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
   addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!

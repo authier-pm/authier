@@ -100,7 +100,6 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
 
   return (
     <Button
-      m={3}
       className="btn btn-block btn-outline-dark"
       onClick={async () => {
         const qr = await tryNextImage()

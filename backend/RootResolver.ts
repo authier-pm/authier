@@ -46,8 +46,8 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
-  @Query(() => UserQuery)
-  @Mutation(() => UserMutation)
+  @Query(() => UserQuery, { nullable: true })
+  @Mutation(() => UserMutation, { nullable: true })
   async user(@Arg('userId', () => String) userId: string) {
     const user = await prisma.user.findFirst({
       where: {
@@ -82,7 +82,8 @@ export class RootResolver {
   @UseMiddleware(isAuth)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
-    name: 'me'
+    name: 'me',
+    nullable: true
   })
   authenticatedMe(@Ctx() ctx: IContext) {
     return prisma.user.findFirst({

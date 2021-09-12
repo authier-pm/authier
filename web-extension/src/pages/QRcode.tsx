@@ -13,16 +13,14 @@ export function QRCode() {
   const [location, setLocation] = useLocation()
   const [count, setCount] = useState<number>(1)
   const { userId } = useContext(UserContext)
-  const { data, error, startPolling, stopPolling } = useDeviceCountQuery({
-    variables: { userId: userId as string }
-  })
+  const { data, error, startPolling, stopPolling } = useDeviceCountQuery()
 
   useEffect(() => {
     startPolling(interval)
   }, [])
 
   useEffect(() => {
-    const devicesCount = data?.user.devicesCount ?? 0
+    const devicesCount = data?.me?.devicesCount ?? 0
 
     if (typeof count !== undefined && devicesCount > count) {
       stopPolling()

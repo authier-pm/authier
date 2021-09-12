@@ -1,8 +1,7 @@
-import { Box, Flex, Spinner } from '@chakra-ui/react'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
-import { useBackground } from '@src/util/useBackground'
+
 import React, {
   useState,
   createContext,
@@ -33,18 +32,14 @@ export const UserContext = createContext<{
   isApiLoggedIn: Boolean
   localStorage: any
   fireToken: string
-  isVaultLocked: Boolean
-  setIsVaultLocked: Dispatch<SetStateAction<Boolean>>
 }>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
   const [password, setPassword] = useState<string>('bob')
   const { data, loading, error } = useIsLoggedInQuery()
   const [userId, setUserId] = useState<string | undefined>(undefined)
-  const [isVaultLocked, setIsVaultLocked] = useState<Boolean>(false)
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
-  const { safeLocked } = useBackground()
 
   useEffect(() => {
     async function checkStorage() {
@@ -73,12 +68,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     getId()
   }, [])
 
-  useEffect(() => {
-    if (safeLocked) {
-      setIsVaultLocked(true)
-    }
-  }, [safeLocked])
-
   const value = {
     password,
     setPassword,
@@ -86,9 +75,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     userId,
     isApiLoggedIn: !!(data?.authenticated && !loading),
     localStorage,
-    fireToken,
-    isVaultLocked,
-    setIsVaultLocked
+    fireToken
   }
   console.log(value)
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
