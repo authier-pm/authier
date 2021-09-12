@@ -42,7 +42,7 @@ let registered = false // we need to only register once
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-  const [safeLockTime, setSafeLockTime] = useState<number | null>(null)
+
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
   const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
@@ -150,14 +150,6 @@ export function useBackgroundState() {
     safeLocked,
     setSafeLocked,
     isFilling,
-    setSafeLockTime: async (lockTime: number | null) => {
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.lockTime,
-        lockTime: lockTime
-      })
-      setSafeLockTime(lockTime)
-    },
-    safeLockTime,
     loginUser: async (totp: ITOTPSecret[], passwords: ILoginCredentials[]) => {
       console.log('safe unclcsd2', passwords, bgPasswords, totp, bgAuths)
 
