@@ -10,6 +10,7 @@ import {
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
 import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { useSettingsQuery } from '@src/popup/Popup.codegen'
 
 export interface ITOTPSecret {
   secret: string
@@ -42,16 +43,14 @@ let registered = false // we need to only register once
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
+  const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
 
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
   const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
   const [bgPasswords, setBgPasswords] = useState<ILoginCredentials[]>([])
-  const [securityConfig, setSecurityConfig] = useState<SecuritySettings>({
-    noHandsLogin: false,
-    vaultLockTime: vaultLockTimeOptions[2].value
-  })
+
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
   })
@@ -98,7 +97,7 @@ export function useBackgroundState() {
       { action: BackgroundMessageType.giveSecuritySettings },
       (res: { config: SecuritySettingsInBg }) => {
         if (res && res.config) {
-          setSecurityConfig({
+          backgroundState.setSecuritySettings({
             noHandsLogin: res.config.noHandsLogin,
             vaultLockTime: res.config.vaultTime
           })
@@ -205,24 +204,15 @@ export function useBackgroundState() {
         }
       })
 
-      setSecurityConfig(config)
+      refetchSettings()
       //Call bg script to save settings to bg
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config
       })
     },
-    securityConfig,
-    setUISettings: (config: UISettings) => {
-      updateSettings({
-        variables: {
-          lockTime: securityConfig.vaultLockTime,
-          noHandsLogin: securityConfig.noHandsLogin,
-          homeUI: config.homeList,
-          twoFA: true //Not added in the settings yet
-        }
-      })
 
+    setUISettings: (config: UISettings) => {
       setUIConfig(config)
 
       chrome.runtime.sendMessage({

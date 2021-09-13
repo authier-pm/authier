@@ -2,8 +2,8 @@ query isLoggedIn {
   authenticated
 }
 
-query settings($userId: String!) {
-  user(userId: $userId) {
+query settings {
+  me {
     settings {
       lockTime
       twoFA
