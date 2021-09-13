@@ -14,7 +14,7 @@
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["contentScript.js"]
+      "js": ["js/contentScript.js"]
     }
   ],
   "icons": {
