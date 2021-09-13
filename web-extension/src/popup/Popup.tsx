@@ -16,7 +16,7 @@ import {
   useSaveFirebaseTokenMutation,
   useSavePasswordsMutation,
   useSendAuthMessageLazyQuery,
-  useSettingsLazyQuery
+  useSettingsQuery
 } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
@@ -48,19 +48,9 @@ export const Popup: FunctionComponent = () => {
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
   const [savePasswordsMutation] = useSavePasswordsMutation()
-  const [
-    getSettings,
-    { data: settingsData, loading: settingsLoading, error: settingsError }
-  ] = useSettingsLazyQuery()
-  const {
-    currentURL,
-    bgAuths,
-    isFilling,
-    safeLocked,
-    bgPasswords,
-    setSecuritySettings,
-    setUISettings
-  } = useContext(BackgroundContext)
+  const { data: settingsData } = useSettingsQuery()
+  const { currentURL, bgAuths, isFilling, safeLocked, bgPasswords } =
+    useContext(BackgroundContext)
 
   useEffect(() => {
     async function saveToLocal(encrypted: any) {
@@ -127,23 +117,6 @@ export const Popup: FunctionComponent = () => {
       // Listen to the response
     }
   }, [isFilling])
-
-  useEffect(() => {
-    if (isAuth) {
-      getSettings({ variables: { userId: userId as string } })
-
-      if (!!settingsData) {
-        setSecuritySettings({
-          noHandsLogin: !!settingsData.user?.settings.noHandsLogin,
-          vaultLockTime:
-            settingsData.user?.settings.lockTime ??
-            vaultLockTimeOptions[2].value
-        })
-        //@ts-expect-error
-        setUISettings({ homeList: settingsData.user.settings.homeUI })
-      }
-    }
-  }, [isAuth, settingsData])
 
   useEffect(() => {
     setLocation('/')
