@@ -11,6 +11,12 @@
     "scripts": ["js/backgroundPage.js"],
     "persistent": false
   },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["contentScript.js"]
+    }
+  ],
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
