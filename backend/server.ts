@@ -9,13 +9,13 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
 import { IContext } from './RootResolver'
-import Sentry from '@sentry/node'
+import { init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
 
 import pkg from '../package.json'
 dotenv.config()
 
-Sentry.init({
+sentryInit({
   dsn: process.env.SENTRY_DSN,
   environment: process.env.NODE_ENV,
   release: `<project-name>@${pkg.version}`
