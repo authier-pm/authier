@@ -80,6 +80,8 @@
     "@emotion/styled": "^11",
     "@lingui/cli": "^3.11.1",
     "@lingui/macro": "^3.11.1",
+    "@sentry/browser": "^6.12.0",
+    "@sentry/tracing": "^6.12.0",
     "@types/offscreencanvas": "^2019.6.3",
     "@types/react-router-dom": "^5.1.8",
     "apollo-boost": "^0.4.9",
