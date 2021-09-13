@@ -25,11 +25,22 @@ export const NavMenu: FunctionComponent = () => {
       <ButtonGroup spacing={4}>
         <Stack>
           <Link to={'/'}>
-            <Button colorScheme="blue">Secrets</Button>
+            <Button colorScheme="teal">Secrets</Button>
           </Link>
           <AddAuthSecretButton />
+          <Link to={'/settings'}>
+            <Button colorScheme="blue">Settings</Button>
+          </Link>
+        </Stack>
+      </ButtonGroup>
+      <ButtonGroup spacing={4} variant="solid" m="10px">
+        <Stack direction="column">
+          <Link to={'/devices'}>
+            <Button>My devices</Button>
+          </Link>
+
           <Button
-            colorScheme={'teal'}
+            colorScheme={'red'}
             onClick={async () => {
               // setIsAuth(false)
               await browser.storage.local.clear()
@@ -42,17 +53,9 @@ export const NavMenu: FunctionComponent = () => {
           >
             Logout
           </Button>
-        </Stack>
-      </ButtonGroup>
-      <ButtonGroup spacing={4} variant="solid" m="10px">
-        <Stack direction="column">
-          <Link to={'/devices'}>
-            <Button>My devices</Button>
+          <Link to={'/about'}>
+            <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>
-          <Link to={'/settings'}>
-            <Button>Settings</Button>
-          </Link>
-          <Button leftIcon={<InfoOutlineIcon />}>About</Button>
         </Stack>
       </ButtonGroup>
     </Stack>
