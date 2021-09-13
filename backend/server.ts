@@ -9,7 +9,7 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
 import { IContext } from './RootResolver'
-import { init as sentryInit } from '@sentry/node'
+import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
 
 import pkg from '../package.json'
@@ -91,7 +91,7 @@ async function main() {
         console.log(chalk.bgRed('Graphql errors: '))
         res.errors.map((err) => {
           if (err instanceof GraphqlError === false) {
-            Sentry.captureException(err)
+            captureException(err)
           }
           console.error(' ', err)
         })
