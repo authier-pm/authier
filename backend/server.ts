@@ -26,7 +26,10 @@ async function main() {
   const app = fastify({
     logger: true
   })
-  app.register(require('fastify-cors'))
+  app.register(require('fastify-cors'), {
+    origin: true,
+    credentials: true
+  })
   app.post('/refresh_token', async (request, reply) => {
     const refreshToken = request.cookies['refresh-token']
 
@@ -83,6 +86,29 @@ async function main() {
         return (
           request.headers['x-forwarded-for'] || request.socket.remoteAddress
         )
+      }
+
+      let token: string | undefined
+
+      if (request.cookies['access-token']) {
+        token = request.cookies['access-token']
+      } else {
+        const authorization = request.headers['authorization']
+        token = authorization?.split(' ')[1]
+      }
+
+      if (!token) {
+        reply.clearCookie('access-token')
+        return { request, reply, getIpAddress }
+      }
+
+      try {
+        const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+
+        let jwtPayload = payload as { userId: string }
+        return { request, reply, getIpAddress, jwtPayload }
+      } catch (err) {
+        reply.clearCookie('access-token')
       }
       return { request, reply, getIpAddress }
     },

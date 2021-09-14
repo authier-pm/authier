@@ -1,4 +1,3 @@
-import { isAuth } from './isAuth'
 import {
   Query,
   //   Mutation,
@@ -80,7 +79,6 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
@@ -99,16 +97,15 @@ export class RootResolver {
   }
 
   //TODO query for info about user
-  @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
   me(@Ctx() context: IContext) {
     const { jwtPayload } = context
+    console.log(jwtPayload)
     if (jwtPayload) {
       return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
     }
   }
 
-  @UseMiddleware(isAuth)
   @Mutation(() => Device)
   async addDevice(
     @Arg('name', () => String) name: string,
@@ -130,7 +127,6 @@ export class RootResolver {
     })
   }
 
-  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendAuthMessage(
     @Arg('userId', () => String) userId: string,
@@ -178,7 +174,6 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendConfirmation(
     @Arg('userId', () => String) userId: string,
@@ -335,7 +330,6 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
   async logout(@Ctx() ctx: IContext) {
     ctx.reply.clearCookie('refresh-token')
