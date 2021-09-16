@@ -13,7 +13,6 @@ import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { BackgroundProvider } from './providers/BackgroundProvider'
 
 export default function Providers() {
-  console.log('~ Providers')
   return (
     <ChakraProvider theme={chakraCustomTheme}>
       <BackgroundProvider>
