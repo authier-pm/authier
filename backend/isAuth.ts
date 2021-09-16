@@ -5,7 +5,7 @@ import { IContext } from './RootResolver'
 export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
   // console.log('~ context.request.cookie', context.request.cookies)
   let token: string | undefined
-  console.log('test', context.request)
+
   if (context.request.cookies['access-token']) {
     token = context.request.cookies['access-token']
   } else {

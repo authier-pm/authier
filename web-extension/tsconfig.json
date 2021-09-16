@@ -2,7 +2,9 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@src/*": ["src/*"]
+      "@src/*": [
+        "src/*"
+      ]
     },
     "target": "es5",
     "module": "commonjs",
@@ -13,7 +15,10 @@
     "sourceMap": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "lib": ["es2015", "dom"],
+    "lib": [
+      "es2015",
+      "dom"
+    ],
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
@@ -22,6 +27,13 @@
     "skipLibCheck": true,
     "incremental": true
   },
-  "exclude": ["../backend/**", "dist/**"],
-  "include": ["./src/**/*", "../shared/**/*"]
+  "exclude": [
+    "../backend/**",
+    "dist/**"
+  ],
+  "include": [
+    "./src/**/*",
+    "../shared/**/*",
+    "page-vault/Vault.tsx"
+  ]
 }
