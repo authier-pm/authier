@@ -47,6 +47,16 @@ export class UserQuery extends UserBase {
       }
     })
   }
+
+  @Field(() => [EncryptedSecrets])
+  @UseMiddleware(isAuth)
+  async secrets() {
+    return prisma.encryptedSecrets.findMany({
+      where: {
+        userId: this.id
+      }
+    })
+  }
 }
 
 @ObjectType()

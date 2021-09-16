@@ -1,11 +1,4 @@
-import React, {
-  createContext,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-  useEffect,
-  useState
-} from 'react'
+import React, { FunctionComponent } from 'react'
 
 import { Flex, Button, ButtonGroup, Stack } from '@chakra-ui/react'
 import browser from 'webextension-polyfill'
@@ -16,9 +9,11 @@ import { Link } from 'wouter'
 import { AddAuthSecretButton } from '@src/components/AddAuthSecretButton'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { useLocation } from 'wouter'
 
 export const NavMenu: FunctionComponent = () => {
   const { refetch } = useIsLoggedInQuery()
+  const [location, setLocation] = useLocation()
 
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
@@ -56,6 +51,14 @@ export const NavMenu: FunctionComponent = () => {
           <Link to={'/about'}>
             <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>
+
+          <Button
+            onClick={() => {
+              chrome.tabs.create({ url: 'vault.html' })
+            }}
+          >
+            My vault
+          </Button>
         </Stack>
       </ButtonGroup>
     </Stack>

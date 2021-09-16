@@ -1,8 +1,10 @@
 import { Box, Center, Flex, Input, Text } from '@chakra-ui/react'
+import { useRouter } from 'next/dist/client/router'
 
 import Head from 'next/head'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useUseMeQuery } from './layout/useMe.codegen'
+import { useEncryptedSecretsLazyQuery } from './vault.codegen'
 
 let test = [
   {
@@ -13,9 +15,16 @@ let test = [
 ]
 
 export default function Vault() {
-  const { data, loading, error } = useUseMeQuery()
+  const { data: meData, loading: meLoading, error: meError } = useUseMeQuery()
+  const [getSecrets, { data, loading, error }] = useEncryptedSecretsLazyQuery()
+  const router = useRouter()
 
-  console.log(data)
+  useEffect(() => {
+    if (meData?.me?.id && !meLoading) {
+      getSecrets({ variables: { userId: meData.me.id } })
+    }
+  }, [meData?.me?.id, loading])
+
   return (
     <Box>
       <Head>

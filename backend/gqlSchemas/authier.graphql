@@ -14,11 +14,12 @@ type UserQuery {
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
-  updatedAt: DateTime!
+  updatedAt: DateTime
   masterDeviceId: Int
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
+  secrets: [EncryptedSecrets!]!
 }
 
 """
@@ -45,6 +46,22 @@ type SettingsConfig {
   twoFA: Boolean!
   noHandsLogin: Boolean!
   homeUI: String!
+  updatedAt: DateTime
+}
+
+type EncryptedSecrets {
+  id: Int!
+  encrypted: String!
+  version: Int!
+  userId: String!
+  kind: EncryptedSecretsType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+enum EncryptedSecretsType {
+  TOTP
+  LOGIN_CREDENTIALS
 }
 
 type Mutation {
@@ -65,7 +82,7 @@ type UserMutation {
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
-  updatedAt: DateTime!
+  updatedAt: DateTime
   masterDeviceId: Int
   addDevice(firebaseToken: String!, name: String!): Device!
   saveAuths(payload: String!): EncryptedSecrets!
@@ -75,28 +92,13 @@ type UserMutation {
   revokeRefreshTokensForUser: User!
 }
 
-type EncryptedSecrets {
-  id: Int!
-  encrypted: String!
-  version: Int!
-  userId: String!
-  kind: EncryptedSecretsType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-}
-
-enum EncryptedSecretsType {
-  TOTP
-  LOGIN_CREDENTIALS
-}
-
 type User {
   id: String!
   email: String
   tokenVersion: Int!
   name: String
   createdAt: DateTime!
-  updatedAt: DateTime!
+  updatedAt: DateTime
   masterDeviceId: Int
 }
 
