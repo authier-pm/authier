@@ -11,9 +11,10 @@ import 'react-toastify/dist/ReactToastify.css'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { BackgroundProvider } from './providers/BackgroundProvider'
+import VaultRoutes from './VaultRoutes'
 
-export default function Providers() {
-  console.log('~ Providers')
+export default function Providers({ parent }: { parent: string }) {
+  console.log('~ Providers', parent)
   return (
     <ChakraProvider theme={chakraCustomTheme}>
       <BackgroundProvider>
@@ -21,7 +22,8 @@ export default function Providers() {
           <AuthsProvider>
             <I18nProvider i18n={i18n}>
               <ToastContainer {...toastifyConfig} />
-              <Routes />
+              {/* <Routes /> */}
+              {parent === 'vault' ? <VaultRoutes /> : <Routes />}
             </I18nProvider>
           </AuthsProvider>
         </UserProvider>

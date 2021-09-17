@@ -5,7 +5,7 @@ import browser from 'webextension-polyfill'
 import { Popup } from './popup/Popup'
 import Providers from './Providers'
 
-function App(): ReactElement {
+function App({ parent }: { parent: string }): ReactElement {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -22,8 +22,8 @@ function App(): ReactElement {
   if (loading) {
     return <Flex>Loading...</Flex>
   }
-
-  return <Providers />
+  console.log(parent)
+  return <Providers parent={parent} />
 }
 
 export default App

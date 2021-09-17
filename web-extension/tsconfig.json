@@ -34,6 +34,6 @@
   "include": [
     "./src/**/*",
     "../shared/**/*",
-    "page-vault/Vault.tsx"
+    "src/page-vault/Vault.tsx"
   ]
 }
