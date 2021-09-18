@@ -1,7 +1,7 @@
 import { Flex, Spinner } from '@chakra-ui/react'
 import React, { ReactElement, useContext } from 'react'
 import AuthPages from './AuthPages'
-import Vault from './page-vault/Vault'
+import Vault from './pages-vault/Vault'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
 import { useIsLoggedInQuery } from './popup/Popup.codegen'

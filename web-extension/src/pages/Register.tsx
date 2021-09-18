@@ -19,6 +19,7 @@ import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 interface Values {
   password: string
@@ -29,9 +30,9 @@ export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
-  const { setPassword, fireToken, setUserId } = useContext(UserContext)
+  const { setPassword, fireToken } = useContext(UserContext)
   const { refetch } = useIsLoggedInQuery()
-  // console.log('~ fireToken', fireToken)
+  const { saveMasterPsw } = useContext(BackgroundContext)
 
   if (registerError) {
     console.log(registerError)
@@ -61,6 +62,7 @@ export default function Register(): ReactElement {
             await browser.storage.local.set({
               'access-token': res.data?.register.accessToken
             })
+            saveMasterPsw(values.password)
             setAccessToken(res.data?.register.accessToken as string)
 
             setPassword(values.password)

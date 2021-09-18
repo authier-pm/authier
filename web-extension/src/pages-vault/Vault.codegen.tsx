@@ -1,4 +1,4 @@
-import * as Types from '../../shared/generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -8,13 +8,14 @@ export type EncryptedSecretsQueryVariables = Types.Exact<{
 }>;
 
 
-export type EncryptedSecretsQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType }> }> };
+export type EncryptedSecretsQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', id: number, encrypted: string, kind: Types.EncryptedSecretsType }> }> };
 
 
 export const EncryptedSecretsDocument = gql`
     query encryptedSecrets($userId: String!) {
   user(userId: $userId) {
     secrets {
+      id
       encrypted
       kind
     }
