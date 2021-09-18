@@ -42,7 +42,7 @@ let registered = false // we need to only register once
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-
+  const [masterPassword, setMasterPassword] = useState<string>('')
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
   const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
@@ -111,6 +111,15 @@ export function useBackgroundState() {
       (res: { config: UISettings }) => {
         if (res.config) {
           setUIConfig(res.config)
+        }
+      }
+    )
+
+    chrome.runtime.sendMessage(
+      { action: BackgroundMessageType.giveMasterPassword },
+      (res: { config: { masterPsw: string } }) => {
+        if (res.config) {
+          setMasterPassword(res.config.masterPsw)
         }
       }
     )
@@ -230,7 +239,14 @@ export function useBackgroundState() {
         config: config
       })
     },
-    UIConfig
+    UIConfig,
+    saveMasterPsw: (psw: string) => {
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.masterPassword,
+        masterPassword: psw
+      })
+    },
+    masterPassword
   }
 
   // @ts-expect-error

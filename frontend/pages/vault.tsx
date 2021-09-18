@@ -15,15 +15,15 @@ let test = [
 ]
 
 export default function Vault() {
-  const { data: meData, loading: meLoading, error: meError } = useUseMeQuery()
-  const [getSecrets, { data, loading, error }] = useEncryptedSecretsLazyQuery()
+  //const { data: meData, loading: meLoading, error: meError } = useUseMeQuery()
+  //const [getSecrets, { data, loading, error }] = useEncryptedSecretsLazyQuery()
   const router = useRouter()
 
-  useEffect(() => {
-    if (meData?.me?.id && !meLoading) {
-      getSecrets({ variables: { userId: meData.me.id } })
-    }
-  }, [meData?.me?.id, loading])
+  // useEffect(() => {
+  //   if (meData?.me?.id && !meLoading) {
+  //     getSecrets({ variables: { userId: meData.me.id } })
+  //   }
+  // }, [meData?.me?.id, loading])
 
   return (
     <Box>
@@ -39,14 +39,14 @@ export default function Vault() {
           />
 
           <Flex backgroundColor="blue.200">
-            {test.map((el) => {
+            {/* {test.map((el) => {
               return (
                 <Flex flexDirection="column">
                   <Text>{el.label}</Text>
                   <Text>{el.secret}</Text>
                 </Flex>
               )
-            })}
+            })} */}
           </Flex>
         </Flex>
       </Center>

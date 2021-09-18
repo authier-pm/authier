@@ -10,5 +10,7 @@ export enum BackgroundMessageType {
   securitySettings = 'securitySettings',
   giveSecuritySettings = 'giveSecuritySettings',
   giveUISettings = 'giveUISettings',
-  UISettings = 'UISettings'
+  UISettings = 'UISettings',
+  masterPassword = 'masterPassword',
+  giveMasterPassword = 'giveMasterPassword'
 }

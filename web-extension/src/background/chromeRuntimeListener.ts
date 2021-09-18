@@ -23,6 +23,7 @@ let vaultLockInterval: NodeJS.Timeout | null = null
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: UIOptions
+let masterPassword: string
 
 export const timeObject: any = {
   'On web close': 0,
@@ -49,6 +50,7 @@ chrome.runtime.onMessage.addListener(function (
     auths: ITOTPSecret[]
     passwords: ILoginCredentials[]
     settings: SecuritySettings
+    masterPassword: string
   },
   sender,
   sendResponse
@@ -118,6 +120,14 @@ chrome.runtime.onMessage.addListener(function (
       homeList = req.config.homeList
 
       console.log('UIconfig', req.config)
+      break
+
+    case BackgroundMessageType.masterPassword:
+      masterPassword = req.masterPassword
+      break
+
+    case BackgroundMessageType.giveMasterPassword:
+      sendResponse({ config: { masterPsw: masterPassword } })
       break
 
     default:

@@ -19,13 +19,6 @@ const firebaseConfig = {
   measurementId: 'G-0W2MW55WVF'
 }
 
-interface IAuth {
-  secret: string
-  label: string
-  icon: string | undefined
-  lastUsed?: Date | null
-  originalUrl: string | undefined
-}
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
 

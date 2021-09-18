@@ -43,7 +43,7 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg } = useContext(BackgroundContext)
+  const { savePasswordsToBg, saveMasterPsw } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -90,6 +90,8 @@ export default function Login(): ReactElement {
                   console.log(decryptedPasswords)
                 }
               })
+
+              saveMasterPsw(values.password)
 
               if (decryptedAuths) {
                 let loadedAuths = await JSON.parse(decryptedAuths)

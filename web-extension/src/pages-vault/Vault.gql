@@ -1,6 +1,7 @@
 query encryptedSecrets($userId: String!) {
   user(userId: $userId) {
     secrets {
+      id
       encrypted
       kind
     }
