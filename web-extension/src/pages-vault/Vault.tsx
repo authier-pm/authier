@@ -36,7 +36,7 @@ export default function Vault() {
   }, [userId])
 
   useEffect(() => {
-    if (data) {
+    if (data && masterPassword) {
       data?.user?.secrets.forEach((i) => {
         if (i.kind === 'TOTP') {
           setTotp(
@@ -59,7 +59,7 @@ export default function Vault() {
         }
       })
     }
-  }, [data])
+  }, [data, masterPassword])
 
   if (loading) {
     return (

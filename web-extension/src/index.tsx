@@ -14,7 +14,7 @@ Sentry.init({
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
-      <App />
+      <App parent="popup" />
     </ApolloProvider>,
     document.getElementById('popup')
   )

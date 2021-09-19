@@ -29,8 +29,7 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { setPassword } = useContext(UserContext)
-  const { loginUser } = useContext(BackgroundContext)
+  const { loginUser, saveMasterPsw } = useContext(BackgroundContext)
 
   return (
     <Flex flexDirection="column" width="315px" p={4}>
@@ -44,8 +43,6 @@ export function VaultUnlockVerification() {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          setPassword(values.password)
-
           const storage = await browser.storage.local.get()
 
           try {
@@ -66,9 +63,8 @@ export function VaultUnlockVerification() {
               let parsedTOTP = JSON.parse(decryptedAuths)
               let parsedPsw = JSON.parse(decryptedPsw)
 
-              console.log('parsedAuths', parsedTOTP)
-              console.log('parsedPasswords', parsedPsw)
               loginUser(parsedTOTP, parsedPsw)
+              saveMasterPsw(values.password)
             }
 
             setSubmitting(false)

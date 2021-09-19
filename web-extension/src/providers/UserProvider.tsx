@@ -25,8 +25,6 @@ import browser from 'webextension-polyfill'
 //     .catch((err) => console.log('failed: ', err))
 
 export const UserContext = createContext<{
-  setPassword: Dispatch<SetStateAction<string>>
-  password: string
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
   isApiLoggedIn: Boolean
@@ -35,7 +33,6 @@ export const UserContext = createContext<{
 }>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
-  const [password, setPassword] = useState<string>('bob')
   const { data, loading, error } = useIsLoggedInQuery()
   const [userId, setUserId] = useState<string | undefined>(undefined)
   const [localStorage, setLocalStorage] = useState<any>()
@@ -69,8 +66,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   }, [])
 
   const value = {
-    password,
-    setPassword,
     setUserId,
     userId,
     isApiLoggedIn: !!(data?.authenticated && !loading),

@@ -245,6 +245,8 @@ export function useBackgroundState() {
         action: BackgroundMessageType.masterPassword,
         masterPassword: psw
       })
+
+      setMasterPassword(psw)
     },
     masterPassword
   }

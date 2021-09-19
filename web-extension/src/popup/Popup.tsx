@@ -20,7 +20,6 @@ import {
 } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
-import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { UserContext } from '@src/providers/UserProvider'
 import { AuthsContext } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
@@ -33,30 +32,18 @@ import { AboutPage } from '@src/pages/AboutPage'
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const {
-    isApiLoggedIn: isAuth,
-    userId,
-    fireToken,
-    password
-  } = useContext(UserContext)
+  const { isApiLoggedIn: isAuth, userId, fireToken } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const [
-    saveFirebaseTokenMutation,
-    { data: tokenData, loading: tokenLoading, error: tokenError }
-  ] = useSaveFirebaseTokenMutation({})
+  const [saveFirebaseTokenMutation] = useSaveFirebaseTokenMutation({})
   const [location, setLocation] = useLocation()
-  const [sendAuthMessage, { data, error, loading }] =
-    useSendAuthMessageLazyQuery()
+  const [sendAuthMessage] = useSendAuthMessageLazyQuery()
   const [savePasswordsMutation] = useSavePasswordsMutation()
-  const [
-    getSettings,
-    { data: settingsData, loading: settingsLoading, error: settingsError }
-  ] = useSettingsLazyQuery()
+  const [getSettings, { data: settingsData }] = useSettingsLazyQuery()
   const {
     currentURL,
     bgAuths,
     isFilling,
-    safeLocked,
+    masterPassword,
     bgPasswords,
     setSecuritySettings,
     setUISettings
@@ -72,7 +59,7 @@ export const Popup: FunctionComponent = () => {
     if (isAuth && bgPasswords.length > 0) {
       const encrypted = cryptoJS.AES.encrypt(
         JSON.stringify(bgPasswords),
-        password
+        masterPassword
       ).toString()
 
       savePasswordsMutation({
