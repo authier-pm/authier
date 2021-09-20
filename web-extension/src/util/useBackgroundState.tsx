@@ -71,6 +71,7 @@ export function useBackgroundState() {
       (res: { auths: Array<ITOTPSecret> }) => {
         if (res && res.auths) {
           setBgAuths(res.auths)
+          console.log('got from BG', res.auths)
         }
       }
     )
@@ -194,6 +195,8 @@ export function useBackgroundState() {
       setBgPasswords(passwords)
     },
     saveAuthsToBg: (totpSecrets: ITOTPSecret[]) => {
+      console.log('secrets', totpSecrets)
+
       //Maybe save to DB here because when you remove item you must close the popup
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.auths,

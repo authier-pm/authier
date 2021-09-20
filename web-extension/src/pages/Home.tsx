@@ -23,15 +23,11 @@ import {
 
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
-import { useLocation } from 'wouter'
-import { UserContext } from '@src/providers/UserProvider'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const Home: FunctionComponent = () => {
-  const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
-  const { setPassword, isApiLoggedIn } = useContext(UserContext)
   const { bgAuths } = useContext(BackgroundContext)
 
   useInterval(() => {
