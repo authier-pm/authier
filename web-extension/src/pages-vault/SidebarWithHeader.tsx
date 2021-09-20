@@ -20,17 +20,16 @@ import {
   MenuButton,
   MenuDivider,
   MenuItem,
-  MenuList
+  MenuList,
+  useColorMode
 } from '@chakra-ui/react'
 import {
   FiHome,
-  FiTrendingUp,
-  FiCompass,
   FiStar,
   FiSettings,
   FiMenu,
-  FiBell,
-  FiChevronDown
+  FiChevronDown,
+  FiMoon
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
@@ -40,11 +39,9 @@ interface LinkItemProps {
   icon: IconType
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Home', icon: FiHome },
-  { name: 'Trending', icon: FiTrendingUp },
-  { name: 'Explore', icon: FiCompass },
-  { name: 'Favourites', icon: FiStar },
-  { name: 'Settings', icon: FiSettings }
+  { name: 'Vault', icon: FiHome },
+  { name: 'Settings', icon: FiSettings },
+  { name: 'Premium', icon: FiStar }
 ]
 
 export default function SidebarWithHeader({
@@ -97,7 +94,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Logo
+          Authier
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
@@ -150,6 +147,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const { colorMode, toggleColorMode } = useColorMode()
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -180,6 +178,13 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
+        <IconButton
+          size="lg"
+          variant="ghost"
+          aria-label="change color mode"
+          icon={<FiMoon />}
+          onClick={toggleColorMode}
+        />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

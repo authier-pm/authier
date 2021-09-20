@@ -12,18 +12,6 @@ import React, {
 } from 'react'
 import browser from 'webextension-polyfill'
 
-// const onMessageListener = () =>
-//   new Promise((resolve) => {
-//     onMessage(messaging, (payload) => {
-//       resolve(payload)
-//     })
-//   })
-//   onMessageListener()
-//     .then((payload) => {
-//       console.log(payload)
-//     })
-//     .catch((err) => console.log('failed: ', err))
-
 export const UserContext = createContext<{
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined

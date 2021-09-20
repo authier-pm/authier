@@ -59,7 +59,7 @@ const colors = {
   }
 }
 export const chakraCustomTheme = extendTheme({
-  colors
-  // initialColorMode: 'dark',
-  // useSystemColorMode: false
+  colors,
+  initialColorMode: 'light',
+  useSystemColorMode: false
 })
