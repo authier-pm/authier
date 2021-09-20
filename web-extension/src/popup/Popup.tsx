@@ -85,8 +85,9 @@ export const Popup: FunctionComponent = () => {
     }
   }, [isAuth, fireToken])
 
+  //wait for data from bg
   useEffect(() => {
-    if (bgAuths) {
+    if (bgAuths.length > 0) {
       console.log('got', bgAuths)
       setAuths(bgAuths)
     }

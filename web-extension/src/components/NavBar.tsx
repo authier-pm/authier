@@ -19,7 +19,6 @@ export const NavBar: FunctionComponent = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
 
   const [location, setLocation] = useLocation()
-  console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (

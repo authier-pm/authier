@@ -191,15 +191,11 @@ const Credentials = ({ psw }: { psw: ILoginCredentials }) => {
 
 export const AuthsList = () => {
   const [changeList, setChangeList] = useState<Values>(Values.TOTP)
-  const { auths } = useContext(AuthsContext)
-  const { bgPasswords, UIConfig } = useContext(BackgroundContext)
-
+  const { bgPasswords, UIConfig, bgAuths } = useContext(BackgroundContext)
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
 
   useEffect(() => {
     getCurrentTab().then((tab) => {
-      console.log('~ tab?.url', tab?.url)
-
       setCurrentTabUrl(tab?.url ?? null)
     })
   }, [])
@@ -238,7 +234,7 @@ export const AuthsList = () => {
       <Flex overflow="auto" overflowX="hidden" flexDirection="column">
         {UIConfig.homeList === UIOptions.all
           ? [
-              auths?.map((auth, i) => {
+              bgAuths?.map((auth, i) => {
                 return <OtpCode auth={auth} key={auth.label + i} />
               }),
               bgPasswords?.map((psw, i) => {
@@ -247,7 +243,7 @@ export const AuthsList = () => {
             ]
           : UIConfig.homeList === UIOptions.byDomain
           ? [
-              auths
+              bgAuths
                 ?.filter(({ originalUrl }) => {
                   if (!currentTabUrl || !originalUrl) {
                     return true
@@ -276,8 +272,7 @@ export const AuthsList = () => {
             ]
           : UIConfig.homeList === UIOptions.loginAndTOTP &&
             changeList === Values.TOTP
-          ? auths?.map((auth, i) => {
-              console.log('test', auth)
+          ? bgAuths?.map((auth, i) => {
               return <OtpCode auth={auth} key={auth.label + i} />
             })
           : UIConfig.homeList === UIOptions.loginAndTOTP &&

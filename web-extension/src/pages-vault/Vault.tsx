@@ -15,10 +15,12 @@ import { useEncryptedSecretsLazyQuery } from './Vault.codegen'
 import cryptoJS from 'crypto-js'
 import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
+import { AuthsContext } from '@src/providers/AuthsProvider'
 
 export default function Vault() {
   const { userId } = useContext(UserContext)
-  const { masterPassword } = useContext(BackgroundContext)
+  const { masterPassword, savePasswordsToBg } = useContext(BackgroundContext)
+  const { setAuths } = useContext(AuthsContext)
   const [totp, setTotp] = useState<[ITOTPSecret]>()
   const [credentials, setCredentials] = useState<[ILoginCredentials]>()
 
@@ -39,23 +41,23 @@ export default function Vault() {
     if (data && masterPassword) {
       data?.user?.secrets.forEach((i) => {
         if (i.kind === 'TOTP') {
-          setTotp(
-            JSON.parse(
-              cryptoJS.AES.decrypt(
-                i.encrypted as string,
-                masterPassword
-              ).toString(cryptoJS.enc.Utf8)
-            )
+          let loadedAuths = JSON.parse(
+            cryptoJS.AES.decrypt(
+              i.encrypted as string,
+              masterPassword
+            ).toString(cryptoJS.enc.Utf8)
           )
+          setTotp(loadedAuths)
+          setAuths(loadedAuths)
         } else if ('LOGIN_CREDENTIALS') {
-          setCredentials(
-            JSON.parse(
-              cryptoJS.AES.decrypt(
-                i.encrypted as string,
-                masterPassword
-              ).toString(cryptoJS.enc.Utf8)
-            )
+          let loadCredentials = JSON.parse(
+            cryptoJS.AES.decrypt(
+              i.encrypted as string,
+              masterPassword
+            ).toString(cryptoJS.enc.Utf8)
           )
+          setCredentials(loadCredentials)
+          savePasswordsToBg(loadCredentials)
         }
       })
     }
