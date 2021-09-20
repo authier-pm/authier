@@ -20,7 +20,7 @@ export default function Vault() {
   const { userId } = useContext(UserContext)
   const { masterPassword } = useContext(BackgroundContext)
   const [totp, setTotp] = useState<[ITOTPSecret]>()
-  const [credencials, setCredentials] = useState<[ILoginCredentials]>()
+  const [credentials, setCredentials] = useState<[ILoginCredentials]>()
 
   const [encryptedData, { data, loading, error }] =
     useEncryptedSecretsLazyQuery({
@@ -83,9 +83,35 @@ export default function Vault() {
           <Flex flexDirection="row" flexWrap="wrap">
             {totp?.map((el) => {
               return (
-                <Flex key={el.label} boxShadow="lg" flexDirection="column">
-                  <Image src={el.icon} alt="Segun Adebayo" />
-                  <Text>{el.label}</Text>
+                <Flex
+                  key={el.label}
+                  boxShadow="lg"
+                  flexDirection="column"
+                  w={180}
+                  h={190}
+                  m={3}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Image boxSize={40} src={el.icon} alt={el.label} />
+                  <Text fontSize={20}>{el.label}</Text>
+                </Flex>
+              )
+            })}
+            {credentials?.map((el) => {
+              return (
+                <Flex
+                  key={el.label}
+                  boxShadow="lg"
+                  flexDirection="column"
+                  m={3}
+                  w={180}
+                  h={190}
+                  alignItems="center"
+                  justifyContent="center"
+                >
+                  <Box boxSize={40} backgroundColor="blue.200" />
+                  <Text fontSize={20}>{el.label}</Text>
                 </Flex>
               )
             })}
