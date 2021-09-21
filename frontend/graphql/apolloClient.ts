@@ -9,7 +9,6 @@ import jwtDecode from 'jwt-decode'
 
 export let getTokenFromLocalStorage = async (): Promise<string | null> => {
   let test = sessionStorage.getItem('access-token')
-  console.log('testik', test)
   return test
 }
 
