@@ -6,7 +6,11 @@ import {
   Input,
   Spinner,
   Text,
-  Image
+  Image,
+  useColorModeValue,
+  Stack,
+  Heading,
+  Avatar
 } from '@chakra-ui/react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { UserContext } from '@src/providers/UserProvider'
@@ -16,6 +20,49 @@ import cryptoJS from 'crypto-js'
 import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
 import { AuthsContext } from '@src/providers/AuthsProvider'
+
+//@ts-expect-error
+function Item({ icon, label }) {
+  const [isVisible, setIsVisible] = useState(false)
+  return (
+    <Center py={5}>
+      <Box
+        maxW={'250px'}
+        w="250px"
+        h="auto"
+        bg={useColorModeValue('white', 'gray.900')}
+        boxShadow={'2xl'}
+        rounded={'md'}
+        overflow={'hidden'}
+        onMouseOver={() => setIsVisible(true)}
+        onMouseOut={() => setIsVisible(false)}
+      >
+        <Box bg={'gray.100'} mt={-6} mx={-6} pos={'relative'}>
+          <Image src={icon} w="100%" h="150px" />
+          <Box
+            display={isVisible ? 'block' : 'none'}
+            zIndex={9}
+            position="absolute"
+            top={0}
+            bgColor="blackAlpha.600"
+            w="100%"
+            h="150px"
+          ></Box>
+        </Box>
+        <Flex
+          flexDirection="row"
+          align="center"
+          justifyContent="flex-start"
+          p={3}
+        >
+          <Text fontWeight={'bold'} fontSize={'lg'}>
+            {label}
+          </Text>
+        </Flex>
+      </Box>
+    </Center>
+  )
+}
 
 export default function Vault() {
   const { userId } = useContext(UserContext)
@@ -73,10 +120,10 @@ export default function Vault() {
 
   return (
     <SidebarWithHeader>
-      <Center>
-        <Flex flexDirection="column" justifyItems="center">
+      <Center justifyContent={['flex-end', 'center', 'center']}>
+        <Flex flexDirection="column">
           <Input
-            w={['150px', '300px', '500px']}
+            w={['150px', '200', '300px', '350px', '400px', '500px']}
             placeholder="Search vault"
             m={5}
             _focus={{ backgroundColor: 'white' }}
@@ -84,21 +131,7 @@ export default function Vault() {
 
           <Flex flexDirection="row" flexWrap="wrap">
             {totp?.map((el) => {
-              return (
-                <Flex
-                  key={el.label}
-                  boxShadow="lg"
-                  flexDirection="column"
-                  w={180}
-                  h={190}
-                  m={3}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Image boxSize={40} src={el.icon} alt={el.label} />
-                  <Text fontSize={20}>{el.label}</Text>
-                </Flex>
-              )
+              return <Item icon={el.icon} label={el.label} />
             })}
             {credentials?.map((el) => {
               return (
