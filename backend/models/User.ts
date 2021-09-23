@@ -39,7 +39,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => SettingsConfig)
-  @UseMiddleware(isAuth)
   async settings() {
     return prisma.settingsConfig.findFirst({
       where: {
@@ -49,7 +48,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecrets])
-  @UseMiddleware(isAuth)
   async secrets() {
     return prisma.encryptedSecrets.findMany({
       where: {

@@ -67,7 +67,7 @@ export function useBackgroundState() {
 
     //Get auth from bg
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.giveMeAuths },
+      { action: BackgroundMessageType.getAuths },
       (res: { auths: Array<ITOTPSecret> }) => {
         if (res && res.auths) {
           setBgAuths(res.auths)
@@ -78,7 +78,7 @@ export function useBackgroundState() {
 
     //Get passwords from bg
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.giveMePasswords },
+      { action: BackgroundMessageType.getCredentials },
       (res: { passwords: Array<ILoginCredentials> }) => {
         if (res && res.passwords) {
           setBgPasswords(res.passwords)
@@ -96,7 +96,7 @@ export function useBackgroundState() {
     )
 
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.giveSecuritySettings },
+      { action: BackgroundMessageType.getSecuritySettings },
       (res: { config: SecuritySettingsInBg }) => {
         if (res && res.config) {
           setSecurityConfig({
@@ -108,7 +108,7 @@ export function useBackgroundState() {
     )
 
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.giveUISettings },
+      { action: BackgroundMessageType.getUISettings },
       (res: { config: UISettings }) => {
         if (res.config) {
           setUIConfig(res.config)
@@ -117,7 +117,7 @@ export function useBackgroundState() {
     )
 
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.giveMasterPassword },
+      { action: BackgroundMessageType.setMasterPassword },
       (res: { config: { masterPsw: string } }) => {
         if (res.config) {
           setMasterPassword(res.config.masterPsw)
