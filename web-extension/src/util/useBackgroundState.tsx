@@ -3,8 +3,7 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect, useContext } from 'react'
 import { browser } from 'webextension-polyfill-ts'
 import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
-import { timeObject, timeToString } from '@src/background/chromeRuntimeListener'
-import { UserContext } from '@src/providers/UserProvider'
+
 import {
   UIOptions,
   UISettings

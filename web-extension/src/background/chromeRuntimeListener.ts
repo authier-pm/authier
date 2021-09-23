@@ -25,21 +25,6 @@ export let noHandsLogin = false
 let homeList: UIOptions
 let masterPassword: string
 
-export const timeObject: any = {
-  'On web close': 0,
-  '10 seconds': 10000,
-  '8 hours': 288000000,
-  '12 hours': 43200000
-}
-
-export let timeToString = (time: number) => {
-  return Object.keys(timeObject).find((key) => {
-    if (timeObject[key] === time) {
-      return timeObject[key]
-    }
-  })
-}
-
 //Work on saving settings to DB
 
 chrome.runtime.onMessage.addListener(function (
