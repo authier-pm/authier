@@ -13,6 +13,7 @@ import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { BackgroundProvider } from './providers/BackgroundProvider'
 import VaultRoutes from './VaultRoutes'
 
+
 export default function Providers({ parent }: { parent: string }) {
   console.log('~ Providers', parent)
   return (
