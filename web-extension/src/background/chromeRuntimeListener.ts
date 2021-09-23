@@ -56,7 +56,7 @@ chrome.runtime.onMessage.addListener(function (
   sendResponse
 ) {
   switch (req.action) {
-    case BackgroundMessageType.giveMeAuths:
+    case BackgroundMessageType.getAuths:
       console.log('sending twoFAs', twoFAs)
       sendResponse({ auths: twoFAs })
       break
@@ -71,12 +71,12 @@ chrome.runtime.onMessage.addListener(function (
       sendResponse({ wasClosed: safeClosed })
       break
 
-    case BackgroundMessageType.giveMePasswords:
+    case BackgroundMessageType.getCredentials:
       console.log('sending passwords', passwords)
       sendResponse({ passwords: passwords })
       break
 
-    case BackgroundMessageType.giveSecuritySettings:
+    case BackgroundMessageType.getSecuritySettings:
       sendResponse({
         config: {
           vaultTime: lockTime,
@@ -85,7 +85,7 @@ chrome.runtime.onMessage.addListener(function (
       })
       break
 
-    case BackgroundMessageType.giveUISettings:
+    case BackgroundMessageType.getUISettings:
       sendResponse({
         config: {
           homeList: homeList
@@ -126,7 +126,7 @@ chrome.runtime.onMessage.addListener(function (
       masterPassword = req.masterPassword
       break
 
-    case BackgroundMessageType.giveMasterPassword:
+    case BackgroundMessageType.setMasterPassword:
       sendResponse({ config: { masterPsw: masterPassword } })
       break
 

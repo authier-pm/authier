@@ -1,16 +1,16 @@
 export enum BackgroundMessageType {
-  giveMeAuths = 'GiveMeAuths',
+  getAuths = 'getAuths',
   getFirebaseToken = 'getFirebaseToken',
   wasClosed = 'wasClosed',
-  giveMePasswords = 'giveMePasswords',
+  getCredentials = 'getCredentials',
   startCount = 'startCount',
   auths = 'auths',
   clear = 'clear',
   passwords = 'passwords',
   securitySettings = 'securitySettings',
-  giveSecuritySettings = 'giveSecuritySettings',
-  giveUISettings = 'giveUISettings',
   UISettings = 'UISettings',
   masterPassword = 'masterPassword',
-  giveMasterPassword = 'giveMasterPassword'
+  setMasterPassword = 'setMasterPassword',
+  getSecuritySettings = 'getSecuritySettings',
+  getUISettings = 'getUISettings'
 }
