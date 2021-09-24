@@ -3,16 +3,16 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type EncryptedSecretsQueryVariables = Types.Exact<{
+export type MeQueryVariables = Types.Exact<{
   userId: Types.Scalars['String'];
 }>;
 
 
-export type EncryptedSecretsQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', id: number, encrypted: string, kind: Types.EncryptedSecretsType }> }> };
+export type MeQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', id: number, encrypted: string, kind: Types.EncryptedSecretsType }> }> };
 
 
-export const EncryptedSecretsDocument = gql`
-    query encryptedSecrets($userId: String!) {
+export const MeDocument = gql`
+    query me($userId: String!) {
   user(userId: $userId) {
     secrets {
       id
@@ -24,29 +24,29 @@ export const EncryptedSecretsDocument = gql`
     `;
 
 /**
- * __useEncryptedSecretsQuery__
+ * __useMeQuery__
  *
- * To run a query within a React component, call `useEncryptedSecretsQuery` and pass it any options that fit your needs.
- * When your component renders, `useEncryptedSecretsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useEncryptedSecretsQuery({
+ * const { data, loading, error } = useMeQuery({
  *   variables: {
  *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useEncryptedSecretsQuery(baseOptions: Apollo.QueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useMeQuery(baseOptions: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
       }
-export function useEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
         }
-export type EncryptedSecretsQueryHookResult = ReturnType<typeof useEncryptedSecretsQuery>;
-export type EncryptedSecretsLazyQueryHookResult = ReturnType<typeof useEncryptedSecretsLazyQuery>;
-export type EncryptedSecretsQueryResult = Apollo.QueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
+export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
+export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
+export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;

@@ -81,6 +81,7 @@ export function useBackgroundState() {
       (res: { passwords: Array<ILoginCredentials> }) => {
         if (res && res.passwords) {
           setBgPasswords(res.passwords)
+          console.log('passwords', res.passwords)
         }
       }
     )
@@ -160,7 +161,7 @@ export function useBackgroundState() {
     setSafeLocked,
     isFilling,
     loginUser: async (totp: ITOTPSecret[], passwords: ILoginCredentials[]) => {
-      console.log('safe unclcsd2', passwords, bgPasswords, totp, bgAuths)
+      console.log('safe unlocked', passwords, bgPasswords, totp, bgAuths)
 
       setSafeLocked(false)
       chrome.runtime.sendMessage({
