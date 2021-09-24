@@ -1,4 +1,4 @@
-query encryptedSecrets($userId: String!) {
+query me($userId: String!) {
   user(userId: $userId) {
     secrets {
       id

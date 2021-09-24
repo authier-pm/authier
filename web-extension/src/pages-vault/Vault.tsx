@@ -10,16 +10,18 @@ import {
   useColorModeValue,
   Stack,
   Heading,
-  Avatar
+  Avatar,
+  IconButton
 } from '@chakra-ui/react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { UserContext } from '@src/providers/UserProvider'
 
-import { useEncryptedSecretsLazyQuery } from './Vault.codegen'
+import { useMeLazyQuery } from './Vault.codegen'
 import cryptoJS from 'crypto-js'
 import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
 import { AuthsContext } from '@src/providers/AuthsProvider'
+import { SettingsIcon, UnlockIcon } from '@chakra-ui/icons'
 
 //@ts-expect-error
 function Item({ icon, label }) {
@@ -37,27 +39,42 @@ function Item({ icon, label }) {
         onMouseOver={() => setIsVisible(true)}
         onMouseOut={() => setIsVisible(false)}
       >
-        <Box bg={'gray.100'} mt={-6} mx={-6} pos={'relative'}>
-          <Image src={icon} w="100%" h="150px" />
-          <Box
-            display={isVisible ? 'block' : 'none'}
+        <Box bg={'gray.100'} h="90%" pos={'relative'}>
+          <Image src={icon} w="100%" h="130px" />
+          <Flex
+            display={isVisible ? 'flex' : 'none'}
+            alignItems="center"
+            justifyContent="center"
             zIndex={9}
             position="absolute"
             top={0}
             bgColor="blackAlpha.600"
             w="100%"
-            h="150px"
-          ></Box>
+            h="full"
+          >
+            <IconButton
+              aria-label="open item"
+              colorScheme="blackAlpha"
+              icon={<UnlockIcon />}
+            />
+          </Flex>
         </Box>
         <Flex
           flexDirection="row"
           align="center"
-          justifyContent="flex-start"
-          p={3}
+          justifyContent="space-between"
+          p={4}
         >
           <Text fontWeight={'bold'} fontSize={'lg'}>
             {label}
           </Text>
+          <IconButton
+            size="sm"
+            display={isVisible ? 'block' : 'none'}
+            aria-label="open item"
+            colorScheme="gray"
+            icon={<SettingsIcon />}
+          />
         </Flex>
       </Box>
     </Center>
@@ -71,12 +88,11 @@ export default function Vault() {
   const [totp, setTotp] = useState<[ITOTPSecret]>()
   const [credentials, setCredentials] = useState<[ILoginCredentials]>()
 
-  const [encryptedData, { data, loading, error }] =
-    useEncryptedSecretsLazyQuery({
-      variables: {
-        userId: userId as string
-      }
-    })
+  const [encryptedData, { data, loading, error }] = useMeLazyQuery({
+    variables: {
+      userId: userId as string
+    }
+  })
 
   useEffect(() => {
     if (userId) {
