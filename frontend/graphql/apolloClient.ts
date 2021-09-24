@@ -8,7 +8,7 @@ import { errorLink } from '../../shared/errorLink'
 import jwtDecode from 'jwt-decode'
 
 export let getTokenFromLocalStorage = async (): Promise<string | null> => {
-  let test = sessionStorage.getItem('access-token')
+  const test = sessionStorage.getItem('access-token')
   return test
 }
 
