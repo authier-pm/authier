@@ -27,7 +27,7 @@ import { SettingsIcon, UnlockIcon } from '@chakra-ui/icons'
 function Item({ icon, label }) {
   const [isVisible, setIsVisible] = useState(false)
   return (
-    <Center py={5}>
+    <Center py={5} m={3}>
       <Box
         maxW={'250px'}
         w="250px"
@@ -150,21 +150,8 @@ export default function Vault() {
               return <Item icon={el.icon} label={el.label} />
             })}
             {credentials?.map((el) => {
-              return (
-                <Flex
-                  key={el.label}
-                  boxShadow="lg"
-                  flexDirection="column"
-                  m={3}
-                  w={180}
-                  h={190}
-                  alignItems="center"
-                  justifyContent="center"
-                >
-                  <Box boxSize={40} backgroundColor="blue.200" />
-                  <Text fontSize={20}>{el.label}</Text>
-                </Flex>
-              )
+              //@ts-expect-error
+              return <Item icon={el.favIconUrl} label={el.label} />
             })}
           </Flex>
         </Flex>
