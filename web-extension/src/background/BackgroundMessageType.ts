@@ -11,5 +11,8 @@ export enum BackgroundMessageType {
   giveSecuritySettings = 'giveSecuritySettings',
   giveUISettings = 'giveUISettings',
   UISettings = 'UISettings',
-  saveLoginCredentials = 'saveLoginCredentials'
+  saveLoginCredentials = 'saveLoginCredentials',
+  getLoginCredentialsModalState = 'getLoginCredentialsModalState',
+  hideLoginCredentialsModal = 'hideLoginCredentialsModal',
+  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown'
 }

@@ -21,7 +21,7 @@ export interface ITOTPSecret {
 
 export interface ILoginCredentials {
   label: string
-  icon: string | undefined
+  favIconUrl: string | undefined
   lastUsed?: Date | null
   originalUrl: string
   password: string
@@ -108,7 +108,7 @@ export function useBackgroundState() {
       { action: BackgroundMessageType.giveUISettings },
       (res: { config: UISettings }) => {
         if (res.config) {
-          setUIConfig(res.config)
+          // setUIConfig(res.config) // TODO fix
         }
       }
     )

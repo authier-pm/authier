@@ -1,22 +1,31 @@
 import { getCssSelector } from 'css-selector-generator'
+import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 export interface IInputRecord {
   element: HTMLInputElement | HTMLFormElement
-  type: 'input' | 'submit'
+  type: 'input' | 'submit' | 'keydown'
   inputted?: string
 }
 
 const defaultSelectorBlacklist = ['[data-*']
 
 function getSelectorForElement(target: HTMLElement) {
-  let selector = getCssSelector(target, {
-    blacklist: defaultSelectorBlacklist
-  })
-  if (selector.match(/\d+/)) {
+  let selector
+  if (document.body.contains(target)) {
     selector = getCssSelector(target, {
-      blacklist: [selector, ...defaultSelectorBlacklist]
+      blacklist: defaultSelectorBlacklist
     })
+
+    if (selector.match(/\d+/)) {
+      selector = getCssSelector(target, {
+        blacklist: [selector, ...defaultSelectorBlacklist]
+      })
+    }
+  } else {
+    // this input is not in DOM anymore--it was probably removed as part of the login flow(multistep login flow)
+    selector = generateQuerySelectorForOrphanedElement(target) // we fallback to generating selector from the orphaned element
   }
+
   return selector
 }
 
