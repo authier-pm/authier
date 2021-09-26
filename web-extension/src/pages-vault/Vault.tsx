@@ -22,9 +22,15 @@ import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
 import { AuthsContext } from '@src/providers/AuthsProvider'
 import { SettingsIcon, UnlockIcon } from '@chakra-ui/icons'
+import { t } from '@lingui/macro'
 
-//@ts-expect-error
-function Item({ icon, label }) {
+function VaultItem({
+  icon,
+  label
+}: {
+  label: string
+  icon: string | undefined
+}) {
   const [isVisible, setIsVisible] = useState(false)
   return (
     <Center py={5} m={3}>
@@ -40,7 +46,9 @@ function Item({ icon, label }) {
         onMouseOut={() => setIsVisible(false)}
       >
         <Box bg={'gray.100'} h="90%" pos={'relative'}>
-          <Image src={icon} w="100%" h="130px" />
+          <Center h={130}>
+            <Image src={icon} />
+          </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
             alignItems="center"
@@ -81,13 +89,13 @@ function Item({ icon, label }) {
   )
 }
 
-export default function Vault() {
+export function Vault() {
   const { userId } = useContext(UserContext)
   const { masterPassword, savePasswordsToBg } = useContext(BackgroundContext)
   const { setAuths } = useContext(AuthsContext)
   const [totp, setTotp] = useState<[ITOTPSecret]>()
   const [credentials, setCredentials] = useState<[ILoginCredentials]>()
-
+  const [filterBy, setFilterBy] = useState('')
   const [encryptedData, { data, loading, error }] = useMeLazyQuery({
     variables: {
       userId: userId as string
@@ -136,23 +144,49 @@ export default function Vault() {
 
   return (
     <SidebarWithHeader>
+      <Input
+        w={['150px', '200', '300px', '350px', '400px', '500px']}
+        placeholder={t`Search vault`}
+        m={5}
+        _focus={{ backgroundColor: 'white' }}
+        onChange={(ev) => {
+          setFilterBy(ev.target.value)
+        }}
+      />
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
-          <Input
-            w={['150px', '200', '300px', '350px', '400px', '500px']}
-            placeholder="Search vault"
-            m={5}
-            _focus={{ backgroundColor: 'white' }}
-          />
-
           <Flex flexDirection="row" flexWrap="wrap">
-            {totp?.map((el) => {
-              return <Item icon={el.icon} label={el.label} />
-            })}
-            {credentials?.map((el) => {
-              //@ts-expect-error
-              return <Item icon={el.favIconUrl} label={el.label} />
-            })}
+            {totp
+              ?.filter(({ label, originalUrl }) => {
+                return (
+                  label.includes(filterBy) || originalUrl.includes(filterBy)
+                )
+              })
+              .map((el, i) => {
+                return (
+                  <VaultItem
+                    icon={el.icon}
+                    label={el.label}
+                    key={el.label + i}
+                  />
+                )
+              })}
+            {credentials
+              ?.filter(({ label, originalUrl }) => {
+                return (
+                  label.includes(filterBy) || originalUrl.includes(filterBy)
+                )
+              })
+              .map((el, i) => {
+                return (
+                  <VaultItem
+                    //@ts-expect-error
+                    icon={el.favIconUrl}
+                    label={el.label}
+                    key={el.label + i}
+                  />
+                )
+              })}
           </Flex>
         </Flex>
       </Center>

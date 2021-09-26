@@ -15,7 +15,7 @@ export interface ITOTPSecret {
   label: string
   icon: string | undefined
   lastUsed?: Date | null
-  originalUrl: string | undefined
+  originalUrl: string
 }
 
 export interface ILoginCredentials {
