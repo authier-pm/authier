@@ -62,7 +62,6 @@ export default function Security({}: Props): ReactElement {
                     }
                     onBlur={field.onBlur}
                     id="vaultTime"
-                    mb={3}
                   />
                   <FormErrorMessage>{form.errors.vaultTime}</FormErrorMessage>
                 </FormControl>
