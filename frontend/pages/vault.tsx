@@ -1,4 +1,5 @@
 import { Box, Center, Flex, Input, Text } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 import { useRouter } from 'next/dist/client/router'
 
 import Head from 'next/head'
@@ -34,7 +35,7 @@ export default function Vault() {
         <Flex flexDirection="column" justifyItems="center">
           <Input
             w={['150px', '300px', '500px']}
-            placeholder="Search vault"
+            placeholder={t`Search vault`}
             m={5}
           />
 
