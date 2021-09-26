@@ -1,7 +1,7 @@
 import {
   ITOTPSecret,
   ILoginCredentials,
-  SecuritySettings
+  ISecuritySettings
 } from '@src/util/useBackgroundState'
 import {
   fireToken,
@@ -40,7 +40,7 @@ chrome.runtime.onMessage.addListener(async function (
     config: UISettings
     auths: ITOTPSecret[]
     passwords: ILoginCredentials[]
-    settings: SecuritySettings
+    settings: ISecuritySettings
   },
   sender,
   sendResponse

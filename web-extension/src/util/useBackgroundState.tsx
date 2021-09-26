@@ -8,7 +8,7 @@ import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { useSettingsQuery } from '@src/popup/Popup.codegen'
 
 export interface ITOTPSecret {
@@ -27,12 +27,12 @@ export interface ILoginCredentials {
   password: string
   username: string
 }
-export interface SecuritySettings {
+export interface ISecuritySettings {
   vaultLockTime: number
   noHandsLogin: boolean
 }
 
-export interface SecuritySettingsInBg {
+export interface ISecuritySettingsInBg {
   vaultTime: number
   noHandsLogin: boolean
 }
@@ -94,7 +94,7 @@ export function useBackgroundState() {
 
     chrome.runtime.sendMessage(
       { action: BackgroundMessageType.giveSecuritySettings },
-      (res: { config: SecuritySettingsInBg }) => {
+      (res: { config: ISecuritySettingsInBg }) => {
         if (res && res.config) {
           backgroundState.setSecuritySettings({
             noHandsLogin: res.config.noHandsLogin,
@@ -193,7 +193,7 @@ export function useBackgroundState() {
     bgAuths,
     isCounting,
     bgPasswords,
-    setSecuritySettings: (config: SecuritySettings) => {
+    setSecuritySettings: (config: ISecuritySettings) => {
       updateSettings({
         variables: {
           lockTime: config.vaultLockTime,
