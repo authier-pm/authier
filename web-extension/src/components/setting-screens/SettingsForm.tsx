@@ -57,7 +57,6 @@ export function SettingsForm({}: Props): ReactElement {
                   <Select
                     options={options}
                     name={field.name}
-                    //@ts-expect-error
                     value={
                       options
                         ? options.find((option) => option.value === field.value)
@@ -69,7 +68,6 @@ export function SettingsForm({}: Props): ReactElement {
                     }
                     onBlur={field.onBlur}
                     id="homeList"
-                    mb={3}
                   />
                   <FormErrorMessage>{form.errors.homeList}</FormErrorMessage>
                 </FormControl>
