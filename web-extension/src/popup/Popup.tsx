@@ -26,7 +26,7 @@ import { AuthsContext } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { AboutPage } from '@src/pages/AboutPage'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
