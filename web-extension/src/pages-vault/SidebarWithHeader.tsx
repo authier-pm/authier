@@ -52,10 +52,7 @@ export default function SidebarWithHeader({
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      <SidebarContent
-        onClose={() => onClose}
-        display={{ base: 'none', md: 'block' }}
-      />
+      <SidebarContent onClose={() => onClose} />
       <Drawer
         autoFocus={false}
         isOpen={isOpen}
@@ -80,7 +77,7 @@ interface SidebarProps extends BoxProps {
   onClose: () => void
 }
 
-const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+const SidebarContent = ({ onClose }: SidebarProps) => {
   return (
     <Box
       transition="3s ease"
@@ -90,7 +87,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       w={{ base: 'full', md: 60 }}
       pos="fixed"
       h="full"
-      {...rest}
+      display={{ base: 'none', md: 'flex' }}
+      flexDirection="column"
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
@@ -106,7 +104,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         ))}
       </Flex>
 
-      <Flex>
+      <Flex m={4} mt="auto">
         <Avatar
           size={'sm'}
           src={
