@@ -46,22 +46,6 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
-  @Query(() => UserQuery, { nullable: true })
-  @Mutation(() => UserMutation, { nullable: true })
-  async user(@Arg('userId', () => String) userId: string) {
-    const user = await prisma.user.findFirst({
-      where: {
-        id: userId
-      },
-      include: {
-        Devices: true,
-        EncryptedSecrets: true
-      }
-    })
-
-    return user
-  }
-
   @Query(() => Boolean, {
     description: 'you need to be authenticated to call this resolver'
   })

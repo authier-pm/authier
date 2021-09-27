@@ -1,5 +1,5 @@
-query me($userId: String!) {
-  user(userId: $userId) {
+query me {
+  me {
     secrets {
       id
       encrypted
