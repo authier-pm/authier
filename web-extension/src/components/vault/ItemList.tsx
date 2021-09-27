@@ -95,7 +95,7 @@ function VaultItem({
   )
 }
 
-export const ItemList: React.FC<{}> = () => {
+export const ItemList = () => {
   const { userId } = useContext(UserContext)
   const { masterPassword, savePasswordsToBg } = useContext(BackgroundContext)
   const { setAuths } = useContext(AuthsContext)
