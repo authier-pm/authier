@@ -24,7 +24,7 @@ import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/User'
-import { Device } from './generated/typegraphql-prisma'
+import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 
 export interface IContext {
@@ -353,5 +353,10 @@ export class RootResolver {
       })
       return user.tokenVersion
     }
+  }
+
+  @Query(() => [WebInput])
+  async webInputs(@Arg('url') url: string) {
+    return prisma.webInput.findMany({ where: { url } })
   }
 }
