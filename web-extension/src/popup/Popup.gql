@@ -2,8 +2,8 @@ query isLoggedIn {
   authenticated
 }
 
-query settings($userId: String!) {
-  user(userId: $userId) {
+query settings {
+  me {
     settings {
       lockTime
       twoFA
@@ -13,16 +13,16 @@ query settings($userId: String!) {
   }
 }
 
-mutation saveAuths($userId: String!, $payload: String!) {
-  user(userId: $userId) {
+mutation saveAuths($payload: String!) {
+  me {
     saveAuths(payload: $payload) {
       id
     }
   }
 }
 
-mutation savePasswords($userId: String!, $payload: String!) {
-  user(userId: $userId) {
+mutation savePasswords($payload: String!) {
+  me {
     savePasswords(payload: $payload) {
       id
     }
@@ -45,8 +45,8 @@ query sendAuthMessage(
   )
 }
 
-mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
-  user(userId: $userId) {
+mutation saveFirebaseToken($firebaseToken: String!) {
+  me {
     updateFireToken(firebaseToken: $firebaseToken) {
       id
     }
