@@ -43,11 +43,12 @@ model EncryptedSecrets {
 }
 
 model Device {
-    id                      Int    @id @default(autoincrement())
-    firstIpAddress          String @db.Inet
-    lastIpAddress           String @db.Inet
+    id                      Int     @id @default(autoincrement())
+    firstIpAddress          String  @db.Inet
+    lastIpAddress           String  @db.Inet
     firebaseToken           String
     name                    String
+    syncTOTP                Boolean @default(true)
     vaultLockTimeoutSeconds Int?
 
 
@@ -135,6 +136,7 @@ model User {
     WebInputsAdded   WebInput[]
     EncryptedChanges EncryptedSecretsChangeAction[]
     SettingsConfig   SettingsConfig[]
+    Tags             Tag[]
 }
 
 model Token {
@@ -167,4 +169,12 @@ enum WebInputType {
     EMAIL
     USERNAME_OR_EMAIL
     PASSWORD
+}
+
+model Tag {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String   @db.Uuid
 }

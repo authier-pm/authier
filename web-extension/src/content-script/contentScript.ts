@@ -6,6 +6,7 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 import type { SessionStoredItem } from '../background/backgroundPage'
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
+import { ILoginCredentials } from '@src/util/useBackgroundState'
 
 const log = debug('contentScript')
 localStorage.debug = '*' // enable all debug messages
@@ -168,13 +169,14 @@ function renderSaveCredentialsForm(username: string, password: string) {
   document
     .querySelector('#__AUTHIER__saveBtn')!
     .addEventListener('click', () => {
+      const loginCreds = {
+        username,
+        password,
+        capturedInputEvents: domRecorder.toJSON()
+      }
       browser.runtime.sendMessage({
         action: BackgroundMessageType.saveLoginCredentials,
-        payload: {
-          username,
-          password,
-          capturedInputEvents: domRecorder.toJSON()
-        }
+        payload: loginCreds
       })
     })
   document
