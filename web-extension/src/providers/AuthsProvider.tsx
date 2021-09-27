@@ -54,8 +54,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
 
             await saveAuthsMutation({
               variables: {
-                payload: encrypted,
-                userId: userId as string
+                payload: encrypted
               }
             })
           }
