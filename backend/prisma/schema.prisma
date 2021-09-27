@@ -5,14 +5,12 @@ datasource db {
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["selectRelationCount"]
+    provider = "prisma-client-js"
 }
 
 generator typegraphql {
-    provider    = "typegraphql-prisma"
-    output      = "../generated/typegraphql-prisma"
-    noResolvers = true
+    provider = "typegraphql-prisma"
+    output   = "../generated/typegraphql-prisma"
 }
 
 model EncryptedSecretsChangeAction {
