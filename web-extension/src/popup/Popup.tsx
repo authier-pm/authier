@@ -64,8 +64,7 @@ export const Popup: FunctionComponent = () => {
 
       savePasswordsMutation({
         variables: {
-          payload: encrypted,
-          userId: userId as string
+          payload: encrypted
         }
       })
 
@@ -78,7 +77,6 @@ export const Popup: FunctionComponent = () => {
       console.log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
-          userId: userId as string,
           firebaseToken: fireToken as string
         }
       })
@@ -118,14 +116,13 @@ export const Popup: FunctionComponent = () => {
 
   useEffect(() => {
     if (isAuth) {
-      getSettings({ variables: { userId: userId as string } })
+      getSettings()
 
       if (!!settingsData) {
         setSecuritySettings({
-          noHandsLogin: !!settingsData.user?.settings.noHandsLogin,
+          noHandsLogin: !!settingsData.me?.settings.noHandsLogin,
           vaultLockTime:
-            settingsData.user?.settings.lockTime ??
-            vaultLockTimeOptions[2].value
+            settingsData.me?.settings.lockTime ?? vaultLockTimeOptions[2].value
         })
         //@ts-expect-error
         setUISettings({ homeList: settingsData.user.settings.homeUI })

@@ -3,17 +3,15 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type MeQueryVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
-}>;
+export type MeQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', id: number, encrypted: string, kind: Types.EncryptedSecretsType }> }> };
+export type MeQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', secrets: Array<{ __typename?: 'EncryptedSecrets', id: number, encrypted: string, kind: Types.EncryptedSecretsType }> }> };
 
 
 export const MeDocument = gql`
-    query me($userId: String!) {
-  user(userId: $userId) {
+    query me {
+  me {
     secrets {
       id
       encrypted
@@ -35,11 +33,10 @@ export const MeDocument = gql`
  * @example
  * const { data, loading, error } = useMeQuery({
  *   variables: {
- *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useMeQuery(baseOptions: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
+export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
       }

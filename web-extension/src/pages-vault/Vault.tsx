@@ -96,11 +96,7 @@ export function Vault() {
   const [totp, setTotp] = useState<[ITOTPSecret]>()
   const [credentials, setCredentials] = useState<[ILoginCredentials]>()
   const [filterBy, setFilterBy] = useState('')
-  const [encryptedData, { data, loading, error }] = useMeLazyQuery({
-    variables: {
-      userId: userId as string
-    }
-  })
+  const [encryptedData, { data, loading, error }] = useMeLazyQuery({})
 
   useEffect(() => {
     if (userId) {
@@ -110,7 +106,7 @@ export function Vault() {
 
   useEffect(() => {
     if (data && masterPassword) {
-      data?.user?.secrets.forEach((i) => {
+      data?.me?.secrets.forEach((i) => {
         if (i.kind === 'TOTP') {
           let loadedAuths = JSON.parse(
             cryptoJS.AES.decrypt(

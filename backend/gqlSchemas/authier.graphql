@@ -1,6 +1,4 @@
 type Query {
-  user(userId: String!): UserQuery
-
   """you need to be authenticated to call this resolver"""
   authenticated: Boolean!
   me: UserQuery
@@ -65,8 +63,6 @@ enum EncryptedSecretsType {
 }
 
 type Mutation {
-  user(userId: String!): UserMutation
-
   """you need to be authenticated to call this resolver"""
   me: UserMutation
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
