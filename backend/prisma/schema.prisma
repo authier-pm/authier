@@ -29,13 +29,14 @@ model EncryptedSecretsChangeAction {
 
 // each row contains all of OTP
 model EncryptedSecrets {
-    id        Int                  @id @default(autoincrement())
-    encrypted String
-    version   Int
-    userId    String               @db.Uuid
-    kind      EncryptedSecretsType
-    createdAt DateTime             @default(now())
-    updatedAt DateTime?            @updatedAt
+    id         Int                  @id @default(autoincrement())
+    encrypted  String
+    version    Int
+    itemsCount Int                  @default(0)
+    userId     String               @db.Uuid
+    kind       EncryptedSecretsType
+    createdAt  DateTime             @default(now())
+    updatedAt  DateTime?            @updatedAt
     //uniqueFiled String               @unique
 
     user User @relation(fields: [userId], references: [id])
@@ -137,6 +138,7 @@ model User {
     EncryptedChanges EncryptedSecretsChangeAction[]
     SettingsConfig   SettingsConfig[]
     Tags             Tag[]
+    UserSlots        UserSlot[]
 }
 
 model Token {
@@ -177,4 +179,15 @@ model Tag {
     createdAt DateTime @default(now())
     user      User     @relation(fields: [userId], references: [id])
     userId    String   @db.Uuid
+}
+
+// these are typically bought with subscription
+model UserSlot {
+    id Int @id @default(autoincrement())
+
+    from      DateTime
+    to        DateTime
+    user      User      @relation(fields: [userId], references: [id])
+    userId    String    @db.Uuid
+    deletedAt DateTime?
 }
