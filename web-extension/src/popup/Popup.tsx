@@ -125,7 +125,7 @@ export const Popup: FunctionComponent = () => {
             settingsData.me?.settings.lockTime ?? vaultLockTimeOptions[2].value
         })
         //@ts-expect-error
-        setUISettings({ homeList: settingsData.user.settings.homeUI })
+        setUISettings({ homeList: settingsData.me.settings.homeUI }) //Need type here
       }
     }
   }, [isAuth, settingsData])

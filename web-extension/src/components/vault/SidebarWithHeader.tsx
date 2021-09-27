@@ -33,6 +33,7 @@ import {
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
+import { Link as RouterLink } from 'react-router-dom'
 
 interface LinkItemProps {
   name: string
@@ -136,7 +137,7 @@ interface NavItemProps extends FlexProps {
 }
 const NavItem = ({ icon, children, ...rest }: NavItemProps) => {
   return (
-    <Link href="#" style={{ textDecoration: 'none' }}>
+    <Link as={RouterLink} to={`#`} style={{ textDecoration: 'none' }}>
       <Flex
         align="center"
         p="4"
