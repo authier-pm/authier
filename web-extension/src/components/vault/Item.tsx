@@ -23,11 +23,11 @@ const InputWithHeading = ({
   heading: string
 }) => {
   return (
-    <Box w="inherit">
+    <Box flex={'50%'}>
       <Heading size="md" as="h5">
         {heading}
       </Heading>
-      <Input w="inherit" defaultValue={defaultValue} />
+      <Input defaultValue={defaultValue} />
     </Box>
   )
 }
@@ -43,25 +43,26 @@ export const Item = ({ data }: any) => {
       boxShadow={'2xl'}
       rounded={'md'}
       overflow={'hidden'}
-      w="800px"
+      w="600px"
       m="auto"
       bg={useColorModeValue('white', 'gray.900')}
     >
       <Flex p={5} flexDirection="column" w="inherit">
-        <Flex flexDirection="row" justifyContent="space-between">
+        <Flex
+          flexDirection="row"
+          justifyContent="space-between"
+          flexWrap="wrap"
+        >
           <InputWithHeading heading="URL:" defaultValue={data.originalUrl} />
           <InputWithHeading heading="Label:" defaultValue={data.label} />
-        </Flex>
 
-        <Flex flexDirection="row" justifyContent="space-between">
           <InputWithHeading heading="Username:" defaultValue={data.username} />
-          <Box w="inherit">
+          <Box flex={'50%'}>
             <Heading size="md" as="h5">
               Password:
             </Heading>
             <InputGroup size="md">
               <Input
-                w="inherit"
                 pr="4.5rem"
                 type={show ? 'text' : 'password'}
                 defaultValue={data.password}
