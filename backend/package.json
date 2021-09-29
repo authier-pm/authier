@@ -34,7 +34,7 @@
     "mz": "^2.7.0",
     "nodemon": "^2.0.13",
     "ts-jest": "^27.0.5",
-    "typegraphql-prisma": "MichalLytek/typegraphql-prisma#dev"
+    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma"
   },
   "scripts": {
     "dev": "nodemon --exec ts-node --transpile-only server.ts",

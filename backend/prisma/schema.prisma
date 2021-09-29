@@ -9,8 +9,9 @@ generator client {
 }
 
 generator typegraphql {
-    provider = "typegraphql-prisma"
-    output   = "../generated/typegraphql-prisma"
+    provider    = "typegraphql-prisma"
+    output      = "../generated/typegraphql-prisma"
+    noResolvers = true
 }
 
 model EncryptedSecretsChangeAction {
