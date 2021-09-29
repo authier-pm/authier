@@ -114,6 +114,8 @@ model WebInput {
     addedByUser   User           @relation(fields: [addedByUserId], references: [id])
     addedByUserId String         @db.Uuid
     OTPCodeEvent  OTPCodeEvent[]
+
+    @@unique([url, domPath], name: "webInputIdentifier")
 }
 
 model User {

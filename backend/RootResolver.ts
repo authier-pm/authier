@@ -26,11 +26,18 @@ import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.j
 import { UserQuery, UserMutation } from './models/User'
 import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
+import { WebInputElement } from './models/WebInputElement'
 
 export interface IContext {
   request: FastifyRequest
   reply: FastifyReply
-  jwtPayload?: { userId: string }
+  getIpAddress: () => string
+}
+
+export interface IContextAuthenticated {
+  request: FastifyRequest
+  reply: FastifyReply
+  jwtPayload: { userId: string }
   getIpAddress: () => string
 }
 
@@ -86,7 +93,7 @@ export class RootResolver {
     name: 'me',
     nullable: true
   })
-  authenticatedMe(@Ctx() ctx: IContext) {
+  authenticatedMe(@Ctx() ctx: IContextAuthenticated) {
     return prisma.user.findFirst({
       where: {
         id: ctx.jwtPayload?.userId
@@ -101,7 +108,7 @@ export class RootResolver {
   //TODO query for info about user
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
-  me(@Ctx() context: IContext) {
+  me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
     if (jwtPayload) {
       return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
@@ -337,7 +344,7 @@ export class RootResolver {
 
   @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
-  async logout(@Ctx() ctx: IContext) {
+  async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
     if (ctx.jwtPayload) {
@@ -358,5 +365,31 @@ export class RootResolver {
   @Query(() => [WebInput])
   async webInputs(@Arg('url') url: string) {
     return prisma.webInput.findMany({ where: { url } })
+  }
+
+  @UseMiddleware(isAuth)
+  @Mutation(() => [WebInput])
+  async addWebInputs(
+    @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    for (const webInput of webInputs) {
+      const forUpsert = {
+        url: webInput.url,
+        domPath: webInput.domPath,
+        kind: webInput.kind,
+        addedByUserId: ctx.jwtPayload.userId
+      }
+      await prisma.webInput.upsert({
+        create: forUpsert,
+        update: forUpsert,
+        where: {
+          webInputIdentifier: {
+            url: webInput.url,
+            domPath: webInput.domPath
+          }
+        }
+      })
+    }
   }
 }

@@ -27,6 +27,16 @@ let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: UIOptions
 
+interface ILoginCredentialsFromContentScript {
+  username: string
+  password: string
+  capturedInputEvents: {
+    element: string
+    type: 'input' | 'submit' | 'keydown'
+    inputted: string | undefined
+  }[]
+}
+
 const saveLoginModalsStates = new Map<
   number,
   { password: string; username: string }
@@ -51,101 +61,120 @@ chrome.runtime.onMessage.addListener(async function (
     log(req.action)
   }
 
-  const currentTabId = sender.tab?.id
+  const tab = sender.tab
+  if (tab && tab.url) {
+    const currentTabId = tab.id
 
-  switch (req.action) {
-    case BackgroundMessageType.giveMeAuths:
-      console.log('sending twoFAs', TOTPSecrets)
-      sendResponse({ auths: TOTPSecrets })
-      break
-    case BackgroundMessageType.saveLoginCredentials:
-      console.log('saveLoginCredentials', req.payload)
-
-      break
-    case BackgroundMessageType.saveLoginCredentialsModalShown:
-      if (currentTabId) {
-        saveLoginModalsStates.set(currentTabId, req.payload)
-      }
-
-      break
-    case BackgroundMessageType.hideLoginCredentialsModal:
-      if (currentTabId) {
-        saveLoginModalsStates.delete(currentTabId)
-      }
-
-      break
-
-    case BackgroundMessageType.getLoginCredentialsModalState:
-      if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
-        sendResponse(saveLoginModalsStates.get(currentTabId))
-      }
-
-      break
-    case BackgroundMessageType.getFirebaseToken:
-      console.log('fireToken in Bg script:', fireToken)
-      sendResponse({ t: fireToken })
-      break
-
-    case BackgroundMessageType.wasClosed:
-      console.log('isClosed', safeClosed, 'lockTime', lockTime)
-      sendResponse({ wasClosed: safeClosed })
-      break
-
-    case BackgroundMessageType.giveMePasswords:
-      console.log('sending passwords', loginCredentials)
-      sendResponse({ passwords: loginCredentials })
-      break
-
-    case BackgroundMessageType.giveSecuritySettings:
-      sendResponse({
-        config: {
-          vaultTime: lockTime,
-          noHandsLogin: noHandsLogin
+    switch (req.action) {
+      case BackgroundMessageType.giveMeAuths:
+        console.log('sending twoFAs', TOTPSecrets)
+        sendResponse({ auths: TOTPSecrets })
+        break
+      case BackgroundMessageType.saveLoginCredentials:
+        console.log('saveLoginCredentials', req.payload)
+        const credentials: ILoginCredentialsFromContentScript = req.payload
+        // TODO register web inputs
+        // TODO add login creds
+        setLoginCredentials([
+          ...loginCredentials,
+          {
+            username: credentials.username,
+            password: credentials.password,
+            favIconUrl: tab.favIconUrl,
+            originalUrl: tab.url,
+            label:
+              tab.title ??
+              `${credentials.username}@${new URL(tab.url).hostname}`
+          }
+        ])
+        // TODO send login creds to server
+        console.log(credentials.capturedInputEvents)
+        break
+      case BackgroundMessageType.saveLoginCredentialsModalShown:
+        if (currentTabId) {
+          saveLoginModalsStates.set(currentTabId, req.payload)
         }
-      })
-      break
 
-    case BackgroundMessageType.giveUISettings:
-      sendResponse({
-        config: {
-          homeList: homeList
+        break
+      case BackgroundMessageType.hideLoginCredentialsModal:
+        if (currentTabId) {
+          saveLoginModalsStates.delete(currentTabId)
         }
-      })
 
-    case BackgroundMessageType.auths:
-      safeClosed = false // ????? What is this why ?
+        break
 
-      setTOTPSecrets(req.auths)
-      console.log('Auths set on', TOTPSecrets)
-      break
+      case BackgroundMessageType.getLoginCredentialsModalState:
+        if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
+          sendResponse(saveLoginModalsStates.get(currentTabId))
+        }
 
-    case BackgroundMessageType.passwords:
-      setLoginCredentials(req.passwords)
-      break
+        break
+      case BackgroundMessageType.getFirebaseToken:
+        console.log('fireToken in Bg script:', fireToken)
+        sendResponse({ t: fireToken })
+        break
 
-    case BackgroundMessageType.clear:
-      setLoginCredentials([])
-      setTOTPSecrets([])
-      break
+      case BackgroundMessageType.wasClosed:
+        console.log('isClosed', safeClosed, 'lockTime', lockTime)
+        sendResponse({ wasClosed: safeClosed })
+        break
 
-    case BackgroundMessageType.securitySettings:
-      setLockTime(req.settings.vaultLockTime)
+      case BackgroundMessageType.giveMePasswords:
+        console.log('sending passwords', loginCredentials)
+        sendResponse({ passwords: loginCredentials })
+        break
 
-      noHandsLogin = req.settings.noHandsLogin
+      case BackgroundMessageType.giveSecuritySettings:
+        sendResponse({
+          config: {
+            vaultTime: lockTime,
+            noHandsLogin: noHandsLogin
+          }
+        })
+        break
 
-      console.log('config set on:', req.settings, lockTime, noHandsLogin)
-      break
+      case BackgroundMessageType.giveUISettings:
+        sendResponse({
+          config: {
+            homeList: homeList
+          }
+        })
 
-    case BackgroundMessageType.UISettings:
-      homeList = req.config.homeList
+      case BackgroundMessageType.auths:
+        safeClosed = false // ????? What is this why ?
 
-      console.log('UIconfig', req.config)
-      break
+        setTOTPSecrets(req.auths)
+        console.log('Auths set on', TOTPSecrets)
+        break
 
-    default:
-      if (typeof req === 'string') {
-        throw new Error(`${req} not supported`)
-      }
+      case BackgroundMessageType.passwords:
+        setLoginCredentials(req.passwords)
+        break
+
+      case BackgroundMessageType.clear:
+        setLoginCredentials([])
+        setTOTPSecrets([])
+        break
+
+      case BackgroundMessageType.securitySettings:
+        setLockTime(req.settings.vaultLockTime)
+
+        noHandsLogin = req.settings.noHandsLogin
+
+        console.log('config set on:', req.settings, lockTime, noHandsLogin)
+        break
+
+      case BackgroundMessageType.UISettings:
+        homeList = req.config.homeList
+
+        console.log('UIconfig', req.config)
+        break
+
+      default:
+        if (typeof req === 'string') {
+          throw new Error(`${req} not supported`)
+        }
+    }
   }
 })
 

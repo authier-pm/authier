@@ -1,8 +1,11 @@
 import { MiddlewareFn } from 'type-graphql'
 import { verify } from 'jsonwebtoken'
-import { IContext } from './RootResolver'
+import { IContextAuthenticated } from './RootResolver'
 
-export const isAuth: MiddlewareFn<IContext> = ({ context }, next) => {
+export const isAuth: MiddlewareFn<IContextAuthenticated> = (
+  { context },
+  next
+) => {
   // console.log('~ context.request.cookie', context.request.cookies)
   let token: string | undefined
 
