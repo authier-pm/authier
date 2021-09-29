@@ -1,0 +1,5 @@
+mutation addWebInputs($webInputs: [WebInputElement!]!) {
+  addWebInputs(webInputs: $webInputs) {
+    id
+  }
+}

@@ -27,7 +27,7 @@ export async function initInputWatch() {
     action: BackgroundMessageType.getLoginCredentialsModalState
   })
   log('~ modalState1', modalState)
-
+  console.log('asds22')
   if (modalState && modalState.username && modalState.password) {
     renderSaveCredentialsForm(modalState.username, modalState.password)
     return // the modal is already displayed

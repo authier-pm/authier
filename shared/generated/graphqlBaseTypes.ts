@@ -22,6 +22,7 @@ export type Device = {
   lastIpAddress: Scalars['String'];
   name: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
+  syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
@@ -53,6 +54,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addDevice: Device;
   addOTPEvent: Scalars['Boolean'];
+  addWebInputs: Array<WebInput>;
   login?: Maybe<LoginResponse>;
   logout?: Maybe<Scalars['Boolean']>;
   /** you need to be authenticated to call this resolver */
@@ -71,6 +73,11 @@ export type MutationAddDeviceArgs = {
 
 export type MutationAddOtpEventArgs = {
   data: OtpEvent;
+};
+
+
+export type MutationAddWebInputsArgs = {
+  webInputs: Array<WebInputElement>;
 };
 
 
@@ -105,6 +112,7 @@ export type Query = {
   sendAuthMessage: Scalars['Boolean'];
   sendConfirmation: Scalars['Boolean'];
   user?: Maybe<UserQuery>;
+  webInputs: Array<WebInput>;
 };
 
 
@@ -127,12 +135,18 @@ export type QueryUserArgs = {
   userId: Scalars['String'];
 };
 
+
+export type QueryWebInputsArgs = {
+  url: Scalars['String'];
+};
+
 export type SettingsConfig = {
   __typename?: 'SettingsConfig';
   homeUI: Scalars['String'];
   lockTime: Scalars['Int'];
   noHandsLogin: Scalars['Boolean'];
   twoFA: Scalars['Boolean'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
 };
 
@@ -144,7 +158,7 @@ export type User = {
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type UserMutation = {
@@ -161,7 +175,7 @@ export type UserMutation = {
   tokenVersion: Scalars['Int'];
   updateFireToken: Device;
   updateSettings: SettingsConfig;
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 
@@ -204,5 +218,30 @@ export type UserQuery = {
   name?: Maybe<Scalars['String']>;
   settings: SettingsConfig;
   tokenVersion: Scalars['Int'];
-  updatedAt: Scalars['DateTime'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
+
+export type WebInput = {
+  __typename?: 'WebInput';
+  addedByUserId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  domPath: Scalars['String'];
+  id: Scalars['Int'];
+  kind: WebInputType;
+  layoutType?: Maybe<Scalars['String']>;
+  url: Scalars['String'];
+};
+
+export type WebInputElement = {
+  domPath: Scalars['String'];
+  kind: WebInputType;
+  url: Scalars['String'];
+};
+
+export enum WebInputType {
+  EMAIL = 'EMAIL',
+  PASSWORD = 'PASSWORD',
+  TOTP = 'TOTP',
+  USERNAME = 'USERNAME',
+  USERNAME_OR_EMAIL = 'USERNAME_OR_EMAIL'
+}
