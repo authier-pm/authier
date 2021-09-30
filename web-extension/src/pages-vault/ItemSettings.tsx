@@ -11,9 +11,11 @@ import {
   Flex,
   Input,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  Progress
 } from '@chakra-ui/react'
 import React from 'react'
+import { useHistory } from 'react-router-dom'
 
 const InputWithHeading = ({
   defaultValue,
@@ -32,10 +34,11 @@ const InputWithHeading = ({
   )
 }
 
-export const Item = ({ data }: any) => {
+export const ItemSettings = ({ data }: any) => {
+  let history = useHistory()
   const [show, setShow] = React.useState(false)
   const handleClick = () => setShow(!show)
-  console.log(data)
+
   return (
     <Center
       mt={4}
@@ -61,6 +64,7 @@ export const Item = ({ data }: any) => {
             <Heading size="md" as="h5">
               Password:
             </Heading>
+            <Progress value={20} size="xs" colorScheme="pink" />
             <InputGroup size="md">
               <Input
                 pr="4.5rem"
@@ -77,7 +81,11 @@ export const Item = ({ data }: any) => {
         </Flex>
 
         <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
-          <Button colorScheme="blackAlpha" size="sm">
+          <Button
+            colorScheme="blackAlpha"
+            size="sm"
+            onClick={() => history.goBack()}
+          >
             Cancel
           </Button>
           <Button colorScheme="twitter" size="sm">

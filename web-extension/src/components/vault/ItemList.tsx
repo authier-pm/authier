@@ -63,6 +63,7 @@ function VaultItem({
               aria-label="open item"
               colorScheme="blackAlpha"
               icon={<UnlockIcon />}
+              onClick={() => chrome.tabs.create({ url: data.originalUrl })}
             />
           </Flex>
         </Box>
@@ -145,11 +146,11 @@ export const ItemList = () => {
   }
 
   return (
-    <>
+    <Flex flexDirection="column">
       <Input
-        w={['150px', '200', '300px', '350px', '400px', '500px']}
+        w={['300px', '350px', '400px', '500px']}
         placeholder={t`Search vault`}
-        m={5}
+        m="auto"
         _focus={{ backgroundColor: 'white' }}
         onChange={(ev) => {
           setFilterBy(ev.target.value)
@@ -195,6 +196,6 @@ export const ItemList = () => {
           </Flex>
         </Flex>
       </Center>
-    </>
+    </Flex>
   )
 }
