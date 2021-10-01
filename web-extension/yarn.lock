@@ -4574,6 +4574,11 @@ chardet@^0.7.0:
   resolved "https://registry.npmjs.org/chardet/-/chardet-0.7.0.tgz"
   integrity sha512-mT8iDcrh03qDGRRmoA2hmBJnxpllMR+0/0qlzjqZES6NdiWDcZkCNAk4rPFZ9Q85r27unkiNNg8ZOiwZXBHwcA==
 
+check-password-strength@^2.0.3:
+  version "2.0.3"
+  resolved "https://registry.yarnpkg.com/check-password-strength/-/check-password-strength-2.0.3.tgz#fed038b1c457ac11a2999bd96f3185af34e88895"
+  integrity sha512-UW3YgMUne9QuejgnNWjWwYi4QhWArVj+1OXqDR1NkEQcmMKKO74O3P5ZvXr9JZNbTBfcwlK3yurYCMuJsck83A==
+
 chokidar@3.5.1:
   version "3.5.1"
   resolved "https://registry.npmjs.org/chokidar/-/chokidar-3.5.1.tgz"
@@ -5939,6 +5944,11 @@ fuzzaldrin@^2.1.0:
   version "2.1.0"
   resolved "https://registry.npmjs.org/fuzzaldrin/-/fuzzaldrin-2.1.0.tgz"
   integrity sha1-kCBMPi/appQbso0WZF1BgGOpDps=
+
+generate-password@^1.6.1:
+  version "1.6.1"
+  resolved "https://registry.yarnpkg.com/generate-password/-/generate-password-1.6.1.tgz#c2a7a2af74abb353dd855c16b3e13336b9d80272"
+  integrity sha512-JvtWSiN4KVmF6kBFi89Uz9LLN7l/EuGZYiKrIxddFlKcjSgc3D3va0Z5faooNwN85O0VBlt/ZtTdqhbQKhAOyw==
 
 gensync@^1.0.0-beta.2:
   version "1.0.0-beta.2"
