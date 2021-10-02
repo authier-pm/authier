@@ -1,5 +1,39 @@
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import { DOMEventsRecorder } from './DOMEventsRecorder'
+
 describe('DOMEventsRecorder', () => {
   it('should only add event once per input', async () => {
     // multiple events from single input must remove the previous ones stored in the recorder
+  })
+
+  it('should mark the input previous to the password kind as username', async () => {
+    const recorder = new DOMEventsRecorder()
+    recorder.addInputEvent({
+      element: document.createElement('input'),
+      eventType: 'input',
+      kind: null
+    })
+
+    recorder.addInputEvent({
+      element: document.createElement('input'),
+      eventType: 'input',
+      kind: WebInputType.PASSWORD
+    })
+    expect(recorder.toJSON()).toMatchInlineSnapshot(`
+Array [
+  Object {
+    "element": "INPUT",
+    "inputted": undefined,
+    "kind": "USERNAME_OR_EMAIL",
+    "type": "input",
+  },
+  Object {
+    "element": "INPUT",
+    "inputted": undefined,
+    "kind": "PASSWORD",
+    "type": "input",
+  },
+]
+`)
   })
 })

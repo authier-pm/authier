@@ -1,9 +1,11 @@
 import { getCssSelector } from 'css-selector-generator'
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 export interface IInputRecord {
   element: HTMLInputElement | HTMLFormElement
-  type: 'input' | 'submit' | 'keydown'
+  eventType: 'input' | 'submit' | 'keydown'
+  kind: WebInputType | null
   inputted?: string
 }
 
@@ -53,26 +55,42 @@ export class DOMEventsRecorder {
   }
 
   toJSON() {
-    return this.capturedInputEvents.map(({ element, type, inputted }) => {
-      return {
-        element: getSelectorForElement(element),
-        type,
-        inputted
+    return this.capturedInputEvents.map(
+      ({ element, eventType: type, inputted, kind }, i) => {
+        const nextEvent = this.capturedInputEvents[i + 1]
+
+        if (
+          kind === null && // this can happen when the input for username is just a plain input with no attribute type="username"
+          nextEvent &&
+          nextEvent.kind === WebInputType.PASSWORD
+        ) {
+          kind = WebInputType.USERNAME_OR_EMAIL
+        }
+        return {
+          element: getSelectorForElement(element),
+          type,
+          inputted,
+          kind
+        }
       }
-    })
+    )
   }
 
   getUsername(): string | undefined {
-    const inputEvents = this.capturedInputEvents.filter(({ type, element }) => {
-      return type === 'input' && element.type !== 'password'
-    })
+    const inputEvents = this.capturedInputEvents.filter(
+      ({ eventType: type, element }) => {
+        return type === 'input' && element.type !== 'password'
+      }
+    )
     return inputEvents[inputEvents.length - 1]?.inputted
   }
 
   getPassword(): string | undefined {
-    const inputEvents = this.capturedInputEvents.filter(({ type, element }) => {
-      return type === 'input' && element.type === 'password'
-    })
+    const inputEvents = this.capturedInputEvents.filter(
+      ({ eventType: type, element }) => {
+        return type === 'input' && element.type === 'password'
+      }
+    )
     return inputEvents[inputEvents.length - 1]?.inputted
   }
 }

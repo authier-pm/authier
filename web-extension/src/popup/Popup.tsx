@@ -65,6 +65,7 @@ export const Popup: FunctionComponent = () => {
         password
       ).toString()
 
+      // TODO move this into background-we cannot rely on popup being opened for saving it
       savePasswordsMutation({
         variables: {
           payload: encrypted,

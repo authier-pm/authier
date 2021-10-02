@@ -7,6 +7,7 @@ import type { SessionStoredItem } from '../background/backgroundPage'
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import { ILoginCredentials } from '@src/util/useBackgroundState'
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('contentScript')
 localStorage.debug = '*' // enable all debug messages
@@ -16,6 +17,11 @@ declare global {
     capturedInputs: IInputRecord[]
     loginCredentials: SessionStoredItem
   }
+}
+
+const inputKindMap = {
+  email: WebInputType.EMAIL,
+  username: WebInputType.USERNAME
 }
 
 const domRecorder = new DOMEventsRecorder()
@@ -54,12 +60,14 @@ export async function initInputWatch() {
         if (inputted) {
           const inputRecord: IInputRecord = {
             element: targetElement,
-            type: 'input',
-            inputted
+            eventType: 'input',
+            inputted,
+            // @ts-expect-error
+            kind: inputKindMap[targetElement.autocomplete] ?? null
           }
           domRecorder.addInputEvent(inputRecord)
           if (inputted.length === 6) {
-            // TODO check
+            // TODO check existing TOTPs and add TOTP web input if we don't have one here
           }
 
           log('inputRecord', inputRecord)
@@ -77,7 +85,8 @@ export async function initInputWatch() {
                   log('onsubmit', ev)
                   domRecorder.addInputEvent({
                     element: form,
-                    type: 'submit'
+                    eventType: 'submit',
+                    kind: WebInputType.PASSWORD
                   })
                   showSavePromptIfAppropriate()
 
@@ -94,7 +103,8 @@ export async function initInputWatch() {
                 if (ev.code === 'Enter') {
                   domRecorder.addInputEvent({
                     element: targetElement,
-                    type: 'keydown'
+                    eventType: 'keydown',
+                    kind: null
                   })
                   showSavePromptIfAppropriate()
                 }
