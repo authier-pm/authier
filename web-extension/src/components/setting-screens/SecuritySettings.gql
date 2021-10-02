@@ -1,0 +1,11 @@
+query SecuritySettings {
+  me {
+    id
+    settings {
+      lockTime
+      twoFA
+      noHandsLogin
+      homeUI
+    }
+  }
+}

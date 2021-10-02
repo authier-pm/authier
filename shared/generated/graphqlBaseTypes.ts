@@ -13,35 +13,35 @@ export type Scalars = {
   DateTime: string;
 };
 
-
 export type Device = {
   __typename?: 'Device';
-  id: Scalars['Int'];
-  firstIpAddress: Scalars['String'];
-  lastIpAddress: Scalars['String'];
-  firebaseToken: Scalars['String'];
-  name: Scalars['String'];
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
   createdAt: Scalars['DateTime'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
+  firebaseToken: Scalars['String'];
+  firstIpAddress: Scalars['String'];
+  id: Scalars['Int'];
+  lastIpAddress: Scalars['String'];
+  name: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
+  syncTOTP: Scalars['Boolean'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
+  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
 };
 
 export type EncryptedSecrets = {
   __typename?: 'EncryptedSecrets';
-  id: Scalars['Int'];
-  encrypted: Scalars['String'];
-  version: Scalars['Int'];
-  userId: Scalars['String'];
-  kind: EncryptedSecretsType;
   createdAt: Scalars['DateTime'];
+  encrypted: Scalars['String'];
+  id: Scalars['Int'];
+  kind: EncryptedSecretsType;
   updatedAt?: Maybe<Scalars['DateTime']>;
+  userId: Scalars['String'];
+  version: Scalars['Int'];
 };
 
 export enum EncryptedSecretsType {
-  TOTP = 'TOTP',
-  LOGIN_CREDENTIALS = 'LOGIN_CREDENTIALS'
+  LOGIN_CREDENTIALS = 'LOGIN_CREDENTIALS',
+  TOTP = 'TOTP'
 }
 
 export type LoginResponse = {
@@ -52,26 +52,22 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation';
-  user?: Maybe<UserMutation>;
-  /** you need to be authenticated to call this resolver */
-  me?: Maybe<UserMutation>;
   addDevice: Device;
   addOTPEvent: Scalars['Boolean'];
-  register: LoginResponse;
+  addWebInputs: Array<WebInput>;
   login?: Maybe<LoginResponse>;
   logout?: Maybe<Scalars['Boolean']>;
-};
-
-
-export type MutationUserArgs = {
-  userId: Scalars['String'];
+  /** you need to be authenticated to call this resolver */
+  me?: Maybe<UserMutation>;
+  register: LoginResponse;
+  user?: Maybe<UserMutation>;
 };
 
 
 export type MutationAddDeviceArgs = {
   firebaseToken: Scalars['String'];
-  userId: Scalars['String'];
   name: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 
@@ -80,16 +76,26 @@ export type MutationAddOtpEventArgs = {
 };
 
 
-export type MutationRegisterArgs = {
-  firebaseToken: Scalars['String'];
-  password: Scalars['String'];
-  email: Scalars['String'];
+export type MutationAddWebInputsArgs = {
+  webInputs: Array<WebInputElement>;
 };
 
 
 export type MutationLoginArgs = {
-  password: Scalars['String'];
   email: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationRegisterArgs = {
+  email: Scalars['String'];
+  firebaseToken: Scalars['String'];
+  password: Scalars['String'];
+};
+
+
+export type MutationUserArgs = {
+  userId: Scalars['String'];
 };
 
 export type OtpEvent = {
@@ -100,25 +106,21 @@ export type OtpEvent = {
 
 export type Query = {
   __typename?: 'Query';
-  user?: Maybe<UserQuery>;
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean'];
   me?: Maybe<UserQuery>;
   sendAuthMessage: Scalars['Boolean'];
   sendConfirmation: Scalars['Boolean'];
-};
-
-
-export type QueryUserArgs = {
-  userId: Scalars['String'];
+  user?: Maybe<UserQuery>;
+  webInputs: Array<WebInput>;
 };
 
 
 export type QuerySendAuthMessageArgs = {
-  pageName: Scalars['String'];
   device: Scalars['String'];
-  time: Scalars['String'];
   location: Scalars['String'];
+  pageName: Scalars['String'];
+  time: Scalars['String'];
   userId: Scalars['String'];
 };
 
@@ -128,41 +130,52 @@ export type QuerySendConfirmationArgs = {
   userId: Scalars['String'];
 };
 
+
+export type QueryUserArgs = {
+  userId: Scalars['String'];
+};
+
+
+export type QueryWebInputsArgs = {
+  url: Scalars['String'];
+};
+
 export type SettingsConfig = {
   __typename?: 'SettingsConfig';
-  userId: Scalars['String'];
-  lockTime: Scalars['Int'];
-  twoFA: Scalars['Boolean'];
-  noHandsLogin: Scalars['Boolean'];
   homeUI: Scalars['String'];
+  lockTime: Scalars['Int'];
+  noHandsLogin: Scalars['Boolean'];
+  twoFA: Scalars['Boolean'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
+  userId: Scalars['String'];
 };
 
 export type User = {
   __typename?: 'User';
-  id: Scalars['String'];
-  email?: Maybe<Scalars['String']>;
-  tokenVersion: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   masterDeviceId?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  tokenVersion: Scalars['Int'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 export type UserMutation = {
   __typename?: 'UserMutation';
-  id: Scalars['String'];
-  email?: Maybe<Scalars['String']>;
-  tokenVersion: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
-  createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
-  masterDeviceId?: Maybe<Scalars['Int']>;
   addDevice: Device;
+  createdAt: Scalars['DateTime'];
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  masterDeviceId?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  revokeRefreshTokensForUser: User;
   saveAuths: EncryptedSecrets;
   savePasswords: EncryptedSecrets;
+  tokenVersion: Scalars['Int'];
   updateFireToken: Device;
   updateSettings: SettingsConfig;
-  revokeRefreshTokensForUser: User;
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
 
@@ -188,22 +201,47 @@ export type UserMutationUpdateFireTokenArgs = {
 
 
 export type UserMutationUpdateSettingsArgs = {
-  noHandsLogin: Scalars['Boolean'];
-  lockTime: Scalars['Int'];
   homeUI: Scalars['String'];
+  lockTime: Scalars['Int'];
+  noHandsLogin: Scalars['Boolean'];
   twoFA: Scalars['Boolean'];
 };
 
 export type UserQuery = {
   __typename?: 'UserQuery';
-  id: Scalars['String'];
-  email?: Maybe<Scalars['String']>;
-  tokenVersion: Scalars['Int'];
-  name?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
-  updatedAt: Scalars['DateTime'];
+  devicesCount: Scalars['Int'];
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
   masterDeviceId?: Maybe<Scalars['Int']>;
   myDevices: Array<Device>;
-  devicesCount: Scalars['Int'];
+  name?: Maybe<Scalars['String']>;
   settings: SettingsConfig;
+  tokenVersion: Scalars['Int'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
 };
+
+export type WebInput = {
+  __typename?: 'WebInput';
+  addedByUserId: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  domPath: Scalars['String'];
+  id: Scalars['Int'];
+  kind: WebInputType;
+  layoutType?: Maybe<Scalars['String']>;
+  url: Scalars['String'];
+};
+
+export type WebInputElement = {
+  domPath: Scalars['String'];
+  kind: WebInputType;
+  url: Scalars['String'];
+};
+
+export enum WebInputType {
+  EMAIL = 'EMAIL',
+  PASSWORD = 'PASSWORD',
+  TOTP = 'TOTP',
+  USERNAME = 'USERNAME',
+  USERNAME_OR_EMAIL = 'USERNAME_OR_EMAIL'
+}

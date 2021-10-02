@@ -25,6 +25,12 @@ export default function Pricing() {
           have browser extension installed. Browser extension just takes care of
           the typing for you once you use biometrics to unlock your vault.
         </li>
+        <li>
+          <Heading size="xs">What encryption is used?</Heading>
+          <br />
+          We encrypt your secrets with AES-256 encryption. We never send them
+          unencrypted anywhere.
+        </li>
       </ul>
     </Box>
   )

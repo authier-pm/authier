@@ -7,6 +7,7 @@ import { EncryptedSecrets } from "../models/EncryptedSecrets";
 import { EncryptedSecretsChangeAction } from "../models/EncryptedSecretsChangeAction";
 import { OTPCodeEvent } from "../models/OTPCodeEvent";
 import { SettingsConfig } from "../models/SettingsConfig";
+import { Tag } from "../models/Tag";
 import { Token } from "../models/Token";
 import { WebInput } from "../models/WebInput";
 
@@ -66,4 +67,6 @@ export class User {
   EncryptedChanges?: EncryptedSecretsChangeAction[];
 
   SettingsConfig?: SettingsConfig[];
+
+  Tags?: Tag[];
 }
