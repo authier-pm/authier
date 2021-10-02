@@ -24,6 +24,18 @@ const inputKindMap = {
   username: WebInputType.USERNAME
 }
 
+// TODO spec
+export function getWebInputKind(
+  targetElement: HTMLInputElement
+): WebInputType | null {
+  return (
+    (targetElement.type === 'password'
+      ? WebInputType.PASSWORD
+      : // @ts-expect-error
+        inputKindMap[targetElement.autocomplete]) ?? null
+  )
+}
+
 const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
@@ -32,8 +44,7 @@ export async function initInputWatch() {
   const modalState = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getLoginCredentialsModalState
   })
-  log('~ modalState1', modalState)
-  console.log('asds22')
+  log('~ modalState', modalState)
   if (modalState && modalState.username && modalState.password) {
     renderSaveCredentialsForm(modalState.username, modalState.password)
     return // the modal is already displayed
@@ -52,18 +63,15 @@ export async function initInputWatch() {
     'input',
     debounce((ev) => {
       const targetElement = ev.target as HTMLInputElement
-      if (
-        (targetElement && targetElement.type === 'password') ||
-        targetElement.type === 'text'
-      ) {
+      const isPasswordType = targetElement.type === 'password'
+      if ((targetElement && isPasswordType) || targetElement.type === 'text') {
         const inputted = targetElement.value
         if (inputted) {
           const inputRecord: IInputRecord = {
             element: targetElement,
             eventType: 'input',
             inputted,
-            // @ts-expect-error
-            kind: inputKindMap[targetElement.autocomplete] ?? null
+            kind: getWebInputKind(targetElement)
           }
           domRecorder.addInputEvent(inputRecord)
           if (inputted.length === 6) {
