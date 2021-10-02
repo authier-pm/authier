@@ -8,12 +8,10 @@ export type IsLoggedInQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 
-export type SettingsQueryVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
-}>;
+export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SettingsQuery = { __typename?: 'Query', user?: Types.Maybe<{ __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } }> };
+export type SettingsQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } }> };
 
 export type SaveAuthsMutationVariables = Types.Exact<{
   userId: Types.Scalars['String'];
@@ -84,8 +82,8 @@ export type IsLoggedInQueryHookResult = ReturnType<typeof useIsLoggedInQuery>;
 export type IsLoggedInLazyQueryHookResult = ReturnType<typeof useIsLoggedInLazyQuery>;
 export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLoggedInQueryVariables>;
 export const SettingsDocument = gql`
-    query settings($userId: String!) {
-  user(userId: $userId) {
+    query settings {
+  me {
     settings {
       lockTime
       twoFA
@@ -108,11 +106,10 @@ export const SettingsDocument = gql`
  * @example
  * const { data, loading, error } = useSettingsQuery({
  *   variables: {
- *      userId: // value for 'userId'
  *   },
  * });
  */
-export function useSettingsQuery(baseOptions: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
+export function useSettingsQuery(baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
       }
