@@ -19,6 +19,14 @@ import {
 } from '@src/components/setting-screens/SettingsForm'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
+import { apolloClient } from '@src/apollo/apolloClient'
+import {
+  AddWebInputsDocument,
+  AddWebInputsMutationFn,
+  AddWebInputsMutationResult,
+  AddWebInputsMutationVariables
+} from './chromeRuntimeListener.codegen'
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('chromeRuntimeListener')
 
@@ -33,6 +41,7 @@ interface ILoginCredentialsFromContentScript {
   capturedInputEvents: {
     element: string
     type: 'input' | 'submit' | 'keydown'
+    kind: WebInputType
     inputted: string | undefined
   }[]
 }
@@ -62,7 +71,9 @@ chrome.runtime.onMessage.addListener(async function (
   }
 
   const tab = sender.tab
-  if (tab && tab.url) {
+  if (tab) {
+    const { url } = tab
+
     const currentTabId = tab.id
 
     switch (req.action) {
@@ -71,23 +82,40 @@ chrome.runtime.onMessage.addListener(async function (
         sendResponse({ auths: TOTPSecrets })
         break
       case BackgroundMessageType.saveLoginCredentials:
+        if (!url) {
+          return // we can't do anything without a valid url
+        }
         console.log('saveLoginCredentials', req.payload)
         const credentials: ILoginCredentialsFromContentScript = req.payload
-        // TODO register web inputs
-        // TODO add login creds
+
         setLoginCredentials([
           ...loginCredentials,
           {
             username: credentials.username,
             password: credentials.password,
             favIconUrl: tab.favIconUrl,
-            originalUrl: tab.url,
+            originalUrl: url,
             label:
-              tab.title ??
-              `${credentials.username}@${new URL(tab.url).hostname}`
+              tab.title ?? `${credentials.username}@${new URL(url).hostname}`
           }
         ])
-        // TODO send login creds to server
+
+        await apolloClient.mutate<
+          AddWebInputsMutationResult,
+          AddWebInputsMutationVariables
+        >({
+          mutation: AddWebInputsDocument,
+          variables: {
+            webInputs: credentials.capturedInputEvents.map((captured) => {
+              return {
+                domPath: captured.element,
+                kind: captured.kind,
+                url: url
+              }
+            })
+          }
+        })
+
         console.log(credentials.capturedInputEvents)
         break
       case BackgroundMessageType.saveLoginCredentialsModalShown:
