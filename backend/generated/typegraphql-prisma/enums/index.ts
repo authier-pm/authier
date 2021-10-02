@@ -6,6 +6,7 @@ export { OTPCodeEventScalarFieldEnum } from "./OTPCodeEventScalarFieldEnum";
 export { QueryMode } from "./QueryMode";
 export { SettingsConfigScalarFieldEnum } from "./SettingsConfigScalarFieldEnum";
 export { SortOrder } from "./SortOrder";
+export { TagScalarFieldEnum } from "./TagScalarFieldEnum";
 export { TokenScalarFieldEnum } from "./TokenScalarFieldEnum";
 export { TokenType } from "./TokenType";
 export { UserScalarFieldEnum } from "./UserScalarFieldEnum";

@@ -10,11 +10,12 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton
+  IconButton,
+  Divider
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
-import { CopyIcon, DeleteIcon } from '@chakra-ui/icons'
+import { CopyIcon, DeleteIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
@@ -111,78 +112,76 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
               )}
             </StatNumber>
           </Box>
+          <Tooltip label={t`Copy TOTP`}>
+            <Button
+              size="md"
+              ml={2}
+              variant="outline"
+              onClick={() => {
+                onCopy()
 
-          <Button
-            size="md"
-            ml={2}
-            variant="outline"
-            onClick={() => {
-              onCopy()
-
-              // TODO log usage of this token to backend
-            }}
-          >
-            <CopyIcon></CopyIcon>
-          </Button>
+                // TODO log usage of this token to backend
+              }}
+            >
+              <CopyIcon></CopyIcon>
+            </Button>
+          </Tooltip>
         </Flex>
       </Stat>
     </Box>
   )
 }
 
-const Credentials = ({ psw }: { psw: ILoginCredentials }) => {
+const LoginCredentialsListItem = ({
+  loginCredentials
+}: {
+  loginCredentials: ILoginCredentials
+}) => {
   const { savePasswordsToBg, bgPasswords } = useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
   const onClose = () => {
     setIsOpen(false)
     savePasswordsToBg(
-      bgPasswords?.filter((i) => i.originalUrl !== psw.originalUrl)
+      bgPasswords?.filter((i) => i.originalUrl !== loginCredentials.originalUrl)
     )
   }
+  const { onCopy } = useClipboard(loginCredentials.password)
+  console.log('~ loginCredentials', loginCredentials)
 
   return (
-    <Flex key={psw.originalUrl} p="3" rounded="md" bg="white" minW="300px">
+    <Flex
+      key={loginCredentials.originalUrl}
+      p="3"
+      rounded="md"
+      bg="white"
+      minW="300px"
+    >
       <Stat maxW="100%">
         <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
-            <IconButton
-              colorScheme="red"
-              aria-label="Delete item"
-              icon={<DeleteIcon />}
-              size="sm"
-              variant="link"
-              position="absolute"
-              zIndex="overlay"
-              top={-1}
-              left={-15}
-              onClick={() => setIsOpen(true)}
-            />
-
-            <RemoveAlertDialog
-              isOpen={isOpen}
-              cancelRef={cancelRef}
-              onClose={onClose}
-            />
-
-            <Avatar src={psw.icon} size="xs"></Avatar>
+            <Avatar src={loginCredentials.favIconUrl} size="xs"></Avatar>
           </Flex>
           <Box ml={2} mr="auto" maxW="200px">
-            <Heading size="sm">{psw.label}</Heading>
-            <Text fontSize="sm">{psw.username.substr(0, 50)}</Text>
+            <Heading size="sm">{loginCredentials.label}</Heading>
+            <Text fontSize="sm" whiteSpace="nowrap">
+              {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
+            </Text>
           </Box>
 
-          <Button
-            size="md"
-            ml="auto"
-            variant="outline"
-            onClick={() => {
-              //onCopy()
-              // TODO log usage of this token to backend
-            }}
-          >
-            <CopyIcon></CopyIcon>
-          </Button>
+          <Tooltip label={t`Copy password`}>
+            <Button
+              size="md"
+              ml="auto"
+              variant="outline"
+              onClick={() => {
+                onCopy()
+                // TODO log usage of this token to backend
+              }}
+            >
+              <CopyIcon></CopyIcon>
+            </Button>
+          </Tooltip>
         </Flex>
       </Stat>
     </Flex>
@@ -192,9 +191,10 @@ const Credentials = ({ psw }: { psw: ILoginCredentials }) => {
 export const AuthsList = () => {
   const [changeList, setChangeList] = useState<Values>(Values.TOTP)
   const { auths } = useContext(AuthsContext)
-  const { bgPasswords, UIConfig } = useContext(BackgroundContext)
+  const { bgPasswords } = useContext(BackgroundContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
+  // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
 
   useEffect(() => {
     getCurrentTab().then((tab) => {
@@ -204,88 +204,84 @@ export const AuthsList = () => {
     })
   }, [])
 
+  const TOTPForCurrentDomain = auths?.filter(({ originalUrl }) => {
+    if (!currentTabUrl || !originalUrl) {
+      return true
+    }
+    return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+  })
+  const loginCredentialForCurrentDomain = bgPasswords?.filter(
+    ({ originalUrl }) => {
+      if (!currentTabUrl || !originalUrl) {
+        return true
+      }
+      return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+    }
+  )
+
   return (
     <>
-      <Flex justifyContent="space-evenly">
-        {UIConfig.homeList === UIOptions.loginAndTOTP
-          ? [
-              <Button
-                onClick={() => setChangeList(Values.TOTP)}
-                style={
-                  changeList === Values.TOTP
-                    ? { fontWeight: 'bold' }
-                    : { fontWeight: 'normal' }
-                }
-                size="md"
-              >
-                OTP
-              </Button>,
-              <Button
-                onClick={() => setChangeList(Values.passwords)}
-                style={
-                  changeList === Values.passwords
-                    ? { fontWeight: 'bold' }
-                    : { fontWeight: 'normal' }
-                }
-                size="md"
-              >
-                Passwords
-              </Button>
-            ]
-          : null}
-      </Flex>
+      {/* <Flex justifyContent="space-evenly">
+        <Button
+          onClick={() => setChangeList(Values.TOTP)}
+          style={
+            changeList === Values.TOTP
+              ? { fontWeight: 'bold' }
+              : { fontWeight: 'normal' }
+          }
+          size="md"
+        >
+          OTP
+        </Button>
+        <Button
+          onClick={() => setChangeList(Values.passwords)}
+          style={
+            changeList === Values.passwords
+              ? { fontWeight: 'bold' }
+              : { fontWeight: 'normal' }
+          }
+          size="md"
+        >
+          Passwords
+        </Button>
+      </Flex> */}
 
       <Flex overflow="auto" overflowX="hidden" flexDirection="column">
-        {UIConfig.homeList === UIOptions.all
-          ? [
-              auths?.map((auth, i) => {
-                return <OtpCode auth={auth} key={auth.label + i} />
-              }),
-              bgPasswords?.map((psw, i) => {
-                return <Credentials psw={psw} key={psw.label + i} />
-              })
-            ]
-          : UIConfig.homeList === UIOptions.byDomain
-          ? [
-              auths
-                ?.filter(({ originalUrl }) => {
-                  if (!currentTabUrl || !originalUrl) {
-                    return true
-                  }
-                  return (
-                    extractHostname(originalUrl) ===
-                    extractHostname(currentTabUrl)
-                  )
-                })
-                .map((auth, i) => {
-                  return <OtpCode auth={auth} key={auth.label + i} />
-                }),
-              bgPasswords
-                ?.filter(({ originalUrl }) => {
-                  if (!currentTabUrl || !originalUrl) {
-                    return true
-                  }
-                  return (
-                    extractHostname(originalUrl) ===
-                    extractHostname(currentTabUrl)
-                  )
-                })
-                .map((psw, i) => {
-                  return <Credentials psw={psw} key={psw.label + i} />
-                })
-            ]
-          : UIConfig.homeList === UIOptions.loginAndTOTP &&
-            changeList === Values.TOTP
-          ? auths?.map((auth, i) => {
-              console.log('test', auth)
-              return <OtpCode auth={auth} key={auth.label + i} />
-            })
-          : UIConfig.homeList === UIOptions.loginAndTOTP &&
-            changeList === Values.passwords
-          ? bgPasswords?.map((psw, i) => {
-              return <Credentials psw={psw} key={psw.label + i} />
-            })
-          : null}
+        {TOTPForCurrentDomain.length === 0 &&
+          loginCredentialForCurrentDomain.length === 0 && (
+            <>
+              <Text>
+                <NotAllowedIcon></NotAllowedIcon>
+                There are no stored secrets for current domain.
+              </Text>
+            </>
+          )}
+        <Divider my={5} />
+        <Heading size="md">Stored secrets for all domains</Heading>
+        {TOTPForCurrentDomain.map((auth, i) => {
+          return <OtpCode auth={auth} key={auth.label + i} />
+        })}
+        {loginCredentialForCurrentDomain.map((psw, i) => {
+          return (
+            <LoginCredentialsListItem
+              loginCredentials={psw}
+              key={psw.label + i}
+            />
+          )
+        })}
+        {[
+          auths?.map((auth, i) => {
+            return <OtpCode auth={auth} key={auth.label + i} />
+          }),
+          bgPasswords?.map((psw, i) => {
+            return (
+              <LoginCredentialsListItem
+                loginCredentials={psw}
+                key={psw.label + i}
+              />
+            )
+          })
+        ]}
       </Flex>
     </>
   )
