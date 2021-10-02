@@ -85,7 +85,7 @@ chrome.runtime.onMessage.addListener(async function (
         if (!url) {
           return // we can't do anything without a valid url
         }
-        console.log('saveLoginCredentials', req.payload)
+        log('saveLoginCredentials', req.payload)
         const credentials: ILoginCredentialsFromContentScript = req.payload
 
         setLoginCredentials([
@@ -100,19 +100,21 @@ chrome.runtime.onMessage.addListener(async function (
           }
         ])
 
+        const webInputs = credentials.capturedInputEvents.map((captured) => {
+          return {
+            domPath: captured.element,
+            kind: captured.kind,
+            url: url
+          }
+        })
+        log('webInputs', webInputs)
         await apolloClient.mutate<
           AddWebInputsMutationResult,
           AddWebInputsMutationVariables
         >({
           mutation: AddWebInputsDocument,
           variables: {
-            webInputs: credentials.capturedInputEvents.map((captured) => {
-              return {
-                domPath: captured.element,
-                kind: captured.kind,
-                url: url
-              }
-            })
+            webInputs
           }
         })
 

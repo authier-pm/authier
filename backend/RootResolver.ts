@@ -373,6 +373,7 @@ export class RootResolver {
     @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
     @Ctx() ctx: IContextAuthenticated
   ) {
+    const returnedInputs: WebInput[] = []
     for (const webInput of webInputs) {
       const forUpsert = {
         url: webInput.url,
@@ -380,7 +381,7 @@ export class RootResolver {
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
       }
-      await prisma.webInput.upsert({
+      const input = await prisma.webInput.upsert({
         create: forUpsert,
         update: forUpsert,
         where: {
@@ -390,6 +391,8 @@ export class RootResolver {
           }
         }
       })
+      returnedInputs.push(input)
     }
+    return returnedInputs
   }
 }
