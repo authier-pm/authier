@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> }> };
+export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', myDevices: Array<{ __typename?: 'Device', id: number, firstIpAddress: string, lastIpAddress: string, name: string }> } | null | undefined };
 
 
 export const MyDevicesDocument = gql`
