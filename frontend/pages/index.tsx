@@ -139,6 +139,7 @@ const SignUpHero = () => {
                   mt={0}
                   type="password"
                   placeholder="Password"
+                  autoComplete="new-password"
                   required
                   bgColor="white"
                 />
