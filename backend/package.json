@@ -3,6 +3,10 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
+  "engines": {
+    "node": ">=16"
+  },
+  "type": "module",
   "dependencies": {
     "@prisma/client": "^3.2.0",
     "@react-native-firebase/app": "^12.9.0",
@@ -37,7 +41,7 @@
     "typegraphql-prisma": "npm:@capaj/typegraphql-prisma"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node --transpile-only server.ts",
+    "dev": "nodemon --exec ts-node/esm --transpile-only server.ts",
     "local": "nodemon server.ts",
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
