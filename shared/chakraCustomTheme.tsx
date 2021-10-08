@@ -6,8 +6,8 @@ export const authierColors = {
     100: '#F0C645',
     200: '#FFC045',
     300: '#FC045A',
-    800: '#0F01AB',
-    700: '#0691AB'
+    700: '#0691AB',
+    800: '#0F01AB'
   },
   gray: {
     '50': '#F0F4F4',
