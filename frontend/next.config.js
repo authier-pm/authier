@@ -13,7 +13,8 @@ const nextConfig = {
   },
   experimental: {
     externalDir: true
-  }
+  },
+  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js']
 }
 const SentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that
