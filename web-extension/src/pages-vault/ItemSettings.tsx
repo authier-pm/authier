@@ -16,7 +16,8 @@ import {
   SlideFade,
   Collapse,
   Checkbox,
-  VStack
+  VStack,
+  SimpleGrid
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -50,10 +51,16 @@ const InputWithHeading = ({
 export const ItemSettings = ({ data }: any) => {
   let history = useHistory()
   const [show, setShow] = useState(false)
-  const [pswValue, SetPswValue] = useState<string>(
+  const [value, setValue] = useState<string>(data.password)
+  const [levelOfPsw, setLevelOfPsw] = useState<string>(
     passwordStrength(data.password).value
   )
-  const [showPasswordMenu, SetShowPasswordMenu] = useState<boolean>(false)
+  const handleChange = (event: any) => {
+    setLevelOfPsw(passwordStrength(event.target.value).value)
+    console.log(levelOfPsw)
+    setValue(event.target.value)
+  }
+
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
 
@@ -69,11 +76,7 @@ export const ItemSettings = ({ data }: any) => {
       bg={useColorModeValue('white', 'gray.900')}
     >
       <Flex p={5} flexDirection="column" w="inherit">
-        <Flex
-          flexDirection="row"
-          justifyContent="space-between"
-          flexWrap="wrap"
-        >
+        <SimpleGrid row={2} columns={2} spacing="40px">
           <InputWithHeading heading="URL:" defaultValue={data.originalUrl} />
           <InputWithHeading heading="Label:" defaultValue={data.label} />
 
@@ -84,16 +87,18 @@ export const ItemSettings = ({ data }: any) => {
             </Heading>
             <Progress
               //@ts-expect-error
-              value={Value[pswValue]}
+              value={Value[levelOfPsw]}
               size="xs"
               colorScheme="green"
               max={4}
+              mb={1}
             />
             <InputGroup size="md">
               <Input
+                value={value}
+                onChange={handleChange}
                 pr="4.5rem"
                 type={show ? 'text' : 'password'}
-                defaultValue={data.password}
               />
               <InputRightElement width="4.5rem">
                 <Button h="1.75rem" size="sm" onClick={handleClick}>
@@ -102,7 +107,7 @@ export const ItemSettings = ({ data }: any) => {
               </InputRightElement>
             </InputGroup>
           </Box>
-        </Flex>
+        </SimpleGrid>
 
         <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
           <Button
@@ -117,21 +122,35 @@ export const ItemSettings = ({ data }: any) => {
             Save
           </Button>
         </Stack>
+
         <IconButton
           w="min-content"
           aria-label="Search database"
           icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
           onClick={onToggle}
+          m={3}
         />
+
         <Collapse in={isOpen} animateOpacity>
-          <Flex flexDirection="column" justifyContent="flex-start">
-            <Input value="Heslo" />
-            <VStack align="flex-start">
+          <Flex
+            flexDirection="column"
+            justifyContent="flex-start"
+            alignItems="center"
+          >
+            <Input defaultValue="Heslo" />
+            <SimpleGrid minChildWidth="180px" spacing={5} mt={2}>
               <Checkbox defaultIsChecked>numbers</Checkbox>
               <Checkbox defaultIsChecked>symbols</Checkbox>
               <Checkbox defaultIsChecked>lowercase</Checkbox>
               <Checkbox defaultIsChecked>uppercase</Checkbox>
-            </VStack>
+              <Button
+                colorScheme="blackAlpha"
+                size="sm"
+                onClick={() => console.log('generate')}
+              >
+                generate
+              </Button>
+            </SimpleGrid>
           </Flex>
         </Collapse>
       </Flex>
