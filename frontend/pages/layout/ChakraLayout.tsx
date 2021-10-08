@@ -16,7 +16,7 @@ import {
   Stack
 } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
-import { NavLink, Links } from '../index'
+import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
 import { kebabCase } from 'lodash'
 
