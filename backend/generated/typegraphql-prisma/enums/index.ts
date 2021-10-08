@@ -9,6 +9,7 @@ export { SortOrder } from "./SortOrder";
 export { TagScalarFieldEnum } from "./TagScalarFieldEnum";
 export { TokenScalarFieldEnum } from "./TokenScalarFieldEnum";
 export { TokenType } from "./TokenType";
+export { UserPaidProductsScalarFieldEnum } from "./UserPaidProductsScalarFieldEnum";
 export { UserScalarFieldEnum } from "./UserScalarFieldEnum";
 export { VaultUnlockEventsScalarFieldEnum } from "./VaultUnlockEventsScalarFieldEnum";
 export { WebInputScalarFieldEnum } from "./WebInputScalarFieldEnum";
