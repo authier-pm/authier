@@ -258,7 +258,9 @@ export class RootResolver {
       user = await prisma.user.create({
         data: {
           email: email,
-          passwordHash: hashedPassword
+          passwordHash: hashedPassword,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
         }
       })
     } catch (err: any) {
