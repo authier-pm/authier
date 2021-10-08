@@ -6,5 +6,6 @@ export { SettingsConfig } from "./SettingsConfig";
 export { Tag } from "./Tag";
 export { Token } from "./Token";
 export { User } from "./User";
+export { UserPaidProducts } from "./UserPaidProducts";
 export { VaultUnlockEvents } from "./VaultUnlockEvents";
 export { WebInput } from "./WebInput";
