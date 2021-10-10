@@ -14,20 +14,18 @@ export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
 
 export type SaveAuthsMutationVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
   payload: Types.Scalars['String'];
 }>;
 
 
-export type SaveAuthsMutation = { __typename?: 'Mutation', user?: { __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } } | null | undefined };
+export type SaveAuthsMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } } | null | undefined };
 
 export type SavePasswordsMutationVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
   payload: Types.Scalars['String'];
 }>;
 
 
-export type SavePasswordsMutation = { __typename?: 'Mutation', user?: { __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } } | null | undefined };
+export type SavePasswordsMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } } | null | undefined };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -41,12 +39,11 @@ export type SendAuthMessageQueryVariables = Types.Exact<{
 export type SendAuthMessageQuery = { __typename?: 'Query', sendAuthMessage: boolean };
 
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
   firebaseToken: Types.Scalars['String'];
 }>;
 
 
-export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', user?: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } } | null | undefined };
+export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } } | null | undefined };
 
 
 export const IsLoggedInDocument = gql`
@@ -121,8 +118,8 @@ export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
 export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
 export type SettingsQueryResult = Apollo.QueryResult<SettingsQuery, SettingsQueryVariables>;
 export const SaveAuthsDocument = gql`
-    mutation saveAuths($userId: String!, $payload: String!) {
-  user(userId: $userId) {
+    mutation saveAuths($payload: String!) {
+  me {
     saveAuths(payload: $payload) {
       id
     }
@@ -144,7 +141,6 @@ export type SaveAuthsMutationFn = Apollo.MutationFunction<SaveAuthsMutation, Sav
  * @example
  * const [saveAuthsMutation, { data, loading, error }] = useSaveAuthsMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      payload: // value for 'payload'
  *   },
  * });
@@ -157,8 +153,8 @@ export type SaveAuthsMutationHookResult = ReturnType<typeof useSaveAuthsMutation
 export type SaveAuthsMutationResult = Apollo.MutationResult<SaveAuthsMutation>;
 export type SaveAuthsMutationOptions = Apollo.BaseMutationOptions<SaveAuthsMutation, SaveAuthsMutationVariables>;
 export const SavePasswordsDocument = gql`
-    mutation savePasswords($userId: String!, $payload: String!) {
-  user(userId: $userId) {
+    mutation savePasswords($payload: String!) {
+  me {
     savePasswords(payload: $payload) {
       id
     }
@@ -180,7 +176,6 @@ export type SavePasswordsMutationFn = Apollo.MutationFunction<SavePasswordsMutat
  * @example
  * const [savePasswordsMutation, { data, loading, error }] = useSavePasswordsMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      payload: // value for 'payload'
  *   },
  * });
@@ -236,8 +231,8 @@ export type SendAuthMessageQueryHookResult = ReturnType<typeof useSendAuthMessag
 export type SendAuthMessageLazyQueryHookResult = ReturnType<typeof useSendAuthMessageLazyQuery>;
 export type SendAuthMessageQueryResult = Apollo.QueryResult<SendAuthMessageQuery, SendAuthMessageQueryVariables>;
 export const SaveFirebaseTokenDocument = gql`
-    mutation saveFirebaseToken($userId: String!, $firebaseToken: String!) {
-  user(userId: $userId) {
+    mutation saveFirebaseToken($firebaseToken: String!) {
+  me {
     updateFireToken(firebaseToken: $firebaseToken) {
       id
     }
@@ -259,7 +254,6 @@ export type SaveFirebaseTokenMutationFn = Apollo.MutationFunction<SaveFirebaseTo
  * @example
  * const [saveFirebaseTokenMutation, { data, loading, error }] = useSaveFirebaseTokenMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      firebaseToken: // value for 'firebaseToken'
  *   },
  * });
