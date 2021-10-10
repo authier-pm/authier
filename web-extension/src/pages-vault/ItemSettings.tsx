@@ -17,18 +17,33 @@ import {
   Collapse,
   Checkbox,
   VStack,
-  SimpleGrid
+  SimpleGrid,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  CheckboxGroup,
+  HStack,
+  useCheckboxGroup
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import { generate } from 'generate-password'
+import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
 enum Value {
   'Too Weak' = 1,
   'Weak' = 2,
   'Medium' = 3,
   'Strong' = 4
+}
+
+interface Values {
+  numbers: boolean
+  symbols: boolean
+  lowercase: boolean
+  uppercase: boolean
 }
 
 const InputWithHeading = ({
@@ -51,14 +66,14 @@ const InputWithHeading = ({
 export const ItemSettings = ({ data }: any) => {
   let history = useHistory()
   const [show, setShow] = useState(false)
-  const [value, setValue] = useState<string>(data.password)
+  const [password, setPassword] = useState<string>(data.password)
   const [levelOfPsw, setLevelOfPsw] = useState<string>(
     passwordStrength(data.password).value
   )
-  const handleChange = (event: any) => {
+
+  const handleChangeOriginPassword = (event: any) => {
     setLevelOfPsw(passwordStrength(event.target.value).value)
-    console.log(levelOfPsw)
-    setValue(event.target.value)
+    setPassword(event.target.value)
   }
 
   const { isOpen, onToggle } = useDisclosure()
@@ -95,8 +110,8 @@ export const ItemSettings = ({ data }: any) => {
             />
             <InputGroup size="md">
               <Input
-                value={value}
-                onChange={handleChange}
+                value={password}
+                onChange={handleChangeOriginPassword}
                 pr="4.5rem"
                 type={show ? 'text' : 'password'}
               />
@@ -131,28 +146,7 @@ export const ItemSettings = ({ data }: any) => {
           m={3}
         />
 
-        <Collapse in={isOpen} animateOpacity>
-          <Flex
-            flexDirection="column"
-            justifyContent="center"
-            alignItems="center"
-          >
-            <Input defaultValue="Heslo" />
-            <SimpleGrid gridAutoFlow="column" spacing={2} mt={2}>
-              <Checkbox defaultIsChecked>numbers</Checkbox>
-              <Checkbox defaultIsChecked>symbols</Checkbox>
-              <Checkbox defaultIsChecked>lowercase</Checkbox>
-              <Checkbox defaultIsChecked>uppercase</Checkbox>
-            </SimpleGrid>
-            <Button
-              colorScheme="blackAlpha"
-              size="sm"
-              onClick={() => console.log('generate')}
-            >
-              generate
-            </Button>
-          </Flex>
-        </Collapse>
+        <PasswordGenerator isOpen={isOpen} />
       </Flex>
     </Center>
   )
