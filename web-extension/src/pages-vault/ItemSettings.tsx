@@ -134,23 +134,23 @@ export const ItemSettings = ({ data }: any) => {
         <Collapse in={isOpen} animateOpacity>
           <Flex
             flexDirection="column"
-            justifyContent="flex-start"
+            justifyContent="center"
             alignItems="center"
           >
             <Input defaultValue="Heslo" />
-            <SimpleGrid minChildWidth="180px" spacing={5} mt={2}>
+            <SimpleGrid gridAutoFlow="column" spacing={2} mt={2}>
               <Checkbox defaultIsChecked>numbers</Checkbox>
               <Checkbox defaultIsChecked>symbols</Checkbox>
               <Checkbox defaultIsChecked>lowercase</Checkbox>
               <Checkbox defaultIsChecked>uppercase</Checkbox>
-              <Button
-                colorScheme="blackAlpha"
-                size="sm"
-                onClick={() => console.log('generate')}
-              >
-                generate
-              </Button>
             </SimpleGrid>
+            <Button
+              colorScheme="blackAlpha"
+              size="sm"
+              onClick={() => console.log('generate')}
+            >
+              generate
+            </Button>
           </Flex>
         </Collapse>
       </Flex>
