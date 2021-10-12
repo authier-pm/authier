@@ -37,7 +37,7 @@ export const Popup: FunctionComponent = () => {
     isApiLoggedIn: isAuth,
     userId,
     fireToken,
-    password
+    masterPassword
   } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
   const [
@@ -59,17 +59,17 @@ export const Popup: FunctionComponent = () => {
       })
     }
 
-    if (isAuth && bgPasswords.length > 0) {
+    if (userId && bgPasswords.length > 0) {
       const encrypted = cryptoJS.AES.encrypt(
         JSON.stringify(bgPasswords),
-        password
+        masterPassword,
+        { iv: CryptoJS.enc.Utf8.parse(userId) }
       ).toString()
 
       // TODO move this into background-we cannot rely on popup being opened for saving it
       savePasswordsMutation({
         variables: {
-          payload: encrypted,
-          userId: userId as string
+          payload: encrypted
         }
       })
 
@@ -82,7 +82,6 @@ export const Popup: FunctionComponent = () => {
       console.log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
-          userId: userId as string,
           firebaseToken: fireToken as string
         }
       })
@@ -151,33 +150,3 @@ export const Popup: FunctionComponent = () => {
     </>
   )
 }
-
-// ;(async () => {
-//   const storage = await browser.storage.local.get()
-//   console.log('stroage', storage)
-//   if (storage.encryptedAuthsMasterPassword && password) {
-//     const decryptedAuths = cryptoJS.AES.decrypt(
-//       storage.encryptedAuthsMasterPassword,
-//       password
-//     ).toString(cryptoJS.enc.Utf8)
-//     console.log('decrypting auths!!!', decryptedAuths)
-//     await browser.runtime.sendMessage({
-//       setAuths: decryptedAuths,
-//       lockTime: 5000
-//     })
-//     console.log('~ decryptedAuth23s', JSON.parse(decryptedAuths))
-
-//     setAuths(JSON.parse(decryptedAuths))
-//   }
-// })()
-
-// geolocation
-// let geo = navigator.geolocation.getCurrentPosition(
-//   (pos) => {
-//     console.log(pos)
-//   },
-//   (er) => {
-//     if (er) console.log(er)
-//   },
-//   { enableHighAccuracy: true }
-// )

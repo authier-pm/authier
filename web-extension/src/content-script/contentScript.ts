@@ -44,7 +44,7 @@ export async function initInputWatch() {
   const modalState = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getLoginCredentialsModalState
   })
-  log('~ modalState', modalState)
+  log('~ modalState2', modalState)
   if (modalState && modalState.username && modalState.password) {
     renderSaveCredentialsForm(modalState.username, modalState.password)
     return // the modal is already displayed
