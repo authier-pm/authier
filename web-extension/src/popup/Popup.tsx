@@ -16,7 +16,7 @@ import {
   useSaveFirebaseTokenMutation,
   useSavePasswordsMutation,
   useSendAuthMessageLazyQuery,
-  useSettingsLazyQuery
+  useSettingsQuery
 } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
@@ -25,29 +25,27 @@ import { AuthsContext } from '@src/providers/AuthsProvider'
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { AboutPage } from '@src/pages/AboutPage'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const { isApiLoggedIn: isAuth, userId, fireToken } = useContext(UserContext)
+  const {
+    isApiLoggedIn: isAuth,
+    userId,
+    fireToken,
+    masterPassword
+  } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
   const [saveFirebaseTokenMutation] = useSaveFirebaseTokenMutation({})
   const [location, setLocation] = useLocation()
   const [sendAuthMessage] = useSendAuthMessageLazyQuery()
   const [savePasswordsMutation] = useSavePasswordsMutation()
-  const [getSettings, { data: settingsData }] = useSettingsLazyQuery()
-  const {
-    currentURL,
-    bgAuths,
-    isFilling,
-    masterPassword,
-    bgPasswords,
-    setSecuritySettings,
-    setUISettings
-  } = useContext(BackgroundContext)
+  const { data: settingsData } = useSettingsQuery()
+  const { currentURL, bgAuths, isFilling, safeLocked, bgPasswords } =
+    useContext(BackgroundContext)
 
   useEffect(() => {
     async function saveToLocal(encrypted: any) {
@@ -56,12 +54,14 @@ export const Popup: FunctionComponent = () => {
       })
     }
 
-    if (isAuth && bgPasswords.length > 0) {
+    if (userId && bgPasswords.length > 0) {
       const encrypted = cryptoJS.AES.encrypt(
         JSON.stringify(bgPasswords),
-        masterPassword
+        masterPassword,
+        { iv: CryptoJS.enc.Utf8.parse(userId) }
       ).toString()
 
+      // TODO move this into background-we cannot rely on popup being opened for saving it
       savePasswordsMutation({
         variables: {
           payload: encrypted
@@ -115,22 +115,6 @@ export const Popup: FunctionComponent = () => {
   }, [isFilling])
 
   useEffect(() => {
-    if (isAuth) {
-      getSettings()
-
-      if (!!settingsData) {
-        setSecuritySettings({
-          noHandsLogin: !!settingsData.me?.settings.noHandsLogin,
-          vaultLockTime:
-            settingsData.me?.settings.lockTime ?? vaultLockTimeOptions[2].value
-        })
-        //@ts-expect-error
-        setUISettings({ homeList: settingsData.me.settings.homeUI }) //Need type here
-      }
-    }
-  }, [isAuth, settingsData])
-
-  useEffect(() => {
     setLocation('/')
     browser.runtime.sendMessage({ popupMounted: true })
 
@@ -162,33 +146,3 @@ export const Popup: FunctionComponent = () => {
     </>
   )
 }
-
-// ;(async () => {
-//   const storage = await browser.storage.local.get()
-//   console.log('stroage', storage)
-//   if (storage.encryptedAuthsMasterPassword && password) {
-//     const decryptedAuths = cryptoJS.AES.decrypt(
-//       storage.encryptedAuthsMasterPassword,
-//       password
-//     ).toString(cryptoJS.enc.Utf8)
-//     console.log('decrypting auths!!!', decryptedAuths)
-//     await browser.runtime.sendMessage({
-//       setAuths: decryptedAuths,
-//       lockTime: 5000
-//     })
-//     console.log('~ decryptedAuth23s', JSON.parse(decryptedAuths))
-
-//     setAuths(JSON.parse(decryptedAuths))
-//   }
-// })()
-
-// geolocation
-// let geo = navigator.geolocation.getCurrentPosition(
-//   (pos) => {
-//     console.log(pos)
-//   },
-//   (er) => {
-//     if (er) console.log(er)
-//   },
-//   { enableHighAccuracy: true }
-// )

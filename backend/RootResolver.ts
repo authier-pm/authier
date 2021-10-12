@@ -23,13 +23,20 @@ import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/User'
-import { Device } from './generated/typegraphql-prisma'
+import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
+import { WebInputElement } from './models/WebInputElement'
 
 export interface IContext {
   request: FastifyRequest
   reply: FastifyReply
-  jwtPayload?: { userId: string }
+  getIpAddress: () => string
+}
+
+export interface IContextAuthenticated {
+  request: FastifyRequest
+  reply: FastifyReply
+  jwtPayload: { userId: string }
   getIpAddress: () => string
 }
 
@@ -68,7 +75,7 @@ export class RootResolver {
     name: 'me',
     nullable: true
   })
-  authenticatedMe(@Ctx() ctx: IContext) {
+  authenticatedMe(@Ctx() ctx: IContextAuthenticated) {
     return prisma.user.findFirst({
       where: {
         id: ctx.jwtPayload?.userId
@@ -82,7 +89,7 @@ export class RootResolver {
 
   //TODO query for info about user
   @Query(() => UserQuery, { nullable: true })
-  me(@Ctx() context: IContext) {
+  me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
     console.log(jwtPayload)
     if (jwtPayload) {
@@ -230,7 +237,9 @@ export class RootResolver {
       user = await prisma.user.create({
         data: {
           email: email,
-          passwordHash: hashedPassword
+          passwordHash: hashedPassword,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
         }
       })
     } catch (err: any) {
@@ -315,7 +324,7 @@ export class RootResolver {
   }
 
   @Mutation(() => Boolean, { nullable: true })
-  async logout(@Ctx() ctx: IContext) {
+  async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
     if (ctx.jwtPayload) {
@@ -331,5 +340,39 @@ export class RootResolver {
       })
       return user.tokenVersion
     }
+  }
+
+  @Query(() => [WebInput])
+  async webInputs(@Arg('url') url: string) {
+    return prisma.webInput.findMany({ where: { url } })
+  }
+
+  //@UseMiddleware(isAuth)
+  @Mutation(() => [WebInput])
+  async addWebInputs(
+    @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    const returnedInputs: WebInput[] = []
+    for (const webInput of webInputs) {
+      const forUpsert = {
+        url: webInput.url,
+        domPath: webInput.domPath,
+        kind: webInput.kind,
+        addedByUserId: ctx.jwtPayload.userId
+      }
+      const input = await prisma.webInput.upsert({
+        create: forUpsert,
+        update: forUpsert,
+        where: {
+          webInputIdentifier: {
+            url: webInput.url,
+            domPath: webInput.domPath
+          }
+        }
+      })
+      returnedInputs.push(input)
+    }
+    return returnedInputs
   }
 }

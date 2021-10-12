@@ -8,7 +8,9 @@ export enum UserScalarFieldEnum {
   name = "name",
   createdAt = "createdAt",
   updatedAt = "updatedAt",
-  masterDeviceId = "masterDeviceId"
+  masterDeviceId = "masterDeviceId",
+  TOTPlimit = "TOTPlimit",
+  loginCredentialsLimit = "loginCredentialsLimit"
 }
 TypeGraphQL.registerEnumType(UserScalarFieldEnum, {
   name: "UserScalarFieldEnum",

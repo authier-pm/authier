@@ -35,6 +35,11 @@ export class Device {
   })
   name!: string;
 
+  @TypeGraphQL.Field(_type => Boolean, {
+    nullable: false
+  })
+  syncTOTP!: boolean;
+
   @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
     nullable: true
   })

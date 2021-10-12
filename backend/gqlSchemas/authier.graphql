@@ -4,6 +4,7 @@ type Query {
   me: UserQuery
   sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!, userId: String!): Boolean!
   sendConfirmation(success: Boolean!, userId: String!): Boolean!
+  webInputs(url: String!): [WebInput!]!
 }
 
 type UserQuery {
@@ -14,6 +15,8 @@ type UserQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
@@ -31,6 +34,7 @@ type Device {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
+  syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -62,6 +66,24 @@ enum EncryptedSecretsType {
   LOGIN_CREDENTIALS
 }
 
+type WebInput {
+  id: Int!
+  layoutType: String
+  createdAt: DateTime!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  addedByUserId: String!
+}
+
+enum WebInputType {
+  TOTP
+  USERNAME
+  EMAIL
+  USERNAME_OR_EMAIL
+  PASSWORD
+}
+
 type Mutation {
   """you need to be authenticated to call this resolver"""
   me: UserMutation
@@ -70,6 +92,7 @@ type Mutation {
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
   login(password: String!, email: String!): LoginResponse
   logout: Boolean
+  addWebInputs(webInputs: [WebInputElement!]!): [WebInput!]!
 }
 
 type UserMutation {
@@ -80,6 +103,8 @@ type UserMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   addDevice(firebaseToken: String!, name: String!): Device!
   saveAuths(payload: String!): EncryptedSecrets!
   savePasswords(payload: String!): EncryptedSecrets!
@@ -96,6 +121,8 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
 }
 
 input OTPEvent {
@@ -107,4 +134,10 @@ input OTPEvent {
 type LoginResponse {
   accessToken: String!
   secrets: [EncryptedSecrets!]
+}
+
+input WebInputElement {
+  domPath: String!
+  url: String!
+  kind: WebInputType!
 }

@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState } from 'react'
 // @ts-expect-error
-import OTP from 'otp-client';
-import { AuthsContext } from '../Providers';
+import OTP from 'otp-client'
+import { AuthsContext } from '../Providers'
 import {
   Modal,
   FlatList,
@@ -14,36 +14,36 @@ import {
   Flex,
   Heading,
   CircularProgress,
-  Button,
-} from 'native-base';
-import Icon from 'react-native-vector-icons/Ionicons';
+  Button
+} from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
 
 interface Item {
-  secret: string;
-  label: string;
-  icon: string;
+  secret: string
+  label: string
+  icon: string
 }
 
 const options = {
   algorithm: 'sha1',
-  digits: 6,
-};
+  digits: 6
+}
 
 export const AuthList = (): JSX.Element => {
-  const { auths } = useContext(AuthsContext);
+  const { auths } = useContext(AuthsContext)
 
-  const [showWhole, setShowWhole] = useState(false);
-  const [open, setOpen] = useState(false);
+  const [showWhole, setShowWhole] = useState(false)
+  const [open, setOpen] = useState(false)
 
-  const [seconds, setRemainingSeconds] = useState(0);
+  const [seconds, setRemainingSeconds] = useState(0)
 
   //@ts-expect-error
   const ListItem = ({ item }) => {
-    const otp = new OTP(item.secret, options);
+    const otp = new OTP(item.secret, options)
 
     setInterval(() => {
-      setRemainingSeconds(otp.getTimeUntilNextTick());
-    }, 1000);
+      setRemainingSeconds(otp.getTimeUntilNextTick())
+    }, 1000)
 
     return (
       <View
@@ -59,7 +59,7 @@ export const AuthList = (): JSX.Element => {
           <Avatar
             size="lg"
             source={{
-              uri: 'https://via.placeholder.com/150',
+              uri: 'https://via.placeholder.com/150'
             }}
           >
             NB
@@ -72,7 +72,7 @@ export const AuthList = (): JSX.Element => {
             <Text
               fontSize={35}
               onPress={() => {
-                setShowWhole(true);
+                setShowWhole(true)
               }}
             >
               {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
@@ -112,8 +112,8 @@ export const AuthList = (): JSX.Element => {
           </Modal.Content>
         </Modal>
       </View>
-    );
-  };
+    )
+  }
 
   return (
     <View flex={1} safeArea backgroundColor="white">
@@ -151,5 +151,5 @@ export const AuthList = (): JSX.Element => {
         />
       </Flex>
     </View>
-  );
-};
+  )
+}
