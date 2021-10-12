@@ -7,7 +7,9 @@ import { EncryptedSecrets } from "../models/EncryptedSecrets";
 import { EncryptedSecretsChangeAction } from "../models/EncryptedSecretsChangeAction";
 import { OTPCodeEvent } from "../models/OTPCodeEvent";
 import { SettingsConfig } from "../models/SettingsConfig";
+import { Tag } from "../models/Tag";
 import { Token } from "../models/Token";
+import { UserPaidProducts } from "../models/UserPaidProducts";
 import { WebInput } from "../models/WebInput";
 
 @TypeGraphQL.ObjectType({
@@ -36,8 +38,6 @@ export class User {
   })
   name?: string | null;
 
-  EncryptedSecrets?: EncryptedSecrets[];
-
   Token?: Token[];
 
   @TypeGraphQL.Field(_type => Date, {
@@ -57,7 +57,19 @@ export class User {
   })
   masterDeviceId?: number | null;
 
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false
+  })
+  TOTPlimit!: number;
+
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+    nullable: false
+  })
+  loginCredentialsLimit!: number;
+
   OTPCodeEvents?: OTPCodeEvent[];
+
+  EncryptedSecrets?: EncryptedSecrets[];
 
   Devices?: Device[];
 
@@ -66,4 +78,8 @@ export class User {
   EncryptedChanges?: EncryptedSecretsChangeAction[];
 
   SettingsConfig?: SettingsConfig[];
+
+  Tags?: Tag[];
+
+  UserPaidProducts?: UserPaidProducts[];
 }

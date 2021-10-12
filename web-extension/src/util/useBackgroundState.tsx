@@ -8,7 +8,8 @@ import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
+import { useSettingsQuery } from '@src/popup/Popup.codegen'
 
 export interface ITOTPSecret {
   secret: string
@@ -20,18 +21,18 @@ export interface ITOTPSecret {
 
 export interface ILoginCredentials {
   label: string
-  icon: string | undefined
+  favIconUrl: string | undefined
   lastUsed?: Date | null
   originalUrl: string
   password: string
   username: string
 }
-export interface SecuritySettings {
+export interface ISecuritySettings {
   vaultLockTime: number
   noHandsLogin: boolean
 }
 
-export interface SecuritySettingsInBg {
+export interface ISecuritySettingsInBg {
   vaultTime: number
   noHandsLogin: boolean
 }
@@ -42,15 +43,14 @@ export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
   const [masterPassword, setMasterPassword] = useState<string>('')
+  const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
+
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
   const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
   const [bgPasswords, setBgPasswords] = useState<ILoginCredentials[]>([])
-  const [securityConfig, setSecurityConfig] = useState<SecuritySettings>({
-    noHandsLogin: false,
-    vaultLockTime: vaultLockTimeOptions[2].value
-  })
+
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
   })
@@ -96,10 +96,10 @@ export function useBackgroundState() {
     )
 
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getSecuritySettings },
-      (res: { config: SecuritySettingsInBg }) => {
+      { action: BackgroundMessageType.giveSecuritySettings },
+      (res: { config: ISecuritySettingsInBg }) => {
         if (res && res.config) {
-          setSecurityConfig({
+          backgroundState.setSecuritySettings({
             noHandsLogin: res.config.noHandsLogin,
             vaultLockTime: res.config.vaultTime
           })
@@ -108,22 +108,22 @@ export function useBackgroundState() {
     )
 
     chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getUISettings },
+      { action: BackgroundMessageType.UISettings },
       (res: { config: UISettings }) => {
         if (res.config) {
-          setUIConfig(res.config)
+          // setUIConfig(res.config) // TODO fix
         }
       }
     )
 
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.setMasterPassword },
-      (res: { config: { masterPsw: string } }) => {
-        if (res.config) {
-          setMasterPassword(res.config.masterPsw)
-        }
-      }
-    )
+    // chrome.runtime.sendMessage(
+    //   { action: BackgroundMessageType.setMasterPassword },
+    //   (res: { config: { masterPsw: string } }) => {
+    //     if (res.config) {
+    //       setMasterPassword(res.config.masterPsw)
+    //     }
+    //   }
+    // )
 
     //CHange to switch
     browser.runtime.onMessage.addListener(function (request: {
@@ -207,7 +207,7 @@ export function useBackgroundState() {
     bgAuths,
     isCounting,
     bgPasswords,
-    setSecuritySettings: (config: SecuritySettings) => {
+    setSecuritySettings: (config: ISecuritySettings) => {
       updateSettings({
         variables: {
           lockTime: config.vaultLockTime,
@@ -217,24 +217,15 @@ export function useBackgroundState() {
         }
       })
 
-      setSecurityConfig(config)
+      refetchSettings()
       //Call bg script to save settings to bg
       chrome.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config
       })
     },
-    securityConfig,
-    setUISettings: (config: UISettings) => {
-      updateSettings({
-        variables: {
-          lockTime: securityConfig.vaultLockTime,
-          noHandsLogin: securityConfig.noHandsLogin,
-          homeUI: config.homeList,
-          twoFA: true //Not added in the settings yet
-        }
-      })
 
+    setUISettings: (config: UISettings) => {
       setUIConfig(config)
 
       chrome.runtime.sendMessage({
@@ -243,14 +234,14 @@ export function useBackgroundState() {
       })
     },
     UIConfig,
-    saveMasterPsw: (psw: string) => {
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.masterPassword,
-        masterPassword: psw
-      })
+    // saveMasterPsw: (psw: string) => {
+    //   chrome.runtime.sendMessage({
+    //     action: BackgroundMessageType.masterPassword,
+    //     masterPassword: psw
+    //   })
 
-      setMasterPassword(psw)
-    },
+    //   setMasterPassword(psw)
+    // },
     masterPassword
   }
 
