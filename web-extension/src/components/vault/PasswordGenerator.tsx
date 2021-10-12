@@ -1,17 +1,10 @@
 import {
   Button,
   Checkbox,
-  CheckboxGroup,
   Collapse,
   Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
   HStack,
   Input,
-  useCheckbox,
-  useCheckboxGroup,
-  Text,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
@@ -32,7 +25,6 @@ interface Values {
 
 export const PasswordGenerator = ({ isOpen }: { isOpen: boolean }) => {
   const [generatedPsw, setGeneratedPsw] = useState<string>('')
-  const { state, getLabelProps } = useCheckbox()
   const handleChangeGeneratedPassword = (event: any) => {
     setGeneratedPsw(event.target.value)
   }
@@ -58,7 +50,6 @@ export const PasswordGenerator = ({ isOpen }: { isOpen: boolean }) => {
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
           ) => {
-            console.log(values)
             setGeneratedPsw(generate({ ...values }))
             setSubmitting(false)
           }}
