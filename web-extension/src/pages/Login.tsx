@@ -41,7 +41,7 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setUserId } = useContext(UserContext)
+  const { setUserId, decrypt } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
   const { savePasswordsToBg } = useContext(BackgroundContext)
 
@@ -78,15 +78,15 @@ export default function Login(): ReactElement {
             if (response.data.login.secrets[0] && values.password) {
               response.data.login?.secrets?.forEach((i) => {
                 if (i.kind === 'TOTP') {
-                  decryptedAuths = cryptoJS.AES.decrypt(
+                  decryptedAuths = decrypt(
                     i.encrypted as string,
                     values.password
-                  ).toString(cryptoJS.enc.Utf8)
+                  )
                 } else if ('LOGIN_CREDENTIALS') {
-                  decryptedPasswords = cryptoJS.AES.decrypt(
+                  decryptedPasswords = decrypt(
                     i.encrypted as string,
                     values.password
-                  ).toString(cryptoJS.enc.Utf8)
+                  )
                   console.log(decryptedPasswords)
                 }
               })

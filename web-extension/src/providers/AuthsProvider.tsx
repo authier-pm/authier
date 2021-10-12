@@ -28,7 +28,12 @@ export interface IAuth {
 
 export const AuthsProvider: FunctionComponent = ({ children }) => {
   const [auths, setAuths] = useState<IAuth[]>([])
-  const { password, isApiLoggedIn: isAuth, userId } = useContext(UserContext)
+  const {
+    masterPassword,
+    isApiLoggedIn: isAuth,
+    userId,
+    encrypt
+  } = useContext(UserContext)
   const [saveAuthsMutation] = useSaveAuthsMutation()
   const { saveAuthsToBg } = useContext(BackgroundContext)
 
@@ -42,17 +47,13 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
           //@ts-expect-error
           saveAuthsToBg(value)
 
-          const encrypted = cryptoJS.AES.encrypt(
-            JSON.stringify(value),
-            password
-          ).toString()
+          const encrypted = encrypt(JSON.stringify(value))
 
           if (isAuth) {
-            console.log('saving with', password, 'userId: ', userId)
+            console.log('saving with', masterPassword, 'userId: ', userId)
             await saveAuthsMutation({
               variables: {
-                payload: encrypted,
-                userId: userId as string
+                payload: encrypted
               }
             })
           }

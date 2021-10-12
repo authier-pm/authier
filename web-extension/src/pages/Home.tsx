@@ -31,7 +31,7 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
-  const { setPassword, isApiLoggedIn } = useContext(UserContext)
+
   const { bgAuths } = useContext(BackgroundContext)
 
   useInterval(() => {
