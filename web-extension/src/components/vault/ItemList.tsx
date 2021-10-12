@@ -32,7 +32,7 @@ function VaultItem({
   const [isVisible, setIsVisible] = useState(false)
 
   return (
-    <Center py={5} m={3}>
+    <Center py={5} m={['auto', '3']}>
       <Box
         maxW={'250px'}
         w="250px"
@@ -158,7 +158,7 @@ export const ItemList = () => {
       />
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
-          <Flex flexDirection="row" flexWrap="wrap">
+          <Flex flexDirection="row" flexWrap="wrap" m="auto">
             {totp
               ?.filter(({ label, originalUrl }) => {
                 return (

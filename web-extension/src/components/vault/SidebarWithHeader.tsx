@@ -70,7 +70,7 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       {/* <MobileNav onOpen={onOpen} /> */}
-      <Box ml={['250px']}>{children}</Box>
+      <Box ml={['auto', '250px']}>{children}</Box>
     </Box>
   )
 }
