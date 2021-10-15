@@ -2,8 +2,8 @@ import * as React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import Home from '../screens/Home'
 import Scan from '../screens/Scan'
-import { AuthList } from '../components/AuthList'
-import { IconButton, Icon as NativeIcon } from 'native-base'
+import { AuthList } from '../screens/AuthList'
+import { IconButton, Icon as NativeIcon, Text } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native'
 
@@ -19,7 +19,6 @@ function HomeScreen() {
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const navigation = useNavigation()
           return (
-            //@ts-expect-error
             <IconButton
               ml={3}
               variant="ghost"
@@ -41,11 +40,12 @@ function HomeScreen() {
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Scan" component={Scan} />
       <Drawer.Screen
-        options={{
+        options={({ navigation }) => ({
+          headerRight: () => <Text>Test</Text>,
           headerStyle: {
             backgroundColor: '#ebebeb'
           }
-        }}
+        })}
         name="AuthList"
         component={AuthList}
       />

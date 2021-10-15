@@ -16,7 +16,7 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NotifyContext } from '../providers/NotifyProvider'
-import { useSendConfirmationLazyQuery } from '../components/Home.codegen'
+import { useSendConfirmationLazyQuery } from './Home.codegen'
 
 const Home = () => {
   const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
