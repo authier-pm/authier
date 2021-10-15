@@ -6,6 +6,7 @@ import { AuthList } from '../screens/AuthList'
 import { IconButton, Icon as NativeIcon, Text } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native'
+import { SearchBar } from '../components/SearchBar'
 
 //const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator()
@@ -41,12 +42,12 @@ function HomeScreen() {
       <Drawer.Screen name="Scan" component={Scan} />
       <Drawer.Screen
         options={({ navigation }) => ({
-          headerRight: () => <Text>Test</Text>,
           headerStyle: {
             backgroundColor: '#ebebeb'
-          }
+          },
+          headerName: false
         })}
-        name="AuthList"
+        name="My List"
         component={AuthList}
       />
     </Drawer.Navigator>
