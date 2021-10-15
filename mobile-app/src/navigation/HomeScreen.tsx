@@ -1,14 +1,14 @@
-import * as React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import Home from '../components/Home';
-import Scan from '../components/Scan';
-import { AuthList } from '../components/AuthList';
-import { IconButton, Icon as NativeIcon } from 'native-base';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import * as React from 'react'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import Home from '../screens/Home'
+import Scan from '../screens/Scan'
+import { AuthList } from '../components/AuthList'
+import { IconButton, Icon as NativeIcon } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { useNavigation } from '@react-navigation/native'
 
 //const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator()
 
 function HomeScreen() {
   return (
@@ -17,8 +17,9 @@ function HomeScreen() {
         headerShown: true,
         headerLeft: () => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          const navigation = useNavigation();
+          const navigation = useNavigation()
           return (
+            //@ts-expect-error
             <IconButton
               ml={3}
               variant="ghost"
@@ -32,8 +33,8 @@ function HomeScreen() {
               //@ts-expect-error
               onPress={() => navigation.openDrawer()}
             />
-          );
-        },
+          )
+        }
       }}
       initialRouteName="Home"
     >
@@ -42,13 +43,13 @@ function HomeScreen() {
       <Drawer.Screen
         options={{
           headerStyle: {
-            backgroundColor: '#ebebeb',
-          },
+            backgroundColor: '#ebebeb'
+          }
         }}
         name="AuthList"
         component={AuthList}
       />
     </Drawer.Navigator>
-  );
+  )
 }
-export default HomeScreen;
+export default HomeScreen

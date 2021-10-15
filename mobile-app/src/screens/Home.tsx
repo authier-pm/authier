@@ -4,98 +4,96 @@ import {
   Button,
   FlatList,
   Flex,
-  Icon as NativeIcon,
-  IconButton,
+  // Icon as NativeIcon,
+  // IconButton,
   Modal,
   Text,
-  Pressable,
-} from 'native-base';
-import React, { useEffect, useState } from 'react';
-import { useContext } from 'react';
-import ReactNativeBiometrics from 'react-native-biometrics';
-import Icon from 'react-native-vector-icons/Ionicons';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { NotifyContext } from '../NotifyProvider';
-import { useSendConfirmationLazyQuery } from './Home.codegen';
+  Pressable
+} from 'native-base'
+import React, { useEffect, useState } from 'react'
+import { useContext } from 'react'
+import ReactNativeBiometrics from 'react-native-biometrics'
+import Icon from 'react-native-vector-icons/Ionicons'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import { NotifyContext } from '../providers/NotifyProvider'
+import { useSendConfirmationLazyQuery } from '../components/Home.codegen'
 
 const Home = () => {
-  const [sendConfirmation, { data, loading, error }] =
-    useSendConfirmationLazyQuery();
-  const { notifies, setNotifies } = useContext(NotifyContext);
-  const [isBio, setIsBio] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [refreshing, setRefreshing] = useState(false);
+  const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
+  const { notifies, setNotifies } = useContext(NotifyContext)
+  const [isBio, setIsBio] = useState(false)
+  const [open, setOpen] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
 
   if (error) {
-    console.log(error);
+    console.log(error)
   }
 
   const authenticate = (page: string) => {
     if (isBio) {
       ReactNativeBiometrics.simplePrompt({
-        promptMessage: 'Confirm fingerprint',
+        promptMessage: 'Confirm fingerprint'
       })
         .then(async (resultObject) => {
-          const { success } = resultObject;
+          const { success } = resultObject
           if (success) {
             //call here api, maybe wait on success confirmation
             sendConfirmation({
               //@ts-expect-error
-              variables: { userId: notifies[0].userId, success: true },
-            });
-            console.log(data, error);
+              variables: { userId: notifies[0].userId, success: true }
+            })
+            console.log(data, error)
             setNotifies(
               notifies.filter((el) => (el.pageName === page ? false : true))
-            );
+            )
             await AsyncStorage.removeItem('notifies', (e) => {
-              if (e) console.log(e);
-            });
+              if (e) console.log(e)
+            })
           } else {
-            console.log('user cancelled biometric prompt');
+            console.log('user cancelled biometric prompt')
           }
         })
         .catch(() => {
-          console.log('biometrics failed');
-        });
+          console.log('biometrics failed')
+        })
     }
-  };
+  }
 
   const updateList = async () => {
     const jsonValue = await AsyncStorage.getItem('notifies', (e) => {
-      if (e) console.log('error in async storage', e);
-    });
+      if (e) console.log('error in async storage', e)
+    })
 
     if (jsonValue) {
-      let data = JSON.parse(jsonValue as string);
-      setNotifies([data.data]);
+      let data = JSON.parse(jsonValue as string)
+      setNotifies([data.data])
     } else {
-      setNotifies([]);
+      setNotifies([])
     }
 
-    setRefreshing(false);
-  };
+    setRefreshing(false)
+  }
 
   useEffect(() => {
     async function getBio() {
-      const { biometryType } = await ReactNativeBiometrics.isSensorAvailable();
+      const { biometryType } = await ReactNativeBiometrics.isSensorAvailable()
 
       if (biometryType === ReactNativeBiometrics.Biometrics) {
-        setIsBio(true);
+        setIsBio(true)
       }
     }
 
-    getBio();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    getBio()
+  }, [])
 
   const handleRefresh = () => {
-    setRefreshing(true);
-    updateList();
-  };
+    setRefreshing(true)
+    updateList()
+  }
 
   //@ts-expect-error
   const ListItem = ({ item }) => {
-    console.log('item', item);
+    console.log('item', item)
     return (
       <Pressable
         key={item.pageName}
@@ -111,7 +109,7 @@ const Home = () => {
           <Avatar
             size="lg"
             source={{
-              uri: 'https://via.placeholder.com/150',
+              uri: 'https://via.placeholder.com/150'
             }}
             mr={10}
           >
@@ -149,8 +147,8 @@ const Home = () => {
           </Modal.Content>
         </Modal>
       </Pressable>
-    );
-  };
+    )
+  }
 
   return (
     <Box safeArea flex={1}>
@@ -159,14 +157,14 @@ const Home = () => {
       <FlatList
         data={notifies}
         keyExtractor={(noti) => {
-          return noti.pageName;
+          return noti.pageName
         }}
         renderItem={ListItem}
         onRefresh={handleRefresh}
         refreshing={refreshing}
       />
     </Box>
-  );
-};
+  )
+}
 
-export default Home;
+export default Home
