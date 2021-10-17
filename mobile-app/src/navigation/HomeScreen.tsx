@@ -1,14 +1,15 @@
-import * as React from 'react';
-import { createDrawerNavigator } from '@react-navigation/drawer';
-import Home from '../components/Home';
-import Scan from '../components/Scan';
-import { AuthList } from '../components/AuthList';
-import { IconButton, Icon as NativeIcon } from 'native-base';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { useNavigation } from '@react-navigation/native';
+import * as React from 'react'
+import { createDrawerNavigator } from '@react-navigation/drawer'
+import Home from '../screens/Home'
+import Scan from '../screens/Scan'
+import { AuthList } from '../screens/AuthList'
+import { IconButton, Icon as NativeIcon, Text } from 'native-base'
+import Icon from 'react-native-vector-icons/Ionicons'
+import { useNavigation } from '@react-navigation/native'
+import { SearchBar } from '../components/SearchBar'
 
 //const Tab = createBottomTabNavigator();
-const Drawer = createDrawerNavigator();
+const Drawer = createDrawerNavigator()
 
 function HomeScreen() {
   return (
@@ -17,7 +18,7 @@ function HomeScreen() {
         headerShown: true,
         headerLeft: () => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
-          const navigation = useNavigation();
+          const navigation = useNavigation()
           return (
             <IconButton
               ml={3}
@@ -32,23 +33,24 @@ function HomeScreen() {
               //@ts-expect-error
               onPress={() => navigation.openDrawer()}
             />
-          );
-        },
+          )
+        }
       }}
       initialRouteName="Home"
     >
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Scan" component={Scan} />
       <Drawer.Screen
-        options={{
+        options={({ navigation }) => ({
           headerStyle: {
-            backgroundColor: '#ebebeb',
+            backgroundColor: '#ebebeb'
           },
-        }}
-        name="AuthList"
+          headerName: false
+        })}
+        name="My List"
         component={AuthList}
       />
     </Drawer.Navigator>
-  );
+  )
 }
-export default HomeScreen;
+export default HomeScreen
