@@ -17,6 +17,7 @@ import {
   Button
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
+import { SearchBar } from '../components/SearchBar'
 
 interface Item {
   secret: string
@@ -117,13 +118,14 @@ export const AuthList = (): JSX.Element => {
 
   return (
     <View flex={1} safeArea backgroundColor="white">
-      <Flex flexDirection="row" justifyContent="space-between">
-        <Heading pl={5} pt={5}>
-          Your tokens
-        </Heading>
+      <Flex
+        flexDirection="row"
+        justifyContent="space-between"
+        mr={5}
+        alignItems="center"
+      >
+        <SearchBar />
         <CircularProgress
-          margin={5}
-          mt={6}
           value={seconds}
           size={8}
           min={0}
