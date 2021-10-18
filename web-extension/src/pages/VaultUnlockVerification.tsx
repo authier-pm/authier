@@ -68,7 +68,7 @@ export function VaultUnlockVerification() {
 
               console.log('parsedAuths', parsedTOTP)
               console.log('parsedPasswords', parsedPsw)
-              loginUser(parsedTOTP, parsedPsw)
+              loginUser(values.password, parsedPsw)
             }
 
             setSubmitting(false)

@@ -11,6 +11,7 @@
     "Chakra",
     "Deduplication",
     "Fastify",
+    "filenamify",
     "firebaseapp",
     "graphiql",
     "ITOTP",

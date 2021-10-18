@@ -3,6 +3,7 @@ import React, {
   Dispatch,
   FunctionComponent,
   SetStateAction,
+  useContext,
   useEffect,
   useState
 } from 'react'
@@ -16,9 +17,10 @@ import { Link } from 'wouter'
 import { AddAuthSecretButton } from '@src/components/AddAuthSecretButton'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const NavMenu: FunctionComponent = () => {
-  const { refetch } = useIsLoggedInQuery()
+  const { logoutUser } = useContext(BackgroundContext)
 
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
@@ -42,13 +44,10 @@ export const NavMenu: FunctionComponent = () => {
           <Button
             colorScheme={'red'}
             onClick={async () => {
-              // setIsAuth(false)
+              await removeToken()
               await browser.storage.local.clear()
-              removeToken()
-              chrome.runtime.sendMessage({
-                action: BackgroundMessageType.clear
-              })
-              refetch()
+
+              logoutUser()
             }}
           >
             Logout

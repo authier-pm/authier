@@ -29,7 +29,6 @@
     "storage",
     "http://*/",
     "https://*/",
-    "system.network",
     "notifications"
   ],
   "web_accessible_resources": ["icon-16.png"],
