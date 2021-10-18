@@ -2,11 +2,10 @@ import * as React from 'react'
 import { createDrawerNavigator } from '@react-navigation/drawer'
 import Home from '../screens/Home'
 import Scan from '../screens/Scan'
-import { AuthList } from '../screens/AuthList'
-import { IconButton, Icon as NativeIcon, Text } from 'native-base'
+import { Vault } from '../screens/Vault'
+import { IconButton, Icon as NativeIcon } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native'
-import { SearchBar } from '../components/SearchBar'
 
 //const Tab = createBottomTabNavigator();
 const Drawer = createDrawerNavigator()
@@ -41,14 +40,14 @@ function HomeScreen() {
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Scan" component={Scan} />
       <Drawer.Screen
-        options={({ navigation }) => ({
+        options={({}) => ({
           headerStyle: {
             backgroundColor: '#ebebeb'
           },
           headerName: false
         })}
-        name="My List"
-        component={AuthList}
+        name="My Vault"
+        component={Vault}
       />
     </Drawer.Navigator>
   )

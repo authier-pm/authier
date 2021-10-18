@@ -108,10 +108,12 @@ export class RootResolver {
   //TODO query for info about user
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
-  me(@Ctx() context: IContextAuthenticated) {
+  async me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
     if (jwtPayload) {
-      return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
+      return prisma.user.findUnique({
+        where: { id: jwtPayload?.userId }
+      })
     }
   }
 
@@ -334,7 +336,6 @@ export class RootResolver {
     }
 
     // //login successful
-
     setNewRefreshToken(user, ctx)
     const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 

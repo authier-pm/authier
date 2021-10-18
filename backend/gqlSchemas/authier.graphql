@@ -17,6 +17,8 @@ type UserQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
@@ -89,6 +91,8 @@ type UserMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   addDevice(firebaseToken: String!, name: String!): Device!
   saveAuths(payload: String!): EncryptedSecrets!
   savePasswords(payload: String!): EncryptedSecrets!
@@ -120,6 +124,8 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
 }
 
 input OTPEvent {

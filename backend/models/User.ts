@@ -38,10 +38,21 @@ export class UserQuery extends UserBase {
     })
   }
 
+  //Call this from the findFirst query in me??
   @Field(() => SettingsConfig)
   @UseMiddleware(isAuth)
   async settings() {
     return prisma.settingsConfig.findFirst({
+      where: {
+        userId: this.id
+      }
+    })
+  }
+
+  @Field(() => [EncryptedSecrets])
+  @UseMiddleware(isAuth)
+  async encryptedSecrets() {
+    return prisma.encryptedSecrets.findMany({
       where: {
         userId: this.id
       }

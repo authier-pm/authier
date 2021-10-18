@@ -12,25 +12,18 @@ import {
   AddIcon,
   Avatar,
   Flex,
-  Heading,
   CircularProgress,
   Button
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '../components/SearchBar'
 
-interface Item {
-  secret: string
-  label: string
-  icon: string
-}
-
 const options = {
   algorithm: 'sha1',
   digits: 6
 }
 
-export const AuthList = (): JSX.Element => {
+export const Vault = () => {
   const { auths } = useContext(AuthsContext)
 
   const [showWhole, setShowWhole] = useState(false)
