@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useRef, useState } from 'react'
-import {
+import Chakra, {
   Avatar,
   Box,
   Button,
@@ -11,7 +11,8 @@ import {
   Text,
   Heading,
   IconButton,
-  Divider
+  Divider,
+  Switch
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 import { AuthsContext, IAuth } from '../providers/AuthsProvider'
@@ -37,17 +38,13 @@ enum Values {
 }
 
 const OtpCode = ({ auth }: { auth: IAuth }) => {
-  const { saveAuthsToBg, bgAuths } = useContext(BackgroundContext)
+  const { saveAuthsToBg, backgroundState } = useContext(BackgroundContext)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(auth.secret)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
-  const onClose = () => {
-    setIsOpen(false)
-    saveAuthsToBg(bgAuths?.filter((i) => i.originalUrl !== auth.originalUrl))
-  }
 
   useEffect(() => {
     setShowWhole(false)
@@ -69,12 +66,6 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
               top={-1}
               left={-15}
               onClick={() => setIsOpen(true)}
-            />
-
-            <RemoveAlertDialog
-              isOpen={isOpen}
-              cancelRef={cancelRef}
-              onClose={onClose}
             />
 
             <Avatar src={auth.icon} size="sm"></Avatar>
@@ -137,15 +128,10 @@ const LoginCredentialsListItem = ({
 }: {
   loginCredentials: ILoginCredentials
 }) => {
-  const { savePasswordsToBg, bgPasswords } = useContext(BackgroundContext)
+  const { savePasswordsToBg, backgroundState } = useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
-  const onClose = () => {
-    setIsOpen(false)
-    savePasswordsToBg(
-      bgPasswords?.filter((i) => i.originalUrl !== loginCredentials.originalUrl)
-    )
-  }
+
   const { onCopy } = useClipboard(loginCredentials.password)
   console.log('~ loginCredentials', loginCredentials)
 
@@ -188,10 +174,10 @@ const LoginCredentialsListItem = ({
   )
 }
 
-export const AuthsList = () => {
+export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   const [changeList, setChangeList] = useState<Values>(Values.TOTP)
-  const { auths } = useContext(AuthsContext)
-  const { bgPasswords } = useContext(BackgroundContext)
+
+  const { backgroundState } = useContext(BackgroundContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
   // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
@@ -204,13 +190,11 @@ export const AuthsList = () => {
     })
   }, [])
 
-  const TOTPForCurrentDomain = auths?.filter(({ originalUrl }) => {
-    if (!currentTabUrl || !originalUrl) {
-      return true
-    }
-    return extractHostname(originalUrl) === extractHostname(currentTabUrl)
-  })
-  const loginCredentialForCurrentDomain = bgPasswords?.filter(
+  if (!backgroundState) {
+    return null
+  }
+
+  const TOTPForCurrentDomain = backgroundState.totpSecrets?.filter(
     ({ originalUrl }) => {
       if (!currentTabUrl || !originalUrl) {
         return true
@@ -218,6 +202,13 @@ export const AuthsList = () => {
       return extractHostname(originalUrl) === extractHostname(currentTabUrl)
     }
   )
+  const loginCredentialForCurrentDomain =
+    backgroundState.loginCredentials.filter(({ originalUrl }) => {
+      if (!currentTabUrl || !originalUrl) {
+        return true
+      }
+      return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+    })
 
   return (
     <>
@@ -247,7 +238,8 @@ export const AuthsList = () => {
       </Flex> */}
 
       <Flex overflow="auto" overflowX="hidden" flexDirection="column">
-        {TOTPForCurrentDomain.length === 0 &&
+        {filterByTLD &&
+          TOTPForCurrentDomain.length === 0 &&
           loginCredentialForCurrentDomain.length === 0 && (
             <>
               <Text>
@@ -256,32 +248,44 @@ export const AuthsList = () => {
               </Text>
             </>
           )}
-        <Divider my={5} />
-        <Heading size="md">Stored secrets for all domains</Heading>
-        {TOTPForCurrentDomain.map((auth, i) => {
-          return <OtpCode auth={auth} key={auth.label + i} />
-        })}
-        {loginCredentialForCurrentDomain.map((psw, i) => {
-          return (
-            <LoginCredentialsListItem
-              loginCredentials={psw}
-              key={psw.label + i}
-            />
-          )
-        })}
-        {[
-          auths?.map((auth, i) => {
-            return <OtpCode auth={auth} key={auth.label + i} />
-          }),
-          bgPasswords?.map((psw, i) => {
-            return (
-              <LoginCredentialsListItem
-                loginCredentials={psw}
-                key={psw.label + i}
-              />
-            )
-          })
-        ]}
+
+        {filterByTLD ? (
+          <>
+            {TOTPForCurrentDomain.map((auth, i) => {
+              return <OtpCode auth={auth} key={auth.label + i} />
+            })}
+            {loginCredentialForCurrentDomain.map((psw, i) => {
+              return (
+                <LoginCredentialsListItem
+                  loginCredentials={psw}
+                  key={psw.label + i}
+                />
+              )
+            })}
+          </>
+        ) : (
+          [
+            backgroundState.totpSecrets.map((auth, i) => {
+              return <OtpCode auth={auth} key={auth.label + i} />
+            }),
+            backgroundState.loginCredentials.map((psw, i) => {
+              return (
+                <LoginCredentialsListItem
+                  loginCredentials={psw}
+                  key={psw.label + i}
+                />
+              )
+            })
+          ]
+        )}
+        {backgroundState.loginCredentials.length === 0 &&
+          backgroundState.totpSecrets.length === 0 && (
+            // TODO login form illustration
+            <Text>
+              Start by adding a secret by logging onto any website or by adding
+              a TOTP code
+            </Text>
+          )}
       </Flex>
     </>
   )

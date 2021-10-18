@@ -16,13 +16,15 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { browser } from 'webextension-polyfill'
+
 import {
   getUserFromToken,
   setAccessToken,
   getTokenFromLocalStorage
 } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
-import browser from 'webextension-polyfill'
+
 import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
@@ -37,13 +39,12 @@ interface Values {
 }
 
 export default function Login(): ReactElement {
-  const { refetch } = useIsLoggedInQuery()
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId, decrypt } = useContext(UserContext)
-  const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg } = useContext(BackgroundContext)
+
+  const { loginUser } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -62,15 +63,18 @@ export default function Login(): ReactElement {
           })
 
           if (response.data?.login?.accessToken) {
-            await browser.storage.local.set({
-              'access-token': response.data.login?.accessToken
-            })
             setAccessToken(response.data.login?.accessToken)
 
             let decodedToken = await getUserFromToken()
             console.log('~ decodedToken', decodedToken)
 
             setUserId(decodedToken.userId)
+            loginUser(
+              values.password,
+              decodedToken.userId,
+              data?.login?.secrets ?? []
+            )
+
             let decryptedAuths = ''
             let decryptedPasswords = ''
             console.log('res', response)
@@ -93,19 +97,18 @@ export default function Login(): ReactElement {
 
               if (decryptedAuths) {
                 let loadedAuths = await JSON.parse(decryptedAuths)
-                setAuths(loadedAuths)
+                // setAuths(loadedAuths)
               }
 
               if (decryptedPasswords) {
                 let loadCredentials = await JSON.parse(decryptedPasswords)
-                savePasswordsToBg(loadCredentials)
+                // savePasswordsToBg(loadCredentials)
               }
               console.log('decrSecrets', decryptedAuths)
               console.log('decrSecrets', decryptedPasswords)
             }
-            refetch()
           } else {
-            toast.error(t`Login failed, check your password`)
+            toast.error(t`Login failed, check your username and password`)
           }
 
           setSubmitting(false)

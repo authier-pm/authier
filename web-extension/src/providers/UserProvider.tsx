@@ -19,7 +19,6 @@ export type IUserContext = {
   masterPassword: string
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
-  isApiLoggedIn: Boolean
   localStorage: any
   fireToken: string
   encrypt(data: string, password?: string): string
@@ -41,11 +40,20 @@ export type IUserContext = {
 export const UserContext = createContext<IUserContext>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
-  const [masterPassword, setMasterPassword] = useState<string>('bob')
-  const { data, loading, error } = useIsLoggedInQuery()
+  const [masterPassword, setMasterPassword] = useState<string>()
   const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
+
+  // useEffect(() => {
+  //   chrome.runtime.sendMessage({
+  //     action: BackgroundMessageType.setUserIdAndMasterPassword,
+  //     payload: {
+  //       userId,
+  //       masterPassword
+  //     }
+  //   })
+  // }, [masterPassword, userId])
 
   useEffect(() => {
     async function checkStorage() {
@@ -83,14 +91,13 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     setMasterPassword,
     setUserId,
     userId,
-    isApiLoggedIn: !!(data?.authenticated && !loading),
     localStorage,
     fireToken,
     encrypt(data: string, password = masterPassword): string {
-      return AES.encrypt(data, password, cryptoOptions).toString()
+      return AES.encrypt(data, password as string, cryptoOptions).toString()
     },
     decrypt(data: string, password = masterPassword): string {
-      return AES.decrypt(data, password, cryptoOptions).toString()
+      return AES.decrypt(data, password as string, cryptoOptions).toString()
     }
   }
   console.log(value)
