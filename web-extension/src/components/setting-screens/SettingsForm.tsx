@@ -48,7 +48,6 @@ export function SettingsForm({}: Props): ReactElement {
         {(props) => (
           <Form>
             <Field name="homeList">
-              {/* @ts-expect-error */}
               {({ field, form }) => (
                 <FormControl
                   isInvalid={form.errors.homeList && form.touched.homeList}
