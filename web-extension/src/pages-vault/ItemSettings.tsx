@@ -113,7 +113,6 @@ export const ItemSettings = ({ data }: any) => {
                   Password:
                 </Heading>
                 <Progress
-                  //@ts-expect-error
                   value={Value[levelOfPsw]}
                   size="xs"
                   colorScheme="green"

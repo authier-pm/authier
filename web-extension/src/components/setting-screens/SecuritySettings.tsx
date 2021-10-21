@@ -53,7 +53,6 @@ export const SecuritySettings = ({}: Props) => {
           {(props) => (
             <Form>
               <Field name="vaultTime">
-                {/* @ts-expect-error */}
                 {({ field, form }) => (
                   <FormControl
                     isInvalid={form.errors.vaultTime && form.touched.vaultTime}
@@ -77,7 +76,6 @@ export const SecuritySettings = ({}: Props) => {
                 )}
               </Field>
               <Field name="noHandsLogin">
-                {/* @ts-expect-error */}
                 {({ field, form }) => (
                   <FormControl
                     isInvalid={
