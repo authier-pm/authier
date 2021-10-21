@@ -28,12 +28,7 @@ export interface IAuth {
 
 export const AuthsProvider: FunctionComponent = ({ children }) => {
   const [auths, setAuths] = useState<IAuth[]>([])
-  const {
-    masterPassword,
-    isApiLoggedIn: isAuth,
-    userId,
-    encrypt
-  } = useContext(UserContext)
+  const { isApiLoggedIn: isAuth, userId, encrypt } = useContext(UserContext)
   const [saveAuthsMutation] = useSaveAuthsMutation()
   const { saveAuthsToBg, masterPassword } = useContext(BackgroundContext)
 
@@ -48,11 +43,11 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
             //@ts-expect-error
             saveAuthsToBg(value)
           }
-
-          const encrypted = encrypt(JSON.stringify(value))
+          console.log(masterPassword)
+          const encrypted = encrypt(JSON.stringify(value), masterPassword)
 
           if (isAuth) {
-            console.log('saving with', masterPassword, 'userId: ', userId)
+            console.log('saving to DB with psw', masterPassword)
             await saveAuthsMutation({
               variables: {
                 payload: encrypted
@@ -61,7 +56,7 @@ export const AuthsProvider: FunctionComponent = ({ children }) => {
           }
 
           await browser.storage.local.set({
-            encryptedAuthsMasterPassword: encrypted
+            encryptedTOTP: encrypted
           })
 
           setAuths(value)

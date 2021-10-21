@@ -14,5 +14,7 @@ export enum BackgroundMessageType {
   saveLoginCredentials = 'saveLoginCredentials',
   getLoginCredentialsModalState = 'getLoginCredentialsModalState',
   hideLoginCredentialsModal = 'hideLoginCredentialsModal',
-  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown'
+  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown',
+  masterPassword = 'masterPassword',
+  setMasterPassword = 'setMasterPassword'
 }
