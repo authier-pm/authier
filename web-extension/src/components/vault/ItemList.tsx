@@ -27,7 +27,7 @@ function VaultItem({
 }: {
   label: string
   icon: string | undefined
-  data: ILoginCredentials
+  data: ILoginCredentials | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
 
@@ -168,7 +168,6 @@ export const ItemList = () => {
               .map((el, i) => {
                 return (
                   <VaultItem
-                    //@ts-expect-error
                     data={el}
                     icon={el.icon}
                     label={el.label}
@@ -185,7 +184,6 @@ export const ItemList = () => {
               .map((el, i) => {
                 return (
                   <VaultItem
-                    //@ts-expect-error
                     icon={el.favIconUrl}
                     label={el.label}
                     key={el.label + i}
