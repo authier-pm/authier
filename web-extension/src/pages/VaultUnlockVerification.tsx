@@ -29,8 +29,8 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { setMasterPassword, encrypt, decrypt } = useContext(UserContext)
-  const { loginUser } = useContext(BackgroundContext)
+  const { setMasterPassword, decrypt } = useContext(UserContext)
+  const { loginUser, saveMasterPsw } = useContext(BackgroundContext)
 
   return (
     <Flex flexDirection="column" width="315px" p={4}>
@@ -49,22 +49,20 @@ export function VaultUnlockVerification() {
           const storage = await browser.storage.local.get()
 
           try {
-            if (
-              storage.encryptedAuthsMasterPassword &&
-              storage.encryptedPswMasterPassword
-            ) {
+            if (storage.encryptedTOTP && storage.encryptedPswMasterPassword) {
               const decryptedAuths = decrypt(
-                storage.encryptedAuthsMasterPassword,
+                storage.encryptedTOTP,
                 values.password
               )
 
               const decryptedPsw = decrypt(
-                storage.encryptedPswMasterPassword,
+                storage.encryptedTOTP,
                 values.password
               )
 
               let parsedTOTP = JSON.parse(decryptedAuths)
               let parsedPsw = JSON.parse(decryptedPsw)
+              console.log(parsedTOTP)
 
               loginUser(parsedTOTP, parsedPsw)
               saveMasterPsw(values.password)

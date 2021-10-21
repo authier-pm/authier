@@ -43,7 +43,12 @@ export default function Login(): ReactElement {
   const [login, { data, loading, error }] = useLoginMutation()
   const { setUserId, decrypt } = useContext(UserContext)
   const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg, saveMasterPsw } = useContext(BackgroundContext)
+  const {
+    savePasswordsToBg,
+    saveMasterPsw,
+    masterPassword,
+    setMasterPassword
+  } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -57,6 +62,8 @@ export default function Login(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          setMasterPassword(values.password)
+          console.log('PLS', masterPassword)
           const response = await login({
             variables: { email: values.email, password: values.password }
           })
@@ -65,17 +72,22 @@ export default function Login(): ReactElement {
             await browser.storage.local.set({
               'access-token': response.data.login?.accessToken
             })
+
             setAccessToken(response.data.login?.accessToken)
 
             let decodedToken = await getUserFromToken()
-            console.log('~ decodedToken', decodedToken)
+            console.log(
+              '~ decodedToken',
+              decodedToken,
+              response.data.login.secrets?.length
+            )
 
             setUserId(decodedToken.userId)
             let decryptedAuths = ''
             let decryptedPasswords = ''
-            console.log('res', response)
+
             //@ts-expect-error
-            if (response.data.login.secrets[0] && values.password) {
+            if (response.data.login.secrets?.length > 0 && values.password) {
               response.data.login?.secrets?.forEach((i) => {
                 if (i.kind === 'TOTP') {
                   decryptedAuths = decrypt(
@@ -87,11 +99,8 @@ export default function Login(): ReactElement {
                     i.encrypted as string,
                     values.password
                   )
-                  console.log(decryptedPasswords)
                 }
               })
-
-              saveMasterPsw(values.password)
 
               if (decryptedAuths) {
                 let loadedAuths = await JSON.parse(decryptedAuths)

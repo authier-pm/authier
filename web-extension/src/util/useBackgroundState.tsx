@@ -120,6 +120,7 @@ export function useBackgroundState() {
     //   { action: BackgroundMessageType.setMasterPassword },
     //   (res: { config: { masterPsw: string } }) => {
     //     if (res.config) {
+    //       console.log('LOL', res.config)
     //       setMasterPassword(res.config.masterPsw)
     //     }
     //   }
@@ -156,6 +157,17 @@ export function useBackgroundState() {
   }, [])
 
   const backgroundState = {
+    saveMasterPsw: (psw: string) => {
+      setMasterPassword(psw)
+      chrome.runtime.sendMessage({
+        action: BackgroundMessageType.masterPassword,
+        masterPassword: psw
+      })
+
+      console.log('master', masterPassword)
+    },
+    setMasterPassword,
+    masterPassword,
     currentURL,
     safeLocked,
     setSafeLocked,
@@ -233,16 +245,7 @@ export function useBackgroundState() {
         config: config
       })
     },
-    UIConfig,
-    // saveMasterPsw: (psw: string) => {
-    //   chrome.runtime.sendMessage({
-    //     action: BackgroundMessageType.masterPassword,
-    //     masterPassword: psw
-    //   })
-
-    //   setMasterPassword(psw)
-    // },
-    masterPassword
+    UIConfig
   }
 
   // @ts-expect-error
