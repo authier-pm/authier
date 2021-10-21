@@ -3,12 +3,12 @@ import { ApolloProvider } from '@apollo/client'
 import { NavigationContainer } from '@react-navigation/native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-import HomeScreen from './navigation/HomeScreen'
 import { apoloCLient } from './ApolloClient'
 import TokenProvider from './providers/TokenProvider'
 import { NativeBaseProvider } from 'native-base'
 import { theme } from './Theme'
 import NotifyProvider from './providers/NotifyProvider'
+import Routes from './Routes'
 
 export const AuthsContext = createContext<{
   auths: Array<any>
@@ -34,7 +34,7 @@ export const Providers: React.FC<{}> = () => {
             <AuthsContext.Provider value={{ auths, setAuths }}>
               <TokenProvider>
                 <NavigationContainer>
-                  <HomeScreen />
+                  <Routes />
                 </NavigationContainer>
               </TokenProvider>
             </AuthsContext.Provider>

@@ -12,13 +12,16 @@
   },
   "dependencies": {
     "@apollo/client": "^3.4.16",
-    "@react-native-async-storage/async-storage": "^1.15.5",
+    "@babel/preset-env": "^7.15.8",
+    "@babel/preset-react": "^7.14.5",
+    "@react-native-async-storage/async-storage": "^1.15.9",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-firebase/app": "^12.1.0",
     "@react-native-firebase/messaging": "^12.1.0",
     "@react-navigation/bottom-tabs": "^5.11.11",
     "@react-navigation/drawer": "^6.1.8",
     "@react-navigation/native": "^6.0.6",
+    "@react-navigation/native-stack": "^6.2.5",
     "@react-navigation/stack": "^5.14.5",
     "@types/react": "^17",
     "apollo-link-http": "^1.5.17",
@@ -73,9 +76,12 @@
       "json",
       "node"
     ],
-    "setupFiles": [
+    "transformIgnorePatterns": [
+      "node_modules/(?!(@react-native|react-native|react-native-vector-icons)/)"
+    ],
+        "setupFiles": [
       "./jestSetup.js"
-    ]
+        ]
   },
   "husky": {
     "hooks": {
