@@ -70,7 +70,7 @@ export default function Login(): ReactElement {
             loginUser(
               values.password,
               decodedToken.userId,
-              data?.login?.secrets ?? []
+              data?.login?.user.secrets ?? []
             )
           } else {
             toast.error(t`Login failed, check your username and password`)

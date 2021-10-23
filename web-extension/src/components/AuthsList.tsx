@@ -15,7 +15,7 @@ import Chakra, {
   Switch
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
-import { AuthsContext, IAuth } from '../providers/AuthsProvider'
+
 import { CopyIcon, DeleteIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
@@ -26,6 +26,7 @@ import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
 import {
   ILoginCredentials,
+  ITOTPSecret,
   useBackgroundState
 } from '@src/util/useBackgroundState'
 import { UIOptions } from './setting-screens/SettingsForm'
@@ -37,10 +38,11 @@ enum Values {
   TOTP = 'OTP'
 }
 
-const OtpCode = ({ auth }: { auth: IAuth }) => {
-  const { saveAuthsToBg, backgroundState } = useContext(BackgroundContext)
+const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
+  const { saveTOTPSecrets: saveAuthsToBg, backgroundState } =
+    useContext(BackgroundContext)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
-  const otpCode = authenticator.generate(auth.secret)
+  const otpCode = authenticator.generate(totpData.secret)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
   const [isOpen, setIsOpen] = useState(false)
@@ -68,10 +70,10 @@ const OtpCode = ({ auth }: { auth: IAuth }) => {
               onClick={() => setIsOpen(true)}
             />
 
-            <Avatar src={auth.icon} size="sm"></Avatar>
+            <Avatar src={totpData.icon} size="sm"></Avatar>
           </Flex>
           <Box ml={4} mr="auto">
-            <StatLabel>{auth.label}</StatLabel>
+            <StatLabel>{totpData.label}</StatLabel>
 
             <StatNumber
               onClick={async () => {
@@ -128,7 +130,8 @@ const LoginCredentialsListItem = ({
 }: {
   loginCredentials: ILoginCredentials
 }) => {
-  const { savePasswordsToBg, backgroundState } = useContext(BackgroundContext)
+  const { saveLoginCredentials: savePasswordsToBg, backgroundState } =
+    useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
 
@@ -252,7 +255,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
         {filterByTLD ? (
           <>
             {TOTPForCurrentDomain.map((auth, i) => {
-              return <OtpCode auth={auth} key={auth.label + i} />
+              return <OtpCode totpData={auth} key={auth.label + i} />
             })}
             {loginCredentialForCurrentDomain.map((psw, i) => {
               return (
@@ -266,7 +269,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
         ) : (
           [
             backgroundState.totpSecrets.map((auth, i) => {
-              return <OtpCode auth={auth} key={auth.label + i} />
+              return <OtpCode totpData={auth} key={auth.label + i} />
             }),
             backgroundState.loginCredentials.map((psw, i) => {
               return (

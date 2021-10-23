@@ -22,7 +22,7 @@ import {
 import Devices from '@src/pages/Devices'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { UserContext } from '@src/providers/UserProvider'
-import { AuthsContext } from '@src/providers/AuthsProvider'
+
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
@@ -33,8 +33,7 @@ import { AboutPage } from '@src/pages/AboutPage'
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const { userId, fireToken, masterPassword } = useContext(UserContext)
-  const { setAuths } = useContext(AuthsContext)
+  const { userId, fireToken } = useContext(UserContext)
   const [
     saveFirebaseTokenMutation,
     { data: tokenData, loading: tokenLoading, error: tokenError }
