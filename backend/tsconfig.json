@@ -1,7 +1,11 @@
 {
   "compilerOptions": {
     "target": "ES2021",
-    "lib": ["esnext", "esnext.asynciterable", "dom"],
+    "lib": [
+      "esnext",
+      "esnext.asynciterable",
+      "dom"
+    ],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -11,7 +15,10 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": ["node", "jest"],
+    "types": [
+      "node",
+      "jest"
+    ],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
@@ -27,9 +34,9 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": true
+    "incremental": true,
+    "strictNullChecks": true
   },
-
   "exclude": [
     ".git",
     "**/node_modules/**",

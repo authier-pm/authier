@@ -251,6 +251,7 @@ export class RootResolver {
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() ctx: IContext
   ) {
+    console.log(password, email)
     const hashedPassword = await hash(password, 12)
 
     const ipAddress = ctx.getIpAddress()
@@ -269,6 +270,7 @@ export class RootResolver {
       if (err.code === 'P2002') {
         throw new GraphqlError('User with such email already exists.')
       }
+
       throw err
     }
 

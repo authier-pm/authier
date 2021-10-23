@@ -1,5 +1,10 @@
 import 'reflect-metadata'
-import fastify from 'fastify'
+import fastify, {
+  FastifyInstance,
+  FastifyReply,
+  FastifyRequest,
+  FastifyServerOptions
+} from 'fastify'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import dotenv from 'dotenv'
@@ -22,7 +27,7 @@ sentryInit({
 })
 
 const { env } = process
-async function main() {
+export async function main() {
   const app = fastify({
     logger: true
   })
