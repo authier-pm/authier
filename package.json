@@ -38,7 +38,9 @@
     "typescript": "^4.4.3"
   },
   "scripts": {
-    "dev": "cd backend && npm run dev",
+    "devBE": "cd backend && npm run dev",
+    "devFE": "cd frontend && npm run dev",
+    "devEX": "cd web-extension && npm run dev",
     "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd frontend && tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",

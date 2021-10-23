@@ -30,7 +30,10 @@ import {
   SaveSecretsMutation,
   SaveSecretsMutationVariables
 } from './backgroundPage.codegen'
-import { EncryptedSecretsType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecrets,
+  EncryptedSecretsType
+} from '../../../shared/generated/graphqlBaseTypes'
 
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
@@ -59,6 +62,7 @@ export interface IBackgroundStateSerializable {
   totpSecrets: ITOTPSecret[]
   userId: string
   masterPassword: string
+  secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
@@ -105,6 +109,14 @@ export const setBgState = (
   // @ts-expect-error
   window.bgState = bgState
 }
+;(async () => {
+  // init bgState from local storage if it has been set
+  const storage = await browser.storage.local.get()
+  if (storage.backgroundState) {
+    setBgState(storage.backgroundState)
+    log('bg init from storage', bgState)
+  }
+})()
 
 export const clearBgState = () => {
   bgState = null

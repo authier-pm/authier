@@ -1,5 +1,5 @@
 import { Button } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import {
   executeScriptInCurrentTab,
   getCurrentTab
@@ -7,31 +7,33 @@ import {
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
-import { AuthsContext } from '../providers/AuthsProvider'
+
 import browser, { Tabs } from 'webextension-polyfill'
 
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const AddAuthSecretButton: React.FC<{}> = () => {
-  const { auths, setAuths } = useContext(AuthsContext)
+  const { backgroundState, saveTOTPSecrets } = useContext(BackgroundContext)
 
-  const addToAuths = async (qr: QRCode) => {
+  const addToTotps = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
-    if (!tab) {
+    if (!tab || !backgroundState) {
       return
     }
 
-    console.log('test', auths)
+    console.log('test', backgroundState.totpSecrets)
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
-    const existingTotpSecret = auths.find(
+    const existingTotpSecret = backgroundState.totpSecrets.find(
       ({ secret }) => newTotpSecret.secret === secret
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
-      setAuths([newTotpSecret, ...auths])
+      saveTOTPSecrets([newTotpSecret, ...backgroundState.totpSecrets])
+
       toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
     }
   }
@@ -43,7 +45,7 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
         const src = await browser.tabs.captureVisibleTab()
         const qr = await getQrCodeFromUrl(src)
         if (qr) {
-          addToAuths(qr)
+          addToTotps(qr)
         } else {
           toast.error(
             t`could not find any QR code on this page. Make sure QR code is visible.`
@@ -51,7 +53,7 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
         }
       }}
     >
-      Add new code
+      <Trans>Add QR TOTP</Trans>
     </Button>
   )
 }

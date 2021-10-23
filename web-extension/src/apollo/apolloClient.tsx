@@ -27,7 +27,6 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 export const apolloClient = new ApolloClient({
-  // @ts-expect-error
   link: ApolloLink.from([tokenRefresh, errorLink, authLink, httpLink]),
   cache: new InMemoryCache(),
   queryDeduplication: true

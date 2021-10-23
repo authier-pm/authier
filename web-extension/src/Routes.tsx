@@ -9,13 +9,13 @@ import { useIsLoggedInQuery } from './popup/Popup.codegen'
 import { BackgroundContext } from './providers/BackgroundProvider'
 
 export default function Routes(): ReactElement {
-  const { safeLocked, backgroundState } = useContext(BackgroundContext)
+  const { backgroundState } = useContext(BackgroundContext)
   console.log('~ backgroundState', backgroundState)
 
   if (!backgroundState) {
     return <AuthPages />
   }
-  if (safeLocked) {
+  if (!backgroundState.masterPassword && backgroundState.userId) {
     return <VaultUnlockVerification />
   }
 

@@ -17,6 +17,7 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
+import { omit } from 'lodash'
 
 export interface ITOTPSecret {
   secret: string
@@ -46,6 +47,8 @@ export interface ISecuritySettingsInBg {
 
 let registered = false // we need to only register once
 
+const { AES, enc } = cryptoJS
+
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
@@ -64,6 +67,16 @@ export function useBackgroundState() {
   const [updateSettings] = useUpdateSettingsMutation()
   console.log('~ backgroundState', backgroundState)
 
+  useEffect(() => {
+    ;(async () => {
+      if (backgroundState) {
+        await browser.storage.local.set({
+          backgroundState
+        })
+      }
+    })()
+  }, [backgroundState])
+
   //TODO move this whole thing into it' own hook
   useEffect(() => {
     if (registered) {
@@ -72,7 +85,6 @@ export function useBackgroundState() {
     registered = true
     console.log('useEffect registering!!')
 
-    //Get auth from bg
     browser.runtime
       .sendMessage({ action: BackgroundMessageType.getBackgroundState })
       .then((res: { backgroundState: IBackgroundStateSerializable }) => {
@@ -80,25 +92,6 @@ export function useBackgroundState() {
         if (res && res.backgroundState) {
           setBackgroundState(res.backgroundState)
           console.log('~ res.backgroundState', res.backgroundState)
-        }
-      })
-
-    browser.runtime
-      .sendMessage({ action: BackgroundMessageType.wasClosed })
-      .then((res: { wasClosed: Boolean }) => {
-        if (res.wasClosed) {
-          setSafeLocked(true)
-        }
-      })
-
-    browser.runtime
-      .sendMessage({ action: BackgroundMessageType.giveSecuritySettings })
-      .then((res: { config: ISecuritySettingsInBg }) => {
-        if (res && res.config) {
-          backgroundStateContext.setSecuritySettings({
-            noHandsLogin: res.config.noHandsLogin,
-            vaultLockTime: res.config.vaultTime
-          })
         }
       })
 
@@ -129,6 +122,16 @@ export function useBackgroundState() {
     )
   }, [])
 
+  const getCryptoOptions = () => {
+    if (!backgroundState) {
+      throw new Error('No background state')
+    }
+
+    return {
+      iv: enc.Utf8.parse(backgroundState.userId)
+    }
+  }
+
   const backgroundStateContext = {
     currentURL,
     safeLocked,
@@ -141,7 +144,7 @@ export function useBackgroundState() {
       secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
     ) => {
       setSafeLocked(false)
-      debugger
+
       const decryptAndParse = (
         data: string,
         password = masterPassword
@@ -173,6 +176,7 @@ export function useBackgroundState() {
       const payload: IBackgroundStateSerializable = {
         masterPassword,
         userId,
+        secrets,
         loginCredentials: credentialsSecretsEncrypted
           ? (decryptAndParse(
               credentialsSecretsEncrypted,
@@ -193,7 +197,7 @@ export function useBackgroundState() {
 
       setBackgroundState(payload)
     },
-    savePasswordsToBg: (passwords: ILoginCredentials[]) => {
+    saveLoginCredentials: (passwords: ILoginCredentials[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,
@@ -206,7 +210,7 @@ export function useBackgroundState() {
         setBackgroundState(newBgState)
       }
     },
-    saveAuthsToBg: (totpSecrets: ITOTPSecret[]) => {
+    saveTOTPSecrets: (totpSecrets: ITOTPSecret[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,
@@ -218,6 +222,13 @@ export function useBackgroundState() {
         })
         setBackgroundState(newBgState)
       }
+    },
+
+    lockVault: async () => {
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.clear
+      })
+      setBackgroundState(null)
     },
 
     isCounting,
@@ -253,7 +264,21 @@ export function useBackgroundState() {
         action: BackgroundMessageType.clear
       })
     },
-    UIConfig
+    UIConfig,
+    encrypt(data: string, password = backgroundState?.masterPassword): string {
+      return AES.encrypt(
+        data,
+        password as string,
+        getCryptoOptions()
+      ).toString()
+    },
+    decrypt(data: string, password = backgroundState?.masterPassword): string {
+      return AES.decrypt(
+        data,
+        password as string,
+        getCryptoOptions()
+      ).toString()
+    }
   }
 
   // @ts-expect-error
