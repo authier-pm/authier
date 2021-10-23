@@ -20,8 +20,7 @@ export interface Notifi {
   time: string
 }
 
-//@ts-expect-error
-export default function TokenProvider({ children }) {
+export default function NotifyProvider({ children }) {
   const [notifies, setNotifies] = useState<Notifi[]>([])
 
   useEffect(() => {

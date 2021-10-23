@@ -1,8 +1,5 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react'
 import { ApolloProvider } from '@apollo/client'
-import { NavigationContainer } from '@react-navigation/native'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-
 import { apoloCLient } from './ApolloClient'
 import TokenProvider from './providers/TokenProvider'
 import { NativeBaseProvider } from 'native-base'
@@ -27,20 +24,16 @@ export const Providers: React.FC<{}> = () => {
   ])
 
   return (
-    <SafeAreaProvider>
-      <NativeBaseProvider theme={theme}>
-        <ApolloProvider client={apoloCLient}>
-          <NotifyProvider>
-            <AuthsContext.Provider value={{ auths, setAuths }}>
-              <TokenProvider>
-                <NavigationContainer>
-                  <Routes />
-                </NavigationContainer>
-              </TokenProvider>
-            </AuthsContext.Provider>
-          </NotifyProvider>
-        </ApolloProvider>
-      </NativeBaseProvider>
-    </SafeAreaProvider>
+    <ApolloProvider client={apoloCLient}>
+      <NotifyProvider>
+        <AuthsContext.Provider value={{ auths, setAuths }}>
+          <TokenProvider>
+            <NativeBaseProvider theme={theme}>
+              <Routes />
+            </NativeBaseProvider>
+          </TokenProvider>
+        </AuthsContext.Provider>
+      </NotifyProvider>
+    </ApolloProvider>
   )
 }

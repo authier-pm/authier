@@ -1,11 +1,20 @@
-import { Box, Heading, VStack, FormControl, Input, Button } from 'native-base'
+import {
+  Heading,
+  VStack,
+  FormControl,
+  Input,
+  Button,
+  View,
+  Text
+} from 'native-base'
 import React from 'react'
 
-export const Register = () => {
+export function Register({ navigation }) {
+  console.log('register')
   return (
-    <Box safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
+    <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
       <Heading size="lg" fontWeight="600" color="coolGray.800">
-        Welcome to Authier
+        Welcome
       </Heading>
       <Heading mt="1" color="coolGray.600" fontWeight="medium" size="xs">
         Create an account to continue!
@@ -51,7 +60,14 @@ export const Register = () => {
         <Button mt="2" colorScheme="indigo" _text={{ color: 'white' }}>
           Create an account
         </Button>
+        <Button
+          onPress={() => {
+            navigation.goBack()
+          }}
+        >
+          Sign Up
+        </Button>
       </VStack>
-    </Box>
+    </View>
   )
 }

@@ -5,7 +5,6 @@ export const GetTokenProvider = createContext<{ token: string | null }>(
   {} as any
 )
 
-//@ts-expect-error
 export default function TokenProvider({ children }) {
   const [token, setToken] = useState<string | null>(null)
 

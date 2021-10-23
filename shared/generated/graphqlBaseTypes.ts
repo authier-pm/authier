@@ -152,9 +152,11 @@ export type SettingsConfig = {
 
 export type User = {
   __typename?: 'User';
+  TOTPlimit: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
+  loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
@@ -163,10 +165,12 @@ export type User = {
 
 export type UserMutation = {
   __typename?: 'UserMutation';
+  TOTPlimit: Scalars['Int'];
   addDevice: Device;
   createdAt: Scalars['DateTime'];
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
+  loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   revokeRefreshTokensForUser: User;
@@ -209,10 +213,12 @@ export type UserMutationUpdateSettingsArgs = {
 
 export type UserQuery = {
   __typename?: 'UserQuery';
+  TOTPlimit: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   devicesCount: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
+  loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;
   myDevices: Array<Device>;
   name?: Maybe<Scalars['String']>;
