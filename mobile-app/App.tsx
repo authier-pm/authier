@@ -12,7 +12,6 @@ import React, { useEffect } from 'react'
 import { Providers } from './src/Providers'
 import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { NavigationContainer } from '@react-navigation/native'
 
 const App = () => {
   async function requestUserPermission() {
@@ -39,11 +38,7 @@ const App = () => {
     return unsubscribe
   }, [])
 
-  return (
-    <NavigationContainer>
-      <Providers />
-    </NavigationContainer>
-  )
+  return <Providers />
 }
 
 export default App

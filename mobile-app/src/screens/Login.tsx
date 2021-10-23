@@ -7,7 +7,8 @@ import {
   Button,
   Text,
   View,
-  Pressable
+  Pressable,
+  HStack
 } from 'native-base'
 import React from 'react'
 import { useLoginMutation } from './Login.codegen'
@@ -17,7 +18,7 @@ interface MyFormValues {
   password: string
 }
 
-export function Login() {
+export function Login({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
   const [login] = useLoginMutation()
   return (
@@ -88,10 +89,23 @@ export function Login() {
             </FormControl>
 
             <Button onPress={handleSubmit}>Submit</Button>
+            <HStack mt="2" justifyContent="center">
+              <Text fontSize="sm" color="muted.700" fontWeight={400}>
+                I'm a new user.{' '}
+              </Text>
+              <Pressable onPress={() => navigation.navigate('Register')}>
+                <Text
+                  color={'indigo.500'}
+                  fontWeight={'medium'}
+                  fontSize={'sm'}
+                >
+                  Sign Up
+                </Text>
+              </Pressable>
+            </HStack>
           </VStack>
         )}
       </Formik>
-      {/* <Button onPress={() => navigation.navigate('Register')}>Register</Button> */}
     </View>
   )
 }
