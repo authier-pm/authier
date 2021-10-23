@@ -16,7 +16,6 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { browser } from 'webextension-polyfill'
 
 import {
   getUserFromToken,
@@ -25,7 +24,6 @@ import {
 } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
 
-import { AuthsContext } from '../providers/AuthsProvider'
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
@@ -42,7 +40,7 @@ export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [login, { data, loading, error }] = useLoginMutation()
-  const { setUserId, decrypt } = useContext(UserContext)
+  const { setUserId } = useContext(UserContext)
 
   const { loginUser } = useContext(BackgroundContext)
 
@@ -74,39 +72,6 @@ export default function Login(): ReactElement {
               decodedToken.userId,
               data?.login?.secrets ?? []
             )
-
-            let decryptedAuths = ''
-            let decryptedPasswords = ''
-            console.log('res', response)
-            //@ts-expect-error
-            if (response.data.login.secrets[0] && values.password) {
-              response.data.login?.secrets?.forEach((i) => {
-                if (i.kind === 'TOTP') {
-                  decryptedAuths = decrypt(
-                    i.encrypted as string,
-                    values.password
-                  )
-                } else if ('LOGIN_CREDENTIALS') {
-                  decryptedPasswords = decrypt(
-                    i.encrypted as string,
-                    values.password
-                  )
-                  console.log(decryptedPasswords)
-                }
-              })
-
-              if (decryptedAuths) {
-                let loadedAuths = await JSON.parse(decryptedAuths)
-                // setAuths(loadedAuths)
-              }
-
-              if (decryptedPasswords) {
-                let loadCredentials = await JSON.parse(decryptedPasswords)
-                // savePasswordsToBg(loadCredentials)
-              }
-              console.log('decrSecrets', decryptedAuths)
-              console.log('decrSecrets', decryptedPasswords)
-            }
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

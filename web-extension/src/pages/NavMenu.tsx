@@ -20,29 +20,29 @@ import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const NavMenu: FunctionComponent = () => {
-  const { logoutUser } = useContext(BackgroundContext)
+  const { logoutUser, lockVault } = useContext(BackgroundContext)
 
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
       <ButtonGroup spacing={4}>
         <Stack>
-          <Link to={'/'}>
+          <Link to="/">
             <Button colorScheme="teal">Secrets</Button>
           </Link>
           <AddAuthSecretButton />
-          <Link to={'/settings'}>
+          <Link to="/settings">
             <Button colorScheme="blue">Settings</Button>
           </Link>
         </Stack>
       </ButtonGroup>
       <ButtonGroup spacing={4} variant="solid" m="10px">
         <Stack direction="column">
-          <Link to={'/devices'}>
+          <Link to="/devices">
             <Button>My devices</Button>
           </Link>
 
           <Button
-            colorScheme={'red'}
+            colorScheme="red"
             onClick={async () => {
               await removeToken()
               await browser.storage.local.clear()
@@ -52,7 +52,15 @@ export const NavMenu: FunctionComponent = () => {
           >
             Logout
           </Button>
-          <Link to={'/about'}>
+          <Button
+            colorScheme="yellow"
+            onClick={async () => {
+              lockVault()
+            }}
+          >
+            Lock vault
+          </Button>
+          <Link to="/about">
             <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>
         </Stack>
