@@ -17,7 +17,7 @@ interface MyFormValues {
   password: string
 }
 
-export function Login({ navigation }) {
+export function Login() {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
   const [login] = useLoginMutation()
   return (
