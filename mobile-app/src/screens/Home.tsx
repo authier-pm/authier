@@ -17,7 +17,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NotifyContext } from '../providers/NotifyProvider'
 import { useSendConfirmationLazyQuery } from './Home.codegen'
-import RNSInfo from 'react-native-sensitive-info'
+import * as Keychain from 'react-native-keychain'
 import { UserContext } from '../providers/UserProvider'
 
 const Home = () => {
@@ -168,10 +168,7 @@ const Home = () => {
       <Button
         onPress={async () => {
           setIsLogged(false)
-          return RNSInfo.deleteItem('encryptedSecrets', {
-            sharedPreferencesName: 'mySharedPrefs',
-            keychainService: 'myKeychain'
-          })
+          await Keychain.resetGenericPassword()
         }}
       >
         Clear storage

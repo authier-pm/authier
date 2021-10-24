@@ -15,6 +15,7 @@ import { useLoginMutation } from './Login.codegen'
 import * as Keychain from 'react-native-keychain'
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 interface MyFormValues {
   email: string
@@ -31,6 +32,15 @@ export function Login({ navigation }) {
       sharedPreferencesName: 'mySharedPrefs',
       keychainService: 'myKeychain'
     })
+  }
+
+  const saveAccessToken = async (value) => {
+    try {
+      await AsyncStorage.setItem('@accessToken', value)
+    } catch (e) {
+      // saving error
+      console.log(e)
+    }
   }
 
   return (
@@ -50,6 +60,8 @@ export function Login({ navigation }) {
           })
 
           if (response.data?.login?.accessToken) {
+            // save accesToken
+            saveAccessToken(response.data.login.accessToken)
             //save email and psw
             await Keychain.setGenericPassword(values.email, values.password)
 

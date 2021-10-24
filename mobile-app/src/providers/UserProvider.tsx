@@ -5,25 +5,42 @@ import React, {
   SetStateAction,
   useEffect
 } from 'react'
-import RNSInfo from 'react-native-sensitive-info'
+import messaging from '@react-native-firebase/messaging'
+import * as Keychain from 'react-native-keychain'
 
 export const UserContext = createContext<{
   isLogged: boolean
   setIsLogged: Dispatch<SetStateAction<boolean>>
+  token: string | null
 }>({} as any)
 
 export default function UserProvider({ children }) {
   const [isLogged, setIsLogged] = useState(false)
   const [hasDate, setHasData] = useState(false)
+  const [token, setToken] = useState<string | null>(null)
 
   useEffect(() => {
-    const getDate = async () => {
-      let data = await RNSInfo.getItem('encryptedSecrets', {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
+    async function getToken() {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const refresed = await messaging().onTokenRefresh(async (fcm) => {
+        console.log('test')
+        setToken(fcm)
+        return
       })
-      console.log('data', data)
-      if (data) {
+      const Token = await messaging().getToken()
+      console.log('t', Token)
+      setToken(Token)
+    }
+
+    getToken()
+  }, [])
+
+  useEffect(() => {
+    const getData = async () => {
+      //@ts-expect-error
+      let { password } = await Keychain.getGenericPassword()
+
+      if (password) {
         setHasData(true)
         return true
       }
@@ -31,7 +48,7 @@ export default function UserProvider({ children }) {
       return false
     }
 
-    getDate()
+    getData()
 
     if (hasDate) {
       setIsLogged(true)
@@ -39,7 +56,7 @@ export default function UserProvider({ children }) {
   }, [hasDate])
 
   return (
-    <UserContext.Provider value={{ isLogged, setIsLogged }}>
+    <UserContext.Provider value={{ isLogged, setIsLogged, token }}>
       {children}
     </UserContext.Provider>
   )
