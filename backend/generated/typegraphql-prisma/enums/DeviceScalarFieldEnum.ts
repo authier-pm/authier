@@ -5,6 +5,7 @@ export enum DeviceScalarFieldEnum {
   firstIpAddress = "firstIpAddress",
   lastIpAddress = "lastIpAddress",
   firebaseToken = "firebaseToken",
+  loginSecret = "loginSecret",
   name = "name",
   syncTOTP = "syncTOTP",
   vaultLockTimeoutSeconds = "vaultLockTimeoutSeconds",

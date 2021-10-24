@@ -17,6 +17,8 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NotifyContext } from '../providers/NotifyProvider'
 import { useSendConfirmationLazyQuery } from './Home.codegen'
+import RNSInfo from 'react-native-sensitive-info'
+import { UserContext } from '../providers/UserProvider'
 
 const Home = () => {
   const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
@@ -24,6 +26,7 @@ const Home = () => {
   const [isBio, setIsBio] = useState(false)
   const [open, setOpen] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const { setIsLogged } = useContext(UserContext)
 
   if (error) {
     console.log(error)
@@ -162,6 +165,17 @@ const Home = () => {
         onRefresh={handleRefresh}
         refreshing={refreshing}
       />
+      <Button
+        onPress={async () => {
+          setIsLogged(false)
+          return RNSInfo.deleteItem('encryptedSecrets', {
+            sharedPreferencesName: 'mySharedPrefs',
+            keychainService: 'myKeychain'
+          })
+        }}
+      >
+        Clear storage
+      </Button>
     </Box>
   )
 }

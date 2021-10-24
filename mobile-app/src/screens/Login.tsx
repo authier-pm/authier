@@ -7,19 +7,32 @@ import {
   Button,
   Text,
   View,
-  Pressable
+  Pressable,
+  HStack
 } from 'native-base'
-import React from 'react'
+import React, { useContext } from 'react'
 import { useLoginMutation } from './Login.codegen'
+import * as Keychain from 'react-native-keychain'
+import SInfo from 'react-native-sensitive-info'
+import { UserContext } from '../providers/UserProvider'
 
 interface MyFormValues {
   email: string
   password: string
 }
 
-export function Login() {
+export function Login({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
   const [login] = useLoginMutation()
+  const { setIsLogged } = useContext(UserContext)
+
+  const saveData = async (value) => {
+    return SInfo.setItem('encryptedSecrets', value, {
+      sharedPreferencesName: 'mySharedPrefs',
+      keychainService: 'myKeychain'
+    })
+  }
+
   return (
     <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
       <Heading size="lg" fontWeight="600" color="coolGray.800">
@@ -37,7 +50,19 @@ export function Login() {
           })
 
           if (response.data?.login?.accessToken) {
-            console.log('data', response)
+            //save email and psw
+            await Keychain.setGenericPassword(values.email, values.password)
+
+            let concat = response.data.login.secrets?.map((i) => {
+              return i.encrypted
+            })
+
+            //save secrets
+            saveData(JSON.stringify(concat))
+
+            // //is logged
+            setIsLogged(true)
+
             actions.setSubmitting(false)
           } else {
             console.error(`Login failed, check your password`)
@@ -88,10 +113,26 @@ export function Login() {
             </FormControl>
 
             <Button onPress={handleSubmit}>Submit</Button>
+            <HStack mt="2" justifyContent="center">
+              <Text fontSize="sm" color="muted.700" fontWeight={400}>
+                I'm a new user.{' '}
+              </Text>
+              <Pressable onPress={() => navigation.navigate('Register')}>
+                <Text
+                  color={'indigo.500'}
+                  fontWeight={'medium'}
+                  fontSize={'sm'}
+                >
+                  Sign Up
+                </Text>
+              </Pressable>
+            </HStack>
+            <Button onPress={() => navigation.navigate('QRLogin')}>
+              With QR Code
+            </Button>
           </VStack>
         )}
       </Formik>
-      {/* <Button onPress={() => navigation.navigate('Register')}>Register</Button> */}
     </View>
   )
 }

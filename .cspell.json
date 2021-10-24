@@ -14,6 +14,7 @@
     "graphiql",
     "Chakra",
     "ITOTP",
+    "Keychain",
     "mercurius",
     "otplib",
     "Pressable",
@@ -22,6 +23,7 @@
     "TOTP",
     "typegraphql",
     "upsert",
+    "uuidv",
     "webextension"
   ]
 }

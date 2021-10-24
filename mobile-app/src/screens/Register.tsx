@@ -5,7 +5,9 @@ import {
   Input,
   Button,
   View,
-  Text
+  Text,
+  HStack,
+  Pressable
 } from 'native-base'
 import React from 'react'
 
@@ -60,13 +62,16 @@ export function Register({ navigation }) {
         <Button mt="2" colorScheme="indigo" _text={{ color: 'white' }}>
           Create an account
         </Button>
-        <Button
-          onPress={() => {
-            navigation.goBack()
-          }}
-        >
-          Sign Up
-        </Button>
+        <HStack mt="2" justifyContent="center">
+          <Text fontSize="sm" color="muted.700" fontWeight={400}>
+            I'm a new user.{' '}
+          </Text>
+          <Pressable onPress={() => navigation.navigate('Login')}>
+            <Text color={'indigo.500'} fontWeight={'medium'} fontSize={'sm'}>
+              Sign Up
+            </Text>
+          </Pressable>
+        </HStack>
       </VStack>
     </View>
   )
