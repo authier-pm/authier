@@ -7,6 +7,7 @@ import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
+import { v4 as uuidv4 } from 'uuid'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -77,7 +78,8 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: 60,
+        loginSecret: uuidv4()
       }
     })
   }
