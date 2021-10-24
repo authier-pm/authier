@@ -10,7 +10,6 @@ import { useAddDeviceMutation } from './Scan.codegen'
 import { getDeviceNameSync } from 'react-native-device-info'
 import { GetTokenProvider } from '../providers/TokenProvider'
 
-//@ts-expect-error
 const Scan = ({ navigation }) => {
   const [addDevice, { data, error }] = useAddDeviceMutation()
   const { setAuths, auths } = useContext(AuthsContext)

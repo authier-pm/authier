@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-// @ts-expect-error
 import OTP from 'otp-client'
 import { AuthsContext } from '../Providers'
 import {
@@ -31,7 +30,6 @@ export const Vault = () => {
 
   const [seconds, setRemainingSeconds] = useState(0)
 
-  //@ts-expect-error
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options)
 
