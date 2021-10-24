@@ -45,7 +45,8 @@
     "react-native-tab-view": "^3.1.1",
     "react-native-vector-icons": "^8.1.0",
     "styled-components": "^5.3.0",
-    "styled-system": "^5.1.5"
+    "styled-system": "^5.1.5",
+   "gqlSchemas": "file:../backend/schemas/gqlSchema.ts"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9",
