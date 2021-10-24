@@ -135,7 +135,7 @@ export class RootResolver {
         userId: userId,
         lastIpAddress: ipAddress,
         vaultLockTimeoutSeconds: 60,
-        loginSecret: 'test'
+        loginSecret: uuidv4()
       }
     })
   }
