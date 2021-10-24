@@ -7,6 +7,7 @@ import { theme } from './Theme'
 import NotifyProvider from './providers/NotifyProvider'
 import Routes from './Routes'
 import { NavigationContainer } from '@react-navigation/native'
+import UserProvider from './providers/UserProvider'
 
 export const AuthsContext = createContext<{
   auths: Array<any>
@@ -29,11 +30,13 @@ export const Providers: React.FC<{}> = () => {
       <NotifyProvider>
         <AuthsContext.Provider value={{ auths, setAuths }}>
           <TokenProvider>
-            <NativeBaseProvider theme={theme}>
-              <NavigationContainer>
-                <Routes />
-              </NavigationContainer>
-            </NativeBaseProvider>
+            <UserProvider>
+              <NativeBaseProvider theme={theme}>
+                <NavigationContainer>
+                  <Routes />
+                </NavigationContainer>
+              </NativeBaseProvider>
+            </UserProvider>
           </TokenProvider>
         </AuthsContext.Provider>
       </NotifyProvider>
