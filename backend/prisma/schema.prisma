@@ -46,6 +46,7 @@ model Device {
     firstIpAddress          String  @db.Inet
     lastIpAddress           String  @db.Inet
     firebaseToken           String
+    loginSecret             String
     name                    String
     syncTOTP                Boolean @default(true)
     vaultLockTimeoutSeconds Int?
@@ -130,7 +131,7 @@ model User {
     createdAt             DateTime  @default(now())
     updatedAt             DateTime? @updatedAt
     masterDevice          Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
-    masterDeviceId        Int?
+    masterDeviceId        Int?      @unique
     // Limits for the number of stored secrets
     TOTPlimit             Int
     loginCredentialsLimit Int

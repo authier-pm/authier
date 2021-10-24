@@ -10,8 +10,7 @@ import {
   Mutation,
   Arg,
   Ctx,
-  UseMiddleware,
-  Int
+  UseMiddleware
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
@@ -27,6 +26,7 @@ import { UserQuery, UserMutation } from './models/User'
 import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface IContext {
   request: FastifyRequest
@@ -134,7 +134,8 @@ export class RootResolver {
         firstIpAddress: ipAddress,
         userId: userId,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: 60,
+        loginSecret: 'test'
       }
     })
   }
@@ -254,6 +255,7 @@ export class RootResolver {
     const hashedPassword = await hash(password, 12)
 
     const ipAddress = ctx.getIpAddress()
+
     let user
 
     try {
@@ -278,9 +280,11 @@ export class RootResolver {
         lastIpAddress: ipAddress,
         firebaseToken: firebaseToken,
         name: 'test', // NEED device name
-        userId: user.id
+        userId: user.id,
+        loginSecret: uuidv4()
       }
     })
+    console.log(device)
 
     await prisma.settingsConfig.create({
       data: {

@@ -23,6 +23,7 @@
     "TOTP",
     "typegraphql",
     "upsert",
+    "uuidv",
     "webextension"
   ]
 }
