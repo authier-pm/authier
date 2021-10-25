@@ -22,6 +22,7 @@ type UserQuery {
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
+  encryptedSecrets: [EncryptedSecrets!]!
 }
 
 """
@@ -34,6 +35,7 @@ type Device {
   firstIpAddress: String!
   lastIpAddress: String!
   firebaseToken: String!
+  loginSecret: String!
   name: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -50,6 +52,21 @@ type SettingsConfig {
   noHandsLogin: Boolean!
   homeUI: String!
   updatedAt: DateTime
+}
+
+type EncryptedSecrets {
+  id: Int!
+  encrypted: String!
+  version: Int!
+  userId: String!
+  kind: EncryptedSecretsType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+enum EncryptedSecretsType {
+  TOTP
+  LOGIN_CREDENTIALS
 }
 
 type WebInput {
@@ -99,21 +116,6 @@ type UserMutation {
   updateFireToken(firebaseToken: String!): Device!
   updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
   revokeRefreshTokensForUser: User!
-}
-
-type EncryptedSecrets {
-  id: Int!
-  encrypted: String!
-  version: Int!
-  userId: String!
-  kind: EncryptedSecretsType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-}
-
-enum EncryptedSecretsType {
-  TOTP
-  LOGIN_CREDENTIALS
 }
 
 type User {

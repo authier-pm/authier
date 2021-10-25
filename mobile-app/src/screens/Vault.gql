@@ -1,10 +1,10 @@
-# query encryptedAuths {
-#   me {
-#     id
-#     encryptedSecrets {
-#       id
-#       kind
-#       encrypted
-#     }
-#   }
-# }
+query encryptedAuths {
+  me {
+    id
+    encryptedSecrets {
+      id
+      kind
+      encrypted
+    }
+  }
+}

@@ -6,18 +6,19 @@ import React, {
   useEffect
 } from 'react'
 import messaging from '@react-native-firebase/messaging'
-import * as Keychain from 'react-native-keychain'
+import { useIsLoggedInQuery } from './UserProvider.codegen'
 
 export const UserContext = createContext<{
   isLogged: boolean
   setIsLogged: Dispatch<SetStateAction<boolean>>
   token: string | null
+  isApiLoggedIn: Boolean
 }>({} as any)
 
 export default function UserProvider({ children }) {
   const [isLogged, setIsLogged] = useState(false)
-  const [hasDate, setHasData] = useState(false)
   const [token, setToken] = useState<string | null>(null)
+  const { data, loading } = useIsLoggedInQuery()
 
   useEffect(() => {
     async function getToken() {
@@ -35,28 +36,15 @@ export default function UserProvider({ children }) {
     getToken()
   }, [])
 
-  useEffect(() => {
-    const getData = async () => {
-      //@ts-expect-error
-      let { password } = await Keychain.getGenericPassword()
-
-      if (password) {
-        setHasData(true)
-        return true
-      }
-
-      return false
-    }
-
-    getData()
-
-    if (hasDate) {
-      setIsLogged(true)
-    }
-  }, [hasDate])
-
   return (
-    <UserContext.Provider value={{ isLogged, setIsLogged, token }}>
+    <UserContext.Provider
+      value={{
+        isLogged,
+        setIsLogged,
+        token,
+        isApiLoggedIn: !!(data?.authenticated && !loading)
+      }}
+    >
       {children}
     </UserContext.Provider>
   )
