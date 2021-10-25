@@ -303,7 +303,8 @@ export class RootResolver {
     const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
     return {
-      accessToken
+      accessToken,
+      user
     }
   }
 
@@ -340,7 +341,7 @@ export class RootResolver {
 
     return {
       accessToken,
-      secrets: user.EncryptedSecrets
+      user
     }
   }
 
