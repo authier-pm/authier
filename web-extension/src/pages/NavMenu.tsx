@@ -3,6 +3,7 @@ import React, {
   Dispatch,
   FunctionComponent,
   SetStateAction,
+  useContext,
   useEffect,
   useState
 } from 'react'
@@ -16,44 +17,50 @@ import { Link } from 'wouter'
 import { AddAuthSecretButton } from '@src/components/AddAuthSecretButton'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const NavMenu: FunctionComponent = () => {
-  const { refetch } = useIsLoggedInQuery()
+  const { logoutUser, lockVault } = useContext(BackgroundContext)
 
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
       <ButtonGroup spacing={4}>
         <Stack>
-          <Link to={'/'}>
+          <Link to="/">
             <Button colorScheme="teal">Secrets</Button>
           </Link>
           <AddAuthSecretButton />
-          <Link to={'/settings'}>
+          <Link to="/settings">
             <Button colorScheme="blue">Settings</Button>
           </Link>
         </Stack>
       </ButtonGroup>
       <ButtonGroup spacing={4} variant="solid" m="10px">
         <Stack direction="column">
-          <Link to={'/devices'}>
+          <Link to="/devices">
             <Button>My devices</Button>
           </Link>
 
           <Button
-            colorScheme={'red'}
+            colorScheme="red"
             onClick={async () => {
-              // setIsAuth(false)
+              await removeToken()
               await browser.storage.local.clear()
-              removeToken()
-              chrome.runtime.sendMessage({
-                action: BackgroundMessageType.clear
-              })
-              refetch()
+
+              logoutUser()
             }}
           >
             Logout
           </Button>
-          <Link to={'/about'}>
+          <Button
+            colorScheme="yellow"
+            onClick={async () => {
+              lockVault()
+            }}
+          >
+            Lock vault
+          </Button>
+          <Link to="/about">
             <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>
         </Stack>
