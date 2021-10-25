@@ -4,14 +4,16 @@ import {
   FormErrorMessage,
   Checkbox,
   Button,
-  Spinner
+  Spinner,
+  Divider
 } from '@chakra-ui/react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { ISecuritySettings } from '@src/util/useBackgroundState'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
-import React, { ReactElement, useContext } from 'react'
+import React, { useContext } from 'react'
 import Select from 'react-select'
 import { useSecuritySettingsQuery } from './SecuritySettings.codegen'
+import { Trans } from '@lingui/macro'
 
 interface Props {}
 
@@ -99,7 +101,7 @@ export const SecuritySettings = ({}: Props) => {
                 isLoading={props.isSubmitting}
                 type="submit"
               >
-                Save
+                <Trans>Save</Trans>
               </Button>
             </Form>
           )}

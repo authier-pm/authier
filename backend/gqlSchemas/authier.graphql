@@ -17,6 +17,8 @@ type UserQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
@@ -89,9 +91,10 @@ type UserMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   addDevice(firebaseToken: String!, name: String!): Device!
-  saveAuths(payload: String!): EncryptedSecrets!
-  savePasswords(payload: String!): EncryptedSecrets!
+  saveEncryptedSecrets(kind: EncryptedSecretsType!, payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
   updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
   revokeRefreshTokensForUser: User!
@@ -120,6 +123,8 @@ type User {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
 }
 
 input OTPEvent {
@@ -130,6 +135,19 @@ input OTPEvent {
 
 type LoginResponse {
   accessToken: String!
+  user: UserAfterAuth!
+}
+
+type UserAfterAuth {
+  id: String!
+  email: String
+  tokenVersion: Int!
+  name: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  masterDeviceId: Int
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
   secrets: [EncryptedSecrets!]
 }
 

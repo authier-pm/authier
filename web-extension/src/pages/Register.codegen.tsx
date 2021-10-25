@@ -10,12 +10,15 @@ export type RegisterMutationVariables = Types.Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string } } };
 
 
 export const RegisterDocument = gql`
     mutation Register($email: String!, $password: String!, $firebaseToken: String!) {
   register(email: $email, password: $password, firebaseToken: $firebaseToken) {
+    user {
+      id
+    }
     accessToken
   }
 }

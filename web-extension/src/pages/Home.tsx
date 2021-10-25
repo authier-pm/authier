@@ -16,8 +16,11 @@ import {
   Button,
   CircularProgress,
   Flex,
+  FormControl,
+  FormLabel,
   Grid,
   Heading,
+  Switch,
   useInterval
 } from '@chakra-ui/react'
 
@@ -32,18 +35,32 @@ export const Home: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
 
-  const { bgAuths } = useContext(BackgroundContext)
+  const { backgroundState } = useContext(BackgroundContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
   }, 1000)
 
+  const [filterByTLD, setFilterByTLD] = useState(false)
+
   return (
     <>
-      <Flex position="sticky" align="center" pl={4} pr={4}>
-        {bgAuths.length > 0 && (
+      <Flex position="sticky" align="center" pl={4} pr={4} mt={3}>
+        <FormControl display="flex" alignItems="center">
+          <FormLabel mb="0">Filter by TLD</FormLabel>
+          <Switch
+            mr="auto"
+            checked={filterByTLD}
+            onChange={(enabled) => {
+              setFilterByTLD(enabled.target.checked)
+            }}
+          ></Switch>
+        </FormControl>
+
+        {backgroundState && backgroundState.totpSecrets.length > 0 && (
           <CircularProgress
             min={1}
+            ml="auto"
             max={30}
             value={30 - seconds}
             valueText={seconds.toString()}
@@ -53,7 +70,7 @@ export const Home: FunctionComponent = () => {
       </Flex>
       <Box height={200} width={330} p={5} mb={5}>
         <Grid gap={3} mb={5}>
-          <AuthsList />
+          <AuthsList filterByTLD={filterByTLD} />
         </Grid>
       </Box>
     </>

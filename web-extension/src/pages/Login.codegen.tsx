@@ -9,17 +9,19 @@ export type LoginMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResponse', accessToken: string, secrets?: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> | null | undefined } | null | undefined };
+export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', secrets?: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> | null | undefined } } | null | undefined };
 
 
 export const LoginDocument = gql`
     mutation Login($email: String!, $password: String!) {
   login(email: $email, password: $password) {
     accessToken
-    secrets {
-      id
-      kind
-      encrypted
+    user {
+      secrets {
+        id
+        kind
+        encrypted
+      }
     }
   }
 }
