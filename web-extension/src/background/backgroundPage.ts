@@ -9,6 +9,8 @@ import './chromeRuntimeListener'
 import { SharedBrowserEvents } from './SharedBrowserEvents'
 
 import debug from 'debug'
+import { apolloClient } from '@src/apollo/apolloClient'
+import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
 
 const log = debug('backgroundPage')
 localStorage.debug = '*' // enable all debug messages
@@ -22,14 +24,17 @@ const firebaseConfig = {
   appId: '1:500382892914:web:6b202f90d6c0c6bcc213eb',
   measurementId: 'G-0W2MW55WVF'
 }
+import cryptoJS from 'crypto-js'
+import {
+  SaveSecretsDocument,
+  SaveSecretsMutation,
+  SaveSecretsMutationVariables
+} from './backgroundPage.codegen'
+import {
+  EncryptedSecrets,
+  EncryptedSecretsType
+} from '../../../shared/generated/graphqlBaseTypes'
 
-interface IAuth {
-  secret: string
-  label: string
-  icon: string | undefined
-  lastUsed?: Date | null
-  originalUrl: string | undefined
-}
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
 
@@ -52,19 +57,74 @@ if ('serviceWorker' in navigator) {
   log('No service-worker on this browser')
 }
 
-export let loginCredentials: Array<ILoginCredentials> = []
-export let TOTPSecrets: Array<ITOTPSecret> = []
+export interface IBackgroundStateSerializable {
+  loginCredentials: ILoginCredentials[]
+  totpSecrets: ITOTPSecret[]
+  userId: string
+  masterPassword: string
+  secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
+}
+
+interface IBackgroundState extends IBackgroundStateSerializable {
+  setTOTPSecrets(val: ITOTPSecret[]): void
+  setLoginCredentials(val: ILoginCredentials[]): void
+  saveSecretsToBackend: (
+    input: string,
+    kind: EncryptedSecretsType
+  ) => Promise<void>
+}
+
+export let bgState: IBackgroundState | null = null
+
+export const setBgState = (
+  bgStateSerializable: IBackgroundStateSerializable
+) => {
+  bgState = {
+    ...bgStateSerializable,
+    setTOTPSecrets(val: Array<ITOTPSecret>) {
+      this.totpSecrets = val
+      this.saveSecretsToBackend(JSON.stringify(val), EncryptedSecretsType.TOTP)
+    },
+    setLoginCredentials(val: Array<ILoginCredentials>) {
+      this.loginCredentials = val
+      this.saveSecretsToBackend(
+        JSON.stringify(val),
+        EncryptedSecretsType.LOGIN_CREDENTIALS
+      )
+    },
+    async saveSecretsToBackend(input: string, kind: EncryptedSecretsType) {
+      const encrypted = cryptoJS.AES.encrypt(input, this.masterPassword, {
+        iv: CryptoJS.enc.Utf8.parse(this.userId)
+      }).toString()
+
+      apolloClient.mutate<SaveSecretsMutation, SaveSecretsMutationVariables>({
+        mutation: SaveSecretsDocument,
+        variables: {
+          payload: encrypted,
+          kind
+        }
+      })
+    }
+  }
+  // @ts-expect-error
+  window.bgState = bgState
+}
+;(async () => {
+  // init bgState from local storage if it has been set
+  const storage = await browser.storage.local.get()
+  if (storage.backgroundState) {
+    setBgState(storage.backgroundState)
+    log('bg init from storage', bgState)
+  }
+})()
+
+export const clearBgState = () => {
+  bgState = null
+}
 
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
 let otpCode = ''
-
-export function setLoginCredentials(val: Array<ILoginCredentials>) {
-  loginCredentials = val
-}
-export function setTOTPSecrets(val: Array<ITOTPSecret>) {
-  TOTPSecrets = val
-}
 
 export function setLockTime(val: number) {
   log('setLockTime', val)
@@ -143,12 +203,4 @@ function fillInput(credentials: string) {
   }, 1000)
 
   return inputs
-}
-
-export type SessionStoredItem = {
-  username: any
-  password: any
-  originalUrl: string
-  label: string
-  willSave: boolean
 }

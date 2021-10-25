@@ -19,6 +19,7 @@ import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 interface Values {
   password: string
@@ -29,7 +30,8 @@ export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
-  const { setMasterPassword, fireToken } = useContext(UserContext)
+  const { fireToken } = useContext(UserContext)
+  const { loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
   // console.log('~ fireToken', fireToken)
 
@@ -55,16 +57,16 @@ export default function Register(): ReactElement {
               firebaseToken: fireToken
             }
           })
+          const registerResult = res.data?.register
 
-          if (res.data?.register.accessToken) {
+          if (registerResult?.accessToken) {
             // is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
               'access-token': res.data?.register.accessToken
             })
-            setAccessToken(res.data?.register.accessToken as string)
+            setAccessToken(registerResult.accessToken as string)
 
-            setMasterPassword(values.password)
-
+            loginUser(values.password, registerResult.user.id, [])
             refetch()
 
             setSubmitting(false)
