@@ -6,16 +6,19 @@ import React, {
   useEffect
 } from 'react'
 import messaging from '@react-native-firebase/messaging'
-import { useIsLoggedInQuery } from './UserProvider.codegen'
+import { useIsLoggedInQuery, useLogoutMutation } from './UserProvider.codegen'
+import * as Keychain from 'react-native-keychain'
 
 export const UserContext = createContext<{
   isLogged: boolean
   setIsLogged: Dispatch<SetStateAction<boolean>>
   token: string | null
   isApiLoggedIn: Boolean
+  logout: () => void
 }>({} as any)
 
 export default function UserProvider({ children }) {
+  const [logout] = useLogoutMutation()
   const [isLogged, setIsLogged] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const { data, loading } = useIsLoggedInQuery()
@@ -23,8 +26,8 @@ export default function UserProvider({ children }) {
   useEffect(() => {
     async function getToken() {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const refresed = await messaging().onTokenRefresh(async (fcm) => {
-        console.log('test')
+      await messaging().onTokenRefresh(async (fcm) => {
+        console.log('ressetting token')
         setToken(fcm)
         return
       })
@@ -33,7 +36,17 @@ export default function UserProvider({ children }) {
       setToken(Token)
     }
 
+    async function checkCredencials() {
+      let value = await Keychain.getGenericPassword()
+
+      if (value) {
+        setIsLogged(true)
+      }
+      return value
+    }
+
     getToken()
+    checkCredencials()
   }, [])
 
   return (
@@ -42,7 +55,12 @@ export default function UserProvider({ children }) {
         isLogged,
         setIsLogged,
         token,
-        isApiLoggedIn: !!(data?.authenticated && !loading)
+        isApiLoggedIn: !!(data?.authenticated && !loading),
+        logout: async () => {
+          setIsLogged(false)
+          await Keychain.resetGenericPassword()
+          await logout()
+        }
       }}
     >
       {children}

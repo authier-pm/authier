@@ -4,7 +4,7 @@ import HomeScreen from './navigation/HomeScreen'
 import { UserContext } from './providers/UserProvider'
 
 export default function Routes() {
-  const { isApiLoggedIn } = useContext(UserContext)
+  const { isLogged } = useContext(UserContext)
 
-  return isApiLoggedIn ? <HomeScreen /> : <AuthScreen />
+  return isLogged ? <HomeScreen /> : <AuthScreen />
 }

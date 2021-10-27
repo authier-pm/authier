@@ -75,7 +75,7 @@ export class RootResolver {
   })
   authenticated(@Ctx() ctx: IContext) {
     const authorization = ctx.request.cookies['access-token']
-
+    console.log(authorization)
     try {
       //const token = authorization?.split(' ')[1]
 

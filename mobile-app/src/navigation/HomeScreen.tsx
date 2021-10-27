@@ -1,16 +1,24 @@
 import * as React from 'react'
-import { createDrawerNavigator } from '@react-navigation/drawer'
+import {
+  createDrawerNavigator,
+  DrawerContentScrollView,
+  DrawerItemList
+} from '@react-navigation/drawer'
 import Home from '../screens/Home'
 import Scan from '../screens/Scan'
 import { Vault } from '../screens/Vault'
-import { IconButton, Icon as NativeIcon } from 'native-base'
+import { IconButton, Icon as NativeIcon, Button } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { useNavigation } from '@react-navigation/native'
 
-//const Tab = createBottomTabNavigator();
+import { UserContext } from '../providers/UserProvider'
+import { useContext } from 'react'
+
 const Drawer = createDrawerNavigator()
 
 function HomeScreen() {
+  const { logout } = useContext(UserContext)
+
   return (
     <Drawer.Navigator
       screenOptions={{
@@ -18,6 +26,7 @@ function HomeScreen() {
         headerLeft: () => {
           // eslint-disable-next-line react-hooks/rules-of-hooks
           const navigation = useNavigation()
+
           return (
             <IconButton
               ml={3}
@@ -36,6 +45,14 @@ function HomeScreen() {
         }
       }}
       initialRouteName="Home"
+      drawerContent={(props) => {
+        return (
+          <DrawerContentScrollView {...props}>
+            <DrawerItemList {...props} />
+            <Button onPress={() => logout()}>LogOut</Button>
+          </DrawerContentScrollView>
+        )
+      }}
     >
       <Drawer.Screen name="Home" component={Home} />
       <Drawer.Screen name="Scan" component={Scan} />

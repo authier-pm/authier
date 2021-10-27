@@ -15,7 +15,6 @@ import { useLoginMutation } from './Login.codegen'
 import * as Keychain from 'react-native-keychain'
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 interface MyFormValues {
   email: string
@@ -28,18 +27,13 @@ export function Login({ navigation }) {
   const { setIsLogged } = useContext(UserContext)
 
   const saveData = async (value) => {
-    return SInfo.setItem('encryptedSecrets', value, {
-      sharedPreferencesName: 'mySharedPrefs',
-      keychainService: 'myKeychain'
-    })
-  }
-
-  const saveAccessToken = async (value) => {
     try {
-      await AsyncStorage.setItem('@accessToken', value)
-    } catch (e) {
-      // saving error
-      console.log(e)
+      SInfo.setItem('encryptedSecrets', value, {
+        sharedPreferencesName: 'mySharedPrefs',
+        keychainService: 'myKeychain'
+      })
+    } catch (error) {
+      console.error(error)
     }
   }
 
@@ -60,21 +54,16 @@ export function Login({ navigation }) {
           })
 
           if (response.data?.login?.accessToken) {
-            // save accesToken
-            saveAccessToken(response.data.login.accessToken)
             //save email and psw
             await Keychain.setGenericPassword(values.email, values.password)
 
-            let concat = response.data.login.secrets?.map((i) => {
+            let concat = response.data.login.user.secrets?.map((i) => {
               return i.encrypted
             })
-
+            console.log('data', concat)
             //save secrets
-            saveData(JSON.stringify(concat))
-
-            // //is logged
+            saveData(concat ? JSON.stringify(concat) : null)
             setIsLogged(true)
-
             actions.setSubmitting(false)
           } else {
             console.error(`Login failed, check your password`)

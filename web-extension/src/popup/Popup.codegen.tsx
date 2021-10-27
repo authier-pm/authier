@@ -13,19 +13,13 @@ export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 export type SettingsQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } }> };
 
-export type SaveAuthsMutationVariables = Types.Exact<{
+export type SaveEncryptedSecretsMutationVariables = Types.Exact<{
   payload: Types.Scalars['String'];
+  kind: Types.EncryptedSecretsType;
 }>;
 
 
-export type SaveAuthsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', saveAuths: { __typename?: 'EncryptedSecrets', id: number } }> };
-
-export type SavePasswordsMutationVariables = Types.Exact<{
-  payload: Types.Scalars['String'];
-}>;
-
-
-export type SavePasswordsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', savePasswords: { __typename?: 'EncryptedSecrets', id: number } }> };
+export type SaveEncryptedSecretsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', saveEncryptedSecrets: { __typename?: 'EncryptedSecrets', encrypted: string } }> };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -117,76 +111,42 @@ export function useSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<S
 export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
 export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
 export type SettingsQueryResult = Apollo.QueryResult<SettingsQuery, SettingsQueryVariables>;
-export const SaveAuthsDocument = gql`
-    mutation saveAuths($payload: String!) {
+export const SaveEncryptedSecretsDocument = gql`
+    mutation saveEncryptedSecrets($payload: String!, $kind: EncryptedSecretsType!) {
   me {
-    saveAuths(payload: $payload) {
-      id
+    saveEncryptedSecrets(kind: $kind, payload: $payload) {
+      encrypted
     }
   }
 }
     `;
-export type SaveAuthsMutationFn = Apollo.MutationFunction<SaveAuthsMutation, SaveAuthsMutationVariables>;
+export type SaveEncryptedSecretsMutationFn = Apollo.MutationFunction<SaveEncryptedSecretsMutation, SaveEncryptedSecretsMutationVariables>;
 
 /**
- * __useSaveAuthsMutation__
+ * __useSaveEncryptedSecretsMutation__
  *
- * To run a mutation, you first call `useSaveAuthsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSaveAuthsMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useSaveEncryptedSecretsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useSaveEncryptedSecretsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [saveAuthsMutation, { data, loading, error }] = useSaveAuthsMutation({
+ * const [saveEncryptedSecretsMutation, { data, loading, error }] = useSaveEncryptedSecretsMutation({
  *   variables: {
  *      payload: // value for 'payload'
+ *      kind: // value for 'kind'
  *   },
  * });
  */
-export function useSaveAuthsMutation(baseOptions?: Apollo.MutationHookOptions<SaveAuthsMutation, SaveAuthsMutationVariables>) {
+export function useSaveEncryptedSecretsMutation(baseOptions?: Apollo.MutationHookOptions<SaveEncryptedSecretsMutation, SaveEncryptedSecretsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SaveAuthsMutation, SaveAuthsMutationVariables>(SaveAuthsDocument, options);
+        return Apollo.useMutation<SaveEncryptedSecretsMutation, SaveEncryptedSecretsMutationVariables>(SaveEncryptedSecretsDocument, options);
       }
-export type SaveAuthsMutationHookResult = ReturnType<typeof useSaveAuthsMutation>;
-export type SaveAuthsMutationResult = Apollo.MutationResult<SaveAuthsMutation>;
-export type SaveAuthsMutationOptions = Apollo.BaseMutationOptions<SaveAuthsMutation, SaveAuthsMutationVariables>;
-export const SavePasswordsDocument = gql`
-    mutation savePasswords($payload: String!) {
-  me {
-    savePasswords(payload: $payload) {
-      id
-    }
-  }
-}
-    `;
-export type SavePasswordsMutationFn = Apollo.MutationFunction<SavePasswordsMutation, SavePasswordsMutationVariables>;
-
-/**
- * __useSavePasswordsMutation__
- *
- * To run a mutation, you first call `useSavePasswordsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useSavePasswordsMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [savePasswordsMutation, { data, loading, error }] = useSavePasswordsMutation({
- *   variables: {
- *      payload: // value for 'payload'
- *   },
- * });
- */
-export function useSavePasswordsMutation(baseOptions?: Apollo.MutationHookOptions<SavePasswordsMutation, SavePasswordsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SavePasswordsMutation, SavePasswordsMutationVariables>(SavePasswordsDocument, options);
-      }
-export type SavePasswordsMutationHookResult = ReturnType<typeof useSavePasswordsMutation>;
-export type SavePasswordsMutationResult = Apollo.MutationResult<SavePasswordsMutation>;
-export type SavePasswordsMutationOptions = Apollo.BaseMutationOptions<SavePasswordsMutation, SavePasswordsMutationVariables>;
+export type SaveEncryptedSecretsMutationHookResult = ReturnType<typeof useSaveEncryptedSecretsMutation>;
+export type SaveEncryptedSecretsMutationResult = Apollo.MutationResult<SaveEncryptedSecretsMutation>;
+export type SaveEncryptedSecretsMutationOptions = Apollo.BaseMutationOptions<SaveEncryptedSecretsMutation, SaveEncryptedSecretsMutationVariables>;
 export const SendAuthMessageDocument = gql`
     query sendAuthMessage($device: String!, $time: String!, $location: String!, $userId: String!, $pageName: String!) {
   sendAuthMessage(

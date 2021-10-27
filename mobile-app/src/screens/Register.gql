@@ -5,8 +5,13 @@ mutation register(
 ) {
   register(password: $password, email: $email, firebaseToken: $firebaseToken) {
     accessToken
-    secrets {
-      encrypted
+    user {
+      id
+      secrets {
+        encrypted
+        kind
+        id
+      }
     }
   }
 }
