@@ -67,9 +67,9 @@ export default function Login(): ReactElement {
             setAccessToken(response.data.login?.accessToken)
 
             let decodedToken = await getUserFromToken()
-            log('~ decodedToken', decodedToken)
+
             const EncryptedSecrets = response.data.login.user.EncryptedSecrets
-            log('EncryptedSecrets23', response.data.login)
+
             setUserId(decodedToken.userId)
             loginUser(
               values.password,
