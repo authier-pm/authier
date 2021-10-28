@@ -53,7 +53,6 @@ export type LoginResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   addDevice: Device;
-  addOTPEvent: Scalars['Boolean'];
   addWebInputs: Array<WebInput>;
   login?: Maybe<LoginResponse>;
   logout?: Maybe<Scalars['Boolean']>;
@@ -68,11 +67,6 @@ export type MutationAddDeviceArgs = {
   firebaseToken: Scalars['String'];
   name: Scalars['String'];
   userId: Scalars['String'];
-};
-
-
-export type MutationAddOtpEventArgs = {
-  data: OtpEvent;
 };
 
 
@@ -101,7 +95,6 @@ export type MutationUserArgs = {
 export type OtpEvent = {
   kind: Scalars['String'];
   url: Scalars['String'];
-  userId: Scalars['String'];
 };
 
 export type Query = {
@@ -165,6 +158,7 @@ export type User = {
 
 export type UserAfterAuth = {
   __typename?: 'UserAfterAuth';
+  EncryptedSecrets?: Maybe<Array<EncryptedSecrets>>;
   TOTPlimit: Scalars['Int'];
   createdAt: Scalars['DateTime'];
   email?: Maybe<Scalars['String']>;
@@ -172,7 +166,6 @@ export type UserAfterAuth = {
   loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
-  secrets?: Maybe<Array<EncryptedSecrets>>;
   tokenVersion: Scalars['Int'];
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
@@ -181,6 +174,7 @@ export type UserMutation = {
   __typename?: 'UserMutation';
   TOTPlimit: Scalars['Int'];
   addDevice: Device;
+  addOTPEvent: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
@@ -199,6 +193,11 @@ export type UserMutation = {
 export type UserMutationAddDeviceArgs = {
   firebaseToken: Scalars['String'];
   name: Scalars['String'];
+};
+
+
+export type UserMutationAddOtpEventArgs = {
+  data: OtpEvent;
 };
 
 

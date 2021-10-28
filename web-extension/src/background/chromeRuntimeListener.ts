@@ -81,7 +81,7 @@ chrome.runtime.onMessage.addListener(async function (
         backgroundState: bgState
       })
       break
-    case BackgroundMessageType.saveLoginCredentials:
+    case BackgroundMessageType.addLoginCredentials:
       if (!tab) {
         return
       }
@@ -90,16 +90,19 @@ chrome.runtime.onMessage.addListener(async function (
       if (!url || !bgState) {
         return // we can't do anything without a valid url
       }
-      log('saveLoginCredentials', req.payload)
+      log('addLoginCredentials', req.payload)
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
-      bgState.loginCredentials.push({
-        username: credentials.username,
-        password: credentials.password,
-        favIconUrl: tab.favIconUrl,
-        originalUrl: url,
-        label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
-      })
+      bgState.setLoginCredentials([
+        ...bgState.loginCredentials,
+        {
+          username: credentials.username,
+          password: credentials.password,
+          favIconUrl: tab.favIconUrl,
+          originalUrl: url,
+          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+        }
+      ])
 
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
@@ -121,6 +124,13 @@ chrome.runtime.onMessage.addListener(async function (
 
       console.log(credentials.capturedInputEvents)
       break
+    case BackgroundMessageType.addTOTPSecret:
+      if (bgState) {
+        bgState.setTOTPSecrets([
+          ...bgState.totpSecrets,
+          req.payload as ITOTPSecret
+        ])
+      }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {
         saveLoginModalsStates.set(currentTabId, req.payload)
@@ -129,7 +139,6 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.setBackgroundState:
       setBgState(req.payload)
-
       break
     case BackgroundMessageType.hideLoginCredentialsModal:
       if (currentTabId) {

@@ -1,4 +1,4 @@
-import { getTokenSecretFromQrCode } from './AddAuthSecretButton'
+import { getTokenSecretFromQrCode } from './AddTOTPSecretButton'
 
 describe('getTokenSecretFromQrCode', () => {
   it('should work for bitfinex TOTP secret QR codes with/without issuer', () => {

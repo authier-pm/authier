@@ -1,13 +1,5 @@
-mutation addOTPEvent(
-  $userId: String!
-  $kind: String!
-  $url: String!
-) {
-  addOTPEvent(
-    data: {
-      userId: $userId
-      kind: $kind
-      url: $url
-    }
-  ) 
+mutation addOTPEvent($kind: String!, $url: String!) {
+  me {
+    addOTPEvent(data: { kind: $kind, url: $url })
+  }
 }
