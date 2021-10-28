@@ -60,9 +60,9 @@ export function Login({ navigation }) {
             let concat = response.data.login.user.secrets?.map((i) => {
               return i.encrypted
             })
-            console.log('data', concat)
+
             //save secrets
-            saveData(concat ? JSON.stringify(concat) : null)
+            saveData(concat ? JSON.stringify(concat) : JSON.stringify([]))
             setIsLogged(true)
             actions.setSubmitting(false)
           } else {

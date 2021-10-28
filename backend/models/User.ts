@@ -52,7 +52,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecrets])
-  @UseMiddleware(isAuth)
   async encryptedSecrets() {
     return prisma.encryptedSecrets.findMany({
       where: {
