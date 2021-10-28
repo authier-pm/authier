@@ -14,7 +14,7 @@ import { removeToken } from '@src/util/accessTokenExtension'
 
 import { InfoOutlineIcon, AddIcon } from '@chakra-ui/icons'
 import { Link } from 'wouter'
-import { AddAuthSecretButton } from '@src/components/AddAuthSecretButton'
+import { AddTOTPSecretButton } from '@src/components/AddTOTPSecretButton'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
@@ -29,7 +29,7 @@ export const NavMenu: FunctionComponent = () => {
           <Link to="/">
             <Button colorScheme="teal">Secrets</Button>
           </Link>
-          <AddAuthSecretButton />
+          <AddTOTPSecretButton />
           <Link to="/settings">
             <Button colorScheme="blue">Settings</Button>
           </Link>
