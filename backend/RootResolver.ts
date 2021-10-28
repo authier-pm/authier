@@ -74,7 +74,8 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
-    const authorization = ctx.request.cookies['access-token']
+    const authorization = ctx.request.cookies['access-token'] || ctx.request.headers['authorization']
+
     console.log(authorization)
     try {
       //const token = authorization?.split(' ')[1]
