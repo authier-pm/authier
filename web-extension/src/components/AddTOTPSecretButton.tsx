@@ -13,11 +13,12 @@ import browser, { Tabs } from 'webextension-polyfill'
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 
-export const AddAuthSecretButton: React.FC<{}> = () => {
+export const AddTOTPSecretButton: React.FC<{}> = () => {
   const { backgroundState, saveTOTPSecrets } = useContext(BackgroundContext)
 
-  const addToTotps = async (qr: QRCode) => {
+  const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
     if (!tab || !backgroundState) {
@@ -32,7 +33,10 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
-      saveTOTPSecrets([newTotpSecret, ...backgroundState.totpSecrets])
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.addTOTPSecret,
+        payload: newTotpSecret
+      })
 
       toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
     }
@@ -45,7 +49,7 @@ export const AddAuthSecretButton: React.FC<{}> = () => {
         const src = await browser.tabs.captureVisibleTab()
         const qr = await getQrCodeFromUrl(src)
         if (qr) {
-          addToTotps(qr)
+          addToTOTPs(qr)
         } else {
           toast.error(
             t`could not find any QR code on this page. Make sure QR code is visible.`

@@ -93,17 +93,23 @@ export const setBgState = (
       )
     },
     async saveSecretsToBackend(input: string, kind: EncryptedSecretsType) {
+      console.log('~ this.masterPassword', this.masterPassword)
+
       const encrypted = cryptoJS.AES.encrypt(input, this.masterPassword, {
-        iv: CryptoJS.enc.Utf8.parse(this.userId)
+        iv: cryptoJS.enc.Utf8.parse(this.userId)
       }).toString()
 
-      apolloClient.mutate<SaveSecretsMutation, SaveSecretsMutationVariables>({
+      await apolloClient.mutate<
+        SaveSecretsMutation,
+        SaveSecretsMutationVariables
+      >({
         mutation: SaveSecretsDocument,
         variables: {
           payload: encrypted,
           kind
         }
       })
+      log('saved secrets to backend', kind)
     }
   }
   // @ts-expect-error

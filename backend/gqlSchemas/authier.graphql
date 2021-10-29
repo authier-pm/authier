@@ -76,7 +76,6 @@ type Mutation {
   """you need to be authenticated to call this resolver"""
   me: UserMutation
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
-  addOTPEvent(data: OTPEvent!): Boolean!
   register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
   login(password: String!, email: String!): LoginResponse
   logout: Boolean
@@ -94,10 +93,16 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   addDevice(firebaseToken: String!, name: String!): Device!
+  addOTPEvent(data: OTPEvent!): Boolean!
   saveEncryptedSecrets(kind: EncryptedSecretsType!, payload: String!): EncryptedSecrets!
   updateFireToken(firebaseToken: String!): Device!
   updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
   revokeRefreshTokensForUser: User!
+}
+
+input OTPEvent {
+  kind: String!
+  url: String!
 }
 
 type EncryptedSecrets {
@@ -127,12 +132,6 @@ type User {
   loginCredentialsLimit: Int!
 }
 
-input OTPEvent {
-  kind: String!
-  url: String!
-  userId: String!
-}
-
 type LoginResponse {
   accessToken: String!
   user: UserAfterAuth!
@@ -148,7 +147,7 @@ type UserAfterAuth {
   masterDeviceId: Int
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  secrets: [EncryptedSecrets!]
+  EncryptedSecrets: [EncryptedSecrets!]
 }
 
 input WebInputElement {

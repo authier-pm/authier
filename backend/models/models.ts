@@ -38,7 +38,7 @@ export class UserBase {
 @ObjectType()
 export class UserAfterAuth extends User {
   @Field(() => [EncryptedSecrets], { nullable: true })
-  secrets?: Array<EncryptedSecrets> | null
+  EncryptedSecrets: Array<EncryptedSecrets> | undefined
 }
 
 @ObjectType()
@@ -57,7 +57,4 @@ export class OTPEvent {
 
   @Field(() => String)
   url: string
-
-  @Field(() => String)
-  userId: string
 }

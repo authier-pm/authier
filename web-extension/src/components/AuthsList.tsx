@@ -31,6 +31,8 @@ import {
 } from '@src/util/useBackgroundState'
 import { UIOptions } from './setting-screens/SettingsForm'
 import RemoveAlertDialog from './RemoveAlertDialog'
+
+import { UserContext } from '@src/providers/UserProvider'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 enum Values {
@@ -39,15 +41,13 @@ enum Values {
 }
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
-  const { saveTOTPSecrets: saveAuthsToBg, backgroundState } =
-    useContext(BackgroundContext)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(totpData.secret)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
-
+  const { userId } = useContext(UserContext)
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
@@ -83,13 +83,11 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
                   let tabs = await browser.tabs.query({ active: true })
 
                   let url = tabs[0].url as string
-                  let unencryptedToken: any = await getUserFromToken()
 
                   await addOTPEvent({
                     variables: {
                       kind: 'show OTP',
-                      url: url,
-                      userId: unencryptedToken.userId as string
+                      url: url
                     }
                   })
                   console.log(data, error)
