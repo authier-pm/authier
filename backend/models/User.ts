@@ -8,6 +8,7 @@ import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
 import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
+import { OTPEvent } from './models'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -40,7 +41,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => SettingsConfig)
-  @UseMiddleware(isAuth)
   async settings() {
     return prisma.settingsConfig.findFirst({
       where: {
@@ -70,6 +70,27 @@ export class UserMutation extends UserBase {
         vaultLockTimeoutSeconds: 60
       }
     })
+  }
+
+  @Field(() => Boolean)
+  async addOTPEvent(
+    @Arg('data', () => OTPEvent) event: OTPEvent,
+    @Ctx() context: IContext
+  ) {
+    try {
+      await prisma.oTPCodeEvent.create({
+        data: {
+          kind: event.kind,
+          url: event.url,
+          userId: this.id,
+          ipAddress: context.getIpAddress()
+        }
+      })
+      return true
+    } catch (error) {
+      console.log(error)
+      return false
+    }
   }
 
   @Field(() => EncryptedSecrets)

@@ -9,7 +9,7 @@ export type LoginMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', secrets?: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> | null | undefined } } | null | undefined };
+export type LoginMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', EncryptedSecrets?: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> | null | undefined } } | null | undefined };
 
 
 export const LoginDocument = gql`
@@ -17,7 +17,7 @@ export const LoginDocument = gql`
   login(email: $email, password: $password) {
     accessToken
     user {
-      secrets {
+      EncryptedSecrets {
         id
         kind
         encrypted

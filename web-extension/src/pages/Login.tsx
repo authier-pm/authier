@@ -16,6 +16,9 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import debug from 'debug'
+
+const log = debug('backgroundPage')
 
 import {
   getUserFromToken,
@@ -39,7 +42,7 @@ interface Values {
 export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [login, { data, loading, error }] = useLoginMutation()
+  const [login, { loading }] = useLoginMutation({})
   const { setUserId } = useContext(UserContext)
 
   const { loginUser } = useContext(BackgroundContext)
@@ -64,13 +67,14 @@ export default function Login(): ReactElement {
             setAccessToken(response.data.login?.accessToken)
 
             let decodedToken = await getUserFromToken()
-            console.log('~ decodedToken', decodedToken)
+
+            const EncryptedSecrets = response.data.login.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
             loginUser(
               values.password,
               decodedToken.userId,
-              data?.login?.user.secrets ?? []
+              EncryptedSecrets ?? []
             )
           } else {
             toast.error(t`Login failed, check your username and password`)
