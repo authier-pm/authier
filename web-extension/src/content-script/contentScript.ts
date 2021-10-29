@@ -177,24 +177,30 @@ function renderSaveCredentialsForm(username: string, password: string) {
       capturedInputEvents: domRecorder.toJSON()
     }
   })
+
+  function closePrompt() {
+    promptDiv!.remove()
+    promptDiv = null
+  }
+
   document
     .querySelector('#__AUTHIER__saveBtn')!
     .addEventListener('click', () => {
-      const loginCreds = {
+      const loginCredentials = {
         username,
         password,
         capturedInputEvents: domRecorder.toJSON()
       }
       browser.runtime.sendMessage({
-        action: BackgroundMessageType.saveLoginCredentials,
-        payload: loginCreds
+        action: BackgroundMessageType.addLoginCredentials,
+        payload: loginCredentials
       })
+      closePrompt()
     })
   document
     .querySelector('#__AUTHIER__closeBtn')!
     .addEventListener('click', async () => {
-      promptDiv!.remove()
-      promptDiv = null
+      closePrompt()
 
       browser.runtime.sendMessage({
         action: BackgroundMessageType.hideLoginCredentialsModal
