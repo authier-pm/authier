@@ -4,22 +4,27 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type RegisterMutationVariables = Types.Exact<{
-  email: Types.Scalars['String'];
   password: Types.Scalars['String'];
+  email: Types.Scalars['String'];
   firebaseToken: Types.Scalars['String'];
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string } } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, secrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType, id: number }>> } } };
 
 
 export const RegisterDocument = gql`
-    mutation Register($email: String!, $password: String!, $firebaseToken: String!) {
-  register(email: $email, password: $password, firebaseToken: $firebaseToken) {
+    mutation register($password: String!, $email: String!, $firebaseToken: String!) {
+  register(password: $password, email: $email, firebaseToken: $firebaseToken) {
+    accessToken
     user {
       id
+      secrets {
+        encrypted
+        kind
+        id
+      }
     }
-    accessToken
   }
 }
     `;
@@ -38,8 +43,8 @@ export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, Regis
  * @example
  * const [registerMutation, { data, loading, error }] = useRegisterMutation({
  *   variables: {
- *      email: // value for 'email'
  *      password: // value for 'password'
+ *      email: // value for 'email'
  *      firebaseToken: // value for 'firebaseToken'
  *   },
  * });

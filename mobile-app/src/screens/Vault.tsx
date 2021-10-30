@@ -24,10 +24,8 @@ const options = {
 
 export const Vault = () => {
   const { auths } = useContext(AuthsContext)
-
   const [showWhole, setShowWhole] = useState(false)
   const [open, setOpen] = useState(false)
-
   const [seconds, setRemainingSeconds] = useState(0)
 
   const ListItem = ({ item }) => {

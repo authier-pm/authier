@@ -7,13 +7,13 @@ import { RNCamera } from 'react-native-camera'
 import { AuthsContext } from '../Providers'
 import { useAddDeviceMutation } from './Scan.codegen'
 import { getDeviceNameSync } from 'react-native-device-info'
-import { GetTokenProvider } from '../providers/TokenProvider'
 import { Pressable, Text } from 'native-base'
+import { UserContext } from '../providers/UserProvider'
 
 const QRLogin = ({ navigation }) => {
   const [addDevice, { data, error }] = useAddDeviceMutation()
   const { setAuths, auths } = useContext(AuthsContext)
-  const { token } = useContext(GetTokenProvider)
+  const { token } = useContext(UserContext)
 
   if (error) {
     console.log(`Error! ${error}`)

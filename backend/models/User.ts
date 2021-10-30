@@ -2,11 +2,13 @@ import { prisma } from '../prisma'
 import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
-import { EncryptedSecretsType } from '@prisma/client'
+
 import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
+import { v4 as uuidv4 } from 'uuid'
+import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -50,7 +52,6 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecrets])
-  @UseMiddleware(isAuth)
   async encryptedSecrets() {
     return prisma.encryptedSecrets.findMany({
       where: {
@@ -77,16 +78,20 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: 60,
+        loginSecret: uuidv4()
       }
     })
   }
 
   @Field(() => EncryptedSecrets)
-  async saveAuths(@Arg('payload', () => String) payload: string) {
+  async saveEncryptedSecrets(
+    @Arg('payload', () => String) payload: string,
+    @Arg('kind', () => EncryptedSecretsType) kind: EncryptedSecretsType
+  ) {
     return prisma.encryptedSecrets.upsert({
       create: {
-        kind: EncryptedSecretsType.TOTP,
+        kind,
         encrypted: payload,
         version: 1,
         userId: this.id
@@ -97,28 +102,7 @@ export class UserMutation extends UserBase {
       where: {
         userId_kind: {
           userId: this.id,
-          kind: EncryptedSecretsType.TOTP
-        }
-      }
-    })
-  }
-
-  @Field(() => EncryptedSecrets)
-  async savePasswords(@Arg('payload', () => String) payload: string) {
-    return prisma.encryptedSecrets.upsert({
-      create: {
-        kind: EncryptedSecretsType.LOGIN_CREDENTIALS,
-        encrypted: payload,
-        version: 1,
-        userId: this.id
-      },
-      update: {
-        encrypted: payload
-      },
-      where: {
-        userId_kind: {
-          userId: this.id,
-          kind: EncryptedSecretsType.LOGIN_CREDENTIALS
+          kind
         }
       }
     })

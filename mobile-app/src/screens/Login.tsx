@@ -27,10 +27,14 @@ export function Login({ navigation }) {
   const { setIsLogged } = useContext(UserContext)
 
   const saveData = async (value) => {
-    return SInfo.setItem('encryptedSecrets', value, {
-      sharedPreferencesName: 'mySharedPrefs',
-      keychainService: 'myKeychain'
-    })
+    try {
+      SInfo.setItem('encryptedSecrets', value, {
+        sharedPreferencesName: 'mySharedPrefs',
+        keychainService: 'myKeychain'
+      })
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   return (
@@ -53,16 +57,13 @@ export function Login({ navigation }) {
             //save email and psw
             await Keychain.setGenericPassword(values.email, values.password)
 
-            let concat = response.data.login.secrets?.map((i) => {
+            let concat = response.data.login.user.secrets?.map((i) => {
               return i.encrypted
             })
 
             //save secrets
-            saveData(JSON.stringify(concat))
-
-            // //is logged
+            saveData(concat ? JSON.stringify(concat) : JSON.stringify([]))
             setIsLogged(true)
-
             actions.setSubmitting(false)
           } else {
             console.error(`Login failed, check your password`)

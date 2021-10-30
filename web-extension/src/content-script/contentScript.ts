@@ -1,9 +1,9 @@
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 
 import { debounce } from 'lodash'
-import { browser } from 'webextension-polyfill-ts'
+import browser from 'webextension-polyfill'
 import { authierColors } from '../../../shared/chakraCustomTheme'
-import type { SessionStoredItem } from '../background/backgroundPage'
+
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import { ILoginCredentials } from '@src/util/useBackgroundState'
@@ -11,13 +11,6 @@ import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('contentScript')
 localStorage.debug = '*' // enable all debug messages
-
-declare global {
-  var __AUTHIER__: {
-    capturedInputs: IInputRecord[]
-    loginCredentials: SessionStoredItem
-  }
-}
 
 const inputKindMap = {
   email: WebInputType.EMAIL,

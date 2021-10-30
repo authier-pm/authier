@@ -13,18 +13,10 @@ query settings {
   }
 }
 
-mutation saveAuths($payload: String!) {
+mutation saveEncryptedSecrets($payload: String!, $kind: EncryptedSecretsType!) {
   me {
-    saveAuths(payload: $payload) {
-      id
-    }
-  }
-}
-
-mutation savePasswords($payload: String!) {
-  me {
-    savePasswords(payload: $payload) {
-      id
+    saveEncryptedSecrets(kind: $kind, payload: $payload) {
+      encrypted
     }
   }
 }

@@ -20,6 +20,7 @@ export type Device = {
   firstIpAddress: Scalars['String'];
   id: Scalars['Int'];
   lastIpAddress: Scalars['String'];
+  loginSecret: Scalars['String'];
   name: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
   syncTOTP: Scalars['Boolean'];
@@ -47,7 +48,7 @@ export enum EncryptedSecretsType {
 export type LoginResponse = {
   __typename?: 'LoginResponse';
   accessToken: Scalars['String'];
-  secrets?: Maybe<Array<EncryptedSecrets>>;
+  user: UserAfterAuth;
 };
 
 export type Mutation = {
@@ -163,6 +164,20 @@ export type User = {
   updatedAt?: Maybe<Scalars['DateTime']>;
 };
 
+export type UserAfterAuth = {
+  __typename?: 'UserAfterAuth';
+  TOTPlimit: Scalars['Int'];
+  createdAt: Scalars['DateTime'];
+  email?: Maybe<Scalars['String']>;
+  id: Scalars['String'];
+  loginCredentialsLimit: Scalars['Int'];
+  masterDeviceId?: Maybe<Scalars['Int']>;
+  name?: Maybe<Scalars['String']>;
+  secrets?: Maybe<Array<EncryptedSecrets>>;
+  tokenVersion: Scalars['Int'];
+  updatedAt?: Maybe<Scalars['DateTime']>;
+};
+
 export type UserMutation = {
   __typename?: 'UserMutation';
   TOTPlimit: Scalars['Int'];
@@ -174,8 +189,7 @@ export type UserMutation = {
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   revokeRefreshTokensForUser: User;
-  saveAuths: EncryptedSecrets;
-  savePasswords: EncryptedSecrets;
+  saveEncryptedSecrets: EncryptedSecrets;
   tokenVersion: Scalars['Int'];
   updateFireToken: Device;
   updateSettings: SettingsConfig;
@@ -189,12 +203,8 @@ export type UserMutationAddDeviceArgs = {
 };
 
 
-export type UserMutationSaveAuthsArgs = {
-  payload: Scalars['String'];
-};
-
-
-export type UserMutationSavePasswordsArgs = {
+export type UserMutationSaveEncryptedSecretsArgs = {
+  kind: EncryptedSecretsType;
   payload: Scalars['String'];
 };
 
@@ -217,6 +227,7 @@ export type UserQuery = {
   createdAt: Scalars['DateTime'];
   devicesCount: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
+  encryptedSecrets: Array<EncryptedSecrets>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;

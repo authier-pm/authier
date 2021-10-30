@@ -1,7 +1,6 @@
 import React, { createContext, Dispatch, SetStateAction, useState } from 'react'
 import { ApolloProvider } from '@apollo/client'
 import { apoloCLient } from './ApolloClient'
-import TokenProvider from './providers/TokenProvider'
 import { NativeBaseProvider } from 'native-base'
 import { theme } from './Theme'
 import NotifyProvider from './providers/NotifyProvider'
@@ -29,15 +28,13 @@ export const Providers: React.FC<{}> = () => {
     <ApolloProvider client={apoloCLient}>
       <NotifyProvider>
         <AuthsContext.Provider value={{ auths, setAuths }}>
-          <TokenProvider>
-            <UserProvider>
-              <NativeBaseProvider theme={theme}>
-                <NavigationContainer>
-                  <Routes />
-                </NavigationContainer>
-              </NativeBaseProvider>
-            </UserProvider>
-          </TokenProvider>
+          <UserProvider>
+            <NativeBaseProvider theme={theme}>
+              <NavigationContainer>
+                <Routes />
+              </NavigationContainer>
+            </NativeBaseProvider>
+          </UserProvider>
         </AuthsContext.Provider>
       </NotifyProvider>
     </ApolloProvider>

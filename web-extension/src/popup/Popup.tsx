@@ -14,7 +14,6 @@ import cryptoJS from 'crypto-js'
 import { QRCode } from '@src/pages/QRcode'
 import {
   useSaveFirebaseTokenMutation,
-  useSavePasswordsMutation,
   useSendAuthMessageLazyQuery,
   useSettingsQuery
 } from './Popup.codegen'
@@ -22,7 +21,7 @@ import {
 import Devices from '@src/pages/Devices'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { UserContext } from '@src/providers/UserProvider'
-import { AuthsContext } from '@src/providers/AuthsProvider'
+
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
@@ -33,13 +32,7 @@ import { AboutPage } from '@src/pages/AboutPage'
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const {
-    isApiLoggedIn: isAuth,
-    userId,
-    fireToken,
-    masterPassword
-  } = useContext(UserContext)
-  const { setAuths } = useContext(AuthsContext)
+  const { userId, fireToken } = useContext(UserContext)
   const [
     saveFirebaseTokenMutation,
     { data: tokenData, loading: tokenLoading, error: tokenError }
@@ -47,38 +40,37 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const [savePasswordsMutation] = useSavePasswordsMutation()
   const { data: settingsData } = useSettingsQuery()
-  const { currentURL, bgAuths, isFilling, safeLocked, bgPasswords } =
+  const { currentURL, isFilling, safeLocked, backgroundState } =
     useContext(BackgroundContext)
 
+  // useEffect(() => {
+  //   async function saveToLocal(encrypted: any) {
+  //     await browser.storage.local.set({
+  //       encryptedPswMasterPassword: encrypted
+  //     })
+  //   }
+
+  //   if (userId && bgPasswords.length > 0) {
+  //     const encrypted = cryptoJS.AES.encrypt(
+  //       JSON.stringify(bgPasswords),
+  //       masterPassword,
+  //       { iv: CryptoJS.enc.Utf8.parse(userId) }
+  //     ).toString()
+
+  //     // TODO move this into background-we cannot rely on popup being opened for saving it
+  //     savePasswordsMutation({
+  //       variables: {
+  //         payload: encrypted
+  //       }
+  //     })
+
+  //     saveToLocal(encrypted)
+  //   }
+  // }, [userId, bgPasswords])
+
   useEffect(() => {
-    async function saveToLocal(encrypted: any) {
-      await browser.storage.local.set({
-        encryptedPswMasterPassword: encrypted
-      })
-    }
-
-    if (userId && bgPasswords.length > 0) {
-      const encrypted = cryptoJS.AES.encrypt(
-        JSON.stringify(bgPasswords),
-        masterPassword,
-        { iv: CryptoJS.enc.Utf8.parse(userId) }
-      ).toString()
-
-      // TODO move this into background-we cannot rely on popup being opened for saving it
-      savePasswordsMutation({
-        variables: {
-          payload: encrypted
-        }
-      })
-
-      saveToLocal(encrypted)
-    }
-  }, [isAuth, bgPasswords])
-
-  useEffect(() => {
-    if (isAuth && fireToken.length > 1) {
+    if (userId && fireToken.length > 1) {
       console.log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
@@ -86,14 +78,14 @@ export const Popup: FunctionComponent = () => {
         }
       })
     }
-  }, [isAuth, fireToken])
+  }, [userId, fireToken])
 
-  useEffect(() => {
-    if (bgAuths) {
-      console.log('got', bgAuths)
-      setAuths(bgAuths)
-    }
-  }, [bgAuths])
+  // useEffect(() => {
+  //   if (bgAuths) {
+  //     console.log('got', bgAuths)
+  //     setAuths(bgAuths)
+  //   }
+  // }, [bgAuths])
 
   useEffect(() => {
     if (isFilling) {

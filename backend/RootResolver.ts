@@ -74,12 +74,20 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
-    const authorization = ctx.request.headers['authorization']
+    const authorization = ctx.request.cookies['access-token']
+    const inHeader = ctx.request.headers['authorization']
 
+    console.log(authorization)
     try {
-      const token = authorization?.split(' ')[1]
-      // @ts-expect-error
-      const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      if (inHeader) {
+        const token = inHeader?.split(' ')[1]
+        const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      } else if (authorization) {
+        const jwtPayload = verify(
+          authorization,
+          process.env.ACCESS_TOKEN_SECRET!
+        )
+      }
 
       return true
     } catch (err) {
@@ -135,7 +143,7 @@ export class RootResolver {
         userId: userId,
         lastIpAddress: ipAddress,
         vaultLockTimeoutSeconds: 60,
-        loginSecret: 'test'
+        loginSecret: uuidv4()
       }
     })
   }
@@ -309,7 +317,8 @@ export class RootResolver {
     const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 
     return {
-      accessToken
+      accessToken,
+      user
     }
   }
 
@@ -345,7 +354,7 @@ export class RootResolver {
 
     return {
       accessToken,
-      secrets: user.EncryptedSecrets
+      user
     }
   }
 

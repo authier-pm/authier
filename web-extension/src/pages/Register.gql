@@ -4,6 +4,9 @@ mutation Register(
   $firebaseToken: String!
 ) {
   register(email: $email, password: $password, firebaseToken: $firebaseToken) {
+    user {
+      id
+    }
     accessToken
   }
 }
