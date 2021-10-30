@@ -10,7 +10,7 @@ export type RegisterMutationVariables = Types.Exact<{
 }>;
 
 
-export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, secrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType, id: number }>> } } };
+export type RegisterMutation = { __typename?: 'Mutation', register: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, EncryptedSecrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType, id: number }>> } } };
 
 
 export const RegisterDocument = gql`
@@ -19,7 +19,7 @@ export const RegisterDocument = gql`
     accessToken
     user {
       id
-      secrets {
+      EncryptedSecrets {
         encrypted
         kind
         id
