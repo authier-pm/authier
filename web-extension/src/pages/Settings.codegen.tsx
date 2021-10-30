@@ -11,7 +11,7 @@ export type UpdateSettingsMutationVariables = Types.Exact<{
 }>;
 
 
-export type UpdateSettingsMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', updateSettings: { __typename?: 'SettingsConfig', userId: string } } | null | undefined };
+export type UpdateSettingsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', updateSettings: { __typename?: 'SettingsConfig', userId: string } }> };
 
 
 export const UpdateSettingsDocument = gql`

@@ -10,7 +10,7 @@ import { getDeviceNameSync } from 'react-native-device-info'
 import { Pressable, Text } from 'native-base'
 import { UserContext } from '../providers/UserProvider'
 
-const Scan = ({ navigation }) => {
+const QRLogin = ({ navigation }) => {
   const [addDevice, { data, error }] = useAddDeviceMutation()
   const { setAuths, auths } = useContext(AuthsContext)
   const { token } = useContext(UserContext)
@@ -73,5 +73,5 @@ const Scan = ({ navigation }) => {
   )
 }
 
-export default Scan
-AppRegistry.registerComponent('default', () => Scan)
+export default QRLogin
+AppRegistry.registerComponent('default', () => QRLogin)

@@ -9,7 +9,7 @@ export type SaveSecretsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveSecretsMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', saveEncryptedSecrets: { __typename?: 'EncryptedSecrets', id: number } } | null | undefined };
+export type SaveSecretsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', saveEncryptedSecrets: { __typename?: 'EncryptedSecrets', id: number } }> };
 
 
 export const SaveSecretsDocument = gql`

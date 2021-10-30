@@ -10,7 +10,7 @@ import { SharedBrowserEvents } from './SharedBrowserEvents'
 
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
-import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
+//import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
 
 const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
