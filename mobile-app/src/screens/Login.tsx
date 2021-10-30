@@ -54,7 +54,7 @@ export function Login({ navigation }) {
           })
 
           if (response.data?.login?.accessToken) {
-            let concat = response.data.login.user.secrets?.map((i) => {
+            let concat = response.data.login.user.EncryptedSecrets?.map((i) => {
               return i.encrypted
             })
 
