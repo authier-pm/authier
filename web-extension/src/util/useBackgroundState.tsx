@@ -150,11 +150,12 @@ export function useBackgroundState() {
         password = masterPassword
       ): ILoginCredentials[] | ITOTPSecret[] => {
         try {
-          return JSON.parse(
-            cryptoJS.AES.decrypt(data, password as string, {
-              iv: cryptoJS.enc.Utf8.parse(userId as string)
-            }).toString()
-          )
+          const decrypted = cryptoJS.AES.decrypt(data, password as string, {
+            iv: cryptoJS.enc.Utf8.parse(userId as string)
+          }).toString(cryptoJS.enc.Utf8)
+          const parsed = JSON.parse(decrypted)
+
+          return parsed
         } catch (err) {
           console.error(err)
           toast.error('decryption failed')

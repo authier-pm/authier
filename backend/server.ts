@@ -1,5 +1,8 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
+import fastifyHelmet from 'fastify-helmet'
+import fastifyCors from 'fastify-cors'
+import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import dotenv from 'dotenv'
@@ -13,6 +16,7 @@ import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
 
 import pkg from '../package.json'
+import { healthReportHandler } from './healthReportRoute'
 dotenv.config()
 
 sentryInit({
@@ -26,7 +30,31 @@ async function main() {
   const app = fastify({
     logger: true
   })
-  app.register(require('fastify-cors'))
+  app.register(fastifyCors)
+  const trustedDomains = ['https://unpkg.com']
+  app.register(fastifyHelmet, {
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+          trustedDomains
+        ),
+        styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+          trustedDomains
+        )
+      }
+    }
+  })
+  app.register(underPressure, {
+    maxEventLoopDelay: 1000,
+    retryAfter: 50,
+    exposeStatusRoute: true
+  })
+  app.route({
+    method: 'GET',
+    url: '/health/report',
+    handler: healthReportHandler
+  })
   app.post('/refresh_token', async (request, reply) => {
     const refreshToken = request.cookies['refresh-token']
 
