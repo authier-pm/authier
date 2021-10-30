@@ -9,8 +9,8 @@ import debug from 'debug'
 import { ILoginCredentials } from '@src/util/useBackgroundState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
-const log = debug('contentScript')
-localStorage.debug = '*' // enable all debug messages
+const log = debug('au:contentScript')
+localStorage.debug = 'au:*' // enable all debug messages
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
