@@ -232,27 +232,6 @@ export class RootResolver {
     }
   }
 
-  @Mutation(() => Boolean)
-  async addOTPEvent(
-    @Arg('data', () => OTPEvent) event: OTPEvent,
-    @Ctx() context: IContext
-  ) {
-    try {
-      await prisma.oTPCodeEvent.create({
-        data: {
-          kind: event.kind,
-          url: event.url,
-          userId: event.userId,
-          ipAddress: context.getIpAddress()
-        }
-      })
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
-
   @Mutation(() => LoginResponse)
   async register(
     @Arg('email', () => String) email: string,
@@ -336,11 +315,11 @@ export class RootResolver {
         EncryptedSecrets: true
       }
     })
-
     if (!user) {
       console.log('Could not find user')
       return null
     }
+    console.log(user?.EncryptedSecrets)
 
     const valid = await compare(password, user.passwordHash)
 
