@@ -3,7 +3,7 @@ mutation login($email: String!, $password: String!) {
     accessToken
     user {
       id
-      secrets {
+      EncryptedSecrets {
         encrypted
         kind
         id

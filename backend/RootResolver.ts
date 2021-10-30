@@ -74,22 +74,21 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
-    const authorization = ctx.request.cookies['access-token']
+    const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    console.log(authorization)
+    console.log(inCookies, inHeader)
     try {
       if (inHeader) {
         const token = inHeader?.split(' ')[1]
         const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      } else if (authorization) {
-        const jwtPayload = verify(
-          authorization,
-          process.env.ACCESS_TOKEN_SECRET!
-        )
+        return true
+      } else if (inCookies) {
+        const jwtPayload = verify(inCookies, process.env.ACCESS_TOKEN_SECRET!)
+        return true
       }
 
-      return true
+      return false
     } catch (err) {
       return false
     }

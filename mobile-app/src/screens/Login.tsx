@@ -12,9 +12,9 @@ import {
 } from 'native-base'
 import React, { useContext } from 'react'
 import { useLoginMutation } from './Login.codegen'
-import * as Keychain from 'react-native-keychain'
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
+import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 
 interface MyFormValues {
   email: string
@@ -23,7 +23,7 @@ interface MyFormValues {
 
 export function Login({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
-  const [login] = useLoginMutation()
+  const [login, { loading }] = useLoginMutation()
   const { setIsLogged } = useContext(UserContext)
 
   const saveData = async (value) => {
@@ -54,15 +54,14 @@ export function Login({ navigation }) {
           })
 
           if (response.data?.login?.accessToken) {
-            //save email and psw
-            await Keychain.setGenericPassword(values.email, values.password)
-
             let concat = response.data.login.user.secrets?.map((i) => {
               return i.encrypted
             })
 
             //save secrets
             saveData(concat ? JSON.stringify(concat) : JSON.stringify([]))
+            saveAccessToken(response.data.login.accessToken)
+
             setIsLogged(true)
             actions.setSubmitting(false)
           } else {
@@ -113,7 +112,9 @@ export function Login({ navigation }) {
               </Pressable>
             </FormControl>
 
-            <Button onPress={handleSubmit}>Submit</Button>
+            <Button onPress={handleSubmit} isLoading={loading}>
+              Submit
+            </Button>
             <HStack mt="2" justifyContent="center">
               <Text fontSize="sm" color="muted.700" fontWeight={400}>
                 I'm a new user.{' '}

@@ -7,7 +7,7 @@ mutation register(
     accessToken
     user {
       id
-      secrets {
+      EncryptedSecrets {
         encrypted
         kind
         id
