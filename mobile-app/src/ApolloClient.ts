@@ -1,11 +1,26 @@
-import { onError } from '@apollo/client/link/error';
-import { ApolloClient, InMemoryCache, from } from '@apollo/client';
-import { createHttpLink } from 'apollo-link-http';
-import Config from 'react-native-config';
+import { onError } from '@apollo/client/link/error'
+import { ApolloClient, InMemoryCache, from } from '@apollo/client'
+import { createHttpLink } from 'apollo-link-http'
+import Config from 'react-native-config'
+import { setContext } from '@apollo/client/link/context'
+import { getAccessToken } from '../util/tokenFromAsyncStorage'
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051
 const httpLink = createHttpLink({
   uri: Config.API_URL,
-});
+  credentials: 'include'
+})
+
+const authLink = setContext(async (_, { headers }) => {
+  //get the authentication token
+  const accessToken = await getAccessToken()
+  //return the headers to the context so httpLink can read them
+  return {
+    headers: {
+      ...headers,
+      authorization: accessToken ? `bearer ${accessToken}` : ''
+    }
+  }
+})
 
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError }) => {
@@ -14,14 +29,14 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
       console.log(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
-    );
+    )
   }
   if (networkError) {
-    console.log(`[Network error]: ${networkError}`);
+    console.log(`[Network error]: ${networkError}`)
   }
-});
+})
 
 export const apoloCLient = new ApolloClient({
   link: from([errorLink, httpLink as any]),
-  cache: new InMemoryCache(),
-});
+  cache: new InMemoryCache()
+})

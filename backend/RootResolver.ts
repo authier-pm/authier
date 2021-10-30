@@ -10,8 +10,7 @@ import {
   Mutation,
   Arg,
   Ctx,
-  UseMiddleware,
-  Int
+  UseMiddleware
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
@@ -27,6 +26,7 @@ import { UserQuery, UserMutation } from './models/User'
 import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
+import { v4 as uuidv4 } from 'uuid'
 
 export interface IContext {
   request: FastifyRequest
@@ -74,12 +74,20 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
-    const authorization = ctx.request.headers['authorization']
+    const authorization = ctx.request.cookies['access-token']
+    const inHeader = ctx.request.headers['authorization']
 
+    console.log(authorization)
     try {
-      const token = authorization?.split(' ')[1]
-      // @ts-expect-error
-      const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      if (inHeader) {
+        const token = inHeader?.split(' ')[1]
+        const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+      } else if (authorization) {
+        const jwtPayload = verify(
+          authorization,
+          process.env.ACCESS_TOKEN_SECRET!
+        )
+      }
 
       return true
     } catch (err) {
@@ -108,10 +116,12 @@ export class RootResolver {
   //TODO query for info about user
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
-  me(@Ctx() context: IContextAuthenticated) {
+  async me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
     if (jwtPayload) {
-      return prisma.user.findUnique({ where: { id: jwtPayload?.userId } })
+      return prisma.user.findUnique({
+        where: { id: jwtPayload?.userId }
+      })
     }
   }
 
@@ -132,7 +142,8 @@ export class RootResolver {
         firstIpAddress: ipAddress,
         userId: userId,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: 60,
+        loginSecret: uuidv4()
       }
     })
   }
@@ -231,6 +242,7 @@ export class RootResolver {
     const hashedPassword = await hash(password, 12)
 
     const ipAddress = ctx.getIpAddress()
+
     let user
 
     try {
@@ -255,9 +267,11 @@ export class RootResolver {
         lastIpAddress: ipAddress,
         firebaseToken: firebaseToken,
         name: 'test', // NEED device name
-        userId: user.id
+        userId: user.id,
+        loginSecret: uuidv4()
       }
     })
+    console.log(device)
 
     await prisma.settingsConfig.create({
       data: {
@@ -314,7 +328,6 @@ export class RootResolver {
     }
 
     // //login successful
-
     setNewRefreshToken(user, ctx)
     const accessToken = setNewAccessTokenIntoCookie(user, ctx)
 

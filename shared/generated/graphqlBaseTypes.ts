@@ -20,6 +20,7 @@ export type Device = {
   firstIpAddress: Scalars['String'];
   id: Scalars['Int'];
   lastIpAddress: Scalars['String'];
+  loginSecret: Scalars['String'];
   name: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
   syncTOTP: Scalars['Boolean'];
@@ -225,6 +226,7 @@ export type UserQuery = {
   createdAt: Scalars['DateTime'];
   devicesCount: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
+  encryptedSecrets: Array<EncryptedSecrets>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
   masterDeviceId?: Maybe<Scalars['Int']>;

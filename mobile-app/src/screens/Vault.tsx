@@ -1,5 +1,4 @@
 import React, { useContext, useState } from 'react'
-// @ts-expect-error
 import OTP from 'otp-client'
 import { AuthsContext } from '../Providers'
 import {
@@ -12,33 +11,23 @@ import {
   AddIcon,
   Avatar,
   Flex,
-  Heading,
   CircularProgress,
   Button
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '../components/SearchBar'
 
-interface Item {
-  secret: string
-  label: string
-  icon: string
-}
-
 const options = {
   algorithm: 'sha1',
   digits: 6
 }
 
-export const AuthList = (): JSX.Element => {
+export const Vault = () => {
   const { auths } = useContext(AuthsContext)
-
   const [showWhole, setShowWhole] = useState(false)
   const [open, setOpen] = useState(false)
-
   const [seconds, setRemainingSeconds] = useState(0)
 
-  //@ts-expect-error
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options)
 

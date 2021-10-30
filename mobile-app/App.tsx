@@ -7,8 +7,8 @@
  *
  * @format
  */
+
 import React, { useEffect } from 'react'
-import 'react-native-gesture-handler'
 import { Providers } from './src/Providers'
 import messaging from '@react-native-firebase/messaging'
 import AsyncStorage from '@react-native-async-storage/async-storage'

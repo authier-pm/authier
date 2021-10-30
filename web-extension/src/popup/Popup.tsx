@@ -14,7 +14,6 @@ import cryptoJS from 'crypto-js'
 import { QRCode } from '@src/pages/QRcode'
 import {
   useSaveFirebaseTokenMutation,
-  useSavePasswordsMutation,
   useSendAuthMessageLazyQuery,
   useSettingsQuery
 } from './Popup.codegen'
@@ -41,7 +40,6 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const [savePasswordsMutation] = useSavePasswordsMutation()
   const { data: settingsData } = useSettingsQuery()
   const { currentURL, isFilling, safeLocked, backgroundState } =
     useContext(BackgroundContext)
