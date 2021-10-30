@@ -12,8 +12,8 @@ import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
 
-const log = debug('backgroundPage')
-localStorage.debug = '*' // enable all debug messages
+const log = debug('au:backgroundPage')
+localStorage.debug = 'au:*' // enable all debug messages
 
 const firebaseConfig = {
   apiKey: 'AIzaSyBkBIcE71acyLg1yMNJwn3Ys_CxbY5gt7U',
@@ -93,8 +93,6 @@ export const setBgState = (
       )
     },
     async saveSecretsToBackend(input: string, kind: EncryptedSecretsType) {
-      console.log('~ this.masterPassword', this.masterPassword)
-
       const encrypted = cryptoJS.AES.encrypt(input, this.masterPassword, {
         iv: cryptoJS.enc.Utf8.parse(this.userId)
       }).toString()
