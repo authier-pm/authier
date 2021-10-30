@@ -36,6 +36,7 @@ export default function UserProvider({ children }) {
       setToken(Token)
     }
 
+    //Check asyncStorage if is the accessToken valid
     async function checkCredencials() {
       let value = await Keychain.getGenericPassword()
 
