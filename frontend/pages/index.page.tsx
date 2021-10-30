@@ -12,7 +12,8 @@ import {
   Flex,
   SimpleGrid,
   VisuallyHidden,
-  Input
+  Input,
+  Container
 } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
@@ -60,110 +61,112 @@ const SignUpHero = () => {
       bgSize="cover"
       minH="90vh"
     >
-      <SimpleGrid
-        alignItems="center"
-        w={{ base: 'full', xl: '100vw' }}
-        columns={{ base: 1, lg: 11 }}
-        gap={{ base: 0, lg: 24 }}
-        mx="auto"
-        // backgroundColor="gray.200"
-      >
-        <GridItem colSpan={{ base: 'auto', md: 4 }} maxW={550}>
-          <Box
-            as="form"
-            mb={8}
-            rounded="lg"
-            shadow="xl"
-            bgColor="whiteAlpha.300"
-            bgBlendMode="darken"
-            boxShadow="dark-lg"
-            dropShadow="lg"
-            border="none"
-            borderBottom="0px"
-            overflow="hidden"
-          >
-            <Center pb={0} color={useColorModeValue('gray.700', 'gray.600')}>
-              <Text pt={2} fontSize="md" mt={3} color="brand.500">
-                Two fields should suffice
-              </Text>
-            </Center>
-            <SimpleGrid
-              columns={1}
-              px={6}
-              py={4}
-              spacing={4}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
-            >
-              <Flex>
-                <VisuallyHidden>First Name</VisuallyHidden>
-                <Input
-                  mt={0}
-                  type="text"
-                  placeholder="First Name"
-                  required
-                  bgColor="white"
-                />
-              </Flex>
-              <Flex>
-                <VisuallyHidden>Email Address</VisuallyHidden>
-                <Input
-                  mt={0}
-                  type="email"
-                  placeholder="Email Address"
-                  required
-                  bgColor="white"
-                />
-              </Flex>
-              <Flex>
-                <VisuallyHidden>Password</VisuallyHidden>
-                <Input
-                  mt={0}
-                  type="password"
-                  placeholder="Password"
-                  autoComplete="new-password"
-                  required
-                  bgColor="white"
-                />
-              </Flex>
-              <Button colorScheme="teal" w="full" py={2} type="submit">
-                Sign up for free
-              </Button>
-            </SimpleGrid>
-            <chakra.p
-              p={2}
-              fontSize="xs"
-              textAlign="center"
-              color="gray.600"
-              backgroundColor="whiteAlpha.500"
-            >
-              By signing up you agree to our{' '}
-              <chakra.a color="brand.500">Terms of Service</chakra.a>
-            </chakra.p>
-          </Box>
-        </GridItem>
-        <GridItem
-          colSpan={{ base: 'auto', lg: 7 }}
-          textAlign={{ base: 'center', lg: 'left' }}
-          color={'cyan.900'}
+      <Container maxW="container.xl">
+        <SimpleGrid
+          alignItems="center"
+          w={{ base: 'full', xl: '100vw' }}
+          columns={{ base: 1, lg: 11 }}
+          gap={{ base: 0, lg: 24 }}
+          mx="auto"
+          // backgroundColor="gray.200"
         >
-          <chakra.h1
-            mb={4}
-            fontSize={{ base: '3xl', md: '4xl' }}
-            fontWeight="bold"
-            lineHeight={{ base: 'shorter', md: 'none' }}
-            letterSpacing={{ base: 'normal', md: 'tight' }}
+          <GridItem colSpan={{ base: 'auto', md: 4 }} maxW={550}>
+            <Box
+              as="form"
+              mb={8}
+              rounded="lg"
+              shadow="xl"
+              bgColor="whiteAlpha.300"
+              bgBlendMode="darken"
+              boxShadow="dark-lg"
+              dropShadow="lg"
+              border="none"
+              borderBottom="0px"
+              overflow="hidden"
+            >
+              <Center pb={0} color={useColorModeValue('gray.700', 'gray.600')}>
+                <Text pt={2} fontSize="md" mt={3} color="brand.500">
+                  Two fields should suffice
+                </Text>
+              </Center>
+              <SimpleGrid
+                columns={1}
+                px={6}
+                py={4}
+                spacing={4}
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+              >
+                <Flex>
+                  <VisuallyHidden>First Name</VisuallyHidden>
+                  <Input
+                    mt={0}
+                    type="text"
+                    placeholder="First Name"
+                    required
+                    bgColor="white"
+                  />
+                </Flex>
+                <Flex>
+                  <VisuallyHidden>Email Address</VisuallyHidden>
+                  <Input
+                    mt={0}
+                    type="email"
+                    placeholder="Email Address"
+                    required
+                    bgColor="white"
+                  />
+                </Flex>
+                <Flex>
+                  <VisuallyHidden>Password</VisuallyHidden>
+                  <Input
+                    mt={0}
+                    type="password"
+                    placeholder="Password"
+                    autoComplete="new-password"
+                    required
+                    bgColor="white"
+                  />
+                </Flex>
+                <Button colorScheme="teal" w="full" py={2} type="submit">
+                  Sign up for free
+                </Button>
+              </SimpleGrid>
+              <chakra.p
+                p={2}
+                fontSize="xs"
+                textAlign="center"
+                color="gray.600"
+                backgroundColor="whiteAlpha.500"
+              >
+                By signing up you agree to our{' '}
+                <chakra.a color="brand.500">Terms of Service</chakra.a>
+              </chakra.p>
+            </Box>
+          </GridItem>
+          <GridItem
+            colSpan={{ base: 'auto', lg: 7 }}
+            textAlign={{ base: 'center', lg: 'left' }}
+            color={'cyan.900'}
           >
-            Ready to start using the smartest 2FA?
-          </chakra.h1>
-          <chakra.p
-            mb={{ base: 10, md: 4 }}
-            fontSize={{ base: 'lg', md: 'xl' }}
-            fontWeight="thin"
-            color="gray.500"
-            letterSpacing="wider"
-          ></chakra.p>
-        </GridItem>
-      </SimpleGrid>
+            <chakra.h1
+              mb={4}
+              fontSize={{ base: '3xl', md: '4xl' }}
+              fontWeight="bold"
+              lineHeight={{ base: 'shorter', md: 'none' }}
+              letterSpacing={{ base: 'normal', md: 'tight' }}
+            >
+              Ready to start using the smartest 2FA?
+            </chakra.h1>
+            <chakra.p
+              mb={{ base: 10, md: 4 }}
+              fontSize={{ base: 'lg', md: 'xl' }}
+              fontWeight="thin"
+              color="gray.500"
+              letterSpacing="wider"
+            ></chakra.p>
+          </GridItem>
+        </SimpleGrid>
+      </Container>
     </Center>
   )
 }
