@@ -10,9 +10,10 @@ import {
   Text
 } from 'native-base'
 import React, { useContext } from 'react'
-import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
+import { saveAccessToken } from '../../util/accessTokenUtilz'
 import { UserContext } from '../providers/UserProvider'
 import { useRegisterMutation } from './Register.codegen'
+import * as Keychain from 'react-native-keychain'
 
 interface MyFormValues {
   email: string
@@ -45,6 +46,7 @@ export function Register({ navigation }) {
           })
 
           if (response.data?.register.accessToken) {
+            await Keychain.setGenericPassword(values.email, values.password)
             //save accessToken
             saveAccessToken(response.data?.register.accessToken)
 

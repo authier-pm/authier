@@ -1,6 +1,5 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import OTP from 'otp-client'
-import { AuthsContext } from '../Providers'
 import {
   Modal,
   FlatList,
@@ -16,97 +15,110 @@ import {
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '../components/SearchBar'
+import { useEncryptedAuthsLazyQuery } from './Vault.codegen'
+import { UserContext } from '../providers/UserProvider'
 
 const options = {
   algorithm: 'sha1',
   digits: 6
 }
 
+const OtpCode = ({
+  item,
+  setRemainingSeconds,
+  setShowWhole,
+  showWhole,
+  setOpen,
+  open
+}) => {
+  const otp = new OTP(item.secret, options)
+
+  setInterval(() => {
+    setRemainingSeconds(otp.getTimeUntilNextTick())
+  }, 1000)
+
+  return (
+    <View
+      backgroundColor="#ffffff"
+      p={9}
+      flexDirection="row"
+      borderBottomWidth={0.5}
+      borderBottomRadius={25}
+      borderBottomColor="#a7a7a7"
+      justifyContent="space-between"
+    >
+      <Flex>
+        <Avatar
+          size="lg"
+          source={{
+            uri: item.icon
+          }}
+        >
+          NB
+        </Avatar>
+      </Flex>
+      <Flex flexDirection="column">
+        <Text fontSize={20}>{item.label}</Text>
+        <Text>{item.label}</Text>
+        <Flex flexDirection="row" alignItems="center">
+          <Text
+            fontSize={35}
+            onPress={() => {
+              setShowWhole(true)
+            }}
+          >
+            {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
+          </Text>
+          <NativeIcon color="red" size="sm" as={<Icon name="copy-outline" />} />
+        </Flex>
+      </Flex>
+      <IconButton
+        alignSelf="flex-start"
+        variant="unstyled"
+        icon={
+          <NativeIcon
+            color="#949090"
+            size="sm"
+            as={<Icon name="ellipsis-vertical-outline" />}
+          />
+        }
+        onPress={() => setOpen(true)}
+      />
+      <Modal isOpen={open} onClose={() => setOpen(false)} mt={12}>
+        <Modal.Content maxWidth={130} maxHeight={112}>
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Button.Group variant="ghost" display="flex" flexDirection="column">
+              <Button>Edit</Button>
+              <Button>Delete</Button>
+            </Button.Group>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
+    </View>
+  )
+}
+
 export const Vault = () => {
-  const { auths } = useContext(AuthsContext)
+  const [encryptedAuths, { data, loading }] = useEncryptedAuthsLazyQuery()
+  const { totpSecrets, decryptAndSaveData } = useContext(UserContext)
+
   const [showWhole, setShowWhole] = useState(false)
   const [open, setOpen] = useState(false)
   const [seconds, setRemainingSeconds] = useState(0)
 
-  const ListItem = ({ item }) => {
-    const otp = new OTP(item.secret, options)
+  useEffect(() => {
+    encryptedAuths()
 
-    setInterval(() => {
-      setRemainingSeconds(otp.getTimeUntilNextTick())
-    }, 1000)
+    if (data) {
+      decryptAndSaveData(data.me?.encryptedSecrets)
+    }
 
-    return (
-      <View
-        backgroundColor="#ffffff"
-        p={9}
-        flexDirection="row"
-        borderBottomWidth={0.5}
-        borderBottomRadius={25}
-        borderBottomColor="#a7a7a7"
-        justifyContent="space-between"
-      >
-        <Flex>
-          <Avatar
-            size="lg"
-            source={{
-              uri: 'https://via.placeholder.com/150'
-            }}
-          >
-            NB
-          </Avatar>
-        </Flex>
-        <Flex flexDirection="column">
-          <Text fontSize={20}>{item.label}</Text>
-          <Text>nick name</Text>
-          <Flex flexDirection="row" alignItems="center">
-            <Text
-              fontSize={35}
-              onPress={() => {
-                setShowWhole(true)
-              }}
-            >
-              {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
-            </Text>
-            <NativeIcon
-              color="red"
-              size="sm"
-              as={<Icon name="copy-outline" />}
-            />
-          </Flex>
-        </Flex>
-        <IconButton
-          alignSelf="flex-start"
-          variant="unstyled"
-          icon={
-            <NativeIcon
-              color="#949090"
-              size="sm"
-              as={<Icon name="ellipsis-vertical-outline" />}
-            />
-          }
-          onPress={() => setOpen(true)}
-        />
-        <Modal isOpen={open} onClose={() => setOpen(false)} mt={12}>
-          <Modal.Content maxWidth={130} maxHeight={112}>
-            <Modal.CloseButton />
-            <Modal.Body>
-              <Button.Group
-                variant="ghost"
-                display="flex"
-                flexDirection="column"
-              >
-                <Button>Edit</Button>
-                <Button>Delete</Button>
-              </Button.Group>
-            </Modal.Body>
-          </Modal.Content>
-        </Modal>
-      </View>
-    )
-  }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading, data])
 
   return (
-    <View flex={1} safeArea backgroundColor="white">
+    <View flex={1} safeArea backgroundColor="light.50">
       <Flex
         flexDirection="row"
         justifyContent="space-between"
@@ -127,9 +139,18 @@ export const Vault = () => {
       </Flex>
 
       <FlatList
-        data={auths}
+        data={totpSecrets}
         keyExtractor={(auth) => auth.label}
-        renderItem={ListItem}
+        renderItem={({ item }) => (
+          <OtpCode
+            item={item}
+            open={open}
+            setOpen={setOpen}
+            setRemainingSeconds={setRemainingSeconds}
+            setShowWhole={setShowWhole}
+            showWhole={showWhole}
+          />
+        )}
       />
       <Flex justifyContent="flex-end" alignItems="flex-end">
         <IconButton
@@ -137,7 +158,7 @@ export const Vault = () => {
           margin={10}
           borderRadius={60}
           variant="solid"
-          icon={<AddIcon color="white" size={8} />}
+          icon={<AddIcon color="light.50" size={8} />}
           onPress={() => console.log('Pressed')}
         />
       </Flex>

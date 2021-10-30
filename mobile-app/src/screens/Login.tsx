@@ -14,7 +14,8 @@ import React, { useContext } from 'react'
 import { useLoginMutation } from './Login.codegen'
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
-import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
+import { saveAccessToken } from '../../util/accessTokenUtilz'
+import * as Keychain from 'react-native-keychain'
 
 interface MyFormValues {
   email: string
@@ -54,7 +55,10 @@ export function Login({ navigation }) {
           })
 
           if (response.data?.login?.accessToken) {
-            let concat = response.data.login.user.secrets?.map((i) => {
+            // Store the credentials
+            await Keychain.setGenericPassword(values.email, values.password)
+
+            let concat = response.data.login.user.EncryptedSecrets?.map((i) => {
               return i.encrypted
             })
 

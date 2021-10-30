@@ -3,7 +3,7 @@ import { ApolloClient, InMemoryCache, from } from '@apollo/client'
 import { createHttpLink } from 'apollo-link-http'
 import Config from 'react-native-config'
 import { setContext } from '@apollo/client/link/context'
-import { getAccessToken } from '../util/tokenFromAsyncStorage'
+import { getAccessToken } from '../util/accessTokenUtilz'
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051
 const httpLink = createHttpLink({
   uri: Config.API_URL,

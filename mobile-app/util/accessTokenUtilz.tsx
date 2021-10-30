@@ -1,4 +1,5 @@
 import SInfo from 'react-native-sensitive-info'
+import jwtDecode from 'jwt-decode'
 
 export const getAccessToken = async () => {
   const value = await SInfo.getItem('@accessToken', {
@@ -21,4 +22,10 @@ export const clearAccessToken = async () => {
     sharedPreferencesName: 'mySharedPrefs',
     keychainService: 'myKeychain'
   })
+}
+
+export const userIdFromToken = async () => {
+  const token = await getAccessToken()
+  //@ts-expect-error
+  return jwtDecode(token).userId
 }
