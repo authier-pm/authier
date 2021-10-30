@@ -91,7 +91,6 @@ const Home = () => {
     updateList()
   }
 
-  //@ts-expect-error
   const ListItem = ({ item }) => {
     console.log('item', item)
     return (

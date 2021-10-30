@@ -7,6 +7,7 @@ import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
+import { v4 as uuidv4 } from 'uuid'
 import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
 import { OTPEvent } from './models'
 
@@ -40,9 +41,19 @@ export class UserQuery extends UserBase {
     })
   }
 
+  //Call this from the findFirst query in me??
   @Field(() => SettingsConfig)
   async settings() {
     return prisma.settingsConfig.findFirst({
+      where: {
+        userId: this.id
+      }
+    })
+  }
+
+  @Field(() => [EncryptedSecrets])
+  async encryptedSecrets() {
+    return prisma.encryptedSecrets.findMany({
       where: {
         userId: this.id
       }
@@ -67,7 +78,8 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: 60,
+        loginSecret: uuidv4()
       }
     })
   }

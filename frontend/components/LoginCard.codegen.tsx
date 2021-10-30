@@ -9,7 +9,7 @@ export type LoginCardMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginCardMutation = { __typename?: 'Mutation', login?: { __typename?: 'LoginResponse', accessToken: string } | null | undefined };
+export type LoginCardMutation = { __typename?: 'Mutation', login?: Types.Maybe<{ __typename?: 'LoginResponse', accessToken: string }> };
 
 
 export const LoginCardDocument = gql`
