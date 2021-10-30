@@ -6,19 +6,9 @@ export const getAccessToken = async () => {
 }
 
 export const saveAccessToken = async (value) => {
-  try {
-    await AsyncStorage.setItem('@accessToken', value)
-  } catch (e) {
-    // saving error
-    console.log(e)
-  }
+  await AsyncStorage.setItem('@accessToken', value)
 }
 
 export const clearAccessToken = async () => {
-  try {
-    await AsyncStorage.removeItem('@accessToken')
-  } catch (e) {
-    // error reading value
-    console.error(e)
-  }
+  await AsyncStorage.removeItem('@accessToken')
 }
