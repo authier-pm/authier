@@ -12,6 +12,7 @@ const httpLink = createHttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
+  console.log('affwe')
   const accessToken = await getAccessToken()
   console.log('accessToken', accessToken)
   //return the headers to the context so httpLink can read them

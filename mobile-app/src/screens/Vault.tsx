@@ -16,6 +16,7 @@ import {
 } from 'native-base'
 import Icon from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '../components/SearchBar'
+import { generateOTP } from '../utils/otp'
 
 const options = {
   algorithm: 'sha1',
@@ -30,7 +31,8 @@ export const Vault = () => {
 
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options)
-
+    const code = generateOTP(item.secret)
+    console.log('~ code2', code)
     setInterval(() => {
       setRemainingSeconds(otp.getTimeUntilNextTick())
     }, 1000)
@@ -114,7 +116,7 @@ export const Vault = () => {
         alignItems="center"
       >
         <SearchBar />
-        <CircularProgress
+        {/* <CircularProgress
           value={seconds}
           size={8}
           min={0}
@@ -123,7 +125,7 @@ export const Vault = () => {
           color="teal"
         >
           <Text>{seconds}</Text>
-        </CircularProgress>
+        </CircularProgress> */}
       </Flex>
 
       <FlatList

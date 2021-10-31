@@ -106,3 +106,4 @@ dist/js
 authier-api.tar.gz
 backend/dist
 package-lock.json
+mobile-app/android/*.hprof
