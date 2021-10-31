@@ -28,6 +28,7 @@ import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { v4 as uuidv4 } from 'uuid'
 import debug from 'debug'
+const log = debug('au:RootResolver')
 
 export interface IContext {
   request: FastifyRequest
@@ -78,7 +79,7 @@ export class RootResolver {
     const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    debug.log('inCookies', inCookies, 'inHeader', inHeader)
+    log('inCookies', inCookies, 'inHeader', inHeader)
 
     try {
       if (inHeader) {
