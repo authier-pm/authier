@@ -13,6 +13,7 @@ const httpLink = createHttpLink({
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
   const accessToken = await getAccessToken()
+  console.log('accessToken', accessToken)
   //return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -37,6 +38,6 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 })
 
 export const apoloCLient = new ApolloClient({
-  link: from([errorLink, httpLink as any]),
+  link: from([errorLink, authLink, httpLink as any]),
   cache: new InMemoryCache()
 })

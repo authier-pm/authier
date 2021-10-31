@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
 import { Formik } from 'formik'
 import {
   Heading,
@@ -11,7 +10,7 @@ import {
   Text
 } from 'native-base'
 import React, { useContext } from 'react'
-import * as Keychain from 'react-native-keychain'
+import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 import { UserContext } from '../providers/UserProvider'
 import { useRegisterMutation } from './Register.codegen'
 
@@ -22,17 +21,8 @@ interface MyFormValues {
 
 export function Register({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
-  const [register] = useRegisterMutation()
+  const [register, { loading }] = useRegisterMutation()
   const { setIsLogged, token } = useContext(UserContext)
-
-  const saveAccessToken = async (value: string) => {
-    try {
-      await AsyncStorage.setItem('@accessToken', value)
-    } catch (e) {
-      // saving error
-      console.log(e)
-    }
-  }
 
   return (
     <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
@@ -57,8 +47,6 @@ export function Register({ navigation }) {
           if (response.data?.register.accessToken) {
             //save accessToken
             saveAccessToken(response.data?.register.accessToken)
-            //save email and psw
-            await Keychain.setGenericPassword(values.email, values.password)
 
             // //is logged
             setIsLogged(true)
@@ -107,7 +95,9 @@ export function Register({ navigation }) {
               />
             </FormControl>
 
-            <Button onPress={handleSubmit}>Register</Button>
+            <Button onPress={handleSubmit} isLoading={loading}>
+              Register
+            </Button>
             <Pressable onPress={() => navigation.navigate('Register')}>
               <Text color={'indigo.500'} fontWeight={'medium'} fontSize={'sm'}>
                 Sign Up
