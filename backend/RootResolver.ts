@@ -27,6 +27,7 @@ import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { v4 as uuidv4 } from 'uuid'
+import debug from 'debug'
 
 export interface IContext {
   request: FastifyRequest
@@ -77,7 +78,8 @@ export class RootResolver {
     const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    console.log(inCookies, inHeader)
+    debug.log('inCookiesin', inCookies, 'inHeader', inHeader)
+
     try {
       if (inHeader) {
         const token = inHeader?.split(' ')[1]
