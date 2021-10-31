@@ -78,7 +78,7 @@ export class RootResolver {
     const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    debug.log('inCookiesin', inCookies, 'inHeader', inHeader)
+    debug.log('inCookies', inCookies, 'inHeader', inHeader)
 
     try {
       if (inHeader) {
