@@ -30,7 +30,7 @@
     "graphql": "^15.5.3",
     "jssha": "^3.2.0",
     "jwt-decode": "^3.1.2",
-    "native-base": "^3.0.6",
+    "native-base": "3.1.0",
     "otp-client": "^1.0.3",
     "react": "17.0.1",
     "react-native": "0.64.1",

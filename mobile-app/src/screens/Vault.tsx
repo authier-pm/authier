@@ -116,7 +116,7 @@ export const Vault = () => {
         alignItems="center"
       >
         <SearchBar />
-        {/* <CircularProgress
+        <CircularProgress
           value={seconds}
           size={8}
           min={0}
@@ -125,7 +125,7 @@ export const Vault = () => {
           color="teal"
         >
           <Text>{seconds}</Text>
-        </CircularProgress> */}
+        </CircularProgress>
       </Flex>
 
       <FlatList
