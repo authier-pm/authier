@@ -99,9 +99,65 @@ const OtpCode = ({
   )
 }
 
+const LoginCredentials = ({ item, setOpen, open }) => {
+  return (
+    <View
+      backgroundColor="#ffffff"
+      flexDirection="row"
+      p={6}
+      borderBottomWidth={0.5}
+      borderBottomRadius={25}
+      borderBottomColor="#a7a7a7"
+      justifyContent="space-between"
+    >
+      <Flex>
+        <Avatar
+          size="md"
+          source={{
+            uri: item.favIconUrl
+          }}
+        >
+          NB
+        </Avatar>
+      </Flex>
+      <Flex flexDirection="column">
+        <Text fontSize={20}>{item.label}</Text>
+        <Flex flexDirection={'row'}>
+          <Text>{item.username}</Text>
+          <NativeIcon color="red" size="sm" as={<Icon name="copy-outline" />} />
+        </Flex>
+      </Flex>
+      <IconButton
+        alignSelf="flex-start"
+        variant="unstyled"
+        icon={
+          <NativeIcon
+            color="#949090"
+            size="sm"
+            as={<Icon name="ellipsis-vertical-outline" />}
+          />
+        }
+        onPress={() => setOpen(true)}
+      />
+      <Modal isOpen={open} onClose={() => setOpen(false)} mt={12}>
+        <Modal.Content maxWidth={130} maxHeight={112}>
+          <Modal.CloseButton />
+          <Modal.Body>
+            <Button.Group variant="ghost" display="flex" flexDirection="column">
+              <Button>Edit</Button>
+              <Button>Delete</Button>
+            </Button.Group>
+          </Modal.Body>
+        </Modal.Content>
+      </Modal>
+    </View>
+  )
+}
+
 export const Vault = () => {
   const [encryptedAuths, { data, loading }] = useEncryptedAuthsLazyQuery()
-  const { totpSecrets, decryptAndSaveData } = useContext(UserContext)
+  const { totpSecrets, decryptAndSaveData, loginCredentials } =
+    useContext(UserContext)
 
   const [showWhole, setShowWhole] = useState(false)
   const [open, setOpen] = useState(false)
@@ -140,18 +196,19 @@ export const Vault = () => {
 
       <FlatList
         data={totpSecrets}
-        keyExtractor={(auth) => auth.label}
+        keyExtractor={(item) => item.label}
         renderItem={({ item }) => (
           <OtpCode
             item={item}
             open={open}
             setOpen={setOpen}
-            setRemainingSeconds={setRemainingSeconds}
             setShowWhole={setShowWhole}
+            setRemainingSeconds={setRemainingSeconds}
             showWhole={showWhole}
           />
         )}
       />
+
       <Flex justifyContent="flex-end" alignItems="flex-end">
         <IconButton
           p={3}
