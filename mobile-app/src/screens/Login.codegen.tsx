@@ -9,7 +9,7 @@ export type LoginMutationVariables = Types.Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login?: Types.Maybe<{ __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, secrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType, id: number }>> } }> };
+export type LoginMutation = { __typename?: 'Mutation', login?: Types.Maybe<{ __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, EncryptedSecrets?: Types.Maybe<Array<{ __typename?: 'EncryptedSecrets', encrypted: string, kind: Types.EncryptedSecretsType, id: number }>> } }> };
 
 
 export const LoginDocument = gql`
@@ -18,7 +18,7 @@ export const LoginDocument = gql`
     accessToken
     user {
       id
-      secrets {
+      EncryptedSecrets {
         encrypted
         kind
         id

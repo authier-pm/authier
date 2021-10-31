@@ -1,14 +1,24 @@
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import SInfo from 'react-native-sensitive-info'
+
 export const getAccessToken = async () => {
-  const value = await AsyncStorage.getItem('@accessToken')
-  console.log('accessToken', value)
+  const value = await SInfo.getItem('@accessToken', {
+    sharedPreferencesName: 'mySharedPrefs',
+    keychainService: 'myKeychain'
+  })
+
   return value
 }
 
 export const saveAccessToken = async (value) => {
-  await AsyncStorage.setItem('@accessToken', value)
+  await await SInfo.setItem('@accessToken', value, {
+    sharedPreferencesName: 'mySharedPrefs',
+    keychainService: 'myKeychain'
+  })
 }
 
 export const clearAccessToken = async () => {
-  await AsyncStorage.removeItem('@accessToken')
+  return await SInfo.deleteItem('@accessToken', {
+    sharedPreferencesName: 'mySharedPrefs',
+    keychainService: 'myKeychain'
+  })
 }

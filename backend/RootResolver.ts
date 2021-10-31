@@ -27,6 +27,8 @@ import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { v4 as uuidv4 } from 'uuid'
+import debug from 'debug'
+const log = debug('au:RootResolver')
 
 export interface IContext {
   request: FastifyRequest
@@ -74,22 +76,22 @@ export class RootResolver {
     description: 'you need to be authenticated to call this resolver'
   })
   authenticated(@Ctx() ctx: IContext) {
-    const authorization = ctx.request.cookies['access-token']
+    const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    console.log(authorization)
+    log('inCookies', inCookies, 'inHeader', inHeader)
+
     try {
       if (inHeader) {
         const token = inHeader?.split(' ')[1]
         const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-      } else if (authorization) {
-        const jwtPayload = verify(
-          authorization,
-          process.env.ACCESS_TOKEN_SECRET!
-        )
+        return true
+      } else if (inCookies) {
+        const jwtPayload = verify(inCookies, process.env.ACCESS_TOKEN_SECRET!)
+        return true
       }
 
-      return true
+      return false
     } catch (err) {
       return false
     }
