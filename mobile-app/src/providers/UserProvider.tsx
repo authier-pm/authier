@@ -6,8 +6,12 @@ import React, {
   useEffect
 } from 'react'
 import messaging from '@react-native-firebase/messaging'
-import { useIsLoggedInQuery, useLogoutMutation } from './UserProvider.codegen'
-import * as Keychain from 'react-native-keychain'
+import { useIsLoggedInQuery } from './UserProvider.codegen'
+import {
+  clearAccessToken,
+  getAccessToken
+} from '../../util/tokenFromAsyncStorage'
+import jwtDecode from 'jwt-decode'
 
 export const UserContext = createContext<{
   isLogged: boolean
@@ -18,7 +22,7 @@ export const UserContext = createContext<{
 }>({} as any)
 
 export default function UserProvider({ children }) {
-  const [logout] = useLogoutMutation()
+  // const [logout] = useLogoutMutation()
   const [isLogged, setIsLogged] = useState(false)
   const [token, setToken] = useState<string | null>(null)
   const { data, loading } = useIsLoggedInQuery()
@@ -32,23 +36,36 @@ export default function UserProvider({ children }) {
         return
       })
       const Token = await messaging().getToken()
-      console.log('t', Token)
       setToken(Token)
     }
 
     //Check asyncStorage if is the accessToken valid
-    async function checkCredencials() {
-      let value = await Keychain.getGenericPassword()
+    async function isAccessTokenValid() {
+      const token = await getAccessToken()
 
-      if (value) {
-        setIsLogged(true)
+      if (!token) {
+        setIsLogged(false)
+        return false
       }
-      return value
+
+      try {
+        // @ts-expect-error
+        const { exp } = jwtDecode(token)
+        if (Date.now() >= exp * 1000) {
+          setIsLogged(false)
+          return false
+        } else {
+          setIsLogged(true)
+          return true
+        }
+      } catch (error) {
+        return false
+      }
     }
 
+    isAccessTokenValid()
     getToken()
-    checkCredencials()
-  }, [])
+  }, [data, loading])
 
   return (
     <UserContext.Provider
@@ -59,8 +76,8 @@ export default function UserProvider({ children }) {
         isApiLoggedIn: !!(data?.authenticated && !loading),
         logout: async () => {
           setIsLogged(false)
-          await Keychain.resetGenericPassword()
-          await logout()
+          clearAccessToken()
+          // await logout()
         }
       }}
     >
