@@ -28,6 +28,8 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { AboutPage } from '@src/pages/AboutPage'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
+import debug from 'debug'
+const log = debug('au:Popup')
 
 i18n.activate('en')
 
@@ -71,7 +73,7 @@ export const Popup: FunctionComponent = () => {
 
   useEffect(() => {
     if (userId && fireToken.length > 1) {
-      console.log('client fireToken:', fireToken)
+      log('client fireToken:', fireToken)
       saveFirebaseTokenMutation({
         variables: {
           firebaseToken: fireToken as string
@@ -89,7 +91,7 @@ export const Popup: FunctionComponent = () => {
 
   useEffect(() => {
     if (isFilling) {
-      console.log('Filling')
+      log('Filling')
       let device = deviceDetect()
       let date = new Date()
 

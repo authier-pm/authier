@@ -34,6 +34,8 @@ import RemoveAlertDialog from './RemoveAlertDialog'
 
 import { UserContext } from '@src/providers/UserProvider'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import debug from 'debug'
+const log = debug('au:AuthsList')
 
 enum Values {
   passwords = 'PSW',
@@ -90,7 +92,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
                       url: url
                     }
                   })
-                  console.log(data, error)
+                  log(data, error)
                 }
               }}
             >
@@ -134,7 +136,7 @@ const LoginCredentialsListItem = ({
   const cancelRef = useRef()
 
   const { onCopy } = useClipboard(loginCredentials.password)
-  console.log('~ loginCredentials', loginCredentials)
+  log('~ loginCredentials', loginCredentials)
 
   return (
     <Flex
@@ -185,7 +187,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
 
   useEffect(() => {
     getCurrentTab().then((tab) => {
-      console.log('~ tab?.url', tab?.url)
+      log('~ tab?.url', tab?.url)
 
       setCurrentTabUrl(tab?.url ?? null)
     })
