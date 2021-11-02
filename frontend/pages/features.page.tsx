@@ -1,15 +1,17 @@
 import Head from 'next/head'
 import React from 'react'
-import { PageHeading } from '../components/PageHeading'
+import { AuPage } from '../components/AuPage'
 import { Image } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 export default function Features() {
   return (
     <>
       <Head>
         <title>Features</title>
       </Head>
-      <PageHeading>Features</PageHeading>
-      <Image src="/assets/Authentication_Two-Color.svg" h="50vh"></Image>
+      <AuPage heading={t`Features`}>
+        <Image src="/assets/Authentication_Two-Color.svg" h="30vh"></Image>
+      </AuPage>
     </>
   )
 }
