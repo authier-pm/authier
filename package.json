@@ -16,20 +16,20 @@
     "authier-mobile-app"
   ],
   "resolutions": {
-    "graphql": "^15.5.3"
+    "graphql": "^16.0.1"
   },
   "devDependencies": {
     "@apollo/client": "^3.4.16",
-    "@chakra-ui/react": "^1.6.9",
-    "@emotion/react": "^11.4.1",
+    "@chakra-ui/react": "^1.6.10",
+    "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
-    "@graphql-codegen/cli": "2.2.0",
-    "@graphql-codegen/fragment-matcher": "3.1.0",
+    "@graphql-codegen/cli": "2.2.2",
+    "@graphql-codegen/fragment-matcher": "3.2.0",
     "@graphql-codegen/introspection": "2.1.0",
-    "@graphql-codegen/near-operation-file-preset": "^2.1.4",
-    "@graphql-codegen/typescript": "2.2.2",
-    "@graphql-codegen/typescript-operations": "2.1.6",
-    "@graphql-codegen/typescript-react-apollo": "3.1.4",
+    "@graphql-codegen/near-operation-file-preset": "^2.2.0",
+    "@graphql-codegen/typescript": "2.3.0",
+    "@graphql-codegen/typescript-operations": "2.2.0",
+    "@graphql-codegen/typescript-react-apollo": "3.2.0",
     "@types/jest": "^27.0.2",
     "framer-motion": "^4.1.17",
     "react": "^17.0.2",
