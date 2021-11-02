@@ -46,7 +46,7 @@ model Device {
     firstIpAddress          String  @db.Inet
     lastIpAddress           String  @db.Inet
     firebaseToken           String
-    loginSecret             String
+    loginSecret             String  @unique @db.Uuid
     name                    String
     syncTOTP                Boolean @default(true)
     vaultLockTimeoutSeconds Int?
