@@ -1,9 +1,10 @@
 mutation Register(
   $email: String!
   $password: String!
+  deviceName: String!
   $firebaseToken: String!
 ) {
-  register(email: $email, password: $password, firebaseToken: $firebaseToken) {
+  register(email: $email, password: $password, deviceName: $deviceName, firebaseToken: $firebaseToken) {
     user {
       id
     }
