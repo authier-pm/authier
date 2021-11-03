@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type EncryptedAuthsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type EncryptedAuthsQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', id: string, encryptedSecrets: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> }> };
+export type EncryptedAuthsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, encryptedSecrets: Array<{ __typename?: 'EncryptedSecrets', id: number, kind: Types.EncryptedSecretsType, encrypted: string }> } | null | undefined };
 
 
 export const EncryptedAuthsDocument = gql`

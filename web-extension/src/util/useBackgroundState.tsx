@@ -1,6 +1,6 @@
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-import { useState, useEffect, useContext } from 'react'
+import { useState, useEffect, useContext, useReducer } from 'react'
 import browser from 'webextension-polyfill'
 import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
 
@@ -53,7 +53,7 @@ export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
   const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
-
+  const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
 
   const [isFilling, setIsFilling] = useState<Boolean>(false)
@@ -83,17 +83,6 @@ export function useBackgroundState() {
       return
     }
     registered = true
-    console.log('useEffect registering!!')
-
-    browser.runtime
-      .sendMessage({ action: BackgroundMessageType.getBackgroundState })
-      .then((res: { backgroundState: IBackgroundStateSerializable }) => {
-        console.log('~ res backgroundState', res)
-        if (res && res.backgroundState) {
-          setBackgroundState(res.backgroundState)
-          console.log('~ res.backgroundState', res.backgroundState)
-        }
-      })
 
     browser.runtime.onMessage.addListener(function (request: {
       message: SharedBrowserEvents
@@ -122,6 +111,19 @@ export function useBackgroundState() {
     )
   }, [])
 
+  // handle background state refresh
+  useEffect(() => {
+    browser.runtime
+      .sendMessage({ action: BackgroundMessageType.getBackgroundState })
+      .then((res: { backgroundState: IBackgroundStateSerializable }) => {
+        console.log('~ res backgroundState', res)
+        if (res && res.backgroundState) {
+          setBackgroundState(res.backgroundState)
+          console.log('~ res.backgroundState', res.backgroundState)
+        }
+      })
+  }, [refreshCount])
+
   const getCryptoOptions = () => {
     if (!backgroundState) {
       throw new Error('No background state')
@@ -137,6 +139,7 @@ export function useBackgroundState() {
     safeLocked,
     setSafeLocked,
     isFilling,
+    forceUpdate,
     backgroundState,
     loginUser: async (
       masterPassword: string,
