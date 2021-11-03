@@ -14,6 +14,7 @@ type UserQuery {
   email: String
   tokenVersion: Int!
   name: String
+  loginSecret: String
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
@@ -35,7 +36,6 @@ type Device {
   firstIpAddress: String!
   lastIpAddress: String!
   firebaseToken: String!
-  loginSecret: String!
   name: String!
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -104,6 +104,7 @@ type UserMutation {
   email: String
   tokenVersion: Int!
   name: String
+  loginSecret: String
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
@@ -127,6 +128,7 @@ type User {
   email: String
   tokenVersion: Int!
   name: String
+  loginSecret: String
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int
@@ -144,6 +146,7 @@ type UserAfterAuth {
   email: String
   tokenVersion: Int!
   name: String
+  loginSecret: String
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: Int

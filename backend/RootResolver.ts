@@ -144,8 +144,7 @@ export class RootResolver {
         firstIpAddress: ipAddress,
         userId: userId,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60,
-        loginSecret: uuidv4()
+        vaultLockTimeoutSeconds: 60
       }
     })
   }
@@ -270,8 +269,7 @@ export class RootResolver {
         lastIpAddress: ipAddress,
         firebaseToken: firebaseToken,
         name: deviceName,
-        userId: user.id,
-        loginSecret: uuidv4()
+        userId: user.id
       }
     })
     console.log(device)

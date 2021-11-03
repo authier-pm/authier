@@ -38,6 +38,11 @@ export class User {
   })
   name?: string | null;
 
+  @TypeGraphQL.Field(_type => String, {
+    nullable: true
+  })
+  loginSecret?: string | null;
+
   Token?: Token[];
 
   @TypeGraphQL.Field(_type => Date, {
