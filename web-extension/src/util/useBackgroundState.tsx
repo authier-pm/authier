@@ -116,10 +116,8 @@ export function useBackgroundState() {
     browser.runtime
       .sendMessage({ action: BackgroundMessageType.getBackgroundState })
       .then((res: { backgroundState: IBackgroundStateSerializable }) => {
-        console.log('~ res backgroundState', res)
         if (res && res.backgroundState) {
           setBackgroundState(res.backgroundState)
-          console.log('~ res.backgroundState', res.backgroundState)
         }
       })
   }, [refreshCount])
