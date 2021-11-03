@@ -33,11 +33,6 @@ export class Device {
   @TypeGraphQL.Field(_type => String, {
     nullable: false
   })
-  loginSecret!: string;
-
-  @TypeGraphQL.Field(_type => String, {
-    nullable: false
-  })
   name!: string;
 
   @TypeGraphQL.Field(_type => Boolean, {
