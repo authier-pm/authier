@@ -12,7 +12,7 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { useRegisterMutation } from './Register.codegen'
+import { useRegisterMutation } from '../../../shared/Register.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
@@ -50,11 +50,13 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          const countOfDevices = 0
           let res = await register({
             variables: {
               email: values.email,
               password: values.password,
-              firebaseToken: fireToken
+              firebaseToken: fireToken,
+              deviceName: `Chrome extension ${countOfDevices + 1}` // TODO get device name from agent string
             }
           })
           const registerResult = res.data?.register

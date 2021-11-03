@@ -83,6 +83,7 @@ export type MutationLoginArgs = {
 
 
 export type MutationRegisterArgs = {
+  deviceName: Scalars['String'];
   email: Scalars['String'];
   firebaseToken: Scalars['String'];
   password: Scalars['String'];

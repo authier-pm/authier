@@ -1,22 +1,23 @@
-import React, {
-  createContext,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-  useEffect,
-  useState
-} from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 
-import browser from 'webextension-polyfill'
-
-import { Flex, Text, IconButton, useDisclosure } from '@chakra-ui/react'
-import { HamburgerIcon, ArrowBackIcon, CloseIcon } from '@chakra-ui/icons'
+import { Flex, IconButton, useDisclosure, Box } from '@chakra-ui/react'
+import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
+import { UserNavMenu } from '@src/pages/UserNavMenu'
 
 export const NavBar: FunctionComponent = () => {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const {
+    isOpen: isNavMenuOpen,
+    onOpen: onNavMenuOpen,
+    onClose: onNavMenuClose
+  } = useDisclosure()
+  const {
+    isOpen: isUserMenuOpen,
+    onOpen: onUserMenuOpen,
+    onClose: onUserMenuClose
+  } = useDisclosure()
 
   const [location, setLocation] = useLocation()
   console.log('~ location', location)
@@ -42,7 +43,7 @@ export const NavBar: FunctionComponent = () => {
   return (
     <Flex flexDir="column">
       <Flex
-        height="40px"
+        p={1}
         textAlign="center"
         backgroundColor="whitesmoke"
         fontSize="16px"
@@ -50,28 +51,55 @@ export const NavBar: FunctionComponent = () => {
         borderBottomColor="gray.300"
         width="330px"
       >
-        {isOpen ? (
-          <IconButton
-            size="md"
-            aria-label="menu"
-            icon={<CloseIcon />}
-            onClick={() => {
-              onClose()
-            }}
-          />
-        ) : (
-          <IconButton
-            size="md"
-            aria-label="menu"
-            icon={<HamburgerIcon />}
-            onClick={() => {
-              onOpen()
-            }}
-          />
-        )}
+        <Box mr="auto">
+          {isNavMenuOpen ? (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<CloseIcon />}
+              onClick={() => {
+                onNavMenuClose()
+              }}
+            />
+          ) : (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<HamburgerIcon />}
+              onClick={() => {
+                onNavMenuOpen()
+                onUserMenuClose()
+              }}
+            />
+          )}
+        </Box>
+
+        <Box ml="auto">
+          {isUserMenuOpen ? (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<CloseIcon />}
+              onClick={() => {
+                onUserMenuClose()
+              }}
+            />
+          ) : (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<LockIcon />}
+              onClick={() => {
+                onUserMenuOpen()
+                onNavMenuClose()
+              }}
+            />
+          )}
+        </Box>
       </Flex>
 
-      {isOpen && <NavMenu />}
+      {isNavMenuOpen && <NavMenu />}
+      {isUserMenuOpen && <UserNavMenu />}
     </Flex>
   )
 }

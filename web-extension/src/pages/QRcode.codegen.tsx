@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DeviceCountQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', devicesCount: number }> };
+export type DeviceCountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devicesCount: number } | null | undefined };
 
 
 export const DeviceCountDocument = gql`

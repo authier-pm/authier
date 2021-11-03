@@ -238,6 +238,7 @@ export class RootResolver {
   async register(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
+    @Arg('deviceName', () => String) deviceName: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() ctx: IContext
   ) {
@@ -268,7 +269,7 @@ export class RootResolver {
         firstIpAddress: ipAddress,
         lastIpAddress: ipAddress,
         firebaseToken: firebaseToken,
-        name: 'test', // NEED device name
+        name: deviceName,
         userId: user.id,
         loginSecret: uuidv4()
       }

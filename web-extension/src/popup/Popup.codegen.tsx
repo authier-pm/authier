@@ -11,7 +11,7 @@ export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SettingsQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } }> };
+export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
 
 export type SaveEncryptedSecretsMutationVariables = Types.Exact<{
   payload: Types.Scalars['String'];
@@ -19,7 +19,7 @@ export type SaveEncryptedSecretsMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveEncryptedSecretsMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', saveEncryptedSecrets: { __typename?: 'EncryptedSecrets', encrypted: string } }> };
+export type SaveEncryptedSecretsMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', saveEncryptedSecrets: { __typename?: 'EncryptedSecrets', encrypted: string } } | null | undefined };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -37,7 +37,7 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me?: Types.Maybe<{ __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } }> };
+export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'Device', id: number } } | null | undefined };
 
 
 export const IsLoggedInDocument = gql`

@@ -93,7 +93,7 @@ type Mutation {
   """you need to be authenticated to call this resolver"""
   me: UserMutation
   addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
-  register(firebaseToken: String!, password: String!, email: String!): LoginResponse!
+  register(firebaseToken: String!, deviceName: String!, password: String!, email: String!): LoginResponse!
   login(password: String!, email: String!): LoginResponse
   logout: Boolean
   addWebInputs(webInputs: [WebInputElement!]!): [WebInput!]!
