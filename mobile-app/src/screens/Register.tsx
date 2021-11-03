@@ -12,7 +12,7 @@ import {
 import React, { useContext } from 'react'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 import { UserContext } from '../providers/UserProvider'
-import { useRegisterMutation } from './Register.codegen'
+import { useRegisterMutation } from '../../../shared/Register.codegen'
 
 interface MyFormValues {
   email: string
@@ -40,7 +40,8 @@ export function Register({ navigation }) {
             variables: {
               email: values.email,
               password: values.password,
-              firebaseToken: token as string
+              firebaseToken: token as string,
+              deviceName: 'Mobile' // TODO get device name from react native
             }
           })
 
