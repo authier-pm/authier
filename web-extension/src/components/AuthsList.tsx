@@ -1,4 +1,10 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState
+} from 'react'
 import Chakra, {
   Avatar,
   Box,
@@ -35,6 +41,7 @@ import RemoveAlertDialog from './RemoveAlertDialog'
 import { UserContext } from '@src/providers/UserProvider'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import debug from 'debug'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 const log = debug('au:AuthsList')
 
 enum Values {
@@ -176,15 +183,13 @@ const LoginCredentialsListItem = ({
     </Flex>
   )
 }
-
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const [changeList, setChangeList] = useState<Values>(Values.TOTP)
-
   const { backgroundState } = useContext(BackgroundContext)
+  console.log('~ backgroundState424', backgroundState)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
   // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
-
+  const [_, forceUpdate] = useReducer((x) => x + 1, 0)
   useEffect(() => {
     getCurrentTab().then((tab) => {
       log('~ tab?.url', tab?.url)

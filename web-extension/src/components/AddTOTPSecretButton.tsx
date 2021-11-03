@@ -16,7 +16,7 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 
 export const AddTOTPSecretButton: React.FC<{}> = () => {
-  const { backgroundState, saveTOTPSecrets } = useContext(BackgroundContext)
+  const { backgroundState, forceUpdate } = useContext(BackgroundContext)
 
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
@@ -25,7 +25,6 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
       return
     }
 
-    console.log('test', backgroundState.totpSecrets)
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = backgroundState.totpSecrets.find(
       ({ secret }) => newTotpSecret.secret === secret
@@ -33,11 +32,11 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
-      browser.runtime.sendMessage({
+      await browser.runtime.sendMessage({
         action: BackgroundMessageType.addTOTPSecret,
         payload: newTotpSecret
       })
-
+      forceUpdate()
       toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
     }
   }
