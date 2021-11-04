@@ -18,6 +18,9 @@
   "resolutions": {
     "graphql": "^15.7.2"
   },
+  "optionalDependencies": {
+    "contrib-locs": "^0.1.7"
+  },
   "devDependencies": {
     "@apollo/client": "^3.4.16",
     "@chakra-ui/react": "^1.6.12",
@@ -32,6 +35,9 @@
     "@graphql-codegen/typescript-react-apollo": "^3.2.0",
     "@types/jest": "^27.0.2",
     "framer-motion": "^4.1.17",
+    "husky": "^7.0.4",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-toastify": "^8.1.0",

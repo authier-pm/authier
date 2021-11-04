@@ -1,0 +1,20 @@
+{
+    "lastCommit": "b3fdb65",
+    "updatedAt": "2021-11-04T19:18:42.352Z",
+    "contributors": [
+        {
+            "email": "capajj@gmail.com",
+            "loc": 32688,
+            "total_additions": 19857,
+            "total_deletions": 12831,
+            "percentageOfTotal": 50.860432550178935
+        },
+        {
+            "email": "petrik.spac@gmail.com",
+            "loc": 31582,
+            "total_additions": 20930,
+            "total_deletions": 10652,
+            "percentageOfTotal": 49.13956744982107
+        }
+    ]
+}
