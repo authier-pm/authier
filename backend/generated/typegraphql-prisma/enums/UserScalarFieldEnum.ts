@@ -6,6 +6,7 @@ export enum UserScalarFieldEnum {
   passwordHash = "passwordHash",
   tokenVersion = "tokenVersion",
   name = "name",
+  loginSecret = "loginSecret",
   createdAt = "createdAt",
   updatedAt = "updatedAt",
   masterDeviceId = "masterDeviceId",
