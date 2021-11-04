@@ -2461,10 +2461,10 @@ constant-case@^3.0.4:
     tslib "^2.0.3"
     upper-case "^2.0.2"
 
-contrib-locs@^0.1.7:
-  version "0.1.7"
-  resolved "https://registry.yarnpkg.com/contrib-locs/-/contrib-locs-0.1.7.tgz#6b873dff4eb3159b2d02be68ab1669d7220ad142"
-  integrity sha512-578WKCKPI8fHgVC1QDb6oiGANM4qdvFISq+fZuaqM1X91D1ts7d7dYtOZbciZMM798JbYCTHPvnfLUgoPVV+dg==
+contrib-locs@^0.1.8:
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/contrib-locs/-/contrib-locs-0.1.8.tgz#60b9ac555ba211db26d255abedb5727078525de6"
+  integrity sha512-jOIduWrY2lr6bVC1WMndA0kSQZihiR1yzNinGQ0OsRtUfvVbmkhaxg7SGpiyJljze9Zmq8ZknsuH27vn7dLe9w==
   dependencies:
     "@types/source-map-support" "^0.5.4"
     chalk "^4.1.2"
