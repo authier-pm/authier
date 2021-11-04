@@ -20,7 +20,6 @@ export type Device = {
   firstIpAddress: Scalars['String'];
   id: Scalars['Int'];
   lastIpAddress: Scalars['String'];
-  loginSecret: Scalars['String'];
   name: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
   syncTOTP: Scalars['Boolean'];
@@ -152,6 +151,7 @@ export type User = {
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
+  loginSecret?: Maybe<Scalars['String']>;
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
@@ -166,6 +166,7 @@ export type UserAfterAuth = {
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
+  loginSecret?: Maybe<Scalars['String']>;
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
@@ -181,6 +182,7 @@ export type UserMutation = {
   email?: Maybe<Scalars['String']>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
+  loginSecret?: Maybe<Scalars['String']>;
   masterDeviceId?: Maybe<Scalars['Int']>;
   name?: Maybe<Scalars['String']>;
   revokeRefreshTokensForUser: User;
@@ -230,6 +232,7 @@ export type UserQuery = {
   encryptedSecrets: Array<EncryptedSecrets>;
   id: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
+  loginSecret?: Maybe<Scalars['String']>;
   masterDeviceId?: Maybe<Scalars['Int']>;
   myDevices: Array<Device>;
   name?: Maybe<Scalars['String']>;

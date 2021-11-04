@@ -78,8 +78,7 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60,
-        loginSecret: uuidv4()
+        vaultLockTimeoutSeconds: 60
       }
     })
   }
