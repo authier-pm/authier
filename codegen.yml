@@ -21,9 +21,11 @@ generates:
       extension: .codegen.tsx
       baseTypesPath: graphqlBaseTypes
 
-  ./graphql.schema.json:
+  shared/generated/graphqlSchemaFragments.ts:
     plugins:
-      - 'introspection'
+      - fragment-matcher
+      - add:
+          content: '// @ts-nocheck THIS IS A GENERATED FILE, DO NOT EDIT'
 
 config:
   withHooks: true
