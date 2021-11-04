@@ -1,0 +1,3 @@
+{
+  match: ['**/*.{yml,yaml,md,ts,tsx,js,sql,gql}']
+}
