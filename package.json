@@ -19,7 +19,7 @@
     "graphql": "^15.7.2"
   },
   "optionalDependencies": {
-    "contrib-locs": "^0.1.7"
+    "contrib-locs": "^0.1.8"
   },
   "devDependencies": {
     "@apollo/client": "^3.4.16",
