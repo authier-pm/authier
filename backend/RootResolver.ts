@@ -1,3 +1,4 @@
+import { isAuth } from './isAuth'
 import {
   Query,
   //   Mutation,
@@ -27,7 +28,6 @@ import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { v4 as uuidv4 } from 'uuid'
 import debug from 'debug'
-import { isAuth } from './isAuth'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -56,6 +56,22 @@ admin.initializeApp({
 
 @Resolver()
 export class RootResolver {
+  @Query(() => UserQuery, { nullable: true })
+  @Mutation(() => UserMutation, { nullable: true })
+  async user(@Arg('userId', () => String) userId: string) {
+    const user = await prisma.user.findFirst({
+      where: {
+        id: userId
+      },
+      include: {
+        Devices: true,
+        EncryptedSecrets: true
+      }
+    })
+
+    return user
+  }
+
   @Query(() => Boolean, {
     description: 'you need to be authenticated to call this resolver'
   })
@@ -81,6 +97,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
@@ -99,10 +116,10 @@ export class RootResolver {
   }
 
   //TODO query for info about user
+  @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
   async me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
-    console.log(jwtPayload)
     if (jwtPayload) {
       return prisma.user.findUnique({
         where: { id: jwtPayload?.userId }
@@ -110,6 +127,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => Device)
   async addDevice(
     @Arg('name', () => String) name: string,
@@ -131,6 +149,7 @@ export class RootResolver {
     })
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendAuthMessage(
     @Arg('userId', () => String) userId: string,
@@ -178,6 +197,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendConfirmation(
     @Arg('userId', () => String) userId: string,
@@ -318,6 +338,7 @@ export class RootResolver {
     }
   }
 
+  @UseMiddleware(isAuth)
   @Mutation(() => Boolean, { nullable: true })
   async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
