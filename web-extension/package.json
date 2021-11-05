@@ -51,7 +51,6 @@
     "eslint-plugin-react": "^7.26.0",
     "firebase": "9.1.0",
     "gqlSchemas": "file:../backend/schemas",
-    "husky": "^7.0.2",
     "jest": "^27.2.2",
     "jest-css-modules": "^2.1.0",
     "js-file-download": "^0.4.12",
@@ -119,10 +118,5 @@
     "string-to-arraybuffer": "^1.0.2",
     "webextension-polyfill": "^0.8.0",
     "wouter": "^2.7.5"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "pretty-quick --staged"
-    }
   }
 }
