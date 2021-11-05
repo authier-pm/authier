@@ -2,7 +2,7 @@
   "name": "authier-frontend",
   "version": "0.1.0",
   "private": true,
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "dev": "next dev -p 5450",
     "build": "next build",

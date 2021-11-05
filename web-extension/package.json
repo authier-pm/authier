@@ -2,7 +2,7 @@
   "name": "authier-web-extension",
   "version": "0.0.1",
   "description": "A Chrome Extension starter kit built with React, TypeScript, SCSS, Bootstrap, EsLint, Prettier & Webpack",
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "scripts": {
     "prodbuild": "API_URL=https://api.authier.ml/graphql webpack --config webpack.prod.js",
     "dev": "webpack -w --config webpack.dev.js",
