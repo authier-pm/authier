@@ -2,7 +2,7 @@
   "name": "authier-backend",
   "version": "1.0.0",
   "main": "index.js",
-  "license": "AGPLv3",
+  "license": "AGPL-3.0-or-later",
   "dependencies": {
     "@prisma/client": "^3.1.1",
     "@react-native-firebase/app": "^12.9.0",
