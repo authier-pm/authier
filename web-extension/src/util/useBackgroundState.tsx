@@ -1,14 +1,23 @@
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-import { useState, useEffect, useContext } from 'react'
-import { browser } from 'webextension-polyfill-ts'
+import { useState, useEffect, useContext, useReducer } from 'react'
+import browser from 'webextension-polyfill'
 import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
 
 import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/Security'
+import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
+import { useSettingsQuery } from '@src/popup/Popup.codegen'
+import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import {
+  EncryptedSecrets,
+  EncryptedSecretsType
+} from '../../../shared/generated/graphqlBaseTypes'
+import cryptoJS from 'crypto-js'
+import { toast } from 'react-toastify'
+import { omit } from 'lodash'
 
 export interface ITOTPSecret {
   secret: string
@@ -20,41 +29,53 @@ export interface ITOTPSecret {
 
 export interface ILoginCredentials {
   label: string
-  icon: string | undefined
+  favIconUrl: string | undefined
   lastUsed?: Date | null
   originalUrl: string
   password: string
   username: string
 }
-export interface SecuritySettings {
+export interface ISecuritySettings {
   vaultLockTime: number
   noHandsLogin: boolean
 }
 
-export interface SecuritySettingsInBg {
+export interface ISecuritySettingsInBg {
   vaultTime: number
   noHandsLogin: boolean
 }
 
 let registered = false // we need to only register once
 
+const { AES, enc } = cryptoJS
+
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-  const [masterPassword, setMasterPassword] = useState<string>('')
+  const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
+  const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
-  const [bgAuths, setBgAuths] = useState<ITOTPSecret[]>([])
+
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
-  const [bgPasswords, setBgPasswords] = useState<ILoginCredentials[]>([])
-  const [securityConfig, setSecurityConfig] = useState<SecuritySettings>({
-    noHandsLogin: false,
-    vaultLockTime: vaultLockTimeOptions[2].value
-  })
+  const [backgroundState, setBackgroundState] =
+    useState<IBackgroundStateSerializable | null>(null)
+
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
   })
-  const [updateSettings, { data, loading, error }] = useUpdateSettingsMutation()
+  const [updateSettings] = useUpdateSettingsMutation()
+  console.log('~ backgroundState', backgroundState)
+
+  useEffect(() => {
+    ;(async () => {
+      if (backgroundState) {
+        await browser.storage.local.set({
+          backgroundState
+        })
+      }
+    })()
+  }, [backgroundState])
 
   //TODO move this whole thing into it' own hook
   useEffect(() => {
@@ -62,75 +83,11 @@ export function useBackgroundState() {
       return
     }
     registered = true
-    console.log('useEffect registering!!')
-
-    //Get auth from bg
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getAuths },
-      (res: { auths: Array<ITOTPSecret> }) => {
-        if (res && res.auths) {
-          setBgAuths(res.auths)
-          console.log('got from BG', res.auths)
-        }
-      }
-    )
-
-    //Get passwords from bg
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getCredentials },
-      (res: { passwords: Array<ILoginCredentials> }) => {
-        if (res && res.passwords) {
-          setBgPasswords(res.passwords)
-          console.log('passwords', res.passwords)
-        }
-      }
-    )
-
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.wasClosed },
-      (res: { wasClosed: Boolean }) => {
-        if (res.wasClosed) {
-          setSafeLocked(true)
-        }
-      }
-    )
-
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getSecuritySettings },
-      (res: { config: SecuritySettingsInBg }) => {
-        if (res && res.config) {
-          setSecurityConfig({
-            noHandsLogin: res.config.noHandsLogin,
-            vaultLockTime: res.config.vaultTime
-          })
-        }
-      }
-    )
-
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getUISettings },
-      (res: { config: UISettings }) => {
-        if (res.config) {
-          setUIConfig(res.config)
-        }
-      }
-    )
-
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.setMasterPassword },
-      (res: { config: { masterPsw: string } }) => {
-        if (res.config) {
-          setMasterPassword(res.config.masterPsw)
-        }
-      }
-    )
-
-    //CHange to switch
     browser.runtime.onMessage.addListener(function (request: {
       message: SharedBrowserEvents
       url: any
     }) {
-      console.log(request)
+      console.log('onMessage', request)
       // listen for messages sent from background.js
       if (request.message === SharedBrowserEvents.URL_CHANGED) {
         setCurrentURL(request.url)
@@ -148,66 +105,135 @@ export function useBackgroundState() {
           setIsFilling(true)
         } else if (request.safe === 'closed') {
           setSafeLocked(true)
-        } else if (request.passwords) {
-          setBgPasswords(request.passwords)
         }
       }
     )
   }, [])
 
-  const backgroundState = {
+  // handle background state refresh
+  useEffect(() => {
+    browser.runtime
+      .sendMessage({ action: BackgroundMessageType.getBackgroundState })
+      .then((res: { backgroundState: IBackgroundStateSerializable }) => {
+        if (res && res.backgroundState) {
+          setBackgroundState(res.backgroundState)
+        }
+      })
+  }, [refreshCount])
+
+  const getCryptoOptions = () => {
+    if (!backgroundState) {
+      throw new Error('No background state')
+    }
+
+    return {
+      iv: enc.Utf8.parse(backgroundState.userId)
+    }
+  }
+
+  const backgroundStateContext = {
     currentURL,
     safeLocked,
     setSafeLocked,
     isFilling,
-    loginUser: async (totp: ITOTPSecret[], passwords: ILoginCredentials[]) => {
-      console.log('safe unlocked', passwords, bgPasswords, totp, bgAuths)
-
+    forceUpdate,
+    backgroundState,
+    loginUser: async (
+      masterPassword: string,
+      userId: string,
+      secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
+    ) => {
       setSafeLocked(false)
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.passwords,
-        passwords
-      })
 
-      setBgPasswords(passwords)
+      const decryptAndParse = (
+        data: string,
+        password = masterPassword
+      ): ILoginCredentials[] | ITOTPSecret[] => {
+        try {
+          const decrypted = cryptoJS.AES.decrypt(data, password as string, {
+            iv: cryptoJS.enc.Utf8.parse(userId as string)
+          }).toString(cryptoJS.enc.Utf8)
+          const parsed = JSON.parse(decrypted)
 
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.auths,
-        auths: totp
-      })
-      setBgAuths(totp)
-
-      chrome.runtime.sendMessage(
-        { action: BackgroundMessageType.startCount },
-        (res: { isCounting: Boolean }) => {
-          if (res.isCounting) {
-            setIsCounting(true)
-          }
+          return parsed
+        } catch (err) {
+          console.error(err)
+          toast.error('decryption failed')
+          return []
         }
-      )
-    },
-    savePasswordsToBg: (passwords: ILoginCredentials[]) => {
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.passwords,
-        passwords
+      }
+      let totpSecretsEncrypted
+      let credentialsSecretsEncrypted
+
+      if (secrets.length > 0) {
+        totpSecretsEncrypted = secrets.filter(
+          ({ kind }) => kind === EncryptedSecretsType.TOTP
+        )[0]?.encrypted
+
+        credentialsSecretsEncrypted = secrets.filter(
+          ({ kind }) => kind === EncryptedSecretsType.LOGIN_CREDENTIALS
+        )[0]?.encrypted
+      }
+      const payload: IBackgroundStateSerializable = {
+        masterPassword,
+        userId,
+        secrets,
+        loginCredentials: credentialsSecretsEncrypted
+          ? (decryptAndParse(
+              credentialsSecretsEncrypted,
+              masterPassword
+            ) as ILoginCredentials[])
+          : [],
+        totpSecrets: totpSecretsEncrypted
+          ? (decryptAndParse(
+              totpSecretsEncrypted,
+              masterPassword
+            ) as ITOTPSecret[])
+          : []
+      }
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.setBackgroundState,
+        payload
       })
 
-      setBgPasswords(passwords)
+      setBackgroundState(payload)
     },
-    saveAuthsToBg: (totpSecrets: ITOTPSecret[]) => {
-      console.log('secrets', totpSecrets)
+    saveLoginCredentials: (passwords: ILoginCredentials[]) => {
+      if (backgroundState) {
+        const newBgState = {
+          ...backgroundState,
+          loginCredentials: passwords
+        }
+        browser.runtime.sendMessage({
+          action: BackgroundMessageType.setBackgroundState,
+          payload: newBgState
+        })
+        setBackgroundState(newBgState)
+      }
+    },
+    saveTOTPSecrets: (totpSecrets: ITOTPSecret[]) => {
+      if (backgroundState) {
+        const newBgState = {
+          ...backgroundState,
+          totpSecrets: totpSecrets
+        }
+        browser.runtime.sendMessage({
+          action: BackgroundMessageType.setBackgroundState,
+          payload: newBgState
+        })
+        setBackgroundState(newBgState)
+      }
+    },
 
-      //Maybe save to DB here because when you remove item you must close the popup
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.auths,
-        auths: totpSecrets
+    lockVault: async () => {
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.clear
       })
-      setBgAuths(totpSecrets)
+      setBackgroundState(null)
     },
-    bgAuths,
+
     isCounting,
-    bgPasswords,
-    setSecuritySettings: (config: SecuritySettings) => {
+    setSecuritySettings: (config: ISecuritySettings) => {
       updateSettings({
         variables: {
           lockTime: config.vaultLockTime,
@@ -217,44 +243,46 @@ export function useBackgroundState() {
         }
       })
 
-      setSecurityConfig(config)
+      refetchSettings()
       //Call bg script to save settings to bg
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config
       })
     },
-    securityConfig,
-    setUISettings: (config: UISettings) => {
-      updateSettings({
-        variables: {
-          lockTime: securityConfig.vaultLockTime,
-          noHandsLogin: securityConfig.noHandsLogin,
-          homeUI: config.homeList,
-          twoFA: true //Not added in the settings yet
-        }
-      })
 
+    setUISettings: (config: UISettings) => {
       setUIConfig(config)
 
-      chrome.runtime.sendMessage({
+      browser.runtime.sendMessage({
         action: BackgroundMessageType.UISettings,
         config: config
       })
     },
-    UIConfig,
-    saveMasterPsw: (psw: string) => {
-      chrome.runtime.sendMessage({
-        action: BackgroundMessageType.masterPassword,
-        masterPassword: psw
+    logoutUser: () => {
+      setBackgroundState(null)
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.clear
       })
-
-      setMasterPassword(psw)
     },
-    masterPassword
+    UIConfig,
+    encrypt(data: string, password = backgroundState?.masterPassword): string {
+      return AES.encrypt(
+        data,
+        password as string,
+        getCryptoOptions()
+      ).toString()
+    },
+    decrypt(data: string, password = backgroundState?.masterPassword): string {
+      return AES.decrypt(
+        data,
+        password as string,
+        getCryptoOptions()
+      ).toString()
+    }
   }
 
   // @ts-expect-error
-  window.backgroundState = backgroundState
-  return backgroundState
+  window.backgroundState = backgroundStateContext
+  return backgroundStateContext
 }

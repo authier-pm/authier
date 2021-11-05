@@ -1,6 +1,12 @@
 overwrite: true
 schema: './backend/gqlSchemas/authier.graphql'
-documents: ['mobile-app/**/*.gql', 'web-extension/**/*.gql','frontend/**/*.gql']
+documents:
+  [
+    'mobile-app/**/*.gql',
+    'web-extension/**/*.gql',
+    'frontend/**/*.gql',
+    'shared/**/*.gql'
+  ]
 generates:
   shared/generated/graphqlBaseTypes.ts:
     plugins:
@@ -15,9 +21,11 @@ generates:
       extension: .codegen.tsx
       baseTypesPath: graphqlBaseTypes
 
-  ./graphql.schema.json:
+  shared/generated/graphqlSchemaFragments.ts:
     plugins:
-      - 'introspection'
+      - fragment-matcher
+      - add:
+          content: '// @ts-nocheck THIS IS A GENERATED FILE, DO NOT EDIT'
 
 config:
   withHooks: true

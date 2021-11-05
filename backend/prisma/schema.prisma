@@ -5,8 +5,7 @@ datasource db {
 }
 
 generator client {
-    provider        = "prisma-client-js"
-    previewFeatures = ["selectRelationCount"]
+    provider = "prisma-client-js"
 }
 
 generator typegraphql {
@@ -43,11 +42,12 @@ model EncryptedSecrets {
 }
 
 model Device {
-    id                      Int    @id @default(autoincrement())
-    firstIpAddress          String @db.Inet
-    lastIpAddress           String @db.Inet
+    id                      Int     @id @default(autoincrement())
+    firstIpAddress          String  @db.Inet
+    lastIpAddress           String  @db.Inet
     firebaseToken           String
     name                    String
+    syncTOTP                Boolean @default(true)
     vaultLockTimeoutSeconds Int?
 
 
@@ -114,27 +114,35 @@ model WebInput {
     addedByUser   User           @relation(fields: [addedByUserId], references: [id])
     addedByUserId String         @db.Uuid
     OTPCodeEvent  OTPCodeEvent[]
+
+    @@unique([url, domPath], name: "webInputIdentifier")
 }
 
 model User {
-    id               String             @id @default(uuid()) @db.Uuid
-    email            String?            @unique
+    id                    String    @id @default(uuid()) @db.Uuid
+    email                 String?   @unique
     /// @TypeGraphQL.omit(output: true)
-    passwordHash     String
-    tokenVersion     Int                @default(0)
-    name             String?
-    EncryptedSecrets EncryptedSecrets[]
-    Token            Token[]
-    createdAt        DateTime           @default(now())
-    updatedAt        DateTime?          @updatedAt
-    masterDevice     Device?            @relation("masterDevice", fields: [masterDeviceId], references: [id])
-    masterDeviceId   Int?
+    passwordHash          String
+    tokenVersion          Int       @default(0)
+    name                  String?
+    loginSecret           String?   @unique @db.Uuid // used when user wants to log in on mobile using a QR code displayed in authier extension
+    Token                 Token[]
+    createdAt             DateTime  @default(now())
+    updatedAt             DateTime? @updatedAt
+    masterDevice          Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
+    masterDeviceId        Int?      @unique
+    // Limits for the number of stored secrets
+    TOTPlimit             Int
+    loginCredentialsLimit Int
 
     OTPCodeEvents    OTPCodeEvent[]
+    EncryptedSecrets EncryptedSecrets[]
     Devices          Device[]                       @relation("devices")
     WebInputsAdded   WebInput[]
     EncryptedChanges EncryptedSecretsChangeAction[]
     SettingsConfig   SettingsConfig[]
+    Tags             Tag[]
+    UserPaidProducts UserPaidProducts[]
 }
 
 model Token {
@@ -149,6 +157,17 @@ model Token {
     // Relation fields
     user   User   @relation(fields: [userId], references: [id])
     userId String @db.Uuid
+}
+
+model UserPaidProducts {
+    id                Int       @id @default(autoincrement())
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime? @updatedAt
+    expiresAt         DateTime?
+    productId         String    @unique
+    userId            String    @db.Uuid
+    user              User      @relation(fields: [userId], references: [id])
+    checkoutSessionId String
 }
 
 enum TokenType {
@@ -167,4 +186,12 @@ enum WebInputType {
     EMAIL
     USERNAME_OR_EMAIL
     PASSWORD
+}
+
+model Tag {
+    id        Int      @id @default(autoincrement())
+    name      String
+    createdAt DateTime @default(now())
+    user      User     @relation(fields: [userId], references: [id])
+    userId    String   @db.Uuid
 }

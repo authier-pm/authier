@@ -20,7 +20,7 @@ import browser from 'webextension-polyfill'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { toast } from 'react-toastify'
-import { t } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 
 interface Values {
   password: string
@@ -29,7 +29,11 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { loginUser, saveMasterPsw } = useContext(BackgroundContext)
+  const { loginUser, backgroundState } = useContext(BackgroundContext)
+
+  if (!backgroundState) {
+    return null
+  }
 
   return (
     <Flex flexDirection="column" width="315px" p={4}>
@@ -43,29 +47,12 @@ export function VaultUnlockVerification() {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const storage = await browser.storage.local.get()
-
           try {
-            if (
-              storage.encryptedAuthsMasterPassword &&
-              storage.encryptedPswMasterPassword
-            ) {
-              const decryptedAuths = cryptoJS.AES.decrypt(
-                storage.encryptedAuthsMasterPassword,
-                values.password
-              ).toString(cryptoJS.enc.Utf8)
-
-              const decryptedPsw = cryptoJS.AES.decrypt(
-                storage.encryptedPswMasterPassword,
-                values.password
-              ).toString(cryptoJS.enc.Utf8)
-
-              let parsedTOTP = JSON.parse(decryptedAuths)
-              let parsedPsw = JSON.parse(decryptedPsw)
-
-              loginUser(parsedTOTP, parsedPsw)
-              saveMasterPsw(values.password)
-            }
+            loginUser(
+              values.password,
+              backgroundState.userId,
+              backgroundState.secrets ?? []
+            )
 
             setSubmitting(false)
           } catch (err) {
@@ -113,7 +100,7 @@ export function VaultUnlockVerification() {
               mt={4}
               isLoading={props.isSubmitting}
             >
-              Login
+              <Trans>Unlock vault</Trans>
             </Button>
           </Form>
         )}

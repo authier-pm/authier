@@ -1,16 +1,20 @@
 export enum BackgroundMessageType {
-  getAuths = 'getAuths',
+  getBackgroundState = 'getBackgroundState',
+  setBackgroundState = 'setBackgroundState',
   getFirebaseToken = 'getFirebaseToken',
   wasClosed = 'wasClosed',
-  getCredentials = 'getCredentials',
+  setUserIdAndMasterPassword = 'setUserIdAndMasterPassword',
   startCount = 'startCount',
-  auths = 'auths',
+  loggedIn = 'loggedIn',
   clear = 'clear',
   passwords = 'passwords',
   securitySettings = 'securitySettings',
+  giveSecuritySettings = 'giveSecuritySettings',
+  giveUISettings = 'giveUISettings',
   UISettings = 'UISettings',
-  masterPassword = 'masterPassword',
-  setMasterPassword = 'setMasterPassword',
-  getSecuritySettings = 'getSecuritySettings',
-  getUISettings = 'getUISettings'
+  addLoginCredentials = 'addLoginCredentials',
+  addTOTPSecret = 'addTOTPSecret',
+  getLoginCredentialsModalState = 'getLoginCredentialsModalState',
+  hideLoginCredentialsModal = 'hideLoginCredentialsModal',
+  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown'
 }

@@ -1,27 +1,29 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes'
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+import { gql } from '@apollo/client'
+import * as Apollo from '@apollo/client'
+const defaultOptions = {}
 export type AddOtpEventMutationVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
-  kind: Types.Scalars['String'];
-  url: Types.Scalars['String'];
-}>;
+  kind: Types.Scalars['String']
+  url: Types.Scalars['String']
+}>
 
-
-export type AddOtpEventMutation = (
-  { __typename?: 'Mutation' }
-  & Pick<Types.Mutation, 'addOTPEvent'>
-);
-
+export type AddOtpEventMutation = {
+  __typename?: 'Mutation'
+  me?: { __typename?: 'UserMutation'; addOTPEvent: boolean } | null | undefined
+}
 
 export const AddOtpEventDocument = gql`
-    mutation addOTPEvent($userId: String!, $kind: String!, $url: String!) {
-  addOTPEvent(data: {userId: $userId, kind: $kind, url: $url})
-}
-    `;
-export type AddOtpEventMutationFn = Apollo.MutationFunction<AddOtpEventMutation, AddOtpEventMutationVariables>;
+  mutation addOTPEvent($kind: String!, $url: String!) {
+    me {
+      addOTPEvent(data: { kind: $kind, url: $url })
+    }
+  }
+`
+export type AddOtpEventMutationFn = Apollo.MutationFunction<
+  AddOtpEventMutation,
+  AddOtpEventMutationVariables
+>
 
 /**
  * __useAddOtpEventMutation__
@@ -36,16 +38,29 @@ export type AddOtpEventMutationFn = Apollo.MutationFunction<AddOtpEventMutation,
  * @example
  * const [addOtpEventMutation, { data, loading, error }] = useAddOtpEventMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      kind: // value for 'kind'
  *      url: // value for 'url'
  *   },
  * });
  */
-export function useAddOtpEventMutation(baseOptions?: Apollo.MutationHookOptions<AddOtpEventMutation, AddOtpEventMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddOtpEventMutation, AddOtpEventMutationVariables>(AddOtpEventDocument, options);
-      }
-export type AddOtpEventMutationHookResult = ReturnType<typeof useAddOtpEventMutation>;
-export type AddOtpEventMutationResult = Apollo.MutationResult<AddOtpEventMutation>;
-export type AddOtpEventMutationOptions = Apollo.BaseMutationOptions<AddOtpEventMutation, AddOtpEventMutationVariables>;
+export function useAddOtpEventMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddOtpEventMutation,
+    AddOtpEventMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<AddOtpEventMutation, AddOtpEventMutationVariables>(
+    AddOtpEventDocument,
+    options
+  )
+}
+export type AddOtpEventMutationHookResult = ReturnType<
+  typeof useAddOtpEventMutation
+>
+export type AddOtpEventMutationResult =
+  Apollo.MutationResult<AddOtpEventMutation>
+export type AddOtpEventMutationOptions = Apollo.BaseMutationOptions<
+  AddOtpEventMutation,
+  AddOtpEventMutationVariables
+>

@@ -7,11 +7,15 @@ export let getTokenFromLocalStorage = async (): Promise<string> => {
   return storage['access-token']
 }
 
-export const setAccessToken = (s: string) => {
+export const setAccessToken = async (s: string) => {
   accessToken = s
+  await browser.storage.local.set({
+    'access-token': s
+  })
 }
 
-export const removeToken = () => {
+export const removeToken = async () => {
+  await browser.storage.local.remove('access-token')
   accessToken = ''
 }
 

@@ -2,11 +2,14 @@ import { prisma } from '../prisma'
 import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
-import { EncryptedSecretsType } from '@prisma/client'
+
 import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
 import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
+import { v4 as uuidv4 } from 'uuid'
+import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
+import { OTPEvent } from './models'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -38,6 +41,7 @@ export class UserQuery extends UserBase {
     })
   }
 
+  //Call this from the findFirst query in me??
   @Field(() => SettingsConfig)
   async settings() {
     return prisma.settingsConfig.findFirst({
@@ -48,7 +52,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecrets])
-  async secrets() {
+  async encryptedSecrets() {
     return prisma.encryptedSecrets.findMany({
       where: {
         userId: this.id
@@ -79,32 +83,35 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => EncryptedSecrets)
-  async saveAuths(@Arg('payload', () => String) payload: string) {
-    return prisma.encryptedSecrets.upsert({
-      create: {
-        kind: EncryptedSecretsType.TOTP,
-        encrypted: payload,
-        version: 1,
-        userId: this.id
-      },
-      update: {
-        encrypted: payload
-      },
-      where: {
-        userId_kind: {
+  @Field(() => Boolean)
+  async addOTPEvent(
+    @Arg('data', () => OTPEvent) event: OTPEvent,
+    @Ctx() context: IContext
+  ) {
+    try {
+      await prisma.oTPCodeEvent.create({
+        data: {
+          kind: event.kind,
+          url: event.url,
           userId: this.id,
-          kind: EncryptedSecretsType.TOTP
+          ipAddress: context.getIpAddress()
         }
-      }
-    })
+      })
+      return true
+    } catch (error) {
+      console.log(error)
+      return false
+    }
   }
 
   @Field(() => EncryptedSecrets)
-  async savePasswords(@Arg('payload', () => String) payload: string) {
+  async saveEncryptedSecrets(
+    @Arg('payload', () => String) payload: string,
+    @Arg('kind', () => EncryptedSecretsType) kind: EncryptedSecretsType
+  ) {
     return prisma.encryptedSecrets.upsert({
       create: {
-        kind: EncryptedSecretsType.LOGIN_CREDENTIALS,
+        kind,
         encrypted: payload,
         version: 1,
         userId: this.id
@@ -115,7 +122,7 @@ export class UserMutation extends UserBase {
       where: {
         userId_kind: {
           userId: this.id,
-          kind: EncryptedSecretsType.LOGIN_CREDENTIALS
+          kind
         }
       }
     })

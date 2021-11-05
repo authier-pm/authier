@@ -12,7 +12,7 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { useRegisterMutation } from './Register.codegen'
+import { useRegisterMutation } from '../../../shared/Register.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
@@ -31,6 +31,7 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterMutation()
   const { fireToken } = useContext(UserContext)
+  const { loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
   const { saveMasterPsw } = useContext(BackgroundContext)
 
@@ -49,22 +50,25 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          const countOfDevices = 0
           let res = await register({
             variables: {
               email: values.email,
               password: values.password,
-              firebaseToken: fireToken
+              firebaseToken: fireToken,
+              deviceName: `Chrome extension ${countOfDevices + 1}` // TODO get device name from agent string
             }
           })
+          const registerResult = res.data?.register
 
-          if (res.data?.register.accessToken) {
+          if (registerResult?.accessToken) {
             // is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
               'access-token': res.data?.register.accessToken
             })
-            saveMasterPsw(values.password)
-            setAccessToken(res.data?.register.accessToken as string)
+            setAccessToken(registerResult.accessToken as string)
 
+            loginUser(values.password, registerResult.user.id, [])
             refetch()
 
             setSubmitting(false)

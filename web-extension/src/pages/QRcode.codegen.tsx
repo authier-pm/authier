@@ -1,21 +1,22 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes'
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
-export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
+import { gql } from '@apollo/client'
+import * as Apollo from '@apollo/client'
+const defaultOptions = {}
+export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never }>
 
-
-export type DeviceCountQuery = { __typename?: 'Query', me?: Types.Maybe<{ __typename?: 'UserQuery', devicesCount: number }> };
-
+export type DeviceCountQuery = {
+  __typename?: 'Query'
+  me?: { __typename?: 'UserQuery'; devicesCount: number } | null | undefined
+}
 
 export const DeviceCountDocument = gql`
-    query DeviceCount {
-  me {
-    devicesCount
+  query DeviceCount {
+    me {
+      devicesCount
+    }
   }
-}
-    `;
+`
 
 /**
  * __useDeviceCountQuery__
@@ -32,14 +33,35 @@ export const DeviceCountDocument = gql`
  *   },
  * });
  */
-export function useDeviceCountQuery(baseOptions?: Apollo.QueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
-      }
-export function useDeviceCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
-        }
-export type DeviceCountQueryHookResult = ReturnType<typeof useDeviceCountQuery>;
-export type DeviceCountLazyQueryHookResult = ReturnType<typeof useDeviceCountLazyQuery>;
-export type DeviceCountQueryResult = Apollo.QueryResult<DeviceCountQuery, DeviceCountQueryVariables>;
+export function useDeviceCountQuery(
+  baseOptions?: Apollo.QueryHookOptions<
+    DeviceCountQuery,
+    DeviceCountQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useQuery<DeviceCountQuery, DeviceCountQueryVariables>(
+    DeviceCountDocument,
+    options
+  )
+}
+export function useDeviceCountLazyQuery(
+  baseOptions?: Apollo.LazyQueryHookOptions<
+    DeviceCountQuery,
+    DeviceCountQueryVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useLazyQuery<DeviceCountQuery, DeviceCountQueryVariables>(
+    DeviceCountDocument,
+    options
+  )
+}
+export type DeviceCountQueryHookResult = ReturnType<typeof useDeviceCountQuery>
+export type DeviceCountLazyQueryHookResult = ReturnType<
+  typeof useDeviceCountLazyQuery
+>
+export type DeviceCountQueryResult = Apollo.QueryResult<
+  DeviceCountQuery,
+  DeviceCountQueryVariables
+>

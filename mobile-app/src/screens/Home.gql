@@ -1,0 +1,3 @@
+query sendConfirmation($userId: String!, $success: Boolean!) {
+  sendConfirmation(userId: $userId, success: $success)
+}
