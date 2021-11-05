@@ -16,14 +16,17 @@ import { useLoginMutation } from './Login.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import debug from 'debug'
+
+const log = debug('backgroundPage')
+
 import {
   getUserFromToken,
   setAccessToken,
   getTokenFromLocalStorage
 } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
-import browser from 'webextension-polyfill'
-import { AuthsContext } from '../providers/AuthsProvider'
+
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
@@ -37,13 +40,12 @@ interface Values {
 }
 
 export default function Login(): ReactElement {
-  const { refetch } = useIsLoggedInQuery()
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [login, { data, loading, error }] = useLoginMutation()
+  const [login, { loading }] = useLoginMutation({})
   const { setUserId } = useContext(UserContext)
-  const { setAuths } = useContext(AuthsContext)
-  const { savePasswordsToBg, saveMasterPsw } = useContext(BackgroundContext)
+
+  const { loginUser } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -62,52 +64,20 @@ export default function Login(): ReactElement {
           })
 
           if (response.data?.login?.accessToken) {
-            await browser.storage.local.set({
-              'access-token': response.data.login?.accessToken
-            })
             setAccessToken(response.data.login?.accessToken)
 
             let decodedToken = await getUserFromToken()
-            console.log('~ decodedToken', decodedToken)
+
+            const EncryptedSecrets = response.data.login.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
-            let decryptedAuths = ''
-            let decryptedPasswords = ''
-            console.log('res', response)
-            //@ts-expect-error
-            if (response.data.login.secrets[0] && values.password) {
-              response.data.login?.secrets?.forEach((i) => {
-                if (i.kind === 'TOTP') {
-                  decryptedAuths = cryptoJS.AES.decrypt(
-                    i.encrypted as string,
-                    values.password
-                  ).toString(cryptoJS.enc.Utf8)
-                } else if ('LOGIN_CREDENTIALS') {
-                  decryptedPasswords = cryptoJS.AES.decrypt(
-                    i.encrypted as string,
-                    values.password
-                  ).toString(cryptoJS.enc.Utf8)
-                  console.log(decryptedPasswords)
-                }
-              })
-
-              saveMasterPsw(values.password)
-
-              if (decryptedAuths) {
-                let loadedAuths = await JSON.parse(decryptedAuths)
-                setAuths(loadedAuths)
-              }
-
-              if (decryptedPasswords) {
-                let loadCredentials = await JSON.parse(decryptedPasswords)
-                savePasswordsToBg(loadCredentials)
-              }
-              console.log('decrSecrets', decryptedAuths)
-              console.log('decrSecrets', decryptedPasswords)
-            }
-            refetch()
+            loginUser(
+              values.password,
+              decodedToken.userId,
+              EncryptedSecrets ?? []
+            )
           } else {
-            toast.error(t`Login failed, check your password`)
+            toast.error(t`Login failed, check your username and password`)
           }
 
           setSubmitting(false)

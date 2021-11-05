@@ -20,7 +20,7 @@ import { useMeLazyQuery } from './Vault.codegen'
 import cryptoJS from 'crypto-js'
 import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
-import { AuthsContext } from '@src/providers/AuthsProvider'
+
 import { SettingsIcon, UnlockIcon } from '@chakra-ui/icons'
 import { t } from '@lingui/macro'
 
@@ -92,7 +92,7 @@ function VaultItem({
 export function Vault() {
   const { userId } = useContext(UserContext)
   const { masterPassword, savePasswordsToBg } = useContext(BackgroundContext)
-  const { setAuths } = useContext(AuthsContext)
+
   const [totp, setTotp] = useState<[ITOTPSecret]>()
   const [credentials, setCredentials] = useState<[ILoginCredentials]>()
   const [filterBy, setFilterBy] = useState('')
@@ -106,7 +106,7 @@ export function Vault() {
 
   useEffect(() => {
     if (data && masterPassword) {
-      data?.me?.secrets.forEach((i) => {
+      data?.me?.encryptedSecrets.forEach((i) => {
         if (i.kind === 'TOTP') {
           let loadedAuths = JSON.parse(
             cryptoJS.AES.decrypt(
@@ -115,7 +115,6 @@ export function Vault() {
             ).toString(cryptoJS.enc.Utf8)
           )
           setTotp(loadedAuths)
-          setAuths(loadedAuths)
         } else if ('LOGIN_CREDENTIALS') {
           let loadCredentials = JSON.parse(
             cryptoJS.AES.decrypt(

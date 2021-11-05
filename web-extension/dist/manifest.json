@@ -11,6 +11,12 @@
     "scripts": ["js/backgroundPage.js"],
     "persistent": false
   },
+  "content_scripts": [
+    {
+      "matches": ["*://*/*"],
+      "js": ["js/contentScript.js"]
+    }
+  ],
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
@@ -23,8 +29,8 @@
     "storage",
     "http://*/",
     "https://*/",
-    "system.network",
-    "notifications"
+    "notifications",
+    "<all_urls>"
   ],
   "web_accessible_resources": ["icon-16.png"],
   "content_security_policy": "script-src 'self' https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"

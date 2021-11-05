@@ -2,7 +2,7 @@ import { ChakraProvider } from '@chakra-ui/react'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
 import { Popup } from './popup/Popup'
-import { AuthsProvider } from './providers/AuthsProvider'
+
 import { UserProvider } from './providers/UserProvider'
 import Routes from './Routes'
 import { i18n } from '@lingui/core'
@@ -14,18 +14,15 @@ import { BackgroundProvider } from './providers/BackgroundProvider'
 import { VaultRoutes } from './VaultRoutes'
 
 export default function Providers({ parent }: { parent: string }) {
-  console.log('~ Providers', parent)
   return (
     <ChakraProvider theme={chakraCustomTheme}>
       <BackgroundProvider>
         <UserProvider>
-          <AuthsProvider>
-            <I18nProvider i18n={i18n}>
-              <ToastContainer {...toastifyConfig} />
-              {/* <Routes /> */}
-              {parent === 'vault' ? <VaultRoutes /> : <Routes />}
-            </I18nProvider>
-          </AuthsProvider>
+          <I18nProvider i18n={i18n}>
+            <ToastContainer {...toastifyConfig} />
+            {/* <Routes /> */}
+            {parent === 'vault' ? <VaultRoutes /> : <Routes />}
+          </I18nProvider>
         </UserProvider>
       </BackgroundProvider>
     </ChakraProvider>

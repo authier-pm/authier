@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { ChevronDownIcon } from '@chakra-ui/icons'
-import Security from '@src/components/setting-screens/Security'
+import { SecuritySettings } from '@src/components/setting-screens/SecuritySettings'
 import { SettingsForm } from '@src/components/setting-screens/SettingsForm'
 
 export const Settings = () => {
@@ -34,7 +34,7 @@ export const Settings = () => {
 
       <Box mt={2}>
         {currSett === 'Security' ? (
-          <Security />
+          <SecuritySettings />
         ) : currSett === 'UI' ? (
           <SettingsForm />
         ) : null}

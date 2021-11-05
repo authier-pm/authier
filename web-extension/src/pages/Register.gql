@@ -1,9 +1,0 @@
-mutation Register(
-  $email: String!
-  $password: String!
-  $firebaseToken: String!
-) {
-  register(email: $email, password: $password, firebaseToken: $firebaseToken) {
-    accessToken
-  }
-}

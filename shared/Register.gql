@@ -1,0 +1,24 @@
+mutation Register(
+  $email: String!
+  $password: String!
+  $deviceName: String!
+  $firebaseToken: String!
+) {
+  register(
+    email: $email
+    password: $password
+    deviceName: $deviceName
+    firebaseToken: $firebaseToken
+  ) {
+    accessToken
+
+    user {
+      id
+      EncryptedSecrets {
+        encrypted
+        kind
+        id
+      }
+    }
+  }
+}

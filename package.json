@@ -8,7 +8,7 @@
     "Petr <petrik.spac@gmail.com>",
     "Jiri Spac <capajj@gmail.com>"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-or-later",
   "workspaces": [
     "authier-web-extension",
     "authier-backend",
@@ -16,29 +16,37 @@
     "authier-mobile-app"
   ],
   "resolutions": {
-    "graphql": "^15.5.3"
+    "graphql": "^15.7.2"
+  },
+  "optionalDependencies": {
+    "contrib-locs": "^0.1.8"
   },
   "devDependencies": {
-    "@apollo/client": "^3.4.11",
-    "@chakra-ui/react": "^1.6.7",
-    "@emotion/react": "^11.4.1",
+    "@apollo/client": "^3.4.16",
+    "@chakra-ui/react": "^1.6.12",
+    "@emotion/react": "^11.5.0",
     "@emotion/styled": "^11.3.0",
-    "@graphql-codegen/cli": "2.2.0",
-    "@graphql-codegen/fragment-matcher": "3.1.0",
-    "@graphql-codegen/introspection": "2.1.0",
-    "@graphql-codegen/near-operation-file-preset": "^2.1.4",
-    "@graphql-codegen/typescript": "2.2.2",
-    "@graphql-codegen/typescript-operations": "2.1.4",
-    "@graphql-codegen/typescript-react-apollo": "3.1.4",
-    "@types/jest": "^27.0.1",
+    "@graphql-codegen/cli": "^2.2.2",
+    "@graphql-codegen/fragment-matcher": "^3.2.0",
+    "@graphql-codegen/introspection": "^2.1.0",
+    "@graphql-codegen/near-operation-file-preset": "^2.2.0",
+    "@graphql-codegen/typescript": "^2.3.0",
+    "@graphql-codegen/typescript-operations": "^2.2.0",
+    "@graphql-codegen/typescript-react-apollo": "^3.2.0",
+    "@types/jest": "^27.0.2",
     "framer-motion": "^4.1.17",
+    "husky": "^7.0.4",
+    "prettier": "^2.4.1",
+    "pretty-quick": "^3.1.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
-    "react-toastify": "^8.0.2",
-    "typescript": "^4.4.3"
+    "react-toastify": "^8.1.0",
+    "typescript": "^4.4.4"
   },
   "scripts": {
-    "dev": "cd backend && npm run dev",
+    "devBE": "cd backend && npm run dev",
+    "devFE": "cd frontend && npm run dev",
+    "devEX": "cd web-extension && npm run dev",
     "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd frontend && tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",

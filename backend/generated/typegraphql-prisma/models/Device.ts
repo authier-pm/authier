@@ -1,72 +1,77 @@
-import * as TypeGraphQL from "type-graphql";
-import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "@prisma/client";
-import { DecimalJSScalar } from "../scalars";
-import { EncryptedSecretsChangeAction } from "../models/EncryptedSecretsChangeAction";
-import { User } from "../models/User";
-import { VaultUnlockEvents } from "../models/VaultUnlockEvents";
+import * as TypeGraphQL from 'type-graphql'
+import * as GraphQLScalars from 'graphql-scalars'
+import { Prisma } from '@prisma/client'
+import { DecimalJSScalar } from '../scalars'
+import { EncryptedSecretsChangeAction } from '../models/EncryptedSecretsChangeAction'
+import { User } from '../models/User'
+import { VaultUnlockEvents } from '../models/VaultUnlockEvents'
 
 @TypeGraphQL.ObjectType({
   isAbstract: true
 })
 export class Device {
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
-  id!: number;
+  id!: number
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  firstIpAddress!: string;
+  firstIpAddress!: string
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  lastIpAddress!: string;
+  lastIpAddress!: string
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  firebaseToken!: string;
+  firebaseToken!: string
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  name!: string;
+  name!: string
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => Boolean, {
+    nullable: false
+  })
+  syncTOTP!: boolean
+
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: true
   })
-  vaultLockTimeoutSeconds?: number | null;
+  vaultLockTimeoutSeconds?: number | null
 
-  @TypeGraphQL.Field(_type => Date, {
+  @TypeGraphQL.Field((_type) => Date, {
     nullable: false
   })
-  createdAt!: Date;
+  createdAt!: Date
 
-  @TypeGraphQL.Field(_type => Date, {
+  @TypeGraphQL.Field((_type) => Date, {
     nullable: true
   })
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 
-  @TypeGraphQL.Field(_type => Date, {
+  @TypeGraphQL.Field((_type) => Date, {
     nullable: true
   })
-  registeredWithMasterAt?: Date | null;
+  registeredWithMasterAt?: Date | null
 
-  VaultUnlockEvents?: VaultUnlockEvents[];
+  VaultUnlockEvents?: VaultUnlockEvents[]
 
-  VaultUnlockEventsApproved?: VaultUnlockEvents[];
+  VaultUnlockEventsApproved?: VaultUnlockEvents[]
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  userId!: string;
+  userId!: string
 
-  User?: User;
+  User?: User
 
-  UserMaster?: User | null;
+  UserMaster?: User | null
 
-  EncryptedChanges?: EncryptedSecretsChangeAction[];
+  EncryptedChanges?: EncryptedSecretsChangeAction[]
 }

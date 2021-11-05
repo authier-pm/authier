@@ -1,14 +1,15 @@
 import {
   ITOTPSecret,
   ILoginCredentials,
-  SecuritySettings
+  ISecuritySettings
 } from '@src/util/useBackgroundState'
 import {
+  bgState,
+  clearBgState,
   fireToken,
+  setBgState,
   lockTime,
-  passwords,
-  setLockTime,
-  setPasswords
+  setLockTime
 } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import {
@@ -16,8 +17,17 @@ import {
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
 import browser from 'webextension-polyfill'
+import debug from 'debug'
+import { apolloClient } from '@src/apollo/apolloClient'
+import {
+  AddWebInputsDocument,
+  AddWebInputsMutationFn,
+  AddWebInputsMutationResult,
+  AddWebInputsMutationVariables
+} from './chromeRuntimeListener.codegen'
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
-export let twoFAs: Array<ITOTPSecret> | null | undefined = undefined
+const log = debug('chromeRuntimeListener')
 
 let vaultLockInterval: NodeJS.Timeout | null = null
 let safeClosed = false // Is safe Closed ?
@@ -25,27 +35,125 @@ export let noHandsLogin = false
 let homeList: UIOptions
 let masterPassword: string
 
-//Work on saving settings to DB
+interface ILoginCredentialsFromContentScript {
+  username: string
+  password: string
+  capturedInputEvents: {
+    element: string
+    type: 'input' | 'submit' | 'keydown'
+    kind: WebInputType
+    inputted: string | undefined
+  }[]
+}
 
-chrome.runtime.onMessage.addListener(function (
+const saveLoginModalsStates = new Map<
+  number,
+  { password: string; username: string }
+>()
+
+chrome.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
+    payload: any
     lockTime: number
     config: UISettings
     auths: ITOTPSecret[]
     passwords: ILoginCredentials[]
-    settings: SecuritySettings
-    masterPassword: string
+    settings: ISecuritySettings
   },
   sender,
   sendResponse
 ) {
+  if (req.payload) {
+    log(req.action, req.payload)
+  } else {
+    log(req.action)
+  }
+
+  const tab = sender.tab
+
+  const currentTabId = tab?.id
+
   switch (req.action) {
-    case BackgroundMessageType.getAuths:
-      console.log('sending twoFAs', twoFAs)
-      sendResponse({ auths: twoFAs })
+    case BackgroundMessageType.getBackgroundState:
+      console.log('get backgroundState', bgState)
+
+      sendResponse({
+        backgroundState: bgState
+      })
+      break
+    case BackgroundMessageType.addLoginCredentials:
+      if (!tab) {
+        return
+      }
+      const { url } = tab
+
+      if (!url || !bgState) {
+        return // we can't do anything without a valid url
+      }
+      log('addLoginCredentials', req.payload)
+      const credentials: ILoginCredentialsFromContentScript = req.payload
+
+      bgState.setLoginCredentials([
+        ...bgState.loginCredentials,
+        {
+          username: credentials.username,
+          password: credentials.password,
+          favIconUrl: tab.favIconUrl,
+          originalUrl: url,
+          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+        }
+      ])
+
+      const webInputs = credentials.capturedInputEvents.map((captured) => {
+        return {
+          domPath: captured.element,
+          kind: captured.kind,
+          url: url
+        }
+      })
+      log('webInputs', webInputs)
+      await apolloClient.mutate<
+        AddWebInputsMutationResult,
+        AddWebInputsMutationVariables
+      >({
+        mutation: AddWebInputsDocument,
+        variables: {
+          webInputs
+        }
+      })
+
+      console.log(credentials.capturedInputEvents)
+      break
+    case BackgroundMessageType.addTOTPSecret:
+      if (bgState) {
+        bgState.setTOTPSecrets([
+          ...bgState.totpSecrets,
+          req.payload as ITOTPSecret
+        ])
+      }
+    case BackgroundMessageType.saveLoginCredentialsModalShown:
+      if (currentTabId) {
+        saveLoginModalsStates.set(currentTabId, req.payload)
+      }
+
+      break
+    case BackgroundMessageType.setBackgroundState:
+      setBgState(req.payload)
+      break
+    case BackgroundMessageType.hideLoginCredentialsModal:
+      if (currentTabId) {
+        saveLoginModalsStates.delete(currentTabId)
+      }
+
       break
 
+    case BackgroundMessageType.getLoginCredentialsModalState:
+      if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
+        sendResponse(saveLoginModalsStates.get(currentTabId))
+      }
+
+      break
     case BackgroundMessageType.getFirebaseToken:
       console.log('fireToken in Bg script:', fireToken)
       sendResponse({ t: fireToken })
@@ -56,12 +164,7 @@ chrome.runtime.onMessage.addListener(function (
       sendResponse({ wasClosed: safeClosed })
       break
 
-    case BackgroundMessageType.getCredentials:
-      console.log('sending passwords', passwords)
-      sendResponse({ passwords: passwords })
-      break
-
-    case BackgroundMessageType.getSecuritySettings:
+    case BackgroundMessageType.giveSecuritySettings:
       sendResponse({
         config: {
           vaultTime: lockTime,
@@ -70,27 +173,8 @@ chrome.runtime.onMessage.addListener(function (
       })
       break
 
-    case BackgroundMessageType.getUISettings:
-      sendResponse({
-        config: {
-          homeList: homeList
-        }
-      })
-
-    case BackgroundMessageType.auths:
-      safeClosed = false // ????? What is this why ?
-
-      twoFAs = req.auths
-      console.log('Auths set on', twoFAs)
-      break
-
-    case BackgroundMessageType.passwords:
-      setPasswords(req.passwords)
-      break
-
     case BackgroundMessageType.clear:
-      twoFAs = null
-      setPasswords(null)
+      clearBgState()
       break
 
     case BackgroundMessageType.securitySettings:
@@ -107,18 +191,20 @@ chrome.runtime.onMessage.addListener(function (
       console.log('UIconfig', req.config)
       break
 
-    case BackgroundMessageType.masterPassword:
-      masterPassword = req.masterPassword
-      break
+    // case BackgroundMessageType.masterPassword:
+    //   masterPassword = req.masterPassword
+    //   break
 
-    case BackgroundMessageType.setMasterPassword:
-      sendResponse({ config: { masterPsw: masterPassword } })
-      break
+    // case BackgroundMessageType.setMasterPassword:
+    //   sendResponse({ config: { masterPsw: masterPassword } })
+    //   break
 
     default:
       if (typeof req === 'string') {
         throw new Error(`${req} not supported`)
       }
+
+      return true
   }
 })
 
@@ -136,7 +222,8 @@ browser.runtime.onConnect.addListener(function (externalPort) {
       vaultLockInterval && clearTimeout(vaultLockInterval)
 
       safeClosed = true
-      twoFAs = null
+
+      clearBgState()
       chrome.runtime.sendMessage({ safe: 'closed' })
       console.log('locked', safeClosed)
     }, lockTime)

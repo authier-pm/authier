@@ -1,6 +1,7 @@
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IsLoggedInQuery, useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
+import cryptoJS from 'crypto-js'
 
 import React, {
   useState,
@@ -8,23 +9,49 @@ import React, {
   Dispatch,
   SetStateAction,
   FunctionComponent,
-  useEffect
+  useEffect,
+  useContext
 } from 'react'
 import browser from 'webextension-polyfill'
+import { BackgroundContext } from './BackgroundProvider'
+const { AES, enc } = cryptoJS
 
-export const UserContext = createContext<{
+export type IUserContext = {
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
-  isApiLoggedIn: Boolean
   localStorage: any
   fireToken: string
-}>({} as any)
+}
+
+// const onMessageListener = () =>
+//   new Promise((resolve) => {
+//     onMessage(messaging, (payload) => {
+//       resolve(payload)
+//     })
+//   })
+//   onMessageListener()
+//     .then((payload) => {
+//       console.log(payload)
+//     })
+//     .catch((err) => console.log('failed: ', err))
+
+export const UserContext = createContext<IUserContext>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
-  const { data, loading, error } = useIsLoggedInQuery()
-  const [userId, setUserId] = useState<string | undefined>(undefined)
+  const { backgroundState } = useContext(BackgroundContext)
+  const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
   const [fireToken, setFireToken] = useState<string>('')
+
+  // useEffect(() => {
+  //   chrome.runtime.sendMessage({
+  //     action: BackgroundMessageType.setUserIdAndMasterPassword,
+  //     payload: {
+  //       userId,
+  //       masterPassword
+  //     }
+  //   })
+  // }, [masterPassword, userId])
 
   useEffect(() => {
     async function checkStorage() {
@@ -53,10 +80,13 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     getId()
   }, [])
 
+  const cryptoOptions = {
+    iv: enc.Utf8.parse(userId as string)
+  }
+
   const value = {
     setUserId,
     userId,
-    isApiLoggedIn: !!(data?.authenticated && !loading),
     localStorage,
     fireToken
   }
