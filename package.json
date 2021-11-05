@@ -8,7 +8,7 @@
     "Petr <petrik.spac@gmail.com>",
     "Jiri Spac <capajj@gmail.com>"
   ],
-  "license": "MIT",
+  "license": "AGPLv3",
   "workspaces": [
     "authier-web-extension",
     "authier-backend",
