@@ -8,9 +8,9 @@ import { useIsLoggedInQuery } from './popup/Popup.codegen'
 import { BackgroundContext } from './providers/BackgroundProvider'
 
 export function VaultRoutes(): ReactElement {
-  const { masterPassword } = useContext(BackgroundContext)
+  const { backgroundState } = useContext(BackgroundContext)
 
-  if (!masterPassword) {
+  if (!backgroundState?.masterPassword) {
     return <VaultUnlockVerification />
   }
 

@@ -11,7 +11,7 @@ export default function Pricing() {
         <title>Authier - Pricing</title>
       </Head>
       <Box bgGradient="linear(to-l, teal.100, teal.400)" minH="90vh">
-        <AuPage heading={t`Pricing`}></AuPage>
+        <AuPage heading={t`Pricing`}>Test</AuPage>
       </Box>
     </>
   )

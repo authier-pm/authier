@@ -6,7 +6,6 @@ import { apolloClient } from '../graphql/apolloClient'
 import { ChakraLayout } from './layout/ChakraLayout'
 import { ToastContainer } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
-import { useUseMeQuery } from './layout/useMe.codegen'
 
 function MyApp({ Component, pageProps }) {
   const router = useRouter()

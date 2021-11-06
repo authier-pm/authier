@@ -24,7 +24,6 @@ const httpLink = createHttpLink({
 })
 
 export const apolloClient = new ApolloClient({
-  //@ts-expect-error
   link: ApolloLink.from([errorLink, httpLink]),
   cache: new InMemoryCache(),
   queryDeduplication: true
