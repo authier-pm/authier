@@ -1,23 +1,36 @@
-import { IconButton } from '@chakra-ui/button'
+import { Button, IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { UnlockIcon, SettingsIcon } from '@chakra-ui/icons'
-import { Center, Box, Flex, Text, Image, Input } from '@chakra-ui/react'
+import {
+  Center,
+  Box,
+  Flex,
+  Text,
+  Image,
+  Input,
+  CloseButton,
+  useDisclosure
+} from '@chakra-ui/react'
 import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import React, { useContext, useState } from 'react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
+import { DeleteAlert } from './DeleteAlert'
 
 function VaultItem({
   icon,
   label,
-  data
+  data,
+  deleteItem
 }: {
   label: string
   icon: string | undefined
   data: ILoginCredentials | ITOTPSecret
+  deleteItem: () => void
 }) {
   const [isVisible, setIsVisible] = useState(false)
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <Center py={5} m={['auto', '3']}>
@@ -53,6 +66,22 @@ function VaultItem({
               icon={<UnlockIcon />}
               onClick={() => chrome.tabs.create({ url: data.originalUrl })}
             />
+
+            <CloseButton
+              overflow={'visible'}
+              backgroundColor={'red.400'}
+              _hover={{ backgroundColor: 'red.500' }}
+              position={'absolute'}
+              right="0"
+              top="inherit"
+              onClick={onOpen}
+            />
+
+            <DeleteAlert
+              isOpen={isOpen}
+              onClose={onClose}
+              deleteItem={deleteItem}
+            />
           </Flex>
         </Box>
         <Flex
@@ -85,9 +114,25 @@ function VaultItem({
 }
 
 export const ItemList = () => {
-  const { backgroundState } = useContext(BackgroundContext)
-  const [credentials, setCredentials] = useState<[ILoginCredentials]>()
+  const { backgroundState, saveLoginCredentials, saveTOTPSecrets } =
+    useContext(BackgroundContext)
   const [filterBy, setFilterBy] = useState('')
+
+  const removeLoginCredential = (label: string) => {
+    saveLoginCredentials(
+      backgroundState?.loginCredentials.filter(
+        (item) => item.label !== label
+      ) as ILoginCredentials[]
+    )
+  }
+
+  const removeTOTPSecret = (label: string) => {
+    saveTOTPSecrets(
+      backgroundState?.totpSecrets.filter(
+        (item) => item.label !== label
+      ) as ITOTPSecret[]
+    )
+  }
 
   return (
     <Flex flexDirection="column">
@@ -116,6 +161,7 @@ export const ItemList = () => {
                     icon={el.icon}
                     label={el.label}
                     key={el.label + i}
+                    deleteItem={() => removeTOTPSecret(el.label)}
                   />
                 )
               })}
@@ -132,6 +178,7 @@ export const ItemList = () => {
                     label={el.label}
                     key={el.label + i}
                     data={el}
+                    deleteItem={() => removeLoginCredential(el.label)}
                   />
                 )
               })}

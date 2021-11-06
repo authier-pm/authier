@@ -24,8 +24,7 @@ export function getWebInputKind(
   return (
     (targetElement.type === 'password'
       ? WebInputType.PASSWORD
-      : // @ts-expect-error
-        inputKindMap[targetElement.autocomplete]) ?? null
+      : inputKindMap[targetElement.autocomplete]) ?? null
   )
 }
 

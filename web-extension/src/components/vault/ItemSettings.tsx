@@ -21,7 +21,7 @@ import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
 enum Value {
-  'Too Weak' = 1,
+  'Tooweak' = 1,
   'Weak' = 2,
   'Medium' = 3,
   'Strong' = 4
@@ -50,7 +50,7 @@ export const ItemSettings = ({ data }: any) => {
   const [password, setPassword] = useState<string>(data.password)
   const [secret, setSecret] = useState<string>(data.secret)
   const [levelOfPsw, setLevelOfPsw] = useState<string>(
-    passwordStrength(data.password).value
+    passwordStrength(data.password).value.split(' ').join('')
   )
 
   const { isOpen, onToggle } = useDisclosure()
@@ -61,7 +61,9 @@ export const ItemSettings = ({ data }: any) => {
   }
 
   const handleChangeOriginPassword = (event: any) => {
-    setLevelOfPsw(passwordStrength(event.target.value).value)
+    setLevelOfPsw(
+      passwordStrength(event.target.value).value.split(' ').join('')
+    )
     setPassword(event.target.value)
   }
 
@@ -118,6 +120,7 @@ export const ItemSettings = ({ data }: any) => {
                   colorScheme="green"
                   max={4}
                   mb={1}
+                  defaultValue={0}
                 />
                 <InputGroup size="md">
                   <Input
@@ -143,22 +146,25 @@ export const ItemSettings = ({ data }: any) => {
             size="sm"
             onClick={() => history.goBack()}
           >
-            Cancel
+            Go back
           </Button>
           <Button colorScheme="twitter" size="sm">
             Save
           </Button>
         </Stack>
 
-        <IconButton
-          w="min-content"
-          aria-label="Search database"
-          icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          onClick={onToggle}
-          m={3}
-        />
-
-        <PasswordGenerator isOpen={isOpen} />
+        {!data.secret ? (
+          <>
+            <IconButton
+              w="min-content"
+              aria-label="Search database"
+              icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+              onClick={onToggle}
+              m={3}
+            />
+            <PasswordGenerator isOpen={isOpen} />
+          </>
+        ) : null}
       </Flex>
     </Center>
   )
