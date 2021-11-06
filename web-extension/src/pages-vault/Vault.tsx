@@ -1,24 +1,15 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {
   Box,
   Center,
   Flex,
   Input,
-  Spinner,
   Text,
   Image,
   useColorModeValue,
-  Stack,
-  Heading,
-  Avatar,
   IconButton
 } from '@chakra-ui/react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { UserContext } from '@src/providers/UserProvider'
-
-import { useMeLazyQuery } from './Vault.codegen'
-import cryptoJS from 'crypto-js'
-import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
 import SidebarWithHeader from './SidebarWithHeader'
 
 import { SettingsIcon, UnlockIcon } from '@chakra-ui/icons'
@@ -90,52 +81,9 @@ function VaultItem({
 }
 
 export function Vault() {
-  const { userId } = useContext(UserContext)
-  const { masterPassword, savePasswordsToBg } = useContext(BackgroundContext)
+  const { backgroundState } = useContext(BackgroundContext)
 
-  const [totp, setTotp] = useState<[ITOTPSecret]>()
-  const [credentials, setCredentials] = useState<[ILoginCredentials]>()
   const [filterBy, setFilterBy] = useState('')
-  const [encryptedData, { data, loading, error }] = useMeLazyQuery({})
-
-  useEffect(() => {
-    if (userId) {
-      encryptedData()
-    }
-  }, [userId])
-
-  useEffect(() => {
-    if (data && masterPassword) {
-      data?.me?.encryptedSecrets.forEach((i) => {
-        if (i.kind === 'TOTP') {
-          let loadedAuths = JSON.parse(
-            cryptoJS.AES.decrypt(
-              i.encrypted as string,
-              masterPassword
-            ).toString(cryptoJS.enc.Utf8)
-          )
-          setTotp(loadedAuths)
-        } else if ('LOGIN_CREDENTIALS') {
-          let loadCredentials = JSON.parse(
-            cryptoJS.AES.decrypt(
-              i.encrypted as string,
-              masterPassword
-            ).toString(cryptoJS.enc.Utf8)
-          )
-          setCredentials(loadCredentials)
-          savePasswordsToBg(loadCredentials)
-        }
-      })
-    }
-  }, [data, masterPassword])
-
-  if (loading) {
-    return (
-      <Center>
-        <Spinner size="xl" />
-      </Center>
-    )
-  }
 
   return (
     <SidebarWithHeader>
@@ -151,7 +99,7 @@ export function Vault() {
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap">
-            {totp
+            {backgroundState?.totpSecrets
               ?.filter(({ label, originalUrl }) => {
                 return (
                   label.includes(filterBy) || originalUrl.includes(filterBy)
@@ -166,7 +114,7 @@ export function Vault() {
                   />
                 )
               })}
-            {credentials
+            {backgroundState?.loginCredentials
               ?.filter(({ label, originalUrl }) => {
                 return (
                   label.includes(filterBy) || originalUrl.includes(filterBy)
@@ -175,7 +123,6 @@ export function Vault() {
               .map((el, i) => {
                 return (
                   <VaultItem
-                    //@ts-expect-error
                     icon={el.favIconUrl}
                     label={el.label}
                     key={el.label + i}

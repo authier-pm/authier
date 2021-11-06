@@ -1,24 +1,20 @@
-import { Box, Center, Flex, Input, Text } from '@chakra-ui/react'
+import { Box, Center, Flex, Input } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
-import { useRouter } from 'next/dist/client/router'
 
 import Head from 'next/head'
-import React, { useEffect } from 'react'
-import { useUseMeQuery } from './layout/useMe.codegen'
-import { useEncryptedSecretsLazyQuery } from './vault.codegen'
+import React from 'react'
 
-let test = [
-  {
-    secret: 'JBSWY3DPEHPK3PXP',
-    label: 'bitfinex',
-    icon: 'https://chakra-ui.com/favicon.png'
-  }
-]
+// let test = [
+//   {
+//     secret: 'JBSWY3DPEHPK3PXP',
+//     label: 'bitfinex',
+//     icon: 'https://chakra-ui.com/favicon.png'
+//   }
+// ]
 
 export default function Vault() {
   //const { data: meData, loading: meLoading, error: meError } = useUseMeQuery()
   //const [getSecrets, { data, loading, error }] = useEncryptedSecretsLazyQuery()
-  const router = useRouter()
 
   // useEffect(() => {
   //   if (meData?.me?.id && !meLoading) {

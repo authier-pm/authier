@@ -33,7 +33,6 @@ export default function Register(): ReactElement {
   const { fireToken } = useContext(UserContext)
   const { loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
-  const { saveMasterPsw } = useContext(BackgroundContext)
 
   if (registerError) {
     console.log(registerError)

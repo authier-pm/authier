@@ -1,47 +1,47 @@
-import * as TypeGraphQL from 'type-graphql'
-import * as GraphQLScalars from 'graphql-scalars'
-import { Prisma } from '@prisma/client'
-import { DecimalJSScalar } from '../scalars'
-import { User } from '../models/User'
+import * as TypeGraphQL from "type-graphql";
+import * as GraphQLScalars from "graphql-scalars";
+import { Prisma } from "@prisma/client";
+import { DecimalJSScalar } from "../scalars";
+import { User } from "../models/User";
 
 @TypeGraphQL.ObjectType({
   isAbstract: true
 })
 export class UserPaidProducts {
-  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
+  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
     nullable: false
   })
-  id!: number
+  id!: number;
 
-  @TypeGraphQL.Field((_type) => Date, {
+  @TypeGraphQL.Field(_type => Date, {
     nullable: false
   })
-  createdAt!: Date
+  createdAt!: Date;
 
-  @TypeGraphQL.Field((_type) => Date, {
+  @TypeGraphQL.Field(_type => Date, {
     nullable: true
   })
-  updatedAt?: Date | null
+  updatedAt?: Date | null;
 
-  @TypeGraphQL.Field((_type) => Date, {
+  @TypeGraphQL.Field(_type => Date, {
     nullable: true
   })
-  expiresAt?: Date | null
+  expiresAt?: Date | null;
 
-  @TypeGraphQL.Field((_type) => String, {
+  @TypeGraphQL.Field(_type => String, {
     nullable: false
   })
-  productId!: string
+  productId!: string;
 
-  @TypeGraphQL.Field((_type) => String, {
+  @TypeGraphQL.Field(_type => String, {
     nullable: false
   })
-  userId!: string
+  userId!: string;
 
-  user?: User
+  user?: User;
 
-  @TypeGraphQL.Field((_type) => String, {
+  @TypeGraphQL.Field(_type => String, {
     nullable: false
   })
-  checkoutSessionId!: string
+  checkoutSessionId!: string;
 }
