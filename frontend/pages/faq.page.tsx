@@ -33,6 +33,11 @@ export default function Pricing() {
             We encrypt your secrets with AES-256 encryption. We never send them
             unencrypted anywhere.
           </li>
+          <li>
+            <Heading size="xs">Is it safe to keep both 2FA and login passwords in the same server?</Heading>
+            <br />
+            Yes. Even if our infrastructure is compromised any new device which wants to sync the vault will need approval from the master device. So even if the attacker gets your master password, without the master device they cannot access your secrets.
+          </li>
         </ul>
       </Box>
     </AuPage>
