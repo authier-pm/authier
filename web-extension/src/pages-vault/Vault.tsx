@@ -7,7 +7,7 @@ import { VaultSettings } from './VaultSettings'
 
 export function Vault() {
   const location = useLocation()
-  console.log('test', location)
+
   return (
     <SidebarWithHeader>
       <Switch>
