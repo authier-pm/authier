@@ -8,12 +8,18 @@ import { gqlSchema } from './schemas/gqlSchema'
 import dotenv from 'dotenv'
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prisma } from './prisma'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
+import {
+  jwtPayloadRefreshToken,
+  setNewAccessTokenIntoCookie,
+  setNewRefreshToken
+} from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
 import { IContext } from './RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
+import * as admin from 'firebase-admin'
+import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
@@ -62,9 +68,12 @@ async function main() {
       return reply.send({ ok: false, accessToken: '' })
     }
 
-    let payload: any = null
+    let payload: jwtPayloadRefreshToken | null = null
     try {
-      payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!)
+      payload = verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET!
+      ) as jwtPayloadRefreshToken
     } catch (err) {
       console.log(err)
       return reply
@@ -88,9 +97,9 @@ async function main() {
     }
     const ctx = { request, reply } as IContext
 
-    setNewRefreshToken(user, ctx)
+    setNewRefreshToken(user, payload.deviceId, ctx)
 
-    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, payload.deviceId, ctx)
 
     return reply.send({
       ok: true,
@@ -128,6 +137,11 @@ async function main() {
       errResponse.statusCode = 200 // mercurius returns 500 by default, but we want to use 200 as that aligns better with apollo-server
       return errResponse
     }
+  })
+
+  admin.initializeApp({
+    //@ts-expect-error
+    credential: admin.credential.cert(serviceAccount)
   })
 
   app.listen(process.env.PORT!, '0.0.0.0')

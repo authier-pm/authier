@@ -10,6 +10,7 @@ import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/Encrypt
 import { v4 as uuidv4 } from 'uuid'
 import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
 import { OTPEvent } from './models'
+import * as admin from 'firebase-admin'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -186,5 +187,40 @@ export class UserMutation extends UserBase {
         id: this.id
       }
     })
+  }
+
+  @Field(() => Boolean)
+  async sendConfirmation(
+    @Arg('userId', () => String) userId: string,
+    @Arg('success', () => Boolean) success: Boolean
+  ) {
+    let user = await prisma.user.findFirst({
+      where: {
+        id: userId
+      }
+    })
+
+    let device = await prisma.device.findFirst({
+      where: {
+        id: user?.masterDeviceId
+      }
+    })
+
+    try {
+      await admin.messaging().sendToDevice(
+        device?.firebaseToken as string,
+        {
+          data: {
+            success: success.toString()
+          }
+        },
+        {}
+      )
+
+      return true
+    } catch (err) {
+      console.log(err)
+      return false
+    }
   }
 }

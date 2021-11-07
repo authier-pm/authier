@@ -1,90 +1,90 @@
-import * as TypeGraphQL from "type-graphql";
-import * as GraphQLScalars from "graphql-scalars";
-import { Prisma } from "@prisma/client";
-import { DecimalJSScalar } from "../scalars";
-import { Device } from "../models/Device";
-import { EncryptedSecrets } from "../models/EncryptedSecrets";
-import { EncryptedSecretsChangeAction } from "../models/EncryptedSecretsChangeAction";
-import { OTPCodeEvent } from "../models/OTPCodeEvent";
-import { SettingsConfig } from "../models/SettingsConfig";
-import { Tag } from "../models/Tag";
-import { Token } from "../models/Token";
-import { UserPaidProducts } from "../models/UserPaidProducts";
-import { WebInput } from "../models/WebInput";
+import * as TypeGraphQL from 'type-graphql'
+import * as GraphQLScalars from 'graphql-scalars'
+import { Prisma } from '@prisma/client'
+import { DecimalJSScalar } from '../scalars'
+import { Device } from '../models/Device'
+import { EncryptedSecrets } from '../models/EncryptedSecrets'
+import { EncryptedSecretsChangeAction } from '../models/EncryptedSecretsChangeAction'
+import { OTPCodeEvent } from '../models/OTPCodeEvent'
+import { SettingsConfig } from '../models/SettingsConfig'
+import { Tag } from '../models/Tag'
+import { Token } from '../models/Token'
+import { UserPaidProducts } from '../models/UserPaidProducts'
+import { WebInput } from '../models/WebInput'
 
 @TypeGraphQL.ObjectType({
   isAbstract: true
 })
 export class User {
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  id!: string;
+  id!: string
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: true
   })
-  email?: string | null;
+  email?: string | null
 
-  passwordHash?: string;
+  passwordHash?: string
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
-  tokenVersion!: number;
+  tokenVersion!: number
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: true
   })
-  name?: string | null;
+  username?: string | null
 
-  @TypeGraphQL.Field(_type => String, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: true
   })
-  loginSecret?: string | null;
+  loginSecret?: string | null
 
-  Token?: Token[];
+  Token?: Token[]
 
-  @TypeGraphQL.Field(_type => Date, {
+  @TypeGraphQL.Field((_type) => Date, {
     nullable: false
   })
-  createdAt!: Date;
+  createdAt!: Date
 
-  @TypeGraphQL.Field(_type => Date, {
+  @TypeGraphQL.Field((_type) => Date, {
     nullable: true
   })
-  updatedAt?: Date | null;
+  updatedAt?: Date | null
 
-  masterDevice?: Device | null;
+  masterDevice?: Device | null
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => String, {
     nullable: true
   })
-  masterDeviceId?: number | null;
+  masterDeviceId?: string | null
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
-  TOTPlimit!: number;
+  TOTPlimit!: number
 
-  @TypeGraphQL.Field(_type => TypeGraphQL.Int, {
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
-  loginCredentialsLimit!: number;
+  loginCredentialsLimit!: number
 
-  OTPCodeEvents?: OTPCodeEvent[];
+  OTPCodeEvents?: OTPCodeEvent[]
 
-  EncryptedSecrets?: EncryptedSecrets[];
+  EncryptedSecrets?: EncryptedSecrets[]
 
-  Devices?: Device[];
+  Devices?: Device[]
 
-  WebInputsAdded?: WebInput[];
+  WebInputsAdded?: WebInput[]
 
-  EncryptedChanges?: EncryptedSecretsChangeAction[];
+  EncryptedChanges?: EncryptedSecretsChangeAction[]
 
-  SettingsConfig?: SettingsConfig[];
+  SettingsConfig?: SettingsConfig[]
 
-  Tags?: Tag[];
+  Tags?: Tag[]
 
-  UserPaidProducts?: UserPaidProducts[];
+  UserPaidProducts?: UserPaidProducts[]
 }

@@ -48,6 +48,7 @@ model Device {
     firebaseToken           String
     name                    String
     syncTOTP                Boolean @default(true)
+    ipAddressLock           Boolean @default(false) // when enabled, we check ip address and force new approval from master if the IP changes
     vaultLockTimeoutSeconds Int?
 
 
