@@ -12,7 +12,18 @@ import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 //import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
 
-const log = debug('au:backgroundPage')
+import cryptoJS from 'crypto-js'
+import {
+  SaveSecretsDocument,
+  SaveSecretsMutation,
+  SaveSecretsMutationVariables
+} from './backgroundPage.codegen'
+import {
+  EncryptedSecrets,
+  EncryptedSecretsType
+} from '../../../shared/generated/graphqlBaseTypes'
+
+export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
 
 const firebaseConfig = {
@@ -24,16 +35,6 @@ const firebaseConfig = {
   appId: '1:500382892914:web:6b202f90d6c0c6bcc213eb',
   measurementId: 'G-0W2MW55WVF'
 }
-import cryptoJS from 'crypto-js'
-import {
-  SaveSecretsDocument,
-  SaveSecretsMutation,
-  SaveSecretsMutationVariables
-} from './backgroundPage.codegen'
-import {
-  EncryptedSecrets,
-  EncryptedSecretsType
-} from '../../../shared/generated/graphqlBaseTypes'
 
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)

@@ -16,12 +16,12 @@ generator typegraphql {
 
 model EncryptedSecretsChangeAction {
     id           Int                  @id @default(autoincrement())
-    encrypted    String
+    encrypted    String // encrypted with a device secret. Master device decrypts this and encrypts it with master password
     userId       String               @unique @db.Uuid
     kind         EncryptedSecretsType
     createdAt    DateTime             @default(now())
     processedAt  DateTime? // master device sets this to a timestamp when it adds this change to
-    fromDeviceId Int
+    fromDeviceId String               @db.Uuid
     fromDevice   Device               @relation("fromDevice", fields: [fromDeviceId], references: [id])
     user         User                 @relation(fields: [userId], references: [id])
 }
@@ -42,7 +42,7 @@ model EncryptedSecrets {
 }
 
 model Device {
-    id                      Int     @id @default(autoincrement())
+    id                      String  @id @default(uuid()) @db.Uuid
     firstIpAddress          String  @db.Inet
     lastIpAddress           String  @db.Inet
     firebaseToken           String
@@ -54,6 +54,7 @@ model Device {
     createdAt              DateTime  @default(now())
     updatedAt              DateTime? @updatedAt
     registeredWithMasterAt DateTime?
+    lastSyncAt             DateTime?
 
     VaultUnlockEvents         VaultUnlockEvents[] @relation("device")
     VaultUnlockEventsApproved VaultUnlockEvents[] @relation("approvedFromDevice")
@@ -63,6 +64,9 @@ model Device {
 
     UserMaster       User?                          @relation("masterDevice")
     EncryptedChanges EncryptedSecretsChangeAction[] @relation("fromDevice")
+
+    @@index([updatedAt])
+    @@index([lastSyncAt])
 }
 
 model SettingsConfig {
@@ -96,9 +100,9 @@ model VaultUnlockEvents {
     approvedFromIp String?   @db.Inet
     approvedAt     DateTime?
 
-    deviceId             Int
+    deviceId             String  @db.Uuid
     device               Device  @relation("device", fields: [deviceId], references: [id])
-    approvedFromDeviceId Int? // when non null it means user unlocked by using another device
+    approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
     approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
 
 }
@@ -124,13 +128,13 @@ model User {
     /// @TypeGraphQL.omit(output: true)
     passwordHash          String
     tokenVersion          Int       @default(0)
-    name                  String?
+    username              String?   @unique
     loginSecret           String?   @unique @db.Uuid // used when user wants to log in on mobile using a QR code displayed in authier extension
     Token                 Token[]
     createdAt             DateTime  @default(now())
     updatedAt             DateTime? @updatedAt
     masterDevice          Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
-    masterDeviceId        Int?      @unique
+    masterDeviceId        String?   @unique @db.Uuid
     // Limits for the number of stored secrets
     TOTPlimit             Int
     loginCredentialsLimit Int

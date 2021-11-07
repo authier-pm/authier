@@ -306,6 +306,7 @@ export class RootResolver {
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
+    @Arg('password', () => String, { nullable: true }) deviceId: string,
     @Ctx() ctx: IContext
   ): Promise<LoginResponse | null> {
     const user = await prisma.user.findUnique({

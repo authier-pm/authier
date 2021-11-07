@@ -1,24 +1,23 @@
 {
-  "ignorePaths": [
-    "*/node_modules/**",
-    "*/dist/**"
-  ],
+  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
   "words": [
     "appspot",
     "authier",
     "auths",
     "Authy",
+    "Chakra",
     "Deduplication",
     "Fastify",
     "filenamify",
     "firebaseapp",
     "graphiql",
-    "Chakra",
     "ITOTP",
     "Keychain",
     "mercurius",
     "otplib",
     "Pressable",
+    "QLUUID",
+    "roadmap",
     "stackoverflow",
     "toastify",
     "TOTP",
