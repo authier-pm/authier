@@ -21,12 +21,11 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
-import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import { UserQuery, UserMutation } from './models/User'
 import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
-import { v4 as uuidv4 } from 'uuid'
+import { GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 const log = debug('au:RootResolver')
 
@@ -48,11 +47,6 @@ export interface Payload {
   iat: number
   exp: number
 }
-
-admin.initializeApp({
-  //@ts-expect-error
-  credential: admin.credential.cert(serviceAccount)
-})
 
 @Resolver()
 export class RootResolver {
@@ -197,42 +191,6 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
-  @Query(() => Boolean)
-  async sendConfirmation(
-    @Arg('userId', () => String) userId: string,
-    @Arg('success', () => Boolean) success: Boolean
-  ) {
-    let user = await prisma.user.findFirst({
-      where: {
-        id: userId
-      }
-    })
-
-    let device = await prisma.device.findFirst({
-      where: {
-        id: user?.masterDeviceId as number
-      }
-    })
-
-    try {
-      await admin.messaging().sendToDevice(
-        device?.firebaseToken as string,
-        {
-          data: {
-            success: success.toString()
-          }
-        },
-        {}
-      )
-
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
-    }
-  }
-
   @Mutation(() => LoginResponse)
   async register(
     @Arg('email', () => String) email: string,
@@ -292,9 +250,9 @@ export class RootResolver {
         masterDeviceId: device.id
       }
     })
-    setNewRefreshToken(user, ctx)
+    setNewRefreshToken(user, device.id, ctx)
 
-    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
 
     return {
       accessToken,
@@ -306,7 +264,8 @@ export class RootResolver {
   async login(
     @Arg('email', () => String) email: string,
     @Arg('password', () => String) password: string,
-    @Arg('password', () => String, { nullable: true }) deviceId: string,
+    @Arg('deviceId', () => GraphQLUUID, { description: 'device UUID' })
+    deviceId: string,
     @Ctx() ctx: IContext
   ): Promise<LoginResponse | null> {
     const user = await prisma.user.findUnique({
@@ -329,9 +288,31 @@ export class RootResolver {
       return null
     }
 
+    let device = await prisma.device.findUnique({
+      where: {
+        id: deviceId
+      }
+    })
+
+    if (!device) {
+      const ipAddress = ctx.getIpAddress()
+
+      device = await prisma.device.create({
+        data: {
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
+          firebaseToken: '',
+          name: `unnamed ${new Date().toDateString()}`,
+          userId: user.id
+        }
+      })
+    } else {
+      throw new GraphqlError('Device already exists')
+    }
+
     // //login successful
-    setNewRefreshToken(user, ctx)
-    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
+    setNewRefreshToken(user, device.id, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
 
     return {
       accessToken,
