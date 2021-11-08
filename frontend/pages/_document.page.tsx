@@ -8,6 +8,17 @@ export default class Document extends NextDocument {
       <Html lang="en">
         <Head>
           <link rel="icon" href="/assets/logos/favicon.png" />
+          <style>
+            {`
+            #__next {
+              display: flex;
+              flex-direction: column;
+              height: 100vh;
+              overflow-x: hidden;
+              width: 100%;
+            }
+          `}
+          </style>
         </Head>
         <body>
           <ColorModeScript

@@ -38,7 +38,7 @@ export default function Pricing() {
       <Head>
         <title>Authier - Pricing</title>
       </Head>
-      <Box bgGradient="linear(to-l, teal.100, teal.400)" minH="90vh">
+      <Box bgGradient="linear(to-l, teal.100, teal.400)" height="auto">
         <AuPage heading={t`Pricing`}>
           <Box py={12}>
             <VStack spacing={2} textAlign="center">
@@ -174,6 +174,7 @@ export default function Pricing() {
                   >
                     <Text
                       textTransform="uppercase"
+                      noOfLines={1}
                       bg={useColorModeValue('red.300', 'red.700')}
                       px={3}
                       py={1}
@@ -187,7 +188,7 @@ export default function Pricing() {
                   </Box>
                   <Box py={4} px={12}>
                     <Text fontWeight="500" fontSize="2xl">
-                      Both TOTP and Credentials
+                      TOTP and Credentials
                     </Text>
                     <HStack justifyContent="center">
                       <Text fontSize="3xl" fontWeight="600">
