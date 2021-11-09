@@ -2,50 +2,60 @@ import * as TypeGraphQL from 'type-graphql'
 import * as GraphQLScalars from 'graphql-scalars'
 import { Prisma } from '@prisma/client'
 import { DecimalJSScalar } from '../scalars'
-import { SecretUsageEvent } from '../models/SecretUsageEvent'
+import { Device } from '../models/Device'
+import { EncryptedSecret } from '../models/EncryptedSecret'
 import { User } from '../models/User'
-import { WebInputType } from '../enums/WebInputType'
+import { WebInput } from '../models/WebInput'
 
 @TypeGraphQL.ObjectType({
   isAbstract: true
 })
-export class WebInput {
-  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
+export class SecretUsageEvent {
+  @TypeGraphQL.Field((_type) => GraphQLScalars.BigIntResolver, {
     nullable: false
   })
-  id!: number
+  id!: bigint
 
   @TypeGraphQL.Field((_type) => String, {
-    nullable: true
+    nullable: false
   })
-  layoutType?: string | null
+  kind!: string
 
   @TypeGraphQL.Field((_type) => Date, {
     nullable: false
   })
-  createdAt!: Date
+  timestamp!: Date
+
+  @TypeGraphQL.Field((_type) => String, {
+    nullable: false
+  })
+  ipAddress!: string
 
   @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
   url!: string
 
-  @TypeGraphQL.Field((_type) => WebInputType, {
-    nullable: false
-  })
-  kind!: 'TOTP' | 'USERNAME' | 'EMAIL' | 'USERNAME_OR_EMAIL' | 'PASSWORD'
+  User?: User
 
   @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  domPath!: string
+  userId!: string
 
-  addedByUser?: User
+  Device?: Device
 
   @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  addedByUserId!: string
+  deviceId!: string
 
-  UsageEvents?: SecretUsageEvent[]
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
+    nullable: true
+  })
+  webInputId?: number | null
+
+  WebOTPInput?: WebInput | null
+
+  EncryptedSecret?: EncryptedSecret[]
 }

@@ -3,9 +3,8 @@ import * as GraphQLScalars from 'graphql-scalars'
 import { Prisma } from '@prisma/client'
 import { DecimalJSScalar } from '../scalars'
 import { Device } from '../models/Device'
-import { EncryptedSecrets } from '../models/EncryptedSecrets'
-import { EncryptedSecretsChangeAction } from '../models/EncryptedSecretsChangeAction'
-import { OTPCodeEvent } from '../models/OTPCodeEvent'
+import { EncryptedSecret } from '../models/EncryptedSecret'
+import { SecretUsageEvent } from '../models/SecretUsageEvent'
 import { SettingsConfig } from '../models/SettingsConfig'
 import { Tag } from '../models/Tag'
 import { Token } from '../models/Token'
@@ -26,8 +25,6 @@ export class User {
   })
   email?: string | null
 
-  passwordHash?: string
-
   @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
@@ -38,10 +35,12 @@ export class User {
   })
   username?: string | null
 
+  addDeviceSecret?: string
+
   @TypeGraphQL.Field((_type) => String, {
-    nullable: true
+    nullable: false
   })
-  loginSecret?: string | null
+  addDeviceSecretEncrypted!: string
 
   Token?: Token[]
 
@@ -72,15 +71,13 @@ export class User {
   })
   loginCredentialsLimit!: number
 
-  OTPCodeEvents?: OTPCodeEvent[]
+  UsageEvents?: SecretUsageEvent[]
 
-  EncryptedSecrets?: EncryptedSecrets[]
+  EncryptedSecrets?: EncryptedSecret[]
 
   Devices?: Device[]
 
   WebInputsAdded?: WebInput[]
-
-  EncryptedChanges?: EncryptedSecretsChangeAction[]
 
   SettingsConfig?: SettingsConfig[]
 

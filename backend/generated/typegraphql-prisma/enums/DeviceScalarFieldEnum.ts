@@ -7,11 +7,13 @@ export enum DeviceScalarFieldEnum {
   firebaseToken = 'firebaseToken',
   name = 'name',
   syncTOTP = 'syncTOTP',
+  ipAddressLock = 'ipAddressLock',
   vaultLockTimeoutSeconds = 'vaultLockTimeoutSeconds',
   createdAt = 'createdAt',
   updatedAt = 'updatedAt',
   registeredWithMasterAt = 'registeredWithMasterAt',
   lastSyncAt = 'lastSyncAt',
+  masterPasswordOutdatedAt = 'masterPasswordOutdatedAt',
   userId = 'userId'
 }
 TypeGraphQL.registerEnumType(DeviceScalarFieldEnum, {

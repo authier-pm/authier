@@ -9,7 +9,11 @@ import {
   UseMiddleware
 } from 'type-graphql'
 
-import { EncryptedSecrets, User } from '../generated/typegraphql-prisma'
+import {
+  EncryptedSecret,
+  EncryptedSecretType,
+  User
+} from '../generated/typegraphql-prisma'
 
 @ObjectType()
 export class UserBase {
@@ -37,8 +41,8 @@ export class UserBase {
 
 @ObjectType()
 export class UserAfterAuth extends User {
-  @Field(() => [EncryptedSecrets], { nullable: true })
-  EncryptedSecrets: Array<EncryptedSecrets> | undefined
+  @Field(() => [EncryptedSecret], { nullable: true })
+  EncryptedSecrets: Array<EncryptedSecret> | undefined
 }
 
 @ObjectType()
@@ -52,9 +56,23 @@ export class LoginResponse {
 
 @InputType()
 export class OTPEvent {
-  @Field(() => String)
-  kind: string
+  @Field(() => EncryptedSecretType)
+  kind: EncryptedSecretType
 
   @Field(() => String)
   url: string
+}
+
+@InputType()
+export class EncryptedSecretInput {
+  @Field(() => EncryptedSecretType)
+  kind: EncryptedSecretType
+
+  @Field(() => String)
+  url: string
+
+  @Field(() => String)
+  label: string
+  @Field(() => String)
+  encrypted: string
 }

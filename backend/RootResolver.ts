@@ -22,11 +22,12 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import { UserQuery, UserMutation } from './models/User'
-import { Device, WebInput } from './generated/typegraphql-prisma'
+import { Device, User, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
-import { GraphQLUUID } from 'graphql-scalars'
+import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
+import { RegisterNewDeviceInput } from './models/AuthInputs'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -122,28 +123,6 @@ export class RootResolver {
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => Device)
-  async addDevice(
-    @Arg('name', () => String) name: string,
-    @Arg('userId', () => String) userId: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
-  ) {
-    const ipAddress = context.getIpAddress()
-
-    return prisma.device.create({
-      data: {
-        name: name,
-        firebaseToken: firebaseToken,
-        firstIpAddress: ipAddress,
-        userId: userId,
-        lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
-      }
-    })
-  }
-
-  @UseMiddleware(isAuth)
   @Query(() => Boolean)
   async sendAuthMessage(
     @Arg('userId', () => String) userId: string,
@@ -191,27 +170,46 @@ export class RootResolver {
     }
   }
 
+  setCookiesAndConstructLoginResponse(
+    user: User,
+    device: Device,
+    ctx: IContext
+  ) {
+    setNewRefreshToken(user, device.id, ctx)
+
+    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
+
+    return {
+      accessToken,
+      user
+    }
+  }
+
   @Mutation(() => LoginResponse)
-  async register(
-    @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string,
-    @Arg('deviceName', () => String) deviceName: string,
-    @Arg('firebaseToken', () => String) firebaseToken: string,
+  async registerNewUser(
+    @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
     @Ctx() ctx: IContext
   ) {
-    const hashedPassword = await hash(password, 12)
-
     const ipAddress = ctx.getIpAddress()
-
-    let user
+    const {
+      email,
+      firebaseToken,
+      deviceName,
+      deviceId,
+      addDeviceSecret,
+      addDeviceSecretEncrypted
+    } = input
+    let user: User
 
     try {
       user = await prisma.user.create({
         data: {
           email: email,
-          passwordHash: hashedPassword,
+          addDeviceSecret,
+          addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          TOTPlimit: 4,
+          masterDeviceId: deviceId
         }
       })
     } catch (err: any) {
@@ -223,6 +221,7 @@ export class RootResolver {
 
     let device = await prisma.device.create({
       data: {
+        id: deviceId,
         firstIpAddress: ipAddress,
         lastIpAddress: ipAddress,
         firebaseToken: firebaseToken,
@@ -250,78 +249,73 @@ export class RootResolver {
         masterDeviceId: device.id
       }
     })
-    setNewRefreshToken(user, device.id, ctx)
-
-    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
-
-    return {
-      accessToken,
-      user
-    }
+    return this.setCookiesAndConstructLoginResponse(user, device, ctx)
   }
 
-  @Mutation(() => LoginResponse, { nullable: true })
-  async login(
-    @Arg('email', () => String) email: string,
-    @Arg('password', () => String) password: string,
-    @Arg('deviceId', () => GraphQLUUID, { description: 'device UUID' })
-    deviceId: string,
+  @Mutation(() => LoginResponse)
+  async addNewDeviceForUser(
+    @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
+    @Arg('currentAddDeviceSecret', () => String) currentAddDeviceSecret: string,
+
     @Ctx() ctx: IContext
-  ): Promise<LoginResponse | null> {
+  ) {
     const user = await prisma.user.findUnique({
-      where: {
-        email: email
-      },
-      include: {
-        EncryptedSecrets: true
-      }
+      where: { email: input.email }
     })
+
     if (!user) {
-      console.log('Could not find user')
-      return null
-    }
-    console.log(user?.EncryptedSecrets)
-
-    const valid = await compare(password, user.passwordHash)
-
-    if (!valid) {
-      return null
+      throw new GraphqlError('User not found')
     }
 
-    let device = await prisma.device.findUnique({
+    if (user?.addDeviceSecret !== currentAddDeviceSecret) {
+      // TODO rate limit these attempts
+      throw new GraphqlError('Wrong master password used')
+    }
+
+    await prisma.user.update({
+      data: {
+        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
+      },
       where: {
-        id: deviceId
+        id: user.id
       }
     })
 
-    if (!device) {
-      const ipAddress = ctx.getIpAddress()
+    const { firebaseToken, deviceName, deviceId } = input
+    const ipAddress = ctx.getIpAddress()
 
-      device = await prisma.device.create({
-        data: {
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: '',
-          name: `unnamed ${new Date().toDateString()}`,
-          userId: user.id
-        }
-      })
-    } else {
-      throw new GraphqlError('Device already exists')
-    }
+    const device = await prisma.device.create({
+      data: {
+        id: deviceId,
+        firstIpAddress: ipAddress,
+        lastIpAddress: ipAddress,
+        firebaseToken: firebaseToken,
+        name: deviceName,
+        userId: user.id
+      }
+    })
 
-    // //login successful
-    setNewRefreshToken(user, device.id, ctx)
-    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
+    return this.setCookiesAndConstructLoginResponse(user, device, ctx)
+  }
 
-    return {
-      accessToken,
-      user
-    }
+  // TODO rate limit this per IP
+  @Query(() => [WebInput], { description: 'returns a decryption challenge' })
+  async deviceDecryptionChallenge(
+    @Arg('email', () => GraphQLEmailAddress) email: string
+  ) {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      select: { addDeviceSecretEncrypted: true }
+    })
+    return user?.addDeviceSecretEncrypted
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => Boolean, { nullable: true })
+  @Mutation(() => Boolean, {
+    nullable: true,
+    description: 'removes current device'
+  })
   async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')

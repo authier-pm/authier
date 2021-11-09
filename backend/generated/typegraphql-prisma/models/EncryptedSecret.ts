@@ -2,14 +2,14 @@ import * as TypeGraphQL from 'type-graphql'
 import * as GraphQLScalars from 'graphql-scalars'
 import { Prisma } from '@prisma/client'
 import { DecimalJSScalar } from '../scalars'
-import { Device } from '../models/Device'
+import { SecretUsageEvent } from '../models/SecretUsageEvent'
 import { User } from '../models/User'
-import { EncryptedSecretsType } from '../enums/EncryptedSecretsType'
+import { EncryptedSecretType } from '../enums/EncryptedSecretType'
 
 @TypeGraphQL.ObjectType({
   isAbstract: true
 })
-export class EncryptedSecretsChangeAction {
+export class EncryptedSecret {
   @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: false
   })
@@ -20,12 +20,17 @@ export class EncryptedSecretsChangeAction {
   })
   encrypted!: string
 
+  @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
+    nullable: false
+  })
+  version!: number
+
   @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
   userId!: string
 
-  @TypeGraphQL.Field((_type) => EncryptedSecretsType, {
+  @TypeGraphQL.Field((_type) => EncryptedSecretType, {
     nullable: false
   })
   kind!: 'TOTP' | 'LOGIN_CREDENTIALS'
@@ -38,14 +43,29 @@ export class EncryptedSecretsChangeAction {
   @TypeGraphQL.Field((_type) => Date, {
     nullable: true
   })
-  processedAt?: Date | null
+  updatedAt?: Date | null
 
   @TypeGraphQL.Field((_type) => String, {
     nullable: false
   })
-  fromDeviceId!: string
+  url!: string
 
-  fromDevice?: Device
+  @TypeGraphQL.Field((_type) => GraphQLScalars.BigIntResolver, {
+    nullable: true
+  })
+  lastUsageEventId?: bigint | null
+
+  lastUsageEvent?: SecretUsageEvent | null
+
+  @TypeGraphQL.Field((_type) => String, {
+    nullable: true
+  })
+  iconUrl?: string | null
+
+  @TypeGraphQL.Field((_type) => String, {
+    nullable: false
+  })
+  label!: string
 
   user?: User
 }
