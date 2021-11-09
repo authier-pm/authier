@@ -2,35 +2,26 @@
 CREATE TYPE "TokenType" AS ENUM ('EMAIL', 'API');
 
 -- CreateEnum
-CREATE TYPE "EncryptedSecretsType" AS ENUM ('TOTP', 'LOGIN_CREDENTIALS');
+CREATE TYPE "EncryptedSecretType" AS ENUM ('TOTP', 'LOGIN_CREDENTIALS');
 
 -- CreateEnum
 CREATE TYPE "WebInputType" AS ENUM ('TOTP', 'USERNAME', 'EMAIL', 'USERNAME_OR_EMAIL', 'PASSWORD');
 
 -- CreateTable
-CREATE TABLE "EncryptedSecretsChangeAction" (
-    "id" SERIAL NOT NULL,
-    "encrypted" TEXT NOT NULL,
-    "userId" UUID NOT NULL,
-    "kind" "EncryptedSecretsType" NOT NULL,
-    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    "processedAt" TIMESTAMP(3),
-    "fromDeviceId" UUID NOT NULL,
-
-    CONSTRAINT "EncryptedSecretsChangeAction_pkey" PRIMARY KEY ("id")
-);
-
--- CreateTable
-CREATE TABLE "EncryptedSecrets" (
+CREATE TABLE "EncryptedSecret" (
     "id" SERIAL NOT NULL,
     "encrypted" TEXT NOT NULL,
     "version" INTEGER NOT NULL,
     "userId" UUID NOT NULL,
-    "kind" "EncryptedSecretsType" NOT NULL,
+    "kind" "EncryptedSecretType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
+    "url" TEXT NOT NULL,
+    "lastUsageEventId" BIGINT,
+    "iconUrl" TEXT,
+    "label" TEXT NOT NULL,
 
-    CONSTRAINT "EncryptedSecrets_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "EncryptedSecret_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -41,11 +32,13 @@ CREATE TABLE "Device" (
     "firebaseToken" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "syncTOTP" BOOLEAN NOT NULL DEFAULT true,
+    "ipAddressLock" BOOLEAN NOT NULL DEFAULT false,
     "vaultLockTimeoutSeconds" INTEGER,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "registeredWithMasterAt" TIMESTAMP(3),
     "lastSyncAt" TIMESTAMP(3),
+    "masterPasswordOutdatedAt" TIMESTAMP(3),
     "userId" UUID NOT NULL,
 
     CONSTRAINT "Device_pkey" PRIMARY KEY ("id")
@@ -64,16 +57,17 @@ CREATE TABLE "SettingsConfig" (
 );
 
 -- CreateTable
-CREATE TABLE "OTPCodeEvent" (
+CREATE TABLE "SecretUsageEvent" (
     "id" BIGSERIAL NOT NULL,
     "kind" TEXT NOT NULL,
     "timestamp" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "ipAddress" INET NOT NULL,
     "url" TEXT NOT NULL,
     "userId" UUID NOT NULL,
+    "deviceId" UUID NOT NULL,
     "webInputId" INTEGER,
 
-    CONSTRAINT "OTPCodeEvent_pkey" PRIMARY KEY ("id")
+    CONSTRAINT "SecretUsageEvent_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -105,10 +99,10 @@ CREATE TABLE "WebInput" (
 CREATE TABLE "User" (
     "id" UUID NOT NULL,
     "email" TEXT,
-    "passwordHash" TEXT NOT NULL,
     "tokenVersion" INTEGER NOT NULL DEFAULT 0,
     "username" TEXT,
-    "loginSecret" UUID,
+    "addDeviceSecret" TEXT NOT NULL,
+    "addDeviceSecretEncrypted" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3),
     "masterDeviceId" UUID,
@@ -156,12 +150,6 @@ CREATE TABLE "Tag" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "EncryptedSecretsChangeAction_userId_key" ON "EncryptedSecretsChangeAction"("userId");
-
--- CreateIndex
-CREATE UNIQUE INDEX "EncryptedSecrets_userId_kind_key" ON "EncryptedSecrets"("userId", "kind");
-
--- CreateIndex
 CREATE INDEX "Device_updatedAt_idx" ON "Device"("updatedAt");
 
 -- CreateIndex
@@ -180,9 +168,6 @@ CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 CREATE UNIQUE INDEX "User_username_key" ON "User"("username");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "User_loginSecret_key" ON "User"("loginSecret");
-
--- CreateIndex
 CREATE UNIQUE INDEX "User_masterDeviceId_key" ON "User"("masterDeviceId");
 
 -- CreateIndex
@@ -192,13 +177,10 @@ CREATE UNIQUE INDEX "Token_emailToken_key" ON "Token"("emailToken");
 CREATE UNIQUE INDEX "UserPaidProducts_productId_key" ON "UserPaidProducts"("productId");
 
 -- AddForeignKey
-ALTER TABLE "EncryptedSecretsChangeAction" ADD CONSTRAINT "EncryptedSecretsChangeAction_fromDeviceId_fkey" FOREIGN KEY ("fromDeviceId") REFERENCES "Device"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "EncryptedSecret" ADD CONSTRAINT "EncryptedSecret_lastUsageEventId_fkey" FOREIGN KEY ("lastUsageEventId") REFERENCES "SecretUsageEvent"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "EncryptedSecretsChangeAction" ADD CONSTRAINT "EncryptedSecretsChangeAction_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "EncryptedSecrets" ADD CONSTRAINT "EncryptedSecrets_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "EncryptedSecret" ADD CONSTRAINT "EncryptedSecret_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Device" ADD CONSTRAINT "Device_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -207,10 +189,13 @@ ALTER TABLE "Device" ADD CONSTRAINT "Device_userId_fkey" FOREIGN KEY ("userId") 
 ALTER TABLE "SettingsConfig" ADD CONSTRAINT "SettingsConfig_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OTPCodeEvent" ADD CONSTRAINT "OTPCodeEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "OTPCodeEvent" ADD CONSTRAINT "OTPCodeEvent_webInputId_fkey" FOREIGN KEY ("webInputId") REFERENCES "WebInput"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_webInputId_fkey" FOREIGN KEY ("webInputId") REFERENCES "WebInput"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "VaultUnlockEvents" ADD CONSTRAINT "VaultUnlockEvents_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

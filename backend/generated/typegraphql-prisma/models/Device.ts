@@ -2,7 +2,7 @@ import * as TypeGraphQL from 'type-graphql'
 import * as GraphQLScalars from 'graphql-scalars'
 import { Prisma } from '@prisma/client'
 import { DecimalJSScalar } from '../scalars'
-import { EncryptedSecretsChangeAction } from '../models/EncryptedSecretsChangeAction'
+import { SecretUsageEvent } from '../models/SecretUsageEvent'
 import { User } from '../models/User'
 import { VaultUnlockEvents } from '../models/VaultUnlockEvents'
 
@@ -40,6 +40,11 @@ export class Device {
   })
   syncTOTP!: boolean
 
+  @TypeGraphQL.Field((_type) => Boolean, {
+    nullable: false
+  })
+  ipAddressLock!: boolean
+
   @TypeGraphQL.Field((_type) => TypeGraphQL.Int, {
     nullable: true
   })
@@ -65,6 +70,11 @@ export class Device {
   })
   lastSyncAt?: Date | null
 
+  @TypeGraphQL.Field((_type) => Date, {
+    nullable: true
+  })
+  masterPasswordOutdatedAt?: Date | null
+
   VaultUnlockEvents?: VaultUnlockEvents[]
 
   VaultUnlockEventsApproved?: VaultUnlockEvents[]
@@ -78,5 +88,5 @@ export class Device {
 
   UserMaster?: User | null
 
-  EncryptedChanges?: EncryptedSecretsChangeAction[]
+  SecretUsageEvents?: SecretUsageEvent[]
 }

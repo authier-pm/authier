@@ -6,11 +6,18 @@ import { isAuth } from '../isAuth'
 import { User } from '../generated/typegraphql-prisma/models/User'
 import { Device } from '../generated/typegraphql-prisma/models/Device'
 import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
-import { EncryptedSecrets } from '../generated/typegraphql-prisma/models/EncryptedSecrets'
+
 import { v4 as uuidv4 } from 'uuid'
-import { EncryptedSecretsType } from '../generated/typegraphql-prisma/enums'
-import { OTPEvent } from './models'
+import { EncryptedSecretType } from '../generated/typegraphql-prisma/enums'
+import {
+  EncryptedSecretMutation,
+  EncryptedSecretQuery
+} from './EncryptedSecret'
+import { EncryptedSecretInput, LoginResponse, OTPEvent } from './models'
 import * as admin from 'firebase-admin'
+import { RegisterNewDeviceInput } from './AuthInputs'
+import { GraphqlError } from '../api/GraphqlError'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 @ObjectType()
 export class UserBase extends User {}
@@ -52,9 +59,9 @@ export class UserQuery extends UserBase {
     })
   }
 
-  @Field(() => [EncryptedSecrets])
+  @Field(() => [EncryptedSecretQuery])
   async encryptedSecrets() {
-    return prisma.encryptedSecrets.findMany({
+    return prisma.encryptedSecret.findMany({
       where: {
         userId: this.id
       }
@@ -67,6 +74,7 @@ export class UserMutation extends UserBase {
   @Field(() => Device)
   async addDevice(
     @Arg('name', () => String) name: string,
+    @Arg('deviceId', () => String) deviceId: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() context: IContext
   ) {
@@ -75,6 +83,7 @@ export class UserMutation extends UserBase {
     return await prisma.device.create({
       data: {
         name: name,
+        id: deviceId,
         firebaseToken: firebaseToken,
         firstIpAddress: ipAddress,
         userId: this.id,
@@ -84,47 +93,41 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Boolean)
-  async addOTPEvent(
-    @Arg('data', () => OTPEvent) event: OTPEvent,
-    @Ctx() context: IContext
-  ) {
-    try {
-      await prisma.oTPCodeEvent.create({
-        data: {
-          kind: event.kind,
-          url: event.url,
-          userId: this.id,
-          ipAddress: context.getIpAddress()
-        }
-      })
-      return true
-    } catch (error) {
-      console.log(error)
-      return false
-    }
-  }
+  // @Field(() => Boolean)
+  // async createSecretUsageEvent(
+  //   @Arg('data', () => OTPEvent) event: OTPEvent,
+  //   @Ctx() context: IContext
+  // ) {
+  //   try {
+  //     await prisma.secretUsageEvent.create({
+  //       data: {
+  //         kind: event.kind,
+  //         url: event.url,
+  //         deviceId: context.request.
+  //         userId: this.id,
+  //         ipAddress: context.getIpAddress()
+  //       }
+  //     })
+  //     return true
+  //   } catch (error) {
+  //     console.log(error)
+  //     return false
+  //   }
+  // }
 
-  @Field(() => EncryptedSecrets)
-  async saveEncryptedSecrets(
-    @Arg('payload', () => String) payload: string,
-    @Arg('kind', () => EncryptedSecretsType) kind: EncryptedSecretsType
+  @Field(() => EncryptedSecretQuery)
+  async addEncryptedSecret(
+    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput,
+    @Arg('kind', () => EncryptedSecretType) kind: EncryptedSecretType
   ) {
-    return prisma.encryptedSecrets.upsert({
-      create: {
+    return prisma.encryptedSecret.create({
+      data: {
         kind,
-        encrypted: payload,
+        encrypted: payload.encrypted,
         version: 1,
-        userId: this.id
-      },
-      update: {
-        encrypted: payload
-      },
-      where: {
-        userId_kind: {
-          userId: this.id,
-          kind
-        }
+        userId: this.id,
+        url: payload.url,
+        label: payload.label
       }
     })
   }
@@ -199,28 +202,29 @@ export class UserMutation extends UserBase {
         id: userId
       }
     })
+    if (user?.masterDeviceId) {
+      let device = await prisma.device.findFirst({
+        where: {
+          id: user?.masterDeviceId
+        }
+      })
 
-    let device = await prisma.device.findFirst({
-      where: {
-        id: user?.masterDeviceId
+      try {
+        await admin.messaging().sendToDevice(
+          device?.firebaseToken as string,
+          {
+            data: {
+              success: success.toString()
+            }
+          },
+          {}
+        )
+
+        return true
+      } catch (err) {
+        console.log(err)
+        return false
       }
-    })
-
-    try {
-      await admin.messaging().sendToDevice(
-        device?.firebaseToken as string,
-        {
-          data: {
-            success: success.toString()
-          }
-        },
-        {}
-      )
-
-      return true
-    } catch (err) {
-      console.log(err)
-      return false
     }
   }
 }
