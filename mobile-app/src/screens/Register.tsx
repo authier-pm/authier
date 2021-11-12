@@ -44,7 +44,7 @@ export function Register({ navigation }) {
               firebaseToken: token as string
             }
           })
-
+          //Wait for backend and change everyhing
           if (response.data?.register.accessToken) {
             await Keychain.setGenericPassword(values.email, values.password)
             //save accessToken
