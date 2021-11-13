@@ -1,20 +1,27 @@
 {
-    "lastCommit": "e5d3aa7",
-    "updatedAt": "2021-11-13T10:45:16.625Z",
+    "lastCommit": "8ca7013",
+    "updatedAt": "2021-11-13T10:50:02.415Z",
     "contributors": [
         {
             "email": "capajj@gmail.com",
-            "loc": 39421,
-            "total_additions": 23260,
-            "total_deletions": 16161,
-            "percentageOfTotal": 55.520189287776574
+            "loc": 601744,
+            "total_additions": 302091,
+            "total_deletions": 299653,
+            "percentageOfTotal": 61.33579324509589
         },
         {
             "email": "petrik.spac@gmail.com",
-            "loc": 31582,
-            "total_additions": 20930,
-            "total_deletions": 10652,
-            "percentageOfTotal": 44.479810712223426
+            "loc": 379285,
+            "total_additions": 263496,
+            "total_deletions": 115789,
+            "percentageOfTotal": 38.660537273269355
+        },
+        {
+            "email": "49699333+dependabot[bot]@users.noreply.github.com",
+            "loc": 36,
+            "total_additions": 18,
+            "total_deletions": 18,
+            "percentageOfTotal": 0.0036694816347540684
         }
     ]
 }
