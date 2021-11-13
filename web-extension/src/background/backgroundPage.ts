@@ -4,7 +4,11 @@ import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 
-import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
+import {
+  ILoginCredentials,
+  ISecret,
+  ITOTPSecret
+} from '@src/util/useBackgroundState'
 import './chromeRuntimeListener'
 import { SharedBrowserEvents } from './SharedBrowserEvents'
 
@@ -14,13 +18,13 @@ import { apolloClient } from '@src/apollo/apolloClient'
 
 import cryptoJS from 'crypto-js'
 import {
-  SaveSecretsDocument,
-  SaveSecretsMutation,
-  SaveSecretsMutationVariables
+  AddEncryptedSecretDocument,
+  AddEncryptedSecretMutation,
+  AddEncryptedSecretMutationVariables
 } from './backgroundPage.codegen'
 import {
-  EncryptedSecrets,
-  EncryptedSecretsType
+  EncryptedSecret,
+  EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
 
 export const log = debug('au:backgroundPage')
@@ -63,16 +67,11 @@ export interface IBackgroundStateSerializable {
   totpSecrets: ITOTPSecret[]
   userId: string
   masterPassword: string
-  secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
+  secrets: Array<Pick<EncryptedSecret, 'encrypted' | 'kind'>>
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
-  setTOTPSecrets(val: ITOTPSecret[]): void
-  setLoginCredentials(val: ILoginCredentials[]): void
-  saveSecretsToBackend: (
-    input: string,
-    kind: EncryptedSecretsType
-  ) => Promise<void>
+  addSecretOnBackend: (input: ITOTPSecret | ILoginCredentials) => Promise<void>
 }
 
 export let bgState: IBackgroundState | null = null
@@ -82,33 +81,36 @@ export const setBgState = (
 ) => {
   bgState = {
     ...bgStateSerializable,
-    setTOTPSecrets(val: Array<ITOTPSecret>) {
-      this.totpSecrets = val
-      this.saveSecretsToBackend(JSON.stringify(val), EncryptedSecretsType.TOTP)
-    },
-    setLoginCredentials(val: Array<ILoginCredentials>) {
-      this.loginCredentials = val
-      this.saveSecretsToBackend(
-        JSON.stringify(val),
-        EncryptedSecretsType.LOGIN_CREDENTIALS
-      )
-    },
-    async saveSecretsToBackend(input: string, kind: EncryptedSecretsType) {
-      const encrypted = cryptoJS.AES.encrypt(input, this.masterPassword, {
-        iv: cryptoJS.enc.Utf8.parse(this.userId)
-      }).toString()
+
+    async addSecretOnBackend(secret: ITOTPSecret | ILoginCredentials) {
+      const stringToEncrypt =
+        secret.kind === EncryptedSecretType.TOTP
+          ? secret.totp
+          : JSON.stringify(secret.loginCredentials)
+
+      const encrypted = cryptoJS.AES.encrypt(
+        stringToEncrypt,
+        this.masterPassword,
+        {
+          iv: cryptoJS.enc.Utf8.parse(this.userId)
+        }
+      ).toString()
 
       await apolloClient.mutate<
-        SaveSecretsMutation,
-        SaveSecretsMutationVariables
+        AddEncryptedSecretMutation,
+        AddEncryptedSecretMutationVariables
       >({
-        mutation: SaveSecretsDocument,
+        mutation: AddEncryptedSecretDocument,
         variables: {
-          payload: encrypted,
-          kind
+          payload: {
+            encrypted,
+            kind: secret.kind,
+            label: secret.label,
+            url: secret.url
+          }
         }
       })
-      log('saved secrets to backend', kind)
+      log('saved secret to the backend', secret)
     }
   }
   // @ts-expect-error

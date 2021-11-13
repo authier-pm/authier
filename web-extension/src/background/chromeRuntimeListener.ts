@@ -25,7 +25,10 @@ import {
   AddWebInputsMutationResult,
   AddWebInputsMutationVariables
 } from './chromeRuntimeListener.codegen'
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  WebInputType
+} from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('chromeRuntimeListener')
 
@@ -93,16 +96,14 @@ chrome.runtime.onMessage.addListener(async function (
       log('addLoginCredentials', req.payload)
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
-      bgState.setLoginCredentials([
-        ...bgState.loginCredentials,
-        {
-          username: credentials.username,
-          password: credentials.password,
-          favIconUrl: tab.favIconUrl,
-          originalUrl: url,
-          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
-        }
-      ])
+      bgState.addSecretOnBackend({
+        kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+        username: credentials.username,
+        password: credentials.password,
+        favIconUrl: tab.favIconUrl,
+        originalUrl: url,
+        label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+      })
 
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
@@ -126,7 +127,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.addTOTPSecret:
       if (bgState) {
-        bgState.setTOTPSecrets([
+        bgState.addTOTPSecret([
           ...bgState.totpSecrets,
           req.payload as ITOTPSecret
         ])

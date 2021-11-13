@@ -122,54 +122,6 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
-  @Query(() => Boolean)
-  async sendAuthMessage(
-    @Arg('userId', () => String) userId: string,
-    @Arg('location', () => String) location: string,
-    @Arg('time', () => String) time: string,
-    @Arg('device', () => String) device: string,
-    @Arg('pageName', () => String) pageName: string
-  ) {
-    let user = await prisma.user.findFirst({
-      where: {
-        id: userId
-      },
-      include: {
-        Devices: true
-      }
-    })
-
-    if (user) {
-      try {
-        await admin.messaging().sendToDevice(
-          user.Devices[0].firebaseToken, // ['token_1', 'token_2', ...]
-          {
-            data: {
-              userId: userId,
-              location: location,
-              time: time,
-              device: device,
-              pageName: pageName
-            }
-          },
-          {
-            // Required for background/quit data-only messages on iOS
-            contentAvailable: true,
-            // Required for background/quit data-only messages on Android
-            priority: 'high'
-          }
-        )
-        return true
-      } catch (err) {
-        console.log(err)
-        return false
-      }
-    } else {
-      return false
-    }
-  }
-
   setCookiesAndConstructLoginResponse(
     user: User,
     device: Device,
@@ -188,6 +140,7 @@ export class RootResolver {
   @Mutation(() => LoginResponse)
   async registerNewUser(
     @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
+    @Arg('userId', () => GraphQLUUID) userId: string,
     @Ctx() ctx: IContext
   ) {
     const ipAddress = ctx.getIpAddress()
@@ -204,12 +157,12 @@ export class RootResolver {
     try {
       user = await prisma.user.create({
         data: {
+          id: userId,
           email: email,
           addDeviceSecret,
           addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
-          TOTPlimit: 4,
-          masterDeviceId: deviceId
+          TOTPlimit: 4
         }
       })
     } catch (err: any) {
@@ -300,7 +253,7 @@ export class RootResolver {
   }
 
   // TODO rate limit this per IP
-  @Query(() => [WebInput], { description: 'returns a decryption challenge' })
+  @Query(() => [String], { description: 'returns a decryption challenge' })
   async deviceDecryptionChallenge(
     @Arg('email', () => GraphQLEmailAddress) email: string
   ) {

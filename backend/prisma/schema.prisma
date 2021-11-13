@@ -24,7 +24,9 @@ model EncryptedSecret {
     createdAt        DateTime            @default(now())
     updatedAt        DateTime?           @updatedAt
     //uniqueFiled String               @unique
-    url              String
+    url              String? // should always be location.hostname, we autofill inputs based on WebInput where we store the path too
+    androidUri       String?
+    iosUri           String?
     lastUsageEventId BigInt?
     lastUsageEvent   SecretUsageEvent?   @relation("secret", fields: [lastUsageEventId], references: [id])
 

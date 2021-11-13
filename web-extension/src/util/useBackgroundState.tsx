@@ -12,29 +12,34 @@ import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySe
 import { useSettingsQuery } from '@src/popup/Popup.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
-  EncryptedSecrets,
-  EncryptedSecretsType
+  EncryptedSecret,
+  EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
 
-export interface ITOTPSecret {
-  secret: string
+export interface ISecret {
+  encrypted: string
+  kind: EncryptedSecretType
   label: string
-  icon: string | undefined
+  iconUrl: string | undefined
+  url: string
   lastUsed?: Date | null
-  originalUrl: string | undefined
+}
+export interface ITOTPSecret extends ISecret {
+  totp: string
+  kind: EncryptedSecretType.TOTP
 }
 
-export interface ILoginCredentials {
-  label: string
-  favIconUrl: string | undefined
-  lastUsed?: Date | null
-  originalUrl: string
-  password: string
-  username: string
+export interface ILoginCredentials extends ISecret {
+  loginCredentials: {
+    password: string
+    username: string
+  }
+  kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
+
 export interface ISecuritySettings {
   vaultLockTime: number
   noHandsLogin: boolean
@@ -142,7 +147,7 @@ export function useBackgroundState() {
     loginUser: async (
       masterPassword: string,
       userId: string,
-      secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
+      secrets: Array<Pick<EncryptedSecret, 'encrypted' | 'kind'>>
     ) => {
       setSafeLocked(false)
 
@@ -168,11 +173,11 @@ export function useBackgroundState() {
 
       if (secrets.length > 0) {
         totpSecretsEncrypted = secrets.filter(
-          ({ kind }) => kind === EncryptedSecretsType.TOTP
+          ({ kind }) => kind === EncryptedSecretType.TOTP
         )[0]?.encrypted
 
         credentialsSecretsEncrypted = secrets.filter(
-          ({ kind }) => kind === EncryptedSecretsType.LOGIN_CREDENTIALS
+          ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
         )[0]?.encrypted
       }
       const payload: IBackgroundStateSerializable = {

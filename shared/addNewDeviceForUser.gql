@@ -1,0 +1,18 @@
+mutation addNewDeviceForUser(
+  $currentAddDeviceSecret: String!
+  $input: RegisterNewDeviceInput!
+) {
+  addNewDeviceForUser(
+    currentAddDeviceSecret: $currentAddDeviceSecret
+    input: $input
+  ) {
+    accessToken
+    user {
+      EncryptedSecrets {
+        id
+        kind
+        encrypted
+      }
+    }
+  }
+}
