@@ -15,12 +15,16 @@ import {
 } from './EncryptedSecret'
 import { EncryptedSecretInput, LoginResponse, OTPEvent } from './models'
 import * as admin from 'firebase-admin'
-import { RegisterNewDeviceInput } from './AuthInputs'
-import { GraphqlError } from '../api/GraphqlError'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
+
+import { GraphQLEmailAddress } from 'graphql-scalars'
 
 @ObjectType()
-export class UserBase extends User {}
+export class UserBase extends User {
+  @Field(() => GraphQLEmailAddress, {
+    nullable: true
+  })
+  email?: string | null
+}
 
 @ObjectType()
 export class UserQuery extends UserBase {
@@ -66,6 +70,52 @@ export class UserQuery extends UserBase {
         userId: this.id
       }
     })
+  }
+
+  @Field(() => Boolean)
+  async sendAuthMessage(
+    @Arg('location', () => String) location: string,
+    @Arg('time', () => String) time: string,
+    @Arg('device', () => String) device: string,
+    @Arg('pageName', () => String) pageName: string
+  ) {
+    let user = await prisma.user.findFirst({
+      where: {
+        id: this.id
+      },
+      include: {
+        Devices: true
+      }
+    })
+
+    if (user) {
+      try {
+        await admin.messaging().sendToDevice(
+          user.Devices[0].firebaseToken, // ['token_1', 'token_2', ...]
+          {
+            data: {
+              userId: this.id,
+              location: location,
+              time: time,
+              device: device,
+              pageName: pageName
+            }
+          },
+          {
+            // Required for background/quit data-only messages on iOS
+            contentAvailable: true,
+            // Required for background/quit data-only messages on Android
+            priority: 'high'
+          }
+        )
+        return true
+      } catch (err) {
+        console.log(err)
+        return false
+      }
+    } else {
+      return false
+    }
   }
 }
 
@@ -117,17 +167,13 @@ export class UserMutation extends UserBase {
 
   @Field(() => EncryptedSecretQuery)
   async addEncryptedSecret(
-    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput,
-    @Arg('kind', () => EncryptedSecretType) kind: EncryptedSecretType
+    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput
   ) {
     return prisma.encryptedSecret.create({
       data: {
-        kind,
-        encrypted: payload.encrypted,
         version: 1,
         userId: this.id,
-        url: payload.url,
-        label: payload.label
+        ...payload
       }
     })
   }
@@ -193,13 +239,11 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => Boolean)
-  async sendConfirmation(
-    @Arg('userId', () => String) userId: string,
-    @Arg('success', () => Boolean) success: Boolean
-  ) {
+  async approveDevice(@Arg('success', () => Boolean) success: Boolean) {
+    // TODO check current device is master
     let user = await prisma.user.findFirst({
       where: {
-        id: userId
+        id: this.id
       }
     })
     if (user?.masterDeviceId) {
@@ -209,22 +253,17 @@ export class UserMutation extends UserBase {
         }
       })
 
-      try {
-        await admin.messaging().sendToDevice(
-          device?.firebaseToken as string,
-          {
-            data: {
-              success: success.toString()
-            }
-          },
-          {}
-        )
+      await admin.messaging().sendToDevice(
+        device?.firebaseToken as string,
+        {
+          data: {
+            success: success.toString()
+          }
+        },
+        {}
+      )
 
-        return true
-      } catch (err) {
-        console.log(err)
-        return false
-      }
+      return true
     }
   }
 }

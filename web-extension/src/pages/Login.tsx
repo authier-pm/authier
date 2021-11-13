@@ -12,7 +12,7 @@ import {
   FormLabel,
   Heading
 } from '@chakra-ui/react'
-import { useLoginMutation } from './Login.codegen'
+
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -29,9 +29,10 @@ import { t, Trans } from '@lingui/macro'
 
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
-import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+
 import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { useAddNewDeviceForUserMutation } from '../../../shared/addNewDeviceForUser.codegen'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -42,7 +43,7 @@ interface Values {
 export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [login, { loading }] = useLoginMutation({})
+  const [login, { loading }] = useAddNewDeviceForUserMutation()
   const { setUserId } = useContext(UserContext)
 
   const { loginUser } = useContext(BackgroundContext)

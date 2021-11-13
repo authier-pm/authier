@@ -68,8 +68,14 @@ export class EncryptedSecretInput {
   @Field(() => EncryptedSecretType)
   kind: EncryptedSecretType
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
   url: string
+
+  @Field(() => String, { nullable: true })
+  iosUri: string
+
+  @Field(() => String, { nullable: true })
+  androidUri: string
 
   @Field(() => String)
   label: string

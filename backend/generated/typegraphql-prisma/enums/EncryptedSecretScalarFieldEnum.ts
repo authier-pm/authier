@@ -9,6 +9,8 @@ export enum EncryptedSecretScalarFieldEnum {
   createdAt = 'createdAt',
   updatedAt = 'updatedAt',
   url = 'url',
+  androidUri = 'androidUri',
+  iosUri = 'iosUri',
   lastUsageEventId = 'lastUsageEventId',
   iconUrl = 'iconUrl',
   label = 'label'

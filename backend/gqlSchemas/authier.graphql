@@ -1,30 +1,46 @@
 type Query {
   user(userId: String!): UserQuery
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   authenticated: Boolean!
   me: UserQuery
-  sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!, userId: String!): Boolean!
-  sendConfirmation(success: Boolean!, userId: String!): Boolean!
+
+  """
+  returns a decryption challenge
+  """
+  deviceDecryptionChallenge(email: EmailAddress!): [String!]!
   webInputs(url: String!): [WebInput!]!
 }
 
 type UserQuery {
   id: String!
-  email: String
+  email: EmailAddress
   tokenVersion: Int!
-  name: String
-  loginSecret: String
+  username: String
+  addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDeviceId: Int
+  masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   myDevices: [Device!]!
   devicesCount: Int!
   settings: SettingsConfig!
-  encryptedSecrets: [EncryptedSecrets!]!
+  encryptedSecrets: [EncryptedSecretQuery!]!
+  sendAuthMessage(
+    pageName: String!
+    device: String!
+    time: String!
+    location: String!
+  ): Boolean!
 }
+
+"""
+A field whose value conforms to the standard internet email address format as specified in RFC822: https://www.w3.org/Protocols/rfc822/.
+"""
+scalar EmailAddress @specifiedBy(url: "https://www.w3.org/Protocols/rfc822/")
 
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
@@ -32,16 +48,19 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type Device {
-  id: Int!
+  id: String!
   firstIpAddress: String!
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
   syncTOTP: Boolean!
+  ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
+  lastSyncAt: DateTime
+  masterPasswordOutdatedAt: DateTime
   userId: String!
 }
 
@@ -54,20 +73,31 @@ type SettingsConfig {
   updatedAt: DateTime
 }
 
-type EncryptedSecrets {
+type EncryptedSecretQuery {
   id: Int!
   encrypted: String!
   version: Int!
   userId: String!
-  kind: EncryptedSecretsType!
+  kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  lastUsageEventId: BigInt
+  iconUrl: String
+  label: String!
 }
 
-enum EncryptedSecretsType {
+enum EncryptedSecretType {
   TOTP
   LOGIN_CREDENTIALS
 }
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
 
 type WebInput {
   id: Int!
@@ -90,48 +120,65 @@ enum WebInputType {
 type Mutation {
   user(userId: String!): UserMutation
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   me: UserMutation
-  addDevice(firebaseToken: String!, userId: String!, name: String!): Device!
-  register(firebaseToken: String!, deviceName: String!, password: String!, email: String!): LoginResponse!
-  login(password: String!, email: String!): LoginResponse
+  registerNewUser(userId: UUID!, input: RegisterNewDeviceInput!): LoginResponse!
+  addNewDeviceForUser(
+    currentAddDeviceSecret: String!
+    input: RegisterNewDeviceInput!
+  ): LoginResponse!
+
+  """
+  removes current device
+  """
   logout: Boolean
   addWebInputs(webInputs: [WebInputElement!]!): [WebInput!]!
 }
 
 type UserMutation {
   id: String!
-  email: String
+  email: EmailAddress
   tokenVersion: Int!
-  name: String
-  loginSecret: String
+  username: String
+  addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDeviceId: Int
+  masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  addDevice(firebaseToken: String!, name: String!): Device!
-  addOTPEvent(data: OTPEvent!): Boolean!
-  saveEncryptedSecrets(kind: EncryptedSecretsType!, payload: String!): EncryptedSecrets!
+  addDevice(firebaseToken: String!, deviceId: String!, name: String!): Device!
+  addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): Device!
-  updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfig!
+  updateSettings(
+    noHandsLogin: Boolean!
+    lockTime: Int!
+    homeUI: String!
+    twoFA: Boolean!
+  ): SettingsConfig!
   revokeRefreshTokensForUser: User!
+  approveDevice(success: Boolean!): Boolean!
 }
 
-input OTPEvent {
-  kind: String!
-  url: String!
+input EncryptedSecretInput {
+  kind: EncryptedSecretType!
+  url: String
+  iosUri: String
+  androidUri: String
+  label: String!
+  encrypted: String!
 }
 
 type User {
   id: String!
   email: String
   tokenVersion: Int!
-  name: String
-  loginSecret: String
+  username: String
+  addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDeviceId: Int
+  masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
 }
@@ -145,14 +192,44 @@ type UserAfterAuth {
   id: String!
   email: String
   tokenVersion: Int!
-  name: String
-  loginSecret: String
+  username: String
+  addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDeviceId: Int
+  masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  EncryptedSecrets: [EncryptedSecrets!]
+  EncryptedSecrets: [EncryptedSecret!]
+}
+
+type EncryptedSecret {
+  id: Int!
+  encrypted: String!
+  version: Int!
+  userId: String!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  lastUsageEventId: BigInt
+  iconUrl: String
+  label: String!
+}
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
+input RegisterNewDeviceInput {
+  email: EmailAddress!
+  deviceName: String!
+  deviceId: String!
+  firebaseToken: String!
+  addDeviceSecret: String!
+  addDeviceSecretEncrypted: String!
 }
 
 input WebInputElement {

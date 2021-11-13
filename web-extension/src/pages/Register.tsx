@@ -12,7 +12,7 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { useRegisterMutation } from '../../../shared/Register.codegen'
+
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
@@ -20,16 +20,19 @@ import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
+import { device } from '@src/background/Device'
+import cryptoJS from 'crypto-js'
+import Bowser from 'bowser'
 
 interface Values {
   password: string
   email: string
 }
-
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
-    useRegisterMutation()
+    useRegisterNewUserMutation()
   const { fireToken } = useContext(UserContext)
   const { loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
@@ -50,21 +53,43 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          const deviceId = await device.getDeviceId()
+          // @ts-expect-error
+          const userId = crypto.randomUUID()
+
           const countOfDevices = 0
+          const addDeviceSecret = device.generateAddDeviceSecret()
+
+          const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
+            addDeviceSecret,
+            values.password,
+            {
+              iv: cryptoJS.enc.Utf8.parse(userId)
+            }
+          ).toString()
+          const browserInfo = Bowser.getParser(navigator.userAgent)
+          console.log(deviceId)
           let res = await register({
             variables: {
-              email: values.email,
-              password: values.password,
-              firebaseToken: fireToken,
-              deviceName: `Chrome extension ${countOfDevices + 1}` // TODO get device name from agent string
+              userId,
+              input: {
+                email: values.email,
+                addDeviceSecret: addDeviceSecret,
+                addDeviceSecretEncrypted,
+                deviceId,
+                firebaseToken: fireToken,
+                deviceName: `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension ${
+                  countOfDevices + 1
+                }` // TODO get device name from agent string
+              }
             }
           })
-          const registerResult = res.data?.register
+          const registerResult = res.data?.registerNewUser
 
           if (registerResult?.accessToken) {
             // is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
-              'access-token': res.data?.register.accessToken
+              'access-token': res.data?.registerNewUser.accessToken
             })
             setAccessToken(registerResult.accessToken as string)
 

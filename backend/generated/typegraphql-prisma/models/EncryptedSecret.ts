@@ -46,9 +46,19 @@ export class EncryptedSecret {
   updatedAt?: Date | null
 
   @TypeGraphQL.Field((_type) => String, {
-    nullable: false
+    nullable: true
   })
-  url!: string
+  url?: string | null
+
+  @TypeGraphQL.Field((_type) => String, {
+    nullable: true
+  })
+  androidUri?: string | null
+
+  @TypeGraphQL.Field((_type) => String, {
+    nullable: true
+  })
+  iosUri?: string | null
 
   @TypeGraphQL.Field((_type) => GraphQLScalars.BigIntResolver, {
     nullable: true
