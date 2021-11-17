@@ -3,12 +3,8 @@ import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
 import { IContext } from '../RootResolver'
 import { isAuth } from '../isAuth'
 
-import { User } from '../generated/typegraphql-prisma/models/User'
-import { Device } from '../generated/typegraphql-prisma/models/Device'
-import { SettingsConfig } from '../generated/typegraphql-prisma/models/SettingsConfig'
-
 import { v4 as uuidv4 } from 'uuid'
-import { EncryptedSecretType } from '../generated/typegraphql-prisma/enums'
+
 import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
@@ -17,18 +13,22 @@ import { EncryptedSecretInput, LoginResponse, OTPEvent } from './models'
 import * as admin from 'firebase-admin'
 
 import { GraphQLEmailAddress } from 'graphql-scalars'
+import { UserGQL } from './generated/User'
+
+import { SettingsConfigGQL } from './generated/SettingsConfig'
+import { DeviceGQL } from './generated/Device'
 
 @ObjectType()
-export class UserBase extends User {
+export class UserBase extends UserGQL {
   @Field(() => GraphQLEmailAddress, {
     nullable: true
   })
-  email?: string | null
+  email?: string
 }
 
 @ObjectType()
 export class UserQuery extends UserBase {
-  @Field(() => [Device])
+  @Field(() => [DeviceGQL])
   async myDevices() {
     return prisma.device.findMany({
       where: {
@@ -54,7 +54,7 @@ export class UserQuery extends UserBase {
   }
 
   //Call this from the findFirst query in me??
-  @Field(() => SettingsConfig)
+  @Field(() => SettingsConfigGQL)
   async settings() {
     return prisma.settingsConfig.findFirst({
       where: {
@@ -121,7 +121,7 @@ export class UserQuery extends UserBase {
 
 @ObjectType()
 export class UserMutation extends UserBase {
-  @Field(() => Device)
+  @Field(() => DeviceGQL)
   async addDevice(
     @Arg('name', () => String) name: string,
     @Arg('deviceId', () => String) deviceId: string,
@@ -178,7 +178,7 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Device)
+  @Field(() => DeviceGQL)
   async updateFireToken(
     @Arg('firebaseToken', () => String) firebaseToken: string
   ) {
@@ -195,7 +195,7 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => SettingsConfig)
+  @Field(() => SettingsConfigGQL)
   async updateSettings(
     @Arg('twoFA', () => Boolean) twoFA: boolean,
     @Arg('homeUI', () => String) homeUI: string,
@@ -224,7 +224,7 @@ export class UserMutation extends UserBase {
   }
 
   //For testing purposes
-  @Field(() => User)
+  @Field(() => UserGQL)
   async revokeRefreshTokensForUser() {
     return prisma.user.update({
       data: {

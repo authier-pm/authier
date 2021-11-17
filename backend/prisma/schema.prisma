@@ -8,10 +8,13 @@ generator client {
     provider = "prisma-client-js"
 }
 
-generator typegraphql {
-    provider    = "typegraphql-prisma"
-    output      = "../generated/typegraphql-prisma"
-    noResolvers = true
+generator PrismaTypeGraphQLTypesGenerator {
+    provider                   = "node node_modules/prisma-typegraphql-types-generator"
+    modelsOutput               = "./models/generated"
+    enumsOutput                = "./models/types"
+    useYarn                    = true
+    removeTypeInFieldDecorator = true
+    exportedNameSuffix         = "GQL"
 }
 
 // each row contains a single TOTP or Login credential

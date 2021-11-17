@@ -12,7 +12,7 @@ export type AddEncryptedSecretMutation = {
   me?:
     | {
         __typename?: 'UserMutation'
-        addEncryptedSecret: { __typename?: 'EncryptedSecretQuery'; id: number }
+        addEncryptedSecret: { __typename?: 'EncryptedSecretQuery'; id: string }
       }
     | null
     | undefined

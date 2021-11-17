@@ -22,12 +22,15 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
 import { UserQuery, UserMutation } from './models/User'
-import { Device, User, WebInput } from './generated/typegraphql-prisma'
+
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewDeviceInput } from './models/AuthInputs'
+
+import { Device, User, WebInput } from '@prisma/client'
+import { WebInputGQL } from './models/generated/WebInput'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -287,13 +290,13 @@ export class RootResolver {
     }
   }
 
-  @Query(() => [WebInput])
+  @Query(() => [WebInputGQL])
   async webInputs(@Arg('url') url: string) {
     return prisma.webInput.findMany({ where: { url } })
   }
 
   @UseMiddleware(isAuth)
-  @Mutation(() => [WebInput])
+  @Mutation(() => [WebInputGQL])
   async addWebInputs(
     @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
     @Ctx() ctx: IContextAuthenticated

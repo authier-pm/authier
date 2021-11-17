@@ -15,7 +15,7 @@ export type SettingsQuery = {
     | {
         __typename?: 'UserQuery'
         settings: {
-          __typename?: 'SettingsConfig'
+          __typename?: 'SettingsConfigGQL'
           lockTime: number
           twoFA: boolean
           noHandsLogin: boolean
@@ -47,7 +47,7 @@ export type SaveFirebaseTokenMutation = {
   me?:
     | {
         __typename?: 'UserMutation'
-        updateFireToken: { __typename?: 'Device'; id: string }
+        updateFireToken: { __typename?: 'DeviceGQL'; id: string }
       }
     | null
     | undefined

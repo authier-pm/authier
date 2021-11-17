@@ -16,15 +16,12 @@ export type RegisterNewUserMutation = {
     user: {
       __typename?: 'UserAfterAuth'
       id: string
-      EncryptedSecrets?:
-        | Array<{
-            __typename?: 'EncryptedSecret'
-            encrypted: string
-            kind: Types.EncryptedSecretType
-            id: number
-          }>
-        | null
-        | undefined
+      EncryptedSecrets: Array<{
+        __typename?: 'EncryptedSecretGQL'
+        encrypted: string
+        kind: Types.EncryptedSecretType
+        id: string
+      }>
     }
   }
 }
