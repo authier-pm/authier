@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@prisma/client": "^3.1.1",
+    "@prisma/client": "^3.5.0",
     "@react-native-firebase/app": "^12.9.0",
     "@sentry/node": "^6.13.2",
     "@types/jsonwebtoken": "^8.5.5",
@@ -26,7 +26,7 @@
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
     "mercurius": "^8.5.0",
-    "prisma": "3.1.1",
+    "prisma": "^3.5.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.2.1",
     "type-graphql": "^1.1.1",
@@ -39,8 +39,8 @@
     "jest": "^27.2.4",
     "mz": "^2.7.0",
     "nodemon": "^2.0.13",
-    "ts-jest": "^27.0.5",
-    "typegraphql-prisma": "npm:@capaj/typegraphql-prisma"
+    "prisma-typegraphql-types-generator": "^1.1.14",
+    "ts-jest": "^27.0.5"
   },
   "scripts": {
     "dev": "DEBUG=au:* nodemon --exec ts-node-transpile-only server.ts",
@@ -53,7 +53,7 @@
     "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
     "generate": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma generate",
-    "postinstall": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma generate",
+    "postinstall2": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma generate",
     "test": "jest",
     "tsc": "tsc",
     "start": "prisma migrate deploy && prisma generate && node server.js",

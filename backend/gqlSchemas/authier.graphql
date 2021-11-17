@@ -11,23 +11,33 @@ type Query {
   returns a decryption challenge
   """
   deviceDecryptionChallenge(email: EmailAddress!): [String!]!
-  webInputs(url: String!): [WebInput!]!
+  webInputs(url: String!): [WebInputGQL!]!
 }
 
 type UserQuery {
-  id: String!
+  id: ID!
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
+  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
+  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  myDevices: [Device!]!
+  UsageEvents: [SecretUsageEventGQL!]!
+  EncryptedSecrets: [EncryptedSecretGQL!]!
+  Devices: [DeviceGQL!]!
+  WebInputsAdded: [WebInputGQL!]!
+  SettingsConfig: [SettingsConfigGQL!]!
+  Tags: [TagGQL!]!
+  UserPaidProducts: [UserPaidProductsGQL!]!
+  myDevices: [DeviceGQL!]!
   devicesCount: Int!
-  settings: SettingsConfig!
+  settings: SettingsConfigGQL!
   encryptedSecrets: [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
@@ -42,13 +52,53 @@ A field whose value conforms to the standard internet email address format as sp
 """
 scalar EmailAddress @specifiedBy(url: "https://www.w3.org/Protocols/rfc822/")
 
+type TokenGQL {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  type: TokenType!
+  emailToken: String
+  valid: Boolean!
+  expiration: DateTime!
+  user: UserGQL!
+  userId: String!
+}
+
 """
 The javascript `Date` as string. Type represents date and time as the ISO Date string.
 """
 scalar DateTime
 
-type Device {
-  id: String!
+enum TokenType {
+  EMAIL
+  API
+}
+
+type UserGQL {
+  id: ID!
+  email: String
+  tokenVersion: Int!
+  username: String
+  addDeviceSecret: String!
+  addDeviceSecretEncrypted: String!
+  Token: [TokenGQL!]!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  masterDevice: DeviceGQL
+  masterDeviceId: String
+  TOTPlimit: Int!
+  loginCredentialsLimit: Int!
+  UsageEvents: [SecretUsageEventGQL!]!
+  EncryptedSecrets: [EncryptedSecretGQL!]!
+  Devices: [DeviceGQL!]!
+  WebInputsAdded: [WebInputGQL!]!
+  SettingsConfig: [SettingsConfigGQL!]!
+  Tags: [TagGQL!]!
+  UserPaidProducts: [UserPaidProductsGQL!]!
+}
+
+type DeviceGQL {
+  id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
   firebaseToken: String!
@@ -61,20 +111,62 @@ type Device {
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
   masterPasswordOutdatedAt: DateTime
+  VaultUnlockEvents: [VaultUnlockEventsGQL!]!
+  VaultUnlockEventsApproved: [VaultUnlockEventsGQL!]!
   userId: String!
+  User: UserGQL!
+  UserMaster: UserGQL
+  SecretUsageEvents: [SecretUsageEventGQL!]!
 }
 
-type SettingsConfig {
-  userId: String!
-  lockTime: Int!
-  twoFA: Boolean!
-  noHandsLogin: Boolean!
-  homeUI: String!
-  updatedAt: DateTime
+type VaultUnlockEventsGQL {
+  id: ID!
+  deviceIp: String!
+  approvedFromIp: String
+  approvedAt: DateTime
+  deviceId: String!
+  device: DeviceGQL!
+  approvedFromDeviceId: String
+  approvedFromDevice: DeviceGQL
 }
 
-type EncryptedSecretQuery {
-  id: Int!
+type SecretUsageEventGQL {
+  id: ID!
+  kind: String!
+  timestamp: DateTime!
+  ipAddress: String!
+  url: String!
+  User: UserGQL!
+  userId: String!
+  Device: DeviceGQL!
+  deviceId: String!
+  webInputId: Int
+  WebOTPInput: WebInputGQL
+  EncryptedSecret: [EncryptedSecretGQL!]!
+}
+
+type WebInputGQL {
+  id: ID!
+  layoutType: String
+  createdAt: DateTime!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  addedByUser: UserGQL!
+  addedByUserId: String!
+  UsageEvents: [SecretUsageEventGQL!]!
+}
+
+enum WebInputType {
+  TOTP
+  USERNAME
+  EMAIL
+  USERNAME_OR_EMAIL
+  PASSWORD
+}
+
+type EncryptedSecretGQL {
+  id: ID!
   encrypted: String!
   version: Int!
   userId: String!
@@ -84,9 +176,11 @@ type EncryptedSecretQuery {
   url: String
   androidUri: String
   iosUri: String
-  lastUsageEventId: BigInt
+  lastUsageEventId: Float
+  lastUsageEvent: SecretUsageEventGQL
   iconUrl: String
   label: String!
+  user: UserGQL!
 }
 
 enum EncryptedSecretType {
@@ -94,27 +188,51 @@ enum EncryptedSecretType {
   LOGIN_CREDENTIALS
 }
 
-"""
-The `BigInt` scalar type represents non-fractional signed whole numeric values.
-"""
-scalar BigInt
-
-type WebInput {
-  id: Int!
-  layoutType: String
-  createdAt: DateTime!
-  url: String!
-  kind: WebInputType!
-  domPath: String!
-  addedByUserId: String!
+type SettingsConfigGQL {
+  userId: ID!
+  lockTime: Int!
+  twoFA: Boolean!
+  noHandsLogin: Boolean!
+  homeUI: String!
+  updatedAt: DateTime
+  user: UserGQL!
 }
 
-enum WebInputType {
-  TOTP
-  USERNAME
-  EMAIL
-  USERNAME_OR_EMAIL
-  PASSWORD
+type TagGQL {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  user: UserGQL!
+  userId: String!
+}
+
+type UserPaidProductsGQL {
+  id: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  expiresAt: DateTime
+  productId: String!
+  userId: String!
+  user: UserGQL!
+  checkoutSessionId: String!
+}
+
+type EncryptedSecretQuery {
+  id: ID!
+  encrypted: String!
+  version: Int!
+  userId: String!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  lastUsageEventId: Float
+  lastUsageEvent: SecretUsageEventGQL
+  iconUrl: String
+  label: String!
+  user: UserGQL!
 }
 
 type Mutation {
@@ -134,30 +252,44 @@ type Mutation {
   removes current device
   """
   logout: Boolean
-  addWebInputs(webInputs: [WebInputElement!]!): [WebInput!]!
+  addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 
 type UserMutation {
-  id: String!
+  id: ID!
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
+  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
+  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  addDevice(firebaseToken: String!, deviceId: String!, name: String!): Device!
+  UsageEvents: [SecretUsageEventGQL!]!
+  EncryptedSecrets: [EncryptedSecretGQL!]!
+  Devices: [DeviceGQL!]!
+  WebInputsAdded: [WebInputGQL!]!
+  SettingsConfig: [SettingsConfigGQL!]!
+  Tags: [TagGQL!]!
+  UserPaidProducts: [UserPaidProductsGQL!]!
+  addDevice(
+    firebaseToken: String!
+    deviceId: String!
+    name: String!
+  ): DeviceGQL!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
-  updateFireToken(firebaseToken: String!): Device!
+  updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
     noHandsLogin: Boolean!
     lockTime: Int!
     homeUI: String!
     twoFA: Boolean!
-  ): SettingsConfig!
-  revokeRefreshTokensForUser: User!
+  ): SettingsConfigGQL!
+  revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
 }
 
@@ -170,52 +302,32 @@ input EncryptedSecretInput {
   encrypted: String!
 }
 
-type User {
-  id: String!
-  email: String
-  tokenVersion: Int!
-  username: String
-  addDeviceSecretEncrypted: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  masterDeviceId: String
-  TOTPlimit: Int!
-  loginCredentialsLimit: Int!
-}
-
 type LoginResponse {
   accessToken: String!
   user: UserAfterAuth!
 }
 
 type UserAfterAuth {
-  id: String!
+  id: ID!
   email: String
   tokenVersion: Int!
   username: String
+  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
+  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
+  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
-  EncryptedSecrets: [EncryptedSecret!]
-}
-
-type EncryptedSecret {
-  id: Int!
-  encrypted: String!
-  version: Int!
-  userId: String!
-  kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  lastUsageEventId: BigInt
-  iconUrl: String
-  label: String!
+  UsageEvents: [SecretUsageEventGQL!]!
+  EncryptedSecrets: [EncryptedSecretGQL!]!
+  Devices: [DeviceGQL!]!
+  WebInputsAdded: [WebInputGQL!]!
+  SettingsConfig: [SettingsConfigGQL!]!
+  Tags: [TagGQL!]!
+  UserPaidProducts: [UserPaidProductsGQL!]!
 }
 
 """

@@ -1,24 +1,28 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '../../../shared/generated/graphqlBaseTypes'
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+import { gql } from '@apollo/client'
+import * as Apollo from '@apollo/client'
+const defaultOptions = {}
 export type AddWebInputsMutationVariables = Types.Exact<{
-  webInputs: Array<Types.WebInputElement> | Types.WebInputElement;
-}>;
+  webInputs: Array<Types.WebInputElement> | Types.WebInputElement
+}>
 
-
-export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInput', id: number }> };
-
+export type AddWebInputsMutation = {
+  __typename?: 'Mutation'
+  addWebInputs: Array<{ __typename?: 'WebInputGQL'; id: string }>
+}
 
 export const AddWebInputsDocument = gql`
-    mutation addWebInputs($webInputs: [WebInputElement!]!) {
-  addWebInputs(webInputs: $webInputs) {
-    id
+  mutation addWebInputs($webInputs: [WebInputElement!]!) {
+    addWebInputs(webInputs: $webInputs) {
+      id
+    }
   }
-}
-    `;
-export type AddWebInputsMutationFn = Apollo.MutationFunction<AddWebInputsMutation, AddWebInputsMutationVariables>;
+`
+export type AddWebInputsMutationFn = Apollo.MutationFunction<
+  AddWebInputsMutation,
+  AddWebInputsMutationVariables
+>
 
 /**
  * __useAddWebInputsMutation__
@@ -37,10 +41,24 @@ export type AddWebInputsMutationFn = Apollo.MutationFunction<AddWebInputsMutatio
  *   },
  * });
  */
-export function useAddWebInputsMutation(baseOptions?: Apollo.MutationHookOptions<AddWebInputsMutation, AddWebInputsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddWebInputsMutation, AddWebInputsMutationVariables>(AddWebInputsDocument, options);
-      }
-export type AddWebInputsMutationHookResult = ReturnType<typeof useAddWebInputsMutation>;
-export type AddWebInputsMutationResult = Apollo.MutationResult<AddWebInputsMutation>;
-export type AddWebInputsMutationOptions = Apollo.BaseMutationOptions<AddWebInputsMutation, AddWebInputsMutationVariables>;
+export function useAddWebInputsMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddWebInputsMutation,
+    AddWebInputsMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    AddWebInputsMutation,
+    AddWebInputsMutationVariables
+  >(AddWebInputsDocument, options)
+}
+export type AddWebInputsMutationHookResult = ReturnType<
+  typeof useAddWebInputsMutation
+>
+export type AddWebInputsMutationResult =
+  Apollo.MutationResult<AddWebInputsMutation>
+export type AddWebInputsMutationOptions = Apollo.BaseMutationOptions<
+  AddWebInputsMutation,
+  AddWebInputsMutationVariables
+>

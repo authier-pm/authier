@@ -1,12 +1,12 @@
 import { Field, ObjectType } from 'type-graphql'
-import { EncryptedSecret } from '../generated/typegraphql-prisma'
+import { EncryptedSecretGQL } from './generated/EncryptedSecret'
 
 @ObjectType()
-export class EncryptedSecretQuery extends EncryptedSecret {}
+export class EncryptedSecretQuery extends EncryptedSecretGQL {}
 
 @ObjectType()
 export class EncryptedSecretMutation extends EncryptedSecretQuery {
-  @Field(() => EncryptedSecret)
+  @Field(() => EncryptedSecretGQL)
   update() {
     throw new Error('Method not implemented.')
   }

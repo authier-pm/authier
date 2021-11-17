@@ -13,7 +13,7 @@ export type EncryptedAuthsQuery = {
         id: string
         encryptedSecrets: Array<{
           __typename?: 'EncryptedSecretQuery'
-          id: number
+          id: string
           kind: Types.EncryptedSecretType
           encrypted: string
         }>

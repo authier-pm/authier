@@ -1,5 +1,6 @@
+import { User } from '@prisma/client'
 import { JwtPayload, sign } from 'jsonwebtoken'
-import { Device, User } from './generated/typegraphql-prisma'
+
 import { isProd } from './envUtils'
 import { IContext } from './RootResolver'
 

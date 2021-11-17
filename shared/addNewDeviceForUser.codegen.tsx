@@ -15,15 +15,12 @@ export type AddNewDeviceForUserMutation = {
     accessToken: string
     user: {
       __typename?: 'UserAfterAuth'
-      EncryptedSecrets?:
-        | Array<{
-            __typename?: 'EncryptedSecret'
-            id: number
-            kind: Types.EncryptedSecretType
-            encrypted: string
-          }>
-        | null
-        | undefined
+      EncryptedSecrets: Array<{
+        __typename?: 'EncryptedSecretGQL'
+        id: string
+        kind: Types.EncryptedSecretType
+        encrypted: string
+      }>
     }
   }
 }

@@ -1,5 +1,5 @@
 import { Field, InputType } from 'type-graphql'
-import { WebInputType } from '../generated/typegraphql-prisma/enums/WebInputType'
+import { WebInputTypeGQL } from './types/WebInputType'
 
 @InputType()
 export class WebInputElement {
@@ -7,6 +7,6 @@ export class WebInputElement {
   domPath: string
   @Field()
   url: string
-  @Field(() => WebInputType)
-  kind: WebInputType
+  @Field(() => WebInputTypeGQL)
+  kind: WebInputTypeGQL
 }

@@ -11,7 +11,7 @@ export type MyDevicesQuery = {
     | {
         __typename?: 'UserQuery'
         myDevices: Array<{
-          __typename?: 'Device'
+          __typename?: 'DeviceGQL'
           id: string
           firstIpAddress: string
           lastIpAddress: string
