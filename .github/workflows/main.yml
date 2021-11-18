@@ -1,9 +1,9 @@
 name: Authier monorepo CI
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 jobs:
   build:
@@ -12,7 +12,7 @@ jobs:
     env:
       CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
       CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
-      APPNAME : authier-api
+      APPNAME: authier-api
 
     steps:
       - uses: actions/checkout@v2
@@ -31,8 +31,6 @@ jobs:
       - name: Yarn install
         run: |
           yarn --frozen-lockfile
-          cd backend
-          yarn --frozen-lockfile
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -46,7 +44,7 @@ jobs:
               - 'mobile-app/**'
             webExtension:
               - 'web-extension/**'
-              
+
         # run only if some file in 'src' folder was changed
       - name: backend install deps, check TS and run jest
         working-directory: ./backend
@@ -59,7 +57,6 @@ jobs:
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
           npm test
 
@@ -67,7 +64,6 @@ jobs:
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn --frozen-lockfile
           yarn tsc
           npm test
 
@@ -77,4 +73,3 @@ jobs:
       #     password: '${{ secrets.CAPROVER_PASSWORD }}'
       #     appname: authier-api
       #     branch: ${GITHUB_REF##*/}
-
