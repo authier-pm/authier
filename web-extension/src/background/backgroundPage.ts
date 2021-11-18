@@ -5,7 +5,7 @@ import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 
 import {
-  ILoginCredentials,
+  ILoginSecret,
   ISecret,
   ITOTPSecret
 } from '@src/util/useBackgroundState'
@@ -23,7 +23,7 @@ import {
   AddEncryptedSecretMutationVariables
 } from './backgroundPage.codegen'
 import {
-  EncryptedSecret,
+  EncryptedSecretGql,
   EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
 
@@ -63,15 +63,15 @@ if ('serviceWorker' in navigator) {
 }
 
 export interface IBackgroundStateSerializable {
-  loginCredentials: ILoginCredentials[]
+  loginCredentials: ILoginSecret[]
   totpSecrets: ITOTPSecret[]
   userId: string
   masterPassword: string
-  secrets: Array<Pick<EncryptedSecret, 'encrypted' | 'kind'>>
+  secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
-  addSecretOnBackend: (input: ITOTPSecret | ILoginCredentials) => Promise<void>
+  addSecretOnBackend: (input: ITOTPSecret | ILoginSecret) => Promise<void>
 }
 
 export let bgState: IBackgroundState | null = null
@@ -82,7 +82,7 @@ export const setBgState = (
   bgState = {
     ...bgStateSerializable,
 
-    async addSecretOnBackend(secret: ITOTPSecret | ILoginCredentials) {
+    async addSecretOnBackend(secret: ITOTPSecret | ILoginSecret) {
       const stringToEncrypt =
         secret.kind === EncryptedSecretType.TOTP
           ? secret.totp

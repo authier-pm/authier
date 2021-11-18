@@ -12,6 +12,15 @@ import { UserGQL } from './generated/User'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 @ObjectType()
+export class DecryptionChallengeResponse {
+  @Field()
+  userId: string
+
+  @Field()
+  addDeviceSecretEncrypted: string
+}
+
+@ObjectType()
 export class UserBase {
   @Field(() => String)
   id: string

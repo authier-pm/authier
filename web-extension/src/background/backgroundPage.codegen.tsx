@@ -1,36 +1,26 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes'
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
-import { gql } from '@apollo/client'
-import * as Apollo from '@apollo/client'
-const defaultOptions = {}
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+const defaultOptions =  {}
 export type AddEncryptedSecretMutationVariables = Types.Exact<{
-  payload: Types.EncryptedSecretInput
-}>
+  payload: Types.EncryptedSecretInput;
+}>;
 
-export type AddEncryptedSecretMutation = {
-  __typename?: 'Mutation'
-  me?:
-    | {
-        __typename?: 'UserMutation'
-        addEncryptedSecret: { __typename?: 'EncryptedSecretQuery'; id: string }
-      }
-    | null
-    | undefined
-}
+
+export type AddEncryptedSecretMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', addEncryptedSecret: { __typename?: 'EncryptedSecretQuery', id: string } } | null | undefined };
+
 
 export const AddEncryptedSecretDocument = gql`
-  mutation addEncryptedSecret($payload: EncryptedSecretInput!) {
-    me {
-      addEncryptedSecret(payload: $payload) {
-        id
-      }
+    mutation addEncryptedSecret($payload: EncryptedSecretInput!) {
+  me {
+    addEncryptedSecret(payload: $payload) {
+      id
     }
   }
-`
-export type AddEncryptedSecretMutationFn = Apollo.MutationFunction<
-  AddEncryptedSecretMutation,
-  AddEncryptedSecretMutationVariables
->
+}
+    `;
+export type AddEncryptedSecretMutationFn = Apollo.MutationFunction<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>;
 
 /**
  * __useAddEncryptedSecretMutation__
@@ -49,24 +39,10 @@ export type AddEncryptedSecretMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useAddEncryptedSecretMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    AddEncryptedSecretMutation,
-    AddEncryptedSecretMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<
-    AddEncryptedSecretMutation,
-    AddEncryptedSecretMutationVariables
-  >(AddEncryptedSecretDocument, options)
-}
-export type AddEncryptedSecretMutationHookResult = ReturnType<
-  typeof useAddEncryptedSecretMutation
->
-export type AddEncryptedSecretMutationResult =
-  Apollo.MutationResult<AddEncryptedSecretMutation>
-export type AddEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<
-  AddEncryptedSecretMutation,
-  AddEncryptedSecretMutationVariables
->
+export function useAddEncryptedSecretMutation(baseOptions?: Apollo.MutationHookOptions<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>(AddEncryptedSecretDocument, options);
+      }
+export type AddEncryptedSecretMutationHookResult = ReturnType<typeof useAddEncryptedSecretMutation>;
+export type AddEncryptedSecretMutationResult = Apollo.MutationResult<AddEncryptedSecretMutation>;
+export type AddEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>;

@@ -1,6 +1,6 @@
 import {
   ITOTPSecret,
-  ILoginCredentials,
+  ILoginSecret,
   ISecuritySettings
 } from '@src/util/useBackgroundState'
 import {
@@ -60,7 +60,7 @@ chrome.runtime.onMessage.addListener(async function (
     lockTime: number
     config: UISettings
     auths: ITOTPSecret[]
-    passwords: ILoginCredentials[]
+    passwords: ILoginSecret[]
     settings: ISecuritySettings
   },
   sender,
@@ -98,10 +98,12 @@ chrome.runtime.onMessage.addListener(async function (
 
       bgState.addSecretOnBackend({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-        username: credentials.username,
-        password: credentials.password,
-        favIconUrl: tab.favIconUrl,
-        originalUrl: url,
+        loginCredentials: {
+          username: credentials.username,
+          password: credentials.password
+        },
+        iconUrl: tab.favIconUrl,
+        url: url,
         label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
       })
 
@@ -127,10 +129,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.addTOTPSecret:
       if (bgState) {
-        bgState.addTOTPSecret([
-          ...bgState.totpSecrets,
-          req.payload as ITOTPSecret
-        ])
+        bgState.addSecretOnBackend(req.payload as ITOTPSecret)
       }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {

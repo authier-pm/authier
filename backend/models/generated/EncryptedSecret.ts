@@ -14,9 +14,6 @@ export class EncryptedSecretGQL {
   @Field(() => Int)
   version: number
 
-  @Field()
-  userId: string
-
   @Field(() => EncryptedSecretTypeGQL)
   kind: EncryptedSecretTypeGQL
 
@@ -46,6 +43,9 @@ export class EncryptedSecretGQL {
 
   @Field()
   label: string
+
+  @Field()
+  userId: string
 
   @Field(() => UserGQL)
   user: UserGQL

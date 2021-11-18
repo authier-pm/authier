@@ -22,7 +22,6 @@ model EncryptedSecret {
     id               Int                 @id @default(autoincrement())
     encrypted        String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
     version          Int
-    userId           String              @db.Uuid
     kind             EncryptedSecretType
     createdAt        DateTime            @default(now())
     updatedAt        DateTime?           @updatedAt
@@ -35,7 +34,24 @@ model EncryptedSecret {
 
     iconUrl String?
     label   String
+    userId  String  @db.Uuid
     user    User    @relation(fields: [userId], references: [id])
+}
+
+// this gets created when a user asks for a new Decryption Challenge
+model DecryptionChallenge {
+    id                       Int       @id @default(autoincrement())
+    // @skip
+    ipAddress                String    @db.Inet
+    masterPasswordVerifiedAt DateTime?
+    approvedAt               DateTime?
+    userId                   String    @db.Uuid
+    user                     User      @relation(fields: [userId], references: [id])
+    createdAt                DateTime  @default(now())
+    deviceId                 String?   @db.Uuid
+    device                   Device?   @relation("device", fields: [deviceId], references: [id])
+    approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
+    approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
 }
 
 model Device {
@@ -55,15 +71,15 @@ model Device {
     lastSyncAt               DateTime?
     masterPasswordOutdatedAt DateTime? // we set it to a timestamp when user changes master password on one device
 
-    VaultUnlockEvents         VaultUnlockEvents[] @relation("device")
-    VaultUnlockEventsApproved VaultUnlockEvents[] @relation("approvedFromDevice")
-
     userId String @db.Uuid
     User   User   @relation("devices", fields: [userId], references: [id])
 
     UserMaster User? @relation("masterDevice")
 
     SecretUsageEvents SecretUsageEvent[]
+
+    DeviceDecryptionChallenges         DecryptionChallenge[] @relation("device")
+    DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
     @@index([updatedAt])
     @@index([lastSyncAt])
 }
@@ -88,6 +104,7 @@ model SecretUsageEvent {
     id          BigInt    @id @default(autoincrement())
     kind        String
     timestamp   DateTime  @default(now())
+    // @skip
     ipAddress   String    @db.Inet
     url         String
     User        User      @relation(fields: [userId], references: [id])
@@ -101,18 +118,18 @@ model SecretUsageEvent {
 }
 
 // recorded whenever user unlocks vault
-model VaultUnlockEvents {
-    id             Int       @id @default(autoincrement())
-    deviceIp       String    @db.Inet
-    approvedFromIp String?   @db.Inet
-    approvedAt     DateTime?
+// model VaultUnlockEvents {
+//     id             Int       @id @default(autoincrement())
+//     deviceIp       String    @db.Inet
+//     approvedFromIp String?   @db.Inet
+//     approvedAt     DateTime?
 
-    deviceId             String  @db.Uuid
-    device               Device  @relation("device", fields: [deviceId], references: [id])
-    approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
-    approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+//     deviceId             String  @db.Uuid
+//     device               Device  @relation("device", fields: [deviceId], references: [id])
+//     approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
+//     approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
 
-}
+// }
 
 // a map of all inputs publicly available on the internet which we need to map in order for authier's automagic login to work
 model WebInput {
@@ -147,13 +164,14 @@ model User {
     TOTPlimit                Int
     loginCredentialsLimit    Int
 
-    UsageEvents      SecretUsageEvent[]
-    EncryptedSecrets EncryptedSecret[]
-    Devices          Device[]           @relation("devices")
-    WebInputsAdded   WebInput[]
-    SettingsConfig   SettingsConfig[]
-    Tags             Tag[]
-    UserPaidProducts UserPaidProducts[]
+    UsageEvents          SecretUsageEvent[]
+    EncryptedSecrets     EncryptedSecret[]
+    Devices              Device[]              @relation("devices")
+    WebInputsAdded       WebInput[]
+    SettingsConfigs      SettingsConfig[]
+    Tags                 Tag[]
+    UserPaidProducts     UserPaidProducts[]
+    DecryptionChallenges DecryptionChallenge[]
 }
 
 model Token {

@@ -13,6 +13,9 @@ mutation registerNewUser($input: RegisterNewDeviceInput!, $userId: UUID!) {
   }
 }
 
-query deviceDecryptionChallenge($email: EmailAddress!) {
-  deviceDecryptionChallenge(email: $email)
+mutation deviceDecryptionChallenge($email: EmailAddress!) {
+  deviceDecryptionChallenge(email: $email) {
+    id
+    addDeviceSecretEncrypted
+  }
 }

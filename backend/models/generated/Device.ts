@@ -2,6 +2,7 @@ import { Field, ID, ObjectType, Int } from 'type-graphql'
 import { VaultUnlockEventsGQL } from './VaultUnlockEvents'
 import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
+import { DecryptionChallengeGQL } from './DecryptionChallenge'
 
 @ObjectType()
 export class DeviceGQL {
@@ -44,12 +45,6 @@ export class DeviceGQL {
   @Field({ nullable: true })
   masterPasswordOutdatedAt?: Date
 
-  @Field(() => [VaultUnlockEventsGQL])
-  VaultUnlockEvents: VaultUnlockEventsGQL[]
-
-  @Field(() => [VaultUnlockEventsGQL])
-  VaultUnlockEventsApproved: VaultUnlockEventsGQL[]
-
   @Field()
   userId: string
 
@@ -61,6 +56,12 @@ export class DeviceGQL {
 
   @Field(() => [SecretUsageEventGQL])
   SecretUsageEvents: SecretUsageEventGQL[]
+
+  @Field(() => [DecryptionChallengeGQL])
+  DeviceDecryptionChallenges: DecryptionChallengeGQL[]
+
+  @Field(() => [DecryptionChallengeGQL])
+  DeviceDecryptionChallengesApproved: DecryptionChallengeGQL[]
 
   // skip overwrite 👇
 }

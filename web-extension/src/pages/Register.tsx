@@ -23,7 +23,6 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
 import { device } from '@src/background/Device'
 import cryptoJS from 'crypto-js'
-import Bowser from 'bowser'
 
 interface Values {
   password: string
@@ -57,30 +56,15 @@ export default function Register(): ReactElement {
           // @ts-expect-error
           const userId = crypto.randomUUID()
 
-          const countOfDevices = 0
-          const addDeviceSecret = device.generateAddDeviceSecret()
-
-          const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
-            addDeviceSecret,
-            values.password,
-            {
-              iv: cryptoJS.enc.Utf8.parse(userId)
-            }
-          ).toString()
-          const browserInfo = Bowser.getParser(navigator.userAgent)
-          console.log(deviceId)
           let res = await register({
             variables: {
               userId,
               input: {
                 email: values.email,
-                addDeviceSecret: addDeviceSecret,
-                addDeviceSecretEncrypted,
+                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
                 deviceId,
                 firebaseToken: fireToken,
-                deviceName: `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension ${
-                  countOfDevices + 1
-                }` // TODO get device name from agent string
+                deviceName: device.generateDeviceName()
               }
             }
           })
