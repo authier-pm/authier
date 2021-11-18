@@ -30,7 +30,7 @@
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.4.0",
     "type-graphql": "^1.1.1",
-    "typescript": "^4.4.4",
+    "typescript": "^4.5.2",
     "under-pressure": "^5.8.0"
   },
   "devDependencies": {
@@ -45,15 +45,15 @@
   "scripts": {
     "dev": "DEBUG=au:* nodemon --exec ts-node-transpile-only server.ts",
     "local": "nodemon server.ts",
-    "pgn": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma migrate dev && prisma db push && prisma generate",
+    "pgn": "cross-env prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate deploy",
     "build": "rm -rf dist && tsc && node scripts/build.js && yarn tar",
     "deploy": "caprover deploy -t authier-api.tar.gz",
     "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
-    "generate": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma generate",
-    "postinstall2": "cross-env SKIP_PRISMA_VERSION_CHECK=1 prisma generate",
+    "generate": "cross-env prisma generate",
+    "postinstall": "cross-env prisma generate",
     "test": "jest",
     "tsc": "tsc",
     "start": "prisma migrate deploy && prisma generate && node server.js",
