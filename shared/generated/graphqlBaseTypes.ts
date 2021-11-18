@@ -1,4 +1,5 @@
 export type Maybe<T> = T | null
+export type InputMaybe<T> = Maybe<T>
 export type Exact<T extends { [key: string]: unknown }> = {
   [K in keyof T]: T[K]
 }
@@ -23,13 +24,28 @@ export type Scalars = {
   UUID: any
 }
 
+export type DecryptionChallengeGql = {
+  __typename?: 'DecryptionChallengeGQL'
+  addDeviceSecretEncrypted: Scalars['String']
+  approvedAt?: Maybe<Scalars['DateTime']>
+  approvedFromDevice?: Maybe<DeviceGql>
+  approvedFromDeviceId?: Maybe<Scalars['String']>
+  createdAt: Scalars['DateTime']
+  device?: Maybe<DeviceGql>
+  deviceId?: Maybe<Scalars['String']>
+  id: Scalars['ID']
+  masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
+  user: UserGql
+  userId: Scalars['String']
+}
+
 export type DeviceGql = {
   __typename?: 'DeviceGQL'
+  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
+  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
   UserMaster?: Maybe<UserGql>
-  VaultUnlockEvents: Array<VaultUnlockEventsGql>
-  VaultUnlockEventsApproved: Array<VaultUnlockEventsGql>
   createdAt: Scalars['DateTime']
   firebaseToken: Scalars['String']
   firstIpAddress: Scalars['String']
@@ -66,12 +82,12 @@ export type EncryptedSecretGql = {
 }
 
 export type EncryptedSecretInput = {
-  androidUri?: Maybe<Scalars['String']>
+  androidUri?: InputMaybe<Scalars['String']>
   encrypted: Scalars['String']
-  iosUri?: Maybe<Scalars['String']>
+  iosUri?: InputMaybe<Scalars['String']>
   kind: EncryptedSecretType
   label: Scalars['String']
-  url?: Maybe<Scalars['String']>
+  url?: InputMaybe<Scalars['String']>
 }
 
 export type EncryptedSecretQuery = {
@@ -108,6 +124,8 @@ export type Mutation = {
   __typename?: 'Mutation'
   addNewDeviceForUser: LoginResponse
   addWebInputs: Array<WebInputGql>
+  /** returns a decryption challenge */
+  deviceDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   /** removes current device */
   logout?: Maybe<Scalars['Boolean']>
   /** you need to be authenticated to call this resolver */
@@ -125,6 +143,10 @@ export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>
 }
 
+export type MutationDeviceDecryptionChallengeArgs = {
+  email: Scalars['EmailAddress']
+}
+
 export type MutationRegisterNewUserArgs = {
   input: RegisterNewDeviceInput
   userId: Scalars['UUID']
@@ -138,15 +160,9 @@ export type Query = {
   __typename?: 'Query'
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean']
-  /** returns a decryption challenge */
-  deviceDecryptionChallenge: Array<Scalars['String']>
   me?: Maybe<UserQuery>
   user?: Maybe<UserQuery>
   webInputs: Array<WebInputGql>
-}
-
-export type QueryDeviceDecryptionChallengeArgs = {
-  email: Scalars['EmailAddress']
 }
 
 export type QueryUserArgs = {
@@ -174,7 +190,6 @@ export type SecretUsageEventGql = {
   WebOTPInput?: Maybe<WebInputGql>
   deviceId: Scalars['String']
   id: Scalars['ID']
-  ipAddress: Scalars['String']
   kind: Scalars['String']
   timestamp: Scalars['DateTime']
   url: Scalars['String']
@@ -222,9 +237,10 @@ export enum TokenType {
 
 export type UserAfterAuth = {
   __typename?: 'UserAfterAuth'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
-  SettingsConfig: Array<SettingsConfigGql>
+  SettingsConfigs: Array<SettingsConfigGql>
   TOTPlimit: Scalars['Int']
   Tags: Array<TagGql>
   Token: Array<TokenGql>
@@ -246,9 +262,10 @@ export type UserAfterAuth = {
 
 export type UserGql = {
   __typename?: 'UserGQL'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
-  SettingsConfig: Array<SettingsConfigGql>
+  SettingsConfigs: Array<SettingsConfigGql>
   TOTPlimit: Scalars['Int']
   Tags: Array<TagGql>
   Token: Array<TokenGql>
@@ -270,9 +287,10 @@ export type UserGql = {
 
 export type UserMutation = {
   __typename?: 'UserMutation'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
-  SettingsConfig: Array<SettingsConfigGql>
+  SettingsConfigs: Array<SettingsConfigGql>
   TOTPlimit: Scalars['Int']
   Tags: Array<TagGql>
   Token: Array<TokenGql>
@@ -337,9 +355,10 @@ export type UserPaidProductsGql = {
 
 export type UserQuery = {
   __typename?: 'UserQuery'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
-  SettingsConfig: Array<SettingsConfigGql>
+  SettingsConfigs: Array<SettingsConfigGql>
   TOTPlimit: Scalars['Int']
   Tags: Array<TagGql>
   Token: Array<TokenGql>
@@ -369,18 +388,6 @@ export type UserQuerySendAuthMessageArgs = {
   location: Scalars['String']
   pageName: Scalars['String']
   time: Scalars['String']
-}
-
-export type VaultUnlockEventsGql = {
-  __typename?: 'VaultUnlockEventsGQL'
-  approvedAt?: Maybe<Scalars['DateTime']>
-  approvedFromDevice?: Maybe<DeviceGql>
-  approvedFromDeviceId?: Maybe<Scalars['String']>
-  approvedFromIp?: Maybe<Scalars['String']>
-  device: DeviceGql
-  deviceId: Scalars['String']
-  deviceIp: Scalars['String']
-  id: Scalars['ID']
 }
 
 export type WebInputElement = {

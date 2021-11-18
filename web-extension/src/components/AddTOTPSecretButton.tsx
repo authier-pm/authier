@@ -14,6 +14,8 @@ import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { ITOTPSecret } from '@src/util/useBackgroundState'
+import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
 
 export const AddTOTPSecretButton: React.FC<{}> = () => {
   const { backgroundState, forceUpdate } = useContext(BackgroundContext)
@@ -27,7 +29,7 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
 
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = backgroundState.totpSecrets.find(
-      ({ secret }) => newTotpSecret.secret === secret
+      ({ totp }) => newTotpSecret.totp === totp
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
@@ -61,7 +63,10 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
+export function getTokenSecretFromQrCode(
+  qr: QRCode,
+  tab: Tabs.Tab
+): ITOTPSecret {
   const parsedQuery = queryString.parseUrl(qr.data)
 
   if (!parsedQuery.query.secret) {
@@ -69,11 +74,12 @@ export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
     throw new Error('QR code does not have any secret')
   }
   return {
-    secret: parsedQuery.query.secret as string,
-    icon: tab.favIconUrl,
+    kind: EncryptedSecretsType.TOTP as any,
+    totp: parsedQuery.query.secret as string,
+    iconUrl: tab.favIconUrl,
     label:
       (parsedQuery.query.issuer as string) ??
       decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
-    originalUrl: tab.url
+    url: tab.url as string
   }
 }

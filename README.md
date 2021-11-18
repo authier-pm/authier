@@ -22,3 +22,7 @@ yarn schemas
 ## Updating packages
 
 keep in mind that a single package can be in multiple subfolders, so if you update it in one place, make sure to update it everywhere
+
+## Yarn install
+
+We are using yarn workspaces so always run yarn in root folder. That's where the lockfile is.

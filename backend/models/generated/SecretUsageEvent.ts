@@ -16,9 +16,6 @@ export class SecretUsageEventGQL {
   timestamp: Date
 
   @Field()
-  ipAddress: string
-
-  @Field()
   url: string
 
   @Field(() => UserGQL)

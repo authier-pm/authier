@@ -12,7 +12,7 @@ import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySe
 import { useSettingsQuery } from '@src/popup/Popup.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
-  EncryptedSecret,
+  EncryptedSecretGql,
   EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
@@ -20,7 +20,7 @@ import { toast } from 'react-toastify'
 import { omit } from 'lodash'
 
 export interface ISecret {
-  encrypted: string
+  // encrypted: string
   kind: EncryptedSecretType
   label: string
   iconUrl: string | undefined
@@ -32,7 +32,7 @@ export interface ITOTPSecret extends ISecret {
   kind: EncryptedSecretType.TOTP
 }
 
-export interface ILoginCredentials extends ISecret {
+export interface ILoginSecret extends ISecret {
   loginCredentials: {
     password: string
     username: string
@@ -105,7 +105,7 @@ export function useBackgroundState() {
       (request: {
         safe: string
         filling: Boolean
-        passwords: Array<ILoginCredentials>
+        passwords: Array<ILoginSecret>
       }) => {
         if (request.filling) {
           setIsFilling(true)
@@ -147,14 +147,14 @@ export function useBackgroundState() {
     loginUser: async (
       masterPassword: string,
       userId: string,
-      secrets: Array<Pick<EncryptedSecret, 'encrypted' | 'kind'>>
+      secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>
     ) => {
       setSafeLocked(false)
 
       const decryptAndParse = (
         data: string,
         password = masterPassword
-      ): ILoginCredentials[] | ITOTPSecret[] => {
+      ): ILoginSecret[] | ITOTPSecret[] => {
         try {
           const decrypted = cryptoJS.AES.decrypt(data, password as string, {
             iv: cryptoJS.enc.Utf8.parse(userId as string)
@@ -188,7 +188,7 @@ export function useBackgroundState() {
           ? (decryptAndParse(
               credentialsSecretsEncrypted,
               masterPassword
-            ) as ILoginCredentials[])
+            ) as ILoginSecret[])
           : [],
         totpSecrets: totpSecretsEncrypted
           ? (decryptAndParse(
@@ -204,7 +204,7 @@ export function useBackgroundState() {
 
       setBackgroundState(payload)
     },
-    saveLoginCredentials: (passwords: ILoginCredentials[]) => {
+    saveLoginCredentials: (passwords: ILoginSecret[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,

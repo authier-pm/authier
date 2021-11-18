@@ -1,54 +1,35 @@
-import * as Types from './generated/graphqlBaseTypes'
+import * as Types from './generated/graphqlBaseTypes';
 
-import { gql } from '@apollo/client'
-import * as Apollo from '@apollo/client'
-const defaultOptions = {}
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+const defaultOptions =  {}
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
-  currentAddDeviceSecret: Types.Scalars['String']
-  input: Types.RegisterNewDeviceInput
-}>
+  currentAddDeviceSecret: Types.Scalars['String'];
+  input: Types.RegisterNewDeviceInput;
+}>;
 
-export type AddNewDeviceForUserMutation = {
-  __typename?: 'Mutation'
-  addNewDeviceForUser: {
-    __typename?: 'LoginResponse'
-    accessToken: string
-    user: {
-      __typename?: 'UserAfterAuth'
-      EncryptedSecrets: Array<{
-        __typename?: 'EncryptedSecretGQL'
-        id: string
-        kind: Types.EncryptedSecretType
-        encrypted: string
-      }>
-    }
-  }
-}
+
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, kind: Types.EncryptedSecretType, encrypted: string }> } } };
+
 
 export const AddNewDeviceForUserDocument = gql`
-  mutation addNewDeviceForUser(
-    $currentAddDeviceSecret: String!
-    $input: RegisterNewDeviceInput!
+    mutation addNewDeviceForUser($currentAddDeviceSecret: String!, $input: RegisterNewDeviceInput!) {
+  addNewDeviceForUser(
+    currentAddDeviceSecret: $currentAddDeviceSecret
+    input: $input
   ) {
-    addNewDeviceForUser(
-      currentAddDeviceSecret: $currentAddDeviceSecret
-      input: $input
-    ) {
-      accessToken
-      user {
-        EncryptedSecrets {
-          id
-          kind
-          encrypted
-        }
+    accessToken
+    user {
+      EncryptedSecrets {
+        id
+        kind
+        encrypted
       }
     }
   }
-`
-export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<
-  AddNewDeviceForUserMutation,
-  AddNewDeviceForUserMutationVariables
->
+}
+    `;
+export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>;
 
 /**
  * __useAddNewDeviceForUserMutation__
@@ -68,24 +49,10 @@ export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useAddNewDeviceForUserMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    AddNewDeviceForUserMutation,
-    AddNewDeviceForUserMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<
-    AddNewDeviceForUserMutation,
-    AddNewDeviceForUserMutationVariables
-  >(AddNewDeviceForUserDocument, options)
-}
-export type AddNewDeviceForUserMutationHookResult = ReturnType<
-  typeof useAddNewDeviceForUserMutation
->
-export type AddNewDeviceForUserMutationResult =
-  Apollo.MutationResult<AddNewDeviceForUserMutation>
-export type AddNewDeviceForUserMutationOptions = Apollo.BaseMutationOptions<
-  AddNewDeviceForUserMutation,
-  AddNewDeviceForUserMutationVariables
->
+export function useAddNewDeviceForUserMutation(baseOptions?: Apollo.MutationHookOptions<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>(AddNewDeviceForUserDocument, options);
+      }
+export type AddNewDeviceForUserMutationHookResult = ReturnType<typeof useAddNewDeviceForUserMutation>;
+export type AddNewDeviceForUserMutationResult = Apollo.MutationResult<AddNewDeviceForUserMutation>;
+export type AddNewDeviceForUserMutationOptions = Apollo.BaseMutationOptions<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>;

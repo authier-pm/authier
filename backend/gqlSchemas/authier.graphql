@@ -6,11 +6,6 @@ type Query {
   """
   authenticated: Boolean!
   me: UserQuery
-
-  """
-  returns a decryption challenge
-  """
-  deviceDecryptionChallenge(email: EmailAddress!): [String!]!
   webInputs(url: String!): [WebInputGQL!]!
 }
 
@@ -32,9 +27,10 @@ type UserQuery {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfig: [SettingsConfigGQL!]!
+  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
+  DecryptionChallenges: [DecryptionChallengeGQL!]!
   myDevices: [DeviceGQL!]!
   devicesCount: Int!
   settings: SettingsConfigGQL!
@@ -92,9 +88,10 @@ type UserGQL {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfig: [SettingsConfigGQL!]!
+  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
+  DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
 
 type DeviceGQL {
@@ -111,30 +108,18 @@ type DeviceGQL {
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
   masterPasswordOutdatedAt: DateTime
-  VaultUnlockEvents: [VaultUnlockEventsGQL!]!
-  VaultUnlockEventsApproved: [VaultUnlockEventsGQL!]!
   userId: String!
   User: UserGQL!
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
-}
-
-type VaultUnlockEventsGQL {
-  id: ID!
-  deviceIp: String!
-  approvedFromIp: String
-  approvedAt: DateTime
-  deviceId: String!
-  device: DeviceGQL!
-  approvedFromDeviceId: String
-  approvedFromDevice: DeviceGQL
+  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
+  DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
 }
 
 type SecretUsageEventGQL {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  ipAddress: String!
   url: String!
   User: UserGQL!
   userId: String!
@@ -169,7 +154,6 @@ type EncryptedSecretGQL {
   id: ID!
   encrypted: String!
   version: Int!
-  userId: String!
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -180,12 +164,27 @@ type EncryptedSecretGQL {
   lastUsageEvent: SecretUsageEventGQL
   iconUrl: String
   label: String!
+  userId: String!
   user: UserGQL!
 }
 
 enum EncryptedSecretType {
   TOTP
   LOGIN_CREDENTIALS
+}
+
+type DecryptionChallengeGQL {
+  id: ID!
+  masterPasswordVerifiedAt: DateTime
+  approvedAt: DateTime
+  userId: String!
+  user: UserGQL!
+  createdAt: DateTime!
+  deviceId: String
+  device: DeviceGQL
+  approvedFromDeviceId: String
+  approvedFromDevice: DeviceGQL
+  addDeviceSecretEncrypted: String!
 }
 
 type SettingsConfigGQL {
@@ -221,7 +220,6 @@ type EncryptedSecretQuery {
   id: ID!
   encrypted: String!
   version: Int!
-  userId: String!
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -232,6 +230,7 @@ type EncryptedSecretQuery {
   lastUsageEvent: SecretUsageEventGQL
   iconUrl: String
   label: String!
+  userId: String!
   user: UserGQL!
 }
 
@@ -247,6 +246,11 @@ type Mutation {
     currentAddDeviceSecret: String!
     input: RegisterNewDeviceInput!
   ): LoginResponse!
+
+  """
+  returns a decryption challenge
+  """
+  deviceDecryptionChallenge(email: EmailAddress!): DecryptionChallengeGQL
 
   """
   removes current device
@@ -273,9 +277,10 @@ type UserMutation {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfig: [SettingsConfigGQL!]!
+  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
+  DecryptionChallenges: [DecryptionChallengeGQL!]!
   addDevice(
     firebaseToken: String!
     deviceId: String!
@@ -325,9 +330,10 @@ type UserAfterAuth {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfig: [SettingsConfigGQL!]!
+  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
+  DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
 
 """

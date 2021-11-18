@@ -6,7 +6,7 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { ILoginCredentials } from '@src/util/useBackgroundState'
+import { ILoginSecret } from '@src/util/useBackgroundState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('au:contentScript')

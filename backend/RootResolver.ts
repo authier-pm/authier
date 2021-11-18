@@ -16,7 +16,11 @@ import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
-import { LoginResponse, OTPEvent } from './models/models'
+import {
+  DecryptionChallengeResponse,
+  LoginResponse,
+  OTPEvent
+} from './models/models'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 
 import { verify } from 'jsonwebtoken'
@@ -29,8 +33,9 @@ import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewDeviceInput } from './models/AuthInputs'
 
-import { Device, User, WebInput } from '@prisma/client'
+import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from './models/generated/WebInput'
+import { DecryptionChallengeGQL } from './models/generated/DecryptionChallenge'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -256,15 +261,45 @@ export class RootResolver {
   }
 
   // TODO rate limit this per IP
-  @Query(() => [String], { description: 'returns a decryption challenge' })
+  @Mutation(() => DecryptionChallengeGQL, {
+    description: 'returns a decryption challenge',
+    nullable: true
+  })
   async deviceDecryptionChallenge(
-    @Arg('email', () => GraphQLEmailAddress) email: string
+    @Arg('email', () => GraphQLEmailAddress) email: string,
+    @Ctx() ctx: IContext
   ) {
     const user = await prisma.user.findUnique({
       where: { email },
-      select: { addDeviceSecretEncrypted: true }
+      select: { id: true, addDeviceSecretEncrypted: true }
     })
-    return user?.addDeviceSecretEncrypted
+    if (user) {
+      const inLastHour = await prisma.decryptionChallenge.count({
+        where: {
+          userId: user.id,
+          createdAt: new Date(Date.now() - 3600000),
+          masterPasswordVerifiedAt: null
+        }
+      })
+      if (inLastHour > 5) {
+        throw new GraphqlError(
+          'Too many decryption challenges, wait for cooldown'
+        )
+      }
+
+      const challenge = await prisma.decryptionChallenge.create({
+        data: {
+          userId: user.id,
+          ipAddress: ctx.getIpAddress()
+        }
+      })
+      // TODO notify user's master device that someone is trying to login
+      return {
+        ...challenge,
+        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted
+      }
+    }
+    return null
   }
 
   @UseMiddleware(isAuth)

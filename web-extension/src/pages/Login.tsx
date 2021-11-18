@@ -33,6 +33,7 @@ import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { useAddNewDeviceForUserMutation } from '../../../shared/addNewDeviceForUser.codegen'
+import { device } from '@src/background/Device'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -43,9 +44,8 @@ interface Values {
 export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [login, { loading }] = useAddNewDeviceForUserMutation()
-  const { setUserId } = useContext(UserContext)
-
+  const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
+  const { setUserId, fireToken } = useContext(UserContext)
   const { loginUser } = useContext(BackgroundContext)
 
   return (
@@ -60,16 +60,29 @@ export default function Login(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const response = await login({
-            variables: { email: values.email, password: values.password }
+          const response = await addNewDevice({
+            variables: {
+              input: {
+                deviceId: await device.getDeviceId(),
+                ...device.getAddDeviceSecretAuthTuple(
+                  values.password,
+                  'userId'
+                ),
+                email: values.email,
+                deviceName: device.generateDeviceName(),
+                firebaseToken: fireToken
+              },
+              currentAddDeviceSecret: ''
+            }
           })
 
-          if (response.data?.login?.accessToken) {
-            setAccessToken(response.data.login?.accessToken)
+          if (response.data?.addNewDeviceForUser?.accessToken) {
+            setAccessToken(response.data.addNewDeviceForUser?.accessToken)
 
             let decodedToken = await getUserFromToken()
 
-            const EncryptedSecrets = response.data.login.user.EncryptedSecrets
+            const EncryptedSecrets =
+              response.data.addNewDeviceForUser.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
             loginUser(

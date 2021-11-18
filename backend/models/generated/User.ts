@@ -7,6 +7,7 @@ import { WebInputGQL } from './WebInput'
 import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
+import { DecryptionChallengeGQL } from './DecryptionChallenge'
 
 @ObjectType()
 export class UserGQL {
@@ -62,13 +63,16 @@ export class UserGQL {
   WebInputsAdded: WebInputGQL[]
 
   @Field(() => [SettingsConfigGQL])
-  SettingsConfig: SettingsConfigGQL[]
+  SettingsConfigs: SettingsConfigGQL[]
 
   @Field(() => [TagGQL])
   Tags: TagGQL[]
 
   @Field(() => [UserPaidProductsGQL])
   UserPaidProducts: UserPaidProductsGQL[]
+
+  @Field(() => [DecryptionChallengeGQL])
+  DecryptionChallenges: DecryptionChallengeGQL[]
 
   // skip overwrite 👇
 }
