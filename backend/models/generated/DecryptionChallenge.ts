@@ -35,7 +35,6 @@ export class DecryptionChallengeGQL {
   approvedFromDevice?: DeviceGQL
 
   // skip overwrite 👇
-
   @Field()
   addDeviceSecretEncrypted: string
 }
