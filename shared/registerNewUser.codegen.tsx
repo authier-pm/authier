@@ -9,7 +9,7 @@ export type RegisterNewUserMutationVariables = Types.Exact<{
 }>;
 
 
-export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', encrypted: string, kind: Types.EncryptedSecretType, id: string }> } } };
+export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', id: string, Devices: Array<{ __typename?: 'DeviceGQL', id: string, name: string }> } } };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
@@ -25,10 +25,9 @@ export const RegisterNewUserDocument = gql`
     accessToken
     user {
       id
-      EncryptedSecrets {
-        encrypted
-        kind
+      Devices {
         id
+        name
       }
     }
   }

@@ -42,7 +42,7 @@ export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const { data: settingsData } = useSettingsQuery()
+
   const { currentURL, isFilling, safeLocked, backgroundState } =
     useContext(BackgroundContext)
 

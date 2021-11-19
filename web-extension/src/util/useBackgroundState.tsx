@@ -57,7 +57,7 @@ const { AES, enc } = cryptoJS
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-  const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
+
   const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
 
@@ -249,7 +249,7 @@ export function useBackgroundState() {
         }
       })
 
-      refetchSettings()
+      // refetchSettings()
       //Call bg script to save settings to bg
       browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,

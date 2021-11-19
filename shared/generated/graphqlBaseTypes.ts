@@ -247,7 +247,6 @@ export type UserAfterAuth = {
   UsageEvents: Array<SecretUsageEventGql>
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
-  addDeviceSecret: Scalars['String']
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['String']>
@@ -272,7 +271,6 @@ export type UserGql = {
   UsageEvents: Array<SecretUsageEventGql>
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
-  addDeviceSecret: Scalars['String']
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['String']>
@@ -298,7 +296,6 @@ export type UserMutation = {
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
   addDevice: DeviceGql
-  addDeviceSecret: Scalars['String']
   addDeviceSecretEncrypted: Scalars['String']
   addEncryptedSecret: EncryptedSecretQuery
   approveDevice: Scalars['Boolean']
@@ -365,7 +362,6 @@ export type UserQuery = {
   UsageEvents: Array<SecretUsageEventGql>
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
-  addDeviceSecret: Scalars['String']
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   devicesCount: Scalars['Int']
