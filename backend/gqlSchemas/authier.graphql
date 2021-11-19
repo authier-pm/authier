@@ -14,7 +14,6 @@ type UserQuery {
   email: EmailAddress
   tokenVersion: Int!
   username: String
-  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
   Token: [TokenGQL!]!
   createdAt: DateTime!
@@ -75,7 +74,6 @@ type UserGQL {
   email: String
   tokenVersion: Int!
   username: String
-  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
   Token: [TokenGQL!]!
   createdAt: DateTime!
@@ -264,7 +262,6 @@ type UserMutation {
   email: EmailAddress
   tokenVersion: Int!
   username: String
-  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
   Token: [TokenGQL!]!
   createdAt: DateTime!
@@ -317,7 +314,6 @@ type UserAfterAuth {
   email: String
   tokenVersion: Int!
   username: String
-  addDeviceSecret: String!
   addDeviceSecretEncrypted: String!
   Token: [TokenGQL!]!
   createdAt: DateTime!

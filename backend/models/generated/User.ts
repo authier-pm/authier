@@ -24,9 +24,6 @@ export class UserGQL {
   username?: string
 
   @Field()
-  addDeviceSecret: string
-
-  @Field()
   addDeviceSecretEncrypted: string
 
   @Field(() => [TokenGQL])

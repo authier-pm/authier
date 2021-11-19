@@ -25,16 +25,25 @@ import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 dotenv.config()
 
+const environment = process.env.NODE_ENV
 sentryInit({
   dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
+  environment,
   release: `<project-name>@${pkg.version}`
 })
 
 const { env } = process
 async function main() {
   const app = fastify({
-    logger: true
+    logger: {
+      prettyPrint:
+        environment === 'production'
+          ? false
+          : {
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname'
+            }
+    }
   })
   app.register(fastifyCors)
   const trustedDomains = ['https://unpkg.com']
