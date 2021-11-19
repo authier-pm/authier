@@ -6,6 +6,7 @@ import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
+import { IoMdRefreshCircle } from 'react-icons/io'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -72,6 +73,16 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           )}
+
+          <IconButton
+            size="md"
+            ml="2"
+            aria-label="menu"
+            icon={<IoMdRefreshCircle />}
+            onClick={async () => {
+              console.log('aa')
+            }}
+          />
         </Box>
 
         <Box ml="auto">

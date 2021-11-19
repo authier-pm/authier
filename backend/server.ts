@@ -20,19 +20,21 @@ import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
+import debug from 'debug'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 dotenv.config()
+const { env } = process
+const log = debug('au:server')
 
-const environment = process.env.NODE_ENV
+const environment = env.NODE_ENV
 sentryInit({
-  dsn: process.env.SENTRY_DSN,
+  dsn: env.SENTRY_DSN,
   environment,
   release: `<project-name>@${pkg.version}`
 })
 
-const { env } = process
 async function main() {
   const app = fastify({
     logger: {
@@ -134,12 +136,13 @@ async function main() {
     },
     errorFormatter: (res, ctx) => {
       if (res.errors) {
-        console.log(chalk.bgRed('Graphql errors: '))
+        log('body: ', ctx.request.body)
+
         res.errors.map((err) => {
           if (err instanceof GraphqlError === false) {
             captureException(err)
           }
-          console.error(' ', err)
+          ctx.request.log.error(err)
         })
       }
       const errResponse = mercurius.defaultErrorFormatter(res, null)

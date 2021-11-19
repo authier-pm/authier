@@ -10,7 +10,8 @@ import {
   Mutation,
   Arg,
   Ctx,
-  UseMiddleware
+  UseMiddleware,
+  Info
 } from 'type-graphql'
 import { prisma } from './prisma'
 import { hash, compare } from 'bcrypt'
@@ -36,6 +37,9 @@ import { RegisterNewDeviceInput } from './models/AuthInputs'
 import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from './models/generated/WebInput'
 import { DecryptionChallengeGQL } from './models/generated/DecryptionChallenge'
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+import { GraphQLResolveInfo } from 'graphql'
+import { getPrismaRelationsFromInfo } from './utils/getPrismaRelationsFromInfo'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -121,11 +125,15 @@ export class RootResolver {
   //TODO query for info about user
   @UseMiddleware(isAuth)
   @Query(() => UserQuery, { nullable: true })
-  async me(@Ctx() context: IContextAuthenticated) {
+  async me(
+    @Ctx() context: IContextAuthenticated,
+    @Info() info: GraphQLResolveInfo
+  ) {
     const { jwtPayload } = context
     if (jwtPayload) {
       return prisma.user.findUnique({
-        where: { id: jwtPayload?.userId }
+        where: { id: jwtPayload?.userId },
+        include: getPrismaRelationsFromInfo(info)
       })
     }
   }
@@ -160,8 +168,8 @@ export class RootResolver {
       addDeviceSecret,
       addDeviceSecretEncrypted
     } = input
-    let user: User
-    let device
+    let user: User & { Devices: Device[] }
+
     try {
       user = await prisma.user.create({
         data: {
@@ -170,50 +178,44 @@ export class RootResolver {
           addDeviceSecret,
           addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          TOTPlimit: 4,
+          Devices: {
+            create: {
+              id: deviceId,
+              firstIpAddress: ipAddress,
+              lastIpAddress: ipAddress,
+              firebaseToken: firebaseToken,
+              name: deviceName
+            }
+          },
+          SettingsConfigs: {
+            create: {
+              twoFA: true,
+              homeUI: 'all',
+              lockTime: 28800000,
+              noHandsLogin: false
+            }
+          }
         },
         include: {
-          EncryptedSecrets: true
+          EncryptedSecrets: true,
+          Devices: true
         }
       })
-    } catch (err: any) {
-      if (err.code === 'P2002') {
+    } catch (err: PrismaClientKnownRequestError | any) {
+      console.log('~ err', err)
+      if (err.code === 'P2002' && err.meta.target[0] === 'email') {
         throw new GraphqlError('User with such email already exists.')
       }
-      throw err
-    }
-    try {
-      device = await prisma.device.create({
-        data: {
-          id: deviceId,
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: firebaseToken,
-          name: deviceName,
-          userId: user.id
-        }
-      })
-    } catch (err: any) {
-      if (err.code === 'P2002') {
+      if (err.code === 'P2002' && err.meta.target[0] === 'id') {
         throw new GraphqlError(
-          'This device is already registered under another user. You cannot open another account on the same device.'
+          'Device already exists. You cannot register this device for multiple accounts.'
         )
       }
       throw err
     }
 
-    console.log(device)
-
-    await prisma.settingsConfig.create({
-      data: {
-        twoFA: true,
-        homeUI: 'all',
-        lockTime: 28800000,
-        noHandsLogin: false,
-        userId: user.id
-      }
-    })
-
+    const device = user.Devices[0]
     user = await prisma.user.update({
       where: {
         id: user.id
