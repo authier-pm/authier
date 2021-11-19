@@ -1,23 +1,26 @@
 import { onError } from '@apollo/client/link/error'
 import { toastifyConfig } from './toastifyConfig'
 import { toast } from 'react-toastify'
+import { print } from 'graphql'
 
 // Log any GraphQL errors or network error that occurred
-export const errorLink = onError(({ graphQLErrors, networkError }) => {
-  const isExtension = window.location.href.startsWith('chrome-extension')
+export const errorLink = onError(
+  ({ graphQLErrors, networkError, operation }) => {
+    const isExtension = window.location.href.startsWith('chrome-extension')
 
-  toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
-  if (graphQLErrors) {
-    graphQLErrors.map(({ message, locations, path }) => {
-      console.error(JSON.stringify(locations))
-      console.error(
-        `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
-      )
-    })
+    toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
+    if (graphQLErrors) {
+      graphQLErrors.map(({ message, locations, path, ...rest }) => {
+        console.error(
+          `[GraphQL error]: Message: ${message}, operation: ${operation.operationName}, Path: ${path}`
+        )
+        console.error('full operation: ', print(operation.query))
+      })
 
-    toast.error(graphQLErrors[0].message ?? 'There was API error.')
-  } else if (networkError) {
-    console.error(`[Network error]: ${networkError}`)
-    toast.error('There was network error.')
+      toast.error(graphQLErrors[0].message ?? 'There was API error.')
+    } else if (networkError) {
+      console.error(`[Network error]: ${networkError}`)
+      toast.error('There was network error.')
+    }
   }
-})
+)

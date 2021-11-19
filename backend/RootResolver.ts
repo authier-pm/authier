@@ -161,7 +161,7 @@ export class RootResolver {
       addDeviceSecretEncrypted
     } = input
     let user: User
-
+    let device
     try {
       user = await prisma.user.create({
         data: {
@@ -171,6 +171,9 @@ export class RootResolver {
           addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
           TOTPlimit: 4
+        },
+        include: {
+          EncryptedSecrets: true
         }
       })
     } catch (err: any) {
@@ -179,17 +182,26 @@ export class RootResolver {
       }
       throw err
     }
-
-    let device = await prisma.device.create({
-      data: {
-        id: deviceId,
-        firstIpAddress: ipAddress,
-        lastIpAddress: ipAddress,
-        firebaseToken: firebaseToken,
-        name: deviceName,
-        userId: user.id
+    try {
+      device = await prisma.device.create({
+        data: {
+          id: deviceId,
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
+          firebaseToken: firebaseToken,
+          name: deviceName,
+          userId: user.id
+        }
+      })
+    } catch (err: any) {
+      if (err.code === 'P2002') {
+        throw new GraphqlError(
+          'This device is already registered under another user. You cannot open another account on the same device.'
+        )
       }
-    })
+      throw err
+    }
+
     console.log(device)
 
     await prisma.settingsConfig.create({
@@ -202,12 +214,15 @@ export class RootResolver {
       }
     })
 
-    await prisma.user.update({
+    user = await prisma.user.update({
       where: {
         id: user.id
       },
       data: {
         masterDeviceId: device.id
+      },
+      include: {
+        Devices: true
       }
     })
     return this.setCookiesAndConstructLoginResponse(user, device, ctx)
