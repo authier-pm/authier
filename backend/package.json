@@ -22,6 +22,7 @@
     "fastify-jwt": "^3.2.1",
     "firebase-admin": "^10.0.0",
     "graphql-fields": "^2.0.3",
+    "graphql-list-fields": "^2.0.2",
     "graphql-scalars": "^1.13.6",
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
