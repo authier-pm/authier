@@ -1,6 +1,6 @@
 import { prisma } from '../prisma'
 import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
-import { IContext } from '../RootResolver'
+import { IContext } from '../schemas/RootResolver'
 import { isAuth } from '../isAuth'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -17,6 +17,7 @@ import { UserGQL } from './generated/User'
 
 import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { DeviceGQL } from './generated/Device'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -24,6 +25,17 @@ export class UserBase extends UserGQL {
     nullable: true
   })
   email?: string
+
+  setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
+    setNewRefreshToken(this, deviceId, ctx)
+
+    const accessToken = setNewAccessTokenIntoCookie(this, deviceId, ctx)
+
+    return {
+      accessToken,
+      user: this
+    }
+  }
 }
 
 @ObjectType()
@@ -121,6 +133,12 @@ export class UserQuery extends UserBase {
 
 @ObjectType()
 export class UserMutation extends UserBase {
+  @Field(() => Boolean)
+  async addCookie(@Ctx() context: IContext) {
+    const firstDev = await prisma.device.findFirst()
+    this.setCookiesAndConstructLoginResponse(firstDev!.id, context)
+  }
+
   @Field(() => DeviceGQL)
   async addDevice(
     @Arg('name', () => String) name: string,

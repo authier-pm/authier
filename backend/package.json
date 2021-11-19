@@ -26,6 +26,7 @@
     "graphql-scalars": "^1.13.6",
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
+    "lodash.set": "^4.3.2",
     "mercurius": "^8.9.1",
     "pino-pretty": "^7.2.0",
     "prisma": "^3.5.0",
