@@ -8,9 +8,10 @@ import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
+import { ConstructorAssigner } from '../../utils/ConstructorAssigner'
 
 @ObjectType()
-export class UserGQL {
+export class UserGQL extends ConstructorAssigner {
   @Field(() => ID)
   id: string
 
