@@ -1,5 +1,6 @@
 const path = require('path')
 const webpack = require('webpack')
+const nodeExternals = require('webpack-node-externals')
 
 module.exports = {
   entry: {
@@ -11,6 +12,7 @@ module.exports = {
     path: path.join(__dirname, 'dist/js'),
     filename: '[name].js'
   },
+
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
@@ -50,8 +52,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
-      '@src': path.resolve(__dirname, 'src/'),
-      react: path.resolve('./node_modules/react') // without this It was throwing "You might have more than one copy of React in the same app"
+      '@src': path.resolve(__dirname, 'src/')
     },
     fallback: {
       crypto: require.resolve('crypto-browserify'),

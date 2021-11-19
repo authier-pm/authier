@@ -26,6 +26,7 @@
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
     "mercurius": "^8.9.1",
+    "pino-pretty": "^7.2.0",
     "prisma": "^3.5.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.4.0",

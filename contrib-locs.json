@@ -1,22 +1,22 @@
 {
-    "lastCommit": "78b7aae",
-    "updatedAt": "2021-11-18T16:36:47.336Z",
-    "totalCommits": 349,
-    "totalLinesAddedOrRemoved": 68224,
+    "lastCommit": "7a812e9",
+    "updatedAt": "2021-11-19T12:58:27.208Z",
+    "totalCommits": 350,
+    "totalLinesAddedOrRemoved": 68245,
     "contributors": [
         {
             "email": "capajj@gmail.com",
-            "loc": 39331,
-            "total_additions": 22947,
-            "total_deletions": 16384,
-            "percentageOfTotal": 57.64980065666041
+            "loc": 39352,
+            "total_additions": 22961,
+            "total_deletions": 16391,
+            "percentageOfTotal": 57.66283244193714
         },
         {
             "email": "petrik.spac@gmail.com",
             "loc": 28893,
             "total_additions": 18941,
             "total_deletions": 9952,
-            "percentageOfTotal": 42.35019934333959
+            "percentageOfTotal": 42.33716755806286
         }
     ]
 }
