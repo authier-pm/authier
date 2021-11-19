@@ -1,4 +1,4 @@
-import { isAuth } from './isAuth'
+import { isAuth } from '../isAuth'
 import {
   Query,
   //   Mutation,
@@ -13,7 +13,7 @@ import {
   UseMiddleware,
   Info
 } from 'type-graphql'
-import { prisma } from './prisma'
+import { prisma } from '../prisma'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
@@ -21,25 +21,26 @@ import {
   DecryptionChallengeResponse,
   LoginResponse,
   OTPEvent
-} from './models/models'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
+} from '../models/models'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
-import { UserQuery, UserMutation } from './models/User'
+import { UserQuery, UserMutation } from '../models/User'
 
-import { GraphqlError } from './api/GraphqlError'
-import { WebInputElement } from './models/WebInputElement'
+import { GraphqlError } from '../api/GraphqlError'
+import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
-import { RegisterNewDeviceInput } from './models/AuthInputs'
+import { RegisterNewDeviceInput } from '../models/AuthInputs'
 
 import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
-import { WebInputGQL } from './models/generated/WebInput'
-import { DecryptionChallengeGQL } from './models/generated/DecryptionChallenge'
+import { WebInputGQL } from '../models/generated/WebInput'
+import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { GraphQLResolveInfo } from 'graphql'
-import { getPrismaRelationsFromInfo } from './utils/getPrismaRelationsFromInfo'
+import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+import { UserGQL } from '../models/generated/User'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -138,21 +139,6 @@ export class RootResolver {
     }
   }
 
-  setCookiesAndConstructLoginResponse(
-    user: User,
-    device: Device,
-    ctx: IContext
-  ) {
-    setNewRefreshToken(user, device.id, ctx)
-
-    const accessToken = setNewAccessTokenIntoCookie(user, device.id, ctx)
-
-    return {
-      accessToken,
-      user
-    }
-  }
-
   @Mutation(() => LoginResponse)
   async registerNewUser(
     @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
@@ -227,7 +213,10 @@ export class RootResolver {
         Devices: true
       }
     })
-    return this.setCookiesAndConstructLoginResponse(user, device, ctx)
+    return new UserMutation(user).setCookiesAndConstructLoginResponse(
+      device.id,
+      ctx
+    )
   }
 
   @Mutation(() => LoginResponse)
@@ -274,7 +263,10 @@ export class RootResolver {
       }
     })
 
-    return this.setCookiesAndConstructLoginResponse(user, device, ctx)
+    return new UserMutation(user).setCookiesAndConstructLoginResponse(
+      device.id,
+      ctx
+    )
   }
 
   // TODO rate limit this per IP
