@@ -41,18 +41,21 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { UserGQL } from '../models/generated/User'
+import { DeviceGQL } from '../models/generated/Device'
+import { DeviceMutation, DeviceQuery } from '../models/Device'
 const log = debug('au:RootResolver')
 
 export interface IContext {
   request: FastifyRequest
   reply: FastifyReply
   getIpAddress: () => string
+  prisma: typeof prisma
 }
 
 export interface IContextAuthenticated {
   request: FastifyRequest
   reply: FastifyReply
-  jwtPayload: { userId: string }
+  jwtPayload: { userId: string; deviceId: string }
   getIpAddress: () => string
 }
 
@@ -125,16 +128,28 @@ export class RootResolver {
 
   //TODO query for info about user
   @UseMiddleware(isAuth)
-  @Query(() => UserQuery, { nullable: true })
+  @Query(() => UserQuery)
   async me(
     @Ctx() context: IContextAuthenticated,
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = context
+    return prisma.user.findUnique({
+      where: { id: jwtPayload.userId }
+    })
+  }
+
+  @UseMiddleware(isAuth)
+  @Query(() => DeviceQuery)
+  @Mutation(() => DeviceMutation)
+  async currentDevice(
+    @Ctx() context: IContextAuthenticated,
+    @Info() info: GraphQLResolveInfo
+  ) {
+    const { jwtPayload } = context
     if (jwtPayload) {
-      return prisma.user.findUnique({
-        where: { id: jwtPayload?.userId },
-        include: getPrismaRelationsFromInfo(info)
+      return prisma.device.findUnique({
+        where: { id: jwtPayload.deviceId }
       })
     }
   }

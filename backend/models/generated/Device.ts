@@ -1,8 +1,17 @@
-import { Field, ID, ObjectType, Int } from 'type-graphql'
+import {
+  Field,
+  ID,
+  ObjectType,
+  Int,
+  Ctx,
+  GraphQLISODateTime
+} from 'type-graphql'
 import { VaultUnlockEventsGQL } from './VaultUnlockEvents'
 import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
+import { IContext } from '../../schemas/RootResolver'
+import { EncryptedSecretQuery } from '../EncryptedSecret'
 
 @ObjectType()
 export class DeviceGQL {

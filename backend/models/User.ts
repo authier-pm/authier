@@ -1,5 +1,13 @@
 import { prisma } from '../prisma'
-import { Arg, Ctx, Field, Int, ObjectType, UseMiddleware } from 'type-graphql'
+import {
+  Arg,
+  Ctx,
+  Field,
+  Int,
+  ObjectType,
+  UseMiddleware,
+  GraphQLISODateTime
+} from 'type-graphql'
 import { IContext } from '../schemas/RootResolver'
 import { isAuth } from '../isAuth'
 
@@ -41,8 +49,8 @@ export class UserBase extends UserGQL {
 @ObjectType()
 export class UserQuery extends UserBase {
   @Field(() => [DeviceGQL])
-  async myDevices() {
-    return prisma.device.findMany({
+  async devices(@Ctx() ctx: IContext) {
+    return ctx.prisma.device.findMany({
       where: {
         userId: this.id
       },
@@ -54,6 +62,22 @@ export class UserQuery extends UserBase {
         }
       }
     })
+  }
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  async lastChangeInSecrets() {
+    const res = await prisma.encryptedSecret.aggregate({
+      where: {
+        userId: this.id
+      },
+      _max: {
+        updatedAt: true,
+        createdAt: true
+      }
+    })
+    return new Date(
+      Math.max(Number(res._max.createdAt), Number(res._max.updatedAt))
+    )
   }
 
   @Field(() => Int)

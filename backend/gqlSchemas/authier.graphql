@@ -5,7 +5,8 @@ type Query {
   you need to be authenticated to call this resolver
   """
   authenticated: Boolean!
-  me: UserQuery
+  me: UserQuery!
+  currentDevice: UserQuery!
   webInputs(url: String!): [WebInputGQL!]!
 }
 
@@ -30,7 +31,8 @@ type UserQuery {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  myDevices: [DeviceGQL!]!
+  devices: [DeviceGQL!]!
+  lastChangeInSecrets: DateTime
   devicesCount: Int!
   settings: SettingsConfigGQL!
   encryptedSecrets: [EncryptedSecretQuery!]!
@@ -278,6 +280,7 @@ type UserMutation {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  addCookie: Boolean!
   addDevice(
     firebaseToken: String!
     deviceId: String!

@@ -15,7 +15,7 @@ import {
 } from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
-import { IContext } from './RootResolver'
+import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
 import * as admin from 'firebase-admin'
@@ -132,12 +132,12 @@ async function main() {
           request.headers['x-forwarded-for'] || request.socket.remoteAddress
         )
       }
-      return { request, reply, getIpAddress }
+      log('body: ', request.body)
+
+      return { request, reply, getIpAddress, prisma }
     },
     errorFormatter: (res, ctx) => {
       if (res.errors) {
-        log('body: ', ctx.request.body)
-
         res.errors.map((err) => {
           if (err instanceof GraphqlError === false) {
             captureException(err)

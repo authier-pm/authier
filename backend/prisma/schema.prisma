@@ -9,7 +9,7 @@ generator client {
 }
 
 generator PrismaTypeGraphQLTypesGenerator {
-    provider                   = "node ../node_modules/prisma-typegraphql-types-generator"
+    provider                   = "node /home/capaj/oss/graphql-repos/prisma-tgql-types-gen/packages/generator"
     modelsOutput               = "./models/generated"
     enumsOutput                = "./models/types"
     useYarn                    = true
