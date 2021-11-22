@@ -62,6 +62,49 @@ export type DeviceGql = {
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
 }
 
+export type DeviceMutation = {
+  __typename?: 'DeviceMutation'
+  createdAt: Scalars['DateTime']
+  firebaseToken: Scalars['String']
+  firstIpAddress: Scalars['String']
+  id: Scalars['ID']
+  ipAddressLock: Scalars['Boolean']
+  lastIpAddress: Scalars['String']
+  lastSyncAt?: Maybe<Scalars['DateTime']>
+  markAsSynced: Scalars['DateTime']
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
+  name: Scalars['String']
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']>
+  syncTOTP: Scalars['Boolean']
+  updatedAt?: Maybe<Scalars['DateTime']>
+  userId: Scalars['String']
+  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
+}
+
+export type DeviceQuery = {
+  __typename?: 'DeviceQuery'
+  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
+  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
+  SecretUsageEvents: Array<SecretUsageEventGql>
+  User: UserGql
+  UserMaster?: Maybe<UserGql>
+  createdAt: Scalars['DateTime']
+  encryptedSecretsToSync: Array<EncryptedSecretQuery>
+  firebaseToken: Scalars['String']
+  firstIpAddress: Scalars['String']
+  id: Scalars['ID']
+  ipAddressLock: Scalars['Boolean']
+  lastIpAddress: Scalars['String']
+  lastSyncAt?: Maybe<Scalars['DateTime']>
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
+  name: Scalars['String']
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']>
+  syncTOTP: Scalars['Boolean']
+  updatedAt?: Maybe<Scalars['DateTime']>
+  userId: Scalars['String']
+  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
+}
+
 export type EncryptedSecretGql = {
   __typename?: 'EncryptedSecretGQL'
   androidUri?: Maybe<Scalars['String']>
@@ -124,6 +167,7 @@ export type Mutation = {
   __typename?: 'Mutation'
   addNewDeviceForUser: LoginResponse
   addWebInputs: Array<WebInputGql>
+  currentDevice: DeviceMutation
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   /** removes current device */
@@ -160,7 +204,8 @@ export type Query = {
   __typename?: 'Query'
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean']
-  me?: Maybe<UserQuery>
+  currentDevice: DeviceQuery
+  me: UserQuery
   user?: Maybe<UserQuery>
   webInputs: Array<WebInputGql>
 }
@@ -295,6 +340,7 @@ export type UserMutation = {
   UsageEvents: Array<SecretUsageEventGql>
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
+  addCookie: Scalars['Boolean']
   addDevice: DeviceGql
   addDeviceSecretEncrypted: Scalars['String']
   addEncryptedSecret: EncryptedSecretQuery
@@ -364,14 +410,15 @@ export type UserQuery = {
   WebInputsAdded: Array<WebInputGql>
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
+  devices: Array<DeviceGql>
   devicesCount: Scalars['Int']
   email?: Maybe<Scalars['EmailAddress']>
   encryptedSecrets: Array<EncryptedSecretQuery>
   id: Scalars['ID']
+  lastChangeInSecrets?: Maybe<Scalars['DateTime']>
   loginCredentialsLimit: Scalars['Int']
   masterDevice?: Maybe<DeviceGql>
   masterDeviceId?: Maybe<Scalars['String']>
-  myDevices: Array<DeviceGql>
   sendAuthMessage: Scalars['Boolean']
   settings: SettingsConfigGql
   tokenVersion: Scalars['Int']

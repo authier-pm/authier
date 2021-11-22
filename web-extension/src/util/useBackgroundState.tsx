@@ -144,58 +144,62 @@ export function useBackgroundState() {
     isFilling,
     forceUpdate,
     backgroundState,
-    loginUser: async (
-      masterPassword: string,
-      userId: string,
-      secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>
-    ) => {
+    initEncryptedSecrets: async (secrets: EncryptedSecretGql[]) => {
       setSafeLocked(false)
-
-      const decryptAndParse = (
-        data: string,
-        password = masterPassword
-      ): ILoginSecret[] | ITOTPSecret[] => {
-        try {
-          const decrypted = cryptoJS.AES.decrypt(data, password as string, {
-            iv: cryptoJS.enc.Utf8.parse(userId as string)
-          }).toString(cryptoJS.enc.Utf8)
-          const parsed = JSON.parse(decrypted)
-
-          return parsed
-        } catch (err) {
-          console.error(err)
-          toast.error('decryption failed')
-          return []
-        }
+      const masterPassword = backgroundState?.masterPassword
+      const userId = backgroundState?.userId
+      if (!masterPassword || !userId) {
+        return
       }
-      let totpSecretsEncrypted
-      let credentialsSecretsEncrypted
+      const decryptAndParse = () => {
+        return secrets.map((secret) => {
+          try {
+            const decrypted = cryptoJS.AES.decrypt(
+              secret.encrypted,
+              masterPassword,
+              {
+                iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+              }
+            ).toString(cryptoJS.enc.Utf8)
 
-      if (secrets.length > 0) {
-        totpSecretsEncrypted = secrets.filter(
+            if (secret.kind === EncryptedSecretType.TOTP) {
+              return {
+                ...secret,
+                totp: decrypted
+              }
+            } else {
+              const parsed = JSON.parse(decrypted)
+              return {
+                ...secret,
+                loginCredentials: parsed
+              }
+            }
+          } catch (err) {
+            console.error(err)
+            toast.error('decryption failed')
+            throw new Error('failed')
+          }
+        })
+      }
+      const secretsDecrypted = decryptAndParse()
+      let totpSecrets
+      let credentialsSecrets
+
+      if (secretsDecrypted.length > 0) {
+        totpSecrets = secretsDecrypted.filter(
           ({ kind }) => kind === EncryptedSecretType.TOTP
-        )[0]?.encrypted
+        )
 
-        credentialsSecretsEncrypted = secrets.filter(
+        credentialsSecrets = secretsDecrypted.filter(
           ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-        )[0]?.encrypted
+        )
       }
       const payload: IBackgroundStateSerializable = {
         masterPassword,
         userId,
         secrets,
-        loginCredentials: credentialsSecretsEncrypted
-          ? (decryptAndParse(
-              credentialsSecretsEncrypted,
-              masterPassword
-            ) as ILoginSecret[])
-          : [],
-        totpSecrets: totpSecretsEncrypted
-          ? (decryptAndParse(
-              totpSecretsEncrypted,
-              masterPassword
-            ) as ITOTPSecret[])
-          : []
+        loginCredentials: credentialsSecrets ? credentialsSecrets : [],
+        totpSecrets: totpSecrets ? totpSecrets : []
       }
       browser.runtime.sendMessage({
         action: BackgroundMessageType.setBackgroundState,
@@ -204,7 +208,7 @@ export function useBackgroundState() {
 
       setBackgroundState(payload)
     },
-    saveLoginCredentials: (passwords: ILoginSecret[]) => {
+    saveLoginCredentials: (passwords: EncryptedSecretGql[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,
@@ -217,7 +221,7 @@ export function useBackgroundState() {
         setBackgroundState(newBgState)
       }
     },
-    saveTOTPSecrets: (totpSecrets: ITOTPSecret[]) => {
+    saveTOTPSecrets: (totpSecrets: EncryptedSecretGql[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,

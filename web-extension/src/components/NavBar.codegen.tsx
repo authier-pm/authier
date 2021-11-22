@@ -3,18 +3,17 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type EncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type EncryptedSecretsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, email?: any | null | undefined, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, url?: string | null | undefined }> } | null | undefined };
+export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, url?: string | null | undefined }> } };
 
 
-export const EncryptedSecretsDocument = gql`
-    query EncryptedSecrets {
-  me {
+export const SyncEncryptedSecretsDocument = gql`
+    query SyncEncryptedSecrets {
+  currentDevice {
     id
-    email
-    EncryptedSecrets {
+    encryptedSecretsToSync {
       id
       encrypted
       kind
@@ -27,28 +26,28 @@ export const EncryptedSecretsDocument = gql`
     `;
 
 /**
- * __useEncryptedSecretsQuery__
+ * __useSyncEncryptedSecretsQuery__
  *
- * To run a query within a React component, call `useEncryptedSecretsQuery` and pass it any options that fit your needs.
- * When your component renders, `useEncryptedSecretsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSyncEncryptedSecretsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSyncEncryptedSecretsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useEncryptedSecretsQuery({
+ * const { data, loading, error } = useSyncEncryptedSecretsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useEncryptedSecretsQuery(baseOptions?: Apollo.QueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useSyncEncryptedSecretsQuery(baseOptions?: Apollo.QueryHookOptions<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+        return Apollo.useQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
       }
-export function useEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useSyncEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+          return Apollo.useLazyQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
         }
-export type EncryptedSecretsQueryHookResult = ReturnType<typeof useEncryptedSecretsQuery>;
-export type EncryptedSecretsLazyQueryHookResult = ReturnType<typeof useEncryptedSecretsLazyQuery>;
-export type EncryptedSecretsQueryResult = Apollo.QueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
+export type SyncEncryptedSecretsQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsQuery>;
+export type SyncEncryptedSecretsLazyQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsLazyQuery>;
+export type SyncEncryptedSecretsQueryResult = Apollo.QueryResult<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>;

@@ -1,22 +1,24 @@
 import { Field, GraphQLISODateTime, Ctx, ObjectType } from 'type-graphql'
-import { IContext } from '../schemas/RootResolver'
+import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecretsToSync(@Ctx() ctx: IContext) {
+  async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
+    const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
+    const { userId } = ctx.jwtPayload
     const res = await ctx.prisma.encryptedSecret.findMany({
       where: {
         OR: [
           {
-            userId: this.id,
-            createdAt: { gte: this.lastSyncAt }
+            userId: userId,
+            createdAt: lastSyncCondition
           },
           {
-            userId: this.id,
-            updatedAt: { gte: this.lastSyncAt }
+            userId: userId,
+            updatedAt: lastSyncCondition
           }
         ]
       }

@@ -46,7 +46,7 @@ export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
   const { setUserId, fireToken } = useContext(UserContext)
-  const { loginUser } = useContext(BackgroundContext)
+  const { initEncryptedSecrets: loginUser } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">

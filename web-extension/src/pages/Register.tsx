@@ -34,7 +34,7 @@ export default function Register(): ReactElement {
     useRegisterNewUserMutation()
 
   const { fireToken } = useContext(UserContext)
-  const { loginUser } = useContext(BackgroundContext)
+  const { initEncryptedSecrets: loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
   // console.log('~ fireToken', fireToken)
 
