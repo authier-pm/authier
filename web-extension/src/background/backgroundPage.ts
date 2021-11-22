@@ -63,8 +63,8 @@ if ('serviceWorker' in navigator) {
 }
 
 export interface IBackgroundStateSerializable {
-  loginCredentials: ILoginSecret[]
-  totpSecrets: ITOTPSecret[]
+  loginCredentials: EncryptedSecretGql[]
+  totpSecrets: EncryptedSecretGql[]
   userId: string
   masterPassword: string
   secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>

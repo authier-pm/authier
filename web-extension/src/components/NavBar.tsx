@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
 import { Flex, IconButton, useDisclosure, Box } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
@@ -7,6 +12,10 @@ import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdRefreshCircle } from 'react-icons/io'
+import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
+import { bgState } from '@src/background/backgroundPage'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -36,6 +45,20 @@ export const NavBar: FunctionComponent = () => {
       </Link>
     )
   }
+  const { initEncryptedSecrets, backgroundState } =
+    useContext(BackgroundContext)
+
+  const [getEncryptedSecretsToSync, { data }] =
+    useSyncEncryptedSecretsLazyQuery()
+
+  useEffect(() => {
+    if (data) {
+      console.log(data)
+      initEncryptedSecrets(
+        data.currentDevice.encryptedSecretsToSync as EncryptedSecretGql[]
+      )
+    }
+  }, [data])
 
   useEffect(() => {
     SetLastPage(location)
@@ -80,7 +103,7 @@ export const NavBar: FunctionComponent = () => {
             aria-label="menu"
             icon={<IoMdRefreshCircle />}
             onClick={async () => {
-              console.log('aa')
+              getEncryptedSecretsToSync()
             }}
           />
         </Box>

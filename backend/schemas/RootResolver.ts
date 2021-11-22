@@ -52,9 +52,7 @@ export interface IContext {
   prisma: typeof prisma
 }
 
-export interface IContextAuthenticated {
-  request: FastifyRequest
-  reply: FastifyReply
+export interface IContextAuthenticated extends IContext {
   jwtPayload: { userId: string; deviceId: string }
   getIpAddress: () => string
 }

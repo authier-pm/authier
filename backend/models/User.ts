@@ -163,6 +163,7 @@ export class UserQuery extends UserBase {
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => Boolean)
+  // TODO remove before putting into prod
   async addCookie(@Ctx() context: IContext) {
     const firstDev = await prisma.device.findFirst()
     this.setCookiesAndConstructLoginResponse(firstDev!.id, context)
