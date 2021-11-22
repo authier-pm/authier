@@ -2,7 +2,7 @@ import { Field, ID, ObjectType, Int } from 'type-graphql'
 import { UserGQL } from './User'
 
 @ObjectType()
-export class SettingsConfigGQL {
+export class SettingsConfigGQLScalars {
   @Field(() => ID)
   userId: string
 
@@ -20,7 +20,10 @@ export class SettingsConfigGQL {
 
   @Field({ nullable: true })
   updatedAt?: Date
+}
 
+@ObjectType()
+export class SettingsConfigGQL extends SettingsConfigGQLScalars {
   @Field(() => UserGQL)
   user: UserGQL
 

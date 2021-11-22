@@ -3,7 +3,7 @@ import { UserGQL } from './User'
 import { DeviceGQL } from './Device'
 
 @ObjectType()
-export class DecryptionChallengeGQL {
+export class DecryptionChallengeGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -16,20 +16,23 @@ export class DecryptionChallengeGQL {
   @Field()
   userId: string
 
-  @Field(() => UserGQL)
-  user: UserGQL
-
   @Field()
   createdAt: Date
 
   @Field({ nullable: true })
   deviceId?: string
 
-  @Field(() => DeviceGQL, { nullable: true })
-  device?: DeviceGQL
-
   @Field({ nullable: true })
   approvedFromDeviceId?: string
+}
+
+@ObjectType()
+export class DecryptionChallengeGQL extends DecryptionChallengeGQLScalars {
+  @Field(() => UserGQL)
+  user: UserGQL
+
+  @Field(() => DeviceGQL, { nullable: true })
+  device?: DeviceGQL
 
   @Field(() => DeviceGQL, { nullable: true })
   approvedFromDevice?: DeviceGQL

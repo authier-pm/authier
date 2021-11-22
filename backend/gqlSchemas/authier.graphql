@@ -6,7 +6,7 @@ type Query {
   """
   authenticated: Boolean!
   me: UserQuery!
-  currentDevice: UserQuery!
+  currentDevice: DeviceQuery!
   webInputs(url: String!): [WebInputGQL!]!
 }
 
@@ -16,13 +16,13 @@ type UserQuery {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  Token: [TokenGQL!]!
+  masterDevice: DeviceGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -49,6 +49,11 @@ A field whose value conforms to the standard internet email address format as sp
 """
 scalar EmailAddress @specifiedBy(url: "https://www.w3.org/Protocols/rfc822/")
 
+"""
+The javascript `Date` as string. Type represents date and time as the ISO Date string.
+"""
+scalar DateTime
+
 type TokenGQL {
   id: ID!
   createdAt: DateTime!
@@ -57,14 +62,9 @@ type TokenGQL {
   emailToken: String
   valid: Boolean!
   expiration: DateTime!
-  user: UserGQL!
   userId: String!
+  user: UserGQL!
 }
-
-"""
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
-"""
-scalar DateTime
 
 enum TokenType {
   EMAIL
@@ -77,13 +77,13 @@ type UserGQL {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  Token: [TokenGQL!]!
+  masterDevice: DeviceGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -121,11 +121,11 @@ type SecretUsageEventGQL {
   kind: String!
   timestamp: DateTime!
   url: String!
-  User: UserGQL!
   userId: String!
-  Device: DeviceGQL!
   deviceId: String!
   webInputId: Int
+  User: UserGQL!
+  Device: DeviceGQL!
   WebOTPInput: WebInputGQL
   EncryptedSecret: [EncryptedSecretGQL!]!
 }
@@ -137,8 +137,8 @@ type WebInputGQL {
   url: String!
   kind: WebInputType!
   domPath: String!
-  addedByUser: UserGQL!
   addedByUserId: String!
+  addedByUser: UserGQL!
   UsageEvents: [SecretUsageEventGQL!]!
 }
 
@@ -161,10 +161,10 @@ type EncryptedSecretGQL {
   androidUri: String
   iosUri: String
   lastUsageEventId: Float
-  lastUsageEvent: SecretUsageEventGQL
   iconUrl: String
   label: String!
   userId: String!
+  lastUsageEvent: SecretUsageEventGQL
   user: UserGQL!
 }
 
@@ -178,11 +178,11 @@ type DecryptionChallengeGQL {
   masterPasswordVerifiedAt: DateTime
   approvedAt: DateTime
   userId: String!
-  user: UserGQL!
   createdAt: DateTime!
   deviceId: String
-  device: DeviceGQL
   approvedFromDeviceId: String
+  user: UserGQL!
+  device: DeviceGQL
   approvedFromDevice: DeviceGQL
   addDeviceSecretEncrypted: String!
 }
@@ -201,8 +201,8 @@ type TagGQL {
   id: ID!
   name: String!
   createdAt: DateTime!
-  user: UserGQL!
   userId: String!
+  user: UserGQL!
 }
 
 type UserPaidProductsGQL {
@@ -212,8 +212,8 @@ type UserPaidProductsGQL {
   expiresAt: DateTime
   productId: String!
   userId: String!
-  user: UserGQL!
   checkoutSessionId: String!
+  user: UserGQL!
 }
 
 type EncryptedSecretQuery {
@@ -227,11 +227,34 @@ type EncryptedSecretQuery {
   androidUri: String
   iosUri: String
   lastUsageEventId: Float
-  lastUsageEvent: SecretUsageEventGQL
   iconUrl: String
   label: String!
   userId: String!
+  lastUsageEvent: SecretUsageEventGQL
   user: UserGQL!
+}
+
+type DeviceQuery {
+  id: ID!
+  firstIpAddress: String!
+  lastIpAddress: String!
+  firebaseToken: String!
+  name: String!
+  syncTOTP: Boolean!
+  ipAddressLock: Boolean!
+  vaultLockTimeoutSeconds: Int
+  createdAt: DateTime!
+  updatedAt: DateTime
+  registeredWithMasterAt: DateTime
+  lastSyncAt: DateTime
+  masterPasswordOutdatedAt: DateTime
+  userId: String!
+  User: UserGQL!
+  UserMaster: UserGQL
+  SecretUsageEvents: [SecretUsageEventGQL!]!
+  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
+  DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
+  encryptedSecretsToSync: [EncryptedSecretQuery!]!
 }
 
 type Mutation {
@@ -241,6 +264,7 @@ type Mutation {
   you need to be authenticated to call this resolver
   """
   me: UserMutation
+  currentDevice: DeviceMutation!
   registerNewUser(userId: UUID!, input: RegisterNewDeviceInput!): LoginResponse!
   addNewDeviceForUser(
     currentAddDeviceSecret: String!
@@ -265,13 +289,13 @@ type UserMutation {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  Token: [TokenGQL!]!
+  masterDevice: DeviceGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -307,6 +331,24 @@ input EncryptedSecretInput {
   encrypted: String!
 }
 
+type DeviceMutation {
+  id: ID!
+  firstIpAddress: String!
+  lastIpAddress: String!
+  firebaseToken: String!
+  name: String!
+  syncTOTP: Boolean!
+  ipAddressLock: Boolean!
+  vaultLockTimeoutSeconds: Int
+  createdAt: DateTime!
+  updatedAt: DateTime
+  registeredWithMasterAt: DateTime
+  lastSyncAt: DateTime
+  masterPasswordOutdatedAt: DateTime
+  userId: String!
+  markAsSynced: DateTime!
+}
+
 type LoginResponse {
   accessToken: String!
   user: UserAfterAuth!
@@ -318,13 +360,13 @@ type UserAfterAuth {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  Token: [TokenGQL!]!
   createdAt: DateTime!
   updatedAt: DateTime
-  masterDevice: DeviceGQL
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  Token: [TokenGQL!]!
+  masterDevice: DeviceGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!

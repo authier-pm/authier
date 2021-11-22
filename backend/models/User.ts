@@ -29,6 +29,11 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 @ObjectType()
 export class UserBase extends UserGQL {
+  constructor(parameters) {
+    super()
+    Object.assign(this, parameters)
+  }
+
   @Field(() => GraphQLEmailAddress, {
     nullable: true
   })

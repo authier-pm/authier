@@ -5,7 +5,7 @@ import { WebInputGQL } from './WebInput'
 import { EncryptedSecretGQL } from './EncryptedSecret'
 
 @ObjectType()
-export class SecretUsageEventGQL {
+export class SecretUsageEventGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -18,20 +18,23 @@ export class SecretUsageEventGQL {
   @Field()
   url: string
 
-  @Field(() => UserGQL)
-  User: UserGQL
-
   @Field()
   userId: string
-
-  @Field(() => DeviceGQL)
-  Device: DeviceGQL
 
   @Field()
   deviceId: string
 
   @Field(() => Int, { nullable: true })
   webInputId?: number
+}
+
+@ObjectType()
+export class SecretUsageEventGQL extends SecretUsageEventGQLScalars {
+  @Field(() => UserGQL)
+  User: UserGQL
+
+  @Field(() => DeviceGQL)
+  Device: DeviceGQL
 
   @Field(() => WebInputGQL, { nullable: true })
   WebOTPInput?: WebInputGQL

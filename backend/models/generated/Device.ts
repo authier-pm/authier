@@ -1,20 +1,10 @@
-import {
-  Field,
-  ID,
-  ObjectType,
-  Int,
-  Ctx,
-  GraphQLISODateTime
-} from 'type-graphql'
-import { VaultUnlockEventsGQL } from './VaultUnlockEvents'
+import { Field, ID, ObjectType, Int } from 'type-graphql'
 import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
-import { IContext } from '../../schemas/RootResolver'
-import { EncryptedSecretQuery } from '../EncryptedSecret'
 
 @ObjectType()
-export class DeviceGQL {
+export class DeviceGQLScalars {
   @Field(() => ID)
   id: string
 
@@ -56,7 +46,10 @@ export class DeviceGQL {
 
   @Field()
   userId: string
+}
 
+@ObjectType()
+export class DeviceGQL extends DeviceGQLScalars {
   @Field(() => UserGQL)
   User: UserGQL
 
