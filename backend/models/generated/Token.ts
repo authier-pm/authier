@@ -3,7 +3,7 @@ import { TokenTypeGQL } from '../types/TokenType'
 import { UserGQL } from './User'
 
 @ObjectType()
-export class TokenGQL {
+export class TokenGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -25,11 +25,17 @@ export class TokenGQL {
   @Field()
   expiration: Date
 
-  @Field(() => UserGQL)
-  user: UserGQL
-
   @Field()
   userId: string
+}
+
+@ObjectType()
+export class TokenGQL extends TokenGQLScalars {
+  @Field(() => TokenTypeGQL)
+  type: TokenTypeGQL
+
+  @Field(() => UserGQL)
+  user: UserGQL
 
   // skip overwrite 👇
 }

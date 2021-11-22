@@ -4,7 +4,7 @@ import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { UserGQL } from './User'
 
 @ObjectType()
-export class EncryptedSecretGQL {
+export class EncryptedSecretGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -35,9 +35,6 @@ export class EncryptedSecretGQL {
   @Field({ nullable: true })
   lastUsageEventId?: number
 
-  @Field(() => SecretUsageEventGQL, { nullable: true })
-  lastUsageEvent?: SecretUsageEventGQL
-
   @Field({ nullable: true })
   iconUrl?: string
 
@@ -46,6 +43,15 @@ export class EncryptedSecretGQL {
 
   @Field()
   userId: string
+}
+
+@ObjectType()
+export class EncryptedSecretGQL extends EncryptedSecretGQLScalars {
+  @Field(() => EncryptedSecretTypeGQL)
+  kind: EncryptedSecretTypeGQL
+
+  @Field(() => SecretUsageEventGQL, { nullable: true })
+  lastUsageEvent?: SecretUsageEventGQL
 
   @Field(() => UserGQL)
   user: UserGQL

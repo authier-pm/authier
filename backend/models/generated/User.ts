@@ -11,7 +11,7 @@ import { DecryptionChallengeGQL } from './DecryptionChallenge'
 import { ConstructorAssigner } from '../../utils/ConstructorAssigner'
 
 @ObjectType()
-export class UserGQL extends ConstructorAssigner {
+export class UserGQLScalars {
   @Field(() => ID)
   id: string
 
@@ -27,17 +27,11 @@ export class UserGQL extends ConstructorAssigner {
   @Field()
   addDeviceSecretEncrypted: string
 
-  @Field(() => [TokenGQL])
-  Token: TokenGQL[]
-
   @Field()
   createdAt: Date
 
   @Field({ nullable: true })
   updatedAt?: Date
-
-  @Field(() => DeviceGQL, { nullable: true })
-  masterDevice?: DeviceGQL
 
   @Field({ nullable: true })
   masterDeviceId?: string
@@ -47,6 +41,15 @@ export class UserGQL extends ConstructorAssigner {
 
   @Field(() => Int)
   loginCredentialsLimit: number
+}
+
+@ObjectType()
+export class UserGQL extends UserGQLScalars {
+  @Field(() => [TokenGQL])
+  Token: TokenGQL[]
+
+  @Field(() => DeviceGQL, { nullable: true })
+  masterDevice?: DeviceGQL
 
   @Field(() => [SecretUsageEventGQL])
   UsageEvents: SecretUsageEventGQL[]

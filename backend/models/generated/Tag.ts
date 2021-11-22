@@ -2,7 +2,7 @@ import { Field, ID, ObjectType } from 'type-graphql'
 import { UserGQL } from './User'
 
 @ObjectType()
-export class TagGQL {
+export class TagGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -12,11 +12,14 @@ export class TagGQL {
   @Field()
   createdAt: Date
 
-  @Field(() => UserGQL)
-  user: UserGQL
-
   @Field()
   userId: string
+}
+
+@ObjectType()
+export class TagGQL extends TagGQLScalars {
+  @Field(() => UserGQL)
+  user: UserGQL
 
   // skip overwrite 👇
 }

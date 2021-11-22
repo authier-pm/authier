@@ -4,7 +4,7 @@ import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 
 @ObjectType()
-export class WebInputGQL {
+export class WebInputGQLScalars {
   @Field(() => ID)
   id: number
 
@@ -23,11 +23,17 @@ export class WebInputGQL {
   @Field()
   domPath: string
 
-  @Field(() => UserGQL)
-  addedByUser: UserGQL
-
   @Field()
   addedByUserId: string
+}
+
+@ObjectType()
+export class WebInputGQL extends WebInputGQLScalars {
+  @Field(() => WebInputTypeGQL)
+  kind: WebInputTypeGQL
+
+  @Field(() => UserGQL)
+  addedByUser: UserGQL
 
   @Field(() => [SecretUsageEventGQL])
   UsageEvents: SecretUsageEventGQL[]
