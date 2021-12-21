@@ -158,7 +158,7 @@ async function main() {
           ctx.request.log.error(err)
         })
       }
-      const errResponse = mercurius.defaultErrorFormatter(res, null)
+      const errResponse = mercurius.defaultErrorFormatter(res, ctx)
       errResponse.statusCode = 200 // mercurius returns 500 by default, but we want to use 200 as that aligns better with apollo-server
       return errResponse
     }
