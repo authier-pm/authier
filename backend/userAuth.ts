@@ -17,6 +17,7 @@ export const setNewAccessTokenIntoCookie = (
       expiresIn: '60m'
     }
   )
+
   ctx.reply.setCookie('access-token', accessToken, {
     secure: isProd, // send cookie over HTTPS only
     httpOnly: true,
@@ -46,6 +47,7 @@ export const setNewRefreshToken = (
   const refreshToken = sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
     expiresIn: '1825d' // 5 years. In 5 years user has to approve the device again as it's refresh token will expire
   })
+
   ctx.reply.setCookie('refresh-token', refreshToken, {
     secure: isProd, // send cookie over HTTPS only
     httpOnly: true,

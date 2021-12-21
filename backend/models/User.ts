@@ -1,4 +1,4 @@
-import { prisma } from '../prisma'
+import { prismaClient } from '../prismaClient'
 import {
   Arg,
   Ctx,
@@ -9,7 +9,7 @@ import {
   GraphQLISODateTime
 } from 'type-graphql'
 import { IContext } from '../schemas/RootResolver'
-import { isAuth } from '../isAuth'
+import { throwIfNotAuthenticated } from '../api/authMiddleware'
 
 import { v4 as uuidv4 } from 'uuid'
 
@@ -71,7 +71,7 @@ export class UserQuery extends UserBase {
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   async lastChangeInSecrets() {
-    const res = await prisma.encryptedSecret.aggregate({
+    const res = await prismaClient.encryptedSecret.aggregate({
       where: {
         userId: this.id
       },
@@ -87,7 +87,7 @@ export class UserQuery extends UserBase {
 
   @Field(() => Int)
   async devicesCount() {
-    return prisma.device.count({
+    return prismaClient.device.count({
       where: {
         userId: this.id
       }
@@ -97,7 +97,7 @@ export class UserQuery extends UserBase {
   //Call this from the findFirst query in me??
   @Field(() => SettingsConfigGQL)
   async settings() {
-    return prisma.settingsConfig.findFirst({
+    return prismaClient.settingsConfig.findFirst({
       where: {
         userId: this.id
       }
@@ -106,7 +106,7 @@ export class UserQuery extends UserBase {
 
   @Field(() => [EncryptedSecretQuery])
   async encryptedSecrets() {
-    return prisma.encryptedSecret.findMany({
+    return prismaClient.encryptedSecret.findMany({
       where: {
         userId: this.id
       }
@@ -120,7 +120,7 @@ export class UserQuery extends UserBase {
     @Arg('device', () => String) device: string,
     @Arg('pageName', () => String) pageName: string
   ) {
-    let user = await prisma.user.findFirst({
+    let user = await prismaClient.user.findFirst({
       where: {
         id: this.id
       },
@@ -165,7 +165,7 @@ export class UserMutation extends UserBase {
   @Field(() => Boolean)
   // TODO remove before putting into prod
   async addCookie(@Ctx() context: IContext) {
-    const firstDev = await prisma.device.findFirst()
+    const firstDev = await prismaClient.device.findFirst()
     this.setCookiesAndConstructLoginResponse(firstDev!.id, context)
   }
 
@@ -178,7 +178,7 @@ export class UserMutation extends UserBase {
   ) {
     const ipAddress: string = context.getIpAddress()
 
-    return await prisma.device.create({
+    return await prismaClient.device.create({
       data: {
         name: name,
         id: deviceId,
@@ -217,7 +217,7 @@ export class UserMutation extends UserBase {
   async addEncryptedSecret(
     @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput
   ) {
-    return prisma.encryptedSecret.create({
+    return prismaClient.encryptedSecret.create({
       data: {
         version: 1,
         userId: this.id,
@@ -233,7 +233,7 @@ export class UserMutation extends UserBase {
     if (!this.masterDeviceId) {
       throw new Error('Must have masterDeviceId')
     }
-    return prisma.device.update({
+    return prismaClient.device.update({
       data: {
         firebaseToken: firebaseToken
       },
@@ -250,7 +250,7 @@ export class UserMutation extends UserBase {
     @Arg('lockTime', () => Int) lockTime: number,
     @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean
   ) {
-    return prisma.settingsConfig.upsert({
+    return prismaClient.settingsConfig.upsert({
       where: {
         userId: this.id
       },
@@ -274,7 +274,7 @@ export class UserMutation extends UserBase {
   //For testing purposes
   @Field(() => UserGQL)
   async revokeRefreshTokensForUser() {
-    return prisma.user.update({
+    return prismaClient.user.update({
       data: {
         tokenVersion: {
           increment: 1
@@ -289,13 +289,13 @@ export class UserMutation extends UserBase {
   @Field(() => Boolean)
   async approveDevice(@Arg('success', () => Boolean) success: Boolean) {
     // TODO check current device is master
-    let user = await prisma.user.findFirst({
+    let user = await prismaClient.user.findFirst({
       where: {
         id: this.id
       }
     })
     if (user?.masterDeviceId) {
-      let device = await prisma.device.findFirst({
+      let device = await prismaClient.device.findFirst({
         where: {
           id: user?.masterDeviceId
         }
