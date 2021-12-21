@@ -1,4 +1,7 @@
-import { isAuth } from '../isAuth'
+import {
+  authenticateFromToken,
+  throwIfNotAuthenticated
+} from '../api/authMiddleware'
 import {
   Query,
   //   Mutation,
@@ -13,7 +16,7 @@ import {
   UseMiddleware,
   Info
 } from 'type-graphql'
-import { prisma } from '../prisma'
+import { prismaClient } from '../prismaClient'
 import { hash, compare } from 'bcrypt'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
@@ -49,12 +52,20 @@ export interface IContext {
   request: FastifyRequest
   reply: FastifyReply
   getIpAddress: () => string
-  prisma: typeof prisma
+  prisma: typeof prismaClient
+}
+
+export interface IJWTPayload {
+  userId: string
+  deviceId: string
 }
 
 export interface IContextAuthenticated extends IContext {
-  jwtPayload: { userId: string; deviceId: string }
-  getIpAddress: () => string
+  jwtPayload: IJWTPayload
+}
+
+export interface IContextMaybeAuthenticated extends IContext {
+  jwtPayload?: IJWTPayload
 }
 
 export interface Payload {
@@ -68,7 +79,7 @@ export class RootResolver {
   @Query(() => UserQuery, { nullable: true })
   @Mutation(() => UserMutation, { nullable: true })
   async user(@Arg('userId', () => String) userId: string) {
-    const user = await prisma.user.findFirst({
+    const user = await prismaClient.user.findFirst({
       where: {
         id: userId
       },
@@ -106,14 +117,14 @@ export class RootResolver {
     }
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
     nullable: true
   })
   authenticatedMe(@Ctx() ctx: IContextAuthenticated) {
-    return prisma.user.findFirst({
+    return prismaClient.user.findFirst({
       where: {
         id: ctx.jwtPayload?.userId
       },
@@ -124,20 +135,16 @@ export class RootResolver {
     })
   }
 
-  //TODO query for info about user
-  @UseMiddleware(isAuth)
-  @Query(() => UserQuery)
-  async me(
-    @Ctx() context: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
-  ) {
+  @UseMiddleware(throwIfNotAuthenticated)
+  @Query(() => UserQuery, { nullable: true })
+  async me(@Ctx() context: IContextAuthenticated) {
     const { jwtPayload } = context
-    return prisma.user.findUnique({
+    return prismaClient.user.findUnique({
       where: { id: jwtPayload.userId }
     })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(throwIfNotAuthenticated)
   @Query(() => DeviceQuery)
   @Mutation(() => DeviceMutation)
   async currentDevice(
@@ -146,7 +153,7 @@ export class RootResolver {
   ) {
     const { jwtPayload } = context
     if (jwtPayload) {
-      return prisma.device.findUnique({
+      return prismaClient.device.findUnique({
         where: { id: jwtPayload.deviceId }
       })
     }
@@ -170,7 +177,7 @@ export class RootResolver {
     let user: User & { Devices: Device[] }
 
     try {
-      user = await prisma.user.create({
+      user = await prismaClient.user.create({
         data: {
           id: userId,
           email: email,
@@ -215,7 +222,7 @@ export class RootResolver {
     }
 
     const device = user.Devices[0]
-    user = await prisma.user.update({
+    user = await prismaClient.user.update({
       where: {
         id: user.id
       },
@@ -239,7 +246,7 @@ export class RootResolver {
 
     @Ctx() ctx: IContext
   ) {
-    const user = await prisma.user.findUnique({
+    const user = await prismaClient.user.findUnique({
       where: { email: input.email }
     })
 
@@ -252,7 +259,7 @@ export class RootResolver {
       throw new GraphqlError('Wrong master password used')
     }
 
-    await prisma.user.update({
+    await prismaClient.user.update({
       data: {
         addDeviceSecret: input.addDeviceSecret,
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
@@ -265,7 +272,7 @@ export class RootResolver {
     const { firebaseToken, deviceName, deviceId } = input
     const ipAddress = ctx.getIpAddress()
 
-    const device = await prisma.device.create({
+    const device = await prismaClient.device.create({
       data: {
         id: deviceId,
         firstIpAddress: ipAddress,
@@ -291,12 +298,12 @@ export class RootResolver {
     @Arg('email', () => GraphQLEmailAddress) email: string,
     @Ctx() ctx: IContext
   ) {
-    const user = await prisma.user.findUnique({
+    const user = await prismaClient.user.findUnique({
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true }
     })
     if (user) {
-      const inLastHour = await prisma.decryptionChallenge.count({
+      const inLastHour = await prismaClient.decryptionChallenge.count({
         where: {
           userId: user.id,
           createdAt: new Date(Date.now() - 3600000),
@@ -309,7 +316,7 @@ export class RootResolver {
         )
       }
 
-      const challenge = await prisma.decryptionChallenge.create({
+      const challenge = await prismaClient.decryptionChallenge.create({
         data: {
           userId: user.id,
           ipAddress: ctx.getIpAddress()
@@ -324,7 +331,7 @@ export class RootResolver {
     return null
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => Boolean, {
     nullable: true,
     description: 'removes current device'
@@ -333,7 +340,7 @@ export class RootResolver {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
     if (ctx.jwtPayload) {
-      const user = await prisma.user.update({
+      const user = await prismaClient.user.update({
         data: {
           tokenVersion: {
             increment: 1
@@ -349,10 +356,10 @@ export class RootResolver {
 
   @Query(() => [WebInputGQL])
   async webInputs(@Arg('url') url: string) {
-    return prisma.webInput.findMany({ where: { url } })
+    return prismaClient.webInput.findMany({ where: { url } })
   }
 
-  @UseMiddleware(isAuth)
+  @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => [WebInputGQL])
   async addWebInputs(
     @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
@@ -366,7 +373,7 @@ export class RootResolver {
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
       }
-      const input = await prisma.webInput.upsert({
+      const input = await prismaClient.webInput.upsert({
         create: forUpsert,
         update: forUpsert,
         where: {

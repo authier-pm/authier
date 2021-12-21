@@ -12,10 +12,10 @@ export default {
 
   roots: ['<rootDir>'],
 
-  setupFiles: ['./tests/setupJest.ts'],
+  setupFiles: ['./tests/jestEnv.ts'],
 
   testPathIgnorePatterns: ['/node_modules/', 'stories.tsx', '/dist/'],
-
+  setupFilesAfterEnv: ['./tests/jestSetup.ts'],
   transform: {
     ...tsjPreset.transform
   },

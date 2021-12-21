@@ -5,9 +5,10 @@ import fastifyCors from 'fastify-cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
-import dotenv from 'dotenv'
+import './dotenv'
+
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
-import { prisma } from './prisma'
+import { prismaClient } from './prismaClient'
 import {
   jwtPayloadRefreshToken,
   setNewAccessTokenIntoCookie,
@@ -24,7 +25,7 @@ import debug from 'debug'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
-dotenv.config()
+
 const { env } = process
 const log = debug('au:server')
 
@@ -47,6 +48,14 @@ async function main() {
             }
     }
   })
+  app.setErrorHandler(async (error, request, reply) => {
+    // Logging locally
+    console.log(error)
+    // Sending error to be logged in Sentry
+    captureException(error)
+    reply.status(500).send({ error: 'Something went wrong' })
+  })
+
   app.register(fastifyCors)
   const trustedDomains = ['https://unpkg.com']
   app.register(fastifyHelmet, {
@@ -93,7 +102,7 @@ async function main() {
     }
 
     //token is valid and we can send back access token
-    const user = await prisma.user.findUnique({
+    const user = await prismaClient.user.findUnique({
       where: {
         id: payload.userId
       }
@@ -124,6 +133,10 @@ async function main() {
   } as FastifyCookieOptions)
 
   app.register(mercurius, {
+    // errorHandler: (err, ctx) => {
+    //   console.error(err)
+    //   return err
+    // },
     schema: gqlSchema,
     graphiql: true,
     context: (request, reply) => {
@@ -134,7 +147,7 @@ async function main() {
       }
       log('body: ', request.body)
 
-      return { request, reply, getIpAddress, prisma }
+      return { request, reply, getIpAddress, prisma: prismaClient }
     },
     errorFormatter: (res, ctx) => {
       if (res.errors) {
