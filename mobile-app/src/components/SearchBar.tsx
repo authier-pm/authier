@@ -9,7 +9,7 @@ export const SearchBar = () => {
       mr={3}
       placeholder="Search"
       variant="filled"
-      bg="gray.100"
+      // bg="gray.100"
       borderRadius={10}
       w="85%"
       py="3"

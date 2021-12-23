@@ -13,6 +13,7 @@
     "chalk": "^4.1.2",
     "class-validator": "^0.13.1",
     "cpy": "^8.1.2",
+    "debug": "^4.3.2",
     "dotenv": "^10.0.0",
     "fastify": "^3.22.0",
     "fastify-cookie": "^5.3.1",
@@ -42,7 +43,7 @@
     "typegraphql-prisma": "npm:@capaj/typegraphql-prisma"
   },
   "scripts": {
-    "dev": "nodemon --exec ts-node-transpile-only server.ts",
+    "dev": "DEBUG=au:* nodemon --exec ts-node-transpile-only server.ts",
     "local": "nodemon server.ts",
     "pgn": "prisma migrate dev && prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",

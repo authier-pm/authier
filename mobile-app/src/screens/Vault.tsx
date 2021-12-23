@@ -19,6 +19,7 @@ import { SearchBar } from '../components/SearchBar'
 import { useEncryptedAuthsLazyQuery } from './Vault.codegen'
 import { ITOTPSecret, UserContext } from '../providers/UserProvider'
 import Clipboard from '@react-native-clipboard/clipboard'
+import { generateOTP } from '../utils/otp'
 
 const options = {
   algorithm: 'sha1',
@@ -41,6 +42,9 @@ const OtpCode = ({
   const copyToClipboard = () => {
     Clipboard.setString('hello world')
   }
+  const ListItem = ({ item }) => {
+    const otp = new OTP(item.secret, options)
+    const code = generateOTP(item.secret)
 
   setInterval(() => {
     setRemainingSeconds(otp.getTimeUntilNextTick())

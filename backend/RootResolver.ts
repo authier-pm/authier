@@ -27,6 +27,8 @@ import { Device, WebInput } from './generated/typegraphql-prisma'
 import { GraphqlError } from './api/GraphqlError'
 import { WebInputElement } from './models/WebInputElement'
 import { v4 as uuidv4 } from 'uuid'
+import debug from 'debug'
+const log = debug('au:RootResolver')
 
 export interface IContext {
   request: FastifyRequest
