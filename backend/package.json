@@ -27,9 +27,9 @@
     "ip": "^1.1.5",
     "jsonwebtoken": "^8.5.1",
     "lodash.set": "^4.3.2",
+    "mercurius": "^8.12",
     "pino-pretty": "^7.3.0",
     "prisma": "^3.7.0",
-    "mercurius": "^8.12",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.4.0",
     "type-graphql": "^1.1.1",
@@ -37,12 +37,18 @@
     "under-pressure": "^5.8.0"
   },
   "devDependencies": {
+    "@anatine/esbuild-decorators": "^0.2.18",
+    "@babel/plugin-proposal-class-properties": "^7.16.5",
+    "@babel/plugin-proposal-decorators": "^7.16.5",
     "@types/bcrypt": "^5.0.0",
+    "@vitejs/plugin-react": "^1.1.3",
     "jest": "^27.4.5",
     "mz": "^2.7.0",
     "nodemon": "^2.0.15",
     "prisma-typegraphql-types-generator": "^1.5.10",
-    "ts-jest": "^27.1.2"
+    "ts-jest": "^27.1.2",
+    "vite": "^2.7.6",
+    "vitest": "^0.0.107"
   },
   "scripts": {
     "dev": "DEBUG=au:* nodemon --exec ts-node-transpile-only server.ts",

@@ -1,3 +1,5 @@
+import { afterAll } from 'vitest'
+
 /**
  * if you need to truncate inside your tests, just call this function. In regular tests, we only invoke this after all specs in current test file are done
  */
