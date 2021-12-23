@@ -6,5 +6,5 @@ import { UserContext } from './providers/UserProvider'
 export default function Routes() {
   const { isLogged } = useContext(UserContext)
 
-  return isLogged ? <HomeScreen /> : <AuthScreen />
+  return true ? <HomeScreen /> : <AuthScreen />
 }

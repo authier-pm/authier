@@ -32,7 +32,7 @@ export const Vault = () => {
   const ListItem = ({ item }) => {
     const otp = new OTP(item.secret, options)
     const code = generateOTP(item.secret)
-    console.log('~ code2', code)
+
     setInterval(() => {
       setRemainingSeconds(otp.getTimeUntilNextTick())
     }, 1000)
@@ -67,7 +67,7 @@ export const Vault = () => {
                 setShowWhole(true)
               }}
             >
-              {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
+              {showWhole ? code : code.substr(0, 3) + '***'}
             </Text>
             <NativeIcon
               color="red"
