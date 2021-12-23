@@ -8,3 +8,5 @@ Unable to strip the following libraries, packaging them as they are: libc++_shar
 ```
 
 use this: https://stackoverflow.com/a/58823679/671457
+
+With native base use color like this: `red.500` instead of `red`

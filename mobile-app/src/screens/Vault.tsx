@@ -35,16 +35,13 @@ const OtpCode = ({
   open
 }) => {
   const otp = new OTP(item.secret, options)
-
   //finish clipboard
   const [copiedText, setCopiedText] = useState('')
+  const code = generateOTP(item.secret)
 
   const copyToClipboard = () => {
     Clipboard.setString('hello world')
   }
-  const ListItem = ({ item }) => {
-    const otp = new OTP(item.secret, options)
-    const code = generateOTP(item.secret)
 
   setInterval(() => {
     setRemainingSeconds(otp.getTimeUntilNextTick())
@@ -80,9 +77,13 @@ const OtpCode = ({
               setShowWhole(!showWhole)
             }}
           >
-            {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
+            {showWhole ? code : code.substr(0, 3) + '***'}
           </Text>
-          <NativeIcon color="red" size="sm" as={<Icon name="copy-outline" />} />
+          <NativeIcon
+            color="red.500"
+            size="sm"
+            as={<Icon name="copy-outline" />}
+          />
         </Flex>
       </Flex>
       <IconButton
@@ -169,10 +170,10 @@ const LoginCredentials = ({ item, setOpen, open }) => {
 
 const dummy: ITOTPSecret[] = [
   {
-    label: 'test',
-    secret: '3432432',
-    icon: '',
-    originalUrl: 'test.com'
+    secret: 'JBSWY3DPEHPK3PXP',
+    label: 'bitfinex',
+    icon: 'https://chakra-ui.com/favicon.png',
+    originalUrl: 'https://chakra-ui.com/favicon.png'
   }
 ]
 
@@ -209,7 +210,7 @@ export const Vault = () => {
           min={0}
           max={30}
           thickness={3}
-          color="teal"
+          color="teal.500"
         >
           <Text>{seconds}</Text>
         </CircularProgress>
