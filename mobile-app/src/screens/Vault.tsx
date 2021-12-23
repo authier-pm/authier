@@ -1,4 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useContext, useState } from 'react'
 import OTP from 'otp-client'
 import {
   Modal,
@@ -16,7 +17,8 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '../components/SearchBar'
 import { useEncryptedAuthsLazyQuery } from './Vault.codegen'
-import { UserContext } from '../providers/UserProvider'
+import { ITOTPSecret, UserContext } from '../providers/UserProvider'
+import Clipboard from '@react-native-clipboard/clipboard'
 
 const options = {
   algorithm: 'sha1',
@@ -32,6 +34,13 @@ const OtpCode = ({
   open
 }) => {
   const otp = new OTP(item.secret, options)
+
+  //finish clipboard
+  const [copiedText, setCopiedText] = useState('')
+
+  const copyToClipboard = () => {
+    Clipboard.setString('hello world')
+  }
 
   setInterval(() => {
     setRemainingSeconds(otp.getTimeUntilNextTick())
@@ -64,7 +73,7 @@ const OtpCode = ({
           <Text
             fontSize={35}
             onPress={() => {
-              setShowWhole(true)
+              setShowWhole(!showWhole)
             }}
           >
             {showWhole ? otp.getToken() : otp.getToken().substr(0, 3) + '***'}
@@ -154,24 +163,32 @@ const LoginCredentials = ({ item, setOpen, open }) => {
   )
 }
 
+const dummy: ITOTPSecret[] = [
+  {
+    label: 'test',
+    secret: '3432432',
+    icon: '',
+    originalUrl: 'test.com'
+  }
+]
+
 export const Vault = () => {
   const [encryptedAuths, { data, loading }] = useEncryptedAuthsLazyQuery()
-  const { totpSecrets, decryptAndSaveData, loginCredentials } =
-    useContext(UserContext)
+  const { totpSecrets, decryptAndSaveData } = useContext(UserContext)
 
   const [showWhole, setShowWhole] = useState(false)
   const [open, setOpen] = useState(false)
   const [seconds, setRemainingSeconds] = useState(0)
 
-  useEffect(() => {
-    encryptedAuths()
+  // useEffect(() => {
+  //   encryptedAuths()
 
-    if (data) {
-      decryptAndSaveData(data.me?.encryptedSecrets)
-    }
+  //   if (data) {
+  //     decryptAndSaveData(data.me?.encryptedSecrets)
+  //   }
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [loading, data])
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [loading, data])
 
   return (
     <View flex={1} safeArea backgroundColor="light.50">
@@ -195,7 +212,7 @@ export const Vault = () => {
       </Flex>
 
       <FlatList
-        data={totpSecrets}
+        data={dummy}
         keyExtractor={(item) => item.label}
         renderItem={({ item }) => (
           <OtpCode
