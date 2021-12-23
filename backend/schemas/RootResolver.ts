@@ -152,11 +152,9 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = context
-    if (jwtPayload) {
-      return prismaClient.device.findUnique({
-        where: { id: jwtPayload.deviceId }
-      })
-    }
+    return prismaClient.device.findUnique({
+      where: { id: jwtPayload.deviceId }
+    })
   }
 
   @Mutation(() => LoginResponse)
