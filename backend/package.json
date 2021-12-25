@@ -55,7 +55,6 @@
     "buildAndDeploy": "yarn build && yarn deploy",
     "DbPush": "prisma db push",
     "generate": "prisma generate",
-    "postinstall": "prisma generate",
     "test": "jest",
     "tsc": "tsc",
     "start": "prisma migrate deploy && prisma generate && node server.js",
