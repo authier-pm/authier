@@ -22,7 +22,12 @@ import Chakra, {
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
-import { CopyIcon, DeleteIcon, NotAllowedIcon } from '@chakra-ui/icons'
+import {
+  CopyIcon,
+  DeleteIcon,
+  EditIcon,
+  NotAllowedIcon
+} from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
@@ -50,6 +55,7 @@ enum Values {
 }
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
+  console.log('~ totpData', totpData)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
@@ -67,9 +73,9 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
         <Flex justify="flex-start" align="center">
           <Flex flexDirection="column">
             <IconButton
-              colorScheme="red"
-              aria-label="Delete item"
-              icon={<DeleteIcon />}
+              colorScheme="teal"
+              aria-label="Edit secret"
+              icon={<EditIcon />}
               size="sm"
               variant="link"
               position="absolute"
