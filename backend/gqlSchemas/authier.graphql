@@ -5,7 +5,7 @@ type Query {
   you need to be authenticated to call this resolver
   """
   authenticated: Boolean!
-  me: UserQuery!
+  me: UserQuery
   currentDevice: DeviceQuery!
   webInputs(url: String!): [WebInputGQL!]!
 }
@@ -120,14 +120,37 @@ type SecretUsageEventGQL {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  url: String!
+  secretId: Int!
+  url: String
   userId: String!
   deviceId: String!
   webInputId: Int
+  Secret: EncryptedSecretGQL!
   User: UserGQL!
   Device: DeviceGQL!
   WebOTPInput: WebInputGQL
-  EncryptedSecret: [EncryptedSecretGQL!]!
+}
+
+type EncryptedSecretGQL {
+  id: ID!
+  encrypted: String!
+  version: Int!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  iconUrl: String
+  label: String!
+  userId: String!
+  user: UserGQL!
+  SecretUsageEvent: [SecretUsageEventGQL!]!
+}
+
+enum EncryptedSecretType {
+  TOTP
+  LOGIN_CREDENTIALS
 }
 
 type WebInputGQL {
@@ -148,29 +171,6 @@ enum WebInputType {
   EMAIL
   USERNAME_OR_EMAIL
   PASSWORD
-}
-
-type EncryptedSecretGQL {
-  id: ID!
-  encrypted: String!
-  version: Int!
-  kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  lastUsageEventId: Float
-  iconUrl: String
-  label: String!
-  userId: String!
-  lastUsageEvent: SecretUsageEventGQL
-  user: UserGQL!
-}
-
-enum EncryptedSecretType {
-  TOTP
-  LOGIN_CREDENTIALS
 }
 
 type DecryptionChallengeGQL {
@@ -226,12 +226,11 @@ type EncryptedSecretQuery {
   url: String
   androidUri: String
   iosUri: String
-  lastUsageEventId: Float
   iconUrl: String
   label: String!
   userId: String!
-  lastUsageEvent: SecretUsageEventGQL
   user: UserGQL!
+  SecretUsageEvent: [SecretUsageEventGQL!]!
 }
 
 type DeviceQuery {
@@ -347,7 +346,28 @@ type DeviceMutation {
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
+  reportSecretUsageEvent(
+    webInputId: PositiveInt!
+    secretId: PositiveInt!
+    kind: String!
+  ): SecretUsageEventGQLScalars!
 }
+
+type SecretUsageEventGQLScalars {
+  id: ID!
+  kind: String!
+  timestamp: DateTime!
+  secretId: Int!
+  url: String
+  userId: String!
+  deviceId: String!
+  webInputId: Int
+}
+
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
 
 type LoginResponse {
   accessToken: String!

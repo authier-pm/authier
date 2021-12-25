@@ -15,8 +15,11 @@ export class SecretUsageEventGQLScalars {
   @Field()
   timestamp: Date
 
-  @Field()
-  url: string
+  @Field(() => Int)
+  secretId: number
+
+  @Field({ nullable: true })
+  url?: string
 
   @Field()
   userId: string
@@ -30,6 +33,9 @@ export class SecretUsageEventGQLScalars {
 
 @ObjectType()
 export class SecretUsageEventGQL extends SecretUsageEventGQLScalars {
+  @Field(() => EncryptedSecretGQL)
+  Secret: EncryptedSecretGQL
+
   @Field(() => UserGQL)
   User: UserGQL
 
@@ -38,9 +44,6 @@ export class SecretUsageEventGQL extends SecretUsageEventGQLScalars {
 
   @Field(() => WebInputGQL, { nullable: true })
   WebOTPInput?: WebInputGQL
-
-  @Field(() => [EncryptedSecretGQL])
-  EncryptedSecret: EncryptedSecretGQL[]
 
   // skip overwrite 👇
 }

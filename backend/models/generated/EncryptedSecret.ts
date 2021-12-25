@@ -33,9 +33,6 @@ export class EncryptedSecretGQLScalars {
   iosUri?: string
 
   @Field({ nullable: true })
-  lastUsageEventId?: number
-
-  @Field({ nullable: true })
   iconUrl?: string
 
   @Field()
@@ -50,11 +47,11 @@ export class EncryptedSecretGQL extends EncryptedSecretGQLScalars {
   @Field(() => EncryptedSecretTypeGQL)
   kind: EncryptedSecretTypeGQL
 
-  @Field(() => SecretUsageEventGQL, { nullable: true })
-  lastUsageEvent?: SecretUsageEventGQL
-
   @Field(() => UserGQL)
   user: UserGQL
+
+  @Field(() => [SecretUsageEventGQL])
+  SecretUsageEvent: SecretUsageEventGQL[]
 
   // skip overwrite 👇
 }
