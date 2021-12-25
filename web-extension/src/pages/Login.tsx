@@ -32,8 +32,12 @@ import cryptoJS from 'crypto-js'
 
 import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { useAddNewDeviceForUserMutation } from '../../../shared/addNewDeviceForUser.codegen'
+
 import { device } from '@src/background/Device'
+import {
+  useAddNewDeviceForUserMutation,
+  useDeviceDecryptionChallengeMutation
+} from './Login.codegen'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -44,9 +48,12 @@ interface Values {
 export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
+  const [addNewDevice] = useAddNewDeviceForUserMutation()
+  const [deviceDecryptionChallenge, { loading }] =
+    useDeviceDecryptionChallengeMutation()
   const { setUserId, fireToken } = useContext(UserContext)
-  const { initEncryptedSecrets: loginUser } = useContext(BackgroundContext)
+  const { initEncryptedSecrets: loginUser, decrypt } =
+    useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -60,19 +67,42 @@ export default function Login(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          const decryptionChallenge = await deviceDecryptionChallenge({
+            variables: {
+              email: values.email
+            }
+          })
+
+          const addDeviceSecretEncrypted =
+            decryptionChallenge.data?.deviceDecryptionChallenge
+              ?.addDeviceSecretEncrypted
+
+          const userId =
+            decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
+
+          if (!addDeviceSecretEncrypted || !userId) {
+            toast.error(t`Login failed, check your username`)
+            return
+          }
+
+          const currentSecret = cryptoJS.AES.decrypt(
+            addDeviceSecretEncrypted,
+            values.password,
+            {
+              iv: cryptoJS.enc.Utf8.parse(userId)
+            }
+          ).toString(cryptoJS.enc.Utf8)
+
           const response = await addNewDevice({
             variables: {
               input: {
                 deviceId: await device.getDeviceId(),
-                ...device.getAddDeviceSecretAuthTuple(
-                  values.password,
-                  'userId'
-                ),
+                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
                 email: values.email,
                 deviceName: device.generateDeviceName(),
                 firebaseToken: fireToken
               },
-              currentAddDeviceSecret: ''
+              currentAddDeviceSecret: currentSecret
             }
           })
 
@@ -85,11 +115,7 @@ export default function Login(): ReactElement {
               response.data.addNewDeviceForUser.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
-            loginUser(
-              values.password,
-              decodedToken.userId,
-              EncryptedSecrets ?? []
-            )
+            loginUser(EncryptedSecrets)
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

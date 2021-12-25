@@ -11,7 +11,7 @@ import {
   HStack
 } from 'native-base'
 import React, { useContext } from 'react'
-import { useLoginMutation } from './Login.codegen'
+
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
@@ -23,7 +23,7 @@ interface MyFormValues {
 
 export function Login({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
-  const [login, { loading }] = useLoginMutation()
+  // const [login, { loading }] = useLoginMutation()
   const { setIsLogged } = useContext(UserContext)
 
   const saveData = async (value) => {
