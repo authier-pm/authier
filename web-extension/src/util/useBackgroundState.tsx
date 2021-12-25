@@ -18,6 +18,8 @@ import {
 import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
+import debug from 'debug'
+const log = debug('au:useBackgroundState')
 
 export interface ISecret {
   // encrypted: string
@@ -145,6 +147,7 @@ export function useBackgroundState() {
     forceUpdate,
     backgroundState,
     initEncryptedSecrets: async (secrets: EncryptedSecretGql[]) => {
+      log('initEncryptedSecrets', secrets)
       setSafeLocked(false)
       const masterPassword = backgroundState?.masterPassword
       const userId = backgroundState?.userId
@@ -284,11 +287,9 @@ export function useBackgroundState() {
       ).toString()
     },
     decrypt(data: string, password = backgroundState?.masterPassword): string {
-      return AES.decrypt(
-        data,
-        password as string,
-        getCryptoOptions()
-      ).toString()
+      return AES.decrypt(data, password as string, getCryptoOptions()).toString(
+        enc.Utf8
+      )
     }
   }
 

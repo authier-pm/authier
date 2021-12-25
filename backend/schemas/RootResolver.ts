@@ -33,7 +33,11 @@ import { UserQuery, UserMutation } from '../models/User'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLNonEmptyString,
+  GraphQLUUID
+} from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
 
@@ -240,7 +244,8 @@ export class RootResolver {
   @Mutation(() => LoginResponse)
   async addNewDeviceForUser(
     @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
-    @Arg('currentAddDeviceSecret', () => String) currentAddDeviceSecret: string,
+    @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
+    currentAddDeviceSecret: string,
 
     @Ctx() ctx: IContext
   ) {
@@ -253,7 +258,7 @@ export class RootResolver {
     }
 
     if (user?.addDeviceSecret !== currentAddDeviceSecret) {
-      // TODO rate limit these attempts
+      // TODO rate limit these attempts and notify current devices
       throw new GraphqlError('Wrong master password used')
     }
 
@@ -318,6 +323,9 @@ export class RootResolver {
         data: {
           userId: user.id,
           ipAddress: ctx.getIpAddress()
+        },
+        include: {
+          user: true
         }
       })
       // TODO notify user's master device that someone is trying to login

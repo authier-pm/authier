@@ -1,5 +1,15 @@
+mutation deviceDecryptionChallenge($email: EmailAddress!) {
+  deviceDecryptionChallenge(email: $email) {
+    id
+    addDeviceSecretEncrypted
+    user {
+      id
+    }
+  }
+}
+
 mutation addNewDeviceForUser(
-  $currentAddDeviceSecret: String!
+  $currentAddDeviceSecret: NonEmptyString!
   $input: RegisterNewDeviceInput!
 ) {
   addNewDeviceForUser(
@@ -12,6 +22,10 @@ mutation addNewDeviceForUser(
         id
         kind
         encrypted
+        url
+        iconUrl
+        label
+        version
       }
     }
   }
