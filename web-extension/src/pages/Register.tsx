@@ -78,7 +78,7 @@ export default function Register(): ReactElement {
             })
             setAccessToken(registerResult.accessToken as string)
 
-            loginUser(values.password, registerResult.user.id, [])
+            loginUser([])
             refetch()
 
             setSubmitting(false)
