@@ -24,7 +24,7 @@
 #       interval: 5s
 #       timeout: 5s
 #       retries: 5
-version: '3.8'
+version: '3.9'
 services:
   authier-api:
     build:
@@ -39,8 +39,9 @@ services:
     # volumes:
     #   - ./:/app
   authierDb:
-    image: postgres
-    container_name: postgresprisma
+    image: postgres:13
+    restart: always
+    container_name: integration-tests-prisma
     environment:
       POSTGRES_PASSWORD: auth133r
       POSTGRES_USER: authier

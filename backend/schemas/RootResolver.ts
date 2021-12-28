@@ -211,7 +211,6 @@ export class RootResolver {
         }
       })
     } catch (err: PrismaClientKnownRequestError | any) {
-      console.log('~ err', err)
       if (err.code === 'P2002' && err.meta.target[0] === 'email') {
         throw new GraphqlError('User with such email already exists.')
       }
