@@ -19,7 +19,7 @@ import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
 import debug from 'debug'
-const log = debug('au:useBackgroundState')
+const log = debug('au:register')
 
 export interface ISecret {
   // encrypted: string
@@ -151,6 +151,7 @@ export function useBackgroundState() {
       setSafeLocked(false)
       const masterPassword = backgroundState?.masterPassword
       const userId = backgroundState?.userId
+      log('test', masterPassword, userId)
       if (!masterPassword || !userId) {
         return
       }
@@ -184,6 +185,7 @@ export function useBackgroundState() {
           }
         })
       }
+
       const secretsDecrypted = decryptAndParse()
       let totpSecrets
       let credentialsSecrets
@@ -197,6 +199,7 @@ export function useBackgroundState() {
           ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
         )
       }
+
       const payload: IBackgroundStateSerializable = {
         masterPassword,
         userId,
@@ -204,11 +207,12 @@ export function useBackgroundState() {
         loginCredentials: credentialsSecrets ? credentialsSecrets : [],
         totpSecrets: totpSecrets ? totpSecrets : []
       }
+
       browser.runtime.sendMessage({
         action: BackgroundMessageType.setBackgroundState,
         payload
       })
-
+      log('state', payload)
       setBackgroundState(payload)
     },
     saveLoginCredentials: (passwords: EncryptedSecretGql[]) => {
