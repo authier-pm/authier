@@ -39,7 +39,7 @@ services:
     # volumes:
     #   - ./:/app
   authierDb:
-    image: postgres:13
+    image: postgres:14
     restart: always
     container_name: integration-tests-prisma
     environment:

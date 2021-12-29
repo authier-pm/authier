@@ -1,5 +1,8 @@
 {
-  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
+  "ignorePaths": [
+    "*/node_modules/**",
+    "*/dist/**"
+  ],
   "words": [
     "appspot",
     "authier",
@@ -10,6 +13,7 @@
     "Fastify",
     "filenamify",
     "firebaseapp",
+    "Formik",
     "graphiql",
     "ITOTP",
     "Keychain",

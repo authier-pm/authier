@@ -22,10 +22,10 @@ import debug from 'debug'
 const log = debug('au:register')
 
 export interface ISecret {
-  // encrypted: string
+  encrypted: string
   kind: EncryptedSecretType
   label: string
-  iconUrl: string | undefined
+  iconUrl: string | undefined | null
   url: string
   lastUsed?: Date | null
 }
@@ -146,7 +146,7 @@ export function useBackgroundState() {
     isFilling,
     forceUpdate,
     backgroundState,
-    initEncryptedSecrets: async (secrets: EncryptedSecretGql[]) => {
+    initEncryptedSecrets: async (secrets: ISecret[]) => {
       log('initEncryptedSecrets', secrets)
       setSafeLocked(false)
       const masterPassword = backgroundState?.masterPassword
