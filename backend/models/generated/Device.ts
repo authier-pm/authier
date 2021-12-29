@@ -29,6 +29,9 @@ export class DeviceGQLScalars {
   @Field(() => Int, { nullable: true })
   vaultLockTimeoutSeconds?: number
 
+  @Field({ nullable: true })
+  logoutAt?: Date
+
   @Field()
   createdAt: Date
 
