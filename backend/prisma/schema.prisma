@@ -35,14 +35,15 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                      String  @id @db.Uuid
-  firstIpAddress          String  @db.Inet
-  lastIpAddress           String  @db.Inet
+  id                      String    @id @db.Uuid
+  firstIpAddress          String    @db.Inet
+  lastIpAddress           String    @db.Inet
   firebaseToken           String
   name                    String
-  syncTOTP                Boolean @default(true)
-  ipAddressLock           Boolean @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  syncTOTP                Boolean   @default(true)
+  ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   vaultLockTimeoutSeconds Int?
+  logoutAt                DateTime?
 
 
   createdAt                DateTime  @default(now())
