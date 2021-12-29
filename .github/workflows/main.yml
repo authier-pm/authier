@@ -30,7 +30,7 @@ jobs:
 
       - name: Yarn install
         run: |
-          yarn --frozen-lockfile
+          yarn --frozen-lockfile --ignore-optional
           yarn generate
 
       - uses: dorny/paths-filter@v2
