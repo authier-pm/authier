@@ -304,14 +304,18 @@ export class RootResolver {
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true }
     })
+
     if (user) {
       const inLastHour = await prismaClient.decryptionChallenge.count({
         where: {
           userId: user.id,
-          createdAt: new Date(Date.now() - 3600000),
+          createdAt: {
+            gte: new Date(Date.now() - 3600000)
+          },
           masterPasswordVerifiedAt: null
         }
       })
+
       if (inLastHour > 5) {
         throw new GraphqlError(
           'Too many decryption challenges, wait for cooldown'

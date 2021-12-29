@@ -1,10 +1,10 @@
 import { prismaClient } from '../prismaClient'
-import { RootResolver } from './RootResolver'
-import faker, { fake } from 'faker'
+import { IContext, RootResolver } from './RootResolver'
+import faker from 'faker'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
-import { setNewAccessTokenIntoCookie } from '../userAuth'
-import { User } from '@prisma/client'
 import { sign } from 'jsonwebtoken'
+import { User } from '@prisma/client'
+import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 
 afterAll(async () => {
   const deleteDevices = prismaClient.device.deleteMany()
@@ -50,7 +50,7 @@ describe('RootResolver', () => {
       jest.setTimeout(10000)
     })
 
-    it('should add new user', async () => {
+    it('should add new USER', async () => {
       let userId = faker.datatype.uuid()
 
       let input: RegisterNewDeviceInput = {
@@ -118,6 +118,236 @@ describe('RootResolver', () => {
             getIpAddress: () => faker.internet.ip()
           } as any)
       ).rejects.toThrow('User with such email already exists.')
+    })
+
+    it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
+      let userId = faker.datatype.uuid()
+
+      let input: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: faker.internet.email(),
+          addDeviceSecret: input.addDeviceSecret,
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
+        }
+      })
+
+      const resolver = new RootResolver()
+
+      expect(
+        async () =>
+          await resolver.registerNewUser(input, userId, {
+            reply: { setCookie: jest.fn() },
+            request: { headers: {} },
+            jwtPayload: { userId: userId },
+            getIpAddress: () => faker.internet.ip()
+          } as any)
+      ).rejects.toThrow(
+        'Device already exists. You cannot register this device for multiple accounts.'
+      )
+    })
+  })
+
+  describe('addNewDeviceForUser', () => {
+    it('should add new DEVICE for user', async () => {
+      let userId = faker.datatype.uuid()
+
+      let input: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: input.email,
+          addDeviceSecret: input.addDeviceSecret,
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
+        }
+      })
+
+      const resolver = new RootResolver()
+
+      let data = await resolver.addNewDeviceForUser(
+        input,
+        input.addDeviceSecret,
+        {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          getIpAddress: () => faker.internet.ip()
+        } as any
+      )
+
+      const accessToken = sign(
+        { userId: userId, deviceId: input.deviceId },
+        process.env.ACCESS_TOKEN_SECRET!,
+        {
+          expiresIn: '60m'
+        }
+      )
+
+      expect({
+        accessToken: data.accessToken,
+        email: data.user.email
+      }).toMatchObject({ accessToken: accessToken, email: input.email })
+    })
+
+    it("should show 'User not found'", async () => {
+      let userId = faker.datatype.uuid()
+
+      let input: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+
+      const resolver = new RootResolver()
+
+      expect(async () => {
+        await resolver.addNewDeviceForUser(input, input.addDeviceSecret, {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          getIpAddress: () => faker.internet.ip()
+        } as any)
+      }).rejects.toThrow('User not found')
+    })
+
+    it("should show 'Wrong master password used'", async () => {
+      let userId = faker.datatype.uuid()
+
+      let input: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: input.email,
+          addDeviceSecret: faker.datatype.string(5),
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
+        }
+      })
+
+      const resolver = new RootResolver()
+
+      expect(async () => {
+        await resolver.addNewDeviceForUser(input, input.addDeviceSecret, {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          getIpAddress: () => faker.internet.ip()
+        } as any)
+      }).rejects.toThrow('Wrong master password used')
+    })
+  })
+
+  describe('deviceDecryptionChallenge', () => {
+    it('should returns a decryption challenge', async () => {
+      let userId = faker.datatype.uuid()
+
+      let fakeData: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: fakeData.email,
+          addDeviceSecret: fakeData.addDeviceSecret,
+          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
+        }
+      })
+
+      const resolver = new RootResolver()
+
+      let data = await resolver.deviceDecryptionChallenge(fakeData.email, {
+        reply: { setCookie: jest.fn() },
+        request: { headers: {} },
+        jwtPayload: { userId: userId },
+        getIpAddress: () => faker.internet.ip()
+      } as any)
+
+      expect(data?.addDeviceSecretEncrypted).toBe(
+        fakeData.addDeviceSecretEncrypted
+      )
+    })
+
+    it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
+      let userId = faker.datatype.uuid()
+
+      let fakeData: RegisterNewDeviceInput = {
+        email: faker.internet.email(),
+        deviceName: faker.internet.userName(),
+        deviceId: faker.datatype.uuid(),
+        firebaseToken: faker.datatype.uuid(),
+        addDeviceSecret: faker.datatype.string(5),
+        addDeviceSecretEncrypted: faker.datatype.string(5)
+      }
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: fakeData.email,
+          addDeviceSecret: fakeData.addDeviceSecret,
+          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+          loginCredentialsLimit: 50,
+          TOTPlimit: 4
+        }
+      })
+
+      const data = Array.from({ length: 10 }).map(() => ({
+        userId: userId,
+        ipAddress: faker.internet.ip(),
+        masterPasswordVerifiedAt: null
+      }))
+
+      await prismaClient.decryptionChallenge.createMany({
+        data
+      })
+
+      const resolver = new RootResolver()
+
+      expect(async () => {
+        await resolver.deviceDecryptionChallenge(fakeData.email, {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          getIpAddress: () => faker.internet.ip()
+        } as any)
+      }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
   })
 })
