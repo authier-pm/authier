@@ -1,5 +1,4 @@
 // @ts-check
-const path = require('path')
 const { withSentryConfig } = require('@sentry/nextjs')
 
 /**
