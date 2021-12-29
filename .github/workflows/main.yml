@@ -31,7 +31,6 @@ jobs:
       - name: Yarn install
         run: |
           yarn --frozen-lockfile --ignore-optional
-          yarn generate
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -58,6 +57,7 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
+          yarn generate
           yarn tsc
           npm test
 
