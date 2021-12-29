@@ -12,6 +12,7 @@ const nextConfig = {
     })
     return config
   },
+  swcMinify: false,
   experimental: {
     externalDir: true
   },
