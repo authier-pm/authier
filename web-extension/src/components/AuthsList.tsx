@@ -85,7 +85,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
               onClick={() => setIsOpen(true)}
             />
 
-            <Avatar src={totpData.iconUrl} size="sm"></Avatar>
+            <Avatar src={totpData.iconUrl as string} size="sm"></Avatar>
           </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{totpData.label}</StatLabel>

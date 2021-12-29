@@ -38,6 +38,7 @@ import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from './Login.codegen'
+import { ISecret } from '@src/util/useBackgroundState'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -52,8 +53,7 @@ export default function Login(): ReactElement {
   const [deviceDecryptionChallenge, { loading }] =
     useDeviceDecryptionChallengeMutation()
   const { setUserId, fireToken } = useContext(UserContext)
-  const { initEncryptedSecrets: loginUser, decrypt } =
-    useContext(BackgroundContext)
+  const { initEncryptedSecrets, decrypt } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -115,7 +115,7 @@ export default function Login(): ReactElement {
               response.data.addNewDeviceForUser.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
-            loginUser(EncryptedSecrets)
+            initEncryptedSecrets(EncryptedSecrets as ISecret[])
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

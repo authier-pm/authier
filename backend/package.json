@@ -40,6 +40,8 @@
   },
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
+    "@types/graphql-list-fields": "^2.0.3",
+    "@types/lodash.set": "^4.3.6",
     "jest": "^27.4.5",
     "mz": "^2.7.0",
     "nodemon": "^2.0.15",

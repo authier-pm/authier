@@ -45,7 +45,6 @@ model Device {
   vaultLockTimeoutSeconds Int?
   logoutAt                DateTime?
 
-
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
   registeredWithMasterAt   DateTime?
