@@ -44,7 +44,6 @@ model Device {
   ipAddressLock           Boolean @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   vaultLockTimeoutSeconds Int?
 
-
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
   registeredWithMasterAt   DateTime?

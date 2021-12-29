@@ -49,7 +49,7 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            loginUser(values.password)
+            // loginUser([])
 
             setSubmitting(false)
           } catch (err) {

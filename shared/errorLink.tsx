@@ -10,7 +10,7 @@ export const errorLink = onError(
 
     toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
     if (graphQLErrors) {
-      graphQLErrors.map(({ message, locations, path, ...rest }) => {
+      graphQLErrors.map(({ message, path }) => {
         console.error(
           `[GraphQL error]: Message: ${message}, operation: ${operation.operationName}, Path: ${path}`
         )
