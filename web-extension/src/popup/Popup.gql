@@ -13,28 +13,20 @@ query settings {
   }
 }
 
-mutation saveEncryptedSecrets($payload: String!, $kind: EncryptedSecretsType!) {
-  me {
-    saveEncryptedSecrets(kind: $kind, payload: $payload) {
-      encrypted
-    }
-  }
-}
-
 query sendAuthMessage(
   $device: String!
   $time: String!
   $location: String!
-  $userId: String!
   $pageName: String!
 ) {
-  sendAuthMessage(
-    device: $device
-    time: $time
-    location: $location
-    userId: $userId
-    pageName: $pageName
-  )
+  me {
+    sendAuthMessage(
+      device: $device
+      time: $time
+      location: $location
+      pageName: $pageName
+    )
+  }
 }
 
 mutation saveFirebaseToken($firebaseToken: String!) {

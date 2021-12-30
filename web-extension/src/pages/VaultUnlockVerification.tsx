@@ -29,7 +29,8 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { loginUser, backgroundState } = useContext(BackgroundContext)
+  const { initEncryptedSecrets: loginUser, backgroundState } =
+    useContext(BackgroundContext)
 
   if (!backgroundState) {
     return null
@@ -48,11 +49,7 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            loginUser(
-              values.password,
-              backgroundState.userId,
-              backgroundState.secrets ?? []
-            )
+            // loginUser([])
 
             setSubmitting(false)
           } catch (err) {

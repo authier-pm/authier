@@ -12,7 +12,7 @@ import {
   FormLabel,
   Heading
 } from '@chakra-ui/react'
-import { useLoginMutation } from './Login.codegen'
+
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -29,9 +29,16 @@ import { t, Trans } from '@lingui/macro'
 
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
-import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+
 import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+
+import { device } from '@src/background/Device'
+import {
+  useAddNewDeviceForUserMutation,
+  useDeviceDecryptionChallengeMutation
+} from './Login.codegen'
+import { ISecret } from '@src/util/useBackgroundState'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -42,10 +49,11 @@ interface Values {
 export default function Login(): ReactElement {
   const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
-  const [login, { loading }] = useLoginMutation({})
-  const { setUserId } = useContext(UserContext)
-
-  const { loginUser } = useContext(BackgroundContext)
+  const [addNewDevice] = useAddNewDeviceForUserMutation()
+  const [deviceDecryptionChallenge, { loading }] =
+    useDeviceDecryptionChallengeMutation()
+  const { setUserId, fireToken } = useContext(UserContext)
+  const { initEncryptedSecrets, decrypt } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -59,23 +67,55 @@ export default function Login(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const response = await login({
-            variables: { email: values.email, password: values.password }
+          const decryptionChallenge = await deviceDecryptionChallenge({
+            variables: {
+              email: values.email
+            }
           })
 
-          if (response.data?.login?.accessToken) {
-            setAccessToken(response.data.login?.accessToken)
+          const addDeviceSecretEncrypted =
+            decryptionChallenge.data?.deviceDecryptionChallenge
+              ?.addDeviceSecretEncrypted
+
+          const userId =
+            decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
+
+          if (!addDeviceSecretEncrypted || !userId) {
+            toast.error(t`Login failed, check your username`)
+            return
+          }
+
+          const currentSecret = cryptoJS.AES.decrypt(
+            addDeviceSecretEncrypted,
+            values.password,
+            {
+              iv: cryptoJS.enc.Utf8.parse(userId)
+            }
+          ).toString(cryptoJS.enc.Utf8)
+
+          const response = await addNewDevice({
+            variables: {
+              input: {
+                deviceId: await device.getDeviceId(),
+                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
+                email: values.email,
+                deviceName: device.generateDeviceName(),
+                firebaseToken: fireToken
+              },
+              currentAddDeviceSecret: currentSecret
+            }
+          })
+
+          if (response.data?.addNewDeviceForUser?.accessToken) {
+            setAccessToken(response.data.addNewDeviceForUser?.accessToken)
 
             let decodedToken = await getUserFromToken()
 
-            const EncryptedSecrets = response.data.login.user.EncryptedSecrets
+            const EncryptedSecrets =
+              response.data.addNewDeviceForUser.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
-            loginUser(
-              values.password,
-              decodedToken.userId,
-              EncryptedSecrets ?? []
-            )
+            initEncryptedSecrets(EncryptedSecrets as ISecret[])
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

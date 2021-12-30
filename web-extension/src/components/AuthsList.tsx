@@ -22,7 +22,12 @@ import Chakra, {
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
-import { CopyIcon, DeleteIcon, NotAllowedIcon } from '@chakra-ui/icons'
+import {
+  CopyIcon,
+  DeleteIcon,
+  EditIcon,
+  NotAllowedIcon
+} from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
@@ -31,7 +36,7 @@ import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
 import {
-  ILoginCredentials,
+  ILoginSecret,
   ITOTPSecret,
   useBackgroundState
 } from '@src/util/useBackgroundState'
@@ -50,8 +55,9 @@ enum Values {
 }
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
+  console.log('~ totpData', totpData)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
-  const otpCode = authenticator.generate(totpData.secret)
+  const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
   const [isOpen, setIsOpen] = useState(false)
@@ -67,9 +73,9 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
         <Flex justify="flex-start" align="center">
           <Flex flexDirection="column">
             <IconButton
-              colorScheme="red"
-              aria-label="Delete item"
-              icon={<DeleteIcon />}
+              colorScheme="teal"
+              aria-label="Edit secret"
+              icon={<EditIcon />}
               size="sm"
               variant="link"
               position="absolute"
@@ -79,7 +85,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
               onClick={() => setIsOpen(true)}
             />
 
-            <Avatar src={totpData.icon} size="sm"></Avatar>
+            <Avatar src={totpData.iconUrl as string} size="sm"></Avatar>
           </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{totpData.label}</StatLabel>
@@ -133,35 +139,32 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
 }
 
 const LoginCredentialsListItem = ({
-  loginCredentials
+  loginSecret
 }: {
-  loginCredentials: ILoginCredentials
+  loginSecret: ILoginSecret
 }) => {
   const { saveLoginCredentials: savePasswordsToBg, backgroundState } =
     useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
 
-  const { onCopy } = useClipboard(loginCredentials.password)
-  log('~ loginCredentials', loginCredentials)
+  const { onCopy } = useClipboard(loginSecret.loginCredentials.password)
+  log('~ loginCredentials', loginSecret)
 
   return (
-    <Flex
-      key={loginCredentials.originalUrl}
-      p="3"
-      rounded="md"
-      bg="white"
-      minW="300px"
-    >
+    <Flex key={loginSecret.url} p="3" rounded="md" bg="white" minW="300px">
       <Stat maxW="100%">
         <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
-            <Avatar src={loginCredentials.favIconUrl} size="xs"></Avatar>
+            <Avatar src={loginSecret.iconUrl as string} size="xs"></Avatar>
           </Flex>
           <Box ml={2} mr="auto" maxW="200px">
-            <Heading size="sm">{loginCredentials.label}</Heading>
+            <Heading size="sm">{loginSecret.label}</Heading>
             <Text fontSize="sm" whiteSpace="nowrap">
-              {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
+              {loginSecret.loginCredentials.username.replace(
+                /http:\/\/|https:\/\//,
+                ''
+              )}
             </Text>
           </Box>
 
@@ -203,19 +206,19 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   }
 
   const TOTPForCurrentDomain = backgroundState.totpSecrets?.filter(
-    ({ originalUrl }) => {
-      if (!currentTabUrl || !originalUrl) {
+    ({ url }) => {
+      if (!currentTabUrl || !url) {
         return true
       }
-      return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+      return extractHostname(url) === extractHostname(currentTabUrl)
     }
   )
   const loginCredentialForCurrentDomain =
-    backgroundState.loginCredentials.filter(({ originalUrl }) => {
-      if (!currentTabUrl || !originalUrl) {
+    backgroundState.loginCredentials.filter(({ url }) => {
+      if (!currentTabUrl || !url) {
         return true
       }
-      return extractHostname(originalUrl) === extractHostname(currentTabUrl)
+      return extractHostname(url) === extractHostname(currentTabUrl)
     })
 
   return (
@@ -265,7 +268,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
             {loginCredentialForCurrentDomain.map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginCredentials={psw}
+                  loginSecret={psw}
                   key={psw.label + i}
                 />
               )
@@ -279,7 +282,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
             backgroundState.loginCredentials.map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginCredentials={psw}
+                  loginSecret={psw}
                   key={psw.label + i}
                 />
               )

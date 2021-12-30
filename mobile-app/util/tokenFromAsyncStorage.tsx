@@ -10,7 +10,7 @@ export const getAccessToken = async () => {
 }
 
 export const saveAccessToken = async (value) => {
-  await await SInfo.setItem('@accessToken', value, {
+  await SInfo.setItem('@accessToken', value, {
     sharedPreferencesName: 'mySharedPrefs',
     keychainService: 'myKeychain'
   })
