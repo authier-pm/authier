@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { AuPage } from '../components/AuPage'
 
-export default function Pricing() {
+export default function FaqPage() {
   return (
     <AuPage heading={t`Frequently asked questions`}>
       <Box m={5}>
@@ -27,16 +27,37 @@ export default function Pricing() {
             extension just takes care of the typing for you once you use
             biometrics to unlock your vault.
           </li>
+
+          <li>
+            <Heading size="xs">
+              Is it safe to keep both 2FA and login passwords in the same app?
+            </Heading>
+            <br />
+            We believe so. Even if our infrastructure is compromised and
+            attacker gains absolute control of our API servers they have no way
+            to sniff out a master password for anyone. Master password is kept
+            only locally on your devices. Any new device which wants to sync the
+            vault will need approval from the master device. So even if the
+            attacker gets your master password through phishing or keylogger in
+            your system, authier will not let them sync any new device.
+          </li>
+
           <li>
             <Heading size="xs">What encryption is used?</Heading>
             <br />
-            We encrypt your secrets with AES-256 encryption. We never send them
-            unencrypted anywhere.
+            Authier encrypts your secrets with AES-256 encryption. They are
+            never sent unencrypted anywhere.
           </li>
+
           <li>
-            <Heading size="xs">Is it safe to keep both 2FA and login passwords in the same server?</Heading>
+            <Heading size="xs">
+              When I need to change the password do I need to change it manually
+              on all of the devices?
+            </Heading>
             <br />
-            Yes. Even if our infrastructure is compromised any new device which wants to sync the vault will need approval from the master device. So even if the attacker gets your master password, without the master device they cannot access your secrets.
+            Yes. We are planning to introduce a synchronization feature for
+            changing password for all devices in the future, but for now
+            manually is the only way.
           </li>
         </ul>
       </Box>

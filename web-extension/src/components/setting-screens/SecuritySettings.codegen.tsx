@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type SecuritySettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SecuritySettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, settings: { __typename?: 'SettingsConfig', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
+export type SecuritySettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
 
 
 export const SecuritySettingsDocument = gql`

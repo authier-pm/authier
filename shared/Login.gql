@@ -1,0 +1,32 @@
+mutation deviceDecryptionChallenge($email: EmailAddress!) {
+  deviceDecryptionChallenge(email: $email) {
+    id
+    addDeviceSecretEncrypted
+    user {
+      id
+    }
+  }
+}
+
+mutation addNewDeviceForUser(
+  $currentAddDeviceSecret: NonEmptyString!
+  $input: RegisterNewDeviceInput!
+) {
+  addNewDeviceForUser(
+    currentAddDeviceSecret: $currentAddDeviceSecret
+    input: $input
+  ) {
+    accessToken
+    user {
+      EncryptedSecrets {
+        id
+        kind
+        encrypted
+        url
+        iconUrl
+        label
+        version
+      }
+    }
+  }
+}

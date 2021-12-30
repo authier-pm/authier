@@ -12,29 +12,36 @@ import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySe
 import { useSettingsQuery } from '@src/popup/Popup.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
-  EncryptedSecrets,
-  EncryptedSecretsType
+  EncryptedSecretGql,
+  EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
+import debug from 'debug'
+const log = debug('au:register')
 
-export interface ITOTPSecret {
-  secret: string
+export interface ISecret {
+  encrypted: string
+  kind: EncryptedSecretType
   label: string
-  icon: string | undefined
+  iconUrl: string | undefined | null
+  url: string
   lastUsed?: Date | null
-  originalUrl: string | undefined
+}
+export interface ITOTPSecret extends ISecret {
+  totp: string
+  kind: EncryptedSecretType.TOTP
 }
 
-export interface ILoginCredentials {
-  label: string
-  favIconUrl: string | undefined
-  lastUsed?: Date | null
-  originalUrl: string
-  password: string
-  username: string
+export interface ILoginSecret extends ISecret {
+  loginCredentials: {
+    password: string
+    username: string
+  }
+  kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
+
 export interface ISecuritySettings {
   vaultLockTime: number
   noHandsLogin: boolean
@@ -52,7 +59,7 @@ const { AES, enc } = cryptoJS
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-  const { data: settingsData, refetch: refetchSettings } = useSettingsQuery()
+
   const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
 
@@ -100,7 +107,7 @@ export function useBackgroundState() {
       (request: {
         safe: string
         filling: Boolean
-        passwords: Array<ILoginCredentials>
+        passwords: Array<ILoginSecret>
       }) => {
         if (request.filling) {
           setIsFilling(true)
@@ -139,67 +146,78 @@ export function useBackgroundState() {
     isFilling,
     forceUpdate,
     backgroundState,
-    loginUser: async (
-      masterPassword: string,
-      userId: string,
-      secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
-    ) => {
+    initEncryptedSecrets: async (secrets: ISecret[]) => {
+      log('initEncryptedSecrets', secrets)
       setSafeLocked(false)
-
-      const decryptAndParse = (
-        data: string,
-        password = masterPassword
-      ): ILoginCredentials[] | ITOTPSecret[] => {
-        try {
-          const decrypted = cryptoJS.AES.decrypt(data, password as string, {
-            iv: cryptoJS.enc.Utf8.parse(userId as string)
-          }).toString(cryptoJS.enc.Utf8)
-          const parsed = JSON.parse(decrypted)
-
-          return parsed
-        } catch (err) {
-          console.error(err)
-          toast.error('decryption failed')
-          return []
-        }
+      const masterPassword = backgroundState?.masterPassword
+      const userId = backgroundState?.userId
+      log('test', masterPassword, userId)
+      if (!masterPassword || !userId) {
+        return
       }
-      let totpSecretsEncrypted
-      let credentialsSecretsEncrypted
+      const decryptAndParse = () => {
+        return secrets.map((secret) => {
+          try {
+            const decrypted = cryptoJS.AES.decrypt(
+              secret.encrypted,
+              masterPassword,
+              {
+                iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+              }
+            ).toString(cryptoJS.enc.Utf8)
 
-      if (secrets.length > 0) {
-        totpSecretsEncrypted = secrets.filter(
-          ({ kind }) => kind === EncryptedSecretsType.TOTP
-        )[0]?.encrypted
-
-        credentialsSecretsEncrypted = secrets.filter(
-          ({ kind }) => kind === EncryptedSecretsType.LOGIN_CREDENTIALS
-        )[0]?.encrypted
+            if (secret.kind === EncryptedSecretType.TOTP) {
+              return {
+                ...secret,
+                totp: decrypted
+              }
+            } else {
+              const parsed = JSON.parse(decrypted)
+              return {
+                ...secret,
+                loginCredentials: parsed
+              }
+            }
+          } catch (err) {
+            console.error(err)
+            toast.error('decryption failed')
+            throw new Error('failed')
+          }
+        })
       }
+
+      const secretsDecrypted = decryptAndParse()
+      let totpSecrets: ITOTPSecret[] = []
+      let credentialsSecrets: ILoginSecret[] = []
+
+      if (secretsDecrypted.length > 0) {
+        // @ts-expect-error
+        totpSecrets = secretsDecrypted.filter(
+          ({ kind }) => kind === EncryptedSecretType.TOTP
+        )
+
+        // @ts-expect-error
+        credentialsSecrets = secretsDecrypted.filter(
+          ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
+        )
+      }
+
       const payload: IBackgroundStateSerializable = {
         masterPassword,
         userId,
         secrets,
-        loginCredentials: credentialsSecretsEncrypted
-          ? (decryptAndParse(
-              credentialsSecretsEncrypted,
-              masterPassword
-            ) as ILoginCredentials[])
-          : [],
-        totpSecrets: totpSecretsEncrypted
-          ? (decryptAndParse(
-              totpSecretsEncrypted,
-              masterPassword
-            ) as ITOTPSecret[])
-          : []
+        loginCredentials: credentialsSecrets,
+        totpSecrets: totpSecrets
       }
+
       browser.runtime.sendMessage({
         action: BackgroundMessageType.setBackgroundState,
         payload
       })
-
+      log('state', payload)
       setBackgroundState(payload)
     },
-    saveLoginCredentials: (passwords: ILoginCredentials[]) => {
+    saveLoginCredentials: (passwords: ILoginSecret[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,
@@ -244,7 +262,7 @@ export function useBackgroundState() {
         }
       })
 
-      refetchSettings()
+      // refetchSettings()
       //Call bg script to save settings to bg
       browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
@@ -275,11 +293,9 @@ export function useBackgroundState() {
       ).toString()
     },
     decrypt(data: string, password = backgroundState?.masterPassword): string {
-      return AES.decrypt(
-        data,
-        password as string,
-        getCryptoOptions()
-      ).toString()
+      return AES.decrypt(data, password as string, getCryptoOptions()).toString(
+        enc.Utf8
+      )
     }
   }
 

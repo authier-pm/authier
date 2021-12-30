@@ -1,0 +1,12 @@
+mutation registerNewUser($input: RegisterNewDeviceInput!, $userId: UUID!) {
+  registerNewUser(input: $input, userId: $userId) {
+    accessToken
+    user {
+      id
+      Devices {
+        id
+        name
+      }
+    }
+  }
+}

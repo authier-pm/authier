@@ -4,7 +4,11 @@ import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 
-import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
+import {
+  ILoginSecret,
+  ISecret,
+  ITOTPSecret
+} from '@src/util/useBackgroundState'
 import './chromeRuntimeListener'
 import { SharedBrowserEvents } from './SharedBrowserEvents'
 
@@ -12,7 +16,18 @@ import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 //import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
 
-const log = debug('au:backgroundPage')
+import cryptoJS from 'crypto-js'
+import {
+  AddEncryptedSecretDocument,
+  AddEncryptedSecretMutation,
+  AddEncryptedSecretMutationVariables
+} from './backgroundPage.codegen'
+import {
+  EncryptedSecretGql,
+  EncryptedSecretType
+} from '../../../shared/generated/graphqlBaseTypes'
+
+export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
 
 const firebaseConfig = {
@@ -24,16 +39,6 @@ const firebaseConfig = {
   appId: '1:500382892914:web:6b202f90d6c0c6bcc213eb',
   measurementId: 'G-0W2MW55WVF'
 }
-import cryptoJS from 'crypto-js'
-import {
-  SaveSecretsDocument,
-  SaveSecretsMutation,
-  SaveSecretsMutationVariables
-} from './backgroundPage.codegen'
-import {
-  EncryptedSecrets,
-  EncryptedSecretsType
-} from '../../../shared/generated/graphqlBaseTypes'
 
 const firebaseApp = initializeApp(firebaseConfig)
 const messaging = getMessaging(firebaseApp)
@@ -58,20 +63,16 @@ if ('serviceWorker' in navigator) {
 }
 
 export interface IBackgroundStateSerializable {
-  loginCredentials: ILoginCredentials[]
+  loginCredentials: ILoginSecret[]
   totpSecrets: ITOTPSecret[]
   userId: string
   masterPassword: string
-  secrets: Array<Pick<EncryptedSecrets, 'encrypted' | 'kind'>>
+  secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
-  setTOTPSecrets(val: ITOTPSecret[]): void
-  setLoginCredentials(val: ILoginCredentials[]): void
-  saveSecretsToBackend: (
-    input: string,
-    kind: EncryptedSecretsType
-  ) => Promise<void>
+  encrypt: (stringToEncrypt: string) => string
+  addSecretOnBackend: (input: ITOTPSecret | ILoginSecret) => Promise<void>
 }
 
 export let bgState: IBackgroundState | null = null
@@ -81,33 +82,35 @@ export const setBgState = (
 ) => {
   bgState = {
     ...bgStateSerializable,
-    setTOTPSecrets(val: Array<ITOTPSecret>) {
-      this.totpSecrets = val
-      this.saveSecretsToBackend(JSON.stringify(val), EncryptedSecretsType.TOTP)
-    },
-    setLoginCredentials(val: Array<ILoginCredentials>) {
-      this.loginCredentials = val
-      this.saveSecretsToBackend(
-        JSON.stringify(val),
-        EncryptedSecretsType.LOGIN_CREDENTIALS
-      )
-    },
-    async saveSecretsToBackend(input: string, kind: EncryptedSecretsType) {
-      const encrypted = cryptoJS.AES.encrypt(input, this.masterPassword, {
+    encrypt(stringToEncrypt: string) {
+      return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
         iv: cryptoJS.enc.Utf8.parse(this.userId)
       }).toString()
+    },
+
+    async addSecretOnBackend(secret: ITOTPSecret | ILoginSecret) {
+      const stringToEncrypt =
+        secret.kind === EncryptedSecretType.TOTP
+          ? secret.totp
+          : JSON.stringify(secret.loginCredentials)
+
+      const encrypted = this.encrypt(stringToEncrypt)
 
       await apolloClient.mutate<
-        SaveSecretsMutation,
-        SaveSecretsMutationVariables
+        AddEncryptedSecretMutation,
+        AddEncryptedSecretMutationVariables
       >({
-        mutation: SaveSecretsDocument,
+        mutation: AddEncryptedSecretDocument,
         variables: {
-          payload: encrypted,
-          kind
+          payload: {
+            encrypted,
+            kind: secret.kind,
+            label: secret.label,
+            url: secret.url
+          }
         }
       })
-      log('saved secrets to backend', kind)
+      log('saved secret to the backend', secret)
     }
   }
   // @ts-expect-error
