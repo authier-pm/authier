@@ -28,7 +28,7 @@ jobs:
       CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
       CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
       APPNAME: authier-api
-      DATABASE_URL: postgresql://authier:auth133r@localhost:6432/authier
+      DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
       - uses: actions/checkout@v2
