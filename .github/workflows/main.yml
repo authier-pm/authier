@@ -9,10 +9,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: runs typescript and jest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: authier
+          POSTGRES_PASSWORD: auth133r
+          POSTGRES_USER: authier
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
       CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
       APPNAME: authier-api
+      DATABASE_URL: postgresql://authier:auth133r@localhost:6432/authier
 
     steps:
       - uses: actions/checkout@v2
@@ -59,6 +75,7 @@ jobs:
         run: |
           yarn generate
           yarn tsc
+          yarn prisma db push
           npm test
 
       - name: mobile-app, check TS and run jest
