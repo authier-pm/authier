@@ -9,10 +9,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     name: runs typescript and jest
+    services:
+      postgres:
+        image: postgres:latest
+        env:
+          POSTGRES_DB: authier
+          POSTGRES_PASSWORD: auth133r
+          POSTGRES_USER: authier
+        ports:
+          - 5432:5432
+        # Set health checks to wait until postgres has started
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
       CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
       APPNAME: authier-api
+      DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
       - uses: actions/checkout@v2
@@ -30,7 +46,7 @@ jobs:
 
       - name: Yarn install
         run: |
-          yarn --frozen-lockfile
+          yarn --frozen-lockfile --ignore-optional
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -46,11 +62,21 @@ jobs:
               - 'web-extension/**'
 
         # run only if some file in 'src' folder was changed
+      - name: frontend install deps, check TS and run jest
+        working-directory: ./frontend
+        if: steps.changes.outputs.frontend == 'true'
+        run: |
+          yarn tsc
+          npm test
+
       - name: backend install deps, check TS and run jest
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
+          yarn generate
           yarn tsc
+          cp .env.sample .env
+          yarn prisma db push
           npm test
 
       - name: mobile-app, check TS and run jest

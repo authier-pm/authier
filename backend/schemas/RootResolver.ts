@@ -304,7 +304,6 @@ export class RootResolver {
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true }
     })
-
     if (user) {
       const inLastHour = await prismaClient.decryptionChallenge.count({
         where: {
