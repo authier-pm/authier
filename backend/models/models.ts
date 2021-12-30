@@ -1,4 +1,4 @@
-import { prisma } from '../prisma'
+import { prismaClient } from '../prismaClient'
 import {
   Arg,
   Ctx,
@@ -8,8 +8,17 @@ import {
   ObjectType,
   UseMiddleware
 } from 'type-graphql'
+import { UserGQL } from './generated/User'
+import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
-import { EncryptedSecrets, User } from '../generated/typegraphql-prisma'
+@ObjectType()
+export class DecryptionChallengeResponse {
+  @Field()
+  userId: string
+
+  @Field()
+  addDeviceSecretEncrypted: string
+}
 
 @ObjectType()
 export class UserBase {
@@ -36,10 +45,7 @@ export class UserBase {
 }
 
 @ObjectType()
-export class UserAfterAuth extends User {
-  @Field(() => [EncryptedSecrets], { nullable: true })
-  EncryptedSecrets: Array<EncryptedSecrets> | undefined
-}
+export class UserAfterAuth extends UserGQL {}
 
 @ObjectType()
 export class LoginResponse {
@@ -52,9 +58,29 @@ export class LoginResponse {
 
 @InputType()
 export class OTPEvent {
-  @Field(() => String)
-  kind: string
+  @Field(() => EncryptedSecretTypeGQL)
+  kind: EncryptedSecretTypeGQL
 
   @Field(() => String)
   url: string
+}
+
+@InputType()
+export class EncryptedSecretInput {
+  @Field(() => EncryptedSecretTypeGQL)
+  kind: EncryptedSecretTypeGQL
+
+  @Field(() => String, { nullable: true })
+  url: string
+
+  @Field(() => String, { nullable: true })
+  iosUri: string
+
+  @Field(() => String, { nullable: true })
+  androidUri: string
+
+  @Field(() => String)
+  label: string
+  @Field(() => String)
+  encrypted: string
 }

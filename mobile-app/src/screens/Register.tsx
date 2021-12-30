@@ -12,7 +12,7 @@ import {
 import React, { useContext } from 'react'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 import { UserContext } from '../providers/UserProvider'
-import { useRegisterMutation } from '../../../shared/Register.codegen'
+import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
 
 interface MyFormValues {
   email: string
@@ -21,11 +21,11 @@ interface MyFormValues {
 
 export function Register({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
-  const [register, { loading }] = useRegisterMutation()
+  const [register, { loading }] = useRegisterNewUserMutation()
   const { setIsLogged, token } = useContext(UserContext)
 
   return (
-    <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
+    <View flex={1} p="2" w="90%" mx="auto" justifyContent="center">
       <Heading size="lg" fontWeight="600" color="coolGray.800">
         Welcome
       </Heading>
@@ -38,6 +38,7 @@ export function Register({ navigation }) {
         onSubmit={async (values, actions) => {
           const response = await register({
             variables: {
+              //@ts-expect-error TODO fix this-API changed
               email: values.email,
               password: values.password,
               firebaseToken: token as string,
@@ -45,9 +46,9 @@ export function Register({ navigation }) {
             }
           })
 
-          if (response.data?.register.accessToken) {
+          if (response.data?.registerNewUser.accessToken) {
             //save accessToken
-            saveAccessToken(response.data?.register.accessToken)
+            saveAccessToken(response.data?.registerNewUser.accessToken)
 
             // //is logged
             setIsLogged(true)

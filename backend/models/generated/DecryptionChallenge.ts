@@ -1,0 +1,43 @@
+import { Field, ID, ObjectType } from 'type-graphql'
+import { UserGQL } from './User'
+import { DeviceGQL } from './Device'
+
+@ObjectType()
+export class DecryptionChallengeGQLScalars {
+  @Field(() => ID)
+  id: number
+
+  @Field({ nullable: true })
+  masterPasswordVerifiedAt?: Date
+
+  @Field({ nullable: true })
+  approvedAt?: Date
+
+  @Field()
+  userId: string
+
+  @Field()
+  createdAt: Date
+
+  @Field({ nullable: true })
+  deviceId?: string
+
+  @Field({ nullable: true })
+  approvedFromDeviceId?: string
+}
+
+@ObjectType()
+export class DecryptionChallengeGQL extends DecryptionChallengeGQLScalars {
+  @Field(() => UserGQL)
+  user: UserGQL
+
+  @Field(() => DeviceGQL, { nullable: true })
+  device?: DeviceGQL
+
+  @Field(() => DeviceGQL, { nullable: true })
+  approvedFromDevice?: DeviceGQL
+
+  // skip overwrite 👇
+  @Field()
+  addDeviceSecretEncrypted: string
+}
