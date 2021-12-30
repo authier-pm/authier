@@ -16,6 +16,7 @@ import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
 import { bgState } from '@src/background/backgroundPage'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
+import { ISecret } from '@src/util/useBackgroundState'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -55,7 +56,8 @@ export const NavBar: FunctionComponent = () => {
     if (data) {
       console.log(data)
       initEncryptedSecrets(
-        data.currentDevice.encryptedSecretsToSync as EncryptedSecretGql[]
+        // @ts-expect-error
+        data.currentDevice.encryptedSecretsToSync as ISecret[]
       )
     }
   }, [data])

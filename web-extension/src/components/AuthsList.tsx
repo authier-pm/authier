@@ -156,7 +156,7 @@ const LoginCredentialsListItem = ({
       <Stat maxW="100%">
         <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
-            <Avatar src={loginSecret.iconUrl} size="xs"></Avatar>
+            <Avatar src={loginSecret.iconUrl as string} size="xs"></Avatar>
           </Flex>
           <Box ml={2} mr="auto" maxW="200px">
             <Heading size="sm">{loginSecret.label}</Heading>
