@@ -5,7 +5,7 @@ import { AppRegistry } from 'react-native'
 import QRCodeScanner from 'react-native-qrcode-scanner'
 import { RNCamera } from 'react-native-camera'
 import { AuthsContext } from '../Providers'
-import { useAddNewDeviceForUserMutation } from '../../../shared/addNewDeviceForUser.codegen'
+import { useAddNewDeviceForUserMutation } from '../../../shared/Login.codegen'
 
 import { getDeviceNameSync } from 'react-native-device-info'
 import { Pressable, Text } from 'native-base'
@@ -39,7 +39,7 @@ const QRLogin = ({ navigation }) => {
       // Save ID to storage
       await addNewDevice({
         variables: {
-          // @ts-expect-error TODO fix this-API changed
+          // @ts-expect-error
           userId: e.data,
           name: getDeviceNameSync(),
           firebaseToken: token as string
