@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { LoginCard } from '../components/LoginCard'
 
-export default function Login() {
+export default function LoginPage() {
   return (
     <Box>
       <Head>

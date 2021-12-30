@@ -49,12 +49,12 @@ export const NavLink = ({
 
 export default function Home() {
   return (
-    <>
+    <Box w="100%" flex="1 1 auto;">
       <Head>
         <title>Authier</title>
       </Head>
       <SignUpHero />
-    </>
+    </Box>
   )
 }
 
@@ -66,7 +66,7 @@ const SignUpHero = () => {
       mx="auto"
       bg='linear-gradient(#0000007f, rgba(255,255,255,.5)), url("/assets/silas-kohler-C1P4wHhQbjM-unsplash.jpg")'
       bgSize="cover"
-      minH="90vh"
+      minH="100%"
     >
       <Container maxW="container.xl">
         <SimpleGrid
@@ -93,7 +93,7 @@ const SignUpHero = () => {
             >
               <Center pb={0} color={useColorModeValue('gray.700', 'gray.600')}>
                 <Text pt={2} fontSize="md" mt={3} color="brand.500">
-                  Two fields should suffice
+                  It takes less than a minute to sign up
                 </Text>
               </Center>
               <SimpleGrid
@@ -103,16 +103,6 @@ const SignUpHero = () => {
                 spacing={4}
                 borderColor={useColorModeValue('gray.200', 'gray.700')}
               >
-                <Flex>
-                  <VisuallyHidden>First Name</VisuallyHidden>
-                  <Input
-                    mt={0}
-                    type="text"
-                    placeholder="First Name"
-                    required
-                    bgColor="white"
-                  />
-                </Flex>
                 <Flex>
                   <VisuallyHidden>Email Address</VisuallyHidden>
                   <Input

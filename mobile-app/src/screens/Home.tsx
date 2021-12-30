@@ -16,15 +16,15 @@ import ReactNativeBiometrics from 'react-native-biometrics'
 import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NotifyContext } from '../providers/NotifyProvider'
-import { useSendConfirmationLazyQuery } from './Home.codegen'
+// import { useSendConfirmationLazyQuery } from './Home.codegen'
 
 const Home = () => {
-  const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
+  // const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
   const { notifies, setNotifies } = useContext(NotifyContext)
   const [isBio, setIsBio] = useState(false)
   const [open, setOpen] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
-
+  const error = undefined
   if (error) {
     console.log(error)
   }
@@ -38,11 +38,10 @@ const Home = () => {
           const { success } = resultObject
           if (success) {
             //call here api, maybe wait on success confirmation
-            sendConfirmation({
-              //@ts-expect-error
-              variables: { userId: notifies[0].userId, success: true }
-            })
-            console.log(data, error)
+            // sendConfirmation({
+            //   variables: { userId: notifies[0].userId, success: true }
+            // })
+
             setNotifies(
               notifies.filter((el) => (el.pageName === page ? false : true))
             )

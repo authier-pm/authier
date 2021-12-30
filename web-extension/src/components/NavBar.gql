@@ -1,0 +1,13 @@
+query SyncEncryptedSecrets {
+  currentDevice {
+    id
+    encryptedSecretsToSync {
+      id
+      encrypted
+      kind
+      createdAt
+      updatedAt
+      url
+    }
+  }
+}

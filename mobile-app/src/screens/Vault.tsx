@@ -106,7 +106,7 @@ export const Vault = () => {
   }
 
   return (
-    <View flex={1} safeArea backgroundColor="white">
+    <View flex={1} backgroundColor="white">
       <Flex
         flexDirection="row"
         justifyContent="space-between"

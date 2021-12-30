@@ -12,11 +12,7 @@ import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import cryptoJS from 'crypto-js'
 
 import { QRCode } from '@src/pages/QRcode'
-import {
-  useSaveFirebaseTokenMutation,
-  useSendAuthMessageLazyQuery,
-  useSettingsQuery
-} from './Popup.codegen'
+import { useSendAuthMessageLazyQuery } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
 import { UserContext } from '@src/providers/UserProvider'
@@ -34,14 +30,11 @@ i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
   const { userId, fireToken } = useContext(UserContext)
-  const [
-    saveFirebaseTokenMutation,
-    { data: tokenData, loading: tokenLoading, error: tokenError }
-  ] = useSaveFirebaseTokenMutation({})
+
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
-  const { data: settingsData } = useSettingsQuery()
+
   const { currentURL, isFilling, safeLocked, backgroundState } =
     useContext(BackgroundContext)
 
@@ -69,17 +62,6 @@ export const Popup: FunctionComponent = () => {
   //     saveToLocal(encrypted)
   //   }
   // }, [userId, bgPasswords])
-
-  useEffect(() => {
-    if (userId && fireToken.length > 1) {
-      log('client fireToken:', fireToken)
-      saveFirebaseTokenMutation({
-        variables: {
-          firebaseToken: fireToken as string
-        }
-      })
-    }
-  }, [userId, fireToken])
 
   // useEffect(() => {
   //   if (bgAuths) {
