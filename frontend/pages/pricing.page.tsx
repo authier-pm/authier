@@ -32,7 +32,7 @@ function PriceWrapper({ children }: { children: ReactNode }) {
   )
 }
 
-export default function Pricing() {
+export default function PricingPage() {
   return (
     <>
       <Head>

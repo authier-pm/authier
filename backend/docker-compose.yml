@@ -38,7 +38,8 @@ services:
     # volumes:
     #   - ./:/app
   authierDb:
-    image: postgres:13 # does not work with v14
+    image: postgres:14
+    restart: always
     container_name: integration-tests-prisma
     environment:
       POSTGRES_PASSWORD: auth133r

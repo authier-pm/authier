@@ -1,10 +1,10 @@
 import { prismaClient } from '../prismaClient'
-import { IContext, RootResolver } from './RootResolver'
-import faker from 'faker'
+import { RootResolver } from './RootResolver'
+import faker, { fake } from 'faker'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
-import { sign } from 'jsonwebtoken'
+import { setNewAccessTokenIntoCookie } from '../userAuth'
 import { User } from '@prisma/client'
-import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
+import { sign } from 'jsonwebtoken'
 
 afterAll(async () => {
   const deleteDevices = prismaClient.device.deleteMany()
@@ -50,7 +50,7 @@ describe('RootResolver', () => {
       jest.setTimeout(10000)
     })
 
-    it('should add new USER', async () => {
+    it('should add new user', async () => {
       let userId = faker.datatype.uuid()
 
       let input: RegisterNewDeviceInput = {

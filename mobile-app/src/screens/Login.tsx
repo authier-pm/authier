@@ -49,6 +49,7 @@ export function Login({ navigation }) {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions) => {
+          // @ts-expect-error
           const response = await login({
             variables: { email: values.email, password: values.password }
           })
@@ -112,7 +113,11 @@ export function Login({ navigation }) {
               </Pressable>
             </FormControl>
 
-            <Button onPress={handleSubmit} isLoading={loading}>
+            <Button
+              onPress={handleSubmit}
+              // @ts-expect-error
+              isLoading={loading}
+            >
               Submit
             </Button>
             <HStack mt="2" justifyContent="center">

@@ -71,6 +71,7 @@ export interface IBackgroundStateSerializable {
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
+  encrypt: (stringToEncrypt: string) => string
   addSecretOnBackend: (input: ITOTPSecret | ILoginSecret) => Promise<void>
 }
 
@@ -81,6 +82,11 @@ export const setBgState = (
 ) => {
   bgState = {
     ...bgStateSerializable,
+    encrypt(stringToEncrypt: string) {
+      return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
+        iv: cryptoJS.enc.Utf8.parse(this.userId)
+      }).toString()
+    },
 
     async addSecretOnBackend(secret: ITOTPSecret | ILoginSecret) {
       const stringToEncrypt =
@@ -88,13 +94,7 @@ export const setBgState = (
           ? secret.totp
           : JSON.stringify(secret.loginCredentials)
 
-      const encrypted = cryptoJS.AES.encrypt(
-        stringToEncrypt,
-        this.masterPassword,
-        {
-          iv: cryptoJS.enc.Utf8.parse(this.userId)
-        }
-      ).toString()
+      const encrypted = this.encrypt(stringToEncrypt)
 
       await apolloClient.mutate<
         AddEncryptedSecretMutation,

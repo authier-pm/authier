@@ -187,14 +187,16 @@ export function useBackgroundState() {
       }
 
       const secretsDecrypted = decryptAndParse()
-      let totpSecrets
-      let credentialsSecrets
+      let totpSecrets: ITOTPSecret[] = []
+      let credentialsSecrets: ILoginSecret[] = []
 
       if (secretsDecrypted.length > 0) {
+        // @ts-expect-error
         totpSecrets = secretsDecrypted.filter(
           ({ kind }) => kind === EncryptedSecretType.TOTP
         )
 
+        // @ts-expect-error
         credentialsSecrets = secretsDecrypted.filter(
           ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
         )
@@ -204,8 +206,8 @@ export function useBackgroundState() {
         masterPassword,
         userId,
         secrets,
-        loginCredentials: credentialsSecrets ? credentialsSecrets : [],
-        totpSecrets: totpSecrets ? totpSecrets : []
+        loginCredentials: credentialsSecrets,
+        totpSecrets: totpSecrets
       }
 
       browser.runtime.sendMessage({
@@ -215,7 +217,7 @@ export function useBackgroundState() {
       log('state', payload)
       setBackgroundState(payload)
     },
-    saveLoginCredentials: (passwords: EncryptedSecretGql[]) => {
+    saveLoginCredentials: (passwords: ILoginSecret[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,
@@ -228,7 +230,7 @@ export function useBackgroundState() {
         setBackgroundState(newBgState)
       }
     },
-    saveTOTPSecrets: (totpSecrets: EncryptedSecretGql[]) => {
+    saveTOTPSecrets: (totpSecrets: ITOTPSecret[]) => {
       if (backgroundState) {
         const newBgState = {
           ...backgroundState,

@@ -1,5 +1,4 @@
 // @ts-check
-const path = require('path')
 const { withSentryConfig } = require('@sentry/nextjs')
 
 /**
@@ -7,13 +6,13 @@ const { withSentryConfig } = require('@sentry/nextjs')
  **/
 const nextConfig = {
   webpack: (config, _options) => {
-    config.resolve.alias.react = path.resolve('./node_modules/react') // without this It was throwing "You might have more than one copy of React in the same app"
     config.module.rules.push({
       test: /\.md$/,
       use: 'raw-loader'
     })
     return config
   },
+  swcMinify: false,
   experimental: {
     externalDir: true
   },

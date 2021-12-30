@@ -4,7 +4,7 @@ import Head from 'next/head'
 import React from 'react'
 import { AuPage } from '../components/AuPage'
 
-export default function Pricing() {
+export default function FaqPage() {
   return (
     <AuPage heading={t`Frequently asked questions`}>
       <Box m={5}>
