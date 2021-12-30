@@ -96,12 +96,14 @@ chrome.runtime.onMessage.addListener(async function (
       log('addLoginCredentials', req.payload)
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
+      const namePassPair = {
+        username: credentials.username,
+        password: credentials.password
+      }
       bgState.addSecretOnBackend({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-        loginCredentials: {
-          username: credentials.username,
-          password: credentials.password
-        },
+        loginCredentials: namePassPair,
+        encrypted: bgState.encrypt(JSON.stringify(namePassPair)),
         iconUrl: tab.favIconUrl,
         url: url,
         label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
