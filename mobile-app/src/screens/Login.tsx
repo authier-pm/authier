@@ -39,7 +39,7 @@ export function Login({ navigation }) {
   }
 
   return (
-    <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
+    <View flex={1} p="2" w="90%" mx="auto" justifyContent="center">
       <Heading size="lg" fontWeight="600" color="coolGray.800">
         Welcome
       </Heading>

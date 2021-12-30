@@ -17,6 +17,7 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { NotifyContext } from '../providers/NotifyProvider'
 import { useSendConfirmationLazyQuery } from './Home.codegen'
+//import Aes from 'react-native-aes-crypto'
 
 const Home = () => {
   const [sendConfirmation, { data, error }] = useSendConfirmationLazyQuery()
@@ -152,7 +153,7 @@ const Home = () => {
   return (
     <Box safeArea flex={1}>
       <Text>notification here</Text>
-
+      <Button onPress={() => {}}>Delete</Button>
       <FlatList
         data={notifies}
         keyExtractor={(noti) => {
