@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "DecryptionChallenge" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ADD COLUMN     "masterPasswordVerifiedAt" TIMESTAMP(3);

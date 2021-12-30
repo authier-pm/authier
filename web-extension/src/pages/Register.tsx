@@ -12,7 +12,6 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { useRegisterMutation } from '../../../shared/Register.codegen'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
@@ -20,19 +19,23 @@ import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
+import { device } from '@src/background/Device'
+import cryptoJS from 'crypto-js'
 
 interface Values {
   password: string
   email: string
 }
-
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
-    useRegisterMutation()
+    useRegisterNewUserMutation()
+
   const { fireToken } = useContext(UserContext)
-  const { loginUser } = useContext(BackgroundContext)
+  const { initEncryptedSecrets: loginUser } = useContext(BackgroundContext)
   const { refetch } = useIsLoggedInQuery()
+  // console.log('~ fireToken', fireToken)
 
   if (registerError) {
     console.log(registerError)
@@ -49,25 +52,32 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const countOfDevices = 0
+          const deviceId = await device.getDeviceId()
+          // @ts-expect-error
+          const userId = crypto.randomUUID()
+
           let res = await register({
             variables: {
-              email: values.email,
-              password: values.password,
-              firebaseToken: fireToken,
-              deviceName: `Chrome extension ${countOfDevices + 1}` // TODO get device name from agent string
+              userId,
+              input: {
+                email: values.email,
+                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
+                deviceId,
+                firebaseToken: fireToken,
+                deviceName: device.generateDeviceName()
+              }
             }
           })
-          const registerResult = res.data?.register
+          const registerResult = res.data?.registerNewUser
 
           if (registerResult?.accessToken) {
             // is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
-              'access-token': res.data?.register.accessToken
+              'access-token': res.data?.registerNewUser.accessToken
             })
             setAccessToken(registerResult.accessToken as string)
 
-            loginUser(values.password, registerResult.user.id, [])
+            loginUser([])
             refetch()
 
             setSubmitting(false)

@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
 import { Flex, IconButton, useDisclosure, Box } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
@@ -6,6 +11,12 @@ import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
+import { IoMdRefreshCircle } from 'react-icons/io'
+import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
+import { bgState } from '@src/background/backgroundPage'
+import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
+import { ISecret } from '@src/util/useBackgroundState'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -20,6 +31,7 @@ export const NavBar: FunctionComponent = () => {
   } = useDisclosure()
 
   const [location, setLocation] = useLocation()
+  console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (
@@ -34,6 +46,21 @@ export const NavBar: FunctionComponent = () => {
       </Link>
     )
   }
+  const { initEncryptedSecrets, backgroundState } =
+    useContext(BackgroundContext)
+
+  const [getEncryptedSecretsToSync, { data }] =
+    useSyncEncryptedSecretsLazyQuery()
+
+  useEffect(() => {
+    if (data) {
+      console.log(data)
+      initEncryptedSecrets(
+        // @ts-expect-error
+        data.currentDevice.encryptedSecretsToSync as ISecret[]
+      )
+    }
+  }, [data])
 
   useEffect(() => {
     SetLastPage(location)
@@ -71,6 +98,16 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           )}
+
+          <IconButton
+            size="md"
+            ml="2"
+            aria-label="menu"
+            icon={<IoMdRefreshCircle />}
+            onClick={async () => {
+              getEncryptedSecretsToSync()
+            }}
+          />
         </Box>
 
         <Box ml="auto">

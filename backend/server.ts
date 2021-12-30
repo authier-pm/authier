@@ -5,31 +5,57 @@ import fastifyCors from 'fastify-cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
-import dotenv from 'dotenv'
+import './dotenv'
+
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
-import { prisma } from './prisma'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
+import { prismaClient } from './prismaClient'
+import {
+  jwtPayloadRefreshToken,
+  setNewAccessTokenIntoCookie,
+  setNewRefreshToken
+} from './userAuth'
 import { verify } from 'jsonwebtoken'
 import chalk from 'chalk'
-import { IContext } from './RootResolver'
+import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
+import * as admin from 'firebase-admin'
+import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
+import debug from 'debug'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
-dotenv.config()
 
+const { env } = process
+const log = debug('au:server')
+
+const environment = env.NODE_ENV
 sentryInit({
-  dsn: process.env.SENTRY_DSN,
-  environment: process.env.NODE_ENV,
+  dsn: env.SENTRY_DSN,
+  environment,
   release: `<project-name>@${pkg.version}`
 })
 
-const { env } = process
 async function main() {
   const app = fastify({
-    logger: true
+    logger: {
+      prettyPrint:
+        environment === 'production'
+          ? false
+          : {
+              translateTime: 'HH:MM:ss Z',
+              ignore: 'pid,hostname'
+            }
+    }
   })
+  app.setErrorHandler(async (error, request, reply) => {
+    // Logging locally
+    console.log(error)
+    // Sending error to be logged in Sentry
+    captureException(error)
+    reply.status(500).send({ error: 'Something went wrong' })
+  })
+
   app.register(fastifyCors)
   const trustedDomains = ['https://unpkg.com']
   app.register(fastifyHelmet, {
@@ -62,9 +88,12 @@ async function main() {
       return reply.send({ ok: false, accessToken: '' })
     }
 
-    let payload: any = null
+    let payload: jwtPayloadRefreshToken | null = null
     try {
-      payload = verify(refreshToken, process.env.REFRESH_TOKEN_SECRET!)
+      payload = verify(
+        refreshToken,
+        process.env.REFRESH_TOKEN_SECRET!
+      ) as jwtPayloadRefreshToken
     } catch (err) {
       console.log(err)
       return reply
@@ -73,7 +102,7 @@ async function main() {
     }
 
     //token is valid and we can send back access token
-    const user = await prisma.user.findUnique({
+    const user = await prismaClient.user.findUnique({
       where: {
         id: payload.userId
       }
@@ -88,9 +117,9 @@ async function main() {
     }
     const ctx = { request, reply } as IContext
 
-    setNewRefreshToken(user, ctx)
+    setNewRefreshToken(user, payload.deviceId, ctx)
 
-    const accessToken = setNewAccessTokenIntoCookie(user, ctx)
+    const accessToken = setNewAccessTokenIntoCookie(user, payload.deviceId, ctx)
 
     return reply.send({
       ok: true,
@@ -104,6 +133,10 @@ async function main() {
   } as FastifyCookieOptions)
 
   app.register(mercurius, {
+    // errorHandler: (err, ctx) => {
+    //   console.error(err)
+    //   return err
+    // },
     schema: gqlSchema,
     graphiql: true,
     context: (request, reply) => {
@@ -112,45 +145,27 @@ async function main() {
           request.headers['x-forwarded-for'] || request.socket.remoteAddress
         )
       }
+      log('body: ', request.body)
 
-      let token: string | undefined
-
-      if (request.cookies['access-token']) {
-        token = request.cookies['access-token']
-      } else {
-        const authorization = request.headers['authorization']
-        token = authorization?.split(' ')[1]
-      }
-
-      if (!token) {
-        reply.clearCookie('access-token')
-        return { request, reply, getIpAddress }
-      }
-
-      try {
-        const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
-
-        let jwtPayload = payload as { userId: string }
-        return { request, reply, getIpAddress, jwtPayload }
-      } catch (err) {
-        reply.clearCookie('access-token')
-      }
-      return { request, reply, getIpAddress }
+      return { request, reply, getIpAddress, prisma: prismaClient }
     },
     errorFormatter: (res, ctx) => {
       if (res.errors) {
-        console.log(chalk.bgRed('Graphql errors: '))
         res.errors.map((err) => {
           if (err instanceof GraphqlError === false) {
             captureException(err)
           }
-          console.error(' ', err)
+          ctx.request.log.error(err)
         })
       }
-      const errResponse = mercurius.defaultErrorFormatter(res, null)
+      const errResponse = mercurius.defaultErrorFormatter(res, ctx)
       errResponse.statusCode = 200 // mercurius returns 500 by default, but we want to use 200 as that aligns better with apollo-server
       return errResponse
     }
+  })
+
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
   })
 
   app.listen(process.env.PORT!, '0.0.0.0')

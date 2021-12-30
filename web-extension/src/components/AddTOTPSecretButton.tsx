@@ -7,6 +7,7 @@ import {
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
+import cryptoJS from 'crypto-js'
 
 import browser, { Tabs } from 'webextension-polyfill'
 
@@ -14,10 +15,12 @@ import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { ITOTPSecret, useBackgroundState } from '@src/util/useBackgroundState'
+import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
 
 export const AddTOTPSecretButton: React.FC<{}> = () => {
   const { backgroundState, forceUpdate } = useContext(BackgroundContext)
-
+  const { encrypt } = useBackgroundState()
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
@@ -25,9 +28,9 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
       return
     }
 
-    const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
+    const newTotpSecret = getTokenSecretFromQrCode(qr, tab, encrypt)
     const existingTotpSecret = backgroundState.totpSecrets.find(
-      ({ secret }) => newTotpSecret.secret === secret
+      ({ totp }) => newTotpSecret.totp === totp
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
@@ -61,19 +64,25 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
+export function getTokenSecretFromQrCode(
+  qr: QRCode,
+  tab: Tabs.Tab,
+  encrypt: (s: string) => string
+): ITOTPSecret {
   const parsedQuery = queryString.parseUrl(qr.data)
-
-  if (!parsedQuery.query.secret) {
+  const secret = parsedQuery.query.secret as string
+  if (!secret) {
     console.error('QR code does not have any secret', qr.data)
     throw new Error('QR code does not have any secret')
   }
   return {
-    secret: parsedQuery.query.secret as string,
-    icon: tab.favIconUrl,
+    kind: EncryptedSecretsType.TOTP as any,
+    totp: secret as string,
+    encrypted: encrypt(secret),
+    iconUrl: tab.favIconUrl,
     label:
       (parsedQuery.query.issuer as string) ??
       decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
-    originalUrl: tab.url
+    url: tab.url as string
   }
 }

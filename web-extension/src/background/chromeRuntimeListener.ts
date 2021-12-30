@@ -1,6 +1,6 @@
 import {
   ITOTPSecret,
-  ILoginCredentials,
+  ILoginSecret,
   ISecuritySettings
 } from '@src/util/useBackgroundState'
 import {
@@ -25,7 +25,10 @@ import {
   AddWebInputsMutationResult,
   AddWebInputsMutationVariables
 } from './chromeRuntimeListener.codegen'
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  WebInputType
+} from '../../../shared/generated/graphqlBaseTypes'
 
 const log = debug('chromeRuntimeListener')
 
@@ -58,7 +61,7 @@ chrome.runtime.onMessage.addListener(async function (
     lockTime: number
     config: UISettings
     auths: ITOTPSecret[]
-    passwords: ILoginCredentials[]
+    passwords: ILoginSecret[]
     settings: ISecuritySettings
   },
   sender,
@@ -94,16 +97,18 @@ chrome.runtime.onMessage.addListener(async function (
       log('addLoginCredentials', req.payload)
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
-      bgState.setLoginCredentials([
-        ...bgState.loginCredentials,
-        {
-          username: credentials.username,
-          password: credentials.password,
-          favIconUrl: tab.favIconUrl,
-          originalUrl: url,
-          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
-        }
-      ])
+      const namePassPair = {
+        username: credentials.username,
+        password: credentials.password
+      }
+      bgState.addSecretOnBackend({
+        kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+        loginCredentials: namePassPair,
+        encrypted: bgState.encrypt(JSON.stringify(namePassPair)),
+        iconUrl: tab.favIconUrl,
+        url: url,
+        label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+      })
 
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
@@ -127,10 +132,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.addTOTPSecret:
       if (bgState) {
-        bgState.setTOTPSecrets([
-          ...bgState.totpSecrets,
-          req.payload as ITOTPSecret
-        ])
+        bgState.addSecretOnBackend(req.payload as ITOTPSecret)
       }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {

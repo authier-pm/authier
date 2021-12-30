@@ -1,24 +1,24 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes'
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
-import { gql } from '@apollo/client'
-import * as Apollo from '@apollo/client'
-const defaultOptions = {}
-export type IsLoggedInQueryVariables = Types.Exact<{ [key: string]: never }>
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+const defaultOptions =  {}
+export type IsLoggedInQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
-export type IsLoggedInQuery = { __typename?: 'Query'; authenticated: boolean }
 
-export type LogoutMutationVariables = Types.Exact<{ [key: string]: never }>
+export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 
-export type LogoutMutation = {
-  __typename?: 'Mutation'
-  logout?: boolean | null | undefined
-}
+export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type LogoutMutation = { __typename?: 'Mutation', logout?: boolean | null | undefined };
+
 
 export const IsLoggedInDocument = gql`
-  query isLoggedIn {
-    authenticated
-  }
-`
+    query isLoggedIn {
+  authenticated
+}
+    `;
 
 /**
  * __useIsLoggedInQuery__
@@ -35,47 +35,23 @@ export const IsLoggedInDocument = gql`
  *   },
  * });
  */
-export function useIsLoggedInQuery(
-  baseOptions?: Apollo.QueryHookOptions<
-    IsLoggedInQuery,
-    IsLoggedInQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<IsLoggedInQuery, IsLoggedInQueryVariables>(
-    IsLoggedInDocument,
-    options
-  )
-}
-export function useIsLoggedInLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    IsLoggedInQuery,
-    IsLoggedInQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<IsLoggedInQuery, IsLoggedInQueryVariables>(
-    IsLoggedInDocument,
-    options
-  )
-}
-export type IsLoggedInQueryHookResult = ReturnType<typeof useIsLoggedInQuery>
-export type IsLoggedInLazyQueryHookResult = ReturnType<
-  typeof useIsLoggedInLazyQuery
->
-export type IsLoggedInQueryResult = Apollo.QueryResult<
-  IsLoggedInQuery,
-  IsLoggedInQueryVariables
->
+export function useIsLoggedInQuery(baseOptions?: Apollo.QueryHookOptions<IsLoggedInQuery, IsLoggedInQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<IsLoggedInQuery, IsLoggedInQueryVariables>(IsLoggedInDocument, options);
+      }
+export function useIsLoggedInLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<IsLoggedInQuery, IsLoggedInQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<IsLoggedInQuery, IsLoggedInQueryVariables>(IsLoggedInDocument, options);
+        }
+export type IsLoggedInQueryHookResult = ReturnType<typeof useIsLoggedInQuery>;
+export type IsLoggedInLazyQueryHookResult = ReturnType<typeof useIsLoggedInLazyQuery>;
+export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLoggedInQueryVariables>;
 export const LogoutDocument = gql`
-  mutation logout {
-    logout
-  }
-`
-export type LogoutMutationFn = Apollo.MutationFunction<
-  LogoutMutation,
-  LogoutMutationVariables
->
+    mutation logout {
+  logout
+}
+    `;
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;
 
 /**
  * __useLogoutMutation__
@@ -93,21 +69,10 @@ export type LogoutMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useLogoutMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    LogoutMutation,
-    LogoutMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(
-    LogoutDocument,
-    options
-  )
-}
-export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>
-export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>
-export type LogoutMutationOptions = Apollo.BaseMutationOptions<
-  LogoutMutation,
-  LogoutMutationVariables
->
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options);
+      }
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>;
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>;
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>;

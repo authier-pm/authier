@@ -11,7 +11,7 @@ import {
   HStack
 } from 'native-base'
 import React, { useContext } from 'react'
-import { useLoginMutation } from './Login.codegen'
+
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
@@ -23,7 +23,7 @@ interface MyFormValues {
 
 export function Login({ navigation }) {
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
-  const [login, { loading }] = useLoginMutation()
+  // const [login, { loading }] = useLoginMutation()
   const { setIsLogged } = useContext(UserContext)
 
   const saveData = async (value) => {
@@ -38,7 +38,7 @@ export function Login({ navigation }) {
   }
 
   return (
-    <View safeArea flex={1} p="2" w="90%" mx="auto" justifyContent="center">
+    <View flex={1} p="2" w="90%" mx="auto" justifyContent="center">
       <Heading size="lg" fontWeight="600" color="coolGray.800">
         Welcome
       </Heading>
@@ -49,6 +49,7 @@ export function Login({ navigation }) {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions) => {
+          // @ts-expect-error
           const response = await login({
             variables: { email: values.email, password: values.password }
           })
@@ -112,7 +113,11 @@ export function Login({ navigation }) {
               </Pressable>
             </FormControl>
 
-            <Button onPress={handleSubmit} isLoading={loading}>
+            <Button
+              onPress={handleSubmit}
+              // @ts-expect-error
+              isLoading={loading}
+            >
               Submit
             </Button>
             <HStack mt="2" justifyContent="center">
