@@ -211,7 +211,9 @@ const LoginSecret = (data: ILoginSecret) => {
 export const ItemSettings = (data: ILoginSecret | ITOTPSecret) => {
   if (data.kind === 'TOTP') {
     return <TOTPSecret {...data} />
-  } else {
+  } else if (data.kind === 'LOGIN_CREDENTIALS') {
     return <LoginSecret {...data} />
   }
+
+  return null
 }

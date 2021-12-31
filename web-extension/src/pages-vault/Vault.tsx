@@ -18,7 +18,7 @@ export function Vault() {
           path="/list/:item"
           children={({ location }) => (
             //@ts-expect-error
-            <ItemSettings data={location.state.data} />
+            <ItemSettings {...location.state.data} />
           )}
         />
         <Route path="/settings">
