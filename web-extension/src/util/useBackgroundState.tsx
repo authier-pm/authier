@@ -194,6 +194,7 @@ export function useBackgroundState() {
       }
 
       const secretsDecrypted = decryptAndParse()
+      console.log('~ secretsDecrypted', secretsDecrypted)
       let totpSecrets: ITOTPSecret[] = []
       let credentialsSecrets: ILoginSecret[] = []
 
