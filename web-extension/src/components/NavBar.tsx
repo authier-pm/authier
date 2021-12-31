@@ -54,10 +54,12 @@ export const NavBar: FunctionComponent = () => {
 
   useEffect(() => {
     if (data) {
-      console.log(data)
+      console.log('~ data', data)
       initEncryptedSecrets(
         // @ts-expect-error
-        data.currentDevice.encryptedSecretsToSync as ISecret[]
+        data.currentDevice.encryptedSecretsToSync as ISecret[],
+        '',
+        ''
       )
     }
   }, [data])

@@ -11,22 +11,18 @@ import {
   CloseButton,
   useDisclosure
 } from '@chakra-ui/react'
-import { ILoginCredentials, ITOTPSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useBackgroundState'
 import React, { useContext, useState } from 'react'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
 
-function VaultItem({
-  icon,
-  label,
+function Item({
   data,
   deleteItem
 }: {
-  label: string
-  icon: string | undefined
-  data: ILoginCredentials | ITOTPSecret
+  data: ILoginSecret | ITOTPSecret
   deleteItem: () => void
 }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -47,7 +43,7 @@ function VaultItem({
       >
         <Box bg={'gray.100'} h="90%" pos={'relative'}>
           <Center h={130}>
-            <Image src={icon} />
+            <Image src={data.iconUrl as string} />
           </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
@@ -60,12 +56,14 @@ function VaultItem({
             w="100%"
             h="full"
           >
-            <IconButton
-              aria-label="open item"
-              colorScheme="blackAlpha"
-              icon={<UnlockIcon />}
-              onClick={() => chrome.tabs.create({ url: data.originalUrl })}
-            />
+            {data.kind === 'LOGIN_CREDENTIALS' ? (
+              <IconButton
+                aria-label="open item"
+                colorScheme="blackAlpha"
+                icon={<UnlockIcon />}
+                onClick={() => chrome.tabs.create({ url: data.url })}
+              />
+            ) : null}
 
             <CloseButton
               overflow={'visible'}
@@ -91,11 +89,12 @@ function VaultItem({
           p={4}
         >
           <Text fontWeight={'bold'} fontSize={'lg'}>
-            {label}
+            {data.label}
           </Text>
+
           <Link
             to={{
-              pathname: `list/${label}`,
+              pathname: `list/${data.label}`,
               state: { data: data }
             }}
           >
@@ -121,15 +120,15 @@ export const ItemList = () => {
   const removeLoginCredential = (label: string) => {
     saveLoginCredentials(
       backgroundState?.loginCredentials.filter(
-        (item) => item.label !== label
-      ) as ILoginCredentials[]
+        (el) => el.label !== label
+      ) as ILoginSecret[]
     )
   }
 
   const removeTOTPSecret = (label: string) => {
     saveTOTPSecrets(
       backgroundState?.totpSecrets.filter(
-        (item) => item.label !== label
+        (el) => el.label !== label
       ) as ITOTPSecret[]
     )
   }
@@ -149,33 +148,25 @@ export const ItemList = () => {
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
             {backgroundState?.totpSecrets
-              ?.filter(({ label, originalUrl }) => {
-                return (
-                  label.includes(filterBy) || originalUrl.includes(filterBy)
-                )
+              ?.filter(({ label, url }) => {
+                return label.includes(filterBy) || url.includes(filterBy)
               })
               .map((el, i) => {
                 return (
-                  <VaultItem
+                  <Item
                     data={el}
-                    icon={el.icon}
-                    label={el.label}
                     key={el.label + i}
                     deleteItem={() => removeTOTPSecret(el.label)}
                   />
                 )
               })}
             {backgroundState?.loginCredentials
-              ?.filter(({ label, originalUrl }) => {
-                return (
-                  label.includes(filterBy) || originalUrl.includes(filterBy)
-                )
+              ?.filter(({ label, url }) => {
+                return label.includes(filterBy) || url.includes(filterBy)
               })
               .map((el, i) => {
                 return (
-                  <VaultItem
-                    icon={el.favIconUrl}
-                    label={el.label}
+                  <Item
                     key={el.label + i}
                     data={el}
                     deleteItem={() => removeLoginCredential(el.label)}

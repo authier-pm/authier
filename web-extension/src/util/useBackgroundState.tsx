@@ -144,22 +144,31 @@ export function useBackgroundState() {
     isFilling,
     forceUpdate,
     backgroundState,
-    initEncryptedSecrets: async (secrets: ISecret[]) => {
+    initEncryptedSecrets: async (
+      secrets: ISecret[],
+      tmpMasterPassword: string,
+      tmpUserId: string
+    ) => {
       log('initEncryptedSecrets', secrets)
       setSafeLocked(false)
-      const masterPassword = backgroundState?.masterPassword
-      const userId = backgroundState?.userId
-      log('test', masterPassword, userId)
+
+      let masterPassword = backgroundState?.masterPassword
+      let userId = backgroundState?.userId
+
       if (!masterPassword || !userId) {
-        return
+        masterPassword = tmpMasterPassword
+        userId = tmpUserId
       }
+      log('~ psw`', masterPassword, userId)
       const decryptAndParse = () => {
         return secrets.map((secret) => {
           try {
             const decrypted = cryptoJS.AES.decrypt(
               secret.encrypted,
-              masterPassword,
+              masterPassword as string,
               {
+                //How to type this?
+                //@ts-expect-error
                 iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
               }
             ).toString(cryptoJS.enc.Utf8)
