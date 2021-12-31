@@ -138,7 +138,16 @@ describe('RootResolver', () => {
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          TOTPlimit: 4,
+          Devices: {
+            create: {
+              id: input.deviceId,
+              firstIpAddress: faker.internet.ip(),
+              lastIpAddress: faker.internet.ip(),
+              firebaseToken: faker.datatype.uuid(),
+              name: input.deviceName
+            }
+          }
         }
       })
 
@@ -146,7 +155,7 @@ describe('RootResolver', () => {
 
       expect(
         async () =>
-          await resolver.registerNewUser(input, userId, {
+          await resolver.registerNewUser(input, faker.datatype.uuid(), {
             reply: { setCookie: jest.fn() },
             request: { headers: {} },
             jwtPayload: { userId: userId },
@@ -159,7 +168,7 @@ describe('RootResolver', () => {
   })
 
   describe('addNewDeviceForUser', () => {
-    it('should add new DEVICE for user', async () => {
+    it('should add new device for user', async () => {
       let userId = faker.datatype.uuid()
 
       let input: RegisterNewDeviceInput = {
