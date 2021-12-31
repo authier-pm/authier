@@ -30,7 +30,7 @@ export type LoginMutation = {
             | Array<{
                 __typename?: 'EncryptedSecrets'
                 id: number
-                kind: Types.EncryptedSecretsType
+                kind: Types.EncryptedSecretType
                 encrypted: string
               }>
             | null

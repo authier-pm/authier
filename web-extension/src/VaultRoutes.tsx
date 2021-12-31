@@ -6,9 +6,5 @@ import { BackgroundContext } from './providers/BackgroundProvider'
 export function VaultRoutes(): ReactElement {
   const { backgroundState } = useContext(BackgroundContext)
 
-  if (!backgroundState?.masterPassword) {
-    return <VaultUnlockVerification />
-  }
-
   return <Vault />
 }

@@ -13,7 +13,6 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
@@ -77,7 +76,7 @@ export default function Register(): ReactElement {
             })
             setAccessToken(registerResult.accessToken as string)
 
-            loginUser([])
+            loginUser([], values.password, registerResult.user.id)
             refetch()
 
             setSubmitting(false)

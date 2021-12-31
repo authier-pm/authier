@@ -165,6 +165,7 @@ async function main() {
   })
 
   admin.initializeApp({
+    //@ts-expect-error
     credential: admin.credential.cert(serviceAccount)
   })
 

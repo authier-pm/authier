@@ -114,7 +114,11 @@ export default function Login(): ReactElement {
               response.data.addNewDeviceForUser.user.EncryptedSecrets
 
             setUserId(decodedToken.userId)
-            initEncryptedSecrets(EncryptedSecrets as ISecret[])
+            initEncryptedSecrets(
+              EncryptedSecrets as ISecret[],
+              values.password,
+              userId
+            )
           } else {
             toast.error(t`Login failed, check your username and password`)
           }
