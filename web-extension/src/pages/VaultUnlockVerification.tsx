@@ -29,8 +29,7 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { initEncryptedSecrets: loginUser, backgroundState } =
-    useContext(BackgroundContext)
+  const { deviceLogin, backgroundState } = useContext(BackgroundContext)
 
   if (!backgroundState) {
     return null

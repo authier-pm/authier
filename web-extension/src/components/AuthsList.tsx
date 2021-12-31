@@ -49,11 +49,6 @@ import debug from 'debug'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 const log = debug('au:AuthsList')
 
-enum Values {
-  passwords = 'PSW',
-  TOTP = 'OTP'
-}
-
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   console.log('~ totpData', totpData)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
@@ -187,8 +182,8 @@ const LoginCredentialsListItem = ({
   )
 }
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const { backgroundState } = useContext(BackgroundContext)
-  console.log('~ backgroundState424', backgroundState)
+  const { backgroundState, TOTPSecrets, LoginCredentials } =
+    useContext(BackgroundContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
   // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
@@ -205,21 +200,18 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     return null
   }
 
-  const TOTPForCurrentDomain = backgroundState.totpSecrets?.filter(
-    ({ url }) => {
-      if (!currentTabUrl || !url) {
-        return true
-      }
-      return extractHostname(url) === extractHostname(currentTabUrl)
+  const TOTPForCurrentDomain = TOTPSecrets.filter(({ url }) => {
+    if (!currentTabUrl || !url) {
+      return true
     }
-  )
-  const loginCredentialForCurrentDomain =
-    backgroundState.loginCredentials.filter(({ url }) => {
-      if (!currentTabUrl || !url) {
-        return true
-      }
-      return extractHostname(url) === extractHostname(currentTabUrl)
-    })
+    return extractHostname(url) === extractHostname(currentTabUrl)
+  })
+  const loginCredentialForCurrentDomain = LoginCredentials.filter(({ url }) => {
+    if (!currentTabUrl || !url) {
+      return true
+    }
+    return extractHostname(url) === extractHostname(currentTabUrl)
+  })
 
   return (
     <>
@@ -263,7 +255,9 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
         {filterByTLD ? (
           <>
             {TOTPForCurrentDomain.map((auth, i) => {
-              return <OtpCode totpData={auth} key={auth.label + i} />
+              return (
+                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
+              )
             })}
             {loginCredentialForCurrentDomain.map((psw, i) => {
               return (
@@ -276,10 +270,10 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           </>
         ) : (
           [
-            backgroundState.totpSecrets.map((auth, i) => {
+            TOTPSecrets.map((auth, i) => {
               return <OtpCode totpData={auth} key={auth.label + i} />
             }),
-            backgroundState.loginCredentials.map((psw, i) => {
+            LoginCredentials.map((psw, i) => {
               return (
                 <LoginCredentialsListItem
                   loginSecret={psw}
@@ -289,14 +283,13 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
             })
           ]
         )}
-        {backgroundState.loginCredentials.length === 0 &&
-          backgroundState.totpSecrets.length === 0 && (
-            // TODO login form illustration
-            <Text>
-              Start by adding a secret by logging onto any website or by adding
-              a TOTP code
-            </Text>
-          )}
+        {LoginCredentials.length === 0 && TOTPSecrets.length === 0 && (
+          // TODO login form illustration
+          <Text>
+            Start by adding a secret by logging onto any website or by adding a
+            TOTP code
+          </Text>
+        )}
       </Flex>
     </>
   )

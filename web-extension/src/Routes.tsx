@@ -5,7 +5,7 @@ import browser from 'webextension-polyfill'
 import AuthPages from './AuthPages'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
-import { useIsLoggedInQuery } from './popup/Popup.codegen'
+
 import { BackgroundContext } from './providers/BackgroundProvider'
 
 export default function Routes(): ReactElement {
