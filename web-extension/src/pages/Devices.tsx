@@ -30,7 +30,7 @@ export default function Devices() {
   return (
     <Box>
       {data && !loading ? (
-        data.me?.myDevices.map((i) => {
+        data.me?.devices.map((i) => {
           return (
             <Flex
               key={i.lastIpAddress}
