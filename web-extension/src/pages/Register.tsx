@@ -9,20 +9,24 @@ import {
   Heading,
   Input,
   InputGroup,
-  InputRightElement
+  InputRightElement,
+  Text
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { useLocation } from 'wouter'
+import { Link, useLocation } from 'wouter'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
-import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
+
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
 import { device } from '@src/background/Device'
 import cryptoJS from 'crypto-js'
+import { Trans } from '@lingui/macro'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 
 interface Values {
   password: string
@@ -34,8 +38,7 @@ export default function Register(): ReactElement {
     useRegisterNewUserMutation()
 
   const { fireToken } = useContext(UserContext)
-  const { initEncryptedSecrets: loginUser } = useContext(BackgroundContext)
-  const { refetch } = useIsLoggedInQuery()
+  const { deviceLogin } = useContext(BackgroundContext)
   // console.log('~ fireToken', fireToken)
 
   if (registerError) {
@@ -78,8 +81,13 @@ export default function Register(): ReactElement {
             })
             setAccessToken(registerResult.accessToken as string)
 
-            loginUser([])
-            refetch()
+            const bgState: IBackgroundStateSerializable = {
+              masterPassword: values.password,
+              userId: userId,
+              secrets: []
+            }
+
+            deviceLogin(bgState)
 
             setSubmitting(false)
           }
@@ -139,6 +147,11 @@ export default function Register(): ReactElement {
           </Form>
         )}
       </Formik>
+      <Link to="/">
+        <Text pt={3}>
+          <Trans>Already have an account?</Trans>
+        </Text>
+      </Link>
     </Box>
   )
 }

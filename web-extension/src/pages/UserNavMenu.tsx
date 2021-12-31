@@ -6,6 +6,7 @@ import { removeToken } from '@src/util/accessTokenExtension'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { Trans } from '@lingui/macro'
+import { device } from '@src/background/Device'
 
 export const UserNavMenu: FunctionComponent = () => {
   const { logoutUser, lockVault } = useContext(BackgroundContext)
@@ -26,7 +27,7 @@ export const UserNavMenu: FunctionComponent = () => {
             colorScheme="red"
             onClick={async () => {
               await removeToken()
-              await browser.storage.local.clear()
+              await device.clearLocalStorage()
 
               logoutUser()
             }}

@@ -105,7 +105,9 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecrets() {
+  async encryptedSecrets(
+    @Arg('fromDate', () => GraphQLISODateTime) fromDate: string
+  ) {
     return prismaClient.encryptedSecret.findMany({
       where: {
         userId: this.id
@@ -116,7 +118,7 @@ export class UserQuery extends UserBase {
   @Field(() => Boolean)
   async sendAuthMessage(
     @Arg('location', () => String) location: string,
-    @Arg('time', () => String) time: string,
+    @Arg('time', () => GraphQLISODateTime) time: string,
     @Arg('device', () => String) device: string,
     @Arg('pageName', () => String) pageName: string
   ) {
@@ -162,11 +164,19 @@ export class UserQuery extends UserBase {
 
 @ObjectType()
 export class UserMutation extends UserBase {
-  @Field(() => Boolean)
+  @Field(() => String)
   // TODO remove before putting into prod
   async addCookie(@Ctx() context: IContext) {
+    if (process.env.NODE_ENV !== 'development') {
+      throw new Error('This is only for development')
+    }
+
     const firstDev = await prismaClient.device.findFirst()
-    this.setCookiesAndConstructLoginResponse(firstDev!.id, context)
+    const { accessToken } = this.setCookiesAndConstructLoginResponse(
+      firstDev!.id,
+      context
+    )
+    return accessToken
   }
 
   @Field(() => DeviceGQL)

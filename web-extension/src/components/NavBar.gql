@@ -8,6 +8,7 @@ query SyncEncryptedSecrets {
       createdAt
       updatedAt
       url
+      label
     }
   }
 }

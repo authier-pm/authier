@@ -1,7 +1,3 @@
-query isLoggedIn {
-  authenticated
-}
-
 query settings {
   me {
     settings {
