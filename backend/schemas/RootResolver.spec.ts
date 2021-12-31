@@ -32,10 +32,13 @@ describe('RootResolver', () => {
 
       const resolver = new RootResolver()
       expect(
-        await resolver.me({
-          request: { headers: {} },
-          jwtPayload: { userId: user.id }
-        } as any)
+        await resolver.me(
+          {
+            request: { headers: {} },
+            jwtPayload: { userId: user.id }
+          } as any,
+          {} as any
+        )
       ).toMatchObject(user)
     })
   })
