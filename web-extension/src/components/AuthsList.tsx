@@ -261,11 +261,11 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
                 <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
               )
             })}
-            {loginCredentialForCurrentDomain.map((psw, i) => {
+            {loginCredentialForCurrentDomain.map((credentials, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginSecret={psw}
-                  key={psw.label + i}
+                  loginSecret={credentials as ILoginSecret}
+                  key={credentials.label + i}
                 />
               )
             })}
@@ -273,12 +273,14 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
         ) : (
           [
             TOTPSecrets.map((auth, i) => {
-              return <OtpCode totpData={auth} key={auth.label + i} />
+              return (
+                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
+              )
             }),
             LoginCredentials.map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginSecret={psw}
+                  loginSecret={psw as ILoginSecret}
                   key={psw.label + i}
                 />
               )

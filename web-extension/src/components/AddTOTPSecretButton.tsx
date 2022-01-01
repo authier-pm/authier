@@ -19,7 +19,8 @@ import { ITOTPSecret, useBackgroundState } from '@src/util/useBackgroundState'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
 
 export const AddTOTPSecretButton: React.FC<{}> = () => {
-  const { backgroundState, forceUpdate } = useContext(BackgroundContext)
+  const { backgroundState, forceUpdate, TOTPSecrets } =
+    useContext(BackgroundContext)
   const { encrypt } = useBackgroundState()
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
@@ -29,7 +30,7 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
     }
 
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab, encrypt)
-    const existingTotpSecret = backgroundState.totpSecrets.find(
+    const existingTotpSecret = TOTPSecrets.find(
       ({ totp }) => newTotpSecret.totp === totp
     )
     if (existingTotpSecret) {
