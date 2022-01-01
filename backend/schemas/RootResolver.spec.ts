@@ -168,9 +168,14 @@ describe('RootResolver', () => {
   })
 
   describe('addNewDeviceForUser', () => {
+    let userId = faker.datatype.uuid()
+    let fakeCtx = {
+      reply: { setCookie: jest.fn() },
+      request: { headers: {} },
+      jwtPayload: { userId: userId },
+      getIpAddress: () => faker.internet.ip()
+    } as any
     it('should add new device for user', async () => {
-      let userId = faker.datatype.uuid()
-
       let input: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
@@ -196,12 +201,7 @@ describe('RootResolver', () => {
       let data = await resolver.addNewDeviceForUser(
         input,
         input.addDeviceSecret,
-        {
-          reply: { setCookie: jest.fn() },
-          request: { headers: {} },
-          jwtPayload: { userId: userId },
-          getIpAddress: () => faker.internet.ip()
-        } as any
+        fakeCtx
       )
 
       const accessToken = sign(
@@ -219,8 +219,6 @@ describe('RootResolver', () => {
     })
 
     it("should show 'User not found'", async () => {
-      let userId = faker.datatype.uuid()
-
       let input: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
@@ -233,12 +231,11 @@ describe('RootResolver', () => {
       const resolver = new RootResolver()
 
       expect(async () => {
-        await resolver.addNewDeviceForUser(input, input.addDeviceSecret, {
-          reply: { setCookie: jest.fn() },
-          request: { headers: {} },
-          jwtPayload: { userId: userId },
-          getIpAddress: () => faker.internet.ip()
-        } as any)
+        await resolver.addNewDeviceForUser(
+          input,
+          input.addDeviceSecret,
+          fakeCtx
+        )
       }).rejects.toThrow('User not found')
     })
 
@@ -268,12 +265,11 @@ describe('RootResolver', () => {
       const resolver = new RootResolver()
 
       expect(async () => {
-        await resolver.addNewDeviceForUser(input, input.addDeviceSecret, {
-          reply: { setCookie: jest.fn() },
-          request: { headers: {} },
-          jwtPayload: { userId: userId },
-          getIpAddress: () => faker.internet.ip()
-        } as any)
+        await resolver.addNewDeviceForUser(
+          input,
+          input.addDeviceSecret,
+          fakeCtx
+        )
       }).rejects.toThrow('Wrong master password used')
     })
   })
