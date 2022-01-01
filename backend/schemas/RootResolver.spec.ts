@@ -1,5 +1,5 @@
 import { prismaClient } from '../prismaClient'
-import { RootResolver } from './RootResolver'
+import { IContextAuthenticated, RootResolver } from './RootResolver'
 import faker, { fake } from 'faker'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
 import { setNewAccessTokenIntoCookie } from '../userAuth'
@@ -35,8 +35,9 @@ describe('RootResolver', () => {
         await resolver.me(
           {
             request: { headers: {} },
+            prisma: prismaClient,
             jwtPayload: { userId: user.id }
-          } as any,
+          } as IContextAuthenticated,
           {} as any
         )
       ).toMatchObject(user)
@@ -113,13 +114,7 @@ describe('RootResolver', () => {
       const resolver = new RootResolver()
 
       expect(
-        async () =>
-          await resolver.registerNewUser(input, userId, {
-            reply: { setCookie: jest.fn() },
-            request: { headers: {} },
-            jwtPayload: { userId: userId },
-            getIpAddress: () => faker.internet.ip()
-          } as any)
+        async () => await resolver.registerNewUser(input, userId, fakeCtx)
       ).rejects.toThrow('User with such email already exists.')
     })
   })
