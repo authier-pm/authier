@@ -10,7 +10,7 @@ export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQue
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
-  time: Types.Scalars['String'];
+  time: Types.Scalars['DateTime'];
   location: Types.Scalars['String'];
   pageName: Types.Scalars['String'];
 }>;
@@ -66,7 +66,7 @@ export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
 export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
 export type SettingsQueryResult = Apollo.QueryResult<SettingsQuery, SettingsQueryVariables>;
 export const SendAuthMessageDocument = gql`
-    query sendAuthMessage($device: String!, $time: String!, $location: String!, $pageName: String!) {
+    query sendAuthMessage($device: String!, $time: DateTime!, $location: String!, $pageName: String!) {
   me {
     sendAuthMessage(
       device: $device

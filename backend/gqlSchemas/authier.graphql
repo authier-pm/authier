@@ -35,7 +35,7 @@ type UserQuery {
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   settings: SettingsConfigGQL!
-  encryptedSecrets(fromDate: DateTime!): [EncryptedSecretQuery!]!
+  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
     device: String!
