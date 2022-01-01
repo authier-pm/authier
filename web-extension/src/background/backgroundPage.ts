@@ -63,11 +63,11 @@ if ('serviceWorker' in navigator) {
 }
 
 export interface IBackgroundStateSerializable {
-  loginCredentials: ILoginSecret[]
-  totpSecrets: ITOTPSecret[]
   userId: string
   masterPassword: string
-  secrets: Array<Pick<EncryptedSecretGql, 'encrypted' | 'kind'>>
+  secrets: Array<
+    Pick<EncryptedSecretGql, 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'>
+  >
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
@@ -77,7 +77,7 @@ interface IBackgroundState extends IBackgroundStateSerializable {
 
 export let bgState: IBackgroundState | null = null
 
-export const setBgState = (
+export const setBgState = async (
   bgStateSerializable: IBackgroundStateSerializable
 ) => {
   bgState = {
@@ -113,6 +113,11 @@ export const setBgState = (
       log('saved secret to the backend', secret)
     }
   }
+
+  await browser.storage.local.set({
+    backgroundState: bgStateSerializable
+  })
+
   // @ts-expect-error
   window.bgState = bgState
 }

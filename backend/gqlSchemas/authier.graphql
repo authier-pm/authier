@@ -1,7 +1,9 @@
 type Query {
   user(userId: String!): UserQuery
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   authenticated: Boolean!
   me: UserQuery
   currentDevice: DeviceQuery!
@@ -29,12 +31,17 @@ type UserQuery {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  devices: [DeviceGQL!]!
+  devices: [DeviceQuery!]!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   settings: SettingsConfigGQL!
-  encryptedSecrets: [EncryptedSecretQuery!]!
-  sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!): Boolean!
+  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
+  sendAuthMessage(
+    pageName: String!
+    device: String!
+    time: DateTime!
+    location: String!
+  ): Boolean!
 }
 
 """
@@ -210,23 +217,6 @@ type UserPaidProductsGQL {
   user: UserGQL!
 }
 
-type EncryptedSecretQuery {
-  id: ID!
-  encrypted: String!
-  version: Int!
-  kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
-  userId: String!
-  user: UserGQL!
-  SecretUsageEvent: [SecretUsageEventGQL!]!
-}
-
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -249,21 +239,48 @@ type DeviceQuery {
   DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
+  lastGeoLocation: String!
+}
+
+type EncryptedSecretQuery {
+  id: ID!
+  encrypted: String!
+  version: Int!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  iconUrl: String
+  label: String!
+  userId: String!
+  user: UserGQL!
+  SecretUsageEvent: [SecretUsageEventGQL!]!
 }
 
 type Mutation {
   user(userId: String!): UserMutation
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   me: UserMutation
   currentDevice: DeviceMutation!
   registerNewUser(userId: UUID!, input: RegisterNewDeviceInput!): LoginResponse!
-  addNewDeviceForUser(currentAddDeviceSecret: NonEmptyString!, input: RegisterNewDeviceInput!): LoginResponse!
+  addNewDeviceForUser(
+    currentAddDeviceSecret: NonEmptyString!
+    input: RegisterNewDeviceInput!
+  ): LoginResponse!
 
-  """returns a decryption challenge"""
+  """
+  returns a decryption challenge
+  """
   deviceDecryptionChallenge(email: EmailAddress!): DecryptionChallengeGQL
 
-  """removes current device"""
+  """
+  removes current device
+  """
   logout: Boolean
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
@@ -289,11 +306,20 @@ type UserMutation {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  addCookie: Boolean!
-  addDevice(firebaseToken: String!, deviceId: String!, name: String!): DeviceGQL!
+  addCookie: String!
+  addDevice(
+    firebaseToken: String!
+    deviceId: String!
+    name: String!
+  ): DeviceGQL!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): DeviceGQL!
-  updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfigGQL!
+  updateSettings(
+    noHandsLogin: Boolean!
+    lockTime: Int!
+    homeUI: String!
+    twoFA: Boolean!
+  ): SettingsConfigGQL!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
 }
@@ -324,7 +350,11 @@ type DeviceMutation {
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
-  reportSecretUsageEvent(webInputId: PositiveInt!, secretId: PositiveInt!, kind: String!): SecretUsageEventGQLScalars!
+  reportSecretUsageEvent(
+    webInputId: PositiveInt!
+    secretId: PositiveInt!
+    kind: String!
+  ): SecretUsageEventGQLScalars!
 }
 
 type SecretUsageEventGQLScalars {
@@ -338,7 +368,9 @@ type SecretUsageEventGQLScalars {
   webInputId: Int
 }
 
-"""Integers that will have a value greater than 0."""
+"""
+Integers that will have a value greater than 0.
+"""
 scalar PositiveInt
 
 type LoginResponse {
@@ -383,7 +415,9 @@ input RegisterNewDeviceInput {
   addDeviceSecretEncrypted: String!
 }
 
-"""A string that cannot be passed as an empty value"""
+"""
+A string that cannot be passed as an empty value
+"""
 scalar NonEmptyString
 
 input WebInputElement {

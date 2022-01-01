@@ -5,6 +5,7 @@ query myDevices {
       firstIpAddress
       lastIpAddress
       name
+      lastGeoLocation
     }
   }
 }

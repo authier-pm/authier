@@ -12,3 +12,7 @@ Do not import generated resolvers from generated/resolvers. Write custom ones.
 1. deviceDecryptionChallenge -> encrypted secret
 2. on the client: decrypt secret
 3. addNewDeviceForUser(decryptedSecret)
+
+# Naming conventions
+
+all graphql custom fields must start with a lower letter. Capital letters are reserved for prisma relations only.
