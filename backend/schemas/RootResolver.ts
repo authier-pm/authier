@@ -29,7 +29,8 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
-import { UserQuery, UserMutation } from '../models/User'
+import { UserQuery } from '../models/UserQuery'
+import { UserMutation } from '../models/UserMutation'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
@@ -47,8 +48,7 @@ import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
-import { UserGQL } from '../models/generated/User'
-import { DeviceGQL } from '../models/generated/Device'
+
 import { DeviceMutation, DeviceQuery } from '../models/Device'
 const log = debug('au:RootResolver')
 
@@ -141,10 +141,14 @@ export class RootResolver {
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Query(() => UserQuery, { nullable: true })
-  async me(@Ctx() context: IContextAuthenticated) {
-    const { jwtPayload } = context
-    return prismaClient.user.findUnique({
-      where: { id: jwtPayload.userId }
+  async me(
+    @Ctx() ctx: IContextAuthenticated,
+    @Info() info: GraphQLResolveInfo
+  ) {
+    const { jwtPayload } = ctx
+    return ctx.prisma.user.findUnique({
+      where: { id: jwtPayload.userId },
+      include: getPrismaRelationsFromInfo(info)
     })
   }
 
@@ -152,12 +156,13 @@ export class RootResolver {
   @Query(() => DeviceQuery)
   @Mutation(() => DeviceMutation)
   async currentDevice(
-    @Ctx() context: IContextAuthenticated,
+    @Ctx() ctx: IContextAuthenticated,
     @Info() info: GraphQLResolveInfo
   ) {
-    const { jwtPayload } = context
-    return prismaClient.device.findUnique({
-      where: { id: jwtPayload.deviceId }
+    const { jwtPayload } = ctx
+    return ctx.prisma.device.findUnique({
+      where: { id: jwtPayload.deviceId },
+      include: getPrismaRelationsFromInfo(info)
     })
   }
 
@@ -179,7 +184,7 @@ export class RootResolver {
     let user: User & { Devices: Device[] }
 
     try {
-      user = await prismaClient.user.create({
+      user = await ctx.prisma.user.create({
         data: {
           id: userId,
           email: email,
@@ -212,11 +217,14 @@ export class RootResolver {
       })
     } catch (err: PrismaClientKnownRequestError | any) {
       if (err.code === 'P2002' && err.meta.target[0] === 'email') {
-        throw new GraphqlError('User with such email already exists.')
+        log('email', email)
+
+        throw new GraphqlError(`User with such email already exists.`)
       }
       if (err.code === 'P2002' && err.meta.target[0] === 'id') {
+        log('deviceId', deviceId)
         throw new GraphqlError(
-          'Device already exists. You cannot register this device for multiple accounts.'
+          `Device already exists. You cannot register this device for multiple accounts.`
         )
       }
       throw err
@@ -245,12 +253,17 @@ export class RootResolver {
     @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
     @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
     currentAddDeviceSecret: string,
-
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContext,
+    @Info() info: GraphQLResolveInfo
   ) {
+    const include = getPrismaRelationsFromInfo(info, 'user')
+    console.log('~ getPrismaRelationsFromInfo(info)', include)
+
     const user = await prismaClient.user.findUnique({
-      where: { email: input.email }
+      where: { email: input.email },
+      include
     })
+    console.log('~ user', user)
 
     if (!user) {
       throw new GraphqlError('User not found')
@@ -274,14 +287,20 @@ export class RootResolver {
     const { firebaseToken, deviceName, deviceId } = input
     const ipAddress = ctx.getIpAddress()
 
-    const device = await prismaClient.device.create({
-      data: {
-        id: deviceId,
-        firstIpAddress: ipAddress,
-        lastIpAddress: ipAddress,
-        firebaseToken: firebaseToken,
-        name: deviceName,
-        userId: user.id
+    const deviceData = {
+      id: deviceId,
+      firstIpAddress: ipAddress,
+      lastIpAddress: ipAddress,
+      firebaseToken: firebaseToken,
+      name: deviceName,
+      userId: user.id
+    }
+    const device = await prismaClient.device.upsert({
+      where: { id: deviceId },
+      create: deviceData,
+      update: {
+        ...deviceData,
+        logoutAt: null
       }
     })
 

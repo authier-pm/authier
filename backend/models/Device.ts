@@ -4,6 +4,19 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
+import { request } from 'undici'
+import mem from 'mem'
+import ms from 'ms'
+
+const getIpGeoLocation = mem(
+  async (ipAddress: string) => {
+    const res = await request(
+      `https://api.freegeoip.app/json/${ipAddress}apikey=${process.env.FREE_GEOIP_API_KEY}`
+    )
+    return await res.body.json()
+  },
+  { maxAge: ms('2 days') }
+)
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
@@ -26,6 +39,12 @@ export class DeviceQuery extends DeviceGQL {
       }
     })
     return res
+  }
+
+  @Field(() => String)
+  async lastGeoLocation() {
+    const geoIp = await getIpGeoLocation(this.lastIpAddress)
+    return geoIp.city + ', ' + geoIp.country_name
   }
 }
 
