@@ -257,13 +257,11 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const include = getPrismaRelationsFromInfo(info, 'user')
-    console.log('~ getPrismaRelationsFromInfo(info)', include)
 
     const user = await prismaClient.user.findUnique({
       where: { email: input.email },
       include
     })
-    console.log('~ user', user)
 
     if (!user) {
       throw new GraphqlError('User not found')
