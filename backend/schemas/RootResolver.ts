@@ -216,11 +216,14 @@ export class RootResolver {
       })
     } catch (err: PrismaClientKnownRequestError | any) {
       if (err.code === 'P2002' && err.meta.target[0] === 'email') {
-        throw new GraphqlError('User with such email already exists.')
+        log('email', email)
+
+        throw new GraphqlError(`User with such email already exists.`)
       }
       if (err.code === 'P2002' && err.meta.target[0] === 'id') {
+        log('deviceId', deviceId)
         throw new GraphqlError(
-          'Device already exists. You cannot register this device for multiple accounts.'
+          `Device already exists. You cannot register this device for multiple accounts.`
         )
       }
       throw err
