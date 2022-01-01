@@ -17,6 +17,8 @@ afterAll(async () => {
 })
 
 describe('RootResolver', () => {
+  const resolver = new RootResolver()
+
   describe('me', () => {
     it('should return current user', async () => {
       const user = await prismaClient.user.create({
@@ -30,7 +32,6 @@ describe('RootResolver', () => {
         }
       })
 
-      const resolver = new RootResolver()
       expect(
         await resolver.me({
           request: { headers: {} },
@@ -107,8 +108,6 @@ describe('RootResolver', () => {
         }
       })
 
-      const resolver = new RootResolver()
-
       expect(
         async () =>
           await resolver.registerNewUser(input, userId, {
@@ -150,8 +149,6 @@ describe('RootResolver', () => {
           }
         }
       })
-
-      const resolver = new RootResolver()
 
       expect(
         async () =>
@@ -196,8 +193,6 @@ describe('RootResolver', () => {
         }
       })
 
-      const resolver = new RootResolver()
-
       let data = await resolver.addNewDeviceForUser(
         input,
         input.addDeviceSecret,
@@ -227,8 +222,6 @@ describe('RootResolver', () => {
         addDeviceSecret: faker.datatype.string(5),
         addDeviceSecretEncrypted: faker.datatype.string(5)
       }
-
-      const resolver = new RootResolver()
 
       expect(async () => {
         await resolver.addNewDeviceForUser(
@@ -262,8 +255,6 @@ describe('RootResolver', () => {
         }
       })
 
-      const resolver = new RootResolver()
-
       expect(async () => {
         await resolver.addNewDeviceForUser(
           input,
@@ -295,8 +286,6 @@ describe('RootResolver', () => {
           TOTPlimit: 4
         }
       })
-
-      const resolver = new RootResolver()
 
       let data = await resolver.deviceDecryptionChallenge(fakeData.email, {
         reply: { setCookie: jest.fn() },
@@ -341,8 +330,6 @@ describe('RootResolver', () => {
       await prismaClient.decryptionChallenge.createMany({
         data
       })
-
-      const resolver = new RootResolver()
 
       expect(async () => {
         await resolver.deviceDecryptionChallenge(fakeData.email, {
