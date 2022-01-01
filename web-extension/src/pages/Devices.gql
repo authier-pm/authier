@@ -1,10 +1,10 @@
-# query myDevices {
-#   me {
-#     myDevices {
-#       id
-#       firstIpAddress
-#       lastIpAddress
-#       name
-#     }
-#   }
-# }
+query myDevices {
+  me {
+    devices {
+      id
+      firstIpAddress
+      lastIpAddress
+      name
+    }
+  }
+}
