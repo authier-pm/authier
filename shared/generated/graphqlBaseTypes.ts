@@ -102,6 +102,7 @@ export type DeviceQuery = {
   firstIpAddress: Scalars['String'];
   id: Scalars['ID'];
   ipAddressLock: Scalars['Boolean'];
+  lastGeoLocation: Scalars['String'];
   lastIpAddress: Scalars['String'];
   lastSyncAt?: Maybe<Scalars['DateTime']>;
   logoutAt?: Maybe<Scalars['DateTime']>;
@@ -367,7 +368,7 @@ export type UserMutation = {
   UsageEvents: Array<SecretUsageEventGql>;
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
-  addCookie: Scalars['Boolean'];
+  addCookie: Scalars['String'];
   addDevice: DeviceGql;
   addDeviceSecretEncrypted: Scalars['String'];
   addEncryptedSecret: EncryptedSecretQuery;
@@ -442,7 +443,7 @@ export type UserQuery = {
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String'];
   createdAt: Scalars['DateTime'];
-  devices: Array<DeviceGql>;
+  devices: Array<DeviceQuery>;
   devicesCount: Scalars['Int'];
   email?: Maybe<Scalars['EmailAddress']>;
   encryptedSecrets: Array<EncryptedSecretQuery>;
@@ -459,11 +460,16 @@ export type UserQuery = {
 };
 
 
+export type UserQueryEncryptedSecretsArgs = {
+  fromDate?: InputMaybe<Scalars['DateTime']>;
+};
+
+
 export type UserQuerySendAuthMessageArgs = {
   device: Scalars['String'];
   location: Scalars['String'];
   pageName: Scalars['String'];
-  time: Scalars['String'];
+  time: Scalars['DateTime'];
 };
 
 export type WebInputElement = {

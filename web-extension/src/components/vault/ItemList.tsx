@@ -18,13 +18,7 @@ import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
 
-function Item({
-  data,
-  deleteItem
-}: {
-  data: ILoginSecret | ITOTPSecret
-  deleteItem: () => void
-}) {
+function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -113,23 +107,24 @@ function Item({
 }
 
 export const ItemList = () => {
-  const { backgroundState, saveLoginCredentials, saveTOTPSecrets } =
-    useContext(BackgroundContext)
+  const {
+    backgroundState,
+    saveLoginCredentials,
+    saveTOTPSecrets,
+    LoginCredentials,
+    TOTPSecrets
+  } = useContext(BackgroundContext)
   const [filterBy, setFilterBy] = useState('')
 
   const removeLoginCredential = (label: string) => {
     saveLoginCredentials(
-      backgroundState?.loginCredentials.filter(
-        (el) => el.label !== label
-      ) as ILoginSecret[]
+      LoginCredentials.filter((el) => el.label !== label) as ILoginSecret[]
     )
   }
 
   const removeTOTPSecret = (label: string) => {
     saveTOTPSecrets(
-      backgroundState?.totpSecrets.filter(
-        (el) => el.label !== label
-      ) as ITOTPSecret[]
+      TOTPSecrets.filter((el) => el.label !== label) as ITOTPSecret[]
     )
   }
 
@@ -147,32 +142,28 @@ export const ItemList = () => {
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
-            {backgroundState?.totpSecrets
-              ?.filter(({ label, url }) => {
-                return label.includes(filterBy) || url.includes(filterBy)
-              })
-              .map((el, i) => {
-                return (
-                  <Item
-                    data={el}
-                    key={el.label + i}
-                    deleteItem={() => removeTOTPSecret(el.label)}
-                  />
-                )
-              })}
-            {backgroundState?.loginCredentials
-              ?.filter(({ label, url }) => {
-                return label.includes(filterBy) || url.includes(filterBy)
-              })
-              .map((el, i) => {
-                return (
-                  <Item
-                    key={el.label + i}
-                    data={el}
-                    deleteItem={() => removeLoginCredential(el.label)}
-                  />
-                )
-              })}
+            {TOTPSecrets?.filter(({ label, url }) => {
+              return label.includes(filterBy) || url?.includes(filterBy)
+            }).map((el, i) => {
+              return (
+                <Item
+                  data={el}
+                  key={el.label + i}
+                  deleteItem={() => removeTOTPSecret(el.label)}
+                />
+              )
+            })}
+            {LoginCredentials?.filter(({ label, url }) => {
+              return label.includes(filterBy) || url?.includes(filterBy)
+            }).map((el, i) => {
+              return (
+                <Item
+                  key={el.label + i}
+                  data={el}
+                  deleteItem={() => removeLoginCredential(el.label)}
+                />
+              )
+            })}
           </Flex>
         </Flex>
       </Center>

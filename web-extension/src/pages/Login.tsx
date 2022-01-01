@@ -31,6 +31,7 @@ import cryptoJS from 'crypto-js'
 
 import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import browser from 'webextension-polyfill'
 
 import { device } from '@src/background/Device'
 import {
@@ -38,6 +39,8 @@ import {
   useDeviceDecryptionChallengeMutation
 } from './Login.codegen'
 import { ISecret } from '@src/util/useBackgroundState'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -52,7 +55,7 @@ export default function Login(): ReactElement {
   const [deviceDecryptionChallenge, { loading }] =
     useDeviceDecryptionChallengeMutation()
   const { setUserId, fireToken } = useContext(UserContext)
-  const { initEncryptedSecrets, decrypt } = useContext(BackgroundContext)
+  const { deviceLogin, decrypt } = useContext(BackgroundContext)
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -113,12 +116,14 @@ export default function Login(): ReactElement {
             const EncryptedSecrets =
               response.data.addNewDeviceForUser.user.EncryptedSecrets
 
+            const bgState: IBackgroundStateSerializable = {
+              masterPassword: values.password,
+              userId: userId,
+              secrets: EncryptedSecrets
+            }
             setUserId(decodedToken.userId)
-            initEncryptedSecrets(
-              EncryptedSecrets as ISecret[],
-              values.password,
-              userId
-            )
+
+            deviceLogin(bgState)
           } else {
             toast.error(t`Login failed, check your username and password`)
           }
@@ -181,7 +186,7 @@ export default function Login(): ReactElement {
         )}
       </Formik>
       <Link to="/register">
-        <Text>
+        <Text pt={3}>
           <Trans>Don't have account?</Trans>
         </Text>
       </Link>

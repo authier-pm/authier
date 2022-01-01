@@ -26,13 +26,16 @@ import {
 
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
+import { useLocation } from 'wouter'
+import { UserContext } from '@src/providers/UserProvider'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 export const Home: FunctionComponent = () => {
+  const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
 
-  const { backgroundState } = useContext(BackgroundContext)
+  const { backgroundState, TOTPSecrets } = useContext(BackgroundContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
@@ -54,7 +57,7 @@ export const Home: FunctionComponent = () => {
           ></Switch>
         </FormControl>
 
-        {backgroundState && backgroundState.totpSecrets.length > 0 && (
+        {backgroundState && TOTPSecrets.length > 0 && (
           <CircularProgress
             min={1}
             ml="auto"

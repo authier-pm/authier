@@ -29,12 +29,12 @@ type UserQuery {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  devices: [DeviceGQL!]!
+  devices: [DeviceQuery!]!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   settings: SettingsConfigGQL!
-  encryptedSecrets: [EncryptedSecretQuery!]!
-  sendAuthMessage(pageName: String!, device: String!, time: String!, location: String!): Boolean!
+  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
+  sendAuthMessage(pageName: String!, device: String!, time: DateTime!, location: String!): Boolean!
 }
 
 """
@@ -210,23 +210,6 @@ type UserPaidProductsGQL {
   user: UserGQL!
 }
 
-type EncryptedSecretQuery {
-  id: ID!
-  encrypted: String!
-  version: Int!
-  kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
-  userId: String!
-  user: UserGQL!
-  SecretUsageEvent: [SecretUsageEventGQL!]!
-}
-
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -249,6 +232,24 @@ type DeviceQuery {
   DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
+  lastGeoLocation: String!
+}
+
+type EncryptedSecretQuery {
+  id: ID!
+  encrypted: String!
+  version: Int!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  iconUrl: String
+  label: String!
+  userId: String!
+  user: UserGQL!
+  SecretUsageEvent: [SecretUsageEventGQL!]!
 }
 
 type Mutation {
@@ -289,7 +290,7 @@ type UserMutation {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  addCookie: Boolean!
+  addCookie: String!
   addDevice(firebaseToken: String!, deviceId: String!, name: String!): DeviceGQL!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): DeviceGQL!

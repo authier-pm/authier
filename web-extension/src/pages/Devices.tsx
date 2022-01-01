@@ -30,10 +30,10 @@ export default function Devices() {
   return (
     <Box>
       {data && !loading ? (
-        data.me?.devices.map((i) => {
+        data.me?.devices.map((device) => {
           return (
             <Flex
-              key={i.lastIpAddress}
+              key={device.lastIpAddress}
               boxShadow="xl"
               bg="white"
               m={2}
@@ -64,9 +64,9 @@ export default function Devices() {
               <Flex justify="flex-start" align="center" flexDirection="row">
                 <Icon as={IoIosPhonePortrait} w={20} h={20} />
                 <Flex flexDirection="column" ml="5px" fontSize="md">
-                  <Text>{i.name}</Text>
-                  <Text>{i.lastIpAddress}</Text>
-                  <Text>Location: </Text>
+                  <Text>{device.name}</Text>
+                  <Text>{device.lastIpAddress}</Text>
+                  <Text>Location: {device.lastGeoLocation}</Text>
                 </Flex>
               </Flex>
             </Flex>

@@ -1,4 +1,4 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes'
+import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceGQL', id: string, firstIpAddress: string, lastIpAddress: string, name: string }> } | null | undefined };
+export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceQuery', id: string, firstIpAddress: string, lastIpAddress: string, name: string, lastGeoLocation: string }> } | null | undefined };
 
 
 export const MyDevicesDocument = gql`
@@ -17,9 +17,11 @@ export const MyDevicesDocument = gql`
       firstIpAddress
       lastIpAddress
       name
+      lastGeoLocation
     }
   }
-`
+}
+    `;
 
 /**
  * __useMyDevicesQuery__
@@ -36,32 +38,14 @@ export const MyDevicesDocument = gql`
  *   },
  * });
  */
-export function useMyDevicesQuery(
-  baseOptions?: Apollo.QueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<MyDevicesQuery, MyDevicesQueryVariables>(
-    MyDevicesDocument,
-    options
-  )
-}
-export function useMyDevicesLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<
-    MyDevicesQuery,
-    MyDevicesQueryVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<MyDevicesQuery, MyDevicesQueryVariables>(
-    MyDevicesDocument,
-    options
-  )
-}
-export type MyDevicesQueryHookResult = ReturnType<typeof useMyDevicesQuery>
-export type MyDevicesLazyQueryHookResult = ReturnType<
-  typeof useMyDevicesLazyQuery
->
-export type MyDevicesQueryResult = Apollo.QueryResult<
-  MyDevicesQuery,
-  MyDevicesQueryVariables
->
+export function useMyDevicesQuery(baseOptions?: Apollo.QueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<MyDevicesQuery, MyDevicesQueryVariables>(MyDevicesDocument, options);
+      }
+export function useMyDevicesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<MyDevicesQuery, MyDevicesQueryVariables>(MyDevicesDocument, options);
+        }
+export type MyDevicesQueryHookResult = ReturnType<typeof useMyDevicesQuery>;
+export type MyDevicesLazyQueryHookResult = ReturnType<typeof useMyDevicesLazyQuery>;
+export type MyDevicesQueryResult = Apollo.QueryResult<MyDevicesQuery, MyDevicesQueryVariables>;

@@ -6,7 +6,6 @@ import { useDeviceCountQuery } from './QRcode.codegen'
 import { useLocation } from 'wouter'
 import { ArrowForwardIcon } from '@chakra-ui/icons'
 import { UserContext } from '@src/providers/UserProvider'
-import { useIsLoggedInQuery } from '@src/popup/Popup.codegen'
 
 export function QRCode() {
   const [interval, setInterval] = useState<number>(500)
