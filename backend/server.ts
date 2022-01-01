@@ -15,7 +15,6 @@ import {
   setNewRefreshToken
 } from './userAuth'
 import { verify } from 'jsonwebtoken'
-import chalk from 'chalk'
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
@@ -38,15 +37,7 @@ sentryInit({
 
 async function main() {
   const app = fastify({
-    logger: {
-      prettyPrint:
-        environment === 'production'
-          ? false
-          : {
-              translateTime: 'HH:MM:ss Z',
-              ignore: 'pid,hostname'
-            }
-    }
+    logger: false
   })
   app.setErrorHandler(async (error, request, reply) => {
     // Logging locally

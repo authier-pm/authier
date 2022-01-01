@@ -140,7 +140,7 @@ chrome.runtime.onMessage.addListener(async function (
 
       break
     case BackgroundMessageType.setBackgroundState:
-      setBgState(req.payload)
+      await setBgState(req.payload)
       break
     case BackgroundMessageType.hideLoginCredentialsModal:
       if (currentTabId) {

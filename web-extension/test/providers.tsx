@@ -9,10 +9,11 @@ import {
 import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
-import { MemoryRouter } from 'react-router-dom'
+import { Router } from 'wouter'
 //@ts-expect-error
 import { gqlSchema } from 'gqlSchemas'
 import { i18n } from '@lingui/core'
+import staticLocationHook from 'wouter/static-location'
 
 export const makeSsrClient = (ctx: any) => {
   return new ApolloClient({
@@ -35,7 +36,7 @@ export const wrapInFEProviders = (
   return (
     <ApolloProvider client={client}>
       <I18nProvider i18n={i18n}>
-        <MemoryRouter>{jsx}</MemoryRouter>
+        <Router hook={staticLocationHook('/')}>{jsx}</Router>
       </I18nProvider>
     </ApolloProvider>
   )
