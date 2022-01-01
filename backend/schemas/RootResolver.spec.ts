@@ -2,8 +2,7 @@ import { prismaClient } from '../prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
 import faker, { fake } from 'faker'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
-import { setNewAccessTokenIntoCookie } from '../userAuth'
-import { User } from '@prisma/client'
+
 import { sign } from 'jsonwebtoken'
 
 afterAll(async () => {
@@ -17,6 +16,8 @@ afterAll(async () => {
 })
 
 describe('RootResolver', () => {
+  const resolver = new RootResolver()
+
   describe('me', () => {
     it('should return current user', async () => {
       const user = await prismaClient.user.create({
@@ -30,7 +31,6 @@ describe('RootResolver', () => {
         }
       })
 
-      const resolver = new RootResolver()
       expect(
         await resolver.me(
           {
@@ -81,8 +81,6 @@ describe('RootResolver', () => {
         }
       )
 
-      const resolver = new RootResolver()
-
       let data = await resolver.registerNewUser(input, userId, fakeCtx)
 
       expect({
@@ -91,7 +89,11 @@ describe('RootResolver', () => {
       }).toMatchObject({ accessToken: accessToken, email: input.email })
     })
 
-    it("should show 'User with such email already exists.'", async () => {
+    it('should throw User with such email already exists', async () => {
+      await prismaClient.settingsConfig.deleteMany()
+      await prismaClient.device.deleteMany()
+      await prismaClient.user.deleteMany()
+
       let input: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
@@ -110,8 +112,6 @@ describe('RootResolver', () => {
           TOTPlimit: 4
         }
       })
-
-      const resolver = new RootResolver()
 
       expect(
         async () => await resolver.registerNewUser(input, userId, fakeCtx)
