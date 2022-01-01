@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, url?: string | null | undefined }> } };
+export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, url?: string | null | undefined, label: string }> } };
 
 
 export const SyncEncryptedSecretsDocument = gql`
@@ -20,6 +20,7 @@ export const SyncEncryptedSecretsDocument = gql`
       createdAt
       updatedAt
       url
+      label
     }
   }
 }

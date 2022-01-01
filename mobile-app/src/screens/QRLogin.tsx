@@ -22,7 +22,6 @@ const QRLogin = ({ navigation }) => {
 
   const onSuccess = async (e: { data: string }) => {
     if (e.data.includes('secret')) {
-      console.log('1')
       const qrDataParts = e.data.split('?secret=')
       setAuths([
         {

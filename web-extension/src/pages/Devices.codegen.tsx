@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceGQL', id: string, firstIpAddress: string, lastIpAddress: string, name: string }> } | null | undefined };
+export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceQuery', id: string, firstIpAddress: string, lastIpAddress: string, name: string, lastGeoLocation: string }> } | null | undefined };
 
 
 export const MyDevicesDocument = gql`
@@ -17,6 +17,7 @@ export const MyDevicesDocument = gql`
       firstIpAddress
       lastIpAddress
       name
+      lastGeoLocation
     }
   }
 }

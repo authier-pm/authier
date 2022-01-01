@@ -1,7 +1,3 @@
-query isLoggedIn {
-  authenticated
-}
-
 query settings {
   me {
     settings {
@@ -15,7 +11,7 @@ query settings {
 
 query sendAuthMessage(
   $device: String!
-  $time: String!
+  $time: DateTime!
   $location: String!
   $pageName: String!
 ) {
