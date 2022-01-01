@@ -279,16 +279,8 @@ describe('RootResolver', () => {
   })
 
   describe('deviceDecryptionChallenge', () => {
-    let userId = faker.datatype.uuid()
-    const fakeCtx = {
-      reply: { setCookie: jest.fn() },
-      request: { headers: {} },
-      jwtPayload: { userId: userId },
-      prisma: prismaClient,
-      getIpAddress: () => faker.internet.ip()
-    } as any
-
     it('should returns a decryption challenge', async () => {
+      let userId = faker.datatype.uuid()
       let fakeData: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
@@ -310,10 +302,13 @@ describe('RootResolver', () => {
 
       const resolver = new RootResolver()
 
-      let data = await resolver.deviceDecryptionChallenge(
-        fakeData.email,
-        fakeCtx
-      )
+      let data = await resolver.deviceDecryptionChallenge(fakeData.email, {
+        reply: { setCookie: jest.fn() },
+        request: { headers: {} },
+        jwtPayload: { userId: userId },
+        prisma: prismaClient,
+        getIpAddress: () => faker.internet.ip()
+      } as any)
 
       expect(data?.addDeviceSecretEncrypted).toBe(
         fakeData.addDeviceSecretEncrypted
@@ -355,7 +350,13 @@ describe('RootResolver', () => {
       const resolver = new RootResolver()
 
       expect(async () => {
-        await resolver.deviceDecryptionChallenge(fakeData.email, fakeCtx)
+        await resolver.deviceDecryptionChallenge(fakeData.email, {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          prisma: prismaClient,
+          getIpAddress: () => faker.internet.ip()
+        } as any)
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
   })
