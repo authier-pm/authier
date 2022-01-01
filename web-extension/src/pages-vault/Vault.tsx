@@ -11,15 +11,15 @@ export function Vault() {
   return (
     <SidebarWithHeader>
       <Switch>
-        <Route exact path="/">
+        <Route path="/">
           <ItemList />
         </Route>
         <Route
           path="/list/:item"
-          children={({ location }) => (
-            //@ts-expect-error
-            <ItemSettings {...location.state.data} />
-          )}
+          children={({ location }) => {
+            console.log(location)
+            return <ItemSettings {...location.state.data} />
+          }}
         />
         <Route path="/settings">
           <VaultSettings />

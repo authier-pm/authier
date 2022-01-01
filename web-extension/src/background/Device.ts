@@ -17,6 +17,12 @@ class Device {
   generateDeviceName(): string {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
+
+  async clearLocalStorage() {
+    const deviceId = await this.getDeviceId()
+    await browser.storage.local.clear()
+    await browser.storage.local.set({ deviceId: deviceId }) // restore deviceId so that we keep it even after logout
+  }
   /**
    * @returns a stored deviceId or a new UUID if the extension was just installed
    */
@@ -43,12 +49,12 @@ class Device {
     return secret
   }
 
-  getAddDeviceSecretAuthTuple(masterPswd: string, userId: string) {
+  getAddDeviceSecretAuthTuple(masterPassword: string, userId: string) {
     const addDeviceSecret = this.generateAddDeviceSecret()
 
     const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
       addDeviceSecret,
-      masterPswd,
+      masterPassword,
       {
         iv: cryptoJS.enc.Utf8.parse(userId)
       }

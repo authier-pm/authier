@@ -8,7 +8,7 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
 // TODO use somewhere
 export const ExportTOTPToCsvButton = () => {
-  const { backgroundState } = useContext(BackgroundContext)
+  const { TOTPSecrets } = useContext(BackgroundContext)
 
   return (
     <Button
@@ -16,9 +16,8 @@ export const ExportTOTPToCsvButton = () => {
       colorScheme="teal"
       type="submit"
       onClick={() => {
-        const totpSecrets = backgroundState?.totpSecrets
-        if (totpSecrets) {
-          const csv = papaparse.unparse(totpSecrets)
+        if (TOTPSecrets.length > 0) {
+          const csv = papaparse.unparse(TOTPSecrets)
           downloadAsFile(csv, 'totp')
         }
       }}

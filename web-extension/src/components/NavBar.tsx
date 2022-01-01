@@ -13,10 +13,7 @@ import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdRefreshCircle } from 'react-icons/io'
 import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
-import { bgState } from '@src/background/backgroundPage'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
-import { ISecret } from '@src/util/useBackgroundState'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -46,21 +43,19 @@ export const NavBar: FunctionComponent = () => {
       </Link>
     )
   }
-  const { initEncryptedSecrets, backgroundState } =
+  const { deviceLogin: initEncryptedSecrets, backgroundState } =
     useContext(BackgroundContext)
 
   const [getEncryptedSecretsToSync, { data }] =
     useSyncEncryptedSecretsLazyQuery()
 
   useEffect(() => {
-    if (data) {
-      console.log('~ data', data)
-      initEncryptedSecrets(
-        // @ts-expect-error
-        data.currentDevice.encryptedSecretsToSync as ISecret[],
-        '',
-        ''
-      )
+    if (data && backgroundState) {
+      console.log(data)
+      initEncryptedSecrets({
+        ...backgroundState,
+        secrets: data.currentDevice.encryptedSecretsToSync
+      })
     }
   }, [data])
 

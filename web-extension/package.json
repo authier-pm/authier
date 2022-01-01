@@ -85,7 +85,7 @@
     "@sentry/browser": "^6.13.2",
     "@sentry/tracing": "^6.13.2",
     "@types/offscreencanvas": "^2019.6.4",
-    "@types/react-router-dom": "^5.3.0",
+    "@types/react-router-dom": "^5.3.2",
     "apollo-boost": "^0.4.9",
     "apollo-link-token-refresh": "^0.3.2",
     "arraybuffer-to-string": "^1.0.2",

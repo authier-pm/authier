@@ -19,7 +19,7 @@ import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
 import debug from 'debug'
-const log = debug('au:register')
+const log = debug('au:useBackgroundState')
 
 export interface ISecret {
   encrypted: string
@@ -71,17 +71,7 @@ export function useBackgroundState() {
     homeList: UIOptions.all
   })
   const [updateSettings] = useUpdateSettingsMutation()
-  console.log('~ backgroundState', backgroundState)
-
-  useEffect(() => {
-    ;(async () => {
-      if (backgroundState) {
-        await browser.storage.local.set({
-          backgroundState
-        })
-      }
-    })()
-  }, [backgroundState])
+  log('~ backgroundState2', backgroundState)
 
   //TODO move this whole thing into it' own hook
   useEffect(() => {
@@ -144,86 +134,74 @@ export function useBackgroundState() {
     isFilling,
     forceUpdate,
     backgroundState,
-    initEncryptedSecrets: async (
-      secrets: ISecret[],
-      tmpMasterPassword: string,
-      tmpUserId: string
-    ) => {
-      log('initEncryptedSecrets', secrets)
+    deviceLogin: async (state: IBackgroundStateSerializable) => {
+      log('deviceLogin', state)
       setSafeLocked(false)
+      setBackgroundState(state)
 
-      let masterPassword = backgroundState?.masterPassword
-      let userId = backgroundState?.userId
-
-      if (!masterPassword || !userId) {
-        masterPassword = tmpMasterPassword
-        userId = tmpUserId
-      }
-      log('~ psw`', masterPassword, userId)
-      const decryptAndParse = () => {
-        return secrets.map((secret) => {
-          try {
-            const decrypted = cryptoJS.AES.decrypt(
-              secret.encrypted,
-              masterPassword as string,
-              {
-                //How to type this?
-                //@ts-expect-error
-                iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
-              }
-            ).toString(cryptoJS.enc.Utf8)
-
-            if (secret.kind === EncryptedSecretType.TOTP) {
-              return {
-                ...secret,
-                totp: decrypted
-              }
-            } else {
-              const parsed = JSON.parse(decrypted)
-              return {
-                ...secret,
-                loginCredentials: parsed
-              }
-            }
-          } catch (err) {
-            console.error(err)
-            toast.error('decryption failed')
-            throw new Error('failed')
-          }
-        })
-      }
-
-      const secretsDecrypted = decryptAndParse()
-      console.log('~ secretsDecrypted', secretsDecrypted)
-      let totpSecrets: ITOTPSecret[] = []
-      let credentialsSecrets: ILoginSecret[] = []
-
-      if (secretsDecrypted.length > 0) {
-        // @ts-expect-error
-        totpSecrets = secretsDecrypted.filter(
-          ({ kind }) => kind === EncryptedSecretType.TOTP
-        )
-
-        // @ts-expect-error
-        credentialsSecrets = secretsDecrypted.filter(
-          ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-        )
-      }
-
-      const payload: IBackgroundStateSerializable = {
-        masterPassword,
-        userId,
-        secrets,
-        loginCredentials: credentialsSecrets,
-        totpSecrets: totpSecrets
-      }
-
-      browser.runtime.sendMessage({
+      await browser.runtime.sendMessage({
         action: BackgroundMessageType.setBackgroundState,
-        payload
+        payload: state
       })
-      log('state', payload)
-      setBackgroundState(payload)
+    },
+    get LoginCredentials() {
+      if (!backgroundState) {
+        return []
+      }
+      const { secrets } = backgroundState
+      const filtered = secrets.filter(
+        ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
+      )
+      return filtered.map((secret) => {
+        try {
+          const decrypted = cryptoJS.AES.decrypt(
+            secret.encrypted,
+            backgroundState.masterPassword,
+            {
+              iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+            }
+          ).toString(cryptoJS.enc.Utf8)
+
+          const parsed = JSON.parse(decrypted)
+          return {
+            ...secret,
+            loginCredentials: parsed
+          }
+        } catch (err) {
+          console.error(err)
+          toast.error('decryption failed')
+          throw err
+        }
+      })
+    },
+    get TOTPSecrets() {
+      if (!backgroundState) {
+        return []
+      }
+      const { secrets } = backgroundState
+      const filtered = secrets.filter(
+        ({ kind }) => kind === EncryptedSecretType.TOTP
+      )
+      return filtered.map((secret) => {
+        try {
+          const decrypted = cryptoJS.AES.decrypt(
+            secret.encrypted,
+            backgroundState.masterPassword,
+            {
+              iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+            }
+          ).toString(cryptoJS.enc.Utf8)
+
+          return {
+            ...secret,
+            totp: decrypted
+          }
+        } catch (err) {
+          console.error(err)
+          toast.error('decryption failed')
+          throw err
+        }
+      })
     },
     saveLoginCredentials: (passwords: ILoginSecret[]) => {
       if (backgroundState) {
