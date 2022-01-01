@@ -64,6 +64,7 @@
     "tar": "tar -czvf authier-api.tar.gz -C ./dist .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
+    "test:w": "jest -i --watch",
     "test": "jest -i",
     "test:docker": "yarn docker:up && set DATABASE_URL=postgresql://authier:auth133r@localhost:6432/authier && yarn prisma db push && jest -i && yarn docker:down"
   }
