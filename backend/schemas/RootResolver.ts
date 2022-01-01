@@ -29,7 +29,8 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 
 import { verify } from 'jsonwebtoken'
 import * as admin from 'firebase-admin'
-import { UserQuery, UserMutation } from '../models/User'
+import { UserQuery } from '../models/UserQuery'
+import { UserMutation } from '../models/UserMutation'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'

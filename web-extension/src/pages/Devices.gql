@@ -1,10 +1,11 @@
 query myDevices {
   me {
-    myDevices {
+    devices {
       id
       firstIpAddress
       lastIpAddress
       name
+      lastGeoLocation
     }
   }
 }
