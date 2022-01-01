@@ -31,15 +31,15 @@ type UserQuery {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  devices: [DeviceGQL!]!
+  devices: [DeviceQuery!]!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   settings: SettingsConfigGQL!
-  encryptedSecrets: [EncryptedSecretQuery!]!
+  encryptedSecrets(fromDate: DateTime!): [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
     device: String!
-    time: String!
+    time: DateTime!
     location: String!
   ): Boolean!
 }
@@ -103,6 +103,7 @@ type DeviceGQL {
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
+  logoutAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -216,6 +217,31 @@ type UserPaidProductsGQL {
   user: UserGQL!
 }
 
+type DeviceQuery {
+  id: ID!
+  firstIpAddress: String!
+  lastIpAddress: String!
+  firebaseToken: String!
+  name: String!
+  syncTOTP: Boolean!
+  ipAddressLock: Boolean!
+  vaultLockTimeoutSeconds: Int
+  logoutAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  registeredWithMasterAt: DateTime
+  lastSyncAt: DateTime
+  masterPasswordOutdatedAt: DateTime
+  userId: String!
+  User: UserGQL!
+  UserMaster: UserGQL
+  SecretUsageEvents: [SecretUsageEventGQL!]!
+  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
+  DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
+  encryptedSecretsToSync: [EncryptedSecretQuery!]!
+  lastGeoLocation: String!
+}
+
 type EncryptedSecretQuery {
   id: ID!
   encrypted: String!
@@ -231,29 +257,6 @@ type EncryptedSecretQuery {
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
-}
-
-type DeviceQuery {
-  id: ID!
-  firstIpAddress: String!
-  lastIpAddress: String!
-  firebaseToken: String!
-  name: String!
-  syncTOTP: Boolean!
-  ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
-  createdAt: DateTime!
-  updatedAt: DateTime
-  registeredWithMasterAt: DateTime
-  lastSyncAt: DateTime
-  masterPasswordOutdatedAt: DateTime
-  userId: String!
-  User: UserGQL!
-  UserMaster: UserGQL
-  SecretUsageEvents: [SecretUsageEventGQL!]!
-  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
-  DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
-  encryptedSecretsToSync: [EncryptedSecretQuery!]!
 }
 
 type Mutation {
@@ -303,7 +306,7 @@ type UserMutation {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
-  addCookie: Boolean!
+  addCookie: String!
   addDevice(
     firebaseToken: String!
     deviceId: String!
@@ -339,6 +342,7 @@ type DeviceMutation {
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
+  logoutAt: DateTime
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime

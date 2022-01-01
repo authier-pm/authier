@@ -213,6 +213,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     return extractHostname(url) === extractHostname(currentTabUrl)
   })
 
+  const hasNoSecrets = backgroundState.secrets.length === 0
   return (
     <>
       {/* <Flex justifyContent="space-evenly">
@@ -241,7 +242,8 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
       </Flex> */}
 
       <Flex overflow="auto" overflowX="hidden" flexDirection="column">
-        {filterByTLD &&
+        {hasNoSecrets === false &&
+          filterByTLD &&
           TOTPForCurrentDomain.length === 0 &&
           loginCredentialForCurrentDomain.length === 0 && (
             <>
@@ -283,7 +285,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
             })
           ]
         )}
-        {LoginCredentials.length === 0 && TOTPSecrets.length === 0 && (
+        {hasNoSecrets && (
           // TODO login form illustration
           <Text>
             Start by adding a secret by logging onto any website or by adding a
