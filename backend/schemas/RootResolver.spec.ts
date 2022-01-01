@@ -2,6 +2,7 @@ import { prismaClient } from '../prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
 import faker, { fake } from 'faker'
 import { RegisterNewDeviceInput } from '../models/AuthInputs'
+import { GraphQLResolveInfo } from 'graphql'
 
 import { sign } from 'jsonwebtoken'
 
@@ -195,7 +196,8 @@ describe('RootResolver', () => {
       let data = await resolver.addNewDeviceForUser(
         input,
         input.addDeviceSecret,
-        fakeCtx
+        fakeCtx,
+        {} as GraphQLResolveInfo
       )
 
       const accessToken = sign(
@@ -226,7 +228,8 @@ describe('RootResolver', () => {
         await resolver.addNewDeviceForUser(
           input,
           input.addDeviceSecret,
-          fakeCtx
+          fakeCtx,
+          {} as GraphQLResolveInfo
         )
       }).rejects.toThrow('User not found')
     })
@@ -258,7 +261,8 @@ describe('RootResolver', () => {
         await resolver.addNewDeviceForUser(
           input,
           input.addDeviceSecret,
-          fakeCtx
+          fakeCtx,
+          {} as GraphQLResolveInfo
         )
       }).rejects.toThrow('Wrong master password used')
     })
