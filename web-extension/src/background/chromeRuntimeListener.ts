@@ -193,14 +193,6 @@ chrome.runtime.onMessage.addListener(async function (
       console.log('UIconfig', req.config)
       break
 
-    // case BackgroundMessageType.masterPassword:
-    //   masterPassword = req.masterPassword
-    //   break
-
-    // case BackgroundMessageType.setMasterPassword:
-    //   sendResponse({ config: { masterPsw: masterPassword } })
-    //   break
-
     default:
       if (typeof req === 'string') {
         throw new Error(`${req} not supported`)
