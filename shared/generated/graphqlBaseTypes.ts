@@ -453,7 +453,7 @@ export type UserQuery = {
 }
 
 export type UserQueryEncryptedSecretsArgs = {
-  fromDate: Scalars['DateTime']
+  fromDate?: InputMaybe<Scalars['DateTime']>
 }
 
 export type UserQuerySendAuthMessageArgs = {
