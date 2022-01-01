@@ -52,10 +52,17 @@ describe('RootResolver', () => {
     beforeEach(() => {
       jest.setTimeout(10000)
     })
+    const userId = faker.datatype.uuid()
+
+    const fakeCtx = {
+      reply: { setCookie: jest.fn() },
+      request: { headers: {} },
+      jwtPayload: { userId: userId },
+      prisma: prismaClient,
+      getIpAddress: () => faker.internet.ip()
+    } as any
 
     it('should add new user', async () => {
-      let userId = faker.datatype.uuid()
-
       let input: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
@@ -75,12 +82,7 @@ describe('RootResolver', () => {
 
       const resolver = new RootResolver()
 
-      let data = await resolver.registerNewUser(input, userId, {
-        reply: { setCookie: jest.fn() },
-        request: { headers: {} },
-        jwtPayload: { userId: userId },
-        getIpAddress: () => faker.internet.ip()
-      } as any)
+      let data = await resolver.registerNewUser(input, userId, fakeCtx)
 
       expect({
         accessToken: data.accessToken,
@@ -89,8 +91,6 @@ describe('RootResolver', () => {
     })
 
     it("should show 'User with such email already exists.'", async () => {
-      let userId = faker.datatype.uuid()
-
       let input: RegisterNewDeviceInput = {
         email: faker.internet.email(),
         deviceName: faker.internet.userName(),
