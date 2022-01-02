@@ -1,7 +1,9 @@
 type Query {
   user(userId: String!): UserQuery
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   authenticated: Boolean!
   me: UserQuery
   currentDevice: DeviceQuery!
@@ -34,7 +36,12 @@ type UserQuery {
   devicesCount: Int!
   settings: SettingsConfigGQL!
   encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
-  sendAuthMessage(pageName: String!, device: String!, time: DateTime!, location: String!): Boolean!
+  sendAuthMessage(
+    pageName: String!
+    device: String!
+    time: DateTime!
+    location: String!
+  ): Boolean!
 }
 
 """
@@ -255,16 +262,25 @@ type EncryptedSecretQuery {
 type Mutation {
   user(userId: String!): UserMutation
 
-  """you need to be authenticated to call this resolver"""
+  """
+  you need to be authenticated to call this resolver
+  """
   me: UserMutation
   currentDevice: DeviceMutation!
-  registerNewUser(userId: UUID!, input: RegisterNewDeviceInput!): LoginResponse!
-  addNewDeviceForUser(currentAddDeviceSecret: NonEmptyString!, input: RegisterNewDeviceInput!): LoginResponse!
+  registerNewUser(userId: UUID!, input: RegisterDeviceInput!): LoginResponse!
+  addNewDeviceForUser(
+    currentAddDeviceSecret: NonEmptyString!
+    input: RegisterDeviceInput!
+  ): LoginResponse!
 
-  """returns a decryption challenge"""
+  """
+  returns a decryption challenge
+  """
   deviceDecryptionChallenge(email: EmailAddress!): DecryptionChallengeGQL
 
-  """removes current device"""
+  """
+  removes current device
+  """
   logout: Boolean
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
@@ -291,10 +307,19 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   addCookie: String!
-  addDevice(firebaseToken: String!, deviceId: String!, name: String!): DeviceGQL!
+  addDevice(
+    firebaseToken: String!
+    deviceId: String!
+    name: String!
+  ): DeviceGQL!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): DeviceGQL!
-  updateSettings(noHandsLogin: Boolean!, lockTime: Int!, homeUI: String!, twoFA: Boolean!): SettingsConfigGQL!
+  updateSettings(
+    noHandsLogin: Boolean!
+    lockTime: Int!
+    homeUI: String!
+    twoFA: Boolean!
+  ): SettingsConfigGQL!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
 }
@@ -325,7 +350,11 @@ type DeviceMutation {
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
-  reportSecretUsageEvent(webInputId: PositiveInt!, secretId: PositiveInt!, kind: String!): SecretUsageEventGQLScalars!
+  reportSecretUsageEvent(
+    webInputId: PositiveInt!
+    secretId: PositiveInt!
+    kind: String!
+  ): SecretUsageEventGQLScalars!
 }
 
 type SecretUsageEventGQLScalars {
@@ -339,7 +368,9 @@ type SecretUsageEventGQLScalars {
   webInputId: Int
 }
 
-"""Integers that will have a value greater than 0."""
+"""
+Integers that will have a value greater than 0.
+"""
 scalar PositiveInt
 
 type LoginResponse {
@@ -375,16 +406,18 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 """
 scalar UUID
 
-input RegisterNewDeviceInput {
+input RegisterDeviceInput {
   email: EmailAddress!
   deviceName: String!
-  deviceId: String!
+  deviceId: UUID!
   firebaseToken: String!
-  addDeviceSecret: String!
-  addDeviceSecretEncrypted: String!
+  addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
 }
 
-"""A string that cannot be passed as an empty value"""
+"""
+A string that cannot be passed as an empty value
+"""
 scalar NonEmptyString
 
 input WebInputElement {

@@ -1,4 +1,4 @@
-mutation registerNewUser($input: RegisterNewDeviceInput!, $userId: UUID!) {
+mutation registerNewUser($input: RegisterDeviceInput!, $userId: UUID!) {
   registerNewUser(input: $input, userId: $userId) {
     accessToken
     user {

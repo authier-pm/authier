@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type RegisterNewUserMutationVariables = Types.Exact<{
-  input: Types.RegisterNewDeviceInput;
+  input: Types.RegisterDeviceInput;
   userId: Types.Scalars['UUID'];
 }>;
 
@@ -13,7 +13,7 @@ export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser
 
 
 export const RegisterNewUserDocument = gql`
-    mutation registerNewUser($input: RegisterNewDeviceInput!, $userId: UUID!) {
+    mutation registerNewUser($input: RegisterDeviceInput!, $userId: UUID!) {
   registerNewUser(input: $input, userId: $userId) {
     accessToken
     user {
