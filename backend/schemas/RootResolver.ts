@@ -262,7 +262,6 @@ export class RootResolver {
       where: { email: input.email },
       include
     })
-    console.log('~ user', user)
 
     if (!user) {
       throw new GraphqlError('User not found')

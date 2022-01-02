@@ -76,7 +76,7 @@ jobs:
           yarn generate
           yarn tsc
           cp .env.sample .env
-          yarn prisma db push
+          yarn test:prepare
           npm test
 
       - name: mobile-app, check TS and run jest
