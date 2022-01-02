@@ -15,7 +15,6 @@ import { QRCode } from '@src/pages/QRcode'
 import { useSendAuthMessageLazyQuery } from './Popup.codegen'
 
 import Devices from '@src/pages/Devices'
-import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { UserContext } from '@src/providers/UserProvider'
 
 import { deviceDetect } from 'react-device-detect'

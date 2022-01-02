@@ -1,5 +1,4 @@
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-
 import { getUserFromToken } from '@src/util/accessTokenExtension'
 import cryptoJS from 'crypto-js'
 

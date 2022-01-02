@@ -29,6 +29,14 @@ export const NavMenu: FunctionComponent = () => {
           <Link to="/about">
             <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>
+
+          <Button
+            onClick={() => {
+              chrome.tabs.create({ url: 'vault.html' })
+            }}
+          >
+            My vault
+          </Button>
         </Stack>
       </ButtonGroup>
     </Stack>
