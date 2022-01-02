@@ -26,16 +26,15 @@
 #       retries: 5
 version: '3.9'
 services:
-  authier-api:
-    build:
-      context: .
-      dockerfile: Dockerfile
-    container_name: authier-api
-    restart: always
-    ports:
-      - 80:80
-    depends_on:
-      - authierDb
+  # authier-api:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: authier-api
+  #   ports:
+  #     - 80:80
+  #   depends_on:
+  #     - authierDb
     # volumes:
     #   - ./:/app
   authierDb:

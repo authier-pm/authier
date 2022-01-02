@@ -257,13 +257,11 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const include = getPrismaRelationsFromInfo(info, 'user')
-    console.log('~ getPrismaRelationsFromInfo(info)', include)
 
     const user = await prismaClient.user.findUnique({
       where: { email: input.email },
       include
     })
-    console.log('~ user', user)
 
     if (!user) {
       throw new GraphqlError('User not found')
@@ -327,10 +325,13 @@ export class RootResolver {
       const inLastHour = await prismaClient.decryptionChallenge.count({
         where: {
           userId: user.id,
-          createdAt: new Date(Date.now() - 3600000),
+          createdAt: {
+            gte: new Date(Date.now() - 3600000)
+          },
           masterPasswordVerifiedAt: null
         }
       })
+
       if (inLastHour > 5) {
         throw new GraphqlError(
           'Too many decryption challenges, wait for cooldown'
