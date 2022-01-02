@@ -17,8 +17,15 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
+import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 
-function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
+function Item({
+  data,
+  deleteItem
+}: {
+  data: ILoginSecret | ITOTPSecret
+  deleteItem: () => void
+}) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
 
@@ -50,7 +57,7 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
             w="100%"
             h="full"
           >
-            {data.kind === 'LOGIN_CREDENTIALS' ? (
+            {data.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
               <IconButton
                 aria-label="open item"
                 colorScheme="blackAlpha"
@@ -88,7 +95,7 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
 
           <Link
             to={{
-              pathname: `list/${data.label}`,
+              pathname: `secret/${data.id}`,
               state: { data: data }
             }}
           >
@@ -147,7 +154,7 @@ export const ItemList = () => {
             }).map((el, i) => {
               return (
                 <Item
-                  data={el}
+                  data={el as ITOTPSecret}
                   key={el.label + i}
                   deleteItem={() => removeTOTPSecret(el.label)}
                 />
@@ -159,7 +166,7 @@ export const ItemList = () => {
               return (
                 <Item
                   key={el.label + i}
-                  data={el}
+                  data={el as ILoginSecret}
                   deleteItem={() => removeLoginCredential(el.label)}
                 />
               )
