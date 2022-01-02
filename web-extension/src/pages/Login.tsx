@@ -12,7 +12,6 @@ import {
   FormLabel,
   Heading
 } from '@chakra-ui/react'
-
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { Link, useLocation } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -35,13 +34,14 @@ import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import browser from 'webextension-polyfill'
 
 import { device } from '@src/background/Device'
-import {
-  useAddNewDeviceForUserMutation,
-  useDeviceDecryptionChallengeMutation
-} from './Login.codegen'
+
 import { ISecret } from '@src/util/useBackgroundState'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import {
+  useAddNewDeviceForUserMutation,
+  useDeviceDecryptionChallengeMutation
+} from '../../../shared/Login.codegen'
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {

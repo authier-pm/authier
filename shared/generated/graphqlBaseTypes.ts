@@ -193,7 +193,7 @@ export type Mutation = {
 
 export type MutationAddNewDeviceForUserArgs = {
   currentAddDeviceSecret: Scalars['NonEmptyString']
-  input: RegisterNewDeviceInput
+  input: RegisterDeviceInput
 }
 
 export type MutationAddWebInputsArgs = {
@@ -205,7 +205,7 @@ export type MutationDeviceDecryptionChallengeArgs = {
 }
 
 export type MutationRegisterNewUserArgs = {
-  input: RegisterNewDeviceInput
+  input: RegisterDeviceInput
   userId: Scalars['UUID']
 }
 
@@ -231,10 +231,10 @@ export type QueryWebInputsArgs = {
   url: Scalars['String']
 }
 
-export type RegisterNewDeviceInput = {
-  addDeviceSecret: Scalars['String']
-  addDeviceSecretEncrypted: Scalars['String']
-  deviceId: Scalars['String']
+export type RegisterDeviceInput = {
+  addDeviceSecret: Scalars['NonEmptyString']
+  addDeviceSecretEncrypted: Scalars['NonEmptyString']
+  deviceId: Scalars['UUID']
   deviceName: Scalars['String']
   email: Scalars['EmailAddress']
   firebaseToken: Scalars['String']

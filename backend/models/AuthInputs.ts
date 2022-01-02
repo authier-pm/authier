@@ -6,14 +6,14 @@ import {
 import { Field, InputType } from 'type-graphql'
 
 @InputType()
-export class RegisterNewDeviceInput {
+export class RegisterDeviceInput {
   @Field(() => GraphQLEmailAddress)
   email: string
   @Field()
   deviceName: string
   @Field(() => GraphQLUUID)
   deviceId: string
-  @Field(() => GraphQLUUID)
+  @Field()
   firebaseToken: string
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string

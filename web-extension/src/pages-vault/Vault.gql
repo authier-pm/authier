@@ -1,10 +1,9 @@
-query encryptedAuths {
+query me {
   me {
-    id
     encryptedSecrets {
       id
-      kind
       encrypted
+      kind
     }
   }
 }

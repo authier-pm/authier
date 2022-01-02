@@ -12,7 +12,7 @@ export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', devic
 
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   currentAddDeviceSecret: Types.Scalars['NonEmptyString'];
-  input: Types.RegisterNewDeviceInput;
+  input: Types.RegisterDeviceInput;
 }>;
 
 
@@ -57,7 +57,7 @@ export type DeviceDecryptionChallengeMutationHookResult = ReturnType<typeof useD
 export type DeviceDecryptionChallengeMutationResult = Apollo.MutationResult<DeviceDecryptionChallengeMutation>;
 export type DeviceDecryptionChallengeMutationOptions = Apollo.BaseMutationOptions<DeviceDecryptionChallengeMutation, DeviceDecryptionChallengeMutationVariables>;
 export const AddNewDeviceForUserDocument = gql`
-    mutation addNewDeviceForUser($currentAddDeviceSecret: NonEmptyString!, $input: RegisterNewDeviceInput!) {
+    mutation addNewDeviceForUser($currentAddDeviceSecret: NonEmptyString!, $input: RegisterDeviceInput!) {
   addNewDeviceForUser(
     currentAddDeviceSecret: $currentAddDeviceSecret
     input: $input
