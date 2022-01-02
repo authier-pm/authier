@@ -22,6 +22,7 @@ import debug from 'debug'
 const log = debug('au:useBackgroundState')
 
 export interface ISecret {
+  id: string
   encrypted: string
   kind: EncryptedSecretType
   label: string
