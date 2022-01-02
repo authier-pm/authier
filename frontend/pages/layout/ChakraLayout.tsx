@@ -58,12 +58,11 @@ export function ChakraLayout({ children }) {
           />
           <HStack spacing={8} alignItems={'center'}>
             <Link href="/">
-              <Box cursor="pointer" zIndex={100}>
+              <Box cursor="pointer">
                 <Image
-                  boxSize={[null, null, 110]}
-                  height={['60px', '60px', null]}
-                  mt={[null, null, 30]}
+                  boxSize={'60px'}
                   src="/assets/logos/logo.png"
+                  objectFit="cover"
                 ></Image>
               </Box>
             </Link>

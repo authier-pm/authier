@@ -1,11 +1,9 @@
 import { Flex, Spinner } from '@chakra-ui/react'
 import React, { ReactElement, useContext, useEffect } from 'react'
-
 import browser from 'webextension-polyfill'
 import AuthPages from './AuthPages'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
-
 import { BackgroundContext } from './providers/BackgroundProvider'
 
 export default function Routes(): ReactElement {

@@ -36,6 +36,7 @@ let vaultLockInterval: NodeJS.Timeout | null = null
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 let homeList: UIOptions
+let masterPassword: string
 
 interface ILoginCredentialsFromContentScript {
   username: string
@@ -170,14 +171,6 @@ chrome.runtime.onMessage.addListener(async function (
         config: {
           vaultTime: lockTime,
           noHandsLogin: noHandsLogin
-        }
-      })
-      break
-
-    case BackgroundMessageType.giveUISettings:
-      sendResponse({
-        config: {
-          homeList: homeList
         }
       })
       break

@@ -59,7 +59,6 @@ const { AES, enc } = cryptoJS
 export function useBackgroundState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-
   const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
 
@@ -80,7 +79,6 @@ export function useBackgroundState() {
       return
     }
     registered = true
-
     browser.runtime.onMessage.addListener(function (request: {
       message: SharedBrowserEvents
       url: any

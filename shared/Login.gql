@@ -10,7 +10,7 @@ mutation deviceDecryptionChallenge($email: EmailAddress!) {
 
 mutation addNewDeviceForUser(
   $currentAddDeviceSecret: NonEmptyString!
-  $input: RegisterNewDeviceInput!
+  $input: RegisterDeviceInput!
 ) {
   addNewDeviceForUser(
     currentAddDeviceSecret: $currentAddDeviceSecret

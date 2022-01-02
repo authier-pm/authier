@@ -17,7 +17,14 @@ import {
 } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
-export const Links = ['Features', 'Pricing', 'FAQ', 'Privacy policy']
+export const Links = [
+  'Features',
+  'Pricing',
+  'FAQ',
+  'Privacy policy',
+  'Vault',
+  'Login'
+]
 
 export const NavLink = ({
   children,

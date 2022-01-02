@@ -40,7 +40,6 @@ export function LoginCard() {
           <Formik
             initialValues={{ password: '', username: '' }}
             onSubmit={async (data) => {
-              console.log(data)
               await login({
                 variables: {
                   email: data.username,

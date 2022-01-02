@@ -40,7 +40,7 @@ import {
   GraphQLUUID
 } from 'graphql-scalars'
 import debug from 'debug'
-import { RegisterNewDeviceInput } from '../models/AuthInputs'
+import { RegisterDeviceInput } from '../models/AuthInputs'
 
 import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
@@ -168,7 +168,7 @@ export class RootResolver {
 
   @Mutation(() => LoginResponse)
   async registerNewUser(
-    @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
+    @Arg('input', () => RegisterDeviceInput) input: RegisterDeviceInput,
     @Arg('userId', () => GraphQLUUID) userId: string,
     @Ctx() ctx: IContext
   ) {
@@ -250,7 +250,7 @@ export class RootResolver {
 
   @Mutation(() => LoginResponse)
   async addNewDeviceForUser(
-    @Arg('input', () => RegisterNewDeviceInput) input: RegisterNewDeviceInput,
+    @Arg('input', () => RegisterDeviceInput) input: RegisterDeviceInput,
     @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
     currentAddDeviceSecret: string,
     @Ctx() ctx: IContext,

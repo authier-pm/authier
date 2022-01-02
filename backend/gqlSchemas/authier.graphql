@@ -267,10 +267,10 @@ type Mutation {
   """
   me: UserMutation
   currentDevice: DeviceMutation!
-  registerNewUser(userId: UUID!, input: RegisterNewDeviceInput!): LoginResponse!
+  registerNewUser(userId: UUID!, input: RegisterDeviceInput!): LoginResponse!
   addNewDeviceForUser(
     currentAddDeviceSecret: NonEmptyString!
-    input: RegisterNewDeviceInput!
+    input: RegisterDeviceInput!
   ): LoginResponse!
 
   """
@@ -406,13 +406,13 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 """
 scalar UUID
 
-input RegisterNewDeviceInput {
+input RegisterDeviceInput {
   email: EmailAddress!
   deviceName: String!
-  deviceId: String!
+  deviceId: UUID!
   firebaseToken: String!
-  addDeviceSecret: String!
-  addDeviceSecretEncrypted: String!
+  addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
 }
 
 """
