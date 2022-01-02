@@ -7,9 +7,11 @@ import {
 import { errorLink } from '../../shared/errorLink'
 import jwtDecode from 'jwt-decode'
 
+const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
+
 export let getTokenFromLocalStorage = async (): Promise<string | null> => {
-  const test = sessionStorage.getItem('access-token')
-  return test
+  const accessToken = sessionStorage.getItem('access-token')
+  return accessToken
 }
 
 export const getUserFromToken = async () => {
@@ -19,7 +21,7 @@ export const getUserFromToken = async () => {
 }
 
 const httpLink = createHttpLink({
-  uri: `http://localhost:5051/graphql`,
+  uri: `${NEXT_PUBLIC_API_URL}/graphql`,
   credentials: 'include'
 })
 
