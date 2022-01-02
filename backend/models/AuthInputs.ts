@@ -1,4 +1,8 @@
-import { GraphQLEmailAddress } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLNonEmptyString,
+  GraphQLUUID
+} from 'graphql-scalars'
 import { Field, InputType } from 'type-graphql'
 
 @InputType()
@@ -7,12 +11,12 @@ export class RegisterNewDeviceInput {
   email: string
   @Field()
   deviceName: string
-  @Field()
+  @Field(() => GraphQLUUID)
   deviceId: string
-  @Field()
+  @Field(() => GraphQLUUID)
   firebaseToken: string
-  @Field()
+  @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string
-  @Field()
+  @Field(() => GraphQLNonEmptyString)
   addDeviceSecretEncrypted: string
 }
