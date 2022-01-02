@@ -22,6 +22,7 @@ export const truncateAllTables = async () => {
       console.log({ error })
     }
   }
+  console.log('truncated all tables')
 }
 
 afterAll(truncateAllTables)
