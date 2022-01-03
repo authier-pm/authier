@@ -138,8 +138,7 @@ const LoginCredentialsListItem = ({
 }: {
   loginSecret: ILoginSecret
 }) => {
-  const { saveLoginCredentials: savePasswordsToBg, backgroundState } =
-    useContext(BackgroundContext)
+  const { backgroundState } = useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
 
