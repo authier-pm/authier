@@ -37,7 +37,7 @@ export type DecryptionChallengeGql = {
   createdAt: Scalars['DateTime']
   device?: Maybe<DeviceGql>
   deviceId?: Maybe<Scalars['String']>
-  id: Scalars['ID']
+  id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
   userId: Scalars['String']
@@ -283,7 +283,7 @@ export type SettingsConfigGql = {
 export type TagGql = {
   __typename?: 'TagGQL'
   createdAt: Scalars['DateTime']
-  id: Scalars['ID']
+  id: Scalars['Int']
   name: Scalars['String']
   user: UserGql
   userId: Scalars['String']
@@ -294,7 +294,7 @@ export type TokenGql = {
   createdAt: Scalars['DateTime']
   emailToken?: Maybe<Scalars['String']>
   expiration: Scalars['DateTime']
-  id: Scalars['ID']
+  id: Scalars['Int']
   type: TokenType
   updatedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
@@ -416,7 +416,7 @@ export type UserPaidProductsGql = {
   checkoutSessionId: Scalars['String']
   createdAt: Scalars['DateTime']
   expiresAt?: Maybe<Scalars['DateTime']>
-  id: Scalars['ID']
+  id: Scalars['Int']
   productId: Scalars['String']
   updatedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
@@ -477,7 +477,7 @@ export type WebInputGql = {
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
   domPath: Scalars['String']
-  id: Scalars['ID']
+  id: Scalars['Int']
   kind: WebInputType
   layoutType?: Maybe<Scalars['String']>
   url: Scalars['String']

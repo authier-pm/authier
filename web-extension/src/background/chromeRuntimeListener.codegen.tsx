@@ -8,7 +8,7 @@ export type AddWebInputsMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: string }> };
+export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number }> };
 
 
 export const AddWebInputsDocument = gql`

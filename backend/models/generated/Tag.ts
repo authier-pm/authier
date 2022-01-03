@@ -1,9 +1,9 @@
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ObjectType, Int } from 'type-graphql'
 import { UserGQL } from './User'
 
 @ObjectType()
 export class TagGQLScalars {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number
 
   @Field()
