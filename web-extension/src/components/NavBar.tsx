@@ -11,7 +11,7 @@ import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
-import { IoMdRefreshCircle } from 'react-icons/io'
+import { IoMdRefreshCircle, IoMdArchive } from 'react-icons/io'
 import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 
@@ -103,6 +103,15 @@ export const NavBar: FunctionComponent = () => {
             icon={<IoMdRefreshCircle />}
             onClick={async () => {
               getEncryptedSecretsToSync()
+            }}
+          />
+          <IconButton
+            size="md"
+            ml="2"
+            aria-label="menu"
+            icon={<IoMdArchive />}
+            onClick={async () => {
+              chrome.tabs.create({ url: 'vault.html' })
             }}
           />
         </Box>
