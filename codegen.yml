@@ -27,6 +27,10 @@ generates:
       - add:
           content: '// @ts-nocheck THIS IS A GENERATED FILE, DO NOT EDIT'
 
+hooks:
+  afterAllFileWrite:
+    - prettier --write
+
 config:
   withHooks: true
   withHOC: false

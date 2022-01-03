@@ -18,16 +18,15 @@ import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
+import { useDeleteEncryptedSecretMutation } from './ItemList.codegen'
+import browser from 'webextension-polyfill'
 
-function Item({
-  data,
-  deleteItem
-}: {
-  data: ILoginSecret | ITOTPSecret
-  deleteItem: () => void
-}) {
+function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
+  const { backgroundState } = useContext(BackgroundContext)
+
   console.log(data)
   return (
     <Center py={5} m={['auto', '3']}>
@@ -82,7 +81,25 @@ function Item({
             <DeleteAlert
               isOpen={isOpen}
               onClose={onClose}
-              deleteItem={deleteItem}
+              deleteItem={async () => {
+                if (!backgroundState) {
+                  throw new Error('backgroundState is not set')
+                }
+                await deleteEncryptedSecretMutation({
+                  variables: {
+                    id: data.id
+                  }
+                })
+
+                browser.storage.local.set({
+                  backgroundState: {
+                    ...backgroundState,
+                    secrets: backgroundState.secrets.filter(
+                      (s) => s.id !== data.id
+                    )
+                  }
+                })
+              }}
             />
           </Flex>
         </Box>
@@ -117,24 +134,9 @@ function Item({
 }
 
 export const ItemList = () => {
-  const {
-    backgroundState,
-    saveLoginCredentials,
-    saveTOTPSecrets,
-    LoginCredentials,
-    TOTPSecrets
-  } = useContext(BackgroundContext)
+  const { backgroundState, LoginCredentials, TOTPSecrets } =
+    useContext(BackgroundContext)
   const [filterBy, setFilterBy] = useState('')
-
-  const removeLoginCredential = (id: string) => {
-    saveLoginCredentials(
-      LoginCredentials.filter((el) => el.id !== id) as ILoginSecret[]
-    )
-  }
-
-  const removeTOTPSecret = (id: string) => {
-    saveTOTPSecrets(TOTPSecrets.filter((el) => el.id !== id) as ITOTPSecret[])
-  }
 
   return (
     <Flex flexDirection="column">
@@ -153,24 +155,12 @@ export const ItemList = () => {
             {TOTPSecrets?.filter(({ label, url }) => {
               return label.includes(filterBy) || url?.includes(filterBy)
             }).map((el, i) => {
-              return (
-                <Item
-                  data={el as ITOTPSecret}
-                  key={el.label + i}
-                  deleteItem={() => removeTOTPSecret(el.id)}
-                />
-              )
+              return <Item data={el as ITOTPSecret} key={el.label + i} />
             })}
             {LoginCredentials?.filter(({ label, url }) => {
               return label.includes(filterBy) || url?.includes(filterBy)
             }).map((el, i) => {
-              return (
-                <Item
-                  key={el.label + i}
-                  data={el as ILoginSecret}
-                  deleteItem={() => removeLoginCredential(el.id)}
-                />
-              )
+              return <Item key={el.label + i} data={el as ILoginSecret} />
             })}
           </Flex>
         </Flex>

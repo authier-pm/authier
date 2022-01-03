@@ -426,7 +426,7 @@ export type UserMutationApproveDeviceArgs = {
 }
 
 export type UserMutationEncryptedSecretArgs = {
-  id: Scalars['UUID']
+  id: Scalars['ID']
 }
 
 export type UserMutationUpdateFireTokenArgs = {

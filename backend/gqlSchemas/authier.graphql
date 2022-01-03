@@ -312,7 +312,7 @@ type UserMutation {
     deviceId: String!
     name: String!
   ): DeviceGQL!
-  encryptedSecret(id: UUID!): EncryptedSecretMutation!
+  encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
@@ -354,11 +354,6 @@ input EncryptedSecretInput {
   encrypted: String!
 }
 
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
 type DeviceMutation {
   id: ID!
   firstIpAddress: String!
@@ -398,6 +393,11 @@ type SecretUsageEventGQLScalars {
 Integers that will have a value greater than 0.
 """
 scalar PositiveInt
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type LoginResponse {
   accessToken: String!

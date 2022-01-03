@@ -76,6 +76,15 @@ export function useBackgroundState() {
   const [updateSettings] = useUpdateSettingsMutation()
   log('~ backgroundState2', backgroundState)
 
+  const onStorageChange = async (
+    changes: Record<string, browser.Storage.StorageChange>,
+    areaName: string
+  ): Promise<void> => {
+    if (areaName === 'local' && changes.backgroundState) {
+      setBackgroundState(changes.backgroundState.newValue)
+    }
+  }
+
   //TODO move this whole thing into it' own hook
   useEffect(() => {
     if (registered) {
@@ -107,6 +116,8 @@ export function useBackgroundState() {
         }
       }
     )
+
+    browser.storage.onChanged.addListener(onStorageChange)
   }, [])
 
   // handle background state refresh
@@ -205,32 +216,6 @@ export function useBackgroundState() {
           throw err
         }
       })
-    },
-    saveLoginCredentials: (passwords: ILoginSecret[]) => {
-      if (backgroundState) {
-        const newBgState = {
-          ...backgroundState,
-          loginCredentials: passwords
-        }
-        browser.runtime.sendMessage({
-          action: BackgroundMessageType.setBackgroundState,
-          payload: newBgState
-        })
-        setBackgroundState(newBgState)
-      }
-    },
-    saveTOTPSecrets: (totpSecrets: ITOTPSecret[]) => {
-      if (backgroundState) {
-        const newBgState = {
-          ...backgroundState,
-          totpSecrets: totpSecrets
-        }
-        browser.runtime.sendMessage({
-          action: BackgroundMessageType.setBackgroundState,
-          payload: newBgState
-        })
-        setBackgroundState(newBgState)
-      }
     },
 
     lockVault: async () => {
