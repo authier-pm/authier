@@ -76,7 +76,19 @@ export class DOMEventsRecorder {
     )
   }
 
+  /**
+   * if any email was inputted, we assume it's the username, if not we fallback to the input field just before the password
+   */
   getUsername(): string | undefined {
+    const emailInputs = this.capturedInputEvents.filter(
+      ({ eventType: type, element }) => {
+        return type === 'input' && element.type === 'email'
+      }
+    )
+    if (emailInputs.length === 1) {
+      return emailInputs[0].inputted
+    }
+
     const inputEvents = this.capturedInputEvents.filter(
       ({ eventType: type, element }) => {
         return type === 'input' && element.type !== 'password'

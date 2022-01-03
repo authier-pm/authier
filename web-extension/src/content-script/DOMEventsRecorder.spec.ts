@@ -6,34 +6,42 @@ describe('DOMEventsRecorder', () => {
     // multiple events from single input must remove the previous ones stored in the recorder
   })
 
-  it('should mark the input previous to the password kind as username', async () => {
-    const recorder = new DOMEventsRecorder()
-    recorder.addInputEvent({
-      element: document.createElement('input'),
-      eventType: 'input',
-      kind: null
+  describe('getUsername', () => {
+    it('should mark the input previous to the password kind as username', async () => {
+      const recorder = new DOMEventsRecorder()
+      recorder.addInputEvent({
+        element: document.createElement('input'),
+        eventType: 'input',
+        kind: null
+      })
+
+      recorder.addInputEvent({
+        element: document.createElement('input'),
+        eventType: 'input',
+        kind: WebInputType.PASSWORD
+      })
+      expect(recorder.toJSON()).toMatchInlineSnapshot(`
+  Array [
+    Object {
+      "element": "INPUT",
+      "inputted": undefined,
+      "kind": "USERNAME_OR_EMAIL",
+      "type": "input",
+    },
+    Object {
+      "element": "INPUT",
+      "inputted": undefined,
+      "kind": "PASSWORD",
+      "type": "input",
+    },
+  ]
+  `)
     })
 
-    recorder.addInputEvent({
-      element: document.createElement('input'),
-      eventType: 'input',
-      kind: WebInputType.PASSWORD
-    })
-    expect(recorder.toJSON()).toMatchInlineSnapshot(`
-Array [
-  Object {
-    "element": "INPUT",
-    "inputted": undefined,
-    "kind": "USERNAME_OR_EMAIL",
-    "type": "input",
-  },
-  Object {
-    "element": "INPUT",
-    "inputted": undefined,
-    "kind": "PASSWORD",
-    "type": "input",
-  },
-]
-`)
+    it.todo('should use email input as username if there is one')
+
+    it.todo(
+      'should use username input as username if there are more than one email inputs'
+    )
   })
 })
