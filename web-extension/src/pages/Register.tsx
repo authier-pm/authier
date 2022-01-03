@@ -83,7 +83,8 @@ export default function Register(): ReactElement {
             const bgState: IBackgroundStateSerializable = {
               masterPassword: values.password,
               userId: userId,
-              secrets: []
+              secrets: [],
+              email: values.email
             }
 
             deviceLogin(bgState)

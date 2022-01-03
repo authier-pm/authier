@@ -101,6 +101,7 @@ chrome.runtime.onMessage.addListener(async function (
         username: credentials.username,
         password: credentials.password
       }
+
       await bgState.addSecret({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
         loginCredentials: namePassPair,
@@ -150,6 +151,9 @@ chrome.runtime.onMessage.addListener(async function (
 
       break
 
+    case BackgroundMessageType.getFallbackUsernames:
+      sendResponse([bgState?.email])
+      break
     case BackgroundMessageType.getLoginCredentialsModalState:
       if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
         sendResponse(saveLoginModalsStates.get(currentTabId))

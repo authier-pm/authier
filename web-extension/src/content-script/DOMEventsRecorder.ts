@@ -31,6 +31,8 @@ function getSelectorForElement(target: HTMLElement) {
   return selector
 }
 
+const simpleEmailRegex = /\S+@\S+\.\S+/g
+
 export class DOMEventsRecorder {
   capturedInputEvents: IInputRecord[]
   constructor() {
@@ -89,9 +91,15 @@ export class DOMEventsRecorder {
       return emailInputs[0].inputted
     }
 
-    const matchedEmailsInText = document.body.innerText.match(/\S+@\S+\.\S+/g)
+    const matchedEmailsInText = document.body.innerText.match(simpleEmailRegex)
     if (matchedEmailsInText?.length === 1) {
-      return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text(it was probably entered somewhere else)
+      if (
+        matchedEmailsInText[0].includes(
+          location.hostname.replace('www.', '') // exclude emails from the same domain as we're currently on
+        ) === false
+      ) {
+        return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text(it was probably entered somewhere else)
+      }
     }
 
     const inputEvents = this.capturedInputEvents.filter(
@@ -99,7 +107,10 @@ export class DOMEventsRecorder {
         return type === 'input' && element.type !== 'password'
       }
     )
-    return inputEvents[inputEvents.length - 1]?.inputted
+
+    const previouslyInputted = inputEvents[inputEvents.length - 1]?.inputted
+
+    return previouslyInputted
   }
 
   getPassword(): string | undefined {

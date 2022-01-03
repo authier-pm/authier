@@ -8,6 +8,7 @@ import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import { ILoginSecret } from '@src/util/useBackgroundState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import { onRemoveFromDOM } from './onRemovedFromDOM'
 
 const log = debug('au:contentScript')
 localStorage.debug = 'au:*' // enable all debug messages
@@ -36,21 +37,32 @@ export async function initInputWatch() {
   const modalState = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getLoginCredentialsModalState
   })
-  log('~ modalState2', modalState)
+  log('~ modalState42', modalState)
   if (modalState && modalState.username && modalState.password) {
     renderSaveCredentialsForm(modalState.username, modalState.password)
     return // the modal is already displayed
   }
-  const showSavePromptIfAppropriate = (): void => {
+  const showSavePromptIfAppropriate = async () => {
     if (promptDiv) {
       return
     }
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
-    if (username && password) {
-      renderSaveCredentialsForm(username, password)
+    console.log('~A showSavePromptIfAppropriate', username, password)
+
+    if (password) {
+      if (username) {
+        renderSaveCredentialsForm(username, password)
+      } else {
+        const fallbackUsername = await browser.runtime.sendMessage({
+          action: BackgroundMessageType.getLoginCredentialsModalState
+        })
+        renderSaveCredentialsForm(fallbackUsername, password)
+      }
     }
   }
+
+  let mutationObserver: MutationObserver
   document.addEventListener(
     'input',
     debounce((ev) => {
@@ -75,28 +87,33 @@ export async function initInputWatch() {
             log('password inputted', inputted)
 
             const form = targetElement.form
+            const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
+              domRecorder.addInputEvent({
+                element,
+                eventType: 'submit',
+                kind: WebInputType.PASSWORD
+              })
+              showSavePromptIfAppropriate()
+
+              log(domRecorder)
+            }
             if (form) {
+              // handle case when this is inside a form
               if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
                 return
               }
+
               form.addEventListener(
                 'submit',
-                (ev) => {
-                  log('onsubmit', ev)
-                  domRecorder.addInputEvent({
-                    element: form,
-                    eventType: 'submit',
-                    kind: WebInputType.PASSWORD
-                  })
-                  showSavePromptIfAppropriate()
-
-                  log(domRecorder)
+                () => {
+                  onSubmit(form)
                 },
                 { once: true }
               )
               formsRegisteredForSubmitEvent.push(form)
             }
 
+            // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
             targetElement.addEventListener(
               'keydown',
               (ev: KeyboardEvent) => {
@@ -111,6 +128,15 @@ export async function initInputWatch() {
               },
               { once: true }
             )
+
+            // handle case when input is removed from DOM by javascript
+            if (mutationObserver) {
+              mutationObserver.disconnect()
+            }
+
+            mutationObserver = onRemoveFromDOM(targetElement, () => {
+              onSubmit(targetElement)
+            })
 
             // some login flows don't have any forms, in that case we are listening for click, keydown
             document.addEventListener('click', showSavePromptIfAppropriate, {

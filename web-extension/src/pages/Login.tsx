@@ -120,7 +120,8 @@ export default function Login(): ReactElement {
             const bgState: IBackgroundStateSerializable = {
               masterPassword: values.password,
               userId: userId,
-              secrets: EncryptedSecrets
+              secrets: EncryptedSecrets,
+              email: values.email
             }
             setUserId(decodedToken.userId)
 
