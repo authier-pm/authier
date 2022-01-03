@@ -21,7 +21,7 @@ import { UserContext } from '../providers/UserProvider'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
-import { device } from '@src/background/Device'
+import { device } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
 import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'

@@ -2,6 +2,9 @@ import debug from 'debug'
 import browser from 'webextension-polyfill'
 import Bowser from 'bowser'
 import cryptoJS from 'crypto-js'
+import { BackgroundMessageType } from './BackgroundMessageType'
+import { removeToken } from '@src/util/accessTokenExtension'
+import { renderPopup } from '..'
 
 export const log = debug('au:Device')
 
@@ -13,7 +16,7 @@ function getRandomInt(min: number, max: number) {
 
 const browserInfo = Bowser.getParser(navigator.userAgent)
 
-class Device {
+class ExtensionDevice {
   generateDeviceName(): string {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
@@ -64,6 +67,16 @@ class Device {
       addDeviceSecretEncrypted
     }
   }
+
+  async logout() {
+    await removeToken()
+    await device.clearLocalStorage()
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.clear
+    })
+
+    renderPopup()
+  }
 }
 
-export const device = new Device()
+export const device = new ExtensionDevice()

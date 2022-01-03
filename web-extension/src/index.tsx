@@ -12,7 +12,7 @@ Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
 })
 
-browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+export const renderPopup = () => {
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
@@ -20,6 +20,7 @@ browser.tabs.query({ active: true, currentWindow: true }).then(() => {
     </ApolloProvider>,
     document.getElementById('popup')
   )
-})
+}
+browser.tabs.query({ active: true, currentWindow: true }).then(renderPopup)
 
 browser.runtime.connect({ name: 'popup' })

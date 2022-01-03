@@ -19,6 +19,8 @@ import cryptoJS from 'crypto-js'
 import { toast } from 'react-toastify'
 import { omit } from 'lodash'
 import debug from 'debug'
+import { removeToken } from './accessTokenExtension'
+import { device } from '@src/background/ExtensionDevice'
 const log = debug('au:useBackgroundState')
 
 export interface ISecret {
@@ -265,11 +267,10 @@ export function useBackgroundState() {
         config: config
       })
     },
-    logoutUser: () => {
-      setBackgroundState(null)
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.clear
-      })
+    logoutUser: async () => {
+      // setBackgroundState(null)
+
+      await device.logout()
     },
     UIConfig,
     encrypt(data: string, password = backgroundState?.masterPassword): string {

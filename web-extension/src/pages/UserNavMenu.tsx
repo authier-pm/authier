@@ -1,12 +1,9 @@
 import React, { FunctionComponent, useContext } from 'react'
 
 import { Button, ButtonGroup, Stack } from '@chakra-ui/react'
-import browser from 'webextension-polyfill'
-import { removeToken } from '@src/util/accessTokenExtension'
 
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import { Trans } from '@lingui/macro'
-import { device } from '@src/background/Device'
 
 export const UserNavMenu: FunctionComponent = () => {
   const { logoutUser, lockVault } = useContext(BackgroundContext)
@@ -26,9 +23,6 @@ export const UserNavMenu: FunctionComponent = () => {
           <Button
             colorScheme="red"
             onClick={async () => {
-              await removeToken()
-              await device.clearLocalStorage()
-
               logoutUser()
             }}
           >
