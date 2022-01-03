@@ -89,6 +89,11 @@ export class DOMEventsRecorder {
       return emailInputs[0].inputted
     }
 
+    const matchedEmailsInText = document.body.innerText.match(/\S+@\S+\.\S+/g)
+    if (matchedEmailsInText?.length === 1) {
+      return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text(it was probably entered somewhere else)
+    }
+
     const inputEvents = this.capturedInputEvents.filter(
       ({ eventType: type, element }) => {
         return type === 'input' && element.type !== 'password'

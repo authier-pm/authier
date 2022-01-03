@@ -43,5 +43,9 @@ describe('DOMEventsRecorder', () => {
     it.todo(
       'should use username input as username if there are more than one email inputs'
     )
+
+    it.todo(
+      'should grep inner text of the HTML page body and return the email if there is exactly one on the page'
+    )
   })
 })
