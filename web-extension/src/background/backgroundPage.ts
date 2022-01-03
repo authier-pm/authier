@@ -68,6 +68,7 @@ type SecretSerializedType = Pick<
 >
 
 export interface IBackgroundStateSerializable {
+  email: string
   userId: string
   masterPassword: string
   secrets: Array<SecretSerializedType>

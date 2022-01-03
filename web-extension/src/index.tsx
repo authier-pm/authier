@@ -13,12 +13,17 @@ Sentry.init({
 })
 
 export const renderPopup = () => {
+  const popupElement = document.getElementById('popup')
+
+  if (!popupElement) {
+    return
+  }
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <App parent="popup" />
     </ApolloProvider>,
-    document.getElementById('popup')
+    popupElement
   )
 }
 browser.tabs.query({ active: true, currentWindow: true }).then(renderPopup)
