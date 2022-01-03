@@ -55,7 +55,7 @@ export async function initInputWatch() {
         renderSaveCredentialsForm(username, password)
       } else {
         const fallbackUsername = await browser.runtime.sendMessage({
-          action: BackgroundMessageType.getLoginCredentialsModalState
+          action: BackgroundMessageType.getFallbackUsernames
         })
         renderSaveCredentialsForm(fallbackUsername, password)
       }
