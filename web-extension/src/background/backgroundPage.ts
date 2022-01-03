@@ -62,17 +62,22 @@ if ('serviceWorker' in navigator) {
   log('No service-worker on this browser')
 }
 
+type SecretSerializedType = Pick<
+  EncryptedSecretGql,
+  'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'
+>
+
 export interface IBackgroundStateSerializable {
   userId: string
   masterPassword: string
-  secrets: Array<
-    Pick<EncryptedSecretGql, 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'>
-  >
+  secrets: Array<SecretSerializedType>
 }
 
 interface IBackgroundState extends IBackgroundStateSerializable {
   encrypt: (stringToEncrypt: string) => string
-  addSecretOnBackend: (input: ITOTPSecret | ILoginSecret) => Promise<void>
+  addSecret: (
+    input: Omit<ITOTPSecret, 'id'> | Omit<ILoginSecret, 'id'>
+  ) => Promise<SecretSerializedType>
 }
 
 export let bgState: IBackgroundState | null = null
@@ -88,7 +93,12 @@ export const setBgState = async (
       }).toString()
     },
 
-    async addSecretOnBackend(secret: ITOTPSecret | ILoginSecret) {
+    /**
+     * invokes the backend mutation and pushes the new secret to the bgState
+     * @param secret
+     * @returns the added secret
+     */
+    async addSecret(secret) {
       const stringToEncrypt =
         secret.kind === EncryptedSecretType.TOTP
           ? secret.totp
@@ -96,7 +106,7 @@ export const setBgState = async (
 
       const encrypted = this.encrypt(stringToEncrypt)
 
-      await apolloClient.mutate<
+      const { data } = await apolloClient.mutate<
         AddEncryptedSecretMutation,
         AddEncryptedSecretMutationVariables
       >({
@@ -106,11 +116,19 @@ export const setBgState = async (
             encrypted,
             kind: secret.kind,
             label: secret.label,
+            iconUrl: secret.iconUrl,
             url: secret.url
           }
         }
       })
+      if (!data) {
+        throw new Error('failed to save secret')
+      }
       log('saved secret to the backend', secret)
+      const secretAdded = data.me.addEncryptedSecret
+
+      bgState?.secrets.push(secretAdded)
+      return secretAdded
     }
   }
 

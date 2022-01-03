@@ -1,6 +1,6 @@
 import { Button, IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon } from '@chakra-ui/icons'
+import { UnlockIcon, SettingsIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -28,7 +28,7 @@ function Item({
 }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
-
+  console.log(data)
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
@@ -66,7 +66,10 @@ function Item({
               />
             ) : null}
 
-            <CloseButton
+            <DeleteIcon
+              cursor={'pointer'}
+              boxSize={26}
+              padding={1.5}
               overflow={'visible'}
               backgroundColor={'red.400'}
               _hover={{ backgroundColor: 'red.500' }}
@@ -89,7 +92,7 @@ function Item({
           justifyContent="space-between"
           p={4}
         >
-          <Text fontWeight={'bold'} fontSize={'lg'}>
+          <Text fontWeight={'bold'} fontSize={'lg'} isTruncated>
             {data.label}
           </Text>
 
@@ -123,16 +126,14 @@ export const ItemList = () => {
   } = useContext(BackgroundContext)
   const [filterBy, setFilterBy] = useState('')
 
-  const removeLoginCredential = (label: string) => {
+  const removeLoginCredential = (id: string) => {
     saveLoginCredentials(
-      LoginCredentials.filter((el) => el.label !== label) as ILoginSecret[]
+      LoginCredentials.filter((el) => el.id !== id) as ILoginSecret[]
     )
   }
 
-  const removeTOTPSecret = (label: string) => {
-    saveTOTPSecrets(
-      TOTPSecrets.filter((el) => el.label !== label) as ITOTPSecret[]
-    )
+  const removeTOTPSecret = (id: string) => {
+    saveTOTPSecrets(TOTPSecrets.filter((el) => el.id !== id) as ITOTPSecret[])
   }
 
   return (
@@ -156,7 +157,7 @@ export const ItemList = () => {
                 <Item
                   data={el as ITOTPSecret}
                   key={el.label + i}
-                  deleteItem={() => removeTOTPSecret(el.label)}
+                  deleteItem={() => removeTOTPSecret(el.id)}
                 />
               )
             })}
@@ -167,7 +168,7 @@ export const ItemList = () => {
                 <Item
                   key={el.label + i}
                   data={el as ILoginSecret}
-                  deleteItem={() => removeLoginCredential(el.label)}
+                  deleteItem={() => removeLoginCredential(el.id)}
                 />
               )
             })}

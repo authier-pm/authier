@@ -101,7 +101,7 @@ chrome.runtime.onMessage.addListener(async function (
         username: credentials.username,
         password: credentials.password
       }
-      bgState.addSecretOnBackend({
+      await bgState.addSecret({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
         loginCredentials: namePassPair,
         encrypted: bgState.encrypt(JSON.stringify(namePassPair)),
@@ -132,7 +132,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.addTOTPSecret:
       if (bgState) {
-        bgState.addSecretOnBackend(req.payload as ITOTPSecret)
+        bgState.addSecret(req.payload as ITOTPSecret)
       }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {

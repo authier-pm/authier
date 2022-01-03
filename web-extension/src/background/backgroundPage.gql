@@ -2,6 +2,12 @@ mutation addEncryptedSecret($payload: EncryptedSecretInput!) {
   me {
     addEncryptedSecret(payload: $payload) {
       id
+      kind
+      encrypted
+      url
+      iconUrl
+      label
+      version
     }
   }
 }

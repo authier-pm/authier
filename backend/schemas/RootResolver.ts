@@ -122,25 +122,12 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
+  @Query(() => UserQuery, { nullable: true })
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
-    nullable: true
+    nullable: false
   })
-  authenticatedMe(@Ctx() ctx: IContextAuthenticated) {
-    return prismaClient.user.findFirst({
-      where: {
-        id: ctx.jwtPayload?.userId
-      },
-      include: {
-        Devices: true,
-        EncryptedSecrets: true
-      }
-    })
-  }
-
-  @UseMiddleware(throwIfNotAuthenticated)
-  @Query(() => UserQuery, { nullable: true })
   async me(
     @Ctx() ctx: IContextAuthenticated,
     @Info() info: GraphQLResolveInfo

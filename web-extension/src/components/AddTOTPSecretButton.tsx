@@ -69,7 +69,7 @@ export function getTokenSecretFromQrCode(
   qr: QRCode,
   tab: Tabs.Tab,
   encrypt: (s: string) => string
-): ITOTPSecret {
+): Omit<ITOTPSecret, 'id'> {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {

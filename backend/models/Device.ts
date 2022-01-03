@@ -1,4 +1,4 @@
-import { GraphQLPositiveInt } from 'graphql-scalars'
+import { GraphQLPositiveInt, GraphQLUUID } from 'graphql-scalars'
 import { Field, GraphQLISODateTime, Ctx, ObjectType, Arg } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
@@ -67,7 +67,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   async reportSecretUsageEvent(
     @Ctx() ctx: IContext,
     @Arg('kind') kind: string,
-    @Arg('secretId', () => GraphQLPositiveInt) secretId: number,
+    @Arg('secretId', () => GraphQLUUID) secretId: string,
     @Arg('webInputId', () => GraphQLPositiveInt) webInputId: number
   ) {
     const res = await ctx.prisma.secretUsageEvent.create({
