@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int } from 'type-graphql'
 import { UserGQL } from './User'
 
 @ObjectType()

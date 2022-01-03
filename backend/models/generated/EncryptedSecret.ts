@@ -1,7 +1,7 @@
-import { Field, ID, ObjectType, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from '../types/EncryptedSecretType'
-import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { UserGQL } from './User'
+import { SecretUsageEventGQL } from './SecretUsageEvent'
 
 @ObjectType()
 export class EncryptedSecretGQLScalars {

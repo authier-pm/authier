@@ -47,7 +47,7 @@
     "jest": "^27.4.5",
     "mz": "^2.7.0",
     "nodemon": "^2.0.15",
-    "prisma-typegraphql-types-generator": "^1.5.10",
+    "prisma-typegraphql-types-generator": "^1.5.11",
     "sql-formatter": "^4.0.2",
     "sql-highlight": "^4.0.1",
     "ts-jest": "^27.1.2"

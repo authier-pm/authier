@@ -16104,10 +16104,10 @@ prettysize@^2.0.0:
   resolved "https://registry.yarnpkg.com/prettysize/-/prettysize-2.0.0.tgz#902c02480d865d9cc0813011c9feb4fa02ce6996"
   integrity sha512-VVtxR7sOh0VsG8o06Ttq5TrI1aiZKmC+ClSn4eBPaNf4SHr5lzbYW+kYGX3HocBL/MfpVrRfFZ9V3vCbLaiplg==
 
-prisma-typegraphql-types-generator@^1.5.10:
-  version "1.5.10"
-  resolved "https://registry.yarnpkg.com/prisma-typegraphql-types-generator/-/prisma-typegraphql-types-generator-1.5.10.tgz#47710ef55f03956136d669d61b7550c5d81e9e03"
-  integrity sha512-wWvSp7oDtfvM2ptHmPI7fa8Z4V0mF8kr0PfS3VsdJnlQYOPhe4ezbwMwMbmKKg7LJUvQvHvB/x4XDSowECJuwQ==
+prisma-typegraphql-types-generator@^1.5.11:
+  version "1.5.11"
+  resolved "https://registry.yarnpkg.com/prisma-typegraphql-types-generator/-/prisma-typegraphql-types-generator-1.5.11.tgz#1a8beb537ded1c532bc9e26c91e4a09f381a5195"
+  integrity sha512-ocjgOuLnMmMROg2sPa5HlJhOAeYnuXDmGZB9SyHfyfry5ljRwTMMBEzVV7KoopMqpihhhFV97BIn47eR7naXAQ==
   dependencies:
     "@prisma/client" "^3.6.0"
     "@prisma/generator-helper" "^3.6.0"

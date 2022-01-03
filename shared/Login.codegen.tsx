@@ -8,7 +8,7 @@ export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
 }>;
 
 
-export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeGQL', id: string, addDeviceSecretEncrypted: string, user: { __typename?: 'UserGQL', id: string } } | null | undefined };
+export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeGQL', id: number, addDeviceSecretEncrypted: string, user: { __typename?: 'UserGQL', id: string } } | null | undefined };
 
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   currentAddDeviceSecret: Types.Scalars['NonEmptyString'];

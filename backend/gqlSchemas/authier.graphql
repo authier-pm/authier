@@ -55,7 +55,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type TokenGQL {
-  id: ID!
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   type: TokenType!
@@ -155,7 +155,7 @@ enum EncryptedSecretType {
 }
 
 type WebInputGQL {
-  id: ID!
+  id: Int!
   layoutType: String
   createdAt: DateTime!
   url: String!
@@ -175,7 +175,7 @@ enum WebInputType {
 }
 
 type DecryptionChallengeGQL {
-  id: ID!
+  id: Int!
   masterPasswordVerifiedAt: DateTime
   approvedAt: DateTime
   userId: String!
@@ -199,7 +199,7 @@ type SettingsConfigGQL {
 }
 
 type TagGQL {
-  id: ID!
+  id: Int!
   name: String!
   createdAt: DateTime!
   userId: String!
@@ -207,7 +207,7 @@ type TagGQL {
 }
 
 type UserPaidProductsGQL {
-  id: ID!
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   expiresAt: DateTime

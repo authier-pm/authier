@@ -1,10 +1,10 @@
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ObjectType, Int } from 'type-graphql'
 import { UserGQL } from './User'
 import { DeviceGQL } from './Device'
 
 @ObjectType()
 export class DecryptionChallengeGQLScalars {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number
 
   @Field({ nullable: true })
