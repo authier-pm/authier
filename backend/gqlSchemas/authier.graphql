@@ -121,7 +121,7 @@ type SecretUsageEventGQL {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  secretId: Int!
+  secretId: String!
   url: String
   userId: String!
   deviceId: String!
@@ -265,7 +265,7 @@ type Mutation {
   """
   you need to be authenticated to call this resolver
   """
-  me: UserMutation
+  me: UserMutation!
   currentDevice: DeviceMutation!
   registerNewUser(userId: UUID!, input: RegisterDeviceInput!): LoginResponse!
   addNewDeviceForUser(
@@ -326,7 +326,8 @@ type UserMutation {
 
 input EncryptedSecretInput {
   kind: EncryptedSecretType!
-  url: String
+  url: String!
+  iconUrl: String
   iosUri: String
   androidUri: String
   label: String!
@@ -352,7 +353,7 @@ type DeviceMutation {
   markAsSynced: DateTime!
   reportSecretUsageEvent(
     webInputId: PositiveInt!
-    secretId: PositiveInt!
+    secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
 }
@@ -361,7 +362,7 @@ type SecretUsageEventGQLScalars {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  secretId: Int!
+  secretId: String!
   url: String
   userId: String!
   deviceId: String!
@@ -372,6 +373,11 @@ type SecretUsageEventGQLScalars {
 Integers that will have a value greater than 0.
 """
 scalar PositiveInt
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type LoginResponse {
   accessToken: String!
@@ -400,11 +406,6 @@ type UserAfterAuth {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
 
 input RegisterDeviceInput {
   email: EmailAddress!

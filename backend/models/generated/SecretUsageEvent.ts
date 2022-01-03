@@ -15,8 +15,8 @@ export class SecretUsageEventGQLScalars {
   @Field()
   timestamp: Date
 
-  @Field(() => Int)
-  secretId: number
+  @Field()
+  secretId: string
 
   @Field({ nullable: true })
   url?: string

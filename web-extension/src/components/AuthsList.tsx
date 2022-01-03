@@ -144,7 +144,6 @@ const LoginCredentialsListItem = ({
   const cancelRef = useRef()
 
   const { onCopy } = useClipboard(loginSecret.loginCredentials.password)
-  log('~ loginCredentials', loginSecret)
 
   return (
     <Flex key={loginSecret.url} p="3" rounded="md" bg="white" minW="300px">

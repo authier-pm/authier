@@ -6,7 +6,7 @@ import { UserGQL } from './User'
 @ObjectType()
 export class EncryptedSecretGQLScalars {
   @Field(() => ID)
-  id: number
+  id: string
 
   @Field()
   encrypted: string

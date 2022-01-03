@@ -23,7 +23,7 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 }>;
 
 
-export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me?: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'DeviceGQL', id: string } } | null | undefined };
+export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'DeviceGQL', id: string } } };
 
 
 export const SettingsDocument = gql`

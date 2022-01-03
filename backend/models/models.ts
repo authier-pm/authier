@@ -67,20 +67,23 @@ export class OTPEvent {
 
 @InputType()
 export class EncryptedSecretInput {
-  @Field(() => EncryptedSecretTypeGQL)
+  @Field(() => EncryptedSecretTypeGQL, { nullable: false })
   kind: EncryptedSecretTypeGQL
 
-  @Field(() => String, { nullable: true })
+  @Field(() => String, { nullable: false })
   url: string
 
   @Field(() => String, { nullable: true })
-  iosUri: string
+  iconUrl: string | null
 
   @Field(() => String, { nullable: true })
-  androidUri: string
+  iosUri: string | null
 
-  @Field(() => String)
+  @Field(() => String, { nullable: true })
+  androidUri: string | null
+
+  @Field(() => String, { nullable: false })
   label: string
-  @Field(() => String)
+  @Field(() => String, { nullable: false })
   encrypted: string
 }
