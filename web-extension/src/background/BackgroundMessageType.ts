@@ -1,4 +1,5 @@
 export enum BackgroundMessageType {
+  getFallbackUsernames = 'getFallbackUsernames',
   getBackgroundState = 'getBackgroundState',
   setBackgroundState = 'setBackgroundState',
   getFirebaseToken = 'getFirebaseToken',
