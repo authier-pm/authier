@@ -12,7 +12,7 @@ Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
 })
 
-browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+const renderVault = () => {
   ReactDOM.render(
     <HashRouter basename="/">
       <ApolloProvider client={apolloClient}>
@@ -21,6 +21,7 @@ browser.tabs.query({ active: true, currentWindow: true }).then(() => {
     </HashRouter>,
     document.getElementById('vault')
   )
-})
+}
+browser.tabs.query({ active: true, currentWindow: true }).then(renderVault)
 
 browser.runtime.connect({ name: 'vault' })

@@ -83,6 +83,15 @@ interface IBackgroundState extends IBackgroundStateSerializable {
 
 export let bgState: IBackgroundState | null = null
 
+const onStorageChange = async (
+  changes: Record<string, browser.Storage.StorageChange>,
+  areaName: string
+): Promise<void> => {
+  if (areaName === 'local' && changes.backgroundState) {
+    setBgState(changes.backgroundState.newValue)
+  }
+}
+
 export const setBgState = async (
   bgStateSerializable: IBackgroundStateSerializable
 ) => {
@@ -132,11 +141,11 @@ export const setBgState = async (
       return secretAdded
     }
   }
-
+  browser.storage.onChanged.removeListener(onStorageChange)
   await browser.storage.local.set({
     backgroundState: bgStateSerializable
   })
-
+  browser.storage.onChanged.addListener(onStorageChange)
   // @ts-expect-error
   window.bgState = bgState
 }
@@ -147,6 +156,8 @@ export const setBgState = async (
     setBgState(storage.backgroundState)
     log('bg init from storage', bgState)
   }
+
+  browser.storage.onChanged.addListener(onStorageChange)
 })()
 
 export const clearBgState = () => {

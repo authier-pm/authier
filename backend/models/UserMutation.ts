@@ -1,5 +1,5 @@
 import { prismaClient } from '../prismaClient'
-import { Arg, Ctx, Field, Info, Int, ObjectType } from 'type-graphql'
+import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import {
   EncryptedSecretMutation,
@@ -12,7 +12,6 @@ import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
-import { GraphQLUUID } from 'graphql-scalars'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
 @ObjectType()
@@ -56,11 +55,11 @@ export class UserMutation extends UserBase {
 
   @Field(() => EncryptedSecretMutation)
   async encryptedSecret(
-    @Arg('id', () => GraphQLUUID) id: string,
+    @Arg('id', () => ID) id: string,
     @Ctx() ctx: IContextAuthenticated,
     @Info() info: GraphQLResolveInfo
   ) {
-    return ctx.prisma.user.findUnique({
+    return ctx.prisma.encryptedSecret.findUnique({
       where: { id },
       include: getPrismaRelationsFromInfo(info)
     })
