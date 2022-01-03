@@ -33,7 +33,7 @@ import { toast } from 'react-toastify'
 import { BackgroundContext } from '@src/providers/BackgroundProvider'
 import browser from 'webextension-polyfill'
 
-import { device } from '@src/background/Device'
+import { device } from '@src/background/ExtensionDevice'
 
 import { ISecret } from '@src/util/useBackgroundState'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
