@@ -5,7 +5,6 @@ import {
 } from '@src/util/useBackgroundState'
 import {
   bgState,
-  clearBgState,
   fireToken,
   setBgState,
   lockTime,
@@ -179,10 +178,6 @@ chrome.runtime.onMessage.addListener(async function (
       })
       break
 
-    case BackgroundMessageType.clear:
-      clearBgState()
-      break
-
     case BackgroundMessageType.securitySettings:
       setLockTime(req.settings.vaultLockTime)
 
@@ -221,7 +216,6 @@ browser.runtime.onConnect.addListener(function (externalPort) {
 
       safeClosed = true
 
-      clearBgState()
       chrome.runtime.sendMessage({ safe: 'closed' })
       console.log('locked', safeClosed)
     }, lockTime)

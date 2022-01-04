@@ -62,7 +62,7 @@ if ('serviceWorker' in navigator) {
   log('No service-worker on this browser')
 }
 
-type SecretSerializedType = Pick<
+export type SecretSerializedType = Pick<
   EncryptedSecretGql,
   'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'
 >
@@ -70,6 +70,7 @@ type SecretSerializedType = Pick<
 export interface IBackgroundStateSerializable {
   email: string
   userId: string
+  fireToken: string
   masterPassword: string
   secrets: Array<SecretSerializedType>
 }
@@ -96,50 +97,7 @@ export const setBgState = async (
   bgStateSerializable: IBackgroundStateSerializable
 ) => {
   bgState = {
-    ...bgStateSerializable,
-    encrypt(stringToEncrypt: string) {
-      return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
-        iv: cryptoJS.enc.Utf8.parse(this.userId)
-      }).toString()
-    },
-
-    /**
-     * invokes the backend mutation and pushes the new secret to the bgState
-     * @param secret
-     * @returns the added secret
-     */
-    async addSecret(secret) {
-      const stringToEncrypt =
-        secret.kind === EncryptedSecretType.TOTP
-          ? secret.totp
-          : JSON.stringify(secret.loginCredentials)
-
-      const encrypted = this.encrypt(stringToEncrypt)
-
-      const { data } = await apolloClient.mutate<
-        AddEncryptedSecretMutation,
-        AddEncryptedSecretMutationVariables
-      >({
-        mutation: AddEncryptedSecretDocument,
-        variables: {
-          payload: {
-            encrypted,
-            kind: secret.kind,
-            label: secret.label,
-            iconUrl: secret.iconUrl,
-            url: secret.url
-          }
-        }
-      })
-      if (!data) {
-        throw new Error('failed to save secret')
-      }
-      log('saved secret to the backend', secret)
-      const secretAdded = data.me.addEncryptedSecret
-
-      bgState?.secrets.push(secretAdded)
-      return secretAdded
-    }
+    ...bgStateSerializable
   }
   browser.storage.onChanged.removeListener(onStorageChange)
   await browser.storage.local.set({
@@ -159,10 +117,6 @@ export const setBgState = async (
 
   browser.storage.onChanged.addListener(onStorageChange)
 })()
-
-export const clearBgState = () => {
-  bgState = null
-}
 
 export let lockTime = 10000 * 60 * 60 * 8
 export let fireToken = ''
