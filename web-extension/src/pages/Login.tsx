@@ -81,12 +81,13 @@ export default function Login(): ReactElement {
           const userId =
             decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
 
-          if (!decryptionChallenge.data?.deviceDecryptionChallenge?.id) {
-            toast.error('failed')
-            return
-          }
           if (!addDeviceSecretEncrypted || !userId) {
             toast.error(t`Login failed, check your username`)
+            return
+          }
+
+          if (!decryptionChallenge.data?.deviceDecryptionChallenge?.id) {
+            toast.error('failed to create decryption challenge')
             return
           }
 

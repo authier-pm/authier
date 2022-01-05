@@ -22,7 +22,7 @@ import { UserContext } from '../providers/UserProvider'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
-import { device } from '@src/background/ExtensionDevice'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
 import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
@@ -37,7 +37,6 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterNewUserMutation()
 
-  const { deviceLogin } = useContext(DeviceStateContext)
   // console.log('~ fireToken', fireToken)
   const { fireToken } = device
   if (!fireToken) {
@@ -84,14 +83,15 @@ export default function Register(): ReactElement {
             })
             setAccessToken(registerResult.accessToken as string)
 
-            const bgState: IBackgroundStateSerializable = {
+            const deviceState: IBackgroundStateSerializable = {
               masterPassword: values.password,
               userId: userId,
               secrets: [],
               email: values.email
             }
 
-            deviceLogin(bgState)
+            device.state = new DeviceState(deviceState)
+            device.state.save()
 
             setSubmitting(false)
           }

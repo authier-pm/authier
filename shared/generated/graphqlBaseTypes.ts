@@ -260,7 +260,7 @@ export type QueryWebInputsArgs = {
 export type RegisterDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
-  decryptionChallengeId: Scalars['PositiveInt']
+  decryptionChallengeId?: InputMaybe<Scalars['PositiveInt']>
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']
   email: Scalars['EmailAddress']

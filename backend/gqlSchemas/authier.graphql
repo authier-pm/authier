@@ -437,7 +437,7 @@ input RegisterDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
-  decryptionChallengeId: PositiveInt!
+  decryptionChallengeId: PositiveInt
 }
 
 """
