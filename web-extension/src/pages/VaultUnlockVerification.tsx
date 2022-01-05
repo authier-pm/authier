@@ -29,7 +29,7 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { deviceLogin, deviceState } = useContext(DeviceStateContext)
+  const { deviceState } = useContext(DeviceStateContext)
 
   if (!deviceState) {
     return null

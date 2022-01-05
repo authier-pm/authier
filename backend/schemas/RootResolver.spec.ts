@@ -13,7 +13,8 @@ const makeInput = () => ({
   deviceId: faker.datatype.uuid(),
   firebaseToken: faker.datatype.uuid(),
   addDeviceSecret: faker.datatype.string(5),
-  addDeviceSecretEncrypted: faker.datatype.string(5)
+  addDeviceSecretEncrypted: faker.datatype.string(5),
+  decryptionChallengeId: faker.random.number()
 })
 
 describe('RootResolver', () => {
@@ -237,12 +238,16 @@ describe('RootResolver', () => {
         }
       })
 
-      let data = await resolver.deviceDecryptionChallenge(fakeData.email, {
-        reply: { setCookie: jest.fn() },
-        request: { headers: {} },
-        jwtPayload: { userId: userId },
-        getIpAddress: () => faker.internet.ip()
-      } as any)
+      let data = await resolver.deviceDecryptionChallenge(
+        fakeData.email,
+        faker.datatype.uuid(),
+        {
+          reply: { setCookie: jest.fn() },
+          request: { headers: {} },
+          jwtPayload: { userId: userId },
+          getIpAddress: () => faker.internet.ip()
+        } as any
+      )
 
       expect(data?.addDeviceSecretEncrypted).toBe(
         fakeData.addDeviceSecretEncrypted
@@ -275,12 +280,16 @@ describe('RootResolver', () => {
       })
 
       expect(async () => {
-        await resolver.deviceDecryptionChallenge(fakeData.email, {
-          reply: { setCookie: jest.fn() },
-          request: { headers: {} },
-          jwtPayload: { userId: userId },
-          getIpAddress: () => faker.internet.ip()
-        } as any)
+        await resolver.deviceDecryptionChallenge(
+          fakeData.email,
+          faker.datatype.uuid(),
+          {
+            reply: { setCookie: jest.fn() },
+            request: { headers: {} },
+            jwtPayload: { userId: userId },
+            getIpAddress: () => faker.internet.ip()
+          } as any
+        )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
   })

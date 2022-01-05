@@ -20,6 +20,6 @@ export class RegisterDeviceInput {
   addDeviceSecret: string
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecretEncrypted: string
-  @Field(() => GraphQLPositiveInt)
+  @Field(() => GraphQLPositiveInt, { nullable: true })
   decryptionChallengeId: number
 }

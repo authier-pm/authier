@@ -42,7 +42,13 @@ import {
 import debug from 'debug'
 import { RegisterDeviceInput } from '../models/AuthInputs'
 
-import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
+import {
+  DecryptionChallenge,
+  Device,
+  prisma,
+  User,
+  WebInput
+} from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
 import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
@@ -289,14 +295,23 @@ export class RootResolver {
       name: deviceName,
       userId: user.id
     }
-    const device = await prismaClient.device.upsert({
-      where: { id: deviceId },
-      create: deviceData,
-      update: {
-        ...deviceData,
-        logoutAt: null
-      }
+    let device = await prismaClient.device.findUnique({
+      // TODO change this to create
+      where: { id: deviceId }
     })
+
+    if (device) {
+      if (device.userId !== user.id) {
+        throw new GraphqlError('Device is already registered for another user')
+      }
+
+      device = await ctx.prisma.device.update({
+        data: { logoutAt: null },
+        where: { id: device.id }
+      })
+    } else {
+      device = await ctx.prisma.device.create({ data: deviceData })
+    }
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device.id,
