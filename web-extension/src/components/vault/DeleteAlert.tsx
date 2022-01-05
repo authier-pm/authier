@@ -34,7 +34,7 @@ export function DeleteAlert({
         <AlertDialogOverlay />
 
         <AlertDialogContent>
-          <AlertDialogHeader>Discard Changes?</AlertDialogHeader>
+          <AlertDialogHeader>Delete confirmation</AlertDialogHeader>
           <AlertDialogCloseButton />
           <AlertDialogBody fontSize={20}>
             Are you sure you want to delete this item?

@@ -29,9 +29,9 @@ model DecryptionChallenge {
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
   deviceId                 String?   @db.Uuid
-  device                   Device?   @relation("device", fields: [deviceId], references: [id])
-  approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
-  approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+
+  approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
+  approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
 }
 
 model Device {
@@ -58,7 +58,6 @@ model Device {
 
   SecretUsageEvents SecretUsageEvent[]
 
-  DeviceDecryptionChallenges         DecryptionChallenge[] @relation("device")
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
   @@index([updatedAt])
   @@index([lastSyncAt])
@@ -77,12 +76,13 @@ model SettingsConfig {
 
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
-  id         Int                 @id @default(autoincrement())
+  id         String              @id @default(uuid()) @db.Uuid
   encrypted  String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
   version    Int
   kind       EncryptedSecretType
   createdAt  DateTime            @default(now())
   updatedAt  DateTime?           @updatedAt
+  deletedAt  DateTime?
   //uniqueFiled String               @unique
   url        String? // should always be location.hostname, we autofill inputs based on WebInput where we store the path too
   androidUri String?
@@ -106,7 +106,7 @@ model SecretUsageEvent {
   id          BigInt          @id @default(autoincrement())
   kind        String
   timestamp   DateTime        @default(now())
-  secretId    Int
+  secretId    String          @db.Uuid
   Secret      EncryptedSecret @relation(fields: [secretId], references: [id])
   // @skip
   ipAddress   String          @db.Inet

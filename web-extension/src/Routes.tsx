@@ -2,19 +2,20 @@ import { Flex, Spinner } from '@chakra-ui/react'
 import React, { ReactElement, useContext, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 import AuthPages from './AuthPages'
+import { device } from './background/ExtensionDevice'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
-import { BackgroundContext } from './providers/BackgroundProvider'
+import { DeviceStateContext } from './providers/DeviceStateProvider'
 
 export default function Routes(): ReactElement {
-  const { backgroundState } = useContext(BackgroundContext)
-  console.log('~ backgroundState', backgroundState)
+  const { deviceState } = useContext(DeviceStateContext)
+  console.log('~ backgroundState', deviceState)
 
-  if (!backgroundState) {
-    return <AuthPages />
-  }
-  if (!backgroundState.masterPassword && backgroundState.userId) {
+  if (device.lockedState) {
     return <VaultUnlockVerification />
+  }
+  if (!deviceState) {
+    return <AuthPages />
   }
 
   return <Popup />

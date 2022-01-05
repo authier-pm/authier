@@ -1,7 +1,7 @@
 import jwtDecode from 'jwt-decode'
 import browser from 'webextension-polyfill'
 
-export let accessToken = ''
+export let accessToken: string | null = null
 export let getTokenFromLocalStorage = async (): Promise<string> => {
   const storage = await browser.storage.local.get('access-token')
   return storage['access-token']
@@ -19,10 +19,9 @@ export const removeToken = async () => {
   accessToken = ''
 }
 
-export const getAccessToken = () => {
-  return accessToken
-}
-
 export const getUserFromToken = async () => {
   return jwtDecode<{ userId: string }>(await getTokenFromLocalStorage())
 }
+;(async () => {
+  accessToken = await getTokenFromLocalStorage()
+})()

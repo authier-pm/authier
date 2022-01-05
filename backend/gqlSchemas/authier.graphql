@@ -55,7 +55,7 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 scalar DateTime
 
 type TokenGQL {
-  id: ID!
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   type: TokenType!
@@ -113,7 +113,6 @@ type DeviceGQL {
   User: UserGQL!
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
-  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
 }
 
@@ -121,7 +120,7 @@ type SecretUsageEventGQL {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  secretId: Int!
+  secretId: String!
   url: String
   userId: String!
   deviceId: String!
@@ -139,6 +138,7 @@ type EncryptedSecretGQL {
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   url: String
   androidUri: String
   iosUri: String
@@ -155,7 +155,7 @@ enum EncryptedSecretType {
 }
 
 type WebInputGQL {
-  id: ID!
+  id: Int!
   layoutType: String
   createdAt: DateTime!
   url: String!
@@ -175,7 +175,7 @@ enum WebInputType {
 }
 
 type DecryptionChallengeGQL {
-  id: ID!
+  id: Int!
   masterPasswordVerifiedAt: DateTime
   approvedAt: DateTime
   userId: String!
@@ -183,7 +183,6 @@ type DecryptionChallengeGQL {
   deviceId: String
   approvedFromDeviceId: String
   user: UserGQL!
-  device: DeviceGQL
   approvedFromDevice: DeviceGQL
   addDeviceSecretEncrypted: String!
 }
@@ -199,7 +198,7 @@ type SettingsConfigGQL {
 }
 
 type TagGQL {
-  id: ID!
+  id: Int!
   name: String!
   createdAt: DateTime!
   userId: String!
@@ -207,7 +206,7 @@ type TagGQL {
 }
 
 type UserPaidProductsGQL {
-  id: ID!
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   expiresAt: DateTime
@@ -236,7 +235,6 @@ type DeviceQuery {
   User: UserGQL!
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
-  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
   lastGeoLocation: String!
@@ -249,6 +247,7 @@ type EncryptedSecretQuery {
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   url: String
   androidUri: String
   iosUri: String
@@ -265,7 +264,7 @@ type Mutation {
   """
   you need to be authenticated to call this resolver
   """
-  me: UserMutation
+  me: UserMutation!
   currentDevice: DeviceMutation!
   registerNewUser(userId: UUID!, input: RegisterDeviceInput!): LoginResponse!
   addNewDeviceForUser(
@@ -276,7 +275,10 @@ type Mutation {
   """
   returns a decryption challenge
   """
-  deviceDecryptionChallenge(email: EmailAddress!): DecryptionChallengeGQL
+  deviceDecryptionChallenge(
+    deviceId: UUID!
+    email: EmailAddress!
+  ): DecryptionChallengeGQL
 
   """
   removes current device
@@ -312,6 +314,7 @@ type UserMutation {
     deviceId: String!
     name: String!
   ): DeviceGQL!
+  encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
@@ -324,9 +327,30 @@ type UserMutation {
   approveDevice(success: Boolean!): Boolean!
 }
 
+type EncryptedSecretMutation {
+  id: ID!
+  encrypted: String!
+  version: Int!
+  kind: EncryptedSecretType!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  deletedAt: DateTime
+  url: String
+  androidUri: String
+  iosUri: String
+  iconUrl: String
+  label: String!
+  userId: String!
+  user: UserGQL!
+  SecretUsageEvent: [SecretUsageEventGQL!]!
+  update(payload: EncryptedSecretInput!): EncryptedSecretGQL!
+  delete: EncryptedSecretGQL!
+}
+
 input EncryptedSecretInput {
   kind: EncryptedSecretType!
-  url: String
+  url: String!
+  iconUrl: String
   iosUri: String
   androidUri: String
   label: String!
@@ -352,7 +376,7 @@ type DeviceMutation {
   markAsSynced: DateTime!
   reportSecretUsageEvent(
     webInputId: PositiveInt!
-    secretId: PositiveInt!
+    secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
 }
@@ -361,7 +385,7 @@ type SecretUsageEventGQLScalars {
   id: ID!
   kind: String!
   timestamp: DateTime!
-  secretId: Int!
+  secretId: String!
   url: String
   userId: String!
   deviceId: String!
@@ -372,6 +396,11 @@ type SecretUsageEventGQLScalars {
 Integers that will have a value greater than 0.
 """
 scalar PositiveInt
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type LoginResponse {
   accessToken: String!
@@ -401,11 +430,6 @@ type UserAfterAuth {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
 
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
 input RegisterDeviceInput {
   email: EmailAddress!
   deviceName: String!
@@ -413,6 +437,7 @@ input RegisterDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
+  decryptionChallengeId: PositiveInt
 }
 
 """

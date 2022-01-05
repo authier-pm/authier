@@ -7,8 +7,8 @@ import {
   Spinner,
   Divider
 } from '@chakra-ui/react'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { ISecuritySettings } from '@src/util/useBackgroundState'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { ISecuritySettings } from '@src/util/useDeviceState'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import React, { useContext } from 'react'
 import Select from 'react-select'
@@ -25,7 +25,7 @@ export const vaultLockTimeOptions = [
 ]
 
 export const SecuritySettings = ({}: Props) => {
-  const { setSecuritySettings } = useContext(BackgroundContext)
+  const { setSecuritySettings } = useContext(DeviceStateContext)
 
   const { data, loading } = useSecuritySettingsQuery()
   if (loading) {

@@ -1,4 +1,4 @@
-import { Field, ID, ObjectType, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int } from 'type-graphql'
 import { TokenGQL } from './Token'
 import { DeviceGQL } from './Device'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
@@ -8,7 +8,6 @@ import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
-import { ConstructorAssigner } from '../../utils/ConstructorAssigner'
 
 @ObjectType()
 export class UserGQLScalars {

@@ -1,10 +1,10 @@
 import React, { ReactElement, useContext } from 'react'
-import { Vault } from './pages-vault/Vault'
+import { VaultRouter } from './pages-vault/VaultRouter'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
-import { BackgroundContext } from './providers/BackgroundProvider'
+import { DeviceStateContext } from './providers/DeviceStateProvider'
 
 export function VaultRoutes(): ReactElement {
-  const { backgroundState } = useContext(BackgroundContext)
+  const { deviceState } = useContext(DeviceStateContext)
 
-  return <Vault />
+  return <VaultRouter />
 }
