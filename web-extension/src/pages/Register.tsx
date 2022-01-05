@@ -10,6 +10,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
   Text
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -19,7 +20,7 @@ import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
 import { device } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
@@ -36,9 +37,12 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterNewUserMutation()
 
-  const { fireToken } = useContext(UserContext)
-  const { deviceLogin } = useContext(BackgroundContext)
+  const { deviceLogin } = useContext(DeviceStateContext)
   // console.log('~ fireToken', fireToken)
+  const { fireToken } = device
+  if (!fireToken) {
+    return <Spinner />
+  }
 
   if (registerError) {
     console.log(registerError)

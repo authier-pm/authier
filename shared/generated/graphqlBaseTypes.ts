@@ -35,7 +35,6 @@ export type DecryptionChallengeGql = {
   approvedFromDevice?: Maybe<DeviceGql>
   approvedFromDeviceId?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
-  device?: Maybe<DeviceGql>
   deviceId?: Maybe<Scalars['String']>
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
@@ -45,7 +44,6 @@ export type DecryptionChallengeGql = {
 
 export type DeviceGql = {
   __typename?: 'DeviceGQL'
-  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
@@ -96,7 +94,6 @@ export type DeviceMutationReportSecretUsageEventArgs = {
 
 export type DeviceQuery = {
   __typename?: 'DeviceQuery'
-  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
@@ -125,6 +122,7 @@ export type EncryptedSecretGql = {
   SecretUsageEvent: Array<SecretUsageEventGql>
   androidUri?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
+  deletedAt?: Maybe<Scalars['DateTime']>
   encrypted: Scalars['String']
   iconUrl?: Maybe<Scalars['String']>
   id: Scalars['ID']
@@ -154,6 +152,7 @@ export type EncryptedSecretMutation = {
   androidUri?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
   delete: EncryptedSecretGql
+  deletedAt?: Maybe<Scalars['DateTime']>
   encrypted: Scalars['String']
   iconUrl?: Maybe<Scalars['String']>
   id: Scalars['ID']
@@ -177,6 +176,7 @@ export type EncryptedSecretQuery = {
   SecretUsageEvent: Array<SecretUsageEventGql>
   androidUri?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
+  deletedAt?: Maybe<Scalars['DateTime']>
   encrypted: Scalars['String']
   iconUrl?: Maybe<Scalars['String']>
   id: Scalars['ID']
@@ -226,6 +226,7 @@ export type MutationAddWebInputsArgs = {
 }
 
 export type MutationDeviceDecryptionChallengeArgs = {
+  deviceId: Scalars['UUID']
   email: Scalars['EmailAddress']
 }
 
@@ -259,6 +260,7 @@ export type QueryWebInputsArgs = {
 export type RegisterDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
+  decryptionChallengeId: Scalars['PositiveInt']
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']
   email: Scalars['EmailAddress']

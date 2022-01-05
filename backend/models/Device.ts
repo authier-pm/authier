@@ -52,15 +52,16 @@ export class DeviceQuery extends DeviceGQL {
 export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => GraphQLISODateTime)
   async markAsSynced(@Ctx() ctx: IContext) {
+    const syncedAt = new Date()
     const res = await ctx.prisma.device.update({
       data: {
-        lastSyncAt: new Date()
+        lastSyncAt: syncedAt
       },
       where: {
         id: this.id
       }
     })
-    return res
+    return syncedAt
   }
 
   @Field(() => SecretUsageEventGQLScalars)

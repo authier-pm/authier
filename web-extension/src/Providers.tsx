@@ -10,13 +10,13 @@ import { ToastContainer } from 'react-toastify' // use react-toastify instead of
 import 'react-toastify/dist/ReactToastify.css'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
-import { BackgroundProvider } from './providers/BackgroundProvider'
+import { DeviceStateProvider } from './providers/DeviceStateProvider'
 import { VaultRoutes } from './VaultRoutes'
 
 export default function Providers({ parent }: { parent: string }) {
   return (
     <ChakraProvider theme={chakraCustomTheme}>
-      <BackgroundProvider>
+      <DeviceStateProvider>
         <UserProvider>
           <I18nProvider i18n={i18n}>
             <ToastContainer {...toastifyConfig} />
@@ -24,7 +24,7 @@ export default function Providers({ parent }: { parent: string }) {
             {parent === 'vault' ? <VaultRoutes /> : <Routes />}
           </I18nProvider>
         </UserProvider>
-      </BackgroundProvider>
+      </DeviceStateProvider>
     </ChakraProvider>
   )
 }

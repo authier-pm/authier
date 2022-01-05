@@ -5,6 +5,7 @@ import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
+  deviceId: Types.Scalars['UUID'];
 }>;
 
 
@@ -16,12 +17,12 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number }> } } };
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, iconUrl?: string | null | undefined, url?: string | null | undefined, label: string, version: number }> } } };
 
 
 export const DeviceDecryptionChallengeDocument = gql`
-    mutation deviceDecryptionChallenge($email: EmailAddress!) {
-  deviceDecryptionChallenge(email: $email) {
+    mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
+  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
     id
     addDeviceSecretEncrypted
     user {
@@ -46,6 +47,7 @@ export type DeviceDecryptionChallengeMutationFn = Apollo.MutationFunction<Device
  * const [deviceDecryptionChallengeMutation, { data, loading, error }] = useDeviceDecryptionChallengeMutation({
  *   variables: {
  *      email: // value for 'email'
+ *      deviceId: // value for 'deviceId'
  *   },
  * });
  */
@@ -66,10 +68,12 @@ export const AddNewDeviceForUserDocument = gql`
     user {
       EncryptedSecrets {
         id
-        kind
         encrypted
-        url
+        kind
+        createdAt
+        updatedAt
         iconUrl
+        url
         label
         version
       }

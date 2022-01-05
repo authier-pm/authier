@@ -4,9 +4,10 @@ import Bowser from 'bowser'
 import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import { removeToken } from '@src/util/accessTokenExtension'
-import { renderPopup } from '..'
 import {
+  generateFireToken,
   IBackgroundStateSerializable,
+  IBackgroundStateSerializableLocked,
   SecretSerializedType
 } from './backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
@@ -16,6 +17,15 @@ import {
   AddEncryptedSecretMutation,
   AddEncryptedSecretMutationVariables
 } from './backgroundPage.codegen'
+import {
+  SyncEncryptedSecretsDocument,
+  SyncEncryptedSecretsQuery,
+  SyncEncryptedSecretsQueryVariables,
+  MarkAsSyncedMutation,
+  MarkAsSyncedMutationVariables,
+  MarkAsSyncedDocument
+} from './ExtensionDevice.codegen'
+import { renderPopup } from '..'
 
 export const log = debug('au:Device')
 
@@ -27,14 +37,15 @@ function getRandomInt(min: number, max: number) {
 
 const browserInfo = Bowser.getParser(navigator.userAgent)
 
-class DeviceState {
+export class DeviceState {
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
+    log('device state created', this)
+
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
   email: string
   userId: string
-  fireToken: string
   masterPassword: string
   secrets: Array<SecretSerializedType>
   lockTime = 10000 * 60 * 60 * 8
@@ -52,6 +63,57 @@ class DeviceState {
     return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
     }).toString()
+  }
+  decrypt(encrypted: string) {
+    return cryptoJS.AES.decrypt(encrypted, this.masterPassword, {
+      iv: cryptoJS.enc.Utf8.parse(this.userId)
+    }).toString(cryptoJS.enc.Utf8)
+  }
+
+  async save() {
+    browser.storage.onChanged.removeListener(this.onStorageChange)
+    await browser.storage.local.set({ backgroundState: this })
+    browser.storage.onChanged.addListener(this.onStorageChange)
+  }
+
+  /**
+   * fetches newly added/deleted/updated secrets from the backend and updates the device state
+   */
+  async backendSync() {
+    const { data } = await apolloClient.query<
+      SyncEncryptedSecretsQuery,
+      SyncEncryptedSecretsQueryVariables
+    >({
+      query: SyncEncryptedSecretsDocument
+    })
+    if (data) {
+      const deviceState = device.state
+      if (data && deviceState) {
+        const removedSecrets = data.currentDevice.encryptedSecretsToSync.filter(
+          ({ deletedAt }) => deletedAt
+        )
+        const newAndUpdatedSecrets =
+          data.currentDevice.encryptedSecretsToSync.filter(
+            ({ deletedAt }) => !deletedAt
+          )
+
+        const oldSecretsWithoutRemoved = deviceState.secrets.filter(
+          ({ id }) =>
+            !removedSecrets.find((removedSecret) => id === removedSecret.id)
+        )
+        deviceState.secrets = [
+          ...oldSecretsWithoutRemoved,
+          ...newAndUpdatedSecrets
+        ]
+
+        await this.save()
+
+        await apolloClient.mutate<
+          MarkAsSyncedMutation,
+          MarkAsSyncedMutationVariables
+        >({ mutation: MarkAsSyncedDocument })
+      }
+    }
   }
 
   /**
@@ -89,19 +151,43 @@ class DeviceState {
     const secretAdded = data.me.addEncryptedSecret
 
     this.secrets.push(secretAdded)
+    await this.save()
     return secretAdded
   }
 }
 
 class ExtensionDevice {
   state: DeviceState | null = null
+  fireToken: string | null = null
+  lockedState: IBackgroundStateSerializableLocked
+
+  /**
+   * runs on startup
+   */
   async initialize() {
+    let storedState = null
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
-      this.state = new DeviceState(storage.backgroundState)
-
-      log('device state init from storage', this.state)
+      storedState = storage.backgroundState
+      log('device state init from storage', storedState)
+    } else {
+      log('device state not found in storage')
     }
+
+    this.state = storedState ? new DeviceState(storedState) : null
+
+    const fireToken = await generateFireToken()
+    console.log('~ fireToken', fireToken)
+    this.fireToken = fireToken
+
+    this.rerenderViews()
+  }
+
+  rerenderViews() {
+    renderPopup()
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.rerenderViews
+    })
   }
 
   generateDeviceName(): string {
@@ -156,16 +242,30 @@ class ExtensionDevice {
     }
   }
 
+  async lock() {
+    if (!this.state) {
+      return
+    }
+    log('locking device')
+
+    const { email, userId, secrets } = this.state
+
+    this.lockedState = { email, userId, secrets }
+    this.state = null
+    this.rerenderViews()
+  }
+
   async logout() {
     await removeToken()
     await device.clearLocalStorage()
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.clear
-    })
 
-    renderPopup()
+    this.rerenderViews()
   }
 }
 
 export const device = new ExtensionDevice()
+
 device.initialize()
+
+// @ts-expect-error
+window.extensionDevice = device

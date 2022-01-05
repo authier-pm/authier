@@ -21,6 +21,9 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
 
   @Field(() => EncryptedSecretGQL)
   delete(@Ctx() ctx: IContextAuthenticated) {
-    return ctx.prisma.encryptedSecret.delete({ where: { id: this.id } })
+    return ctx.prisma.encryptedSecret.update({
+      where: { id: this.id },
+      data: { deletedAt: new Date() }
+    })
   }
 }

@@ -35,16 +35,12 @@ import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
-import {
-  ILoginSecret,
-  ITOTPSecret,
-  useBackgroundState
-} from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { UIOptions } from './setting-screens/SettingsForm'
 import RemoveAlertDialog from './RemoveAlertDialog'
 
 import { UserContext } from '@src/providers/UserProvider'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 const log = debug('au:AuthsList')
@@ -138,7 +134,6 @@ const LoginCredentialsListItem = ({
 }: {
   loginSecret: ILoginSecret
 }) => {
-  const { backgroundState } = useContext(BackgroundContext)
   const [isOpen, setIsOpen] = useState(false)
   const cancelRef = useRef()
 
@@ -180,8 +175,8 @@ const LoginCredentialsListItem = ({
   )
 }
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const { backgroundState, TOTPSecrets, LoginCredentials } =
-    useContext(BackgroundContext)
+  const { deviceState, TOTPSecrets, LoginCredentials } =
+    useContext(DeviceStateContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
   // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
@@ -194,7 +189,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     })
   }, [])
 
-  if (!backgroundState) {
+  if (!deviceState) {
     return null
   }
 
@@ -211,7 +206,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     return extractHostname(url) === extractHostname(currentTabUrl)
   })
 
-  const hasNoSecrets = backgroundState.secrets.length === 0
+  const hasNoSecrets = deviceState.secrets.length === 0
   return (
     <>
       {/* <Flex justifyContent="space-evenly">

@@ -18,7 +18,7 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 
@@ -29,9 +29,9 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { deviceLogin, backgroundState } = useContext(BackgroundContext)
+  const { deviceLogin, deviceState } = useContext(DeviceStateContext)
 
-  if (!backgroundState) {
+  if (!deviceState) {
     return null
   }
 

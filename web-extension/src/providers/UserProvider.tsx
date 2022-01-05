@@ -12,14 +12,13 @@ import React, {
   useContext
 } from 'react'
 import browser from 'webextension-polyfill'
-import { BackgroundContext } from './BackgroundProvider'
+import { DeviceStateContext } from './DeviceStateProvider'
 const { AES, enc } = cryptoJS
 
 export type IUserContext = {
   setUserId: Dispatch<SetStateAction<string | undefined>>
   userId: string | undefined
   localStorage: any
-  fireToken: string
 }
 
 // const onMessageListener = () =>
@@ -37,20 +36,9 @@ export type IUserContext = {
 export const UserContext = createContext<IUserContext>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
-  const { backgroundState } = useContext(BackgroundContext)
+  const { deviceState } = useContext(DeviceStateContext)
   const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
-  const [fireToken, setFireToken] = useState<string>('')
-
-  // useEffect(() => {
-  //   chrome.runtime.sendMessage({
-  //     action: BackgroundMessageType.setUserIdAndMasterPassword,
-  //     payload: {
-  //       userId,
-  //       masterPassword
-  //     }
-  //   })
-  // }, [masterPassword, userId])
 
   useEffect(() => {
     async function checkStorage() {
@@ -59,13 +47,6 @@ export const UserProvider: FunctionComponent = ({ children }) => {
       return storage
     }
     checkStorage()
-
-    chrome.runtime.sendMessage(
-      { action: BackgroundMessageType.getFirebaseToken },
-      (res: { t: string }) => {
-        setFireToken(res.t)
-      }
-    )
 
     async function getId() {
       try {
@@ -86,8 +67,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
   const value = {
     setUserId,
     userId,
-    localStorage,
-    fireToken
+    localStorage
   }
   console.log(value)
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>

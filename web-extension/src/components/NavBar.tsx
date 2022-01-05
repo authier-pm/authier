@@ -12,8 +12,9 @@ import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdRefreshCircle, IoMdArchive } from 'react-icons/io'
-import { useSyncEncryptedSecretsLazyQuery } from './NavBar.codegen'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { device } from '@src/background/ExtensionDevice'
+import { toast } from 'react-toastify'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -26,7 +27,7 @@ export const NavBar: FunctionComponent = () => {
     onOpen: onUserMenuOpen,
     onClose: onUserMenuClose
   } = useDisclosure()
-
+  const [isSyncing, setIsSyncing] = useState(false)
   const [location, setLocation] = useLocation()
   console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
@@ -43,21 +44,6 @@ export const NavBar: FunctionComponent = () => {
       </Link>
     )
   }
-  const { deviceLogin: initEncryptedSecrets, backgroundState } =
-    useContext(BackgroundContext)
-
-  const [getEncryptedSecretsToSync, { data }] =
-    useSyncEncryptedSecretsLazyQuery()
-
-  useEffect(() => {
-    if (data && backgroundState) {
-      console.log(data)
-      initEncryptedSecrets({
-        ...backgroundState,
-        secrets: data.currentDevice.encryptedSecretsToSync
-      })
-    }
-  }, [data])
 
   useEffect(() => {
     SetLastPage(location)
@@ -101,8 +87,12 @@ export const NavBar: FunctionComponent = () => {
             ml="2"
             aria-label="menu"
             icon={<IoMdRefreshCircle />}
+            disabled={isSyncing}
             onClick={async () => {
-              getEncryptedSecretsToSync()
+              setIsSyncing(true)
+              await device.state?.backendSync()
+              setIsSyncing(false)
+              toast.success('Sync successful')
             }}
           />
           <IconButton

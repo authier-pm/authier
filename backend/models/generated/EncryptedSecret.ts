@@ -24,6 +24,9 @@ export class EncryptedSecretGQLScalars {
   updatedAt?: Date
 
   @Field({ nullable: true })
+  deletedAt?: Date
+
+  @Field({ nullable: true })
   url?: string
 
   @Field({ nullable: true })

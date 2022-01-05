@@ -269,6 +269,15 @@ export class RootResolver {
       }
     })
 
+    await prismaClient.decryptionChallenge.updateMany({
+      where: {
+        id: input.decryptionChallengeId,
+        deviceId: input.deviceId,
+        userId: user.id
+      },
+      data: { masterPasswordVerifiedAt: new Date() }
+    })
+
     const { firebaseToken, deviceName, deviceId } = input
     const ipAddress = ctx.getIpAddress()
 
@@ -302,6 +311,8 @@ export class RootResolver {
   })
   async deviceDecryptionChallenge(
     @Arg('email', () => GraphQLEmailAddress) email: string,
+    @Arg('deviceId', () => GraphQLUUID)
+    deviceId: string,
     @Ctx() ctx: IContext
   ) {
     const user = await prismaClient.user.findUnique({
@@ -327,6 +338,7 @@ export class RootResolver {
 
       const challenge = await prismaClient.decryptionChallenge.create({
         data: {
+          deviceId,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
         },

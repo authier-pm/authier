@@ -1,0 +1,27 @@
+mutation markAsSynced {
+  currentDevice {
+    markAsSynced
+  }
+}
+
+query SyncEncryptedSecrets {
+  currentDevice {
+    id
+    encryptedSecretsToSync {
+      ...secretExtension
+    }
+  }
+}
+
+fragment secretExtension on EncryptedSecretQuery {
+  id
+  encrypted
+  kind
+  createdAt
+  updatedAt
+  deletedAt
+  iconUrl
+  url
+  label
+  version
+}

@@ -32,9 +32,6 @@ export class DecryptionChallengeGQL extends DecryptionChallengeGQLScalars {
   user: UserGQL
 
   @Field(() => DeviceGQL, { nullable: true })
-  device?: DeviceGQL
-
-  @Field(() => DeviceGQL, { nullable: true })
   approvedFromDevice?: DeviceGQL
 
   // skip overwrite 👇

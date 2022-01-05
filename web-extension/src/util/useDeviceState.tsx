@@ -21,7 +21,7 @@ import { omit } from 'lodash'
 import debug from 'debug'
 import { removeToken } from './accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
-const log = debug('au:useBackgroundState')
+const log = debug('au:useDeviceState')
 
 export interface ISecret {
   id: string
@@ -57,31 +57,33 @@ export interface ISecuritySettingsInBg {
 
 let registered = false // we need to only register once
 
-const { AES, enc } = cryptoJS
-
-export function useBackgroundState() {
+export function useDeviceState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
-  const [refreshCount, forceUpdate] = useReducer((x) => x + 1, 0)
+
   const [safeLocked, setSafeLocked] = useState<Boolean>(false)
 
   const [isFilling, setIsFilling] = useState<Boolean>(false)
   const [isCounting, setIsCounting] = useState<Boolean>(false)
-  const [backgroundState, setBackgroundState] =
-    useState<IBackgroundStateSerializable | null>(null)
+  const [deviceState, setDeviceState] =
+    useState<IBackgroundStateSerializable | null>(device.state)
 
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
   })
   const [updateSettings] = useUpdateSettingsMutation()
-  log('~ backgroundState2', backgroundState)
+  log('~ deviceState', deviceState)
+
+  useEffect(() => {
+    setDeviceState(device.state)
+  }, [device.state])
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ): Promise<void> => {
     if (areaName === 'local' && changes.backgroundState) {
-      setBackgroundState(changes.backgroundState.newValue)
+      setDeviceState(changes.backgroundState.newValue)
     }
   }
 
@@ -120,49 +122,17 @@ export function useBackgroundState() {
     browser.storage.onChanged.addListener(onStorageChange)
   }, [])
 
-  // handle background state refresh
-  useEffect(() => {
-    browser.runtime
-      .sendMessage({ action: BackgroundMessageType.getBackgroundState })
-      .then((res: { backgroundState: IBackgroundStateSerializable }) => {
-        if (res && res.backgroundState) {
-          setBackgroundState(res.backgroundState)
-        }
-      })
-  }, [refreshCount])
-
-  const getCryptoOptions = () => {
-    if (!backgroundState) {
-      throw new Error('No background state')
-    }
-
-    return {
-      iv: enc.Utf8.parse(backgroundState.userId)
-    }
-  }
-
   const backgroundStateContext = {
     currentURL,
     safeLocked,
     setSafeLocked,
     isFilling,
-    forceUpdate,
-    backgroundState,
-    deviceLogin: async (state: IBackgroundStateSerializable) => {
-      log('deviceLogin', state)
-      setSafeLocked(false)
-      setBackgroundState(state)
-
-      await browser.runtime.sendMessage({
-        action: BackgroundMessageType.setBackgroundState,
-        payload: state
-      })
-    },
+    deviceState,
     get LoginCredentials() {
-      if (!backgroundState) {
+      if (!deviceState) {
         return []
       }
-      const { secrets } = backgroundState
+      const { secrets } = deviceState
       const filtered = secrets.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
       )
@@ -170,9 +140,9 @@ export function useBackgroundState() {
         try {
           const decrypted = cryptoJS.AES.decrypt(
             secret.encrypted,
-            backgroundState.masterPassword,
+            deviceState.masterPassword,
             {
-              iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+              iv: cryptoJS.enc.Utf8.parse(deviceState.userId)
             }
           ).toString(cryptoJS.enc.Utf8)
 
@@ -189,10 +159,10 @@ export function useBackgroundState() {
       })
     },
     get TOTPSecrets() {
-      if (!backgroundState) {
+      if (!deviceState) {
         return []
       }
-      const { secrets } = backgroundState
+      const { secrets } = deviceState
       const filtered = secrets.filter(
         ({ kind }) => kind === EncryptedSecretType.TOTP
       )
@@ -200,9 +170,9 @@ export function useBackgroundState() {
         try {
           const decrypted = cryptoJS.AES.decrypt(
             secret.encrypted,
-            backgroundState.masterPassword,
+            deviceState.masterPassword,
             {
-              iv: cryptoJS.enc.Utf8.parse(backgroundState.userId)
+              iv: cryptoJS.enc.Utf8.parse(deviceState.userId)
             }
           ).toString(cryptoJS.enc.Utf8)
 
@@ -216,13 +186,6 @@ export function useBackgroundState() {
           throw err
         }
       })
-    },
-
-    lockVault: async () => {
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.clear
-      })
-      setBackgroundState(null)
     },
 
     isCounting,
@@ -252,24 +215,8 @@ export function useBackgroundState() {
         config: config
       })
     },
-    logoutUser: async () => {
-      // setBackgroundState(null)
 
-      await device.logout()
-    },
-    UIConfig,
-    encrypt(data: string, password = backgroundState?.masterPassword): string {
-      return AES.encrypt(
-        data,
-        password as string,
-        getCryptoOptions()
-      ).toString()
-    },
-    decrypt(data: string, password = backgroundState?.masterPassword): string {
-      return AES.decrypt(data, password as string, getCryptoOptions()).toString(
-        enc.Utf8
-      )
-    }
+    UIConfig
   }
 
   // @ts-expect-error

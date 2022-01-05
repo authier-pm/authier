@@ -112,7 +112,8 @@ export class UserQuery extends UserBase {
   ) {
     return prismaClient.encryptedSecret.findMany({
       where: {
-        userId: this.id
+        userId: this.id,
+        deletedAt: null
       }
     })
   }
