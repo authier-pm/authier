@@ -19,6 +19,7 @@ import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
 import { kebabCase } from 'lodash'
+import MD5 from 'crypto-js/md5'
 
 const theme = extendTheme({
   colors: {
@@ -39,6 +40,8 @@ const theme = extendTheme({
 
 export function ChakraLayout({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
+  // const email = device.state?.email
+  const email = 'bob@bob.com'
 
   const navLinks = Links.map((link) => (
     <NavLink key={link} href={kebabCase(link)}>
@@ -97,9 +100,7 @@ export function ChakraLayout({ children }) {
               >
                 <Avatar
                   size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1493666438817-866a91353ca9?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
+                  src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
                 />
               </MenuButton>
               <MenuList>

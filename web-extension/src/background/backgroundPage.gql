@@ -8,6 +8,8 @@ mutation addEncryptedSecret($payload: EncryptedSecretInput!) {
       iconUrl
       label
       version
+      createdAt
+      updatedAt
     }
   }
 }

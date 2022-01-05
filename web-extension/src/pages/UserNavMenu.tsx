@@ -1,14 +1,16 @@
-import React, { FunctionComponent, useContext } from 'react'
+import React, { FunctionComponent } from 'react'
 
-import { Button, ButtonGroup, Stack } from '@chakra-ui/react'
+import { Button, ButtonGroup, Center, Heading, Stack } from '@chakra-ui/react'
 
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Trans } from '@lingui/macro'
 import { device } from '@src/background/ExtensionDevice'
 
 export const UserNavMenu: FunctionComponent = () => {
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
+      <Center>
+        <Heading size={'sm'}>Logged as {device.state?.email}</Heading>
+      </Center>
       <ButtonGroup spacing={4} variant="solid" m="10px">
         <Stack direction="column">
           <Button

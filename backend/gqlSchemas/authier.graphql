@@ -343,7 +343,7 @@ type EncryptedSecretMutation {
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
-  update(payload: EncryptedSecretInput!): EncryptedSecretGQL!
+  update(patch: EncryptedSecretInput!): EncryptedSecretGQL!
   delete: EncryptedSecretGQL!
 }
 

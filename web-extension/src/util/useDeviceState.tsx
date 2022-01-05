@@ -1,6 +1,6 @@
 import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-import { useState, useEffect, useContext, useReducer } from 'react'
+import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
 
@@ -8,19 +8,15 @@ import {
   UIOptions,
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
-import { useSettingsQuery } from '@src/popup/Popup.codegen'
+
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import {
-  EncryptedSecretGql,
-  EncryptedSecretType
-} from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
-import { toast } from 'react-toastify'
-import { omit } from 'lodash'
 import debug from 'debug'
-import { removeToken } from './accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
+import { loginCredentialsSchema } from './loginCredentialsSchema'
+import { z, ZodError } from 'zod'
+
 const log = debug('au:useDeviceState')
 
 export interface ISecret {
@@ -38,9 +34,8 @@ export interface ITOTPSecret extends ISecret {
 }
 
 export interface ILoginSecret extends ISecret {
-  loginCredentials: {
-    password: string
-    username: string
+  loginCredentials: z.infer<typeof loginCredentialsSchema> & {
+    parseError?: ZodError
   }
   kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
@@ -136,7 +131,9 @@ export function useDeviceState() {
       const filtered = secrets.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
       )
-      return filtered.map((secret) => {
+      const creds = filtered.map((secret) => {
+        let parsed
+
         try {
           const decrypted = cryptoJS.AES.decrypt(
             secret.encrypted,
@@ -146,17 +143,30 @@ export function useDeviceState() {
             }
           ).toString(cryptoJS.enc.Utf8)
 
-          const parsed = JSON.parse(decrypted)
+          parsed = JSON.parse(decrypted)
+
+          loginCredentialsSchema.parse(parsed)
+
           return {
             ...secret,
             loginCredentials: parsed
           }
         } catch (err) {
+          parsed && log('parsed', parsed)
           console.error(err)
-          toast.error('decryption failed')
-          throw err
+          console.error(`decryption failed for login credential ${secret.id}}`)
+
+          return {
+            ...secret,
+            loginCredentials: {
+              username: '',
+              password: ''
+            }
+          }
         }
       })
+
+      return creds
     },
     get TOTPSecrets() {
       if (!deviceState) {
@@ -182,8 +192,11 @@ export function useDeviceState() {
           }
         } catch (err) {
           console.error(err)
-          toast.error('decryption failed')
-          throw err
+          console.error(`decryption failed for totp secret ${secret.id}}`)
+          return {
+            ...secret,
+            totp: ''
+          }
         }
       })
     },
