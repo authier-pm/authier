@@ -168,7 +168,7 @@ export type EncryptedSecretMutation = {
 }
 
 export type EncryptedSecretMutationUpdateArgs = {
-  payload: EncryptedSecretInput
+  patch: EncryptedSecretInput
 }
 
 export type EncryptedSecretQuery = {

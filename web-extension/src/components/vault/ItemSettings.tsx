@@ -12,7 +12,9 @@ import {
   Progress,
   IconButton,
   useDisclosure,
-  SimpleGrid
+  SimpleGrid,
+  Spinner,
+  Alert
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -20,6 +22,9 @@ import { passwordStrength } from 'check-password-strength'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { device } from '@src/background/ExtensionDevice'
+import { Trans } from '@lingui/macro'
+import { useUpdateEncryptedSecretMutation } from './ItemSettings.codegen'
 
 enum Value {
   'Tooweak' = 1,
@@ -53,7 +58,6 @@ const TOTPSecret = (data: ITOTPSecret) => {
     setSecret(event.target.value)
   }
   const handleClick = () => setShow(!show)
-
   return (
     <Center
       mt={4}
@@ -129,6 +133,8 @@ const LoginSecret = (data: ILoginSecret) => {
     setPassword(event.target.value)
   }
 
+  const [updateSecret] = useUpdateEncryptedSecretMutation()
+
   return (
     <Center
       mt={4}
@@ -180,6 +186,12 @@ const LoginSecret = (data: ILoginSecret) => {
           </>
         </SimpleGrid>
 
+        {data.loginCredentials.parseError && (
+          <Alert status="error" mt={4}>
+            <Trans>Failed to parse this secret:</Trans>
+            {JSON.stringify(data.loginCredentials.parseError)}
+          </Alert>
+        )}
         <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
           <Button
             colorScheme="blackAlpha"
@@ -188,7 +200,22 @@ const LoginSecret = (data: ILoginSecret) => {
           >
             Go back
           </Button>
-          <Button colorScheme="twitter" size="sm">
+          <Button
+            colorScheme="twitter"
+            size="sm"
+            onClick={async () => {
+              await updateSecret({
+                variables: {
+                  id: data.id,
+                  //@ts-expect-error TODO fix this-we need formik here
+                  patch: {
+                    encrypted: data.encrypted
+                  }
+                }
+              })
+              await device.state?.save()
+            }}
+          >
             Save
           </Button>
         </Stack>
@@ -208,11 +235,19 @@ const LoginSecret = (data: ILoginSecret) => {
   )
 }
 
-export const ItemSettings = (data: ILoginSecret | ITOTPSecret) => {
-  if (data.kind === 'TOTP') {
-    return <TOTPSecret {...data} />
-  } else if (data.kind === 'LOGIN_CREDENTIALS') {
-    return <LoginSecret {...data} />
+export const VaultItemSettings = ({ secretId }) => {
+  if (!device.state) {
+    return <Spinner></Spinner>
+  }
+
+  const secret = device.state.getSecretWithDecryptedBit(secretId)
+  if (!secret) {
+    return <Alert>Could not find this secret, it may be deleted</Alert>
+  }
+  if (secret.kind === 'TOTP') {
+    return <TOTPSecret {...secret} />
+  } else if (secret.kind === 'LOGIN_CREDENTIALS') {
+    return <LoginSecret {...secret} />
   }
 
   return null

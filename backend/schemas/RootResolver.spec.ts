@@ -33,7 +33,7 @@ describe('RootResolver', () => {
         }
       })
 
-      expect(
+      await expect(
         await resolver.me(
           {
             request: { headers: {} },
@@ -97,7 +97,7 @@ describe('RootResolver', () => {
         }
       })
 
-      expect(
+      await expect(
         async () =>
           await resolver.registerNewUser(input, userId, makeFakeCtx(userId))
       ).rejects.toThrow('User with such email already exists.')
@@ -127,7 +127,7 @@ describe('RootResolver', () => {
         }
       })
 
-      expect(
+      await expect(
         async () =>
           await resolver.registerNewUser(
             input,
@@ -187,7 +187,7 @@ describe('RootResolver', () => {
     it("should show 'User not found'", async () => {
       let input: RegisterDeviceInput = makeInput()
 
-      expect(async () => {
+      await expect(async () => {
         await resolver.addNewDeviceForUser(
           input,
           input.addDeviceSecret,
@@ -280,7 +280,7 @@ describe('RootResolver', () => {
         data
       })
 
-      expect(async () => {
+      await expect(async () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           faker.datatype.uuid(),

@@ -54,10 +54,10 @@ export async function initInputWatch() {
       if (username) {
         renderSaveCredentialsForm(username, password)
       } else {
-        const fallbackUsername = await browser.runtime.sendMessage({
+        const fallbackUsernames: string[] = await browser.runtime.sendMessage({
           action: BackgroundMessageType.getFallbackUsernames
         })
-        renderSaveCredentialsForm(fallbackUsername, password)
+        renderSaveCredentialsForm(fallbackUsernames[0], password)
       }
     }
   }

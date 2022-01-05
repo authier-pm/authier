@@ -1,0 +1,10 @@
+mutation updateEncryptedSecret($id: ID!, $patch: EncryptedSecretInput!) {
+  me {
+    encryptedSecret(id: $id) {
+      id
+      update(patch: $patch) {
+        id
+      }
+    }
+  }
+}
