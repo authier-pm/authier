@@ -42,7 +42,13 @@ import {
 import debug from 'debug'
 import { RegisterDeviceInput } from '../models/AuthInputs'
 
-import { DecryptionChallenge, Device, User, WebInput } from '@prisma/client'
+import {
+  DecryptionChallenge,
+  Device,
+  prisma,
+  User,
+  WebInput
+} from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
 import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
@@ -122,25 +128,12 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
+  @Query(() => UserQuery, { nullable: true })
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
-    nullable: true
+    nullable: false
   })
-  authenticatedMe(@Ctx() ctx: IContextAuthenticated) {
-    return prismaClient.user.findFirst({
-      where: {
-        id: ctx.jwtPayload?.userId
-      },
-      include: {
-        Devices: true,
-        EncryptedSecrets: true
-      }
-    })
-  }
-
-  @UseMiddleware(throwIfNotAuthenticated)
-  @Query(() => UserQuery, { nullable: true })
   async me(
     @Ctx() ctx: IContextAuthenticated,
     @Info() info: GraphQLResolveInfo
@@ -282,6 +275,15 @@ export class RootResolver {
       }
     })
 
+    await prismaClient.decryptionChallenge.updateMany({
+      where: {
+        id: input.decryptionChallengeId,
+        deviceId: input.deviceId,
+        userId: user.id
+      },
+      data: { masterPasswordVerifiedAt: new Date() }
+    })
+
     const { firebaseToken, deviceName, deviceId } = input
     const ipAddress = ctx.getIpAddress()
 
@@ -293,14 +295,23 @@ export class RootResolver {
       name: deviceName,
       userId: user.id
     }
-    const device = await prismaClient.device.upsert({
-      where: { id: deviceId },
-      create: deviceData,
-      update: {
-        ...deviceData,
-        logoutAt: null
-      }
+    let device = await prismaClient.device.findUnique({
+      // TODO change this to create
+      where: { id: deviceId }
     })
+
+    if (device) {
+      if (device.userId !== user.id) {
+        throw new GraphqlError('Device is already registered for another user')
+      }
+
+      device = await ctx.prisma.device.update({
+        data: { logoutAt: null },
+        where: { id: device.id }
+      })
+    } else {
+      device = await ctx.prisma.device.create({ data: deviceData })
+    }
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device.id,
@@ -315,6 +326,8 @@ export class RootResolver {
   })
   async deviceDecryptionChallenge(
     @Arg('email', () => GraphQLEmailAddress) email: string,
+    @Arg('deviceId', () => GraphQLUUID)
+    deviceId: string,
     @Ctx() ctx: IContext
   ) {
     const user = await prismaClient.user.findUnique({
@@ -340,6 +353,7 @@ export class RootResolver {
 
       const challenge = await prismaClient.decryptionChallenge.create({
         data: {
+          deviceId,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
         },

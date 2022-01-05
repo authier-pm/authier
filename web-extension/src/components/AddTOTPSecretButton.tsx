@@ -1,46 +1,37 @@
 import { Button } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
-import {
-  executeScriptInCurrentTab,
-  getCurrentTab
-} from '@src/util/executeScriptInCurrentTab'
+import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
-import cryptoJS from 'crypto-js'
 
 import browser, { Tabs } from 'webextension-polyfill'
 
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-import { ITOTPSecret, useBackgroundState } from '@src/util/useBackgroundState'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { ITOTPSecret } from '@src/util/useDeviceState'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
+import { device } from '@src/background/ExtensionDevice'
 
 export const AddTOTPSecretButton: React.FC<{}> = () => {
-  const { backgroundState, forceUpdate, TOTPSecrets } =
-    useContext(BackgroundContext)
-  const { encrypt } = useBackgroundState()
+  const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
+
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
-    if (!tab || !backgroundState) {
+    if (!tab || !deviceState) {
       return
     }
 
-    const newTotpSecret = getTokenSecretFromQrCode(qr, tab, encrypt)
+    const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = TOTPSecrets.find(
       ({ totp }) => newTotpSecret.totp === totp
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
-      await browser.runtime.sendMessage({
-        action: BackgroundMessageType.addTOTPSecret,
-        payload: newTotpSecret
-      })
-      forceUpdate()
+      await device.state?.addSecret(newTotpSecret)
       toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
     }
   }
@@ -67,9 +58,8 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
 
 export function getTokenSecretFromQrCode(
   qr: QRCode,
-  tab: Tabs.Tab,
-  encrypt: (s: string) => string
-): ITOTPSecret {
+  tab: Tabs.Tab
+): Omit<ITOTPSecret, 'id'> {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {
@@ -79,7 +69,7 @@ export function getTokenSecretFromQrCode(
   return {
     kind: EncryptedSecretsType.TOTP as any,
     totp: secret as string,
-    encrypted: encrypt(secret),
+    encrypted: device.state!.encrypt(secret),
     iconUrl: tab.favIconUrl,
     label:
       (parsedQuery.query.issuer as string) ??

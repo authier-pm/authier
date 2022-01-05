@@ -4,11 +4,11 @@ import papaparse from 'papaparse'
 
 import { downloadAsFile } from '@src/util/downloadAsFile'
 import { Trans } from '@lingui/macro'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 // TODO use somewhere
 export const ExportTOTPToCsvButton = () => {
-  const { TOTPSecrets } = useContext(BackgroundContext)
+  const { TOTPSecrets } = useContext(DeviceStateContext)
 
   return (
     <Button

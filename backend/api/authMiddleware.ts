@@ -20,7 +20,6 @@ export const throwIfNotAuthenticated: MiddlewareFn<IContextAuthenticated> = (
     context.reply.clearCookie('access-token')
     throw new Error('not authenticated')
   }
-  console.log(context)
 
   try {
     const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)

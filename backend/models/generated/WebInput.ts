@@ -1,11 +1,11 @@
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ObjectType, Int } from 'type-graphql'
 import { WebInputTypeGQL } from '../types/WebInputType'
 import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 
 @ObjectType()
 export class WebInputGQLScalars {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number
 
   @Field({ nullable: true })

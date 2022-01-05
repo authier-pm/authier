@@ -1,13 +1,18 @@
 import { prismaClient } from '../prismaClient'
-import { Arg, Ctx, Field, Int, ObjectType } from 'type-graphql'
-import { IContext } from '../schemas/RootResolver'
-import { EncryptedSecretQuery } from './EncryptedSecret'
+import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
+import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import {
+  EncryptedSecretMutation,
+  EncryptedSecretQuery
+} from './EncryptedSecret'
 import { EncryptedSecretInput } from './models'
 import * as admin from 'firebase-admin'
 import { UserGQL } from './generated/User'
 import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
+import { GraphQLResolveInfo } from 'graphql'
+import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -48,6 +53,17 @@ export class UserMutation extends UserBase {
     })
   }
 
+  @Field(() => EncryptedSecretMutation)
+  async encryptedSecret(
+    @Arg('id', () => ID) id: string,
+    @Ctx() ctx: IContextAuthenticated,
+    @Info() info: GraphQLResolveInfo
+  ) {
+    return ctx.prisma.encryptedSecret.findUnique({
+      where: { id },
+      include: getPrismaRelationsFromInfo(info)
+    })
+  }
   // @Field(() => Boolean)
   // async createSecretUsageEvent(
   //   @Arg('data', () => OTPEvent) event: OTPEvent,

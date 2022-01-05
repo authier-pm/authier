@@ -1,6 +1,6 @@
 import { Button, IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon } from '@chakra-ui/icons'
+import { UnlockIcon, SettingsIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -11,17 +11,23 @@ import {
   CloseButton,
   useDisclosure
 } from '@chakra-ui/react'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useState } from 'react'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
+import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
+import { useDeleteEncryptedSecretMutation } from './ItemList.codegen'
+import browser from 'webextension-polyfill'
 
-function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
+function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
+  const { deviceState } = useContext(DeviceStateContext)
 
+  console.log(data)
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
@@ -50,7 +56,7 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
             w="100%"
             h="full"
           >
-            {data.kind === 'LOGIN_CREDENTIALS' ? (
+            {data.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
               <IconButton
                 aria-label="open item"
                 colorScheme="blackAlpha"
@@ -59,7 +65,10 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
               />
             ) : null}
 
-            <CloseButton
+            <DeleteIcon
+              cursor={'pointer'}
+              boxSize={26}
+              padding={1.5}
               overflow={'visible'}
               backgroundColor={'red.400'}
               _hover={{ backgroundColor: 'red.500' }}
@@ -72,7 +81,23 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
             <DeleteAlert
               isOpen={isOpen}
               onClose={onClose}
-              deleteItem={deleteItem}
+              deleteItem={async () => {
+                if (!deviceState) {
+                  throw new Error('deviceState is not set')
+                }
+                await deleteEncryptedSecretMutation({
+                  variables: {
+                    id: data.id
+                  }
+                })
+
+                browser.storage.local.set({
+                  backgroundState: {
+                    ...deviceState,
+                    secrets: deviceState.secrets.filter((s) => s.id !== data.id)
+                  }
+                })
+              }}
             />
           </Flex>
         </Box>
@@ -82,13 +107,13 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
           justifyContent="space-between"
           p={4}
         >
-          <Text fontWeight={'bold'} fontSize={'lg'}>
+          <Text fontWeight={'bold'} fontSize={'lg'} isTruncated>
             {data.label}
           </Text>
 
           <Link
             to={{
-              pathname: `list/${data.label}`,
+              pathname: `secret/${data.id}`,
               state: { data: data }
             }}
           >
@@ -107,26 +132,9 @@ function Item({ data, deleteItem }: { data: any; deleteItem: () => void }) {
 }
 
 export const ItemList = () => {
-  const {
-    backgroundState,
-    saveLoginCredentials,
-    saveTOTPSecrets,
-    LoginCredentials,
-    TOTPSecrets
-  } = useContext(BackgroundContext)
+  const { deviceState, LoginCredentials, TOTPSecrets } =
+    useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
-
-  const removeLoginCredential = (label: string) => {
-    saveLoginCredentials(
-      LoginCredentials.filter((el) => el.label !== label) as ILoginSecret[]
-    )
-  }
-
-  const removeTOTPSecret = (label: string) => {
-    saveTOTPSecrets(
-      TOTPSecrets.filter((el) => el.label !== label) as ITOTPSecret[]
-    )
-  }
 
   return (
     <Flex flexDirection="column">
@@ -145,24 +153,12 @@ export const ItemList = () => {
             {TOTPSecrets?.filter(({ label, url }) => {
               return label.includes(filterBy) || url?.includes(filterBy)
             }).map((el, i) => {
-              return (
-                <Item
-                  data={el}
-                  key={el.label + i}
-                  deleteItem={() => removeTOTPSecret(el.label)}
-                />
-              )
+              return <Item data={el as ITOTPSecret} key={el.label + i} />
             })}
             {LoginCredentials?.filter(({ label, url }) => {
               return label.includes(filterBy) || url?.includes(filterBy)
             }).map((el, i) => {
-              return (
-                <Item
-                  key={el.label + i}
-                  data={el}
-                  deleteItem={() => removeLoginCredential(el.label)}
-                />
-              )
+              return <Item key={el.label + i} data={el as ILoginSecret} />
             })}
           </Flex>
         </Flex>

@@ -1,12 +1,12 @@
-import { Field, ID, ObjectType, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from '../types/EncryptedSecretType'
-import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { UserGQL } from './User'
+import { SecretUsageEventGQL } from './SecretUsageEvent'
 
 @ObjectType()
 export class EncryptedSecretGQLScalars {
   @Field(() => ID)
-  id: number
+  id: string
 
   @Field()
   encrypted: string
@@ -22,6 +22,9 @@ export class EncryptedSecretGQLScalars {
 
   @Field({ nullable: true })
   updatedAt?: Date
+
+  @Field({ nullable: true })
+  deletedAt?: Date
 
   @Field({ nullable: true })
   url?: string

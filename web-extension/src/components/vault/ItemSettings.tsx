@@ -19,7 +19,7 @@ import { useHistory } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 enum Value {
   'Tooweak' = 1,

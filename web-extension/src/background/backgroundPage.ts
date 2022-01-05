@@ -4,24 +4,11 @@ import { authenticator } from 'otplib'
 import { initializeApp } from 'firebase/app'
 import { getMessaging, getToken } from 'firebase/messaging'
 
-import {
-  ILoginSecret,
-  ISecret,
-  ITOTPSecret
-} from '@src/util/useBackgroundState'
+import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import './chromeRuntimeListener'
 import { SharedBrowserEvents } from './SharedBrowserEvents'
 
 import debug from 'debug'
-import { apolloClient } from '@src/apollo/apolloClient'
-//import { SavePasswordsDocument } from '@src/popup/Popup.codegen'
-
-import cryptoJS from 'crypto-js'
-import {
-  AddEncryptedSecretDocument,
-  AddEncryptedSecretMutation,
-  AddEncryptedSecretMutationVariables
-} from './backgroundPage.codegen'
 import {
   EncryptedSecretGql,
   EncryptedSecretType
@@ -62,108 +49,48 @@ if ('serviceWorker' in navigator) {
   log('No service-worker on this browser')
 }
 
-export interface IBackgroundStateSerializable {
+export type SecretSerializedType = Pick<
+  EncryptedSecretGql,
+  'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'
+>
+
+export interface IBackgroundStateSerializableLocked {
+  email: string
   userId: string
+  secrets: Array<SecretSerializedType>
+}
+
+export interface IBackgroundStateSerializable
+  extends IBackgroundStateSerializableLocked {
   masterPassword: string
-  secrets: Array<
-    Pick<EncryptedSecretGql, 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'>
-  >
-}
-
-interface IBackgroundState extends IBackgroundStateSerializable {
-  encrypt: (stringToEncrypt: string) => string
-  addSecretOnBackend: (input: ITOTPSecret | ILoginSecret) => Promise<void>
-}
-
-export let bgState: IBackgroundState | null = null
-
-export const setBgState = async (
-  bgStateSerializable: IBackgroundStateSerializable
-) => {
-  bgState = {
-    ...bgStateSerializable,
-    encrypt(stringToEncrypt: string) {
-      return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
-        iv: cryptoJS.enc.Utf8.parse(this.userId)
-      }).toString()
-    },
-
-    async addSecretOnBackend(secret: ITOTPSecret | ILoginSecret) {
-      const stringToEncrypt =
-        secret.kind === EncryptedSecretType.TOTP
-          ? secret.totp
-          : JSON.stringify(secret.loginCredentials)
-
-      const encrypted = this.encrypt(stringToEncrypt)
-
-      await apolloClient.mutate<
-        AddEncryptedSecretMutation,
-        AddEncryptedSecretMutationVariables
-      >({
-        mutation: AddEncryptedSecretDocument,
-        variables: {
-          payload: {
-            encrypted,
-            kind: secret.kind,
-            label: secret.label,
-            url: secret.url
-          }
-        }
-      })
-      log('saved secret to the backend', secret)
-    }
-  }
-
-  await browser.storage.local.set({
-    backgroundState: bgStateSerializable
-  })
-
-  // @ts-expect-error
-  window.bgState = bgState
-}
-;(async () => {
-  // init bgState from local storage if it has been set
-  const storage = await browser.storage.local.get()
-  if (storage.backgroundState) {
-    setBgState(storage.backgroundState)
-    log('bg init from storage', bgState)
-  }
-})()
-
-export const clearBgState = () => {
-  bgState = null
 }
 
 export let lockTime = 10000 * 60 * 60 * 8
-export let fireToken = ''
-let otpCode = ''
 
-export function setLockTime(val: number) {
-  log('setLockTime', val)
-  if (typeof val !== 'number') {
-    throw new Error('setLockTime must have a number value')
-  }
-  lockTime = val
-}
+// export function setLockTime(val: number) {
+//   log('setLockTime', val)
+//   if (typeof val !== 'number') {
+//     throw new Error('setLockTime must have a number value')
+//   }
+//   lockTime = val
+// }
 
-broadcast.onmessage = (event) => {
-  if (event.data.data.success === 'true') {
-    log('sec', typeof otpCode)
-    let a = executeScriptInCurrentTab(
-      `const OTP = ${otpCode};` + `(` + fillInput.toString() + `)()`
-    )
-  }
-}
+// broadcast.onmessage = (event) => {
+//   if (event.data.data.success === 'true') {
+//     log('sec', typeof otpCode)
+//     let a = executeScriptInCurrentTab(
+//       `const OTP = ${otpCode};` + `(` + fillInput.toString() + `)()`
+//     )
+//   }
+// }
 
-async function generateFireToken() {
-  fireToken = await getToken(messaging, {
+export async function generateFireToken() {
+  return await getToken(messaging, {
     vapidKey:
       'BPxh_JmX3cR4Cb6lCYon2cC0iAVlv8dOL1pjX2Q33ROT0VILKuGAlTqG1uH8YZXQRCscLlxqct0XeTiUvF4sy4A'
   })
 }
-generateFireToken().then(() => {
-  log('fireToken', fireToken)
-})
+
 // Listen for messages sent from other parts of the extension
 browser.runtime.onMessage.addListener(
   async (request: { popupMounted: boolean }) => {
