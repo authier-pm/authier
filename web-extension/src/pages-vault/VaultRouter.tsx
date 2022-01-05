@@ -5,8 +5,19 @@ import { Route, Switch } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { device } from '@src/background/ExtensionDevice'
+import Login from '@src/pages/Login'
+import { Center } from '@chakra-ui/react'
 
 export function VaultRouter() {
+  if (device.state === null) {
+    return (
+      <Center mw="50%" h="100vh">
+        <Login></Login>
+      </Center>
+    )
+  }
+
   return (
     <SidebarWithHeader>
       <Switch>
