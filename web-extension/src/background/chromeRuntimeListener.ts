@@ -23,6 +23,7 @@ import {
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 import { device } from './ExtensionDevice'
+import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 
 const log = debug('chromeRuntimeListener')
 
@@ -89,6 +90,8 @@ chrome.runtime.onMessage.addListener(async function (
         username: credentials.username,
         password: credentials.password
       }
+
+      loginCredentialsSchema.parse(namePassPair)
 
       await deviceState.addSecret({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,

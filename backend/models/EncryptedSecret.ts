@@ -11,7 +11,7 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
   @Field(() => EncryptedSecretGQL)
   update(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('payload', () => EncryptedSecretInput) patch: EncryptedSecretInput
+    @Arg('patch', () => EncryptedSecretInput) patch: EncryptedSecretInput
   ) {
     return ctx.prisma.encryptedSecret.update({
       where: { id: this.id },
