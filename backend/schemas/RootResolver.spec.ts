@@ -14,7 +14,7 @@ const makeInput = () => ({
   firebaseToken: faker.datatype.uuid(),
   addDeviceSecret: faker.datatype.string(5),
   addDeviceSecretEncrypted: faker.datatype.string(5),
-  decryptionChallengeId: faker.random.number()
+  decryptionChallengeId: faker.datatype.number()
 })
 
 describe('RootResolver', () => {
@@ -145,6 +145,7 @@ describe('RootResolver', () => {
     let fakeCtx = {
       reply: { setCookie: jest.fn() },
       request: { headers: {} },
+      prisma: prismaClient,
       jwtPayload: { userId: userId },
       getIpAddress: () => faker.internet.ip()
     } as any
