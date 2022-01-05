@@ -2,7 +2,7 @@ import React from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { ItemList } from '@src/components/vault/ItemList'
 import { Route, Switch } from 'react-router-dom'
-import { ItemSettings } from '@src/components/vault/ItemSettings'
+import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
@@ -14,12 +14,10 @@ export function VaultRouter() {
           <ItemList />
         </Route>
         <Route
-          path="/secret/:item"
-          children={({
-            location
-          }: {
-            location: { state: { data: ILoginSecret | ITOTPSecret } }
-          }) => <ItemSettings {...location.state.data} />}
+          path="/secret/:secretId"
+          children={({ match }) => (
+            <VaultItemSettings secretId={match?.params.secretId} />
+          )}
         />
         <Route path="/settings">
           <VaultSettings />

@@ -1,7 +1,6 @@
 import { ChakraProvider } from '@chakra-ui/react'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
-import { Popup } from './popup/Popup'
 
 import { UserProvider } from './providers/UserProvider'
 import Routes from './Routes'
@@ -11,7 +10,8 @@ import 'react-toastify/dist/ReactToastify.css'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
-import { VaultRoutes } from './VaultRoutes'
+
+import { VaultRouter } from './pages-vault/VaultRouter'
 
 export default function Providers({ parent }: { parent: string }) {
   return (
@@ -21,7 +21,7 @@ export default function Providers({ parent }: { parent: string }) {
           <I18nProvider i18n={i18n}>
             <ToastContainer {...toastifyConfig} />
             {/* <Routes /> */}
-            {parent === 'vault' ? <VaultRoutes /> : <Routes />}
+            {parent === 'vault' ? <VaultRouter /> : <Routes />}
           </I18nProvider>
         </UserProvider>
       </DeviceStateProvider>
