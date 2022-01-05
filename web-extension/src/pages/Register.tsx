@@ -10,6 +10,7 @@ import {
   Input,
   InputGroup,
   InputRightElement,
+  Spinner,
   Text
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -19,9 +20,9 @@ import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
-import { device } from '@src/background/Device'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
 import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
@@ -36,9 +37,11 @@ export default function Register(): ReactElement {
   const [register, { data, loading, error: registerError }] =
     useRegisterNewUserMutation()
 
-  const { fireToken } = useContext(UserContext)
-  const { deviceLogin } = useContext(BackgroundContext)
   // console.log('~ fireToken', fireToken)
+  const { fireToken } = device
+  if (!fireToken) {
+    return <Spinner />
+  }
 
   if (registerError) {
     console.log(registerError)
@@ -80,13 +83,15 @@ export default function Register(): ReactElement {
             })
             setAccessToken(registerResult.accessToken as string)
 
-            const bgState: IBackgroundStateSerializable = {
+            const deviceState: IBackgroundStateSerializable = {
               masterPassword: values.password,
               userId: userId,
-              secrets: []
+              secrets: [],
+              email: values.email
             }
 
-            deviceLogin(bgState)
+            device.state = new DeviceState(deviceState)
+            device.state.save()
 
             setSubmitting(false)
           }

@@ -4,8 +4,9 @@ import { ItemList } from '@src/components/vault/ItemList'
 import { Route, Switch } from 'react-router-dom'
 import { ItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
-export function Vault() {
+export function VaultRouter() {
   return (
     <SidebarWithHeader>
       <Switch>
@@ -13,11 +14,12 @@ export function Vault() {
           <ItemList />
         </Route>
         <Route
-          path="/list/:item"
-          children={({ location }) => (
-            //@ts-expect-error
-            <ItemSettings {...location.state.data} />
-          )}
+          path="/secret/:item"
+          children={({
+            location
+          }: {
+            location: { state: { data: ILoginSecret | ITOTPSecret } }
+          }) => <ItemSettings {...location.state.data} />}
         />
         <Route path="/settings">
           <VaultSettings />

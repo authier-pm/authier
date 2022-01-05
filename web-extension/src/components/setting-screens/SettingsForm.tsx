@@ -6,7 +6,7 @@ import {
   Button
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import React, { ReactElement, useContext } from 'react'
 import Select from 'react-select'
@@ -30,7 +30,7 @@ const options = [
 ]
 
 export function SettingsForm({}: Props): ReactElement {
-  const { setUISettings, UIConfig } = useContext(BackgroundContext)
+  const { setUISettings, UIConfig } = useContext(DeviceStateContext)
   return (
     <>
       <Formik

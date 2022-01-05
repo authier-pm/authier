@@ -35,9 +35,8 @@ export type DecryptionChallengeGql = {
   approvedFromDevice?: Maybe<DeviceGql>
   approvedFromDeviceId?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
-  device?: Maybe<DeviceGql>
   deviceId?: Maybe<Scalars['String']>
-  id: Scalars['ID']
+  id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
   userId: Scalars['String']
@@ -45,7 +44,6 @@ export type DecryptionChallengeGql = {
 
 export type DeviceGql = {
   __typename?: 'DeviceGQL'
-  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
@@ -90,13 +88,12 @@ export type DeviceMutation = {
 
 export type DeviceMutationReportSecretUsageEventArgs = {
   kind: Scalars['String']
-  secretId: Scalars['PositiveInt']
+  secretId: Scalars['UUID']
   webInputId: Scalars['PositiveInt']
 }
 
 export type DeviceQuery = {
   __typename?: 'DeviceQuery'
-  DeviceDecryptionChallenges: Array<DecryptionChallengeGql>
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
@@ -125,6 +122,7 @@ export type EncryptedSecretGql = {
   SecretUsageEvent: Array<SecretUsageEventGql>
   androidUri?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
+  deletedAt?: Maybe<Scalars['DateTime']>
   encrypted: Scalars['String']
   iconUrl?: Maybe<Scalars['String']>
   id: Scalars['ID']
@@ -141,10 +139,36 @@ export type EncryptedSecretGql = {
 export type EncryptedSecretInput = {
   androidUri?: InputMaybe<Scalars['String']>
   encrypted: Scalars['String']
+  iconUrl?: InputMaybe<Scalars['String']>
   iosUri?: InputMaybe<Scalars['String']>
   kind: EncryptedSecretType
   label: Scalars['String']
-  url?: InputMaybe<Scalars['String']>
+  url: Scalars['String']
+}
+
+export type EncryptedSecretMutation = {
+  __typename?: 'EncryptedSecretMutation'
+  SecretUsageEvent: Array<SecretUsageEventGql>
+  androidUri?: Maybe<Scalars['String']>
+  createdAt: Scalars['DateTime']
+  delete: EncryptedSecretGql
+  deletedAt?: Maybe<Scalars['DateTime']>
+  encrypted: Scalars['String']
+  iconUrl?: Maybe<Scalars['String']>
+  id: Scalars['ID']
+  iosUri?: Maybe<Scalars['String']>
+  kind: EncryptedSecretType
+  label: Scalars['String']
+  update: EncryptedSecretGql
+  updatedAt?: Maybe<Scalars['DateTime']>
+  url?: Maybe<Scalars['String']>
+  user: UserGql
+  userId: Scalars['String']
+  version: Scalars['Int']
+}
+
+export type EncryptedSecretMutationUpdateArgs = {
+  payload: EncryptedSecretInput
 }
 
 export type EncryptedSecretQuery = {
@@ -152,6 +176,7 @@ export type EncryptedSecretQuery = {
   SecretUsageEvent: Array<SecretUsageEventGql>
   androidUri?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
+  deletedAt?: Maybe<Scalars['DateTime']>
   encrypted: Scalars['String']
   iconUrl?: Maybe<Scalars['String']>
   id: Scalars['ID']
@@ -186,7 +211,7 @@ export type Mutation = {
   /** removes current device */
   logout?: Maybe<Scalars['Boolean']>
   /** you need to be authenticated to call this resolver */
-  me?: Maybe<UserMutation>
+  me: UserMutation
   registerNewUser: LoginResponse
   user?: Maybe<UserMutation>
 }
@@ -201,6 +226,7 @@ export type MutationAddWebInputsArgs = {
 }
 
 export type MutationDeviceDecryptionChallengeArgs = {
+  deviceId: Scalars['UUID']
   email: Scalars['EmailAddress']
 }
 
@@ -234,6 +260,7 @@ export type QueryWebInputsArgs = {
 export type RegisterDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
+  decryptionChallengeId?: InputMaybe<Scalars['PositiveInt']>
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']
   email: Scalars['EmailAddress']
@@ -249,7 +276,7 @@ export type SecretUsageEventGql = {
   deviceId: Scalars['String']
   id: Scalars['ID']
   kind: Scalars['String']
-  secretId: Scalars['Int']
+  secretId: Scalars['String']
   timestamp: Scalars['DateTime']
   url?: Maybe<Scalars['String']>
   userId: Scalars['String']
@@ -261,7 +288,7 @@ export type SecretUsageEventGqlScalars = {
   deviceId: Scalars['String']
   id: Scalars['ID']
   kind: Scalars['String']
-  secretId: Scalars['Int']
+  secretId: Scalars['String']
   timestamp: Scalars['DateTime']
   url?: Maybe<Scalars['String']>
   userId: Scalars['String']
@@ -282,7 +309,7 @@ export type SettingsConfigGql = {
 export type TagGql = {
   __typename?: 'TagGQL'
   createdAt: Scalars['DateTime']
-  id: Scalars['ID']
+  id: Scalars['Int']
   name: Scalars['String']
   user: UserGql
   userId: Scalars['String']
@@ -293,7 +320,7 @@ export type TokenGql = {
   createdAt: Scalars['DateTime']
   emailToken?: Maybe<Scalars['String']>
   expiration: Scalars['DateTime']
-  id: Scalars['ID']
+  id: Scalars['Int']
   type: TokenType
   updatedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
@@ -373,6 +400,7 @@ export type UserMutation = {
   approveDevice: Scalars['Boolean']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['EmailAddress']>
+  encryptedSecret: EncryptedSecretMutation
   id: Scalars['ID']
   loginCredentialsLimit: Scalars['Int']
   masterDevice?: Maybe<DeviceGql>
@@ -399,6 +427,10 @@ export type UserMutationApproveDeviceArgs = {
   success: Scalars['Boolean']
 }
 
+export type UserMutationEncryptedSecretArgs = {
+  id: Scalars['ID']
+}
+
 export type UserMutationUpdateFireTokenArgs = {
   firebaseToken: Scalars['String']
 }
@@ -415,7 +447,7 @@ export type UserPaidProductsGql = {
   checkoutSessionId: Scalars['String']
   createdAt: Scalars['DateTime']
   expiresAt?: Maybe<Scalars['DateTime']>
-  id: Scalars['ID']
+  id: Scalars['Int']
   productId: Scalars['String']
   updatedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
@@ -476,7 +508,7 @@ export type WebInputGql = {
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
   domPath: Scalars['String']
-  id: Scalars['ID']
+  id: Scalars['Int']
   kind: WebInputType
   layoutType?: Maybe<Scalars['String']>
   url: Scalars['String']

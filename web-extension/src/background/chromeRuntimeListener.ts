@@ -2,15 +2,8 @@ import {
   ITOTPSecret,
   ILoginSecret,
   ISecuritySettings
-} from '@src/util/useBackgroundState'
-import {
-  bgState,
-  clearBgState,
-  fireToken,
-  setBgState,
-  lockTime,
-  setLockTime
-} from './backgroundPage'
+} from '@src/util/useDeviceState'
+import { lockTime } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import {
   UIOptions,
@@ -29,6 +22,7 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
+import { device } from './ExtensionDevice'
 
 const log = debug('chromeRuntimeListener')
 
@@ -76,22 +70,16 @@ chrome.runtime.onMessage.addListener(async function (
   const tab = sender.tab
 
   const currentTabId = tab?.id
+  const deviceState = device.state
 
   switch (req.action) {
-    case BackgroundMessageType.getBackgroundState:
-      console.log('get backgroundState', bgState)
-
-      sendResponse({
-        backgroundState: bgState
-      })
-      break
     case BackgroundMessageType.addLoginCredentials:
       if (!tab) {
         return
       }
       const { url } = tab
 
-      if (!url || !bgState) {
+      if (!url || !deviceState) {
         return // we can't do anything without a valid url
       }
       log('addLoginCredentials', req.payload)
@@ -101,10 +89,11 @@ chrome.runtime.onMessage.addListener(async function (
         username: credentials.username,
         password: credentials.password
       }
-      bgState.addSecretOnBackend({
+
+      await deviceState.addSecret({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
         loginCredentials: namePassPair,
-        encrypted: bgState.encrypt(JSON.stringify(namePassPair)),
+        encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
         iconUrl: tab.favIconUrl,
         url: url,
         label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
@@ -131,17 +120,14 @@ chrome.runtime.onMessage.addListener(async function (
       console.log(credentials.capturedInputEvents)
       break
     case BackgroundMessageType.addTOTPSecret:
-      if (bgState) {
-        bgState.addSecretOnBackend(req.payload as ITOTPSecret)
+      if (deviceState) {
+        deviceState.addSecret(req.payload as ITOTPSecret)
       }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {
         saveLoginModalsStates.set(currentTabId, req.payload)
       }
 
-      break
-    case BackgroundMessageType.setBackgroundState:
-      await setBgState(req.payload)
       break
     case BackgroundMessageType.hideLoginCredentialsModal:
       if (currentTabId) {
@@ -150,19 +136,17 @@ chrome.runtime.onMessage.addListener(async function (
 
       break
 
+    case BackgroundMessageType.getFallbackUsernames:
+      sendResponse([deviceState?.email])
+      break
     case BackgroundMessageType.getLoginCredentialsModalState:
       if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
         sendResponse(saveLoginModalsStates.get(currentTabId))
       }
 
       break
-    case BackgroundMessageType.getFirebaseToken:
-      console.log('fireToken in Bg script:', fireToken)
-      sendResponse({ t: fireToken })
-      break
 
     case BackgroundMessageType.wasClosed:
-      console.log('isClosed', safeClosed, 'lockTime', lockTime)
       sendResponse({ wasClosed: safeClosed })
       break
 
@@ -175,13 +159,11 @@ chrome.runtime.onMessage.addListener(async function (
       })
       break
 
-    case BackgroundMessageType.clear:
-      clearBgState()
-      break
-
     case BackgroundMessageType.securitySettings:
-      setLockTime(req.settings.vaultLockTime)
-
+      if (deviceState) {
+        deviceState.lockTime = req.settings.vaultLockTime
+        deviceState.save()
+      }
       noHandsLogin = req.settings.noHandsLogin
 
       console.log('config set on:', req.settings, lockTime, noHandsLogin)
@@ -217,7 +199,6 @@ browser.runtime.onConnect.addListener(function (externalPort) {
 
       safeClosed = true
 
-      clearBgState()
       chrome.runtime.sendMessage({ safe: 'closed' })
       console.log('locked', safeClosed)
     }, lockTime)

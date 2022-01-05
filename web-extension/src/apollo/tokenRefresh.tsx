@@ -1,22 +1,21 @@
-import { getAccessToken, setAccessToken } from '../util/accessTokenExtension'
+import { accessToken, setAccessToken } from '../util/accessTokenExtension'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
-import jwtDecode from 'jwt-decode'
+import jwtDecode, { JwtPayload } from 'jwt-decode'
 import browser from 'webextension-polyfill'
 import { API_URL } from './apolloClient'
+import { device } from '@src/background/ExtensionDevice'
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: () => {
     //Get token from local storage
-    const token = getAccessToken()
-
-    if (!token) {
-      return true
+    console.log('~ isTokenValidOrUndefined', accessToken)
+    if (!accessToken) {
+      return false
     }
 
     try {
-      // @ts-expect-error
-      const { exp } = jwtDecode(token)
+      const { exp } = jwtDecode<JwtPayload & { exp: number }>(accessToken)
       if (Date.now() >= exp * 1000) {
         return false
       } else {
@@ -39,6 +38,7 @@ export const tokenRefresh = new TokenRefreshLink({
     setAccessToken(accessToken)
   },
   handleError: (err) => {
-    console.warn('Your refresh token is invalid. Try to login again', err)
+    console.warn('Your refresh token is invalid. You must login again', err)
+    device.logout()
   }
 })

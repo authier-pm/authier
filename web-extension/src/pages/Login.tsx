@@ -10,33 +10,27 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Heading
+  Heading,
+  Spinner
 } from '@chakra-ui/react'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { Link, useLocation } from 'wouter'
+import { Link } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 
 const log = debug('backgroundPage')
 
-import {
-  getUserFromToken,
-  setAccessToken,
-  getTokenFromLocalStorage
-} from '../util/accessTokenExtension'
+import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
 
 import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 
 import { toast } from 'react-toastify'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
-import browser from 'webextension-polyfill'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
-import { device } from '@src/background/Device'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 
-import { ISecret } from '@src/util/useBackgroundState'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   useAddNewDeviceForUserMutation,
@@ -50,13 +44,16 @@ interface Values {
 }
 
 export default function Login(): ReactElement {
-  const [location, setLocation] = useLocation()
   const [showPassword, setShowPassword] = useState(false)
   const [addNewDevice] = useAddNewDeviceForUserMutation()
   const [deviceDecryptionChallenge, { loading }] =
     useDeviceDecryptionChallengeMutation()
-  const { setUserId, fireToken } = useContext(UserContext)
-  const { deviceLogin, decrypt } = useContext(BackgroundContext)
+  const { setUserId } = useContext(UserContext)
+
+  const { fireToken } = device
+  if (!fireToken) {
+    return <Spinner />
+  }
 
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
@@ -72,6 +69,7 @@ export default function Login(): ReactElement {
         ) => {
           const decryptionChallenge = await deviceDecryptionChallenge({
             variables: {
+              deviceId: await device.getDeviceId(),
               email: values.email
             }
           })
@@ -85,6 +83,11 @@ export default function Login(): ReactElement {
 
           if (!addDeviceSecretEncrypted || !userId) {
             toast.error(t`Login failed, check your username`)
+            return
+          }
+
+          if (!decryptionChallenge.data?.deviceDecryptionChallenge?.id) {
+            toast.error('failed to create decryption challenge')
             return
           }
 
@@ -103,7 +106,9 @@ export default function Login(): ReactElement {
                 ...device.getAddDeviceSecretAuthTuple(values.password, userId),
                 email: values.email,
                 deviceName: device.generateDeviceName(),
-                firebaseToken: fireToken
+                firebaseToken: fireToken,
+                decryptionChallengeId:
+                  decryptionChallenge.data.deviceDecryptionChallenge.id
               },
               currentAddDeviceSecret: currentSecret
             }
@@ -117,14 +122,16 @@ export default function Login(): ReactElement {
             const EncryptedSecrets =
               response.data.addNewDeviceForUser.user.EncryptedSecrets
 
-            const bgState: IBackgroundStateSerializable = {
+            const deviceState: IBackgroundStateSerializable = {
               masterPassword: values.password,
               userId: userId,
-              secrets: EncryptedSecrets
+              secrets: EncryptedSecrets,
+              email: values.email
             }
             setUserId(decodedToken.userId)
 
-            deviceLogin(bgState)
+            device.state = new DeviceState(deviceState)
+            device.state.save()
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

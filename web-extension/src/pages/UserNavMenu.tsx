@@ -1,16 +1,12 @@
 import React, { FunctionComponent, useContext } from 'react'
 
 import { Button, ButtonGroup, Stack } from '@chakra-ui/react'
-import browser from 'webextension-polyfill'
-import { removeToken } from '@src/util/accessTokenExtension'
 
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Trans } from '@lingui/macro'
-import { device } from '@src/background/Device'
+import { device } from '@src/background/ExtensionDevice'
 
 export const UserNavMenu: FunctionComponent = () => {
-  const { logoutUser, lockVault } = useContext(BackgroundContext)
-
   return (
     <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
       <ButtonGroup spacing={4} variant="solid" m="10px">
@@ -18,7 +14,7 @@ export const UserNavMenu: FunctionComponent = () => {
           <Button
             colorScheme="yellow"
             onClick={async () => {
-              lockVault()
+              device.lock()
             }}
           >
             <Trans>Lock vault</Trans>
@@ -26,10 +22,7 @@ export const UserNavMenu: FunctionComponent = () => {
           <Button
             colorScheme="red"
             onClick={async () => {
-              await removeToken()
-              await device.clearLocalStorage()
-
-              logoutUser()
+              device.logout()
             }}
           >
             <Trans>Logout</Trans>

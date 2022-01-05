@@ -19,7 +19,7 @@ import { UserContext } from '@src/providers/UserProvider'
 
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { AboutPage } from '@src/pages/AboutPage'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
@@ -29,14 +29,13 @@ const log = debug('au:Popup')
 i18n.activate('en')
 
 export const Popup: FunctionComponent = () => {
-  const { userId, fireToken } = useContext(UserContext)
+  const { userId } = useContext(UserContext)
 
   const [location, setLocation] = useLocation()
   const [sendAuthMessage, { data, error, loading }] =
     useSendAuthMessageLazyQuery()
 
-  const { currentURL, isFilling, safeLocked, backgroundState } =
-    useContext(BackgroundContext)
+  const { currentURL, isFilling } = useContext(DeviceStateContext)
 
   // useEffect(() => {
   //   async function saveToLocal(encrypted: any) {

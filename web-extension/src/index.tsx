@@ -7,19 +7,32 @@ import { ApolloProvider } from '@apollo/client'
 import App from './App'
 import { apolloClient } from './apollo/apolloClient'
 import { ColorModeScript, theme } from '@chakra-ui/react'
+import { BackgroundMessageType } from './background/BackgroundMessageType'
 
 Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
 })
 
-browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+export const renderPopup = () => {
+  const popupElement = document.getElementById('popup')
+
+  if (!popupElement) {
+    return
+  }
   ReactDOM.render(
     <ApolloProvider client={apolloClient}>
       <ColorModeScript initialColorMode={theme.config.initialColorMode} />
       <App parent="popup" />
     </ApolloProvider>,
-    document.getElementById('popup')
+    popupElement
   )
-})
+}
+browser.tabs.query({ active: true, currentWindow: true }).then(renderPopup)
 
 browser.runtime.connect({ name: 'popup' })
+browser.runtime.onMessage.addListener((msg) => {
+  console.log('~ msg', msg)
+  if (msg.action === BackgroundMessageType.rerenderViews) {
+    renderPopup()
+  }
+})

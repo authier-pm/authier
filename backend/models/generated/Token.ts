@@ -1,10 +1,10 @@
-import { Field, ID, ObjectType } from 'type-graphql'
+import { Field, ObjectType, Int } from 'type-graphql'
 import { TokenTypeGQL } from '../types/TokenType'
 import { UserGQL } from './User'
 
 @ObjectType()
 export class TokenGQLScalars {
-  @Field(() => ID)
+  @Field(() => Int)
   id: number
 
   @Field()

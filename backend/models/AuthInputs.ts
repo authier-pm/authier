@@ -1,6 +1,7 @@
 import {
   GraphQLEmailAddress,
   GraphQLNonEmptyString,
+  GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
 import { Field, InputType } from 'type-graphql'
@@ -19,4 +20,6 @@ export class RegisterDeviceInput {
   addDeviceSecret: string
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecretEncrypted: string
+  @Field(() => GraphQLPositiveInt, { nullable: true })
+  decryptionChallengeId: number
 }

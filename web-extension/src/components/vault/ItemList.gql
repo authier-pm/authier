@@ -1,0 +1,10 @@
+mutation deleteEncryptedSecret($id: ID!) {
+  me {
+    encryptedSecret(id: $id) {
+      id
+      delete {
+        id
+      }
+    }
+  }
+}
