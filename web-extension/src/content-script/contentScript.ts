@@ -6,7 +6,7 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { ILoginSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret } from '@src/util/useDeviceState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { onRemoveFromDOM } from './onRemovedFromDOM'
 

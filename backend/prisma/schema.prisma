@@ -29,9 +29,9 @@ model DecryptionChallenge {
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
   deviceId                 String?   @db.Uuid
-  device                   Device?   @relation("device", fields: [deviceId], references: [id])
-  approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
-  approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+
+  approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
+  approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
 }
 
 model Device {
@@ -58,7 +58,6 @@ model Device {
 
   SecretUsageEvents SecretUsageEvent[]
 
-  DeviceDecryptionChallenges         DecryptionChallenge[] @relation("device")
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
   @@index([updatedAt])
   @@index([lastSyncAt])
@@ -83,6 +82,7 @@ model EncryptedSecret {
   kind       EncryptedSecretType
   createdAt  DateTime            @default(now())
   updatedAt  DateTime?           @updatedAt
+  deletedAt  DateTime?
   //uniqueFiled String               @unique
   url        String? // should always be location.hostname, we autofill inputs based on WebInput where we store the path too
   androidUri String?

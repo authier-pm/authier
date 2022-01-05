@@ -11,9 +11,9 @@ import {
   CloseButton,
   useDisclosure
 } from '@chakra-ui/react'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useState } from 'react'
-import { BackgroundContext } from '@src/providers/BackgroundProvider'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from './DeleteAlert'
@@ -25,7 +25,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
-  const { backgroundState } = useContext(BackgroundContext)
+  const { deviceState } = useContext(DeviceStateContext)
 
   console.log(data)
   return (
@@ -82,8 +82,8 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
               isOpen={isOpen}
               onClose={onClose}
               deleteItem={async () => {
-                if (!backgroundState) {
-                  throw new Error('backgroundState is not set')
+                if (!deviceState) {
+                  throw new Error('deviceState is not set')
                 }
                 await deleteEncryptedSecretMutation({
                   variables: {
@@ -93,10 +93,8 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 
                 browser.storage.local.set({
                   backgroundState: {
-                    ...backgroundState,
-                    secrets: backgroundState.secrets.filter(
-                      (s) => s.id !== data.id
-                    )
+                    ...deviceState,
+                    secrets: deviceState.secrets.filter((s) => s.id !== data.id)
                   }
                 })
               }}
@@ -134,8 +132,8 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 }
 
 export const ItemList = () => {
-  const { backgroundState, LoginCredentials, TOTPSecrets } =
-    useContext(BackgroundContext)
+  const { deviceState, LoginCredentials, TOTPSecrets } =
+    useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
 
   return (

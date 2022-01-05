@@ -63,9 +63,6 @@ export class DeviceGQL extends DeviceGQLScalars {
   SecretUsageEvents: SecretUsageEventGQL[]
 
   @Field(() => [DecryptionChallengeGQL])
-  DeviceDecryptionChallenges: DecryptionChallengeGQL[]
-
-  @Field(() => [DecryptionChallengeGQL])
   DeviceDecryptionChallengesApproved: DecryptionChallengeGQL[]
 
   // skip overwrite 👇

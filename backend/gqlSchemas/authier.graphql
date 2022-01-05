@@ -113,7 +113,6 @@ type DeviceGQL {
   User: UserGQL!
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
-  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
 }
 
@@ -139,6 +138,7 @@ type EncryptedSecretGQL {
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   url: String
   androidUri: String
   iosUri: String
@@ -183,7 +183,6 @@ type DecryptionChallengeGQL {
   deviceId: String
   approvedFromDeviceId: String
   user: UserGQL!
-  device: DeviceGQL
   approvedFromDevice: DeviceGQL
   addDeviceSecretEncrypted: String!
 }
@@ -236,7 +235,6 @@ type DeviceQuery {
   User: UserGQL!
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
-  DeviceDecryptionChallenges: [DecryptionChallengeGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
   lastGeoLocation: String!
@@ -249,6 +247,7 @@ type EncryptedSecretQuery {
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   url: String
   androidUri: String
   iosUri: String
@@ -276,7 +275,10 @@ type Mutation {
   """
   returns a decryption challenge
   """
-  deviceDecryptionChallenge(email: EmailAddress!): DecryptionChallengeGQL
+  deviceDecryptionChallenge(
+    deviceId: UUID!
+    email: EmailAddress!
+  ): DecryptionChallengeGQL
 
   """
   removes current device
@@ -332,6 +334,7 @@ type EncryptedSecretMutation {
   kind: EncryptedSecretType!
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   url: String
   androidUri: String
   iosUri: String
@@ -434,6 +437,7 @@ input RegisterDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
+  decryptionChallengeId: PositiveInt!
 }
 
 """

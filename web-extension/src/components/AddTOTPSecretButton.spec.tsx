@@ -10,8 +10,7 @@ describe('getTokenSecretFromQrCode', () => {
         favIconUrl: 'test.ico',
         title: 'testTitle',
         url: 'https://www.bitfinex.com/'
-      } as any,
-      () => 'test'
+      } as any
     )
 
     expect(secretToken).toMatchInlineSnapshot(`
@@ -32,8 +31,7 @@ describe('getTokenSecretFromQrCode', () => {
           favIconUrl: 'test.ico',
           title: 'testTitle',
           url: 'https://www.bitfinex.com/'
-        } as any,
-        () => 'test'
+        } as any
       )
     ).toMatchInlineSnapshot(`
       Object {

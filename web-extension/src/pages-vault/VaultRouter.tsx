@@ -4,7 +4,7 @@ import { ItemList } from '@src/components/vault/ItemList'
 import { Route, Switch } from 'react-router-dom'
 import { ItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useBackgroundState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 export function VaultRouter() {
   return (
