@@ -21,7 +21,8 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  useColorMode
+  useColorMode,
+  Spinner
 } from '@chakra-ui/react'
 import {
   FiHome,
@@ -29,11 +30,15 @@ import {
   FiSettings,
   FiMenu,
   FiChevronDown,
-  FiMoon
+  FiMoon,
+  FiHardDrive
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
+import { device } from '@src/background/ExtensionDevice'
+import MD5 from 'crypto-js/md5'
+import { ChevronDownIcon } from '@chakra-ui/icons'
 
 interface LinkItemProps {
   name: string
@@ -43,7 +48,8 @@ interface LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Vault', icon: FiHome, path: '/' },
   { name: 'Settings', icon: FiSettings, path: '/settings' },
-  { name: 'Premium', icon: FiStar, path: '/premium' }
+  { name: 'Account Limits', icon: FiStar, path: '/account-limits' },
+  { name: 'Devices', icon: FiHardDrive, path: '/devices' }
 ]
 
 export default function SidebarWithHeader({
@@ -83,6 +89,10 @@ interface SidebarProps extends BoxProps {
 
 const SidebarContent = ({ onClose }: SidebarProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
+  const email = device.state?.email
+  if (!email) {
+    return <Spinner />
+  }
   return (
     <Box
       transition="3s ease"
@@ -101,15 +111,12 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" height="100%">
         {LinkItems.map((link) => (
           <NavItem key={link.name} icon={link.icon} path={link.path}>
             {link.name}
           </NavItem>
         ))}
-      </Flex>
-
-      <Flex m={4} mt="auto">
         <IconButton
           size="lg"
           variant="ghost"
@@ -118,36 +125,39 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
           onClick={toggleColorMode}
           mt="auto"
         />
-        <HStack spacing={{ base: '0', md: '6' }}>
-          <Flex alignItems={'center'}>
+      </Flex>
+
+      <Flex m={4} mt="auto">
+        <HStack spacing={{ base: '0', md: '6' }} w="100%">
+          <Flex alignItems={'center'} w="100%">
             <Menu>
               <MenuButton
                 py={2}
                 transition="all 0.3s"
                 _focus={{ boxShadow: 'none' }}
+                w="100%"
               >
-                <HStack>
+                <Flex w="100%">
                   <Avatar
                     size={'sm'}
-                    src={
-                      'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                    }
+                    src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
                   />
                   <VStack
                     display={{ base: 'none', md: 'flex' }}
                     alignItems="flex-start"
                     spacing="1px"
                     ml="2"
+                    mr="auto"
                   >
-                    <Text fontSize="sm">Justina Clark</Text>
+                    <Text fontSize="sm">{email}</Text>
                     <Text fontSize="xs" color="gray.600">
                       Admin
                     </Text>
                   </VStack>
-                  <Box display={{ base: 'none', md: 'flex' }}>
-                    <FiChevronDown />
+                  <Box display={{ base: 'none', md: 'flex' }} ml="auto">
+                    <ChevronDownIcon boxSize={19} />
                   </Box>
-                </HStack>
+                </Flex>
               </MenuButton>
               <MenuList
                 bg={useColorModeValue('white', 'gray.900')}
@@ -157,7 +167,17 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
                 <MenuItem>Settings</MenuItem>
                 <MenuItem>Billing</MenuItem>
                 <MenuDivider />
-                <MenuItem>Sign out</MenuItem>
+                <MenuItem
+                  backgroundColor="red.100"
+                  _hover={{
+                    backgroundColor: 'red.200'
+                  }}
+                  onClick={async () => {
+                    await device.logout()
+                  }}
+                >
+                  Logout
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -208,6 +228,8 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const email = device.state?.email!
+
   const { colorMode, toggleColorMode } = useColorMode()
   return (
     <Flex
@@ -256,9 +278,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <HStack>
                 <Avatar
                   size={'sm'}
-                  src={
-                    'https://images.unsplash.com/photo-1619946794135-5bc917a27793?ixlib=rb-0.3.5&q=80&fm=jpg&crop=faces&fit=crop&h=200&w=200&s=b616b2c5b373a80ffc9636ba24f7a4a9'
-                  }
+                  src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
                 />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
@@ -266,7 +286,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">Justina Clark</Text>
+                  <Text fontSize="sm">{email}</Text>
                   <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
@@ -284,7 +304,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem backgroundColor="red.400">Logout</MenuItem>
             </MenuList>
           </Menu>
         </Flex>
