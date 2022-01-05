@@ -132,6 +132,7 @@ export default function Login(): ReactElement {
 
             device.state = new DeviceState(deviceState)
             device.state.save()
+            device.rerenderViews()
           } else {
             toast.error(t`Login failed, check your username and password`)
           }

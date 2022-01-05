@@ -31,7 +31,6 @@ browser.tabs.query({ active: true, currentWindow: true }).then(renderPopup)
 
 browser.runtime.connect({ name: 'popup' })
 browser.runtime.onMessage.addListener((msg) => {
-  console.log('~ msg', msg)
   if (msg.action === BackgroundMessageType.rerenderViews) {
     renderPopup()
   }

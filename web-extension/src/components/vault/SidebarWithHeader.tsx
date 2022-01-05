@@ -111,7 +111,7 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
         </Text>
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
-      <Flex flexDirection="column">
+      <Flex flexDirection="column" height="100%">
         {LinkItems.map((link) => (
           <NavItem key={link.name} icon={link.icon} path={link.path}>
             {link.name}
@@ -167,7 +167,17 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
                 <MenuItem>Settings</MenuItem>
                 <MenuItem>Billing</MenuItem>
                 <MenuDivider />
-                <MenuItem>Sign out</MenuItem>
+                <MenuItem
+                  backgroundColor="red.100"
+                  _hover={{
+                    backgroundColor: 'red.200'
+                  }}
+                  onClick={async () => {
+                    await device.logout()
+                  }}
+                >
+                  Logout
+                </MenuItem>
               </MenuList>
             </Menu>
           </Flex>
@@ -218,6 +228,8 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
+  const email = device.state?.email!
+
   const { colorMode, toggleColorMode } = useColorMode()
   return (
     <Flex
@@ -274,7 +286,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   spacing="1px"
                   ml="2"
                 >
-                  <Text fontSize="sm">{device.state?.email}</Text>
+                  <Text fontSize="sm">{email}</Text>
                   <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
@@ -292,7 +304,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem>Sign out</MenuItem>
+              <MenuItem backgroundColor="red.400">Logout</MenuItem>
             </MenuList>
           </Menu>
         </Flex>

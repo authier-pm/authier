@@ -29,6 +29,7 @@ import { renderPopup } from '..'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { ZodError } from 'zod'
+import { renderVault } from '@src/vault-index'
 export const log = debug('au:Device')
 
 function getRandomInt(min: number, max: number) {
@@ -214,6 +215,7 @@ class ExtensionDevice {
 
   rerenderViews() {
     renderPopup()
+    renderVault()
     browser.runtime.sendMessage({
       action: BackgroundMessageType.rerenderViews
     })
