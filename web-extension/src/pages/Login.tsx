@@ -117,7 +117,7 @@ export default function Login(): ReactElement {
           if (response.data?.addNewDeviceForUser?.accessToken) {
             setAccessToken(response.data.addNewDeviceForUser?.accessToken)
 
-            let decodedToken = await getUserFromToken()
+            const decodedToken = await getUserFromToken()
 
             const EncryptedSecrets =
               response.data.addNewDeviceForUser.user.EncryptedSecrets

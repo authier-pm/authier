@@ -72,8 +72,8 @@ export const Popup: FunctionComponent = () => {
   useEffect(() => {
     if (isFilling) {
       log('Filling')
-      let device = deviceDetect()
-      let date = new Date()
+      const device = deviceDetect()
+      const date = new Date()
 
       //TODO: get all variables
       sendAuthMessage({

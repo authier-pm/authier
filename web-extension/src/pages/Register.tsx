@@ -62,7 +62,7 @@ export default function Register(): ReactElement {
           // @ts-expect-error
           const userId = crypto.randomUUID()
 
-          let res = await register({
+          const res = await register({
             variables: {
               userId,
               input: {

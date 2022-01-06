@@ -50,7 +50,7 @@ export const UserProvider: FunctionComponent = ({ children }) => {
 
     async function getId() {
       try {
-        let id = await getUserFromToken()
+        const id = await getUserFromToken()
 
         setUserId(id.userId)
       } catch (err) {
