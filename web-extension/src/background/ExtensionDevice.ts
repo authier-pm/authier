@@ -5,11 +5,11 @@ import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import { removeToken } from '@src/util/accessTokenExtension'
 import {
-  generateFireToken,
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked,
   SecretSerializedType
 } from './backgroundPage'
+import { generateFireToken } from './generateFireToken'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -25,11 +25,10 @@ import {
   MarkAsSyncedMutationVariables,
   MarkAsSyncedDocument
 } from './ExtensionDevice.codegen'
-import { renderPopup } from '..'
+
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
-import { ZodError } from 'zod'
-import { renderVault } from '@src/vault-index'
+
 export const log = debug('au:Device')
 
 function getRandomInt(min: number, max: number) {
@@ -39,6 +38,20 @@ function getRandomInt(min: number, max: number) {
 }
 
 const browserInfo = Bowser.getParser(navigator.userAgent)
+export const isRunningInBgPage = location.href.includes(
+  '_generated_background_page.html'
+)
+const isVault = location.href.includes('vault.html')
+
+async function rerenderViewInThisRuntime() {
+  if (isVault) {
+    const index = await import('@src/vault-index')
+    index.renderVault()
+  } else {
+    const index = await import('..')
+    index.renderPopup()
+  }
+}
 
 export class DeviceState {
   constructor(parameters: IBackgroundStateSerializable) {
@@ -196,6 +209,19 @@ class ExtensionDevice {
    */
   async initialize() {
     let storedState = null
+
+    if (isRunningInBgPage === false) {
+      //this is popup or vault
+
+      // browser.runtime.connect({ name: isVault ? 'vault' : 'popup' })
+
+      browser.runtime.onMessage.addListener(async (msg) => {
+        if (msg.action === BackgroundMessageType.rerenderViews) {
+          await rerenderViewInThisRuntime()
+        }
+      })
+    }
+
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
       storedState = storage.backgroundState
@@ -210,12 +236,11 @@ class ExtensionDevice {
     console.log('~ fireToken', fireToken)
     this.fireToken = fireToken
 
-    this.rerenderViews()
+    this.rerenderViews() // for letting vault/popup know that the state has changed
   }
 
   rerenderViews() {
-    renderPopup()
-    renderVault()
+    rerenderViewInThisRuntime()
     browser.runtime.sendMessage({
       action: BackgroundMessageType.rerenderViews
     })

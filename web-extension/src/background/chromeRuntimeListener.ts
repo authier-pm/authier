@@ -22,17 +22,18 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
-import { device } from './ExtensionDevice'
+import { device, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import type { IInitStateRes } from '@src/content-script/contentScript'
 
-const log = debug('chromeRuntimeListener')
+const log = debug('au:chListener')
 
-let vaultLockInterval: NodeJS.Timeout | null = null
+if (!isRunningInBgPage) {
+  throw new Error('this file should only be imported in the background page')
+}
+
 let safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
-let homeList: UIOptions
-let masterPassword: string
 
 interface ILoginCredentialsFromContentScript {
   username: string
@@ -63,11 +64,7 @@ chrome.runtime.onMessage.addListener(async function (
   sender,
   sendResponse
 ) {
-  if (req.payload) {
-    log(req.action, req.payload)
-  } else {
-    log(req.action)
-  }
+  log(req)
 
   const tab = sender.tab
 
@@ -144,13 +141,13 @@ chrome.runtime.onMessage.addListener(async function (
       sendResponse([deviceState?.email])
       break
     case BackgroundMessageType.getContentScriptInitialState:
-      if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
-        const res: IInitStateRes = {
-          isLoggedIn: !!device.state?.masterPassword,
-          saveLoginModalsState: saveLoginModalsStates.get(currentTabId)
-        }
-        sendResponse(res)
+      const res: IInitStateRes = {
+        isLoggedIn: !!device.state?.masterPassword,
+        saveLoginModalsState: currentTabId
+          ? saveLoginModalsStates.get(currentTabId)
+          : null
       }
+      sendResponse(res)
 
       break
 
@@ -178,7 +175,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
 
     case BackgroundMessageType.UISettings:
-      homeList = req.config.homeList
+      // homeList = req.config.homeList
 
       console.log('UIconfig', req.config)
       break
@@ -192,28 +189,28 @@ chrome.runtime.onMessage.addListener(async function (
   }
 })
 
-/**
- * when user open popup we clear the vault lock interval, when user closes it we always restart it again
- */
-browser.runtime.onConnect.addListener(function (externalPort) {
-  externalPort.onDisconnect.addListener(function () {
-    console.log('onDisconnect')
-    // Do stuff that should happen when popup window closes here
-    if (vaultLockInterval) {
-      clearInterval(vaultLockInterval)
-    }
-    vaultLockInterval = setTimeout(() => {
-      vaultLockInterval && clearTimeout(vaultLockInterval)
+// /**
+//  * when user open popup we clear the vault lock interval, when user closes it we always restart it again
+//  */
+// browser.runtime.onConnect.addListener(function (externalPort) {
+//   externalPort.onDisconnect.addListener(function () {
+//     console.log('onDisconnect')
+//     // Do stuff that should happen when popup window closes here
+//     if (vaultLockInterval) {
+//       clearInterval(vaultLockInterval)
+//     }
+//     vaultLockInterval = setTimeout(() => {
+//       vaultLockInterval && clearTimeout(vaultLockInterval)
 
-      safeClosed = true
+//       safeClosed = true
 
-      chrome.runtime.sendMessage({ safe: 'closed' })
-      console.log('locked', safeClosed)
-    }, lockTime)
-  })
+//       chrome.runtime.sendMessage({ safe: 'closed' })
+//       console.log('locked', safeClosed)
+//     }, lockTime)
+//   })
 
-  if (vaultLockInterval) {
-    clearTimeout(vaultLockInterval)
-    vaultLockInterval = null
-  }
-})
+//   if (vaultLockInterval) {
+//     clearTimeout(vaultLockInterval)
+//     vaultLockInterval = null
+//   }
+// })

@@ -15,22 +15,15 @@ Sentry.init({
 
 export const renderVault = () => {
   const vaultRoot = document.getElementById('vault')
-  if (vaultRoot) {
-    ReactDOM.render(
-      <HashRouter basename="/">
-        <ApolloProvider client={apolloClient}>
-          <App parent={'vault'} />
-        </ApolloProvider>
-      </HashRouter>,
-      vaultRoot
-    )
-  }
-}
-browser.tabs.query({ active: true, currentWindow: true }).then(renderVault)
 
-browser.runtime.connect({ name: 'vault' })
-browser.runtime.onMessage.addListener((msg) => {
-  if (msg.action === BackgroundMessageType.rerenderViews) {
-    renderVault()
-  }
-})
+  ReactDOM.render(
+    <HashRouter basename="/">
+      <ApolloProvider client={apolloClient}>
+        <App parent={'vault'} />
+      </ApolloProvider>
+    </HashRouter>,
+    vaultRoot
+  )
+}
+
+browser.tabs.query({ active: true, currentWindow: true }).then(renderVault)

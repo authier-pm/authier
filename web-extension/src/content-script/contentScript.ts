@@ -25,6 +25,7 @@ export interface IInitStateRes {
         password: string
         username: string
       }
+    | null
     | undefined
 }
 
@@ -42,7 +43,6 @@ export function getWebInputKind(
 const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-
 export async function initInputWatch() {
   const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
