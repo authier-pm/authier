@@ -24,6 +24,7 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { device } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
+import type { IInitStateRes } from '@src/content-script/contentScript'
 
 const log = debug('chromeRuntimeListener')
 
@@ -144,7 +145,7 @@ chrome.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.getContentScriptInitialState:
       if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
-        const res = {
+        const res: IInitStateRes = {
           isLoggedIn: !!device.state?.masterPassword,
           saveLoginModalsState: saveLoginModalsStates.get(currentTabId)
         }
