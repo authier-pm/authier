@@ -6,7 +6,6 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { ILoginSecret } from '@src/util/useDeviceState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { onRemoveFromDOM } from './onRemovedFromDOM'
 
@@ -16,6 +15,17 @@ localStorage.debug = 'au:*' // enable all debug messages
 const inputKindMap = {
   email: WebInputType.EMAIL,
   username: WebInputType.USERNAME
+}
+
+export interface IInitStateRes {
+  isLoggedIn: boolean
+  saveLoginModalsState:
+    | {
+        password: string
+        username: string
+      }
+    | null
+    | undefined
 }
 
 // TODO spec
@@ -32,16 +42,28 @@ export function getWebInputKind(
 const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-
 export async function initInputWatch() {
-  const modalState = await browser.runtime.sendMessage({
-    action: BackgroundMessageType.getLoginCredentialsModalState
+  const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
+    action: BackgroundMessageType.getContentScriptInitialState
   })
-  log('~ modalState42', modalState)
-  if (modalState && modalState.username && modalState.password) {
-    renderSaveCredentialsForm(modalState.username, modalState.password)
+
+  const { saveLoginModalsState, isLoggedIn } = stateInitRes
+  if (!isLoggedIn) {
+    return // no need to do anything
+  }
+
+  if (
+    saveLoginModalsState &&
+    saveLoginModalsState.username &&
+    saveLoginModalsState.password
+  ) {
+    renderSaveCredentialsForm(
+      saveLoginModalsState.username,
+      saveLoginModalsState.password
+    )
     return // the modal is already displayed
   }
+
   const showSavePromptIfAppropriate = async () => {
     if (promptDiv) {
       return
@@ -186,6 +208,9 @@ function renderSaveCredentialsForm(username: string, password: string) {
  <button id="__AUTHIER__saveBtn" style="${buttonStyle(
    authierColors.green[500]
  )} min-width=60px;">save</button >
+  <button id="__AUTHIER__saveAndEditBtn" style="${buttonStyle(
+    authierColors.green[600]
+  )} min-width=60px;">save & edit</button >
   <button style="${buttonStyle(
     authierColors.teal[900]
   )}" id="__AUTHIER__closeBtn">close</button >
@@ -208,23 +233,35 @@ function renderSaveCredentialsForm(username: string, password: string) {
     promptDiv = null
   }
 
+  const addCredential = async () => {
+    const loginCredentials = {
+      username,
+      password,
+      capturedInputEvents: domRecorder.toJSON()
+    }
+    return browser.runtime.sendMessage({
+      action: BackgroundMessageType.addLoginCredentials,
+      payload: loginCredentials
+    })
+  }
   document
-    .querySelector('#__AUTHIER__saveBtn')!
-    .addEventListener('click', () => {
-      const loginCredentials = {
-        username,
-        password,
-        capturedInputEvents: domRecorder.toJSON()
-      }
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.addLoginCredentials,
-        payload: loginCredentials
-      })
+    .querySelector('#__AUTHIER__saveBtn')
+    ?.addEventListener('click', async () => {
+      await addCredential()
+      closePrompt()
+    })
+
+  document
+    .querySelector('#__AUTHIER__saveAndEditBtn')
+    ?.addEventListener('click', async () => {
+      const secret = await addCredential()
+      chrome.tabs.create({ url: `vault.html/secret/${secret.id}}` })
+
       closePrompt()
     })
   document
-    .querySelector('#__AUTHIER__closeBtn')!
-    .addEventListener('click', async () => {
+    .querySelector('#__AUTHIER__closeBtn')
+    ?.addEventListener('click', async () => {
       closePrompt()
 
       browser.runtime.sendMessage({
@@ -235,8 +272,8 @@ function renderSaveCredentialsForm(username: string, password: string) {
   // password show button functionality
   let passwordShown = false
   document
-    .querySelector('#__AUTHIER__showPswdBtn')!
-    .addEventListener('click', () => {
+    .querySelector('#__AUTHIER__showPswdBtn')
+    ?.addEventListener('click', () => {
       const passwordDisplayEl = document.querySelector(
         '#__AUTHIER__pswdDisplay'
       )!
