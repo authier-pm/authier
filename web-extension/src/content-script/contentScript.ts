@@ -18,6 +18,16 @@ const inputKindMap = {
   username: WebInputType.USERNAME
 }
 
+interface IInitStateRes {
+  isLoggedIn: boolean
+  saveLoginModalsState:
+    | {
+        password: string
+        username: string
+      }
+    | undefined
+}
+
 // TODO spec
 export function getWebInputKind(
   targetElement: HTMLInputElement
@@ -34,14 +44,27 @@ const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 
 export async function initInputWatch() {
-  const modalState = await browser.runtime.sendMessage({
-    action: BackgroundMessageType.getLoginCredentialsModalState
+  const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
+    action: BackgroundMessageType.getContentScriptInitialState
   })
-  log('~ modalState42', modalState)
-  if (modalState && modalState.username && modalState.password) {
-    renderSaveCredentialsForm(modalState.username, modalState.password)
+
+  const { saveLoginModalsState, isLoggedIn } = stateInitRes
+  if (!isLoggedIn) {
+    return // no need to do anything
+  }
+
+  if (
+    saveLoginModalsState &&
+    saveLoginModalsState.username &&
+    saveLoginModalsState.password
+  ) {
+    renderSaveCredentialsForm(
+      saveLoginModalsState.username,
+      saveLoginModalsState.password
+    )
     return // the modal is already displayed
   }
+
   const showSavePromptIfAppropriate = async () => {
     if (promptDiv) {
       return

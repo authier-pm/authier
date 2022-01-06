@@ -142,9 +142,13 @@ chrome.runtime.onMessage.addListener(async function (
     case BackgroundMessageType.getFallbackUsernames:
       sendResponse([deviceState?.email])
       break
-    case BackgroundMessageType.getLoginCredentialsModalState:
+    case BackgroundMessageType.getContentScriptInitialState:
       if (currentTabId && saveLoginModalsStates.has(currentTabId)) {
-        sendResponse(saveLoginModalsStates.get(currentTabId))
+        const res = {
+          isLoggedIn: !!device.state?.masterPassword,
+          saveLoginModalsState: saveLoginModalsStates.get(currentTabId)
+        }
+        sendResponse(res)
       }
 
       break
