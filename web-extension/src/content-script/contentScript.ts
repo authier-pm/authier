@@ -18,7 +18,7 @@ const inputKindMap = {
   username: WebInputType.USERNAME
 }
 
-interface IInitStateRes {
+export interface IInitStateRes {
   isLoggedIn: boolean
   saveLoginModalsState:
     | {
