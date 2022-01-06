@@ -100,6 +100,8 @@ chrome.runtime.onMessage.addListener(async function (
         label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
       })
 
+      tab.id && saveLoginModalsStates.delete(tab.id)
+
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
           domPath: captured.element,

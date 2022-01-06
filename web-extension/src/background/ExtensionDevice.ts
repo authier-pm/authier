@@ -42,12 +42,13 @@ export const isRunningInBgPage = location.href.includes(
   '_generated_background_page.html'
 )
 const isVault = location.href.includes('vault.html')
+const isPopup = location.href.includes('popup.html')
 
 async function rerenderViewInThisRuntime() {
   if (isVault) {
     const index = await import('@src/vault-index')
     index.renderVault()
-  } else {
+  } else if (isPopup) {
     const index = await import('..')
     index.renderPopup()
   }
@@ -238,10 +239,13 @@ class ExtensionDevice {
   }
 
   rerenderViews() {
-    rerenderViewInThisRuntime()
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.rerenderViews
-    })
+    if (isRunningInBgPage === false) {
+      rerenderViewInThisRuntime()
+
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.rerenderViews
+      })
+    }
   }
 
   generateDeviceName(): string {
