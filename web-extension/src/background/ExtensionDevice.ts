@@ -213,8 +213,6 @@ class ExtensionDevice {
     if (isRunningInBgPage === false) {
       //this is popup or vault
 
-      // browser.runtime.connect({ name: isVault ? 'vault' : 'popup' })
-
       browser.runtime.onMessage.addListener(async (msg) => {
         if (msg.action === BackgroundMessageType.rerenderViews) {
           await rerenderViewInThisRuntime()
