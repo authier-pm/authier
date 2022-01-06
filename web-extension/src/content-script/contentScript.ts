@@ -6,7 +6,6 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { ILoginSecret } from '@src/util/useDeviceState'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { onRemoveFromDOM } from './onRemovedFromDOM'
 
@@ -240,29 +239,29 @@ function renderSaveCredentialsForm(username: string, password: string) {
       password,
       capturedInputEvents: domRecorder.toJSON()
     }
-    browser.runtime.sendMessage({
+    return browser.runtime.sendMessage({
       action: BackgroundMessageType.addLoginCredentials,
       payload: loginCredentials
     })
   }
   document
-    .querySelector('#__AUTHIER__saveBtn')!
-    .addEventListener('click', async () => {
+    .querySelector('#__AUTHIER__saveBtn')
+    ?.addEventListener('click', async () => {
       await addCredential()
       closePrompt()
     })
 
   document
-    .querySelector('#__AUTHIER__saveAndEditBtn')!
-    .addEventListener('click', async () => {
+    .querySelector('#__AUTHIER__saveAndEditBtn')
+    ?.addEventListener('click', async () => {
       const secret = await addCredential()
       chrome.tabs.create({ url: `vault.html/secret/${secret.id}}` })
 
       closePrompt()
     })
   document
-    .querySelector('#__AUTHIER__closeBtn')!
-    .addEventListener('click', async () => {
+    .querySelector('#__AUTHIER__closeBtn')
+    ?.addEventListener('click', async () => {
       closePrompt()
 
       browser.runtime.sendMessage({
@@ -273,8 +272,8 @@ function renderSaveCredentialsForm(username: string, password: string) {
   // password show button functionality
   let passwordShown = false
   document
-    .querySelector('#__AUTHIER__showPswdBtn')!
-    .addEventListener('click', () => {
+    .querySelector('#__AUTHIER__showPswdBtn')
+    ?.addEventListener('click', () => {
       const passwordDisplayEl = document.querySelector(
         '#__AUTHIER__pswdDisplay'
       )!
