@@ -10,7 +10,7 @@ import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { onRemoveFromDOM } from './onRemovedFromDOM'
 
 const log = debug('au:contentScript')
-localStorage.debug = 'au:*' // enable all debug messages
+localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages
 
 const inputKindMap = {
   email: WebInputType.EMAIL,

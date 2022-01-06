@@ -91,7 +91,7 @@ chrome.runtime.onMessage.addListener(async function (
 
       loginCredentialsSchema.parse(namePassPair)
 
-      await deviceState.addSecret({
+      const secret = await deviceState.addSecret({
         kind: EncryptedSecretType.LOGIN_CREDENTIALS,
         loginCredentials: namePassPair,
         encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
@@ -121,6 +121,7 @@ chrome.runtime.onMessage.addListener(async function (
       })
 
       console.log(credentials.capturedInputEvents)
+      sendResponse(secret)
       break
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
