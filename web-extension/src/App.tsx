@@ -10,7 +10,7 @@ function App({ parent }: { parent: string }): ReactElement {
 
   useEffect(() => {
     async function token() {
-      let s = await browser.storage.local.get('access-token')
+      const s = await browser.storage.local.get('access-token')
 
       setAccessToken(s['access-token'])
       setLoading(false)
