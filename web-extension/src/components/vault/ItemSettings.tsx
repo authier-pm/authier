@@ -51,7 +51,7 @@ const InputWithHeading = ({
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
-  let history = useHistory()
+  const history = useHistory()
   const [secret, setSecret] = useState<string>(data.totp)
   const [show, setShow] = useState(false)
   const handleChangeSecret = (event: any) => {
@@ -114,7 +114,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
 }
 
 const LoginSecret = (data: ILoginSecret) => {
-  let history = useHistory()
+  const history = useHistory()
   const [show, setShow] = useState(false)
   const [password, setPassword] = useState<string>(
     data.loginCredentials.password

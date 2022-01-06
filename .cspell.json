@@ -6,6 +6,7 @@
     "auths",
     "Authy",
     "Chakra",
+    "codegen",
     "cooldown",
     "Deduplication",
     "Fastify",
@@ -29,6 +30,7 @@
     "typegraphql",
     "upsert",
     "uuidv",
-    "webextension"
+    "webextension",
+    "wouter"
   ]
 }

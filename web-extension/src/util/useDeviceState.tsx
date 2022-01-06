@@ -56,10 +56,10 @@ export function useDeviceState() {
   //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
 
-  const [safeLocked, setSafeLocked] = useState<Boolean>(false)
+  const [safeLocked, setSafeLocked] = useState<boolean>(false)
 
-  const [isFilling, setIsFilling] = useState<Boolean>(false)
-  const [isCounting, setIsCounting] = useState<Boolean>(false)
+  const [isFilling, setIsFilling] = useState<boolean>(false)
+  const [isCounting, setIsCounting] = useState<boolean>(false)
   const [deviceState, setDeviceState] =
     useState<IBackgroundStateSerializable | null>(device.state)
 
@@ -103,7 +103,7 @@ export function useDeviceState() {
     browser.runtime.onMessage.addListener(
       (request: {
         safe: string
-        filling: Boolean
+        filling: boolean
         passwords: Array<ILoginSecret>
       }) => {
         if (request.filling) {
@@ -232,7 +232,6 @@ export function useDeviceState() {
     UIConfig
   }
 
-  // @ts-expect-error
-  window.backgroundState = backgroundStateContext
+  window['backgroundState'] = backgroundStateContext
   return backgroundStateContext
 }
