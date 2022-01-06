@@ -1,5 +1,5 @@
 export async function AuthKey(salt: BufferSource, keyMaterial: CryptoKey) {
-  let key = await crypto.subtle.deriveKey(
+  const key = await crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt as ArrayBuffer,
@@ -20,8 +20,8 @@ export async function VaultKey(
   salt: BufferSource,
   password: string
 ) {
-  let enc = new TextEncoder()
-  let keyMaterial = await window.crypto.subtle.importKey(
+  const enc = new TextEncoder()
+  const keyMaterial = await window.crypto.subtle.importKey(
     'raw',
     enc.encode(password),
     'PBKDF2',
@@ -29,7 +29,7 @@ export async function VaultKey(
     ['deriveBits', 'deriveKey']
   )
 
-  let key = await crypto.subtle.deriveKey(
+  const key = await crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt as ArrayBuffer,

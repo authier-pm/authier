@@ -86,9 +86,9 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
                 setShowWhole(!showWhole)
                 if (!showWhole) {
                   // CHECK
-                  let tabs = await browser.tabs.query({ active: true })
+                  const tabs = await browser.tabs.query({ active: true })
 
-                  let url = tabs[0].url as string
+                  const url = tabs[0].url as string
 
                   await addOTPEvent({
                     variables: {

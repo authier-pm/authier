@@ -17,7 +17,7 @@ import { IoIosPhonePortrait } from 'react-icons/io'
 import { useLocation } from 'wouter'
 import { useMyDevicesQuery } from './Devices.codegen'
 
-let devices = [
+const devices = [
   { name: 'test', lastIp: '25', location: 'Brno' },
   { name: 'test', lastIp: '123', location: 'Brno' }
 ]

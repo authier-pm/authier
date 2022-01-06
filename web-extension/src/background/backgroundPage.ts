@@ -65,7 +65,7 @@ export interface IBackgroundStateSerializable
   masterPassword: string
 }
 
-export let lockTime = 10000 * 60 * 60 * 8
+export const lockTime = 10000 * 60 * 60 * 8
 
 // export function setLockTime(val: number) {
 //   log('setLockTime', val)
@@ -105,7 +105,7 @@ browser.runtime.onMessage.addListener(
 function fillInput(credentials: string) {
   const inputs = document.getElementsByTagName('input')
   let filtered: Array<HTMLInputElement> = []
-  let scan = setInterval(() => {
+  const scan = setInterval(() => {
     filtered = Array.from(inputs).filter((i) => {
       log('scanning')
       if (

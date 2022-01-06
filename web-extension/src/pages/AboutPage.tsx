@@ -4,7 +4,7 @@ import { Trans } from '@lingui/macro'
 import { Center, Stack } from '@chakra-ui/layout'
 import { Heading, Text } from '@chakra-ui/react'
 
-export const AboutPage: React.FC<{}> = () => {
+export const AboutPage: React.FC = () => {
   return (
     <Center m={2} p={2}>
       <Stack direction="column">
