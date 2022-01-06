@@ -41,6 +41,6 @@
     "react-toastify": "^8.1.0",
     "typescript": "^4.5.4",
     "vite": "^2.7.9",
-    "vitest": "^0.0.122"
+    "vitest": "^0.0.134"
   }
 }
