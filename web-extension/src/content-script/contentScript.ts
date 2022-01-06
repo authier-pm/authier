@@ -209,6 +209,9 @@ function renderSaveCredentialsForm(username: string, password: string) {
  <button id="__AUTHIER__saveBtn" style="${buttonStyle(
    authierColors.green[500]
  )} min-width=60px;">save</button >
+  <button id="__AUTHIER__saveAndEditBtn" style="${buttonStyle(
+    authierColors.green[600]
+  )} min-width=60px;">save & edit</button >
   <button style="${buttonStyle(
     authierColors.teal[900]
   )}" id="__AUTHIER__closeBtn">close</button >
@@ -231,18 +234,30 @@ function renderSaveCredentialsForm(username: string, password: string) {
     promptDiv = null
   }
 
+  const addCredential = async () => {
+    const loginCredentials = {
+      username,
+      password,
+      capturedInputEvents: domRecorder.toJSON()
+    }
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.addLoginCredentials,
+      payload: loginCredentials
+    })
+  }
   document
     .querySelector('#__AUTHIER__saveBtn')!
-    .addEventListener('click', () => {
-      const loginCredentials = {
-        username,
-        password,
-        capturedInputEvents: domRecorder.toJSON()
-      }
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.addLoginCredentials,
-        payload: loginCredentials
-      })
+    .addEventListener('click', async () => {
+      await addCredential()
+      closePrompt()
+    })
+
+  document
+    .querySelector('#__AUTHIER__saveAndEditBtn')!
+    .addEventListener('click', async () => {
+      const secret = await addCredential()
+      chrome.tabs.create({ url: `vault.html/secret/${secret.id}}` })
+
       closePrompt()
     })
   document
