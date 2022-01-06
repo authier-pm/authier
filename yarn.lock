@@ -7550,13 +7550,6 @@ builtin-status-codes@^3.0.0:
   resolved "https://registry.yarnpkg.com/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz#85982878e21b98e1c66425e03d0174788f569ee8"
   integrity sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug=
 
-builtins@^4.0.0:
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/builtins/-/builtins-4.0.0.tgz#a8345420de82068fdc4d6559d0456403a8fb1905"
-  integrity sha512-qC0E2Dxgou1IHhvJSLwGDSTvokbRovU5zZFuDY6oY8Y2lF3nGt5Ad8YZK7GMtqzY84Wu7pXTPeHQeHcXSXsRhw==
-  dependencies:
-    semver "^7.0.0"
-
 bytes@3.0.0:
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/bytes/-/bytes-3.0.0.tgz#d32815404d689699f85a4ea4fa8755dd13a96048"
@@ -11580,13 +11573,6 @@ import-local@^3.0.2:
     pkg-dir "^4.2.0"
     resolve-cwd "^3.0.0"
 
-import-meta-resolve@^1.1.1:
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/import-meta-resolve/-/import-meta-resolve-1.1.1.tgz#244fd542fd1fae73550d4f8b3cde3bba1d7b2b18"
-  integrity sha512-JiTuIvVyPaUg11eTrNDx5bgQ/yMKMZffc7YSjvQeSMXy58DO2SQ8BtAf3xteZvmzvjYh14wnqNjL8XVeDy2o9A==
-  dependencies:
-    builtins "^4.0.0"
-
 imurmurhash@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/imurmurhash/-/imurmurhash-0.1.4.tgz#9218b9b2b928a238b13dc4fb6b6d576f231453ea"
@@ -13683,12 +13669,10 @@ loader-utils@^2.0.0:
     emojis-list "^3.0.0"
     json5 "^2.1.2"
 
-local-pkg@^0.4.0:
-  version "0.4.0"
-  resolved "https://registry.yarnpkg.com/local-pkg/-/local-pkg-0.4.0.tgz#e6221171813d5a0812dd84fa80ffb1c8fcc00531"
-  integrity sha512-2XBWjO/v63JeR1HPzLJxdTVRQDB84Av2p2KtBA5ahvpyLUPubcAU6iXlAJrONcY7aSqgJhXxElAnKtnYsRolPQ==
-  dependencies:
-    mlly "^0.2.2"
+local-pkg@^0.4.1:
+  version "0.4.1"
+  resolved "https://registry.yarnpkg.com/local-pkg/-/local-pkg-0.4.1.tgz#e7b0d7aa0b9c498a1110a5ac5b00ba66ef38cfff"
+  integrity sha512-lL87ytIGP2FU5PWwNDo0w3WhIo2gopIAxPg9RxDYF7m4rr5ahuZxP22xnJHIvaLTe4Z9P6uKKY2UHiwyB4pcrw==
 
 localforage@^1.8.1:
   version "1.10.0"
@@ -14833,13 +14817,6 @@ mkdirp@^1.0.3, mkdirp@^1.0.4:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
-
-mlly@^0.2.2:
-  version "0.2.10"
-  resolved "https://registry.yarnpkg.com/mlly/-/mlly-0.2.10.tgz#645902c9761dc6b5ded174b8e717147fe52e4893"
-  integrity sha512-xfyW6c2QBGArtctzNnTV5leOKX8nOMz2simeubtXofdsdSJFSNw+Ncvrs8kxcN3pBrQLXuYBHNFV6NgZ5Ryf4A==
-  dependencies:
-    import-meta-resolve "^1.1.1"
 
 mnemonist@^0.39.0:
   version "0.39.0"
@@ -17600,7 +17577,7 @@ semver@7.0.0:
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.0.0.tgz#5f3ca35761e47e05b206c6daff2cf814f0316b8e"
   integrity sha512-+GB6zVA9LWh6zovYQLALHwv5rb2PHGlJi3lfiqIHxR0uuwCgefcOJc59v9fv1w8GbStwxuuqqAjI9NMAOOgq1A==
 
-semver@7.x, semver@^7.0.0, semver@^7.2.1, semver@^7.3.2, semver@^7.3.4, semver@^7.3.5:
+semver@7.x, semver@^7.2.1, semver@^7.3.2, semver@^7.3.4, semver@^7.3.5:
   version "7.3.5"
   resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
   integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
@@ -18786,15 +18763,15 @@ tinycolor2@^1.4.2:
   resolved "https://registry.yarnpkg.com/tinycolor2/-/tinycolor2-1.4.2.tgz#3f6a4d1071ad07676d7fa472e1fac40a719d8803"
   integrity sha512-vJhccZPs965sV/L2sU4oRQVAos0pQXwsvTLkWYdqJ+a8Q5kPFzJTuOFwy7UniPli44NKQGAglksjvOcpo95aZA==
 
-tinypool@^0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/tinypool/-/tinypool-0.0.6.tgz#19ca10329e7f60dc9fff90128e3357e895840405"
-  integrity sha512-E9vY6eq/Q7fUlSt69cY3y7qXNbVOFaxP+lAEDMKMObLrmO0MmEdUPyjOMgepoMDw/ps/sazl7WIQglnUrunnLg==
+tinypool@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/tinypool/-/tinypool-0.1.1.tgz#99eaf29d030feeca2da6c1d6b33f90fc18093bc7"
+  integrity sha512-sW2fQZ2BRb/GX5v55NkHiTrbMLx0eX0xNpP+VGhOe2f7Oo04+LeClDyM19zCE/WCy7jJ8kzIJ0Ojrxj3UhN9Sg==
 
-tinyspy@^0.2.6:
-  version "0.2.6"
-  resolved "https://registry.yarnpkg.com/tinyspy/-/tinyspy-0.2.6.tgz#4c5430afa361d4a18431f85d9ccbefc21c607cb3"
-  integrity sha512-HXNA1PZ9p95rWK7h3DvWaDK06XmsjN3ldZjacW/1F0viVfPanTGSQ6l2iQyjNElD0Nd5ogfq/hT0sx2Hdyz4wQ==
+tinyspy@^0.2.7:
+  version "0.2.7"
+  resolved "https://registry.yarnpkg.com/tinyspy/-/tinyspy-0.2.7.tgz#265b5deab32c89b2fa1986939869ef74b160c0f5"
+  integrity sha512-AaNITSED8/2j2/nSgPeQZW2nNhdTxNJ7XwcdBezI7MtPS2C+pJ1HjcHc/qfDhohUhQvODITdxzWH9u+Qs+7yFQ==
 
 title-case@^3.0.3:
   version "3.0.3"
@@ -19586,6 +19563,18 @@ vfile@^5.0.0:
     unist-util-stringify-position "^3.0.0"
     vfile-message "^3.0.0"
 
+vite@>=2.7.10:
+  version "2.7.10"
+  resolved "https://registry.yarnpkg.com/vite/-/vite-2.7.10.tgz#d12c4c10e56a0ecf7890cb529c15996c6111218f"
+  integrity sha512-KEY96ntXUid1/xJihJbgmLZx7QSC2D4Tui0FdS0Old5OokYzFclcofhtxtjDdGOk/fFpPbHv9yw88+rB93Tb8w==
+  dependencies:
+    esbuild "^0.13.12"
+    postcss "^8.4.5"
+    resolve "^1.20.0"
+    rollup "^2.59.0"
+  optionalDependencies:
+    fsevents "~2.3.2"
+
 vite@^2.7.9:
   version "2.7.9"
   resolved "https://registry.yarnpkg.com/vite/-/vite-2.7.9.tgz#c72d8817cdddbb127daed0c8f87fbca4e7754a81"
@@ -19598,17 +19587,18 @@ vite@^2.7.9:
   optionalDependencies:
     fsevents "~2.3.2"
 
-vitest@^0.0.122:
-  version "0.0.122"
-  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.0.122.tgz#97924f2a5510c0ecf8bdc1575f7f2385a60dc801"
-  integrity sha512-ayAY8Ue444rutcU6gXO2fTASmVSEEYGBtrGSRgnVBrBo+RlOkv0i67yUJFLyH3krtKdLbbKGk+lQ5B7kBvhX7w==
+vitest@^0.0.134:
+  version "0.0.134"
+  resolved "https://registry.yarnpkg.com/vitest/-/vitest-0.0.134.tgz#cca4239ca9ee48d931e258a06e0212deb00df503"
+  integrity sha512-zrYkdyQ+erHLCPhc6hkz9mDaXQ94kVcJkIhaC0uhoot2Mpf0TKqQLWSWRFpdxJGM3wMi+bmwbIkWPYEIXHObkg==
   dependencies:
     "@types/chai" "^4.3.0"
     "@types/chai-subset" "^1.3.3"
     chai "^4.3.4"
-    local-pkg "^0.4.0"
-    tinypool "^0.0.6"
-    tinyspy "^0.2.6"
+    local-pkg "^0.4.1"
+    tinypool "^0.1.1"
+    tinyspy "^0.2.7"
+    vite ">=2.7.10"
 
 vlq@^1.0.0:
   version "1.0.1"
