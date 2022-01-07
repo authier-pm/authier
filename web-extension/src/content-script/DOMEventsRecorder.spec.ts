@@ -49,3 +49,9 @@ describe('DOMEventsRecorder', () => {
     )
   })
 })
+
+describe('getSelectorForElement', () => {
+  it.todo(
+    'should return a selector based on autocomplete attribute if it is present'
+  )
+})
