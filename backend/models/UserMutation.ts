@@ -163,13 +163,13 @@ export class UserMutation extends UserBase {
   @Field(() => Boolean)
   async approveDevice(@Arg('success', () => Boolean) success: Boolean) {
     // TODO check current device is master
-    let user = await prismaClient.user.findFirst({
+    const user = await prismaClient.user.findFirst({
       where: {
         id: this.id
       }
     })
     if (user?.masterDeviceId) {
-      let device = await prismaClient.device.findFirst({
+      const device = await prismaClient.device.findFirst({
         where: {
           id: user?.masterDeviceId
         }
