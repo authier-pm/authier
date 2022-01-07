@@ -2,6 +2,9 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
+import { generate } from 'generate-password'
+import browser from 'webextension-polyfill'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 
 const log = debug('au:autofill')
 
@@ -22,22 +25,26 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
 
 let enabled = false
 export const autofill = (secrets: IDecryptedSecrets) => {
-  if (
-    enabled === false &&
-    secrets.loginCredentials.length === 0 &&
-    secrets.totpSecrets.length === 0
-  ) {
+  if (enabled === true) {
     return
   }
   log('init autofill', secrets)
 
   enabled = true
 
-  const autofillElement = (input: HTMLInputElement) => {
-    if (input.autocomplete === 'username') {
+  const autofillElement = async (input: HTMLInputElement) => {
+    if (
+      input.autocomplete.includes('username') ||
+      input.autocomplete.includes('email')
+    ) {
       const secret = secrets.loginCredentials[0]
       if (secret) {
         autofillValueIntoInput(input, secret.loginCredentials.username)
+      } else {
+        const fallbackUsernames: string[] = await browser.runtime.sendMessage({
+          action: BackgroundMessageType.getFallbackUsernames
+        })
+        autofillValueIntoInput(input, fallbackUsernames[0])
       }
     } else if (input.autocomplete === 'current-password') {
       const secret = secrets.loginCredentials[0]
@@ -45,7 +52,10 @@ export const autofill = (secrets: IDecryptedSecrets) => {
         autofillValueIntoInput(input, secret.loginCredentials.password)
       }
     } else if (input.autocomplete === 'new-password') {
-      autofillValueIntoInput(input, 'TODO generate')
+      autofillValueIntoInput(
+        input,
+        generate({ length: 12, numbers: true, symbols: true }) // TODO get from user's options
+      )
     } else if (input.autocomplete === 'one-time-code') {
       const totpSecret = secrets.totpSecrets[0]
       if (totpSecret) {

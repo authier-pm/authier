@@ -153,7 +153,7 @@ chrome.runtime.onMessage.addListener(async function (
 
       const tabUrl = tab?.url
       if (!tabUrl || !deviceState) {
-        res = { extensionDeviceReady: false }
+        return sendResponse(null)
       } else {
         const decrypted =
           device.state?.getSecretsDecryptedByHostname(
