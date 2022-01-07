@@ -47,7 +47,7 @@ interface LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Vault', icon: FiHome, path: '/' },
-  { name: 'Settings', icon: FiSettings, path: '/settings' },
+  { name: 'Settings', icon: FiSettings, path: '/settings/account' },
   { name: 'Account Limits', icon: FiStar, path: '/account-limits' },
   { name: 'Devices', icon: FiHardDrive, path: '/devices' }
 ]
