@@ -14,7 +14,10 @@ import {
   useDisclosure,
   SimpleGrid,
   Spinner,
-  Alert
+  Alert,
+  FormControl,
+  FormErrorMessage,
+  FormLabel
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -23,8 +26,9 @@ import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
-import { Trans } from '@lingui/macro'
 import { useUpdateEncryptedSecretMutation } from './ItemSettings.codegen'
+import { Field, Form, Formik, FormikHelpers } from 'formik'
+import { Trans } from '@lingui/macro'
 
 enum Value {
   'Tooweak' = 1,
@@ -113,6 +117,13 @@ const TOTPSecret = (data: ITOTPSecret) => {
   )
 }
 
+interface LoginParsedValues {
+  url: string
+  label: string
+  username: string
+  password: string
+}
+
 const LoginSecret = (data: ILoginSecret) => {
   const history = useHistory()
   const [show, setShow] = useState(false)
@@ -147,90 +158,157 @@ const LoginSecret = (data: ILoginSecret) => {
       m="auto"
       bg={useColorModeValue('white', 'gray.900')}
     >
-      <Flex p={5} flexDirection="column" w="inherit">
-        <SimpleGrid row={2} columns={2} spacing="40px">
-          <InputWithHeading heading="URL:" defaultValue={data.url} />
-          <InputWithHeading heading="Label:" defaultValue={data.label} />
-
+      <Formik
+        initialValues={{
+          url: data.url,
+          password: data.loginCredentials.password,
+          label: data.label,
+          username: data.loginCredentials.username
+        }}
+        onSubmit={async (
+          values: LoginParsedValues,
+          { setSubmitting }: FormikHelpers<LoginParsedValues>
+        ) => {
+          await updateSecret({
+            variables: {
+              id: data.id,
+              patch: {
+                //Finish here the string
+                encrypted: data.encrypted,
+                label: values.label,
+                url: values.url,
+                kind: data.kind
+              }
+            }
+          })
+          await device.state?.save()
+          setSubmitting(false)
+        }}
+      >
+        {({ values, setSubmitting }) => (
           <>
-            <InputWithHeading
-              heading="Username:"
-              defaultValue={data.loginCredentials.username}
-            />
-            <Box flex={'50%'}>
-              <Heading size="md" as="h5">
-                Password:
-              </Heading>
-              <Progress
-                value={Value[levelOfPsw]}
-                size="xs"
-                colorScheme="green"
-                max={4}
-                mb={1}
-                defaultValue={0}
-              />
-              <InputGroup size="md">
-                <Input
-                  value={password}
-                  onChange={handleChangeOriginPassword}
-                  pr="4.5rem"
-                  type={show ? 'text' : 'password'}
+            <Flex p={5} as={Form} flexDirection="column" w="inherit">
+              <SimpleGrid row={2} columns={2} spacing="40px">
+                <Field name="url">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.name && form.touched.name}
+                    >
+                      <FormLabel htmlFor="url">URL:</FormLabel>
+
+                      <Input pr="4.5rem" id="url" {...field} required />
+
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="label">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.name && form.touched.name}
+                    >
+                      <FormLabel htmlFor="label">Label:</FormLabel>
+
+                      <Input pr="4.5rem" id="label" {...field} required />
+
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="username">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.name && form.touched.name}
+                    >
+                      <FormLabel htmlFor="username">Username:</FormLabel>
+
+                      <Input pr="4.5rem" id="username" {...field} required />
+
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="password">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.name && form.touched.name}
+                    >
+                      <FormLabel htmlFor="password">Password</FormLabel>
+
+                      <Progress
+                        value={Value[levelOfPsw]}
+                        size="xs"
+                        colorScheme="green"
+                        max={4}
+                        mb={1}
+                        defaultValue={0}
+                      />
+                      <InputGroup size="md">
+                        <Input
+                          value={password}
+                          onChange={handleChangeOriginPassword}
+                          pr="4.5rem"
+                          type={show ? 'text' : 'password'}
+                        />
+                        <InputRightElement width="4.5rem">
+                          <Button h="1.75rem" size="sm" onClick={handleClick}>
+                            {show ? 'Hide' : 'Show'}
+                          </Button>
+                        </InputRightElement>
+                      </InputGroup>
+
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+              </SimpleGrid>
+
+              {data.loginCredentials.parseError && (
+                <Alert status="error" mt={4}>
+                  <Trans>Failed to parse this secret:</Trans>
+                  {JSON.stringify(data.loginCredentials.parseError)}
+                </Alert>
+              )}
+              <Stack
+                direction={'row'}
+                justifyContent="flex-end"
+                spacing={1}
+                my={5}
+              >
+                <Button
+                  colorScheme="blackAlpha"
+                  size="sm"
+                  onClick={() => history.goBack()}
+                  type="button"
+                >
+                  Go back
+                </Button>
+                <Button
+                  colorScheme="twitter"
+                  size="sm"
+                  type="submit"
+                  onClick={async () => {
+                    setSubmitting(true)
+                  }}
+                >
+                  Save
+                </Button>
+              </Stack>
+
+              <>
+                <IconButton
+                  w="min-content"
+                  aria-label="Search database"
+                  icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                  onClick={onToggle}
+                  m={3}
                 />
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={handleClick}>
-                    {show ? 'Hide' : 'Show'}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </Box>
+                <PasswordGenerator isOpen={isOpen} />
+              </>
+            </Flex>
           </>
-        </SimpleGrid>
-
-        {data.loginCredentials.parseError && (
-          <Alert status="error" mt={4}>
-            <Trans>Failed to parse this secret:</Trans>
-            {JSON.stringify(data.loginCredentials.parseError)}
-          </Alert>
         )}
-        <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
-          <Button
-            colorScheme="blackAlpha"
-            size="sm"
-            onClick={() => history.goBack()}
-          >
-            Go back
-          </Button>
-          <Button
-            colorScheme="twitter"
-            size="sm"
-            onClick={async () => {
-              await updateSecret({
-                variables: {
-                  id: data.id,
-                  //@ts-expect-error TODO fix this-we need formik here
-                  patch: {
-                    encrypted: data.encrypted
-                  }
-                }
-              })
-              await device.state?.save()
-            }}
-          >
-            Save
-          </Button>
-        </Stack>
-
-        <>
-          <IconButton
-            w="min-content"
-            aria-label="Search database"
-            icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-            onClick={onToggle}
-            m={3}
-          />
-          <PasswordGenerator isOpen={isOpen} />
-        </>
-      </Flex>
+      </Formik>
     </Center>
   )
 }
