@@ -30,12 +30,6 @@ export class ChangeMasterPasswordInput {
   @Field(() => [EncryptedSecretPatchInput])
   secrets: EncryptedSecretPatchInput[]
 
-  @Field({
-    nullable: true,
-    description:
-      'When true, it will invalidate sessions for all the currently logged in devices and keep only the current device logged in'
-  })
-  logoutFromAllDevices: boolean
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string
   @Field(() => GraphQLNonEmptyString)
