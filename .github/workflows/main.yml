@@ -46,7 +46,7 @@ jobs:
 
       - name: Yarn install
         run: |
-          yarn --frozen-lockfile --ignore-optional
+          yarn --frozen-lockfile --ignore-optional --prefer-offline
 
       - uses: dorny/paths-filter@v2
         id: changes
