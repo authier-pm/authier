@@ -163,9 +163,11 @@ chrome.runtime.onMessage.addListener(async function (
         res = {
           extensionDeviceReady: !!device.state?.masterPassword,
           secretsForHost: {
+            // @ts-expect-error
             loginCredentials: decrypted.filter(
               ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
             ),
+            // @ts-expect-error
             totpSecrets: decrypted.filter(
               ({ kind }) => kind === EncryptedSecretType.TOTP
             )
