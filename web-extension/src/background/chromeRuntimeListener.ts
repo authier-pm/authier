@@ -44,6 +44,7 @@ interface ILoginCredentialsFromContentScript {
     kind: WebInputType
     inputted: string | undefined
   }[]
+  openInVault: boolean
 }
 
 const saveLoginModalsStates = new Map<
@@ -121,6 +122,10 @@ chrome.runtime.onMessage.addListener(async function (
       })
 
       console.log(credentials.capturedInputEvents)
+
+      if (req.payload.openInVault) {
+        browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
+      }
       sendResponse(secret)
       break
     case BackgroundMessageType.addTOTPSecret:
@@ -144,12 +149,33 @@ chrome.runtime.onMessage.addListener(async function (
       sendResponse([deviceState?.email])
       break
     case BackgroundMessageType.getContentScriptInitialState:
-      const res: IInitStateRes = {
-        isLoggedIn: !!device.state?.masterPassword,
-        saveLoginModalsState: currentTabId
-          ? saveLoginModalsStates.get(currentTabId)
-          : null
+      let res: IInitStateRes
+
+      const tabUrl = tab?.url
+      if (!tabUrl || !deviceState) {
+        res = { extensionDeviceReady: false }
+      } else {
+        const decrypted =
+          device.state?.getSecretsDecryptedByHostname(
+            new URL(tabUrl).hostname
+          ) ?? []
+
+        res = {
+          extensionDeviceReady: !!device.state?.masterPassword,
+          secretsForHost: {
+            loginCredentials: decrypted.filter(
+              ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
+            ),
+            totpSecrets: decrypted.filter(
+              ({ kind }) => kind === EncryptedSecretType.TOTP
+            )
+          },
+          saveLoginModalsState: currentTabId
+            ? saveLoginModalsStates.get(currentTabId)
+            : null
+        }
       }
+
       sendResponse(res)
 
       break
