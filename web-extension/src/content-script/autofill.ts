@@ -33,10 +33,7 @@ export const autofill = (secrets: IDecryptedSecrets) => {
   enabled = true
 
   const autofillElement = async (input: HTMLInputElement) => {
-    if (
-      input.autocomplete.includes('username') ||
-      input.autocomplete.includes('email')
-    ) {
+    if (input.autocomplete === 'username' || input.autocomplete === 'email') {
       const secret = secrets.loginCredentials[0]
       if (secret) {
         autofillValueIntoInput(input, secret.loginCredentials.username)
@@ -64,6 +61,10 @@ export const autofill = (secrets: IDecryptedSecrets) => {
       }
     }
   }
-  document.body.querySelectorAll('input').forEach(autofillElement)
+
   bodyInputChangeEmitter.on('inputAdded', autofillElement)
+
+  setTimeout(() => {
+    document.body.querySelectorAll('input').forEach(autofillElement)
+  }, 100) // let's wait a bit for the page to load
 }
