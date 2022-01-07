@@ -1,4 +1,5 @@
 import { getCssSelector } from 'css-selector-generator'
+import { CssSelectorMatch } from 'css-selector-generator/types/types'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
@@ -11,9 +12,13 @@ export interface IInputRecord {
 
 const defaultSelectorBlacklist = ['[data-*']
 
-function getSelectorForElement(target: HTMLElement) {
-  let selector
+export function getSelectorForElement(target: HTMLInputElement) {
+  let selector: CssSelectorMatch
   if (document.body.contains(target)) {
+    if (target.autocomplete) {
+      return `[autocomplete="${target.autocomplete}"]` // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
+    }
+
     selector = getCssSelector(target, {
       blacklist: defaultSelectorBlacklist
     })
