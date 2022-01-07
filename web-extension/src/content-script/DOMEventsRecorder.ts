@@ -44,6 +44,12 @@ export class DOMEventsRecorder {
     this.capturedInputEvents = []
   }
 
+  hasInput(input: HTMLInputElement) {
+    return this.capturedInputEvents.some(({ element }) => {
+      return element === input
+    })
+  }
+
   addInputEvent(event: IInputRecord) {
     const existingEventIndex = this.capturedInputEvents.findIndex(
       ({ element }) => {
@@ -74,7 +80,7 @@ export class DOMEventsRecorder {
           kind = WebInputType.USERNAME_OR_EMAIL
         }
         return {
-          element: getSelectorForElement(element),
+          element: getSelectorForElement(element as HTMLInputElement),
           type,
           inputted,
           kind

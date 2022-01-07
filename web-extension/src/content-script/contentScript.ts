@@ -7,7 +7,10 @@ import { authierColors } from '../../../shared/chakraCustomTheme'
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-import { onRemoveFromDOM } from './onRemovedFromDOM'
+
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { bodyInputChangeEmitter } from './DOMObserver'
+import { autofill, IDecryptedSecrets } from './autofill'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages
@@ -18,8 +21,9 @@ const inputKindMap = {
 }
 
 export interface IInitStateRes {
-  isLoggedIn: boolean
-  saveLoginModalsState:
+  extensionDeviceReady: boolean
+  secretsForHost?: IDecryptedSecrets
+  saveLoginModalsState?:
     | {
         password: string
         username: string
@@ -47,9 +51,14 @@ export async function initInputWatch() {
     action: BackgroundMessageType.getContentScriptInitialState
   })
 
-  const { saveLoginModalsState, isLoggedIn } = stateInitRes
-  if (!isLoggedIn) {
+  const { saveLoginModalsState, extensionDeviceReady, secretsForHost } =
+    stateInitRes
+
+  if (!extensionDeviceReady) {
     return // no need to do anything
+  }
+  if (secretsForHost) {
+    autofill(secretsForHost)
   }
 
   if (
@@ -72,7 +81,11 @@ export async function initInputWatch() {
     const password = domRecorder.getPassword()
     console.log('~A showSavePromptIfAppropriate', username, password)
 
-    if (password) {
+    const existingCredentialWithSamePassword =
+      secretsForHost?.loginCredentials.find(
+        ({ loginCredentials }) => loginCredentials.password === password
+      )
+    if (password && !existingCredentialWithSamePassword) {
       if (username) {
         renderSaveCredentialsForm(username, password)
       } else {
@@ -84,92 +97,92 @@ export async function initInputWatch() {
     }
   }
 
-  let mutationObserver: MutationObserver
-  document.addEventListener(
-    'input',
-    debounce((ev) => {
-      const targetElement = ev.target as HTMLInputElement
-      const isPasswordType = targetElement.type === 'password'
-      if ((targetElement && isPasswordType) || targetElement.type === 'text') {
-        const inputted = targetElement.value
-        if (inputted) {
-          const inputRecord: IInputRecord = {
-            element: targetElement,
-            eventType: 'input',
-            inputted,
-            kind: getWebInputKind(targetElement)
-          }
-          domRecorder.addInputEvent(inputRecord)
-          if (inputted.length === 6) {
-            // TODO check existing TOTPs and add TOTP web input if we don't have one here
-          }
+  const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
+    domRecorder.addInputEvent({
+      element,
+      eventType: 'submit',
+      kind: WebInputType.PASSWORD
+    })
+    showSavePromptIfAppropriate()
 
-          log('inputRecord', inputRecord)
-          if (targetElement.type === 'password') {
-            log('password inputted', inputted)
+    log(domRecorder)
+  }
 
-            const form = targetElement.form
-            const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
-              domRecorder.addInputEvent({
-                element,
-                eventType: 'submit',
-                kind: WebInputType.PASSWORD
-              })
-              showSavePromptIfAppropriate()
+  bodyInputChangeEmitter.on('inputRemoved', (input) => {
+    // handle case when password input is removed from DOM by javascript
+    if (input.type === 'password' && domRecorder.hasInput(input)) {
+      onSubmit(input)
+    }
+  })
 
-              log(domRecorder)
+  const debouncedInputEventListener = debounce((ev) => {
+    const targetElement = ev.target as HTMLInputElement
+    const isPasswordType = targetElement.type === 'password'
+    if (
+      (targetElement && isPasswordType) ||
+      targetElement.type === 'text' ||
+      targetElement.type === 'email'
+    ) {
+      const inputted = targetElement.value
+      if (inputted) {
+        const inputRecord: IInputRecord = {
+          element: targetElement,
+          eventType: 'input',
+          inputted,
+          kind: getWebInputKind(targetElement)
+        }
+        domRecorder.addInputEvent(inputRecord)
+        if (inputted.length === 6) {
+          // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
+        }
+
+        log('inputRecord', inputRecord)
+        if (targetElement.type === 'password') {
+          log('password inputted', inputted)
+
+          const form = targetElement.form
+
+          if (form) {
+            // handle case when this is inside a form
+            if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
+              return
             }
-            if (form) {
-              // handle case when this is inside a form
-              if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
-                return
-              }
 
-              form.addEventListener(
-                'submit',
-                () => {
-                  onSubmit(form)
-                },
-                { once: true }
-              )
-              formsRegisteredForSubmitEvent.push(form)
-            }
-
-            // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
-            targetElement.addEventListener(
-              'keydown',
-              (ev: KeyboardEvent) => {
-                if (ev.code === 'Enter') {
-                  domRecorder.addInputEvent({
-                    element: targetElement,
-                    eventType: 'keydown',
-                    kind: null
-                  })
-                  showSavePromptIfAppropriate()
-                }
+            form.addEventListener(
+              'submit',
+              () => {
+                onSubmit(form)
               },
               { once: true }
             )
-
-            // handle case when input is removed from DOM by javascript
-            if (mutationObserver) {
-              mutationObserver.disconnect()
-            }
-
-            mutationObserver = onRemoveFromDOM(targetElement, () => {
-              onSubmit(targetElement)
-            })
-
-            // some login flows don't have any forms, in that case we are listening for click, keydown
-            document.addEventListener('click', showSavePromptIfAppropriate, {
-              once: true
-            })
+            formsRegisteredForSubmitEvent.push(form)
           }
+
+          // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
+          targetElement.addEventListener(
+            'keydown',
+            (ev: KeyboardEvent) => {
+              if (ev.code === 'Enter') {
+                domRecorder.addInputEvent({
+                  element: targetElement,
+                  eventType: 'keydown',
+                  kind: null
+                })
+                showSavePromptIfAppropriate()
+              }
+            },
+            { once: true }
+          )
+
+          // some login flows don't have any forms, in that case we are listening for click, keydown
+          document.body.addEventListener('click', showSavePromptIfAppropriate, {
+            once: true
+          })
         }
       }
-    }, 400),
-    true
-  )
+    }
+  }, 400)
+  document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
 }
 
 let promptDiv: HTMLDivElement | null
@@ -233,11 +246,12 @@ function renderSaveCredentialsForm(username: string, password: string) {
     promptDiv = null
   }
 
-  const addCredential = async () => {
+  const addCredential = async (openInVault = false) => {
     const loginCredentials = {
       username,
       password,
-      capturedInputEvents: domRecorder.toJSON()
+      capturedInputEvents: domRecorder.toJSON(),
+      openInVault
     }
     return browser.runtime.sendMessage({
       action: BackgroundMessageType.addLoginCredentials,
@@ -254,8 +268,7 @@ function renderSaveCredentialsForm(username: string, password: string) {
   document
     .querySelector('#__AUTHIER__saveAndEditBtn')
     ?.addEventListener('click', async () => {
-      const secret = await addCredential()
-      chrome.tabs.create({ url: `vault.html/secret/${secret.id}}` })
+      await addCredential(true)
 
       closePrompt()
     })

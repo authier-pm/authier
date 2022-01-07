@@ -28,6 +28,7 @@ import {
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
+import { url } from 'inspector'
 
 export const log = debug('au:Device')
 
@@ -93,31 +94,47 @@ export class DeviceState {
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
 
-  getSecretWithDecryptedBit(id: string) {
+  getSecretDecryptedById(id: string) {
     const secret: ILoginSecret | ITOTPSecret = this.secrets.find(
       (secret) => secret.id === id
     ) as ILoginSecret | ITOTPSecret
     if (secret) {
-      const decrypted = this.decrypt(secret.encrypted)
-      if (secret.kind === EncryptedSecretType.TOTP) {
-        secret.totp = decrypted
-      } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-        const parsed = JSON.parse(decrypted)
+      return this.decryptSecret(secret)
+    }
+  }
 
-        try {
-          loginCredentialsSchema.parse(parsed)
-          secret.loginCredentials = parsed
-        } catch (err: any) {
-          secret.loginCredentials = {
-            username: '',
-            password: '',
-            parseError: err
-          }
+  getSecretsDecryptedByHostname(host: string) {
+    const secrets = this.secrets.filter(
+      (secret) => host === new URL(secret.url ?? '').hostname
+    ) as Array<ILoginSecret | ITOTPSecret>
+    if (secrets) {
+      return secrets.map((secret) => {
+        return this.decryptSecret(secret)
+      })
+    }
+    return []
+  }
+
+  private decryptSecret(secret: ILoginSecret | ITOTPSecret) {
+    const decrypted = this.decrypt(secret.encrypted)
+    if (secret.kind === EncryptedSecretType.TOTP) {
+      secret.totp = decrypted
+    } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
+      const parsed = JSON.parse(decrypted)
+
+      try {
+        loginCredentialsSchema.parse(parsed)
+        secret.loginCredentials = parsed
+      } catch (err: any) {
+        secret.loginCredentials = {
+          username: '',
+          password: '',
+          parseError: err
         }
       }
-
-      return secret
     }
+
+    return secret
   }
 
   /**
