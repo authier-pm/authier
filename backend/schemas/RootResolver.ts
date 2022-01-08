@@ -224,7 +224,7 @@ export class RootResolver {
     }
 
     const device = user.Devices[0]
-    user = await prismaClient.user.update({
+    user = await ctx.prisma.user.update({
       where: {
         id: user.id
       },
@@ -251,7 +251,7 @@ export class RootResolver {
   ) {
     const include = getPrismaRelationsFromInfo(info, 'user')
 
-    const user = await prismaClient.user.findUnique({
+    const user = await ctx.prisma.user.findUnique({
       where: { email: input.email },
       include
     })
@@ -265,7 +265,7 @@ export class RootResolver {
       throw new GraphqlError('Wrong master password used')
     }
 
-    await prismaClient.user.update({
+    await ctx.prisma.user.update({
       data: {
         addDeviceSecret: input.addDeviceSecret,
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
@@ -275,7 +275,7 @@ export class RootResolver {
       }
     })
 
-    await prismaClient.decryptionChallenge.updateMany({
+    await ctx.prisma.decryptionChallenge.updateMany({
       where: {
         id: input.decryptionChallengeId,
         deviceId: input.deviceId,
@@ -295,7 +295,7 @@ export class RootResolver {
       name: deviceName,
       userId: user.id
     }
-    let device = await prismaClient.device.findUnique({
+    let device = await ctx.prisma.device.findUnique({
       // TODO change this to create
       where: { id: deviceId }
     })
@@ -330,12 +330,12 @@ export class RootResolver {
     deviceId: string,
     @Ctx() ctx: IContext
   ) {
-    const user = await prismaClient.user.findUnique({
+    const user = await ctx.prisma.user.findUnique({
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true }
     })
     if (user) {
-      const inLastHour = await prismaClient.decryptionChallenge.count({
+      const inLastHour = await ctx.prisma.decryptionChallenge.count({
         where: {
           userId: user.id,
           createdAt: {
@@ -351,7 +351,7 @@ export class RootResolver {
         )
       }
 
-      const challenge = await prismaClient.decryptionChallenge.create({
+      const challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId,
           userId: user.id,
@@ -379,7 +379,7 @@ export class RootResolver {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
     if (ctx.jwtPayload) {
-      const user = await prismaClient.user.update({
+      const user = await ctx.prisma.user.update({
         data: {
           tokenVersion: {
             increment: 1
@@ -394,8 +394,8 @@ export class RootResolver {
   }
 
   @Query(() => [WebInputGQL])
-  async webInputs(@Arg('url') url: string) {
-    return prismaClient.webInput.findMany({ where: { url } })
+  async webInputs(@Arg('url') url: string, @Ctx() ctx: IContextAuthenticated) {
+    return ctx.prisma.webInput.findMany({ where: { url } })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
@@ -412,7 +412,7 @@ export class RootResolver {
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
       }
-      const input = await prismaClient.webInput.upsert({
+      const input = await ctx.prisma.webInput.upsert({
         create: forUpsert,
         update: forUpsert,
         where: {

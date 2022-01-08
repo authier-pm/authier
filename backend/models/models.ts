@@ -10,6 +10,7 @@ import {
 } from 'type-graphql'
 import { UserGQL } from './generated/User'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { GraphQLUUID } from 'graphql-scalars'
 
 @ObjectType()
 export class DecryptionChallengeResponse {
@@ -22,7 +23,7 @@ export class DecryptionChallengeResponse {
 
 @ObjectType()
 export class UserBase {
-  @Field(() => String)
+  @Field(() => GraphQLUUID)
   id: string
 
   @Field(() => String, { nullable: true })
@@ -86,4 +87,10 @@ export class EncryptedSecretInput {
   label: string
   @Field(() => String, { nullable: false })
   encrypted: string
+}
+
+@InputType()
+export class EncryptedSecretPatchInput extends EncryptedSecretInput {
+  @Field(() => GraphQLUUID)
+  id: string
 }
