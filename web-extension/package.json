@@ -115,6 +115,7 @@
     "stream-browserify": "^3.0.0",
     "string-to-arraybuffer": "^1.0.2",
     "webextension-polyfill": "^0.8.0",
-    "wouter": "^2.7.5"
+    "wouter": "^2.7.5",
+    "yup": "^0.32.11"
   }
 }

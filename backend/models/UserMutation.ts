@@ -191,7 +191,8 @@ export class UserMutation extends UserBase {
 
   @Field(() => GraphQLPositiveInt)
   async changeMasterPassword(
-    @Arg('input', () => EncryptedSecretInput) input: ChangeMasterPasswordInput,
+    @Arg('input', () => ChangeMasterPasswordInput)
+    input: ChangeMasterPasswordInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
     const secretsUpdates = input.secrets.map(({ id, ...patch }) => {

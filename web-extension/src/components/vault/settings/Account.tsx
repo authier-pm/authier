@@ -1,7 +1,5 @@
 import {
   Box,
-  Flex,
-  Heading,
   FormControl,
   FormLabel,
   Input,
@@ -10,19 +8,40 @@ import {
   InputRightElement,
   Button,
   Spinner,
-  Fade,
-  SimpleGrid,
   HStack
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
+import { useChangeMasterPasswordMutation } from './Account.codegen'
+import * as Yup from 'yup'
+import { useDeviceDecryptionChallengeMutation } from '../../../../../shared/Login.codegen'
+
+const ChangePasswordSchema = Yup.object().shape({
+  newPassword: Yup.string()
+    .min(4, 'Too Short!')
+    .max(50, 'Too Long!')
+    .required('Required'),
+  currPassword: Yup.string()
+    .min(4, 'Too Short!')
+    .max(50, 'Too Long!')
+    .required('Required'),
+  confirmPassword: Yup.string()
+    .min(4, 'Too Short!')
+    .max(50, 'Too Long!')
+    .required('Required'),
+  email: Yup.string().email('Invalid email').required('Required')
+})
 
 export default function Account() {
   const email = device.state?.email
   const [showCurr, setShowCurr] = useState(false)
   const [showNew, setShownNew] = useState(false)
+  const [showPass, setShowPass] = useState(false)
+  const [changePassword, { data }] = useChangeMasterPasswordMutation()
+  const [deviceDecryptionChallenge, { loading }] =
+    useDeviceDecryptionChallengeMutation()
 
   if (!email) {
     return <Spinner />
@@ -54,10 +73,40 @@ export default function Account() {
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
           ) => {
+            if (
+              values.newPassword === values.confirmPassword &&
+              values.currPassword === device.state?.masterPassword
+            ) {
+              const decryptionChallenge = await deviceDecryptionChallenge({
+                variables: {
+                  deviceId: await device.getDeviceId(),
+                  email: values.email
+                }
+              })
+
+              const secrets = device.state.secrets
+              const userId =
+                decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
+
+              await changePassword({
+                variables: {
+                  secrets: device.serielizeSecrets(secrets),
+                  ...device.getAddDeviceSecretAuthTuple(
+                    values.newPassword,
+                    userId as string
+                  ),
+                  decryptionChallengeId: decryptionChallenge.data
+                    ?.deviceDecryptionChallenge?.id as number
+                }
+              })
+              await device.logout()
+            } else {
+              console.error('wrong password')
+            }
             setSubmitting(false)
           }}
         >
-          {({ values }) => (
+          {(props) => (
             <Form>
               <Field name="email">
                 {({ field, form }) => (
@@ -82,6 +131,7 @@ export default function Account() {
                 <Box as={Field} name="currPassword">
                   {({ field, form }) => (
                     <FormControl
+                      isRequired
                       isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel htmlFor="currPassword">
@@ -116,6 +166,7 @@ export default function Account() {
                 <Box as={Field} name="newPassword">
                   {({ field, form }) => (
                     <FormControl
+                      isRequired
                       isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
@@ -150,6 +201,7 @@ export default function Account() {
                 <Box as={Field} name="confirmPassword">
                   {({ field, form }) => (
                     <FormControl
+                      isRequired
                       isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel
@@ -162,7 +214,7 @@ export default function Account() {
                       <InputGroup size="md">
                         <Input
                           pr="4.5rem"
-                          type={showNew ? 'text' : 'confirmPassword'}
+                          type={showPass ? 'text' : 'confirmPassword'}
                           placeholder="Master confirmPassword"
                           id="confirmPassword"
                           {...field}
@@ -172,9 +224,9 @@ export default function Account() {
                           <Button
                             h="1.75rem"
                             size="sm"
-                            onClick={() => setShownNew(!showNew)}
+                            onClick={() => setShowPass(!showPass)}
                           >
-                            {showNew ? 'Hide' : 'Show'}
+                            {showPass ? 'Hide' : 'Show'}
                           </Button>
                         </InputRightElement>
                       </InputGroup>
@@ -188,7 +240,7 @@ export default function Account() {
               <Button
                 mt={4}
                 colorScheme="teal"
-                onClick={() => console.log(values)}
+                isLoading={props.isSubmitting}
                 type="submit"
               >
                 Save

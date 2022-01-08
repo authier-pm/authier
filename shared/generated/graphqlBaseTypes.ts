@@ -28,6 +28,13 @@ export type Scalars = {
   UUID: any
 }
 
+export type ChangeMasterPasswordInput = {
+  addDeviceSecret: Scalars['NonEmptyString']
+  addDeviceSecretEncrypted: Scalars['NonEmptyString']
+  decryptionChallengeId: Scalars['PositiveInt']
+  secrets: Array<EncryptedSecretPatchInput>
+}
+
 export type DecryptionChallengeGql = {
   __typename?: 'DecryptionChallengeGQL'
   addDeviceSecretEncrypted: Scalars['String']
@@ -169,6 +176,17 @@ export type EncryptedSecretMutation = {
 
 export type EncryptedSecretMutationUpdateArgs = {
   patch: EncryptedSecretInput
+}
+
+export type EncryptedSecretPatchInput = {
+  androidUri?: InputMaybe<Scalars['String']>
+  encrypted: Scalars['String']
+  iconUrl?: InputMaybe<Scalars['String']>
+  id: Scalars['UUID']
+  iosUri?: InputMaybe<Scalars['String']>
+  kind: EncryptedSecretType
+  label: Scalars['String']
+  url: Scalars['String']
 }
 
 export type EncryptedSecretQuery = {
@@ -398,6 +416,7 @@ export type UserMutation = {
   addDeviceSecretEncrypted: Scalars['String']
   addEncryptedSecret: EncryptedSecretQuery
   approveDevice: Scalars['Boolean']
+  changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['EmailAddress']>
   encryptedSecret: EncryptedSecretMutation
@@ -425,6 +444,10 @@ export type UserMutationAddEncryptedSecretArgs = {
 
 export type UserMutationApproveDeviceArgs = {
   success: Scalars['Boolean']
+}
+
+export type UserMutationChangeMasterPasswordArgs = {
+  input: ChangeMasterPasswordInput
 }
 
 export type UserMutationEncryptedSecretArgs = {

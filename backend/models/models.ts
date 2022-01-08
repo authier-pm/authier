@@ -85,6 +85,7 @@ export class EncryptedSecretInput {
 
   @Field(() => String, { nullable: false })
   label: string
+
   @Field(() => String, { nullable: false })
   encrypted: string
 }
