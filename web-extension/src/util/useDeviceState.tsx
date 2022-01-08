@@ -22,7 +22,6 @@ const log = debug('au:useDeviceState')
 export interface ISecret {
   id: string
   encrypted: string
-  kind: EncryptedSecretType
   label: string
   iconUrl: string | undefined | null
   url: string

@@ -13,6 +13,8 @@ import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+import { ChangeMasterPasswordInput } from './AuthInputs'
+import { GraphQLPositiveInt } from 'graphql-scalars'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -161,13 +163,13 @@ export class UserMutation extends UserBase {
   @Field(() => Boolean)
   async approveDevice(@Arg('success', () => Boolean) success: Boolean) {
     // TODO check current device is master
-    let user = await prismaClient.user.findFirst({
+    const user = await prismaClient.user.findFirst({
       where: {
         id: this.id
       }
     })
     if (user?.masterDeviceId) {
-      let device = await prismaClient.device.findFirst({
+      const device = await prismaClient.device.findFirst({
         where: {
           id: user?.masterDeviceId
         }
@@ -185,5 +187,40 @@ export class UserMutation extends UserBase {
 
       return true
     }
+  }
+
+  @Field(() => GraphQLPositiveInt)
+  async changeMasterPassword(
+    @Arg('input', () => EncryptedSecretInput) input: ChangeMasterPasswordInput,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    const secretsUpdates = input.secrets.map(({ id, ...patch }) => {
+      return ctx.prisma.encryptedSecret.update({
+        where: { id: id },
+        data: patch
+      })
+    })
+
+    await prismaClient.$transaction([
+      ...secretsUpdates,
+      ctx.prisma.user.update({
+        data: {
+          addDeviceSecret: input.addDeviceSecret,
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
+        },
+        where: {
+          id: this.id
+        }
+      }),
+      ctx.prisma.decryptionChallenge.updateMany({
+        where: {
+          id: input.decryptionChallengeId,
+          deviceId: ctx.jwtPayload.deviceId,
+          userId: this.id
+        },
+        data: { masterPasswordVerifiedAt: new Date() }
+      })
+    ])
+    return secretsUpdates.length
   }
 }
