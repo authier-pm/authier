@@ -10,7 +10,10 @@ import {
   SecretSerializedType
 } from './backgroundPage'
 import { generateFireToken } from './generateFireToken'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretPatchInput,
+  EncryptedSecretType
+} from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   AddEncryptedSecretDocument,
@@ -335,6 +338,24 @@ class ExtensionDevice {
     await device.clearLocalStorage()
 
     this.rerenderViews()
+  }
+
+  serielizeSecrets(
+    secrets: SecretSerializedType[]
+  ): EncryptedSecretPatchInput[] {
+    return secrets.map((secret) => {
+      const { id, encrypted, kind, label, iconUrl, url } = secret
+      return {
+        id,
+        encrypted,
+        kind,
+        label,
+        iconUrl: iconUrl as string,
+        url: url as string,
+        androidUri: null,
+        iosUri: null
+      }
+    })
   }
 }
 
