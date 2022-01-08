@@ -13,8 +13,6 @@ import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
-import { ChangePasswordInput, RegisterDeviceInput } from './AuthInputs'
-import { GraphQLUUID } from 'graphql-scalars'
 
 @ObjectType()
 export class UserMutation extends UserBase {

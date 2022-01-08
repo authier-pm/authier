@@ -1,13 +1,13 @@
 import React from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
-import { ItemList } from '@src/components/vault/ItemList'
+import { ItemList } from '@src/pages-vault/ItemList'
 import { Route, Switch } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
 import Login from '@src/pages/Login'
 import { Center } from '@chakra-ui/react'
+import Premium from './Premium'
 
 export function VaultRouter() {
   if (device.state === null) {
@@ -30,6 +30,9 @@ export function VaultRouter() {
             <VaultItemSettings secretId={match?.params.secretId} />
           )}
         />
+        <Route path="/account-limits">
+          <Premium />
+        </Route>
         <Route path="/settings">
           <VaultSettings />
         </Route>

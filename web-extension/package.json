@@ -93,7 +93,7 @@
     "css-selector-generator": "^3.4.4",
     "dotenv": "^10.0.0",
     "formik": "^2.2.9",
-    "framer-motion": "^4",
+    "framer-motion": "^5.5.6",
     "generate-password": "^1.6.1",
     "graphql": "^15.7.2",
     "jsqr": "^1.4.0",
