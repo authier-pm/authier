@@ -242,12 +242,7 @@ describe('RootResolver', () => {
       let data = await resolver.deviceDecryptionChallenge(
         fakeData.email,
         faker.datatype.uuid(),
-        {
-          reply: { setCookie: jest.fn() },
-          request: { headers: {} },
-          jwtPayload: { userId: userId },
-          getIpAddress: () => faker.internet.ip()
-        } as any
+        makeFakeCtx(userId)
       )
 
       expect(data?.addDeviceSecretEncrypted).toBe(
@@ -284,12 +279,7 @@ describe('RootResolver', () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           faker.datatype.uuid(),
-          {
-            reply: { setCookie: jest.fn() },
-            request: { headers: {} },
-            jwtPayload: { userId: userId },
-            getIpAddress: () => faker.internet.ip()
-          } as any
+          makeFakeCtx(userId)
         )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })

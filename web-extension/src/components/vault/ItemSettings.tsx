@@ -240,7 +240,7 @@ export const VaultItemSettings = ({ secretId }) => {
     return <Spinner></Spinner>
   }
 
-  const secret = device.state.getSecretWithDecryptedBit(secretId)
+  const secret = device.state.getSecretDecryptedById(secretId)
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }
