@@ -17,7 +17,8 @@ import {
   Alert,
   FormControl,
   FormErrorMessage,
-  FormLabel
+  FormLabel,
+  Tooltip
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
@@ -311,13 +312,15 @@ const LoginSecret = (data: ILoginSecret) => {
           )}
         </Formik>
 
-        <IconButton
-          w="min-content"
-          aria-label="Search database"
-          icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          onClick={onToggle}
-          m={3}
-        />
+        <Tooltip label="Password generator">
+          <IconButton
+            w="min-content"
+            aria-label="Open password generator"
+            icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+            onClick={onToggle}
+            m={3}
+          />
+        </Tooltip>
         <PasswordGenerator isOpen={isOpen} />
       </Flex>
     </motion.div>

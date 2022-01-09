@@ -1,38 +1,25 @@
-import React, {
-  createContext,
-  Dispatch,
-  FunctionComponent,
-  SetStateAction,
-  useContext,
-  useEffect,
-  useState
-} from 'react'
+import React, { FunctionComponent, useContext, useState } from 'react'
 
 // var str2ab = require('string-to-arraybuffer')
 // var ab2str = require('arraybuffer-to-string')
 
 import {
   Box,
-  Button,
   CircularProgress,
   Flex,
   FormControl,
   FormLabel,
   Grid,
-  Heading,
   Switch,
   useInterval
 } from '@chakra-ui/react'
 
 import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
-import { useLocation } from 'wouter'
-import { UserContext } from '@src/providers/UserProvider'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const Home: FunctionComponent = () => {
-  const [location, setLocation] = useLocation()
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
 
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)

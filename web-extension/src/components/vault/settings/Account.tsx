@@ -18,30 +18,13 @@ import { useChangeMasterPasswordMutation } from './Account.codegen'
 import * as Yup from 'yup'
 import { useDeviceDecryptionChallengeMutation } from '../../../../../shared/Login.codegen'
 
-const ChangePasswordSchema = Yup.object().shape({
-  newPassword: Yup.string()
-    .min(4, 'Too Short!')
-    .max(50, 'Too Long!')
-    .required('Required'),
-  currPassword: Yup.string()
-    .min(4, 'Too Short!')
-    .max(50, 'Too Long!')
-    .required('Required'),
-  confirmPassword: Yup.string()
-    .min(4, 'Too Short!')
-    .max(50, 'Too Long!')
-    .required('Required'),
-  email: Yup.string().email('Invalid email').required('Required')
-})
-
 export default function Account() {
   const email = device.state?.email
   const [showCurr, setShowCurr] = useState(false)
   const [showNew, setShownNew] = useState(false)
   const [showPass, setShowPass] = useState(false)
-  const [changePassword, { data }] = useChangeMasterPasswordMutation()
-  const [deviceDecryptionChallenge, { loading }] =
-    useDeviceDecryptionChallengeMutation()
+  const [changePassword] = useChangeMasterPasswordMutation()
+  const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
 
   if (!email) {
     return <Spinner />
@@ -53,6 +36,22 @@ export default function Account() {
     currPassword: string
     confirmPassword: string
   }
+
+  const ChangePasswordSchema = Yup.object().shape({
+    newPassword: Yup.string()
+      .min(4, 'Too Short!')
+      .max(50, 'Too Long!')
+      .required('Required'),
+    currPassword: Yup.string()
+      .min(4, 'Too Short!')
+      .max(50, 'Too Long!')
+      .required('Required'),
+    confirmPassword: Yup.string()
+      .min(4, 'Too Short!')
+      .max(50, 'Too Long!')
+      .required('Required'),
+    email: Yup.string().email('Invalid email').required('Required')
+  })
 
   return (
     <motion.div
@@ -106,7 +105,7 @@ export default function Account() {
             setSubmitting(false)
           }}
         >
-          {(props) => (
+          {({ isSubmitting }) => (
             <Form>
               <Field name="email">
                 {({ field, form }) => (
@@ -141,7 +140,7 @@ export default function Account() {
                       <InputGroup size="md">
                         <Input
                           pr="4.5rem"
-                          type={showCurr ? 'text' : 'currPassword'}
+                          type={showCurr ? 'text' : 'password'}
                           placeholder="Master currPassword"
                           id="currPassword"
                           {...field}
@@ -176,7 +175,7 @@ export default function Account() {
                       <InputGroup size="md">
                         <Input
                           pr="4.5rem"
-                          type={showNew ? 'text' : 'newPassword'}
+                          type={showNew ? 'text' : 'password'}
                           placeholder="Master newPassword"
                           id="newPassword"
                           {...field}
@@ -214,7 +213,7 @@ export default function Account() {
                       <InputGroup size="md">
                         <Input
                           pr="4.5rem"
-                          type={showPass ? 'text' : 'confirmPassword'}
+                          type={showPass ? 'text' : 'password'}
                           placeholder="Master confirmPassword"
                           id="confirmPassword"
                           {...field}
@@ -240,7 +239,7 @@ export default function Account() {
               <Button
                 mt={4}
                 colorScheme="teal"
-                isLoading={props.isSubmitting}
+                isLoading={isSubmitting}
                 type="submit"
               >
                 Save
