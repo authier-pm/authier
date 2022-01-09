@@ -158,13 +158,14 @@ export class DeviceState {
         )
         const newAndUpdatedSecrets =
           data.currentDevice.encryptedSecretsToSync.filter(
-            ({ deletedAt }) => !deletedAt
+            ({ updatedAt }) => !updatedAt
           )
 
         const oldSecretsWithoutRemoved = deviceState.secrets.filter(
           ({ id }) =>
             !removedSecrets.find((removedSecret) => id === removedSecret.id)
         )
+
         deviceState.secrets = [
           ...oldSecretsWithoutRemoved,
           ...newAndUpdatedSecrets

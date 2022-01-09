@@ -47,7 +47,13 @@ export class UserBase extends UserGQL {
 
     return {
       accessToken,
-      user: this
+      user: {
+        ...this,
+        //Remove deleted items
+        EncryptedSecrets: this.EncryptedSecrets.filter(
+          ({ deletedAt }) => !deletedAt
+        )
+      }
     }
   }
 }
