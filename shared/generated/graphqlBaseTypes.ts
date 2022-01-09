@@ -254,7 +254,7 @@ export type QueryUserArgs = {
 }
 
 export type QueryWebInputsArgs = {
-  url: Scalars['String']
+  host: Scalars['String']
 }
 
 export type RegisterDeviceInput = {
@@ -398,6 +398,7 @@ export type UserMutation = {
   addDeviceSecretEncrypted: Scalars['String']
   addEncryptedSecret: EncryptedSecretQuery
   approveDevice: Scalars['Boolean']
+  changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['EmailAddress']>
   encryptedSecret: EncryptedSecretMutation
@@ -425,6 +426,10 @@ export type UserMutationAddEncryptedSecretArgs = {
 
 export type UserMutationApproveDeviceArgs = {
   success: Scalars['Boolean']
+}
+
+export type UserMutationChangeMasterPasswordArgs = {
+  input: EncryptedSecretInput
 }
 
 export type UserMutationEncryptedSecretArgs = {
@@ -508,6 +513,7 @@ export type WebInputGql = {
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
   domPath: Scalars['String']
+  host: Scalars['String']
   id: Scalars['Int']
   kind: WebInputType
   layoutType?: Maybe<Scalars['String']>

@@ -15,6 +15,9 @@ export class WebInputGQLScalars {
   createdAt: Date
 
   @Field()
+  host: string
+
+  @Field()
   url: string
 
   @Field(() => WebInputTypeGQL)

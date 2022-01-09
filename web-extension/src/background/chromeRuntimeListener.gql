@@ -3,3 +3,14 @@ mutation addWebInputs($webInputs: [WebInputElement!]!) {
     id
   }
 }
+
+query webInputsForHost($host: String!) {
+  webInputs(host: $host) {
+    id
+    host
+    url
+    domPath
+    kind
+    createdAt
+  }
+}
