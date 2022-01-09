@@ -7,7 +7,7 @@ type Query {
   authenticated: Boolean!
   me: UserQuery
   currentDevice: DeviceQuery!
-  webInputs(url: String!): [WebInputGQL!]!
+  webInputs(host: String!): [WebInputGQL!]!
 }
 
 type UserQuery {
@@ -158,6 +158,7 @@ type WebInputGQL {
   id: Int!
   layoutType: String
   createdAt: DateTime!
+  host: String!
   url: String!
   kind: WebInputType!
   domPath: String!
@@ -325,6 +326,7 @@ type UserMutation {
   ): SettingsConfigGQL!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
+  changeMasterPassword(input: EncryptedSecretInput!): PositiveInt!
 }
 
 type EncryptedSecretMutation {
@@ -356,6 +358,11 @@ input EncryptedSecretInput {
   label: String!
   encrypted: String!
 }
+
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
 
 type DeviceMutation {
   id: ID!
@@ -391,11 +398,6 @@ type SecretUsageEventGQLScalars {
   deviceId: String!
   webInputId: Int
 }
-
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
 
 """
 A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.

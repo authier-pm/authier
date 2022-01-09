@@ -16,3 +16,14 @@ Do not import generated resolvers from generated/resolvers. Write custom ones.
 # Naming conventions
 
 all graphql custom fields must start with a lower letter. Capital letters are reserved for prisma relations only.
+
+# DB
+
+To run the project, you need a single postgresql superuser. You can name it whatever you like and use whatever password you wish.
+We typically use `authier` and `auth133r` for testing.
+
+you can use this:
+
+```
+ALTER USER authier WITH SUPERUSER;
+```
