@@ -5,7 +5,10 @@ import browser from 'webextension-polyfill'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  WebInputGql,
+  WebInputType
+} from '../../../shared/generated/graphqlBaseTypes'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './DOMObserver'
@@ -26,6 +29,15 @@ const inputKindMap = {
 export interface IInitStateRes {
   extensionDeviceReady: boolean
   secretsForHost: IDecryptedSecrets
+  webInputs: Array<{
+    __typename?: 'WebInputGQL'
+    id: number
+    url: string
+    host: string
+    domPath: string
+    kind: WebInputType
+    createdAt: string
+  }>
   saveLoginModalsState?:
     | {
         password: string
@@ -53,6 +65,8 @@ export async function initInputWatch() {
   const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
+  log('~ stateInitRes', stateInitRes)
+
   if (!stateInitRes) {
     return
   }
@@ -63,7 +77,7 @@ export async function initInputWatch() {
   if (!extensionDeviceReady) {
     return // no need to do anything-user locked out
   }
-  autofill(secretsForHost)
+  autofill(stateInitRes)
 
   if (
     saveLoginModalsState &&
