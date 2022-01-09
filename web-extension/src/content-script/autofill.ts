@@ -5,6 +5,11 @@ import debug from 'debug'
 import { generate } from 'generate-password'
 import browser from 'webextension-polyfill'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { isElementInViewport, isHidden } from './isElementInViewport'
+import { IInitStateRes } from './contentScript'
+import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import { authierColors } from '../../../shared/chakraCustomTheme'
+import { toast } from 'react-toastify'
 
 const log = debug('au:autofill')
 
@@ -14,6 +19,12 @@ export type IDecryptedSecrets = {
 }
 
 const autofillValueIntoInput = (element: HTMLInputElement, value) => {
+  //
+  if (isElementInViewport(element) === false || isHidden(element)) {
+    return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
+  }
+
+  element.style.borderColor = authierColors.green[400]
   element.value = value
   element.dispatchEvent(
     new Event('input', {
@@ -21,50 +32,84 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
       cancelable: true
     })
   )
+  return element
 }
 
 let enabled = false
-export const autofill = (secrets: IDecryptedSecrets) => {
+export const autofill = (initState: IInitStateRes) => {
+  const { secretsForHost, webInputs } = initState
+
   if (enabled === true) {
     return
   }
-  log('init autofill', secrets)
+  log('init autofill', initState)
 
   enabled = true
 
-  const autofillElement = async (input: HTMLInputElement) => {
-    if (input.autocomplete === 'username' || input.autocomplete === 'email') {
-      const secret = secrets.loginCredentials[0]
-      if (secret) {
-        autofillValueIntoInput(input, secret.loginCredentials.username)
-      } else {
-        const fallbackUsernames: string[] = await browser.runtime.sendMessage({
-          action: BackgroundMessageType.getFallbackUsernames
+  const secret = secretsForHost.loginCredentials[0]
+
+  if (!secret) {
+    return
+  }
+
+  const scanKnownWebInputsAndFillWhenFound = () => {
+    const filledElements = webInputs
+      .filter(({ url }) => url === location.href)
+      .map((webInputGql) => {
+        const inputEl = document.body.querySelector(webInputGql.domPath)
+
+        if (inputEl) {
+          if (webInputGql.kind === WebInputType.PASSWORD) {
+            return autofillValueIntoInput(
+              inputEl as HTMLInputElement,
+              secret.loginCredentials.password
+            )
+          } else if (
+            webInputGql.kind === WebInputType.USERNAME ||
+            webInputGql.kind === WebInputType.USERNAME_OR_EMAIL
+          ) {
+            return autofillValueIntoInput(
+              inputEl as HTMLInputElement,
+              secret.loginCredentials.username
+            )
+          }
+        }
+      })
+
+    if (filledElements.length === 2) {
+      log('filled both')
+      const form = filledElements[0]?.form
+      if (form) {
+        // TODO try to submit the form
+        filledElements[0]?.form?.dispatchEvent(
+          new Event('submit', {
+            bubbles: true,
+            cancelable: true
+          })
+        )
+        const clickEvent = new MouseEvent('click', {
+          view: window,
+          bubbles: true,
+          cancelable: true
         })
-        autofillValueIntoInput(input, fallbackUsernames[0])
+        // @ts-expect-error
+        form.submit.dispatchEvent(clickEvent)
+        // TODO show notification
+
+        toast.success('Autofilled form')
       }
-    } else if (input.autocomplete === 'current-password') {
-      const secret = secrets.loginCredentials[0]
-      if (secret) {
-        autofillValueIntoInput(input, secret.loginCredentials.password)
-      }
-    } else if (input.autocomplete === 'new-password') {
+    }
+  }
+  bodyInputChangeEmitter.on('inputAdded', (input) => {
+    if (input.autocomplete === 'new-password') {
       autofillValueIntoInput(
         input,
         generate({ length: 12, numbers: true, symbols: true }) // TODO get from user's options
       )
-    } else if (input.autocomplete === 'one-time-code') {
-      const totpSecret = secrets.totpSecrets[0]
-      if (totpSecret) {
-        const otpCode = authenticator.generate(totpSecret.totp)
-        autofillValueIntoInput(input, otpCode)
-      }
+    } else {
+      setTimeout(scanKnownWebInputsAndFillWhenFound, 20)
     }
-  }
+  })
 
-  bodyInputChangeEmitter.on('inputAdded', autofillElement)
-
-  setTimeout(() => {
-    document.body.querySelectorAll('input').forEach(autofillElement)
-  }, 100) // let's wait a bit for the page to load
+  setTimeout(scanKnownWebInputsAndFillWhenFound, 100) // let's wait a bit for the page to load
 }
