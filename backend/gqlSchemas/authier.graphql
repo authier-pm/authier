@@ -18,6 +18,7 @@ type UserQuery {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
+  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
@@ -79,6 +80,7 @@ type UserGQL {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
+  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
@@ -296,6 +298,7 @@ type UserMutation {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
+  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
@@ -326,7 +329,7 @@ type UserMutation {
   ): SettingsConfigGQL!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
-  changeMasterPassword(input: EncryptedSecretInput!): PositiveInt!
+  changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
 }
 
 type EncryptedSecretMutation {
@@ -364,6 +367,34 @@ Integers that will have a value greater than 0.
 """
 scalar PositiveInt
 
+input ChangeMasterPasswordInput {
+  secrets: [EncryptedSecretPatchInput!]!
+  addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
+  decryptionChallengeId: PositiveInt!
+}
+
+input EncryptedSecretPatchInput {
+  kind: EncryptedSecretType!
+  url: String!
+  iconUrl: String
+  iosUri: String
+  androidUri: String
+  label: String!
+  encrypted: String!
+  id: UUID!
+}
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
+"""
+A string that cannot be passed as an empty value
+"""
+scalar NonEmptyString
+
 type DeviceMutation {
   id: ID!
   firstIpAddress: String!
@@ -399,11 +430,6 @@ type SecretUsageEventGQLScalars {
   webInputId: Int
 }
 
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
 type LoginResponse {
   accessToken: String!
   user: UserAfterAuth!
@@ -417,6 +443,7 @@ type UserAfterAuth {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
+  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
@@ -441,11 +468,6 @@ input RegisterDeviceInput {
   addDeviceSecretEncrypted: NonEmptyString!
   decryptionChallengeId: PositiveInt
 }
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
 
 input WebInputElement {
   domPath: String!

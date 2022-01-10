@@ -10,7 +10,10 @@ import {
   SecretSerializedType
 } from './backgroundPage'
 import { generateFireToken } from './generateFireToken'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretPatchInput,
+  EncryptedSecretType
+} from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   AddEncryptedSecretDocument,
@@ -76,6 +79,11 @@ export class DeviceState {
     if (areaName === 'local' && changes.backgroundState) {
       Object.assign(this, changes.backgroundState.newValue)
     }
+  }
+
+  setMasterPassword(masterPassword: string) {
+    this.masterPassword = masterPassword
+    this.save()
   }
 
   encrypt(stringToEncrypt: string) {
@@ -156,13 +164,14 @@ export class DeviceState {
         )
         const newAndUpdatedSecrets =
           data.currentDevice.encryptedSecretsToSync.filter(
-            ({ deletedAt }) => !deletedAt
+            ({ updatedAt }) => !updatedAt
           )
 
         const oldSecretsWithoutRemoved = deviceState.secrets.filter(
           ({ id }) =>
             !removedSecrets.find((removedSecret) => id === removedSecret.id)
         )
+
         deviceState.secrets = [
           ...oldSecretsWithoutRemoved,
           ...newAndUpdatedSecrets
@@ -357,6 +366,34 @@ class ExtensionDevice {
     // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
     // this.listenForUserLogin()
     browser.runtime.reload()
+  }
+
+  serializeSecrets(
+    secrets: SecretSerializedType[],
+    newPsw: string
+  ): EncryptedSecretPatchInput[] {
+    const state = this.state
+    if (!state) {
+      throw new Error('device not initialized')
+    }
+    return secrets.map((secret) => {
+      const { id, encrypted, kind, label, iconUrl, url } = secret
+      const decr = state.decrypt(encrypted)
+      log('decrypted secret', decr)
+      state.setMasterPassword(newPsw)
+      const enc = state.encrypt(decr as string)
+      log('encrypted secret', enc, state.masterPassword)
+      return {
+        id,
+        encrypted: enc as string,
+        kind,
+        label,
+        iconUrl: iconUrl as string,
+        url: url as string,
+        androidUri: null,
+        iosUri: null
+      }
+    })
   }
 }
 

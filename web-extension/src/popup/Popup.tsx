@@ -37,38 +37,6 @@ export const Popup: FunctionComponent = () => {
 
   const { currentURL, isFilling } = useContext(DeviceStateContext)
 
-  // useEffect(() => {
-  //   async function saveToLocal(encrypted: any) {
-  //     await browser.storage.local.set({
-  //       encryptedPswMasterPassword: encrypted
-  //     })
-  //   }
-
-  //   if (userId && bgPasswords.length > 0) {
-  //     const encrypted = cryptoJS.AES.encrypt(
-  //       JSON.stringify(bgPasswords),
-  //       masterPassword,
-  //       { iv: CryptoJS.enc.Utf8.parse(userId) }
-  //     ).toString()
-
-  //     // TODO move this into background-we cannot rely on popup being opened for saving it
-  //     savePasswordsMutation({
-  //       variables: {
-  //         payload: encrypted
-  //       }
-  //     })
-
-  //     saveToLocal(encrypted)
-  //   }
-  // }, [userId, bgPasswords])
-
-  // useEffect(() => {
-  //   if (bgAuths) {
-  //     console.log('got', bgAuths)
-  //     setAuths(bgAuths)
-  //   }
-  // }, [bgAuths])
-
   useEffect(() => {
     if (isFilling) {
       log('Filling')

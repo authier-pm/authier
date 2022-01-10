@@ -1,18 +1,12 @@
-import React, {
-  FunctionComponent,
-  useContext,
-  useEffect,
-  useState
-} from 'react'
+import React, { FunctionComponent, useEffect, useState } from 'react'
 
-import { Flex, IconButton, useDisclosure, Box } from '@chakra-ui/react'
+import { Flex, IconButton, useDisclosure, Box, Tooltip } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdRefreshCircle, IoMdArchive } from 'react-icons/io'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { device } from '@src/background/ExtensionDevice'
 import { toast } from 'react-toastify'
 
@@ -81,29 +75,32 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           )}
-
-          <IconButton
-            size="md"
-            ml="2"
-            aria-label="menu"
-            icon={<IoMdRefreshCircle />}
-            disabled={isSyncing}
-            onClick={async () => {
-              setIsSyncing(true)
-              await device.state?.backendSync()
-              setIsSyncing(false)
-              toast.success('Sync successful')
-            }}
-          />
-          <IconButton
-            size="md"
-            ml="2"
-            aria-label="menu"
-            icon={<IoMdArchive />}
-            onClick={async () => {
-              chrome.tabs.create({ url: 'vault.html' })
-            }}
-          />
+          <Tooltip label="Refresh" aria-label="A tooltip">
+            <IconButton
+              size="md"
+              ml="2"
+              aria-label="menu"
+              icon={<IoMdRefreshCircle />}
+              disabled={isSyncing}
+              onClick={async () => {
+                setIsSyncing(true)
+                await device.state?.backendSync()
+                setIsSyncing(false)
+                toast.success('Sync successful')
+              }}
+            />
+          </Tooltip>
+          <Tooltip label="Open vault" aria-label="A tooltip">
+            <IconButton
+              size="md"
+              ml="2"
+              aria-label="menu"
+              icon={<IoMdArchive />}
+              onClick={async () => {
+                chrome.tabs.create({ url: 'vault.html' })
+              }}
+            />
+          </Tooltip>
         </Box>
 
         <Box ml="auto">
