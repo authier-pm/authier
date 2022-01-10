@@ -133,25 +133,12 @@ interface LoginParsedValues {
   password: string
 }
 
-const LoginSecret = (data: ILoginSecret) => {
+const LoginSecret = (secretProps: ILoginSecret) => {
   const history = useHistory()
   const [show, setShow] = useState(false)
-  const [password, setPassword] = useState<string>(
-    data.loginCredentials.password
-  )
-  const [levelOfPsw, setLevelOfPsw] = useState<string>(
-    passwordStrength(data.loginCredentials.password).value.split(' ').join('')
-  )
 
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
-
-  const handleChangeOriginPassword = (event: any) => {
-    setLevelOfPsw(
-      passwordStrength(event.target.value).value.split(' ').join('')
-    )
-    setPassword(event.target.value)
-  }
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
 
@@ -175,34 +162,50 @@ const LoginSecret = (data: ILoginSecret) => {
       >
         <Formik
           initialValues={{
-            url: data.url,
-            password: data.loginCredentials.password,
-            label: data.label,
-            username: data.loginCredentials.username
+            url: secretProps.url,
+            password: secretProps.loginCredentials.password,
+            label: secretProps.label,
+            username: secretProps.loginCredentials.username
           }}
           onSubmit={async (
             values: LoginParsedValues,
             { setSubmitting }: FormikHelpers<LoginParsedValues>
           ) => {
-            await updateSecret({
-              variables: {
-                id: data.id,
-                patch: {
-                  //Finish here the string
-                  encrypted: data.encrypted,
-                  label: values.label,
-                  url: values.url,
-                  kind: data.kind
+            const secret = device.state?.secrets.find(
+              ({ id }) => id === secretProps.id
+            )
+            if (secret && device.state) {
+              secret.encrypted = device.state.encrypt(
+                JSON.stringify({
+                  username: values.username,
+                  password: values.password
+                })
+              )
+
+              await updateSecret({
+                variables: {
+                  id: secretProps.id,
+                  patch: {
+                    //Finish here the string
+                    encrypted: secret.encrypted,
+                    label: values.label,
+                    url: values.url,
+                    kind: secretProps.kind
+                  }
                 }
-              }
-            })
-            await device.state?.save()
-            setSubmitting(false)
+              })
+
+              await device.state?.save()
+              setSubmitting(false)
+            }
           }}
         >
-          {({ values, setSubmitting }) => (
-            <Flex p={5} as={Form} flexDirection="column" w="inherit">
-              <SimpleGrid row={2} columns={2} spacing="40px">
+          {({ values, setSubmitting }) => {
+            const levelOfPsw = passwordStrength(values.password)
+              .value.split(' ')
+              .join('')
+            return (
+              <Flex p={5} as={Form} flexDirection="column" w="inherit">
                 <Field name="url">
                   {({ field, form }) => (
                     <FormControl
@@ -210,7 +213,7 @@ const LoginSecret = (data: ILoginSecret) => {
                     >
                       <FormLabel htmlFor="url">URL:</FormLabel>
 
-                      <Input pr="4.5rem" id="url" {...field} required />
+                      <Input id="url" {...field} required />
 
                       <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                     </FormControl>
@@ -223,7 +226,7 @@ const LoginSecret = (data: ILoginSecret) => {
                     >
                       <FormLabel htmlFor="label">Label:</FormLabel>
 
-                      <Input pr="4.5rem" id="label" {...field} required />
+                      <Input id="label" {...field} required />
 
                       <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                     </FormControl>
@@ -236,7 +239,7 @@ const LoginSecret = (data: ILoginSecret) => {
                     >
                       <FormLabel htmlFor="username">Username:</FormLabel>
 
-                      <Input pr="4.5rem" id="username" {...field} required />
+                      <Input id="username" {...field} required />
 
                       <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                     </FormControl>
@@ -259,8 +262,7 @@ const LoginSecret = (data: ILoginSecret) => {
                       />
                       <InputGroup size="md">
                         <Input
-                          value={password}
-                          onChange={handleChangeOriginPassword}
+                          {...field}
                           pr="4.5rem"
                           type={show ? 'text' : 'password'}
                         />
@@ -275,41 +277,41 @@ const LoginSecret = (data: ILoginSecret) => {
                     </FormControl>
                   )}
                 </Field>
-              </SimpleGrid>
 
-              {data.loginCredentials.parseError && (
-                <Alert status="error" mt={4}>
-                  <Trans>Failed to parse this secret:</Trans>
-                  {JSON.stringify(data.loginCredentials.parseError)}
-                </Alert>
-              )}
-              <Stack
-                direction={'row'}
-                justifyContent="flex-end"
-                spacing={1}
-                my={5}
-              >
-                <Button
-                  colorScheme="blackAlpha"
-                  size="sm"
-                  onClick={() => history.goBack()}
-                  type="button"
+                {secretProps.loginCredentials.parseError && (
+                  <Alert status="error" mt={4}>
+                    <Trans>Failed to parse this secret:</Trans>
+                    {JSON.stringify(secretProps.loginCredentials.parseError)}
+                  </Alert>
+                )}
+                <Stack
+                  direction={'row'}
+                  justifyContent="flex-end"
+                  spacing={1}
+                  my={5}
                 >
-                  Go back
-                </Button>
-                <Button
-                  colorScheme="twitter"
-                  size="sm"
-                  type="submit"
-                  onClick={async () => {
-                    setSubmitting(true)
-                  }}
-                >
-                  Save
-                </Button>
-              </Stack>
-            </Flex>
-          )}
+                  <Button
+                    colorScheme="blackAlpha"
+                    size="sm"
+                    onClick={() => history.goBack()}
+                    type="button"
+                  >
+                    Go back
+                  </Button>
+                  <Button
+                    colorScheme="twitter"
+                    size="sm"
+                    type="submit"
+                    onClick={async () => {
+                      setSubmitting(true)
+                    }}
+                  >
+                    Save
+                  </Button>
+                </Stack>
+              </Flex>
+            )
+          }}
         </Formik>
 
         <Tooltip label="Password generator">

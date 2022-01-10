@@ -372,13 +372,17 @@ class ExtensionDevice {
     secrets: SecretSerializedType[],
     newPsw: string
   ): EncryptedSecretPatchInput[] {
+    const state = this.state
+    if (!state) {
+      throw new Error('device not initialized')
+    }
     return secrets.map((secret) => {
       const { id, encrypted, kind, label, iconUrl, url } = secret
-      const decr = device.state?.decrypt(encrypted)
+      const decr = state.decrypt(encrypted)
       log('decrypted secret', decr)
-      this.state?.setMasterPassword(newPsw)
-      const enc = device.state?.encrypt(decr as string)
-      log('encrypted secret', enc, device.state?.masterPassword)
+      state.setMasterPassword(newPsw)
+      const enc = state.encrypt(decr as string)
+      log('encrypted secret', enc, state.masterPassword)
       return {
         id,
         encrypted: enc as string,
