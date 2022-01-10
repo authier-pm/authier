@@ -366,6 +366,7 @@ export type UserAfterAuth = {
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['String']>
+  emailAddressVerifiedAt?: Maybe<Scalars['DateTime']>
   id: Scalars['ID']
   loginCredentialsLimit: Scalars['Int']
   masterDevice?: Maybe<DeviceGql>
@@ -390,6 +391,7 @@ export type UserGql = {
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['String']>
+  emailAddressVerifiedAt?: Maybe<Scalars['DateTime']>
   id: Scalars['ID']
   loginCredentialsLimit: Scalars['Int']
   masterDevice?: Maybe<DeviceGql>
@@ -419,6 +421,7 @@ export type UserMutation = {
   changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
   email?: Maybe<Scalars['EmailAddress']>
+  emailAddressVerifiedAt?: Maybe<Scalars['DateTime']>
   encryptedSecret: EncryptedSecretMutation
   id: Scalars['ID']
   loginCredentialsLimit: Scalars['Int']
@@ -447,7 +450,7 @@ export type UserMutationApproveDeviceArgs = {
 }
 
 export type UserMutationChangeMasterPasswordArgs = {
-  input: EncryptedSecretInput
+  input: ChangeMasterPasswordInput
 }
 
 export type UserMutationEncryptedSecretArgs = {
@@ -494,6 +497,7 @@ export type UserQuery = {
   devices: Array<DeviceQuery>
   devicesCount: Scalars['Int']
   email?: Maybe<Scalars['EmailAddress']>
+  emailAddressVerifiedAt?: Maybe<Scalars['DateTime']>
   encryptedSecrets: Array<EncryptedSecretQuery>
   id: Scalars['ID']
   lastChangeInSecrets?: Maybe<Scalars['DateTime']>
