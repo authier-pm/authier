@@ -5,7 +5,10 @@ import browser from 'webextension-polyfill'
 
 import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  WebInputGql,
+  WebInputType
+} from '../../../shared/generated/graphqlBaseTypes'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './DOMObserver'
@@ -16,7 +19,7 @@ import {
 } from './renderSaveCredentialsForm'
 
 const log = debug('au:contentScript')
-localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages
+localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
@@ -26,6 +29,15 @@ const inputKindMap = {
 export interface IInitStateRes {
   extensionDeviceReady: boolean
   secretsForHost: IDecryptedSecrets
+  webInputs: Array<{
+    __typename?: 'WebInputGQL'
+    id: number
+    url: string
+    host: string
+    domPath: string
+    kind: WebInputType
+    createdAt: string
+  }>
   saveLoginModalsState?:
     | {
         password: string
@@ -49,10 +61,13 @@ export function getWebInputKind(
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
+
 export async function initInputWatch() {
   const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
+  log('~ stateInitRes', stateInitRes)
+
   if (!stateInitRes) {
     return
   }
@@ -63,7 +78,7 @@ export async function initInputWatch() {
   if (!extensionDeviceReady) {
     return // no need to do anything-user locked out
   }
-  autofill(secretsForHost)
+  const unregAutofillListener = autofill(stateInitRes)
 
   if (
     saveLoginModalsState &&
@@ -83,7 +98,7 @@ export async function initInputWatch() {
     }
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
-    console.log('~A showSavePromptIfAppropriate', username, password)
+    log('showSavePromptIfAppropriate', username, password)
 
     const existingCredentialWithSamePassword =
       secretsForHost?.loginCredentials.find(
@@ -112,12 +127,13 @@ export async function initInputWatch() {
     log(domRecorder)
   }
 
-  bodyInputChangeEmitter.on('inputRemoved', (input) => {
+  const onInputRemoved = (input) => {
     // handle case when password input is removed from DOM by javascript
     if (input.type === 'password' && domRecorder.hasInput(input)) {
       onSubmit(input)
     }
-  })
+  }
+  bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
 
   const debouncedInputEventListener = debounce((ev) => {
     const targetElement = ev.target as HTMLInputElement
@@ -187,7 +203,26 @@ export async function initInputWatch() {
     }
   }, 400)
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
+
+  return () => {
+    document.body.removeEventListener(
+      'input',
+      debouncedInputEventListener,
+      true
+    )
+    unregAutofillListener()
+    bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
+  }
 }
 
-// showSavePrompt()
-initInputWatch()
+;(async () => {
+  let destroy = await initInputWatch()
+
+  // for some reason this does not work TODO figure out why. In the meantime we're doing browser.runtime.reload() so not a big deal
+  browser.runtime.onMessage.addListener(async (message) => {
+    if (message.action === BackgroundMessageType.rerenderViews) {
+      destroy && destroy()
+      destroy = await initInputWatch()
+    }
+  })
+})()

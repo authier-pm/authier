@@ -25,6 +25,7 @@ import {
 import { device, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import type { IInitStateRes } from '@src/content-script/contentScript'
+import { getContentScriptInitialState } from './getContentScriptInitialState'
 
 const log = debug('au:chListener')
 
@@ -47,7 +48,7 @@ interface ILoginCredentialsFromContentScript {
   openInVault: boolean
 }
 
-const saveLoginModalsStates = new Map<
+export const saveLoginModalsStates = new Map<
   number,
   { password: string; username: string }
 >()
@@ -149,36 +150,12 @@ chrome.runtime.onMessage.addListener(async function (
       sendResponse([deviceState?.email])
       break
     case BackgroundMessageType.getContentScriptInitialState:
-      let res: IInitStateRes
-
       const tabUrl = tab?.url
-      if (!tabUrl || !deviceState) {
+      if (!tabUrl || !deviceState || !currentTabId) {
         return sendResponse(null)
       } else {
-        const decrypted =
-          device.state?.getSecretsDecryptedByHostname(
-            new URL(tabUrl).hostname
-          ) ?? []
-
-        res = {
-          extensionDeviceReady: !!device.state?.masterPassword,
-          secretsForHost: {
-            // @ts-expect-error
-            loginCredentials: decrypted.filter(
-              ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-            ),
-            // @ts-expect-error
-            totpSecrets: decrypted.filter(
-              ({ kind }) => kind === EncryptedSecretType.TOTP
-            )
-          },
-          saveLoginModalsState: currentTabId
-            ? saveLoginModalsStates.get(currentTabId)
-            : null
-        }
+        sendResponse(await getContentScriptInitialState(tabUrl, currentTabId))
       }
-
-      sendResponse(res)
 
       break
 

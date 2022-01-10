@@ -394,8 +394,11 @@ export class RootResolver {
   }
 
   @Query(() => [WebInputGQL])
-  async webInputs(@Arg('url') url: string, @Ctx() ctx: IContextAuthenticated) {
-    return ctx.prisma.webInput.findMany({ where: { url } })
+  async webInputs(
+    @Arg('host') host: string,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.webInput.findMany({ where: { host } })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
@@ -408,6 +411,7 @@ export class RootResolver {
     for (const webInput of webInputs) {
       const forUpsert = {
         url: webInput.url,
+        host: new URL(webInput.url).host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId

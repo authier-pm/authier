@@ -29,7 +29,7 @@ export function getSelectorForElement(target: HTMLInputElement) {
       })
     }
   } else {
-    // this input is not in DOM anymore--it was probably removed as part of the login flow(multistep login flow)
+    // this input is not in DOM anymore--it was probably removed as part of the login flow(multi step login flow)
     selector = generateQuerySelectorForOrphanedElement(target) // we fallback to generating selector from the orphaned element
   }
 
