@@ -147,7 +147,14 @@ const LoginCredentialsListItem = ({
             <Avatar src={loginSecret.iconUrl as string} size="xs"></Avatar>
           </Flex>
           <Box ml={2} mr="auto" maxW="200px">
-            <Heading size="sm">{loginSecret.label}</Heading>
+            <Heading
+              size="sm"
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+            >
+              {loginSecret.label}
+            </Heading>
             <Text fontSize="sm" whiteSpace="nowrap">
               {loginSecret.loginCredentials.username.replace(
                 /http:\/\/|https:\/\//,
