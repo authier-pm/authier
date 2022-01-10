@@ -368,17 +368,16 @@ class ExtensionDevice {
     browser.runtime.reload()
   }
 
-  serielizeSecrets(
+  serializeSecrets(
     secrets: SecretSerializedType[],
     newPsw: string
   ): EncryptedSecretPatchInput[] {
-    let test = this
     return secrets.map((secret) => {
       const { id, encrypted, kind, label, iconUrl, url } = secret
-      let decr = device.state?.decrypt(encrypted)
+      const decr = device.state?.decrypt(encrypted)
       log('decrypted secret', decr)
       this.state?.setMasterPassword(newPsw)
-      let enc = device.state?.encrypt(decr as string)
+      const enc = device.state?.encrypt(decr as string)
       log('encrypted secret', enc, device.state?.masterPassword)
       return {
         id,
