@@ -31,7 +31,12 @@ export const PasswordGenerator = ({ isOpen }: { isOpen: boolean }) => {
 
   return (
     <Collapse in={isOpen} animateOpacity>
-      <Flex flexDirection="column" justifyContent="center" alignItems="center">
+      <Flex
+        flexDirection="column"
+        justifyContent="center"
+        alignItems="center"
+        m={2}
+      >
         <Input
           value={generatedPsw}
           onChange={handleChangeGeneratedPassword}

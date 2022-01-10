@@ -16,9 +16,9 @@ import React, { useContext, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
-import { DeleteAlert } from './DeleteAlert'
-import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
-import { useDeleteEncryptedSecretMutation } from './ItemList.codegen'
+import { DeleteAlert } from '../components/vault/DeleteAlert'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import browser from 'webextension-polyfill'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {

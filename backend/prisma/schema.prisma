@@ -165,6 +165,7 @@ model User {
   Token                    Token[]
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
+  emailAddressVerifiedAt   DateTime?
   masterDevice             Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
   masterDeviceId           String?   @unique @db.Uuid
   // Limits for the number of stored secrets
