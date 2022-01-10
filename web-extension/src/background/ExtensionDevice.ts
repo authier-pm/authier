@@ -361,7 +361,6 @@ class ExtensionDevice {
 }
 
 export const device = new ExtensionDevice()
-console.log('you fucker')
 
 device.initialize()
 // @ts-expect-error
