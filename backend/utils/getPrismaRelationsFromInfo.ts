@@ -9,7 +9,6 @@ export const getPrismaRelationsFromInfo = (
   info: GraphQLResolveInfo,
   prefixFilter?: string
 ) => {
-  // @ts-expect-error TODO
   const queriedFields = getFieldNames(info)
 
   const forRelations = queriedFields.filter((field) => {
