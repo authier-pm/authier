@@ -21,7 +21,7 @@ import Chakra, {
   Switch
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
-
+import { distance } from 'fastest-levenshtein'
 import {
   CopyIcon,
   DeleteIcon,
@@ -43,6 +43,7 @@ import { UserContext } from '@src/providers/UserProvider'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
@@ -153,7 +154,7 @@ const LoginCredentialsListItem = ({
               textOverflow="ellipsis"
               overflow="hidden"
             >
-              {loginSecret.label}
+              {new URL(loginSecret.url).hostname.replace('www.', '')}
             </Heading>
             <Text fontSize="sm" whiteSpace="nowrap">
               {loginSecret.loginCredentials.username.replace(
@@ -185,14 +186,14 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   const { deviceState, TOTPSecrets, LoginCredentials } =
     useContext(DeviceStateContext)
 
-  const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
+  const [currentTabUrl, setCurrentTabUrl] = useState('')
   // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
   const [_, forceUpdate] = useReducer((x) => x + 1, 0)
   useEffect(() => {
     getCurrentTab().then((tab) => {
       log('~ tab?.url', tab?.url)
 
-      setCurrentTabUrl(tab?.url ?? null)
+      setCurrentTabUrl(tab?.url ?? '')
     })
   }, [])
 
@@ -271,21 +272,33 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
             })}
           </>
         ) : (
-          [
-            TOTPSecrets.map((auth, i) => {
+          deviceState
+            .getDecryptedSecrets()
+            .sort((a, b) => {
               return (
-                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
-              )
-            }),
-            LoginCredentials.map((psw, i) => {
-              return (
-                <LoginCredentialsListItem
-                  loginSecret={psw as ILoginSecret}
-                  key={psw.label + i}
-                />
+                distance(a.url ?? '', currentTabUrl) -
+                distance(b.url ?? '', currentTabUrl)
               )
             })
-          ]
+            .map((secretDecrypted) => {
+              if (
+                secretDecrypted.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+              ) {
+                return (
+                  <LoginCredentialsListItem
+                    loginSecret={secretDecrypted as ILoginSecret}
+                    key={secretDecrypted.id}
+                  />
+                )
+              } else {
+                return (
+                  <OtpCode
+                    totpData={secretDecrypted as ITOTPSecret}
+                    key={secretDecrypted.id}
+                  />
+                )
+              }
+            })
         )}
         {hasNoSecrets && (
           // TODO login form illustration

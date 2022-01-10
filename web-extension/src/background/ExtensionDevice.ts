@@ -96,9 +96,7 @@ export class DeviceState {
   }
 
   getSecretDecryptedById(id: string) {
-    const secret: ILoginSecret | ITOTPSecret = this.secrets.find(
-      (secret) => secret.id === id
-    ) as ILoginSecret | ITOTPSecret
+    const secret = this.secrets.find((secret) => secret.id === id)
     if (secret) {
       return this.decryptSecret(secret)
     }
@@ -107,31 +105,41 @@ export class DeviceState {
   getSecretsDecryptedByHostname(host: string) {
     const secrets = this.secrets.filter(
       (secret) => host === new URL(secret.url ?? '').hostname
-    ) as Array<ILoginSecret | ITOTPSecret>
-    if (secrets) {
-      return secrets.map((secret) => {
-        return this.decryptSecret(secret)
-      })
+    )
+    if (!secrets) {
+      return []
     }
-    return []
+    return this.getDecryptedSecrets()
   }
 
-  private decryptSecret(secret: ILoginSecret | ITOTPSecret) {
+  getDecryptedSecrets() {
+    return this.secrets.map((secret) => {
+      return this.decryptSecret(secret)
+    })
+  }
+
+  private decryptSecret(secret: SecretSerializedType) {
     const decrypted = this.decrypt(secret.encrypted)
     if (secret.kind === EncryptedSecretType.TOTP) {
-      secret.totp = decrypted
+      return {
+        ...secret,
+        totp: decrypted
+      }
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-      const parsed = JSON.parse(decrypted)
+      let parsed = JSON.parse(decrypted)
 
       try {
         loginCredentialsSchema.parse(parsed)
-        secret.loginCredentials = parsed
       } catch (err: any) {
-        secret.loginCredentials = {
+        parsed = {
           username: '',
           password: '',
           parseError: err
         }
+      }
+      return {
+        ...secret,
+        loginCredentials: parsed
       }
     }
 

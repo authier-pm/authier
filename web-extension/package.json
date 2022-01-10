@@ -41,6 +41,7 @@
     "css-loader": "^6.3.0",
     "date-fns": "^2.25.0",
     "debug": "^4.3.2",
+    "fastest-levenshtein": "^1.0.12",
     "firebase": "9.1.0",
     "gqlSchemas": "file:../backend/schemas",
     "jest": "^27.2.2",

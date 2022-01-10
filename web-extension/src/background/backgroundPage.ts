@@ -39,7 +39,7 @@ if ('serviceWorker' in navigator) {
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
-  'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'
+  'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url' | 'createdAt'
 >
 
 export interface IBackgroundStateSerializableLocked {

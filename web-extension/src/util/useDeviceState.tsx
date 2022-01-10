@@ -13,7 +13,7 @@ import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import cryptoJS from 'crypto-js'
 import debug from 'debug'
-import { device } from '@src/background/ExtensionDevice'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 
@@ -59,8 +59,9 @@ export function useDeviceState() {
 
   const [isFilling, setIsFilling] = useState<boolean>(false)
   const [isCounting, setIsCounting] = useState<boolean>(false)
-  const [deviceState, setDeviceState] =
-    useState<IBackgroundStateSerializable | null>(device.state)
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(
+    device.state
+  )
 
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
