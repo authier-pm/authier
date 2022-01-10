@@ -19,7 +19,7 @@ import {
 } from './renderSaveCredentialsForm'
 
 const log = debug('au:contentScript')
-localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages
+localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
@@ -98,7 +98,7 @@ export async function initInputWatch() {
     }
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
-    log('~A showSavePromptIfAppropriate', username, password)
+    log('showSavePromptIfAppropriate', username, password)
 
     const existingCredentialWithSamePassword =
       secretsForHost?.loginCredentials.find(
