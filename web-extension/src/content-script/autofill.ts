@@ -40,7 +40,7 @@ export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
 
   if (enabled === true) {
-    return
+    return () => {}
   }
   log('init autofill', initState)
 
@@ -49,7 +49,7 @@ export const autofill = (initState: IInitStateRes) => {
   const secret = secretsForHost.loginCredentials[0]
 
   if (!secret) {
-    return
+    return () => {}
   }
 
   const scanKnownWebInputsAndFillWhenFound = () => {
@@ -112,4 +112,9 @@ export const autofill = (initState: IInitStateRes) => {
   })
 
   setTimeout(scanKnownWebInputsAndFillWhenFound, 100) // let's wait a bit for the page to load
+
+  return () => {
+    enabled = false
+    bodyInputChangeEmitter.off('inputAdded', scanKnownWebInputsAndFillWhenFound)
+  }
 }
