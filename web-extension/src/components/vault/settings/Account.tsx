@@ -88,13 +88,15 @@ export default function Account() {
               const userId =
                 decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
 
+              const secretAuthTuple = device.getAddDeviceSecretAuthTuple(
+                values.newPassword,
+                userId as string
+              )
+              console.log('~ secretAuthTuple', secretAuthTuple)
               await changePassword({
                 variables: {
-                  secrets: device.serielizeSecrets(secrets, values.newPassword),
-                  ...device.getAddDeviceSecretAuthTuple(
-                    values.newPassword,
-                    userId as string
-                  ),
+                  secrets: device.serializeSecrets(secrets, values.newPassword),
+                  ...secretAuthTuple,
                   decryptionChallengeId: decryptionChallenge.data
                     ?.deviceDecryptionChallenge?.id as number
                 }
@@ -104,6 +106,8 @@ export default function Account() {
               toast.warning('Wrong password')
             }
             setSubmitting(false)
+
+            return false
           }}
         >
           {({ isSubmitting }) => (
