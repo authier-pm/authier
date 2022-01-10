@@ -7,7 +7,7 @@ type Query {
   authenticated: Boolean!
   me: UserQuery
   currentDevice: DeviceQuery!
-  webInputs(url: String!): [WebInputGQL!]!
+  webInputs(host: String!): [WebInputGQL!]!
 }
 
 type UserQuery {
@@ -158,6 +158,7 @@ type WebInputGQL {
   id: Int!
   layoutType: String
   createdAt: DateTime!
+  host: String!
   url: String!
   kind: WebInputType!
   domPath: String!
@@ -325,7 +326,7 @@ type UserMutation {
   ): SettingsConfigGQL!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
-  changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
+  changeMasterPassword(input: EncryptedSecretInput!): PositiveInt!
 }
 
 type EncryptedSecretMutation {
@@ -363,34 +364,6 @@ Integers that will have a value greater than 0.
 """
 scalar PositiveInt
 
-input ChangeMasterPasswordInput {
-  secrets: [EncryptedSecretPatchInput!]!
-  addDeviceSecret: NonEmptyString!
-  addDeviceSecretEncrypted: NonEmptyString!
-  decryptionChallengeId: PositiveInt!
-}
-
-input EncryptedSecretPatchInput {
-  kind: EncryptedSecretType!
-  url: String!
-  iconUrl: String
-  iosUri: String
-  androidUri: String
-  label: String!
-  encrypted: String!
-  id: UUID!
-}
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
-"""
-A string that cannot be passed as an empty value
-"""
-scalar NonEmptyString
-
 type DeviceMutation {
   id: ID!
   firstIpAddress: String!
@@ -425,6 +398,11 @@ type SecretUsageEventGQLScalars {
   deviceId: String!
   webInputId: Int
 }
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type LoginResponse {
   accessToken: String!

@@ -75,6 +75,7 @@ export class DeviceState {
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ) {
+    log('storage changed', changes, areaName)
     if (areaName === 'local' && changes.backgroundState) {
       Object.assign(this, changes.backgroundState.newValue)
     }
@@ -255,13 +256,32 @@ class ExtensionDevice {
       log('device state not found in storage')
     }
 
-    this.state = storedState ? new DeviceState(storedState) : null
+    if (storedState) {
+      this.state = new DeviceState(storedState)
+    } else {
+      this.listenForUserLogin()
+    }
 
     const fireToken = await generateFireToken()
     console.log('~ fireToken', fireToken)
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
+  }
+
+  private listenForUserLogin() {
+    this.state = null
+    const onStorageChange = (
+      changes: Record<string, browser.Storage.StorageChange>,
+      areaName: string
+    ) => {
+      log('storage changed', changes, areaName)
+      if (areaName === 'local' && changes.backgroundState) {
+        this.state = new DeviceState(changes.backgroundState.newValue)
+        browser.storage.onChanged.removeListener(onStorageChange)
+      }
+    }
+    browser.storage.onChanged.addListener(onStorageChange)
   }
 
   rerenderViews() {
@@ -343,7 +363,9 @@ class ExtensionDevice {
     await removeToken()
     await device.clearLocalStorage()
 
-    this.rerenderViews()
+    // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    // this.listenForUserLogin()
+    browser.runtime.reload()
   }
 
   serielizeSecrets(
@@ -375,6 +397,5 @@ class ExtensionDevice {
 export const device = new ExtensionDevice()
 
 device.initialize()
-
 // @ts-expect-error
 window.extensionDevice = device

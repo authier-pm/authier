@@ -140,7 +140,8 @@ model WebInput {
   id            Int                @id @default(autoincrement())
   layoutType    String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
   createdAt     DateTime           @default(now())
-  url           String
+  host          String             @db.VarChar(253)
+  url           String             @db.VarChar(2048)
   kind          WebInputType
   domPath       String
   addedByUser   User               @relation(fields: [addedByUserId], references: [id])
@@ -148,11 +149,13 @@ model WebInput {
   UsageEvents   SecretUsageEvent[]
 
   @@unique([url, domPath], name: "webInputIdentifier")
+  @@index([host])
+  @@index([kind])
 }
 
 model User {
   id    String  @id @default(uuid()) @db.Uuid
-  email String? @unique
+  email String? @unique @db.Citext
 
   tokenVersion             Int       @default(0)
   username                 String?   @unique

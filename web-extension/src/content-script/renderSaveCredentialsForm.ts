@@ -30,12 +30,14 @@ export function renderSaveCredentialsForm(username: string, password: string) {
   promptDiv.style.top = '0px'
   promptDiv.style.left = '0px'
   const buttonStyle = (bgColor: string) =>
-    `background-color:${bgColor}; color: ${authierColors.green[100]}; margin: 4px; padding: 4px;border-radius: 4px;`
+    `background-color:${bgColor}; color: ${authierColors.green[100]}; margin: 4px; padding: 4px;border-radius: 4px; font-size: 13px;`
 
-  const h3Style = '"margin: 0 5px; font-family: sans-serif !important;"'
+  const h3Style =
+    '"margin: 0 5px; font-family: sans-serif !important; font-size: 14px; font-weight: bold; color: #000;"'
+  const spanStyle = '"font-size: 13px; color: #000;"'
   promptDiv.innerHTML = `
-  <span>Username: </span><h3 style=${h3Style}>${username}</h3>
-  <span>Password: </span><h3 id="__AUTHIER__pswdDisplay" style=${h3Style}>${password.replaceAll(
+  <span style=${spanStyle}>Username: </span><h3 style=${h3Style}>${username}</h3>
+  <span style=${spanStyle}>Password: </span><h3 id="__AUTHIER__pswdDisplay" style=${h3Style}>${password.replaceAll(
     /./g,
     '*'
   )}</h3>
