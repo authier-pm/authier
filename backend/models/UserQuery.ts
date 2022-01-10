@@ -50,9 +50,10 @@ export class UserBase extends UserGQL {
       user: {
         ...this,
         //Remove deleted items
-        EncryptedSecrets: this.EncryptedSecrets.filter(
-          ({ deletedAt }) => !deletedAt
-        )
+        EncryptedSecrets:
+          this.EncryptedSecrets.length > 0
+            ? this.EncryptedSecrets.filter(({ deletedAt }) => !deletedAt)
+            : []
       }
     }
   }
@@ -131,7 +132,7 @@ export class UserQuery extends UserBase {
     @Arg('device', () => String) device: string,
     @Arg('pageName', () => String) pageName: string
   ) {
-    let user = await prismaClient.user.findFirst({
+    const user = await prismaClient.user.findFirst({
       where: {
         id: this.id
       },

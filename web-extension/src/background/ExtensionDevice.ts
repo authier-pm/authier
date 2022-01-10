@@ -80,6 +80,11 @@ export class DeviceState {
     }
   }
 
+  setMasterPassword(masterPassword: string) {
+    this.masterPassword = masterPassword
+    this.save()
+  }
+
   encrypt(stringToEncrypt: string) {
     return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
@@ -342,13 +347,20 @@ class ExtensionDevice {
   }
 
   serielizeSecrets(
-    secrets: SecretSerializedType[]
+    secrets: SecretSerializedType[],
+    newPsw: string
   ): EncryptedSecretPatchInput[] {
+    let test = this
     return secrets.map((secret) => {
       const { id, encrypted, kind, label, iconUrl, url } = secret
+      let decr = device.state?.decrypt(encrypted)
+      log('decrypted secret', decr)
+      this.state?.setMasterPassword(newPsw)
+      let enc = device.state?.encrypt(decr as string)
+      log('encrypted secret', enc, device.state?.masterPassword)
       return {
         id,
-        encrypted,
+        encrypted: enc as string,
         kind,
         label,
         iconUrl: iconUrl as string,

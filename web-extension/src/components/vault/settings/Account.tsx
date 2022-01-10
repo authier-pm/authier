@@ -17,6 +17,7 @@ import { motion } from 'framer-motion'
 import { useChangeMasterPasswordMutation } from './Account.codegen'
 import * as Yup from 'yup'
 import { useDeviceDecryptionChallengeMutation } from '../../../../../shared/Login.codegen'
+import { toast } from 'react-toastify'
 
 export default function Account() {
   const email = device.state?.email
@@ -89,7 +90,7 @@ export default function Account() {
 
               await changePassword({
                 variables: {
-                  secrets: device.serielizeSecrets(secrets),
+                  secrets: device.serielizeSecrets(secrets, values.newPassword),
                   ...device.getAddDeviceSecretAuthTuple(
                     values.newPassword,
                     userId as string
@@ -100,7 +101,7 @@ export default function Account() {
               })
               await device.logout()
             } else {
-              console.error('wrong password')
+              toast.warning('Wrong password')
             }
             setSubmitting(false)
           }}
