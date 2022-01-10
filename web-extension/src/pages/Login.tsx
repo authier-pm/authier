@@ -27,7 +27,6 @@ import { UserContext } from '../providers/UserProvider'
 import cryptoJS from 'crypto-js'
 
 import { toast } from 'react-toastify'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 
@@ -98,6 +97,11 @@ export default function Login(): ReactElement {
               iv: cryptoJS.enc.Utf8.parse(userId)
             }
           ).toString(cryptoJS.enc.Utf8)
+
+          if (!currentSecret) {
+            toast.error('wrong password or email')
+            return
+          }
 
           const response = await addNewDevice({
             variables: {

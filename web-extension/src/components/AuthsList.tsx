@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState
 } from 'react'
-import Chakra, {
+import {
   Avatar,
   Box,
   Button,
@@ -16,44 +16,30 @@ import Chakra, {
   useClipboard,
   Text,
   Heading,
-  IconButton,
-  Divider,
-  Switch
+  IconButton
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
-import {
-  CopyIcon,
-  DeleteIcon,
-  EditIcon,
-  NotAllowedIcon
-} from '@chakra-ui/icons'
+import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
-import { getUserFromToken } from '@src/util/accessTokenExtension'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { UIOptions } from './setting-screens/SettingsForm'
-import RemoveAlertDialog from './RemoveAlertDialog'
 
-import { UserContext } from '@src/providers/UserProvider'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
-  console.log('~ totpData', totpData)
   const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
   const [isOpen, setIsOpen] = useState(false)
-  const cancelRef = useRef()
-  const { userId } = useContext(UserContext)
+
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
@@ -134,9 +120,6 @@ const LoginCredentialsListItem = ({
 }: {
   loginSecret: ILoginSecret
 }) => {
-  const [isOpen, setIsOpen] = useState(false)
-  const cancelRef = useRef()
-
   const { onCopy } = useClipboard(loginSecret.loginCredentials.password)
 
   return (
@@ -186,7 +169,6 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     useContext(DeviceStateContext)
 
   const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
-  // const [showForCurrentUrlDomain, setShowForCurrentUrlDomain] = useState(true)
   const [_, forceUpdate] = useReducer((x) => x + 1, 0)
   useEffect(() => {
     getCurrentTab().then((tab) => {
@@ -216,31 +198,6 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   const hasNoSecrets = deviceState.secrets.length === 0
   return (
     <>
-      {/* <Flex justifyContent="space-evenly">
-        <Button
-          onClick={() => setChangeList(Values.TOTP)}
-          style={
-            changeList === Values.TOTP
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          OTP
-        </Button>
-        <Button
-          onClick={() => setChangeList(Values.passwords)}
-          style={
-            changeList === Values.passwords
-              ? { fontWeight: 'bold' }
-              : { fontWeight: 'normal' }
-          }
-          size="md"
-        >
-          Passwords
-        </Button>
-      </Flex> */}
-
       <Flex overflow="auto" overflowX="hidden" flexDirection="column">
         {hasNoSecrets === false &&
           filterByTLD &&
@@ -298,12 +255,3 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     </>
   )
 }
-
-// .filter(({ originalUrl }) => {
-//   if (!currentTabUrl || !originalUrl) {
-//     return true
-//   }
-//   return (
-//     extractHostname(originalUrl) === extractHostname(currentTabUrl)
-//   )
-// })
