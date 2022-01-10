@@ -33,6 +33,9 @@ export class UserGQLScalars {
   updatedAt?: Date
 
   @Field({ nullable: true })
+  emailAddressVerifiedAt?: Date
+
+  @Field({ nullable: true })
   masterDeviceId?: string
 
   @Field(() => Int)
