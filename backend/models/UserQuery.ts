@@ -51,7 +51,7 @@ export class UserBase extends UserGQL {
         ...this,
         //Remove deleted items
         EncryptedSecrets:
-          this.EncryptedSecrets.length > 0
+          this.EncryptedSecrets?.length > 0
             ? this.EncryptedSecrets.filter(({ deletedAt }) => !deletedAt)
             : []
       }
