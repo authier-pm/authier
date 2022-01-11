@@ -180,6 +180,8 @@ model User {
   Tags                 Tag[]
   UserPaidProducts     UserPaidProducts[]
   DecryptionChallenges DecryptionChallenge[]
+  // @skip
+  EmailVerification    EmailVerification[]
 }
 
 model Token {
@@ -231,4 +233,12 @@ model Tag {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id])
   userId    String   @db.Uuid
+}
+
+model EmailVerification {
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  userId    String    @id @db.Uuid
+  user      User      @relation(fields: [userId], references: [id])
+  token     String    @unique @db.Uuid
 }

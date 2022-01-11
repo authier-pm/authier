@@ -8,6 +8,8 @@ import {
   WebInputsForHostQueryVariables
 } from './chromeRuntimeListener.codegen'
 import { device } from './ExtensionDevice'
+import mem from 'mem'
+import ms from 'ms'
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
@@ -16,10 +18,7 @@ export const getContentScriptInitialState = async (
   const hostname = new URL(tabUrl).hostname
   const decrypted = device.state?.getSecretsDecryptedByHostname(hostname ?? [])
 
-  const res = await apolloClient.query<
-    WebInputsForHostQuery,
-    WebInputsForHostQueryVariables
-  >({ query: WebInputsForHostDocument, variables: { host: hostname } })
+  const res = await getWebInputs(hostname)
 
   return {
     extensionDeviceReady: !!device.state?.masterPassword,
@@ -39,3 +38,13 @@ export const getContentScriptInitialState = async (
       : null
   }
 }
+
+const getWebInputs = mem(
+  (hostname: string) => {
+    return apolloClient.query<
+      WebInputsForHostQuery,
+      WebInputsForHostQueryVariables
+    >({ query: WebInputsForHostDocument, variables: { host: hostname } })
+  },
+  { maxAge: ms('2 days') }
+)
