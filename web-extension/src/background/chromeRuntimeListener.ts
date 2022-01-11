@@ -146,6 +146,17 @@ chrome.runtime.onMessage.addListener(async function (
 
       break
 
+    case BackgroundMessageType.addTOTPInput:
+      await apolloClient.mutate<
+        AddWebInputsMutationResult,
+        AddWebInputsMutationVariables
+      >({
+        mutation: AddWebInputsDocument,
+        variables: {
+          webInputs: [req.payload]
+        }
+      })
+      break
     case BackgroundMessageType.getFallbackUsernames:
       sendResponse([deviceState?.email])
       break
