@@ -46,9 +46,10 @@ export const autofill = (initState: IInitStateRes) => {
 
   enabled = true
 
-  const secret = secretsForHost.loginCredentials[0]
+  const namePassSecret = secretsForHost.loginCredentials[0]
+  const totpSecret = secretsForHost.totpSecrets[0]
 
-  if (!secret) {
+  if (!namePassSecret && !totpSecret) {
     return () => {}
   }
 
@@ -56,21 +57,28 @@ export const autofill = (initState: IInitStateRes) => {
     const filledElements = webInputs
       .filter(({ url }) => url === location.href)
       .map((webInputGql) => {
-        const inputEl = document.body.querySelector(webInputGql.domPath)
+        const inputEl = document.body.querySelector(
+          webInputGql.domPath
+        ) as HTMLInputElement
 
         if (inputEl) {
           if (webInputGql.kind === WebInputType.PASSWORD) {
             return autofillValueIntoInput(
-              inputEl as HTMLInputElement,
-              secret.loginCredentials.password
+              inputEl,
+              namePassSecret.loginCredentials.password
             )
           } else if (
             webInputGql.kind === WebInputType.USERNAME ||
             webInputGql.kind === WebInputType.USERNAME_OR_EMAIL
           ) {
             return autofillValueIntoInput(
-              inputEl as HTMLInputElement,
-              secret.loginCredentials.username
+              inputEl,
+              namePassSecret.loginCredentials.username
+            )
+          } else if (webInputGql.kind === WebInputType.TOTP) {
+            return autofillValueIntoInput(
+              inputEl,
+              authenticator.generate(totpSecret.totp)
             )
           }
         }
