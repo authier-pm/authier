@@ -10,6 +10,7 @@ import {
 } from './DOMEventsRecorder'
 import debug from 'debug'
 import {
+  WebInputElement,
   WebInputGql,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
@@ -165,15 +166,16 @@ export async function initInputWatch() {
               const elementSelector = getSelectorForElement(
                 targetElement as HTMLInputElement
               )
+              const webInput: WebInputElement = {
+                domPath: elementSelector,
+                kind: WebInputType.TOTP,
+                url: location.href
+              }
               await browser.runtime.sendMessage({
                 action: BackgroundMessageType.addTOTPInput,
-                payload: {
-                  element: elementSelector,
-                  type: 'input',
-                  kind: WebInputType.TOTP
-                }
+                payload: webInput
               })
-              log(`TOTP added ${elementSelector}`)
+              log(`TOTP WebInput added for selector "${elementSelector}"`)
             }
           })
         }
