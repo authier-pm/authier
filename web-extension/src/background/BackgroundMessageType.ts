@@ -2,6 +2,7 @@ export enum BackgroundMessageType {
   getFallbackUsernames = 'getFallbackUsernames',
   rerenderViews = 'rerenderViews',
   wasClosed = 'wasClosed',
+  addTOTPInput = 'addTOTPInput',
   startCount = 'startCount',
   loggedIn = 'loggedIn',
   passwords = 'passwords',
