@@ -3,7 +3,11 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { debounce } from 'lodash'
 import browser from 'webextension-polyfill'
 
-import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
+import {
+  DOMEventsRecorder,
+  getSelectorForElement,
+  IInputRecord
+} from './DOMEventsRecorder'
 import debug from 'debug'
 import {
   WebInputGql,
@@ -17,6 +21,7 @@ import {
   promptDiv,
   renderSaveCredentialsForm
 } from './renderSaveCredentialsForm'
+import { authenticator } from 'otplib'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -152,8 +157,25 @@ export async function initInputWatch() {
           kind: getWebInputKind(targetElement)
         }
         domRecorder.addInputEvent(inputRecord)
-        if (inputted.length === 6) {
+        if (inputted.length === 6 && secretsForHost.totpSecrets.length > 0) {
           // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
+
+          secretsForHost.totpSecrets.forEach(async (totpSecret) => {
+            if (authenticator.generate(totpSecret.totp) === inputted) {
+              const elementSelector = getSelectorForElement(
+                targetElement as HTMLInputElement
+              )
+              await browser.runtime.sendMessage({
+                action: BackgroundMessageType.addTOTPInput,
+                payload: {
+                  element: elementSelector,
+                  type: 'input',
+                  kind: WebInputType.TOTP
+                }
+              })
+              log(`TOTP added ${elementSelector}`)
+            }
+          })
         }
 
         log('inputRecord', inputRecord)
