@@ -67,7 +67,7 @@ export class DeviceState {
   }
   email: string
   userId: string
-  masterPassword: string
+  masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime = 10000 * 60 * 60 * 8
 
@@ -81,18 +81,24 @@ export class DeviceState {
     }
   }
 
-  setMasterPassword(masterPassword: string) {
-    this.masterPassword = masterPassword
+  setMasterEncryptionKey(masterPassword: string) {
+    this.masterEncryptionKey = cryptoJS
+      .PBKDF2(
+        masterPassword,
+        this.email,
+        { iterations: 100000, keySize: 64 } // TODO make customizable
+      )
+      .toString(cryptoJS.enc.Utf8)
     this.save()
   }
 
   encrypt(stringToEncrypt: string) {
-    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
+    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterEncryptionKey, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
     }).toString()
   }
   decrypt(encrypted: string) {
-    return cryptoJS.AES.decrypt(encrypted, this.masterPassword, {
+    return cryptoJS.AES.decrypt(encrypted, this.masterEncryptionKey, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
     }).toString(cryptoJS.enc.Utf8)
   }
@@ -380,9 +386,9 @@ class ExtensionDevice {
       const { id, encrypted, kind, label, iconUrl, url } = secret
       const decr = state.decrypt(encrypted)
       log('decrypted secret', decr)
-      state.setMasterPassword(newPsw)
+      state.setMasterEncryptionKey(newPsw)
       const enc = state.encrypt(decr as string)
-      log('encrypted secret', enc, state.masterPassword)
+      log('encrypted secret', enc, state.masterEncryptionKey)
       return {
         id,
         encrypted: enc as string,

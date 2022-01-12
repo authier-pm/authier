@@ -75,7 +75,7 @@ export default function Account() {
           ) => {
             if (
               values.newPassword === values.confirmPassword &&
-              values.currPassword === device.state?.masterPassword
+              values.currPassword === device.state?.masterEncryptionKey
             ) {
               const decryptionChallenge = await deviceDecryptionChallenge({
                 variables: {

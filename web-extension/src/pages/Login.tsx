@@ -118,16 +118,22 @@ export default function Login(): ReactElement {
             }
           })
 
-          if (response.data?.addNewDeviceForUser?.accessToken) {
-            setAccessToken(response.data.addNewDeviceForUser?.accessToken)
+          const addNewDeviceForUser = response.data?.addNewDeviceForUser
+          if (addNewDeviceForUser?.accessToken) {
+            setAccessToken(addNewDeviceForUser?.accessToken)
 
             const decodedToken = await getUserFromToken()
 
-            const EncryptedSecrets =
-              response.data.addNewDeviceForUser.user.EncryptedSecrets
+            const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
             const deviceState: IBackgroundStateSerializable = {
-              masterPassword: values.password,
+              masterEncryptionKey: cryptoJS
+                .PBKDF2(
+                  values.password,
+                  values.email,
+                  { iterations: 100000, keySize: 64 } // TODO make customizable
+                )
+                .toString(cryptoJS.enc.Utf8),
               userId: userId,
               secrets: EncryptedSecrets,
               email: values.email

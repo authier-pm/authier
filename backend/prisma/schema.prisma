@@ -77,23 +77,23 @@ model SettingsConfig {
 
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
-  id         String              @id @default(uuid()) @db.Uuid
-  encrypted  String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
-  version    Int
-  kind       EncryptedSecretType
-  createdAt  DateTime            @default(now())
-  updatedAt  DateTime?           @updatedAt
-  deletedAt  DateTime?
-  //uniqueFiled String               @unique
+  id        String              @id @default(uuid()) @db.Uuid
+  encrypted String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
+  version   Int
+  kind      EncryptedSecretType
+  createdAt DateTime            @default(now())
+  updatedAt DateTime?           @updatedAt
+  deletedAt DateTime?
+
+  // TODO move to encrypted
   url        String? // should always be location.hostname, we autofill inputs based on WebInput where we store the path too
   androidUri String?
   iosUri     String?
+  iconUrl    String?
+  label      String
 
-
-  iconUrl String?
-  label   String
-  userId  String  @db.Uuid
-  user    User    @relation(fields: [userId], references: [id])
+  userId String @db.Uuid
+  user   User   @relation(fields: [userId], references: [id])
 
   SecretUsageEvent SecretUsageEvent[]
 }
@@ -162,6 +162,8 @@ model User {
   // @skip
   addDeviceSecret          String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
   addDeviceSecretEncrypted String // client has to decrypt this to prove they have the correct master password
+  // @skip
+  encryptionSalt           String
   Token                    Token[]
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
