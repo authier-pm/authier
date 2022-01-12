@@ -88,7 +88,7 @@ export class DeviceState {
         this.email,
         { iterations: 100000, keySize: 64 } // TODO make customizable
       )
-      .toString(cryptoJS.enc.Utf8)
+      .toString(cryptoJS.enc.Hex)
     this.save()
   }
 
@@ -316,7 +316,6 @@ class ExtensionDevice {
   async getDeviceId() {
     const storage = await browser.storage.local.get('deviceId')
     if (!storage.deviceId) {
-      // @ts-expect-error
       const deviceId = crypto.randomUUID()
       browser.storage.local.set({ deviceId: deviceId })
       log('deviceId', deviceId)
@@ -327,7 +326,7 @@ class ExtensionDevice {
     }
   }
 
-  generateAddDeviceSecret() {
+  generateBackendSecret() {
     const lengthMultiplier = getRandomInt(1, 10)
     let secret = ''
     for (let i = 0; i < lengthMultiplier; i++) {
@@ -336,12 +335,12 @@ class ExtensionDevice {
     return secret
   }
 
-  getAddDeviceSecretAuthTuple(masterPassword: string, userId: string) {
-    const addDeviceSecret = this.generateAddDeviceSecret()
+  getAddDeviceSecretAuthParams(masterEncryptionKey: string, userId: string) {
+    const addDeviceSecret = this.generateBackendSecret()
 
     const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
       addDeviceSecret,
-      masterPassword,
+      masterEncryptionKey,
       {
         iv: cryptoJS.enc.Utf8.parse(userId)
       }

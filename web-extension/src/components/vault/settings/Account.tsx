@@ -88,7 +88,7 @@ export default function Account() {
               const userId =
                 decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
 
-              const secretAuthTuple = device.getAddDeviceSecretAuthTuple(
+              const secretAuthTuple = device.getAddDeviceSecretAuthParams(
                 values.newPassword,
                 userId as string
               )

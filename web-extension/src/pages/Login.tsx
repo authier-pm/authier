@@ -107,7 +107,7 @@ export default function Login(): ReactElement {
             variables: {
               input: {
                 deviceId: await device.getDeviceId(),
-                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
+                ...device.getAddDeviceSecretAuthParams(values.password, userId),
                 email: values.email,
                 deviceName: device.generateDeviceName(),
                 firebaseToken: fireToken,
@@ -133,7 +133,7 @@ export default function Login(): ReactElement {
                   values.email,
                   { iterations: 100000, keySize: 64 } // TODO make customizable
                 )
-                .toString(cryptoJS.enc.Utf8),
+                .toString(cryptoJS.enc.Hex),
               userId: userId,
               secrets: EncryptedSecrets,
               email: values.email
