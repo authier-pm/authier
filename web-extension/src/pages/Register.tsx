@@ -84,7 +84,12 @@ export default function Register(): ReactElement {
             setAccessToken(registerResult.accessToken as string)
 
             const deviceState: IBackgroundStateSerializable = {
-              masterPassword: values.password,
+              masterEncryptionKey: cryptoJS
+                .PBKDF2(values.password, values.email, {
+                  iterations: 100000,
+                  keySize: 64
+                })
+                .toString(cryptoJS.enc.Utf8),
               userId: userId,
               secrets: [],
               email: values.email

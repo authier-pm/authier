@@ -59,6 +59,15 @@ export default function FaqPage() {
             changing password for all devices in the future, but for now
             manually is the only way.
           </li>
+          <li>
+            <Heading size="xs">
+              When I add a new password and user name on a website, can I
+              opt-out from storing the public record about the login form on
+              that particular page?
+            </Heading>
+            <br />
+            Not right now, but we plan to add this feature in the future.
+          </li>
         </ul>
       </Box>
     </AuPage>
