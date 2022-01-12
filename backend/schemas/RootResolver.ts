@@ -1,7 +1,4 @@
-import {
-  authenticateFromToken,
-  throwIfNotAuthenticated
-} from '../api/authMiddleware'
+import { throwIfNotAuthenticated } from '../api/authMiddleware'
 import {
   Query,
   //   Mutation,
@@ -17,18 +14,11 @@ import {
   Info
 } from 'type-graphql'
 import { prismaClient } from '../prismaClient'
-import { hash, compare } from 'bcrypt'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
-import {
-  DecryptionChallengeResponse,
-  LoginResponse,
-  OTPEvent
-} from '../models/models'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
+import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
-import * as admin from 'firebase-admin'
 import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 
@@ -42,13 +32,7 @@ import {
 import debug from 'debug'
 import { RegisterDeviceInput } from '../models/AuthInputs'
 
-import {
-  DecryptionChallenge,
-  Device,
-  prisma,
-  User,
-  WebInput
-} from '@prisma/client'
+import { Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
 import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
@@ -172,7 +156,8 @@ export class RootResolver {
       deviceName,
       deviceId,
       addDeviceSecret,
-      addDeviceSecretEncrypted
+      addDeviceSecretEncrypted,
+      encryptionSalt
     } = input
     let user: User & { Devices: Device[] }
 
@@ -183,6 +168,7 @@ export class RootResolver {
           email: email,
           addDeviceSecret,
           addDeviceSecretEncrypted,
+          encryptionSalt,
           loginCredentialsLimit: 50,
           TOTPlimit: 4,
           Devices: {
@@ -321,6 +307,7 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeGQL, {
+    // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true
   })
@@ -332,7 +319,7 @@ export class RootResolver {
   ) {
     const user = await ctx.prisma.user.findUnique({
       where: { email },
-      select: { id: true, addDeviceSecretEncrypted: true }
+      select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
     })
     if (user) {
       const inLastHour = await ctx.prisma.decryptionChallenge.count({
@@ -356,15 +343,21 @@ export class RootResolver {
           deviceId,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
-        },
-        include: {
-          user: true
         }
       })
-      // TODO notify user's master device that someone is trying to login
+
+      // if (!challenge.approvedAt) { // TODO enable when we have device management in the vault
+      //   return {
+      //     id: challenge.id,
+      //     approvedAt: challenge.approvedAt
+      //   }
+      // }
+
       return {
         ...challenge,
-        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted
+
+        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+        encryptionSalt: user.encryptionSalt
       }
     }
     return null

@@ -76,8 +76,6 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 
 - Includes Storybook configured to work with React + TypeScript. Note that it maintains its own `webpack.config.js` and `tsconfig.json` files. See example story in `src/components/hello/__tests__/hello.stories.tsx`
 
-- Includes a custom mock for the [webextension-polyfill-ts](https://github.com/Lusito/webextension-polyfill-ts) package in `src/__mocks__`. This allows you to mock any browser APIs used by your extension so you can develop your components inside Storybook.
-
 **Built with**
 
 - [React](https://reactjs.org)
@@ -88,7 +86,6 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 - [Webpack](https://webpack.js.org/)
 - [Babel](https://babeljs.io/)
 - [Chakra-ui](https://chakra-ui.com/)
-- [webextension-polyfill-ts](https://github.com/Lusito/webextension-polyfill-ts)
 
 **Misc. References**
 

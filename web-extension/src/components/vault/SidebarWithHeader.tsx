@@ -194,17 +194,25 @@ interface NavItemProps extends FlexProps {
 }
 const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
   return (
-    <Link as={RouterLink} to={path} style={{ textDecoration: 'none' }}>
+    <Link
+      as={RouterLink}
+      to={path}
+      style={{ textDecoration: 'none' }}
+      _activeLink={{
+        bg: 'teal.100' // TODO fix
+      }}
+    >
       <Flex
         align="center"
         p="4"
         mx="4"
         borderRadius="lg"
+        color="gray.800"
         role="group"
         cursor="pointer"
         _hover={{
-          bg: 'cyan.400',
-          color: 'white'
+          bg: 'cyan.100',
+          color: 'gray.400'
         }}
         {...rest}
       >
@@ -213,7 +221,7 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
             mr="4"
             fontSize="16"
             _groupHover={{
-              color: 'white'
+              color: 'gray.400'
             }}
             as={icon}
           />
