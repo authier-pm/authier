@@ -67,7 +67,8 @@ export class DeviceState {
   }
   email: string
   userId: string
-  masterPassword: string
+  encryptionSalt: string
+  masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime = 10000 * 60 * 60 * 8
 
@@ -81,18 +82,24 @@ export class DeviceState {
     }
   }
 
-  setMasterPassword(masterPassword: string) {
-    this.masterPassword = masterPassword
+  setMasterEncryptionKey(masterPassword: string) {
+    this.masterEncryptionKey = cryptoJS
+      .PBKDF2(
+        masterPassword,
+        this.encryptionSalt,
+        { iterations: 100000, keySize: 64 } // TODO make customizable
+      )
+      .toString(cryptoJS.enc.Hex)
     this.save()
   }
 
   encrypt(stringToEncrypt: string) {
-    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterPassword, {
+    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterEncryptionKey, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
     }).toString()
   }
   decrypt(encrypted: string) {
-    return cryptoJS.AES.decrypt(encrypted, this.masterPassword, {
+    return cryptoJS.AES.decrypt(encrypted, this.masterEncryptionKey, {
       iv: cryptoJS.enc.Utf8.parse(this.userId)
     }).toString(cryptoJS.enc.Utf8)
   }
@@ -310,7 +317,6 @@ class ExtensionDevice {
   async getDeviceId() {
     const storage = await browser.storage.local.get('deviceId')
     if (!storage.deviceId) {
-      // @ts-expect-error
       const deviceId = crypto.randomUUID()
       browser.storage.local.set({ deviceId: deviceId })
       log('deviceId', deviceId)
@@ -321,7 +327,7 @@ class ExtensionDevice {
     }
   }
 
-  generateAddDeviceSecret() {
+  generateBackendSecret() {
     const lengthMultiplier = getRandomInt(1, 10)
     let secret = ''
     for (let i = 0; i < lengthMultiplier; i++) {
@@ -330,12 +336,12 @@ class ExtensionDevice {
     return secret
   }
 
-  getAddDeviceSecretAuthTuple(masterPassword: string, userId: string) {
-    const addDeviceSecret = this.generateAddDeviceSecret()
+  getAddDeviceSecretAuthParams(masterEncryptionKey: string, userId: string) {
+    const addDeviceSecret = this.generateBackendSecret()
 
     const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
       addDeviceSecret,
-      masterPassword,
+      masterEncryptionKey,
       {
         iv: cryptoJS.enc.Utf8.parse(userId)
       }
@@ -380,9 +386,9 @@ class ExtensionDevice {
       const { id, encrypted, kind, label, iconUrl, url } = secret
       const decr = state.decrypt(encrypted)
       log('decrypted secret', decr)
-      state.setMasterPassword(newPsw)
+      state.setMasterEncryptionKey(newPsw)
       const enc = state.encrypt(decr as string)
-      log('encrypted secret', enc, state.masterPassword)
+      log('encrypted secret', enc, state.masterEncryptionKey)
       return {
         id,
         encrypted: enc as string,

@@ -75,7 +75,7 @@ export default function Account() {
           ) => {
             if (
               values.newPassword === values.confirmPassword &&
-              values.currPassword === device.state?.masterPassword
+              values.currPassword === device.state?.masterEncryptionKey
             ) {
               const decryptionChallenge = await deviceDecryptionChallenge({
                 variables: {
@@ -86,9 +86,9 @@ export default function Account() {
 
               const secrets = device.state.secrets
               const userId =
-                decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
+                decryptionChallenge.data?.deviceDecryptionChallenge?.userId
 
-              const secretAuthTuple = device.getAddDeviceSecretAuthTuple(
+              const secretAuthTuple = device.getAddDeviceSecretAuthParams(
                 values.newPassword,
                 userId as string
               )
