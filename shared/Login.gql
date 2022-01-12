@@ -2,10 +2,8 @@ mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
   deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
     id
     addDeviceSecretEncrypted
-
-    user {
-      id
-    }
+    encryptionSalt
+    userId
   }
 }
 

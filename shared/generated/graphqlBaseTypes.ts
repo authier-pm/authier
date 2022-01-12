@@ -43,6 +43,7 @@ export type DecryptionChallengeGql = {
   approvedFromDeviceId?: Maybe<Scalars['String']>
   createdAt: Scalars['DateTime']
   deviceId?: Maybe<Scalars['String']>
+  encryptionSalt: Scalars['String']
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   user: UserGql
@@ -216,6 +217,7 @@ export enum EncryptedSecretType {
 export type LoginResponse = {
   __typename?: 'LoginResponse'
   accessToken: Scalars['String']
+  encryptionSalt: Scalars['String']
   user: UserAfterAuth
 }
 
@@ -282,6 +284,7 @@ export type RegisterDeviceInput = {
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']
   email: Scalars['EmailAddress']
+  encryptionSalt?: InputMaybe<Scalars['NonEmptyString']>
   firebaseToken: Scalars['String']
 }
 

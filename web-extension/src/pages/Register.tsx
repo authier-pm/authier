@@ -85,6 +85,7 @@ export default function Register(): ReactElement {
             variables: {
               userId,
               input: {
+                encryptionSalt,
                 email: values.email,
                 ...params,
                 deviceId,
@@ -106,7 +107,8 @@ export default function Register(): ReactElement {
               masterEncryptionKey: masterEncryptionKey,
               userId: userId,
               secrets: [],
-              email: values.email
+              email: values.email,
+              encryptionSalt
             }
 
             device.state = new DeviceState(deviceState)
