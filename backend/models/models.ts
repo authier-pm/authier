@@ -55,6 +55,9 @@ export class LoginResponse {
 
   @Field(() => UserAfterAuth)
   user: UserAfterAuth
+
+  @Field(() => String, { nullable: false })
+  encryptionSalt: string
 }
 
 @InputType()

@@ -14,6 +14,7 @@ const makeInput = () => ({
   firebaseToken: faker.datatype.uuid(),
   addDeviceSecret: faker.datatype.string(5),
   addDeviceSecretEncrypted: faker.datatype.string(5),
+  encryptionSalt: faker.datatype.string(5),
   decryptionChallengeId: faker.datatype.number()
 })
 
@@ -28,6 +29,7 @@ describe('RootResolver', () => {
           email: faker.internet.email(),
           addDeviceSecret: faker.datatype.string(5),
           addDeviceSecretEncrypted: faker.datatype.string(5),
+          encryptionSalt: faker.datatype.string(5),
           loginCredentialsLimit: 50,
           TOTPlimit: 4
         }
@@ -92,6 +94,8 @@ describe('RootResolver', () => {
           email: input.email,
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          encryptionSalt: input.encryptionSalt,
+
           loginCredentialsLimit: 50,
           TOTPlimit: 4
         }
@@ -113,6 +117,7 @@ describe('RootResolver', () => {
           email: faker.internet.email(),
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          encryptionSalt: input.encryptionSalt,
           loginCredentialsLimit: 50,
           TOTPlimit: 4,
           Devices: {
@@ -158,6 +163,7 @@ describe('RootResolver', () => {
           email: input.email,
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          encryptionSalt: input.encryptionSalt,
           loginCredentialsLimit: 50,
           TOTPlimit: 4
         }
@@ -209,6 +215,7 @@ describe('RootResolver', () => {
           addDeviceSecret: faker.datatype.string(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
+          encryptionSalt: input.encryptionSalt,
           TOTPlimit: 4
         }
       })
@@ -235,6 +242,7 @@ describe('RootResolver', () => {
           addDeviceSecret: fakeData.addDeviceSecret,
           addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
           loginCredentialsLimit: 50,
+          encryptionSalt: fakeData.encryptionSalt,
           TOTPlimit: 4
         }
       })
@@ -260,6 +268,8 @@ describe('RootResolver', () => {
           email: fakeData.email,
           addDeviceSecret: fakeData.addDeviceSecret,
           addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+          encryptionSalt: fakeData.encryptionSalt,
+
           loginCredentialsLimit: 50,
           TOTPlimit: 4
         }

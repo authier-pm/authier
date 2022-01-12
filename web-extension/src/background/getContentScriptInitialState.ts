@@ -21,7 +21,7 @@ export const getContentScriptInitialState = async (
   const res = await getWebInputs(hostname)
 
   return {
-    extensionDeviceReady: !!device.state?.masterPassword,
+    extensionDeviceReady: !!device.state?.masterEncryptionKey,
     webInputs: res.data.webInputs,
     secretsForHost: {
       // @ts-expect-error

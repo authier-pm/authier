@@ -66,7 +66,7 @@ export default function Login(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const decryptionChallenge = await deviceDecryptionChallenge({
+          const decryptionChallengeResponse = await deviceDecryptionChallenge({
             variables: {
               deviceId: await device.getDeviceId(),
               email: values.email
@@ -74,18 +74,20 @@ export default function Login(): ReactElement {
           })
 
           const addDeviceSecretEncrypted =
-            decryptionChallenge.data?.deviceDecryptionChallenge
+            decryptionChallengeResponse.data?.deviceDecryptionChallenge
               ?.addDeviceSecretEncrypted
 
           const userId =
-            decryptionChallenge.data?.deviceDecryptionChallenge?.user.id
+            decryptionChallengeResponse.data?.deviceDecryptionChallenge?.userId
 
           if (!addDeviceSecretEncrypted || !userId) {
             toast.error(t`Login failed, check your username`)
             return
           }
 
-          if (!decryptionChallenge.data?.deviceDecryptionChallenge?.id) {
+          if (
+            !decryptionChallengeResponse.data?.deviceDecryptionChallenge?.id
+          ) {
             toast.error('failed to create decryption challenge')
             return
           }
@@ -102,35 +104,49 @@ export default function Login(): ReactElement {
             toast.error('wrong password or email')
             return
           }
+          const encryptionSalt =
+            decryptionChallengeResponse.data?.deviceDecryptionChallenge
+              ?.encryptionSalt
+          const masterEncryptionKey = cryptoJS
+            .PBKDF2(
+              values.password,
+              encryptionSalt,
+              { iterations: 100000, keySize: 64 } // TODO make customizable
+            )
+            .toString(cryptoJS.enc.Hex)
 
           const response = await addNewDevice({
             variables: {
               input: {
                 deviceId: await device.getDeviceId(),
-                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
+                ...device.getAddDeviceSecretAuthParams(
+                  masterEncryptionKey,
+                  userId
+                ),
                 email: values.email,
                 deviceName: device.generateDeviceName(),
                 firebaseToken: fireToken,
                 decryptionChallengeId:
-                  decryptionChallenge.data.deviceDecryptionChallenge.id
+                  decryptionChallengeResponse.data.deviceDecryptionChallenge.id
               },
               currentAddDeviceSecret: currentSecret
             }
           })
 
-          if (response.data?.addNewDeviceForUser?.accessToken) {
-            setAccessToken(response.data.addNewDeviceForUser?.accessToken)
+          const addNewDeviceForUser = response.data?.addNewDeviceForUser
+          if (addNewDeviceForUser?.accessToken) {
+            setAccessToken(addNewDeviceForUser?.accessToken)
 
             const decodedToken = await getUserFromToken()
 
-            const EncryptedSecrets =
-              response.data.addNewDeviceForUser.user.EncryptedSecrets
+            const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
             const deviceState: IBackgroundStateSerializable = {
-              masterPassword: values.password,
+              masterEncryptionKey,
               userId: userId,
               secrets: EncryptedSecrets,
-              email: values.email
+              email: values.email,
+              encryptionSalt
             }
             setUserId(decodedToken.userId)
 
