@@ -28,6 +28,12 @@ import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 
+declare global {
+  interface Crypto {
+    randomUUID: () => string
+  }
+}
+
 interface Values {
   password: string
   email: string
@@ -59,15 +65,28 @@ export default function Register(): ReactElement {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           const deviceId = await device.getDeviceId()
-          // @ts-expect-error
+
           const userId = crypto.randomUUID()
 
+          const encryptionSalt = device.generateBackendSecret()
+
+          const masterEncryptionKey = cryptoJS
+            .PBKDF2(values.password, encryptionSalt, {
+              iterations: 100000,
+              keySize: 64
+            })
+            .toString(cryptoJS.enc.Hex)
+
+          const params = device.getAddDeviceSecretAuthParams(
+            masterEncryptionKey,
+            userId
+          )
           const res = await register({
             variables: {
               userId,
               input: {
                 email: values.email,
-                ...device.getAddDeviceSecretAuthTuple(values.password, userId),
+                ...params,
                 deviceId,
                 firebaseToken: fireToken,
                 deviceName: device.generateDeviceName()
@@ -84,12 +103,7 @@ export default function Register(): ReactElement {
             setAccessToken(registerResult.accessToken as string)
 
             const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey: cryptoJS
-                .PBKDF2(values.password, values.email, {
-                  iterations: 100000,
-                  keySize: 64
-                })
-                .toString(cryptoJS.enc.Utf8),
+              masterEncryptionKey: masterEncryptionKey,
               userId: userId,
               secrets: [],
               email: values.email

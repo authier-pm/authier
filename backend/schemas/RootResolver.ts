@@ -1,7 +1,4 @@
-import {
-  authenticateFromToken,
-  throwIfNotAuthenticated
-} from '../api/authMiddleware'
+import { throwIfNotAuthenticated } from '../api/authMiddleware'
 import {
   Query,
   //   Mutation,
@@ -17,18 +14,11 @@ import {
   Info
 } from 'type-graphql'
 import { prismaClient } from '../prismaClient'
-import { hash, compare } from 'bcrypt'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
-import {
-  DecryptionChallengeResponse,
-  LoginResponse,
-  OTPEvent
-} from '../models/models'
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
+import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
-import * as admin from 'firebase-admin'
 import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 
@@ -42,13 +32,7 @@ import {
 import debug from 'debug'
 import { RegisterDeviceInput } from '../models/AuthInputs'
 
-import {
-  DecryptionChallenge,
-  Device,
-  prisma,
-  User,
-  WebInput
-} from '@prisma/client'
+import { Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
 import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
@@ -321,6 +305,7 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeGQL, {
+    // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true
   })
@@ -361,7 +346,14 @@ export class RootResolver {
           user: true
         }
       })
-      // TODO notify user's master device that someone is trying to login
+
+      // if (!challenge.approvedAt) { // TODO enable when we have device management in the vault
+      //   return {
+      //     id: challenge.id,
+      //     approvedAt: challenge.approvedAt
+      //   }
+      // }
+
       return {
         ...challenge,
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted

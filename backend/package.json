@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@prisma/client": "^3.7.0",
+    "@prisma/client": "^3.8.0",
     "@react-native-firebase/app": "^14.1.0",
     "@sentry/node": "^6.16.1",
     "@types/faker": "^5.5.9",
@@ -32,7 +32,7 @@
     "mem": "8",
     "mercurius": "^8.12",
     "pino-pretty": "^7.3.0",
-    "prisma": "^3.7.0",
+    "prisma": "^3.8.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^10.4.0",
     "type-graphql": "^1.1.1",
