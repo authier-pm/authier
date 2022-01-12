@@ -188,6 +188,7 @@ type DecryptionChallengeGQL {
   user: UserGQL!
   approvedFromDevice: DeviceGQL
   addDeviceSecretEncrypted: String!
+  encryptionSalt: String!
 }
 
 type SettingsConfigGQL {
@@ -433,6 +434,7 @@ type SecretUsageEventGQLScalars {
 type LoginResponse {
   accessToken: String!
   user: UserAfterAuth!
+  encryptionSalt: String!
 }
 
 type UserAfterAuth {
@@ -466,6 +468,7 @@ input RegisterDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
+  encryptionSalt: NonEmptyString
   decryptionChallengeId: PositiveInt
 }
 

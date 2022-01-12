@@ -156,7 +156,8 @@ export class RootResolver {
       deviceName,
       deviceId,
       addDeviceSecret,
-      addDeviceSecretEncrypted
+      addDeviceSecretEncrypted,
+      encryptionSalt
     } = input
     let user: User & { Devices: Device[] }
 
@@ -167,6 +168,7 @@ export class RootResolver {
           email: email,
           addDeviceSecret,
           addDeviceSecretEncrypted,
+          encryptionSalt,
           loginCredentialsLimit: 50,
           TOTPlimit: 4,
           Devices: {
@@ -317,7 +319,7 @@ export class RootResolver {
   ) {
     const user = await ctx.prisma.user.findUnique({
       where: { email },
-      select: { id: true, addDeviceSecretEncrypted: true }
+      select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
     })
     if (user) {
       const inLastHour = await ctx.prisma.decryptionChallenge.count({
@@ -341,9 +343,6 @@ export class RootResolver {
           deviceId,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
-        },
-        include: {
-          user: true
         }
       })
 
@@ -356,7 +355,9 @@ export class RootResolver {
 
       return {
         ...challenge,
-        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted
+
+        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+        encryptionSalt: user.encryptionSalt
       }
     }
     return null

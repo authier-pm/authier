@@ -67,6 +67,7 @@ export class DeviceState {
   }
   email: string
   userId: string
+  encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime = 10000 * 60 * 60 * 8
@@ -85,7 +86,7 @@ export class DeviceState {
     this.masterEncryptionKey = cryptoJS
       .PBKDF2(
         masterPassword,
-        this.email,
+        this.encryptionSalt,
         { iterations: 100000, keySize: 64 } // TODO make customizable
       )
       .toString(cryptoJS.enc.Hex)
