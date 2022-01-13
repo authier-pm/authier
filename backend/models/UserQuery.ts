@@ -5,28 +5,20 @@ import {
   Field,
   Int,
   ObjectType,
-  UseMiddleware,
   GraphQLISODateTime
 } from 'type-graphql'
 import { IContext } from '../schemas/RootResolver'
-import { throwIfNotAuthenticated } from '../api/authMiddleware'
 
-import { v4 as uuidv4 } from 'uuid'
-
-import {
-  EncryptedSecretMutation,
-  EncryptedSecretQuery
-} from './EncryptedSecret'
-import { LoginResponse, OTPEvent } from './models'
+import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
 import { GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/User'
 
 import { SettingsConfigGQL } from './generated/SettingsConfig'
-import { DeviceGQL } from './generated/Device'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
+import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -96,6 +88,15 @@ export class UserQuery extends UserBase {
   @Field(() => Int)
   async devicesCount() {
     return prismaClient.device.count({
+      where: {
+        userId: this.id
+      }
+    })
+  }
+
+  @Field(() => [EmailVerificationGQLScalars])
+  async emailVerifications() {
+    return prismaClient.emailVerification.findMany({
       where: {
         userId: this.id
       }

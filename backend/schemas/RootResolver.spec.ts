@@ -1,22 +1,29 @@
 import { prismaClient } from '../prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
 import faker, { fake } from 'faker'
-import { RegisterDeviceInput } from '../models/AuthInputs'
+import {
+  AddNewDeviceInput,
+  RegisterNewAccountInput
+} from '../models/AuthInputs'
 import { GraphQLResolveInfo } from 'graphql'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 
-const makeInput = () => ({
+const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
   deviceName: faker.internet.userName(),
   deviceId: faker.datatype.uuid(),
   firebaseToken: faker.datatype.uuid(),
   addDeviceSecret: faker.datatype.string(5),
   addDeviceSecretEncrypted: faker.datatype.string(5),
-  encryptionSalt: faker.datatype.string(5),
   decryptionChallengeId: faker.datatype.number(),
   deviceRecoveryCooldownMinutes: faker.datatype.number()
+})
+
+const makeRegisterAccountInput = () => ({
+  ...makeAddNewDeviceInput(),
+  encryptionSalt: faker.datatype.string(5)
 })
 
 const userSecurityProps = {
@@ -66,7 +73,7 @@ describe('RootResolver', () => {
     const userId = faker.datatype.uuid()
 
     it('should add new user', async () => {
-      let input: RegisterDeviceInput = makeInput()
+      let input: RegisterNewAccountInput = makeRegisterAccountInput()
 
       const accessToken = sign(
         { userId: userId, deviceId: input.deviceId },
@@ -93,7 +100,7 @@ describe('RootResolver', () => {
     })
 
     it('should throw User with such email already exists', async () => {
-      let input: RegisterDeviceInput = makeInput()
+      let input: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
           id: faker.datatype.uuid(),
@@ -114,7 +121,7 @@ describe('RootResolver', () => {
     it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
       let userId = faker.datatype.uuid()
 
-      let input: RegisterDeviceInput = makeInput()
+      let input: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
           id: userId,
@@ -159,7 +166,7 @@ describe('RootResolver', () => {
       getIpAddress: () => faker.internet.ip()
     } as any
     it('should add new device for user', async () => {
-      let input: RegisterDeviceInput = makeInput()
+      let input: RegisterNewAccountInput = makeRegisterAccountInput()
 
       await prismaClient.user.create({
         data: {
@@ -175,7 +182,10 @@ describe('RootResolver', () => {
       })
 
       let data = await resolver.addNewDeviceForUser(
-        input,
+        {
+          ...input,
+          decryptionChallengeId: faker.datatype.number()
+        },
         input.addDeviceSecret,
         fakeCtx,
         {} as GraphQLResolveInfo
@@ -196,7 +206,7 @@ describe('RootResolver', () => {
     })
 
     it("should show 'User not found'", async () => {
-      let input: RegisterDeviceInput = makeInput()
+      let input: AddNewDeviceInput = makeAddNewDeviceInput()
 
       await expect(async () => {
         await resolver.addNewDeviceForUser(
@@ -211,7 +221,7 @@ describe('RootResolver', () => {
     it("should show 'Wrong master password used'", async () => {
       let userId = faker.datatype.uuid()
 
-      let input: RegisterDeviceInput = makeInput()
+      let input: AddNewDeviceInput = makeAddNewDeviceInput()
 
       await prismaClient.user.create({
         data: {
@@ -219,7 +229,7 @@ describe('RootResolver', () => {
           email: input.email,
           addDeviceSecret: faker.datatype.string(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: input.encryptionSalt,
+          encryptionSalt: faker.datatype.string(5),
           ...userSecurityProps
         }
       })
@@ -238,7 +248,7 @@ describe('RootResolver', () => {
   describe('deviceDecryptionChallenge', () => {
     it('should returns a decryption challenge', async () => {
       let userId = faker.datatype.uuid()
-      let fakeData: RegisterDeviceInput = makeInput()
+      let fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
           id: userId,
@@ -265,7 +275,7 @@ describe('RootResolver', () => {
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
       let userId = faker.datatype.uuid()
 
-      let fakeData: RegisterDeviceInput = makeInput()
+      let fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
           id: userId,

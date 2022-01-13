@@ -31,6 +31,7 @@
     "lodash.set": "^4.3.2",
     "mem": "8",
     "mercurius": "^8.12",
+    "node-mailjet": "^3.3.4",
     "pino-pretty": "^7.3.0",
     "prisma": "^3.8.0",
     "reflect-metadata": "^0.1.13",
@@ -40,6 +41,7 @@
     "under-pressure": "^5.8.0"
   },
   "devDependencies": {
+    "@types/node-mailjet": "^3.3.8",
     "@types/bcrypt": "^5.0.0",
     "@types/graphql-list-fields": "^2.0.3",
     "@types/lodash.set": "^4.3.6",
