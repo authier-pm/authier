@@ -31,7 +31,11 @@ afterAll(truncateAllTables)
 jest.mock('node-mailjet', () => ({
   connect: () => {
     return {
-      post: jest.fn()
+      post: () => {
+        return {
+          request: jest.fn()
+        }
+      }
     }
   }
 }))
