@@ -18,12 +18,13 @@ type UserQuery {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  deviceRecoveryCooldownMinutes: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
+  recoveryDecryptionChallenge: DecryptionChallengeGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -35,6 +36,7 @@ type UserQuery {
   devices: [DeviceQuery!]!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
+  emailVerifications: [EmailVerificationGQLScalars!]!
   settings: SettingsConfigGQL!
   encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
   sendAuthMessage(
@@ -80,12 +82,13 @@ type UserGQL {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  deviceRecoveryCooldownMinutes: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
+  recoveryDecryptionChallenge: DecryptionChallengeGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -106,6 +109,7 @@ type DeviceGQL {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -181,12 +185,16 @@ type DecryptionChallengeGQL {
   id: Int!
   masterPasswordVerifiedAt: DateTime
   approvedAt: DateTime
+  rejectedAt: DateTime
+  blockIp: Boolean
   userId: String!
   createdAt: DateTime!
   deviceId: String
+  approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
   approvedFromDevice: DeviceGQL
+  User: [UserGQL!]!
   addDeviceSecretEncrypted: String!
   encryptionSalt: String!
 }
@@ -230,6 +238,7 @@ type DeviceQuery {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -262,6 +271,19 @@ type EncryptedSecretQuery {
   SecretUsageEvent: [SecretUsageEventGQL!]!
 }
 
+type EmailVerificationGQLScalars {
+  address: ID!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  userId: String!
+  kind: EmailVerificationType!
+}
+
+enum EmailVerificationType {
+  PRIMARY
+  CONTACT
+}
+
 type Mutation {
   user(userId: String!): UserMutation
 
@@ -270,10 +292,13 @@ type Mutation {
   """
   me: UserMutation!
   currentDevice: DeviceMutation!
-  registerNewUser(userId: UUID!, input: RegisterDeviceInput!): LoginResponse!
+  registerNewUser(
+    userId: UUID!
+    input: RegisterNewAccountInput!
+  ): LoginResponse!
   addNewDeviceForUser(
     currentAddDeviceSecret: NonEmptyString!
-    input: RegisterDeviceInput!
+    input: AddNewDeviceInput!
   ): LoginResponse!
 
   """
@@ -282,7 +307,7 @@ type Mutation {
   deviceDecryptionChallenge(
     deviceId: UUID!
     email: EmailAddress!
-  ): DecryptionChallengeGQL
+  ): DecryptionChallengeMutation
 
   """
   removes current device
@@ -299,12 +324,13 @@ type UserMutation {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  deviceRecoveryCooldownMinutes: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
+  recoveryDecryptionChallenge: DecryptionChallengeGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -406,6 +432,7 @@ type DeviceMutation {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -445,12 +472,13 @@ type UserAfterAuth {
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
-  emailAddressVerifiedAt: DateTime
   masterDeviceId: String
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
+  deviceRecoveryCooldownMinutes: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
+  recoveryDecryptionChallenge: DecryptionChallengeGQL
   UsageEvents: [SecretUsageEventGQL!]!
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
@@ -461,15 +489,45 @@ type UserAfterAuth {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
 
-input RegisterDeviceInput {
+input RegisterNewAccountInput {
   email: EmailAddress!
   deviceName: String!
   deviceId: UUID!
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
-  encryptionSalt: NonEmptyString
-  decryptionChallengeId: PositiveInt
+  encryptionSalt: NonEmptyString!
+}
+
+input AddNewDeviceInput {
+  email: EmailAddress!
+  deviceName: String!
+  deviceId: UUID!
+  firebaseToken: String!
+  addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
+  decryptionChallengeId: PositiveInt!
+}
+
+type DecryptionChallengeMutation {
+  id: Int!
+  masterPasswordVerifiedAt: DateTime
+  approvedAt: DateTime
+  rejectedAt: DateTime
+  blockIp: Boolean
+  userId: String!
+  createdAt: DateTime!
+  deviceId: String
+  approvedByRecovery: Boolean!
+  approvedFromDeviceId: String
+  user: UserGQL!
+  approvedFromDevice: DeviceGQL
+  User: [UserGQL!]!
+  addDeviceSecretEncrypted: String!
+  encryptionSalt: String!
+  approve: DecryptionChallengeGQL!
+  reject: DecryptionChallengeGQL!
+  recoverAccount: DecryptionChallengeGQL!
 }
 
 input WebInputElement {

@@ -25,7 +25,7 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   }
 
   @Field(() => DecryptionChallengeGQL)
-  async recover(@Ctx() ctx: IContextAuthenticated) {
+  async recoverAccount(@Ctx() ctx: IContextAuthenticated) {
     // TODO send notification to all contacts we have, email for now
     return ctx.prisma.user.update({
       where: { id: this.userId },

@@ -39,15 +39,16 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                      String    @id @db.Uuid
-  firstIpAddress          String    @db.Inet
-  lastIpAddress           String    @db.Inet
-  firebaseToken           String
-  name                    String
-  syncTOTP                Boolean   @default(true)
-  ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  vaultLockTimeoutSeconds Int?
-  logoutAt                DateTime?
+  id                       String    @id @db.Uuid
+  firstIpAddress           String    @db.Inet
+  lastIpAddress            String    @db.Inet
+  firebaseToken            String
+  name                     String
+  syncTOTP                 Boolean   @default(true)
+  ipAddressLock            Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  vaultLockTimeoutSeconds  Int?
+  logoutAt                 DateTime?
+  deauthorizedFromDeviceId String?   @db.Uuid // when non null it means user deauthorized it. We don't allow any further syncs for this device
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -170,7 +171,6 @@ model User {
   Token                         Token[]
   createdAt                     DateTime             @default(now())
   updatedAt                     DateTime?            @updatedAt
-  emailAddressVerifiedAt        DateTime?
   masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
   masterDeviceId                String?              @unique @db.Uuid
   // Limits for the number of stored secrets
@@ -245,10 +245,18 @@ model Tag {
   userId    String   @db.Uuid
 }
 
+enum EmailVerificationType {
+  PRIMARY
+  CONTACT
+}
+
 model EmailVerification {
-  createdAt DateTime  @default(now())
-  updatedAt DateTime? @updatedAt
-  userId    String    @id @db.Uuid
-  user      User      @relation(fields: [userId], references: [id])
-  token     String    @unique @db.Uuid
+  address   String                @id @db.Citext
+  createdAt DateTime              @default(now())
+  updatedAt DateTime?             @updatedAt
+  userId    String                @db.Uuid
+  user      User                  @relation(fields: [userId], references: [id])
+  // @skip
+  token     String                @unique @db.Uuid
+  kind      EmailVerificationType
 }

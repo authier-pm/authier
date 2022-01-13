@@ -8,6 +8,7 @@
     "Chakra",
     "codegen",
     "cooldown",
+    "deauthorized",
     "Deduplication",
     "Fastify",
     "filenamify",
