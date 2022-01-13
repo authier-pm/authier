@@ -1,4 +1,8 @@
-import { accessToken, setAccessToken } from '../util/accessTokenExtension'
+import {
+  accessToken,
+  removeToken,
+  setAccessToken
+} from '../util/accessTokenExtension'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
 import browser from 'webextension-polyfill'
@@ -37,8 +41,10 @@ export const tokenRefresh = new TokenRefreshLink({
     await browser.storage.local.set({ 'access-token': accessToken })
     setAccessToken(accessToken)
   },
-  handleError: (err) => {
+  handleError: async (err) => {
     console.warn('Your refresh token is invalid. You must login again', err)
-    device.logout()
+    await removeToken()
+    await device.clearLocalStorage()
+    device.rerenderViews()
   }
 })

@@ -13,6 +13,12 @@ export class DecryptionChallengeGQLScalars {
   @Field({ nullable: true })
   approvedAt?: Date
 
+  @Field({ nullable: true })
+  rejectedAt?: Date
+
+  @Field({ nullable: true })
+  blockIp?: boolean
+
   @Field()
   userId: string
 
@@ -21,6 +27,9 @@ export class DecryptionChallengeGQLScalars {
 
   @Field({ nullable: true })
   deviceId?: string
+
+  @Field()
+  approvedByRecovery: boolean
 
   @Field({ nullable: true })
   approvedFromDeviceId?: string
@@ -33,6 +42,9 @@ export class DecryptionChallengeGQL extends DecryptionChallengeGQLScalars {
 
   @Field(() => DeviceGQL, { nullable: true })
   approvedFromDevice?: DeviceGQL
+
+  @Field(() => [UserGQL])
+  User: UserGQL[]
 
   // skip overwrite 👇
   @Field()
