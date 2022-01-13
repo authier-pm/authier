@@ -30,7 +30,10 @@ import {
   GraphQLUUID
 } from 'graphql-scalars'
 import debug from 'debug'
-import { RegisterDeviceInput } from '../models/AuthInputs'
+import {
+  AddNewDeviceInput,
+  RegisterNewAccountInput
+} from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
@@ -40,6 +43,9 @@ import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceMutation, DeviceQuery } from '../models/Device'
+import { DecryptionChallengeMutation } from '../models/DecryptionChallenge'
+import { sendEmail } from '../utils/email'
+
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -145,7 +151,7 @@ export class RootResolver {
 
   @Mutation(() => LoginResponse)
   async registerNewUser(
-    @Arg('input', () => RegisterDeviceInput) input: RegisterDeviceInput,
+    @Arg('input', () => RegisterNewAccountInput) input: RegisterNewAccountInput,
     @Arg('userId', () => GraphQLUUID) userId: string,
     @Ctx() ctx: IContext
   ) {
@@ -169,6 +175,7 @@ export class RootResolver {
           addDeviceSecret,
           addDeviceSecretEncrypted,
           encryptionSalt,
+          deviceRecoveryCooldownMinutes: 16 * 60, // 16 hours should be plenty enough
           loginCredentialsLimit: 50,
           TOTPlimit: 4,
           Devices: {
@@ -221,6 +228,19 @@ export class RootResolver {
         Devices: true
       }
     })
+
+    if (user.email) {
+      await sendEmail(
+        user.email,
+
+        {
+          Subject: 'Verify your email',
+          TextPart: `To verify your email, please go here: ${''} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
+          HTMLPart: `<a href="${''}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
+        }
+      )
+    }
+
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device.id,
       ctx
@@ -229,7 +249,7 @@ export class RootResolver {
 
   @Mutation(() => LoginResponse)
   async addNewDeviceForUser(
-    @Arg('input', () => RegisterDeviceInput) input: RegisterDeviceInput,
+    @Arg('input', () => AddNewDeviceInput) input: AddNewDeviceInput,
     @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
     currentAddDeviceSecret: string,
     @Ctx() ctx: IContext,
@@ -306,7 +326,7 @@ export class RootResolver {
   }
 
   // TODO rate limit this per IP
-  @Mutation(() => DecryptionChallengeGQL, {
+  @Mutation(() => DecryptionChallengeMutation, {
     // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true

@@ -26,3 +26,16 @@ export const truncateAllTables = async () => {
 }
 
 afterAll(truncateAllTables)
+
+// we don't want to send anything from tests.
+jest.mock('node-mailjet', () => ({
+  connect: () => {
+    return {
+      post: () => {
+        return {
+          request: jest.fn()
+        }
+      }
+    }
+  }
+}))

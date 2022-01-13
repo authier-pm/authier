@@ -27,6 +27,7 @@ import cryptoJS from 'crypto-js'
 import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 
 declare global {
   interface Crypto {
@@ -70,12 +71,10 @@ export default function Register(): ReactElement {
 
           const encryptionSalt = device.generateBackendSecret()
 
-          const masterEncryptionKey = cryptoJS
-            .PBKDF2(values.password, encryptionSalt, {
-              iterations: 100000,
-              keySize: 64
-            })
-            .toString(cryptoJS.enc.Hex)
+          const masterEncryptionKey = generateEncryptionKey(
+            values.password,
+            encryptionSalt
+          )
 
           const params = device.getAddDeviceSecretAuthParams(
             masterEncryptionKey,
