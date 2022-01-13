@@ -164,6 +164,20 @@ export type DeviceQuery = {
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
 }
 
+export type EmailVerificationGqlScalars = {
+  __typename?: 'EmailVerificationGQLScalars'
+  address: Scalars['ID']
+  createdAt: Scalars['DateTime']
+  kind: EmailVerificationType
+  updatedAt?: Maybe<Scalars['DateTime']>
+  userId: Scalars['String']
+}
+
+export enum EmailVerificationType {
+  CONTACT = 'CONTACT',
+  PRIMARY = 'PRIMARY'
+}
+
 export type EncryptedSecretGql = {
   __typename?: 'EncryptedSecretGQL'
   SecretUsageEvent: Array<SecretUsageEventGql>
@@ -542,6 +556,7 @@ export type UserQuery = {
   devices: Array<DeviceQuery>
   devicesCount: Scalars['Int']
   email?: Maybe<Scalars['EmailAddress']>
+  emailVerifications: Array<EmailVerificationGqlScalars>
   encryptedSecrets: Array<EncryptedSecretQuery>
   id: Scalars['ID']
   lastChangeInSecrets?: Maybe<Scalars['DateTime']>

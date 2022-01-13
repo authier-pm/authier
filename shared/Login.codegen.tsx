@@ -1,36 +1,69 @@
-import * as Types from './generated/graphqlBaseTypes';
+import * as Types from './generated/graphqlBaseTypes'
 
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+import { gql } from '@apollo/client'
+import * as Apollo from '@apollo/client'
+const defaultOptions = {}
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress'];
-  deviceId: Types.Scalars['UUID'];
-}>;
+  email: Types.Scalars['EmailAddress']
+  deviceId: Types.Scalars['UUID']
+}>
 
-
-export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeMutation', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string } | null | undefined };
+export type DeviceDecryptionChallengeMutation = {
+  __typename?: 'Mutation'
+  deviceDecryptionChallenge?:
+    | {
+        __typename?: 'DecryptionChallengeMutation'
+        id: number
+        addDeviceSecretEncrypted: string
+        encryptionSalt: string
+        userId: string
+      }
+    | null
+    | undefined
+}
 
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
-  currentAddDeviceSecret: Types.Scalars['NonEmptyString'];
-  input: Types.AddNewDeviceInput;
-}>;
+  currentAddDeviceSecret: Types.Scalars['NonEmptyString']
+  input: Types.AddNewDeviceInput
+}>
 
-
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserAfterAuth', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, iconUrl?: string | null | undefined, url?: string | null | undefined, label: string, version: number }> } } };
-
-
-export const DeviceDecryptionChallengeDocument = gql`
-    mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
-  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
-    id
-    addDeviceSecretEncrypted
-    encryptionSalt
-    userId
+export type AddNewDeviceForUserMutation = {
+  __typename?: 'Mutation'
+  addNewDeviceForUser: {
+    __typename?: 'LoginResponse'
+    accessToken: string
+    user: {
+      __typename?: 'UserAfterAuth'
+      EncryptedSecrets: Array<{
+        __typename?: 'EncryptedSecretGQL'
+        id: string
+        encrypted: string
+        kind: Types.EncryptedSecretType
+        createdAt: string
+        updatedAt?: string | null | undefined
+        iconUrl?: string | null | undefined
+        url?: string | null | undefined
+        label: string
+        version: number
+      }>
+    }
   }
 }
-    `;
-export type DeviceDecryptionChallengeMutationFn = Apollo.MutationFunction<DeviceDecryptionChallengeMutation, DeviceDecryptionChallengeMutationVariables>;
+
+export const DeviceDecryptionChallengeDocument = gql`
+  mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
+    deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+      id
+      addDeviceSecretEncrypted
+      encryptionSalt
+      userId
+    }
+  }
+`
+export type DeviceDecryptionChallengeMutationFn = Apollo.MutationFunction<
+  DeviceDecryptionChallengeMutation,
+  DeviceDecryptionChallengeMutationVariables
+>
 
 /**
  * __useDeviceDecryptionChallengeMutation__
@@ -50,37 +83,58 @@ export type DeviceDecryptionChallengeMutationFn = Apollo.MutationFunction<Device
  *   },
  * });
  */
-export function useDeviceDecryptionChallengeMutation(baseOptions?: Apollo.MutationHookOptions<DeviceDecryptionChallengeMutation, DeviceDecryptionChallengeMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeviceDecryptionChallengeMutation, DeviceDecryptionChallengeMutationVariables>(DeviceDecryptionChallengeDocument, options);
-      }
-export type DeviceDecryptionChallengeMutationHookResult = ReturnType<typeof useDeviceDecryptionChallengeMutation>;
-export type DeviceDecryptionChallengeMutationResult = Apollo.MutationResult<DeviceDecryptionChallengeMutation>;
-export type DeviceDecryptionChallengeMutationOptions = Apollo.BaseMutationOptions<DeviceDecryptionChallengeMutation, DeviceDecryptionChallengeMutationVariables>;
+export function useDeviceDecryptionChallengeMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    DeviceDecryptionChallengeMutation,
+    DeviceDecryptionChallengeMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    DeviceDecryptionChallengeMutation,
+    DeviceDecryptionChallengeMutationVariables
+  >(DeviceDecryptionChallengeDocument, options)
+}
+export type DeviceDecryptionChallengeMutationHookResult = ReturnType<
+  typeof useDeviceDecryptionChallengeMutation
+>
+export type DeviceDecryptionChallengeMutationResult =
+  Apollo.MutationResult<DeviceDecryptionChallengeMutation>
+export type DeviceDecryptionChallengeMutationOptions =
+  Apollo.BaseMutationOptions<
+    DeviceDecryptionChallengeMutation,
+    DeviceDecryptionChallengeMutationVariables
+  >
 export const AddNewDeviceForUserDocument = gql`
-    mutation addNewDeviceForUser($currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!) {
-  addNewDeviceForUser(
-    currentAddDeviceSecret: $currentAddDeviceSecret
-    input: $input
+  mutation addNewDeviceForUser(
+    $currentAddDeviceSecret: NonEmptyString!
+    $input: AddNewDeviceInput!
   ) {
-    accessToken
-    user {
-      EncryptedSecrets {
-        id
-        encrypted
-        kind
-        createdAt
-        updatedAt
-        iconUrl
-        url
-        label
-        version
+    addNewDeviceForUser(
+      currentAddDeviceSecret: $currentAddDeviceSecret
+      input: $input
+    ) {
+      accessToken
+      user {
+        EncryptedSecrets {
+          id
+          encrypted
+          kind
+          createdAt
+          updatedAt
+          iconUrl
+          url
+          label
+          version
+        }
       }
     }
   }
-}
-    `;
-export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>;
+`
+export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<
+  AddNewDeviceForUserMutation,
+  AddNewDeviceForUserMutationVariables
+>
 
 /**
  * __useAddNewDeviceForUserMutation__
@@ -100,10 +154,24 @@ export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<AddNewDevice
  *   },
  * });
  */
-export function useAddNewDeviceForUserMutation(baseOptions?: Apollo.MutationHookOptions<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>(AddNewDeviceForUserDocument, options);
-      }
-export type AddNewDeviceForUserMutationHookResult = ReturnType<typeof useAddNewDeviceForUserMutation>;
-export type AddNewDeviceForUserMutationResult = Apollo.MutationResult<AddNewDeviceForUserMutation>;
-export type AddNewDeviceForUserMutationOptions = Apollo.BaseMutationOptions<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>;
+export function useAddNewDeviceForUserMutation(
+  baseOptions?: Apollo.MutationHookOptions<
+    AddNewDeviceForUserMutation,
+    AddNewDeviceForUserMutationVariables
+  >
+) {
+  const options = { ...defaultOptions, ...baseOptions }
+  return Apollo.useMutation<
+    AddNewDeviceForUserMutation,
+    AddNewDeviceForUserMutationVariables
+  >(AddNewDeviceForUserDocument, options)
+}
+export type AddNewDeviceForUserMutationHookResult = ReturnType<
+  typeof useAddNewDeviceForUserMutation
+>
+export type AddNewDeviceForUserMutationResult =
+  Apollo.MutationResult<AddNewDeviceForUserMutation>
+export type AddNewDeviceForUserMutationOptions = Apollo.BaseMutationOptions<
+  AddNewDeviceForUserMutation,
+  AddNewDeviceForUserMutationVariables
+>
