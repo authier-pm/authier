@@ -26,13 +26,16 @@ model DecryptionChallenge {
   ipAddress                String    @db.Inet
   masterPasswordVerifiedAt DateTime?
   approvedAt               DateTime?
+  rejectedAt               DateTime?
+  blockIp                  Boolean? // when true, attempt to get a new challenge from the same IP address will fail
   userId                   String    @db.Uuid
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
   deviceId                 String?   @db.Uuid
-
-  approvedFromDeviceId String? @db.Uuid // when non null it means user unlocked by using another device
-  approvedFromDevice   Device? @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+  approvedByRecovery       Boolean   @default(false)
+  approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
+  approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
+  User                     User[]    @relation("recoveryDecryptionChallenge")
 }
 
 model Device {
@@ -157,22 +160,27 @@ model User {
   id    String  @id @default(uuid()) @db.Uuid
   email String? @unique @db.Citext
 
-  tokenVersion             Int       @default(0)
-  username                 String?   @unique
+  tokenVersion                  Int                  @default(0)
+  username                      String?              @unique
   // @skip
-  addDeviceSecret          String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted String // client has to decrypt this to prove they have the correct master password
+  addDeviceSecret               String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted      String // client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt           String
-  Token                    Token[]
-  createdAt                DateTime  @default(now())
-  updatedAt                DateTime? @updatedAt
-  emailAddressVerifiedAt   DateTime?
-  masterDevice             Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
-  masterDeviceId           String?   @unique @db.Uuid
+  encryptionSalt                String
+  Token                         Token[]
+  createdAt                     DateTime             @default(now())
+  updatedAt                     DateTime?            @updatedAt
+  emailAddressVerifiedAt        DateTime?
+  masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
+  masterDeviceId                String?              @unique @db.Uuid
   // Limits for the number of stored secrets
-  TOTPlimit                Int
-  loginCredentialsLimit    Int
+  TOTPlimit                     Int
+  loginCredentialsLimit         Int
+  // @skip
+  recoveryDecryptionChallengeId Int? // when set user is in process of adding a new master device waiting for the cooldown to
+  recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
+
+  deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]
