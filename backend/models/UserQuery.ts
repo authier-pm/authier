@@ -58,13 +58,6 @@ export class UserQuery extends UserBase {
     return ctx.prisma.device.findMany({
       where: {
         userId: this.id
-      },
-      include: {
-        User: {
-          select: {
-            masterDeviceId: true
-          }
-        }
       }
     })
   }
