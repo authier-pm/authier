@@ -31,7 +31,7 @@ import {
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
-import { url } from 'inspector'
+import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 
 export const log = debug('au:Device')
 
@@ -83,13 +83,10 @@ export class DeviceState {
   }
 
   setMasterEncryptionKey(masterPassword: string) {
-    this.masterEncryptionKey = cryptoJS
-      .PBKDF2(
-        masterPassword,
-        this.encryptionSalt,
-        { iterations: 100000, keySize: 64 } // TODO make customizable
-      )
-      .toString(cryptoJS.enc.Hex)
+    this.masterEncryptionKey = generateEncryptionKey(
+      masterPassword,
+      this.encryptionSalt
+    )
     this.save()
   }
 
