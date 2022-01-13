@@ -15,8 +15,15 @@ const makeInput = () => ({
   addDeviceSecret: faker.datatype.string(5),
   addDeviceSecretEncrypted: faker.datatype.string(5),
   encryptionSalt: faker.datatype.string(5),
-  decryptionChallengeId: faker.datatype.number()
+  decryptionChallengeId: faker.datatype.number(),
+  deviceRecoveryCooldownMinutes: faker.datatype.number()
 })
+
+const userSecurityProps = {
+  deviceRecoveryCooldownMinutes: 960,
+  loginCredentialsLimit: 50,
+  TOTPlimit: 4
+}
 
 describe('RootResolver', () => {
   const resolver = new RootResolver()
@@ -30,12 +37,11 @@ describe('RootResolver', () => {
           addDeviceSecret: faker.datatype.string(5),
           addDeviceSecretEncrypted: faker.datatype.string(5),
           encryptionSalt: faker.datatype.string(5),
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          ...userSecurityProps
         }
       })
 
-      await expect(
+      expect(
         await resolver.me(
           {
             request: { headers: {} },
@@ -95,9 +101,7 @@ describe('RootResolver', () => {
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           encryptionSalt: input.encryptionSalt,
-
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          ...userSecurityProps
         }
       })
 
@@ -118,8 +122,8 @@ describe('RootResolver', () => {
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           encryptionSalt: input.encryptionSalt,
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4,
+          ...userSecurityProps,
+
           Devices: {
             create: {
               id: input.deviceId,
@@ -165,7 +169,8 @@ describe('RootResolver', () => {
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           encryptionSalt: input.encryptionSalt,
           loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          TOTPlimit: 4,
+          deviceRecoveryCooldownMinutes: 960
         }
       })
 
@@ -214,9 +219,8 @@ describe('RootResolver', () => {
           email: input.email,
           addDeviceSecret: faker.datatype.string(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          loginCredentialsLimit: 50,
           encryptionSalt: input.encryptionSalt,
-          TOTPlimit: 4
+          ...userSecurityProps
         }
       })
 
@@ -241,9 +245,9 @@ describe('RootResolver', () => {
           email: fakeData.email,
           addDeviceSecret: fakeData.addDeviceSecret,
           addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-          loginCredentialsLimit: 50,
+
           encryptionSalt: fakeData.encryptionSalt,
-          TOTPlimit: 4
+          ...userSecurityProps
         }
       })
 
@@ -270,8 +274,7 @@ describe('RootResolver', () => {
           addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
           encryptionSalt: fakeData.encryptionSalt,
 
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4
+          ...userSecurityProps
         }
       })
 

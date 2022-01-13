@@ -43,6 +43,9 @@ export class UserGQLScalars {
 
   @Field(() => Int)
   loginCredentialsLimit: number
+
+  @Field(() => Int)
+  deviceRecoveryCooldownMinutes: number
 }
 
 @ObjectType()
@@ -52,6 +55,9 @@ export class UserGQL extends UserGQLScalars {
 
   @Field(() => DeviceGQL, { nullable: true })
   masterDevice?: DeviceGQL
+
+  @Field(() => DecryptionChallengeGQL, { nullable: true })
+  recoveryDecryptionChallenge?: DecryptionChallengeGQL
 
   @Field(() => [SecretUsageEventGQL])
   UsageEvents: SecretUsageEventGQL[]
