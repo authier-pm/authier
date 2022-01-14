@@ -24,7 +24,7 @@ import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
-import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
+
 import { extractHostname } from '../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -165,34 +165,24 @@ const LoginCredentialsListItem = ({
   )
 }
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const { deviceState, TOTPSecrets, LoginCredentials } =
+  const { deviceState, TOTPSecrets, LoginCredentials, currentURL } =
     useContext(DeviceStateContext)
-
-  const [currentTabUrl, setCurrentTabUrl] = useState<string | null>(null)
-  const [_, forceUpdate] = useReducer((x) => x + 1, 0)
-  useEffect(() => {
-    getCurrentTab().then((tab) => {
-      log('~ tab?.url', tab?.url)
-
-      setCurrentTabUrl(tab?.url ?? null)
-    })
-  }, [])
 
   if (!deviceState) {
     return null
   }
 
   const TOTPForCurrentDomain = TOTPSecrets.filter(({ url }) => {
-    if (!currentTabUrl || !url) {
+    if (!currentURL || !url) {
       return true
     }
-    return extractHostname(url) === extractHostname(currentTabUrl)
+    return extractHostname(url) === extractHostname(currentURL)
   })
   const loginCredentialForCurrentDomain = LoginCredentials.filter(({ url }) => {
-    if (!currentTabUrl || !url) {
+    if (!currentURL || !url) {
       return true
     }
-    return extractHostname(url) === extractHostname(currentTabUrl)
+    return extractHostname(url) === extractHostname(currentURL)
   })
 
   const hasNoSecrets = deviceState.secrets.length === 0
