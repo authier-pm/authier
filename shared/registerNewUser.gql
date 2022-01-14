@@ -3,6 +3,7 @@ mutation registerNewUser($input: RegisterNewAccountInput!, $userId: UUID!) {
     accessToken
     user {
       id
+      sendEmailVerification
       Devices {
         id
         name

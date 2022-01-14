@@ -11,6 +11,7 @@ import {
 import { UserGQL } from './generated/User'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { GraphQLUUID } from 'graphql-scalars'
+import { UserMutation } from './UserMutation'
 
 @ObjectType()
 export class DecryptionChallengeResponse {
@@ -46,15 +47,12 @@ export class UserBase {
 }
 
 @ObjectType()
-export class UserAfterAuth extends UserGQL {}
-
-@ObjectType()
 export class LoginResponse {
   @Field(() => String)
   accessToken: string
 
-  @Field(() => UserAfterAuth)
-  user: UserAfterAuth
+  @Field(() => UserMutation)
+  user: UserMutation
 
   @Field(() => String, { nullable: false })
   encryptionSalt: string

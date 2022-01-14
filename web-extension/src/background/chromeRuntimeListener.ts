@@ -53,7 +53,7 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-chrome.runtime.onMessage.addListener(async function (
+browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
     payload: any
@@ -63,8 +63,7 @@ chrome.runtime.onMessage.addListener(async function (
     passwords: ILoginSecret[]
     settings: ISecuritySettings
   },
-  sender,
-  sendResponse
+  sender
 ) {
   log(req)
 
@@ -127,7 +126,7 @@ chrome.runtime.onMessage.addListener(async function (
       if (req.payload.openInVault) {
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
-      sendResponse(secret)
+      return secret
       break
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
@@ -158,30 +157,28 @@ chrome.runtime.onMessage.addListener(async function (
       })
       break
     case BackgroundMessageType.getFallbackUsernames:
-      sendResponse([deviceState?.email])
-      break
+      return [deviceState?.email]
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
       if (!tabUrl || !deviceState || !currentTabId) {
-        return sendResponse(null)
+        return null
       } else {
-        sendResponse(await getContentScriptInitialState(tabUrl, currentTabId))
+        return await getContentScriptInitialState(tabUrl, currentTabId)
       }
 
       break
 
     case BackgroundMessageType.wasClosed:
-      sendResponse({ wasClosed: safeClosed })
+      return { wasClosed: safeClosed }
       break
 
     case BackgroundMessageType.giveSecuritySettings:
-      sendResponse({
+      return {
         config: {
           vaultTime: lockTime,
           noHandsLogin: noHandsLogin
         }
-      })
-      break
+      }
 
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
@@ -207,29 +204,3 @@ chrome.runtime.onMessage.addListener(async function (
       return true
   }
 })
-
-// /**
-//  * when user open popup we clear the vault lock interval, when user closes it we always restart it again
-//  */
-// browser.runtime.onConnect.addListener(function (externalPort) {
-//   externalPort.onDisconnect.addListener(function () {
-//     console.log('onDisconnect')
-//     // Do stuff that should happen when popup window closes here
-//     if (vaultLockInterval) {
-//       clearInterval(vaultLockInterval)
-//     }
-//     vaultLockInterval = setTimeout(() => {
-//       vaultLockInterval && clearTimeout(vaultLockInterval)
-
-//       safeClosed = true
-
-//       chrome.runtime.sendMessage({ safe: 'closed' })
-//       console.log('locked', safeClosed)
-//     }, lockTime)
-//   })
-
-//   if (vaultLockInterval) {
-//     clearTimeout(vaultLockInterval)
-//     vaultLockInterval = null
-//   }
-// })

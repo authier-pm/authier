@@ -229,6 +229,10 @@ export class DeviceState {
     await this.save()
     return secretAdded
   }
+
+  onDestroy() {
+    browser.storage.onChanged.removeListener(this.onStorageChange)
+  }
 }
 
 class ExtensionDevice {
@@ -304,9 +308,11 @@ class ExtensionDevice {
 
   async clearLocalStorage() {
     const deviceId = await this.getDeviceId()
+    this.state?.onDestroy()
     await browser.storage.local.clear()
-    await browser.storage.local.set({ deviceId: deviceId }) // restore deviceId so that we keep it even after logout
     this.state = null
+
+    await browser.storage.local.set({ deviceId: deviceId }) // restore deviceId so that we keep it even after logout
   }
   /**
    * @returns a stored deviceId or a new UUID if the extension was just installed
