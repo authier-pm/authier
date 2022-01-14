@@ -345,14 +345,23 @@ export class RootResolver {
           'Too many decryption challenges, wait for cooldown'
         )
       }
-
-      const challenge = await ctx.prisma.decryptionChallenge.create({
-        data: {
+      let challenge = await ctx.prisma.decryptionChallenge.findFirst({
+        where: {
           deviceId,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
         }
       })
+
+      if (!challenge) {
+        challenge = await ctx.prisma.decryptionChallenge.create({
+          data: {
+            deviceId,
+            userId: user.id,
+            ipAddress: ctx.getIpAddress()
+          }
+        })
+      }
 
       // if (!challenge.approvedAt) { // TODO enable when we have device management in the vault
       //   return {
