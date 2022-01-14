@@ -19,6 +19,7 @@ import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
+import { EmailVerificationType } from '@prisma/client'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -87,6 +88,16 @@ export class UserQuery extends UserBase {
     })
   }
 
+  @Field(() => EmailVerificationGQLScalars, { nullable: true })
+  async primaryEmailVerification() {
+    return prismaClient.emailVerification.findFirst({
+      where: {
+        userId: this.id,
+        address: this.email,
+        kind: EmailVerificationType.PRIMARY
+      }
+    })
+  }
   @Field(() => [EmailVerificationGQLScalars])
   async emailVerifications() {
     return prismaClient.emailVerification.findMany({

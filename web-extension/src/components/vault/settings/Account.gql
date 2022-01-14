@@ -15,3 +15,20 @@ mutation changeMasterPassword(
     )
   }
 }
+
+query Account {
+  me {
+    id
+    deviceRecoveryCooldownMinutes
+    primaryEmailVerification {
+      createdAt
+      verifiedAt
+    }
+  }
+}
+
+mutation resendEmailVerification {
+  me {
+    sendEmailVerification
+  }
+}
