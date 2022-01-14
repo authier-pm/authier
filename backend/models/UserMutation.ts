@@ -14,7 +14,11 @@ import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLPositiveInt } from 'graphql-scalars'
+import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
+import { sendEmail } from '../utils/email'
+import { v4 as uuidv4 } from 'uuid'
+
+import { EmailVerificationType } from '@prisma/client'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -143,6 +147,39 @@ export class UserMutation extends UserBase {
         twoFA: twoFA
       }
     })
+  }
+
+  @Field(() => GraphQLNonNegativeInt)
+  async sendEmailVerification(@Ctx() ctx: IContext) {
+    if (this.email) {
+      let verification = await prismaClient.emailVerification.findFirst({
+        where: {
+          address: this.email
+        }
+      })
+
+      if (!verification) {
+        verification = await prismaClient.emailVerification.create({
+          data: {
+            token: uuidv4(),
+            address: this.email,
+            userId: this.id,
+            kind: EmailVerificationType.PRIMARY
+          }
+        })
+      }
+
+      const res = await sendEmail(
+        this.email,
+
+        {
+          Subject: 'Verify your email',
+          TextPart: `To verify your email, please go here: ${''} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
+          HTMLPart: `<a href="${''}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
+        }
+      )
+      return res.body.Messages.length
+    }
   }
 
   //For testing purposes

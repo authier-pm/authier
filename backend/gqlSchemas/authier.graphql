@@ -354,6 +354,7 @@ type UserMutation {
     homeUI: String!
     twoFA: Boolean!
   ): SettingsConfigGQL!
+  sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
@@ -388,6 +389,11 @@ input EncryptedSecretInput {
   label: String!
   encrypted: String!
 }
+
+"""
+Integers that will have a value of 0 or more.
+"""
+scalar NonNegativeInt
 
 """
 Integers that will have a value greater than 0.
@@ -460,33 +466,8 @@ type SecretUsageEventGQLScalars {
 
 type LoginResponse {
   accessToken: String!
-  user: UserAfterAuth!
+  user: UserMutation!
   encryptionSalt: String!
-}
-
-type UserAfterAuth {
-  id: ID!
-  email: String
-  tokenVersion: Int!
-  username: String
-  addDeviceSecretEncrypted: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  masterDeviceId: String
-  TOTPlimit: Int!
-  loginCredentialsLimit: Int!
-  deviceRecoveryCooldownMinutes: Int!
-  Token: [TokenGQL!]!
-  masterDevice: DeviceGQL
-  recoveryDecryptionChallenge: DecryptionChallengeGQL
-  UsageEvents: [SecretUsageEventGQL!]!
-  EncryptedSecrets: [EncryptedSecretGQL!]!
-  Devices: [DeviceGQL!]!
-  WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
-  Tags: [TagGQL!]!
-  UserPaidProducts: [UserPaidProductsGQL!]!
-  DecryptionChallenges: [DecryptionChallengeGQL!]!
 }
 
 input RegisterNewAccountInput {

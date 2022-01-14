@@ -229,18 +229,6 @@ export class RootResolver {
       }
     })
 
-    if (user.email) {
-      await sendEmail(
-        user.email,
-
-        {
-          Subject: 'Verify your email',
-          TextPart: `To verify your email, please go here: ${''} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
-          HTMLPart: `<a href="${''}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
-        }
-      )
-    }
-
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device.id,
       ctx
