@@ -16,6 +16,7 @@ import debug from 'debug'
 import { device } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
+import { getCurrentTab } from './executeScriptInCurrentTab'
 
 const log = debug('au:useDeviceState')
 
@@ -116,12 +117,22 @@ export function useDeviceState() {
     browser.storage.onChanged.addListener(onStorageChange)
   }, [])
 
+  const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
+
+  useEffect(() => {
+    getCurrentTab().then((tab) => {
+      setCurrentTab(tab ?? null)
+      setCurrentURL(tab?.url ?? '')
+    })
+  }, [])
+
   const backgroundStateContext = {
     currentURL,
     safeLocked,
     setSafeLocked,
     isFilling,
     deviceState,
+    currentTab,
     get LoginCredentials() {
       if (!deviceState) {
         return []
