@@ -27,7 +27,7 @@
     "@types/react": "^17",
     "apollo-link-http": "^1.5.17",
     "formik": "^2.2.9",
-    "graphql": "^15.7.2",
+    "graphql": "^15",
     "jssha": "^3.2.0",
     "jwt-decode": "^3.1.2",
     "native-base": "^3.0.6",

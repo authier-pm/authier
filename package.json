@@ -16,7 +16,7 @@
     "mobile-app"
   ],
   "resolutions": {
-    "graphql": "^15.8.0"
+    "graphql": "^15"
   },
   "optionalDependencies": {
     "contrib-locs": "^0.2.0"

@@ -155,7 +155,7 @@ async function main() {
           if (err instanceof GraphqlError === false) {
             captureException(err)
           }
-          ctx.request.log.error(err)
+          ctx.reply.log.error(err)
         })
       }
       const errResponse = mercurius.defaultErrorFormatter(res, ctx)

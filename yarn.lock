@@ -11169,7 +11169,7 @@ graphql-ws@^5.4.1:
   resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.5.5.tgz#f375486d3f196e2a2527b503644693ae3a8670a9"
   integrity sha512-hvyIS71vs4Tu/yUYHPvGXsTgo0t3arU820+lT5VjZS2go0ewp2LqyCgxEN56CzOG7Iys52eRhHBiD1gGRdiQtw==
 
-graphql@^14.5.3, graphql@^15.5.1, graphql@^15.7.2, graphql@^15.8.0:
+graphql@^14.5.3, graphql@^15, graphql@^16.0.0:
   version "15.8.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.8.0.tgz#33410e96b012fa3bdb1091cc99a94769db212b38"
   integrity sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==
@@ -14128,10 +14128,10 @@ memoize-one@^5.0.0:
   resolved "https://registry.yarnpkg.com/memoize-one/-/memoize-one-5.2.1.tgz#8337aa3c4335581839ec01c3d594090cebe8f00e"
   integrity sha512-zYiwtZUcYyXKo/np96AGZAckk+FWWsUdJ3cHGGmld7+AhvcWmQyGCYUh1hc4Q/pkOhb65dQR/pqCyK0cOaHz4Q==
 
-mercurius@^8.12:
-  version "8.12.0"
-  resolved "https://registry.yarnpkg.com/mercurius/-/mercurius-8.12.0.tgz#ec53deabc0fab28d02cae6cbbad8b5f6745156b4"
-  integrity sha512-z36afRf2GgoS3NCHJUV6wKVg8jlNuCC/dkWsARWwrbZeVd7LXZRZclOu8z9aFP2+45P1KwtzZ/B+zG++oOKbQA==
+mercurius@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/mercurius/-/mercurius-9.1.0.tgz#ca2c0a012e88e523a3c564909435cfc05c5b9140"
+  integrity sha512-RU7Wu+64WEfSSOUZLkusAkpLzj0BN+tp0mWUznOwucrOGO1aWDwt0jsgae5nLCTh7yByH03r/X8uloIBa/dN5w==
   dependencies:
     "@types/isomorphic-form-data" "^2.0.0"
     events.on "^1.0.1"
@@ -14139,7 +14139,7 @@ mercurius@^8.12:
     fastify-plugin "^3.0.0"
     fastify-static "^4.2.2"
     fastify-websocket "^4.0.0"
-    graphql "^15.5.1"
+    graphql "^16.0.0"
     graphql-jit "^0.7.0"
     mqemitter "^4.4.1"
     p-map "^4.0.0"
