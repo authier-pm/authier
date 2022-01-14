@@ -6,7 +6,7 @@ const cpy = require('cpy')
     [
       'package.json',
       'package-lock.json',
-
+      'yarn.lock',
       '**/*.json',
       '**/*.tpl',
       '**/*.ejs',
