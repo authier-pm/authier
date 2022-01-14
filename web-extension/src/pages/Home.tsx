@@ -22,14 +22,19 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 export const Home: FunctionComponent = () => {
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
 
-  const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
+  const { deviceState, TOTPSecrets, currentURL } =
+    useContext(DeviceStateContext)
 
   useInterval(() => {
     setRemainingSeconds(authenticator.timeRemaining())
   }, 1000)
 
-  const [filterByTLD, setFilterByTLD] = useState(false)
+  const [filterByTLDManual, setFilterByTLD] = useState<null | boolean>(null) // when in vault or browser config, show all: ;
 
+  const filterByTLD =
+    filterByTLDManual === null
+      ? currentURL.startsWith('http')
+      : filterByTLDManual
   return (
     <>
       <Flex position="sticky" align="center" pl={4} pr={4} mt={3}>
@@ -37,7 +42,8 @@ export const Home: FunctionComponent = () => {
           <FormLabel mb="0">Filter by TLD</FormLabel>
           <Switch
             mr="auto"
-            checked={filterByTLD}
+            isChecked={filterByTLD}
+            // checked={filterByTLD}
             onChange={(enabled) => {
               setFilterByTLD(enabled.target.checked)
             }}
