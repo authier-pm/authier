@@ -1,4 +1,3 @@
-import { prismaClient } from '../prismaClient'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import {
@@ -24,15 +23,15 @@ import { EmailVerificationType } from '@prisma/client'
 export class UserMutation extends UserBase {
   @Field(() => String)
   // TODO remove before putting into prod
-  async addCookie(@Ctx() context: IContext) {
+  async addCookie(@Ctx() ctx: IContext) {
     if (process.env.NODE_ENV !== 'development') {
       throw new Error('This is only for development')
     }
 
-    const firstDev = await prismaClient.device.findFirst()
+    const firstDev = await ctx.prisma.device.findFirst()
     const { accessToken } = this.setCookiesAndConstructLoginResponse(
       firstDev!.id,
-      context
+      ctx
     )
     return accessToken
   }
@@ -42,11 +41,11 @@ export class UserMutation extends UserBase {
     @Arg('name', () => String) name: string,
     @Arg('deviceId', () => String) deviceId: string,
     @Arg('firebaseToken', () => String) firebaseToken: string,
-    @Ctx() context: IContext
+    @Ctx() ctx: IContext
   ) {
-    const ipAddress: string = context.getIpAddress()
+    const ipAddress: string = ctx.getIpAddress()
 
-    return await prismaClient.device.create({
+    return await ctx.prisma.device.create({
       data: {
         name: name,
         id: deviceId,
@@ -93,9 +92,10 @@ export class UserMutation extends UserBase {
   // }
   @Field(() => EncryptedSecretQuery)
   async addEncryptedSecret(
-    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput
+    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput,
+    @Ctx() ctx: IContext
   ) {
-    return prismaClient.encryptedSecret.create({
+    return ctx.prisma.encryptedSecret.create({
       data: {
         version: 1,
         userId: this.id,
@@ -106,12 +106,13 @@ export class UserMutation extends UserBase {
 
   @Field(() => DeviceGQL)
   async updateFireToken(
-    @Arg('firebaseToken', () => String) firebaseToken: string
+    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Ctx() ctx: IContext
   ) {
     if (!this.masterDeviceId) {
       throw new Error('Must have masterDeviceId')
     }
-    return prismaClient.device.update({
+    return ctx.prisma.device.update({
       data: {
         firebaseToken: firebaseToken
       },
@@ -126,9 +127,10 @@ export class UserMutation extends UserBase {
     @Arg('twoFA', () => Boolean) twoFA: boolean,
     @Arg('homeUI', () => String) homeUI: string,
     @Arg('lockTime', () => Int) lockTime: number,
-    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean
+    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean,
+    @Ctx() ctx: IContext
   ) {
-    return prismaClient.settingsConfig.upsert({
+    return ctx.prisma.settingsConfig.upsert({
       where: {
         userId: this.id
       },
@@ -152,14 +154,14 @@ export class UserMutation extends UserBase {
   @Field(() => GraphQLNonNegativeInt)
   async sendEmailVerification(@Ctx() ctx: IContext) {
     if (this.email) {
-      let verification = await prismaClient.emailVerification.findFirst({
+      let verification = await ctx.prisma.emailVerification.findFirst({
         where: {
           address: this.email
         }
       })
 
       if (!verification) {
-        verification = await prismaClient.emailVerification.create({
+        verification = await ctx.prisma.emailVerification.create({
           data: {
             token: uuidv4(),
             address: this.email,
@@ -169,13 +171,15 @@ export class UserMutation extends UserBase {
         })
       }
 
+      const link = `${process.env.FRONTEND_URL}/verify-email?token=${verification.token}`
+
       const res = await sendEmail(
         this.email,
 
         {
           Subject: 'Verify your email',
-          TextPart: `To verify your email, please go here: ${''} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
-          HTMLPart: `<a href="${''}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
+          TextPart: `To verify your email, please go here: ${link} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
+          HTMLPart: `<a href="${link}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
         }
       )
       return res.body.Messages.length
@@ -184,8 +188,8 @@ export class UserMutation extends UserBase {
 
   //For testing purposes
   @Field(() => UserGQL)
-  async revokeRefreshTokensForUser() {
-    return prismaClient.user.update({
+  async revokeRefreshTokensForUser(@Ctx() ctx: IContext) {
+    return ctx.prisma.user.update({
       data: {
         tokenVersion: {
           increment: 1
@@ -198,15 +202,18 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => Boolean)
-  async approveDevice(@Arg('success', () => Boolean) success: Boolean) {
+  async approveDevice(
+    @Arg('success', () => Boolean) success: Boolean,
+    @Ctx() ctx: IContext
+  ) {
     // TODO check current device is master
-    const user = await prismaClient.user.findFirst({
+    const user = await ctx.prisma.user.findFirst({
       where: {
         id: this.id
       }
     })
     if (user?.masterDeviceId) {
-      const device = await prismaClient.device.findFirst({
+      const device = await ctx.prisma.device.findFirst({
         where: {
           id: user?.masterDeviceId
         }
@@ -239,7 +246,7 @@ export class UserMutation extends UserBase {
       })
     })
 
-    await prismaClient.$transaction([
+    await ctx.prisma.$transaction([
       ...secretsUpdates,
       ctx.prisma.user.update({
         data: {
