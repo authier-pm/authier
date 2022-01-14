@@ -142,7 +142,6 @@ export const ItemList = () => {
         w={['300px', '350px', '400px', '500px']}
         placeholder={t`Search vault`}
         m="auto"
-        _focus={{ backgroundColor: 'white' }}
         onChange={(ev) => {
           setFilterBy(ev.target.value)
         }}

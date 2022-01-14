@@ -23,7 +23,11 @@ import {
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import {
+  ArrowForwardIcon,
+  ChevronDownIcon,
+  ChevronUpIcon
+} from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
@@ -108,15 +112,40 @@ const TOTPSecret = (data: ITOTPSecret) => {
             </Box>
           </SimpleGrid>
 
-          <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
+          <Stack
+            direction={'row'}
+            justifyContent="flex-end"
+            spacing={1}
+            my={5}
+            alignItems={'baseline'}
+          >
             <Button
-              colorScheme="blackAlpha"
+              _focus={{
+                bg: 'gray.200'
+              }}
+              fontSize={'sm'}
               size="sm"
               onClick={() => history.goBack()}
             >
               Go back
             </Button>
-            <Button colorScheme="twitter" size="sm">
+            <Button
+              size={'sm'}
+              fontSize={'sm'}
+              bg={'blue.400'}
+              color={'white'}
+              boxShadow={
+                '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+              }
+              _hover={{
+                bg: 'blue.500'
+              }}
+              _focus={{
+                bg: 'blue.500'
+              }}
+              aria-label="Save"
+              rightIcon={<ArrowForwardIcon />}
+            >
               Save
             </Button>
           </Stack>

@@ -207,7 +207,6 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
         p="4"
         mx="4"
         borderRadius="lg"
-        color="gray.800"
         role="group"
         cursor="pointer"
         _hover={{
