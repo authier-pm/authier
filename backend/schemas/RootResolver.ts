@@ -384,6 +384,16 @@ export class RootResolver {
         data: {
           tokenVersion: {
             increment: 1
+          },
+          Devices: {
+            update: {
+              where: {
+                id: ctx.jwtPayload.deviceId
+              },
+              data: {
+                logoutAt: new Date()
+              }
+            }
           }
         },
         where: {

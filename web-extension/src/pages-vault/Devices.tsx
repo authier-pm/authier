@@ -44,6 +44,7 @@ const ListItem = (item: {
   lastIpAddress: string
   name: string
   lastGeoLocation: string
+  logoutAt?: string | null | undefined
 }) => {
   return (
     <Flex py={6}>
@@ -64,12 +65,18 @@ const ListItem = (item: {
             alignItems={'baseline'}
             lineHeight={'6'}
           >
-            <Badge height="min-content" colorScheme="red">
+            <Badge height="min-content" colorScheme="purple">
               Master
             </Badge>
-            <Badge height="min-content" colorScheme="green">
-              Online
-            </Badge>
+            {item.logoutAt ? (
+              <Badge height="min-content" colorScheme="red">
+                Offline
+              </Badge>
+            ) : (
+              <Badge height="min-content" colorScheme="green">
+                Online
+              </Badge>
+            )}
 
             <Menu>
               <MenuButton

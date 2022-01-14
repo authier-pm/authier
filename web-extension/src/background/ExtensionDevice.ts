@@ -26,7 +26,10 @@ import {
   SyncEncryptedSecretsQueryVariables,
   MarkAsSyncedMutation,
   MarkAsSyncedMutationVariables,
-  MarkAsSyncedDocument
+  MarkAsSyncedDocument,
+  LogoutDocument,
+  LogoutMutation,
+  LogoutMutationVariables
 } from './ExtensionDevice.codegen'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -371,6 +374,10 @@ class ExtensionDevice {
   async logout() {
     await removeToken()
     await device.clearLocalStorage()
+
+    await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
+      mutation: LogoutDocument
+    })
 
     // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
     // this.listenForUserLogin()
