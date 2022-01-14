@@ -8,16 +8,24 @@ import {
   InputRightElement,
   Button,
   Spinner,
-  HStack
+  HStack,
+  Flex,
+  VStack
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
-import { useChangeMasterPasswordMutation } from './Account.codegen'
+import {
+  useAccountQuery,
+  useChangeMasterPasswordMutation
+} from './Account.codegen'
 import * as Yup from 'yup'
 import { useDeviceDecryptionChallengeMutation } from '../../../../../shared/Login.codegen'
 import { toast } from 'react-toastify'
+import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
+import { NbSp } from '@src/components/util/NbSp'
+import { Trans } from '@lingui/macro'
 
 export default function Account() {
   const email = device.state?.email
@@ -26,6 +34,7 @@ export default function Account() {
   const [showPass, setShowPass] = useState(false)
   const [changePassword] = useChangeMasterPasswordMutation()
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
+  const { data } = useAccountQuery()
 
   if (!email) {
     return <Spinner />
@@ -60,6 +69,9 @@ export default function Account() {
       initial={{ opacity: 0, y: 20 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.35 }}
+      style={{
+        width: '60%'
+      }}
     >
       <Box textAlign="start" pt={5}>
         <Formik
@@ -110,28 +122,35 @@ export default function Account() {
             return false
           }}
         >
-          {({ isSubmitting }) => (
+          {({ isSubmitting, dirty }) => (
             <Form>
               <Field name="email">
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.name && form.touched.name}
-                  >
-                    <FormLabel htmlFor="email">Email</FormLabel>
+                {({ field, form }) => {
+                  return (
+                    <Flex>
+                      <FormControl
+                        isInvalid={form.errors.name && form.touched.name}
+                      >
+                        <FormLabel htmlFor="email">
+                          Email
+                          <NbSp />
+                          {data?.me?.primaryEmailVerification?.verifiedAt ? (
+                            <CheckIcon boxSize={18} />
+                          ) : (
+                            <WarningIcon boxSize={18} />
+                          )}
+                        </FormLabel>
 
-                    <Input
-                      maxW={'xs'}
-                      pr="4.5rem"
-                      id="email"
-                      {...field}
-                      required
-                    />
+                        <Input pr="4.5rem" id="email" {...field} required />
 
-                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                  </FormControl>
-                )}
+                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      </FormControl>
+                    </Flex>
+                  )
+                }}
               </Field>
-              <HStack pt={6}>
+
+              <VStack pt={6}>
                 <Box as={Field} name="currPassword">
                   {({ field, form }) => (
                     <FormControl
@@ -139,7 +158,7 @@ export default function Account() {
                       isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel htmlFor="currPassword">
-                        Current password
+                        <Trans>Current password</Trans>
                       </FormLabel>
 
                       <InputGroup size="md">
@@ -174,7 +193,7 @@ export default function Account() {
                       isInvalid={form.errors.name && form.touched.name}
                     >
                       <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
-                        Set new Master password
+                        <Trans>Set new Master password</Trans>
                       </FormLabel>
 
                       <InputGroup size="md">
@@ -212,7 +231,7 @@ export default function Account() {
                         htmlFor="confirmPassword"
                         whiteSpace={'nowrap'}
                       >
-                        Confirm new password
+                        <Trans>Confirm new password</Trans>
                       </FormLabel>
 
                       <InputGroup size="md">
@@ -239,15 +258,16 @@ export default function Account() {
                     </FormControl>
                   )}
                 </Box>
-              </HStack>
+              </VStack>
 
               <Button
                 mt={4}
                 colorScheme="teal"
+                disabled={isSubmitting || !dirty}
                 isLoading={isSubmitting}
                 type="submit"
               >
-                Save
+                <Trans>Set master password</Trans>
               </Button>
             </Form>
           )}
