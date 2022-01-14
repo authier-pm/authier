@@ -3,11 +3,11 @@
  */
 export const truncateAllTables = async () => {
   const prisma = (await import('../prismaClient')).prismaClient
-  const tablenames = await prisma.$queryRaw<
+  const tableNames = await prisma.$queryRaw<
     Array<{ tablename: string }>
   >`SELECT tablename FROM pg_tables WHERE schemaname='public'`
 
-  const tables = tablenames
+  const tables = tableNames
     .map(({ tablename }) => tablename)
     .filter((tableName) => {
       return tableName !== '_prisma_migrations'
@@ -27,14 +27,16 @@ export const truncateAllTables = async () => {
 
 afterAll(truncateAllTables)
 
+export const fakeMailjetPost = {
+  request: jest.fn()
+}
+
 // we don't want to send anything from tests.
 jest.mock('node-mailjet', () => ({
   connect: () => {
     return {
       post: () => {
-        return {
-          request: jest.fn()
-        }
+        return fakeMailjetPost
       }
     }
   }
