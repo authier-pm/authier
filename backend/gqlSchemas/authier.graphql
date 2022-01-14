@@ -36,6 +36,7 @@ type UserQuery {
   devices: [DeviceQuery!]!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
+  primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   settings: SettingsConfigGQL!
   encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
@@ -274,7 +275,7 @@ type EncryptedSecretQuery {
 type EmailVerificationGQLScalars {
   address: ID!
   createdAt: DateTime!
-  updatedAt: DateTime
+  verifiedAt: DateTime
   userId: String!
   kind: EmailVerificationType!
 }

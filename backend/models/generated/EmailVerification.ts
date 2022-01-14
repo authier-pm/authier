@@ -11,7 +11,7 @@ export class EmailVerificationGQLScalars {
   createdAt: Date
 
   @Field({ nullable: true })
-  updatedAt?: Date
+  verifiedAt?: Date
 
   @Field()
   userId: string
