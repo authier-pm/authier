@@ -5,10 +5,9 @@ import prettier from 'prettier'
 
 import { gqlSchema } from '../schemas/gqlSchema'
 ;(async () => {
-  await Promise.all([
-    fs.writeFile(
-      './gqlSchemas/authier.graphql',
-      prettier.format(printSchema(gqlSchema), { parser: 'graphql' })
-    )
-  ])
+  await fs.writeFile(
+    './gqlSchemas/authier.graphql',
+    prettier.format(printSchema(gqlSchema), { parser: 'graphql' })
+  )
+  console.log('✅ backend schema written')
 })()

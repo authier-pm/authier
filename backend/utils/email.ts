@@ -1,4 +1,7 @@
 import mailjet from 'node-mailjet'
+import debug from 'debug'
+
+const log = debug('au:email')
 
 const client = mailjet.connect(
   process.env.MJ_APIKEY_PUBLIC!,
@@ -13,11 +16,11 @@ export const sendEmail = async (
     HTMLPart: string
   }
 ) => {
-  return client.post('send', { version: 'v3.1' }).request({
+  const res = client.post('send', { version: 'v3.1' }).request({
     Messages: [
       {
         From: {
-          Email: 'authier.ml@google.com',
+          Email: 'admin@authier.ml',
           Name: 'Authier password manager'
         },
         To: [
@@ -29,4 +32,7 @@ export const sendEmail = async (
       }
     ]
   })
+
+  log(`sent email to ${emailAddress}`)
+  return res
 }

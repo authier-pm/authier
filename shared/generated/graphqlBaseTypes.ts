@@ -22,6 +22,8 @@ export type Scalars = {
   EmailAddress: any
   /** A string that cannot be passed as an empty value */
   NonEmptyString: any
+  /** Integers that will have a value of 0 or more. */
+  NonNegativeInt: number
   /** Integers that will have a value greater than 0. */
   PositiveInt: number
   /** A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier. */
@@ -271,7 +273,7 @@ export type LoginResponse = {
   __typename?: 'LoginResponse'
   accessToken: Scalars['String']
   encryptionSalt: Scalars['String']
-  user: UserAfterAuth
+  user: UserMutation
 }
 
 export type Mutation = {
@@ -406,32 +408,6 @@ export enum TokenType {
   EMAIL = 'EMAIL'
 }
 
-export type UserAfterAuth = {
-  __typename?: 'UserAfterAuth'
-  DecryptionChallenges: Array<DecryptionChallengeGql>
-  Devices: Array<DeviceGql>
-  EncryptedSecrets: Array<EncryptedSecretGql>
-  SettingsConfigs: Array<SettingsConfigGql>
-  TOTPlimit: Scalars['Int']
-  Tags: Array<TagGql>
-  Token: Array<TokenGql>
-  UsageEvents: Array<SecretUsageEventGql>
-  UserPaidProducts: Array<UserPaidProductsGql>
-  WebInputsAdded: Array<WebInputGql>
-  addDeviceSecretEncrypted: Scalars['String']
-  createdAt: Scalars['DateTime']
-  deviceRecoveryCooldownMinutes: Scalars['Int']
-  email?: Maybe<Scalars['String']>
-  id: Scalars['ID']
-  loginCredentialsLimit: Scalars['Int']
-  masterDevice?: Maybe<DeviceGql>
-  masterDeviceId?: Maybe<Scalars['String']>
-  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
-  tokenVersion: Scalars['Int']
-  updatedAt?: Maybe<Scalars['DateTime']>
-  username?: Maybe<Scalars['String']>
-}
-
 export type UserGql = {
   __typename?: 'UserGQL'
   DecryptionChallenges: Array<DecryptionChallengeGql>
@@ -486,6 +462,7 @@ export type UserMutation = {
   masterDeviceId?: Maybe<Scalars['String']>
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   revokeRefreshTokensForUser: UserGql
+  sendEmailVerification: Scalars['NonNegativeInt']
   tokenVersion: Scalars['Int']
   updateFireToken: DeviceGql
   updateSettings: SettingsConfigGql
