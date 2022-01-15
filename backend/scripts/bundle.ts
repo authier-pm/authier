@@ -1,6 +1,6 @@
 import { build } from 'esbuild'
 import { esbuildDecorators } from '@anatine/esbuild-decorators'
-import esbuildFileLocPlugin from './esbuild-fileloc-plugin'
+import esbuildFileLocPlugin from './esbuildFileLocPlugin'
 ;(async () => {
   await build({
     entryPoints: ['server.ts'],
