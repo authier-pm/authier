@@ -24,7 +24,7 @@
     "@babel/preset-env": "^7.15.6",
     "@babel/preset-typescript": "^7.15.0",
     "@lingui/react": "^3.11.1",
-    "@types/chrome": "^0.0.158",
+    "@types/chrome": "^0.0.176",
     "@types/crypto-js": "^4.0.2",
     "@types/debug": "^4.1.7",
     "@types/mz": "^2.7.4",
