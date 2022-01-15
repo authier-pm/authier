@@ -38,7 +38,7 @@ import { ReactText } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 
 interface LinkItemProps {
   name: string
