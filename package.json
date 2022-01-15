@@ -58,7 +58,6 @@
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",
-    "schemas": "yarn gbs && yarn gfs",
-    "deploy": "caprover deploy"
+    "schemas": "yarn gbs && yarn gfs"
   }
 }
