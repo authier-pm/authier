@@ -60,7 +60,7 @@ export default function Register(): ReactElement {
         <Heading>Create account</Heading>
       </Flex>
       <Formik
-        initialValues={{ email: 'bob@bob.com', password: 'bob' }}
+        initialValues={{ email: '', password: '' }}
         onSubmit={async (
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
