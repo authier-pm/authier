@@ -7,11 +7,11 @@ const cpy = require('cpy')
       'package.json',
       'package-lock.json',
       'yarn.lock',
-      '**/*.json',
-      '**/*.tpl',
-      '**/*.ejs',
-      '**/*.html',
-      '**/*.toml',
+      // '**/*.json',
+      // '**/*.tpl',
+      // '**/*.ejs',
+      // '**/*.html',
+      // '**/*.toml',
       '**/*.sql',
       '**/*.pem',
       '**/*.graphql',
@@ -21,7 +21,18 @@ const cpy = require('cpy')
       'captain-definition'
     ],
     './dist',
-    { parents: true, ignore: ['./dist', 'node_modules'] }
+    {
+      parents: true,
+      ignore: ['./dist']
+    }
+  )
+
+  await cpy(
+    ['../node_modules/mercurius/static/**/*'],
+    './dist/node_modules/mercurius/static',
+    {
+      parents: false
+    }
   )
 
   console.log(`${r.length} files copied!`)
