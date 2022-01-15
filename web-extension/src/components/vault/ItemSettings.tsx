@@ -431,7 +431,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   )
 }
 
-export const VaultItemSettings = ({ secretId }: { secretId: string }) => {
+export const VaultItemSettings = ({ secretId }) => {
   if (!device.state) {
     return <Spinner></Spinner>
   }

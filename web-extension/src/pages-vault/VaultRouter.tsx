@@ -28,7 +28,7 @@ export function VaultRouter() {
         <Route
           path="/secret/:secretId"
           children={({ match }) => (
-            <VaultItemSettings secretId={match?.params.secretId} />
+            <VaultItemSettings secretId={match?.params.secretId as string} />
           )}
         />
         <Route path="/account-limits">
