@@ -44,6 +44,7 @@ model Device {
   lastIpAddress            String    @db.Inet
   firebaseToken            String
   name                     String
+  platform                 String?
   syncTOTP                 Boolean   @default(true)
   ipAddressLock            Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   vaultLockTimeoutSeconds  Int?
