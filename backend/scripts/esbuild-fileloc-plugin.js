@@ -12,7 +12,9 @@ const esbuildFileLocPlugin = (rootPath) => ({
       async (args) => {
         const isWindows = /^win/.test(process.platform)
         const esc = (p) => (isWindows ? p.replace(/\\/g, '/') : p)
-        const pathInLambda = args.path.replace(process.cwd(), rootPath)
+        const pathInLambda = args.path
+          .replace(process.cwd(), rootPath)
+          .replace(path.dirname(process.cwd()), rootPath)
         const variables = `
         const __fileloc = {
           filename: "${esc(pathInLambda)}",

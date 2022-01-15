@@ -4,9 +4,9 @@ const cpy = require('cpy')
 ;(async () => {
   const r = await cpy(
     [
-      'package.json',
-      'package-lock.json',
-      'yarn.lock',
+      // 'package.json',
+      // 'package-lock.json',
+      // 'yarn.lock',
       // '**/*.json',
       // '**/*.tpl',
       // '**/*.ejs',
@@ -18,7 +18,8 @@ const cpy = require('cpy')
       '**/*.key',
       '**/*.crt',
       '**/*.prisma',
-      'captain-definition'
+      'captain-definition',
+      'Dockerfile'
     ],
     './dist',
     {
@@ -28,7 +29,7 @@ const cpy = require('cpy')
   )
 
   await cpy(
-    ['../node_modules/mercurius/static/**/*'],
+    ['../node_modules/mercurius/static/*'],
     './dist/node_modules/mercurius/static',
     {
       parents: false
