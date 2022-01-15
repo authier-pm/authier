@@ -105,6 +105,7 @@ export class DeviceState {
   }
 
   async save() {
+    log('saving device state', this)
     browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({ backgroundState: this })
     browser.storage.onChanged.addListener(this.onStorageChange)

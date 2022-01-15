@@ -1,4 +1,4 @@
-import { SettingsIcon } from '@chakra-ui/icons'
+import { ArrowForwardIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
   Heading,
   Avatar,
@@ -16,12 +16,31 @@ import {
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner
+  Spinner,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Checkbox,
+  Select,
+  Button
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
+import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useState } from 'react'
 import { IoIosPhonePortrait } from 'react-icons/io'
+
+interface configValues {
+  lockTime: number
+  twoFA: boolean
+}
+
+const vaultLockTimeOptions = [
+  { value: 0, label: 'On web close' },
+  { value: 10000, label: '10 seconds' },
+  { value: 288000000, label: '8 hours' },
+  { value: 432000000, label: '12 hours' }
+]
 
 const ListItem = (item: {
   id: string
@@ -31,8 +50,9 @@ const ListItem = (item: {
   lastGeoLocation: string
   logoutAt?: string | null | undefined
 }) => {
+  const [isConfigOpen, setIsConfigOpen] = useState(false)
   return (
-    <Flex py={6}>
+    <Flex py={6} m={5}>
       <Box
         maxW={'380px'}
         w={'full'}
@@ -42,7 +62,7 @@ const ListItem = (item: {
         p={6}
       >
         <Flex flexDirection={'row'} justifyContent={'space-between'}>
-          <Icon as={IoIosPhonePortrait} size={'xl'} w={20} h={20} />
+          <Icon as={IoIosPhonePortrait} w={20} h={20} />
 
           <Stack
             direction={'row'}
@@ -74,30 +94,114 @@ const ListItem = (item: {
               />
               <MenuList>
                 <MenuItem>Deauth</MenuItem>
+
+                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
+                  Config
+                </MenuItem>
+
                 <MenuItem>Remove</MenuItem>
               </MenuList>
             </Menu>
           </Stack>
         </Flex>
-        <Stack mt={6} spacing={4}>
-          <Heading fontSize={'xl'} fontFamily={'body'}>
-            {item.name}
-          </Heading>
 
-          <Box>
-            <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-              IP Address
-            </Text>
-            <Text fontSize={'2xl'}>{item.lastIpAddress}</Text>
-          </Box>
+        <Heading fontSize={'xl'} fontFamily={'body'}>
+          {item.name}
+        </Heading>
 
-          <Box>
-            <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-              Geolocation
-            </Text>
-            <Text fontSize={'2xl'}>{item.lastGeoLocation}</Text>
+        {isConfigOpen ? (
+          <Box mt={5}>
+            <Formik
+              initialValues={{
+                lockTime: 0,
+                twoFA: false
+              }}
+              onSubmit={async (
+                values: configValues,
+                { setSubmitting }: FormikHelpers<configValues>
+              ) => {
+                console.log(values)
+                setSubmitting(false)
+              }}
+            >
+              <Stack spacing={3}>
+                <Field name="lockTime">
+                  {({ form }) => (
+                    <FormControl
+                      isInvalid={form.errors.lockTime && form.touched.lockTime}
+                    >
+                      <FormLabel htmlFor="lockTime">Safe lock time</FormLabel>
+                      <Select
+                        name="lockTime"
+                        id="lockTime"
+                        defaultValue={vaultLockTimeOptions[0].label}
+                      >
+                        {vaultLockTimeOptions.map((i) => (
+                          <option key={i.value} value={i.value}>
+                            {i.label}
+                          </option>
+                        ))}
+                      </Select>
+                      <FormErrorMessage>
+                        {form.errors.lockTime}
+                      </FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Field name="TwoFA">
+                  {({ field, form }) => (
+                    <FormControl
+                      isInvalid={form.errors.name && form.touched.name}
+                    >
+                      <Checkbox id="TwoFA" {...field}>
+                        2FA
+                      </Checkbox>
+
+                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    </FormControl>
+                  )}
+                </Field>
+                <Flex justifyContent={'flex-end'}>
+                  <Button
+                    type="submit"
+                    size={'sm'}
+                    bg={'blue.400'}
+                    color={'white'}
+                    boxShadow={
+                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                    }
+                    _hover={{
+                      bg: 'blue.500'
+                    }}
+                    _focus={{
+                      bg: 'blue.500'
+                    }}
+                    aria-label="Save"
+                    rightIcon={<ArrowForwardIcon />}
+                  >
+                    Save
+                  </Button>
+                </Flex>
+              </Stack>
+            </Formik>
           </Box>
-        </Stack>
+        ) : (
+          <Stack mt={6} spacing={4}>
+            <Box>
+              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                IP Address
+              </Text>
+              <Text fontSize={'2xl'}>{item.lastIpAddress}</Text>
+            </Box>
+
+            <Box>
+              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                Geolocation
+              </Text>
+              <Text fontSize={'2xl'}>{item.lastGeoLocation}</Text>
+            </Box>
+          </Stack>
+        )}
       </Box>
     </Flex>
   )
