@@ -87,30 +87,28 @@ const TOTPSecret = (data: ITOTPSecret) => {
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Flex p={5} flexDirection="column" w="inherit">
-          <SimpleGrid row={2} columns={2} spacing="40px">
-            <InputWithHeading heading="URL:" defaultValue={data.url} />
-            <InputWithHeading heading="Label:" defaultValue={data.label} />
+          <InputWithHeading heading="URL:" defaultValue={data.url} />
+          <InputWithHeading heading="Label:" defaultValue={data.label} />
 
-            <Box flex={'50%'}>
-              <Heading size="md" as="h5">
-                Secret:
-              </Heading>
+          <Box flex={'50%'}>
+            <Heading size="md" as="h5">
+              Secret:
+            </Heading>
 
-              <InputGroup size="md">
-                <Input
-                  value={secret}
-                  onChange={handleChangeSecret}
-                  pr="4.5rem"
-                  type={show ? 'text' : 'password'}
-                />
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={handleClick}>
-                    {show ? 'Hide' : 'Show'}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </Box>
-          </SimpleGrid>
+            <InputGroup size="md">
+              <Input
+                value={secret}
+                onChange={handleChangeSecret}
+                pr="4.5rem"
+                type={show ? 'text' : 'password'}
+              />
+              <InputRightElement width="4.5rem">
+                <Button h="1.75rem" size="sm" onClick={handleClick}>
+                  {show ? 'Hide' : 'Show'}
+                </Button>
+              </InputRightElement>
+            </InputGroup>
+          </Box>
 
           <Stack
             direction={'row'}

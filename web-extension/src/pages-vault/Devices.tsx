@@ -1,9 +1,4 @@
-import {
-  ArrowForwardIcon,
-  ChevronDownIcon,
-  SettingsIcon,
-  StarIcon
-} from '@chakra-ui/icons'
+import { SettingsIcon } from '@chakra-ui/icons'
 import {
   Heading,
   Avatar,
@@ -11,27 +6,17 @@ import {
   Center,
   Text,
   Stack,
-  Button,
-  Link,
   Badge,
   useColorModeValue,
   Icon,
   IconButton,
   Flex,
   Input,
-  Popover,
-  PopoverArrow,
-  PopoverBody,
-  PopoverCloseButton,
-  PopoverContent,
-  PopoverFooter,
-  PopoverHeader,
-  PopoverTrigger,
-  Portal,
   Menu,
   MenuButton,
   MenuItem,
-  MenuList
+  MenuList,
+  Spinner
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
@@ -136,13 +121,19 @@ export default function Devices() {
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
-            {data?.me?.devices
-              ?.filter(({ name }) => {
-                return name.includes(filterBy)
-              })
-              .map((el, i) => {
-                return <ListItem {...el} key={i} />
-              })}
+            {loading ? (
+              <Center pt={5}>
+                <Spinner size="lg" />
+              </Center>
+            ) : (
+              data?.me?.devices
+                ?.filter(({ name }) => {
+                  return name.includes(filterBy)
+                })
+                .map((el, i) => {
+                  return <ListItem {...el} key={i} />
+                })
+            )}
           </Flex>
         </Flex>
       </Center>
