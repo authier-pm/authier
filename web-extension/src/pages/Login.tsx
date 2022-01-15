@@ -62,7 +62,7 @@ export default function Login(): ReactElement {
       </Flex>
 
       <Formik
-        initialValues={{ email: 'bob@bob.com', password: 'bob' }}
+        initialValues={{ email: '', password: '' }}
         onSubmit={async (
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
