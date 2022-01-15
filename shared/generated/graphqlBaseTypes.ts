@@ -171,8 +171,8 @@ export type EmailVerificationGqlScalars = {
   address: Scalars['ID']
   createdAt: Scalars['DateTime']
   kind: EmailVerificationType
-  updatedAt?: Maybe<Scalars['DateTime']>
   userId: Scalars['String']
+  verifiedAt?: Maybe<Scalars['DateTime']>
 }
 
 export enum EmailVerificationType {
@@ -540,6 +540,7 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int']
   masterDevice?: Maybe<DeviceGql>
   masterDeviceId?: Maybe<Scalars['String']>
+  primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   sendAuthMessage: Scalars['Boolean']
   settings: SettingsConfigGql
