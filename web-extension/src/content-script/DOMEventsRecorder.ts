@@ -15,8 +15,11 @@ const defaultSelectorBlacklist = ['[data-*']
 export function getSelectorForElement(target: HTMLInputElement) {
   let selector: CssSelectorMatch
   if (document.body.contains(target)) {
-    if (target.autocomplete) {
-      return `[autocomplete="${target.autocomplete}"]` // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
+    if (target.autocomplete && target.autocomplete !== 'off') {
+      const autocompleteSelector = `[autocomplete="${target.autocomplete}"]`
+      if (document.body.querySelectorAll(autocompleteSelector).length === 1) {
+        return autocompleteSelector // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
+      }
     }
 
     selector = getCssSelector(target, {
