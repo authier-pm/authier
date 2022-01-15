@@ -19,6 +19,7 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
       API_URL: 'http://localhost:5051/graphql'
+      // API_URL: 'http://api.authier.ml/graphql'
     })
   ],
   module: {

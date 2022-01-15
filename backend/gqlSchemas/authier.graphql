@@ -106,6 +106,7 @@ type DeviceGQL {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
+  platform: String
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -235,6 +236,7 @@ type DeviceQuery {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
+  platform: String
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -435,6 +437,7 @@ type DeviceMutation {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
+  platform: String
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -452,6 +455,7 @@ type DeviceMutation {
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
+  rename(name: String!): DeviceGQL!
 }
 
 type SecretUsageEventGQLScalars {
