@@ -84,4 +84,16 @@ export class DeviceMutation extends DeviceGQLScalars {
     })
     return res
   }
+
+  @Field(() => DeviceGQL)
+  async rename(@Ctx() ctx: IContext, @Arg('name') name: string) {
+    return ctx.prisma.device.update({
+      data: {
+        name
+      },
+      where: {
+        id: this.id
+      }
+    })
+  }
 }

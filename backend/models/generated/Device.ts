@@ -20,6 +20,9 @@ export class DeviceGQLScalars {
   @Field()
   name: string
 
+  @Field({ nullable: true })
+  platform?: string
+
   @Field()
   syncTOTP: boolean
 
