@@ -281,14 +281,6 @@ export class RootResolver {
     const { firebaseToken, deviceName, deviceId } = input
     const ipAddress = ctx.getIpAddress()
 
-    const deviceData = {
-      id: deviceId,
-      firstIpAddress: ipAddress,
-      lastIpAddress: ipAddress,
-      firebaseToken: firebaseToken,
-      name: deviceName,
-      userId: user.id
-    }
     let device = await ctx.prisma.device.findUnique({
       // TODO change this to create
       where: { id: deviceId }
@@ -304,7 +296,17 @@ export class RootResolver {
         where: { id: device.id }
       })
     } else {
-      device = await ctx.prisma.device.create({ data: deviceData })
+      device = await ctx.prisma.device.create({
+        data: {
+          id: deviceId,
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
+          firebaseToken: firebaseToken,
+          name: deviceName,
+          userId: user.id,
+          platform: 'chrome' // TODO add this to input
+        }
+      })
     }
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
