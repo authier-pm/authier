@@ -13,14 +13,14 @@ export const UserNavMenu: FunctionComponent = () => {
       </Center>
       <ButtonGroup spacing={4} variant="solid" m="10px">
         <Stack direction="column">
-          <Button
+          {/* <Button
             colorScheme="yellow"
             onClick={async () => {
               device.lock()
             }}
           >
             <Trans>Lock vault</Trans>
-          </Button>
+          </Button> */}
           <Button
             colorScheme="red"
             onClick={async () => {
