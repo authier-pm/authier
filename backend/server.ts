@@ -15,7 +15,7 @@ import {
   setNewRefreshToken
 } from './userAuth'
 import { verify } from 'jsonwebtoken'
-import chalk from 'chalk'
+
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
@@ -23,8 +23,8 @@ import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import debug from 'debug'
 
-import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
+import { getGitHash } from './utils/getGitHash'
 
 const { env } = process
 const log = debug('au:server')
@@ -33,7 +33,7 @@ const environment = env.NODE_ENV
 sentryInit({
   dsn: env.SENTRY_DSN,
   environment,
-  release: `<project-name>@${pkg.version}`
+  release: `<project-name>@${getGitHash()}`
 })
 
 async function main() {

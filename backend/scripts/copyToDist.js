@@ -2,7 +2,7 @@ const cpy = require('cpy')
 
 // tsc only produces js files, so we need to copy other filetypes
 ;(async () => {
-  const r = await cpy(
+  const c1 = await cpy(
     [
       '**/*.sql',
       '**/*.pem',
@@ -11,7 +11,10 @@ const cpy = require('cpy')
       '**/*.crt',
       '**/*.prisma',
       'captain-definition',
-      'Dockerfile'
+      'package.json',
+      'Dockerfile',
+      'node_modules/.prisma/client/**',
+      'node_modules/.bin/prisma' // needed for migrations
     ],
     './dist',
     {
@@ -20,7 +23,7 @@ const cpy = require('cpy')
     }
   )
 
-  await cpy(
+  const c2 = await cpy(
     ['../node_modules/mercurius/static/*'],
     './dist/node_modules/mercurius/static',
     {
@@ -28,7 +31,15 @@ const cpy = require('cpy')
     }
   )
 
-  console.log(`${r.length} files copied!`)
+  const c3 = await cpy(
+    ['../node_modules/prisma', '../node_modules/@prisma'],
+    './dist/node_modules',
+    {
+      parents: true
+    }
+  )
+
+  console.log(`${c1.length} | ${c2.length} | ${c3.length} files copied!`)
   // await Promise.all([moveFile('node_modules', '../dist/back-end/node_modules')])
 })()
 

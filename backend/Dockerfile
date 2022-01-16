@@ -4,13 +4,13 @@ RUN apk update && apk upgrade && \
     apk add --no-cache git
 WORKDIR /app 
 ENV NODE_ENV production
-RUN yarn add prisma@3.8.1 -g
+# RUN yarn add prisma@3.8.1 -g
 
 COPY . /app 
 # COPY ./yarn.lock /app
 
 # RUN yarn install --frozen-lockfile --non-interactive --ignore-optional --prefer-offline
-RUN npx prisma generate
+# RUN npx prisma generate
 
 # ENV DATABASE_URL "postgresql://authier:auth133r@localhost:5432/authier"
 ENV PORT 80
