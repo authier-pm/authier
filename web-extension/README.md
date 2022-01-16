@@ -97,3 +97,7 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 
 - strict: you never have your codes on another device other than your primary phone. One code only is sent to the device from your phone after every biometric verification.
 - lax: your codes are decrypted on your devices too. You can choose a timeout to lock the vault. When unlocked, all the OTP codes are filled effortlessly without the need for your primary phone.
+
+## Check output in dist
+
+since it is common to bump into a dependency which breaks webpack silently, it's best to check at least parsing on the webpack output. We can do this by `yarn checkBuildOutput`
