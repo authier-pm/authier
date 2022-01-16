@@ -1,6 +1,6 @@
 import debug from 'debug'
 import browser from 'webextension-polyfill'
-import Bowser from 'bowser'
+import bowser from 'bowser'
 import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import { removeToken } from '@src/util/accessTokenExtension'
@@ -44,7 +44,7 @@ function getRandomInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min) + min) //The maximum is exclusive and the minimum is inclusive
 }
 
-const browserInfo = Bowser.getParser(navigator.userAgent)
+const browserInfo = bowser.getParser(navigator.userAgent)
 export const isRunningInBgPage = location.href.includes(
   '_generated_background_page.html'
 )
@@ -365,9 +365,9 @@ class ExtensionDevice {
     }
     log('locking device')
 
-    const { email, userId, secrets } = this.state
+    const { email, userId, secrets, encryptionSalt } = this.state
 
-    this.lockedState = { email, userId, secrets }
+    this.lockedState = { email, userId, secrets, encryptionSalt }
     this.state = null
     this.rerenderViews()
   }

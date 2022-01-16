@@ -34,6 +34,7 @@ const inputKindMap = {
 
 export interface IInitStateRes {
   extensionDeviceReady: boolean
+  autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   webInputs: Array<{
     __typename?: 'WebInputGQL'
@@ -78,10 +79,14 @@ export async function initInputWatch() {
     return
   }
 
-  const { saveLoginModalsState, extensionDeviceReady, secretsForHost } =
-    stateInitRes
+  const {
+    saveLoginModalsState,
+    extensionDeviceReady,
+    secretsForHost,
+    autofillEnabled
+  } = stateInitRes
 
-  if (!extensionDeviceReady) {
+  if (!extensionDeviceReady || !autofillEnabled) {
     return // no need to do anything-user locked out
   }
   const unregAutofillListener = autofill(stateInitRes)
