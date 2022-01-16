@@ -101,7 +101,7 @@ export default function Login(): ReactElement {
             encryptionSalt
           )
 
-          const currentSecret = cryptoJS.AES.decrypt(
+          const currentAddDeviceSecret = cryptoJS.AES.decrypt(
             addDeviceSecretEncrypted,
             masterEncryptionKey,
             {
@@ -109,7 +109,7 @@ export default function Login(): ReactElement {
             }
           ).toString(cryptoJS.enc.Utf8)
 
-          if (!currentSecret) {
+          if (!currentAddDeviceSecret) {
             toast.error('wrong password or email')
             return
           }
@@ -128,7 +128,7 @@ export default function Login(): ReactElement {
                 decryptionChallengeId:
                   decryptionChallengeResponse.data.deviceDecryptionChallenge.id
               },
-              currentAddDeviceSecret: currentSecret
+              currentAddDeviceSecret
             }
           })
 
