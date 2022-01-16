@@ -10,6 +10,8 @@ import {
   FormControl,
   FormLabel,
   Grid,
+  IconButton,
+  Stack,
   Switch,
   useInterval
 } from '@chakra-ui/react'
@@ -18,6 +20,7 @@ import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { AddIcon } from '@chakra-ui/icons'
 
 export const Home: FunctionComponent = () => {
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
@@ -49,6 +52,14 @@ export const Home: FunctionComponent = () => {
             }}
           ></Switch>
         </FormControl>
+
+        <IconButton
+          mr={15}
+          colorScheme="blue"
+          aria-label="Add item"
+          icon={<AddIcon />}
+          rounded={'full'}
+        />
 
         {deviceState && TOTPSecrets.length > 0 && (
           <CircularProgress

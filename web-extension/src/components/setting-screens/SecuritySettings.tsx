@@ -15,8 +15,6 @@ import Select from 'react-select'
 import { useSecuritySettingsQuery } from './SecuritySettings.codegen'
 import { Trans } from '@lingui/macro'
 
-interface Props {}
-
 export const vaultLockTimeOptions = [
   { value: 0, label: 'On web close' },
   { value: 10000, label: '10 seconds' },
@@ -24,7 +22,7 @@ export const vaultLockTimeOptions = [
   { value: 432000000, label: '12 hours' }
 ]
 
-export const SecuritySettings = ({}: Props) => {
+export const SecuritySettings = () => {
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
   const { data, loading } = useSecuritySettingsQuery()
@@ -37,7 +35,7 @@ export const SecuritySettings = ({}: Props) => {
       <>
         <Formik
           enableReinitialize
-          // @ts-expect-error
+          // @ts-expect-error TODO: fix types
           initialValues={settings}
           onSubmit={async (
             values: ISecuritySettings,
@@ -67,7 +65,7 @@ export const SecuritySettings = ({}: Props) => {
                         (option) => option.value === field.value
                       )}
                       onChange={(option) =>
-                        //@ts-expect-error
+                        //@ts-expect-error TODO: fix types
                         form.setFieldValue(field.name, option.value)
                       }
                       onBlur={field.onBlur}
