@@ -26,7 +26,10 @@ import {
   SyncEncryptedSecretsQueryVariables,
   MarkAsSyncedMutation,
   MarkAsSyncedMutationVariables,
-  MarkAsSyncedDocument
+  MarkAsSyncedDocument,
+  LogoutDocument,
+  LogoutMutation,
+  LogoutMutationVariables
 } from './ExtensionDevice.codegen'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -102,6 +105,7 @@ export class DeviceState {
   }
 
   async save() {
+    log('saving device state', this)
     browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({ backgroundState: this })
     browser.storage.onChanged.addListener(this.onStorageChange)
@@ -369,6 +373,10 @@ class ExtensionDevice {
   }
 
   async logout() {
+    await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
+      mutation: LogoutDocument
+    })
+
     await removeToken()
     await device.clearLocalStorage()
 

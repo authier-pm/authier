@@ -8,6 +8,7 @@ import { device } from '@src/background/ExtensionDevice'
 import Login from '@src/pages/Login'
 import { Center } from '@chakra-ui/react'
 import Premium from './Premium'
+import Devices from './Devices'
 
 export function VaultRouter() {
   if (device.state === null) {
@@ -27,7 +28,7 @@ export function VaultRouter() {
         <Route
           path="/secret/:secretId"
           children={({ match }) => (
-            <VaultItemSettings secretId={match?.params.secretId} />
+            <VaultItemSettings secretId={match?.params.secretId as string} />
           )}
         />
         <Route path="/account-limits">
@@ -35,6 +36,9 @@ export function VaultRouter() {
         </Route>
         <Route path="/settings">
           <VaultSettings />
+        </Route>
+        <Route path="/devices">
+          <Devices />
         </Route>
       </Switch>
     </SidebarWithHeader>

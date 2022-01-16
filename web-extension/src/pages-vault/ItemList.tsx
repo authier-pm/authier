@@ -1,6 +1,6 @@
-import { Button, IconButton } from '@chakra-ui/button'
+import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, DeleteIcon } from '@chakra-ui/icons'
+import { UnlockIcon, SettingsIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -8,7 +8,6 @@ import {
   Text,
   Image,
   Input,
-  CloseButton,
   useDisclosure
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -17,7 +16,6 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import browser from 'webextension-polyfill'
 
@@ -27,7 +25,6 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
   const { deviceState } = useContext(DeviceStateContext)
 
-  console.log(data)
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
@@ -56,7 +53,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
             w="100%"
             h="full"
           >
-            {data.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
+            {data.url ? (
               <IconButton
                 aria-label="open item"
                 colorScheme="blackAlpha"
@@ -132,8 +129,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 }
 
 export const ItemList = () => {
-  const { deviceState, LoginCredentials, TOTPSecrets } =
-    useContext(DeviceStateContext)
+  const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
 
   return (
@@ -142,7 +138,6 @@ export const ItemList = () => {
         w={['300px', '350px', '400px', '500px']}
         placeholder={t`Search vault`}
         m="auto"
-        _focus={{ backgroundColor: 'white' }}
         onChange={(ev) => {
           setFilterBy(ev.target.value)
         }}
