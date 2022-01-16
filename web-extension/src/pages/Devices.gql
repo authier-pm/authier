@@ -2,9 +2,10 @@ query myDevices {
   me {
     devices {
       id
+      name
       firstIpAddress
       lastIpAddress
-      name
+      logoutAt
       lastGeoLocation
     }
   }

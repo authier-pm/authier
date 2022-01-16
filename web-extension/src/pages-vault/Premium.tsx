@@ -32,7 +32,7 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 
 export default function Premium() {
   return (
-    <Box py={12}>
+    <Box py={12} m="auto">
       <VStack spacing={2} textAlign="center">
         <Heading as="h1" fontSize="4xl">
           Plans that fit your need

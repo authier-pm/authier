@@ -23,7 +23,11 @@ import {
 import React, { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import {
+  ArrowForwardIcon,
+  ChevronDownIcon,
+  ChevronUpIcon
+} from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
@@ -31,6 +35,7 @@ import { useUpdateEncryptedSecretMutation } from './ItemSettings.codegen'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
+import { log } from 'debug'
 
 enum Value {
   'Tooweak' = 1,
@@ -39,31 +44,17 @@ enum Value {
   'Strong' = 4
 }
 
-const InputWithHeading = ({
-  defaultValue,
-  heading
-}: {
-  defaultValue: string
-  heading: string
-}) => {
-  return (
-    <Box flex={'50%'}>
-      <Heading size="md" as="h5">
-        {heading}
-      </Heading>
-      <Input defaultValue={defaultValue} />
-    </Box>
-  )
+interface totpValues {
+  secret: string
+  url: string
+  label: string
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const history = useHistory()
-  const [secret, setSecret] = useState<string>(data.totp)
+  const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
-  const handleChangeSecret = (event: any) => {
-    setSecret(event.target.value)
-  }
-  const handleClick = () => setShow(!show)
+
   return (
     <motion.div
       animate={{ opacity: 1 }}
@@ -71,7 +62,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
       exit={{ opacity: 0 }}
       transition={{ duration: 0.25 }}
     >
-      <Center
+      <Flex
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -82,46 +73,142 @@ const TOTPSecret = (data: ITOTPSecret) => {
         m="auto"
         bg={useColorModeValue('white', 'gray.900')}
       >
-        <Flex p={5} flexDirection="column" w="inherit">
-          <SimpleGrid row={2} columns={2} spacing="40px">
-            <InputWithHeading heading="URL:" defaultValue={data.url} />
-            <InputWithHeading heading="Label:" defaultValue={data.label} />
+        <Formik
+          initialValues={{
+            secret: data.totp,
+            url: data.url,
+            label: data.label
+          }}
+          onSubmit={async (
+            values: totpValues,
+            { setSubmitting }: FormikHelpers<totpValues>
+          ) => {
+            const secret = device.state?.secrets.find(
+              ({ id }) => id === data.id
+            )
 
-            <Box flex={'50%'}>
-              <Heading size="md" as="h5">
-                Secret:
-              </Heading>
+            if (secret && device.state) {
+              secret.encrypted = device.state.encrypt(data.totp)
+              secret.label = values.label
+              secret.url = values.url
 
-              <InputGroup size="md">
-                <Input
-                  value={secret}
-                  onChange={handleChangeSecret}
-                  pr="4.5rem"
-                  type={show ? 'text' : 'password'}
-                />
-                <InputRightElement width="4.5rem">
-                  <Button h="1.75rem" size="sm" onClick={handleClick}>
-                    {show ? 'Hide' : 'Show'}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-            </Box>
-          </SimpleGrid>
+              await updateSecret({
+                variables: {
+                  id: data.id,
+                  patch: {
+                    encrypted: secret.encrypted,
+                    label: values.label,
+                    url: values.url,
+                    kind: data.kind
+                  }
+                }
+              })
 
-          <Stack direction={'row'} justifyContent="flex-end" spacing={1} my={5}>
-            <Button
-              colorScheme="blackAlpha"
-              size="sm"
-              onClick={() => history.goBack()}
-            >
-              Go back
-            </Button>
-            <Button colorScheme="twitter" size="sm">
-              Save
-            </Button>
-          </Stack>
-        </Flex>
-      </Center>
+              await device.state?.save()
+              setSubmitting(false)
+            }
+          }}
+        >
+          {({ isSubmitting, dirty }) => (
+            <Flex as={Form} p={5} flexDirection="column" w="inherit">
+              <Field name="url">
+                {({ field, form }) => (
+                  <FormControl
+                    isInvalid={form.errors.name && form.touched.name}
+                  >
+                    <FormLabel htmlFor="url">URL:</FormLabel>
+
+                    <Input id="url" {...field} required />
+
+                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="label">
+                {({ field, form }) => (
+                  <FormControl
+                    isInvalid={form.errors.name && form.touched.name}
+                  >
+                    <FormLabel htmlFor="label">Label:</FormLabel>
+
+                    <Input id="label" {...field} required />
+
+                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="secret">
+                {({ field, form }) => (
+                  <FormControl
+                    isInvalid={form.errors.name && form.touched.name}
+                  >
+                    <FormLabel htmlFor="secret">Secret:</FormLabel>
+
+                    <InputGroup size="md">
+                      <Input
+                        id="secret"
+                        pr="4.5rem"
+                        type={show ? 'text' : 'password'}
+                        {...field}
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={() => setShow(!show)}
+                        >
+                          {show ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+
+                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Stack
+                direction={'row'}
+                justifyContent="flex-end"
+                spacing={1}
+                my={5}
+                alignItems={'baseline'}
+              >
+                <Button
+                  _focus={{
+                    bg: 'gray.200'
+                  }}
+                  fontSize={'sm'}
+                  size="sm"
+                  onClick={() => history.goBack()}
+                >
+                  Go back
+                </Button>
+                <Button
+                  disabled={isSubmitting || !dirty}
+                  isLoading={isSubmitting}
+                  type="submit"
+                  size={'sm'}
+                  fontSize={'sm'}
+                  bg={'blue.400'}
+                  color={'white'}
+                  boxShadow={
+                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                  }
+                  _hover={{
+                    bg: 'blue.500'
+                  }}
+                  _focus={{
+                    bg: 'blue.500'
+                  }}
+                  aria-label="Save"
+                >
+                  Save
+                </Button>
+              </Stack>
+            </Flex>
+          )}
+        </Formik>
+      </Flex>
     </motion.div>
   )
 }
@@ -181,12 +268,13 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                   password: values.password
                 })
               )
+              secret.url = values.url
+              secret.label = values.label
 
               await updateSecret({
                 variables: {
                   id: secretProps.id,
                   patch: {
-                    //Finish here the string
                     encrypted: secret.encrypted,
                     label: values.label,
                     url: values.url,
@@ -200,12 +288,12 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             }
           }}
         >
-          {({ values, setSubmitting }) => {
+          {({ values, isSubmitting, dirty }) => {
             const levelOfPsw = passwordStrength(values.password)
               .value.split(' ')
               .join('')
             return (
-              <Flex p={5} as={Form} flexDirection="column" w="inherit">
+              <Flex as={Form} p={5} flexDirection="column" w="inherit">
                 <Field name="url">
                   {({ field, form }) => (
                     <FormControl
@@ -289,22 +377,36 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                   justifyContent="flex-end"
                   spacing={1}
                   my={5}
+                  alignItems={'baseline'}
                 >
                   <Button
-                    colorScheme="blackAlpha"
+                    _focus={{
+                      bg: 'gray.200'
+                    }}
+                    fontSize={'sm'}
                     size="sm"
                     onClick={() => history.goBack()}
-                    type="button"
                   >
                     Go back
                   </Button>
                   <Button
-                    colorScheme="twitter"
-                    size="sm"
+                    disabled={isSubmitting || !dirty}
+                    isLoading={isSubmitting}
                     type="submit"
-                    onClick={async () => {
-                      setSubmitting(true)
+                    size={'sm'}
+                    fontSize={'sm'}
+                    bg={'blue.400'}
+                    color={'white'}
+                    boxShadow={
+                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                    }
+                    _hover={{
+                      bg: 'blue.500'
                     }}
+                    _focus={{
+                      bg: 'blue.500'
+                    }}
+                    aria-label="Save"
                   >
                     Save
                   </Button>

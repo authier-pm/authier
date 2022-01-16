@@ -45,7 +45,7 @@ model Device {
   firebaseToken            String
   name                     String
   platform                 String?
-  syncTOTP                 Boolean   @default(true)
+  syncTOTP                 Boolean   @default(true) //2FA
   ipAddressLock            Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   vaultLockTimeoutSeconds  Int?
   logoutAt                 DateTime?
