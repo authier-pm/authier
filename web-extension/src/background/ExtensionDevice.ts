@@ -234,7 +234,7 @@ export class DeviceState {
     return secretAdded
   }
 
-  onDestroy() {
+  destroy() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
   }
 }
@@ -264,8 +264,9 @@ class ExtensionDevice {
     if (storage.backgroundState) {
       storedState = storage.backgroundState
       log('device state init from storage', storedState)
-    } else {
-      log('device state not found in storage')
+    } else if (storage.lockedState) {
+      this.lockedState = storage.lockedState
+      log('device state locked', this.lockedState)
     }
 
     if (storedState) {
@@ -312,7 +313,7 @@ class ExtensionDevice {
 
   async clearLocalStorage() {
     const deviceId = await this.getDeviceId()
-    this.state?.onDestroy()
+    this.state?.destroy()
     await browser.storage.local.clear()
     this.state = null
 
@@ -368,7 +369,15 @@ class ExtensionDevice {
     const { email, userId, secrets, encryptionSalt } = this.state
 
     this.lockedState = { email, userId, secrets, encryptionSalt }
+    await browser.storage.local.set({
+      deviceId: this.getDeviceId(),
+      lockedState: this.lockedState,
+      backgroundState: null
+    }) // restore deviceId so that we keep it even after logout
+    this.state.destroy()
+
     this.state = null
+
     this.rerenderViews()
   }
 

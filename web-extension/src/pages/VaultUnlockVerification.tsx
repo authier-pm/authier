@@ -15,12 +15,12 @@ import { UserContext } from '@src/providers/UserProvider'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import cryptoJS from 'crypto-js'
-import browser from 'webextension-polyfill'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
+import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 
 interface Values {
   password: string
@@ -48,8 +48,15 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            // loginUser([])
-
+            const masterEncryptionKey = generateEncryptionKey(
+              values.password,
+              device.lockedState.encryptionSalt
+            )
+            device.state = new DeviceState({
+              masterEncryptionKey,
+              ...device.lockedState
+            })
+            device.state.save()
             setSubmitting(false)
           } catch (err) {
             console.log(err)
