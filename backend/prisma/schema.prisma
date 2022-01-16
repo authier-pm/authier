@@ -90,8 +90,8 @@ model EncryptedSecret {
   updatedAt DateTime?           @updatedAt
   deletedAt DateTime?
 
-  // TODO move to encrypted
-  url        String? // should always be location.hostname, we autofill inputs based on WebInput where we store the path too
+  // TODO move these 5 fields to encrypted
+  url        String? // TODO should always be location.hostname, we autofill inputs based on WebInput where we store the path too
   androidUri String?
   iosUri     String?
   iconUrl    String?

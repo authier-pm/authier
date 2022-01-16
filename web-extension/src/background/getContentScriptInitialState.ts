@@ -22,6 +22,7 @@ export const getContentScriptInitialState = async (
 
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
+    autofillEnabled: true, // TODO
     webInputs: res.data.webInputs,
     secretsForHost: {
       // @ts-expect-error

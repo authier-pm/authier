@@ -34,12 +34,12 @@ export interface IBackgroundStateSerializableLocked {
   email: string
   userId: string
   secrets: Array<SecretSerializedType>
+  encryptionSalt: string
 }
 
 export interface IBackgroundStateSerializable
   extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
-  encryptionSalt: string
 }
 
 export const lockTime = 10000 * 60 * 60 * 8
