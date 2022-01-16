@@ -373,12 +373,12 @@ class ExtensionDevice {
   }
 
   async logout() {
-    await removeToken()
-    await device.clearLocalStorage()
-
     await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
       mutation: LogoutDocument
     })
+
+    await removeToken()
+    await device.clearLocalStorage()
 
     // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
     // this.listenForUserLogin()
