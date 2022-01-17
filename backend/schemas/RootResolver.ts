@@ -27,6 +27,7 @@ import { WebInputElement } from '../models/WebInputElement'
 import {
   GraphQLEmailAddress,
   GraphQLNonEmptyString,
+  GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
 import debug from 'debug'
@@ -382,37 +383,38 @@ export class RootResolver {
     return null
   }
 
-  @UseMiddleware(throwIfNotAuthenticated)
-  @Mutation(() => Boolean, {
+  @Mutation(() => GraphQLPositiveInt, {
     nullable: true,
-    description: 'removes current device'
+    description:
+      'removes current device. Returns null if user is not authenticated'
   })
   async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
-    if (ctx.jwtPayload) {
-      const user = await ctx.prisma.user.update({
-        data: {
-          tokenVersion: {
-            increment: 1
-          },
-          Devices: {
-            update: {
-              where: {
-                id: ctx.jwtPayload.deviceId
-              },
-              data: {
-                logoutAt: new Date()
-              }
+    if (!ctx.jwtPayload) {
+      return null
+    }
+    const user = await ctx.prisma.user.update({
+      data: {
+        tokenVersion: {
+          increment: 1
+        },
+        Devices: {
+          update: {
+            where: {
+              id: ctx.jwtPayload.deviceId
+            },
+            data: {
+              logoutAt: new Date()
             }
           }
-        },
-        where: {
-          id: ctx.jwtPayload.userId
         }
-      })
-      return user.tokenVersion
-    }
+      },
+      where: {
+        id: ctx.jwtPayload.userId
+      }
+    })
+    return user.tokenVersion
   }
 
   @Query(() => [WebInputGQL])

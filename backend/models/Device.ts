@@ -5,21 +5,25 @@ import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 import { request } from 'undici'
-import mem from 'mem'
+import { decorator as mem } from 'mem'
 import ms from 'ms'
 
-const getIpGeoLocation = mem(
-  async (ipAddress: string) => {
+@ObjectType()
+export class DeviceQuery extends DeviceGQL {
+  @mem({ maxAge: ms('2 days') })
+  async getIpGeoLocation(ipAddress: string) {
+    if (ipAddress === '127.0.0.1') {
+      return {
+        city: 'Brno',
+        country: 'Czech Republic'
+      }
+    }
     const res = await request(
       `https://api.freegeoip.app/json/${ipAddress}apikey=${process.env.FREE_GEOIP_API_KEY}`
     )
     return await res.body.json()
-  },
-  { maxAge: ms('2 days') }
-)
+  }
 
-@ObjectType()
-export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery])
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
@@ -43,7 +47,7 @@ export class DeviceQuery extends DeviceGQL {
 
   @Field(() => String)
   async lastGeoLocation() {
-    const geoIp = await getIpGeoLocation(this.lastIpAddress)
+    const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
     return geoIp.city + ', ' + geoIp.country_name
   }
 }

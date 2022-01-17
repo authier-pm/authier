@@ -4,6 +4,7 @@ import { Button, ButtonGroup, Center, Heading, Stack } from '@chakra-ui/react'
 
 import { Trans } from '@lingui/macro'
 import { device } from '@src/background/ExtensionDevice'
+import { toast } from 'react-toastify'
 
 export const UserNavMenu: FunctionComponent = () => {
   return (

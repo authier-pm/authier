@@ -36,6 +36,8 @@ import {
   useDeviceDecryptionChallengeMutation
 } from '../../../shared/Login.codegen'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import browser from 'webextension-polyfill'
+
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -101,7 +103,7 @@ export default function Login(): ReactElement {
             encryptionSalt
           )
 
-          const currentSecret = cryptoJS.AES.decrypt(
+          const currentAddDeviceSecret = cryptoJS.AES.decrypt(
             addDeviceSecretEncrypted,
             masterEncryptionKey,
             {
@@ -109,7 +111,7 @@ export default function Login(): ReactElement {
             }
           ).toString(cryptoJS.enc.Utf8)
 
-          if (!currentSecret) {
+          if (!currentAddDeviceSecret) {
             toast.error('wrong password or email')
             return
           }
@@ -128,8 +130,13 @@ export default function Login(): ReactElement {
                 decryptionChallengeId:
                   decryptionChallengeResponse.data.deviceDecryptionChallenge.id
               },
-              currentAddDeviceSecret: currentSecret
+              currentAddDeviceSecret
             }
+          })
+
+          await browser.storage.local.set({
+            addDeviceSecretEncrypted,
+            currentAddDeviceSecret
           })
 
           const addNewDeviceForUser = response.data?.addNewDeviceForUser
