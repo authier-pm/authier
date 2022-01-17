@@ -12,15 +12,16 @@ import {
   Center
 } from '@chakra-ui/react'
 import { UserContext } from '@src/providers/UserProvider'
+import browser from 'webextension-polyfill'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
+import cryptoJS from 'crypto-js'
 
 interface Values {
   password: string
@@ -29,9 +30,8 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { deviceState } = useContext(DeviceStateContext)
-
-  if (!deviceState) {
+  const { lockedState } = device
+  if (!lockedState) {
     return null
   }
 
@@ -42,7 +42,7 @@ export function VaultUnlockVerification() {
       </Center>
 
       <Formik
-        initialValues={{ password: 'bob' }}
+        initialValues={{ password: '' }}
         onSubmit={async (
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
@@ -50,18 +50,33 @@ export function VaultUnlockVerification() {
           try {
             const masterEncryptionKey = generateEncryptionKey(
               values.password,
-              device.lockedState.encryptionSalt
+              lockedState.encryptionSalt
             )
+            const storage = await browser.storage.local.get()
+
+            const currentAddDeviceSecret = cryptoJS.AES.decrypt(
+              storage.addDeviceSecretEncrypted,
+              masterEncryptionKey,
+              {
+                iv: cryptoJS.enc.Utf8.parse(lockedState.userId)
+              }
+            ).toString(cryptoJS.enc.Utf8)
+
+            if (currentAddDeviceSecret !== storage.currentAddDeviceSecret) {
+              throw new Error(t`Incorrect password`)
+            }
+
             device.state = new DeviceState({
               masterEncryptionKey,
-              ...device.lockedState
+              ...lockedState
             })
-            device.state.save()
+            await device.state.save()
+            device.rerenderViews()
             setSubmitting(false)
-          } catch (err) {
+          } catch (err: any) {
             console.log(err)
 
-            toast.error(t`Wrong password`)
+            toast.error(err.message)
           }
         }}
       >
@@ -79,7 +94,6 @@ export function VaultUnlockVerification() {
                     <Input
                       {...field}
                       type={showPassword ? 'text' : 'password'}
-                      placeholder="*******"
                     />
                     <InputRightElement width="3rem">
                       <Button
@@ -98,6 +112,7 @@ export function VaultUnlockVerification() {
             <Button
               colorScheme="teal"
               variant="outline"
+              isDisabled={props.values.password.length < 3}
               type="submit"
               width="full"
               mt={4}
