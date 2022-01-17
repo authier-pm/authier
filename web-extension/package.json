@@ -5,6 +5,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "prodbuild": "API_URL=https://api.authier.ml/graphql webpack --config webpack.prod.js",
+    "checkBuildOutput": "node ./check-es6.js",
     "dev": "webpack -w --config webpack.dev.js",
     "tsc": "tsc",
     "test": "echo",
@@ -34,6 +35,7 @@
     "@types/react-dom": "^17.0.9",
     "@types/react-test-renderer": "^17.0.1",
     "@types/webextension-polyfill": "^0.8.0",
+    "acorn": "^8.7.0",
     "babel-core": "^6.26.3",
     "babel-jest": "^27.2.2",
     "babel-loader": "^8.2.2",
@@ -41,7 +43,7 @@
     "css-loader": "^6.3.0",
     "date-fns": "^2.25.0",
     "debug": "^4.3.2",
-    "firebase": "9.1.0",
+    "firebase": "9.6.3",
     "gqlSchemas": "file:../backend/schemas",
     "jest": "^27.2.2",
     "jest-css-modules": "^2.1.0",
@@ -65,7 +67,7 @@
     "ts-node-dev": "^1.1.8",
     "type-graphql": "^1.1.1",
     "typescript": "^4.5.4",
-    "webpack": "^5.65.0",
+    "webpack": "^5.66.0",
     "webpack-cli": "^4.8.0",
     "webpack-merge": "^5.8.0",
     "zod": "^3.11.6"

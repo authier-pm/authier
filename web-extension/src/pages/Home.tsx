@@ -1,8 +1,5 @@
 import React, { FunctionComponent, useContext, useState } from 'react'
 
-// var str2ab = require('string-to-arraybuffer')
-// var ab2str = require('arraybuffer-to-string')
-
 import {
   Box,
   CircularProgress,
@@ -34,10 +31,11 @@ export const Home: FunctionComponent = () => {
 
   const [filterByTLDManual, setFilterByTLD] = useState<null | boolean>(null) // when in vault or browser config, show all: ;
 
-  const filterByTLD =
-    filterByTLDManual === null
-      ? currentURL.startsWith('http')
-      : filterByTLDManual
+  const filterByTLD = !currentURL
+    ? true
+    : filterByTLDManual === null
+    ? currentURL.startsWith('http')
+    : filterByTLDManual
   return (
     <>
       <Flex position="sticky" align="center" pl={4} pr={4} mt={3}>

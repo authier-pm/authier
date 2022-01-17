@@ -9,6 +9,7 @@
     "Chakra",
     "codegen",
     "cooldown",
+    "deauthorize",
     "deauthorized",
     "Deduplication",
     "esbuild",
