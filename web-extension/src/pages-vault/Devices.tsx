@@ -24,10 +24,12 @@ import {
   Select,
   Button
 } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
+import { NbSp } from '@src/components/util/NbSp'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useState } from 'react'
+import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
 
 interface configValues {
@@ -93,13 +95,23 @@ const ListItem = (item: {
                 icon={<SettingsIcon color="ButtonShadow" />}
               />
               <MenuList>
-                <MenuItem>Deauth</MenuItem>
-
-                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
-                  Config
+                <MenuItem>
+                  <FiLogOut></FiLogOut>
+                  <NbSp />
+                  <Trans>Deauthorize</Trans>
                 </MenuItem>
 
-                <MenuItem>Remove</MenuItem>
+                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
+                  <FiSettings />
+                  <NbSp />
+                  <Trans>Config</Trans>
+                </MenuItem>
+
+                <MenuItem>
+                  <FiTrash />
+                  <NbSp />
+                  <Trans>Remove</Trans>
+                </MenuItem>
               </MenuList>
             </Menu>
           </Stack>

@@ -36,6 +36,8 @@ import {
   useDeviceDecryptionChallengeMutation
 } from '../../../shared/Login.codegen'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import browser from 'webextension-polyfill'
+
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
 interface Values {
@@ -130,6 +132,11 @@ export default function Login(): ReactElement {
               },
               currentAddDeviceSecret
             }
+          })
+
+          await browser.storage.local.set({
+            addDeviceSecretEncrypted,
+            currentAddDeviceSecret
           })
 
           const addNewDeviceForUser = response.data?.addNewDeviceForUser

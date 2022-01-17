@@ -35,6 +35,7 @@ import {
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import { toast } from 'react-toastify'
 
 export const log = debug('au:Device')
 
@@ -105,9 +106,14 @@ export class DeviceState {
   }
 
   async save() {
+    device.lockedState = null
     log('saving device state', this)
+
     browser.storage.onChanged.removeListener(this.onStorageChange)
-    await browser.storage.local.set({ backgroundState: this })
+    await browser.storage.local.set({
+      backgroundState: this,
+      lockedState: null
+    })
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
 
@@ -242,7 +248,7 @@ export class DeviceState {
 class ExtensionDevice {
   state: DeviceState | null = null
   fireToken: string | null = null
-  lockedState: IBackgroundStateSerializableLocked
+  lockedState: IBackgroundStateSerializableLocked | null = null
 
   /**
    * runs on startup
@@ -326,7 +332,7 @@ class ExtensionDevice {
     const storage = await browser.storage.local.get('deviceId')
     if (!storage.deviceId) {
       const deviceId = crypto.randomUUID()
-      browser.storage.local.set({ deviceId: deviceId })
+      await browser.storage.local.set({ deviceId: deviceId })
       log('deviceId', deviceId)
       return deviceId
     } else {
@@ -370,7 +376,6 @@ class ExtensionDevice {
 
     this.lockedState = { email, userId, secrets, encryptionSalt }
     await browser.storage.local.set({
-      deviceId: this.getDeviceId(),
       lockedState: this.lockedState,
       backgroundState: null
     }) // restore deviceId so that we keep it even after logout
@@ -382,16 +387,32 @@ class ExtensionDevice {
   }
 
   async logout() {
-    await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
-      mutation: LogoutDocument
-    })
+    async function clearAndReload() {
+      await removeToken()
+      await device.clearLocalStorage()
 
-    await removeToken()
-    await device.clearLocalStorage()
+      // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+      // this.listenForUserLogin()
+      browser.runtime.reload()
+    }
 
-    // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-    // this.listenForUserLogin()
-    browser.runtime.reload()
+    try {
+      await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
+        mutation: LogoutDocument
+      })
+    } catch (err: any) {
+      toast.error(
+        `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
+        {
+          autoClose: false,
+          onClose: () => {
+            clearAndReload()
+          }
+        }
+      )
+    } finally {
+      await clearAndReload()
+    }
   }
 
   serializeSecrets(
