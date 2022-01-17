@@ -19,7 +19,7 @@ module.exports = {
     }),
     new webpack.EnvironmentPlugin({
       API_URL: 'http://localhost:5051/graphql'
-      // API_URL: 'http://api.authier.ml/graphql'
+      // API_URL: 'https://api.authier.ml/graphql'
     })
   ],
   module: {
@@ -44,6 +44,7 @@ module.exports = {
           }
         }
       },
+
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
