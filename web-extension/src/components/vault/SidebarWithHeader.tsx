@@ -31,7 +31,8 @@ import {
   FiMenu,
   FiChevronDown,
   FiMoon,
-  FiHardDrive
+  FiHardDrive,
+  FiDisc
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { ReactText } from 'react'
@@ -39,17 +40,31 @@ import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
+import { t, Trans } from '@lingui/macro'
 
 interface LinkItemProps {
-  name: string
+  title: JSX.Element
   icon: IconType
   path: string
 }
 const LinkItems: Array<LinkItemProps> = [
-  { name: 'Vault', icon: FiHome, path: '/' },
-  { name: 'Settings', icon: FiSettings, path: '/settings/account' },
-  { name: 'Account Limits', icon: FiStar, path: '/account-limits' },
-  { name: 'Devices', icon: FiHardDrive, path: '/devices' }
+  { title: <Trans>Vault</Trans>, icon: FiHome, path: '/' },
+  {
+    title: <Trans>Settings</Trans>,
+    icon: FiSettings,
+    path: '/settings/account'
+  },
+  {
+    title: <Trans>Account Limits</Trans>,
+    icon: FiStar,
+    path: '/account-limits'
+  },
+  { title: <Trans>Devices</Trans>, icon: FiHardDrive, path: '/devices' },
+  {
+    title: <Trans>Import & Export</Trans>,
+    icon: FiDisc,
+    path: '/import-export'
+  }
 ]
 
 export default function SidebarWithHeader({
@@ -112,9 +127,9 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
         <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
       </Flex>
       <Flex flexDirection="column" height="100%">
-        {LinkItems.map((link) => (
-          <NavItem key={link.name} icon={link.icon} path={link.path}>
-            {link.name}
+        {LinkItems.map((link, i) => (
+          <NavItem key={i} icon={link.icon} path={link.path}>
+            {link.title}
           </NavItem>
         ))}
         <IconButton
@@ -190,7 +205,7 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType
   path: string
-  children: ReactText
+  children: ReactText | JSX.Element
 }
 const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
   return (

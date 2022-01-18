@@ -9,6 +9,7 @@ import Login from '@src/pages/Login'
 import { Center } from '@chakra-ui/react'
 import Premium from './Premium'
 import Devices from './Devices'
+import { VaultImportExport } from './VaultImportExport'
 
 export function VaultRouter() {
   if (device.state === null) {
@@ -39,6 +40,9 @@ export function VaultRouter() {
         </Route>
         <Route path="/devices">
           <Devices />
+        </Route>
+        <Route path="/import-export">
+          <VaultImportExport />
         </Route>
       </Switch>
     </SidebarWithHeader>
