@@ -27,6 +27,7 @@ export interface ISecret {
   iconUrl: string | undefined | null
   url: string
   lastUsed?: Date | null
+  kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
   totp: string
