@@ -7,6 +7,9 @@ import {
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
 import React from 'react'
 import papaparse from 'papaparse'
+import { device } from '@src/background/ExtensionDevice'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { toast } from 'react-toastify'
 
 const mapCsvToLoginCredentials = (csv: string[][]) => {
   const [header] = csv
@@ -45,9 +48,30 @@ export const VaultImportExport: React.FC<{}> = () => {
           <ImportFromFile
             onFileAccepted={(file) => {
               papaparse.parse(file, {
-                complete: (results) => {
+                complete: async (results) => {
+                  if (!results.data) {
+                    toast.error('failed to parse')
+                  }
                   const mapped = mapCsvToLoginCredentials(results.data)
                   // TODO add to device state
+                  const state = device.state
+
+                  for (const creds of mapped) {
+                    await state?.addSecret({
+                      kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+                      loginCredentials: creds.loginCredential,
+                      encrypted: state.encrypt(
+                        JSON.stringify(creds.loginCredential)
+                      ),
+                      iconUrl: null,
+                      url: creds.url,
+                      label:
+                        creds.label ??
+                        `${creds.loginCredential.username}@${
+                          new URL(creds.url).hostname
+                        }`
+                    })
+                  }
                   setIsCompleted(true)
                 }
               })
