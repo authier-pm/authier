@@ -3,13 +3,13 @@ import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-import browser from 'webextension-polyfill'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraCustomTheme'
 import { toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
 
 const log = debug('au:autofill')
 
@@ -68,8 +68,11 @@ export const autofill = (initState: IInitStateRes) => {
               namePassSecret.loginCredentials.password
             )
           } else if (
-            webInputGql.kind === WebInputType.USERNAME ||
-            webInputGql.kind === WebInputType.USERNAME_OR_EMAIL
+            [
+              WebInputType.EMAIL,
+              WebInputType.USERNAME,
+              WebInputType.USERNAME_OR_EMAIL
+            ].includes(webInputGql.kind)
           ) {
             return autofillValueIntoInput(
               inputEl,
@@ -83,6 +86,7 @@ export const autofill = (initState: IInitStateRes) => {
           }
         }
       })
+      .filter((el) => !!el)
 
     if (filledElements.length === 2) {
       log('filled both')
@@ -100,11 +104,13 @@ export const autofill = (initState: IInitStateRes) => {
           bubbles: true,
           cancelable: true
         })
-        // @ts-expect-error
-        form.submit.dispatchEvent(clickEvent)
+        if (form.submit instanceof HTMLElement) {
+          // @ts-expect-error
+          form.submit.dispatchEvent(clickEvent)
+        }
         // TODO show notification
 
-        toast.success('Autofilled form')
+        toast.success('Submitted autofilled form')
       }
     }
   }
