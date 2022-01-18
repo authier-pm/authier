@@ -9,6 +9,7 @@ import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdRefreshCircle, IoMdArchive } from 'react-icons/io'
 import { device } from '@src/background/ExtensionDevice'
 import { toast } from 'react-toastify'
+import { t, Trans } from '@lingui/macro'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -52,7 +53,7 @@ export const NavBar: FunctionComponent = () => {
         fontSize="16px"
         borderBottom="1px"
         borderBottomColor="gray.300"
-        width="330px"
+        width="100%"
       >
         <Box mr="auto">
           {isNavMenuOpen ? (
@@ -75,7 +76,10 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           )}
-          <Tooltip label="Refresh" aria-label="A tooltip">
+          <Tooltip
+            label={<Trans>Synchronize vault</Trans>}
+            aria-label={t`Synchronize vault`}
+          >
             <IconButton
               size="md"
               ml="2"
@@ -90,7 +94,7 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           </Tooltip>
-          <Tooltip label="Open vault" aria-label="A tooltip">
+          <Tooltip label={t`Open vault`} aria-label={t`Open vault`}>
             <IconButton
               size="md"
               ml="2"

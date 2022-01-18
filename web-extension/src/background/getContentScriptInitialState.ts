@@ -10,13 +10,15 @@ import {
 import { device } from './ExtensionDevice'
 import mem from 'mem'
 import ms from 'ms'
+import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
   currentTabId: number
 ): Promise<IInitStateRes> => {
   const hostname = new URL(tabUrl).hostname
-  const decrypted = device.state?.getSecretsDecryptedByHostname(hostname ?? [])
+  const decrypted =
+    device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
 
@@ -25,14 +27,12 @@ export const getContentScriptInitialState = async (
     autofillEnabled: true, // TODO
     webInputs: res.data.webInputs,
     secretsForHost: {
-      // @ts-expect-error
       loginCredentials: decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-      ),
-      // @ts-expect-error
+      ) as ILoginSecret[],
       totpSecrets: decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.TOTP
-      )
+      ) as ITOTPSecret[]
     },
     saveLoginModalsState: currentTabId
       ? saveLoginModalsStates.get(currentTabId)
