@@ -16,7 +16,8 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton
+  IconButton,
+  Image
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
@@ -45,7 +46,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   }, [otpCode])
 
   return (
-    <Box boxShadow="2xl" p="4" rounded="md" bg="white">
+    <Box boxShadow="xl" p="4" rounded="md" bg="white" m={2}>
       <Stat>
         <Flex justify="flex-start" align="center">
           <Flex flexDirection="column">
@@ -62,7 +63,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
               onClick={() => setIsOpen(true)}
             />
 
-            <Avatar src={totpData.iconUrl as string} size="sm"></Avatar>
+            <Image src={totpData.iconUrl as string} boxSize="30px"></Image>
           </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{totpData.label}</StatLabel>
@@ -99,7 +100,8 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
             <Button
               size="md"
               ml={2}
-              variant="outline"
+              variant="solid"
+              colorScheme={'cyan'}
               onClick={() => {
                 onCopy()
 
@@ -123,45 +125,50 @@ const LoginCredentialsListItem = ({
   const { onCopy } = useClipboard(loginSecret.loginCredentials.password)
 
   return (
-    <Flex key={loginSecret.url} p="3" rounded="md" bg="white" minW="300px">
-      <Stat maxW="100%">
-        <Flex justify="space-between" align="center" w="100%">
-          <Flex flexDirection="column">
-            <Avatar src={loginSecret.iconUrl as string} size="xs"></Avatar>
-          </Flex>
-          <Box ml={2} mr="auto" maxW="200px">
-            <Heading
-              size="sm"
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-              overflow="hidden"
-            >
-              {loginSecret.label}
-            </Heading>
-            <Text fontSize="sm" whiteSpace="nowrap">
-              {loginSecret.loginCredentials.username.replace(
-                /http:\/\/|https:\/\//,
-                ''
-              )}
-            </Text>
-          </Box>
+    <Box boxShadow="xl" m={2}>
+      <Flex key={loginSecret.url} p="3" rounded="md" bg="gray.100" minW="300px">
+        <Stat maxW="100%">
+          <Flex justify="space-between" align="center" w="100%">
+            <Flex flexDirection="column">
+              <Image src={loginSecret.iconUrl as string} boxSize="30px"></Image>
+            </Flex>
+            <Box ml={2} mr="auto" maxW="200px">
+              <Heading
+                size="sm"
+                whiteSpace="nowrap"
+                textOverflow="ellipsis"
+                overflow="hidden"
+              >
+                {loginSecret.label}
+              </Heading>
+              <Text fontSize="sm" whiteSpace="nowrap">
+                {loginSecret.loginCredentials.username.replace(
+                  /http:\/\/|https:\/\//,
+                  ''
+                )}
+              </Text>
+            </Box>
 
-          <Tooltip label={t`Copy password`}>
-            <Button
-              size="md"
-              ml="auto"
-              variant="outline"
-              onClick={() => {
-                onCopy()
-                // TODO log usage of this token to backend
-              }}
-            >
-              <CopyIcon></CopyIcon>
-            </Button>
-          </Tooltip>
-        </Flex>
-      </Stat>
-    </Flex>
+            <Tooltip label={t`Copy password`}>
+              <Button
+                size="md"
+                ml="auto"
+                boxShadow="md"
+                variant="solid"
+                color={'green.700'}
+                bgColor={'green.200'}
+                onClick={() => {
+                  onCopy()
+                  // TODO log usage of this token to backend
+                }}
+              >
+                <CopyIcon></CopyIcon>
+              </Button>
+            </Tooltip>
+          </Flex>
+        </Stat>
+      </Flex>
+    </Box>
   )
 }
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
@@ -188,7 +195,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   const hasNoSecrets = deviceState.secrets.length === 0
   return (
     <>
-      <Flex overflow="auto" overflowX="hidden" flexDirection="column">
+      <Flex flexDirection="column">
         {hasNoSecrets === false &&
           filterByTLD &&
           TOTPForCurrentDomain.length === 0 &&
