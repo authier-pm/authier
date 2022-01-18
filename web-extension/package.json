@@ -29,7 +29,6 @@
     "@types/crypto-js": "^4.0.2",
     "@types/debug": "^4.1.7",
     "@types/mz": "^2.7.4",
-    "@types/node": "^16.10.1",
     "@types/papaparse": "^5.2.6",
     "@types/react": "^17.0.24",
     "@types/react-dom": "^17.0.9",
