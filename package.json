@@ -9,12 +9,25 @@
     "Jiri Spac <capajj@gmail.com>"
   ],
   "license": "AGPL-3.0-or-later",
-  "workspaces": [
+  "workspaces": {
+    "packages": [
     "web-extension",
     "backend",
     "frontend",
     "mobile-app"
-  ],
+      ],
+      "nohoist": [
+      "**/@react-native-async-storage/async-storage",
+      "**/react",
+      "**/react-dom",
+      "**/react-native",
+      "**/react-native/**",
+      "**/react-native-codegen",
+      "**/react-native-dev-menu",
+      "**/react-native-macos",
+      "**/react-native-windows"
+    ]
+    },
   "resolutions": {
     "graphql": "^15.8.0"
   },
