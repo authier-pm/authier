@@ -2,7 +2,7 @@
  * if you need to truncate inside your tests, just call this function. In regular tests, we only invoke this after all specs in current test file are done
  */
 export const truncateAllTables = async () => {
-  const prisma = (await import('../prismaClient')).prismaClient
+  const prisma = (await import('../prisma/prismaClient')).prismaClient
   const tableNames = await prisma.$queryRaw<
     Array<{ tablename: string }>
   >`SELECT tablename FROM pg_tables WHERE schemaname='public'`
