@@ -11,7 +11,7 @@ export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout?: boolean | null | undefined };
+export type LogoutMutation = { __typename?: 'Mutation', logout?: number | null | undefined };
 
 
 export const IsLoggedInDocument = gql`

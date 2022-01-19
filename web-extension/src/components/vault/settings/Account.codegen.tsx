@@ -1,76 +1,39 @@
-import * as Types from '../../../../../shared/generated/graphqlBaseTypes'
+import * as Types from '../../../../../shared/generated/graphqlBaseTypes';
 
-import { gql } from '@apollo/client'
-import * as Apollo from '@apollo/client'
-const defaultOptions = {}
+import { gql } from '@apollo/client';
+import * as Apollo from '@apollo/client';
+const defaultOptions =  {}
 export type ChangeMasterPasswordMutationVariables = Types.Exact<{
-  secrets:
-    | Array<Types.EncryptedSecretPatchInput>
-    | Types.EncryptedSecretPatchInput
-  addDeviceSecret: Types.Scalars['NonEmptyString']
-  addDeviceSecretEncrypted: Types.Scalars['NonEmptyString']
-  decryptionChallengeId: Types.Scalars['PositiveInt']
-}>
+  secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
+  addDeviceSecret: Types.Scalars['NonEmptyString'];
+  addDeviceSecretEncrypted: Types.Scalars['NonEmptyString'];
+  decryptionChallengeId: Types.Scalars['PositiveInt'];
+}>;
 
-export type ChangeMasterPasswordMutation = {
-  __typename?: 'Mutation'
-  me: { __typename?: 'UserMutation'; changeMasterPassword: number }
-}
 
-export type AccountQueryVariables = Types.Exact<{ [key: string]: never }>
+export type ChangeMasterPasswordMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', changeMasterPassword: number } };
 
-export type AccountQuery = {
-  __typename?: 'Query'
-  me?:
-    | {
-        __typename?: 'UserQuery'
-        id: string
-        deviceRecoveryCooldownMinutes: number
-        primaryEmailVerification?:
-          | {
-              __typename?: 'EmailVerificationGQLScalars'
-              createdAt: string
-              verifiedAt?: string | null | undefined
-            }
-          | null
-          | undefined
-      }
-    | null
-    | undefined
-}
+export type AccountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
-export type ResendEmailVerificationMutationVariables = Types.Exact<{
-  [key: string]: never
-}>
 
-export type ResendEmailVerificationMutation = {
-  __typename?: 'Mutation'
-  me: { __typename?: 'UserMutation'; sendEmailVerification: number }
-}
+export type AccountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null | undefined } | null | undefined } | null | undefined };
+
+export type ResendEmailVerificationMutationVariables = Types.Exact<{ [key: string]: never; }>;
+
+
+export type ResendEmailVerificationMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', sendEmailVerification: number } };
+
 
 export const ChangeMasterPasswordDocument = gql`
-  mutation changeMasterPassword(
-    $secrets: [EncryptedSecretPatchInput!]!
-    $addDeviceSecret: NonEmptyString!
-    $addDeviceSecretEncrypted: NonEmptyString!
-    $decryptionChallengeId: PositiveInt!
-  ) {
-    me {
-      changeMasterPassword(
-        input: {
-          secrets: $secrets
-          addDeviceSecret: $addDeviceSecret
-          addDeviceSecretEncrypted: $addDeviceSecretEncrypted
-          decryptionChallengeId: $decryptionChallengeId
-        }
-      )
-    }
+    mutation changeMasterPassword($secrets: [EncryptedSecretPatchInput!]!, $addDeviceSecret: NonEmptyString!, $addDeviceSecretEncrypted: NonEmptyString!, $decryptionChallengeId: PositiveInt!) {
+  me {
+    changeMasterPassword(
+      input: {secrets: $secrets, addDeviceSecret: $addDeviceSecret, addDeviceSecretEncrypted: $addDeviceSecretEncrypted, decryptionChallengeId: $decryptionChallengeId}
+    )
   }
-`
-export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<
-  ChangeMasterPasswordMutation,
-  ChangeMasterPasswordMutationVariables
->
+}
+    `;
+export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
 
 /**
  * __useChangeMasterPasswordMutation__
@@ -92,39 +55,25 @@ export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useChangeMasterPasswordMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ChangeMasterPasswordMutation,
-    ChangeMasterPasswordMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<
-    ChangeMasterPasswordMutation,
-    ChangeMasterPasswordMutationVariables
-  >(ChangeMasterPasswordDocument, options)
-}
-export type ChangeMasterPasswordMutationHookResult = ReturnType<
-  typeof useChangeMasterPasswordMutation
->
-export type ChangeMasterPasswordMutationResult =
-  Apollo.MutationResult<ChangeMasterPasswordMutation>
-export type ChangeMasterPasswordMutationOptions = Apollo.BaseMutationOptions<
-  ChangeMasterPasswordMutation,
-  ChangeMasterPasswordMutationVariables
->
-export const AccountDocument = gql`
-  query Account {
-    me {
-      id
-      deviceRecoveryCooldownMinutes
-      primaryEmailVerification {
-        createdAt
-        verifiedAt
+export function useChangeMasterPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>(ChangeMasterPasswordDocument, options);
       }
+export type ChangeMasterPasswordMutationHookResult = ReturnType<typeof useChangeMasterPasswordMutation>;
+export type ChangeMasterPasswordMutationResult = Apollo.MutationResult<ChangeMasterPasswordMutation>;
+export type ChangeMasterPasswordMutationOptions = Apollo.BaseMutationOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
+export const AccountDocument = gql`
+    query Account {
+  me {
+    id
+    deviceRecoveryCooldownMinutes
+    primaryEmailVerification {
+      createdAt
+      verifiedAt
     }
   }
-`
+}
+    `;
 
 /**
  * __useAccountQuery__
@@ -141,41 +90,25 @@ export const AccountDocument = gql`
  *   },
  * });
  */
-export function useAccountQuery(
-  baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    options
-  )
-}
-export function useAccountLazyQuery(
-  baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(
-    AccountDocument,
-    options
-  )
-}
-export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>
-export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>
-export type AccountQueryResult = Apollo.QueryResult<
-  AccountQuery,
-  AccountQueryVariables
->
+export function useAccountQuery(baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+      }
+export function useAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+        }
+export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
+export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
+export type AccountQueryResult = Apollo.QueryResult<AccountQuery, AccountQueryVariables>;
 export const ResendEmailVerificationDocument = gql`
-  mutation resendEmailVerification {
-    me {
-      sendEmailVerification
-    }
+    mutation resendEmailVerification {
+  me {
+    sendEmailVerification
   }
-`
-export type ResendEmailVerificationMutationFn = Apollo.MutationFunction<
-  ResendEmailVerificationMutation,
-  ResendEmailVerificationMutationVariables
->
+}
+    `;
+export type ResendEmailVerificationMutationFn = Apollo.MutationFunction<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>;
 
 /**
  * __useResendEmailVerificationMutation__
@@ -193,24 +126,10 @@ export type ResendEmailVerificationMutationFn = Apollo.MutationFunction<
  *   },
  * });
  */
-export function useResendEmailVerificationMutation(
-  baseOptions?: Apollo.MutationHookOptions<
-    ResendEmailVerificationMutation,
-    ResendEmailVerificationMutationVariables
-  >
-) {
-  const options = { ...defaultOptions, ...baseOptions }
-  return Apollo.useMutation<
-    ResendEmailVerificationMutation,
-    ResendEmailVerificationMutationVariables
-  >(ResendEmailVerificationDocument, options)
-}
-export type ResendEmailVerificationMutationHookResult = ReturnType<
-  typeof useResendEmailVerificationMutation
->
-export type ResendEmailVerificationMutationResult =
-  Apollo.MutationResult<ResendEmailVerificationMutation>
-export type ResendEmailVerificationMutationOptions = Apollo.BaseMutationOptions<
-  ResendEmailVerificationMutation,
-  ResendEmailVerificationMutationVariables
->
+export function useResendEmailVerificationMutation(baseOptions?: Apollo.MutationHookOptions<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>(ResendEmailVerificationDocument, options);
+      }
+export type ResendEmailVerificationMutationHookResult = ReturnType<typeof useResendEmailVerificationMutation>;
+export type ResendEmailVerificationMutationResult = Apollo.MutationResult<ResendEmailVerificationMutation>;
+export type ResendEmailVerificationMutationOptions = Apollo.BaseMutationOptions<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>;

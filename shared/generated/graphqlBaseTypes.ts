@@ -105,6 +105,7 @@ export type DeviceGql = {
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
+  platform?: Maybe<Scalars['String']>
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
   syncTOTP: Scalars['Boolean']
   updatedAt?: Maybe<Scalars['DateTime']>
@@ -126,12 +127,18 @@ export type DeviceMutation = {
   markAsSynced: Scalars['DateTime']
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
+  platform?: Maybe<Scalars['String']>
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
+  rename: DeviceGql
   reportSecretUsageEvent: SecretUsageEventGqlScalars
   syncTOTP: Scalars['Boolean']
   updatedAt?: Maybe<Scalars['DateTime']>
   userId: Scalars['String']
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
+}
+
+export type DeviceMutationRenameArgs = {
+  name: Scalars['String']
 }
 
 export type DeviceMutationReportSecretUsageEventArgs = {
@@ -159,6 +166,7 @@ export type DeviceQuery = {
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
+  platform?: Maybe<Scalars['String']>
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
   syncTOTP: Scalars['Boolean']
   updatedAt?: Maybe<Scalars['DateTime']>
@@ -283,8 +291,8 @@ export type Mutation = {
   currentDevice: DeviceMutation
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallengeMutation>
-  /** removes current device */
-  logout?: Maybe<Scalars['Boolean']>
+  /** removes current device. Returns null if user is not authenticated */
+  logout?: Maybe<Scalars['PositiveInt']>
   /** you need to be authenticated to call this resolver */
   me: UserMutation
   registerNewUser: LoginResponse

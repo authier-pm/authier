@@ -15,6 +15,10 @@ import React, { useContext } from 'react'
 import SInfo from 'react-native-sensitive-info'
 import { UserContext } from '../providers/UserProvider'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
+import {
+  AddNewDeviceForUserMutation,
+  useDeviceDecryptionChallengeMutation
+} from '../../../shared/Login.codegen'
 
 interface MyFormValues {
   email: string
@@ -22,6 +26,8 @@ interface MyFormValues {
 }
 
 export function Login({ navigation }) {
+  const [deviceDecryptionChallenge, { loading }] =
+    useDeviceDecryptionChallengeMutation()
   const initialValues: MyFormValues = { email: 'bob@bob.com', password: 'bob' }
   // const [login, { loading }] = useLoginMutation()
   const { setIsLogged } = useContext(UserContext)
@@ -49,6 +55,13 @@ export function Login({ navigation }) {
       <Formik
         initialValues={initialValues}
         onSubmit={async (values, actions) => {
+          const decryptionChallengeResponse = await deviceDecryptionChallenge({
+            variables: {
+              deviceId: await device.getDeviceId(),
+              email: values.email
+            }
+          })
+
           // @ts-expect-error
           const response = await login({
             variables: { email: values.email, password: values.password }
