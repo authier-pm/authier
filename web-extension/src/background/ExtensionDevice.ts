@@ -32,7 +32,7 @@ import {
   LogoutMutationVariables
 } from './ExtensionDevice.codegen'
 
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
@@ -61,6 +61,13 @@ async function rerenderViewInThisRuntime() {
     index.renderPopup()
   }
 }
+
+const isLoginSecret = (
+  secret: ILoginSecret | ITOTPSecret
+): secret is ILoginSecret => 'loginCredentials' in secret
+const isTotpSecret = (
+  secret: ILoginSecret | ITOTPSecret
+): secret is ITOTPSecret => 'totp' in secret
 
 export class DeviceState {
   constructor(parameters: IBackgroundStateSerializable) {
@@ -207,6 +214,21 @@ export class DeviceState {
    * @returns the added secret
    */
   async addSecret(secret) {
+    const existingSecrets = this.getSecretsDecryptedByHostname(
+      new URL(secret.url).hostname
+    )
+    if (
+      existingSecrets.find(
+        (s) =>
+          (isLoginSecret(s) &&
+            s.loginCredentials.username ===
+              secret.loginCredentials?.username) ||
+          (isTotpSecret(s) && s.totp === secret.totp)
+      )
+    ) {
+      return null
+    }
+
     const stringToEncrypt =
       secret.kind === EncryptedSecretType.TOTP
         ? secret.totp
