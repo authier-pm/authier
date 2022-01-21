@@ -5,11 +5,11 @@ import { AppRegistry } from 'react-native'
 import QRCodeScanner from 'react-native-qrcode-scanner'
 import { RNCamera } from 'react-native-camera'
 import { AuthsContext } from '../Providers'
-import { useAddNewDeviceForUserMutation } from '../../../shared/Login.codegen'
 
 import { getDeviceNameSync } from 'react-native-device-info'
 import { Pressable, Text } from 'native-base'
 import { UserContext } from '../providers/UserProvider'
+import { useAddNewDeviceForUserMutation } from './Login.codegen'
 
 const QRLogin = ({ navigation }) => {
   const [addNewDevice, { data, error }] = useAddNewDeviceForUserMutation()

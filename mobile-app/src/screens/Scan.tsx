@@ -5,7 +5,7 @@ import { AppRegistry } from 'react-native'
 import QRCodeScanner from 'react-native-qrcode-scanner'
 import { RNCamera } from 'react-native-camera'
 import { AuthsContext } from '../Providers'
-import { useAddNewDeviceForUserMutation } from '../../../shared/Login.codegen'
+import { useAddNewDeviceForUserMutation } from './Login.codegen'
 
 import { getDeviceNameSync } from 'react-native-device-info'
 import { Pressable, Text } from 'native-base'
