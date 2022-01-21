@@ -18,7 +18,7 @@ import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 import {
   AddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
-} from '../../../shared/Login.codegen'
+} from './Login.codegen'
 
 interface MyFormValues {
   email: string

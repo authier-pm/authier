@@ -12,7 +12,7 @@ import {
 import React, { useContext } from 'react'
 import { saveAccessToken } from '../../util/tokenFromAsyncStorage'
 import { UserContext } from '../providers/UserProvider'
-import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
+import { useRegisterNewUserMutation } from './registerNewUser.codegen'
 
 interface MyFormValues {
   email: string
