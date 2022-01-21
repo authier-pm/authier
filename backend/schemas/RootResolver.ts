@@ -13,7 +13,7 @@ import {
   UseMiddleware,
   Info
 } from 'type-graphql'
-import { prismaClient } from '../prismaClient'
+import { prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { LoginResponse } from '../models/models'
