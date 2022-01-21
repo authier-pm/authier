@@ -17,6 +17,8 @@ target 'authier' do
   )
 
 
+  pod 'RNPermissions', :path => '../node_modules/react-native-permissions'
+
   target 'authierTests' do
     inherit! :complete
     # Pods for testing
