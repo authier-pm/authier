@@ -1,4 +1,4 @@
-import { prismaClient } from '../prismaClient'
+import { prismaClient } from '../prisma/prismaClient'
 import {
   Arg,
   Ctx,

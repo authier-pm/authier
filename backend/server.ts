@@ -8,7 +8,7 @@ import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
 
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
-import { prismaClient } from './prismaClient'
+import { prismaClient } from './prisma/prismaClient'
 import {
   jwtPayloadRefreshToken,
   setNewAccessTokenIntoCookie,

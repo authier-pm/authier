@@ -11,12 +11,12 @@
   "license": "AGPL-3.0-or-later",
   "workspaces": {
     "packages": [
-    "web-extension",
-    "backend",
-    "frontend",
-    "mobile-app"
-      ],
-      "nohoist": [
+      "web-extension",
+      "backend",
+      "frontend",
+      "mobile-app"
+    ],
+    "nohoist": [
       "**/@react-native-async-storage/async-storage",
       "**/react",
       "**/react-dom",
@@ -27,7 +27,7 @@
       "**/react-native-macos",
       "**/react-native-windows"
     ]
-    },
+  },
   "resolutions": {
     "graphql": "^15.8.0"
   },
@@ -55,7 +55,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
     "eslint-plugin-react": "^7.26.0",
-    "framer-motion": "^4",
+    "framer-motion": "^5",
     "husky": "^7.0.4",
     "prettier": "^2.5.1",
     "pretty-quick": "^3.1.2",

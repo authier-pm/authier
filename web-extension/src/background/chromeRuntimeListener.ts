@@ -100,6 +100,9 @@ browser.runtime.onMessage.addListener(async function (
         url: url,
         label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
       })
+      if (!secret) {
+        return null
+      }
 
       tab.id && saveLoginModalsStates.delete(tab.id)
 
@@ -127,7 +130,6 @@ browser.runtime.onMessage.addListener(async function (
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
       return secret
-      break
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
         deviceState.addSecret(req.payload as ITOTPSecret)

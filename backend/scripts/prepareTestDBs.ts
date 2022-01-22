@@ -3,7 +3,7 @@ import 'dotenv/config'
 import { execFile } from 'child_process'
 import os from 'os'
 
-import { prismaClient } from '../prismaClient'
+import { prismaClient } from '../prisma/prismaClient'
 
 export const testDbsPrefix = 'authier_test'
 const dbCount = os.cpus().length ?? 16 // each jest worker uses one CPU and one DB, so we need that many DBs
