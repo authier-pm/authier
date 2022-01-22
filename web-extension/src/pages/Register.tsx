@@ -21,13 +21,13 @@ import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { useRegisterNewUserMutation } from '../../../shared/registerNewUser.codegen'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
 import { Trans } from '@lingui/macro'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import { useRegisterNewUserMutation } from './registerNewUser.codegen'
 
 declare global {
   interface Crypto {

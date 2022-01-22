@@ -11,7 +11,7 @@ export type MarkAsSyncedMutation = { __typename?: 'Mutation', currentDevice: { _
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout?: boolean | null | undefined };
+export type LogoutMutation = { __typename?: 'Mutation', logout?: number | null | undefined };
 
 export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 

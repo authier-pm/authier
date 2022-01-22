@@ -34,7 +34,7 @@ import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
-} from '../../../shared/Login.codegen'
+} from './Login.codegen'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import browser from 'webextension-polyfill'
 
@@ -215,7 +215,7 @@ export default function Login(): ReactElement {
               mt={4}
               isLoading={props.isSubmitting}
             >
-              Login
+              <Trans>Login</Trans>
             </Button>
           </Form>
         )}
