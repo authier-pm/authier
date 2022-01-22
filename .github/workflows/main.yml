@@ -56,8 +56,6 @@ jobs:
               - 'backend/**'
             frontend:
               - 'frontend/**'
-            mobileApp:
-              - 'mobile-app/**'
             webExtension:
               - 'web-extension/**'
 
@@ -77,13 +75,6 @@ jobs:
           yarn tsc
           cp .env.sample .env
           yarn test:prepare
-          npm test
-
-      - name: mobile-app, check TS and run jest
-        working-directory: ./mobile-app
-        if: steps.changes.outputs.mobileApp == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          yarn tsc
           npm test
 
       - name: web-extension, check TS and run jest
