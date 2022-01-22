@@ -20,10 +20,10 @@ import NextLink from 'next/link'
 export const Links = [
   'Features',
   'Pricing',
+  'Blog',
+  'Download',
   'FAQ',
-  'Privacy policy',
-  'Vault',
-  'Login'
+  'Privacy policy'
 ]
 
 export const NavLink = ({
