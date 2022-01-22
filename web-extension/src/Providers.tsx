@@ -6,12 +6,12 @@ import { UserProvider } from './providers/UserProvider'
 import Routes from './Routes'
 import { i18n } from '@lingui/core'
 import { ToastContainer } from 'react-toastify' // use react-toastify instead of chakra toast. Chakra toast is somehow weirdly broken in extension, see: https://github.com/chakra-ui/chakra-ui/issues/4619
-import 'react-toastify/dist/ReactToastify.css'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
 
 import { VaultRouter } from './pages-vault/VaultRouter'
+import 'react-toastify/dist/ReactToastify.css'
 
 export default function Providers({ parent }: { parent: string }) {
   return (
