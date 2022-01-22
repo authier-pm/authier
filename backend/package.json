@@ -30,7 +30,7 @@
     "jsonwebtoken": "^8.5.1",
     "lodash.set": "^4.3.2",
     "mem": "8",
-    "mercurius": "^8.12",
+    "mercurius": "^9.1",
     "node-mailjet": "^3.3.4",
     "pino-pretty": "^7.3.0",
     "prisma": "^3.8.1",
