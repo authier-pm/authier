@@ -18,9 +18,9 @@
     ],
     "nohoist": [
       "**/@react-native-async-storage/async-storage",
-      "**/react",
-      "**/react-dom",
       "**/react-native",
+      "**/@react-native-community",
+      "**/@react-native-community/**",
       "**/react-native/**",
       "**/react-native-codegen",
       "**/react-native-dev-menu",
@@ -30,9 +30,6 @@
   },
   "resolutions": {
     "graphql": "^15.8.0"
-  },
-  "optionalDependencies": {
-    "contrib-locs": "^0.2.0"
   },
   "devDependencies": {
     "@apollo/client": "^3.5.6",
