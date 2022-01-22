@@ -13,8 +13,7 @@
     "packages": [
       "web-extension",
       "backend",
-      "frontend",
-      "mobile-app"
+      "frontend"
     ]
   },
   "resolutions": {
