@@ -15,17 +15,6 @@
       "backend",
       "frontend",
       "mobile-app"
-    ],
-    "nohoist": [
-      "**/@react-native-async-storage/async-storage",
-      "**/react-native",
-      "**/@react-native-community",
-      "**/@react-native-community/**",
-      "**/react-native/**",
-      "**/react-native-codegen",
-      "**/react-native-dev-menu",
-      "**/react-native-macos",
-      "**/react-native-windows"
     ]
   },
   "resolutions": {

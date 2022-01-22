@@ -29,7 +29,7 @@ generates:
 
 hooks:
   afterAllFileWrite:
-    - npx prettier --write
+    - prettier --write
 
 config:
   withHooks: true

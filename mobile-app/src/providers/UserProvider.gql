@@ -1,7 +1,0 @@
-query isLoggedIn {
-  authenticated
-}
-
-mutation logout {
-  logout
-}
