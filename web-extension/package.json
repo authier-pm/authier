@@ -96,7 +96,6 @@
     "crypto-browserify": "^3.12.0",
     "crypto-js": "^4.1.1",
     "css-selector-generator": "^3.5.4",
-    "dotenv": "^10.0.0",
     "formik": "^2.2.9",
     "generate-password": "^1.7.0",
     "graphql": "^15.8.0",
