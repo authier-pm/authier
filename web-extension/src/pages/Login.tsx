@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext, useState } from 'react'
+import React, { ReactElement, useContext, useEffect, useState } from 'react'
 import {
   Button,
   Flex,
@@ -13,48 +13,42 @@ import {
   Heading,
   Spinner
 } from '@chakra-ui/react'
-import { Formik, Form, Field, FormikHelpers } from 'formik'
+import { Formik, Form, Field, FormikHelpers, FormikState } from 'formik'
 import { Link } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 
-const log = debug('backgroundPage')
+const log = debug('au:Login')
 
-import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { t, Trans } from '@lingui/macro'
-
-import { UserContext } from '../providers/UserProvider'
-import cryptoJS from 'crypto-js'
-
-import { toast } from 'react-toastify'
 
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 
-import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from './Login.codegen'
-import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
-import browser from 'webextension-polyfill'
+import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
-interface Values {
+export interface LoginFormValues {
   password: string
   email: string
 }
 
 export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [addNewDevice] = useAddNewDeviceForUserMutation()
-  const [deviceDecryptionChallenge, { loading }] =
+  const [formState, setFormState] = useState<LoginFormValues | null>(null)
+  const [deviceDecryptionChallenge, { data: decryptionData, loading }] =
     useDeviceDecryptionChallengeMutation()
-  const { setUserId } = useContext(UserContext)
 
-  const { fireToken } = device
-  if (!fireToken) {
+  if (!device.id) {
     return <Spinner />
+  }
+
+  if (decryptionData && formState) {
+    return <LoginAwaitingApproval {...formState} />
   }
 
   return (
@@ -66,102 +60,16 @@ export default function Login(): ReactElement {
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={async (
-          values: Values,
-          { setSubmitting }: FormikHelpers<Values>
+          values: LoginFormValues,
+          { setSubmitting }: FormikHelpers<LoginFormValues>
         ) => {
-          const decryptionChallengeResponse = await deviceDecryptionChallenge({
+          await deviceDecryptionChallenge({
             variables: {
               deviceId: await device.getDeviceId(),
               email: values.email
             }
           })
-
-          const addDeviceSecretEncrypted =
-            decryptionChallengeResponse.data?.deviceDecryptionChallenge
-              ?.addDeviceSecretEncrypted
-
-          const userId =
-            decryptionChallengeResponse.data?.deviceDecryptionChallenge?.userId
-
-          if (!addDeviceSecretEncrypted || !userId) {
-            toast.error(t`Login failed, check your username`)
-            return
-          }
-
-          if (
-            !decryptionChallengeResponse.data?.deviceDecryptionChallenge?.id
-          ) {
-            toast.error('failed to create decryption challenge')
-            return
-          }
-
-          const encryptionSalt =
-            decryptionChallengeResponse.data?.deviceDecryptionChallenge
-              ?.encryptionSalt
-          const masterEncryptionKey = generateEncryptionKey(
-            values.password,
-            encryptionSalt
-          )
-
-          const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-            addDeviceSecretEncrypted,
-            masterEncryptionKey,
-            {
-              iv: cryptoJS.enc.Utf8.parse(userId)
-            }
-          ).toString(cryptoJS.enc.Utf8)
-
-          if (!currentAddDeviceSecret) {
-            toast.error('wrong password or email')
-            return
-          }
-
-          const response = await addNewDevice({
-            variables: {
-              input: {
-                deviceId: await device.getDeviceId(),
-                ...device.getAddDeviceSecretAuthParams(
-                  masterEncryptionKey,
-                  userId
-                ),
-                email: values.email,
-                deviceName: device.generateDeviceName(),
-                firebaseToken: fireToken,
-                decryptionChallengeId:
-                  decryptionChallengeResponse.data.deviceDecryptionChallenge.id
-              },
-              currentAddDeviceSecret
-            }
-          })
-
-          await browser.storage.local.set({
-            addDeviceSecretEncrypted,
-            currentAddDeviceSecret
-          })
-
-          const addNewDeviceForUser = response.data?.addNewDeviceForUser
-          if (addNewDeviceForUser?.accessToken) {
-            setAccessToken(addNewDeviceForUser?.accessToken)
-
-            const decodedToken = await getUserFromToken()
-
-            const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
-
-            const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey,
-              userId: userId,
-              secrets: EncryptedSecrets,
-              email: values.email,
-              encryptionSalt
-            }
-            setUserId(decodedToken.userId)
-
-            device.state = new DeviceState(deviceState)
-            device.state.save()
-            device.rerenderViews()
-          } else {
-            toast.error(t`Login failed, check your username and password`)
-          }
+          setFormState(values)
 
           setSubmitting(false)
         }}

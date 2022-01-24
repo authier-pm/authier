@@ -9,6 +9,9 @@ export class DecryptionChallengeForApproval {
 
   @Field({ nullable: true })
   approvedAt?: Date
+
+  @Field()
+  createdAt: Date
 }
 
 @ObjectType()
@@ -35,7 +38,7 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
 
   @Field(() => DecryptionChallengeGQL)
   async recoverAccount(@Ctx() ctx: IContextAuthenticated) {
-    // TODO send notification to all contacts we have, email for now
+    // TODO send notification to all contacts we have, just email for now
     return ctx.prisma.user.update({
       where: { id: this.userId },
       data: { recoveryDecryptionChallengeId: this.id } // rest is handled by our CRON job
@@ -45,7 +48,8 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
 
 import { createUnionType } from 'type-graphql'
 
-const SearchResultUnion = createUnionType({
-  name: 'ChallengeType', // the name of the GraphQL union
-  types: () => [DecryptionChallengeMutation] as const // function that returns tuple of object types classes
+export const DecryptionChallengeUnion = createUnionType({
+  name: 'DecryptionChallenge', // the name of the GraphQL union
+  types: () =>
+    [DecryptionChallengeMutation, DecryptionChallengeForApproval] as const
 })

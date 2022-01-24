@@ -9,7 +9,7 @@ export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
 }>;
 
 
-export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeMutation', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string } | null | undefined };
+export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeForApproval', id: number, approvedAt?: string | null | undefined } | { __typename?: 'DecryptionChallengeMutation', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt?: string | null | undefined } | null | undefined };
 
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   currentAddDeviceSecret: Types.Scalars['NonEmptyString'];
@@ -23,10 +23,17 @@ export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', addNewDevic
 export const DeviceDecryptionChallengeDocument = gql`
     mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
   deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
-    id
-    addDeviceSecretEncrypted
-    encryptionSalt
-    userId
+    ... on DecryptionChallengeMutation {
+      id
+      addDeviceSecretEncrypted
+      encryptionSalt
+      userId
+      approvedAt
+    }
+    ... on DecryptionChallengeForApproval {
+      id
+      approvedAt
+    }
   }
 }
     `;

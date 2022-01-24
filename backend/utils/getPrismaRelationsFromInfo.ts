@@ -51,7 +51,6 @@ export const getPrismaRelationsFromInfo = ({
   if (Object.keys(prismaInclude).length === 0) {
     return null
   }
-  console.log('~ prismaInclude', prismaInclude)
 
   return prismaInclude
 }

@@ -47,6 +47,17 @@ export type ChangeMasterPasswordInput = {
   secrets: Array<EncryptedSecretPatchInput>
 }
 
+export type DecryptionChallenge =
+  | DecryptionChallengeForApproval
+  | DecryptionChallengeMutation
+
+export type DecryptionChallengeForApproval = {
+  __typename?: 'DecryptionChallengeForApproval'
+  approvedAt?: Maybe<Scalars['DateTime']>
+  createdAt: Scalars['DateTime']
+  id: Scalars['Int']
+}
+
 export type DecryptionChallengeGql = {
   __typename?: 'DecryptionChallengeGQL'
   User: Array<UserGql>
@@ -290,7 +301,7 @@ export type Mutation = {
   addWebInputs: Array<WebInputGql>
   currentDevice: DeviceMutation
   /** returns a decryption challenge */
-  deviceDecryptionChallenge?: Maybe<DecryptionChallengeMutation>
+  deviceDecryptionChallenge?: Maybe<DecryptionChallenge>
   /** removes current device. Returns null if user is not authenticated */
   logout?: Maybe<Scalars['PositiveInt']>
   /** you need to be authenticated to call this resolver */
@@ -542,6 +553,7 @@ export type UserQuery = {
   WebInputsAdded: Array<WebInputGql>
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
+  decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>
   deviceRecoveryCooldownMinutes: Scalars['Int']
   devices: Array<DeviceQuery>
   devicesCount: Scalars['Int']

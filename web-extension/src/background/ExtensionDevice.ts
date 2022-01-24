@@ -36,6 +36,7 @@ import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
+import ms from 'ms'
 
 export const log = debug('au:Device')
 
@@ -49,6 +50,7 @@ const browserInfo = bowser.getParser(navigator.userAgent)
 export const isRunningInBgPage = location.href.includes(
   '_generated_background_page.html'
 )
+
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
@@ -81,7 +83,7 @@ export class DeviceState {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = 10000 * 60 * 60 * 8
+  lockTime = ms('1s')
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -274,11 +276,14 @@ class ExtensionDevice {
   state: DeviceState | null = null
   fireToken: string | null = null
   lockedState: IBackgroundStateSerializableLocked | null = null
+  id: string | null = null
 
   /**
    * runs on startup
    */
   async initialize() {
+    this.id = await this.getDeviceId()
+
     let storedState = null
 
     if (isRunningInBgPage === false) {
@@ -306,11 +311,22 @@ class ExtensionDevice {
       this.listenForUserLogin()
     }
 
-    const fireToken = await generateFireToken()
+    // const fireToken = await generateFireToken()
+    const fireToken = 'aaaa'
     console.log('~ fireToken', fireToken)
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
+    if (isRunningInBgPage) {
+      browser.idle.setDetectionInterval(30)
+      console.log('~ device initialized, locking test45')
+      browser.idle.onStateChanged.addListener((state) => {
+        console.log('~ state', state)
+        if (state !== 'active') {
+          this.lock()
+        }
+      })
+    }
   }
 
   private listenForUserLogin() {
