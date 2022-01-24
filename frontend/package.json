@@ -25,7 +25,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.16.10",
-    "@lingui/cli": "^3.13.1",
+    "@lingui/cli": "^3.13.2",
     "@lingui/macro": "^3.13.1",
     "@types/react": "^17.0.38",
     "apollo-link-token-refresh": "^0.3.3",
