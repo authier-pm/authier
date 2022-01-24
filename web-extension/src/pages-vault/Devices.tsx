@@ -25,7 +25,8 @@ import {
   Button,
   Tooltip,
   Alert,
-  VStack
+  VStack,
+  Grid
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
@@ -263,7 +264,7 @@ export default function Devices() {
           setFilterBy(ev.target.value)
         }}
       />
-      <VStack>
+      <VStack mt={3}>
         {devicesPageData?.me?.decryptionChallengesWaiting.map(
           (challengeToApprove) => {
             return (
@@ -274,38 +275,50 @@ export default function Devices() {
                 maxW={500}
                 key={challengeToApprove.id}
               >
-                New Device trying to login{' '}
-                {formatRelative(
-                  new Date(challengeToApprove.createdAt),
-                  new Date()
-                )}
-                : {challengeToApprove.id}
-                <Button
-                  color="teal"
-                  onClick={async () => {
-                    await approve({
-                      variables: {
-                        id: challengeToApprove.id
-                      }
-                    })
-                    refetch()
-                  }}
+                <Center>
+                  New Device trying to login{' '}
+                  {formatRelative(
+                    new Date(challengeToApprove.createdAt),
+                    new Date()
+                  )}
+                  : {challengeToApprove.id}
+                </Center>
+
+                <Grid
+                  gridGap={1}
+                  autoFlow="row"
+                  templateColumns="repeat(auto-fit, 49%)"
                 >
-                  <Trans>Approve</Trans>
-                </Button>
-                <Button
-                  color="red"
-                  onClick={async () => {
-                    await reject({
-                      variables: {
-                        id: challengeToApprove.id
-                      }
-                    })
-                    refetch()
-                  }}
-                >
-                  <Trans>Reject</Trans>
-                </Button>
+                  <Button
+                    w="100%"
+                    colorScheme="red"
+                    // bgColor="red.100"
+                    onClick={async () => {
+                      await reject({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      refetch()
+                    }}
+                  >
+                    <Trans>Reject</Trans>
+                  </Button>
+                  <Button
+                    w="100%"
+                    colorScheme="green"
+                    onClick={async () => {
+                      await approve({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      refetch()
+                    }}
+                  >
+                    <Trans>Approve</Trans>
+                  </Button>
+                </Grid>
               </Alert>
             )
           }
