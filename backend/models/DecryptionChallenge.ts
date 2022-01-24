@@ -1,6 +1,15 @@
-import { Ctx, Field, ObjectType } from 'type-graphql'
+import { Ctx, Field, Int, ObjectType } from 'type-graphql'
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
+
+@ObjectType()
+export class DecryptionChallengeForApproval {
+  @Field(() => Int)
+  id: number
+
+  @Field({ nullable: true })
+  approvedAt?: Date
+}
 
 @ObjectType()
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
@@ -33,3 +42,10 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
     })
   }
 }
+
+import { createUnionType } from 'type-graphql'
+
+const SearchResultUnion = createUnionType({
+  name: 'ChallengeType', // the name of the GraphQL union
+  types: () => [DecryptionChallengeMutation] as const // function that returns tuple of object types classes
+})

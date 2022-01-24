@@ -246,7 +246,7 @@ describe('RootResolver', () => {
   })
 
   describe('deviceDecryptionChallenge', () => {
-    it('should returns a decryption challenge', async () => {
+    it('should return a decryption challenge', async () => {
       let userId = faker.datatype.uuid()
       let fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
@@ -306,5 +306,9 @@ describe('RootResolver', () => {
         )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
+
+    it.todo(
+      'should block creation of a challenge from an IP which was blocked previously'
+    )
   })
 })

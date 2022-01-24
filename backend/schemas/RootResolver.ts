@@ -13,7 +13,7 @@ import {
   UseMiddleware,
   Info
 } from 'type-graphql'
-import { prismaClient } from '../prisma/prismaClient'
+import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
 
 import { LoginResponse } from '../models/models'
@@ -130,14 +130,14 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
-    const include = getPrismaRelationsFromInfo(info)
-    console.log('~ include', include)
+    const include = getPrismaRelationsFromInfo({
+      info,
+      rootModel: dmmf.modelMap.User
+    })
+
     return ctx.prisma.user.findUnique({
       where: { id: jwtPayload.userId },
-      include: {
-        ...include,
-        masterDevice: true
-      }
+      include
     })
   }
 
@@ -149,9 +149,13 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
+
     return ctx.prisma.device.findUnique({
       where: { id: jwtPayload.deviceId },
-      include: getPrismaRelationsFromInfo(info)
+      include: getPrismaRelationsFromInfo({
+        info,
+        rootModel: dmmf.modelMap.Device
+      })
     })
   }
 
@@ -249,7 +253,10 @@ export class RootResolver {
     @Ctx() ctx: IContext,
     @Info() info: GraphQLResolveInfo
   ) {
-    const include = getPrismaRelationsFromInfo(info, 'user')
+    const include = getPrismaRelationsFromInfo({
+      info,
+      rootModel: dmmf.modelMap.User
+    })
 
     const user = await ctx.prisma.user.findUnique({
       where: { email: input.email },
@@ -333,11 +340,24 @@ export class RootResolver {
     deviceId: string,
     @Ctx() ctx: IContext
   ) {
+    const ipAddress = ctx.getIpAddress()
+
     const user = await ctx.prisma.user.findUnique({
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
     })
     if (user) {
+      const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
+        where: {
+          userId: user.id,
+          blockIp: true,
+          ipAddress
+        }
+      })
+      if (isBlocked) {
+        throw new GraphqlError('login failed')
+      }
+
       const inLastHour = await ctx.prisma.decryptionChallenge.count({
         where: {
           userId: user.id,
@@ -357,7 +377,7 @@ export class RootResolver {
         where: {
           deviceId,
           userId: user.id,
-          ipAddress: ctx.getIpAddress()
+          ipAddress: ipAddress
         }
       })
 
