@@ -130,9 +130,14 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
+    const include = getPrismaRelationsFromInfo(info)
+    console.log('~ include', include)
     return ctx.prisma.user.findUnique({
       where: { id: jwtPayload.userId },
-      include: getPrismaRelationsFromInfo(info)
+      include: {
+        ...include,
+        masterDevice: true
+      }
     })
   }
 

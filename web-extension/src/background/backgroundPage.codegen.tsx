@@ -4,17 +4,17 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type AddEncryptedSecretMutationVariables = Types.Exact<{
-  payload: Types.EncryptedSecretInput;
+  payload: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
 }>;
 
 
-export type AddEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecret: { __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number, createdAt: string, updatedAt?: string | null | undefined } } };
+export type AddEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number, createdAt: string, updatedAt?: string | null | undefined }> } };
 
 
 export const AddEncryptedSecretDocument = gql`
-    mutation addEncryptedSecret($payload: EncryptedSecretInput!) {
+    mutation addEncryptedSecret($payload: [EncryptedSecretInput!]!) {
   me {
-    addEncryptedSecret(payload: $payload) {
+    addEncryptedSecrets(payload: $payload) {
       id
       kind
       encrypted

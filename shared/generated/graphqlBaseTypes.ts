@@ -457,7 +457,7 @@ export type UserMutation = {
   addCookie: Scalars['String']
   addDevice: DeviceGql
   addDeviceSecretEncrypted: Scalars['String']
-  addEncryptedSecret: EncryptedSecretQuery
+  addEncryptedSecrets: Array<EncryptedSecretQuery>
   approveDevice: Scalars['Boolean']
   changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
@@ -484,8 +484,8 @@ export type UserMutationAddDeviceArgs = {
   name: Scalars['String']
 }
 
-export type UserMutationAddEncryptedSecretArgs = {
-  payload: EncryptedSecretInput
+export type UserMutationAddEncryptedSecretsArgs = {
+  payload: Array<EncryptedSecretInput>
 }
 
 export type UserMutationApproveDeviceArgs = {

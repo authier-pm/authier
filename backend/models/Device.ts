@@ -50,6 +50,14 @@ export class DeviceQuery extends DeviceGQL {
     const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
     return geoIp.city + ', ' + geoIp.country_name
   }
+
+  // @Field(() => String)
+  // async isMaster(
+  //   @Ctx() ctx: IContextAuthenticated
+  // ) {
+
+  //   return ctx.user.
+  // }
 }
 
 @ObjectType()

@@ -31,6 +31,7 @@ import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useState } from 'react'
 import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
+import { useMasterDeviceIdQuery } from './Devices.codegen'
 
 interface configValues {
   lockTime: number
@@ -44,7 +45,7 @@ const vaultLockTimeOptions = [
   { value: 432000000, label: '12 hours' }
 ]
 
-const ListItem = (item: {
+const DeviceListItem = (item: {
   id: string
   firstIpAddress: string
   lastIpAddress: string
@@ -53,6 +54,8 @@ const ListItem = (item: {
   logoutAt?: string | null | undefined
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
+  const { data } = useMasterDeviceIdQuery({ fetchPolicy: 'cache-first' })
+
   return (
     <Flex py={6} m={5}>
       <Box
@@ -72,16 +75,18 @@ const ListItem = (item: {
             alignItems={'baseline'}
             lineHeight={'6'}
           >
-            <Badge height="min-content" colorScheme="purple">
-              Master
-            </Badge>
+            {item.id === data?.me?.masterDeviceId && (
+              <Badge height="min-content" colorScheme="purple">
+                Master
+              </Badge>
+            )}
             {item.logoutAt ? (
               <Badge height="min-content" colorScheme="red">
-                Offline
+                <Trans>Logged out</Trans>
               </Badge>
             ) : (
               <Badge height="min-content" colorScheme="green">
-                Online
+                <Trans>Logged in</Trans>
               </Badge>
             )}
 
@@ -203,14 +208,14 @@ const ListItem = (item: {
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 IP Address
               </Text>
-              <Text fontSize={'2xl'}>{item.lastIpAddress}</Text>
+              <Text fontSize={'xl'}>{item.lastIpAddress}</Text>
             </Box>
 
             <Box>
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Geolocation
               </Text>
-              <Text fontSize={'2xl'}>{item.lastGeoLocation}</Text>
+              <Text fontSize={'xl'}>{item.lastGeoLocation}</Text>
             </Box>
           </Stack>
         )}
@@ -220,7 +225,10 @@ const ListItem = (item: {
 }
 
 export default function Devices() {
-  const { data, loading, error } = useMyDevicesQuery()
+  const { data, loading, error } = useMyDevicesQuery({
+    // TODO figure out why this is called twice
+    fetchPolicy: 'cache-first'
+  })
   const [filterBy, setFilterBy] = useState('')
 
   return (
@@ -247,7 +255,7 @@ export default function Devices() {
                   return name.includes(filterBy)
                 })
                 .map((el, i) => {
-                  return <ListItem {...el} key={i} />
+                  return <DeviceListItem {...el} key={i} />
                 })
             )}
           </Flex>
