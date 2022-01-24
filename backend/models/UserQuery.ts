@@ -20,6 +20,7 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 import { EmailVerificationType } from '@prisma/client'
+import { DeviceGQL } from './generated/Device'
 
 @ObjectType()
 export class UserBase extends UserGQL {

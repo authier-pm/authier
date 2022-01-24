@@ -208,24 +208,27 @@ export class DeviceState {
     }
   }
 
+  findExistingSecret(secret) {
+    const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
+      new URL(secret.url).hostname
+    )
+
+    return existingSecretsOnHostname.find(
+      (s) =>
+        (isLoginSecret(s) &&
+          s.loginCredentials.username === secret.loginCredentials?.username) ||
+        (isTotpSecret(s) && s.totp === secret.totp)
+    )
+  }
+
   /**
    * invokes the backend mutation and pushes the new secret to the bgState
    * @param secret
    * @returns the added secret
    */
   async addSecret(secret) {
-    const existingSecrets = this.getSecretsDecryptedByHostname(
-      new URL(secret.url).hostname
-    )
-    if (
-      existingSecrets.find(
-        (s) =>
-          (isLoginSecret(s) &&
-            s.loginCredentials.username ===
-              secret.loginCredentials?.username) ||
-          (isTotpSecret(s) && s.totp === secret.totp)
-      )
-    ) {
+    const existingSecret = this.findExistingSecret(secret)
+    if (existingSecret) {
       return null
     }
 
@@ -255,7 +258,7 @@ export class DeviceState {
       throw new Error('failed to save secret')
     }
     log('saved secret to the backend', secret)
-    const secretAdded = data.me.addEncryptedSecret
+    const [secretAdded] = data.me.addEncryptedSecrets
 
     this.secrets.push(secretAdded)
     await this.save()

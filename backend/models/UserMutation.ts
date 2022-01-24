@@ -90,17 +90,18 @@ export class UserMutation extends UserBase {
   //     return false
   //   }
   // }
-  @Field(() => EncryptedSecretQuery)
-  async addEncryptedSecret(
-    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput,
+  @Field(() => [EncryptedSecretQuery])
+  async addEncryptedSecrets(
+    @Arg('payload', () => [EncryptedSecretInput])
+    payload: EncryptedSecretInput[],
     @Ctx() ctx: IContext
   ) {
-    return ctx.prisma.encryptedSecret.create({
-      data: {
+    return ctx.prisma.encryptedSecret.createMany({
+      data: payload.map((secret) => ({
         version: 1,
         userId: this.id,
-        ...payload
-      }
+        ...secret
+      }))
     })
   }
 

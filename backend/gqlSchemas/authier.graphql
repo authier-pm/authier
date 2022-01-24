@@ -349,7 +349,9 @@ type UserMutation {
     name: String!
   ): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
-  addEncryptedSecret(payload: EncryptedSecretInput!): EncryptedSecretQuery!
+  addEncryptedSecrets(
+    payload: [EncryptedSecretInput!]!
+  ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
     noHandsLogin: Boolean!
