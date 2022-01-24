@@ -22,7 +22,8 @@ import {
   FormLabel,
   Checkbox,
   Select,
-  Button
+  Button,
+  Tooltip
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
@@ -32,6 +33,7 @@ import React, { useState } from 'react'
 import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
 import { useMasterDeviceIdQuery } from './Devices.codegen'
+import { formatDistance, intlFormat } from 'date-fns'
 
 interface configValues {
   lockTime: number
@@ -51,6 +53,7 @@ const DeviceListItem = (item: {
   lastIpAddress: string
   name: string
   lastGeoLocation: string
+  createdAt: string
   logoutAt?: string | null | undefined
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
@@ -67,7 +70,7 @@ const DeviceListItem = (item: {
         p={6}
       >
         <Flex flexDirection={'row'} justifyContent={'space-between'}>
-          <Icon as={IoIosPhonePortrait} w={20} h={20} />
+          <Icon as={IoIosPhonePortrait} boxSize={16} />
 
           <Stack
             direction={'row'}
@@ -110,12 +113,6 @@ const DeviceListItem = (item: {
                   <FiSettings />
                   <NbSp />
                   <Trans>Config</Trans>
-                </MenuItem>
-
-                <MenuItem>
-                  <FiTrash />
-                  <NbSp />
-                  <Trans>Remove</Trans>
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -206,7 +203,7 @@ const DeviceListItem = (item: {
           <Stack mt={6} spacing={4}>
             <Box>
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                IP Address
+                Last IP Address
               </Text>
               <Text fontSize={'xl'}>{item.lastIpAddress}</Text>
             </Box>
@@ -216,6 +213,24 @@ const DeviceListItem = (item: {
                 Geolocation
               </Text>
               <Text fontSize={'xl'}>{item.lastGeoLocation}</Text>
+            </Box>
+
+            <Box>
+              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                Added
+              </Text>
+              <Tooltip
+                label={intlFormat(new Date(item.createdAt), {
+                  weekday: 'long',
+                  year: 'numeric',
+                  month: 'long',
+                  day: 'numeric'
+                })}
+              >
+                <Text fontSize={'xl'}>
+                  {formatDistance(new Date(item.createdAt), new Date())} ago
+                </Text>
+              </Tooltip>
             </Box>
           </Stack>
         )}

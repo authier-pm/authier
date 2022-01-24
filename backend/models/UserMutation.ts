@@ -18,6 +18,8 @@ import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
 import { EmailVerificationType } from '@prisma/client'
+import { DecryptionChallengeMutation } from './DecryptionChallenge'
+import { dmmf } from '../prisma/prismaClient'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -66,7 +68,10 @@ export class UserMutation extends UserBase {
   ) {
     return ctx.prisma.encryptedSecret.findUnique({
       where: { id },
-      include: getPrismaRelationsFromInfo(info)
+      include: getPrismaRelationsFromInfo({
+        info,
+        rootModel: dmmf.modelMap.EncryptedSecret
+      })
     })
   }
   // @Field(() => Boolean)
@@ -268,5 +273,18 @@ export class UserMutation extends UserBase {
       })
     ])
     return secretsUpdates.length
+  }
+
+  @Field(() => DecryptionChallengeMutation)
+  async decryptionChallenge(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('id', () => Int) id: number
+  ) {
+    return ctx.prisma.decryptionChallenge.findFirst({
+      where: {
+        id,
+        userId: ctx.jwtPayload.userId
+      }
+    })
   }
 }

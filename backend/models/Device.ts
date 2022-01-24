@@ -15,7 +15,7 @@ export class DeviceQuery extends DeviceGQL {
     if (ipAddress === '127.0.0.1') {
       return {
         city: 'Brno',
-        country: 'Czech Republic'
+        country_name: 'Czech Republic'
       }
     }
     const res = await request(

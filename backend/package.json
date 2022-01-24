@@ -77,7 +77,7 @@
     "tar": "tar -czvf authier-api.tar.gz -C ./dist .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "test:w": "jest --watch",
+    "w": "jest --watch",
     "test": "jest",
     "test:prepare": "cross-env NODE_ENV=test ts-node scripts/prepareTestDBs",
     "test:docker": "yarn docker:up && cross-env DATABASE_URL=postgresql://authier:auth133r@localhost:6432/authier && yarn prisma db push && jest -i && yarn docker:down"

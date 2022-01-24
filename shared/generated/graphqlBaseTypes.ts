@@ -461,6 +461,7 @@ export type UserMutation = {
   approveDevice: Scalars['Boolean']
   changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
+  decryptionChallenge: DecryptionChallengeMutation
   deviceRecoveryCooldownMinutes: Scalars['Int']
   email?: Maybe<Scalars['EmailAddress']>
   encryptedSecret: EncryptedSecretMutation
@@ -494,6 +495,10 @@ export type UserMutationApproveDeviceArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput
+}
+
+export type UserMutationDecryptionChallengeArgs = {
+  id: Scalars['Int']
 }
 
 export type UserMutationEncryptedSecretArgs = {
