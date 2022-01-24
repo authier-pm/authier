@@ -32,7 +32,7 @@
     "mem": "8",
     "mercurius": "^8.12",
     "node-mailjet": "^3.3.4",
-    "pino-pretty": "^7.3.0",
+    "pino-pretty": "^7.5.0",
     "prisma": "^3.8.1",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
