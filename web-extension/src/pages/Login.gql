@@ -1,9 +1,16 @@
 mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
   deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
-    id
-    addDeviceSecretEncrypted
-    encryptionSalt
-    userId
+    ... on DecryptionChallengeMutation {
+      id
+      addDeviceSecretEncrypted
+      encryptionSalt
+      userId
+      approvedAt
+    }
+    ... on DecryptionChallengeForApproval {
+      id
+      approvedAt
+    }
   }
 }
 

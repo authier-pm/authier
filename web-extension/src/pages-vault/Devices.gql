@@ -1,6 +1,30 @@
-query MasterDeviceId {
+query DevicesPage {
   me {
     id
     masterDeviceId
+    decryptionChallengesWaiting {
+      id
+      createdAt
+    }
+  }
+}
+
+mutation ApproveChallenge($id: Int!) {
+  me {
+    decryptionChallenge(id: $id) {
+      approve {
+        id
+      }
+    }
+  }
+}
+
+mutation RejectChallenge($id: Int!) {
+  me {
+    decryptionChallenge(id: $id) {
+      reject {
+        id
+      }
+    }
   }
 }

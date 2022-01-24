@@ -6,6 +6,11 @@ export interface PossibleTypesResultData {
   }
 }
 const result: PossibleTypesResultData = {
-  possibleTypes: {}
+  possibleTypes: {
+    DecryptionChallenge: [
+      'DecryptionChallengeForApproval',
+      'DecryptionChallengeMutation'
+    ]
+  }
 }
 export default result

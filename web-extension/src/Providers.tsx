@@ -9,9 +9,12 @@ import { ToastContainer } from 'react-toastify' // use react-toastify instead of
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
-
+import { messages } from './locale/en-gb/messages'
 import { VaultRouter } from './pages-vault/VaultRouter'
 import 'react-toastify/dist/ReactToastify.css'
+
+i18n.load('en', messages)
+i18n.activate('en')
 
 export default function Providers({ parent }: { parent: string }) {
   return (

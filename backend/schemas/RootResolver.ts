@@ -44,8 +44,13 @@ import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceMutation, DeviceQuery } from '../models/Device'
-import { DecryptionChallengeMutation } from '../models/DecryptionChallenge'
+import {
+  DecryptionChallengeForApproval,
+  DecryptionChallengeMutation,
+  DecryptionChallengeUnion
+} from '../models/DecryptionChallenge'
 import { sendEmail } from '../utils/email'
+import { plainToClass } from 'class-transformer'
 
 const log = debug('au:RootResolver')
 
@@ -329,7 +334,7 @@ export class RootResolver {
   }
 
   // TODO rate limit this per IP
-  @Mutation(() => DecryptionChallengeMutation, {
+  @Mutation(() => DecryptionChallengeUnion, {
     // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true
@@ -376,8 +381,7 @@ export class RootResolver {
       let challenge = await ctx.prisma.decryptionChallenge.findFirst({
         where: {
           deviceId,
-          userId: user.id,
-          ipAddress: ipAddress
+          userId: user.id
         }
       })
 
@@ -391,19 +395,20 @@ export class RootResolver {
         })
       }
 
-      // if (!challenge.approvedAt) { // TODO enable when we have device management in the vault
-      //   return {
-      //     id: challenge.id,
-      //     approvedAt: challenge.approvedAt
-      //   }
-      // }
+      if (!challenge.approvedAt) {
+        // TODO enable when we have device management in the vault
+        return plainToClass(DecryptionChallengeForApproval, {
+          id: challenge.id,
+          approvedAt: challenge.approvedAt
+        })
+      }
 
-      return {
+      return plainToClass(DecryptionChallengeMutation, {
         ...challenge,
 
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
         encryptionSalt: user.encryptionSalt
-      }
+      })
     }
     return null
   }
