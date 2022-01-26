@@ -45,6 +45,7 @@ import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceMutation, DeviceQuery } from '../models/Device'
 import {
+  DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
   DecryptionChallengeMutation,
   DecryptionChallengeUnion
@@ -250,89 +251,6 @@ export class RootResolver {
     )
   }
 
-  @Mutation(() => LoginResponse)
-  async addNewDeviceForUser(
-    @Arg('input', () => AddNewDeviceInput) input: AddNewDeviceInput,
-    @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
-    currentAddDeviceSecret: string,
-    @Ctx() ctx: IContext,
-    @Info() info: GraphQLResolveInfo
-  ) {
-    const include = getPrismaRelationsFromInfo({
-      info,
-      rootModel: dmmf.modelMap.User
-    })
-
-    const user = await ctx.prisma.user.findUnique({
-      where: { email: input.email },
-      include
-    })
-
-    if (!user) {
-      throw new GraphqlError('User not found')
-    }
-
-    if (user?.addDeviceSecret !== currentAddDeviceSecret) {
-      // TODO rate limit these attempts and notify current devices
-      throw new GraphqlError('Wrong master password used')
-    }
-
-    await ctx.prisma.user.update({
-      data: {
-        addDeviceSecret: input.addDeviceSecret,
-        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
-      },
-      where: {
-        id: user.id
-      }
-    })
-
-    await ctx.prisma.decryptionChallenge.updateMany({
-      where: {
-        id: input.decryptionChallengeId,
-        deviceId: input.deviceId,
-        userId: user.id
-      },
-      data: { masterPasswordVerifiedAt: new Date() }
-    })
-
-    const { firebaseToken, deviceName, deviceId } = input
-    const ipAddress = ctx.getIpAddress()
-
-    let device = await ctx.prisma.device.findUnique({
-      // TODO change this to create
-      where: { id: deviceId }
-    })
-
-    if (device) {
-      if (device.userId !== user.id) {
-        throw new GraphqlError('Device is already registered for another user')
-      }
-
-      device = await ctx.prisma.device.update({
-        data: { logoutAt: null },
-        where: { id: device.id }
-      })
-    } else {
-      device = await ctx.prisma.device.create({
-        data: {
-          id: deviceId,
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: firebaseToken,
-          name: deviceName,
-          userId: user.id,
-          platform: 'chrome' // TODO add this to input
-        }
-      })
-    }
-
-    return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device.id,
-      ctx
-    )
-  }
-
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
     // TODO return a union instead
@@ -351,6 +269,7 @@ export class RootResolver {
       where: { email },
       select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
     })
+
     if (user) {
       const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
         where: {
@@ -378,6 +297,11 @@ export class RootResolver {
           'Too many decryption challenges, wait for cooldown'
         )
       }
+
+      const device = await ctx.prisma.device.findUnique({
+        where: { id: deviceId }
+      })
+
       let challenge = await ctx.prisma.decryptionChallenge.findFirst({
         where: {
           deviceId,
@@ -385,7 +309,23 @@ export class RootResolver {
         }
       })
 
+      if (device && challenge) {
+        // user logged out, but kept the device as safe for later, we can reuse the previous challenge
+        return plainToClass(DecryptionChallengeApproved, {
+          ...challenge,
+
+          addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+          encryptionSalt: user.encryptionSalt
+        })
+      }
+
+      if (challenge?.rejectedAt) {
+        // someone tried to login with this device and it was rejected in the past, we don't want to create a new challenge
+        throw new GraphqlError('login failed')
+      }
+
       if (!challenge) {
+        // TODO send notification to user
         challenge = await ctx.prisma.decryptionChallenge.create({
           data: {
             deviceId,
@@ -403,7 +343,8 @@ export class RootResolver {
         })
       }
 
-      return plainToClass(DecryptionChallengeMutation, {
+      // use has approved this device in the past, we can return the challenge including salt and encrypted secret
+      return plainToClass(DecryptionChallengeApproved, {
         ...challenge,
 
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,

@@ -24,10 +24,6 @@ import { t, Trans } from '@lingui/macro'
 
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 
-import {
-  useAddNewDeviceForUserMutation,
-  useDeviceDecryptionChallengeMutation
-} from './Login.codegen'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
@@ -40,14 +36,12 @@ export interface LoginFormValues {
 export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [formState, setFormState] = useState<LoginFormValues | null>(null)
-  const [deviceDecryptionChallenge, { data: decryptionData, loading }] =
-    useDeviceDecryptionChallengeMutation()
 
   if (!device.id) {
     return <Spinner />
   }
 
-  if (decryptionData && formState) {
+  if (formState) {
     return <LoginAwaitingApproval {...formState} />
   }
 
@@ -63,12 +57,6 @@ export default function Login(): ReactElement {
           values: LoginFormValues,
           { setSubmitting }: FormikHelpers<LoginFormValues>
         ) => {
-          await deviceDecryptionChallenge({
-            variables: {
-              deviceId: await device.getDeviceId(),
-              email: values.email
-            }
-          })
           setFormState(values)
 
           setSubmitting(false)

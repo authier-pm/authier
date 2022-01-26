@@ -1,6 +1,15 @@
-import { Ctx, Field, Int, ObjectType } from 'type-graphql'
-import { IContextAuthenticated } from '../schemas/RootResolver'
+import { Arg, Ctx, Field, Info, Int, Mutation, ObjectType } from 'type-graphql'
+import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
+import { GraphQLResolveInfo } from 'graphql'
+import { createUnionType } from 'type-graphql'
+import { GraphQLNonEmptyString } from 'graphql-scalars'
+import { GraphqlError } from '../api/GraphqlError'
+import { dmmf } from '../prisma/prismaClient'
+import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+import { AddNewDeviceInput } from './AuthInputs'
+import { LoginResponse } from './models'
+import { UserMutation } from './UserMutation'
 
 @ObjectType()
 export class DecryptionChallengeForApproval {
@@ -10,8 +19,111 @@ export class DecryptionChallengeForApproval {
   @Field({ nullable: true })
   approvedAt?: Date
 
+  @Field({ nullable: true })
+  rejectedAt?: Date
+
   @Field()
   createdAt: Date
+}
+
+@ObjectType()
+export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
+  @Field()
+  addDeviceSecretEncrypted: string
+
+  @Field()
+  encryptionSalt: string
+
+  @Field(() => LoginResponse)
+  async addNewDeviceForUser(
+    @Arg('input', () => AddNewDeviceInput) input: AddNewDeviceInput,
+    @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
+    currentAddDeviceSecret: string,
+    @Ctx() ctx: IContext,
+    @Info() info: GraphQLResolveInfo
+  ) {
+    const include = getPrismaRelationsFromInfo({
+      info,
+      rootModel: dmmf.modelMap.User
+    })
+    console.log('~ include', include)
+
+    const user = await ctx.prisma.user.findUnique({
+      where: { id: this.userId },
+      include: {
+        EncryptedSecrets: true
+      }
+    })
+
+    if (!user) {
+      throw new GraphqlError('User not found')
+    }
+    console.log(
+      '~ currentAddDeviceSecret',
+      currentAddDeviceSecret,
+      user?.addDeviceSecret
+    )
+
+    if (user?.addDeviceSecret !== currentAddDeviceSecret) {
+      // TODO rate limit these attempts and notify current devices
+      throw new GraphqlError('Wrong master password used')
+    }
+
+    await ctx.prisma.user.update({
+      data: {
+        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecretEncrypted: this.addDeviceSecretEncrypted
+      },
+      where: {
+        id: user.id
+      }
+    })
+
+    await ctx.prisma.decryptionChallenge.updateMany({
+      where: {
+        id: this.id,
+        deviceId: this.deviceId,
+        userId: user.id
+      },
+      data: { masterPasswordVerifiedAt: new Date() }
+    })
+
+    const { firebaseToken, deviceName } = input
+    const ipAddress = ctx.getIpAddress()
+
+    let device = await ctx.prisma.device.findUnique({
+      // TODO change this to upsert
+      where: { id: this.deviceId }
+    })
+
+    if (device) {
+      if (device.userId !== user.id) {
+        throw new GraphqlError('Device is already registered for another user')
+      }
+
+      device = await ctx.prisma.device.update({
+        data: { logoutAt: null },
+        where: { id: device.id }
+      })
+    } else {
+      device = await ctx.prisma.device.create({
+        data: {
+          id: this.deviceId,
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
+          firebaseToken: firebaseToken,
+          name: deviceName,
+          userId: user.id,
+          platform: 'chrome' // TODO add this to input
+        }
+      })
+    }
+
+    return new UserMutation(user).setCookiesAndConstructLoginResponse(
+      device.id,
+      ctx
+    )
+  }
 }
 
 @ObjectType()
@@ -46,10 +158,8 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   }
 }
 
-import { createUnionType } from 'type-graphql'
-
 export const DecryptionChallengeUnion = createUnionType({
   name: 'DecryptionChallenge', // the name of the GraphQL union
   types: () =>
-    [DecryptionChallengeMutation, DecryptionChallengeForApproval] as const
+    [DecryptionChallengeApproved, DecryptionChallengeForApproval] as const
 })

@@ -47,9 +47,4 @@ export class DecryptionChallengeGQL extends DecryptionChallengeGQLScalars {
   User: UserGQL[]
 
   // skip overwrite 👇
-  @Field()
-  addDeviceSecretEncrypted: string
-
-  @Field()
-  encryptionSalt: string
 }
