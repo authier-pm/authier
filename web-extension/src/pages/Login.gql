@@ -1,6 +1,38 @@
+mutation addNewDeviceForUser(
+  $email: EmailAddress!
+  $deviceId: UUID!
+  $currentAddDeviceSecret: NonEmptyString!
+  $input: AddNewDeviceInput!
+) {
+  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+    ... on DecryptionChallengeApproved {
+      id
+      addNewDeviceForUser(
+        currentAddDeviceSecret: $currentAddDeviceSecret
+        input: $input
+      ) {
+        accessToken
+        user {
+          EncryptedSecrets {
+            id
+            encrypted
+            kind
+            createdAt
+            updatedAt
+            iconUrl
+            url
+            label
+            version
+          }
+        }
+      }
+    }
+  }
+}
+
 mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
   deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
-    ... on DecryptionChallengeMutation {
+    ... on DecryptionChallengeApproved {
       id
       addDeviceSecretEncrypted
       encryptionSalt
@@ -10,31 +42,6 @@ mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
     ... on DecryptionChallengeForApproval {
       id
       approvedAt
-    }
-  }
-}
-
-mutation addNewDeviceForUser(
-  $currentAddDeviceSecret: NonEmptyString!
-  $input: AddNewDeviceInput!
-) {
-  addNewDeviceForUser(
-    currentAddDeviceSecret: $currentAddDeviceSecret
-    input: $input
-  ) {
-    accessToken
-    user {
-      EncryptedSecrets {
-        id
-        encrypted
-        kind
-        createdAt
-        updatedAt
-        iconUrl
-        url
-        label
-        version
-      }
     }
   }
 }

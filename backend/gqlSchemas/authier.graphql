@@ -198,8 +198,6 @@ type DecryptionChallengeGQL {
   user: UserGQL!
   approvedFromDevice: DeviceGQL
   User: [UserGQL!]!
-  addDeviceSecretEncrypted: String!
-  encryptionSalt: String!
 }
 
 type SettingsConfigGQL {
@@ -291,6 +289,7 @@ enum EmailVerificationType {
 type DecryptionChallengeForApproval {
   id: Int!
   approvedAt: DateTime
+  rejectedAt: DateTime
   createdAt: DateTime!
 }
 
@@ -305,10 +304,6 @@ type Mutation {
   registerNewUser(
     userId: UUID!
     input: RegisterNewAccountInput!
-  ): LoginResponse!
-  addNewDeviceForUser(
-    currentAddDeviceSecret: NonEmptyString!
-    input: AddNewDeviceInput!
   ): LoginResponse!
 
   """
@@ -455,8 +450,6 @@ type DecryptionChallengeMutation {
   user: UserGQL!
   approvedFromDevice: DeviceGQL
   User: [UserGQL!]!
-  addDeviceSecretEncrypted: String!
-  encryptionSalt: String!
   approve: DecryptionChallengeGQL!
   reject: DecryptionChallengeGQL!
   recoverAccount: DecryptionChallengeGQL!
@@ -507,28 +500,46 @@ type LoginResponse {
 }
 
 input RegisterNewAccountInput {
-  email: EmailAddress!
   deviceName: String!
-  deviceId: UUID!
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
-  addDeviceSecretEncrypted: NonEmptyString!
+  deviceId: UUID!
   encryptionSalt: NonEmptyString!
-}
-
-input AddNewDeviceInput {
-  email: EmailAddress!
-  deviceName: String!
-  deviceId: UUID!
-  firebaseToken: String!
-  addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
-  decryptionChallengeId: PositiveInt!
+  email: EmailAddress!
 }
 
 union DecryptionChallenge =
-    DecryptionChallengeMutation
+    DecryptionChallengeApproved
   | DecryptionChallengeForApproval
+
+type DecryptionChallengeApproved {
+  id: Int!
+  masterPasswordVerifiedAt: DateTime
+  approvedAt: DateTime
+  rejectedAt: DateTime
+  blockIp: Boolean
+  userId: String!
+  createdAt: DateTime!
+  deviceId: String
+  approvedByRecovery: Boolean!
+  approvedFromDeviceId: String
+  user: UserGQL!
+  approvedFromDevice: DeviceGQL
+  User: [UserGQL!]!
+  addDeviceSecretEncrypted: String!
+  encryptionSalt: String!
+  addNewDeviceForUser(
+    currentAddDeviceSecret: NonEmptyString!
+    input: AddNewDeviceInput!
+  ): LoginResponse!
+}
+
+input AddNewDeviceInput {
+  deviceName: String!
+  firebaseToken: String!
+  addDeviceSecret: NonEmptyString!
+}
 
 input WebInputElement {
   domPath: String!

@@ -8,8 +8,8 @@ export interface PossibleTypesResultData {
 const result: PossibleTypesResultData = {
   possibleTypes: {
     DecryptionChallenge: [
-      'DecryptionChallengeForApproval',
-      'DecryptionChallengeMutation'
+      'DecryptionChallengeApproved',
+      'DecryptionChallengeForApproval'
     ]
   }
 }

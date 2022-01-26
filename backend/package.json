@@ -70,6 +70,7 @@
     "deploy": "caprover deploy -t authier-api.tar.gz -h https://captain.caprover-root.subz.fun -a authier-api --default",
     "buildAndDeploy": "yarn build && yarn deploy",
     "bundle": "tsnd scripts/bundle.ts",
+    "studio": "prisma studio",
     "dbPush": "prisma db push",
     "generate": "prisma generate",
     "postinstall": "prisma generate",

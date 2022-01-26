@@ -8,31 +8,28 @@ import { Field, InputType } from 'type-graphql'
 import { EncryptedSecretInput, EncryptedSecretPatchInput } from './models'
 
 @InputType()
-export class AuthCommonInput {
-  @Field(() => GraphQLEmailAddress)
-  email: string
+export class AddNewDeviceInput {
   @Field()
   deviceName: string
-  @Field(() => GraphQLUUID)
-  deviceId: string
   @Field()
   firebaseToken: string
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string
-  @Field(() => GraphQLNonEmptyString)
-  addDeviceSecretEncrypted: string
 }
 
 @InputType()
-export class AddNewDeviceInput extends AuthCommonInput {
-  @Field(() => GraphQLPositiveInt)
-  decryptionChallengeId: number
-}
+export class RegisterNewAccountInput extends AddNewDeviceInput {
+  @Field(() => GraphQLUUID)
+  deviceId: string
 
-@InputType()
-export class RegisterNewAccountInput extends AuthCommonInput {
   @Field(() => GraphQLNonEmptyString)
   encryptionSalt: string
+
+  @Field(() => GraphQLNonEmptyString)
+  addDeviceSecretEncrypted: string
+
+  @Field(() => GraphQLEmailAddress)
+  email: string
 }
 
 @InputType()

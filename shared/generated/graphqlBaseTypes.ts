@@ -32,11 +32,7 @@ export type Scalars = {
 
 export type AddNewDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString']
-  addDeviceSecretEncrypted: Scalars['NonEmptyString']
-  decryptionChallengeId: Scalars['PositiveInt']
-  deviceId: Scalars['UUID']
   deviceName: Scalars['String']
-  email: Scalars['EmailAddress']
   firebaseToken: Scalars['String']
 }
 
@@ -48,20 +44,14 @@ export type ChangeMasterPasswordInput = {
 }
 
 export type DecryptionChallenge =
+  | DecryptionChallengeApproved
   | DecryptionChallengeForApproval
-  | DecryptionChallengeMutation
 
-export type DecryptionChallengeForApproval = {
-  __typename?: 'DecryptionChallengeForApproval'
-  approvedAt?: Maybe<Scalars['DateTime']>
-  createdAt: Scalars['DateTime']
-  id: Scalars['Int']
-}
-
-export type DecryptionChallengeGql = {
-  __typename?: 'DecryptionChallengeGQL'
+export type DecryptionChallengeApproved = {
+  __typename?: 'DecryptionChallengeApproved'
   User: Array<UserGql>
   addDeviceSecretEncrypted: Scalars['String']
+  addNewDeviceForUser: LoginResponse
   approvedAt?: Maybe<Scalars['DateTime']>
   approvedByRecovery: Scalars['Boolean']
   approvedFromDevice?: Maybe<DeviceGql>
@@ -77,10 +67,39 @@ export type DecryptionChallengeGql = {
   userId: Scalars['String']
 }
 
+export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
+  currentAddDeviceSecret: Scalars['NonEmptyString']
+  input: AddNewDeviceInput
+}
+
+export type DecryptionChallengeForApproval = {
+  __typename?: 'DecryptionChallengeForApproval'
+  approvedAt?: Maybe<Scalars['DateTime']>
+  createdAt: Scalars['DateTime']
+  id: Scalars['Int']
+  rejectedAt?: Maybe<Scalars['DateTime']>
+}
+
+export type DecryptionChallengeGql = {
+  __typename?: 'DecryptionChallengeGQL'
+  User: Array<UserGql>
+  approvedAt?: Maybe<Scalars['DateTime']>
+  approvedByRecovery: Scalars['Boolean']
+  approvedFromDevice?: Maybe<DeviceGql>
+  approvedFromDeviceId?: Maybe<Scalars['String']>
+  blockIp?: Maybe<Scalars['Boolean']>
+  createdAt: Scalars['DateTime']
+  deviceId?: Maybe<Scalars['String']>
+  id: Scalars['Int']
+  masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
+  rejectedAt?: Maybe<Scalars['DateTime']>
+  user: UserGql
+  userId: Scalars['String']
+}
+
 export type DecryptionChallengeMutation = {
   __typename?: 'DecryptionChallengeMutation'
   User: Array<UserGql>
-  addDeviceSecretEncrypted: Scalars['String']
   approve: DecryptionChallengeGql
   approvedAt?: Maybe<Scalars['DateTime']>
   approvedByRecovery: Scalars['Boolean']
@@ -89,7 +108,6 @@ export type DecryptionChallengeMutation = {
   blockIp?: Maybe<Scalars['Boolean']>
   createdAt: Scalars['DateTime']
   deviceId?: Maybe<Scalars['String']>
-  encryptionSalt: Scalars['String']
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   recoverAccount: DecryptionChallengeGql
@@ -297,7 +315,6 @@ export type LoginResponse = {
 
 export type Mutation = {
   __typename?: 'Mutation'
-  addNewDeviceForUser: LoginResponse
   addWebInputs: Array<WebInputGql>
   currentDevice: DeviceMutation
   /** returns a decryption challenge */
@@ -308,11 +325,6 @@ export type Mutation = {
   me: UserMutation
   registerNewUser: LoginResponse
   user?: Maybe<UserMutation>
-}
-
-export type MutationAddNewDeviceForUserArgs = {
-  currentAddDeviceSecret: Scalars['NonEmptyString']
-  input: AddNewDeviceInput
 }
 
 export type MutationAddWebInputsArgs = {
@@ -354,9 +366,7 @@ export type QueryWebInputsArgs = {
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
-  deviceId: Scalars['UUID']
   deviceName: Scalars['String']
-  email: Scalars['EmailAddress']
   encryptionSalt: Scalars['NonEmptyString']
   firebaseToken: Scalars['String']
 }

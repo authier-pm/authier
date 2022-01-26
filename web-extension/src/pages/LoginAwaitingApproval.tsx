@@ -15,48 +15,47 @@ import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { Heading, useInterval } from '@chakra-ui/react'
 
-export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
-  props
-) => {
+export const useLogin = (props: LoginFormValues) => {
   const { setUserId } = useContext(UserContext)
   const [addNewDevice] = useAddNewDeviceForUserMutation()
 
-  const [deviceDecryptionChallenge, { data: decryptionData }] =
+  const [getDeviceDecryptionChallenge, { data: decryptionData }] =
     useDeviceDecryptionChallengeMutation({
       variables: {
-        email: props.email,
-        deviceId: device.id
+        deviceId: device.id,
+        email: props.email
       }
     })
 
   useInterval(() => {
-    deviceDecryptionChallenge()
+    getDeviceDecryptionChallenge()
   }, 6000)
+  const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {
-    ;(async () => {
-      if (
-        decryptionData?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeMutation' &&
-        device.fireToken
-      ) {
+    console.log('~ decryptionData', decryptionData)
+    const { fireToken } = device
+    if (
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
+      fireToken
+    ) {
+      ;(async () => {
         const addDeviceSecretEncrypted =
-          decryptionData?.deviceDecryptionChallenge?.addDeviceSecretEncrypted
+          deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
-        const userId = decryptionData?.deviceDecryptionChallenge?.userId
+        const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
           toast.error(t`Login failed, check your username`)
           return
         }
 
-        if (!decryptionData?.deviceDecryptionChallenge?.id) {
+        if (!deviceDecryptionChallenge?.id) {
           toast.error('failed to create decryption challenge')
           return
         }
 
-        const encryptionSalt =
-          decryptionData?.deviceDecryptionChallenge?.encryptionSalt
+        const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
         const masterEncryptionKey = generateEncryptionKey(
           props.password,
           encryptionSalt
@@ -69,6 +68,7 @@ export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
             iv: cryptoJS.enc.Utf8.parse(userId)
           }
         ).toString(cryptoJS.enc.Utf8)
+        console.log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
           toast.error('wrong password or email')
@@ -77,16 +77,13 @@ export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
 
         const response = await addNewDevice({
           variables: {
+            email: props.email,
+            deviceId: await device.getDeviceId(),
+
             input: {
-              deviceId: await device.getDeviceId(),
-              ...device.getAddDeviceSecretAuthParams(
-                masterEncryptionKey,
-                userId
-              ),
-              email: props.email,
-              deviceName: deviceName,
-              firebaseToken: device.fireToken,
-              decryptionChallengeId: decryptionData.deviceDecryptionChallenge.id
+              addDeviceSecret: device.generateBackendSecret(),
+              deviceName: device.generateDeviceName(),
+              firebaseToken: fireToken
             },
             currentAddDeviceSecret
           }
@@ -97,7 +94,12 @@ export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
           currentAddDeviceSecret
         })
 
-        const addNewDeviceForUser = response.data?.addNewDeviceForUser
+        const addNewDeviceForUser =
+          response.data?.deviceDecryptionChallenge?.__typename ===
+          'DecryptionChallengeApproved'
+            ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
+            : null
+
         if (addNewDeviceForUser?.accessToken) {
           setAccessToken(addNewDeviceForUser?.accessToken)
 
@@ -112,6 +114,7 @@ export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
             email: props.email,
             encryptionSalt
           }
+
           setUserId(decodedToken.userId)
 
           device.state = new DeviceState(deviceState)
@@ -120,15 +123,23 @@ export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
         } else {
           toast.error(t`Login failed, check your username and password`)
         }
-      }
-    })()
-  }, [decryptionData?.deviceDecryptionChallenge?.__typename])
+      })()
+    }
+  }, [deviceDecryptionChallenge?.__typename])
+
+  return deviceDecryptionChallenge
+}
+
+export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
+  props
+) => {
+  const deviceDecryptionChallenge = useLogin(props)
 
   const deviceName = device.generateDeviceName()
 
   if (
-    decryptionData?.deviceDecryptionChallenge?.id &&
-    !decryptionData?.deviceDecryptionChallenge?.approvedAt
+    !deviceDecryptionChallenge ||
+    (deviceDecryptionChallenge?.id && !deviceDecryptionChallenge?.approvedAt)
   ) {
     return (
       <>
