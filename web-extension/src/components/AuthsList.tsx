@@ -16,8 +16,7 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton,
-  Image
+  IconButton
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
@@ -32,6 +31,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
+import { SecretItemIcon } from './SecretItemIcon'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
@@ -63,7 +63,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
               onClick={() => setIsOpen(true)}
             />
 
-            <Image src={totpData.iconUrl as string} boxSize="30px"></Image>
+            <SecretItemIcon {...totpData}></SecretItemIcon>
           </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{totpData.label}</StatLabel>
@@ -129,7 +129,9 @@ const LoginCredentialsListItem = ({
       <Flex key={loginSecret.url} p="3" rounded="md" bg="gray.100" minW="300px">
         <Stat maxW="100%">
           <Flex justify="space-between" align="center" w="100%">
-            <Flex flexDirection="column">{credentialIcon(loginSecret)}</Flex>
+            <Flex flexDirection="column">
+              <SecretItemIcon {...loginSecret} />
+            </Flex>
             <Box ml={2} mr="auto" maxW="200px">
               <Heading
                 size="sm"
@@ -248,16 +250,5 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
         )}
       </Flex>
     </>
-  )
-}
-function credentialIcon(loginSecret: ILoginSecret) {
-  return (
-    <Image
-      src={
-        (loginSecret.iconUrl as string) ??
-        new URL(loginSecret.url).hostname + '/favicon.ico'
-      }
-      boxSize="30px"
-    ></Image>
   )
 }
