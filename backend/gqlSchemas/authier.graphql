@@ -190,9 +190,10 @@ type DecryptionChallengeGQL {
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
+  deviceName: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String
+  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -291,7 +292,14 @@ type DecryptionChallengeForApproval {
   approvedAt: DateTime
   rejectedAt: DateTime
   createdAt: DateTime!
+  deviceName: String!
+  deviceId: UUID!
 }
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type Mutation {
   user(userId: String!): UserMutation
@@ -310,7 +318,7 @@ type Mutation {
   returns a decryption challenge
   """
   deviceDecryptionChallenge(
-    deviceId: UUID!
+    deviceInput: DeviceInput!
     email: EmailAddress!
   ): DecryptionChallenge
 
@@ -427,11 +435,6 @@ input EncryptedSecretPatchInput {
 }
 
 """
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
-"""
 A string that cannot be passed as an empty value
 """
 scalar NonEmptyString
@@ -442,9 +445,10 @@ type DecryptionChallengeMutation {
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
+  deviceName: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String
+  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -500,10 +504,10 @@ type LoginResponse {
 }
 
 input RegisterNewAccountInput {
-  deviceName: String!
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   deviceId: UUID!
+  deviceName: String!
   encryptionSalt: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
   email: EmailAddress!
@@ -519,9 +523,10 @@ type DecryptionChallengeApproved {
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
+  deviceName: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String
+  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -536,9 +541,13 @@ type DecryptionChallengeApproved {
 }
 
 input AddNewDeviceInput {
-  deviceName: String!
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
+}
+
+input DeviceInput {
+  id: UUID!
+  name: String!
 }
 
 input WebInputElement {

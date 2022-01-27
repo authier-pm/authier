@@ -3,7 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import React from 'react'
 
 import { UserProvider } from './providers/UserProvider'
-import Routes from './Routes'
+import PopupRoutes from './PopupRoutes'
 import { i18n } from '@lingui/core'
 import { ToastContainer } from 'react-toastify' // use react-toastify instead of chakra toast. Chakra toast is somehow weirdly broken in extension, see: https://github.com/chakra-ui/chakra-ui/issues/4619
 import { toastifyConfig } from '../../shared/toastifyConfig'
@@ -24,7 +24,7 @@ export default function Providers({ parent }: { parent: string }) {
           <I18nProvider i18n={i18n}>
             <ToastContainer {...toastifyConfig} />
             {/* <Routes /> */}
-            {parent === 'vault' ? <VaultRouter /> : <Routes />}
+            {parent === 'vault' ? <VaultRouter /> : <PopupRoutes />}
           </I18nProvider>
         </UserProvider>
       </DeviceStateProvider>

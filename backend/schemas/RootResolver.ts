@@ -48,7 +48,8 @@ import {
   DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
   DecryptionChallengeMutation,
-  DecryptionChallengeUnion
+  DecryptionChallengeUnion,
+  DeviceInput
 } from '../models/DecryptionChallenge'
 import { sendEmail } from '../utils/email'
 import { plainToClass } from 'class-transformer'
@@ -259,8 +260,8 @@ export class RootResolver {
   })
   async deviceDecryptionChallenge(
     @Arg('email', () => GraphQLEmailAddress) email: string,
-    @Arg('deviceId', () => GraphQLUUID)
-    deviceId: string,
+    @Arg('deviceInput', () => DeviceInput)
+    deviceInput: DeviceInput,
     @Ctx() ctx: IContext
   ) {
     const ipAddress = ctx.getIpAddress()
@@ -299,12 +300,12 @@ export class RootResolver {
       }
 
       const device = await ctx.prisma.device.findUnique({
-        where: { id: deviceId }
+        where: { id: deviceInput.id }
       })
 
       let challenge = await ctx.prisma.decryptionChallenge.findFirst({
         where: {
-          deviceId,
+          deviceId: deviceInput.id,
           userId: user.id
         }
       })
@@ -328,7 +329,8 @@ export class RootResolver {
         // TODO send notification to user
         challenge = await ctx.prisma.decryptionChallenge.create({
           data: {
-            deviceId,
+            deviceId: deviceInput.id,
+            deviceName: deviceInput.name,
             userId: user.id,
             ipAddress: ctx.getIpAddress()
           }

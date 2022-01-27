@@ -5,7 +5,7 @@ import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
-  deviceId: Types.Scalars['UUID'];
+  deviceInput: Types.DeviceInput;
   currentAddDeviceSecret: Types.Scalars['NonEmptyString'];
   input: Types.AddNewDeviceInput;
 }>;
@@ -15,7 +15,7 @@ export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecry
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
-  deviceId: Types.Scalars['UUID'];
+  deviceInput: Types.DeviceInput;
 }>;
 
 
@@ -23,8 +23,8 @@ export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', devic
 
 
 export const AddNewDeviceForUserDocument = gql`
-    mutation addNewDeviceForUser($email: EmailAddress!, $deviceId: UUID!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!) {
-  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+    mutation addNewDeviceForUser($email: EmailAddress!, $deviceInput: DeviceInput!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!) {
+  deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
       id
       addNewDeviceForUser(
@@ -66,7 +66,7 @@ export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<AddNewDevice
  * const [addNewDeviceForUserMutation, { data, loading, error }] = useAddNewDeviceForUserMutation({
  *   variables: {
  *      email: // value for 'email'
- *      deviceId: // value for 'deviceId'
+ *      deviceInput: // value for 'deviceInput'
  *      currentAddDeviceSecret: // value for 'currentAddDeviceSecret'
  *      input: // value for 'input'
  *   },
@@ -80,8 +80,8 @@ export type AddNewDeviceForUserMutationHookResult = ReturnType<typeof useAddNewD
 export type AddNewDeviceForUserMutationResult = Apollo.MutationResult<AddNewDeviceForUserMutation>;
 export type AddNewDeviceForUserMutationOptions = Apollo.BaseMutationOptions<AddNewDeviceForUserMutation, AddNewDeviceForUserMutationVariables>;
 export const DeviceDecryptionChallengeDocument = gql`
-    mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
-  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+    mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceInput: DeviceInput!) {
+  deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
       id
       addDeviceSecretEncrypted
@@ -112,7 +112,7 @@ export type DeviceDecryptionChallengeMutationFn = Apollo.MutationFunction<Device
  * const [deviceDecryptionChallengeMutation, { data, loading, error }] = useDeviceDecryptionChallengeMutation({
  *   variables: {
  *      email: // value for 'email'
- *      deviceId: // value for 'deviceId'
+ *      deviceInput: // value for 'deviceInput'
  *   },
  * });
  */

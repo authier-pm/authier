@@ -20,13 +20,16 @@ export class DecryptionChallengeGQLScalars {
   blockIp?: boolean
 
   @Field()
+  deviceName: string
+
+  @Field()
   userId: string
 
   @Field()
   createdAt: Date
 
-  @Field({ nullable: true })
-  deviceId?: string
+  @Field()
+  deviceId: string
 
   @Field()
   approvedByRecovery: boolean

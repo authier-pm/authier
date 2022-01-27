@@ -15,7 +15,7 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { Link, useLocation } from 'wouter'
+
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { UserContext } from '../providers/UserProvider'
@@ -28,6 +28,7 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from './registerNewUser.codegen'
+import { Link } from 'react-router-dom'
 
 declare global {
   interface Crypto {
@@ -88,8 +89,8 @@ export default function Register(): ReactElement {
                 email: values.email,
                 ...params,
                 deviceId,
-                firebaseToken: fireToken,
-                deviceName: device.generateDeviceName()
+                deviceName: device.generateDeviceName(),
+                firebaseToken: fireToken
               }
             }
           })
@@ -110,9 +111,7 @@ export default function Register(): ReactElement {
               encryptionSalt
             }
 
-            device.state = new DeviceState(deviceState)
-            device.state.save()
-
+            device.save(deviceState)
             setSubmitting(false)
           }
         }}

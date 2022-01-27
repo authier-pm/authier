@@ -32,7 +32,6 @@ export type Scalars = {
 
 export type AddNewDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString']
-  deviceName: Scalars['String']
   firebaseToken: Scalars['String']
 }
 
@@ -58,7 +57,8 @@ export type DecryptionChallengeApproved = {
   approvedFromDeviceId?: Maybe<Scalars['String']>
   blockIp?: Maybe<Scalars['Boolean']>
   createdAt: Scalars['DateTime']
-  deviceId?: Maybe<Scalars['String']>
+  deviceId: Scalars['String']
+  deviceName: Scalars['String']
   encryptionSalt: Scalars['String']
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
@@ -76,6 +76,8 @@ export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval'
   approvedAt?: Maybe<Scalars['DateTime']>
   createdAt: Scalars['DateTime']
+  deviceId: Scalars['UUID']
+  deviceName: Scalars['String']
   id: Scalars['Int']
   rejectedAt?: Maybe<Scalars['DateTime']>
 }
@@ -89,7 +91,8 @@ export type DecryptionChallengeGql = {
   approvedFromDeviceId?: Maybe<Scalars['String']>
   blockIp?: Maybe<Scalars['Boolean']>
   createdAt: Scalars['DateTime']
-  deviceId?: Maybe<Scalars['String']>
+  deviceId: Scalars['String']
+  deviceName: Scalars['String']
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   rejectedAt?: Maybe<Scalars['DateTime']>
@@ -107,7 +110,8 @@ export type DecryptionChallengeMutation = {
   approvedFromDeviceId?: Maybe<Scalars['String']>
   blockIp?: Maybe<Scalars['Boolean']>
   createdAt: Scalars['DateTime']
-  deviceId?: Maybe<Scalars['String']>
+  deviceId: Scalars['String']
+  deviceName: Scalars['String']
   id: Scalars['Int']
   masterPasswordVerifiedAt?: Maybe<Scalars['DateTime']>
   recoverAccount: DecryptionChallengeGql
@@ -140,6 +144,11 @@ export type DeviceGql = {
   updatedAt?: Maybe<Scalars['DateTime']>
   userId: Scalars['String']
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>
+}
+
+export type DeviceInput = {
+  id: Scalars['UUID']
+  name: Scalars['String']
 }
 
 export type DeviceMutation = {
@@ -332,7 +341,7 @@ export type MutationAddWebInputsArgs = {
 }
 
 export type MutationDeviceDecryptionChallengeArgs = {
-  deviceId: Scalars['UUID']
+  deviceInput: DeviceInput
   email: Scalars['EmailAddress']
 }
 
@@ -366,7 +375,9 @@ export type QueryWebInputsArgs = {
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
+  deviceId: Scalars['UUID']
   deviceName: Scalars['String']
+  email: Scalars['EmailAddress']
   encryptionSalt: Scalars['NonEmptyString']
   firebaseToken: Scalars['String']
 }
