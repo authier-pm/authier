@@ -82,6 +82,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
         const state = device.state
         let skipped = 0
         for (const creds of mapped) {
+          const hostname = new URL(creds.url).hostname
           const secret = await state?.addSecret({
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds.loginCredential,
@@ -89,8 +90,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
             iconUrl: null,
             url: creds.url,
             label:
-              creds.label ??
-              `${creds.loginCredential.username}@${new URL(creds.url).hostname}`
+              creds.label ?? `${creds.loginCredential.username}@${hostname}`
           })
           if (!secret) {
             skipped++
