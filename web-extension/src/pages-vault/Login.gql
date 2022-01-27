@@ -1,10 +1,10 @@
 mutation addNewDeviceForUser(
   $email: EmailAddress!
-  $deviceId: UUID!
+  $deviceInput: DeviceInput!
   $currentAddDeviceSecret: NonEmptyString!
   $input: AddNewDeviceInput!
 ) {
-  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+  deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
       id
       addNewDeviceForUser(
@@ -30,8 +30,11 @@ mutation addNewDeviceForUser(
   }
 }
 
-mutation deviceDecryptionChallenge($email: EmailAddress!, $deviceId: UUID!) {
-  deviceDecryptionChallenge(email: $email, deviceId: $deviceId) {
+mutation deviceDecryptionChallenge(
+  $email: EmailAddress!
+  $deviceInput: DeviceInput!
+) {
+  deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
       id
       addDeviceSecretEncrypted

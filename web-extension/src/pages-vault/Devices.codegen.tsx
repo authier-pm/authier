@@ -6,7 +6,7 @@ const defaultOptions =  {}
 export type DevicesPageQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null | undefined, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string }> } | null | undefined };
+export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null | undefined, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string }> } | null | undefined };
 
 export type ApproveChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int'];
@@ -31,6 +31,8 @@ export const DevicesPageDocument = gql`
     decryptionChallengesWaiting {
       id
       createdAt
+      deviceName
+      deviceId
     }
   }
 }

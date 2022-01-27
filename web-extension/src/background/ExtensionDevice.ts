@@ -483,6 +483,12 @@ class ExtensionDevice {
       }
     })
   }
+
+  async save(deviceState: IBackgroundStateSerializable) {
+    this.state = new DeviceState(deviceState)
+    this.state.save()
+    this.rerenderViews()
+  }
 }
 
 export const device = new ExtensionDevice()

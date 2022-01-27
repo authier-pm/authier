@@ -11,10 +11,11 @@ import {
   FormErrorMessage,
   FormLabel,
   Heading,
-  Spinner
+  Spinner,
+  IconButton,
+  Tooltip
 } from '@chakra-ui/react'
 import { Formik, Form, Field, FormikHelpers, FormikState } from 'formik'
-import { Link } from 'wouter'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 
@@ -22,9 +23,11 @@ const log = debug('au:Login')
 
 import { t, Trans } from '@lingui/macro'
 
-import { device, DeviceState } from '@src/background/ExtensionDevice'
+import { device } from '@src/background/ExtensionDevice'
 
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
+import { IoMdArchive } from 'react-icons/io'
+import { Link } from 'react-router-dom'
 
 //import { AuthKey, VaultKey } from '@src/util/encrypt'
 
@@ -32,6 +35,8 @@ export interface LoginFormValues {
   password: string
   email: string
 }
+
+// export const isRunningInVault = location.href.includes('/vault.html#')
 
 export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
@@ -116,11 +121,13 @@ export default function Login(): ReactElement {
           </Form>
         )}
       </Formik>
-      <Link to="/register">
-        <Text pt={3}>
-          <Trans>Don't have account?</Trans>
-        </Text>
-      </Link>
+      <Flex>
+        <Link to="/signup">
+          <Text pt={3}>
+            <Trans>Don't have account?</Trans>
+          </Text>
+        </Link>
+      </Flex>
     </Box>
   )
 }

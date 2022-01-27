@@ -1,7 +1,7 @@
 import { t, Trans } from '@lingui/macro'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { UserContext } from '@src/providers/UserProvider'
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { LoginFormValues } from './Login'
 import {
   useAddNewDeviceForUserMutation,
@@ -13,16 +13,19 @@ import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import { Heading, useInterval } from '@chakra-ui/react'
+import { Heading, Spinner, useInterval } from '@chakra-ui/react'
 
-export const useLogin = (props: LoginFormValues) => {
+export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
   const { setUserId } = useContext(UserContext)
-  const [addNewDevice] = useAddNewDeviceForUserMutation()
+  const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
 
   const [getDeviceDecryptionChallenge, { data: decryptionData }] =
     useDeviceDecryptionChallengeMutation({
       variables: {
-        deviceId: device.id,
+        deviceInput: {
+          id: device.id,
+          name: props.deviceName
+        },
         email: props.email
       }
     })
@@ -78,11 +81,14 @@ export const useLogin = (props: LoginFormValues) => {
         const response = await addNewDevice({
           variables: {
             email: props.email,
-            deviceId: await device.getDeviceId(),
+            deviceInput: {
+              id: device.id,
+              name: props.deviceName
+            },
 
             input: {
               addDeviceSecret: device.generateBackendSecret(),
-              deviceName: device.generateDeviceName(),
+
               firebaseToken: fireToken
             },
             currentAddDeviceSecret
@@ -117,9 +123,8 @@ export const useLogin = (props: LoginFormValues) => {
 
           setUserId(decodedToken.userId)
 
-          device.state = new DeviceState(deviceState)
-          device.state.save()
-          device.rerenderViews()
+          device.save(deviceState)
+          toast.success(t`Device approved successfully`)
         } else {
           toast.error(t`Login failed, check your username and password`)
         }
@@ -127,26 +132,34 @@ export const useLogin = (props: LoginFormValues) => {
     }
   }, [deviceDecryptionChallenge?.__typename])
 
-  return deviceDecryptionChallenge
+  return { deviceDecryptionChallenge, loading }
 }
 
 export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
   props
 ) => {
-  const deviceDecryptionChallenge = useLogin(props)
+  const [deviceName, setDeviceName] = useState(device.generateDeviceName())
 
-  const deviceName = device.generateDeviceName()
+  const { deviceDecryptionChallenge, loading } = useLogin({
+    ...props,
+    deviceName
+  })
 
+  if (loading) {
+    return <Spinner />
+  }
   if (
     !deviceDecryptionChallenge ||
     (deviceDecryptionChallenge?.id && !deviceDecryptionChallenge?.approvedAt)
   ) {
     return (
       <>
+        <Trans>Device: </Trans>
         <Heading size="sm">{deviceName}</Heading>
+        <br />
         <Trans>
           Approve this device in your device management in the vault on another
-          device.
+          device in order to finish login.
         </Trans>
       </>
     )

@@ -5,17 +5,26 @@ import { Route, Switch } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 import { device } from '@src/background/ExtensionDevice'
-import Login from '@src/pages/Login'
+import Login from '@src/pages-vault/Login'
 import { Box, Center } from '@chakra-ui/react'
 import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
+import Register from './Register'
 
 export function VaultRouter() {
   if (device.state === null) {
+    console.log('aaafd')
     return (
       <Center mw="50%" h="100vh">
-        <Login></Login>
+        <Switch>
+          <Route path="/" exact>
+            <Login />
+          </Route>
+          <Route path="/signup">
+            <Register />
+          </Route>
+        </Switch>
       </Center>
     )
   }

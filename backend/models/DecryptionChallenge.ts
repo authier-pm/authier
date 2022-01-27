@@ -1,15 +1,33 @@
-import { Arg, Ctx, Field, Info, Int, Mutation, ObjectType } from 'type-graphql'
+import {
+  Arg,
+  Ctx,
+  Field,
+  Info,
+  InputType,
+  Int,
+  Mutation,
+  ObjectType
+} from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
 import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
-import { GraphQLNonEmptyString } from 'graphql-scalars'
+import { GraphQLNonEmptyString, GraphQLUUID } from 'graphql-scalars'
 import { GraphqlError } from '../api/GraphqlError'
 import { dmmf } from '../prisma/prismaClient'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
+
+@InputType()
+export class DeviceInput {
+  @Field(() => GraphQLUUID)
+  id: string
+
+  @Field()
+  name: string
+}
 
 @ObjectType()
 export class DecryptionChallengeForApproval {
@@ -24,6 +42,12 @@ export class DecryptionChallengeForApproval {
 
   @Field()
   createdAt: Date
+
+  @Field()
+  deviceName: string
+
+  @Field(() => GraphQLUUID)
+  deviceId: string
 }
 
 @ObjectType()
@@ -47,7 +71,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       rootModel: dmmf.modelMap.User
     })
     console.log('~ include', include)
-
+    const { id, deviceId } = this
     const user = await ctx.prisma.user.findUnique({
       where: { id: this.userId },
       include: {
@@ -81,19 +105,19 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 
     await ctx.prisma.decryptionChallenge.updateMany({
       where: {
-        id: this.id,
-        deviceId: this.deviceId,
+        id,
+        deviceId,
         userId: user.id
       },
       data: { masterPasswordVerifiedAt: new Date() }
     })
 
-    const { firebaseToken, deviceName } = input
+    const { firebaseToken } = input
     const ipAddress = ctx.getIpAddress()
 
     let device = await ctx.prisma.device.findUnique({
       // TODO change this to upsert
-      where: { id: this.deviceId }
+      where: { id: deviceId }
     })
 
     if (device) {
@@ -108,11 +132,11 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     } else {
       device = await ctx.prisma.device.create({
         data: {
-          id: this.deviceId,
+          id: deviceId,
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
-          name: deviceName,
+          name: this.deviceName,
           userId: user.id,
           platform: 'chrome' // TODO add this to input
         }

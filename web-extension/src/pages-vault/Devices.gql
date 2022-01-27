@@ -5,6 +5,8 @@ query DevicesPage {
     decryptionChallengesWaiting {
       id
       createdAt
+      deviceName
+      deviceId
     }
   }
 }

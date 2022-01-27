@@ -19,7 +19,7 @@ generator PrismaTypeGraphQLTypesGenerator {
   exportedNameSuffix             = "GQL"
 }
 
-// this gets created when a user asks for a new Decryption Challenge
+// this gets created when a user asks for a new Decryption Challenge in order to login on a new device
 model DecryptionChallenge {
   id                       Int       @id @default(autoincrement())
   // @skip
@@ -28,10 +28,11 @@ model DecryptionChallenge {
   approvedAt               DateTime?
   rejectedAt               DateTime?
   blockIp                  Boolean? // when true, attempt to get a new challenge from the same IP address will fail
+  deviceName               String
   userId                   String    @db.Uuid
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
-  deviceId                 String?   @db.Uuid
+  deviceId                 String   @db.Uuid // no reference as we might want to keep this even when device is deleted
   approvedByRecovery       Boolean   @default(false)
   approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
   approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
