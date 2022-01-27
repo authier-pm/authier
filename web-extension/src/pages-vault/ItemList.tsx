@@ -18,6 +18,7 @@ import { Link } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import browser from 'webextension-polyfill'
+import { SecretItemIcon } from '@src/components/SecretItemIcon'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -40,7 +41,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
       >
         <Box bg={'gray.100'} h="90%" pos={'relative'}>
           <Center h={130}>
-            <Image src={data.iconUrl as string} />
+            <SecretItemIcon {...data} />
           </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
