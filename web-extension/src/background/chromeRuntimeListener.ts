@@ -92,14 +92,16 @@ browser.runtime.onMessage.addListener(async function (
 
       loginCredentialsSchema.parse(namePassPair)
 
-      const secret = await deviceState.addSecret({
-        kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-        loginCredentials: namePassPair,
-        encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
-        iconUrl: tab.favIconUrl,
-        url: url,
-        label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
-      })
+      const secret = await deviceState.addSecrets([
+        {
+          kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+          loginCredentials: namePassPair,
+          encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
+          iconUrl: tab.favIconUrl,
+          url: url,
+          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+        }
+      ])
       if (!secret) {
         return null
       }
@@ -132,7 +134,7 @@ browser.runtime.onMessage.addListener(async function (
       return secret
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
-        deviceState.addSecret(req.payload as ITOTPSecret)
+        deviceState.addSecrets([req.payload])
       }
     case BackgroundMessageType.saveLoginCredentialsModalShown:
       if (currentTabId) {

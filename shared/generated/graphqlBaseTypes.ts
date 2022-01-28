@@ -252,7 +252,7 @@ export type EncryptedSecretInput = {
   iosUri?: InputMaybe<Scalars['String']>
   kind: EncryptedSecretType
   label: Scalars['String']
-  url: Scalars['String']
+  url?: InputMaybe<Scalars['String']>
 }
 
 export type EncryptedSecretMutation = {
@@ -288,7 +288,7 @@ export type EncryptedSecretPatchInput = {
   iosUri?: InputMaybe<Scalars['String']>
   kind: EncryptedSecretType
   label: Scalars['String']
-  url: Scalars['String']
+  url?: InputMaybe<Scalars['String']>
 }
 
 export type EncryptedSecretQuery = {
@@ -518,7 +518,7 @@ export type UserMutationAddDeviceArgs = {
 }
 
 export type UserMutationAddEncryptedSecretsArgs = {
-  payload: Array<EncryptedSecretInput>
+  secrets: Array<EncryptedSecretInput>
 }
 
 export type UserMutationApproveDeviceArgs = {

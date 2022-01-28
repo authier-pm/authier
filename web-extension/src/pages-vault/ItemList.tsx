@@ -8,7 +8,8 @@ import {
   Text,
   Image,
   Input,
-  useDisclosure
+  useDisclosure,
+  Stat
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useState } from 'react'
@@ -19,13 +20,17 @@ import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import browser from 'webextension-polyfill'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
+import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
+import { device } from '@src/background/ExtensionDevice'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
   const { deviceState } = useContext(DeviceStateContext)
-
+  if (!deviceState) {
+    return null
+  }
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
@@ -80,21 +85,12 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
               isOpen={isOpen}
               onClose={onClose}
               deleteItem={async () => {
-                if (!deviceState) {
-                  throw new Error('deviceState is not set')
-                }
                 await deleteEncryptedSecretMutation({
                   variables: {
                     id: data.id
                   }
                 })
-
-                browser.storage.local.set({
-                  backgroundState: {
-                    ...deviceState,
-                    secrets: deviceState.secrets.filter((s) => s.id !== data.id)
-                  }
-                })
+                await device.state?.removeSecret(data.id)
               }}
             />
           </Flex>
@@ -135,14 +131,24 @@ export const ItemList = () => {
 
   return (
     <Flex flexDirection="column">
-      <Input
-        w={['300px', '350px', '400px', '500px']}
-        placeholder={t`Search vault`}
-        m="auto"
-        onChange={(ev) => {
-          setFilterBy(ev.target.value)
-        }}
-      />
+      <Center mw="100%">
+        <Input
+          w={['300px', '350px', '400px', '500px']}
+          placeholder={t`Search vault`}
+          mr="auto"
+          onChange={(ev) => {
+            setFilterBy(ev.target.value)
+          }}
+        />
+        <Center mx={4} px={10}>
+          <Stat ml="auto">
+            {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
+          </Stat>
+
+          <RefreshSecretsButton />
+        </Center>
+      </Center>
+
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">

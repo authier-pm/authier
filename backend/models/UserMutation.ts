@@ -97,17 +97,22 @@ export class UserMutation extends UserBase {
   // }
   @Field(() => [EncryptedSecretQuery])
   async addEncryptedSecrets(
-    @Arg('payload', () => [EncryptedSecretInput])
-    payload: EncryptedSecretInput[],
+    @Arg('secrets', () => [EncryptedSecretInput])
+    secrets: EncryptedSecretInput[],
     @Ctx() ctx: IContext
   ) {
-    return ctx.prisma.encryptedSecret.createMany({
-      data: payload.map((secret) => ({
-        version: 1,
-        userId: this.id,
-        ...secret
-      }))
-    })
+    return ctx.prisma.$transaction(
+      // prisma.createMany cannot be used here https://github.com/prisma/prisma/issues/8131
+      secrets.map((secret) =>
+        ctx.prisma.encryptedSecret.create({
+          data: {
+            version: 1,
+            userId: this.id,
+            ...secret
+          }
+        })
+      )
+    )
   }
 
   @Field(() => DeviceGQL)

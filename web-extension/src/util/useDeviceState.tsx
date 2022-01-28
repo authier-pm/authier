@@ -144,7 +144,7 @@ export function useDeviceState() {
       )
       const creds = filtered.map((secret) => {
         let parsed
-        log('~ secret', deviceState.masterEncryptionKey, secret.encrypted)
+
         try {
           const decrypted = cryptoJS.AES.decrypt(
             secret.encrypted,

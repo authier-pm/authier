@@ -3,18 +3,18 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions =  {}
-export type AddEncryptedSecretMutationVariables = Types.Exact<{
-  payload: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
+export type AddEncryptedSecretsMutationVariables = Types.Exact<{
+  secrets: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
 }>;
 
 
-export type AddEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number, createdAt: string, updatedAt?: string | null | undefined }> } };
+export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number, createdAt: string, updatedAt?: string | null | undefined }> } };
 
 
-export const AddEncryptedSecretDocument = gql`
-    mutation addEncryptedSecret($payload: [EncryptedSecretInput!]!) {
+export const AddEncryptedSecretsDocument = gql`
+    mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {
   me {
-    addEncryptedSecrets(payload: $payload) {
+    addEncryptedSecrets(secrets: $secrets) {
       id
       kind
       encrypted
@@ -28,29 +28,29 @@ export const AddEncryptedSecretDocument = gql`
   }
 }
     `;
-export type AddEncryptedSecretMutationFn = Apollo.MutationFunction<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>;
+export type AddEncryptedSecretsMutationFn = Apollo.MutationFunction<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>;
 
 /**
- * __useAddEncryptedSecretMutation__
+ * __useAddEncryptedSecretsMutation__
  *
- * To run a mutation, you first call `useAddEncryptedSecretMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useAddEncryptedSecretMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useAddEncryptedSecretsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddEncryptedSecretsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [addEncryptedSecretMutation, { data, loading, error }] = useAddEncryptedSecretMutation({
+ * const [addEncryptedSecretsMutation, { data, loading, error }] = useAddEncryptedSecretsMutation({
  *   variables: {
- *      payload: // value for 'payload'
+ *      secrets: // value for 'secrets'
  *   },
  * });
  */
-export function useAddEncryptedSecretMutation(baseOptions?: Apollo.MutationHookOptions<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>) {
+export function useAddEncryptedSecretsMutation(baseOptions?: Apollo.MutationHookOptions<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>(AddEncryptedSecretDocument, options);
+        return Apollo.useMutation<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>(AddEncryptedSecretsDocument, options);
       }
-export type AddEncryptedSecretMutationHookResult = ReturnType<typeof useAddEncryptedSecretMutation>;
-export type AddEncryptedSecretMutationResult = Apollo.MutationResult<AddEncryptedSecretMutation>;
-export type AddEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<AddEncryptedSecretMutation, AddEncryptedSecretMutationVariables>;
+export type AddEncryptedSecretsMutationHookResult = ReturnType<typeof useAddEncryptedSecretsMutation>;
+export type AddEncryptedSecretsMutationResult = Apollo.MutationResult<AddEncryptedSecretsMutation>;
+export type AddEncryptedSecretsMutationOptions = Apollo.BaseMutationOptions<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>;

@@ -360,7 +360,7 @@ type UserMutation {
   ): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecrets(
-    payload: [EncryptedSecretInput!]!
+    secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
@@ -398,7 +398,7 @@ type EncryptedSecretMutation {
 
 input EncryptedSecretInput {
   kind: EncryptedSecretType!
-  url: String!
+  url: String
   iconUrl: String
   iosUri: String
   androidUri: String
@@ -425,7 +425,7 @@ input ChangeMasterPasswordInput {
 
 input EncryptedSecretPatchInput {
   kind: EncryptedSecretType!
-  url: String!
+  url: String
   iconUrl: String
   iosUri: String
   androidUri: String

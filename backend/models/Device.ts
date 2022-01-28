@@ -27,17 +27,22 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery])
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
-    const { userId } = ctx.jwtPayload
+
+    console.log('~ lastSyncCondition', lastSyncCondition)
     const res = await ctx.prisma.encryptedSecret.findMany({
       where: {
         OR: [
           {
-            userId: userId,
+            userId: this.userId,
             createdAt: lastSyncCondition
           },
           {
-            userId: userId,
+            userId: this.userId,
             updatedAt: lastSyncCondition
+          },
+          {
+            userId: this.userId,
+            deletedAt: lastSyncCondition
           }
         ]
       }
@@ -65,7 +70,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => GraphQLISODateTime)
   async markAsSynced(@Ctx() ctx: IContext) {
     const syncedAt = new Date()
-    const res = await ctx.prisma.device.update({
+    await ctx.prisma.device.update({
       data: {
         lastSyncAt: syncedAt
       },
