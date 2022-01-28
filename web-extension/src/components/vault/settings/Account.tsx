@@ -91,20 +91,24 @@ export default function Account() {
             ) {
               const decryptionChallenge = await deviceDecryptionChallenge({
                 variables: {
-                  deviceId: await device.getDeviceId(),
+                  deviceInput: {
+                    id: device.id,
+                    name: device.name
+                  },
                   email: values.email
                 }
               })
 
               const secrets = device.state.secrets
               const userId =
+                // @ts-expect-error TODO fix
                 decryptionChallenge.data?.deviceDecryptionChallenge?.userId
 
               const secretAuthTuple = device.getAddDeviceSecretAuthParams(
                 values.newPassword,
                 userId as string
               )
-              console.log('~ secretAuthTuple', secretAuthTuple)
+
               await changePassword({
                 variables: {
                   secrets: device.serializeSecrets(secrets, values.newPassword),

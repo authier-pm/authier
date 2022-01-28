@@ -1,6 +1,6 @@
-mutation addEncryptedSecret($payload: [EncryptedSecretInput!]!) {
+mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {
   me {
-    addEncryptedSecrets(payload: $payload) {
+    addEncryptedSecrets(secrets: $secrets) {
       id
       kind
       encrypted

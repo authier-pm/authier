@@ -16,9 +16,9 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
-  AddEncryptedSecretDocument,
-  AddEncryptedSecretMutation,
-  AddEncryptedSecretMutationVariables
+  AddEncryptedSecretsDocument,
+  AddEncryptedSecretsMutation,
+  AddEncryptedSecretsMutationVariables
 } from './backgroundPage.codegen'
 import {
   SyncEncryptedSecretsDocument,
@@ -63,13 +63,20 @@ async function rerenderViewInThisRuntime() {
     index.renderPopup()
   }
 }
+type SecretTypeUnion = ILoginSecret | ITOTPSecret
 
-const isLoginSecret = (
-  secret: ILoginSecret | ITOTPSecret
-): secret is ILoginSecret => 'loginCredentials' in secret
-const isTotpSecret = (
-  secret: ILoginSecret | ITOTPSecret
-): secret is ITOTPSecret => 'totp' in secret
+const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
+  'loginCredentials' in secret
+
+const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
+  'totp' in secret
+
+export type AddSecretInput = Array<
+  Omit<SecretSerializedType, 'id'> & {
+    totp?: string
+    loginCredentials?: any
+  }
+>
 
 export class DeviceState {
   constructor(parameters: IBackgroundStateSerializable) {
@@ -177,28 +184,33 @@ export class DeviceState {
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
     >({
-      query: SyncEncryptedSecretsDocument
+      query: SyncEncryptedSecretsDocument,
+      fetchPolicy: 'no-cache'
     })
     if (data) {
       const deviceState = device.state
       if (data && deviceState) {
-        const removedSecrets = data.currentDevice.encryptedSecretsToSync.filter(
-          ({ deletedAt }) => deletedAt
-        )
+        const backendRemovedSecrets =
+          data.currentDevice.encryptedSecretsToSync.filter(
+            ({ deletedAt }) => deletedAt
+          )
         const newAndUpdatedSecrets =
           data.currentDevice.encryptedSecretsToSync.filter(
-            ({ updatedAt }) => !updatedAt
+            ({ deletedAt }) => !deletedAt
           )
 
-        const oldSecretsWithoutRemoved = deviceState.secrets.filter(
+        const secretsBeforeSync = deviceState.secrets
+        const unchangedSecrets = secretsBeforeSync.filter(
           ({ id }) =>
-            !removedSecrets.find((removedSecret) => id === removedSecret.id)
+            !backendRemovedSecrets.find(
+              (removedSecret) => id === removedSecret.id
+            ) &&
+            !newAndUpdatedSecrets.find(
+              (updatedSecret) => id === updatedSecret.id
+            )
         )
 
-        deviceState.secrets = [
-          ...oldSecretsWithoutRemoved,
-          ...newAndUpdatedSecrets
-        ]
+        deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
 
         await this.save()
 
@@ -206,6 +218,20 @@ export class DeviceState {
           MarkAsSyncedMutation,
           MarkAsSyncedMutationVariables
         >({ mutation: MarkAsSyncedDocument })
+
+        const actuallyRemovedOnThisDevice = backendRemovedSecrets.filter(
+          ({ id: removedId }) => {
+            return secretsBeforeSync.find(({ id }) => removedId === id)
+          }
+        )
+        console.log(
+          '~ actuallyRemovedOnThisDevice',
+          actuallyRemovedOnThisDevice
+        )
+        return {
+          removedSecrets: actuallyRemovedOnThisDevice.length,
+          newAndUpdatedSecrets: newAndUpdatedSecrets.length
+        }
       }
     }
   }
@@ -225,46 +251,59 @@ export class DeviceState {
 
   /**
    * invokes the backend mutation and pushes the new secret to the bgState
-   * @param secret
+   * @param secrets
    * @returns the added secret
    */
-  async addSecret(secret) {
-    const existingSecret = this.findExistingSecret(secret)
-    if (existingSecret) {
-      return null
-    }
-
-    const stringToEncrypt =
-      secret.kind === EncryptedSecretType.TOTP
-        ? secret.totp
-        : JSON.stringify(secret.loginCredentials)
-
-    const encrypted = this.encrypt(stringToEncrypt)
+  async addSecrets(secrets: AddSecretInput) {
+    // const existingSecret = this.findExistingSecret(secrets)
+    // if (existingSecret) {
+    //   return null
+    // }
 
     const { data } = await apolloClient.mutate<
-      AddEncryptedSecretMutation,
-      AddEncryptedSecretMutationVariables
+      AddEncryptedSecretsMutation,
+      AddEncryptedSecretsMutationVariables
     >({
-      mutation: AddEncryptedSecretDocument,
+      mutation: AddEncryptedSecretsDocument,
       variables: {
-        payload: {
-          encrypted,
-          kind: secret.kind,
-          label: secret.label,
-          iconUrl: secret.iconUrl,
-          url: secret.url
-        }
+        secrets: secrets.map((secret) => {
+          const stringToEncrypt =
+            secret.kind === EncryptedSecretType.TOTP
+              ? secret.totp
+              : JSON.stringify(secret.loginCredentials)
+
+          const encrypted = this.encrypt(stringToEncrypt as string)
+
+          return {
+            encrypted,
+            kind: secret.kind,
+            label: secret.label,
+            iconUrl: secret.iconUrl,
+            url: secret.url
+          }
+        })
       }
     })
     if (!data) {
       throw new Error('failed to save secret')
     }
-    log('saved secret to the backend', secret)
-    const [secretAdded] = data.me.addEncryptedSecrets
+    log('saved secret to the backend', secrets)
+    const secretsAdded = data.me.addEncryptedSecrets
 
-    this.secrets.push(secretAdded)
+    this.secrets.push(...secretsAdded)
     await this.save()
-    return secretAdded
+    return secretsAdded
+  }
+
+  async removeSecret(secretId: string) {
+    // browser.storage.local.set({
+    //   backgroundState: {
+    //     ...deviceState,
+    //     secrets: deviceState.secrets.filter((s) => s.id !== data.id)
+    //   }
+    // })
+    this.secrets = this.secrets.filter((s) => s.id !== secretId)
+    this.save()
   }
 
   destroy() {
@@ -277,6 +316,7 @@ class ExtensionDevice {
   fireToken: string | null = null
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
+  name: string
 
   /**
    * runs on startup
@@ -284,7 +324,7 @@ class ExtensionDevice {
   async initialize() {
     this.id = await this.getDeviceId()
 
-    let storedState = null
+    let storedState: IBackgroundStateSerializable | null = null
 
     if (isRunningInBgPage === false) {
       //this is popup or vault
@@ -307,7 +347,9 @@ class ExtensionDevice {
 
     if (storedState) {
       this.state = new DeviceState(storedState)
+      this.name = storedState.deviceName
     } else {
+      this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
 
