@@ -32,6 +32,7 @@ if (process.env.JEST_WORKER_ID) {
 
 export const prismaClient = new PrismaClient({
   log: logConfig,
+  errorFormat: 'pretty',
   datasources: {
     db: {
       url: dbUrl

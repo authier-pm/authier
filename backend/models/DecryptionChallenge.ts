@@ -66,14 +66,17 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     @Ctx() ctx: IContext,
     @Info() info: GraphQLResolveInfo
   ) {
-    const include = getPrismaRelationsFromInfo({
-      info,
-      rootModel: dmmf.modelMap.User
-    })
-    console.log('~ include', include)
-    const { id, deviceId } = this
-    const user = await ctx.prisma.user.findUnique({
-      where: { id: this.userId },
+    // const include = getPrismaRelationsFromInfo({
+    //   info,
+    //   rootModel: dmmf.modelMap.User
+    // })
+
+    const { id, deviceId, userId } = this
+    const where = { id: userId }
+
+    // TODO use findUnique when prisma bug gets fixed
+    const user = await ctx.prisma.user.findFirst({
+      where: where,
       include: {
         EncryptedSecrets: true
       }
@@ -82,11 +85,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     if (!user) {
       throw new GraphqlError('User not found')
     }
-    console.log(
-      '~ currentAddDeviceSecret',
-      currentAddDeviceSecret,
-      user?.addDeviceSecret
-    )
 
     if (user?.addDeviceSecret !== currentAddDeviceSecret) {
       // TODO rate limit these attempts and notify current devices

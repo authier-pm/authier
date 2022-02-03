@@ -158,7 +158,7 @@ describe('RootResolver', () => {
   })
 
   describe('deviceDecryptionChallenge', () => {
-    it('should return a decryption challenge', async () => {
+    it('should return a DecryptionChallengeForApproval', async () => {
       let userId = faker.datatype.uuid()
       let fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
@@ -175,13 +175,14 @@ describe('RootResolver', () => {
 
       let data = (await resolver.deviceDecryptionChallenge(
         fakeData.email,
-        faker.datatype.uuid(),
+        {
+          id: faker.datatype.uuid(),
+          name: 'chrome '
+        },
         makeFakeCtx(userId)
       )) as DecryptionChallengeApproved
 
-      expect(data?.addDeviceSecretEncrypted).toBe(
-        fakeData.addDeviceSecretEncrypted
-      )
+      expect(data?.addDeviceSecretEncrypted).toBe(undefined)
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
@@ -203,7 +204,9 @@ describe('RootResolver', () => {
       const data = Array.from({ length: 10 }).map(() => ({
         userId: userId,
         ipAddress: faker.internet.ip(),
-        masterPasswordVerifiedAt: null
+        masterPasswordVerifiedAt: null,
+        deviceId: faker.datatype.uuid(),
+        deviceName: 'chrome'
       }))
 
       await prismaClient.decryptionChallenge.createMany({
@@ -213,7 +216,10 @@ describe('RootResolver', () => {
       await expect(async () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
-          faker.datatype.uuid(),
+          {
+            id: faker.datatype.uuid(),
+            name: 'chrome '
+          },
           makeFakeCtx(userId)
         )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
