@@ -17,6 +17,7 @@ import {
 } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
+import { Link } from '../components/Link'
 export const Links = [
   'Features',
   'Pricing',
@@ -69,100 +70,64 @@ const SignUpHero = () => {
       minH="100%"
     >
       <Container maxW="container.xl">
-        <SimpleGrid
-          alignItems="center"
-          w={{ base: 'full', xl: '100vw' }}
-          columns={{ base: 1, lg: 11 }}
-          gap={{ base: 0, lg: 24 }}
-          mx="auto"
-          // backgroundColor="gray.200"
-        >
-          <GridItem colSpan={{ base: 'auto', md: 4 }} maxW={550}>
-            <Box
-              as="form"
-              mb={8}
-              rounded="lg"
-              shadow="xl"
-              bgColor="whiteAlpha.300"
-              bgBlendMode="darken"
-              boxShadow="dark-lg"
-              dropShadow="lg"
-              border="none"
-              borderBottom="0px"
-              overflow="hidden"
-            >
-              <Center pb={0} color={useColorModeValue('gray.700', 'gray.600')}>
-                <Text pt={2} fontSize="md" mt={3} color="brand.500">
-                  It takes less than a minute to sign up
-                </Text>
-              </Center>
-              <SimpleGrid
-                columns={1}
-                px={6}
-                py={4}
-                spacing={4}
-                borderColor={useColorModeValue('gray.200', 'gray.700')}
-              >
-                <Flex>
-                  <VisuallyHidden>Email Address</VisuallyHidden>
-                  <Input
-                    mt={0}
-                    type="email"
-                    placeholder="Email Address"
-                    required
-                    bgColor="white"
-                  />
-                </Flex>
-                <Flex>
-                  <VisuallyHidden>Password</VisuallyHidden>
-                  <Input
-                    mt={0}
-                    type="password"
-                    placeholder="Password"
-                    autoComplete="new-password"
-                    required
-                    bgColor="white"
-                  />
-                </Flex>
-                <Button colorScheme="teal" w="full" py={2} type="submit">
-                  Sign up for free
-                </Button>
-              </SimpleGrid>
-              <chakra.p
-                p={2}
-                fontSize="xs"
-                textAlign="center"
-                color="gray.600"
-                backgroundColor="whiteAlpha.500"
-              >
-                By signing up you agree to our{' '}
-                <chakra.a color="brand.500">Terms of Service</chakra.a>
-              </chakra.p>
-            </Box>
-          </GridItem>
-          <GridItem
-            colSpan={{ base: 'auto', lg: 7 }}
-            textAlign={{ base: 'center', lg: 'left' }}
-            color={'cyan.900'}
+        <GridItem colSpan={{ base: 'auto', md: 4 }} maxW={550}>
+          <Box
+            as="form"
+            mb={8}
+            p={12}
+            rounded="lg"
+            shadow="xl"
+            bgColor="whiteAlpha.300"
+            bgBlendMode="darken"
+            boxShadow="dark-lg"
+            dropShadow="lg"
+            border="none"
+            borderBottom="0px"
+            overflow="hidden"
           >
-            <chakra.h1
-              mb={4}
-              fontSize={{ base: '3xl', md: '4xl' }}
-              fontWeight="bold"
-              lineHeight={{ base: 'shorter', md: 'none' }}
-              letterSpacing={{ base: 'normal', md: 'tight' }}
+            <Center
+              pb={0}
+              color={useColorModeValue('gray.700', 'gray.600')}
+              flexDir="column"
             >
-              Ready to start using the smartest 2FA?
-            </chakra.h1>
-            <chakra.p
-              mb={{ base: 10, md: 4 }}
-              fontSize={{ base: 'lg', md: 'xl' }}
-              fontWeight="thin"
-              color="gray.500"
-              letterSpacing="wider"
-            ></chakra.p>
-          </GridItem>
-        </SimpleGrid>
+              <chakra.h1
+                mb={4}
+                fontSize={{ base: '3xl', md: '4xl' }}
+                fontWeight="bold"
+                lineHeight={{ base: 'shorter', md: 'none' }}
+                letterSpacing={{ base: 'normal', md: 'tight' }}
+              >
+                Ready to explore how easy authentication can be?
+              </chakra.h1>
+              <Link href="/download">
+                <Text pt={2} fontSize="md" mt={3} color="brand.800">
+                  It takes less than a minute to set up, just download the
+                  browser extension and start
+                </Text>
+              </Link>
+            </Center>
+            <SimpleGrid
+              columns={1}
+              px={6}
+              py={4}
+              spacing={4}
+              borderColor={useColorModeValue('gray.200', 'gray.700')}
+            ></SimpleGrid>
+          </Box>
+        </GridItem>
+        <GridItem
+          colSpan={{ base: 'auto', lg: 7 }}
+          textAlign={{ base: 'center', lg: 'left' }}
+          color={'cyan.900'}
+        >
+          <chakra.p
+            mb={{ base: 10, md: 4 }}
+            fontSize={{ base: 'lg', md: 'xl' }}
+            fontWeight="thin"
+            color="gray.500"
+            letterSpacing="wider"
+          ></chakra.p>
+        </GridItem>
       </Container>
     </Center>
   )

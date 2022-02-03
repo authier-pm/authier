@@ -6,6 +6,7 @@ export const Link: React.FC<LinkProps & NextLinkProps> = (props) => {
   return (
     <ChakraLink
       as={NextLink}
+      cursor={'pointer'}
       data-test="Link"
       color={'blue.400'}
       tabIndex={0}

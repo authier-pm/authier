@@ -78,39 +78,7 @@ export function ChakraLayout({ children }) {
               {navLinks}
             </HStack>
           </HStack>
-          <Flex alignItems={'center'}>
-            <Button
-              onClick={() => {
-                console.log('aaa')
-              }}
-              variant={'solid'}
-              colorScheme={'teal'}
-              size={'sm'}
-              mr={4}
-              leftIcon={<AddIcon />}
-            >
-              Action
-            </Button>
-            <Menu>
-              <MenuButton
-                as={Button}
-                rounded={'full'}
-                variant={'link'}
-                cursor={'pointer'}
-              >
-                <Avatar
-                  size={'sm'}
-                  src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
-                />
-              </MenuButton>
-              <MenuList>
-                <MenuItem>Link 1</MenuItem>
-                <MenuItem>Link 2</MenuItem>
-                <MenuDivider />
-                <MenuItem>Link 3</MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
+          <Flex alignItems={'center'}></Flex>
         </Flex>
 
         {isOpen ? (
