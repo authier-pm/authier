@@ -12,6 +12,7 @@ import {
 } from '../schemas/RootResolver.spec'
 import { sign } from 'jsonwebtoken'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
+import { User } from '@prisma/client'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -19,10 +20,31 @@ const userSecurityProps = {
   TOTPlimit: 4
 }
 describe('DecryptionChallenge', () => {
-  let challenge = new DecryptionChallengeApproved()
+  let challenge: DecryptionChallengeApproved
+  let user: User
 
+  challenge = new DecryptionChallengeApproved()
+  challenge.deviceId = faker.datatype.uuid()
+  challenge.deviceName = faker.random.word()
+  let userId = faker.datatype.uuid()
+  let input: RegisterNewAccountInput = makeRegisterAccountInput()
+
+  beforeAll(async () => {
+    user = await prismaClient.user.create({
+      data: {
+        id: userId,
+        email: input.email,
+        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+        encryptionSalt: input.encryptionSalt,
+        loginCredentialsLimit: 50,
+        TOTPlimit: 4,
+        deviceRecoveryCooldownMinutes: 960
+      }
+    })
+  })
+  // })
   describe('addNewDeviceForUser', () => {
-    let userId = faker.datatype.uuid()
     let fakeCtx = {
       reply: { setCookie: jest.fn() },
       request: { headers: {} },
@@ -31,25 +53,10 @@ describe('DecryptionChallenge', () => {
       getIpAddress: () => faker.internet.ip()
     } as any
     it('should add new device for user', async () => {
-      let input: RegisterNewAccountInput = makeRegisterAccountInput()
-
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: input.email,
-          addDeviceSecret: input.addDeviceSecret,
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: input.encryptionSalt,
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4,
-          deviceRecoveryCooldownMinutes: 960
-        }
-      })
-
+      challenge.userId = user.id
       let data = await challenge.addNewDeviceForUser(
         {
-          ...input,
-          decryptionChallengeId: faker.datatype.number()
+          ...input
         },
         input.addDeviceSecret,
         fakeCtx,
@@ -57,7 +64,7 @@ describe('DecryptionChallenge', () => {
       )
 
       const accessToken = sign(
-        { userId: userId, deviceId: input.deviceId },
+        { userId: user.id, deviceId: challenge.deviceId },
         process.env.ACCESS_TOKEN_SECRET!,
         {
           expiresIn: '60m'
@@ -72,7 +79,7 @@ describe('DecryptionChallenge', () => {
 
     it("should show 'User not found'", async () => {
       let input: AddNewDeviceInput = makeAddNewDeviceInput()
-
+      challenge.userId = faker.datatype.uuid()
       await expect(async () => {
         await challenge.addNewDeviceForUser(
           input,
@@ -87,8 +94,9 @@ describe('DecryptionChallenge', () => {
       let userId = faker.datatype.uuid()
 
       let input = makeAddNewDeviceInput()
+      challenge.userId = userId
 
-      await prismaClient.user.create({
+      const user = await prismaClient.user.create({
         data: {
           id: userId,
           email: input.email,
