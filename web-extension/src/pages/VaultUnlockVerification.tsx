@@ -52,17 +52,16 @@ export function VaultUnlockVerification() {
               values.password,
               lockedState.encryptionSalt
             )
-            const storage = await browser.storage.local.get()
 
             const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-              storage.addDeviceSecretEncrypted,
+              lockedState.authSecretEncrypted,
               masterEncryptionKey,
               {
                 iv: cryptoJS.enc.Utf8.parse(lockedState.userId)
               }
             ).toString(cryptoJS.enc.Utf8)
 
-            if (currentAddDeviceSecret !== storage.currentAddDeviceSecret) {
+            if (currentAddDeviceSecret !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
             }
 

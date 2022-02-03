@@ -506,10 +506,10 @@ type LoginResponse {
 input RegisterNewAccountInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
   deviceId: UUID!
   deviceName: String!
   encryptionSalt: NonEmptyString!
-  addDeviceSecretEncrypted: NonEmptyString!
   email: EmailAddress!
 }
 
@@ -543,6 +543,7 @@ type DecryptionChallengeApproved {
 input AddNewDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
+  addDeviceSecretEncrypted: NonEmptyString!
 }
 
 input DeviceInput {

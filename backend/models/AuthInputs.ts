@@ -11,8 +11,12 @@ import { EncryptedSecretInput, EncryptedSecretPatchInput } from './models'
 export class AddNewDeviceInput {
   @Field()
   firebaseToken: string
+
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string
+
+  @Field(() => GraphQLNonEmptyString)
+  addDeviceSecretEncrypted: string
 }
 
 @InputType()
@@ -25,9 +29,6 @@ export class RegisterNewAccountInput extends AddNewDeviceInput {
 
   @Field(() => GraphQLNonEmptyString)
   encryptionSalt: string
-
-  @Field(() => GraphQLNonEmptyString)
-  addDeviceSecretEncrypted: string
 
   @Field(() => GraphQLEmailAddress)
   email: string

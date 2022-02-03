@@ -96,7 +96,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     await ctx.prisma.user.update({
       data: {
         addDeviceSecret: input.addDeviceSecret,
-        addDeviceSecretEncrypted: this.addDeviceSecretEncrypted
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
       },
       where: {
         id: user.id
