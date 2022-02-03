@@ -16,9 +16,9 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
-  AddEncryptedSecretDocument,
-  AddEncryptedSecretMutation,
-  AddEncryptedSecretMutationVariables
+  AddEncryptedSecretsDocument,
+  AddEncryptedSecretsMutation,
+  AddEncryptedSecretsMutationVariables
 } from './backgroundPage.codegen'
 import {
   SyncEncryptedSecretsDocument,
@@ -36,6 +36,7 @@ import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
+import ms from 'ms'
 
 export const log = debug('au:Device')
 
@@ -49,6 +50,7 @@ const browserInfo = bowser.getParser(navigator.userAgent)
 export const isRunningInBgPage = location.href.includes(
   '_generated_background_page.html'
 )
+
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
@@ -61,15 +63,22 @@ async function rerenderViewInThisRuntime() {
     index.renderPopup()
   }
 }
+type SecretTypeUnion = ILoginSecret | ITOTPSecret
 
-const isLoginSecret = (
-  secret: ILoginSecret | ITOTPSecret
-): secret is ILoginSecret => 'loginCredentials' in secret
-const isTotpSecret = (
-  secret: ILoginSecret | ITOTPSecret
-): secret is ITOTPSecret => 'totp' in secret
+const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
+  'loginCredentials' in secret
 
-export class DeviceState {
+const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
+  'totp' in secret
+
+export type AddSecretInput = Array<
+  Omit<SecretSerializedType, 'id'> & {
+    totp?: string
+    loginCredentials?: any
+  }
+>
+
+export class DeviceState implements IBackgroundStateSerializable {
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     log('device state created', this)
@@ -78,10 +87,14 @@ export class DeviceState {
   }
   email: string
   userId: string
+  deviceName: string
+
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = 10000 * 60 * 60 * 8
+  lockTime = ms('1s')
+  authSecret: string
+  authSecretEncrypted: string
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -175,28 +188,33 @@ export class DeviceState {
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
     >({
-      query: SyncEncryptedSecretsDocument
+      query: SyncEncryptedSecretsDocument,
+      fetchPolicy: 'no-cache'
     })
     if (data) {
       const deviceState = device.state
       if (data && deviceState) {
-        const removedSecrets = data.currentDevice.encryptedSecretsToSync.filter(
-          ({ deletedAt }) => deletedAt
-        )
+        const backendRemovedSecrets =
+          data.currentDevice.encryptedSecretsToSync.filter(
+            ({ deletedAt }) => deletedAt
+          )
         const newAndUpdatedSecrets =
           data.currentDevice.encryptedSecretsToSync.filter(
-            ({ updatedAt }) => !updatedAt
+            ({ deletedAt }) => !deletedAt
           )
 
-        const oldSecretsWithoutRemoved = deviceState.secrets.filter(
+        const secretsBeforeSync = deviceState.secrets
+        const unchangedSecrets = secretsBeforeSync.filter(
           ({ id }) =>
-            !removedSecrets.find((removedSecret) => id === removedSecret.id)
+            !backendRemovedSecrets.find(
+              (removedSecret) => id === removedSecret.id
+            ) &&
+            !newAndUpdatedSecrets.find(
+              (updatedSecret) => id === updatedSecret.id
+            )
         )
 
-        deviceState.secrets = [
-          ...oldSecretsWithoutRemoved,
-          ...newAndUpdatedSecrets
-        ]
+        deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
 
         await this.save()
 
@@ -204,62 +222,92 @@ export class DeviceState {
           MarkAsSyncedMutation,
           MarkAsSyncedMutationVariables
         >({ mutation: MarkAsSyncedDocument })
+
+        const actuallyRemovedOnThisDevice = backendRemovedSecrets.filter(
+          ({ id: removedId }) => {
+            return secretsBeforeSync.find(({ id }) => removedId === id)
+          }
+        )
+        console.log(
+          '~ actuallyRemovedOnThisDevice',
+          actuallyRemovedOnThisDevice
+        )
+        return {
+          removedSecrets: actuallyRemovedOnThisDevice.length,
+          newAndUpdatedSecrets: newAndUpdatedSecrets.length
+        }
       }
     }
   }
 
-  /**
-   * invokes the backend mutation and pushes the new secret to the bgState
-   * @param secret
-   * @returns the added secret
-   */
-  async addSecret(secret) {
-    const existingSecrets = this.getSecretsDecryptedByHostname(
+  findExistingSecret(secret) {
+    const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
     )
-    if (
-      existingSecrets.find(
-        (s) =>
-          (isLoginSecret(s) &&
-            s.loginCredentials.username ===
-              secret.loginCredentials?.username) ||
-          (isTotpSecret(s) && s.totp === secret.totp)
-      )
-    ) {
-      return null
-    }
 
-    const stringToEncrypt =
-      secret.kind === EncryptedSecretType.TOTP
-        ? secret.totp
-        : JSON.stringify(secret.loginCredentials)
+    return existingSecretsOnHostname.find(
+      (s) =>
+        (isLoginSecret(s) &&
+          s.loginCredentials.username === secret.loginCredentials?.username) ||
+        (isTotpSecret(s) && s.totp === secret.totp)
+    )
+  }
 
-    const encrypted = this.encrypt(stringToEncrypt)
+  /**
+   * invokes the backend mutation and pushes the new secret to the bgState
+   * @param secrets
+   * @returns the added secret
+   */
+  async addSecrets(secrets: AddSecretInput) {
+    // const existingSecret = this.findExistingSecret(secrets)
+    // if (existingSecret) {
+    //   return null
+    // }
 
     const { data } = await apolloClient.mutate<
-      AddEncryptedSecretMutation,
-      AddEncryptedSecretMutationVariables
+      AddEncryptedSecretsMutation,
+      AddEncryptedSecretsMutationVariables
     >({
-      mutation: AddEncryptedSecretDocument,
+      mutation: AddEncryptedSecretsDocument,
       variables: {
-        payload: {
-          encrypted,
-          kind: secret.kind,
-          label: secret.label,
-          iconUrl: secret.iconUrl,
-          url: secret.url
-        }
+        secrets: secrets.map((secret) => {
+          const stringToEncrypt =
+            secret.kind === EncryptedSecretType.TOTP
+              ? secret.totp
+              : JSON.stringify(secret.loginCredentials)
+
+          const encrypted = this.encrypt(stringToEncrypt as string)
+
+          return {
+            encrypted,
+            kind: secret.kind,
+            label: secret.label,
+            iconUrl: secret.iconUrl,
+            url: secret.url
+          }
+        })
       }
     })
     if (!data) {
       throw new Error('failed to save secret')
     }
-    log('saved secret to the backend', secret)
-    const secretAdded = data.me.addEncryptedSecret
+    log('saved secret to the backend', secrets)
+    const secretsAdded = data.me.addEncryptedSecrets
 
-    this.secrets.push(secretAdded)
+    this.secrets.push(...secretsAdded)
     await this.save()
-    return secretAdded
+    return secretsAdded
+  }
+
+  async removeSecret(secretId: string) {
+    // browser.storage.local.set({
+    //   backgroundState: {
+    //     ...deviceState,
+    //     secrets: deviceState.secrets.filter((s) => s.id !== data.id)
+    //   }
+    // })
+    this.secrets = this.secrets.filter((s) => s.id !== secretId)
+    this.save()
   }
 
   destroy() {
@@ -271,12 +319,16 @@ class ExtensionDevice {
   state: DeviceState | null = null
   fireToken: string | null = null
   lockedState: IBackgroundStateSerializableLocked | null = null
+  id: string | null = null
+  name: string
 
   /**
    * runs on startup
    */
   async initialize() {
-    let storedState = null
+    this.id = await this.getDeviceId()
+
+    let storedState: IBackgroundStateSerializable | null = null
 
     if (isRunningInBgPage === false) {
       //this is popup or vault
@@ -299,15 +351,28 @@ class ExtensionDevice {
 
     if (storedState) {
       this.state = new DeviceState(storedState)
+      this.name = storedState.deviceName
     } else {
+      this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
 
-    const fireToken = await generateFireToken()
+    // const fireToken = await generateFireToken()
+    const fireToken = 'aaaa'
     console.log('~ fireToken', fireToken)
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
+    if (isRunningInBgPage) {
+      browser.idle.setDetectionInterval(30)
+      console.log('~ device initialized, locking test45')
+      browser.idle.onStateChanged.addListener((state) => {
+        console.log('~ state', state)
+        if (state !== 'active') {
+          this.lock()
+        }
+      })
+    }
   }
 
   private listenForUserLogin() {
@@ -372,19 +437,20 @@ class ExtensionDevice {
     return secret
   }
 
-  getAddDeviceSecretAuthParams(masterEncryptionKey: string, userId: string) {
-    const addDeviceSecret = this.generateBackendSecret()
+  initLocalDeviceAuthSecret(masterEncryptionKey: string, userId: string) {
+    const authSecret = this.generateBackendSecret()
 
-    const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
-      addDeviceSecret,
+    const addDeviceSecret = cryptoJS.AES.encrypt(
+      authSecret,
       masterEncryptionKey,
       {
         iv: cryptoJS.enc.Utf8.parse(userId)
       }
     ).toString()
+
     return {
-      addDeviceSecret,
-      addDeviceSecretEncrypted
+      addDeviceSecret: authSecret,
+      addDeviceSecretEncrypted: addDeviceSecret
     }
   }
 
@@ -396,7 +462,15 @@ class ExtensionDevice {
 
     const { email, userId, secrets, encryptionSalt } = this.state
 
-    this.lockedState = { email, userId, secrets, encryptionSalt }
+    this.lockedState = {
+      email,
+      userId,
+      secrets,
+      deviceName: this.name,
+      encryptionSalt,
+      authSecret: this.state.authSecret,
+      authSecretEncrypted: this.state.authSecretEncrypted
+    }
     await browser.storage.local.set({
       lockedState: this.lockedState,
       backgroundState: null
@@ -463,6 +537,12 @@ class ExtensionDevice {
         iosUri: null
       }
     })
+  }
+
+  async save(deviceState: IBackgroundStateSerializable) {
+    this.state = new DeviceState(deviceState)
+    this.state.save()
+    this.rerenderViews()
   }
 }
 

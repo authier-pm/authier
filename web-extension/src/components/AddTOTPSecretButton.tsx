@@ -31,7 +31,7 @@ export const AddTOTPSecretButton: React.FC<{}> = () => {
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
-      await device.state?.addSecret(newTotpSecret)
+      await device.state?.addSecrets([newTotpSecret])
       toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
     }
   }

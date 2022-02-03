@@ -1,4 +1,5 @@
 import './chromeRuntimeListener'
+import browser from 'webextension-polyfill'
 
 import debug from 'debug'
 import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
@@ -35,6 +36,9 @@ export interface IBackgroundStateSerializableLocked {
   userId: string
   secrets: Array<SecretSerializedType>
   encryptionSalt: string
+  deviceName: string
+  authSecretEncrypted: string
+  authSecret: string
 }
 
 export interface IBackgroundStateSerializable

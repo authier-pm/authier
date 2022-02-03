@@ -1,0 +1,89 @@
+{
+  "fieldName": "me",
+  "fieldNodes": [
+    {
+      "kind": "Field",
+      "name": {
+        "kind": "Name",
+        "value": "me",
+        "loc": { "start": 4, "end": 6 }
+      },
+      "arguments": [],
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "id",
+              "loc": { "start": 13, "end": 15 }
+            },
+            "arguments": [],
+            "directives": [],
+            "loc": { "start": 13, "end": 15 }
+          },
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "masterDevice",
+              "loc": { "start": 20, "end": 32 }
+            },
+            "arguments": [],
+            "directives": [],
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "id",
+                    "loc": { "start": 41, "end": 43 }
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "loc": { "start": 41, "end": 43 }
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "User",
+                    "loc": { "start": 50, "end": 54 }
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "id",
+                          "loc": { "start": 65, "end": 67 }
+                        },
+                        "arguments": [],
+                        "directives": [],
+                        "loc": { "start": 65, "end": 67 }
+                      }
+                    ],
+                    "loc": { "start": 55, "end": 75 }
+                  },
+                  "loc": { "start": 50, "end": 75 }
+                }
+              ],
+              "loc": { "start": 33, "end": 81 }
+            },
+            "loc": { "start": 20, "end": 81 }
+          }
+        ],
+        "loc": { "start": 7, "end": 85 }
+      },
+      "loc": { "start": 4, "end": 85 }
+    }
+  ]
+}

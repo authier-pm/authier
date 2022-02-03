@@ -15,7 +15,11 @@ import {
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
 import React from 'react'
 import papaparse from 'papaparse'
-import { device } from '@src/background/ExtensionDevice'
+import {
+  AddSecretInput,
+  device,
+  DeviceState
+} from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
 
@@ -79,23 +83,31 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
         }
         const mapped = mapCsvToLoginCredentials(results.data)
         // TODO add to device state
-        const state = device.state
+        const state = device.state as DeviceState
+
         let skipped = 0
+        const toAdd: AddSecretInput = []
         for (const creds of mapped) {
           const hostname = new URL(creds.url).hostname
-          const secret = await state?.addSecret({
+          const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds.loginCredential,
-            encrypted: state.encrypt(JSON.stringify(creds.loginCredential)),
+            encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
             iconUrl: null,
             url: creds.url,
             label:
               creds.label ?? `${creds.loginCredential.username}@${hostname}`
-          })
-          if (!secret) {
-            skipped++
           }
+
+          if (state.findExistingSecret(input)) {
+            skipped++
+            break
+          }
+          toAdd.push(input)
         }
+        console.log('~ toAdd', toAdd)
+
+        await state.addSecrets(toAdd)
 
         resolve({
           added: mapped.length - skipped,

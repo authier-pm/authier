@@ -21,7 +21,7 @@ import {
   useChangeMasterPasswordMutation
 } from './Account.codegen'
 import * as Yup from 'yup'
-import { useDeviceDecryptionChallengeMutation } from '../../../pages/Login.codegen'
+import { useDeviceDecryptionChallengeMutation } from '../../../pages-vault/Login.codegen'
 import { toast } from 'react-toastify'
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'
@@ -91,24 +91,26 @@ export default function Account() {
             ) {
               const decryptionChallenge = await deviceDecryptionChallenge({
                 variables: {
-                  deviceId: await device.getDeviceId(),
+                  deviceInput: {
+                    id: device.id,
+                    name: device.name
+                  },
                   email: values.email
                 }
               })
 
               const secrets = device.state.secrets
               const userId =
+                // @ts-expect-error TODO fix
                 decryptionChallenge.data?.deviceDecryptionChallenge?.userId
 
-              const secretAuthTuple = device.getAddDeviceSecretAuthParams(
-                values.newPassword,
-                userId as string
-              )
-              console.log('~ secretAuthTuple', secretAuthTuple)
+              const { state } = device
+
               await changePassword({
                 variables: {
                   secrets: device.serializeSecrets(secrets, values.newPassword),
-                  ...secretAuthTuple,
+                  addDeviceSecret: state.authSecret,
+                  addDeviceSecretEncrypted: state.authSecretEncrypted,
                   decryptionChallengeId: decryptionChallenge.data
                     ?.deviceDecryptionChallenge?.id as number
                 }
