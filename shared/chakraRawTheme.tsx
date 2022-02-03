@@ -1,7 +1,7 @@
-import { extendTheme } from '@chakra-ui/react'
+import type { Colors, ThemeOverride } from '@chakra-ui/react'
 
 // 2. Extend the theme to include custom colors, fonts, etc
-export const authierColors = {
+export const authierColors: Colors = {
   brand: {
     100: '#F0C645',
     200: '#FFC045',
@@ -58,11 +58,9 @@ export const authierColors = {
     '900': '#002B33'
   }
 }
-export const chakraCustomTheme = extendTheme({
+export const chakraRawTheme: ThemeOverride = {
   colors: authierColors
-  // initialColorMode: 'dark',
-  // useSystemColorMode: false
-})
+}
 
 // brand: {
 //   50: '#84CAE7',

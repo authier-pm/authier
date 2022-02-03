@@ -1,6 +1,6 @@
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
-import { authierColors } from '../../../shared/chakraCustomTheme'
+import { authierColors } from '../../../shared/chakraRawTheme'
 import { domRecorder } from './contentScript'
 
 export let promptDiv: HTMLDivElement | null
