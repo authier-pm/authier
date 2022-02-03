@@ -92,7 +92,7 @@ browser.runtime.onMessage.addListener(async function (
 
       loginCredentialsSchema.parse(namePassPair)
 
-      const secret = await deviceState.addSecrets([
+      const [secret] = await deviceState.addSecrets([
         {
           kind: EncryptedSecretType.LOGIN_CREDENTIALS,
           loginCredentials: namePassPair,
