@@ -19,7 +19,7 @@ all graphql custom fields must start with a lower letter. Capital letters are re
 
 # DB
 
-To run the project, you need a single postgresql superuser. You can name it whatever you like and use whatever password you wish.
+To run the project locally, you need a single postgresql superuser. You can name it whatever you like and use whatever password you wish.
 We typically use `authier` and `auth133r` for testing.
 
 you can use this:

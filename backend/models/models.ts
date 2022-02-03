@@ -72,7 +72,7 @@ export class EncryptedSecretInput {
   @Field(() => EncryptedSecretTypeGQL, { nullable: false })
   kind: EncryptedSecretTypeGQL
 
-  @Field(() => String, { nullable: false })
+  @Field(() => String, { nullable: true })
   url: string
 
   @Field(() => String, { nullable: true })

@@ -23,6 +23,7 @@
     "128": "icon-128.png"
   },
   "permissions": [
+    "idle",
     "tabs",
     "activeTab",
     "notifications",
