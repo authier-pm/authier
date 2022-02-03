@@ -78,7 +78,7 @@ export type AddSecretInput = Array<
   }
 >
 
-export class DeviceState {
+export class DeviceState implements IBackgroundStateSerializable {
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     log('device state created', this)
@@ -87,6 +87,8 @@ export class DeviceState {
   }
   email: string
   userId: string
+  deviceName: string
+
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
