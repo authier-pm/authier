@@ -37,6 +37,8 @@ export interface IBackgroundStateSerializableLocked {
   secrets: Array<SecretSerializedType>
   encryptionSalt: string
   deviceName: string
+  authSecretEncrypted: string
+  authSecret: string
 }
 
 export interface IBackgroundStateSerializable

@@ -91,6 +91,8 @@ export class DeviceState {
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime = ms('1s')
+  authSecret: string
+  authSecretEncrypted: string
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -433,19 +435,20 @@ class ExtensionDevice {
     return secret
   }
 
-  getAddDeviceSecretAuthParams(masterEncryptionKey: string, userId: string) {
-    const addDeviceSecret = this.generateBackendSecret()
+  initLocalDeviceAuthSecret(masterEncryptionKey: string, userId: string) {
+    const authSecret = this.generateBackendSecret()
 
-    const addDeviceSecretEncrypted = cryptoJS.AES.encrypt(
-      addDeviceSecret,
+    const addDeviceSecret = cryptoJS.AES.encrypt(
+      authSecret,
       masterEncryptionKey,
       {
         iv: cryptoJS.enc.Utf8.parse(userId)
       }
     ).toString()
+
     return {
-      addDeviceSecret,
-      addDeviceSecretEncrypted
+      addDeviceSecret: authSecret,
+      addDeviceSecretEncrypted: addDeviceSecret
     }
   }
 
@@ -457,7 +460,15 @@ class ExtensionDevice {
 
     const { email, userId, secrets, encryptionSalt } = this.state
 
-    this.lockedState = { email, userId, secrets, encryptionSalt }
+    this.lockedState = {
+      email,
+      userId,
+      secrets,
+      deviceName: this.name,
+      encryptionSalt,
+      authSecret: this.state.authSecret,
+      authSecretEncrypted: this.state.authSecretEncrypted
+    }
     await browser.storage.local.set({
       lockedState: this.lockedState,
       backgroundState: null

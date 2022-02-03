@@ -2,7 +2,7 @@ import { t, Trans } from '@lingui/macro'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { UserContext } from '@src/providers/UserProvider'
 import React, { useContext, useEffect, useState } from 'react'
-import { LoginFormValues } from './Login'
+import { LoginContext, LoginFormValues } from './Login'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
@@ -14,10 +14,15 @@ import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { Heading, Spinner, useInterval } from '@chakra-ui/react'
+import { Redirect } from 'react-router-dom'
+import { renderVault } from '@src/vault-index'
 
-export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
+export const useLogin = (props: { deviceName: string }) => {
+  const { formState, setFormState } = useContext(LoginContext)
+
   const { setUserId } = useContext(UserContext)
-  const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
+  const [addNewDevice, { loading, data }] = useAddNewDeviceForUserMutation()
+  console.log('~ addNewDevice', addNewDevice)
 
   const [getDeviceDecryptionChallenge, { data: decryptionData }] =
     useDeviceDecryptionChallengeMutation({
@@ -26,7 +31,7 @@ export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
           id: device.id,
           name: props.deviceName
         },
-        email: props.email
+        email: formState.email
       }
     })
 
@@ -60,7 +65,7 @@ export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
 
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
         const masterEncryptionKey = generateEncryptionKey(
-          props.password,
+          formState.password,
           encryptionSalt
         )
 
@@ -75,20 +80,30 @@ export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
 
         if (!currentAddDeviceSecret) {
           toast.error('wrong password or email')
+          setFormState(null)
           return
         }
 
+        const newAuthSecret = device.generateBackendSecret()
+        const newAuthSecretEncrypted = cryptoJS.AES.encrypt(
+          newAuthSecret,
+          masterEncryptionKey,
+          {
+            iv: cryptoJS.enc.Utf8.parse(userId)
+          }
+        ).toString()
+
         const response = await addNewDevice({
           variables: {
-            email: props.email,
+            email: formState.email,
             deviceInput: {
               id: device.id,
               name: props.deviceName
             },
 
             input: {
-              addDeviceSecret: device.generateBackendSecret(),
-
+              addDeviceSecret: newAuthSecret,
+              addDeviceSecretEncrypted: newAuthSecretEncrypted,
               firebaseToken: fireToken
             },
             currentAddDeviceSecret
@@ -117,8 +132,11 @@ export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
             masterEncryptionKey,
             userId: userId,
             secrets: EncryptedSecrets,
-            email: props.email,
-            encryptionSalt
+            email: formState.email,
+            encryptionSalt,
+            deviceName: props.deviceName,
+            authSecret: newAuthSecret,
+            authSecretEncrypted: newAuthSecretEncrypted
           }
 
           setUserId(decodedToken.userId)
@@ -135,17 +153,14 @@ export const useLogin = (props: LoginFormValues & { deviceName: string }) => {
   return { deviceDecryptionChallenge, loading }
 }
 
-export const LoginAwaitingApproval: React.FC<LoginFormValues & {}> = (
-  props
-) => {
+export const LoginAwaitingApproval: React.FC = () => {
   const [deviceName, setDeviceName] = useState(device.generateDeviceName())
-
+  const loginCtx = useContext(LoginContext)
   const { deviceDecryptionChallenge, loading } = useLogin({
-    ...props,
     deviceName
   })
 
-  if (loading) {
+  if (!deviceDecryptionChallenge) {
     return <Spinner />
   }
   if (

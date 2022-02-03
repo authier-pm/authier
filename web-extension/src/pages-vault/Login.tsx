@@ -1,4 +1,11 @@
-import React, { ReactElement, useContext, useEffect, useState } from 'react'
+import React, {
+  Dispatch,
+  ReactElement,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 import {
   Button,
   Flex,
@@ -36,6 +43,12 @@ export interface LoginFormValues {
   email: string
 }
 
+// @ts-expect-error
+export const LoginContext = React.createContext<{
+  formState: LoginFormValues
+  setFormState: Dispatch<SetStateAction<LoginFormValues | null>>
+}>()
+
 // export const isRunningInVault = location.href.includes('/vault.html#')
 
 export default function Login(): ReactElement {
@@ -47,7 +60,11 @@ export default function Login(): ReactElement {
   }
 
   if (formState) {
-    return <LoginAwaitingApproval {...formState} />
+    return (
+      <LoginContext.Provider value={{ formState, setFormState }}>
+        <LoginAwaitingApproval />
+      </LoginContext.Provider>
+    )
   }
 
   return (

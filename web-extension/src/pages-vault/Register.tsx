@@ -76,11 +76,13 @@ export default function Register(): ReactElement {
             values.password,
             encryptionSalt
           )
+          console.log('~ masterEncryptionKey', masterEncryptionKey)
 
-          const params = device.getAddDeviceSecretAuthParams(
+          const params = device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
             userId
           )
+          console.log('~ params', params)
           const res = await register({
             variables: {
               userId,
@@ -108,7 +110,10 @@ export default function Register(): ReactElement {
               userId: userId,
               secrets: [],
               email: values.email,
-              encryptionSalt
+              deviceName: device.name,
+              encryptionSalt,
+              authSecret: params.addDeviceSecret,
+              authSecretEncrypted: params.addDeviceSecretEncrypted
             }
 
             device.save(deviceState)
