@@ -1,5 +1,4 @@
-import { Box, Center, Flex, Input, Image, Link, Text } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+import { Box, Center, Flex, Image, Link, Text } from '@chakra-ui/react'
 
 import Head from 'next/head'
 import React from 'react'
