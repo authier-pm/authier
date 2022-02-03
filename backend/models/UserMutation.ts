@@ -18,6 +18,8 @@ import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
 import { EmailVerificationType } from '@prisma/client'
+import { DecryptionChallengeMutation } from './DecryptionChallenge'
+import { dmmf } from '../prisma/prismaClient'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -66,7 +68,10 @@ export class UserMutation extends UserBase {
   ) {
     return ctx.prisma.encryptedSecret.findUnique({
       where: { id },
-      include: getPrismaRelationsFromInfo(info)
+      include: getPrismaRelationsFromInfo({
+        info,
+        rootModel: dmmf.modelMap.EncryptedSecret
+      })
     })
   }
   // @Field(() => Boolean)
@@ -90,18 +95,24 @@ export class UserMutation extends UserBase {
   //     return false
   //   }
   // }
-  @Field(() => EncryptedSecretQuery)
-  async addEncryptedSecret(
-    @Arg('payload', () => EncryptedSecretInput) payload: EncryptedSecretInput,
+  @Field(() => [EncryptedSecretQuery])
+  async addEncryptedSecrets(
+    @Arg('secrets', () => [EncryptedSecretInput])
+    secrets: EncryptedSecretInput[],
     @Ctx() ctx: IContext
   ) {
-    return ctx.prisma.encryptedSecret.create({
-      data: {
-        version: 1,
-        userId: this.id,
-        ...payload
-      }
-    })
+    return ctx.prisma.$transaction(
+      // prisma.createMany cannot be used here https://github.com/prisma/prisma/issues/8131
+      secrets.map((secret) =>
+        ctx.prisma.encryptedSecret.create({
+          data: {
+            version: 1,
+            userId: this.id,
+            ...secret
+          }
+        })
+      )
+    )
   }
 
   @Field(() => DeviceGQL)
@@ -267,5 +278,18 @@ export class UserMutation extends UserBase {
       })
     ])
     return secretsUpdates.length
+  }
+
+  @Field(() => DecryptionChallengeMutation)
+  async decryptionChallenge(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('id', () => Int) id: number
+  ) {
+    return ctx.prisma.decryptionChallenge.findFirst({
+      where: {
+        id,
+        userId: ctx.jwtPayload.userId
+      }
+    })
   }
 }

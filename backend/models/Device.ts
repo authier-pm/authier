@@ -15,7 +15,7 @@ export class DeviceQuery extends DeviceGQL {
     if (ipAddress === '127.0.0.1') {
       return {
         city: 'Brno',
-        country: 'Czech Republic'
+        country_name: 'Czech Republic'
       }
     }
     const res = await request(
@@ -27,17 +27,22 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery])
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
-    const { userId } = ctx.jwtPayload
+
+    console.log('~ lastSyncCondition', lastSyncCondition)
     const res = await ctx.prisma.encryptedSecret.findMany({
       where: {
         OR: [
           {
-            userId: userId,
+            userId: this.userId,
             createdAt: lastSyncCondition
           },
           {
-            userId: userId,
+            userId: this.userId,
             updatedAt: lastSyncCondition
+          },
+          {
+            userId: this.userId,
+            deletedAt: lastSyncCondition
           }
         ]
       }
@@ -50,6 +55,14 @@ export class DeviceQuery extends DeviceGQL {
     const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
     return geoIp.city + ', ' + geoIp.country_name
   }
+
+  // @Field(() => String)
+  // async isMaster(
+  //   @Ctx() ctx: IContextAuthenticated
+  // ) {
+
+  //   return ctx.user.
+  // }
 }
 
 @ObjectType()
@@ -57,7 +70,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => GraphQLISODateTime)
   async markAsSynced(@Ctx() ctx: IContext) {
     const syncedAt = new Date()
-    const res = await ctx.prisma.device.update({
+    await ctx.prisma.device.update({
       data: {
         lastSyncAt: syncedAt
       },

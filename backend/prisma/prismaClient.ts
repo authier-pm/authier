@@ -1,5 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import '../dotenv'
+import { DMMFClass } from '@prisma/client/runtime'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
@@ -31,6 +32,7 @@ if (process.env.JEST_WORKER_ID) {
 
 export const prismaClient = new PrismaClient({
   log: logConfig,
+  errorFormat: 'pretty',
   datasources: {
     db: {
       url: dbUrl
@@ -45,3 +47,4 @@ if (debugLogs) {
 }
 
 export default prismaClient
+export const dmmf = (prismaClient as any)._dmmf as DMMFClass

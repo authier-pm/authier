@@ -22,7 +22,11 @@ import {
   FormLabel,
   Checkbox,
   Select,
-  Button
+  Button,
+  Tooltip,
+  Alert,
+  VStack,
+  Grid
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
@@ -31,6 +35,12 @@ import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useState } from 'react'
 import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
+import {
+  useApproveChallengeMutation,
+  useDevicesPageQuery,
+  useRejectChallengeMutation
+} from './Devices.codegen'
+import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 
 interface configValues {
   lockTime: number
@@ -44,184 +54,205 @@ const vaultLockTimeOptions = [
   { value: 432000000, label: '12 hours' }
 ]
 
-const ListItem = (item: {
+const DeviceListItem = (item: {
   id: string
   firstIpAddress: string
   lastIpAddress: string
   name: string
   lastGeoLocation: string
+  createdAt: string
   logoutAt?: string | null | undefined
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
+  const { data } = useDevicesPageQuery({ fetchPolicy: 'cache-first' })
+
   return (
-    <Flex py={6} m={5}>
-      <Box
-        maxW={'380px'}
-        w={'full'}
-        bg={useColorModeValue('white', 'gray.900')}
-        boxShadow={'2xl'}
-        rounded={'lg'}
-        p={6}
-      >
-        <Flex flexDirection={'row'} justifyContent={'space-between'}>
-          <Icon as={IoIosPhonePortrait} w={20} h={20} />
-
-          <Stack
-            direction={'row'}
-            spacing={3}
-            alignItems={'baseline'}
-            lineHeight={'6'}
-          >
-            <Badge height="min-content" colorScheme="purple">
-              Master
-            </Badge>
-            {item.logoutAt ? (
-              <Badge height="min-content" colorScheme="red">
-                Offline
-              </Badge>
-            ) : (
-              <Badge height="min-content" colorScheme="green">
-                Online
-              </Badge>
-            )}
-
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                size="xs"
-                variant="unstyled"
-                aria-label="Favourite"
-                fontSize="15px"
-                icon={<SettingsIcon color="ButtonShadow" />}
-              />
-              <MenuList>
-                <MenuItem>
-                  <FiLogOut></FiLogOut>
-                  <NbSp />
-                  <Trans>Deauthorize</Trans>
-                </MenuItem>
-
-                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
-                  <FiSettings />
-                  <NbSp />
-                  <Trans>Config</Trans>
-                </MenuItem>
-
-                <MenuItem>
-                  <FiTrash />
-                  <NbSp />
-                  <Trans>Remove</Trans>
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Stack>
-        </Flex>
-
-        <Heading fontSize={'xl'} fontFamily={'body'}>
-          {item.name}
-        </Heading>
-
-        {isConfigOpen ? (
-          <Box mt={5}>
-            <Formik
-              initialValues={{
-                lockTime: 0,
-                twoFA: false
-              }}
-              onSubmit={async (
-                values: configValues,
-                { setSubmitting }: FormikHelpers<configValues>
-              ) => {
-                console.log(values)
-                setSubmitting(false)
-              }}
+    <>
+      <Flex py={6} m={5}>
+        <Box
+          maxW={'380px'}
+          w={'full'}
+          bg={useColorModeValue('white', 'gray.900')}
+          boxShadow={'2xl'}
+          rounded={'lg'}
+          p={6}
+        >
+          <Flex flexDirection={'row'} justifyContent={'space-between'}>
+            <Icon as={IoIosPhonePortrait} boxSize={16} />
+            <Stack
+              direction={'row'}
+              spacing={3}
+              alignItems={'baseline'}
+              lineHeight={'6'}
             >
-              <Stack spacing={3}>
-                <Field name="lockTime">
-                  {({ form }) => (
-                    <FormControl
-                      isInvalid={form.errors.lockTime && form.touched.lockTime}
-                    >
-                      <FormLabel htmlFor="lockTime">Safe lock time</FormLabel>
-                      <Select
-                        name="lockTime"
-                        id="lockTime"
-                        defaultValue={vaultLockTimeOptions[0].label}
+              {item.id === data?.me?.masterDeviceId && (
+                <Badge height="min-content" colorScheme="purple">
+                  Master
+                </Badge>
+              )}
+              {item.logoutAt ? (
+                <Badge height="min-content" colorScheme="red">
+                  <Trans>Logged out</Trans>
+                </Badge>
+              ) : (
+                <Badge height="min-content" colorScheme="green">
+                  <Trans>Logged in</Trans>
+                </Badge>
+              )}
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  size="xs"
+                  variant="unstyled"
+                  aria-label="Favourite"
+                  fontSize="15px"
+                  icon={<SettingsIcon color="ButtonShadow" />}
+                />
+                <MenuList>
+                  <MenuItem>
+                    <FiLogOut></FiLogOut>
+                    <NbSp />
+                    <Trans>Deauthorize</Trans>
+                  </MenuItem>
+                  <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
+                    <FiSettings />
+                    <NbSp />
+                    <Trans>Config</Trans>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </Stack>
+          </Flex>
+          <Heading fontSize={'xl'} fontFamily={'body'}>
+            {item.name}
+          </Heading>
+          {isConfigOpen ? (
+            <Box mt={5}>
+              <Formik
+                initialValues={{
+                  lockTime: 0,
+                  twoFA: false
+                }}
+                onSubmit={async (
+                  values: configValues,
+                  { setSubmitting }: FormikHelpers<configValues>
+                ) => {
+                  console.log(values)
+                  setSubmitting(false)
+                }}
+              >
+                <Stack spacing={3}>
+                  <Field name="lockTime">
+                    {({ form }) => (
+                      <FormControl
+                        isInvalid={
+                          form.errors.lockTime && form.touched.lockTime
+                        }
                       >
-                        {vaultLockTimeOptions.map((i) => (
-                          <option key={i.value} value={i.value}>
-                            {i.label}
-                          </option>
-                        ))}
-                      </Select>
-                      <FormErrorMessage>
-                        {form.errors.lockTime}
-                      </FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Field>
-                <Field name="TwoFA">
-                  {({ field, form }) => (
-                    <FormControl
-                      isInvalid={form.errors.name && form.touched.name}
+                        <FormLabel htmlFor="lockTime">Safe lock time</FormLabel>
+                        <Select
+                          name="lockTime"
+                          id="lockTime"
+                          defaultValue={vaultLockTimeOptions[0].label}
+                        >
+                          {vaultLockTimeOptions.map((i) => (
+                            <option key={i.value} value={i.value}>
+                              {i.label}
+                            </option>
+                          ))}
+                        </Select>
+                        <FormErrorMessage>
+                          {form.errors.lockTime}
+                        </FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Field name="TwoFA">
+                    {({ field, form }) => (
+                      <FormControl
+                        isInvalid={form.errors.name && form.touched.name}
+                      >
+                        <Checkbox id="TwoFA" {...field}>
+                          2FA
+                        </Checkbox>
+                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Field>
+                  <Flex justifyContent={'flex-end'}>
+                    <Button
+                      type="submit"
+                      size={'sm'}
+                      bg={'blue.400'}
+                      color={'white'}
+                      boxShadow={
+                        '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                      }
+                      _hover={{
+                        bg: 'blue.500'
+                      }}
+                      _focus={{
+                        bg: 'blue.500'
+                      }}
+                      aria-label="Save"
+                      rightIcon={<ArrowForwardIcon />}
                     >
-                      <Checkbox id="TwoFA" {...field}>
-                        2FA
-                      </Checkbox>
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Field>
-                <Flex justifyContent={'flex-end'}>
-                  <Button
-                    type="submit"
-                    size={'sm'}
-                    bg={'blue.400'}
-                    color={'white'}
-                    boxShadow={
-                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                    }
-                    _hover={{
-                      bg: 'blue.500'
-                    }}
-                    _focus={{
-                      bg: 'blue.500'
-                    }}
-                    aria-label="Save"
-                    rightIcon={<ArrowForwardIcon />}
-                  >
-                    Save
-                  </Button>
-                </Flex>
-              </Stack>
-            </Formik>
-          </Box>
-        ) : (
-          <Stack mt={6} spacing={4}>
-            <Box>
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                IP Address
-              </Text>
-              <Text fontSize={'2xl'}>{item.lastIpAddress}</Text>
+                      Save
+                    </Button>
+                  </Flex>
+                </Stack>
+              </Formik>
             </Box>
-
-            <Box>
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Geolocation
-              </Text>
-              <Text fontSize={'2xl'}>{item.lastGeoLocation}</Text>
-            </Box>
-          </Stack>
-        )}
-      </Box>
-    </Flex>
+          ) : (
+            <Stack mt={6} spacing={4}>
+              <Box>
+                <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                  Last IP Address
+                </Text>
+                <Text fontSize={'xl'}>{item.lastIpAddress}</Text>
+              </Box>
+              <Box>
+                <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                  Geolocation
+                </Text>
+                <Text fontSize={'xl'}>{item.lastGeoLocation}</Text>
+              </Box>
+              <Box>
+                <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                  Added
+                </Text>
+                <Tooltip
+                  label={intlFormat(new Date(item.createdAt), {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                >
+                  <Text fontSize={'xl'}>
+                    {formatDistance(new Date(item.createdAt), new Date())} ago
+                  </Text>
+                </Tooltip>
+              </Box>
+            </Stack>
+          )}
+        </Box>
+      </Flex>
+    </>
   )
 }
 
 export default function Devices() {
-  const { data, loading, error } = useMyDevicesQuery()
+  const { data, loading } = useMyDevicesQuery({
+    // TODO figure out why this is called twice
+    fetchPolicy: 'cache-first'
+  })
+  const [reject] = useRejectChallengeMutation()
+  const [approve] = useApproveChallengeMutation()
   const [filterBy, setFilterBy] = useState('')
+  const { data: devicesPageData, refetch } = useDevicesPageQuery({
+    fetchPolicy: 'cache-first'
+  })
 
   return (
     <Flex flexDirection="column">
@@ -233,7 +264,66 @@ export default function Devices() {
           setFilterBy(ev.target.value)
         }}
       />
+      <VStack mt={3}>
+        {devicesPageData?.me?.decryptionChallengesWaiting.map(
+          (challengeToApprove) => {
+            return (
+              <Alert
+                status="warning"
+                display="grid"
+                gridRowGap={1}
+                maxW={500}
+                key={challengeToApprove.id}
+              >
+                <Center>
+                  New Device trying to login{' '}
+                  {formatRelative(
+                    new Date(challengeToApprove.createdAt),
+                    new Date()
+                  )}
+                  : {challengeToApprove.id}
+                </Center>
 
+                <Grid
+                  gridGap={1}
+                  autoFlow="row"
+                  templateColumns="repeat(auto-fit, 49%)"
+                >
+                  <Button
+                    w="100%"
+                    colorScheme="red"
+                    // bgColor="red.100"
+                    onClick={async () => {
+                      await reject({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      refetch()
+                    }}
+                  >
+                    <Trans>Reject</Trans>
+                  </Button>
+                  <Button
+                    w="100%"
+                    colorScheme="green"
+                    onClick={async () => {
+                      await approve({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      refetch()
+                    }}
+                  >
+                    <Trans>Approve</Trans>
+                  </Button>
+                </Grid>
+              </Alert>
+            )
+          }
+        )}
+      </VStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
@@ -247,7 +337,7 @@ export default function Devices() {
                   return name.includes(filterBy)
                 })
                 .map((el, i) => {
-                  return <ListItem {...el} key={i} />
+                  return <DeviceListItem {...el} key={i} />
                 })
             )}
           </Flex>

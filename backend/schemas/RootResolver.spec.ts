@@ -9,8 +9,9 @@ import { GraphQLResolveInfo } from 'graphql'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
+import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
 
-const makeAddNewDeviceInput = () => ({
+export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
   deviceName: faker.internet.userName(),
   deviceId: faker.datatype.uuid(),
@@ -21,7 +22,7 @@ const makeAddNewDeviceInput = () => ({
   deviceRecoveryCooldownMinutes: faker.datatype.number()
 })
 
-const makeRegisterAccountInput = () => ({
+export const makeRegisterAccountInput = () => ({
   ...makeAddNewDeviceInput(),
   encryptionSalt: faker.datatype.string(5)
 })
@@ -156,97 +157,8 @@ describe('RootResolver', () => {
     })
   })
 
-  describe('addNewDeviceForUser', () => {
-    let userId = faker.datatype.uuid()
-    let fakeCtx = {
-      reply: { setCookie: jest.fn() },
-      request: { headers: {} },
-      prisma: prismaClient,
-      jwtPayload: { userId: userId },
-      getIpAddress: () => faker.internet.ip()
-    } as any
-    it('should add new device for user', async () => {
-      let input: RegisterNewAccountInput = makeRegisterAccountInput()
-
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: input.email,
-          addDeviceSecret: input.addDeviceSecret,
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: input.encryptionSalt,
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4,
-          deviceRecoveryCooldownMinutes: 960
-        }
-      })
-
-      let data = await resolver.addNewDeviceForUser(
-        {
-          ...input,
-          decryptionChallengeId: faker.datatype.number()
-        },
-        input.addDeviceSecret,
-        fakeCtx,
-        {} as GraphQLResolveInfo
-      )
-
-      const accessToken = sign(
-        { userId: userId, deviceId: input.deviceId },
-        process.env.ACCESS_TOKEN_SECRET!,
-        {
-          expiresIn: '60m'
-        }
-      )
-
-      expect({
-        accessToken: data.accessToken,
-        email: data.user.email
-      }).toMatchObject({ accessToken: accessToken, email: input.email })
-    })
-
-    it("should show 'User not found'", async () => {
-      let input: AddNewDeviceInput = makeAddNewDeviceInput()
-
-      await expect(async () => {
-        await resolver.addNewDeviceForUser(
-          input,
-          input.addDeviceSecret,
-          fakeCtx,
-          {} as GraphQLResolveInfo
-        )
-      }).rejects.toThrow('User not found')
-    })
-
-    it("should show 'Wrong master password used'", async () => {
-      let userId = faker.datatype.uuid()
-
-      let input: AddNewDeviceInput = makeAddNewDeviceInput()
-
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: input.email,
-          addDeviceSecret: faker.datatype.string(5),
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: faker.datatype.string(5),
-          ...userSecurityProps
-        }
-      })
-
-      expect(async () => {
-        await resolver.addNewDeviceForUser(
-          input,
-          input.addDeviceSecret,
-          fakeCtx,
-          {} as GraphQLResolveInfo
-        )
-      }).rejects.toThrow('Wrong master password used')
-    })
-  })
-
   describe('deviceDecryptionChallenge', () => {
-    it('should returns a decryption challenge', async () => {
+    it('should return a DecryptionChallengeForApproval', async () => {
       let userId = faker.datatype.uuid()
       let fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
@@ -261,15 +173,16 @@ describe('RootResolver', () => {
         }
       })
 
-      let data = await resolver.deviceDecryptionChallenge(
+      let data = (await resolver.deviceDecryptionChallenge(
         fakeData.email,
-        faker.datatype.uuid(),
+        {
+          id: faker.datatype.uuid(),
+          name: 'chrome '
+        },
         makeFakeCtx(userId)
-      )
+      )) as DecryptionChallengeApproved
 
-      expect(data?.addDeviceSecretEncrypted).toBe(
-        fakeData.addDeviceSecretEncrypted
-      )
+      expect(data?.addDeviceSecretEncrypted).toBe(undefined)
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
@@ -291,7 +204,9 @@ describe('RootResolver', () => {
       const data = Array.from({ length: 10 }).map(() => ({
         userId: userId,
         ipAddress: faker.internet.ip(),
-        masterPasswordVerifiedAt: null
+        masterPasswordVerifiedAt: null,
+        deviceId: faker.datatype.uuid(),
+        deviceName: 'chrome'
       }))
 
       await prismaClient.decryptionChallenge.createMany({
@@ -301,10 +216,17 @@ describe('RootResolver', () => {
       await expect(async () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
-          faker.datatype.uuid(),
+          {
+            id: faker.datatype.uuid(),
+            name: 'chrome '
+          },
           makeFakeCtx(userId)
         )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
+
+    it.todo(
+      'should block creation of a challenge from an IP which was blocked previously'
+    )
   })
 })

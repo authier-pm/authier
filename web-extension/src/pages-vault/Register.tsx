@@ -15,7 +15,6 @@ import {
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { Link } from 'wouter'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
@@ -23,6 +22,7 @@ import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from './registerNewUser.codegen'
+import { Link } from 'react-router-dom'
 
 declare global {
   interface Crypto {
@@ -70,11 +70,13 @@ export default function Register(): ReactElement {
             values.password,
             encryptionSalt
           )
+          console.log('~ masterEncryptionKey', masterEncryptionKey)
 
-          const params = device.getAddDeviceSecretAuthParams(
+          const params = device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
             userId
           )
+          console.log('~ params', params)
           const res = await register({
             variables: {
               userId,
@@ -83,8 +85,8 @@ export default function Register(): ReactElement {
                 email: values.email,
                 ...params,
                 deviceId,
-                firebaseToken: fireToken,
-                deviceName: device.generateDeviceName()
+                deviceName: device.generateDeviceName(),
+                firebaseToken: fireToken
               }
             }
           })
@@ -102,12 +104,13 @@ export default function Register(): ReactElement {
               userId: userId,
               secrets: [],
               email: values.email,
-              encryptionSalt
+              deviceName: device.name,
+              encryptionSalt,
+              authSecret: params.addDeviceSecret,
+              authSecretEncrypted: params.addDeviceSecretEncrypted
             }
 
-            device.state = new DeviceState(deviceState)
-            device.state.save()
-
+            device.save(deviceState)
             setSubmitting(false)
           }
         }}

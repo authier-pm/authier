@@ -7,7 +7,7 @@ import {
   ObjectType,
   GraphQLISODateTime
 } from 'type-graphql'
-import { IContext } from '../schemas/RootResolver'
+import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
@@ -20,6 +20,8 @@ import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 import { EmailVerificationType } from '@prisma/client'
+import { DeviceGQL } from './generated/Device'
+import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -174,5 +176,16 @@ export class UserQuery extends UserBase {
     } else {
       return false
     }
+  }
+
+  @Field(() => [DecryptionChallengeForApproval])
+  async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
+    return ctx.prisma.decryptionChallenge.findMany({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        approvedAt: null,
+        rejectedAt: null
+      }
+    })
   }
 }
