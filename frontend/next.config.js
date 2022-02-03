@@ -13,8 +13,14 @@ const nextConfig = {
     return config
   },
   swcMinify: false,
+  eslint: {
+    ignoreDuringBuilds: true
+  },
   experimental: {
     externalDir: true
+  },
+  typescript: {
+    ignoreBuildErrors: true
   },
   pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js']
 }

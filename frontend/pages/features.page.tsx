@@ -5,9 +5,10 @@ import { Box, Image } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import ReactMarkdown from 'react-markdown'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'
-import { chakraCustomTheme } from '../../shared/chakraCustomTheme'
+
 import md from './features.md'
 import remarkGfm from 'remark-gfm'
+import { chakraCustomTheme } from '../lib/chakraTheme'
 
 export default function Features() {
   return (
