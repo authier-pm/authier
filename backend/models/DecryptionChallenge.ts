@@ -14,8 +14,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
 import { GraphQLNonEmptyString, GraphQLUUID } from 'graphql-scalars'
 import { GraphqlError } from '../api/GraphqlError'
-import { dmmf } from '../prisma/prismaClient'
-import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
@@ -35,9 +34,6 @@ export class DecryptionChallengeForApproval {
   id: number
 
   @Field({ nullable: true })
-  approvedAt?: Date
-
-  @Field({ nullable: true })
   rejectedAt?: Date
 
   @Field()
@@ -54,6 +50,9 @@ export class DecryptionChallengeForApproval {
 export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   @Field()
   addDeviceSecretEncrypted: string
+
+  @Field({ nullable: false })
+  approvedAt: Date
 
   @Field()
   encryptionSalt: string

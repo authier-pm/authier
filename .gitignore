@@ -112,3 +112,4 @@ mobile-app/android/*.hprof
 dist.crx
 dist.pem
 authier.zip
+.vercel

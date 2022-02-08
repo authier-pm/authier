@@ -131,7 +131,7 @@ export const ItemList = () => {
 
   return (
     <Flex flexDirection="column">
-      <Center mw="100%">
+      <Center marginX="100%">
         <Input
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}

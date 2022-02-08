@@ -2,6 +2,7 @@ import React, { ReactElement, useState } from 'react'
 import {
   Box,
   Button,
+  chakra,
   Flex,
   FormControl,
   FormErrorMessage,
@@ -166,6 +167,16 @@ export default function Register(): ReactElement {
             >
               Register
             </Button>
+            <chakra.p
+              p={2}
+              fontSize="xs"
+              textAlign="center"
+              color="gray.600"
+              backgroundColor="whiteAlpha.500"
+            >
+              By signing up you agree to our{' '}
+              <chakra.a color="brand.500">Terms of Service</chakra.a>
+            </chakra.p>
           </Form>
         )}
       </Formik>
