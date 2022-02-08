@@ -16,6 +16,7 @@ import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { Heading, Spinner, useInterval } from '@chakra-ui/react'
 import { Redirect } from 'react-router-dom'
 import { renderVault } from '@src/vault-index'
+import { formatRelative } from 'date-fns'
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
@@ -142,11 +143,18 @@ export const useLogin = (props: { deviceName: string }) => {
           setUserId(decodedToken.userId)
 
           device.save(deviceState)
-          toast.success(t`Device approved successfully`)
+          toast.success(
+            t`Device approved at ${formatRelative(
+              new Date(),
+              new Date(deviceDecryptionChallenge.approvedAt)
+            )}`
+          )
         } else {
           toast.error(t`Login failed, check your username and password`)
         }
       })()
+    } else {
+      getDeviceDecryptionChallenge()
     }
   }, [deviceDecryptionChallenge?.__typename])
 
@@ -165,7 +173,8 @@ export const LoginAwaitingApproval: React.FC = () => {
   }
   if (
     !deviceDecryptionChallenge ||
-    (deviceDecryptionChallenge?.id && !deviceDecryptionChallenge?.approvedAt)
+    (deviceDecryptionChallenge?.id &&
+      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
   ) {
     return (
       <>
