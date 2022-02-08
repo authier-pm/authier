@@ -17,7 +17,7 @@ export function VaultRouter() {
   if (device.state === null) {
     console.log('aaafd')
     return (
-      <Center mw="50%" h="100vh">
+      <Center marginX="50%" h="100vh">
         <Switch>
           <Route path="/" exact>
             <Login />

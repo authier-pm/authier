@@ -29,7 +29,7 @@ const LinkItems: Array<LinkItemProps> = [
 const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
   return (
     <Box
-      align="center"
+      verticalAlign="center"
       px={2}
       py={1}
       borderRadius="lg"
