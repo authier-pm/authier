@@ -52,7 +52,7 @@ export type DecryptionChallengeApproved = {
   User: Array<UserGql>
   addDeviceSecretEncrypted: Scalars['String']
   addNewDeviceForUser: LoginResponse
-  approvedAt?: Maybe<Scalars['DateTime']>
+  approvedAt: Scalars['DateTime']
   approvedByRecovery: Scalars['Boolean']
   approvedFromDevice?: Maybe<DeviceGql>
   approvedFromDeviceId?: Maybe<Scalars['String']>
@@ -75,7 +75,6 @@ export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
 
 export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval'
-  approvedAt?: Maybe<Scalars['DateTime']>
   createdAt: Scalars['DateTime']
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']

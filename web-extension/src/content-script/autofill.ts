@@ -7,7 +7,7 @@ import { generate } from 'generate-password'
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-import { authierColors } from '../../../shared/chakraCustomTheme'
+import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 

@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "lib": [
-      "esnext",
-      "esnext.asynciterable",
-      "dom"
-    ],
+    "lib": ["esnext", "esnext.asynciterable", "dom"],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -15,16 +11,12 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": [
-      "node",
-      "jest",
-      "@emotion/react/types/css-prop"
-    ],
+    "types": ["node", "jest", "@emotion/react/types/css-prop"],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noUnusedLocals": true,
+    // "noUnusedLocals": true,
     "resolveJsonModule": true,
-    "noUnusedParameters": true,
+    // "noUnusedParameters": true,
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "strictPropertyInitialization": false,
