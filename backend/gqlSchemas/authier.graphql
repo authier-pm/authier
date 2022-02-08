@@ -289,7 +289,6 @@ enum EmailVerificationType {
 
 type DecryptionChallengeForApproval {
   id: Int!
-  approvedAt: DateTime
   rejectedAt: DateTime
   createdAt: DateTime!
   deviceName: String!
@@ -520,7 +519,7 @@ union DecryptionChallenge =
 type DecryptionChallengeApproved {
   id: Int!
   masterPasswordVerifiedAt: DateTime
-  approvedAt: DateTime
+  approvedAt: DateTime!
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!

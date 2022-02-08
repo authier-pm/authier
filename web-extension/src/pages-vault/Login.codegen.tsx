@@ -2,7 +2,7 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
   deviceInput: Types.DeviceInput;
@@ -11,7 +11,7 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null | undefined, iconUrl?: string | null | undefined, url?: string | null | undefined, label: string, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null | undefined };
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, iconUrl?: string | null, url?: string | null, label: string, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress'];
@@ -19,7 +19,7 @@ export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
 }>;
 
 
-export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt?: string | null | undefined } | { __typename?: 'DecryptionChallengeForApproval', id: number, approvedAt?: string | null | undefined } | null | undefined };
+export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt: string } | { __typename?: 'DecryptionChallengeForApproval', id: number } | null };
 
 
 export const AddNewDeviceForUserDocument = gql`
@@ -91,7 +91,6 @@ export const DeviceDecryptionChallengeDocument = gql`
     }
     ... on DecryptionChallengeForApproval {
       id
-      approvedAt
     }
   }
 }
