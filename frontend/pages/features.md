@@ -57,4 +57,8 @@
 | export 2FA secrets to CSV                                        | ❌                   | ❌    | ✔️      | ✔️        | ✔️        | ✔️       |
 | API for 3rd party to check whether an account is breached or not | ❌                   | ❌    | ✔️      | ✔️        | ❌        | ✔️       |
 | no hands login                                                   | ❌                   | ❌    | ✔️      | ❌        | ❌        | ✔️       |
-| add new TOTP without using a phone camera                        | ❌                   | ❌    | ✔️      | ❌        | ❌        | ✔️       |
+| add a new TOTP through screenshot                                | ❌                   | ❌    | ✔️      | ❌        | ❌        | ❌       |
+| add a new TOTP through phone camera                              | ✔️                   | ✔️    | ✔️      | ✔️        | ✔️        | ✔️       |
+| keep a record of URL where the TOTP was created                  | ❌                   | ❌    | ✔️      | ✔️        | ✔️        | ✔️       |
+
+Have you spotted any mistakes here? It's possible we may have missed a feature in a competitor app-if this is the case, please open a pull request to mitigate this.
