@@ -271,89 +271,101 @@ export class RootResolver {
       select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
     })
 
-    if (user) {
-      const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
-        where: {
-          userId: user.id,
-          blockIp: true,
-          ipAddress
-        }
-      })
-      if (isBlocked) {
-        throw new GraphqlError('login failed')
+    if (!user) {
+      return null
+    }
+    const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
+      where: {
+        userId: user.id,
+        blockIp: true,
+        ipAddress
       }
+    })
+    if (isBlocked) {
+      throw new GraphqlError('login failed')
+    }
 
-      const inLastHour = await ctx.prisma.decryptionChallenge.count({
-        where: {
-          userId: user.id,
-          createdAt: {
-            gte: new Date(Date.now() - 3600000)
-          },
-          masterPasswordVerifiedAt: null
-        }
-      })
-
-      if (inLastHour > 5) {
-        throw new GraphqlError(
-          'Too many decryption challenges, wait for cooldown'
-        )
+    const inLastHour = await ctx.prisma.decryptionChallenge.count({
+      where: {
+        userId: user.id,
+        createdAt: {
+          gte: new Date(Date.now() - 3600000)
+        },
+        masterPasswordVerifiedAt: null
       }
+    })
 
-      const device = await ctx.prisma.device.findUnique({
-        where: { id: deviceInput.id }
-      })
+    if (inLastHour > 5) {
+      throw new GraphqlError(
+        'Too many decryption challenges, wait for cooldown'
+      )
+    }
 
-      let challenge = await ctx.prisma.decryptionChallenge.findFirst({
-        where: {
-          deviceId: deviceInput.id,
-          userId: user.id
-        }
-      })
+    const device = await ctx.prisma.device.findUnique({
+      where: { id: deviceInput.id }
+    })
 
-      if (device && challenge) {
-        // user logged out, but kept the device as safe for later, we can reuse the previous challenge
-        return plainToClass(DecryptionChallengeApproved, {
-          ...challenge,
-
-          addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-          encryptionSalt: user.encryptionSalt
-        })
+    let challenge = await ctx.prisma.decryptionChallenge.findFirst({
+      where: {
+        deviceId: deviceInput.id,
+        userId: user.id
       }
+    })
 
-      if (challenge?.rejectedAt) {
-        // someone tried to login with this device and it was rejected in the past, we don't want to create a new challenge
-        throw new GraphqlError('login failed')
-      }
-
+    if (device) {
       if (!challenge) {
-        // TODO send notification to user
-        challenge = await ctx.prisma.decryptionChallenge.create({
-          data: {
-            deviceId: deviceInput.id,
-            deviceName: deviceInput.name,
-            userId: user.id,
-            ipAddress: ctx.getIpAddress()
+        const deviceCount = await ctx.prisma.device.count({
+          where: {
+            userId: user.id
           }
         })
+        if (deviceCount === 1) {
+          // user has only one device
+          challenge = await ctx.prisma.decryptionChallenge.create({
+            data: {
+              deviceId: deviceInput.id,
+              deviceName: deviceInput.name,
+              userId: user.id,
+              ipAddress,
+              approvedAt: device.createdAt // we mark this as approved immediately, because user has only one device
+            }
+          })
+        }
       }
+    }
 
-      if (!challenge.approvedAt) {
-        // TODO enable when we have device management in the vault
-        return plainToClass(DecryptionChallengeForApproval, {
-          id: challenge.id,
-          approvedAt: challenge.approvedAt
-        })
-      }
+    if (challenge?.rejectedAt) {
+      // someone tried to login with this device and it was rejected in the past, we don't want to create a new challenge
+      throw new GraphqlError('login failed')
+    }
 
-      // use has approved this device in the past, we can return the challenge including salt and encrypted secret
-      return plainToClass(DecryptionChallengeApproved, {
-        ...challenge,
-
-        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-        encryptionSalt: user.encryptionSalt
+    if (!challenge) {
+      // TODO send notification to user
+      challenge = await ctx.prisma.decryptionChallenge.create({
+        data: {
+          deviceId: deviceInput.id,
+          deviceName: deviceInput.name,
+          userId: user.id,
+          ipAddress: ctx.getIpAddress()
+        }
       })
     }
-    return null
+
+    if (!challenge.approvedAt) {
+      // TODO enable when we have device management in the vault
+      return plainToClass(DecryptionChallengeForApproval, {
+        id: challenge.id,
+        approvedAt: challenge.approvedAt
+      })
+    }
+
+    // use has approved this device in the past, we can return the challenge including salt and encrypted secret
+    return plainToClass(DecryptionChallengeApproved, {
+      ...challenge,
+
+      addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+      encryptionSalt: user.encryptionSalt
+    })
   }
 
   @Mutation(() => GraphQLPositiveInt, {
