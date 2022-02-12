@@ -51,7 +51,7 @@ export default function Register(): ReactElement {
   }
 
   return (
-    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
+    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
       <Flex alignItems="center" justifyContent="center">
         <Heading>Create account</Heading>
       </Flex>

@@ -68,9 +68,9 @@ export default function Login(): ReactElement {
   }
 
   return (
-    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg">
+    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
       <Flex alignItems="center" justifyContent="center">
-        <Heading>Login</Heading>
+        <Heading size="lg">Login</Heading>
       </Flex>
 
       <Formik
