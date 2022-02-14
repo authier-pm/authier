@@ -131,7 +131,7 @@ export const ItemList = () => {
 
   return (
     <Flex flexDirection="column">
-      <Center marginX="100%">
+      <Center mx={4}>
         <Input
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}
@@ -140,7 +140,7 @@ export const ItemList = () => {
             setFilterBy(ev.target.value)
           }}
         />
-        <Center mx={4} px={10}>
+        <Center px={10}>
           <Stat ml="auto">
             {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
           </Stat>
