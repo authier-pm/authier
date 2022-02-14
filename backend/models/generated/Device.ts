@@ -3,6 +3,8 @@ import { UserGQL } from './User'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
 
+import { DevicePlatformGQL } from '../types/DevicePlatform'
+
 @ObjectType()
 export class DeviceGQLScalars {
   @Field(() => ID)
@@ -20,8 +22,8 @@ export class DeviceGQLScalars {
   @Field()
   name: string
 
-  @Field({ nullable: true })
-  platform?: string
+  @Field(() => DevicePlatformGQL)
+  platform: DevicePlatformGQL
 
   @Field()
   syncTOTP: boolean
@@ -59,6 +61,9 @@ export class DeviceGQLScalars {
 
 @ObjectType()
 export class DeviceGQL extends DeviceGQLScalars {
+  @Field(() => DevicePlatformGQL)
+  platform: DevicePlatformGQL
+
   @Field(() => UserGQL)
   User: UserGQL
 

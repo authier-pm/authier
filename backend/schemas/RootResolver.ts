@@ -272,7 +272,7 @@ export class RootResolver {
     })
 
     if (!user) {
-      return null
+      throw new GraphqlError('login failed')
     }
     const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
