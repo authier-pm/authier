@@ -31,9 +31,6 @@ export class TokenGQLScalars {
 
 @ObjectType()
 export class TokenGQL extends TokenGQLScalars {
-  @Field(() => TokenTypeGQL)
-  type: TokenTypeGQL
-
   @Field(() => UserGQL)
   user: UserGQL
 

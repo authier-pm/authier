@@ -43,13 +43,12 @@ import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
-import { DeviceMutation, DeviceQuery } from '../models/Device'
+import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
   DecryptionChallengeMutation,
-  DecryptionChallengeUnion,
-  DeviceInput
+  DecryptionChallengeUnion
 } from '../models/DecryptionChallenge'
 import { sendEmail } from '../utils/email'
 import { plainToClass } from 'class-transformer'
@@ -197,6 +196,7 @@ export class RootResolver {
           TOTPlimit: 4,
           Devices: {
             create: {
+              platform: input.devicePlatform,
               id: deviceId,
               firstIpAddress: ipAddress,
               lastIpAddress: ipAddress,

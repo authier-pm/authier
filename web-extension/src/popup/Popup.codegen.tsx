@@ -2,11 +2,11 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
+export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null };
 
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
@@ -16,7 +16,7 @@ export type SendAuthMessageQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendAuthMessageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', sendAuthMessage: boolean } | null | undefined };
+export type SendAuthMessageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', sendAuthMessage: boolean } | null };
 
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
   firebaseToken: Types.Scalars['String'];

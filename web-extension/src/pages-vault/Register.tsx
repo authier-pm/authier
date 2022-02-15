@@ -86,6 +86,7 @@ export default function Register(): ReactElement {
                 email: values.email,
                 ...params,
                 deviceId,
+                devicePlatform: device.platform,
                 deviceName: device.generateDeviceName(),
                 firebaseToken: fireToken
               }

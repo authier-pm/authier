@@ -29,10 +29,10 @@ model DecryptionChallenge {
   rejectedAt               DateTime?
   blockIp                  Boolean? // when true, attempt to get a new challenge from the same IP address will fail
   deviceName               String
+  deviceId                 String    @db.Uuid // no reference as we might want to keep this even when device is deleted
   userId                   String    @db.Uuid
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
-  deviceId                 String    @db.Uuid // no reference as we might want to keep this even when device is deleted
   approvedByRecovery       Boolean   @default(false)
   approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
   approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
@@ -40,17 +40,17 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                       String         @id @db.Uuid
-  firstIpAddress           String         @db.Inet
-  lastIpAddress            String         @db.Inet
+  id                       String    @id @db.Uuid
+  firstIpAddress           String    @db.Inet
+  lastIpAddress            String    @db.Inet
   firebaseToken            String
   name                     String
-  platform                 DevicePlatform
-  syncTOTP                 Boolean        @default(true) //2FA
-  ipAddressLock            Boolean        @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  platform                 String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
+  syncTOTP                 Boolean   @default(true) //2FA
+  ipAddressLock            Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   vaultLockTimeoutSeconds  Int?
   logoutAt                 DateTime?
-  deauthorizedFromDeviceId String?        @db.Uuid // when non null it means user deauthorized it. We don't allow any further syncs for this device
+  deauthorizedFromDeviceId String?   @db.Uuid // when non null it means user deauthorized it. We don't allow any further syncs for this device
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -261,12 +261,4 @@ model EmailVerification {
   // @skip
   token      String                @unique @db.Uuid
   kind       EmailVerificationType
-}
-
-enum DevicePlatform {
-  WINDOWS
-  IOS
-  ANDROID
-  MAC
-  LINUX
 }

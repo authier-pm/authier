@@ -93,7 +93,8 @@ export default function Account() {
                 variables: {
                   deviceInput: {
                     id: device.id,
-                    name: device.name
+                    name: device.name,
+                    platform: device.platform
                   },
                   email: values.email
                 }

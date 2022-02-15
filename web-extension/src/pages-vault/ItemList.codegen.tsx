@@ -2,7 +2,7 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
   id: Types.Scalars['ID'];
 }>;

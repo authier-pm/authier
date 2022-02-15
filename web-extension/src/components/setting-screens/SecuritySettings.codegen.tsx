@@ -2,11 +2,11 @@ import * as Types from '../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type SecuritySettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SecuritySettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null | undefined };
+export type SecuritySettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null };
 
 
 export const SecuritySettingsDocument = gql`

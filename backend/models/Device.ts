@@ -1,5 +1,12 @@
 import { GraphQLPositiveInt, GraphQLUUID } from 'graphql-scalars'
-import { Field, GraphQLISODateTime, Ctx, ObjectType, Arg } from 'type-graphql'
+import {
+  Field,
+  GraphQLISODateTime,
+  Ctx,
+  ObjectType,
+  Arg,
+  InputType
+} from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
@@ -7,6 +14,18 @@ import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 import { request } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
+
+@InputType()
+export class DeviceInput {
+  @Field(() => GraphQLUUID, { nullable: false })
+  id: string
+
+  @Field()
+  name: string
+
+  @Field({ nullable: false })
+  platform: string
+}
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
@@ -28,7 +47,6 @@ export class DeviceQuery extends DeviceGQL {
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
 
-    console.log('~ lastSyncCondition', lastSyncCondition)
     const res = await ctx.prisma.encryptedSecret.findMany({
       where: {
         OR: [
@@ -81,6 +99,18 @@ export class DeviceMutation extends DeviceGQLScalars {
     return syncedAt
   }
 
+  @Field(() => DeviceGQL)
+  async deauthorize(@Ctx() ctx: IContextAuthenticated) {
+    return await ctx.prisma.device.update({
+      data: {
+        deauthorizedFromDeviceId: ctx.jwtPayload.deviceId
+      },
+      where: {
+        id: this.id
+      }
+    })
+  }
+
   @Field(() => SecretUsageEventGQLScalars)
   async reportSecretUsageEvent(
     @Ctx() ctx: IContext,
@@ -113,4 +143,7 @@ export class DeviceMutation extends DeviceGQLScalars {
       }
     })
   }
+}
+function InputField(arg0: () => import('graphql').GraphQLScalarType) {
+  throw new Error('Function not implemented.')
 }

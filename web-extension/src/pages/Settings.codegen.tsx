@@ -2,7 +2,7 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type UpdateSettingsMutationVariables = Types.Exact<{
   noHandsLogin: Types.Scalars['Boolean'];
   lockTime: Types.Scalars['Int'];
