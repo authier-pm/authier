@@ -32,9 +32,6 @@ export class WebInputGQLScalars {
 
 @ObjectType()
 export class WebInputGQL extends WebInputGQLScalars {
-  @Field(() => WebInputTypeGQL)
-  kind: WebInputTypeGQL
-
   @Field(() => UserGQL)
   addedByUser: UserGQL
 

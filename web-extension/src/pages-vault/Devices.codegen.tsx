@@ -2,11 +2,11 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type DevicesPageQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null | undefined, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } | null | undefined };
+export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } | null };
 
 export type ApproveChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int'];

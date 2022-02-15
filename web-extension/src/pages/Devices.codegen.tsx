@@ -2,11 +2,11 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null | undefined, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null | undefined }> } | null | undefined };
+export type MyDevicesQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null }> } | null };
 
 
 export const MyDevicesDocument = gql`

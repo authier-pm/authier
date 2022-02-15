@@ -138,7 +138,7 @@ export type DeviceGql = {
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
-  platform?: Maybe<Scalars['String']>
+  platform: Scalars['String']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
   syncTOTP: Scalars['Boolean']
   updatedAt?: Maybe<Scalars['DateTime']>
@@ -149,11 +149,13 @@ export type DeviceGql = {
 export type DeviceInput = {
   id: Scalars['UUID']
   name: Scalars['String']
+  platform: Scalars['String']
 }
 
 export type DeviceMutation = {
   __typename?: 'DeviceMutation'
   createdAt: Scalars['DateTime']
+  deauthorize: DeviceGql
   deauthorizedFromDeviceId?: Maybe<Scalars['String']>
   firebaseToken: Scalars['String']
   firstIpAddress: Scalars['String']
@@ -165,7 +167,7 @@ export type DeviceMutation = {
   markAsSynced: Scalars['DateTime']
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
-  platform?: Maybe<Scalars['String']>
+  platform: Scalars['String']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
   rename: DeviceGql
   reportSecretUsageEvent: SecretUsageEventGqlScalars
@@ -204,7 +206,7 @@ export type DeviceQuery = {
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
-  platform?: Maybe<Scalars['String']>
+  platform: Scalars['String']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
   syncTOTP: Scalars['Boolean']
   updatedAt?: Maybe<Scalars['DateTime']>
@@ -377,6 +379,7 @@ export type RegisterNewAccountInput = {
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
   deviceId: Scalars['UUID']
   deviceName: Scalars['String']
+  devicePlatform: Scalars['String']
   email: Scalars['EmailAddress']
   encryptionSalt: Scalars['NonEmptyString']
   firebaseToken: Scalars['String']
@@ -512,9 +515,8 @@ export type UserMutation = {
 }
 
 export type UserMutationAddDeviceArgs = {
-  deviceId: Scalars['String']
+  device: DeviceInput
   firebaseToken: Scalars['String']
-  name: Scalars['String']
 }
 
 export type UserMutationAddEncryptedSecretsArgs = {

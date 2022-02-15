@@ -25,8 +25,5 @@ export class EmailVerificationGQL extends EmailVerificationGQLScalars {
   @Field(() => UserGQL)
   user: UserGQL
 
-  @Field(() => EmailVerificationTypeGQL)
-  kind: EmailVerificationTypeGQL
-
   // skip overwrite 👇
 }

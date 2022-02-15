@@ -85,6 +85,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
+
   email: string
   userId: string
   deviceName: string
@@ -321,7 +322,9 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
-
+  get platform() {
+    return browserInfo.getOSName()
+  }
   /**
    * runs on startup
    */
