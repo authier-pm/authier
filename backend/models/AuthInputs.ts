@@ -27,6 +27,9 @@ export class RegisterNewAccountInput extends AddNewDeviceInput {
   @Field()
   deviceName: string
 
+  @Field()
+  devicePlatform: string
+
   @Field(() => GraphQLNonEmptyString)
   encryptionSalt: string
 

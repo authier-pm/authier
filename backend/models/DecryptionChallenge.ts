@@ -19,15 +19,6 @@ import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 
-@InputType()
-export class DeviceInput {
-  @Field(() => GraphQLUUID)
-  id: string
-
-  @Field()
-  name: string
-}
-
 @ObjectType()
 export class DecryptionChallengeForApproval {
   @Field(() => Int)

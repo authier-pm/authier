@@ -2,13 +2,13 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type AddEncryptedSecretsMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
 }>;
 
 
-export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null | undefined, iconUrl?: string | null | undefined, label: string, version: number, createdAt: string, updatedAt?: string | null | undefined }> } };
+export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null, iconUrl?: string | null, label: string, version: number, createdAt: string, updatedAt?: string | null }> } };
 
 
 export const AddEncryptedSecretsDocument = gql`

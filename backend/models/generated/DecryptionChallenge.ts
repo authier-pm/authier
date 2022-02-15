@@ -23,13 +23,13 @@ export class DecryptionChallengeGQLScalars {
   deviceName: string
 
   @Field()
+  deviceId: string
+
+  @Field()
   userId: string
 
   @Field()
   createdAt: Date
-
-  @Field()
-  deviceId: string
 
   @Field()
   approvedByRecovery: boolean

@@ -2,7 +2,7 @@ import * as Types from '../../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type ChangeMasterPasswordMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
   addDeviceSecret: Types.Scalars['NonEmptyString'];
@@ -16,7 +16,7 @@ export type ChangeMasterPasswordMutation = { __typename?: 'Mutation', me: { __ty
 export type AccountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type AccountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null | undefined } | null | undefined } | null | undefined };
+export type AccountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null } | null } | null };
 
 export type ResendEmailVerificationMutationVariables = Types.Exact<{ [key: string]: never; }>;
 

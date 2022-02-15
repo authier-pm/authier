@@ -47,9 +47,6 @@ export class EncryptedSecretGQLScalars {
 
 @ObjectType()
 export class EncryptedSecretGQL extends EncryptedSecretGQLScalars {
-  @Field(() => EncryptedSecretTypeGQL)
-  kind: EncryptedSecretTypeGQL
-
   @Field(() => UserGQL)
   user: UserGQL
 

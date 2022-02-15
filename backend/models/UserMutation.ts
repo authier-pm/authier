@@ -20,6 +20,7 @@ import { v4 as uuidv4 } from 'uuid'
 import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
+import { DeviceInput } from './Device'
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -40,8 +41,7 @@ export class UserMutation extends UserBase {
 
   @Field(() => DeviceGQL)
   async addDevice(
-    @Arg('name', () => String) name: string,
-    @Arg('deviceId', () => String) deviceId: string,
+    @Arg('device', () => DeviceInput) device: DeviceInput,
     @Arg('firebaseToken', () => String) firebaseToken: string,
     @Ctx() ctx: IContext
   ) {
@@ -49,8 +49,9 @@ export class UserMutation extends UserBase {
 
     return await ctx.prisma.device.create({
       data: {
-        name: name,
-        id: deviceId,
+        platform: device.platform,
+        name: device.name,
+        id: device.id,
         firebaseToken: firebaseToken,
         firstIpAddress: ipAddress,
         userId: this.id,

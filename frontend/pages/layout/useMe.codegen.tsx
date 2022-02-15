@@ -2,11 +2,11 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type MeQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, email?: any | null | undefined } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, email?: any | null } | null };
 
 
 export const MeDocument = gql`

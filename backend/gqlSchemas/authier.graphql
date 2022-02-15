@@ -107,7 +107,7 @@ type DeviceGQL {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
-  platform: String
+  platform: String!
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -191,9 +191,9 @@ type DecryptionChallengeGQL {
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!
+  deviceId: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -236,7 +236,7 @@ type DeviceQuery {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
-  platform: String
+  platform: String!
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -352,11 +352,7 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   addCookie: String!
-  addDevice(
-    firebaseToken: String!
-    deviceId: String!
-    name: String!
-  ): DeviceGQL!
+  addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecrets(
     secrets: [EncryptedSecretInput!]!
@@ -373,6 +369,12 @@ type UserMutation {
   approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+}
+
+input DeviceInput {
+  id: UUID!
+  name: String!
+  platform: String!
 }
 
 type EncryptedSecretMutation {
@@ -445,9 +447,9 @@ type DecryptionChallengeMutation {
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!
+  deviceId: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -464,7 +466,7 @@ type DeviceMutation {
   lastIpAddress: String!
   firebaseToken: String!
   name: String!
-  platform: String
+  platform: String!
   syncTOTP: Boolean!
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
@@ -477,6 +479,7 @@ type DeviceMutation {
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
+  deauthorize: DeviceGQL!
   reportSecretUsageEvent(
     webInputId: PositiveInt!
     secretId: UUID!
@@ -508,6 +511,7 @@ input RegisterNewAccountInput {
   addDeviceSecretEncrypted: NonEmptyString!
   deviceId: UUID!
   deviceName: String!
+  devicePlatform: String!
   encryptionSalt: NonEmptyString!
   email: EmailAddress!
 }
@@ -523,9 +527,9 @@ type DecryptionChallengeApproved {
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!
+  deviceId: String!
   userId: String!
   createdAt: DateTime!
-  deviceId: String!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -543,11 +547,6 @@ input AddNewDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
-}
-
-input DeviceInput {
-  id: UUID!
-  name: String!
 }
 
 input WebInputElement {

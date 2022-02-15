@@ -14,6 +14,7 @@ import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
 export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
   deviceName: faker.internet.userName(),
+  devicePlatform: faker.internet.domainWord(),
   deviceId: faker.datatype.uuid(),
   firebaseToken: faker.datatype.uuid(),
   addDeviceSecret: faker.datatype.string(5),
@@ -135,6 +136,7 @@ describe('RootResolver', () => {
           Devices: {
             create: {
               id: input.deviceId,
+              platform: 'iOS',
               firstIpAddress: faker.internet.ip(),
               lastIpAddress: faker.internet.ip(),
               firebaseToken: faker.datatype.uuid(),
@@ -177,7 +179,8 @@ describe('RootResolver', () => {
         fakeData.email,
         {
           id: faker.datatype.uuid(),
-          name: 'chrome '
+          name: 'chrome ',
+          platform: 'macOS'
         },
         makeFakeCtx(userId)
       )) as DecryptionChallengeApproved
@@ -218,7 +221,8 @@ describe('RootResolver', () => {
           fakeData.email,
           {
             id: faker.datatype.uuid(),
-            name: 'chrome '
+            name: 'chrome ',
+            platform: 'macOS'
           },
           makeFakeCtx(userId)
         )

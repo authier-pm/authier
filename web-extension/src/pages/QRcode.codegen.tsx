@@ -2,11 +2,11 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
-const defaultOptions =  {}
+const defaultOptions = {} as const;
 export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DeviceCountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devicesCount: number } | null | undefined };
+export type DeviceCountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', devicesCount: number } | null };
 
 
 export const DeviceCountDocument = gql`

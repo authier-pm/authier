@@ -30,7 +30,8 @@ export const useLogin = (props: { deviceName: string }) => {
       variables: {
         deviceInput: {
           id: device.id,
-          name: props.deviceName
+          name: props.deviceName,
+          platform: device.platform
         },
         email: formState.email
       }
@@ -99,7 +100,8 @@ export const useLogin = (props: { deviceName: string }) => {
             email: formState.email,
             deviceInput: {
               id: device.id,
-              name: props.deviceName
+              name: props.deviceName,
+              platform: device.platform
             },
 
             input: {

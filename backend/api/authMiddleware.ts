@@ -3,10 +3,9 @@ import { verify } from 'jsonwebtoken'
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { IJWTPayload } from '../schemas/RootResolver'
 
-export const throwIfNotAuthenticated: MiddlewareFn<IContextAuthenticated> = (
-  { context },
-  next
-) => {
+export const throwIfNotAuthenticated: MiddlewareFn<
+  IContextAuthenticated
+> = async ({ context }, next) => {
   let token: string | undefined
 
   if (context.request.cookies['access-token']) {
@@ -20,12 +19,27 @@ export const throwIfNotAuthenticated: MiddlewareFn<IContextAuthenticated> = (
     context.reply.clearCookie('access-token')
     throw new Error('not authenticated')
   }
-
+  let jwtPayload: IJWTPayload
   try {
-    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+    jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!) as IJWTPayload
 
-    context.jwtPayload = payload as IJWTPayload
+    context.jwtPayload = jwtPayload
   } catch (err) {
+    context.reply.clearCookie('access-token')
+
+    throw new Error('not authenticated')
+  }
+
+  const isDeauthorized = await context.prisma.device.count({
+    where: {
+      id: jwtPayload.deviceId,
+      deauthorizedFromDeviceId: {
+        not: null
+      }
+    }
+  })
+
+  if (isDeauthorized) {
     context.reply.clearCookie('access-token')
 
     throw new Error('not authenticated')
