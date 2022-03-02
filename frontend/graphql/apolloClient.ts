@@ -9,7 +9,7 @@ import jwtDecode from 'jwt-decode'
 
 const NEXT_PUBLIC_API_URL = process.env.NEXT_PUBLIC_API_URL
 
-export let getTokenFromLocalStorage = async (): Promise<string | null> => {
+export const getTokenFromLocalStorage = async (): Promise<string | null> => {
   const accessToken = sessionStorage.getItem('access-token')
   return accessToken
 }
@@ -26,6 +26,7 @@ const httpLink = createHttpLink({
 })
 
 export const apolloClient = new ApolloClient({
+  // @ts-expect-error TODO
   link: ApolloLink.from([errorLink, httpLink]),
   cache: new InMemoryCache(),
   queryDeduplication: true
