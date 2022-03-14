@@ -182,6 +182,8 @@ enum WebInputType {
   EMAIL
   USERNAME_OR_EMAIL
   PASSWORD
+  NEW_PASSWORD
+  NEW_PASSWORD_CONFIRMATION
 }
 
 type DecryptionChallengeGQL {
