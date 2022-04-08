@@ -15,7 +15,6 @@ import {
   setNewRefreshToken
 } from './userAuth'
 import { verify } from 'jsonwebtoken'
-import chalk from 'chalk'
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './api/GraphqlError'
@@ -58,6 +57,7 @@ async function main() {
 
   app.register(fastifyCors)
   const trustedDomains = ['https://unpkg.com']
+
   app.register(fastifyHelmet, {
     contentSecurityPolicy: {
       directives: {

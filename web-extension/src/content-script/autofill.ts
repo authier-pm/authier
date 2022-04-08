@@ -89,8 +89,8 @@ export const autofill = (initState: IInitStateRes) => {
       .filter((el) => !!el)
 
     if (filledElements.length === 2) {
-      log('filled both')
       const form = filledElements[0]?.form
+      log('filled both', form)
       if (form) {
         // TODO try to submit the form
         filledElements[0]?.form?.dispatchEvent(

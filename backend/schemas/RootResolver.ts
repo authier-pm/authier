@@ -368,6 +368,7 @@ export class RootResolver {
     })
   }
 
+  @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => GraphQLPositiveInt, {
     nullable: true,
     description:
@@ -376,6 +377,7 @@ export class RootResolver {
   async logout(@Ctx() ctx: IContextAuthenticated) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
+    console.log(ctx)
     if (!ctx.jwtPayload) {
       return null
     }

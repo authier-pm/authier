@@ -39,6 +39,37 @@ export class UserMutation extends UserBase {
     return accessToken
   }
 
+  //Cant remove master device
+  //Cant remove own device
+  //Loading time on reauth is too long
+  //Save URL on defocus
+  //Use nano for HTML insert
+
+  @Field(() => DeviceGQL)
+  async deauthDevice(
+    @Arg('deviceId', () => String) deviceId: DeviceInput,
+    @Ctx() ctx: IContext
+  ) {
+    const ipAddress: string = ctx.getIpAddress()
+
+    const tmp = await ctx.prisma.device.findUnique({
+      where: {
+        id: deviceId as unknown as string
+      }
+    })
+
+    if (ipAddress === tmp?.firstIpAddress) {
+      throw new Error('You cannot deauth yourself')
+    }
+
+    return await ctx.prisma.device.update({
+      where: {
+        id: deviceId as unknown as string
+      },
+      data: { deauthorizedFromDeviceId: tmp?.userId }
+    })
+  }
+
   @Field(() => DeviceGQL)
   async addDevice(
     @Arg('device', () => DeviceInput) device: DeviceInput,
@@ -215,7 +246,7 @@ export class UserMutation extends UserBase {
 
   @Field(() => Boolean)
   async approveDevice(
-    @Arg('success', () => Boolean) success: Boolean,
+    @Arg('success', () => Boolean) success: boolean,
     @Ctx() ctx: IContext
   ) {
     // TODO check current device is master
