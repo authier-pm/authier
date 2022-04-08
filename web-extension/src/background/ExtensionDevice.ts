@@ -368,7 +368,7 @@ class ExtensionDevice {
     this.rerenderViews() // for letting vault/popup know that the state has changed
     if (isRunningInBgPage) {
       browser.idle.setDetectionInterval(30)
-      console.log('~ device initialized, locking test45')
+      console.log('~ device initialized, locking test45', isRunningInBgPage)
       browser.idle.onStateChanged.addListener((state) => {
         console.log('~ state', state)
         if (state !== 'active') {

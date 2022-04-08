@@ -22,7 +22,7 @@ function App({ parent }: { parent: string }): ReactElement {
   if (loading) {
     return <Flex>Loading...</Flex>
   }
-  console.log(parent)
+
   return <Providers parent={parent} />
 }
 

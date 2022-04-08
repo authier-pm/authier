@@ -11,11 +11,9 @@ import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
-import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 export function VaultRouter() {
   if (device.state === null) {
-    console.log('aaafd')
     return (
       <Center marginX="50%" h="100vh">
         <Switch>

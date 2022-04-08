@@ -354,6 +354,7 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   addCookie: String!
+  deauthDevice(deviceId: String!): DeviceGQL!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecrets(

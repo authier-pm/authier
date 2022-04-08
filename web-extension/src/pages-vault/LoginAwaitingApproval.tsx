@@ -14,16 +14,14 @@ import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { Heading, Spinner, useInterval } from '@chakra-ui/react'
-import { Redirect } from 'react-router-dom'
-import { renderVault } from '@src/vault-index'
 import { formatRelative } from 'date-fns'
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
 
   const { setUserId } = useContext(UserContext)
-  const [addNewDevice, { loading, data }] = useAddNewDeviceForUserMutation()
-  console.log('~ addNewDevice', addNewDevice)
+  const [addNewDevice, { loading, data, error }] =
+    useAddNewDeviceForUserMutation()
 
   const [getDeviceDecryptionChallenge, { data: decryptionData }] =
     useDeviceDecryptionChallengeMutation({
@@ -36,6 +34,13 @@ export const useLogin = (props: { deviceName: string }) => {
         email: formState.email
       }
     })
+
+  useEffect(() => {
+    if (error) {
+      toast.error('failed to create decryption challenge')
+      setFormState(null)
+    }
+  }, [error])
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
@@ -143,7 +148,6 @@ export const useLogin = (props: { deviceName: string }) => {
           }
 
           setUserId(decodedToken.userId)
-
           device.save(deviceState)
           toast.success(
             t`Device approved at ${formatRelative(
@@ -155,17 +159,16 @@ export const useLogin = (props: { deviceName: string }) => {
           toast.error(t`Login failed, check your username and password`)
         }
       })()
-    } else {
+    } else if (!deviceDecryptionChallenge) {
       getDeviceDecryptionChallenge()
     }
-  }, [deviceDecryptionChallenge?.__typename])
+  }, [deviceDecryptionChallenge])
 
   return { deviceDecryptionChallenge, loading }
 }
 
 export const LoginAwaitingApproval: React.FC = () => {
   const [deviceName, setDeviceName] = useState(device.generateDeviceName())
-  const loginCtx = useContext(LoginContext)
   const { deviceDecryptionChallenge, loading } = useLogin({
     deviceName
   })

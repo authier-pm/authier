@@ -43,7 +43,7 @@ export interface LoginFormValues {
   email: string
 }
 
-// @ts-expect-error
+// @ts-expect-error TODO: fix types
 export const LoginContext = React.createContext<{
   formState: LoginFormValues
   setFormState: Dispatch<SetStateAction<LoginFormValues | null>>

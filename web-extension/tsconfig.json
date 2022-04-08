@@ -2,9 +2,11 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@src/*": ["src/*"]
+      "@src/*": [
+        "src/*"
+      ]
     },
-    "target": "ES2020",
+    "target": "ES2015",
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "../../authier",
@@ -13,7 +15,10 @@
     "sourceMap": true,
     "jsx": "react",
     "esModuleInterop": true,
-    "lib": ["es2021", "dom"],
+    "lib": [
+      "es2021",
+      "dom"
+    ],
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
@@ -23,6 +28,12 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "exclude": ["../backend/**", "dist/**"],
-  "include": ["./src/**/*", "../shared/**/*"]
+  "exclude": [
+    "../backend/**",
+    "dist/**"
+  ],
+  "include": [
+    "./src/**/*",
+    "../shared/**/*"
+  ]
 }
