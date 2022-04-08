@@ -1,7 +1,10 @@
+import { Test } from './components/Test'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { domRecorder } from './contentScript'
+
+import { render } from 'nano-jsx/lib/core'
 
 export let promptDiv: HTMLDivElement | null
 const escapeHtml = (unsafe: string) => {
@@ -14,6 +17,7 @@ const escapeHtml = (unsafe: string) => {
 }
 
 export function renderSaveCredentialsForm(username: string, password: string) {
+  //render(Test, document.body)
   promptDiv = document.createElement('div')
 
   promptDiv.id = '__AUTHIER__savePrompt'

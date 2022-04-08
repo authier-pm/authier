@@ -164,6 +164,12 @@ browser.runtime.onMessage.addListener(async function (
       return [deviceState?.email]
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
+      console.log(
+        'getContentScriptInitialState',
+        tabUrl,
+        deviceState,
+        currentTabId
+      )
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {

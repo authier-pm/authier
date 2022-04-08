@@ -290,8 +290,6 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         >
           {({ values, isSubmitting, dirty }) => {
             const levelOfPsw = passwordStrength(values.password)
-              .value.split(' ')
-              .join('')
             return (
               <Flex as={Form} p={5} flexDirection="column" w="inherit">
                 <Field name="url">
@@ -341,12 +339,12 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       <FormLabel htmlFor="password">Password</FormLabel>
 
                       <Progress
-                        value={Value[levelOfPsw]}
+                        value={levelOfPsw.id}
                         size="xs"
                         colorScheme="green"
-                        max={4}
+                        max={3}
+                        min={0}
                         mb={1}
-                        defaultValue={0}
                       />
                       <InputGroup size="md">
                         <Input
@@ -431,7 +429,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   )
 }
 
-export const VaultItemSettings = ({ secretId }) => {
+export const VaultItemSettings = ({ secretId }: { secretId: string }) => {
   if (!device.state) {
     return <Spinner></Spinner>
   }
