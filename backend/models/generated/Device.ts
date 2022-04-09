@@ -35,9 +35,6 @@ export class DeviceGQLScalars {
   @Field({ nullable: true })
   logoutAt?: Date
 
-  @Field({ nullable: true })
-  deauthorizedFromDeviceId?: string
-
   @Field()
   createdAt: Date
 
