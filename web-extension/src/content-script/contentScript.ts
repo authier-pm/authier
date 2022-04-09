@@ -1,5 +1,4 @@
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-
+import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import { debounce } from 'lodash'
 import browser from 'webextension-polyfill'
 

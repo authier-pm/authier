@@ -57,10 +57,13 @@ export const PromptPassword = ({
       capturedInputEvents: domRecorder.toJSON(),
       openInVault
     }
-    return browser.runtime.sendMessage({
-      action: BackgroundMessageType.addLoginCredentials,
-      payload: loginCredentials
-    })
+    return chrome.runtime.sendMessage(
+      {
+        action: BackgroundMessageType.addLoginCredentials,
+        payload: loginCredentials
+      },
+      (res) => console.log('popup')
+    )
   }
   let passwordShown = false
 
