@@ -4,10 +4,14 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { domRecorder } from './contentScript'
-import { h } from 'nano-jsx/lib/core'
-import { render } from 'nano-jsx/lib/core'
+
+import { h, render } from 'nano-jsx/lib/core'
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const nano = h
 
 export let promptDiv: HTMLDivElement | null
+
 const escapeHtml = (unsafe: string) => {
   return unsafe
     .replaceAll('&', '&amp;')
