@@ -552,5 +552,5 @@ class ExtensionDevice {
 export const device = new ExtensionDevice()
 
 device.initialize()
-// @ts-expect-error
+// @ts-expect-error TODO fix types
 window.extensionDevice = device
