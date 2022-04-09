@@ -11,11 +11,9 @@ import {
 import debug from 'debug'
 import {
   WebInputElement,
-  WebInputGql,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './DOMObserver'
 import { autofill, IDecryptedSecrets } from './autofill'
 import {
@@ -76,6 +74,7 @@ export async function initInputWatch() {
   log('~ stateInitRes', stateInitRes)
 
   if (!stateInitRes) {
+    log('no state')
     return
   }
 
