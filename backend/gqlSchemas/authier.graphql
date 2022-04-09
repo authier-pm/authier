@@ -490,6 +490,8 @@ type DeviceMutation {
     kind: String!
   ): SecretUsageEventGQLScalars!
   rename(name: String!): DeviceGQL!
+  logout: DeviceGQL!
+  removeDevice: Boolean!
 }
 
 type SecretUsageEventGQLScalars {
