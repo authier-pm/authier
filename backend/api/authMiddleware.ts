@@ -33,8 +33,8 @@ export const throwIfNotAuthenticated: MiddlewareFn<
   const isDeauthorized = await context.prisma.device.count({
     where: {
       id: jwtPayload.deviceId,
-      deauthorizedFromDeviceId: {
-        not: null
+      logoutAt: {
+        lt: new Date()
       }
     }
   })
