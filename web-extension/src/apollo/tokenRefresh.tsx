@@ -13,7 +13,7 @@ export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: () => {
     //Get token from local storage
-    console.log('~ isTokenValidOrUndefined', accessToken)
+
     if (!accessToken) {
       return false
     }
@@ -30,8 +30,6 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    console.log('refetch JWT access token')
-
     return await fetch(`${API_URL?.replace('/graphql', '')}/refresh_token`, {
       method: 'POST',
       credentials: 'include'
@@ -42,6 +40,7 @@ export const tokenRefresh = new TokenRefreshLink({
     setAccessToken(accessToken)
   },
   handleError: async (err) => {
+    console.log('PEPA')
     console.warn('Your refresh token is invalid. You must login again', err)
     await removeToken()
     await device.clearLocalStorage()
