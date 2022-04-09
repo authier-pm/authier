@@ -12,14 +12,14 @@
   "dependencies": {
     "@apollo/client": "^3.5.10",
     "@chakra-ui/icons": "^1.1.7",
-    "@chakra-ui/react": "^1.8.6",
+    "@chakra-ui/react": "^1.8.8",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@lingui/react": "^3.13.2",
-    "@sentry/nextjs": "^6.18.2",
-    "@testing-library/jest-dom": "^5.16.2",
+    "@sentry/nextjs": "^6.19.6",
+    "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^12.1.4",
-    "next": "12.1.0",
+    "next": "12.1.4",
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "remark": "^14.0.2",
@@ -27,10 +27,10 @@
     "remark-html": "^15.0.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.7",
+    "@babel/core": "^7.17.9",
     "@lingui/cli": "^3.13.2",
     "@lingui/macro": "^3.13.2",
-    "@types/react": "^17.0.40",
+    "@types/react": "^17.0.43",
     "apollo-link-token-refresh": "^0.4.0",
     "babel-plugin-macros": "^3.1.0",
     "chakra-ui-markdown-renderer": "^4.0.0",
@@ -38,10 +38,10 @@
     "formik-chakra-ui": "^1.6.0",
     "jwt-decode": "^3.1.2",
     "raw-loader": "^4.0.2",
-    "react-markdown": "^8.0.1",
+    "react-markdown": "^8.0.2",
     "react-toastify": "^8.2.0",
-    "typescript": "^4.6.2",
-    "vite": "^2.8.6",
-    "vitest": "^0.7.4"
+    "typescript": "^4.6.3",
+    "vite": "^2.9.1",
+    "vitest": "^0.9.0"
   }
 }

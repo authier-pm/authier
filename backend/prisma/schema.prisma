@@ -40,17 +40,16 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                       String    @id @db.Uuid
-  firstIpAddress           String    @db.Inet
-  lastIpAddress            String    @db.Inet
-  firebaseToken            String
-  name                     String
-  platform                 String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
-  syncTOTP                 Boolean   @default(true) //2FA
-  ipAddressLock            Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  vaultLockTimeoutSeconds  Int?
-  logoutAt                 DateTime?
-  deauthorizedFromDeviceId String?   @db.Uuid // when non null it means user deauthorized it. We don't allow any further syncs for this device
+  id                      String    @id @db.Uuid
+  firstIpAddress          String    @db.Inet
+  lastIpAddress           String    @db.Inet
+  firebaseToken           String
+  name                    String
+  platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
+  syncTOTP                Boolean   @default(true) //2FA
+  ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  vaultLockTimeoutSeconds Int?
+  logoutAt                DateTime?
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -239,6 +238,8 @@ enum WebInputType {
   PASSWORD
   NEW_PASSWORD
   NEW_PASSWORD_CONFIRMATION
+  SUBMIT_BUTTON
+  CUSTOM
 }
 
 model Tag {
