@@ -51,7 +51,7 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            plugins: ['macros']
+            plugins: ['macros', '@emotion']
           }
         }
       },
