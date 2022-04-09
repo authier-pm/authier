@@ -15,9 +15,11 @@ const escapeHtml = (unsafe: string) => {
     .replaceAll('"', '&quot;')
     .replaceAll("'", '&#039;')
 }
+const test = document.createElement('div')
+document.body.appendChild(test)
+render(Test, test)
 
 export function renderSaveCredentialsForm(username: string, password: string) {
-  //render(Test, document.body)
   promptDiv = document.createElement('div')
 
   promptDiv.id = '__AUTHIER__savePrompt'

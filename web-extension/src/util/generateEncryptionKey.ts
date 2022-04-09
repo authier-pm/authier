@@ -1,6 +1,6 @@
 import cryptoJS from 'crypto-js'
 
-const PBKDF2Iterations = 10000
+const PBKDF2Iterations = 10
 
 export const generateEncryptionKey = (
   password: string,

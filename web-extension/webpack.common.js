@@ -36,6 +36,17 @@ module.exports = {
       },
       {
         exclude: /node_modules/,
+        test: /src\/content-script.*\.tsx?$/,
+        use: {
+          loader: 'ts-loader',
+          options: {
+            transpileOnly: true,
+            configFile: path.join(__dirname, 'src/content-script/tsconfig.json')
+          }
+        }
+      },
+      {
+        exclude: /node_modules/,
         test: /\.tsx?$/,
         use: {
           loader: 'babel-loader',
