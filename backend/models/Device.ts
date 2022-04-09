@@ -113,7 +113,7 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => SecretUsageEventGQLScalars)
   async reportSecretUsageEvent(
-    @Ctx() ctx: IContext,
+    @Ctx() ctx: IContextAuthenticated,
     @Arg('kind') kind: string,
     @Arg('secretId', () => GraphQLUUID) secretId: string,
     @Arg('webInputId', () => GraphQLPositiveInt) webInputId: number
@@ -133,7 +133,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   }
 
   @Field(() => DeviceGQL)
-  async rename(@Ctx() ctx: IContext, @Arg('name') name: string) {
+  async rename(@Ctx() ctx: IContextAuthenticated, @Arg('name') name: string) {
     return ctx.prisma.device.update({
       data: {
         name
@@ -143,7 +143,38 @@ export class DeviceMutation extends DeviceGQLScalars {
       }
     })
   }
-}
-function InputField(arg0: () => import('graphql').GraphQLScalarType) {
-  throw new Error('Function not implemented.')
+
+  @Field(() => DeviceGQL)
+  async logout(@Ctx() ctx: IContextAuthenticated) {
+    if (ctx.jwtPayload.deviceId === this.id) {
+      ctx.reply.clearCookie('refresh-token')
+      ctx.reply.clearCookie('access-token')
+    }
+
+    return await ctx.prisma.device.update({
+      where: {
+        id: this.id
+      },
+      data: { logoutAt: new Date() }
+    })
+  }
+
+  @Field(() => Boolean)
+  async removeDevice(@Ctx() ctx: IContextAuthenticated) {
+    await this.logout(ctx)
+
+    await ctx.prisma.$transaction([
+      ctx.prisma.device.delete({
+        where: {
+          id: ctx.jwtPayload.deviceId
+        }
+      }),
+      ctx.prisma.decryptionChallenge.deleteMany({
+        where: {
+          deviceId: ctx.jwtPayload.deviceId
+        }
+      })
+    ])
+    return true
+  }
 }
