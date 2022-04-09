@@ -374,7 +374,10 @@ export class RootResolver {
     description:
       'removes current device. Returns null if user is not authenticated'
   })
-  async logout(@Ctx() ctx: IContextAuthenticated) {
+  async logout(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('removeDevice', { nullable: true }) removeDevice: boolean
+  ) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
     console.log(ctx)
@@ -383,9 +386,6 @@ export class RootResolver {
     }
     const user = await ctx.prisma.user.update({
       data: {
-        tokenVersion: {
-          increment: 1
-        },
         Devices: {
           update: {
             where: {
@@ -401,6 +401,21 @@ export class RootResolver {
         id: ctx.jwtPayload.userId
       }
     })
+
+    if (removeDevice) {
+      await ctx.prisma.$transaction([
+        ctx.prisma.device.delete({
+          where: {
+            id: ctx.jwtPayload.deviceId
+          }
+        }),
+        ctx.prisma.decryptionChallenge.deleteMany({
+          where: {
+            deviceId: ctx.jwtPayload.deviceId
+          }
+        })
+      ])
+    }
     return user.tokenVersion
   }
 
