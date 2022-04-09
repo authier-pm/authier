@@ -1,9 +1,10 @@
+/* eslint-disable react/react-in-jsx-scope */
 import { Test } from './components/Test'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { domRecorder } from './contentScript'
-
+import { h } from 'nano-jsx/lib/core'
 import { render } from 'nano-jsx/lib/core'
 
 export let promptDiv: HTMLDivElement | null
@@ -17,7 +18,7 @@ const escapeHtml = (unsafe: string) => {
 }
 const test = document.createElement('div')
 document.body.appendChild(test)
-render(Test, test)
+render(<Test />, test)
 
 export function renderSaveCredentialsForm(username: string, password: string) {
   promptDiv = document.createElement('div')
