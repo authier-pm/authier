@@ -1,4 +1,10 @@
-/* eslint-disable react/react-in-jsx-scope */
 import { h } from 'nano-jsx/lib/core'
 
-export const Test = () => h(<h1>Hello from Tets!</h1>)
+export const Test = () => {
+  console.log('nanojsx')
+  return (
+    <div>
+      <h1>test</h1>
+    </div>
+  )
+}
