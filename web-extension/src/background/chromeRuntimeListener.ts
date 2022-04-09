@@ -33,7 +33,7 @@ if (!isRunningInBgPage) {
   throw new Error('this file should only be imported in the background page')
 }
 
-let safeClosed = false // Is safe Closed ?
+const safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 
 interface ILoginCredentialsFromContentScript {
@@ -75,11 +75,13 @@ browser.runtime.onMessage.addListener(async function (
   switch (req.action) {
     case BackgroundMessageType.addLoginCredentials:
       if (!tab) {
+        console.log('no tab')
         return
       }
       const { url } = tab
 
       if (!url || !deviceState) {
+        console.log('no url')
         return // we can't do anything without a valid url
       }
       log('addLoginCredentials', req.payload)
@@ -103,6 +105,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       ])
       if (!secret) {
+        console.log('not secret')
         return null
       }
 
@@ -162,6 +165,7 @@ browser.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.getFallbackUsernames:
       return [deviceState?.email]
+
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
       console.log(
