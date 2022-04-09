@@ -144,6 +144,3 @@ export class DeviceMutation extends DeviceGQLScalars {
     })
   }
 }
-function InputField(arg0: () => import('graphql').GraphQLScalarType) {
-  throw new Error('Function not implemented.')
-}
