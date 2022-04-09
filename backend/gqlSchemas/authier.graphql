@@ -328,7 +328,7 @@ type Mutation {
   """
   removes current device. Returns null if user is not authenticated
   """
-  logout: PositiveInt
+  logout(removeDevice: Boolean): PositiveInt
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 
