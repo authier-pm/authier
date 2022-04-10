@@ -25,6 +25,7 @@ import {
   Button,
   Tooltip,
   Alert,
+  useDisclosure,
   VStack,
   Grid
 } from '@chakra-ui/react'
@@ -41,6 +42,7 @@ import {
   useRejectChallengeMutation
 } from './Devices.codegen'
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
+import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 
 interface configValues {
   lockTime: number
@@ -65,6 +67,7 @@ const DeviceListItem = (item: {
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { data } = useDevicesPageQuery({ fetchPolicy: 'cache-first' })
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
@@ -109,11 +112,18 @@ const DeviceListItem = (item: {
                   icon={<SettingsIcon color="ButtonShadow" />}
                 />
                 <MenuList>
-                  <MenuItem>
+                  <MenuItem onClick={() => onOpen()}>
                     <FiLogOut></FiLogOut>
                     <NbSp />
-                    <Trans>Deauthorize</Trans>
+                    <Trans>Logout</Trans>
                   </MenuItem>
+                  <DeviceDeleteAlert
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    logoutDevice={async () => {
+                      console.log('delete')
+                    }}
+                  />
                   <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
                     <FiSettings />
                     <NbSp />
