@@ -166,12 +166,12 @@ export class DeviceMutation extends DeviceGQLScalars {
     await ctx.prisma.$transaction([
       ctx.prisma.device.delete({
         where: {
-          id: ctx.jwtPayload.deviceId
+          id: this.id
         }
       }),
       ctx.prisma.decryptionChallenge.deleteMany({
         where: {
-          deviceId: ctx.jwtPayload.deviceId
+          deviceId: this.id
         }
       })
     ])
