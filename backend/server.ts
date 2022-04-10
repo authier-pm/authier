@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
-import fastifyHelmet from 'fastify-helmet'
+// import fastifyHelmet from 'fastify-helmet'
 import fastifyCors from 'fastify-cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
@@ -56,21 +56,22 @@ async function main() {
   })
 
   app.register(fastifyCors)
-  const trustedDomains = ['https://unpkg.com']
+  // const trustedDomains = ['https://unpkg.com']
 
-  app.register(fastifyHelmet, {
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-          trustedDomains
-        ),
-        styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-          trustedDomains
-        )
-      }
-    }
-  })
+  // app.register(fastifyHelmet, { // TODO figure this out
+  //   contentSecurityPolicy: {
+  //     directives: {
+  //       defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+
+  //       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+  //         trustedDomains
+  //       ),
+  //       styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+  //         trustedDomains
+  //       )
+  //     }
+  //   }
+  // })
   app.register(underPressure, {
     maxEventLoopDelay: 1000,
     retryAfter: 50,
