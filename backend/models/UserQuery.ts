@@ -65,6 +65,16 @@ export class UserQuery extends UserBase {
     })
   }
 
+  @Field(() => DeviceQuery)
+  async device(@Ctx() ctx: IContext, id: string) {
+    return ctx.prisma.device.findFirst({
+      where: {
+        userId: this.id,
+        id
+      }
+    })
+  }
+
   @Field(() => GraphQLISODateTime, { nullable: true })
   async lastChangeInSecrets() {
     const res = await prismaClient.encryptedSecret.aggregate({
