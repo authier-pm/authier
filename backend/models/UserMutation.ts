@@ -21,7 +21,7 @@ import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
-
+import { DeviceMutation } from './Device'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -39,57 +39,14 @@ export class UserMutation extends UserBase {
     return accessToken
   }
 
-  @Field(() => Boolean, {
-    description: 'Deauth device by deviceId'
-  })
-  async deauthDevice(
-    @Arg('deviceId', () => String) deviceId: string,
-    @Ctx() ctx: IContextAuthenticated
-  ) {
-    const tmp = await ctx.prisma.device.findUnique({
+  @Field(() => DeviceMutation)
+  async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
+    return ctx.prisma.device.findFirst({
       where: {
-        id: deviceId
+        userId: this.id,
+        id
       }
     })
-
-    if (ctx.jwtPayload.deviceId === tmp?.id) {
-      throw new Error('You cannot deauth yourself')
-    }
-
-    await ctx.prisma.device.update({
-      where: {
-        id: deviceId
-      },
-      data: { logoutAt: new Date() }
-    })
-
-    return true
-  }
-
-  @Field(() => Boolean, {
-    description: 'Remove device by deviceId'
-  })
-  async removeDevice(
-    @Arg('deviceId', () => String) deviceId: string,
-    @Ctx() ctx: IContextAuthenticated
-  ) {
-    if (ctx.jwtPayload.deviceId === deviceId) {
-      throw new Error('You cannot remove current device')
-    }
-    await ctx.prisma.$transaction([
-      ctx.prisma.device.delete({
-        where: {
-          id: deviceId
-        }
-      }),
-      ctx.prisma.decryptionChallenge.deleteMany({
-        where: {
-          deviceId: deviceId
-        }
-      })
-    ])
-
-    return true
   }
 
   @Field(() => DeviceGQL)
