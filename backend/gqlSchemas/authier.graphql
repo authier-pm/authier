@@ -34,6 +34,7 @@ type UserQuery {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   devices: [DeviceQuery!]!
+  device: DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
@@ -324,9 +325,10 @@ type Mutation {
   ): DecryptionChallenge
 
   """
-  removes current device. Returns null if user is not authenticated
+  removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
   """
   logout(removeDevice: Boolean): PositiveInt
+    @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 
