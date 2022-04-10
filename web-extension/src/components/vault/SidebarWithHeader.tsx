@@ -188,7 +188,7 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
                     backgroundColor: 'red.200'
                   }}
                   onClick={async () => {
-                    await device.logout()
+                    await device.logout(false)
                   }}
                 >
                   Logout
