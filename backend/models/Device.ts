@@ -148,7 +148,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   }
 
   @Field(() => Boolean)
-  async removeCurrentDevice(@Ctx() ctx: IContextAuthenticated) {
+  async removeDevice(@Ctx() ctx: IContextAuthenticated) {
     await this.logout(ctx)
 
     await ctx.prisma.$transaction([

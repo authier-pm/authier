@@ -41,6 +41,8 @@ mutation deviceDecryptionChallenge(
       encryptionSalt
       userId
       approvedAt
+      deviceId
+      deviceName
     }
     ... on DecryptionChallengeForApproval {
       id
