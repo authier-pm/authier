@@ -1,3 +1,4 @@
+import { Checkbox } from '@chakra-ui/react'
 import {
   Button,
   AlertDialog,
@@ -20,6 +21,7 @@ export function DeviceDeleteAlert({
   logoutDevice: () => void
 }) {
   const cancelRef = React.useRef()
+  const [checked, setChecked] = React.useState(false)
 
   return (
     <>
@@ -39,6 +41,9 @@ export function DeviceDeleteAlert({
           <AlertDialogBody fontSize={20}>
             Are you sure you want to logout this device?
           </AlertDialogBody>
+          <Checkbox isChecked={checked} onChange={() => setChecked(!checked)}>
+            Remove device
+          </Checkbox>
           <AlertDialogFooter>
             <Button
               //@ts-expect-error TODO: fix this

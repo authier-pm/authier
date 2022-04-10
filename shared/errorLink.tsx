@@ -13,7 +13,8 @@ export const errorLink = onError(
 
     if (graphQLErrors) {
       if (graphQLErrors[0].message === 'not authenticated') {
-        device.logout()
+        //Here just logout the user
+        device.logout(true)
       }
       graphQLErrors.map(({ message, path }) => {
         console.error(
