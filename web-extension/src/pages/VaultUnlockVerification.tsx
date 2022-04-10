@@ -87,7 +87,7 @@ export function VaultUnlockVerification() {
                   isInvalid={form.errors.password && form.touched.password}
                 >
                   <FormLabel htmlFor="password">
-                    <Heading size="md">Re-enter you Master Password</Heading>
+                    <Heading size="md">Re-enter your Master Password</Heading>
                   </FormLabel>
                   <InputGroup>
                     <Input

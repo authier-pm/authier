@@ -1,7 +1,7 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { ItemList } from '@src/pages-vault/ItemList'
-import { Route, Switch } from 'react-router-dom'
+import { Route, Switch, useHistory } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 import { device } from '@src/background/ExtensionDevice'
@@ -11,8 +11,11 @@ import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
+import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 
 export function VaultRouter() {
+  //const history = useHistory()
+
   if (device.state === null) {
     return (
       <Center marginX="50%" h="100vh">
@@ -23,11 +26,13 @@ export function VaultRouter() {
           <Route path="/signup">
             <Register />
           </Route>
+          <Route path="/verify">
+            <VaultUnlockVerification />
+          </Route>
         </Switch>
       </Center>
     )
   }
-
   return (
     <SidebarWithHeader>
       <Switch>

@@ -423,10 +423,10 @@ class ExtensionDevice {
     if (!storage.deviceId) {
       const deviceId = crypto.randomUUID()
       await browser.storage.local.set({ deviceId: deviceId })
-      log('deviceId', deviceId)
+      log('Creating new deviceID', deviceId)
       return deviceId
     } else {
-      log('deviceId', storage.deviceId)
+      log('Got deviceID', storage.deviceId)
       return storage.deviceId
     }
   }
@@ -485,33 +485,36 @@ class ExtensionDevice {
     this.rerenderViews()
   }
 
-  async logout() {
+  async logout(isDeauthorize: boolean) {
     async function clearAndReload() {
       await removeToken()
       await device.clearLocalStorage()
 
-      // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-      // this.listenForUserLogin()
+      //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+      //device.listenForUserLogin()
       browser.runtime.reload()
     }
 
-    try {
-      await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
-        mutation: LogoutDocument
-      })
-    } catch (err: any) {
-      toast.error(
-        `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
-        {
-          autoClose: false,
-          onClose: () => {
-            clearAndReload()
+    if (!isDeauthorize) {
+      try {
+        await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
+          mutation: LogoutDocument
+        })
+      } catch (err: any) {
+        toast.error(
+          `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
+          {
+            autoClose: false,
+            onClose: () => {
+              clearAndReload()
+            }
           }
-        }
-      )
-    } finally {
-      await clearAndReload()
+        )
+      } finally {
+        await clearAndReload()
+      }
     }
+    await clearAndReload()
   }
 
   serializeSecrets(

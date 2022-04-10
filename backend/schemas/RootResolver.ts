@@ -311,7 +311,7 @@ export class RootResolver {
         userId: user.id
       }
     })
-    console.log('CHALLENGE', challenge, device)
+
     if (device) {
       if (!challenge) {
         const deviceCount = await ctx.prisma.device.count({
