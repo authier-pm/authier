@@ -370,8 +370,9 @@ export class RootResolver {
 
   @Mutation(() => GraphQLPositiveInt, {
     nullable: true,
+    deprecationReason: 'prefer device methods',
     description:
-      'removes current device. Returns null if user is not authenticated'
+      'removes current device. Returns null if user is not authenticated, alias for device logout/remove methods'
   })
   async logout(
     @Ctx() ctx: IContextAuthenticated,
