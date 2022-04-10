@@ -301,12 +301,12 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecret(secretId: string) {
-    // browser.storage.local.set({
-    //   backgroundState: {
-    //     ...deviceState,
-    //     secrets: deviceState.secrets.filter((s) => s.id !== data.id)
-    //   }
-    // })
+    browser.storage.local.set({
+      backgroundState: {
+        ...device.state,
+        secrets: device.state?.secrets.filter((s) => s.id !== secretId)
+      }
+    })
     this.secrets = this.secrets.filter((s) => s.id !== secretId)
     this.save()
   }
