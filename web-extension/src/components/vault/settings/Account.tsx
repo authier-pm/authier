@@ -26,6 +26,7 @@ import { toast } from 'react-toastify'
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'
 import { Trans } from '@lingui/macro'
+import { Heading } from '@chakra-ui/react'
 
 export default function Account() {
   const email = device.state?.email
@@ -73,209 +74,222 @@ export default function Account() {
         width: '60%'
       }}
     >
-      <Box textAlign="start" pt={5}>
-        <Formik
-          initialValues={{
-            email: email,
-            currPassword: '',
-            newPassword: '',
-            confirmPassword: ''
-          }}
-          onSubmit={async (
-            values: Values,
-            { setSubmitting }: FormikHelpers<Values>
-          ) => {
-            if (
-              values.newPassword === values.confirmPassword &&
-              values.currPassword === device.state?.masterEncryptionKey
-            ) {
-              const decryptionChallenge = await deviceDecryptionChallenge({
-                variables: {
-                  deviceInput: {
-                    id: device.id,
-                    name: device.name,
-                    platform: device.platform
-                  },
-                  email: values.email
-                }
-              })
+      <VStack alignItems={'normal'} spacing={20}>
+        <Box textAlign="start" pt={5}>
+          <Heading as="h3" size="lg">
+            Change master password
+          </Heading>
+          <Formik
+            initialValues={{
+              email: email,
+              currPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+            }}
+            onSubmit={async (
+              values: Values,
+              { setSubmitting }: FormikHelpers<Values>
+            ) => {
+              if (
+                values.newPassword === values.confirmPassword &&
+                values.currPassword === device.state?.masterEncryptionKey
+              ) {
+                const decryptionChallenge = await deviceDecryptionChallenge({
+                  variables: {
+                    deviceInput: {
+                      id: device.id,
+                      name: device.name,
+                      platform: device.platform
+                    },
+                    email: values.email
+                  }
+                })
 
-              const secrets = device.state.secrets
-              const userId =
-                // @ts-expect-error TODO fix
-                decryptionChallenge.data?.deviceDecryptionChallenge?.userId
+                const secrets = device.state.secrets
 
-              const { state } = device
+                const { state } = device
 
-              await changePassword({
-                variables: {
-                  secrets: device.serializeSecrets(secrets, values.newPassword),
-                  addDeviceSecret: state.authSecret,
-                  addDeviceSecretEncrypted: state.authSecretEncrypted,
-                  decryptionChallengeId: decryptionChallenge.data
-                    ?.deviceDecryptionChallenge?.id as number
-                }
-              })
-              await device.logout()
-            } else {
-              toast.warning('Wrong password')
-            }
-            setSubmitting(false)
+                await changePassword({
+                  variables: {
+                    secrets: device.serializeSecrets(
+                      secrets,
+                      values.newPassword
+                    ),
+                    addDeviceSecret: state.authSecret,
+                    addDeviceSecretEncrypted: state.authSecretEncrypted,
+                    decryptionChallengeId: decryptionChallenge.data
+                      ?.deviceDecryptionChallenge?.id as number
+                  }
+                })
+                await device.logout(false)
+              } else {
+                toast.warning('Wrong password')
+              }
+              setSubmitting(false)
 
-            return false
-          }}
-        >
-          {({ isSubmitting, dirty }) => (
-            <Form>
-              <Field name="email">
-                {({ field, form }) => {
-                  return (
-                    <Flex>
+              return false
+            }}
+          >
+            {({ isSubmitting, dirty }) => (
+              <Form>
+                <Field name="email">
+                  {({ field, form }) => {
+                    return (
+                      <Flex>
+                        <FormControl
+                          isInvalid={form.errors.name && form.touched.name}
+                        >
+                          <FormLabel htmlFor="email">
+                            Email
+                            <NbSp />
+                            {data?.me?.primaryEmailVerification?.verifiedAt ? (
+                              <CheckIcon boxSize={18} />
+                            ) : (
+                              <WarningIcon boxSize={18} />
+                            )}
+                          </FormLabel>
+
+                          <Input pr="4.5rem" id="email" {...field} required />
+
+                          <FormErrorMessage>
+                            {form.errors.name}
+                          </FormErrorMessage>
+                        </FormControl>
+                      </Flex>
+                    )
+                  }}
+                </Field>
+
+                <VStack pt={6}>
+                  <Box as={Field} name="currPassword">
+                    {({ field, form }) => (
                       <FormControl
+                        isRequired
                         isInvalid={form.errors.name && form.touched.name}
                       >
-                        <FormLabel htmlFor="email">
-                          Email
-                          <NbSp />
-                          {data?.me?.primaryEmailVerification?.verifiedAt ? (
-                            <CheckIcon boxSize={18} />
-                          ) : (
-                            <WarningIcon boxSize={18} />
-                          )}
+                        <FormLabel htmlFor="currPassword">
+                          <Trans>Current password</Trans>
                         </FormLabel>
 
-                        <Input pr="4.5rem" id="email" {...field} required />
+                        <InputGroup size="md">
+                          <Input
+                            pr="4.5rem"
+                            type={showCurr ? 'text' : 'password'}
+                            placeholder="Master password"
+                            id="Current password"
+                            {...field}
+                            required
+                          />
+                          <InputRightElement width="4.5rem">
+                            <Button
+                              h="1.75rem"
+                              size="sm"
+                              onClick={() => setShowCurr(!showCurr)}
+                            >
+                              {showCurr ? 'Hide' : 'Show'}
+                            </Button>
+                          </InputRightElement>
+                        </InputGroup>
 
                         <FormErrorMessage>{form.errors.name}</FormErrorMessage>
                       </FormControl>
-                    </Flex>
-                  )
-                }}
-              </Field>
+                    )}
+                  </Box>
 
-              <VStack pt={6}>
-                <Box as={Field} name="currPassword">
-                  {({ field, form }) => (
-                    <FormControl
-                      isRequired
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
-                      <FormLabel htmlFor="currPassword">
-                        <Trans>Current password</Trans>
-                      </FormLabel>
-
-                      <InputGroup size="md">
-                        <Input
-                          pr="4.5rem"
-                          type={showCurr ? 'text' : 'password'}
-                          placeholder="Master currPassword"
-                          id="currPassword"
-                          {...field}
-                          required
-                        />
-                        <InputRightElement width="4.5rem">
-                          <Button
-                            h="1.75rem"
-                            size="sm"
-                            onClick={() => setShowCurr(!showCurr)}
-                          >
-                            {showCurr ? 'Hide' : 'Show'}
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Box>
-
-                <Box as={Field} name="newPassword">
-                  {({ field, form }) => (
-                    <FormControl
-                      isRequired
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
-                      <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
-                        <Trans>Set new Master password</Trans>
-                      </FormLabel>
-
-                      <InputGroup size="md">
-                        <Input
-                          pr="4.5rem"
-                          type={showNew ? 'text' : 'password'}
-                          placeholder="Master newPassword"
-                          id="newPassword"
-                          {...field}
-                          required
-                        />
-                        <InputRightElement width="4.5rem">
-                          <Button
-                            h="1.75rem"
-                            size="sm"
-                            onClick={() => setShownNew(!showNew)}
-                          >
-                            {showNew ? 'Hide' : 'Show'}
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Box>
-
-                <Box as={Field} name="confirmPassword">
-                  {({ field, form }) => (
-                    <FormControl
-                      isRequired
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
-                      <FormLabel
-                        htmlFor="confirmPassword"
-                        whiteSpace={'nowrap'}
+                  <Box as={Field} name="newPassword">
+                    {({ field, form }) => (
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.name && form.touched.name}
                       >
-                        <Trans>Confirm new password</Trans>
-                      </FormLabel>
+                        <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
+                          <Trans>Set new Master password</Trans>
+                        </FormLabel>
 
-                      <InputGroup size="md">
-                        <Input
-                          pr="4.5rem"
-                          type={showPass ? 'text' : 'password'}
-                          placeholder="Master confirmPassword"
-                          id="confirmPassword"
-                          {...field}
-                          required
-                        />
-                        <InputRightElement width="4.5rem">
-                          <Button
-                            h="1.75rem"
-                            size="sm"
-                            onClick={() => setShowPass(!showPass)}
-                          >
-                            {showPass ? 'Hide' : 'Show'}
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
+                        <InputGroup size="md">
+                          <Input
+                            pr="4.5rem"
+                            type={showNew ? 'text' : 'password'}
+                            placeholder="Master password"
+                            id="newPassword"
+                            {...field}
+                            required
+                          />
+                          <InputRightElement width="4.5rem">
+                            <Button
+                              h="1.75rem"
+                              size="sm"
+                              onClick={() => setShownNew(!showNew)}
+                            >
+                              {showNew ? 'Hide' : 'Show'}
+                            </Button>
+                          </InputRightElement>
+                        </InputGroup>
 
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                    </FormControl>
-                  )}
-                </Box>
-              </VStack>
+                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Box>
 
-              <Button
-                mt={4}
-                colorScheme="teal"
-                disabled={isSubmitting || !dirty}
-                isLoading={isSubmitting}
-                type="submit"
-              >
-                <Trans>Set master password</Trans>
-              </Button>
-            </Form>
-          )}
-        </Formik>
-      </Box>
+                  <Box as={Field} name="confirmPassword">
+                    {({ field, form }) => (
+                      <FormControl
+                        isRequired
+                        isInvalid={form.errors.name && form.touched.name}
+                      >
+                        <FormLabel
+                          htmlFor="confirmPassword"
+                          whiteSpace={'nowrap'}
+                        >
+                          <Trans>Confirm new password</Trans>
+                        </FormLabel>
+
+                        <InputGroup size="md">
+                          <Input
+                            pr="4.5rem"
+                            type={showPass ? 'text' : 'password'}
+                            placeholder="Confirm password"
+                            id="confirmPassword"
+                            {...field}
+                            required
+                          />
+                          <InputRightElement width="4.5rem">
+                            <Button
+                              h="1.75rem"
+                              size="sm"
+                              onClick={() => setShowPass(!showPass)}
+                            >
+                              {showPass ? 'Hide' : 'Show'}
+                            </Button>
+                          </InputRightElement>
+                        </InputGroup>
+
+                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      </FormControl>
+                    )}
+                  </Box>
+                </VStack>
+
+                <Button
+                  mt={4}
+                  colorScheme="teal"
+                  disabled={isSubmitting || !dirty}
+                  isLoading={isSubmitting}
+                  type="submit"
+                >
+                  <Trans>Set master password</Trans>
+                </Button>
+              </Form>
+            )}
+          </Formik>
+        </Box>
+        <Box>
+          <Heading as="h3" size="lg" color={'red'}>
+            Delete account
+          </Heading>
+          <Button colorScheme={'red'}>Delete your account</Button>
+        </Box>
+      </VStack>
     </motion.div>
   )
 }

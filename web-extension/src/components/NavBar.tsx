@@ -1,6 +1,13 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
 
-import { Flex, IconButton, useDisclosure, Box, Tooltip } from '@chakra-ui/react'
+import {
+  Flex,
+  IconButton,
+  useDisclosure,
+  Box,
+  Tooltip,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
@@ -38,6 +45,8 @@ export const NavBar: FunctionComponent = () => {
     )
   }
 
+  const bg = useColorModeValue('whitesmoke', 'white.500')
+
   useEffect(() => {
     SetLastPage(location)
   }, [])
@@ -47,7 +56,7 @@ export const NavBar: FunctionComponent = () => {
       <Flex
         p={1}
         textAlign="center"
-        backgroundColor="whitesmoke"
+        backgroundColor={bg}
         fontSize="16px"
         borderBottom="1px"
         borderBottomColor="gray.300"
