@@ -7,21 +7,35 @@ import {
   AlertDialogHeader,
   AlertDialogBody,
   AlertDialogFooter,
+  Text,
+  Tooltip,
   AlertDialogCloseButton
 } from '@chakra-ui/react'
-import React from 'react'
+import { QuestionOutlineIcon } from '@chakra-ui/icons'
+import React, { useRef, useState } from 'react'
+import { HStack } from '@chakra-ui/react'
+import {
+  useRemoveDeviceMutation,
+  useLogoutDeviceMutation
+} from './DeviceDeleteAlert.codegen'
 
 export function DeviceDeleteAlert({
   isOpen,
-  onClose,
-  logoutDevice
+  id,
+  onClose
 }: {
   onClose: () => void
   isOpen: boolean
-  logoutDevice: () => void
+  id: string
 }) {
-  const cancelRef = React.useRef()
-  const [checked, setChecked] = React.useState(false)
+  const cancelRef = useRef()
+  const [remove, setRemove] = useState(false)
+  const [logoutDevice] = useLogoutDeviceMutation({
+    variables: {
+      id: id
+    }
+  })
+  const [removeDevice] = useRemoveDeviceMutation({ variables: { id: id } })
 
   return (
     <>
@@ -39,11 +53,18 @@ export function DeviceDeleteAlert({
           <AlertDialogHeader>Logout confirmation</AlertDialogHeader>
           <AlertDialogCloseButton />
           <AlertDialogBody fontSize={20}>
-            Are you sure you want to logout this device?
+            <Text>Are you sure you want to logout this device?</Text>
+
+            <HStack>
+              <Checkbox isChecked={remove} onChange={() => setRemove(!remove)}>
+                Remove device from list
+              </Checkbox>
+              <Tooltip label="You will have to confirm login" fontSize="sm">
+                <QuestionOutlineIcon />
+              </Tooltip>
+            </HStack>
           </AlertDialogBody>
-          <Checkbox isChecked={checked} onChange={() => setChecked(!checked)}>
-            Remove device
-          </Checkbox>
+
           <AlertDialogFooter>
             <Button
               //@ts-expect-error TODO: fix this
@@ -55,8 +76,12 @@ export function DeviceDeleteAlert({
             <Button
               colorScheme="red"
               ml={3}
-              onClick={() => {
-                logoutDevice()
+              onClick={async () => {
+                if (remove) {
+                  await removeDevice()
+                } else {
+                  await logoutDevice()
+                }
               }}
             >
               Yes
