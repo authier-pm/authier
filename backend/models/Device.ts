@@ -99,18 +99,6 @@ export class DeviceMutation extends DeviceGQLScalars {
     return syncedAt
   }
 
-  @Field(() => DeviceGQL)
-  async deauthorize(@Ctx() ctx: IContextAuthenticated) {
-    return await ctx.prisma.device.update({
-      data: {
-        deauthorizedFromDeviceId: ctx.jwtPayload.deviceId
-      },
-      where: {
-        id: this.id
-      }
-    })
-  }
-
   @Field(() => SecretUsageEventGQLScalars)
   async reportSecretUsageEvent(
     @Ctx() ctx: IContextAuthenticated,
