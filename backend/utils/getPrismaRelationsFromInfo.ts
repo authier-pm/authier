@@ -15,6 +15,7 @@ export const getPrismaRelationsFromInfo = ({
   info: GraphQLResolveInfo
   rootModel: DMMF.Model
 }) => {
+  // @ts-expect-error TODO fix type mismatch
   const queriedFields = getFieldNames(info)
 
   const relationsChains = queriedFields
@@ -32,7 +33,7 @@ export const getPrismaRelationsFromInfo = ({
   const prismaInclude = {}
   for (const chain of relationsChains) {
     let lastRelationModel = rootModel
-    let path: string[] = []
+    const path: string[] = []
 
     for (const singleRelation of chain!) {
       const field = lastRelationModel.fields.find(
