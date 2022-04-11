@@ -1,0 +1,17 @@
+mutation logoutDevice($id: String!) {
+  me {
+    device(id: $id) {
+      logout {
+        id
+      }
+    }
+  }
+}
+
+mutation removeDevice($id: String!) {
+  me {
+    device(id: $id) {
+      removeDevice
+    }
+  }
+}

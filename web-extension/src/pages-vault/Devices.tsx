@@ -125,11 +125,9 @@ const DeviceListItem = (item: {
                     <Trans>Logout</Trans>
                   </MenuItem>
                   <DeviceDeleteAlert
+                    id={item.id}
                     isOpen={isOpen}
                     onClose={onClose}
-                    logoutDevice={async () => {
-                      console.log('delete')
-                    }}
                   />
                   <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
                     <FiSettings />
