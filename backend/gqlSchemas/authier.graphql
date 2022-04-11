@@ -113,7 +113,6 @@ type DeviceGQL {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
-  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -246,7 +245,6 @@ type DeviceQuery {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
-  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -358,7 +356,6 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   addCookie: String!
-  deauthDevice(deviceId: String!): DeviceGQL!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecrets(
@@ -478,7 +475,6 @@ type DeviceMutation {
   ipAddressLock: Boolean!
   vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
-  deauthorizedFromDeviceId: String
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -486,7 +482,6 @@ type DeviceMutation {
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
-  deauthorize: DeviceGQL!
   reportSecretUsageEvent(
     webInputId: PositiveInt!
     secretId: UUID!
