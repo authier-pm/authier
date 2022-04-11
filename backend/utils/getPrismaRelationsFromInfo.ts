@@ -15,7 +15,6 @@ export const getPrismaRelationsFromInfo = ({
   info: GraphQLResolveInfo
   rootModel: DMMF.Model
 }) => {
-  // @ts-expect-error TODO fix type mismatch
   const queriedFields = getFieldNames(info)
 
   const relationsChains = queriedFields
