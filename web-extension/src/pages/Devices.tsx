@@ -17,11 +17,6 @@ import { IoIosPhonePortrait } from 'react-icons/io'
 import { useLocation } from 'wouter'
 import { useMyDevicesQuery } from './Devices.codegen'
 
-const devices = [
-  { name: 'test', lastIp: '25', location: 'Brno' },
-  { name: 'test', lastIp: '123', location: 'Brno' }
-]
-
 export default function Devices() {
   const [location, setLocation] = useLocation()
   const { userId } = useContext(UserContext)
@@ -35,7 +30,7 @@ export default function Devices() {
             <Flex
               key={device.lastIpAddress}
               boxShadow="xl"
-              bg="white"
+              //bg="white"
               m={2}
               pb={2}
               flexDirection="column"

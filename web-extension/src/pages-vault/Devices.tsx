@@ -43,6 +43,7 @@ import {
 } from './Devices.codegen'
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
+import { device } from '@src/background/ExtensionDevice'
 
 interface configValues {
   lockTime: number
@@ -88,6 +89,11 @@ const DeviceListItem = (item: {
               alignItems={'baseline'}
               lineHeight={'6'}
             >
+              {item.id === device.id && (
+                <Badge height="min-content" colorScheme="yellow">
+                  Current
+                </Badge>
+              )}
               {item.id === data?.me?.masterDeviceId && (
                 <Badge height="min-content" colorScheme="purple">
                   Master
@@ -102,6 +108,7 @@ const DeviceListItem = (item: {
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
+
               <Menu>
                 <MenuButton
                   as={IconButton}
