@@ -485,6 +485,11 @@ class ExtensionDevice {
     this.rerenderViews()
   }
 
+  /**
+   * Logout user
+   * @param isDeauthorize if false, the user will be deauthorized from the backend
+   *
+   */
   async logout(isDeauthorize: boolean) {
     async function clearAndReload() {
       await removeToken()
