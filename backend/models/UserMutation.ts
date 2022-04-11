@@ -46,31 +46,6 @@ export class UserMutation extends UserBase {
   //Use nano for HTML insert
 
   @Field(() => DeviceGQL)
-  async deauthDevice(
-    @Arg('deviceId', () => String) deviceId: DeviceInput,
-    @Ctx() ctx: IContext
-  ) {
-    const ipAddress: string = ctx.getIpAddress()
-
-    const tmp = await ctx.prisma.device.findUnique({
-      where: {
-        id: deviceId as unknown as string
-      }
-    })
-
-    if (ipAddress === tmp?.firstIpAddress) {
-      throw new Error('You cannot deauth yourself')
-    }
-
-    return await ctx.prisma.device.update({
-      where: {
-        id: deviceId as unknown as string
-      },
-      data: { deauthorizedFromDeviceId: tmp?.userId }
-    })
-  }
-
-  @Field(() => DeviceGQL)
   async addDevice(
     @Arg('device', () => DeviceInput) device: DeviceInput,
     @Arg('firebaseToken', () => String) firebaseToken: string,

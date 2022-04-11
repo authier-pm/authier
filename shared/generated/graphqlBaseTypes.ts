@@ -128,7 +128,6 @@ export type DeviceGql = {
   User: UserGql
   UserMaster?: Maybe<UserGql>
   createdAt: Scalars['DateTime']
-  deauthorizedFromDeviceId?: Maybe<Scalars['String']>
   firebaseToken: Scalars['String']
   firstIpAddress: Scalars['String']
   id: Scalars['ID']
@@ -155,20 +154,20 @@ export type DeviceInput = {
 export type DeviceMutation = {
   __typename?: 'DeviceMutation'
   createdAt: Scalars['DateTime']
-  deauthorize: DeviceGql
-  deauthorizedFromDeviceId?: Maybe<Scalars['String']>
   firebaseToken: Scalars['String']
   firstIpAddress: Scalars['String']
   id: Scalars['ID']
   ipAddressLock: Scalars['Boolean']
   lastIpAddress: Scalars['String']
   lastSyncAt?: Maybe<Scalars['DateTime']>
+  logout: DeviceGql
   logoutAt?: Maybe<Scalars['DateTime']>
   markAsSynced: Scalars['DateTime']
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
   platform: Scalars['String']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
+  removeDevice: Scalars['Boolean']
   rename: DeviceGql
   reportSecretUsageEvent: SecretUsageEventGqlScalars
   syncTOTP: Scalars['Boolean']
@@ -194,7 +193,6 @@ export type DeviceQuery = {
   User: UserGql
   UserMaster?: Maybe<UserGql>
   createdAt: Scalars['DateTime']
-  deauthorizedFromDeviceId?: Maybe<Scalars['String']>
   encryptedSecretsToSync: Array<EncryptedSecretQuery>
   firebaseToken: Scalars['String']
   firstIpAddress: Scalars['String']
@@ -330,7 +328,10 @@ export type Mutation = {
   currentDevice: DeviceMutation
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>
-  /** removes current device. Returns null if user is not authenticated */
+  /**
+   * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
+   * @deprecated prefer device methods
+   */
   logout?: Maybe<Scalars['PositiveInt']>
   /** you need to be authenticated to call this resolver */
   me: UserMutation
@@ -345,6 +346,10 @@ export type MutationAddWebInputsArgs = {
 export type MutationDeviceDecryptionChallengeArgs = {
   deviceInput: DeviceInput
   email: Scalars['EmailAddress']
+}
+
+export type MutationLogoutArgs = {
+  removeDevice?: InputMaybe<Scalars['Boolean']>
 }
 
 export type MutationRegisterNewUserArgs = {
@@ -577,6 +582,7 @@ export type UserQuery = {
   addDeviceSecretEncrypted: Scalars['String']
   createdAt: Scalars['DateTime']
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>
+  device: DeviceQuery
   deviceRecoveryCooldownMinutes: Scalars['Int']
   devices: Array<DeviceQuery>
   devicesCount: Scalars['Int']
@@ -629,8 +635,12 @@ export type WebInputGql = {
 }
 
 export enum WebInputType {
+  CUSTOM = 'CUSTOM',
   EMAIL = 'EMAIL',
+  NEW_PASSWORD = 'NEW_PASSWORD',
+  NEW_PASSWORD_CONFIRMATION = 'NEW_PASSWORD_CONFIRMATION',
   PASSWORD = 'PASSWORD',
+  SUBMIT_BUTTON = 'SUBMIT_BUTTON',
   TOTP = 'TOTP',
   USERNAME = 'USERNAME',
   USERNAME_OR_EMAIL = 'USERNAME_OR_EMAIL'
