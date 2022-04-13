@@ -128,14 +128,16 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async save() {
     device.lockedState = null
-    log('saving device state', this)
 
     browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
     })
+
     browser.storage.onChanged.addListener(this.onStorageChange)
+
+    console.log('STATE', device.state)
   }
 
   getSecretDecryptedById(id: string) {
@@ -308,6 +310,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     })
     this.secrets = this.secrets.filter((s) => s.id !== secretId)
+    console.log('removed secret', secretId)
     this.save()
   }
 

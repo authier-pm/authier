@@ -33,7 +33,7 @@ if (!isRunningInBgPage) {
   throw new Error('this file should only be imported in the background page')
 }
 
-let safeClosed = false // Is safe Closed ?
+const safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 
 interface ILoginCredentialsFromContentScript {
@@ -53,7 +53,7 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-browser.runtime.onMessage.addListener(async function (
+chrome.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
     payload: any
@@ -63,7 +63,8 @@ browser.runtime.onMessage.addListener(async function (
     passwords: ILoginSecret[]
     settings: ISecuritySettings
   },
-  sender
+  sender,
+  sendResponse
 ) {
   log(req)
 
@@ -75,14 +76,14 @@ browser.runtime.onMessage.addListener(async function (
   switch (req.action) {
     case BackgroundMessageType.addLoginCredentials:
       if (!tab) {
-        return
+        return false
       }
       const { url } = tab
 
       if (!url || !deviceState) {
-        return // we can't do anything without a valid url
+        return false // we can't do anything without a valid url
       }
-      log('addLoginCredentials', req.payload)
+
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
       const namePassPair = {
@@ -103,7 +104,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       ])
       if (!secret) {
-        return null
+        return false
       }
 
       tab.id && saveLoginModalsStates.delete(tab.id)
@@ -115,7 +116,7 @@ browser.runtime.onMessage.addListener(async function (
           url: url
         }
       })
-      log('webInputs', webInputs)
+
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
@@ -127,11 +128,11 @@ browser.runtime.onMessage.addListener(async function (
       })
 
       console.log(credentials.capturedInputEvents)
-
+      sendResponse({ failed: false })
       if (req.payload.openInVault) {
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
-      return secret
+      return true
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
         deviceState.addSecrets([req.payload])
@@ -162,6 +163,7 @@ browser.runtime.onMessage.addListener(async function (
       break
     case BackgroundMessageType.getFallbackUsernames:
       return [deviceState?.email]
+
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
       console.log(
@@ -173,6 +175,7 @@ browser.runtime.onMessage.addListener(async function (
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
+        // After item remove, this returns bad state
         return await getContentScriptInitialState(tabUrl, currentTabId)
       }
 
