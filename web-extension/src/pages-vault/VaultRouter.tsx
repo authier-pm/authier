@@ -14,7 +14,13 @@ import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 
 export function VaultRouter() {
-  //const history = useHistory()
+  const history = useHistory()
+
+  useEffect(() => {
+    if (device.lockedState) {
+      history.push('/verify')
+    }
+  }, [device.lockedState])
 
   if (device.state === null) {
     return (

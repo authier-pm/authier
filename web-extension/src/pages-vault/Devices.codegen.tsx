@@ -13,14 +13,14 @@ export type ApproveChallengeMutationVariables = Types.Exact<{
 }>;
 
 
-export type ApproveChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', approve: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
+export type ApproveChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', id: string, decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', approve: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
 
 export type RejectChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int'];
 }>;
 
 
-export type RejectChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', reject: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
+export type RejectChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', id: string, decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', reject: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
 
 
 export const DevicesPageDocument = gql`
@@ -67,6 +67,7 @@ export type DevicesPageQueryResult = Apollo.QueryResult<DevicesPageQuery, Device
 export const ApproveChallengeDocument = gql`
     mutation ApproveChallenge($id: Int!) {
   me {
+    id
     decryptionChallenge(id: $id) {
       approve {
         id
@@ -104,6 +105,7 @@ export type ApproveChallengeMutationOptions = Apollo.BaseMutationOptions<Approve
 export const RejectChallengeDocument = gql`
     mutation RejectChallenge($id: Int!) {
   me {
+    id
     decryptionChallenge(id: $id) {
       reject {
         id

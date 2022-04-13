@@ -22,11 +22,13 @@ import {
 export function DeviceDeleteAlert({
   isOpen,
   id,
-  onClose
+  onClose,
+  refetch
 }: {
   onClose: () => void
   isOpen: boolean
   id: string
+  refetch: () => void
 }) {
   const cancelRef = useRef()
   const [remove, setRemove] = useState(false)
@@ -54,7 +56,6 @@ export function DeviceDeleteAlert({
           <AlertDialogCloseButton />
           <AlertDialogBody fontSize={20}>
             <Text>Are you sure you want to logout this device?</Text>
-
             <HStack>
               <Checkbox isChecked={remove} onChange={() => setRemove(!remove)}>
                 Remove device from list
@@ -82,6 +83,8 @@ export function DeviceDeleteAlert({
                 } else {
                   await logoutDevice()
                 }
+                onClose()
+                refetch()
               }}
             >
               Yes
