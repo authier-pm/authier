@@ -32,7 +32,7 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 
 export default function Premium() {
   return (
-    <Box py={12} m="auto">
+    <Box py={12}>
       <VStack spacing={2} textAlign="center">
         <Heading as="h1" fontSize="4xl">
           Plans that fit your need
@@ -43,7 +43,7 @@ export default function Premium() {
         </Text>
       </VStack>
       <Stack
-        direction={{ base: 'column', md: 'row' }}
+        direction={{ base: 'column', md: 'column', lg: 'row' }}
         textAlign="center"
         justify="center"
         spacing={{ base: 4, lg: 10 }}

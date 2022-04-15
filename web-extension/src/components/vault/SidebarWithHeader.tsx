@@ -75,7 +75,10 @@ export default function SidebarWithHeader({
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      <SidebarContent onClose={() => onClose} />
+      <SidebarContent
+        onClose={() => onClose}
+        display={{ base: 'none', md: 'block' }}
+      />
       <Drawer
         autoFocus={false}
         isOpen={isOpen}
@@ -90,8 +93,8 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       {/* mobilenav */}
-      {/* <MobileNav onOpen={onOpen} /> */}
-      <Box ml={['auto', '250px']} pt="10">
+      <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
+      <Box ml={{ base: 0, md: 60 }} p="7">
         {children}
       </Box>
     </Box>
@@ -102,7 +105,7 @@ interface SidebarProps extends BoxProps {
   onClose: () => void
 }
 
-const SidebarContent = ({ onClose }: SidebarProps) => {
+const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const email = device.state?.email
   if (!email) {
@@ -117,8 +120,8 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
       w={{ base: 'full', md: 60 }}
       pos="fixed"
       h="full"
-      display={{ base: 'none', md: 'flex' }}
       flexDirection="column"
+      {...rest}
     >
       <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
         <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
@@ -250,7 +253,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const email = device.state?.email!
+  const email = device.state?.email as string
 
   const { colorMode, toggleColorMode } = useColorMode()
   return (
