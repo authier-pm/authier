@@ -327,7 +327,7 @@ type Mutation {
   """
   removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
   """
-  logout(removeDevice: Boolean): PositiveInt
+  logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }

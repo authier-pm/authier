@@ -68,9 +68,6 @@ const TOTPSecret = (data: ITOTPSecret) => {
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
-        w={['400px', '600px']}
-        minW={'420px'}
-        m="auto"
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
@@ -242,9 +239,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
-        w={['400px', '600px']}
-        minW={'420px'}
         m="auto"
+        alignItems={'normal'}
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
