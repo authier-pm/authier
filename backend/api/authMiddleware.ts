@@ -30,20 +30,22 @@ export const throwIfNotAuthenticated: MiddlewareFn<
     throw new Error('not authenticated')
   }
 
-  const isLoggedOut = await context.prisma.device.count({
+  const currentDevice = await context.prisma.device.findUnique({
     where: {
-      id: jwtPayload.deviceId,
-      logoutAt: {
-        not: null
-      }
+      id: jwtPayload.deviceId
     }
   })
+  if (!currentDevice) {
+    context.reply.clearCookie('access-token')
+    throw new Error('not authenticated')
+  }
 
-  if (isLoggedOut) {
+  if (currentDevice?.logoutAt) {
     context.reply.clearCookie('access-token')
 
     throw new Error('not authenticated')
   }
+  context.device = currentDevice
 
   return next()
 }
