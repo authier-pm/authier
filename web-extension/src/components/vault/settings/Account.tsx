@@ -71,10 +71,17 @@ export default function Account() {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.35 }}
       style={{
-        width: '60%'
+        width: '90%',
+        display: 'contents'
       }}
     >
-      <VStack alignItems={'normal'} spacing={20}>
+      <VStack
+        width={{ base: '90%', sm: '70%', md: '40%' }}
+        maxW="fit-content"
+        minH={'100vh'}
+        alignItems={'normal'}
+        spacing={20}
+      >
         <Box textAlign="start" pt={5}>
           <Heading as="h3" size="lg">
             Change master password
@@ -149,7 +156,7 @@ export default function Account() {
                             )}
                           </FormLabel>
 
-                          <Input pr="4.5rem" id="email" {...field} required />
+                          <Input id="email" {...field} required />
 
                           <FormErrorMessage>
                             {form.errors.name}

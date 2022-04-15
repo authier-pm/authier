@@ -293,7 +293,7 @@ export default function Devices() {
           }}
         />
         <Center px={10}>
-          <Stat ml="auto">
+          <Stat ml="auto" whiteSpace={'nowrap'}>
             {data?.me?.devices.length} {t`devices`}
           </Stat>
 
