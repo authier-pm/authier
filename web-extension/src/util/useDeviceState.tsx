@@ -89,31 +89,6 @@ export function useDeviceState() {
       return
     }
     registered = true
-    browser.runtime.onMessage.addListener(function (request: {
-      message: SharedBrowserEvents
-      url: any
-    }) {
-      console.log('onMessage', request)
-      // listen for messages sent from background.js
-      if (request.message === SharedBrowserEvents.URL_CHANGED) {
-        setCurrentURL(request.url)
-      }
-    })
-
-    // Checking if is safe closed
-    browser.runtime.onMessage.addListener(
-      (request: {
-        safe: string
-        filling: boolean
-        passwords: Array<ILoginSecret>
-      }) => {
-        if (request.filling) {
-          setIsFilling(true)
-        } else if (request.safe === 'closed') {
-          setSafeLocked(true)
-        }
-      }
-    )
 
     browser.storage.onChanged.addListener(onStorageChange)
   }, [])
