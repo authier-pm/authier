@@ -106,7 +106,7 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { toggleColorMode } = useColorMode()
   const email = device.state?.email
   if (!email) {
     return <Spinner />
@@ -123,29 +123,32 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       flexDirection="column"
       {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Authier
-        </Text>
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
-      </Flex>
-      <Flex flexDirection="column" height="100%">
-        {LinkItems.map((link, i) => (
-          <NavItem key={i} icon={link.icon} path={link.path}>
-            {link.title}
-          </NavItem>
-        ))}
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="change color mode"
-          icon={<FiMoon />}
-          onClick={toggleColorMode}
-          mt="auto"
-        />
-      </Flex>
+      <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
+        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+            Authier
+          </Text>
+          <CloseButton
+            display={{ base: 'flex', md: 'none' }}
+            onClick={onClose}
+          />
+        </Flex>
+        <Flex flexDirection="column" height="100%">
+          {LinkItems.map((link, i) => (
+            <NavItem key={i} icon={link.icon} path={link.path}>
+              {link.title}
+            </NavItem>
+          ))}
+          <IconButton
+            size="lg"
+            variant="ghost"
+            aria-label="change color mode"
+            icon={<FiMoon />}
+            onClick={toggleColorMode}
+            mt="auto"
+          />
+        </Flex>
 
-      <Flex m={4} mt="auto">
         <HStack spacing={{ base: '0', md: '6' }} w="100%">
           <Flex alignItems={'center'} w="100%">
             <Menu>
@@ -186,9 +189,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 <MenuItem>Billing</MenuItem>
                 <MenuDivider />
                 <MenuItem
-                  backgroundColor="red.100"
+                  backgroundColor="red.500"
                   _hover={{
-                    backgroundColor: 'red.200'
+                    backgroundColor: useColorModeValue('red.200', 'red.400')
                   }}
                   onClick={async () => {
                     await device.logout(false)
