@@ -87,7 +87,7 @@ export async function initInputWatch() {
   if (!extensionDeviceReady || !autofillEnabled) {
     return // no need to do anything-user locked out
   }
-  const unregAutofillListener = autofill(stateInitRes)
+  const stopAutofillListener = autofill(stateInitRes)
 
   if (
     saveLoginModalsState &&
@@ -237,7 +237,7 @@ export async function initInputWatch() {
       debouncedInputEventListener,
       true
     )
-    unregAutofillListener()
+    stopAutofillListener()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
   }
 }
