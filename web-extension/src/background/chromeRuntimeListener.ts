@@ -173,7 +173,7 @@ browser.runtime.onMessage.addListener(async function (
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
-        return await getContentScriptInitialState(tabUrl, currentTabId)
+        return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
       break
