@@ -32,7 +32,7 @@ export const UserNavMenu: FunctionComponent = () => {
           <Button
             colorScheme="red"
             onClick={async () => {
-              device.logout(false)
+              device.logout()
             }}
           >
             <Trans>Logout</Trans>
