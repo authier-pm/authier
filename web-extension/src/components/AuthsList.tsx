@@ -16,7 +16,8 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton
+  IconButton,
+  useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
@@ -126,7 +127,13 @@ const LoginCredentialsListItem = ({
 
   return (
     <Box boxShadow="xl" m={2}>
-      <Flex key={loginSecret.url} p="3" rounded="md" bg="gray.100" minW="300px">
+      <Flex
+        key={loginSecret.url}
+        p="3"
+        rounded="md"
+        bg={useColorModeValue('gray.100', 'gray.700')}
+        minW="300px"
+      >
         <Stat maxW="100%">
           <Flex justify="space-between" align="center" w="100%">
             <Flex flexDirection="column">

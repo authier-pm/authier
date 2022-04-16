@@ -128,7 +128,7 @@ export default function Account() {
                       ?.deviceDecryptionChallenge?.id as number
                   }
                 })
-                await device.logout(false)
+                await device.logout()
               } else {
                 toast.warning('Wrong password')
               }
