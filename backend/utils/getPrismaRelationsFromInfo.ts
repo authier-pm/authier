@@ -32,7 +32,7 @@ export const getPrismaRelationsFromInfo = ({
   const prismaInclude = {}
   for (const chain of relationsChains) {
     let lastRelationModel = rootModel
-    let path: string[] = []
+    const path: string[] = []
 
     for (const singleRelation of chain!) {
       const field = lastRelationModel.fields.find(

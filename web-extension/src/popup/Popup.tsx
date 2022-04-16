@@ -8,9 +8,6 @@ import { Home } from '../pages/Home'
 
 import { i18n } from '@lingui/core'
 
-import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
-import cryptoJS from 'crypto-js'
-
 import { QRCode } from '@src/pages/QRcode'
 import { useSendAuthMessageLazyQuery } from './Popup.codegen'
 
@@ -20,7 +17,6 @@ import { UserContext } from '@src/providers/UserProvider'
 import { deviceDetect } from 'react-device-detect'
 import { Settings } from '@src/pages/Settings'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { vaultLockTimeOptions } from '@src/components/setting-screens/SecuritySettings'
 import { AboutPage } from '@src/pages/AboutPage'
 //import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import debug from 'debug'
@@ -32,8 +28,7 @@ export const Popup: FunctionComponent = () => {
   const { userId } = useContext(UserContext)
 
   const [location, setLocation] = useLocation()
-  const [sendAuthMessage, { data, error, loading }] =
-    useSendAuthMessageLazyQuery()
+  const [sendAuthMessage] = useSendAuthMessageLazyQuery()
 
   const { currentURL, isFilling } = useContext(DeviceStateContext)
 
@@ -63,17 +58,6 @@ export const Popup: FunctionComponent = () => {
   useEffect(() => {
     setLocation('/')
     browser.runtime.sendMessage({ popupMounted: true })
-
-    browser.runtime.onMessage.addListener(function (request: {
-      message: SharedBrowserEvents
-      url: any
-    }) {
-      // listen for messages sent from background.js
-      if (request.message === SharedBrowserEvents.URL_CHANGED) {
-        //setCurrURL(request.url)
-        console.log('new url', request.url) // new url is now in content scripts!
-      }
-    })
   }, [])
 
   return (

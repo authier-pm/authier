@@ -56,21 +56,24 @@ async function main() {
   })
 
   app.register(fastifyCors)
-  const trustedDomains = ['https://unpkg.com']
+  // const trustedDomains = ['https://unpkg.com']
 
-  app.register(fastifyHelmet, {
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-          trustedDomains
-        ),
-        styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-          trustedDomains
-        )
-      }
-    }
-  })
+  // app.register(fastifyHelmet, {
+  //   contentSecurityPolicy: {
+  //     directives: {
+  //       defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+  //         trustedDomains
+  //       ),
+
+  //       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+  //         trustedDomains
+  //       ),
+  //       styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
+  //         trustedDomains
+  //       )
+  //     }
+  //   }
+  // })
   app.register(underPressure, {
     maxEventLoopDelay: 1000,
     retryAfter: 50,
