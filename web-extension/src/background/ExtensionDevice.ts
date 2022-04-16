@@ -336,16 +336,6 @@ class ExtensionDevice {
 
     let storedState: IBackgroundStateSerializable | null = null
 
-    if (isRunningInBgPage === false) {
-      //this is popup or vault
-
-      browser.runtime.onMessage.addListener(async (msg) => {
-        if (msg.action === BackgroundMessageType.rerenderViews) {
-          await rerenderViewInThisRuntime()
-        }
-      })
-    }
-
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
       storedState = storage.backgroundState
@@ -488,41 +478,34 @@ class ExtensionDevice {
     this.rerenderViews()
   }
 
-  /**
-   * Logout user
-   * @param isDeauthorize if false, the user will be deauthorized from the backend
-   *
-   */
-  async logout(isDeauthorize: boolean) {
-    async function clearAndReload() {
-      await removeToken()
-      await device.clearLocalStorage()
+  async clearAndReload() {
+    await removeToken()
+    await device.clearLocalStorage()
 
-      //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-      //device.listenForUserLogin()
-      browser.runtime.reload()
-    }
+    //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    //device.listenForUserLogin()
+    browser.runtime.reload()
+  }
 
-    if (!isDeauthorize) {
-      try {
-        await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
-          mutation: LogoutDocument
-        })
-      } catch (err: any) {
-        toast.error(
-          `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
-          {
-            autoClose: false,
-            onClose: () => {
-              clearAndReload()
-            }
+  async logout() {
+    try {
+      await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
+        mutation: LogoutDocument
+      })
+    } catch (err: any) {
+      toast.error(
+        `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
+        {
+          autoClose: false,
+          onClose: () => {
+            this.clearAndReload()
           }
-        )
-      } finally {
-        await clearAndReload()
-      }
+        }
+      )
+    } finally {
+      await this.clearAndReload()
     }
-    await clearAndReload()
+    await this.clearAndReload()
   }
 
   serializeSecrets(
