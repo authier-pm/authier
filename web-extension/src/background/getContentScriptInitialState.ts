@@ -22,7 +22,7 @@ export const getContentScriptInitialState = async (
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
-
+  console.log('getWebInputs', res.data.webInputs)
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     autofillEnabled: true, // TODO
