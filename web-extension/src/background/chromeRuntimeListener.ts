@@ -141,10 +141,11 @@ browser.runtime.onMessage.addListener(async function (
       if (currentTabId) {
         saveLoginModalsStates.delete(currentTabId)
       }
-
+      console.log(saveLoginModalsStates)
       break
 
     case BackgroundMessageType.addTOTPInput:
+      console.log('test', req.payload)
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
