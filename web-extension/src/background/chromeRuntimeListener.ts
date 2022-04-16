@@ -48,6 +48,8 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
+let capturedInputEvents = []
+
 browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
@@ -127,6 +129,11 @@ browser.runtime.onMessage.addListener(async function (
       }
       return { failed: false }
 
+    case BackgroundMessageType.saveCapturedInputEvents:
+      capturedInputEvents = req.payload
+      console.log('SAVE', capturedInputEvents)
+      break
+
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
         deviceState.addSecrets([req.payload])
@@ -145,7 +152,6 @@ browser.runtime.onMessage.addListener(async function (
       break
 
     case BackgroundMessageType.addTOTPInput:
-      console.log('test', req.payload)
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
@@ -161,18 +167,18 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
-      console.log(
-        'getContentScriptInitialState',
-        tabUrl,
-        deviceState,
-        currentTabId
-      )
+
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
         return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
+      break
+
+    case BackgroundMessageType.getCapturedInputEvents:
+      console.log('GET', capturedInputEvents)
+      return capturedInputEvents
       break
 
     case BackgroundMessageType.wasClosed:

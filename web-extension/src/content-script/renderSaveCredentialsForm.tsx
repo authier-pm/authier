@@ -10,9 +10,24 @@ const nano = h
 
 export let promptDiv: HTMLDivElement | null
 
-export function renderSaveCredentialsForm(username: string, password: string) {
+export async function renderSaveCredentialsForm(
+  username: string,
+  password: string
+) {
+  const inputEvents = await browser.runtime.sendMessage({
+    action: BackgroundMessageType.getCapturedInputEvents
+  })
+
+  console.log('GOT', inputEvents)
   promptDiv = document.createElement('div')
-  render(<PromptPassword username={username} password={password} />, promptDiv)
+  render(
+    <PromptPassword
+      username={username}
+      password={password}
+      inputEvents={inputEvents}
+    />,
+    promptDiv
+  )
 
   document.body.appendChild(promptDiv)
 
@@ -20,8 +35,7 @@ export function renderSaveCredentialsForm(username: string, password: string) {
     action: BackgroundMessageType.saveLoginCredentialsModalShown,
     payload: {
       username,
-      password,
-      capturedInputEvents: domRecorder.toJSON()
+      password
     }
   })
 }
