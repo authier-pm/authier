@@ -6,16 +6,6 @@ import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
 const nano = h
 import './test.css'
 import { autofill } from '../autofill'
-import { IInitStateRes } from '../contentScript'
-
-const escapeHtml = (unsafe: string) => {
-  return unsafe
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
-}
 
 export const PromptPasswordOption = ({
   loginCredentials,
