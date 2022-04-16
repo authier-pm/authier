@@ -21,8 +21,8 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.5.10",
-    "@chakra-ui/react": "^1.8.6",
-    "@emotion/react": "^11.8.2",
+    "@chakra-ui/react": "^1.8.8",
+    "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@graphql-codegen/cli": "^2.6.2",
     "@graphql-codegen/fragment-matcher": "^3.2.1",
