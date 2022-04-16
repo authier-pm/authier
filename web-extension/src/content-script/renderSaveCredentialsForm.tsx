@@ -12,6 +12,7 @@ export let promptDiv: HTMLDivElement | null
 
 export function renderSaveCredentialsForm(username: string, password: string) {
   promptDiv = document.createElement('div')
+  // @ts-expect-error
   render(<PromptPassword username={username} password={password} />, promptDiv)
 
   document.body.appendChild(promptDiv)
