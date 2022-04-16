@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { h } from 'nano-jsx/lib/core'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { domRecorder } from '../contentScript'
