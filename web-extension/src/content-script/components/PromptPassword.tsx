@@ -57,6 +57,7 @@ export const PromptPassword = ({
       capturedInputEvents: domRecorder.toJSON(),
       openInVault
     }
+    console.log('Test', loginCredentials.capturedInputEvents)
     return chrome.runtime.sendMessage(
       {
         action: BackgroundMessageType.addLoginCredentials,
@@ -65,6 +66,14 @@ export const PromptPassword = ({
       (res) => console.log('popup')
     )
   }
+
+  const removeCredential = async () => {
+    promptDiv?.remove()
+    return chrome.runtime.sendMessage({
+      action: BackgroundMessageType.hideLoginCredentialsModal
+    })
+  }
+
   let passwordShown = false
 
   console.log('nanojsx')
@@ -128,7 +137,7 @@ export const PromptPassword = ({
         <button
           style={buttonStyle('#072C27')}
           onClick={() => {
-            promptDiv?.remove()
+            removeCredential()
           }}
         >
           close
