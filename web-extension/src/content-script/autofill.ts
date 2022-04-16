@@ -93,12 +93,12 @@ export const autofill = (initState: IInitStateRes) => {
       log('filled both', form)
       if (form) {
         // TODO try to submit the form
-        filledElements[0]?.form?.dispatchEvent(
-          new Event('submit', {
-            bubbles: true,
-            cancelable: true
-          })
-        )
+        // filledElements[0]?.form?.dispatchEvent(
+        //   new Event('submit', {
+        //     bubbles: true,
+        //     cancelable: true
+        //   })
+        // )
         const clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,

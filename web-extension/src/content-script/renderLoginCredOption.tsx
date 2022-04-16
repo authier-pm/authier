@@ -25,7 +25,6 @@ export function renderLoginCredOption(
     createdAt: string
   }>
 ) {
-  console.log('TEST', loginCredentials)
   promptDiv = document.createElement('div')
   render(
     <PromptPasswordOption
