@@ -14,5 +14,7 @@ export enum BackgroundMessageType {
   addTOTPSecret = 'addTOTPSecret',
   getContentScriptInitialState = 'getContentScriptInitialState',
   hideLoginCredentialsModal = 'hideLoginCredentialsModal',
-  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown'
+  saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown',
+  saveCapturedInputEvents = 'saveCapturedInputEvents',
+  getCapturedInputEvents = 'getCapturedInputEvents'
 }

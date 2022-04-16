@@ -19,10 +19,12 @@ const escapeHtml = (unsafe: string) => {
 
 export const PromptPassword = ({
   username,
-  password
+  password,
+  inputEvents
 }: {
   username: string
   password: string
+  inputEvents: any
 }) => {
   const h3Style = {
     margin: 0,
@@ -50,14 +52,15 @@ export const PromptPassword = ({
       borderDecoration: 'none'
     }
   }
+
   const addCredential = async (openInVault = false) => {
     const loginCredentials = {
       username,
       password,
-      capturedInputEvents: domRecorder.toJSON(),
+      capturedInputEvents: inputEvents,
       openInVault
     }
-    console.log('Test', loginCredentials.capturedInputEvents)
+    console.log('ADD', loginCredentials.capturedInputEvents)
     return chrome.runtime.sendMessage(
       {
         action: BackgroundMessageType.addLoginCredentials,
