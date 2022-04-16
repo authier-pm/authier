@@ -49,6 +49,8 @@ export const saveLoginModalsStates = new Map<
 >()
 
 let capturedInputEvents = []
+//This is for saving URL of inputs
+let inputsUrl: string
 
 browser.runtime.onMessage.addListener(async function (
   req: {
@@ -95,7 +97,7 @@ browser.runtime.onMessage.addListener(async function (
           loginCredentials: namePassPair,
           encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
           iconUrl: tab.favIconUrl,
-          url: url,
+          url: inputsUrl,
           label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
         }
       ])
@@ -109,7 +111,7 @@ browser.runtime.onMessage.addListener(async function (
         return {
           domPath: captured.element,
           kind: captured.kind,
-          url: url
+          url: inputsUrl
         }
       })
 
@@ -131,6 +133,7 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.saveCapturedInputEvents:
       capturedInputEvents = req.payload
+      inputsUrl = tab?.url as string
       console.log('SAVE', capturedInputEvents)
       break
 
@@ -177,8 +180,7 @@ browser.runtime.onMessage.addListener(async function (
       break
 
     case BackgroundMessageType.getCapturedInputEvents:
-      console.log('GET', capturedInputEvents)
-      return capturedInputEvents
+      return { capturedInputEvents, inputsUrl }
       break
 
     case BackgroundMessageType.wasClosed:

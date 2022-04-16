@@ -57,8 +57,9 @@ export const PromptPassword = ({
     const loginCredentials = {
       username,
       password,
-      capturedInputEvents: inputEvents,
-      openInVault
+      capturedInputEvents: inputEvents.capturedInputEvents,
+      openInVault,
+      url: inputEvents.url
     }
     console.log('ADD', loginCredentials.capturedInputEvents)
     return chrome.runtime.sendMessage(
