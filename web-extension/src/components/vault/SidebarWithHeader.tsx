@@ -194,7 +194,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                     backgroundColor: useColorModeValue('red.200', 'red.400')
                   }}
                   onClick={async () => {
-                    await device.logout(false)
+                    await device.logout()
                   }}
                 >
                   Logout
@@ -332,7 +332,14 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem backgroundColor="red.400">Logout</MenuItem>
+              <MenuItem
+                backgroundColor="red.400"
+                onClick={() => {
+                  device.logout()
+                }}
+              >
+                Logout
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>

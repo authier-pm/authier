@@ -27,19 +27,14 @@ import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import {
   GraphQLEmailAddress,
-  GraphQLNonEmptyString,
   GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
 import debug from 'debug'
-import {
-  AddNewDeviceInput,
-  RegisterNewAccountInput
-} from '../models/AuthInputs'
+import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
-import { DecryptionChallengeGQL } from '../models/generated/DecryptionChallenge'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
@@ -48,10 +43,8 @@ import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
-  DecryptionChallengeMutation,
   DecryptionChallengeUnion
 } from '../models/DecryptionChallenge'
-import { sendEmail } from '../utils/email'
 import { plainToClass } from 'class-transformer'
 
 const log = debug('au:RootResolver')
@@ -70,6 +63,7 @@ export interface IJWTPayload {
 
 export interface IContextAuthenticated extends IContext {
   jwtPayload: IJWTPayload
+  device: Device
 }
 
 export interface IContextMaybeAuthenticated extends IContext {
