@@ -118,7 +118,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
   })
 }
 
-export const VaultImportExport: React.FC<{ any }> = () => {
+export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
     null
   )

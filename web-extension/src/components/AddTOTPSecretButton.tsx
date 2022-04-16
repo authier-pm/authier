@@ -14,7 +14,7 @@ import { ITOTPSecret } from '@src/util/useDeviceState'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
 import { device } from '@src/background/ExtensionDevice'
 
-export const AddTOTPSecretButton: React.FC<{}> = () => {
+export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
 
   const addToTOTPs = async (qr: QRCode) => {
