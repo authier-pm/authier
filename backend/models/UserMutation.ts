@@ -32,11 +32,13 @@ export class UserMutation extends UserBase {
     }
 
     const firstDev = await ctx.prisma.device.findFirst()
-    const { accessToken } = this.setCookiesAndConstructLoginResponse(
-      firstDev!.id,
-      ctx
-    )
-    return accessToken
+    if (firstDev) {
+      const { accessToken } = this.setCookiesAndConstructLoginResponse(
+        firstDev.id,
+        ctx
+      )
+      return accessToken
+    }
   }
 
   @Field(() => DeviceMutation)

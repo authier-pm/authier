@@ -5,16 +5,12 @@ import {
 } from '@src/util/useDeviceState'
 import { lockTime } from './backgroundPage'
 import { BackgroundMessageType } from './BackgroundMessageType'
-import {
-  UIOptions,
-  UISettings
-} from '@src/components/setting-screens/SettingsForm'
+import { UISettings } from '@src/components/setting-screens/SettingsForm'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   AddWebInputsDocument,
-  AddWebInputsMutationFn,
   AddWebInputsMutationResult,
   AddWebInputsMutationVariables
 } from './chromeRuntimeListener.codegen'
@@ -24,7 +20,6 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { device, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
-import type { IInitStateRes } from '@src/content-script/contentScript'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
 
 const log = debug('au:chListener')
@@ -53,7 +48,7 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-chrome.runtime.onMessage.addListener(async function (
+browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
     payload: any
@@ -63,8 +58,7 @@ chrome.runtime.onMessage.addListener(async function (
     passwords: ILoginSecret[]
     settings: ISecuritySettings
   },
-  sender,
-  sendResponse
+  sender
 ) {
   log(req)
 
@@ -128,11 +122,11 @@ chrome.runtime.onMessage.addListener(async function (
       })
 
       console.log(credentials.capturedInputEvents)
-      sendResponse({ failed: false })
       if (req.payload.openInVault) {
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
-      return true
+      return { failed: false }
+
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
         deviceState.addSecrets([req.payload])
@@ -175,8 +169,7 @@ chrome.runtime.onMessage.addListener(async function (
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
-        // After item remove, this returns bad state
-        return await getContentScriptInitialState(tabUrl, currentTabId)
+        return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
       break
