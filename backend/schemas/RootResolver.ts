@@ -11,7 +11,8 @@ import {
   Arg,
   Ctx,
   UseMiddleware,
-  Info
+  Info,
+  Int
 } from 'type-graphql'
 import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
@@ -363,7 +364,7 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
-  @Mutation(() => GraphQLPositiveInt, {
+  @Mutation(() => Int, {
     nullable: true,
     deprecationReason: 'prefer device methods',
     description:
@@ -375,7 +376,7 @@ export class RootResolver {
   ) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
-    console.log(ctx)
+
     if (!ctx.jwtPayload) {
       return null
     }

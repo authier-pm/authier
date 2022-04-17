@@ -1,5 +1,4 @@
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-
+import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import { debounce } from 'lodash'
 import browser from 'webextension-polyfill'
 
@@ -74,6 +73,7 @@ export async function initInputWatch() {
   log('~ stateInitRes', stateInitRes)
 
   if (!stateInitRes) {
+    log('no state')
     return
   }
 
@@ -242,14 +242,4 @@ export async function initInputWatch() {
   }
 }
 
-;(async () => {
-  let destroy = await initInputWatch()
-
-  // for some reason this does not work TODO figure out why. In the meantime we're doing browser.runtime.reload() so not a big deal
-  browser.runtime.onMessage.addListener(async (message) => {
-    if (message.action === BackgroundMessageType.rerenderViews) {
-      destroy && destroy()
-      destroy = await initInputWatch()
-    }
-  })
-})()
+initInputWatch()

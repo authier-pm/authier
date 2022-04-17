@@ -3,5 +3,5 @@ module.exports = {
     '@babel/preset-typescript',
     ['@babel/preset-env', { targets: { node: 'current' } }]
   ],
-  plugins: ['macros']
+  plugins: ['macros', '@emotion']
 }

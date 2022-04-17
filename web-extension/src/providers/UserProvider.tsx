@@ -21,22 +21,9 @@ export type IUserContext = {
   localStorage: any
 }
 
-// const onMessageListener = () =>
-//   new Promise((resolve) => {
-//     onMessage(messaging, (payload) => {
-//       resolve(payload)
-//     })
-//   })
-//   onMessageListener()
-//     .then((payload) => {
-//       console.log(payload)
-//     })
-//     .catch((err) => console.log('failed: ', err))
-
 export const UserContext = createContext<IUserContext>({} as any)
 
 export const UserProvider: FunctionComponent = ({ children }) => {
-  const { deviceState } = useContext(DeviceStateContext)
   const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
 
@@ -60,15 +47,11 @@ export const UserProvider: FunctionComponent = ({ children }) => {
     getId()
   }, [])
 
-  const cryptoOptions = {
-    iv: enc.Utf8.parse(userId as string)
-  }
-
   const value = {
     setUserId,
     userId,
     localStorage
   }
-  console.log(value)
+
   return <UserContext.Provider value={value}>{children}</UserContext.Provider>
 }

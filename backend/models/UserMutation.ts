@@ -21,7 +21,7 @@ import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
-
+import { DeviceMutation } from './Device'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -32,18 +32,24 @@ export class UserMutation extends UserBase {
     }
 
     const firstDev = await ctx.prisma.device.findFirst()
-    const { accessToken } = this.setCookiesAndConstructLoginResponse(
-      firstDev!.id,
-      ctx
-    )
-    return accessToken
+    if (firstDev) {
+      const { accessToken } = this.setCookiesAndConstructLoginResponse(
+        firstDev.id,
+        ctx
+      )
+      return accessToken
+    }
   }
 
-  //Cant remove master device
-  //Cant remove own device
-  //Loading time on reauth is too long
-  //Save URL on defocus
-  //Use nano for HTML insert
+  @Field(() => DeviceMutation)
+  async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
+    return ctx.prisma.device.findFirst({
+      where: {
+        userId: this.id,
+        id
+      }
+    })
+  }
 
   @Field(() => DeviceGQL)
   async addDevice(
