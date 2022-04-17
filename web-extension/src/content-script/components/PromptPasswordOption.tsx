@@ -56,7 +56,7 @@ export const PromptPasswordOption = ({
         margin: '5px'
       }}
     >
-      <span className="icon"></span>
+      <span className="iconAuthier"></span>
 
       <div className="dropdown-content">
         {loginCredentials.map((el) => (
