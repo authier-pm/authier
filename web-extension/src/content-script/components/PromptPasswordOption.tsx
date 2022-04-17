@@ -4,10 +4,11 @@ import { ILoginSecret } from '../../util/useDeviceState'
 import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
 import { useState, useEffect } from 'preact/hooks'
 import { promptOption } from '../renderLoginCredOption'
+import { enabled } from '../autofill'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
-import './test.css'
+import './Option.css'
 import { autofill } from '../autofill'
 
 export const PromptPasswordOption = ({
@@ -25,40 +26,43 @@ export const PromptPasswordOption = ({
     createdAt: string
   }>
 }) => {
+  console.log('GOT in option prompt', { webInputs, loginCredentials })
   const el = document.querySelector(webInputs[0].domPath)
-  const [test, setTest] = useState(el?.getBoundingClientRect())
+  const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer
   window.onresize = function () {
     promptOption.remove()
     clearTimeout(resizeTimer)
     resizeTimer = setTimeout(function () {
-      setTest(el?.getBoundingClientRect())
+      setPos(el?.getBoundingClientRect())
       document.body.appendChild(promptOption)
     }, 100)
   }
 
   return (
     <div
-      class="dropdown"
+      className="dropdown"
       style={{
         zIndex: '2147483647', // max z-index according to stackoverflow
         justifyContent: 'center',
         alignItems: 'baseline',
         fontFamily: 'sans-serif !important',
         position: 'fixed',
-        top: test?.top + 'px',
-        left: (test?.left as number) + (test?.width as number) + 'px',
-        right: test?.right + 'px',
-        bottom: test?.bottom + 'px',
+        top: (pos?.top as number) - 10 + 'px',
+        left: (pos?.left as number) - 30 + 'px',
+        right: pos?.right + 'px',
+        bottom: pos?.bottom + 'px',
         margin: '5px'
       }}
     >
-      <button className="dropbtn">Dropdown</button>
+      <span className="icon"></span>
+
       <div className="dropdown-content">
         {loginCredentials.map((el) => (
           <a
             onClick={async () => {
+              //enabled = false
               autofill({
                 secretsForHost: { loginCredentials: [el], totpSecrets: [] },
                 autofillEnabled: true,

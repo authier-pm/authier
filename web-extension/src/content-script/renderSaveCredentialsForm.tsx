@@ -20,7 +20,6 @@ export async function renderSaveCredentialsForm(
     action: BackgroundMessageType.getCapturedInputEvents
   })
 
-  console.log('GOT', inputEvents)
   promptDiv = document.createElement('div')
   render(
     <PromptPassword

@@ -61,7 +61,7 @@ export const PromptPassword = ({
       openInVault,
       url: inputEvents.url
     }
-    console.log('ADD', loginCredentials.capturedInputEvents)
+
     return chrome.runtime.sendMessage(
       {
         action: BackgroundMessageType.addLoginCredentials,
