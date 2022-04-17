@@ -92,7 +92,11 @@ export const autofill = (initState: IInitStateRes) => {
             'input[type="password"]'
           ) as NodeListOf<HTMLInputElement>
 
-          if (passwordInputsOnPage.length === 2) {
+          if (
+            passwordInputsOnPage.length === 2 &&
+            passwordInputsOnPage[0].autocomplete !== 'current-password' &&
+            passwordInputsOnPage[1].autocomplete !== 'current-password'
+          ) {
             const newPassword = generate(passwordGenOptions)
             // must be some kind of signup page
             autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
