@@ -66,7 +66,7 @@ export function getWebInputKind(
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-
+log('no state')
 export async function initInputWatch() {
   const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState

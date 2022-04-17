@@ -13,7 +13,7 @@ import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
-export let promptDiv: HTMLDivElement | null
+export let promptOption: HTMLDivElement | null
 
 export function renderLoginCredOption(
   loginCredentials: ILoginSecret[],
@@ -27,14 +27,14 @@ export function renderLoginCredOption(
     createdAt: string
   }>
 ) {
-  promptDiv = document.createElement('div')
+  promptOption = document.createElement('div')
   render(
     <PromptPasswordOption
       loginCredentials={loginCredentials}
       webInputs={webInputs}
     />,
-    promptDiv
+    promptOption
   )
 
-  document.body.appendChild(promptDiv)
+  document.body.appendChild(promptOption)
 }
