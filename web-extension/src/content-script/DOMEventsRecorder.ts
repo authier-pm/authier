@@ -78,7 +78,6 @@ export class DOMEventsRecorder {
   }
 
   toJSON() {
-    console.log('PLS', this.capturedInputEvents)
     return this.capturedInputEvents.map(
       ({ element, eventType: type, inputted, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
