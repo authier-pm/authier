@@ -128,14 +128,15 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async save() {
     device.lockedState = null
-    log('saving device state', this)
 
     browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
     })
+
     browser.storage.onChanged.addListener(this.onStorageChange)
+
   }
 
   getSecretDecryptedById(id: string) {
@@ -301,13 +302,14 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecret(secretId: string) {
-    // browser.storage.local.set({
-    //   backgroundState: {
-    //     ...deviceState,
-    //     secrets: deviceState.secrets.filter((s) => s.id !== data.id)
-    //   }
-    // })
+    browser.storage.local.set({
+      backgroundState: {
+        ...device.state,
+        secrets: device.state?.secrets.filter((s) => s.id !== secretId)
+      }
+    })
     this.secrets = this.secrets.filter((s) => s.id !== secretId)
+    console.log('removed secret', secretId)
     this.save()
   }
 
@@ -332,16 +334,6 @@ class ExtensionDevice {
     this.id = await this.getDeviceId()
 
     let storedState: IBackgroundStateSerializable | null = null
-
-    if (isRunningInBgPage === false) {
-      //this is popup or vault
-
-      browser.runtime.onMessage.addListener(async (msg) => {
-        if (msg.action === BackgroundMessageType.rerenderViews) {
-          await rerenderViewInThisRuntime()
-        }
-      })
-    }
 
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
@@ -423,10 +415,10 @@ class ExtensionDevice {
     if (!storage.deviceId) {
       const deviceId = crypto.randomUUID()
       await browser.storage.local.set({ deviceId: deviceId })
-      log('deviceId', deviceId)
+      log('Creating new deviceID', deviceId)
       return deviceId
     } else {
-      log('deviceId', storage.deviceId)
+      log('Got deviceID', storage.deviceId)
       return storage.deviceId
     }
   }
@@ -485,16 +477,16 @@ class ExtensionDevice {
     this.rerenderViews()
   }
 
+  async clearAndReload() {
+    await removeToken()
+    await device.clearLocalStorage()
+
+    //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    //device.listenForUserLogin()
+    browser.runtime.reload()
+  }
+
   async logout() {
-    async function clearAndReload() {
-      await removeToken()
-      await device.clearLocalStorage()
-
-      // this.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-      // this.listenForUserLogin()
-      browser.runtime.reload()
-    }
-
     try {
       await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
         mutation: LogoutDocument
@@ -505,13 +497,14 @@ class ExtensionDevice {
         {
           autoClose: false,
           onClose: () => {
-            clearAndReload()
+            this.clearAndReload()
           }
         }
       )
     } finally {
-      await clearAndReload()
+      await this.clearAndReload()
     }
+    await this.clearAndReload()
   }
 
   serializeSecrets(
@@ -552,5 +545,5 @@ class ExtensionDevice {
 export const device = new ExtensionDevice()
 
 device.initialize()
-// @ts-expect-error
+// @ts-expect-error TODO fix types
 window.extensionDevice = device

@@ -1,14 +1,16 @@
 import React, { FunctionComponent } from 'react'
 
-import { Button, ButtonGroup, Stack } from '@chakra-ui/react'
+import { Button, ButtonGroup, Stack, useColorModeValue } from '@chakra-ui/react'
 
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { Link } from 'wouter'
 import { AddTOTPSecretButton } from '@src/components/AddTOTPSecretButton'
 
 export const NavMenu: FunctionComponent = () => {
+  const bg = useColorModeValue('teal.200', 'teal.700')
+
   return (
-    <Stack direction="row" bgColor="teal.200" justify="center" p="10px">
+    <Stack direction="row" bgColor={bg} justify="center" p="10px">
       <ButtonGroup spacing={4}>
         <Stack>
           <Link to="/">

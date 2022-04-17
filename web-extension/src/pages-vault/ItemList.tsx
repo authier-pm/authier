@@ -140,8 +140,8 @@ export const ItemList = () => {
             setFilterBy(ev.target.value)
           }}
         />
-        <Center px={10}>
-          <Stat ml="auto">
+        <Center px={3}>
+          <Stat whiteSpace={'nowrap'}>
             {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
           </Stat>
 

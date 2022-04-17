@@ -13,6 +13,7 @@ query DevicesPage {
 
 mutation ApproveChallenge($id: Int!) {
   me {
+    id
     decryptionChallenge(id: $id) {
       approve {
         id
@@ -23,6 +24,7 @@ mutation ApproveChallenge($id: Int!) {
 
 mutation RejectChallenge($id: Int!) {
   me {
+    id
     decryptionChallenge(id: $id) {
       reject {
         id
