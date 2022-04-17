@@ -1,10 +1,12 @@
+// @ts-nocheck
+
 import { PromptPassword } from './components/PromptPassword'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { domRecorder } from './contentScript'
 import { ILoginSecret } from '../util/useDeviceState'
 
-import { h, render } from 'nano-jsx/lib/core'
+import { h, render } from 'preact'
 import { PromptPasswordOption } from './components/PromptPasswordOption'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
