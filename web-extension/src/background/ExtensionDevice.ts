@@ -136,8 +136,6 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
-
-    console.log('STATE', device.state)
   }
 
   getSecretDecryptedById(id: string) {
