@@ -35,7 +35,7 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
   return element
 }
 
-let enabled = false
+export let enabled = false
 export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
 
