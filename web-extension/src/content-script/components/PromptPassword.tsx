@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { h } from 'nano-jsx/lib/core'
+import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { domRecorder } from '../contentScript'
 import { promptDiv } from '../renderSaveCredentialsForm'

@@ -1,4 +1,5 @@
-import { h } from 'nano-jsx/lib/core'
+// @ts-nocheck
+import { h } from 'preact'
 import { ILoginSecret } from '../../util/useDeviceState'
 import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
 //import { css } from '@emotion/css'
@@ -43,8 +44,8 @@ export const PromptPasswordOption = ({
         margin: '5px'
       }}
     >
-      <button class="dropbtn">Dropdown</button>
-      <div class="dropdown-content">
+      <button className="dropbtn">Dropdown</button>
+      <div className="dropdown-content">
         {loginCredentials.map((el) => (
           <a
             onClick={async () => {

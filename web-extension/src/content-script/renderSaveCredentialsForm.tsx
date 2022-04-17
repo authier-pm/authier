@@ -1,9 +1,11 @@
+// @ts-nocheck
+
 import { PromptPassword } from './components/PromptPassword'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { domRecorder } from './contentScript'
 
-import { h, render } from 'nano-jsx/lib/core'
+import { h, render } from 'preact'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
