@@ -45,7 +45,8 @@ export const autofill = (initState: IInitStateRes) => {
   log('init autofill', initState)
 
   enabled = true
-
+  const namePassSecret = secretsForHost.loginCredentials[0]
+  const totpSecret = secretsForHost.totpSecrets[0]
   const scanKnownWebInputsAndFillWhenFound = () => {
     const filledElements = webInputs
       .filter(({ url }) => url === location.href)
@@ -55,7 +56,7 @@ export const autofill = (initState: IInitStateRes) => {
         ) as HTMLInputElement
 
         if (inputEl) {
-          if (webInputGql.kind === WebInputType.PASSWORD) {
+          if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
               inputEl,
               namePassSecret.loginCredentials.password
@@ -65,13 +66,14 @@ export const autofill = (initState: IInitStateRes) => {
               WebInputType.EMAIL,
               WebInputType.USERNAME,
               WebInputType.USERNAME_OR_EMAIL
-            ].includes(webInputGql.kind)
+            ].includes(webInputGql.kind) &&
+            namePassSecret
           ) {
             return autofillValueIntoInput(
               inputEl,
               namePassSecret.loginCredentials.username
             )
-          } else if (webInputGql.kind === WebInputType.TOTP) {
+          } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
             return autofillValueIntoInput(
               inputEl,
               authenticator.generate(totpSecret.totp)
@@ -107,9 +109,6 @@ export const autofill = (initState: IInitStateRes) => {
         setTimeout(scanKnownWebInputsAndFillWhenFound, 20)
       }
     })
-
-    const namePassSecret = secretsForHost.loginCredentials[0]
-    const totpSecret = secretsForHost.totpSecrets[0]
 
     if (!namePassSecret && !totpSecret) {
       return () => {}
