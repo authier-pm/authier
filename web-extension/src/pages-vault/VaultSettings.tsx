@@ -1,4 +1,11 @@
-import { Box, Flex, HStack, Link, useColorModeValue } from '@chakra-ui/react'
+import {
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Link,
+  useColorModeValue
+} from '@chakra-ui/react'
 import {
   Link as RouterLink,
   Route,
@@ -59,11 +66,9 @@ export const VaultSettings = () => {
     <Flex
       rounded={'lg'}
       boxShadow={'lg'}
-      p={5}
       align={'center'}
       justify={'center'}
       flexDirection={'column'}
-      maxW={'4xl'}
       m="auto"
       bg={useColorModeValue('white', 'gray.900')}
     >

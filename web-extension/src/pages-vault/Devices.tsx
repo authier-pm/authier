@@ -25,14 +25,16 @@ import {
   Button,
   Tooltip,
   Alert,
+  useDisclosure,
   VStack,
-  Grid
+  Grid,
+  Stat
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field } from 'formik'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
 import {
@@ -41,6 +43,9 @@ import {
   useRejectChallengeMutation
 } from './Devices.codegen'
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
+import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
+import { device } from '@src/background/ExtensionDevice'
+import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
 
 interface configValues {
   lockTime: number
@@ -62,9 +67,11 @@ const DeviceListItem = (item: {
   lastGeoLocation: string
   createdAt: string
   logoutAt?: string | null | undefined
+  masterId: string
+  refetch: () => void
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
-  const { data } = useDevicesPageQuery({ fetchPolicy: 'cache-first' })
+  const { isOpen, onOpen, onClose } = useDisclosure()
 
   return (
     <>
@@ -85,7 +92,12 @@ const DeviceListItem = (item: {
               alignItems={'baseline'}
               lineHeight={'6'}
             >
-              {item.id === data?.me?.masterDeviceId && (
+              {item.id === device.id && (
+                <Badge height="min-content" colorScheme="yellow">
+                  Current
+                </Badge>
+              )}
+              {item.id === item.masterId && (
                 <Badge height="min-content" colorScheme="purple">
                   Master
                 </Badge>
@@ -99,6 +111,7 @@ const DeviceListItem = (item: {
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
+
               <Menu>
                 <MenuButton
                   as={IconButton}
@@ -109,11 +122,17 @@ const DeviceListItem = (item: {
                   icon={<SettingsIcon color="ButtonShadow" />}
                 />
                 <MenuList>
-                  <MenuItem>
+                  <MenuItem onClick={() => onOpen()}>
                     <FiLogOut></FiLogOut>
                     <NbSp />
-                    <Trans>Deauthorize</Trans>
+                    <Trans>Logout</Trans>
                   </MenuItem>
+                  <DeviceDeleteAlert
+                    id={item.id}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                    refetch={item.refetch}
+                  />
                   <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
                     <FiSettings />
                     <NbSp />
@@ -243,7 +262,11 @@ const DeviceListItem = (item: {
 }
 
 export default function Devices() {
-  const { data, loading } = useMyDevicesQuery({
+  const {
+    data,
+    loading,
+    refetch: deviceRefetch
+  } = useMyDevicesQuery({
     // TODO figure out why this is called twice
     fetchPolicy: 'cache-first'
   })
@@ -254,16 +277,30 @@ export default function Devices() {
     fetchPolicy: 'cache-first'
   })
 
+  useEffect(() => {
+    deviceRefetch()
+  }, [])
+
   return (
     <Flex flexDirection="column">
-      <Input
-        w={['300px', '350px', '400px', '500px']}
-        placeholder={t`Search for device`}
-        m="auto"
-        onChange={(ev) => {
-          setFilterBy(ev.target.value)
-        }}
-      />
+      <Center>
+        <Input
+          w={['300px', '350px', '400px', '500px']}
+          placeholder={t`Search for device`}
+          m="auto"
+          onChange={(ev) => {
+            setFilterBy(ev.target.value)
+          }}
+        />
+        <Center px={10}>
+          <Stat ml="auto" whiteSpace={'nowrap'}>
+            {data?.me?.devices.length} {t`devices`}
+          </Stat>
+
+          <RefreshDeviceButton refetch={deviceRefetch} />
+        </Center>
+      </Center>
+
       <VStack mt={3}>
         {devicesPageData?.me?.decryptionChallengesWaiting.map(
           (challengeToApprove) => {
@@ -337,7 +374,14 @@ export default function Devices() {
                   return name.includes(filterBy)
                 })
                 .map((el, i) => {
-                  return <DeviceListItem {...el} key={i} />
+                  return (
+                    <DeviceListItem
+                      {...el}
+                      key={i}
+                      masterId={devicesPageData?.me?.masterDeviceId as string}
+                      refetch={deviceRefetch}
+                    />
+                  )
                 })
             )}
           </Flex>

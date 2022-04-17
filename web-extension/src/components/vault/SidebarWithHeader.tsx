@@ -75,7 +75,10 @@ export default function SidebarWithHeader({
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
     <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      <SidebarContent onClose={() => onClose} />
+      <SidebarContent
+        onClose={() => onClose}
+        display={{ base: 'none', md: 'block' }}
+      />
       <Drawer
         autoFocus={false}
         isOpen={isOpen}
@@ -90,8 +93,8 @@ export default function SidebarWithHeader({
         </DrawerContent>
       </Drawer>
       {/* mobilenav */}
-      {/* <MobileNav onOpen={onOpen} /> */}
-      <Box ml={['auto', '250px']} pt="10">
+      <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
+      <Box ml={{ base: 0, md: 60 }} p="7">
         {children}
       </Box>
     </Box>
@@ -102,8 +105,8 @@ interface SidebarProps extends BoxProps {
   onClose: () => void
 }
 
-const SidebarContent = ({ onClose }: SidebarProps) => {
-  const { colorMode, toggleColorMode } = useColorMode()
+const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+  const { toggleColorMode } = useColorMode()
   const email = device.state?.email
   if (!email) {
     return <Spinner />
@@ -117,32 +120,35 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
       w={{ base: 'full', md: 60 }}
       pos="fixed"
       h="full"
-      display={{ base: 'none', md: 'flex' }}
       flexDirection="column"
+      {...rest}
     >
-      <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
-        <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-          Authier
-        </Text>
-        <CloseButton display={{ base: 'flex', md: 'none' }} onClick={onClose} />
-      </Flex>
-      <Flex flexDirection="column" height="100%">
-        {LinkItems.map((link, i) => (
-          <NavItem key={i} icon={link.icon} path={link.path}>
-            {link.title}
-          </NavItem>
-        ))}
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="change color mode"
-          icon={<FiMoon />}
-          onClick={toggleColorMode}
-          mt="auto"
-        />
-      </Flex>
+      <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
+        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
+            Authier
+          </Text>
+          <CloseButton
+            display={{ base: 'flex', md: 'none' }}
+            onClick={onClose}
+          />
+        </Flex>
+        <Flex flexDirection="column" height="100%">
+          {LinkItems.map((link, i) => (
+            <NavItem key={i} icon={link.icon} path={link.path}>
+              {link.title}
+            </NavItem>
+          ))}
+          <IconButton
+            size="lg"
+            variant="ghost"
+            aria-label="change color mode"
+            icon={<FiMoon />}
+            onClick={toggleColorMode}
+            mt="auto"
+          />
+        </Flex>
 
-      <Flex m={4} mt="auto">
         <HStack spacing={{ base: '0', md: '6' }} w="100%">
           <Flex alignItems={'center'} w="100%">
             <Menu>
@@ -183,9 +189,9 @@ const SidebarContent = ({ onClose }: SidebarProps) => {
                 <MenuItem>Billing</MenuItem>
                 <MenuDivider />
                 <MenuItem
-                  backgroundColor="red.100"
+                  backgroundColor="red.500"
                   _hover={{
-                    backgroundColor: 'red.200'
+                    backgroundColor: useColorModeValue('red.200', 'red.400')
                   }}
                   onClick={async () => {
                     await device.logout()
@@ -250,7 +256,7 @@ interface MobileProps extends FlexProps {
   onOpen: () => void
 }
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const email = device.state?.email!
+  const email = device.state?.email as string
 
   const { colorMode, toggleColorMode } = useColorMode()
   return (
@@ -326,7 +332,14 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuItem>Settings</MenuItem>
               <MenuItem>Billing</MenuItem>
               <MenuDivider />
-              <MenuItem backgroundColor="red.400">Logout</MenuItem>
+              <MenuItem
+                backgroundColor="red.400"
+                onClick={() => {
+                  device.logout()
+                }}
+              >
+                Logout
+              </MenuItem>
             </MenuList>
           </Menu>
         </Flex>

@@ -327,7 +327,7 @@ type Mutation {
   """
   removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
   """
-  logout(removeDevice: Boolean): PositiveInt
+  logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
@@ -356,6 +356,7 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   addCookie: String!
+  device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   addEncryptedSecrets(
@@ -374,6 +375,50 @@ type UserMutation {
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
 }
+
+type DeviceMutation {
+  id: ID!
+  firstIpAddress: String!
+  lastIpAddress: String!
+  firebaseToken: String!
+  name: String!
+  platform: String!
+  syncTOTP: Boolean!
+  ipAddressLock: Boolean!
+  vaultLockTimeoutSeconds: Int
+  logoutAt: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+  registeredWithMasterAt: DateTime
+  lastSyncAt: DateTime
+  masterPasswordOutdatedAt: DateTime
+  userId: String!
+  markAsSynced: DateTime!
+  reportSecretUsageEvent(
+    webInputId: PositiveInt!
+    secretId: UUID!
+    kind: String!
+  ): SecretUsageEventGQLScalars!
+  rename(name: String!): DeviceGQL!
+  logout: DeviceGQL!
+  removeDevice: Boolean!
+}
+
+type SecretUsageEventGQLScalars {
+  id: ID!
+  kind: String!
+  timestamp: DateTime!
+  secretId: String!
+  url: String
+  userId: String!
+  deviceId: String!
+  webInputId: Int
+}
+
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
 
 input DeviceInput {
   id: UUID!
@@ -416,11 +461,6 @@ Integers that will have a value of 0 or more.
 """
 scalar NonNegativeInt
 
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
-
 input ChangeMasterPasswordInput {
   secrets: [EncryptedSecretPatchInput!]!
   addDeviceSecret: NonEmptyString!
@@ -462,45 +502,6 @@ type DecryptionChallengeMutation {
   approve: DecryptionChallengeGQL!
   reject: DecryptionChallengeGQL!
   recoverAccount: DecryptionChallengeGQL!
-}
-
-type DeviceMutation {
-  id: ID!
-  firstIpAddress: String!
-  lastIpAddress: String!
-  firebaseToken: String!
-  name: String!
-  platform: String!
-  syncTOTP: Boolean!
-  ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
-  logoutAt: DateTime
-  createdAt: DateTime!
-  updatedAt: DateTime
-  registeredWithMasterAt: DateTime
-  lastSyncAt: DateTime
-  masterPasswordOutdatedAt: DateTime
-  userId: String!
-  markAsSynced: DateTime!
-  reportSecretUsageEvent(
-    webInputId: PositiveInt!
-    secretId: UUID!
-    kind: String!
-  ): SecretUsageEventGQLScalars!
-  rename(name: String!): DeviceGQL!
-  logout: DeviceGQL!
-  removeDevice: Boolean!
-}
-
-type SecretUsageEventGQLScalars {
-  id: ID!
-  kind: String!
-  timestamp: DateTime!
-  secretId: String!
-  url: String
-  userId: String!
-  deviceId: String!
-  webInputId: Int
 }
 
 type LoginResponse {

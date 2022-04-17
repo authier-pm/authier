@@ -332,7 +332,7 @@ export type Mutation = {
    * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
    * @deprecated prefer device methods
    */
-  logout?: Maybe<Scalars['PositiveInt']>
+  logout?: Maybe<Scalars['Int']>
   /** you need to be authenticated to call this resolver */
   me: UserMutation
   registerNewUser: LoginResponse
@@ -502,6 +502,7 @@ export type UserMutation = {
   changeMasterPassword: Scalars['PositiveInt']
   createdAt: Scalars['DateTime']
   decryptionChallenge: DecryptionChallengeMutation
+  device: DeviceMutation
   deviceRecoveryCooldownMinutes: Scalars['Int']
   email?: Maybe<Scalars['EmailAddress']>
   encryptedSecret: EncryptedSecretMutation
@@ -538,6 +539,10 @@ export type UserMutationChangeMasterPasswordArgs = {
 
 export type UserMutationDecryptionChallengeArgs = {
   id: Scalars['Int']
+}
+
+export type UserMutationDeviceArgs = {
+  id: Scalars['String']
 }
 
 export type UserMutationEncryptedSecretArgs = {

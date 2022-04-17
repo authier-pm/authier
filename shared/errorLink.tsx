@@ -2,6 +2,7 @@ import { onError } from '@apollo/client/link/error'
 import { toastifyConfig } from './toastifyConfig'
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
+import { device } from '@src/background/ExtensionDevice'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
@@ -9,7 +10,12 @@ export const errorLink = onError(
     const isExtension = window.location.href.startsWith('chrome-extension')
 
     toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
+
     if (graphQLErrors) {
+      if (graphQLErrors[0].message === 'not authenticated') {
+        //Here just logout the user
+        device.clearAndReload()
+      }
       graphQLErrors.map(({ message, path }) => {
         console.error(
           `[GraphQL error]: Message: ${message}, operation: ${operation.operationName}, Path: ${path}`
