@@ -131,22 +131,24 @@ export const ItemList = () => {
 
   return (
     <Flex flexDirection="column">
-      <Center mx={4}>
+      <Center>
         <Input
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}
-          mr="auto"
+          m="auto"
           onChange={(ev) => {
             setFilterBy(ev.target.value)
           }}
         />
+
         <Center px={3}>
-          <Stat whiteSpace={'nowrap'}>
+          <Stat ml="auto" whiteSpace={'nowrap'}>
             {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
           </Stat>
 
           <RefreshSecretsButton />
         </Center>
+        <IconButton aria-label="Add item" icon={<AddIcon />} rounded={'full'} />
       </Center>
 
       <Center justifyContent={['flex-end', 'center', 'center']}>
