@@ -57,6 +57,9 @@ export const Home: FunctionComponent = () => {
           aria-label="Add item"
           icon={<AddIcon />}
           rounded={'full'}
+          onClick={async () => {
+            chrome.tabs.create({ url: 'vault.html#/settings/account' })
+          }}
         />
 
         {deviceState && TOTPSecrets.length > 0 && (
