@@ -12,6 +12,7 @@ import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
+import { AddItem } from './AddItem'
 
 export function VaultRouter() {
   const history = useHistory()
@@ -62,6 +63,9 @@ export function VaultRouter() {
         </Route>
         <Route path="/import-export">
           <VaultImportExport />
+        </Route>
+        <Route path="/addItem">
+          <AddItem />
         </Route>
       </Switch>
     </SidebarWithHeader>
