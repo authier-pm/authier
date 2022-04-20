@@ -58,7 +58,7 @@ export const Home: FunctionComponent = () => {
           icon={<AddIcon />}
           rounded={'full'}
           onClick={async () => {
-            chrome.tabs.create({ url: 'vault.html#/settings/account' })
+            chrome.tabs.create({ url: 'vault.html#/addItem' })
           }}
         />
 
