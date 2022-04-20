@@ -15,7 +15,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
-import { Link } from 'react-router-dom'
+import { Link, useHistory } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import browser from 'webextension-polyfill'
@@ -128,6 +128,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 export const ItemList = () => {
   const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
+  const history = useHistory()
 
   return (
     <Flex flexDirection="column">
@@ -148,7 +149,12 @@ export const ItemList = () => {
 
           <RefreshSecretsButton />
         </Center>
-        <IconButton aria-label="Add item" icon={<AddIcon />} rounded={'full'} />
+        <IconButton
+          aria-label="Add item"
+          icon={<AddIcon />}
+          rounded={'full'}
+          onClick={async () => history.push('/addItem')}
+        />
       </Center>
 
       <Center justifyContent={['flex-end', 'center', 'center']}>
