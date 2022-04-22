@@ -134,6 +134,16 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
+    const user = await ctx.prisma.user.findFirst({
+      where: {
+        id: this.userId
+      }
+    })
+
+    if (this.id === user?.masterDeviceId) {
+      throw new Error('You cannot logout master device')
+    }
+
     if (ctx.jwtPayload.deviceId === this.id) {
       ctx.reply.clearCookie('refresh-token')
       ctx.reply.clearCookie('access-token')
