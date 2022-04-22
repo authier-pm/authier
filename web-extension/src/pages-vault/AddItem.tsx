@@ -31,7 +31,6 @@ export const AddItem = () => {
     >
       <Flex
         width={{ base: '90%', sm: '70%', md: '50%' }}
-        mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
@@ -45,6 +44,7 @@ export const AddItem = () => {
           defaultValue={'Login'}
           placeholder="Select type"
           w={'50%'}
+          mt={5}
         >
           <option value="TOTP">TOTP</option>
           <option value="Login">Login</option>
