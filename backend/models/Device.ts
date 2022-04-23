@@ -14,6 +14,7 @@ import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 import { request } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
+import { GraphqlError } from '../api/GraphqlError'
 
 @InputType()
 export class DeviceInput {
@@ -134,14 +135,14 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
-    const user = await ctx.prisma.user.findFirst({
+    const user = await ctx.prisma.user.findUnique({
       where: {
         id: this.userId
       }
     })
 
     if (this.id === user?.masterDeviceId) {
-      throw new Error('You cannot logout master device')
+      throw new GraphqlError('You cannot logout master device')
     }
 
     if (ctx.jwtPayload.deviceId === this.id) {
