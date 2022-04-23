@@ -10,7 +10,7 @@ import {
 } from '@chakra-ui/react'
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 
-import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
+import { useLocation } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdArchive } from 'react-icons/io'
@@ -32,19 +32,6 @@ export const NavBar: FunctionComponent = () => {
   console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
-  const ActiveLink = (
-    props: JSX.IntrinsicAttributes &
-      React.PropsWithChildren<LinkProps<LocationHook>>
-  ) => {
-    const [isActive] = useRoute(props.href as string)
-
-    return (
-      <Link {...props}>
-        <a className={isActive ? 'active' : ''}>{props.children}</a>
-      </Link>
-    )
-  }
-
   const bg = useColorModeValue('whitesmoke', 'white.500')
 
   useEffect(() => {
@@ -52,7 +39,7 @@ export const NavBar: FunctionComponent = () => {
   }, [])
 
   return (
-    <Flex flexDir="column">
+    <Flex flexDir="column" minW="350px">
       <Flex
         p={1}
         textAlign="center"
