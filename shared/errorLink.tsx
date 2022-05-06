@@ -2,6 +2,7 @@ import { onError } from '@apollo/client/link/error'
 import { toastifyConfig } from './toastifyConfig'
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
+//@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
 
 // Log any GraphQL errors or network error that occurred
