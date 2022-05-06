@@ -13,9 +13,6 @@ import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { AddItem } from './AddItem'
-import Devices from './Devices'
-import Account from '@src/components/vault/settings/Account'
-import { VaultSettings } from './VaultSettings'
 
 export function VaultRouter() {
   const history = useHistory()
@@ -51,6 +48,7 @@ export function VaultRouter() {
         </Route>
         <Route
           path="/secret/:secretId"
+          // eslint-disable-next-line react/no-children-prop
           children={({ match }) => (
             <VaultItemSettings secretId={match?.params.secretId as string} />
           )}
