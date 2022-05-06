@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { h } from 'nano-jsx/lib/core'
+import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { domRecorder } from '../contentScript'
 import { promptDiv } from '../renderSaveCredentialsForm'
@@ -20,10 +20,12 @@ const escapeHtml = (unsafe: string) => {
 
 export const PromptPassword = ({
   username,
-  password
+  password,
+  inputEvents
 }: {
   username: string
   password: string
+  inputEvents: any
 }) => {
   const h3Style = {
     margin: 0,
@@ -55,9 +57,11 @@ export const PromptPassword = ({
     const loginCredentials = {
       username,
       password,
-      capturedInputEvents: domRecorder.toJSON(),
-      openInVault
+      capturedInputEvents: inputEvents.capturedInputEvents,
+      openInVault,
+      url: inputEvents.url
     }
+
     return chrome.runtime.sendMessage(
       {
         action: BackgroundMessageType.addLoginCredentials,
@@ -66,6 +70,14 @@ export const PromptPassword = ({
       (res) => console.log('popup')
     )
   }
+
+  const removeCredential = async () => {
+    promptDiv?.remove()
+    return chrome.runtime.sendMessage({
+      action: BackgroundMessageType.hideLoginCredentialsModal
+    })
+  }
+
   let passwordShown = false
 
   console.log('nanojsx')
@@ -129,7 +141,7 @@ export const PromptPassword = ({
         <button
           style={buttonStyle('#072C27')}
           onClick={() => {
-            promptDiv?.remove()
+            removeCredential()
           }}
         >
           close

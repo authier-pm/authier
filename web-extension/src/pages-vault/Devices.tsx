@@ -47,6 +47,7 @@ import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
 
+
 interface configValues {
   lockTime: number
   twoFA: boolean
@@ -292,7 +293,7 @@ export default function Devices() {
             setFilterBy(ev.target.value)
           }}
         />
-        <Center px={10}>
+        <Center px={3}>
           <Stat ml="auto" whiteSpace={'nowrap'}>
             {data?.me?.devices.length} {t`devices`}
           </Stat>
