@@ -16,7 +16,8 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton
+  IconButton,
+  useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
