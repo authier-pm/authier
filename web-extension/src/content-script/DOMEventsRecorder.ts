@@ -1,9 +1,7 @@
-import browser from 'webextension-polyfill'
 import { getCssSelector } from 'css-selector-generator'
 import { CssSelectorMatch } from 'css-selector-generator/types/types'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 export interface IInputRecord {
   element: HTMLInputElement | HTMLFormElement
@@ -70,11 +68,6 @@ export class DOMEventsRecorder {
     if (this.capturedInputEvents.length > 10) {
       this.capturedInputEvents.shift() // we don't need more than 10 events
     }
-
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: this.toJSON()
-    })
   }
 
   toJSON() {

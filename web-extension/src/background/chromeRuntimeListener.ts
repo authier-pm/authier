@@ -48,10 +48,6 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-let capturedInputEvents = []
-//This is for saving URL of inputs
-let inputsUrl: string
-
 browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
@@ -97,7 +93,7 @@ browser.runtime.onMessage.addListener(async function (
           loginCredentials: namePassPair,
           encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
           iconUrl: tab.favIconUrl,
-          url: inputsUrl,
+          url: url,
           label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
         }
       ])
@@ -111,7 +107,7 @@ browser.runtime.onMessage.addListener(async function (
         return {
           domPath: captured.element,
           kind: captured.kind,
-          url: inputsUrl
+          url: url
         }
       })
 
@@ -131,12 +127,6 @@ browser.runtime.onMessage.addListener(async function (
       }
       return { failed: false }
 
-    case BackgroundMessageType.saveCapturedInputEvents:
-      capturedInputEvents = req.payload
-      inputsUrl = tab?.url as string
-      console.log('SAVE', capturedInputEvents)
-      break
-
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
         deviceState.addSecrets([req.payload])
@@ -151,7 +141,7 @@ browser.runtime.onMessage.addListener(async function (
       if (currentTabId) {
         saveLoginModalsStates.delete(currentTabId)
       }
-      console.log(saveLoginModalsStates)
+
       break
 
     case BackgroundMessageType.addTOTPInput:
@@ -170,17 +160,18 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
-
+      console.log(
+        'getContentScriptInitialState',
+        tabUrl,
+        deviceState,
+        currentTabId
+      )
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
         return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
-      break
-
-    case BackgroundMessageType.getCapturedInputEvents:
-      return { capturedInputEvents, inputsUrl }
       break
 
     case BackgroundMessageType.wasClosed:

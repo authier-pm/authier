@@ -11,10 +11,6 @@ import Premium from './Premium'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
-import { AddItem } from './AddItem'
-import Devices from './Devices'
-import Account from '@src/components/vault/settings/Account'
-import { VaultSettings } from './VaultSettings'
 
 export function VaultRouter() {
   const history = useHistory()
@@ -59,15 +55,6 @@ export function VaultRouter() {
         </Route>
         <Route path="/import-export">
           <VaultImportExport />
-        </Route>
-        <Route path="/addItem">
-          <AddItem />
-        </Route>
-        <Route path="/devices">
-          <Devices />
-        </Route>
-        <Route path="/settings">
-          <VaultSettings />
         </Route>
       </Switch>
     </SidebarWithHeader>
