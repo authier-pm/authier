@@ -1,19 +1,34 @@
+// @ts-nocheck
+
 import { PromptPassword } from './components/PromptPassword'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { domRecorder } from './contentScript'
 
-import { h, render } from 'nano-jsx/lib/core'
+import { h, render } from 'preact'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
 export let promptDiv: HTMLDivElement | null
 
-export function renderSaveCredentialsForm(username: string, password: string) {
+export async function renderSaveCredentialsForm(
+  username: string,
+  password: string
+) {
+  const inputEvents = await browser.runtime.sendMessage({
+    action: BackgroundMessageType.getCapturedInputEvents
+  })
+
   promptDiv = document.createElement('div')
-  // @ts-expect-error
-  render(<PromptPassword username={username} password={password} />, promptDiv)
+  render(
+    <PromptPassword
+      username={username}
+      password={password}
+      inputEvents={inputEvents}
+    />,
+    promptDiv
+  )
 
   document.body.appendChild(promptDiv)
 
@@ -21,8 +36,7 @@ export function renderSaveCredentialsForm(username: string, password: string) {
     action: BackgroundMessageType.saveLoginCredentialsModalShown,
     payload: {
       username,
-      password,
-      capturedInputEvents: domRecorder.toJSON()
+      password
     }
   })
 }
