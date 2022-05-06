@@ -47,6 +47,7 @@ export function VaultRouter() {
         </Route>
         <Route
           path="/secret/:secretId"
+          // eslint-disable-next-line react/no-children-prop
           children={({ match }) => (
             <VaultItemSettings secretId={match?.params.secretId as string} />
           )}
