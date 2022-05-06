@@ -87,6 +87,7 @@ export async function initInputWatch() {
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
+    log('no need to do anything-user locked out')
     return // no need to do anything-user locked out
   }
 
@@ -101,6 +102,7 @@ export async function initInputWatch() {
     saveLoginModalsState.username &&
     saveLoginModalsState.password
   ) {
+    log('rendering save credentials form')
     renderSaveCredentialsForm(
       saveLoginModalsState.username,
       saveLoginModalsState.password

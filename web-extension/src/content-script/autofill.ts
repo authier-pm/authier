@@ -3,7 +3,7 @@ import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-
+let stringSimilarity = require('string-similarity')
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
@@ -36,10 +36,11 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
 }
 
 export let enabled = false
-export const autofill = (initState: IInitStateRes) => {
+export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
   const { secretsForHost, webInputs } = initState
 
-  if (enabled === true) {
+  if (enabled === true && !fillAgain) {
+    log('enabled is true, returning')
     return () => {}
   }
   log('init autofill', initState)
@@ -49,7 +50,11 @@ export const autofill = (initState: IInitStateRes) => {
   const totpSecret = secretsForHost.totpSecrets[0]
   const scanKnownWebInputsAndFillWhenFound = () => {
     const filledElements = webInputs
-      .filter(({ url }) => url === location.href)
+      .filter(({ url }) =>
+        stringSimilarity.compareTwoStrings(url, location.href) > 0.5
+          ? true
+          : false
+      )
       .map((webInputGql) => {
         const inputEl = document.body.querySelector(
           webInputGql.domPath
