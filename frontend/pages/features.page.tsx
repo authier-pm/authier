@@ -22,8 +22,9 @@ export default function Features() {
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
             components={ChakraUIRenderer(chakraCustomTheme)}
-            children={md}
-          />
+          >
+            {md}
+          </ReactMarkdown>
         </Box>
       </AuPage>
     </>
