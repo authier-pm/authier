@@ -1,5 +1,12 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, {
+  useContext,
+  useEffect,
+  useReducer,
+  useRef,
+  useState
+} from 'react'
 import {
+  Avatar,
   Box,
   Button,
   Flex,
@@ -9,8 +16,7 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton,
-  useColorModeValue
+  IconButton
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
@@ -29,7 +35,7 @@ import { SecretItemIcon } from './SecretItemIcon'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
-  const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
+  const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
@@ -40,13 +46,7 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   }, [otpCode])
 
   return (
-    <Box
-      boxShadow="xl"
-      p="4"
-      rounded="md"
-      bg={useColorModeValue('white', 'gray.900')}
-      m={2}
-    >
+    <Box boxShadow="xl" p="4" rounded="md" bg="white" m={2}>
       <Stat>
         <Flex justify="flex-start" align="center">
           <Flex flexDirection="column">
@@ -126,7 +126,13 @@ const LoginCredentialsListItem = ({
 
   return (
     <Box boxShadow="xl" m={2}>
-      <Flex key={loginSecret.url} p="3" rounded="md" bg="gray.100" minW="300px">
+      <Flex
+        key={loginSecret.url}
+        p="3"
+        rounded="md"
+        bg={useColorModeValue('gray.100', 'gray.700')}
+        minW="300px"
+      >
         <Stat maxW="100%">
           <Flex justify="space-between" align="center" w="100%">
             <Flex flexDirection="column">

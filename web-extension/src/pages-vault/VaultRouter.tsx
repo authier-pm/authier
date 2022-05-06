@@ -1,16 +1,21 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { ItemList } from '@src/pages-vault/ItemList'
 import { Route, Switch, useHistory } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
+import { VaultSettings } from './VaultSettings'
 import { device } from '@src/background/ExtensionDevice'
 import Login from '@src/pages-vault/Login'
-import { Center } from '@chakra-ui/react'
+import { Box, Center } from '@chakra-ui/react'
 import Premium from './Premium'
-
+import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
+import { AddItem } from './AddItem'
+import Devices from './Devices'
+import Account from '@src/components/vault/settings/Account'
+import { VaultSettings } from './VaultSettings'
 
 export function VaultRouter() {
   const history = useHistory()
@@ -53,8 +58,23 @@ export function VaultRouter() {
         <Route path="/account-limits">
           <Premium />
         </Route>
+        <Route path="/settings">
+          <VaultSettings />
+        </Route>
+        <Route path="/devices">
+          <Devices />
+        </Route>
         <Route path="/import-export">
           <VaultImportExport />
+        </Route>
+        <Route path="/addItem">
+          <AddItem />
+        </Route>
+        <Route path="/devices">
+          <Devices />
+        </Route>
+        <Route path="/settings">
+          <VaultSettings />
         </Route>
       </Switch>
     </SidebarWithHeader>
