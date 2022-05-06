@@ -63,6 +63,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
       transition={{ duration: 0.25 }}
     >
       <Flex
+        width={'100%'}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -107,7 +108,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
           }}
         >
           {({ isSubmitting, dirty }) => (
-            <Flex as={Form} p={5} flexDirection="column" w="inherit">
+            <Flex as={Form} p={5} flexDirection="column">
               <Field name="url">
                 {({ field, form }) => (
                   <FormControl
@@ -223,7 +224,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
 
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
-
+  const [initPassword, setInitPassword] = useState('')
+  console.log(initPassword)
   const [updateSecret] = useUpdateEncryptedSecretMutation()
 
   return (
@@ -232,21 +234,30 @@ const LoginSecret = (secretProps: ILoginSecret) => {
       initial={{ opacity: 0 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.35 }}
+      style={{
+        width: '80%',
+        display: 'contents'
+      }}
     >
       <Flex
+        width={{ base: '90%', sm: '70%', md: '50%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
         m="auto"
-        alignItems={'normal'}
+        alignItems={'center'}
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
+          enableReinitialize
           initialValues={{
             url: secretProps.url,
-            password: secretProps.loginCredentials.password,
+            password:
+              initPassword === ''
+                ? secretProps.loginCredentials.password
+                : initPassword,
             label: secretProps.label,
             username: secretProps.loginCredentials.username
           }}
@@ -409,7 +420,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             )
           }}
         </Formik>
-
+        {/* TODO generator is broken for settings */}
         <Tooltip label="Password generator">
           <IconButton
             w="min-content"
@@ -419,7 +430,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             m={3}
           />
         </Tooltip>
-        <PasswordGenerator isOpen={isOpen} />
+        <PasswordGenerator isOpen={isOpen} setInitPassword={setInitPassword} />
       </Flex>
     </motion.div>
   )
