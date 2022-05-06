@@ -40,6 +40,7 @@ export const tokenRefresh = new TokenRefreshLink({
     setAccessToken(accessToken)
   },
   handleError: async (err) => {
+    console.log('PEPA')
     console.warn('Your refresh token is invalid. You must login again', err)
     await removeToken()
     await device.clearLocalStorage()
