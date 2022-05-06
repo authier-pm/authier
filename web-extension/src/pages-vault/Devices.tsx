@@ -37,16 +37,16 @@ import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
-
-import { formatDistance, formatRelative, intlFormat } from 'date-fns'
-import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
-import { device } from '@src/background/ExtensionDevice'
-import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
 import {
   useApproveChallengeMutation,
   useDevicesPageQuery,
   useRejectChallengeMutation
-} from './Device.codegen'
+} from './Devices.codegen'
+import { formatDistance, formatRelative, intlFormat } from 'date-fns'
+import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
+import { device } from '@src/background/ExtensionDevice'
+import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
+
 
 interface configValues {
   lockTime: number

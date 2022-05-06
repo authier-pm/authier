@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
 import fastifyHelmet from 'fastify-helmet'
-import fastifyCors from 'fastify-cors'
+import fastifyCors from '@fastify/cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
