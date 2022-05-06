@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "jsx": "react-jsx",
-    "jsxImportSource": "preact",
+    "jsx": "react",
+    "jsxFactory": "h",
+    "jsxFragmentFactory": "Fragment",
     "module": "commonjs",
     "moduleResolution": "node",
     "strict": true,

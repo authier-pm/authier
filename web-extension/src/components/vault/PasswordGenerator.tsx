@@ -23,13 +23,12 @@ interface Values {
   length: number
 }
 
-export const PasswordGenerator = ({
-  isOpen,
-  setInitPassword
-}: {
-  isOpen: boolean
-  setInitPassword: (password: string) => void
-}) => {
+export const PasswordGenerator = ({ isOpen }: { isOpen: boolean }) => {
+  const [generatedPsw, setGeneratedPsw] = useState<string>('')
+  const handleChangeGeneratedPassword = (event: any) => {
+    setGeneratedPsw(event.target.value)
+  }
+
   return (
     <Collapse in={isOpen} animateOpacity>
       <Flex
@@ -38,6 +37,12 @@ export const PasswordGenerator = ({
         alignItems="center"
         m={2}
       >
+        <Input
+          value={generatedPsw}
+          onChange={handleChangeGeneratedPassword}
+          placeholder="Generated password"
+        />
+
         <Formik
           initialValues={{
             numbers: false,
@@ -50,11 +55,11 @@ export const PasswordGenerator = ({
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
           ) => {
-            setInitPassword(generate({ ...values }))
+            setGeneratedPsw(generate({ ...values }))
             setSubmitting(false)
           }}
         >
-          {({ isSubmitting }) => (
+          {(props) => (
             <Form>
               <Flex justifyContent="center" flexDirection="column">
                 <HStack>
@@ -125,7 +130,7 @@ export const PasswordGenerator = ({
                   alignSelf="center"
                   mt={4}
                   colorScheme="teal"
-                  isLoading={isSubmitting}
+                  isLoading={props.isSubmitting}
                   type="submit"
                 >
                   Generate

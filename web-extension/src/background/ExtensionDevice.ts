@@ -103,7 +103,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   ) {
     log('storage changed', changes, areaName)
     if (areaName === 'local' && changes.backgroundState) {
-      Object.assign(device.state, changes.backgroundState.newValue)
+      Object.assign(this, changes.backgroundState.newValue)
     }
   }
 
@@ -136,6 +136,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
+
   }
 
   getSecretDecryptedById(id: string) {
@@ -357,21 +358,31 @@ class ExtensionDevice {
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
+    if (isRunningInBgPage) {
+      browser.idle.setDetectionInterval(30)
+      console.log('~ device initialized, locking test45', isRunningInBgPage)
+      browser.idle.onStateChanged.addListener((state) => {
+        console.log('~ state', state)
+        if (state !== 'active') {
+          this.lock()
+        }
+      })
+    }
   }
 
   private listenForUserLogin() {
     this.state = null
-    const onStorageChangeLogin = (
+    const onStorageChange = (
       changes: Record<string, browser.Storage.StorageChange>,
       areaName: string
     ) => {
-      log('storage change UL', changes, areaName)
+      log('storage changed', changes, areaName)
       if (areaName === 'local' && changes.backgroundState) {
         this.state = new DeviceState(changes.backgroundState.newValue)
-        browser.storage.onChanged.removeListener(onStorageChangeLogin)
+        browser.storage.onChanged.removeListener(onStorageChange)
       }
     }
-    browser.storage.onChanged.addListener(onStorageChangeLogin)
+    browser.storage.onChanged.addListener(onStorageChange)
   }
 
   rerenderViews() {

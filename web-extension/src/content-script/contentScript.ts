@@ -20,7 +20,6 @@ import {
   renderSaveCredentialsForm
 } from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
-import { renderLoginCredOption } from './renderLoginCredOption'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -82,17 +81,11 @@ export async function initInputWatch() {
     saveLoginModalsState,
     extensionDeviceReady,
     secretsForHost,
-    autofillEnabled,
-    webInputs
+    autofillEnabled
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
     return // no need to do anything-user locked out
-  }
-
-  if (secretsForHost.loginCredentials.length > 1) {
-    renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
-    return
   }
   const stopAutofillListener = autofill(stateInitRes)
 
@@ -109,7 +102,6 @@ export async function initInputWatch() {
   }
 
   const showSavePromptIfAppropriate = async () => {
-    console.log('showSavePromptIfAppropriate')
     if (promptDiv) {
       return
     }
@@ -137,10 +129,11 @@ export async function initInputWatch() {
     domRecorder.addInputEvent({
       element,
       eventType: 'submit',
-      kind: WebInputType.SUBMIT_BUTTON
+      kind: WebInputType.PASSWORD
     })
-
     showSavePromptIfAppropriate()
+
+    log(domRecorder)
   }
 
   const onInputRemoved = (input) => {
@@ -204,7 +197,7 @@ export async function initInputWatch() {
 
             form.addEventListener(
               'submit',
-              (ev) => {
+              () => {
                 onSubmit(form)
               },
               { once: true }
