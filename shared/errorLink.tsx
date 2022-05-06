@@ -9,7 +9,7 @@ import { device } from '@src/background/ExtensionDevice'
 export const errorLink = onError(
   ({ graphQLErrors, networkError, operation }) => {
     const isExtension = window.location.href.startsWith('chrome-extension')
-
+    //@ts-expect-error
     toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
 
     if (graphQLErrors) {
