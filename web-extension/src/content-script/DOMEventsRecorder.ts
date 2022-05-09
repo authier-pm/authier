@@ -56,6 +56,8 @@ export class DOMEventsRecorder {
   }
 
   addInputEvent(event: IInputRecord) {
+    console.log('adding input event', event)
+
     const existingEventIndex = this.capturedInputEvents.findIndex(
       ({ element }) => {
         return event.element === element

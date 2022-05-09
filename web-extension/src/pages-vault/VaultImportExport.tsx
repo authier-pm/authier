@@ -82,12 +82,18 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
           toast.error('failed to parse')
         }
         const mapped = mapCsvToLoginCredentials(results.data)
+
         // TODO add to device state
         const state = device.state as DeviceState
 
         let skipped = 0
         const toAdd: AddSecretInput = []
         for (const creds of mapped) {
+          // if (creds.loginCredential.username.length === 0) {
+          //   skipped++
+          //   break
+          // }
+
           let hostname
           try {
             hostname = new URL(creds.url).hostname

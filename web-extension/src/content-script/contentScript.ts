@@ -132,6 +132,8 @@ export async function initInputWatch() {
         })
         renderSaveCredentialsForm(fallbackUsernames[0], password)
       }
+    } else {
+      log('save DOM path')
     }
   }
 

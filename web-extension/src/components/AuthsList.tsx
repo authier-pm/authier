@@ -20,6 +20,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const stringSimilarity = require('string-similarity')
 
 import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
@@ -196,7 +198,13 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     if (!currentURL || !url) {
       return true
     }
-    return extractHostname(url) === extractHostname(currentURL)
+
+    return (
+      stringSimilarity.compareTwoStrings(
+        extractHostname(url),
+        extractHostname(currentURL)
+      ) > 0.5
+    )
   })
 
   const hasNoSecrets = deviceState.secrets.length === 0
