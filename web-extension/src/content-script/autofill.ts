@@ -48,6 +48,8 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
   enabled = true
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
+
+  // Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = () => {
     const filledElements = webInputs
       .filter(({ url }) =>
@@ -88,12 +90,54 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       })
       .filter((el) => !!el)
 
+    //If we dont know any webInput DOMpath and we can guess
+    //TODO save web inputs after succesfull login??
+    if (
+      webInputs.length === 0 &&
+      secretsForHost.loginCredentials.length === 1
+    ) {
+      const inputEls = document.body.querySelectorAll('input')
+      const inputElsArray = Array.from(inputEls)
+      log('test', inputElsArray)
+      inputElsArray.map((input, index, arr) => {
+        if (input.type === 'password') {
+          //Search for a username input
+          log('j', index)
+          for (let j = index - 1; j >= 0; j--) {
+            log('j', j)
+            if (arr[j].type !== 'hidden') {
+              log('found username input', arr[j])
+              autofillValueIntoInput(
+                arr[j],
+                secretsForHost.loginCredentials[0].loginCredentials.username
+              )
+              break
+            }
+          }
+
+          autofillValueIntoInput(
+            input,
+            secretsForHost.loginCredentials[0].loginCredentials.password
+          )
+
+          //Save DOM paths
+        }
+      })
+    }
+
+    //If input shows on loaded page
     bodyInputChangeEmitter.on('inputAdded', (input) => {
+      log('Pepa')
       const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
-      if (input.autocomplete === 'new-password') {
+      // For one input on page
+      if (
+        input.autocomplete === 'new-password' ||
+        (webInputs.length === 0 && input.type === 'password')
+      ) {
         autofillValueIntoInput(input, generate(passwordGenOptions))
       } else {
+        // More inputs on page
         if (input.type === 'password') {
           const passwordInputsOnPage = document.querySelectorAll(
             'input[type="password"]'
@@ -116,6 +160,7 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
     })
 
     if (!namePassSecret && !totpSecret) {
+      log('no secrets found for this host')
       return () => {}
     }
 
