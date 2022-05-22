@@ -68,7 +68,7 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 
 export async function initInputWatch() {
-  const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
+  let stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
   log('~ stateInitRes', stateInitRes)
@@ -113,6 +113,7 @@ export async function initInputWatch() {
   const showSavePromptIfAppropriate = async () => {
     console.log('showSavePromptIfAppropriate')
     if (promptDiv) {
+      console.log('not promptDiv')
       return
     }
     const username = domRecorder.getUsername()
@@ -132,7 +133,17 @@ export async function initInputWatch() {
         })
         renderSaveCredentialsForm(fallbackUsernames[0], password)
       }
-    } else {
+    } else if (webInputs.length === 0) {
+      //Save domPaths for already known credentials
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.saveCapturedInputEvents,
+        payload: domRecorder.toJSON()
+      })
+
+      stateInitRes = await browser.runtime.sendMessage({
+        action: BackgroundMessageType.getContentScriptInitialState
+      })
+
       log('save DOM path')
     }
   }
@@ -143,7 +154,7 @@ export async function initInputWatch() {
       eventType: 'submit',
       kind: WebInputType.SUBMIT_BUTTON
     })
-
+    log('records', domRecorder.capturedInputEvents)
     showSavePromptIfAppropriate()
   }
 
