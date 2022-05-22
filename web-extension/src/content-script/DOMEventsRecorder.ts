@@ -72,11 +72,6 @@ export class DOMEventsRecorder {
     if (this.capturedInputEvents.length > 10) {
       this.capturedInputEvents.shift() // we don't need more than 10 events
     }
-
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: this.toJSON()
-    })
   }
 
   toJSON() {

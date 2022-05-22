@@ -5,7 +5,7 @@ import debug from 'debug'
 import { generate } from 'generate-password'
 let stringSimilarity = require('string-similarity')
 import { isElementInViewport, isHidden } from './isElementInViewport'
-import { IInitStateRes } from './contentScript'
+import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
@@ -32,6 +32,7 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
       cancelable: true
     })
   )
+
   return element
 }
 
@@ -102,15 +103,21 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       inputElsArray.map((input, index, arr) => {
         if (input.type === 'password') {
           //Search for a username input
-          log('j', index)
           for (let j = index - 1; j >= 0; j--) {
-            log('j', j)
             if (arr[j].type !== 'hidden') {
               log('found username input', arr[j])
               autofillValueIntoInput(
                 arr[j],
                 secretsForHost.loginCredentials[0].loginCredentials.username
               )
+
+              domRecorder.addInputEvent({
+                element: arr[j],
+                eventType: 'input',
+                inputted:
+                  secretsForHost.loginCredentials[0].loginCredentials.username,
+                kind: WebInputType.USERNAME
+              })
               break
             }
           }
@@ -119,15 +126,13 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
             input,
             secretsForHost.loginCredentials[0].loginCredentials.password
           )
-
-          //Save DOM paths
         }
       })
     }
 
     //If input shows on loaded page
     bodyInputChangeEmitter.on('inputAdded', (input) => {
-      log('Pepa')
+      log('Autofilled')
       const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
       // For one input on page
