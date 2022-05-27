@@ -7,7 +7,7 @@ import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
 
-import cookie, { FastifyCookieOptions } from 'fastify-cookie'
+import cookie, { FastifyCookieOptions } from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'
 import {
   jwtPayloadRefreshToken,
@@ -56,6 +56,11 @@ async function main() {
   })
 
   app.register(fastifyCors)
+  app.register(cookie, {
+    secret: process.env.COOKIE_SECRET, // for cookies signature
+    parseOptions: {} // options for parsing cookies
+  } as FastifyCookieOptions)
+
   // const trustedDomains = ['https://unpkg.com']
 
   // app.register(fastifyHelmet, {
@@ -129,11 +134,6 @@ async function main() {
       accessToken
     })
   })
-
-  app.register(cookie, {
-    secret: process.env.COOKIE_SECRET, // for cookies signature
-    parseOptions: {} // options for parsing cookies
-  } as FastifyCookieOptions)
 
   app.register(mercurius, {
     // errorHandler: (err, ctx) => {
