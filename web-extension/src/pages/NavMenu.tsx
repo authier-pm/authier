@@ -17,17 +17,10 @@ export const NavMenu: FunctionComponent = () => {
             <Button colorScheme="teal">Secrets</Button>
           </Link>
           <AddTOTPSecretButton />
-          <Link to="/settings">
-            <Button colorScheme="blue">Settings</Button>
-          </Link>
         </Stack>
       </ButtonGroup>
       <ButtonGroup spacing={4} variant="solid" m="10px">
         <Stack direction="column">
-          <Link to="/devices">
-            <Button>My devices</Button>
-          </Link>
-
           <Link to="/about">
             <Button leftIcon={<InfoOutlineIcon />}>About</Button>
           </Link>

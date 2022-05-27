@@ -224,7 +224,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
 
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
-
+  const [initPassword, setInitPassword] = useState('')
+  console.log(initPassword)
   const [updateSecret] = useUpdateEncryptedSecretMutation()
 
   return (
@@ -250,9 +251,13 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
+          enableReinitialize
           initialValues={{
             url: secretProps.url,
-            password: secretProps.loginCredentials.password,
+            password:
+              initPassword === ''
+                ? secretProps.loginCredentials.password
+                : initPassword,
             label: secretProps.label,
             username: secretProps.loginCredentials.username
           }}
@@ -415,7 +420,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             )
           }}
         </Formik>
-
+        {/* TODO generator is broken for settings */}
         <Tooltip label="Password generator">
           <IconButton
             w="min-content"
@@ -425,7 +430,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             m={3}
           />
         </Tooltip>
-        <PasswordGenerator isOpen={isOpen} />
+        <PasswordGenerator isOpen={isOpen} setInitPassword={setInitPassword} />
       </Flex>
     </motion.div>
   )
