@@ -59,7 +59,7 @@ export const PromptPassword = ({
       password,
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault,
-      url: inputEvents.url
+      url: inputEvents.inputsUrl ? inputEvents.inputsUrl : ''
     }
 
     return chrome.runtime.sendMessage(

@@ -89,11 +89,6 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
         let skipped = 0
         const toAdd: AddSecretInput = []
         for (const creds of mapped) {
-          // if (creds.loginCredential.username.length === 0) {
-          //   skipped++
-          //   break
-          // }
-
           let hostname
           try {
             hostname = new URL(creds.url).hostname

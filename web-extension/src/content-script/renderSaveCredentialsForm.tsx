@@ -1,10 +1,7 @@
 // @ts-nocheck
-
 import { PromptPassword } from './components/PromptPassword'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
-import { domRecorder } from './contentScript'
-
 import { h, render } from 'preact'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -19,7 +16,7 @@ export async function renderSaveCredentialsForm(
   const inputEvents = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getCapturedInputEvents
   })
-
+  console.log('Events', inputEvents)
   promptDiv = document.createElement('div')
   render(
     <PromptPassword
