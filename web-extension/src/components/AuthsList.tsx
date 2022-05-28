@@ -42,30 +42,21 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
-  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
 
   return (
-    <Box boxShadow="xl" p="4" rounded="md" bg="white" m={2}>
-      <Stat>
-        <Flex justify="flex-start" align="center">
+    <Box
+      p="3"
+      rounded="md"
+      bg={useColorModeValue('gray.100', 'gray.700')}
+      minW="300px"
+    >
+      <Stat maxW="100%">
+        <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
-            <IconButton
-              colorScheme="teal"
-              aria-label="Edit secret"
-              icon={<EditIcon />}
-              size="sm"
-              variant="link"
-              position="absolute"
-              zIndex="overlay"
-              top={-1}
-              left={-15}
-              onClick={() => setIsOpen(true)}
-            />
-
             <SecretItemIcon {...totpData}></SecretItemIcon>
           </Flex>
           <Box ml={4} mr="auto">

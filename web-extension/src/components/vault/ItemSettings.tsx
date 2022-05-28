@@ -63,12 +63,14 @@ const TOTPSecret = (data: ITOTPSecret) => {
       transition={{ duration: 0.25 }}
     >
       <Flex
-        width={'100%'}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
+        m="auto"
+        alignItems={'center'}
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
@@ -108,7 +110,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
           }}
         >
           {({ isSubmitting, dirty }) => (
-            <Flex as={Form} p={5} flexDirection="column">
+            <Flex as={Form} width={'80%'} flexDirection="column">
               <Field name="url">
                 {({ field, form }) => (
                   <FormControl
@@ -240,7 +242,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '50%' }}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -298,7 +300,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           {({ values, isSubmitting, dirty }) => {
             const levelOfPsw = passwordStrength(values.password)
             return (
-              <Flex as={Form} p={5} flexDirection="column" w="inherit">
+              <Flex as={Form} flexDirection="column" width={'80%'}>
                 <Field name="url">
                   {({ field, form }) => (
                     <FormControl

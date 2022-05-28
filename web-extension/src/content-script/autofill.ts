@@ -132,7 +132,7 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
 
     //If input shows on loaded page
     bodyInputChangeEmitter.on('inputAdded', (input) => {
-      log('Autofilled')
+      log('inputed added')
       const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
       // For one input on page

@@ -151,7 +151,6 @@ export function useDeviceState() {
           }
         }
       })
-
       return creds
     },
     get TOTPSecrets() {
