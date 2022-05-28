@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-empty-function */
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
@@ -132,7 +133,6 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
 
     //If input shows on loaded page
     bodyInputChangeEmitter.on('inputAdded', (input) => {
-      log('inputed added')
       const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
       // For one input on page
@@ -165,7 +165,6 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
     })
 
     if (!namePassSecret && !totpSecret) {
-      log('no secrets found for this host')
       return () => {}
     }
 
@@ -186,7 +185,7 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
           cancelable: true
         })
         if (form.submit instanceof HTMLElement) {
-          // @ts-expect-error
+          // @ts-expect-error TODO
           form.submit.dispatchEvent(clickEvent)
         }
         // TODO show notification

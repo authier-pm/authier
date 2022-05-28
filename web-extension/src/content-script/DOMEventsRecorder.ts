@@ -56,8 +56,7 @@ export class DOMEventsRecorder {
   }
 
   addInputEvent(event: IInputRecord) {
-    console.log('adding input event', event)
-
+    console.log('addInputEvent', event)
     const existingEventIndex = this.capturedInputEvents.findIndex(
       ({ element }) => {
         return event.element === element
@@ -72,6 +71,11 @@ export class DOMEventsRecorder {
     if (this.capturedInputEvents.length > 10) {
       this.capturedInputEvents.shift() // we don't need more than 10 events
     }
+
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: { inputEvents: this.toJSON(), url: document.documentURI }
+    })
   }
 
   toJSON() {

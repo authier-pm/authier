@@ -154,6 +154,7 @@ export async function initInputWatch() {
       eventType: 'submit',
       kind: WebInputType.SUBMIT_BUTTON
     })
+
     log('records', domRecorder.capturedInputEvents)
     showSavePromptIfAppropriate()
   }
@@ -205,7 +206,6 @@ export async function initInputWatch() {
           })
         }
 
-        log('inputRecord', inputRecord)
         if (targetElement.type === 'password') {
           log('password inputted', inputted)
 
