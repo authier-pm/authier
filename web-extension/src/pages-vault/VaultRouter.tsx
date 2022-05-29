@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { ItemList } from '@src/pages-vault/ItemList'
-import { Route, Switch, useHistory } from 'react-router-dom'
+import { Route, Routes, useNavigate } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 import { device } from '@src/background/ExtensionDevice'
 import Login from '@src/pages-vault/Login'
-import { Box, Center } from '@chakra-ui/react'
+import { Center } from '@chakra-ui/react'
 import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
@@ -15,66 +15,37 @@ import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { AddItem } from './AddItem'
 
 export function VaultRouter() {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (device.lockedState) {
-      history.push('/verify')
+      navigate('/verify')
     }
   }, [device.lockedState])
 
   if (device.state === null) {
     return (
       <Center marginX="50%" h="100vh">
-        <Switch>
-          <Route path="/" exact>
-            <Login />
-          </Route>
-          <Route path="/signup">
-            <Register />
-          </Route>
-          <Route path="/verify">
-            <VaultUnlockVerification />
-          </Route>
-        </Switch>
+        <Routes>
+          <Route path="/" element={<Login />}></Route>
+          <Route path="/signup" element={<Register />}></Route>
+          <Route path="/verify" element={<VaultUnlockVerification />}></Route>
+        </Routes>
       </Center>
     )
   }
   return (
     <SidebarWithHeader>
-      <Switch>
-        <Route exact path="/">
-          <ItemList />
-        </Route>
-        <Route
-          path="/secret/:secretId"
-          // eslint-disable-next-line react/no-children-prop
-          children={({ match }) => (
-            <VaultItemSettings secretId={match?.params.secretId as string} />
-          )}
-        />
-        <Route path="/account-limits">
-          <Premium />
-        </Route>
-        <Route path="/settings">
-          <VaultSettings />
-        </Route>
-        <Route path="/devices">
-          <Devices />
-        </Route>
-        <Route path="/import-export">
-          <VaultImportExport />
-        </Route>
-        <Route path="/addItem">
-          <AddItem />
-        </Route>
-        <Route path="/devices">
-          <Devices />
-        </Route>
-        <Route path="/settings">
-          <VaultSettings />
-        </Route>
-      </Switch>
+      <Routes>
+        <Route path="/" element={<ItemList />}></Route>
+        <Route path="/secret/:secretId" element={<VaultItemSettings />} />
+        <Route path="/account-limits" element={<Premium />}></Route>
+        <Route path="/settings/*" element={<VaultSettings />}></Route>
+        <Route path="/devices" element={<Devices />}></Route>
+        <Route path="/import-export" element={<VaultImportExport />}></Route>
+        <Route path="/addItem" element={<AddItem />}></Route>
+        <Route path="/devices" element={<Devices />}></Route>
+      </Routes>
     </SidebarWithHeader>
   )
 }
