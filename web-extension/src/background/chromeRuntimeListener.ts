@@ -137,7 +137,7 @@ browser.runtime.onMessage.addListener(async function (
       return { failed: false }
 
     case BackgroundMessageType.saveCapturedInputEvents:
-      console.log('TEST', req.payload)
+      console.log('~ saveCapturedInputEvents', req.payload)
       capturedInputEvents = req.payload.inputEvents
       inputsUrl = req.payload.url
 
