@@ -1,29 +1,33 @@
 import * as Sentry from '@sentry/browser'
 
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
+
 import browser from 'webextension-polyfill'
 import { ApolloProvider } from '@apollo/client'
 import App from './App'
 import { apolloClient } from './apollo/apolloClient'
-import { HashRouter, BrowserRouter } from 'react-router-dom'
-import { BackgroundMessageType } from './background/BackgroundMessageType'
+import { HashRouter } from 'react-router-dom'
 
 Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
 })
 
+let vaultRoot
 export const renderVault = () => {
-  const vaultRoot = document.getElementById('vault')
-
-  ReactDOM.render(
+  vaultRoot.render(
     <HashRouter basename="/">
       <ApolloProvider client={apolloClient}>
         <App parent={'vault'} />
       </ApolloProvider>
-    </HashRouter>,
-    vaultRoot
+    </HashRouter>
   )
 }
 
-browser.tabs.query({ active: true, currentWindow: true }).then(renderVault)
+browser.tabs.query({ active: true, currentWindow: true }).then(() => {
+  vaultRoot = ReactDOM.createRoot(
+    document.getElementById('vault') as HTMLElement
+  )
+
+  renderVault()
+})

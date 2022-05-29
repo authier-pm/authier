@@ -1,9 +1,5 @@
 import {
-  Box,
-  Center,
-  Heading,
   Stack,
-  useColorModeValue,
   Button,
   Flex,
   Input,
@@ -12,29 +8,17 @@ import {
   Progress,
   IconButton,
   useDisclosure,
-  SimpleGrid,
-  Spinner,
-  Alert,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Tooltip,
-  Select
+  Tooltip
 } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React, { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
-import {
-  Field,
-  Form,
-  Formik,
-  FormikHelpers,
-  useField,
-  useFormikContext
-} from 'formik'
-import { motion } from 'framer-motion'
+import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { device } from '@src/background/ExtensionDevice'
 
@@ -49,7 +33,8 @@ interface LoginParsedValues {
 }
 
 export const AddLogin = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const [show, setShow] = useState(false)
   const [initPassword, setInitPassword] = useState('')
 
@@ -89,7 +74,7 @@ export const AddLogin = () => {
           ])
 
           setSubmitting(false)
-          history.goBack()
+          navigate(-1)
         }}
       >
         {({ values, isSubmitting, dirty }) => {
@@ -182,7 +167,7 @@ export const AddLogin = () => {
                   }}
                   fontSize={'sm'}
                   size="sm"
-                  onClick={() => history.push('/')}
+                  onClick={() => navigate('/')}
                 >
                   Go back
                 </Button>

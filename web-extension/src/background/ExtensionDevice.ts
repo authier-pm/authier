@@ -93,7 +93,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = ms('1s')
+  lockTime = ms('30m')
   authSecret: string
   authSecretEncrypted: string
 
@@ -102,7 +102,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     areaName: string
   ) {
     log('storage changed', changes, areaName)
-    if (areaName === 'local' && changes.backgroundState) {
+    if (areaName === 'local' && changes.backgroundState && device.state) {
       Object.assign(device.state, changes.backgroundState.newValue)
     }
   }

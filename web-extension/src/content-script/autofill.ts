@@ -4,7 +4,7 @@ import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-let stringSimilarity = require('string-similarity')
+import stringSimilarity from 'string-similarity'
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
@@ -25,7 +25,7 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
   }
 
-  element.style.borderColor = authierColors.green[400]
+  element.style.backgroundColor = authierColors.green[400]
   element.value = value
   element.dispatchEvent(
     new Event('input', {
@@ -55,7 +55,7 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
   const scanKnownWebInputsAndFillWhenFound = () => {
     const filledElements = webInputs
       .filter(({ url }) =>
-        stringSimilarity.compareTwoStrings(url, location.href) > 0.5
+        stringSimilarity.compareTwoStrings(url, location.href) > 0.5 // TODO change this to match TLD domain
           ? true
           : false
       )
