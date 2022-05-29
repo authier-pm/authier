@@ -93,15 +93,14 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       .filter((el) => !!el)
 
     //If we dont know any webInput DOMpath and we can guess
-    //TODO save web inputs after succesfull login??
     if (
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
       const inputEls = document.body.querySelectorAll('input')
       const inputElsArray = Array.from(inputEls)
-      log('test', inputElsArray)
-      inputElsArray.map((input, index, arr) => {
+
+      inputElsArray.every((input, index, arr) => {
         if (input.type === 'password') {
           //Search for a username input
           for (let j = index - 1; j >= 0; j--) {
@@ -119,15 +118,25 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
                   secretsForHost.loginCredentials[0].loginCredentials.username,
                 kind: WebInputType.USERNAME
               })
+
+              autofillValueIntoInput(
+                input,
+                secretsForHost.loginCredentials[0].loginCredentials.password
+              )
+              domRecorder.addInputEvent({
+                element: input,
+                eventType: 'input',
+                inputted:
+                  secretsForHost.loginCredentials[0].loginCredentials.password,
+                kind: WebInputType.PASSWORD
+              })
+
               break
             }
           }
-
-          autofillValueIntoInput(
-            input,
-            secretsForHost.loginCredentials[0].loginCredentials.password
-          )
+          return false
         }
+        return true
       })
     }
 

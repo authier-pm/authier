@@ -66,9 +66,9 @@ export function getWebInputKind(
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-
+let stateInitRes: IInitStateRes
 export async function initInputWatch() {
-  let stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
+  stateInitRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
   log('~ stateInitRes', stateInitRes)
@@ -135,16 +135,12 @@ export async function initInputWatch() {
       }
     } else if (webInputs.length === 0) {
       //Save domPaths for already known credentials
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.saveCapturedInputEvents,
-        payload: domRecorder.toJSON()
-      })
 
       stateInitRes = await browser.runtime.sendMessage({
         action: BackgroundMessageType.getContentScriptInitialState
       })
 
-      log('save DOM path')
+      log('save DOM path', stateInitRes.webInputs)
     }
   }
 
@@ -155,7 +151,11 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
-    log('records', domRecorder.capturedInputEvents)
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: { inputEvents: domRecorder.toJSON(), url: document.documentURI }
+    })
+
     showSavePromptIfAppropriate()
   }
 

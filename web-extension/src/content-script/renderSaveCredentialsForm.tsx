@@ -16,7 +16,7 @@ export async function renderSaveCredentialsForm(
   const inputEvents = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getCapturedInputEvents
   })
-  console.log('Events', inputEvents)
+
   promptDiv = document.createElement('div')
   render(
     <PromptPassword

@@ -34,7 +34,6 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
-        //maxW={'250px'}
         w="250px"
         h="auto"
         bg={useColorModeValue('white', 'gray.900')}
