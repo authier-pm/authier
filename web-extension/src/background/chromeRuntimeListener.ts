@@ -199,6 +199,7 @@ browser.runtime.onMessage.addListener(async function (
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
+        //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
         return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
