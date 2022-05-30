@@ -136,11 +136,15 @@ export async function initInputWatch() {
     } else if (webInputs.length === 0) {
       //Save domPaths for already known credentials
 
-      stateInitRes = await browser.runtime.sendMessage({
-        action: BackgroundMessageType.getContentScriptInitialState
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.saveCapturedInputEvents,
+        payload: {
+          inputEvents: domRecorder.toJSON(),
+          url: document.documentURI
+        }
       })
 
-      log('save DOM path', stateInitRes.webInputs)
+      log('save DOM paths')
     }
   }
 
@@ -149,11 +153,6 @@ export async function initInputWatch() {
       element,
       eventType: 'submit',
       kind: WebInputType.SUBMIT_BUTTON
-    })
-
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: { inputEvents: domRecorder.toJSON(), url: document.documentURI }
     })
 
     showSavePromptIfAppropriate()

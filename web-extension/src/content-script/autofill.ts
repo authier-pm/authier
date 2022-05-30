@@ -37,6 +37,22 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
   return element
 }
 
+const uselessInputTypes = [
+  'hidden',
+  'submit',
+  'button',
+  'reset',
+  'button',
+  'checkbox',
+  'radio',
+  'file',
+  'color',
+  'image',
+  'range',
+  'search',
+  'time'
+]
+
 export let enabled = false
 export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
   const { secretsForHost, webInputs } = initState
@@ -53,6 +69,20 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
 
   // Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = () => {
+    //Distinguish between register and login from by the number of inputs
+    //Then Distinguish between phased and not phased
+
+    const usefullInputs = Array.from(
+      document.body.querySelectorAll('input')
+    ).filter(
+      (el) => uselessInputTypes.find((type) => type === el.type) === undefined
+    )
+
+    if (usefullInputs.length > 2) {
+      // Autofill register form
+    }
+
+    //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) =>
         stringSimilarity.compareTwoStrings(url, location.href) > 0.5 // TODO change this to match TLD domain
@@ -92,13 +122,15 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       })
       .filter((el) => !!el)
 
-    //If we dont know any webInput DOMpath and we can guess
+    //Guess web input, if you have credentials
     if (
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
       const inputEls = document.body.querySelectorAll('input')
-      const inputElsArray = Array.from(inputEls)
+      const inputElsArray: HTMLInputElement[] = Array.from(
+        inputEls
+      ) as HTMLInputElement[]
 
       inputElsArray.every((input, index, arr) => {
         if (input.type === 'password') {
