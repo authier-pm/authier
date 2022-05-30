@@ -1,4 +1,3 @@
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { getUserFromToken } from '@src/util/accessTokenExtension'
 import cryptoJS from 'crypto-js'
 
@@ -7,12 +6,9 @@ import React, {
   createContext,
   Dispatch,
   SetStateAction,
-  FunctionComponent,
-  useEffect,
-  useContext
+  useEffect
 } from 'react'
 import browser from 'webextension-polyfill'
-import { DeviceStateContext } from './DeviceStateProvider'
 const { AES, enc } = cryptoJS
 
 export type IUserContext = {
@@ -23,7 +19,7 @@ export type IUserContext = {
 
 export const UserContext = createContext<IUserContext>({} as any)
 
-export const UserProvider: FunctionComponent = ({ children }) => {
+export const UserProvider = ({ children }: { children: JSX.Element }) => {
   const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
 

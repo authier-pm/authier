@@ -21,7 +21,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import {
   ArrowForwardIcon,
@@ -51,7 +51,8 @@ interface totpValues {
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
 
@@ -179,7 +180,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
                   }}
                   fontSize={'sm'}
                   size="sm"
-                  onClick={() => history.goBack()}
+                  onClick={() => navigate(-1)}
                 >
                   Go back
                 </Button>
@@ -221,7 +222,8 @@ interface LoginParsedValues {
 }
 
 const LoginSecret = (secretProps: ILoginSecret) => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const [show, setShow] = useState(false)
 
   const { isOpen, onToggle } = useDisclosure()
@@ -392,7 +394,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                     }}
                     fontSize={'sm'}
                     size="sm"
-                    onClick={() => history.goBack()}
+                    onClick={() => navigate(-1)}
                   >
                     Go back
                   </Button>
@@ -438,12 +440,14 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   )
 }
 
-export const VaultItemSettings = ({ secretId }: { secretId: string }) => {
+export const VaultItemSettings = () => {
+  const params = useParams()
+
   if (!device.state) {
     return <Spinner></Spinner>
   }
 
-  const secret = device.state.getSecretDecryptedById(secretId)
+  const secret = device.state.getSecretDecryptedById(params.secretId as string)
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }
