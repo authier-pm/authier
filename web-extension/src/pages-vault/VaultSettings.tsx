@@ -9,13 +9,13 @@ import {
 import {
   Link as RouterLink,
   Route,
-  Switch,
-  useRouteMatch,
-  useLocation
+  useLocation,
+  Routes,
+  useMatch
 } from 'react-router-dom'
 import React, { useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
-import Config from '@src/components/vault/settings/Config'
+import VaultConfig from '@src/components/vault/settings/VaultConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface LinkItemProps {
@@ -58,7 +58,7 @@ const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
 }
 
 export const VaultSettings = () => {
-  const { url } = useRouteMatch()
+  // const { url } = useMatch('/secret/:secretId')
   const location = useLocation()
   const [selectedTab, setSelectedTab] = useState(LinkItems[0])
 
@@ -84,21 +84,17 @@ export const VaultSettings = () => {
               selected={selectedTab}
               handleClick={handleClick}
               name={link.name}
-              url={url}
+              url={'/settings'}
             />
           )
         })}
       </HStack>
 
       <AnimatePresence exitBeforeEnter>
-        <Switch location={location} key={location.pathname}>
-          <Route exact path={'/settings/account'}>
-            <Account />
-          </Route>
-          <Route path={'/settings/config'}>
-            <Config />
-          </Route>
-        </Switch>
+        <Routes key={location.pathname}>
+          <Route path={'/account'} element={<Account />}></Route>
+          <Route path={'/config'} element={<VaultConfig />}></Route>
+        </Routes>
       </AnimatePresence>
     </Flex>
   )

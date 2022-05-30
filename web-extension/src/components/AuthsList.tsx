@@ -125,7 +125,6 @@ const LoginCredentialsListItem = ({
         p="3"
         rounded="md"
         bg={useColorModeValue('gray.100', 'gray.700')}
-        minW="300px"
       >
         <Stat maxW="100%">
           <Flex justify="space-between" align="center" w="100%">

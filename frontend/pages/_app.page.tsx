@@ -4,10 +4,10 @@ import React from 'react'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { apolloClient } from '../graphql/apolloClient'
 import { ChakraLayout } from './layout/ChakraLayout'
-import { ToastContainer } from 'react-toastify'
+import { ToastContainer, ToastTransitionProps } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
   const router = useRouter()
   if (!router.isReady) {
     // A necessary hack as `const { appId } = router.query` is undefined on first render
@@ -17,7 +17,10 @@ function MyApp({ Component, pageProps }) {
   return (
     <ApolloProvider client={apolloClient}>
       <ChakraLayout>
-        <ToastContainer {...toastifyConfig('bottom-right')} />
+        {/* @ts-expect-error */}
+        <ToastContainer
+          {...(toastifyConfig('bottom-right') as ToastTransitionProps)}
+        />
 
         <Component {...pageProps} />
       </ChakraLayout>
