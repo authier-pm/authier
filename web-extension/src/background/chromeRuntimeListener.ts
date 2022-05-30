@@ -54,6 +54,7 @@ let capturedInputEvents: {
   kind: WebInputType
   inputted: string | undefined
 }[] = []
+
 //This is for saving URL of inputs
 let inputsUrl: string
 
@@ -111,7 +112,6 @@ browser.runtime.onMessage.addListener(async function (
       }
 
       tab.id && saveLoginModalsStates.delete(tab.id)
-
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
           domPath: captured.element,
@@ -137,7 +137,6 @@ browser.runtime.onMessage.addListener(async function (
       return { failed: false }
 
     case BackgroundMessageType.saveCapturedInputEvents:
-      console.log('~ saveCapturedInputEvents', req.payload)
       capturedInputEvents = req.payload.inputEvents
       inputsUrl = req.payload.url
 
@@ -149,6 +148,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       })
 
+      //Update web inputs in DB
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
@@ -159,7 +159,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       })
 
-      console.log('SAVED', capturedInputEvents)
+      console.log('SAVED webinuts in DB', capturedInputEvents)
       break
 
     case BackgroundMessageType.addTOTPSecret:

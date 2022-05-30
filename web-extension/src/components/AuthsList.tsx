@@ -73,8 +73,11 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
 
                   await addOTPEvent({
                     variables: {
-                      kind: 'show OTP',
-                      url: url
+                      event: {
+                        kind: 'show OTP',
+                        url: url,
+                        secretId: totpData.id
+                      }
                     }
                   })
                   log(data, error)

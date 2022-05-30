@@ -17,6 +17,8 @@ export async function renderSaveCredentialsForm(
     action: BackgroundMessageType.getCapturedInputEvents
   })
 
+  //DEBUG EVENTS FOR NEW CREDENTIALS
+
   promptDiv = document.createElement('div')
   render(
     <PromptPassword
