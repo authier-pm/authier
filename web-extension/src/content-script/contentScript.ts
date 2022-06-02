@@ -21,6 +21,7 @@ import {
 } from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
 import { renderLoginCredOption } from './renderLoginCredOption'
+import { renderRecordingStart } from './renderRecordingStart'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -71,6 +72,16 @@ export async function initInputWatch() {
   stateInitRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
+
+  document.addEventListener('keydown', function (e) {
+    //Start recording
+    if (e.shiftKey && (e.key === 'c' || e.key === 'C')) {
+      console.log('Shift + C is pressed!')
+      renderRecordingStart()
+      e.preventDefault()
+    }
+  })
+
   log('~ stateInitRes', stateInitRes)
 
   if (!stateInitRes) {
