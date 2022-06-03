@@ -5,7 +5,7 @@ import { Toast } from './components/Toast'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
-export let promptDiv: HTMLDivElement | null
+export let recordDiv: HTMLDivElement | null
 
 export async function renderToast({
   header,
@@ -14,9 +14,9 @@ export async function renderToast({
   header: string
   text: string
 }) {
-  promptDiv = document.createElement('div')
-  console.log(promptDiv)
-  render(<Toast header={header} text={text} />, promptDiv)
+  recordDiv = document.createElement('div')
 
-  document.body.appendChild(promptDiv)
+  render(<Toast header={header} text={text} />, recordDiv)
+
+  document.body.appendChild(recordDiv)
 }

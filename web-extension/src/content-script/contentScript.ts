@@ -21,7 +21,7 @@ import {
 } from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
 import { renderLoginCredOption } from './renderLoginCredOption'
-import { renderToast } from './renderToast'
+import { recordDiv, renderToast } from './renderToast'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -64,7 +64,16 @@ export function getWebInputKind(
   )
 }
 
-let clickCount = 2
+let clickCount = 0
+let recording = false
+
+const hideToast = () => {
+  const x = document.getElementById('toast')
+
+  setTimeout(function () {
+    x?.remove()
+  }, 5000)
+}
 
 export const domRecorder = new DOMEventsRecorder()
 
@@ -75,28 +84,53 @@ export async function initInputWatch() {
     action: BackgroundMessageType.getContentScriptInitialState
   })
 
-  document.addEventListener('keydown', function (e) {
-    //Start recording
-    if (e.shiftKey && e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
-      console.log('Shift + C is pressed!')
+  document.addEventListener('keydown', onKeyDown)
+
+  function onKeyDown(e?: KeyboardEvent) {
+    if (
+      e &&
+      e.shiftKey &&
+      e.ctrlKey &&
+      (e.key === 'c' || e.key === 'C') &&
+      !recording
+    ) {
+      recording = true
       renderToast({
         header: 'Recording started',
         text: 'Press Ctrl + shift +C to stop'
       })
 
-      document.addEventListener(
-        'click',
-        function (e) {
-          e.preventDefault()
-          clickCount = clickCount + 1
-          e = e || window.event
-          console.log('click', e.target)
-        },
-        false
-      )
-      e.preventDefault()
+      document.addEventListener('click', clicked)
+    } else if (
+      e &&
+      e.shiftKey &&
+      e.ctrlKey &&
+      (e.key === 'c' || e.key === 'C') &&
+      recording
+    ) {
+      document.removeEventListener('click', clicked)
+      recordDiv?.remove()
+      clickCount = 0
+      recording = false
+      hideToast()
+      console.log('ended')
     }
-  })
+  }
+
+  function clicked(e) {
+    clickCount = clickCount + 1
+
+    if (clickCount === 2) {
+      recordDiv?.remove()
+      document.removeEventListener('click', clicked)
+      clickCount = 0
+      renderToast({
+        header: 'Recording ended',
+        text: 'Saved'
+      })
+      hideToast()
+    }
+  }
 
   log('~ stateInitRes', stateInitRes)
 
