@@ -1,23 +1,25 @@
 // @ts-nocheck
 import { h } from 'preact'
+import { useEffect } from 'preact/hooks'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Toast.css'
 
-export const Toast = () => {
-  console.log('popup')
-
+export const Toast = ({ header, text }: { header: string; text: string }) => {
   const x = document.getElementById('toast')
-  x.className = 'show'
-  setTimeout(function () {
-    x.className = x.className.replace('show', '')
-  }, 5000)
+
+  useEffect(() => {
+    x.className = 'show'
+    setTimeout(function () {
+      x.className = x.className.replace('show', '')
+    }, 5000)
+  }, [])
 
   return (
     <div id="toast">
-      <div id="img">Icon</div>
-      <div id="desc">A notification message..</div>
+      <div id="img">{header}</div>
+      <div id="desc">{text}</div>
     </div>
   )
 }

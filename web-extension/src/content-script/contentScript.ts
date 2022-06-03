@@ -21,7 +21,7 @@ import {
 } from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
 import { renderLoginCredOption } from './renderLoginCredOption'
-import { renderRecordingStart } from './renderRecordingStart'
+import { renderToast } from './renderToast'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -64,6 +64,8 @@ export function getWebInputKind(
   )
 }
 
+let clickCount = 2
+
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
@@ -75,9 +77,23 @@ export async function initInputWatch() {
 
   document.addEventListener('keydown', function (e) {
     //Start recording
-    if (e.shiftKey && (e.key === 'c' || e.key === 'C')) {
+    if (e.shiftKey && e.ctrlKey && (e.key === 'c' || e.key === 'C')) {
       console.log('Shift + C is pressed!')
-      renderRecordingStart()
+      renderToast({
+        header: 'Recording started',
+        text: 'Press Ctrl + shift +C to stop'
+      })
+
+      document.addEventListener(
+        'click',
+        function (e) {
+          e.preventDefault()
+          clickCount = clickCount + 1
+          e = e || window.event
+          console.log('click', e.target)
+        },
+        false
+      )
       e.preventDefault()
     }
   })

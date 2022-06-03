@@ -14,7 +14,7 @@
     left: 0;right:0;
     bottom: 30px;
     font-size: 17px;
-    white-space: nowrap;
+    /* white-space: nowrap; */
 }
 #toast #img{
 	width: 50px;
