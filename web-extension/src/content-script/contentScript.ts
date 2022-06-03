@@ -22,6 +22,7 @@ import {
 import { authenticator } from 'otplib'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import { recordDiv, renderToast } from './renderToast'
+import { renderItemPopup } from './renderItemPopup'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -60,7 +61,7 @@ export function getWebInputKind(
   return (
     (targetElement.type === 'password'
       ? WebInputType.PASSWORD
-      : inputKindMap[targetElement.autocomplete]) ?? null
+      : inputKindMap[targetElement.autocomplete]) ?? 'USERNAME_OR_EMAIL'
   )
 }
 
@@ -91,13 +92,13 @@ export async function initInputWatch() {
       e &&
       e.shiftKey &&
       e.ctrlKey &&
-      (e.key === 'c' || e.key === 'C') &&
+      (e.key === 'q' || e.key === 'Q') &&
       !recording
     ) {
       recording = true
       renderToast({
         header: 'Recording started',
-        text: 'Press Ctrl + shift +C to stop'
+        text: 'Press Ctrl + shift + Q to stop'
       })
 
       document.addEventListener('click', clicked)
@@ -105,30 +106,47 @@ export async function initInputWatch() {
       e &&
       e.shiftKey &&
       e.ctrlKey &&
-      (e.key === 'c' || e.key === 'C') &&
+      (e.key === 'q' || e.key === 'Q') &&
       recording
     ) {
+      domRecorder.clearCapturedEvents()
       document.removeEventListener('click', clicked)
       recordDiv?.remove()
       clickCount = 0
       recording = false
       hideToast()
-      console.log('ended')
     }
   }
 
-  function clicked(e) {
-    clickCount = clickCount + 1
+  function clicked(e: MouseEvent) {
+    console.log(e)
+
+    //@ts-expect-error TODO
+    if (e.target.type === 'password' || e.target.type === 'text') {
+      domRecorder.addInputEvent({
+        element: e.target as HTMLInputElement,
+        eventType: 'input',
+        kind: getWebInputKind(e.target as HTMLInputElement)
+      })
+
+      clickCount = clickCount + 1
+    }
 
     if (clickCount === 2) {
-      recordDiv?.remove()
-      document.removeEventListener('click', clicked)
-      clickCount = 0
-      renderToast({
-        header: 'Recording ended',
-        text: 'Saved'
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.saveCapturedInputEvents,
+        payload: {
+          inputEvents: domRecorder.toJSON(),
+          url: document.documentURI
+        }
       })
-      hideToast()
+
+      recordDiv?.remove()
+      recording = false
+      clickCount = 0
+      document.removeEventListener('click', clicked)
+
+      renderItemPopup()
     }
   }
 
@@ -194,18 +212,6 @@ export async function initInputWatch() {
         })
         renderSaveCredentialsForm(fallbackUsernames[0], password)
       }
-    } else if (webInputs.length === 0) {
-      //Save domPaths for already known credentials
-
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.saveCapturedInputEvents,
-        payload: {
-          inputEvents: domRecorder.toJSON(),
-          url: document.documentURI
-        }
-      })
-
-      log('save DOM paths')
     }
   }
 
@@ -214,6 +220,14 @@ export async function initInputWatch() {
       element,
       eventType: 'submit',
       kind: WebInputType.SUBMIT_BUTTON
+    })
+
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
     })
 
     showSavePromptIfAppropriate()
@@ -230,10 +244,11 @@ export async function initInputWatch() {
   const debouncedInputEventListener = debounce((ev) => {
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
+    console.log(domRecorder.toJSON().length)
     if (
-      (targetElement && isPasswordType) ||
-      targetElement.type === 'text' ||
-      targetElement.type === 'email'
+      (targetElement && isPasswordType && domRecorder.toJSON().length === 0) ||
+      (targetElement.type === 'text' && domRecorder.toJSON().length === 0) ||
+      (targetElement.type === 'email' && domRecorder.toJSON().length === 0)
     ) {
       const inputted = targetElement.value
       if (inputted) {
