@@ -137,4 +137,8 @@ export class DOMEventsRecorder {
     )
     return inputEvents[inputEvents.length - 1]?.inputted
   }
+
+  clearCapturedEvents() {
+    this.capturedInputEvents = []
+  }
 }

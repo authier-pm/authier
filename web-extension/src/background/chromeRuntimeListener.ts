@@ -159,7 +159,6 @@ browser.runtime.onMessage.addListener(async function (
         }
       })
 
-      console.log('SAVED webinuts in DB', capturedInputEvents)
       break
 
     case BackgroundMessageType.addTOTPSecret:
