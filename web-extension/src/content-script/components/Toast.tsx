@@ -7,13 +7,12 @@ const nano = h
 import './Toast.css'
 
 export const Toast = ({ header, text }: { header: string; text: string }) => {
-  const x = document.getElementById('toast')
-
   useEffect(() => {
+    const x = document.getElementById('toast')
     x.className = 'show'
-    setTimeout(function () {
-      x.className = x.className.replace('show', '')
-    }, 5000)
+    // setTimeout(function () {
+    //   x.className = x.className.replace('show', '')
+    // }, 5000)
   }, [])
 
   return (
