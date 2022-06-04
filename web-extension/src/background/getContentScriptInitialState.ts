@@ -21,7 +21,7 @@ export const getContentScriptInitialState = async (
   const decrypted =
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
-  const res = await getWebInputs(hostname)
+  const res = await getWebInputsMemoized(hostname)
   console.log('getWebInputs', res.data.webInputs)
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
@@ -41,12 +41,16 @@ export const getContentScriptInitialState = async (
   }
 }
 
-const getWebInputs = mem(
+const getWebInputsMemoized = mem(
   (hostname: string) => {
     return apolloClient.query<
       WebInputsForHostQuery,
       WebInputsForHostQueryVariables
-    >({ query: WebInputsForHostDocument, variables: { host: hostname } })
+    >({
+      query: WebInputsForHostDocument,
+      variables: { host: hostname },
+      fetchPolicy: 'network-only'
+    })
   },
   { maxAge: ms('2 days') }
 )
