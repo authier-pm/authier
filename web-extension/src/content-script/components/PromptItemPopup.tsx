@@ -20,6 +20,16 @@ export const PrompItemPopup = ({ inputEvents }: { inputEvents: any }) => {
       url: inputEvents.inputsUrl ? inputEvents.inputsUrl : ''
     }
 
+    //fill inputs
+    inputEvents.capturedInputEvents.forEach((element) => {
+      const input = document.body.querySelector(element.element)
+      if (input.type === 'password') {
+        input.value = password
+      } else {
+        input.value = username
+      }
+    })
+
     return chrome.runtime.sendMessage({
       action: BackgroundMessageType.addLoginCredentials,
       payload: loginCredentials

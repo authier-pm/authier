@@ -85,7 +85,11 @@ export async function initInputWatch() {
     action: BackgroundMessageType.getContentScriptInitialState
   })
 
-  document.addEventListener('keydown', onKeyDown)
+  log('~ stateInitRes', stateInitRes)
+
+  if (stateInitRes) {
+    document.addEventListener('keydown', onKeyDown)
+  }
 
   function onKeyDown(e?: KeyboardEvent) {
     if (
@@ -149,8 +153,6 @@ export async function initInputWatch() {
       renderItemPopup()
     }
   }
-
-  log('~ stateInitRes', stateInitRes)
 
   if (!stateInitRes) {
     log('no state')
