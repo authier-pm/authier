@@ -41,6 +41,7 @@ export const getContentScriptInitialState = async (
   }
 }
 
+// TODO stop using mem for this, we should be able to use the apollo cache
 const getWebInputs = mem(
   (hostname: string) => {
     return apolloClient.query<
