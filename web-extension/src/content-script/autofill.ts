@@ -127,7 +127,9 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
-      const inputEls = document.body.querySelectorAll('input')
+      const inputEls = document.body.querySelectorAll(
+        'input[type=text], input[type=tel], input[type=email], input[type=password]'
+      )
       const inputElsArray: HTMLInputElement[] = Array.from(
         inputEls
       ) as HTMLInputElement[]
