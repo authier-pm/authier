@@ -91,6 +91,11 @@ export class RootResolver {
     return user
   }
 
+  @Query(() => String)
+  osTime() {
+    return new Date().toISOString()
+  }
+
   @Query(() => Boolean, {
     description: 'you need to be authenticated to call this resolver'
   })
