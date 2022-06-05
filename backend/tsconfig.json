@@ -27,7 +27,8 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": true
+    "incremental": true,
+    "typeRoots": ["./node_modules/@types"]
   },
 
   "exclude": [
@@ -36,7 +37,8 @@
     "**/dist/**",
     "**/build/**",
     "./node_modules/*",
-    "./generated/typegraphql-prisma/resolvers/**/*"
+    "./generated/typegraphql-prisma/resolvers/**/*",
+    "cdk.out"
   ]
   // "include": ["**/*.ts", "**/*.tsx"]
 }
