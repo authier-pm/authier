@@ -27,8 +27,7 @@
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "isolatedModules": true,
-    "incremental": true,
-    "typeRoots": ["./node_modules/@types"]
+    "incremental": true
   },
 
   "exclude": [
