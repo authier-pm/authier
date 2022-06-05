@@ -1,8 +1,6 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
-import fastifyHelmet from 'fastify-helmet'
-import fastifyCors from '@fastify/cors'
-import underPressure from 'under-pressure'
+
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
@@ -54,35 +52,11 @@ app.setErrorHandler(async (error, request, reply) => {
   reply.status(500).send({ error: 'Something went wrong' })
 })
 
-app.register(fastifyCors)
 app.register(cookie, {
   secret: process.env.COOKIE_SECRET, // for cookies signature
   parseOptions: {} // options for parsing cookies
 } as FastifyCookieOptions)
 
-// const trustedDomains = ['https://unpkg.com']
-
-// app.register(fastifyHelmet, {
-//   contentSecurityPolicy: {
-//     directives: {
-//       defaultSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-//         trustedDomains
-//       ),
-
-//       scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-//         trustedDomains
-//       ),
-//       styleSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"].concat(
-//         trustedDomains
-//       )
-//     }
-//   }
-// })
-app.register(underPressure, {
-  maxEventLoopDelay: 1000,
-  retryAfter: 50,
-  exposeStatusRoute: true
-})
 app.route({
   method: 'GET',
   url: '/health/report',
