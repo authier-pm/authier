@@ -1,2 +1,4 @@
 pgdata
 dist
+cdk.out
+.env.production

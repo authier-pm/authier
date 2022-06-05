@@ -1,5 +1,5 @@
 const cpy = require('cpy')
-
+const fs = require('fs/promises')
 // tsc only produces js files, so we need to copy other filetypes
 ;(async () => {
   const r = await cpy(
@@ -9,14 +9,14 @@ const cpy = require('cpy')
       '**/*.graphql',
       '**/*.key',
       '**/*.crt',
-      '**/*.prisma',
-      'captain-definition',
-      'Dockerfile'
+      '**/*.prisma'
+      // 'captain-definition',
+      // 'Dockerfile'
     ],
     './dist',
     {
       parents: true,
-      ignore: ['./dist']
+      ignore: ['./dist', './cdk.out', './node_modules/**']
     }
   )
 
@@ -28,7 +28,30 @@ const cpy = require('cpy')
     }
   )
 
+  await cpy(['../node_modules/@prisma/client/**'], './dist/node_modules', {
+    parents: true
+  })
+
+  await cpy(['../node_modules/prisma/**'], './dist/node_modules', {
+    parents: true,
+    ignore: [
+      '../node_modules/prisma/libquery_engine-debian-openssl-3.0.x.so.node'
+    ]
+  })
+
+  await cpy(['../node_modules/.prisma/**'], './dist/node_modules', {
+    parents: true,
+    ignore: [
+      '../node_modules/.prisma/client/libquery_engine-debian-openssl-1.1.x.so.node',
+      '../node_modules/.prisma/client/libquery_engine-debian-openssl-3.0.x.so.node'
+    ]
+  })
+  await cpy(['../node_modules/vm2/**'], './dist/node_modules', {
+    parents: true
+  })
+
   console.log(`${r.length} files copied!`)
+
   // await Promise.all([moveFile('node_modules', '../dist/back-end/node_modules')])
 })()
 
