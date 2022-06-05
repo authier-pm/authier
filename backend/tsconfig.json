@@ -38,7 +38,7 @@
     "**/build/**",
     "./node_modules/*",
     "./generated/typegraphql-prisma/resolvers/**/*",
-    "cdk.out"
+    "cdk.out/**/*"
   ]
   // "include": ["**/*.ts", "**/*.tsx"]
 }

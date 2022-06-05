@@ -9,14 +9,14 @@ const cpy = require('cpy')
       '**/*.graphql',
       '**/*.key',
       '**/*.crt',
-      '**/*.prisma',
-      'captain-definition',
-      'Dockerfile'
+      '**/*.prisma'
+      // 'captain-definition',
+      // 'Dockerfile'
     ],
     './dist',
     {
       parents: true,
-      ignore: ['./dist']
+      ignore: ['./dist', './cdk.out', './node_modules/**']
     }
   )
 
@@ -27,6 +27,21 @@ const cpy = require('cpy')
       parents: false
     }
   )
+
+  await cpy(['../node_modules/@prisma/client/**'], './dist/node_modules', {
+    parents: true
+  })
+
+  await cpy(['../node_modules/prisma/**'], './dist/node_modules', {
+    parents: true
+  })
+
+  await cpy(['../node_modules/.prisma/**'], './dist/node_modules', {
+    parents: true
+  })
+  await cpy(['../node_modules/vm2/**'], './dist/node_modules', {
+    parents: true
+  })
 
   console.log(`${r.length} files copied!`)
   // await Promise.all([moveFile('node_modules', '../dist/back-end/node_modules')])
