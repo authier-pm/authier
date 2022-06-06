@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 import {
   Box,
   Stack,
@@ -14,6 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { FaCheck } from 'react-icons/fa'
 import React from 'react'
+import { useCreateCheckoutSessionMutation } from './Premium.codegen'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -31,6 +32,43 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 }
 
 export default function Premium() {
+  const [loading, setLoading] = useState(false)
+  const [
+    createCheckoutSessionMutation,
+    { data, loading: sessionLoading, error }
+  ] = useCreateCheckoutSessionMutation()
+
+  const handleCheckout = async () => {
+    setLoading(true)
+    // Create a Checkout Session.
+    const response = await createCheckoutSessionMutation({
+      variables: {
+        product: '2'
+      }
+    })
+    //@ts-expect-error
+    if (response.statusCode === 500) {
+      //@ts-expect-error
+      console.error(response.message)
+      return
+    }
+    console.log(response)
+
+    // // Redirect to Checkout.
+    // const stripe = await getStripe()
+    // const { error } = await stripe!.redirectToCheckout({
+    //   // Make the id field from the Checkout Session creation API response
+    //   // available to this file, so you can provide it as parameter here
+    //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+    //   sessionId: response.id
+    // })
+    // // If `redirectToCheckout` fails due to a browser or network
+    // // error, display the localized error message to your customer
+    // // using `error.message`.
+    // console.warn(error.message)
+    setLoading(false)
+  }
+
   return (
     <Box py={12}>
       <VStack spacing={2} textAlign="center">
@@ -210,13 +248,7 @@ export default function Premium() {
                 </ListItem>
               </List>
               <Box w="80%" pt={7}>
-                <Button
-                  w="full"
-                  colorScheme="red"
-                  onClick={() =>
-                    chrome.tabs.create({ url: 'http://localhost:5450/' })
-                  }
-                >
+                <Button w="full" colorScheme="red" onClick={handleCheckout}>
                   Checkout
                 </Button>
               </Box>
