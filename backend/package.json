@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
-    "@fastify/cookie": "^6.0.0",
-    "@prisma/client": "^3.15.2",
-    "@react-native-firebase/app": "^14.11.0",
+    "@fastify/cors": "^7.0.0",
+    "@prisma/client": "^3.13.0",
+    "@react-native-firebase/app": "^14.9.1",
     "@sentry/node": "^6.19.7",
     "@types/faker": "^5.5.9",
     "@types/jsonwebtoken": "^8.5.8",
