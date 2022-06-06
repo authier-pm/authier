@@ -210,8 +210,14 @@ export default function Premium() {
                 </ListItem>
               </List>
               <Box w="80%" pt={7}>
-                <Button w="full" colorScheme="red">
-                  Buy
+                <Button
+                  w="full"
+                  colorScheme="red"
+                  onClick={() =>
+                    chrome.tabs.create({ url: 'http://localhost:5450/' })
+                  }
+                >
+                  Checkout
                 </Button>
               </Box>
             </VStack>

@@ -1,4 +1,5 @@
 import { CheckIcon } from '@chakra-ui/icons'
+import getStripe from '../utils/get-stripe'
 import {
   Box,
   Button,
@@ -14,8 +15,9 @@ import {
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import Head from 'next/head'
-import React, { ReactNode } from 'react'
+import React, { ReactNode, useState } from 'react'
 import { AuPage } from '../components/AuPage'
+import { useCreateCheckoutSessionMutation } from './pricing.codegen'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -33,6 +35,46 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 }
 
 export default function PricingPage() {
+  const [loading, setLoading] = useState(false)
+  const [
+    createCheckoutSessionMutation,
+    { data, loading: sessionLoading, error }
+  ] = useCreateCheckoutSessionMutation()
+
+  if (error) {
+    console.log(error)
+  }
+  const handleCheckout = async () => {
+    setLoading(true)
+    // Create a Checkout Session.
+    const response = await createCheckoutSessionMutation({
+      variables: {
+        product: 'TOTP and Credentials',
+        userId: 'e2618a0b-ddf9-4f0d-ae64-86ac5581d9fb'
+      }
+    })
+    //@ts-expect-error
+    if (response.statusCode === 500) {
+      console.error(response.message)
+      return
+    }
+    console.log(response)
+
+    // // Redirect to Checkout.
+    // const stripe = await getStripe()
+    // const { error } = await stripe!.redirectToCheckout({
+    //   // Make the id field from the Checkout Session creation API response
+    //   // available to this file, so you can provide it as parameter here
+    //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+    //   sessionId: response.id
+    // })
+    // // If `redirectToCheckout` fails due to a browser or network
+    // // error, display the localized error message to your customer
+    // // using `error.message`.
+    // console.warn(error.message)
+    setLoading(false)
+  }
+
   return (
     <>
       <Head>
@@ -218,7 +260,11 @@ export default function PricingPage() {
                       </ListItem>
                     </List>
                     <Box w="80%" pt={7}>
-                      <Button w="full" colorScheme="red">
+                      <Button
+                        w="full"
+                        colorScheme="red"
+                        onClick={handleCheckout}
+                      >
                         Buy
                       </Button>
                     </Box>

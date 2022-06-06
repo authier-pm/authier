@@ -541,6 +541,10 @@ export type UserMutationCreateSecretUsageEventArgs = {
   event: SecretUsageEventInput
 }
 
+export type UserMutationCreateCheckoutSessionArgs = {
+  product: Scalars['String']
+}
+
 export type UserMutationDecryptionChallengeArgs = {
   id: Scalars['Int']
 }
