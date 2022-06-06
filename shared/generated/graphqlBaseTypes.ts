@@ -503,6 +503,7 @@ export type UserMutation = {
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
   approveDevice: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
+  createCheckoutSession: Scalars['String'];
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
   device: DeviceMutation;
@@ -542,6 +543,11 @@ export type UserMutationApproveDeviceArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput;
+};
+
+
+export type UserMutationCreateCheckoutSessionArgs = {
+  product: Scalars['String'];
 };
 
 

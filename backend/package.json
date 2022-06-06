@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "AGPL-3.0-or-later",
   "dependencies": {
+    "@fastify/cors": "^7",
     "@prisma/client": "^3.13.0",
     "@react-native-firebase/app": "^14.9.1",
     "@sentry/node": "^6.19.7",
@@ -20,7 +21,6 @@
     "faker": "^5.5.3",
     "fastify": "^3.29.0",
     "fastify-cookie": "^5.7.0",
-    "@fastify/cors": "^7",
     "fastify-helmet": "^7.1.0",
     "fastify-jwt": "^4.2.0",
     "firebase-admin": "^10.1.0",
@@ -37,6 +37,7 @@
     "prisma": "^3.13.0",
     "reflect-metadata": "^0.1.13",
     "source-map-support": "^0.5.21",
+    "stripe": "^9.6.0",
     "ts-node": "^10.7.0",
     "type-graphql": "^1.1.1",
     "typescript": "^4.6.4",

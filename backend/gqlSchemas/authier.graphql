@@ -374,6 +374,7 @@ type UserMutation {
   approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+  createCheckoutSession(product: String!): String!
 }
 
 type DeviceMutation {
