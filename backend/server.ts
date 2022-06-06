@@ -55,7 +55,10 @@ async function main() {
     reply.status(500).send({ error: 'Something went wrong' })
   })
 
-  app.register(fastifyCors)
+  app.register(fastifyCors, {
+    origin: '*',
+    allowedHeaders: ['Content-Type', 'Authorization']
+  })
   // const trustedDomains = ['https://unpkg.com']
 
   // app.register(fastifyHelmet, {

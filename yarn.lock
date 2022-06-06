@@ -2538,7 +2538,7 @@
   dependencies:
     ajv "^6.12.6"
 
-"@fastify/cors@^7":
+"@fastify/cors@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@fastify/cors/-/cors-7.0.0.tgz#c67c5a5909498b696bb19578e903f36037ac6f32"
   integrity sha512-nlo6ScwagBNJacAZD3KX90xjWLIoV0vN9QqoX1wUE9ZeZMdvkVkMZCGlxEtr00NshV0X5wDge4w5rwox7rRzSg==
