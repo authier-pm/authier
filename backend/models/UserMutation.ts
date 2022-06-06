@@ -22,6 +22,7 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
+import { stripe } from '../stripe'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -304,5 +305,32 @@ export class UserMutation extends UserBase {
         userId: ctx.jwtPayload.userId
       }
     })
+  }
+
+  @Field(() => String)
+  async createCheckoutSession(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('product', () => String) product: string
+  ) {
+    const prices = await stripe.prices.list({
+      product: product
+    })
+
+    const session = await stripe.checkout.sessions.create({
+      billing_address_collection: 'auto',
+      line_items: [
+        {
+          price: prices.data[0].id,
+          //For metered billing, do not pass quantity
+          quantity: 1
+        }
+      ],
+      mode: 'subscription',
+      success_url: `${ctx.request.headers}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${ctx.request.headers}?canceled=true`
+    })
+    console.log('test', session)
+
+    return session.id
   }
 }
