@@ -21,7 +21,6 @@ export class AwsCdkAuthierStack extends Stack {
       architecture: Architecture.ARM_64,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../dist')),
-
       environment: {
         ...parsedDotenv
       }
