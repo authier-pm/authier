@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2019",
-    "lib": [
-      "esnext",
-      "esnext.asynciterable",
-      "dom"
-    ],
+    "lib": ["esnext", "esnext.asynciterable", "dom"],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -15,11 +11,7 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": [
-      "node",
-      "jest",
-      "@emotion/react/types/css-prop"
-    ],
+    "types": ["node", "jest", "@emotion/react/types/css-prop"],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     // "noUnusedLocals": true,
@@ -32,6 +24,7 @@
     "allowJs": true,
     "downlevelIteration": true,
     "jsx": "preserve",
+    "jsxImportSource": "@emotion/react",
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "noEmit": true,
@@ -54,8 +47,6 @@
     "../shared/**/*"
   ],
   "paths": {
-    "@src/*": [
-      "../web-extension/src/*"
-    ]
+    "@src/*": ["../web-extension/src/*"]
   }
 }
