@@ -112,8 +112,8 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     return <Spinner />
   }
   return (
-    <Box
-      transition="3s ease"
+    <Flex
+      transition="1s ease"
       bg={useColorModeValue('white', 'gray.900')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
@@ -121,6 +121,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       pos="fixed"
       h="full"
       flexDirection="column"
+      alignItems="center"
       {...rest}
     >
       <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
@@ -149,7 +150,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           />
         </Flex>
 
-        <HStack spacing={{ base: '0', md: '6' }} w="100%">
+        <HStack spacing={{ base: '0', md: '6' }} w="80%" m={4}>
           <Flex alignItems={'center'} w="100%">
             <Menu>
               <MenuButton
@@ -204,7 +205,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           </Flex>
         </HStack>
       </Flex>
-    </Box>
+    </Flex>
   )
 }
 
