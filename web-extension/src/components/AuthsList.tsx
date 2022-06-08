@@ -35,6 +35,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { SecretItemIcon } from './SecretItemIcon'
+import { SecretSerializedType } from '@src/background/backgroundPage'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
@@ -201,6 +202,15 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   })
 
   const hasNoSecrets = deviceState.secrets.length === 0
+
+  const getRecentlyUsed = (secrets: Array<SecretSerializedType>) => {
+    return secrets
+      .sort((a, b) =>
+        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
+      )
+      .slice(0, 20) // we get items
+  }
+
   return (
     <>
       <Flex flexDirection="column">
@@ -234,12 +244,12 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           </>
         ) : (
           [
-            TOTPSecrets.map((auth, i) => {
+            getRecentlyUsed(TOTPSecrets).map((auth, i) => {
               return (
                 <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
               )
             }),
-            LoginCredentials.map((psw, i) => {
+            getRecentlyUsed(LoginCredentials).map((psw, i) => {
               return (
                 <LoginCredentialsListItem
                   loginSecret={psw as ILoginSecret}
