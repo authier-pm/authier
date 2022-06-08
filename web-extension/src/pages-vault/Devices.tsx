@@ -1,7 +1,6 @@
 import { ArrowForwardIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
   Heading,
-  Avatar,
   Box,
   Center,
   Text,
@@ -35,7 +34,7 @@ import { NbSp } from '@src/components/util/NbSp'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { FiLogOut, FiSettings, FiTrash } from 'react-icons/fi'
+import { FiLogOut, FiSettings } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
 import {
   useApproveChallengeMutation,
@@ -46,7 +45,6 @@ import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
-
 
 interface configValues {
   lockTime: number

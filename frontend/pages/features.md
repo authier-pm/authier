@@ -27,7 +27,7 @@
 | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- | --------- | --------- | ----------------------- | -------- |
 | keeps your secrets safe from common [malware](https://www.bleepingcomputer.com/news/security/redline-malware-shows-why-passwords-shouldnt-be-saved-in-browsers/) | ✅      | ✔️        | ✔️        | ❌                      | ✔️       |
 | open source                                                                                                                                                      | ✅      | ❌        | ✔️        | ❌                      | ❌       |
-| multi device sync                                                                                                                                                | ✅      | ✔️        | ✔️        | ✔️                      | ✔️       |
+| multi device sync                                                                                                                                                | ✅      | ✔️        | ✔️        | ✔️                      | ✔️ \*    |
 | cross browser&platform sync                                                                                                                                      | ✅      | ✔️        | ✔️        | ❌                      | ✔️       |
 | localization                                                                                                                                                     | ✅      | ✔️        | ✔️        | ✔️                      | ✔️       |
 | browser extension with secure input autofill                                                                                                                     | ✅      | ❌        | ❌        | ❌                      | ✔️       |
@@ -49,7 +49,7 @@
 |                                                                  | google authenticator | authy | authier | 1password | bitwarden | roboform |
 | ---------------------------------------------------------------- | -------------------- | ----- | ------- | --------- | --------- | -------- |
 | open source                                                      | ❌                   | ❌    | ✅      | ❌        | ✔️        | ❌       |
-| multi device sync                                                | ❌                   | ✔️    | ✅      | ✔️        | ✔️        | ✔️       |
+| multi device sync                                                | ❌                   | ✔️    | ✅      | ✔️        | ✔️        | ✔️ \*    |
 | localization                                                     | ❌                   | ❌    | ✅      | ✔️        | ✔️        | ✔️       |
 | browser extension with TOTP code input autofill                  | ❌                   | ❌    | ✅      | ✔️        | ❌        | ✔️       |
 | multiple security groups                                         | ❌                   | ❌    | ✅      | ✔️        | ✔️        | ✔️       |
@@ -61,4 +61,11 @@
 | add a new TOTP through phone camera                              | ✔️                   | ✔️    | ✅      | ✔️        | ✔️        | ✔️       |
 | keep a record of URL where the TOTP was created                  | ❌                   | ❌    | ✅      | ✔️        | ✔️        | ✔️       |
 
-Have you spotted any mistakes here? It's possible we may have missed a feature in a competitor app-if this is the case, please open a pull request to mitigate this.
+- these features are only available in paid version of the product
+
+&nbsp;&nbsp;
+&nbsp;
+
+### Did we get anything wrong?
+
+Have you spotted any mistakes here? Please open a pull request to mitigate this.

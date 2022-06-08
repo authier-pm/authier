@@ -20,6 +20,8 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const stringSimilarity = require('string-similarity')
 
 import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
@@ -40,30 +42,21 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
-  const [isOpen, setIsOpen] = useState(false)
 
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
 
   return (
-    <Box boxShadow="xl" p="4" rounded="md" bg="white" m={2}>
-      <Stat>
-        <Flex justify="flex-start" align="center">
+    <Box
+      p="3"
+      rounded="md"
+      bg={useColorModeValue('gray.100', 'gray.700')}
+      minW="300px"
+    >
+      <Stat maxW="100%">
+        <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
-            <IconButton
-              colorScheme="teal"
-              aria-label="Edit secret"
-              icon={<EditIcon />}
-              size="sm"
-              variant="link"
-              position="absolute"
-              zIndex="overlay"
-              top={-1}
-              left={-15}
-              onClick={() => setIsOpen(true)}
-            />
-
             <SecretItemIcon {...totpData}></SecretItemIcon>
           </Flex>
           <Box ml={4} mr="auto">
@@ -80,8 +73,11 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
 
                   await addOTPEvent({
                     variables: {
-                      kind: 'show OTP',
-                      url: url
+                      event: {
+                        kind: 'show OTP',
+                        url: url,
+                        secretId: totpData.id
+                      }
                     }
                   })
                   log(data, error)
@@ -132,7 +128,6 @@ const LoginCredentialsListItem = ({
         p="3"
         rounded="md"
         bg={useColorModeValue('gray.100', 'gray.700')}
-        minW="300px"
       >
         <Stat maxW="100%">
           <Flex justify="space-between" align="center" w="100%">
@@ -196,7 +191,13 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     if (!currentURL || !url) {
       return true
     }
-    return extractHostname(url) === extractHostname(currentURL)
+
+    return (
+      stringSimilarity.compareTwoStrings(
+        extractHostname(url),
+        extractHostname(currentURL)
+      ) > 0.5
+    )
   })
 
   const hasNoSecrets = deviceState.secrets.length === 0

@@ -35,7 +35,7 @@ export const Popup: FunctionComponent = () => {
   useEffect(() => {
     if (isFilling) {
       log('Filling')
-      const device = deviceDetect()
+      const device = deviceDetect(navigator.userAgent)
       const date = new Date()
 
       //TODO: get all variables
