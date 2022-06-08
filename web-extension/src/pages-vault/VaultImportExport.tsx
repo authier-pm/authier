@@ -82,6 +82,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
           toast.error('failed to parse')
         }
         const mapped = mapCsvToLoginCredentials(results.data)
+
         // TODO add to device state
         const state = device.state as DeviceState
 

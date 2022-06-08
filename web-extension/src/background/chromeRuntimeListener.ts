@@ -48,7 +48,13 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-let capturedInputEvents = []
+let capturedInputEvents: {
+  element: string
+  type: 'input' | 'submit' | 'keydown'
+  kind: WebInputType
+  inputted: string | undefined
+}[] = []
+
 //This is for saving URL of inputs
 let inputsUrl: string
 
@@ -106,7 +112,6 @@ browser.runtime.onMessage.addListener(async function (
       }
 
       tab.id && saveLoginModalsStates.delete(tab.id)
-
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
           domPath: captured.element,
@@ -132,9 +137,28 @@ browser.runtime.onMessage.addListener(async function (
       return { failed: false }
 
     case BackgroundMessageType.saveCapturedInputEvents:
-      capturedInputEvents = req.payload
-      inputsUrl = tab?.url as string
-      console.log('SAVE', capturedInputEvents)
+      capturedInputEvents = req.payload.inputEvents
+      inputsUrl = req.payload.url
+
+      const newWebInputs = capturedInputEvents.map((captured) => {
+        return {
+          domPath: captured.element,
+          kind: captured.kind,
+          url: inputsUrl
+        }
+      })
+
+      //Update web inputs in DB
+      await apolloClient.mutate<
+        AddWebInputsMutationResult,
+        AddWebInputsMutationVariables
+      >({
+        mutation: AddWebInputsDocument,
+        variables: {
+          webInputs: newWebInputs
+        }
+      })
+
       break
 
     case BackgroundMessageType.addTOTPSecret:
@@ -174,6 +198,7 @@ browser.runtime.onMessage.addListener(async function (
       if (!tabUrl || !deviceState || !currentTabId) {
         return null
       } else {
+        //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
         return getContentScriptInitialState(tabUrl, currentTabId)
       }
 

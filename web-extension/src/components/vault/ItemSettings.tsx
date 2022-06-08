@@ -21,7 +21,7 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import {
   ArrowForwardIcon,
@@ -51,7 +51,8 @@ interface totpValues {
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
 
@@ -63,12 +64,14 @@ const TOTPSecret = (data: ITOTPSecret) => {
       transition={{ duration: 0.25 }}
     >
       <Flex
-        width={'100%'}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
+        m="auto"
+        alignItems={'center'}
         bg={useColorModeValue('white', 'gray.900')}
       >
         <Formik
@@ -108,7 +111,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
           }}
         >
           {({ isSubmitting, dirty }) => (
-            <Flex as={Form} p={5} flexDirection="column">
+            <Flex as={Form} width={'80%'} flexDirection="column">
               <Field name="url">
                 {({ field, form }) => (
                   <FormControl
@@ -177,7 +180,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
                   }}
                   fontSize={'sm'}
                   size="sm"
-                  onClick={() => history.goBack()}
+                  onClick={() => navigate(-1)}
                 >
                   Go back
                 </Button>
@@ -219,7 +222,8 @@ interface LoginParsedValues {
 }
 
 const LoginSecret = (secretProps: ILoginSecret) => {
-  const history = useHistory()
+  const navigate = useNavigate()
+
   const [show, setShow] = useState(false)
 
   const { isOpen, onToggle } = useDisclosure()
@@ -240,7 +244,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '50%' }}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -298,7 +302,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           {({ values, isSubmitting, dirty }) => {
             const levelOfPsw = passwordStrength(values.password)
             return (
-              <Flex as={Form} p={5} flexDirection="column" w="inherit">
+              <Flex as={Form} flexDirection="column" width={'80%'}>
                 <Field name="url">
                   {({ field, form }) => (
                     <FormControl
@@ -390,7 +394,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                     }}
                     fontSize={'sm'}
                     size="sm"
-                    onClick={() => history.goBack()}
+                    onClick={() => navigate(-1)}
                   >
                     Go back
                   </Button>
@@ -436,12 +440,14 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   )
 }
 
-export const VaultItemSettings = ({ secretId }: { secretId: string }) => {
+export const VaultItemSettings = () => {
+  const params = useParams()
+
   if (!device.state) {
     return <Spinner></Spinner>
   }
 
-  const secret = device.state.getSecretDecryptedById(secretId)
+  const secret = device.state.getSecretDecryptedById(params.secretId as string)
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }

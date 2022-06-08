@@ -169,6 +169,7 @@ export default function Account() {
 
                 <VStack pt={6}>
                   <Box as={Field} name="currPassword">
+                    {/* @ts-expect-error */}
                     {({ field, form }) => (
                       <FormControl
                         isRequired
@@ -204,6 +205,7 @@ export default function Account() {
                   </Box>
 
                   <Box as={Field} name="newPassword">
+                    {/* @ts-expect-error */}
                     {({ field, form }) => (
                       <FormControl
                         isRequired
@@ -239,6 +241,7 @@ export default function Account() {
                   </Box>
 
                   <Box as={Field} name="confirmPassword">
+                    {/* @ts-expect-error */}
                     {({ field, form }) => (
                       <FormControl
                         isRequired
