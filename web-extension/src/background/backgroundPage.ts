@@ -1,6 +1,4 @@
 import './chromeRuntimeListener'
-import browser from 'webextension-polyfill'
-
 import debug from 'debug'
 import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
 

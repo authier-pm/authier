@@ -7,7 +7,7 @@ import {
 
 import jwtDecode from 'jwt-decode'
 import { onError } from '@apollo/client/link/error'
-import { toastifyConfig } from '../../shared/toastifyConfig'
+
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
 
@@ -30,9 +30,7 @@ const httpLink = createHttpLink({
 })
 
 const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-  const isExtension = window.location.href.startsWith('chrome-extension')
-
-  toast.configure(toastifyConfig(isExtension ? undefined : 'bottom-right'))
+  // const isExtension = window.location.href.startsWith('chrome-extension')
 
   if (graphQLErrors) {
     graphQLErrors.map(({ message, path }) => {

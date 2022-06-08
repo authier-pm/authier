@@ -139,8 +139,6 @@ export function useDeviceState() {
           }
         } catch (err) {
           parsed && log('parsed', parsed)
-          console.error(err)
-          console.error(`decryption failed for login credential ${secret.id}}`)
 
           return {
             ...secret,
@@ -151,7 +149,6 @@ export function useDeviceState() {
           }
         }
       })
-
       return creds
     },
     get TOTPSecrets() {

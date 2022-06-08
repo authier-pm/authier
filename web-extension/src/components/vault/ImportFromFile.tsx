@@ -4,9 +4,13 @@ import { useDropzone } from 'react-dropzone'
 import { Center, useColorModeValue, Icon } from '@chakra-ui/react'
 import { AiFillFileAdd } from 'react-icons/ai'
 
-export function ImportFromFile({ onFileAccepted }) {
+export function ImportFromFile({
+  onFileAccepted
+}: {
+  onFileAccepted: (file: File) => void
+}) {
   const onDrop = useCallback(
-    (acceptedFiles) => {
+    (acceptedFiles: File[]) => {
       onFileAccepted(acceptedFiles[0])
     },
     [onFileAccepted]
@@ -14,7 +18,9 @@ export function ImportFromFile({ onFileAccepted }) {
 
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
-    accept: '.csv',
+    accept: {
+      'text/*': ['.csv']
+    },
     maxFiles: 1,
     multiple: false
   })
