@@ -1,5 +1,5 @@
 export function extractHostname(url: string) {
-  let hostname
+  let hostname: string
   //find & remove protocol (http, ftp, etc.) and get hostname
   if (url.indexOf('//') > -1) {
     hostname = url.split('/')[2]
@@ -12,5 +12,5 @@ export function extractHostname(url: string) {
   //find & remove "?"
   hostname = hostname.split('?')[0]
 
-  return hostname
+  return hostname.toLowerCase()
 }
