@@ -4,7 +4,6 @@ const environment = process.env.NODE_ENV
 
 app.listen(process.env.PORT!, '0.0.0.0').then(() => {
   console.log(`Listening on ${process.env.PORT}`)
-  if (environment === 'development') {
-    import('./scripts/generateGqlSchemas')
-  }
+
+  import('./scripts/generateGqlSchemas')
 })
