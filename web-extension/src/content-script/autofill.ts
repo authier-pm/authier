@@ -4,7 +4,7 @@ import { bodyInputChangeEmitter } from './DOMObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-import stringSimilarity from 'string-similarity'
+
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
@@ -84,11 +84,13 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
 
     //Fill known inputs
     const filledElements = webInputs
-      .filter(({ url }) =>
-        stringSimilarity.compareTwoStrings(url, location.href) > 0.5 // TODO change this to match TLD domain
-          ? true
-          : false
-      )
+      .filter(({ url }) => {
+        const [urlNoQuery] = url.split('?')
+        const matches = location.href.startsWith(urlNoQuery)
+        console.log('~ matches', matches)
+
+        return matches
+      })
       .map((webInputGql) => {
         let inputEl
 
