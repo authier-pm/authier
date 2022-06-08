@@ -14,11 +14,6 @@
       "web-extension",
       "backend",
       "frontend"
-    ],
-    "nohoist": [
-      "**/react/**",
-      "**/react-dom/**",
-      "**/@chakra-ui/react/**"
     ]
   },
   "resolutions": {
@@ -26,7 +21,7 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.6.5",
-    "@chakra-ui/react": "^2.1.2",
+    "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
     "@graphql-codegen/cli": "^2.6.2",
