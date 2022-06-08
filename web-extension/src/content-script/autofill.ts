@@ -90,10 +90,21 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
           : false
       )
       .map((webInputGql) => {
-        const inputEl = document.body.querySelector(
+        let inputEl
+
+        inputEl = document.body.querySelector(
           webInputGql.domPath
         ) as HTMLInputElement
 
+        if (!inputEl) {
+          const iframeBody =
+            document.querySelector('iframe')?.contentDocument?.body // we want to detect elements in the first iframe as well. Some login pages have iframes with the inputs-for example *.zendesk.com
+          if (iframeBody) {
+            inputEl = iframeBody.querySelector(
+              webInputGql.domPath
+            ) as HTMLInputElement
+          }
+        }
         if (inputEl) {
           if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
@@ -127,51 +138,16 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
-      const inputEls = document.body.querySelectorAll(
-        'input[type=text], input[type=tel], input[type=email], input[type=password]'
-      )
-      const inputElsArray: HTMLInputElement[] = Array.from(
-        inputEls
-      ) as HTMLInputElement[]
-
-      inputElsArray.every((input, index, arr) => {
-        if (input.type === 'password') {
-          //Search for a username input
-          for (let j = index - 1; j >= 0; j--) {
-            if (arr[j].type !== 'hidden') {
-              log('found username input', arr[j])
-              autofillValueIntoInput(
-                arr[j],
-                secretsForHost.loginCredentials[0].loginCredentials.username
-              )
-
-              domRecorder.addInputEvent({
-                element: arr[j],
-                eventType: 'input',
-                inputted:
-                  secretsForHost.loginCredentials[0].loginCredentials.username,
-                kind: WebInputType.USERNAME
-              })
-
-              autofillValueIntoInput(
-                input,
-                secretsForHost.loginCredentials[0].loginCredentials.password
-              )
-              domRecorder.addInputEvent({
-                element: input,
-                eventType: 'input',
-                inputted:
-                  secretsForHost.loginCredentials[0].loginCredentials.password,
-                kind: WebInputType.PASSWORD
-              })
-
-              break
-            }
-          }
-          return false
-        }
-        return true
-      })
+      const autofillRes = searchInputsAndAutofill(document.body)
+      console.log('~ autofillRes', autofillRes)
+      const iframe = document.createElement('iframe')
+      if (
+        autofillRes.findIndex((filled) => filled === true) === -1 &&
+        iframe.contentDocument?.body
+      ) {
+        // No input found, try first iframe
+        searchInputsAndAutofill(iframe.contentDocument?.body)
+      }
     }
 
     //If input shows on loaded page
@@ -235,6 +211,54 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
 
         toast.success('Submitted autofilled form')
       }
+    }
+
+    function searchInputsAndAutofill(documentBody: HTMLElement) {
+      const inputEls = documentBody.querySelectorAll(
+        'input[type=text], input[type=tel], input[type=email], input[type=password]'
+      )
+      const inputElsArray: HTMLInputElement[] = Array.from(
+        inputEls
+      ) as HTMLInputElement[]
+
+      return inputElsArray.map((input, index, arr) => {
+        if (input.type === 'password') {
+          //Search for a username input
+          for (let j = index - 1; j >= 0; j--) {
+            if (arr[j].type !== 'hidden') {
+              log('found username input', arr[j])
+              const autofilledElUsername = autofillValueIntoInput(
+                arr[j],
+                secretsForHost.loginCredentials[0].loginCredentials.username
+              )
+
+              domRecorder.addInputEvent({
+                element: arr[j],
+                eventType: 'input',
+                inputted:
+                  secretsForHost.loginCredentials[0].loginCredentials.username,
+                kind: WebInputType.USERNAME
+              })
+
+              const autofilledElPassword = autofillValueIntoInput(
+                input,
+                secretsForHost.loginCredentials[0].loginCredentials.password
+              )
+              domRecorder.addInputEvent({
+                element: input,
+                eventType: 'input',
+                inputted:
+                  secretsForHost.loginCredentials[0].loginCredentials.password,
+                kind: WebInputType.PASSWORD
+              })
+
+              return !!autofilledElUsername || !!autofilledElPassword
+            }
+          }
+          return false
+        }
+        return false
+      })
     }
   }
 

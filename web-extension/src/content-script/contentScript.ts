@@ -88,7 +88,7 @@ export async function initInputWatch() {
   log('~ stateInitRes', stateInitRes)
 
   if (stateInitRes) {
-    document.addEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown, true)
   }
 
   function onKeyDown(e?: KeyboardEvent) {
@@ -192,9 +192,8 @@ export async function initInputWatch() {
   }
 
   const showSavePromptIfAppropriate = async () => {
-    console.log('showSavePromptIfAppropriate')
+    log('showSavePromptIfAppropriate', domRecorder.toJSON())
     if (promptDiv) {
-      console.log('not promptDiv')
       return
     }
     const username = domRecorder.getUsername()
@@ -205,6 +204,7 @@ export async function initInputWatch() {
       secretsForHost?.loginCredentials.find(
         ({ loginCredentials }) => loginCredentials.password === password
       )
+
     if (password && !existingCredentialWithSamePassword) {
       if (username) {
         renderSaveCredentialsForm(username, password)
@@ -246,13 +246,15 @@ export async function initInputWatch() {
   const debouncedInputEventListener = debounce((ev) => {
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
-    console.log(domRecorder.toJSON().length)
+    console.log(domRecorder.toJSON())
+
+    const inputted = targetElement.value
+
     if (
-      (targetElement && isPasswordType && domRecorder.toJSON().length === 0) ||
-      (targetElement.type === 'text' && domRecorder.toJSON().length === 0) ||
-      (targetElement.type === 'email' && domRecorder.toJSON().length === 0)
+      isPasswordType ||
+      targetElement.type === 'text' ||
+      targetElement.type === 'email'
     ) {
-      const inputted = targetElement.value
       if (inputted) {
         const inputRecord: IInputRecord = {
           element: targetElement,
@@ -321,14 +323,32 @@ export async function initInputWatch() {
           )
 
           // some login flows don't have any forms, in that case we are listening for click, keydown
-          document.body.addEventListener('click', showSavePromptIfAppropriate, {
-            once: true
-          })
+          targetElement.ownerDocument.body.addEventListener(
+            'click',
+            showSavePromptIfAppropriate,
+            {
+              once: true
+            }
+          )
         }
       }
     }
   }, 400)
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
+
+  setTimeout(() => {
+    // some websites like for example https://withribbon.zendesk.com/access/unauthenticated?theme=hc use iframes, so we have to listen for input in all iframes too
+    const iframe = document.querySelector('iframe')
+    const iframeDocument = iframe?.contentDocument
+    if (iframeDocument) {
+      iframeDocument.body.addEventListener(
+        'input',
+        debouncedInputEventListener,
+        true
+      )
+      document.addEventListener('keydown', onKeyDown, true)
+    }
+  }, 50)
 
   return () => {
     document.body.removeEventListener(

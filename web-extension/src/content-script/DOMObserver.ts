@@ -24,7 +24,7 @@ export const inputDomMutationObserver = new MutationObserver(function (
       if (addedNode.nodeName === 'INPUT') {
         bodyInputChangeEmitter.emit('inputAdded', addedNode as HTMLInputElement)
       } else if (addedNode['querySelectorAll']) {
-        // @ts-expect-error
+        // @ts-expect-error TODO
         const childInputs = addedNode.querySelectorAll('input')
         for (const input of childInputs) {
           bodyInputChangeEmitter.emit('inputAdded', input)
