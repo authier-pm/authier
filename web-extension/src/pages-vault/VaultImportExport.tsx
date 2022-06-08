@@ -55,7 +55,7 @@ const mapCsvToLoginCredentials = (csv: string[][]) => {
 
   return csv
     .slice(1)
-    .filter((row) => row[indexUrl])
+    .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
       url: row[indexUrl],
       label: row[indexLabel],
