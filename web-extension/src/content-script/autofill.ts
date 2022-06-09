@@ -20,6 +20,7 @@ export type IDecryptedSecrets = {
 }
 
 const autofillValueIntoInput = (element: HTMLInputElement, value) => {
+  log('autofillValueIntoInput:', value)
   //
   if (isElementInViewport(element) === false || isHidden(element)) {
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
@@ -87,7 +88,6 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       .filter(({ url }) => {
         const [urlNoQuery] = url.split('?')
         const matches = location.href.startsWith(urlNoQuery)
-        console.log('~ matches', matches)
 
         return matches
       })
