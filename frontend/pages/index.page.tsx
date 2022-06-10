@@ -18,6 +18,9 @@ import {
 
 import NextLink from 'next/link'
 import { Link } from '../components/Link'
+import { useRouter } from 'next/router'
+import Success from '../components/Success'
+import Error from '../components/Error'
 export const Links = [
   'Features',
   'Pricing',
@@ -49,6 +52,15 @@ export const NavLink = ({
 )
 
 export default function Home() {
+  const router = useRouter()
+  const { success, canceled, session_id } = router.query
+
+  if (success) {
+    return <Success />
+  } else if (canceled) {
+    return <Error />
+  }
+
   return (
     <Box w="100%" flex="1 1 auto;">
       <Head>

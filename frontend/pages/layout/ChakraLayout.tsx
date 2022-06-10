@@ -2,15 +2,8 @@ import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import {
   Box,
   Flex,
-  Avatar,
   HStack,
   IconButton,
-  Button,
-  Menu,
-  MenuButton,
-  MenuList,
-  MenuItem,
-  MenuDivider,
   useDisclosure,
   Image,
   Stack
@@ -18,6 +11,7 @@ import {
 import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
+import React from 'react'
 import { kebabCase } from 'lodash'
 
 const theme = extendTheme({
