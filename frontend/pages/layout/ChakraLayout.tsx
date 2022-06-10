@@ -11,6 +11,7 @@ import {
 import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
+import React from 'react'
 import { kebabCase } from 'lodash'
 
 const theme = extendTheme({

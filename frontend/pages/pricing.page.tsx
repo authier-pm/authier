@@ -34,6 +34,12 @@ function PriceWrapper({ children }: { children: ReactNode }) {
   )
 }
 
+const pricingPlan = {
+  Credentials: 'prod_LquWXgjk6kl5sM',
+  TOTP: 'prod_LquVrkwfsXjTAL',
+  TOTP_Credentials: 'prod_Lp3NU9UcNWduBm'
+}
+
 export default function PricingPage() {
   const [loading, setLoading] = useState(false)
   const [
@@ -41,16 +47,13 @@ export default function PricingPage() {
     { data, loading: sessionLoading, error }
   ] = useCreateCheckoutSessionMutation()
 
-  if (error) {
-    console.log(error)
-  }
-  const handleCheckout = async () => {
+  const handleCheckout = async (type: string) => {
     setLoading(true)
     // Create a Checkout Session.
     const response = await createCheckoutSessionMutation({
       variables: {
-        product: 'TOTP and Credentials',
-        userId: 'e2618a0b-ddf9-4f0d-ae64-86ac5581d9fb'
+        product: type,
+        userId: '2c678a2d-87a8-4ff8-96f1-6c9e0bab73d3'
       }
     })
     //@ts-expect-error
@@ -61,13 +64,13 @@ export default function PricingPage() {
     console.log(response)
 
     // // Redirect to Checkout.
-    // const stripe = await getStripe()
-    // const { error } = await stripe!.redirectToCheckout({
-    //   // Make the id field from the Checkout Session creation API response
-    //   // available to this file, so you can provide it as parameter here
-    //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-    //   sessionId: response.id
-    // })
+    const stripe = await getStripe()
+    const { error } = await stripe!.redirectToCheckout({
+      //   // Make the id field from the Checkout Session creation API response
+      //   // available to this file, so you can provide it as parameter here
+      //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
+      sessionId: response.data?.createCheckoutSession as string
+    })
     // // If `redirectToCheckout` fails due to a browser or network
     // // error, display the localized error message to your customer
     // // using `error.message`.
@@ -165,7 +168,12 @@ export default function PricingPage() {
                     </ListItem>
                   </List>
                   <Box w="80%" pt={7}>
-                    <Button w="full" colorScheme="red" variant="outline">
+                    <Button
+                      w="full"
+                      colorScheme="red"
+                      variant="outline"
+                      onClick={() => handleCheckout(pricingPlan.Credentials)}
+                    >
                       Buy
                     </Button>
                   </Box>
@@ -200,7 +208,12 @@ export default function PricingPage() {
                     </ListItem>
                   </List>
                   <Box w="80%" pt={7}>
-                    <Button w="full" colorScheme="red" variant="outline">
+                    <Button
+                      w="full"
+                      colorScheme="red"
+                      variant="outline"
+                      onClick={() => handleCheckout(pricingPlan.TOTP)}
+                    >
                       Buy
                     </Button>
                   </Box>
@@ -263,7 +276,9 @@ export default function PricingPage() {
                       <Button
                         w="full"
                         colorScheme="red"
-                        onClick={handleCheckout}
+                        onClick={() =>
+                          handleCheckout(pricingPlan.TOTP_Credentials)
+                        }
                       >
                         Buy
                       </Button>
