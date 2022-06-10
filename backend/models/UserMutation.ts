@@ -310,6 +310,7 @@ export class UserMutation extends UserBase {
   @Field(() => String)
   async createCheckoutSession(
     @Ctx() ctx: IContextAuthenticated,
+    @Arg('userId', () => String) userId: string,
     @Arg('product', () => String) product: string
   ) {
     // TODO Find price by name
@@ -328,6 +329,17 @@ export class UserMutation extends UserBase {
       success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${ctx.request.headers.referer}?canceled=true`
     })
+
+    if (session.id) {
+      await ctx.prisma.user.update({
+        where: {
+          id: userId
+        },
+        data: {
+          stripeId: session.id
+        }
+      })
+    }
     console.log('test', session)
 
     return session.id

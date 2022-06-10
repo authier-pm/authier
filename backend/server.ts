@@ -56,8 +56,14 @@ async function main() {
   })
 
   app.register(fastifyCors, {
-    origin: '*',
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: (origin, cb) => {
+      if (/localhost/.test(origin)) {
+        //  Request from localhost will pass
+        cb(null, true)
+        return
+      }
+    },
+    credentials: true
   })
   // const trustedDomains = ['https://unpkg.com']
 
