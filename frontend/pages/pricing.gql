@@ -1,5 +1,3 @@
 mutation createCheckoutSession($userId: String!, $product: String!) {
-  user(userId: $userId) {
-    createCheckoutSession(product: $product)
-  }
+  createCheckoutSession(userId: $userId, product: $product)
 }

@@ -13,6 +13,8 @@ type Query {
 type UserQuery {
   id: ID!
   email: EmailAddress
+  stripeId: String
+  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
@@ -81,6 +83,8 @@ enum TokenType {
 type UserGQL {
   id: ID!
   email: String
+  stripeId: String
+  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
@@ -336,11 +340,14 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
+  createCheckoutSession(product: String!, userId: String!): String!
 }
 
 type UserMutation {
   id: ID!
   email: EmailAddress
+  stripeId: String
+  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
