@@ -321,6 +321,7 @@ export type LoginResponse = {
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
+  createCheckoutSession: Scalars['String'];
   currentDevice: DeviceMutation;
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
@@ -338,6 +339,12 @@ export type Mutation = {
 
 export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>;
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  product: Scalars['String'];
+  userId: Scalars['String'];
 };
 
 
@@ -471,6 +478,7 @@ export type UserGql = {
   UsageEvents: Array<SecretUsageEventGql>;
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
+  accountType: Scalars['String'];
   addDeviceSecretEncrypted: Scalars['String'];
   createdAt: Scalars['DateTime'];
   deviceRecoveryCooldownMinutes: Scalars['Int'];
@@ -480,6 +488,7 @@ export type UserGql = {
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
+  stripeId?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   username?: Maybe<Scalars['String']>;
@@ -497,13 +506,13 @@ export type UserMutation = {
   UsageEvents: Array<SecretUsageEventGql>;
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
+  accountType: Scalars['String'];
   addCookie: Scalars['String'];
   addDevice: DeviceGql;
   addDeviceSecretEncrypted: Scalars['String'];
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
   approveDevice: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
-  createCheckoutSession: Scalars['String'];
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
   device: DeviceMutation;
@@ -517,6 +526,7 @@ export type UserMutation = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt'];
+  stripeId?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
   updateFireToken: DeviceGql;
   updateSettings: SettingsConfigGql;
@@ -543,11 +553,6 @@ export type UserMutationApproveDeviceArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput;
-};
-
-
-export type UserMutationCreateCheckoutSessionArgs = {
-  product: Scalars['String'];
 };
 
 
@@ -602,6 +607,7 @@ export type UserQuery = {
   UsageEvents: Array<SecretUsageEventGql>;
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
+  accountType: Scalars['String'];
   addDeviceSecretEncrypted: Scalars['String'];
   createdAt: Scalars['DateTime'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
@@ -621,6 +627,7 @@ export type UserQuery = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   sendAuthMessage: Scalars['Boolean'];
   settings: SettingsConfigGql;
+  stripeId?: Maybe<Scalars['String']>;
   tokenVersion: Scalars['Int'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   username?: Maybe<Scalars['String']>;

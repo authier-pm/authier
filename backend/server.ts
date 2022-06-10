@@ -24,6 +24,9 @@ import debug from 'debug'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
+import { stripe } from './stripe'
+import rawBody from 'fastify-raw-body'
+import { UnauthorizedError } from 'type-graphql'
 
 const { env } = process
 const log = debug('au:server')
@@ -34,6 +37,9 @@ sentryInit({
   environment,
   release: `<project-name>@${pkg.version}`
 })
+
+const endpointSecret =
+  'whsec_a5f8e80deb9a6c6aa46646127601e0788905dd1b956c3e2a1021e8b5884a7a68'
 
 async function main() {
   const app = fastify({
@@ -47,6 +53,15 @@ async function main() {
             }
     }
   })
+
+  await app.register(rawBody, {
+    field: 'rawBody', // change the default request.rawBody property name
+    global: true, // add the rawBody to every request. **Default true**
+    encoding: false, // set it to false to set rawBody as a Buffer **Default utf8**
+    runFirst: true, // get the body before any preParsing hook change/uncompress it. **Default false**
+    routes: [] // array of routes, **`global`** will be ignored, wildcard routes not supported
+  })
+
   app.setErrorHandler(async (error, request, reply) => {
     // Logging locally
     console.log(error)
@@ -56,13 +71,7 @@ async function main() {
   })
 
   app.register(fastifyCors, {
-    origin: (origin, cb) => {
-      if (/localhost/.test(origin)) {
-        //  Request from localhost will pass
-        cb(null, true)
-        return
-      }
-    },
+    origin: true,
     credentials: true
   })
   // const trustedDomains = ['https://unpkg.com']
@@ -93,6 +102,42 @@ async function main() {
     url: '/health/report',
     handler: healthReportHandler
   })
+
+  app.post('/webhook', {
+    config: {
+      //add the rawBody to this route. if false, rawBody will be disabled when global is true
+      rawBody: true
+    },
+    handler(req, reply) {
+      const sig = req.headers['stripe-signature']
+
+      let event
+
+      try {
+        stripe.webhooks.constructEvent(req.rawBody!, sig!, endpointSecret)
+      } catch (err) {
+        console.log(err)
+        reply.status(400).send(`Webhook Error: ${err.message}`)
+        return
+      }
+
+      //Handle the event
+      switch (event.type) {
+        case 'payment_intent.succeeded':
+          const paymentIntent = event.data.object
+          console.log('TEST', paymentIntent)
+          //Then define and call a function to handle the event payment_intent.succeeded
+          break
+        // ... handle other event types
+        default:
+          console.log(`Unhandled event type ${event.type}`)
+      }
+
+      //Return a 200 response to acknowledge receipt of the event
+      reply.send()
+    }
+  })
+
   app.post('/refresh_token', async (request, reply) => {
     const refreshToken = request.cookies['refresh-token']
 
@@ -181,7 +226,8 @@ async function main() {
     credential: admin.credential.cert(serviceAccount)
   })
 
-  app.listen(process.env.PORT!, '0.0.0.0')
+  console.log(process.env.PORT)
+  app.listen({ host: '0.0.0.0', port: process.env.PORT as unknown as number })
 }
 
 main().then(() => {

@@ -9,14 +9,12 @@ export type CreateCheckoutSessionMutationVariables = Types.Exact<{
 }>;
 
 
-export type CreateCheckoutSessionMutation = { __typename?: 'Mutation', user?: { __typename?: 'UserMutation', createCheckoutSession: string } | null };
+export type CreateCheckoutSessionMutation = { __typename?: 'Mutation', createCheckoutSession: string };
 
 
 export const CreateCheckoutSessionDocument = gql`
     mutation createCheckoutSession($userId: String!, $product: String!) {
-  user(userId: $userId) {
-    createCheckoutSession(product: $product)
-  }
+  createCheckoutSession(userId: $userId, product: $product)
 }
     `;
 export type CreateCheckoutSessionMutationFn = Apollo.MutationFunction<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;

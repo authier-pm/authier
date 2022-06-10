@@ -159,9 +159,10 @@ model WebInput {
 }
 
 model User {
-  id    String  @id @default(uuid()) @db.Uuid
-  email String? @unique @db.Citext
-
+  id                            String               @id @default(uuid()) @db.Uuid
+  email                         String?              @unique @db.Citext
+  stripeId                      String?
+  accountType                   String               @default("free-trial")
   tokenVersion                  Int                  @default(0)
   username                      String?              @unique
   // @skip

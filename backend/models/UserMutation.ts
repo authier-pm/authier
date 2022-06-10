@@ -22,7 +22,7 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
-import { stripe } from '../stripe'
+
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -305,43 +305,5 @@ export class UserMutation extends UserBase {
         userId: ctx.jwtPayload.userId
       }
     })
-  }
-
-  @Field(() => String)
-  async createCheckoutSession(
-    @Ctx() ctx: IContextAuthenticated,
-    @Arg('userId', () => String) userId: string,
-    @Arg('product', () => String) product: string
-  ) {
-    // TODO Find price by name
-    const prices = await stripe.prices.list({})
-
-    const session = await stripe.checkout.sessions.create({
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price: 'price_1L7PGdI3AGASZpOVHvAwowhY',
-          //For metered billing, do not pass quantity
-          quantity: 1
-        }
-      ],
-      mode: 'subscription',
-      success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${ctx.request.headers.referer}?canceled=true`
-    })
-
-    if (session.id) {
-      await ctx.prisma.user.update({
-        where: {
-          id: userId
-        },
-        data: {
-          stripeId: session.id
-        }
-      })
-    }
-    console.log('test', session)
-
-    return session.id
   }
 }
