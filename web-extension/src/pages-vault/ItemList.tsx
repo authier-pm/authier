@@ -15,10 +15,9 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
-import browser from 'webextension-polyfill'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
@@ -34,17 +33,16 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
-        maxW={'250px'}
         w="250px"
-        h="auto"
-        bg={useColorModeValue('white', 'gray.900')}
+        h="195px"
+        bg={useColorModeValue('white', 'gray.800')}
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
         onMouseOver={() => setIsVisible(true)}
         onMouseOut={() => setIsVisible(false)}
       >
-        <Box bg={'gray.100'} h="90%" pos={'relative'}>
+        <Box bg={'gray.100'} h="70%" pos={'relative'}>
           <Center h={130}>
             <SecretItemIcon {...data} />
           </Center>
@@ -101,15 +99,15 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
           justifyContent="space-between"
           p={4}
         >
-          <Text fontWeight={'bold'} fontSize={'lg'} isTruncated>
+          <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
             {data.label}
           </Text>
 
           <Link
             to={{
-              pathname: `secret/${data.id}`,
-              state: { data: data }
+              pathname: `secret/${data.id}`
             }}
+            state={{ data: data }}
           >
             <IconButton
               size="sm"
@@ -128,7 +126,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 export const ItemList = () => {
   const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <Flex flexDirection="column">
@@ -153,7 +151,7 @@ export const ItemList = () => {
           aria-label="Add item"
           icon={<AddIcon />}
           rounded={'full'}
-          onClick={async () => history.push('/addItem')}
+          onClick={async () => navigate('/addItem')}
         />
       </Center>
 

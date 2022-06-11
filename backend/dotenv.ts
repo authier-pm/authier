@@ -1,2 +1,3 @@
 import dotenv from 'dotenv'
-dotenv.config()
+const { parsed } = dotenv.config()
+export default parsed

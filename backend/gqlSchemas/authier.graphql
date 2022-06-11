@@ -1,5 +1,6 @@
 type Query {
   user(userId: String!): UserQuery
+  osTime: String!
 
   """
   you need to be authenticated to call this resolver
@@ -359,6 +360,9 @@ type UserMutation {
   device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
+  createSecretUsageEvent(
+    event: SecretUsageEventInput!
+  ): SecretUsageEventGQLScalars!
   addEncryptedSecrets(
     secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!
@@ -454,6 +458,12 @@ input EncryptedSecretInput {
   androidUri: String
   label: String!
   encrypted: String!
+}
+
+input SecretUsageEventInput {
+  kind: String!
+  secretId: String!
+  url: String
 }
 
 """

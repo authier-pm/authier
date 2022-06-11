@@ -421,6 +421,12 @@ export type SecretUsageEventGqlScalars = {
   webInputId?: Maybe<Scalars['Int']>;
 };
 
+export type SecretUsageEventInput = {
+  kind: Scalars['String'];
+  secretId: Scalars['String'];
+  url?: InputMaybe<Scalars['String']>;
+};
+
 export type SettingsConfigGql = {
   __typename?: 'SettingsConfigGQL';
   homeUI: Scalars['String'];
@@ -503,6 +509,7 @@ export type UserMutation = {
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
   approveDevice: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
+  createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
   device: DeviceMutation;
@@ -542,6 +549,11 @@ export type UserMutationApproveDeviceArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput;
+};
+
+
+export type UserMutationCreateSecretUsageEventArgs = {
+  event: SecretUsageEventInput;
 };
 
 

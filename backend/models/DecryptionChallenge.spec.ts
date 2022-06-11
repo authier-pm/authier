@@ -26,8 +26,8 @@ describe('DecryptionChallenge', () => {
   challenge = new DecryptionChallengeApproved()
   challenge.deviceId = faker.datatype.uuid()
   challenge.deviceName = faker.random.word()
-  let userId = faker.datatype.uuid()
-  let input: RegisterNewAccountInput = makeRegisterAccountInput()
+  const userId = faker.datatype.uuid()
+  const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
   beforeAll(async () => {
     user = await prismaClient.user.create({
@@ -45,7 +45,7 @@ describe('DecryptionChallenge', () => {
   })
   // })
   describe('addNewDeviceForUser', () => {
-    let fakeCtx = {
+    const fakeCtx = {
       reply: { setCookie: jest.fn() },
       request: { headers: {} },
       prisma: prismaClient,
@@ -54,7 +54,7 @@ describe('DecryptionChallenge', () => {
     } as any
     it('should add new device for user', async () => {
       challenge.userId = user.id
-      let data = await challenge.addNewDeviceForUser(
+      const data = await challenge.addNewDeviceForUser(
         {
           ...input
         },
@@ -78,7 +78,7 @@ describe('DecryptionChallenge', () => {
     })
 
     it("should show 'User not found'", async () => {
-      let input: AddNewDeviceInput = makeAddNewDeviceInput()
+      const input: AddNewDeviceInput = makeAddNewDeviceInput()
       challenge.userId = faker.datatype.uuid()
       await expect(async () => {
         await challenge.addNewDeviceForUser(
@@ -91,9 +91,9 @@ describe('DecryptionChallenge', () => {
     })
 
     it("should show 'Wrong master password used'", async () => {
-      let userId = faker.datatype.uuid()
+      const userId = faker.datatype.uuid()
 
-      let input = makeAddNewDeviceInput()
+      const input = makeAddNewDeviceInput()
       challenge.userId = userId
 
       const user = await prismaClient.user.create({
