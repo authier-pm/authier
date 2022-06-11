@@ -1,11 +1,12 @@
 import 'reflect-metadata'
-import fastify from 'fastify'
+import fastify, { FastifyRequest } from 'fastify'
 import fastifyCors from '@fastify/cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
-import cookie, { FastifyCookieOptions } from 'fastify-cookie'
+import type { FastifyCookieOptions } from '@fastify/cookie'
+import cookie from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'
 import {
   jwtPayloadRefreshToken,
@@ -79,11 +80,18 @@ async function main() {
   //     }
   //   }
   // })
+
+  app.register(cookie, {
+    secret: process.env.COOKIE_SECRET, // for cookies signature
+    parseOptions: {} // options for parsing cookies
+  } as FastifyCookieOptions)
+
   app.register(underPressure, {
     maxEventLoopDelay: 1000,
     retryAfter: 50,
     exposeStatusRoute: true
   })
+
   app.route({
     method: 'GET',
     url: '/health/report',
@@ -98,27 +106,28 @@ async function main() {
         try {
           const newBody = {
             raw: body,
-            parsed: JSON.parse(body)
+            parsed: JSON.parse(body as string)
           }
           done(null, newBody)
-        } catch (error) {
+        } catch (error: any) {
           error.statusCode = 400
           done(error, undefined)
         }
       }
     )
-    fastify.post('/webhook', async (req, reply) => {
+    fastify.post('/webhook', async (req: FastifyRequest, reply) => {
       const sig = req.headers['stripe-signature']
 
       let event
 
       try {
         event = stripe.webhooks.constructEvent(
-          req.body.raw!,
-          sig!,
+          //@ts-expect-error TODO @capaj
+          req.body.raw,
+          sig as string | string[] | Buffer,
           endpointSecret
         )
-      } catch (err) {
+      } catch (err: any) {
         reply.status(400).send(`Webhook Error: ${err.message}`)
         return
       }
@@ -210,11 +219,6 @@ async function main() {
       accessToken
     })
   })
-
-  app.register(cookie, {
-    secret: process.env.COOKIE_SECRET, // for cookies signature
-    parseOptions: {} // options for parsing cookies
-  } as FastifyCookieOptions)
 
   app.register(mercurius, {
     // errorHandler: (err, ctx) => {
