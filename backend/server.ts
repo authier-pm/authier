@@ -1,12 +1,10 @@
 import 'reflect-metadata'
 import fastify from 'fastify'
-import fastifyHelmet from 'fastify-helmet'
 import fastifyCors from '@fastify/cors'
 import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
-
 import cookie, { FastifyCookieOptions } from 'fastify-cookie'
 import { prismaClient } from './prisma/prismaClient'
 import {
@@ -21,12 +19,9 @@ import { GraphqlError } from './api/GraphqlError'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import debug from 'debug'
-
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import { stripe } from './stripe'
-import rawBody from 'fastify-raw-body'
-import { UnauthorizedError } from 'type-graphql'
 
 const { env } = process
 const log = debug('au:server')
@@ -52,14 +47,6 @@ async function main() {
               ignore: 'pid,hostname'
             }
     }
-  })
-
-  await app.register(rawBody, {
-    field: 'rawBody', // change the default request.rawBody property name
-    global: true, // add the rawBody to every request. **Default true**
-    encoding: false, // set it to false to set rawBody as a Buffer **Default utf8**
-    runFirst: true, // get the body before any preParsing hook change/uncompress it. **Default false**
-    routes: [] // array of routes, **`global`** will be ignored, wildcard routes not supported
   })
 
   app.setErrorHandler(async (error, request, reply) => {
@@ -103,39 +90,79 @@ async function main() {
     handler: healthReportHandler
   })
 
-  app.post('/webhook', {
-    config: {
-      //add the rawBody to this route. if false, rawBody will be disabled when global is true
-      rawBody: true
-    },
-    handler(req, reply) {
+  app.register((fastify, opts, done) => {
+    fastify.addContentTypeParser(
+      'application/json',
+      { parseAs: 'string' },
+      function (req, body, done) {
+        try {
+          const newBody = {
+            raw: body,
+            parsed: JSON.parse(body)
+          }
+          done(null, newBody)
+        } catch (error) {
+          error.statusCode = 400
+          done(error, undefined)
+        }
+      }
+    )
+    fastify.post('/webhook', async (req, reply) => {
       const sig = req.headers['stripe-signature']
 
       let event
 
       try {
-        stripe.webhooks.constructEvent(req.rawBody!, sig!, endpointSecret)
+        event = stripe.webhooks.constructEvent(
+          req.body.raw!,
+          sig!,
+          endpointSecret
+        )
       } catch (err) {
-        console.log(err)
         reply.status(400).send(`Webhook Error: ${err.message}`)
         return
       }
 
+      let subscription
+      let status
+
       //Handle the event
       switch (event.type) {
-        case 'payment_intent.succeeded':
-          const paymentIntent = event.data.object
-          console.log('TEST', paymentIntent)
-          //Then define and call a function to handle the event payment_intent.succeeded
+        case 'customer.subscription.deleted':
+          subscription = event.data.object
+          status = subscription.status
+          console.log(`Subscription status is ${status}.`)
+          // Then define and call a method to handle the subscription deleted.
+          // handleSubscriptionDeleted(subscriptionDeleted);
           break
-        // ... handle other event types
+
+        case 'checkout.session.completed':
+          const session = event.data.object
+
+          await prismaClient.user.update({
+            where: {
+              email: session.customer_details.email
+            },
+            data: {
+              UserPaidProducts: {
+                create: {
+                  checkoutSessionId: session.id,
+                  productId: session.subscription
+                }
+              }
+            }
+          })
+
+          break
         default:
-          console.log(`Unhandled event type ${event.type}`)
+          // Unexpected event type
+          console.log(`Unhandled event type ${event.type}.`)
       }
 
       //Return a 200 response to acknowledge receipt of the event
       reply.send()
-    }
+    })
+    done()
   })
 
   app.post('/refresh_token', async (request, reply) => {
