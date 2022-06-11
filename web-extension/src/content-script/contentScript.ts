@@ -172,7 +172,7 @@ export async function initInputWatch() {
     return // no need to do anything-user locked out
   }
 
-  if (secretsForHost.loginCredentials.length > 1) {
+  if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
     renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
     return
   }
