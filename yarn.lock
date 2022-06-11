@@ -2538,6 +2538,14 @@
   dependencies:
     ajv "^6.12.6"
 
+"@fastify/cookie@^7.0.0":
+  version "7.0.0"
+  resolved "https://registry.yarnpkg.com/@fastify/cookie/-/cookie-7.0.0.tgz#f17208546f8d9cb6aae6327684c98efb82c151d8"
+  integrity sha512-/JQcHR4bsFGRo39esT1GTxB0MsMd3loJxNfHYV0MRduXvdiDJd94okiCBlPOesRxwA5dJCqFNo80J7muHG+T+w==
+  dependencies:
+    cookie-signature "^1.1.0"
+    fastify-plugin "^3.0.1"
+
 "@fastify/cors@^7.0.0":
   version "7.0.0"
   resolved "https://registry.yarnpkg.com/@fastify/cors/-/cors-7.0.0.tgz#c67c5a5909498b696bb19578e903f36037ac6f32"
