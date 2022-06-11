@@ -22,7 +22,8 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
-
+import { SecretUsageEventInput } from './types/SecretUsageEventInput'
+import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -88,27 +89,23 @@ export class UserMutation extends UserBase {
       })
     })
   }
-  // @Field(() => Boolean)
-  // async createSecretUsageEvent(
-  //   @Arg('data', () => OTPEvent) event: OTPEvent,
-  //   @Ctx() context: IContext
-  // ) {
-  //   try {
-  //     await prisma.secretUsageEvent.create({
-  //       data: {
-  //         kind: event.kind,
-  //         url: event.url,
-  //         deviceId: context.request.
-  //         userId: this.id,
-  //         ipAddress: context.getIpAddress()
-  //       }
-  //     })
-  //     return true
-  //   } catch (error) {
-  //     console.log(error)
-  //     return false
-  //   }
-  // }
+  @Field(() => SecretUsageEventGQLScalars)
+  async createSecretUsageEvent(
+    @Arg('event', () => SecretUsageEventInput)
+    event: SecretUsageEventInput,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.secretUsageEvent.create({
+      data: {
+        kind: event.kind,
+        url: event.url,
+        deviceId: ctx.device.id,
+        userId: this.id,
+        ipAddress: ctx.getIpAddress(),
+        secretId: event.secretId
+      }
+    })
+  }
   @Field(() => [EncryptedSecretQuery])
   async addEncryptedSecrets(
     @Arg('secrets', () => [EncryptedSecretInput])

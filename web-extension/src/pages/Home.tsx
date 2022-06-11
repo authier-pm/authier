@@ -8,7 +8,6 @@ import {
   FormLabel,
   Grid,
   IconButton,
-  Stack,
   Switch,
   useInterval
 } from '@chakra-ui/react'

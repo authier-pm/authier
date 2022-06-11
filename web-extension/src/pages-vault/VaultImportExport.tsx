@@ -55,7 +55,7 @@ const mapCsvToLoginCredentials = (csv: string[][]) => {
 
   return csv
     .slice(1)
-    .filter((row) => row[indexUrl])
+    .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
       url: row[indexUrl],
       label: row[indexLabel],
@@ -82,6 +82,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
           toast.error('failed to parse')
         }
         const mapped = mapCsvToLoginCredentials(results.data)
+
         // TODO add to device state
         const state = device.state as DeviceState
 

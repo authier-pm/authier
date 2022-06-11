@@ -4,7 +4,6 @@ import { ILoginSecret } from '../../util/useDeviceState'
 import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
 import { useState, useEffect } from 'preact/hooks'
 import { promptOption } from '../renderLoginCredOption'
-import { enabled } from '../autofill'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -50,10 +49,9 @@ export const PromptPasswordOption = ({
         fontFamily: 'sans-serif !important',
         position: 'fixed',
         top: (pos?.top as number) - 10 + 'px',
-        left: (pos?.left as number) - 30 + 'px',
+        left: pos?.left + pos?.width + 'px',
         right: pos?.right + 'px',
-        bottom: pos?.bottom + 'px',
-        margin: '5px'
+        bottom: pos?.bottom + 'px'
       }}
     >
       <span className="iconAuthier"></span>
@@ -62,14 +60,16 @@ export const PromptPasswordOption = ({
         {loginCredentials.map((el) => (
           <a
             onClick={async () => {
-              //enabled = false
-              autofill({
-                secretsForHost: { loginCredentials: [el], totpSecrets: [] },
-                autofillEnabled: true,
-                extensionDeviceReady: true,
-                saveLoginModalsState: undefined,
-                webInputs: webInputs
-              })
+              autofill(
+                {
+                  secretsForHost: { loginCredentials: [el], totpSecrets: [] },
+                  autofillEnabled: true,
+                  extensionDeviceReady: true,
+                  saveLoginModalsState: undefined,
+                  webInputs: webInputs
+                },
+                true
+              )
             }}
           >
             {el.loginCredentials.username}
@@ -79,51 +79,3 @@ export const PromptPasswordOption = ({
     </div>
   )
 }
-
-// export class Test extends Component {
-//   constructor() {
-//     super()
-//     this.initState = el?.getBoundingClientRect()
-//   }
-
-//   render() {
-//     console.log('Test', props)
-
-//     return (
-//       <div
-//         class="dropdown"
-//         style={{
-//           zIndex: '2147483647', // max z-index according to stackoverflow
-//           justifyContent: 'center',
-//           alignItems: 'baseline',
-//           fontFamily: 'sans-serif !important',
-//           position: 'fixed',
-//           top: value?.top + 'px',
-//           left: (value?.left as number) + (value?.width as number) + 'px',
-//           right: value?.right + 'px',
-//           bottom: value?.bottom + 'px',
-//           margin: '5px'
-//         }}
-//       >
-//         <button className="dropbtn">Dropdown</button>
-//         <div className="dropdown-content">
-//           {loginCredentials.map((el) => (
-//             <a
-//               onClick={async () => {
-//                 autofill({
-//                   secretsForHost: { loginCredentials: [el], totpSecrets: [] },
-//                   autofillEnabled: true,
-//                   extensionDeviceReady: true,
-//                   saveLoginModalsState: undefined,
-//                   webInputs: webInputs
-//                 })
-//               }}
-//             >
-//               {el.loginCredentials.username}
-//             </a>
-//           ))}
-//         </div>
-//       </div>
-//     )
-//   }
-// }

@@ -1,5 +1,7 @@
-mutation addOTPEvent($kind: String!, $url: String!) {
+mutation addOTPEvent($event: SecretUsageEventInput!) {
   me {
-    addOTPEvent(data: { kind: $kind, url: $url })
+    createSecretUsageEvent(event: $event) {
+      id
+    }
   }
 }
