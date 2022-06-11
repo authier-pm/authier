@@ -8,7 +8,7 @@ import {
   Image,
   Stack
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon, AddIcon } from '@chakra-ui/icons'
+import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
 import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
 import React from 'react'

@@ -26,17 +26,13 @@ import { UserMutation } from '../models/UserMutation'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
-import {
-  GraphQLEmailAddress,
-  GraphQLPositiveInt,
-  GraphQLUUID
-} from 'graphql-scalars'
+import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '@prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
-import { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 
@@ -47,6 +43,7 @@ import {
   DecryptionChallengeUnion
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
+import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 const log = debug('au:RootResolver')
 
@@ -93,6 +90,11 @@ export class RootResolver {
     })
 
     return user
+  }
+
+  @Query(() => String)
+  osTime() {
+    return new Date().toISOString()
   }
 
   @Query(() => Boolean, {

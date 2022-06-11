@@ -1,32 +1,18 @@
 import {
-  Box,
-  Center,
-  Heading,
   Stack,
-  useColorModeValue,
   Button,
   Flex,
   Input,
-  InputGroup,
-  InputRightElement,
-  Progress,
-  IconButton,
-  useDisclosure,
-  SimpleGrid,
-  Spinner,
-  Alert,
   FormControl,
   FormErrorMessage,
-  FormLabel,
-  Tooltip,
-  Select
+  FormLabel
 } from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
-import { useHistory } from 'react-router-dom'
+import React from 'react'
 
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
+import { useNavigate } from 'react-router-dom'
 
 interface LoginParsedValues {
   url: string
@@ -36,7 +22,7 @@ interface LoginParsedValues {
 }
 
 export const AddTOTP = () => {
-  const history = useHistory()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -64,7 +50,7 @@ export const AddTOTP = () => {
           ])
 
           setSubmitting(false)
-          history.goBack()
+          navigate(-1)
         }}
       >
         {({ values, isSubmitting, dirty }) => {
@@ -122,7 +108,7 @@ export const AddTOTP = () => {
                   }}
                   fontSize={'sm'}
                   size="sm"
-                  onClick={() => history.push('/')}
+                  onClick={() => navigate('/')}
                 >
                   Go back
                 </Button>

@@ -21,6 +21,8 @@ import {
 } from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
 import { renderLoginCredOption } from './renderLoginCredOption'
+import { recordDiv, renderToast } from './renderToast'
+import { renderItemPopup } from './renderItemPopup'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -59,19 +61,98 @@ export function getWebInputKind(
   return (
     (targetElement.type === 'password'
       ? WebInputType.PASSWORD
-      : inputKindMap[targetElement.autocomplete]) ?? null
+      : inputKindMap[targetElement.autocomplete]) ?? 'USERNAME_OR_EMAIL'
   )
+}
+
+let clickCount = 0
+let recording = false
+
+const hideToast = () => {
+  const x = document.getElementById('toast')
+
+  setTimeout(function () {
+    x?.remove()
+  }, 5000)
 }
 
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-
+let stateInitRes: IInitStateRes
 export async function initInputWatch() {
-  const stateInitRes: IInitStateRes = await browser.runtime.sendMessage({
+  stateInitRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
+
   log('~ stateInitRes', stateInitRes)
+
+  if (stateInitRes) {
+    document.addEventListener('keydown', onKeyDown)
+  }
+
+  function onKeyDown(e?: KeyboardEvent) {
+    if (
+      e &&
+      e.shiftKey &&
+      e.ctrlKey &&
+      (e.key === 'q' || e.key === 'Q') &&
+      !recording
+    ) {
+      recording = true
+      renderToast({
+        header: 'Recording started',
+        text: 'Press Ctrl + shift + Q to stop'
+      })
+
+      document.addEventListener('click', clicked)
+    } else if (
+      e &&
+      e.shiftKey &&
+      e.ctrlKey &&
+      (e.key === 'q' || e.key === 'Q') &&
+      recording
+    ) {
+      domRecorder.clearCapturedEvents()
+      document.removeEventListener('click', clicked)
+      recordDiv?.remove()
+      clickCount = 0
+      recording = false
+      hideToast()
+    }
+  }
+
+  function clicked(e: MouseEvent) {
+    console.log(e)
+
+    //@ts-expect-error TODO
+    if (e.target.type === 'password' || e.target.type === 'text') {
+      domRecorder.addInputEvent({
+        element: e.target as HTMLInputElement,
+        eventType: 'input',
+        kind: getWebInputKind(e.target as HTMLInputElement)
+      })
+
+      clickCount = clickCount + 1
+    }
+
+    if (clickCount === 2) {
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.saveCapturedInputEvents,
+        payload: {
+          inputEvents: domRecorder.toJSON(),
+          url: document.documentURI
+        }
+      })
+
+      recordDiv?.remove()
+      recording = false
+      clickCount = 0
+      document.removeEventListener('click', clicked)
+
+      renderItemPopup()
+    }
+  }
 
   if (!stateInitRes) {
     log('no state')
@@ -87,6 +168,7 @@ export async function initInputWatch() {
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
+    log('no need to do anything-user locked out')
     return // no need to do anything-user locked out
   }
 
@@ -101,6 +183,7 @@ export async function initInputWatch() {
     saveLoginModalsState.username &&
     saveLoginModalsState.password
   ) {
+    log('rendering save credentials form')
     renderSaveCredentialsForm(
       saveLoginModalsState.username,
       saveLoginModalsState.password
@@ -111,6 +194,7 @@ export async function initInputWatch() {
   const showSavePromptIfAppropriate = async () => {
     console.log('showSavePromptIfAppropriate')
     if (promptDiv) {
+      console.log('not promptDiv')
       return
     }
     const username = domRecorder.getUsername()
@@ -140,6 +224,14 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
+    })
+
     showSavePromptIfAppropriate()
   }
 
@@ -154,10 +246,11 @@ export async function initInputWatch() {
   const debouncedInputEventListener = debounce((ev) => {
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
+    console.log(domRecorder.toJSON().length)
     if (
-      (targetElement && isPasswordType) ||
-      targetElement.type === 'text' ||
-      targetElement.type === 'email'
+      (targetElement && isPasswordType && domRecorder.toJSON().length === 0) ||
+      (targetElement.type === 'text' && domRecorder.toJSON().length === 0) ||
+      (targetElement.type === 'email' && domRecorder.toJSON().length === 0)
     ) {
       const inputted = targetElement.value
       if (inputted) {
@@ -190,7 +283,6 @@ export async function initInputWatch() {
           })
         }
 
-        log('inputRecord', inputRecord)
         if (targetElement.type === 'password') {
           log('password inputted', inputted)
 

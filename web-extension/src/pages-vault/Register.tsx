@@ -23,7 +23,7 @@ import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from './registerNewUser.codegen'
-import { Link, useHistory } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 declare global {
   interface Crypto {
@@ -39,7 +39,7 @@ export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
   const [register, { data, loading, error: registerError }] =
     useRegisterNewUserMutation()
-  let history = useHistory()
+  const navigate = useNavigate()
 
   // console.log('~ fireToken', fireToken)
   const { fireToken } = device
@@ -114,7 +114,7 @@ export default function Register(): ReactElement {
             }
 
             device.save(deviceState)
-            history.push('/')
+            navigate('/')
             setSubmitting(false)
           }
         }}
@@ -170,13 +170,7 @@ export default function Register(): ReactElement {
             >
               Register
             </Button>
-            <chakra.p
-              p={2}
-              fontSize="xs"
-              textAlign="center"
-              color="gray.600"
-              backgroundColor="whiteAlpha.500"
-            >
+            <chakra.p p={2} fontSize="xs" textAlign="center" color="gray.600">
               By signing up you agree to our{' '}
               <chakra.a color="brand.500">Terms of Service</chakra.a>
             </chakra.p>
