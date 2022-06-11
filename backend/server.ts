@@ -1,7 +1,6 @@
 import 'reflect-metadata'
 import fastify, { FastifyRequest } from 'fastify'
 import fastifyCors from '@fastify/cors'
-import underPressure from 'under-pressure'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
@@ -23,6 +22,7 @@ import debug from 'debug'
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import { stripe } from './stripe'
+import underPressure from '@fastify/under-pressure'
 
 const { env } = process
 const log = debug('au:server')
