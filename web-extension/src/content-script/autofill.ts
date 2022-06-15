@@ -12,7 +12,6 @@ import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { debounce } from 'lodash'
-import { Handler } from 'mitt'
 
 const log = debug('au:autofill')
 
@@ -57,7 +56,7 @@ const uselessInputTypes = [
 ]
 
 export let autofillEnabled = false
-let onInputAddedHandler: Handler<HTMLInputElement> | undefined
+let onInputAddedHandler
 
 export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
@@ -147,17 +146,14 @@ export const autofill = (initState: IInitStateRes) => {
       const autofillRes = searchInputsAndAutofill(document.body)
       console.log('~ autofillRes', autofillRes)
       const iframe = document.createElement('iframe')
-      if (
-        autofillRes.findIndex((filled) => filled === true) === -1 &&
-        iframe.contentDocument?.body
-      ) {
+      if (autofillRes === false && iframe.contentDocument?.body) {
         // No input found, try first iframe
         searchInputsAndAutofill(iframe.contentDocument?.body)
       }
     }
 
     if (onInputAddedHandler) {
-      bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
+      bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
     }
     onInputAddedHandler = debounce(
       (input) => {
@@ -200,6 +196,8 @@ export const autofill = (initState: IInitStateRes) => {
       }
     )
 
+    //If input shows on loaded page
+
     bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
 
     if (!namePassSecret && !totpSecret) {
@@ -233,26 +231,25 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const inputEls = documentBody.querySelectorAll(
-        'input[type=text], input[type=tel], input[type=email], input[type=password]'
+      const inputEls = documentBody.querySelectorAll('input')
+      const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
+        (el) => uselessInputTypes.includes(el.type) === false
       )
-      const inputElsArray: HTMLInputElement[] = Array.from(
-        inputEls
-      ) as HTMLInputElement[]
 
-      return inputElsArray.map((input, index, arr) => {
+      for (let index = 0; index < inputElsArray.length; index++) {
+        const input = inputElsArray[index]
         if (input.type === 'password') {
           //Search for a username input
           for (let j = index - 1; j >= 0; j--) {
-            if (arr[j].type !== 'hidden') {
-              log('found username input', arr[j])
+            if (inputElsArray[j].type !== 'hidden') {
+              log('found username input', inputElsArray[j])
               const autofilledElUsername = autofillValueIntoInput(
-                arr[j],
+                inputElsArray[j],
                 secretsForHost.loginCredentials[0].loginCredentials.username
               )
 
               domRecorder.addInputEvent({
-                element: arr[j],
+                element: inputElsArray[j],
                 eventType: 'input',
                 inputted:
                   secretsForHost.loginCredentials[0].loginCredentials.username,
@@ -276,8 +273,8 @@ export const autofill = (initState: IInitStateRes) => {
           }
           return false
         }
-        return false
-      })
+      }
+      return false
     }
   }
 
