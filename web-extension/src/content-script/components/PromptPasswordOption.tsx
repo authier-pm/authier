@@ -1,3 +1,5 @@
+// @ts-nocheck
+
 import { h } from 'preact'
 import { ILoginSecret } from '../../util/useDeviceState'
 import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
@@ -65,24 +67,26 @@ export const PromptPasswordOption = ({
       <span className="iconAuthier"></span>
 
       <div className="dropdown-content">
-        {loginCredentials.map((el) => (
-          <a
-            onClick={async () => {
-              autofill(
-                {
-                  secretsForHost: { loginCredentials: [el], totpSecrets: [] },
-                  autofillEnabled: true,
-                  extensionDeviceReady: true,
-                  saveLoginModalsState: undefined,
-                  webInputs: webInputs
-                },
-                true
-              )
-            }}
-          >
-            {el.loginCredentials.username}
-          </a>
-        ))}
+        {loginCredentials.map((el) => {
+          return (
+            <a
+              onClick={async () => {
+                autofill(
+                  {
+                    secretsForHost: { loginCredentials: [el], totpSecrets: [] },
+                    autofillEnabled: true,
+                    extensionDeviceReady: true,
+                    saveLoginModalsState: undefined,
+                    webInputs: webInputs
+                  },
+                  true
+                )
+              }}
+            >
+              {el.loginCredentials.username}
+            </a>
+          )
+        })}
       </div>
     </div>
   )
