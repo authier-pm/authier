@@ -67,7 +67,7 @@ export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
   return {
     kind: EncryptedSecretType.TOTP,
     totp: secret as string,
-    encrypted: device.state?.encrypt(secret),
+    encrypted: device.state!.encrypt(secret),
     iconUrl: tab.favIconUrl,
     createdAt: new Date().toJSON(),
     label:

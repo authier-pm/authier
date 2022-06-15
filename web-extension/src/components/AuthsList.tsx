@@ -239,13 +239,16 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           [
             getRecentlyUsed(TOTPSecrets).map((auth, i) => {
               return (
-                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
+                <OtpCode
+                  totpData={auth as any as ITOTPSecret}
+                  key={auth.label + i}
+                />
               )
             }),
             getRecentlyUsed(LoginCredentials).map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginSecret={psw as ILoginSecret}
+                  loginSecret={psw as any as ILoginSecret}
                   key={psw.label + i}
                 />
               )
