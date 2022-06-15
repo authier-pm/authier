@@ -1,6 +1,4 @@
-import { Flex, Spinner } from '@chakra-ui/react'
-import React, { ReactElement, useContext, useEffect } from 'react'
-import browser from 'webextension-polyfill'
+import React, { ReactElement, useContext } from 'react'
 import { AuthLinkPage } from './AuthLinkPage'
 import { device } from './background/ExtensionDevice'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'

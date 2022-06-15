@@ -11,6 +11,8 @@ import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { debounce } from 'lodash'
+import { Handler } from 'mitt'
 
 const log = debug('au:autofill')
 
@@ -54,17 +56,19 @@ const uselessInputTypes = [
   'time'
 ]
 
-export let enabled = false
-export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
+export let autofillEnabled = false
+let onInputAddedHandler: Handler<HTMLInputElement> | undefined
+
+export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
 
-  if (enabled === true && !fillAgain) {
+  if (autofillEnabled === true) {
     log('enabled is true, returning')
     return () => {}
   }
   log('init autofill', initState)
 
-  enabled = true
+  autofillEnabled = true
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
@@ -73,13 +77,13 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
     //Distinguish between register and login from by the number of inputs
     //Then Distinguish between phased and not phased
 
-    const usefullInputs = Array.from(
+    const usefulInputs = Array.from(
       document.body.querySelectorAll('input')
     ).filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
     )
 
-    if (usefullInputs.length > 2) {
+    if (usefulInputs.length > 2) {
       // Autofill register form
     }
 
@@ -152,38 +156,51 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
       }
     }
 
-    //If input shows on loaded page
-    bodyInputChangeEmitter.on('inputAdded', (input) => {
-      const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
+    if (onInputAddedHandler) {
+      bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
+    }
+    onInputAddedHandler = debounce(
+      (input) => {
+        console.log('~ input', input)
 
-      // For one input on page
-      if (
-        input.autocomplete === 'new-password' ||
-        (webInputs.length === 0 && input.type === 'password')
-      ) {
-        autofillValueIntoInput(input, generate(passwordGenOptions))
-      } else {
-        // More inputs on page
-        if (input.type === 'password') {
-          const passwordInputsOnPage = document.querySelectorAll(
-            'input[type="password"]'
-          ) as NodeListOf<HTMLInputElement>
+        const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
-          if (
-            passwordInputsOnPage.length === 2 &&
-            passwordInputsOnPage[0].autocomplete !== 'current-password' &&
-            passwordInputsOnPage[1].autocomplete !== 'current-password'
-          ) {
-            const newPassword = generate(passwordGenOptions)
-            // must be some kind of signup page
-            autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
+        // For one input on page
+        if (
+          input.autocomplete === 'new-password' ||
+          (webInputs.length === 0 && input.type === 'password')
+        ) {
+          autofillValueIntoInput(input, generate(passwordGenOptions))
+        } else {
+          // More inputs on page
+          if (input.type === 'password') {
+            const passwordInputsOnPage = document.querySelectorAll(
+              'input[type="password"]'
+            ) as NodeListOf<HTMLInputElement>
 
-            autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
+            if (
+              passwordInputsOnPage.length === 2 &&
+              passwordInputsOnPage[0].autocomplete !== 'current-password' &&
+              passwordInputsOnPage[1].autocomplete !== 'current-password'
+            ) {
+              const newPassword = generate(passwordGenOptions)
+              // must be some kind of signup page
+              autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
+
+              autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
+            }
+          } else {
+            scanKnownWebInputsAndFillWhenFound()
           }
         }
-        setTimeout(scanKnownWebInputsAndFillWhenFound, 20)
+      },
+      500,
+      {
+        trailing: true
       }
-    })
+    )
+
+    bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
 
     if (!namePassSecret && !totpSecret) {
       return () => {}
@@ -267,7 +284,7 @@ export const autofill = (initState: IInitStateRes, fillAgain?: boolean) => {
   setTimeout(scanKnownWebInputsAndFillWhenFound, 100) // let's wait a bit for the page to load
 
   return () => {
-    enabled = false
+    autofillEnabled = false
     bodyInputChangeEmitter.off('inputAdded', scanKnownWebInputsAndFillWhenFound)
   }
 }
