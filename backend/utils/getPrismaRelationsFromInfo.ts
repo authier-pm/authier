@@ -15,6 +15,7 @@ export const getPrismaRelationsFromInfo = ({
   info: GraphQLResolveInfo
   rootModel: DMMF.Model
 }) => {
+  //@ts-ignore
   const queriedFields = getFieldNames(info)
 
   const relationsChains = queriedFields
