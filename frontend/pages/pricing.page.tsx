@@ -53,7 +53,7 @@ export default function PricingPage() {
     const response = await createCheckoutSessionMutation({
       variables: {
         product: type,
-        userId: 'ea0d51c2-4edd-4b61-af03-d09b50a8e6a3'
+        userId: '93a4c066-5e91-4cfb-93a5-aeb3072ed9f5'
       }
     })
 
