@@ -1,4 +1,5 @@
 // @ts-nocheck
+
 import { h } from 'preact'
 import { ILoginSecret } from '../../util/useDeviceState'
 import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
@@ -25,18 +26,27 @@ export const PromptPasswordOption = ({
     createdAt: string
   }>
 }) => {
+  if (webInputs.length === 0) {
+    return null
+  }
   console.log('GOT in option prompt', { webInputs, loginCredentials })
+
   const el = document.querySelector(webInputs[0].domPath)
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer
   window.onresize = function () {
-    promptOption.remove()
-    clearTimeout(resizeTimer)
-    resizeTimer = setTimeout(function () {
-      setPos(el?.getBoundingClientRect())
-      document.body.appendChild(promptOption)
-    }, 100)
+    if (promptOption) {
+      promptOption.remove()
+      clearTimeout(resizeTimer)
+      resizeTimer = setTimeout(function () {
+        setPos(el?.getBoundingClientRect())
+        document.body.appendChild(promptOption)
+      }, 100)
+    }
+  }
+  if (!pos) {
+    return null
   }
 
   return (
@@ -48,33 +58,35 @@ export const PromptPasswordOption = ({
         alignItems: 'baseline',
         fontFamily: 'sans-serif !important',
         position: 'fixed',
-        top: (pos?.top as number) - 10 + 'px',
-        left: pos?.left + pos?.width + 'px',
-        right: pos?.right + 'px',
-        bottom: pos?.bottom + 'px'
+        top: (pos.top as number) - 10 + 'px',
+        left: pos.left + pos.width + 'px',
+        right: pos.right + 'px',
+        bottom: pos.bottom + 'px'
       }}
     >
       <span className="iconAuthier"></span>
 
       <div className="dropdown-content">
-        {loginCredentials.map((el) => (
-          <a
-            onClick={async () => {
-              autofill(
-                {
-                  secretsForHost: { loginCredentials: [el], totpSecrets: [] },
-                  autofillEnabled: true,
-                  extensionDeviceReady: true,
-                  saveLoginModalsState: undefined,
-                  webInputs: webInputs
-                },
-                true
-              )
-            }}
-          >
-            {el.loginCredentials.username}
-          </a>
-        ))}
+        {loginCredentials.map((el) => {
+          return (
+            <a
+              onClick={async () => {
+                autofill(
+                  {
+                    secretsForHost: { loginCredentials: [el], totpSecrets: [] },
+                    autofillEnabled: true,
+                    extensionDeviceReady: true,
+                    saveLoginModalsState: undefined,
+                    webInputs: webInputs
+                  },
+                  true
+                )
+              }}
+            >
+              {el.loginCredentials.username}
+            </a>
+          )
+        })}
       </div>
     </div>
   )

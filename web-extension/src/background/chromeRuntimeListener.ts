@@ -104,6 +104,7 @@ browser.runtime.onMessage.addListener(async function (
           encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
           iconUrl: tab.favIconUrl,
           url: inputsUrl,
+          createdAt: new Date().toJSON(),
           label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
         }
       ])

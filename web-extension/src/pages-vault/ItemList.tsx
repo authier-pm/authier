@@ -123,6 +123,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   )
 }
 
+// TODO virtualize this
 export const ItemList = () => {
   const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')

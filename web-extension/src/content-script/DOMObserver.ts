@@ -5,6 +5,24 @@ export const bodyInputChangeEmitter = mitt<{
   inputAdded: HTMLInputElement
 }>()
 
+const inputDebounceMap = new Map()
+
+const DEBOUNCE_TIME = 180 // we want to debounce the emitted events- we don't want to emit events for every DOM mutation if there are many in quick succession
+
+function emitDebounced(
+  eventName: 'inputRemoved' | 'inputAdded',
+  input: HTMLInputElement
+) {
+  if (inputDebounceMap.has(input)) {
+    clearTimeout(inputDebounceMap.get(input))
+  }
+  const timer = setTimeout(() => {
+    bodyInputChangeEmitter.emit(eventName, input)
+    inputDebounceMap.delete(input)
+  }, DEBOUNCE_TIME)
+  inputDebounceMap.set(input, timer)
+}
+
 /**
  * inspired from https://usefulangle.com/post/357/javascript-detect-element-removed-from-dom
  */
@@ -14,20 +32,17 @@ export const inputDomMutationObserver = new MutationObserver(function (
   mutationsList.forEach(function (mutation) {
     mutation.removedNodes.forEach(function (removedNode) {
       if (removedNode.nodeName === 'INPUT') {
-        bodyInputChangeEmitter.emit(
-          'inputRemoved',
-          removedNode as HTMLInputElement
-        )
+        emitDebounced('inputRemoved', removedNode as HTMLInputElement)
       }
     })
     mutation.addedNodes.forEach(function (addedNode) {
       if (addedNode.nodeName === 'INPUT') {
-        bodyInputChangeEmitter.emit('inputAdded', addedNode as HTMLInputElement)
+        emitDebounced('inputAdded', addedNode as HTMLInputElement)
       } else if (addedNode['querySelectorAll']) {
-        // @ts-expect-error
+        // @ts-expect-error TODO
         const childInputs = addedNode.querySelectorAll('input')
         for (const input of childInputs) {
-          bodyInputChangeEmitter.emit('inputAdded', input)
+          emitDebounced('inputAdded', input)
         }
       }
     })
