@@ -3022,10 +3022,10 @@
   dependencies:
     ajv "^6.12.6"
 
-"@fastify/cookie@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@fastify/cookie/-/cookie-7.0.0.tgz#f17208546f8d9cb6aae6327684c98efb82c151d8"
-  integrity sha512-/JQcHR4bsFGRo39esT1GTxB0MsMd3loJxNfHYV0MRduXvdiDJd94okiCBlPOesRxwA5dJCqFNo80J7muHG+T+w==
+"@fastify/cookie@^6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@fastify/cookie/-/cookie-6.0.0.tgz#ba0418c8d26c105e6b069c42fe9ee7a1c22f75c9"
+  integrity sha512-Luy3Po3dOJmqAuPCiPcWsX0tV5+C3AOnULSdlsGjNGOvyE7jqzysp8kT9ICfsUvove+TeUMgTWl1y9XS3ZPPMg==
   dependencies:
     cookie-signature "^1.1.0"
     fastify-plugin "^3.0.1"
@@ -3042,14 +3042,6 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@fastify/error/-/error-2.0.0.tgz#a9f94af56eb934f0ab1ce4ef9f0ced6ebf2319dc"
   integrity sha512-wI3fpfDT0t7p8E6dA2eTECzzOd+bZsZCJ2Hcv+Onn2b7ZwK3RwD27uW2QDaMtQhAfWQQP+WNK7nKf0twLsBf9w==
-
-"@fastify/under-pressure@^7.0.0":
-  version "7.0.0"
-  resolved "https://registry.yarnpkg.com/@fastify/under-pressure/-/under-pressure-7.0.0.tgz#ef9ef7ff9e43e7586894a1e6bcc43411fae59e4d"
-  integrity sha512-UhdC9+wEJRmLnbSYyINOcykiJDgPwflSxGz5Vw91192D25MmddbwM4+nCnG9JX2ZzMDJ57b0aQjYJj+asfqYMg==
-  dependencies:
-    "@fastify/error" "^2.0.0"
-    fastify-plugin "^3.0.0"
 
 "@firebase/analytics-compat@0.1.10":
   version "0.1.10"
@@ -10562,14 +10554,7 @@ graphql-ws@^5.4.1:
   resolved "https://registry.yarnpkg.com/graphql-ws/-/graphql-ws-5.8.2.tgz#800184b1addb20b3010dc06cb70877703a5fff20"
   integrity sha512-hYo8kTGzxePFJtMGC7Y4cbypwifMphIJJ7n4TDcVUAfviRwQBnmZAbfZlC+XFwWDUaR7raEDQPxWctpccmE0JQ==
 
-graphql@^14.5.3:
-  version "14.7.0"
-  resolved "https://registry.yarnpkg.com/graphql/-/graphql-14.7.0.tgz#7fa79a80a69be4a31c27dda824dc04dac2035a72"
-  integrity sha512-l0xWZpoPKpppFzMfvVyFmp9vLN7w/ZZJPefUicMCepfJeQ8sMcztloGYY9DfjVPo6tIUDzU5Hw3MUbIjj9AVVA==
-  dependencies:
-    iterall "^1.2.2"
-
-graphql@^15.5.1, graphql@^15.8.0:
+graphql@^14.5.3, graphql@^15.5.1, graphql@^15.8.0:
   version "15.8.0"
   resolved "https://registry.yarnpkg.com/graphql/-/graphql-15.8.0.tgz#33410e96b012fa3bdb1091cc99a94769db212b38"
   integrity sha512-5gghUc24tP9HRznNpV2+FIoq3xKkj5dTQqf4v0CpdPbFVwFkWoxOM+o+2OC9ZSvjEMTjfmG9QT+gcvggTwW1zw==
@@ -11610,7 +11595,7 @@ istanbul-reports@^3.1.3:
     html-escaper "^2.0.0"
     istanbul-lib-report "^3.0.0"
 
-iterall@^1.2.2, iterall@^1.3.0:
+iterall@^1.3.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/iterall/-/iterall-1.3.0.tgz#afcb08492e2915cbd8a0884eb93a8c94d0d72fea"
   integrity sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==
@@ -17489,22 +17474,6 @@ undefsafe@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/undefsafe/-/undefsafe-2.0.5.tgz#38733b9327bdcd226db889fb723a6efd162e6e2c"
   integrity sha512-WxONCrssBM8TSPRqN5EmsjVrsv4A8X12J4ArBiiayv3DyyG3ZlIg6yysuuSYdZsVz3TKcTg2fd//Ujd4CHV1iA==
-
-"under-pressure-deprecated@npm:under-pressure@6.0.0":
-  version "6.0.0"
-  resolved "https://registry.yarnpkg.com/under-pressure/-/under-pressure-6.0.0.tgz#f819afca22c3b5ace828dd451eaad2c109860fd3"
-  integrity sha512-WzjbH+xyX4gLoT8dY2/VYga+sVrGDFQEcj1l8q9nJ/RgLS5fAix/x5W9P+Hi/71gQ5UInixE0hfiQIBx8GEGhQ==
-  dependencies:
-    "@fastify/error" "^2.0.0"
-    fastify-plugin "^3.0.0"
-
-under-pressure@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/under-pressure/-/under-pressure-6.1.0.tgz#73345a902521bc39ea266c0f80a27c72390dbed6"
-  integrity sha512-6p89wh9logkVWWXGXwMbpU75ehEjWLL8Wn2g3NNf24kqPl4eXPqcCKlKMZDAzmXtp65C87H8hy3euG6AXnXPCA==
-  dependencies:
-    process-warning "^1.0.0"
-    under-pressure-deprecated "npm:under-pressure@6.0.0"
 
 undici@5.0.0:
   version "5.0.0"
