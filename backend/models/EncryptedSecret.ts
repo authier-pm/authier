@@ -4,7 +4,23 @@ import { EncryptedSecretGQL } from './generated/EncryptedSecret'
 import { EncryptedSecretInput } from './models'
 
 @ObjectType()
-export class EncryptedSecretQuery extends EncryptedSecretGQL {}
+export class EncryptedSecretQuery extends EncryptedSecretGQL {
+  @Field(() => Date, { nullable: true })
+  async lastUsedAt(@Ctx() ctx: IContextAuthenticated) {
+    const lastUsed = await ctx.prisma.secretUsageEvent.findFirst({
+      where: {
+        secretId: this.id
+      },
+      orderBy: {
+        timestamp: 'desc'
+      },
+      select: {
+        timestamp: true
+      }
+    })
+    return lastUsed?.timestamp
+  }
+}
 
 @ObjectType()
 export class EncryptedSecretMutation extends EncryptedSecretQuery {

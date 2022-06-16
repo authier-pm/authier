@@ -20,8 +20,6 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const stringSimilarity = require('string-similarity')
 
 import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
@@ -35,6 +33,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { SecretItemIcon } from './SecretItemIcon'
+import { SecretSerializedType } from '@src/background/backgroundPage'
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
@@ -192,15 +191,19 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
       return true
     }
 
-    return (
-      stringSimilarity.compareTwoStrings(
-        extractHostname(url),
-        extractHostname(currentURL)
-      ) > 0.5
-    )
+    return extractHostname(url) === extractHostname(currentURL)
   })
 
   const hasNoSecrets = deviceState.secrets.length === 0
+
+  const getRecentlyUsed = (secrets: Array<SecretSerializedType>) => {
+    return secrets
+      .sort((a, b) =>
+        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
+      )
+      .slice(0, 20) // we get items
+  }
+
   return (
     <>
       <Flex flexDirection="column">
@@ -234,15 +237,18 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           </>
         ) : (
           [
-            TOTPSecrets.map((auth, i) => {
+            getRecentlyUsed(TOTPSecrets).map((auth, i) => {
               return (
-                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
+                <OtpCode
+                  totpData={auth as any as ITOTPSecret}
+                  key={auth.label + i}
+                />
               )
             }),
-            LoginCredentials.map((psw, i) => {
+            getRecentlyUsed(LoginCredentials).map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginSecret={psw as ILoginSecret}
+                  loginSecret={psw as any as ILoginSecret}
                   key={psw.label + i}
                 />
               )
