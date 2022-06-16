@@ -22,7 +22,6 @@ import debug from 'debug'
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import { stripe } from './stripe'
-import underPressure from '@fastify/under-pressure'
 
 const { env } = process
 const log = debug('au:server')
@@ -34,8 +33,7 @@ sentryInit({
   release: `<project-name>@${pkg.version}`
 })
 
-const endpointSecret =
-  'whsec_a5f8e80deb9a6c6aa46646127601e0788905dd1b956c3e2a1021e8b5884a7a68'
+const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
 
 async function main() {
   const app = fastify({
@@ -85,12 +83,6 @@ async function main() {
     secret: process.env.COOKIE_SECRET, // for cookies signature
     parseOptions: {} // options for parsing cookies
   } as FastifyCookieOptions)
-
-  app.register(underPressure, {
-    maxEventLoopDelay: 1000,
-    retryAfter: 50,
-    exposeStatusRoute: true
-  })
 
   app.route({
     method: 'GET',
