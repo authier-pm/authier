@@ -1,11 +1,9 @@
 import './chromeRuntimeListener'
 import debug from 'debug'
-import { EncryptedSecretGql } from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretQuery } from '../../../shared/generated/graphqlBaseTypes'
 
 export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
-
-const broadcast = new BroadcastChannel('test-channel')
 
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
@@ -25,8 +23,17 @@ if ('serviceWorker' in navigator) {
 }
 
 export type SecretSerializedType = Pick<
-  EncryptedSecretGql,
-  'id' | 'encrypted' | 'kind' | 'label' | 'iconUrl' | 'url'
+  EncryptedSecretQuery,
+  | 'id'
+  | 'encrypted'
+  | 'kind'
+  | 'label'
+  | 'iconUrl'
+  | 'url'
+  | 'lastUsedAt'
+  | 'createdAt'
+  | 'deletedAt'
+  | 'updatedAt'
 >
 
 export interface IBackgroundStateSerializableLocked {

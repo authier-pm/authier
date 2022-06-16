@@ -10,9 +10,10 @@ import browser, { Tabs } from 'webextension-polyfill'
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { ITOTPSecret } from '@src/util/useDeviceState'
-import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
+
 import { device } from '@src/background/ExtensionDevice'
+
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
@@ -56,10 +57,7 @@ export const AddTOTPSecretButton = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(
-  qr: QRCode,
-  tab: Tabs.Tab
-): Omit<ITOTPSecret, 'id'> {
+export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {
@@ -67,10 +65,11 @@ export function getTokenSecretFromQrCode(
     throw new Error('QR code does not have any secret')
   }
   return {
-    kind: EncryptedSecretsType.TOTP as any,
+    kind: EncryptedSecretType.TOTP,
     totp: secret as string,
     encrypted: device.state!.encrypt(secret),
     iconUrl: tab.favIconUrl,
+    createdAt: new Date().toJSON(),
     label:
       (parsedQuery.query.issuer as string) ??
       decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),

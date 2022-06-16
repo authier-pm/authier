@@ -47,7 +47,11 @@ const getWebInputs = mem(
     return apolloClient.query<
       WebInputsForHostQuery,
       WebInputsForHostQueryVariables
-    >({ query: WebInputsForHostDocument, variables: { host: hostname } })
+    >({
+      query: WebInputsForHostDocument,
+      variables: { host: hostname },
+      fetchPolicy: 'network-only'
+    })
   },
   { maxAge: ms('2 days') }
 )

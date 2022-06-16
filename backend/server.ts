@@ -255,7 +255,6 @@ async function main() {
 
 main().then(() => {
   console.log(`Listening on ${process.env.PORT}`)
-  if (environment === 'development') {
-    import('./scripts/generateGqlSchemas')
-  }
+
+  import('./scripts/generateGqlSchemas')
 })

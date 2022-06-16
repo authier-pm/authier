@@ -43,6 +43,7 @@ export const AddTOTP = () => {
               kind: EncryptedSecretsType.TOTP as any,
               totp: values.secret,
               encrypted: device.state!.encrypt(values.secret),
+              createdAt: new Date().toJSON(),
               iconUrl: '',
               label: values.label,
               url: values.url
