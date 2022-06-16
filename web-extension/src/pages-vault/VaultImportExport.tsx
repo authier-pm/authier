@@ -102,6 +102,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
             loginCredentials: creds.loginCredential,
             encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
             iconUrl: null,
+            createdAt: new Date().toJSON(),
             url: creds.url,
             label:
               creds.label ?? `${creds.loginCredential.username}@${hostname}`

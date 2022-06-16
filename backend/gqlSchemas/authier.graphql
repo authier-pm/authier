@@ -280,6 +280,7 @@ type EncryptedSecretQuery {
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
+  lastUsedAt: DateTime
 }
 
 type EmailVerificationGQLScalars {
@@ -453,6 +454,7 @@ type EncryptedSecretMutation {
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
+  lastUsedAt: DateTime
   update(patch: EncryptedSecretInput!): EncryptedSecretGQL!
   delete: EncryptedSecretGQL!
 }

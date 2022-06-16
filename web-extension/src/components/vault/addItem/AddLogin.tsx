@@ -67,6 +67,7 @@ export const AddLogin = () => {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: namePassPair,
               encrypted: device.state.encrypt(JSON.stringify(namePassPair)),
+              createdAt: new Date().toJSON(),
               iconUrl: null,
               url: values.url,
               label: values.label

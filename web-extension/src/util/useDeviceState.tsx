@@ -36,7 +36,7 @@ export interface ITOTPSecret extends ISecret {
 
 export interface ILoginSecret extends ISecret {
   loginCredentials: z.infer<typeof loginCredentialsSchema> & {
-    parseError?: ZodError
+    parseError?: ZodError | Error
   }
   kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
