@@ -59,7 +59,7 @@
     "prisma-typegraphql-types-generator": "^1.5.12",
     "sql-formatter": "^4.0.2",
     "sql-highlight": "^4.0.1",
-    "ts-jest": "^27.1.5"
+    "ts-jest": "^28.0.5"
   },
   "scripts": {
     "dev": "cross-env DEBUG=au:* && nodemon --exec ts-node-transpile-only server.ts",
