@@ -9,7 +9,6 @@ import {
   IBackgroundStateSerializableLocked,
   SecretSerializedType
 } from './backgroundPage'
-import { generateFireToken } from './generateFireToken'
 import {
   EncryptedSecretPatchInput,
   EncryptedSecretType
@@ -32,13 +31,19 @@ import {
   LogoutMutationVariables
 } from './ExtensionDevice.codegen'
 
-import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
 import ms from 'ms'
 
 export const log = debug('au:Device')
+
+const getTldPart = (url: string) => {
+  const host = new URL(url ?? '').hostname
+  const parts = host.split('.')
+  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
+}
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min)
@@ -139,46 +144,58 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretDecryptedById(id: string) {
-    const secret: ILoginSecret | ITOTPSecret = this.secrets.find(
-      (secret) => secret.id === id
-    ) as ILoginSecret | ITOTPSecret
+    const secret = this.secrets.find((secret) => secret.id === id)
     if (secret) {
       return this.decryptSecret(secret)
     }
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    const secrets = this.secrets.filter(
+    let secrets = this.secrets.filter(
       (secret) => host === new URL(secret.url ?? '').hostname
-    ) as Array<ILoginSecret | ITOTPSecret>
-    if (secrets) {
-      return secrets.map((secret) => {
-        return this.decryptSecret(secret)
-      })
+    )
+    if (secrets.length === 0) {
+      secrets = this.secrets.filter((secret) =>
+        host.endsWith(getTldPart(secret.url ?? ''))
+      )
     }
-    return []
+    return secrets.map((secret) => {
+      return this.decryptSecret(secret)
+    })
   }
 
-  private decryptSecret(secret: ILoginSecret | ITOTPSecret) {
+  private decryptSecret(secret: SecretSerializedType) {
     const decrypted = this.decrypt(secret.encrypted)
+    let secretDecrypted: ILoginSecret | ITOTPSecret
     if (secret.kind === EncryptedSecretType.TOTP) {
-      secret.totp = decrypted
+      secretDecrypted = {
+        ...secret,
+        totp: decrypted
+      } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
       const parsed = JSON.parse(decrypted)
 
       try {
         loginCredentialsSchema.parse(parsed)
-        secret.loginCredentials = parsed
-      } catch (err: any) {
-        secret.loginCredentials = {
-          username: '',
-          password: '',
-          parseError: err
-        }
+        secretDecrypted = {
+          ...secret,
+          loginCredentials: parsed
+        } as ILoginSecret
+      } catch (err: unknown) {
+        secretDecrypted = {
+          ...secret,
+          loginCredentials: {
+            username: '',
+            password: '',
+            parseError: err as Error
+          }
+        } as ILoginSecret
       }
+    } else {
+      throw new Error('Unknown secret type')
     }
 
-    return secret
+    return secretDecrypted
   }
 
   /**
