@@ -1,8 +1,18 @@
-import { Box, Flex, Heading, Text } from '@chakra-ui/react'
+import {
+  Box,
+  Flex,
+  Heading,
+  Link,
+  Text,
+  useColorModeValue
+} from '@chakra-ui/react'
 import { CloseIcon } from '@chakra-ui/icons'
-import React from 'react'
 
-export default function Error() {
+export default function Error({
+  message = 'There was an error. Please try again.'
+}: {
+  message?: string
+}) {
   return (
     <Box textAlign="center" py={10} px={6}>
       <Box display="inline-block">
@@ -22,7 +32,14 @@ export default function Error() {
       <Heading as="h2" size="xl" mt={6} mb={2}>
         Error
       </Heading>
-      <Text color={'gray.500'}>There was an error. Please try again.</Text>
+      <Text>{message}</Text>
+      <Link
+        href={'/'}
+        color={useColorModeValue('brand.600', 'brand.400')}
+        _hover={{ textDecor: 'underline' }}
+      >
+        Go home
+      </Link>
     </Box>
   )
 }
