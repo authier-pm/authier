@@ -53,11 +53,11 @@ export const NavLink = ({
 
 export default function Home() {
   const router = useRouter()
-  const { success, canceled, session_id } = router.query
+  const { success, canceled, error, session_id } = router.query
 
   if (success) {
     return <Success />
-  } else if (canceled) {
+  } else if (canceled || error) {
     return <Error />
   }
 
