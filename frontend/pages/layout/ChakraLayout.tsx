@@ -1,4 +1,3 @@
-import { ChakraProvider, extendTheme } from '@chakra-ui/react'
 import {
   Box,
   Flex,
@@ -6,35 +5,22 @@ import {
   IconButton,
   useDisclosure,
   Image,
-  Stack
+  Stack,
+  Button,
+  useColorMode,
+  useColorModeValue
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon } from '@chakra-ui/icons'
+import { HamburgerIcon, CloseIcon, MoonIcon, SunIcon } from '@chakra-ui/icons'
+
 import { NavLink, Links } from '../index.page'
 import Link from 'next/link'
-import React from 'react'
-import { kebabCase } from 'lodash'
 
-const theme = extendTheme({
-  colors: {
-    brand: {
-      50: '#84CAE7',
-      100: '#68D5DD',
-      200: '#5ADBD8',
-      300: '#4CE0D2',
-      400: '#37C5BA',
-      500: '#22AAA1',
-      600: '#1B8D82',
-      700: '#136F63',
-      800: '#0C453C',
-      900: '#041B15'
-    }
-  }
-})
+import { kebabCase } from 'lodash'
+import { Footer } from '../../components/Footer'
 
 export function ChakraLayout({ children }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  // const email = device.state?.email
-  const email = 'bob@bob.com'
+  const { colorMode, toggleColorMode } = useColorMode()
 
   const navLinks = Links.map((link) => (
     <NavLink key={link} href={kebabCase(link)}>
@@ -42,8 +28,15 @@ export function ChakraLayout({ children }) {
     </NavLink>
   ))
   return (
-    <ChakraProvider theme={theme}>
-      <Box bgColor={'gray.700'} px={4}>
+    <>
+      <Box
+        bgColor={useColorModeValue('white', 'gray.900')}
+        px={4}
+        borderBottom={'1px'}
+        borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
+        position="sticky"
+        top={0}
+      >
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
             size={'md'}
@@ -56,6 +49,7 @@ export function ChakraLayout({ children }) {
             <Link href="/">
               <Box cursor="pointer">
                 <Image
+                  rounded={'full'}
                   boxSize={'60px'}
                   src="/assets/logos/logo.png"
                   objectFit="cover"
@@ -72,6 +66,9 @@ export function ChakraLayout({ children }) {
             </HStack>
           </HStack>
           <Flex alignItems={'center'}></Flex>
+          <Button onClick={toggleColorMode}>
+            {colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
+          </Button>
         </Flex>
 
         {isOpen ? (
@@ -84,7 +81,9 @@ export function ChakraLayout({ children }) {
       </Box>
 
       {children}
-    </ChakraProvider>
+
+      <Footer />
+    </>
   )
 }
 

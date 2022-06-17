@@ -40,11 +40,10 @@ export const NavLink = ({
   <Box
     px={2}
     py={1}
-    color={'green.200'}
     rounded={'md'}
     _hover={{
       textDecoration: 'none',
-      bg: useColorModeValue('brand.800', 'brand.100')
+      bg: useColorModeValue('teal.100', 'teal.900')
     }}
   >
     <NextLink href={href}>{children}</NextLink>
@@ -97,11 +96,7 @@ const SignUpHero = () => {
             borderBottom="0px"
             overflow="hidden"
           >
-            <Center
-              pb={0}
-              color={useColorModeValue('gray.700', 'gray.600')}
-              flexDir="column"
-            >
+            <Center pb={0} color="white" flexDir="column">
               <chakra.h1
                 mb={4}
                 fontSize={{ base: '3xl', md: '4xl' }}
@@ -112,7 +107,7 @@ const SignUpHero = () => {
                 Ready to explore how easy authentication can be?
               </chakra.h1>
               <Link href="/download">
-                <Text pt={2} fontSize="md" mt={3} color="brand.800">
+                <Text pt={2} fontSize="md" mt={3}>
                   It takes less than a minute to set up, just download the
                   browser extension and start
                 </Text>
