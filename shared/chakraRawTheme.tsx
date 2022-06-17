@@ -61,7 +61,7 @@ export const authierColors: Colors = {
 export const chakraRawTheme: ThemeOverride = {
   colors: authierColors,
   config: {
-    initialColorMode: 'dark'
+    initialColorMode: 'light'
   }
 }
 
