@@ -28,7 +28,7 @@ export function ChakraLayout({ children }) {
     </NavLink>
   ))
   return (
-    <>
+    <Box>
       <Box
         bgColor={useColorModeValue('white', 'gray.900')}
         px={4}
@@ -83,7 +83,7 @@ export function ChakraLayout({ children }) {
       {children}
 
       <Footer />
-    </>
+    </Box>
   )
 }
 
