@@ -7,12 +7,12 @@ import { VaultSettings } from './VaultSettings'
 import { device } from '@src/background/ExtensionDevice'
 import Login from '@src/pages-vault/Login'
 import { Center } from '@chakra-ui/react'
-import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { AddItem } from './AddItem'
+import { AccountLimits } from './AccountLimits'
 
 export function VaultRouter() {
   const navigate = useNavigate()
@@ -39,7 +39,7 @@ export function VaultRouter() {
       <Routes>
         <Route path="/" element={<ItemList />}></Route>
         <Route path="/secret/:secretId" element={<VaultItemSettings />} />
-        <Route path="/account-limits" element={<Premium />}></Route>
+        <Route path="/account-limits" element={<AccountLimits />}></Route>
         <Route path="/settings/*" element={<VaultSettings />}></Route>
         <Route path="/devices" element={<Devices />}></Route>
         <Route path="/import-export" element={<VaultImportExport />}></Route>
