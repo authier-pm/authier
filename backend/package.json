@@ -52,7 +52,7 @@
     "aws-cdk-lib": "^2.27.0",
     "constructs": "^10.1.31",
     "cross-env": "^7.0.3",
-    "esbuild": "^0.14.42",
+    "esbuild": "^0.14.45",
     "jest": "^27.5.1",
     "mz": "^2.7.0",
     "nodemon": "^2.0.16",
