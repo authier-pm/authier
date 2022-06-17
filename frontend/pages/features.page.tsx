@@ -16,8 +16,7 @@ export default function Features() {
       <Head>
         <title>Features</title>
       </Head>
-      <AuPage heading={t`Features`}>
-        <Image src="/assets/Authentication_Two-Color.svg" h="20vh"></Image>
+      <AuPage>
         <Box m={3} p={3}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
