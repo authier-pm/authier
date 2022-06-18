@@ -6,7 +6,7 @@ import { AuPage } from '../components/AuPage'
 export default function FaqPage() {
   return (
     <AuPage heading={t`Frequently asked questions`}>
-      <Box m={5}>
+      <Box minH="80vh" m={5}>
         <Head>
           <title>Authier - FAQ</title>
         </Head>

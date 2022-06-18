@@ -1,5 +1,6 @@
+import { ReactElement } from 'react'
+
 import {
-  Container,
   SimpleGrid,
   Image,
   Flex,
@@ -9,10 +10,15 @@ import {
   StackDivider,
   Icon,
   useColorModeValue,
-  Center
+  Center,
+  Fade
 } from '@chakra-ui/react'
-import { IoAnalyticsSharp, IoLogoBitcoin, IoSearchSharp } from 'react-icons/io5'
-import { ReactElement } from 'react'
+import {
+  IoLogoBitcoin,
+  IoLaptopOutline,
+  IoDocumentLockOutline
+} from 'react-icons/io5'
+import { InView, useInView } from 'react-intersection-observer'
 
 interface FeatureProps {
   text: string
@@ -39,65 +45,72 @@ const Feature = ({ text, icon, iconBg }: FeatureProps) => {
 }
 
 export default function FeaturesSection() {
+  const { ref, inView } = useInView({
+    rootMargin: '-300px',
+    triggerOnce: true
+  })
   return (
-    <Center minHeight="90vh" px={['30', '20']} mt={16}>
-      <SimpleGrid columns={{ base: 1, md: 2 }} spacing={10}>
-        <Stack spacing={4}>
-          <Text
-            textTransform={'uppercase'}
-            color={'blue.400'}
-            fontWeight={600}
-            fontSize={'sm'}
-            bg={useColorModeValue('blue.50', 'blue.900')}
-            p={2}
-            alignSelf={'flex-start'}
-            rounded={'md'}
-          >
-            Our Story
-          </Text>
-          <Heading>A digital Product design agency</Heading>
-          <Text color={'gray.500'} fontSize={'lg'}>
-            Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam
-            nonumy eirmod tempor invidunt ut labore
-          </Text>
-          <Stack
-            spacing={4}
-            divider={
-              <StackDivider
-                borderColor={useColorModeValue('gray.100', 'gray.700')}
+    <Fade in={inView}>
+      <Center minHeight="90vh" mt={16} ref={ref}>
+        <SimpleGrid
+          gridGap={'10px'}
+          w="70vw"
+          mx={10}
+          columns={{ base: 1, md: 2 }}
+          spacing={20}
+        >
+          <Stack spacing={4}>
+            <Heading>Authier</Heading>
+            <Text color={'gray.500'} fontSize={'lg'}>
+              Open-source password manager with a focus on security and trust.
+              Builded for the most demanding users.
+            </Text>
+            <Stack
+              spacing={4}
+              divider={
+                <StackDivider
+                  borderColor={useColorModeValue('gray.100', 'gray.700')}
+                />
+              }
+            >
+              <Feature
+                icon={
+                  <Icon
+                    as={IoDocumentLockOutline}
+                    color={'yellow.500'}
+                    w={5}
+                    h={5}
+                  />
+                }
+                iconBg={useColorModeValue('yellow.100', 'yellow.900')}
+                text={'Security'}
               />
-            }
-          >
-            <Feature
-              icon={
-                <Icon as={IoAnalyticsSharp} color={'yellow.500'} w={5} h={5} />
-              }
-              iconBg={useColorModeValue('yellow.100', 'yellow.900')}
-              text={'Business Planning'}
-            />
-            <Feature
-              icon={<Icon as={IoLogoBitcoin} color={'green.500'} w={5} h={5} />}
-              iconBg={useColorModeValue('green.100', 'green.900')}
-              text={'Financial Planning'}
-            />
-            <Feature
-              icon={
-                <Icon as={IoSearchSharp} color={'purple.500'} w={5} h={5} />
-              }
-              iconBg={useColorModeValue('purple.100', 'purple.900')}
-              text={'Market Analysis'}
-            />
+              <Feature
+                icon={
+                  <Icon as={IoLogoBitcoin} color={'green.500'} w={5} h={5} />
+                }
+                iconBg={useColorModeValue('green.100', 'green.900')}
+                text={'Payment with crypto'}
+              />
+              <Feature
+                icon={
+                  <Icon as={IoLaptopOutline} color={'purple.500'} w={5} h={5} />
+                }
+                iconBg={useColorModeValue('purple.100', 'purple.900')}
+                text={'Cross-platform'}
+              />
+            </Stack>
           </Stack>
-        </Stack>
-        <Flex>
-          <Image
-            rounded={'md'}
-            alt={'feature image'}
-            src="/assets/2fa-panna.svg"
-            objectFit={'cover'}
-          />
-        </Flex>
-      </SimpleGrid>
-    </Center>
+          <Flex>
+            <Image
+              rounded={'md'}
+              alt={'feature image'}
+              src="/assets/2fa-panna.svg"
+              objectFit={'cover'}
+            />
+          </Flex>
+        </SimpleGrid>
+      </Center>
+    </Fade>
   )
 }
