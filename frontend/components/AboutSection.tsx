@@ -18,7 +18,7 @@ import {
   IoLaptopOutline,
   IoDocumentLockOutline
 } from 'react-icons/io5'
-import { InView, useInView } from 'react-intersection-observer'
+import { useInView } from 'react-intersection-observer'
 
 interface FeatureProps {
   text: string
@@ -44,9 +44,9 @@ const Feature = ({ text, icon, iconBg }: FeatureProps) => {
   )
 }
 
-export default function FeaturesSection() {
+export default function AboutSection() {
   const { ref, inView } = useInView({
-    rootMargin: '-300px',
+    rootMargin: '-400px',
     triggerOnce: true
   })
   return (
