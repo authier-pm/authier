@@ -1,6 +1,6 @@
-import React, { ReactNode, useState } from 'react'
+import { ReactNode, useState } from 'react'
 
-import { CheckIcon } from '@chakra-ui/icons'
+import { FaCheckCircle } from 'react-icons/fa'
 import getStripe from '../utils/get-stripe'
 import {
   Box,
@@ -19,11 +19,9 @@ import {
 import { t } from '@lingui/macro'
 import Head from 'next/head'
 
-import { AuPage } from '../components/AuPage'
 import { useCreateCheckoutSessionMutation } from './pricing.codegen'
 
 import { useRouter } from 'next/router'
-import Error from '../components/Error'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -164,10 +162,11 @@ export default function PricingPage() {
               >
                 <List spacing={3} textAlign="start" px={12}>
                   <ListItem>
-                    <ListIcon as={CheckIcon} color="green.500" />3 TOTP secrets
+                    <ListIcon as={FaCheckCircle} color="green.500" />3 TOTP
+                    secrets
                   </ListItem>
                   <ListItem>
-                    <ListIcon as={CheckIcon} color="green.500" />
+                    <ListIcon as={FaCheckCircle} color="green.500" />
                     40 login secrets
                   </ListItem>
                 </List>
@@ -201,7 +200,7 @@ export default function PricingPage() {
               >
                 <List spacing={3} textAlign="start" px={12}>
                   <ListItem>
-                    <ListIcon as={CheckIcon} color="green.500" />
+                    <ListIcon as={FaCheckCircle} color="green.500" />
                     additional 60 login secrets
                   </ListItem>
                 </List>
@@ -238,7 +237,7 @@ export default function PricingPage() {
               >
                 <List spacing={3} textAlign="start" px={12}>
                   <ListItem>
-                    <ListIcon as={CheckIcon} color="green.500" />
+                    <ListIcon as={FaCheckCircle} color="green.500" />
                     additional 20 TOTP secrets
                   </ListItem>
                 </List>
@@ -296,11 +295,11 @@ export default function PricingPage() {
                 >
                   <List spacing={3} textAlign="start" px={12}>
                     <ListItem>
-                      <ListIcon as={CheckIcon} color="green.500" />
+                      <ListIcon as={FaCheckCircle} color="green.500" />
                       additional 60 login secrets
                     </ListItem>
                     <ListItem>
-                      <ListIcon as={CheckIcon} color="green.500" />
+                      <ListIcon as={FaCheckCircle} color="green.500" />
                       additional 20 TOTP secrets
                     </ListItem>
                   </List>

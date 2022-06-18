@@ -1,4 +1,4 @@
-import { ReactElement, ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 import Head from 'next/head'
 import {
@@ -10,12 +10,8 @@ import {
   Center,
   SimpleGrid,
   Container,
-  Flex,
-  Icon,
-  Stack,
-  useMediaQuery
+  Flex
 } from '@chakra-ui/react'
-import { FcAssistant, FcDonate, FcInTransit } from 'react-icons/fc'
 
 import NextLink from 'next/link'
 import { Link } from '../components/Link'
@@ -23,7 +19,10 @@ import { useRouter } from 'next/router'
 import Success from '../components/Success'
 import Error from '../components/Error'
 import Testimonials from '../components/Testimonials'
-import FeaturesSection from '../components/FeturesSection'
+
+import AboutSection from '../components/AboutSection'
+import FeaturesSection from '../components/FeaturesSection'
+import Benefits from '../components/Benefits'
 export const Links = [
   'Features',
   'Pricing',
@@ -68,9 +67,9 @@ export default function Home() {
       <Head>
         <title>Authier</title>
       </Head>
-
       <Hero />
-      <FeaturesSection />
+      <AboutSection />
+      <Benefits />
       <Testimonials />
     </Box>
   )
