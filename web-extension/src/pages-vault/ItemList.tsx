@@ -21,6 +21,7 @@ import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.c
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
+import { useDebounce } from './useDebounce'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -128,6 +129,7 @@ export const ItemList = () => {
   const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
+  const debouncedSearchTerm = useDebounce(filterBy, 400)
 
   return (
     <Flex flexDirection="column">
@@ -160,12 +162,18 @@ export const ItemList = () => {
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
             {TOTPSecrets?.filter(({ label, url }) => {
-              return label.includes(filterBy) || url?.includes(filterBy)
+              return (
+                label.includes(debouncedSearchTerm) ||
+                url?.includes(debouncedSearchTerm)
+              )
             }).map((el, i) => {
               return <Item data={el as ITOTPSecret} key={el.label + i} />
             })}
             {LoginCredentials?.filter(({ label, url }) => {
-              return label.includes(filterBy) || url?.includes(filterBy)
+              return (
+                label.includes(debouncedSearchTerm) ||
+                url?.includes(debouncedSearchTerm)
+              )
             }).map((el, i) => {
               return <Item key={el.label + i} data={el as ILoginSecret} />
             })}
