@@ -12,6 +12,7 @@ export const ExportTOTPToCsvButton = () => {
   return (
     <Button
       mt={4}
+      minW="300px"
       colorScheme="teal"
       type="submit"
       onClick={() => {
@@ -30,6 +31,7 @@ export const ExportLoginCredentialsToCsvButton = () => {
   return (
     <Button
       mt={4}
+      minW="300px"
       colorScheme="teal"
       type="submit"
       onClick={() => {
@@ -42,7 +44,7 @@ export const ExportLoginCredentialsToCsvButton = () => {
             password: loginCredentials.password
           }))
         )
-        downloadAsFile(csv, 'totp')
+        downloadAsFile(csv, 'credentials')
       }}
     >
       <Trans>Export Login Credentials to CSV</Trans>
