@@ -20,6 +20,8 @@ export type IDecryptedSecrets = {
   totpSecrets: ITOTPSecret[]
 }
 
+export const autofillEventsDispatched = new Set()
+
 const autofillValueIntoInput = (element: HTMLInputElement, value) => {
   log('autofillValueIntoInput:', value)
   //
@@ -29,12 +31,13 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
 
   element.style.backgroundColor = authierColors.green[400]
   element.value = value
-  element.dispatchEvent(
-    new Event('input', {
-      bubbles: true,
-      cancelable: true
-    })
-  )
+  const event = new Event('input', {
+    bubbles: false,
+    cancelable: true
+  })
+  autofillEventsDispatched.add(event)
+
+  element.dispatchEvent(event)
 
   return element
 }
@@ -153,7 +156,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     if (onInputAddedHandler) {
-      bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
+      bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
     }
     onInputAddedHandler = debounce(
       (input) => {
@@ -162,10 +165,7 @@ export const autofill = (initState: IInitStateRes) => {
         const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
         // For one input on page
-        if (
-          input.autocomplete === 'new-password' ||
-          (webInputs.length === 0 && input.type === 'password')
-        ) {
+        if (input.autocomplete === 'new-password') {
           autofillValueIntoInput(input, generate(passwordGenOptions))
         } else {
           // More inputs on page
@@ -185,8 +185,6 @@ export const autofill = (initState: IInitStateRes) => {
 
               autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
             }
-          } else {
-            scanKnownWebInputsAndFillWhenFound()
           }
         }
       },
