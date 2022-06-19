@@ -7401,13 +7401,6 @@ capital-case@^1.0.4:
     tslib "^2.0.3"
     upper-case-first "^2.0.2"
 
-cartesian@^1.0.1:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/cartesian/-/cartesian-1.0.1.tgz#ae3fc8a63e2ba7e2c4989ce696207457bcae65af"
-  integrity sha512-tR3qKRYpRJ6FXEGuoBwpuCYcwydrk1N2rduy7eWg1Msepi3i5fCxheryw4VBlCqjCbk3Vhjh3eg+IGHtl5H74A==
-  dependencies:
-    xtend "^4.0.1"
-
 case@1.6.3:
   version "1.6.3"
   resolved "https://registry.yarnpkg.com/case/-/case-1.6.3.tgz#0a4386e3e9825351ca2e6216c60467ff5f1ea1c9"
@@ -8190,14 +8183,6 @@ css-loader@^6.7.1:
     postcss-modules-values "^4.0.0"
     postcss-value-parser "^4.2.0"
     semver "^7.3.5"
-
-css-selector-generator@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/css-selector-generator/-/css-selector-generator-3.6.1.tgz#bfe7ea59cb987cc7597e6f80fd57581e85fa0f65"
-  integrity sha512-00CD9cAH1bYKi/7UztQmsnp1MJjeBMV7hMAR39wG/jDI2ef2BS9ZqW3gKpBN+vJOxB4rNrQG4xJfmgx5ZFCFHQ==
-  dependencies:
-    cartesian "^1.0.1"
-    iselement "^1.1.4"
 
 css.escape@^1.5.1:
   version "1.5.1"
@@ -11487,11 +11472,6 @@ isarray@^2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/isarray/-/isarray-2.0.5.tgz#8af1e4c1221244cc62459faf38940d4e644a5723"
   integrity sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==
-
-iselement@^1.1.4:
-  version "1.1.4"
-  resolved "https://registry.yarnpkg.com/iselement/-/iselement-1.1.4.tgz#7e55b52a8ebca50a7e2e80e5b8d2840f32353146"
-  integrity sha1-flW1Ko68pQp+LoDluNKEDzI1MUY=
 
 isexe@^2.0.0:
   version "2.0.0"
@@ -18214,7 +18194,7 @@ xregexp@2.0.0:
   resolved "https://registry.yarnpkg.com/xregexp/-/xregexp-2.0.0.tgz#52a63e56ca0b84a7f3a5f3d61872f126ad7a5943"
   integrity sha1-UqY+VsoLhKfzpfPWGHLxJq16WUM=
 
-xtend@^4.0.0, xtend@^4.0.1, xtend@^4.0.2:
+xtend@^4.0.0, xtend@^4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/xtend/-/xtend-4.0.2.tgz#bb72779f5fa465186b1f438f674fa347fdb5db54"
   integrity sha512-LKYU1iAXJXUgAXn9URjiu+MWhyUXHsvfp7mcuYm9dSUKK0/CjtrUwFAxD82/mCWbtLsGjFIad0wIsod4zrTAEQ==
