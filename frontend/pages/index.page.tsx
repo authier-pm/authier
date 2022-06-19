@@ -21,7 +21,6 @@ import Error from '../components/Error'
 import Testimonials from '../components/Testimonials'
 
 import AboutSection from '../components/AboutSection'
-import FeaturesSection from '../components/FeaturesSection'
 import Benefits from '../components/Benefits'
 export const Links = [
   'Features',
