@@ -26,6 +26,9 @@ export class WebInputGQLScalars {
   @Field()
   domPath: string
 
+  @Field(() => Int)
+  domOrdinal: number
+
   @Field()
   addedByUserId: string
 }
