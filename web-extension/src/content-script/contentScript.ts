@@ -14,7 +14,11 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 
 import { bodyInputChangeEmitter } from './DOMObserver'
-import { autofill, IDecryptedSecrets } from './autofill'
+import {
+  autofill,
+  autofillEventsDispatched,
+  IDecryptedSecrets
+} from './autofill'
 import {
   promptDiv,
   renderSaveCredentialsForm
@@ -243,7 +247,15 @@ export async function initInputWatch() {
   }
   bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
 
+  /**
+   * responsible for saving new web inputs
+   */
   const debouncedInputEventListener = debounce((ev) => {
+    if (autofillEventsDispatched.has(ev)) {
+      // this was dispatched by autofill, we don't need to do anything here
+      autofillEventsDispatched.delete(ev)
+      return
+    }
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
     console.log(domRecorder.toJSON())
