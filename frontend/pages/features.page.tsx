@@ -16,7 +16,7 @@ export default function Features() {
       <Head>
         <title>Features</title>
       </Head>
-      <AuPage>
+      <AuPage heading={'Features'}>
         <Box m={3} p={3}>
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
