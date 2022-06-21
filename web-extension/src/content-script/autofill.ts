@@ -82,7 +82,6 @@ export const autofill = (initState: IInitStateRes) => {
     const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
     )
-    console.log('~ usefulInputs', usefulInputs)
 
     if (usefulInputs.length > 2) {
       // TODO Autofill register form if present
@@ -134,8 +133,8 @@ export const autofill = (initState: IInitStateRes) => {
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
-      const autofillRes = searchInputsAndAutofill(document.body)
-      console.log('~ autofillRes', autofillRes)
+      const autofillResult = searchInputsAndAutofill(document.body)
+      log('autofillResult', autofillResult)
     }
 
     if (onInputAddedHandler) {
@@ -143,8 +142,6 @@ export const autofill = (initState: IInitStateRes) => {
     }
     onInputAddedHandler = debounce(
       (input) => {
-        console.log('~ input', input)
-
         const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
         // For one input on page
