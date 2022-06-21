@@ -258,7 +258,7 @@ export async function initInputWatch() {
     }
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
-    console.log(domRecorder.toJSON())
+    log('domRecorder', domRecorder.toJSON())
 
     const inputted = targetElement.value
 
@@ -361,10 +361,6 @@ export async function initInputWatch() {
 }
 
 document.addEventListener('readystatechange', (event) => {
-  // if (event.target.readyState === 'interactive') {
-  //   initLoader();
-  // }
-  console.log(event.target)
   if (event.target && event.target?.readyState === 'complete') {
     initInputWatch()
   }
