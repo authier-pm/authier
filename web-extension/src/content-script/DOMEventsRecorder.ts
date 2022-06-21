@@ -41,7 +41,7 @@ export function getCssSelectorForInput(
         return { css: proposedSelector, ordinal: index }
       }
     }
-    throw new Error('failed to resolve a CSS selectore')
+    throw new Error('failed to resolve a CSS selector')
   }
 }
 

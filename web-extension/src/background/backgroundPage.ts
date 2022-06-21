@@ -1,6 +1,7 @@
 import './chromeRuntimeListener'
 import debug from 'debug'
 import { EncryptedSecretQuery } from '../../../shared/generated/graphqlBaseTypes'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
@@ -49,6 +50,7 @@ export interface IBackgroundStateSerializableLocked {
 export interface IBackgroundStateSerializable
   extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
+  decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
 }
 
 export const lockTime = 10000 * 60 * 60 * 8

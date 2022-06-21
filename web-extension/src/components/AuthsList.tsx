@@ -173,7 +173,7 @@ const LoginCredentialsListItem = ({
   )
 }
 export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const { deviceState, TOTPSecrets, LoginCredentials, currentURL } =
+  const { deviceState, TOTPSecrets, loginCredentials, currentURL } =
     useContext(DeviceStateContext)
 
   if (!deviceState) {
@@ -186,7 +186,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     }
     return extractHostname(url) === extractHostname(currentURL)
   })
-  const loginCredentialForCurrentDomain = LoginCredentials.filter(({ url }) => {
+  const loginCredentialForCurrentDomain = loginCredentials.filter(({ url }) => {
     if (!currentURL || !url) {
       return true
     }
@@ -196,7 +196,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
 
   const hasNoSecrets = deviceState.secrets.length === 0
 
-  const getRecentlyUsed = (secrets: Array<SecretSerializedType>) => {
+  const getRecentlyUsed = (secrets: (ILoginSecret | ITOTPSecret)[]) => {
     return secrets
       .sort((a, b) =>
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
@@ -239,16 +239,13 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           [
             getRecentlyUsed(TOTPSecrets).map((auth, i) => {
               return (
-                <OtpCode
-                  totpData={auth as any as ITOTPSecret}
-                  key={auth.label + i}
-                />
+                <OtpCode totpData={auth as ITOTPSecret} key={auth.label + i} />
               )
             }),
-            getRecentlyUsed(LoginCredentials).map((psw, i) => {
+            getRecentlyUsed(loginCredentials).map((psw, i) => {
               return (
                 <LoginCredentialsListItem
-                  loginSecret={psw as any as ILoginSecret}
+                  loginSecret={psw as ILoginSecret}
                   key={psw.label + i}
                 />
               )

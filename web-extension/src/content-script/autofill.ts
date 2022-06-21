@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { bodyInputChangeEmitter } from './DOMObserver'
+import { bodyInputChangeEmitter } from './domMutationObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
@@ -74,16 +74,29 @@ export const autofill = (initState: IInitStateRes) => {
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
+  const scanAddedIframeInHalfASecond = (iframe: HTMLIFrameElement) => {
+    console.log('ssssss')
+    setTimeout(() => {
+      const iframeBody = iframe.contentDocument?.body
+      console.log('~ iframeBody', iframeBody)
+      if (iframeBody) {
+        console.log('scanAddedIframe and has body')
+        scanKnownWebInputsAndFillWhenFound(iframeBody as HTMLBodyElement)
+      } else {
+        scanAddedIframeInHalfASecond(iframe)
+      }
+    }, 500)
+  }
+
   // Should be renamed on scanOnInputs?
-  const scanKnownWebInputsAndFillWhenFound = () => {
+  const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
     //Distinguish between register and login from by the number of inputs
     //Then Distinguish between phased and not phased
 
-    const usefulInputs = Array.from(
-      document.body.querySelectorAll('input')
-    ).filter(
+    const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
     )
+    console.log('~ usefulInputs', usefulInputs)
 
     if (usefulInputs.length > 2) {
       // Autofill register form
@@ -276,10 +289,14 @@ export const autofill = (initState: IInitStateRes) => {
     }
   }
 
-  setTimeout(scanKnownWebInputsAndFillWhenFound, 100) // let's wait a bit for the page to load
+  const scanGlobalDocument = () =>
+    scanKnownWebInputsAndFillWhenFound(document.body as HTMLBodyElement)
+  setTimeout(scanGlobalDocument, 100) // let's wait a bit for the page to load
+  bodyInputChangeEmitter.on('iframeAdded', scanAddedIframeInHalfASecond)
 
   return () => {
     autofillEnabled = false
-    bodyInputChangeEmitter.off('inputAdded', scanKnownWebInputsAndFillWhenFound)
+    bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
+    bodyInputChangeEmitter.off('iframeAdded', scanAddedIframeInHalfASecond)
   }
 }

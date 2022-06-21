@@ -13,7 +13,7 @@ import {
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 
-import { bodyInputChangeEmitter } from './DOMObserver'
+import { bodyInputChangeEmitter } from './domMutationObserver'
 import {
   autofill,
   autofillEventsDispatched,
@@ -349,19 +349,26 @@ export async function initInputWatch() {
   }, 400)
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
 
-  setTimeout(() => {
+  const listenToInputsInIframe = (iframeDocument: Document) => {
+    iframeDocument.body.addEventListener(
+      'input',
+      debouncedInputEventListener,
+      true
+    )
+    iframeDocument.addEventListener('readystatechange', (ev) => {
+      console.log('ev.target?.readyState', ev.target?.readyState)
+    })
+    document.addEventListener('keydown', onKeyDown, true)
+  }
+
+  bodyInputChangeEmitter.on('iframeAdded', (el) => {
     // some websites like for example https://withribbon.zendesk.com/access/unauthenticated?theme=hc use iframes, so we have to listen for input in all iframes too
-    const iframe = document.querySelector('iframe')
-    const iframeDocument = iframe?.contentDocument
+
+    const iframeDocument = el?.contentDocument
     if (iframeDocument) {
-      iframeDocument.body.addEventListener(
-        'input',
-        debouncedInputEventListener,
-        true
-      )
-      document.addEventListener('keydown', onKeyDown, true)
+      listenToInputsInIframe(iframeDocument)
     }
-  }, 50)
+  })
 
   return () => {
     document.body.removeEventListener(
@@ -374,4 +381,12 @@ export async function initInputWatch() {
   }
 }
 
-initInputWatch()
+document.addEventListener('readystatechange', (event) => {
+  // if (event.target.readyState === 'interactive') {
+  //   initLoader();
+  // }
+  console.log(event.target)
+  if (event.target && event.target?.readyState === 'complete') {
+    initInputWatch()
+  }
+})
