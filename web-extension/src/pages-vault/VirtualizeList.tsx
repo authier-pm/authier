@@ -1,29 +1,30 @@
-import React, { useContext, useState } from 'react'
-
-import { IconButton } from '@chakra-ui/button'
-import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons'
+import { UnlockIcon, DeleteIcon, SettingsIcon } from '@chakra-ui/icons'
 import {
+  useDisclosure,
   Center,
   Box,
+  useColorModeValue,
   Flex,
-  Text,
-  Input,
-  useDisclosure,
-  Stat
+  IconButton,
+  Text
 } from '@chakra-ui/react'
-
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { DeleteAlert } from '../components/vault/DeleteAlert'
-import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
-import { SecretItemIcon } from '@src/components/SecretItemIcon'
-import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
-
-import { t } from '@lingui/macro'
-import { Link, useNavigate } from 'react-router-dom'
-import VirtualizeList from './VirtualizeList'
+import { SecretItemIcon } from '@src/components/SecretItemIcon'
+import { DeleteAlert } from '@src/components/vault/DeleteAlert'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import React, { useContext } from 'react'
+import { useState } from 'react'
+import {
+  AutoSizer,
+  CellMeasurer,
+  CellMeasurerCache,
+  createMasonryCellPositioner,
+  List,
+  Masonry
+} from 'react-virtualized'
+import { Link } from 'react-router-dom'
+import { useDeleteEncryptedSecretMutation } from './ItemList.codegen'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -126,58 +127,53 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   )
 }
 
-// TODO virtualize this
-export const ItemList = () => {
-  const { LoginCredentials, TOTPSecrets } = useContext(DeviceStateContext)
-  const [filterBy, setFilterBy] = useState('')
-  const navigate = useNavigate()
-  const data = LoginCredentials?.filter(({ label, url }) => {
-    return label.includes(filterBy) || url?.includes(filterBy)
-  })
+const ITEM_SIZE = 100
 
+export default function VirtualizeList({ data }: { data: any }) {
   return (
-    <Flex flexDirection="column">
-      <Center>
-        <Input
-          w={['300px', '350px', '400px', '500px']}
-          placeholder={t`Search vault`}
-          m="auto"
-          onChange={(ev) => {
-            setFilterBy(ev.target.value)
-          }}
-        />
+    <AutoSizer style={{ height: '85vh' }}>
+      {({ height, width }) => {
+        console.log(width)
+        const itemsPerRow = Math.floor(width / 300)
+        const rowCount = Math.ceil(data.length / itemsPerRow)
 
-        <Center px={3}>
-          <Stat ml="auto" whiteSpace={'nowrap'}>
-            {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
-          </Stat>
+        return (
+          <List
+            width={width}
+            height={height}
+            rowCount={rowCount}
+            rowHeight={data.length}
+            rowRenderer={({ index, key, isScrolling }) => {
+              const items: any = []
+              const fromIndex = index * itemsPerRow
+              const toIndex = Math.min(fromIndex + itemsPerRow, data.length)
 
-          <RefreshSecretsButton />
-        </Center>
-        <IconButton
-          aria-label="Add item"
-          icon={<AddIcon />}
-          rounded={'full'}
-          onClick={async () => navigate('/addItem')}
-        />
-      </Center>
-      <VirtualizeList data={data} />
-      {/* <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection="column">
-          <Flex flexDirection="row" flexWrap="wrap" m="auto">
-             {TOTPSecrets?.filter(({ label, url }) => {
-              return label.includes(filterBy) || url?.includes(filterBy)
-            }).map((el, i) => {
-              return <Item data={el as ITOTPSecret} key={el.label + i} />
-            })}
-            {LoginCredentials?.filter(({ label, url }) => {
-              return label.includes(filterBy) || url?.includes(filterBy)
-            }).map((el, i) => {
-              return <Item key={el.label + i} data={el as ILoginSecret} />
-            })} 
-          </Flex>
-        </Flex>
-      </Center> */}
-    </Flex>
+              for (let i = fromIndex; i < toIndex; i++) {
+                items.push(<Item key={i} data={data[i]} />)
+              }
+
+              return (
+                <Center key={key}>
+                  <Flex flexDirection="row" flexWrap="wrap" m="auto">
+                    {items}
+                  </Flex>
+                </Center>
+              )
+            }}
+          />
+        )
+      }}
+    </AutoSizer>
   )
 }
+
+// ;<List
+//   width={600}
+//   height={600}
+//   rowHeight={60}
+//   rowCount={data.length}
+//   rowRenderer={({ key, index, style }) => {
+//     const item = data[index]
+//     return <Item key={key} data={item} />
+//   }}
+// />
