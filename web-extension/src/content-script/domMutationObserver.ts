@@ -3,7 +3,6 @@ import mitt from 'mitt'
 type EventHash = {
   inputRemoved: HTMLInputElement
   inputAdded: HTMLInputElement
-  iframeAdded: HTMLIFrameElement
 }
 
 export const bodyInputChangeEmitter = mitt<EventHash>()
@@ -20,7 +19,7 @@ function emitDebounced(
     clearTimeout(inputDebounceMap.get(input))
   }
   const timer = setTimeout(() => {
-    bodyInputChangeEmitter.emit(eventName, input)
+    bodyInputChangeEmitter.emit(eventName, input as HTMLInputElement)
     inputDebounceMap.delete(input)
   }, DEBOUNCE_TIME)
   inputDebounceMap.set(input, timer)
@@ -43,8 +42,6 @@ export const domMutationObserver = new MutationObserver(function (
 
       if (node.nodeName === 'INPUT') {
         emitDebounced('inputAdded', node as HTMLInputElement)
-      } else if (node.nodeName === 'IFRAME') {
-        emitDebounced('iframeAdded', node as HTMLIFrameElement)
       } else if (node['querySelectorAll']) {
         node.querySelectorAll('input').forEach((input) => {
           emitDebounced('inputAdded', input)
@@ -52,7 +49,7 @@ export const domMutationObserver = new MutationObserver(function (
 
         const childIframe = node.querySelector('input')
         if (childIframe) {
-          emitDebounced('iframeAdded', node as HTMLIFrameElement)
+          emitDebounced('inputAdded', node as HTMLInputElement)
         }
       }
     })

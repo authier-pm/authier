@@ -74,20 +74,6 @@ export const autofill = (initState: IInitStateRes) => {
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
-  const scanAddedIframeInHalfASecond = (iframe: HTMLIFrameElement) => {
-    console.log('ssssss')
-    setTimeout(() => {
-      const iframeBody = iframe.contentDocument?.body
-      console.log('~ iframeBody', iframeBody)
-      if (iframeBody) {
-        console.log('scanAddedIframe and has body')
-        scanKnownWebInputsAndFillWhenFound(iframeBody as HTMLBodyElement)
-      } else {
-        scanAddedIframeInHalfASecond(iframe)
-      }
-    }, 500)
-  }
-
   // Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
     //Distinguish between register and login from by the number of inputs
@@ -99,33 +85,22 @@ export const autofill = (initState: IInitStateRes) => {
     console.log('~ usefulInputs', usefulInputs)
 
     if (usefulInputs.length > 2) {
-      // Autofill register form
+      // TODO Autofill register form if present
     }
 
     //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
-        const [urlNoQuery] = url.split('?')
-        const matches = location.href.startsWith(urlNoQuery)
+        const host = new URL(url).host
+        const matches = location.href.includes(host)
 
         return matches
       })
       .map((webInputGql) => {
-        let inputEl
-
-        inputEl = document.body.querySelector(
+        const inputEl = document.body.querySelector(
           webInputGql.domPath
         ) as HTMLInputElement
 
-        if (!inputEl) {
-          const iframeBody =
-            document.querySelector('iframe')?.contentDocument?.body // we want to detect elements in the first iframe as well. Some login pages have iframes with the inputs-for example *.zendesk.com
-          if (iframeBody) {
-            inputEl = iframeBody.querySelector(
-              webInputGql.domPath
-            ) as HTMLInputElement
-          }
-        }
         if (inputEl) {
           if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
@@ -161,11 +136,6 @@ export const autofill = (initState: IInitStateRes) => {
     ) {
       const autofillRes = searchInputsAndAutofill(document.body)
       console.log('~ autofillRes', autofillRes)
-      const iframe = document.createElement('iframe')
-      if (autofillRes === false && iframe.contentDocument?.body) {
-        // No input found, try first iframe
-        searchInputsAndAutofill(iframe.contentDocument?.body)
-      }
     }
 
     if (onInputAddedHandler) {
@@ -291,12 +261,10 @@ export const autofill = (initState: IInitStateRes) => {
 
   const scanGlobalDocument = () =>
     scanKnownWebInputsAndFillWhenFound(document.body as HTMLBodyElement)
-  setTimeout(scanGlobalDocument, 100) // let's wait a bit for the page to load
-  bodyInputChangeEmitter.on('iframeAdded', scanAddedIframeInHalfASecond)
+  setTimeout(scanGlobalDocument, 150) // let's wait a bit for the page to load
 
   return () => {
     autofillEnabled = false
     bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
-    bodyInputChangeEmitter.off('iframeAdded', scanAddedIframeInHalfASecond)
   }
 }

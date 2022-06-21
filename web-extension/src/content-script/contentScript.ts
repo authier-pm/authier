@@ -349,27 +349,6 @@ export async function initInputWatch() {
   }, 400)
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
 
-  const listenToInputsInIframe = (iframeDocument: Document) => {
-    iframeDocument.body.addEventListener(
-      'input',
-      debouncedInputEventListener,
-      true
-    )
-    iframeDocument.addEventListener('readystatechange', (ev) => {
-      console.log('ev.target?.readyState', ev.target?.readyState)
-    })
-    document.addEventListener('keydown', onKeyDown, true)
-  }
-
-  bodyInputChangeEmitter.on('iframeAdded', (el) => {
-    // some websites like for example https://withribbon.zendesk.com/access/unauthenticated?theme=hc use iframes, so we have to listen for input in all iframes too
-
-    const iframeDocument = el?.contentDocument
-    if (iframeDocument) {
-      listenToInputsInIframe(iframeDocument)
-    }
-  })
-
   return () => {
     document.body.removeEventListener(
       'input',
