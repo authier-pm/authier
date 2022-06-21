@@ -26,7 +26,7 @@ export const ExportTOTPToCsvButton = () => {
 }
 
 export const ExportLoginCredentialsToCsvButton = () => {
-  const { LoginCredentials } = useContext(DeviceStateContext)
+  const { loginCredentials: LoginCredentials } = useContext(DeviceStateContext)
 
   return (
     <Button

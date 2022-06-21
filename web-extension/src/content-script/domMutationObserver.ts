@@ -1,17 +1,20 @@
 import mitt from 'mitt'
 
-export const bodyInputChangeEmitter = mitt<{
+type EventHash = {
   inputRemoved: HTMLInputElement
   inputAdded: HTMLInputElement
-}>()
+  iframeAdded: HTMLIFrameElement
+}
+
+export const bodyInputChangeEmitter = mitt<EventHash>()
 
 const inputDebounceMap = new Map()
 
 const DEBOUNCE_TIME = 180 // we want to debounce the emitted events- we don't want to emit events for every DOM mutation if there are many in quick succession
 
 function emitDebounced(
-  eventName: 'inputRemoved' | 'inputAdded',
-  input: HTMLInputElement
+  eventName: keyof EventHash,
+  input: HTMLInputElement | HTMLIFrameElement
 ) {
   if (inputDebounceMap.has(input)) {
     clearTimeout(inputDebounceMap.get(input))
@@ -26,7 +29,7 @@ function emitDebounced(
 /**
  * inspired from https://usefulangle.com/post/357/javascript-detect-element-removed-from-dom
  */
-export const inputDomMutationObserver = new MutationObserver(function (
+export const domMutationObserver = new MutationObserver(function (
   mutationsList
 ) {
   mutationsList.forEach(function (mutation) {
@@ -36,20 +39,27 @@ export const inputDomMutationObserver = new MutationObserver(function (
       }
     })
     mutation.addedNodes.forEach(function (addedNode) {
-      if (addedNode.nodeName === 'INPUT') {
-        emitDebounced('inputAdded', addedNode as HTMLInputElement)
-      } else if (addedNode['querySelectorAll']) {
-        // @ts-expect-error TODO
-        const childInputs = addedNode.querySelectorAll('input')
-        for (const input of childInputs) {
+      const node = addedNode as HTMLElement
+
+      if (node.nodeName === 'INPUT') {
+        emitDebounced('inputAdded', node as HTMLInputElement)
+      } else if (node.nodeName === 'IFRAME') {
+        emitDebounced('iframeAdded', node as HTMLIFrameElement)
+      } else if (node['querySelectorAll']) {
+        node.querySelectorAll('input').forEach((input) => {
           emitDebounced('inputAdded', input)
+        })
+
+        const childIframe = node.querySelector('input')
+        if (childIframe) {
+          emitDebounced('iframeAdded', node as HTMLIFrameElement)
         }
       }
     })
   })
 })
 
-inputDomMutationObserver.observe(document.body, {
+domMutationObserver.observe(document.body, {
   subtree: true,
   childList: true
 })
