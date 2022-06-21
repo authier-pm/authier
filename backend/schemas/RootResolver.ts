@@ -462,17 +462,6 @@ export class RootResolver {
       cancel_url: `${ctx.request.headers.referer}?canceled=true`
     })
 
-    if (session.id) {
-      await ctx.prisma.user.update({
-        where: {
-          id: userId
-        },
-        data: {
-          stripeId: session.id
-        }
-      })
-    }
-
     return session.id
   }
 }

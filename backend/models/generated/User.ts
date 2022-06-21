@@ -17,12 +17,6 @@ export class UserGQLScalars {
   @Field({ nullable: true })
   email?: string
 
-  @Field({ nullable: true })
-  stripeId?: string
-
-  @Field()
-  accountType: string
-
   @Field(() => Int)
   tokenVersion: number
 
