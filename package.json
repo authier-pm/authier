@@ -55,6 +55,7 @@
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",
+    "contrib": "npx contrib-locs init",
     "schemas": "yarn gbs && yarn gfs"
   }
 }
