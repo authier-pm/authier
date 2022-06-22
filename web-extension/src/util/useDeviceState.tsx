@@ -11,7 +11,7 @@ import {
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
-import { device } from '@src/background/ExtensionDevice'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
@@ -24,8 +24,8 @@ export interface ISecret {
   label: string
   iconUrl: string | undefined | null
   url: string
-  lastUsedAt?: Date | null
-  createdAt: Date
+  lastUsedAt?: string | null
+  createdAt: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
@@ -60,8 +60,9 @@ export function useDeviceState() {
 
   const [isFilling, setIsFilling] = useState<boolean>(false)
   const [isCounting, setIsCounting] = useState<boolean>(false)
-  const [deviceState, setDeviceState] =
-    useState<IBackgroundStateSerializable | null>(device.state)
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(
+    device.state
+  )
 
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
@@ -109,18 +110,14 @@ export function useDeviceState() {
     deviceState,
     currentTab,
     get loginCredentials() {
-      return (
-        deviceState?.decryptedSecrets.filter(({ kind }) => {
-          return kind === EncryptedSecretType.LOGIN_CREDENTIALS
-        }) ?? []
-      )
+      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
+        return kind === EncryptedSecretType.LOGIN_CREDENTIALS
+      }) ?? []) as ILoginSecret[]
     },
     get TOTPSecrets() {
-      return (
-        deviceState?.decryptedSecrets.filter(({ kind }) => {
-          return kind === EncryptedSecretType.TOTP
-        }) ?? []
-      )
+      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
+        return kind === EncryptedSecretType.TOTP
+      }) ?? []) as ITOTPSecret[]
     },
 
     isCounting,

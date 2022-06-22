@@ -50,7 +50,7 @@ export interface IBackgroundStateSerializableLocked {
 export interface IBackgroundStateSerializable
   extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
-  decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  // decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
 }
 
 export const lockTime = 10000 * 60 * 60 * 8
