@@ -24,6 +24,9 @@ export class UserGQLScalars {
   username?: string
 
   @Field()
+  uiLocalisation: string
+
+  @Field()
   addDeviceSecretEncrypted: string
 
   @Field()

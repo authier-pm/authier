@@ -1,4 +1,3 @@
-import { SharedBrowserEvents } from '@src/background/SharedBrowserEvents'
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
@@ -11,9 +10,8 @@ import {
 
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import cryptoJS from 'crypto-js'
 import debug from 'debug'
-import { device } from '@src/background/ExtensionDevice'
+import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
@@ -26,7 +24,8 @@ export interface ISecret {
   label: string
   iconUrl: string | undefined | null
   url: string
-  lastUsed?: Date | null
+  lastUsedAt?: string | null
+  createdAt: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
@@ -61,8 +60,9 @@ export function useDeviceState() {
 
   const [isFilling, setIsFilling] = useState<boolean>(false)
   const [isCounting, setIsCounting] = useState<boolean>(false)
-  const [deviceState, setDeviceState] =
-    useState<IBackgroundStateSerializable | null>(device.state)
+  const [deviceState, setDeviceState] = useState<DeviceState | null>(
+    device.state
+  )
 
   const [UIConfig, setUIConfig] = useState<UISettings>({
     homeList: UIOptions.all
@@ -109,79 +109,15 @@ export function useDeviceState() {
     isFilling,
     deviceState,
     currentTab,
-    get LoginCredentials() {
-      if (!deviceState) {
-        return []
-      }
-      const { secrets } = deviceState
-      const filtered = secrets.filter(
-        ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-      )
-      const creds = filtered.map((secret) => {
-        let parsed
-
-        try {
-          const decrypted = cryptoJS.AES.decrypt(
-            secret.encrypted,
-            deviceState.masterEncryptionKey,
-            {
-              iv: cryptoJS.enc.Utf8.parse(deviceState.userId)
-            }
-          ).toString(cryptoJS.enc.Utf8)
-
-          parsed = JSON.parse(decrypted)
-
-          loginCredentialsSchema.parse(parsed)
-
-          return {
-            ...secret,
-            loginCredentials: parsed
-          }
-        } catch (err) {
-          parsed && log('parsed', parsed)
-
-          return {
-            ...secret,
-            loginCredentials: {
-              username: '',
-              password: ''
-            }
-          }
-        }
-      })
-      return creds
+    get loginCredentials() {
+      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
+        return kind === EncryptedSecretType.LOGIN_CREDENTIALS
+      }) ?? []) as ILoginSecret[]
     },
     get TOTPSecrets() {
-      if (!deviceState) {
-        return []
-      }
-      const { secrets } = deviceState
-      const filtered = secrets.filter(
-        ({ kind }) => kind === EncryptedSecretType.TOTP
-      )
-      return filtered.map((secret) => {
-        try {
-          const decrypted = cryptoJS.AES.decrypt(
-            secret.encrypted,
-            deviceState.masterEncryptionKey,
-            {
-              iv: cryptoJS.enc.Utf8.parse(deviceState.userId)
-            }
-          ).toString(cryptoJS.enc.Utf8)
-
-          return {
-            ...secret,
-            totp: decrypted
-          }
-        } catch (err) {
-          console.error(err)
-          console.error(`decryption failed for totp secret ${secret.id}}`)
-          return {
-            ...secret,
-            totp: ''
-          }
-        }
-      })
+      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
+        return kind === EncryptedSecretType.TOTP
+      }) ?? []) as ITOTPSecret[]
     },
 
     isCounting,

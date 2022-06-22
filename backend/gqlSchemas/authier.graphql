@@ -1,5 +1,4 @@
 type Query {
-  user(userId: String!): UserQuery
   osTime: String!
 
   """
@@ -16,6 +15,7 @@ type UserQuery {
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -83,6 +83,7 @@ type UserGQL {
   email: String
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -172,6 +173,7 @@ type WebInputGQL {
   url: String!
   kind: WebInputType!
   domPath: String!
+  domOrdinal: Int!
   addedByUserId: String!
   addedByUser: UserGQL!
   UsageEvents: [SecretUsageEventGQL!]!
@@ -306,8 +308,6 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 scalar UUID
 
 type Mutation {
-  user(userId: String!): UserMutation
-
   """
   you need to be authenticated to call this resolver
   """
@@ -339,6 +339,7 @@ type UserMutation {
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -568,6 +569,7 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
+  domOrdinal: PositiveInt!
   url: String!
   kind: WebInputType!
 }

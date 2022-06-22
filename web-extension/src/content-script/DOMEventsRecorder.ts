@@ -1,6 +1,5 @@
 import browser from 'webextension-polyfill'
-import { getCssSelector } from 'css-selector-generator'
-import { CssSelectorMatch } from 'css-selector-generator/types/types'
+
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
@@ -12,30 +11,59 @@ export interface IInputRecord {
   inputted?: string
 }
 
-const defaultSelectorBlacklist = ['[data-*']
+interface ICSSSelectorDomOrdinal {
+  css: string
+  ordinal: number
+}
 
-export function getSelectorForElement(target: HTMLInputElement) {
-  let selector: CssSelectorMatch
+export function getCssSelectorForInput(
+  input: HTMLInputElement
+): ICSSSelectorDomOrdinal {
+  if (input.id) {
+    return { css: `input#${input.id}`, ordinal: 0 }
+  }
+  let proposedSelector = ''
+  if (input.name) {
+    proposedSelector += `[name=${input.name}]`
+  } else if (input.className) {
+    proposedSelector += `[class=${input.name}]`
+  } else if (input.autocomplete) {
+    proposedSelector += `[autocomplete=${input.name}]`
+  }
+
+  const inputsForProposedSelector = document.querySelectorAll(proposedSelector)
+  if (inputsForProposedSelector.length === 0) {
+    return { css: proposedSelector, ordinal: 0 }
+  } else {
+    for (let index = 0; index < inputsForProposedSelector.length; index++) {
+      const element = inputsForProposedSelector[index]
+      if (element === input) {
+        return { css: proposedSelector, ordinal: index }
+      }
+    }
+    throw new Error('failed to resolve a CSS selector')
+  }
+}
+
+export function getSelectorForElement(
+  target: HTMLInputElement
+): ICSSSelectorDomOrdinal {
+  let selector: ICSSSelectorDomOrdinal
   if (document.body.contains(target)) {
     if (target.autocomplete && target.autocomplete !== 'off') {
       const autocompleteSelector = `[autocomplete="${target.autocomplete}"]`
       if (document.body.querySelectorAll(autocompleteSelector).length === 1) {
-        return autocompleteSelector // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
+        return { css: autocompleteSelector, ordinal: 0 } // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
       }
     }
 
-    selector = getCssSelector(target, {
-      blacklist: defaultSelectorBlacklist
-    })
-
-    if (selector.match(/\d+/)) {
-      selector = getCssSelector(target, {
-        blacklist: [selector, ...defaultSelectorBlacklist]
-      })
-    }
+    selector = getCssSelectorForInput(target)
   } else {
     // this input is not in DOM anymore--it was probably removed as part of the login flow(multi step login flow)
-    selector = generateQuerySelectorForOrphanedElement(target) // we fallback to generating selector from the orphaned element
+    selector = {
+      css: generateQuerySelectorForOrphanedElement(target),
+      ordinal: 0
+    } // we fallback to generating selector from the orphaned element
   }
 
   return selector

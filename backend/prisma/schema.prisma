@@ -150,6 +150,7 @@ model WebInput {
   url           String             @db.VarChar(2048)
   kind          WebInputType
   domPath       String
+  domOrdinal    Int                @default(0)
   addedByUser   User               @relation(fields: [addedByUserId], references: [id])
   addedByUserId String             @db.Uuid
   UsageEvents   SecretUsageEvent[]
@@ -165,6 +166,7 @@ model User {
 
   tokenVersion                  Int                  @default(0)
   username                      String?              @unique
+  uiLocalisation                String               @default("en")
   // @skip
   addDeviceSecret               String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
   addDeviceSecretEncrypted      String // client has to decrypt this to prove they have the correct master password

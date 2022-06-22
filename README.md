@@ -30,3 +30,7 @@ We are using yarn workspaces so always run yarn in root folder. That's where the
 ## How to run locally
 
 Refer to readme inside each subproject for all the instructions. Generally you will need to run backend + whatever client you want to develop.
+
+## Contrib locs
+
+For now we're running it manually every week or so by `yarn contrib`. If we ever see a profit from this project, it will be divided each month proportionally according to the latest numbers in `contrib-locs.json`
