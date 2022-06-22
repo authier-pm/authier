@@ -166,6 +166,7 @@ model User {
 
   tokenVersion                  Int                  @default(0)
   username                      String?              @unique
+  uiLocalisation                String               @default("en")
   // @skip
   addDeviceSecret               String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
   addDeviceSecretEncrypted      String // client has to decrypt this to prove they have the correct master password
