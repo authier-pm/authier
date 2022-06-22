@@ -10,7 +10,7 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.6",
+    "@apollo/client": "^3.6.8",
     "@chakra-ui/icons": "^2.0.1",
     "@chakra-ui/react": "1",
     "@emotion/react": "^11",

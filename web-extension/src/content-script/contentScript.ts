@@ -361,7 +361,10 @@ export async function initInputWatch() {
 }
 
 document.addEventListener('readystatechange', (event) => {
-  if (event.target && event.target?.readyState === 'complete') {
+  if (
+    event.target instanceof Document &&
+    event.target?.readyState === 'complete'
+  ) {
     initInputWatch()
   }
 })

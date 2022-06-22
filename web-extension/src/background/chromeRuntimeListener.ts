@@ -31,15 +31,18 @@ if (!isRunningInBgPage) {
 const safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 
+interface ICapturedInput {
+  cssSelector: string
+  domOrdinal: number
+  type: 'input' | 'submit' | 'keydown'
+  kind: WebInputType
+  inputted: string | undefined
+}
+
 interface ILoginCredentialsFromContentScript {
   username: string
   password: string
-  capturedInputEvents: {
-    element: string
-    type: 'input' | 'submit' | 'keydown'
-    kind: WebInputType
-    inputted: string | undefined
-  }[]
+  capturedInputEvents: ICapturedInput[]
   openInVault: boolean
 }
 
@@ -48,12 +51,7 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-let capturedInputEvents: {
-  element: string
-  type: 'input' | 'submit' | 'keydown'
-  kind: WebInputType
-  inputted: string | undefined
-}[] = []
+let capturedInputEvents: ICapturedInput[] = []
 
 //This is for saving URL of inputs
 let inputsUrl: string
@@ -115,9 +113,10 @@ browser.runtime.onMessage.addListener(async function (
       tab.id && saveLoginModalsStates.delete(tab.id)
       const webInputs = credentials.capturedInputEvents.map((captured) => {
         return {
-          domPath: captured.element,
+          domPath: captured.cssSelector,
           kind: captured.kind,
-          url: inputsUrl
+          url: inputsUrl,
+          domOrdinal: captured.domOrdinal
         }
       })
 
@@ -143,9 +142,10 @@ browser.runtime.onMessage.addListener(async function (
 
       const newWebInputs = capturedInputEvents.map((captured) => {
         return {
-          domPath: captured.element,
+          domPath: captured.cssSelector,
           kind: captured.kind,
-          url: inputsUrl
+          url: inputsUrl,
+          domOrdinal: captured.domOrdinal
         }
       })
 
