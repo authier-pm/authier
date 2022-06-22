@@ -1,3 +1,5 @@
+import React, { ReactNode, useState } from 'react'
+
 import { CheckIcon } from '@chakra-ui/icons'
 import getStripe from '../utils/get-stripe'
 import {
@@ -11,13 +13,17 @@ import {
   Stack,
   useColorModeValue,
   VStack,
-  Text
+  Text,
+  Tooltip
 } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import Head from 'next/head'
-import React, { ReactNode, useState } from 'react'
+
 import { AuPage } from '../components/AuPage'
 import { useCreateCheckoutSessionMutation } from './pricing.codegen'
+
+import { useRouter } from 'next/router'
+import Error from '../components/Error'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -34,6 +40,34 @@ function PriceWrapper({ children }: { children: ReactNode }) {
   )
 }
 
+function ToolTipButton({
+  userId,
+  plan,
+  handleCheckout
+}: {
+  userId: string | string[] | undefined
+  plan: string
+  handleCheckout: (type: string) => Promise<void>
+}) {
+  return (
+    <Tooltip
+      isDisabled={userId ? true : false}
+      label="Visit this page through yout vault"
+    >
+      <span>
+        <Button
+          disabled={!userId}
+          w="full"
+          colorScheme="red"
+          onClick={() => handleCheckout(plan)}
+        >
+          Buy
+        </Button>
+      </span>
+    </Tooltip>
+  )
+}
+
 const pricingPlan = {
   Credentials: 'prod_LquWXgjk6kl5sM',
   TOTP: 'prod_LquVrkwfsXjTAL',
@@ -41,7 +75,11 @@ const pricingPlan = {
 }
 
 export default function PricingPage() {
+  const router = useRouter()
+  const { userId } = router.query
+
   const [loading, setLoading] = useState(false)
+
   const [
     createCheckoutSessionMutation,
     { data, loading: sessionLoading, error: sessionError }
@@ -49,16 +87,18 @@ export default function PricingPage() {
 
   const handleCheckout = async (type: string) => {
     setLoading(true)
-    // Create a Checkout Session.
+
+    //Create a Checkout Session.
     const response = await createCheckoutSessionMutation({
       variables: {
         product: type,
-        userId: '93a4c066-5e91-4cfb-93a5-aeb3072ed9f5'
+        userId: userId as string
       }
     })
 
     if (sessionError) {
       console.error(sessionError.message)
+      router.push('/?error=true')
       return
     }
     console.log('res', response)
@@ -168,14 +208,11 @@ export default function PricingPage() {
                     </ListItem>
                   </List>
                   <Box w="80%" pt={7}>
-                    <Button
-                      w="full"
-                      colorScheme="red"
-                      variant="outline"
-                      onClick={() => handleCheckout(pricingPlan.Credentials)}
-                    >
-                      Buy
-                    </Button>
+                    <ToolTipButton
+                      userId={userId}
+                      plan={pricingPlan.Credentials}
+                      handleCheckout={handleCheckout}
+                    />
                   </Box>
                 </VStack>
               </PriceWrapper>
@@ -208,14 +245,11 @@ export default function PricingPage() {
                     </ListItem>
                   </List>
                   <Box w="80%" pt={7}>
-                    <Button
-                      w="full"
-                      colorScheme="red"
-                      variant="outline"
-                      onClick={() => handleCheckout(pricingPlan.TOTP)}
-                    >
-                      Buy
-                    </Button>
+                    <ToolTipButton
+                      userId={userId}
+                      plan={pricingPlan.TOTP}
+                      handleCheckout={handleCheckout}
+                    />
                   </Box>
                 </VStack>
               </PriceWrapper>
@@ -273,15 +307,11 @@ export default function PricingPage() {
                       </ListItem>
                     </List>
                     <Box w="80%" pt={7}>
-                      <Button
-                        w="full"
-                        colorScheme="red"
-                        onClick={() =>
-                          handleCheckout(pricingPlan.TOTP_Credentials)
-                        }
-                      >
-                        Buy
-                      </Button>
+                      <ToolTipButton
+                        userId={userId}
+                        plan={pricingPlan.TOTP_Credentials}
+                        handleCheckout={handleCheckout}
+                      />
                     </Box>
                   </VStack>
                 </Box>
