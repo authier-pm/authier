@@ -15,6 +15,7 @@ type UserQuery {
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -82,6 +83,7 @@ type UserGQL {
   email: String
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -337,6 +339,7 @@ type UserMutation {
   email: EmailAddress
   tokenVersion: Int!
   username: String
+  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
