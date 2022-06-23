@@ -133,7 +133,9 @@ export type DeviceGql = {
   id: Scalars['ID']
   ipAddressLock: Scalars['Boolean']
   lastIpAddress: Scalars['String']
+  lastLockAt?: Maybe<Scalars['DateTime']>
   lastSyncAt?: Maybe<Scalars['DateTime']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']>
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
@@ -159,7 +161,9 @@ export type DeviceMutation = {
   id: Scalars['ID']
   ipAddressLock: Scalars['Boolean']
   lastIpAddress: Scalars['String']
+  lastLockAt?: Maybe<Scalars['DateTime']>
   lastSyncAt?: Maybe<Scalars['DateTime']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']>
   logout: DeviceGql
   logoutAt?: Maybe<Scalars['DateTime']>
   markAsSynced: Scalars['DateTime']
@@ -167,6 +171,7 @@ export type DeviceMutation = {
   name: Scalars['String']
   platform: Scalars['String']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>
+  /** user has to approve it when they log in again on that device */
   removeDevice: Scalars['Boolean']
   rename: DeviceGql
   reportSecretUsageEvent: SecretUsageEventGqlScalars
@@ -200,7 +205,9 @@ export type DeviceQuery = {
   ipAddressLock: Scalars['Boolean']
   lastGeoLocation: Scalars['String']
   lastIpAddress: Scalars['String']
+  lastLockAt?: Maybe<Scalars['DateTime']>
   lastSyncAt?: Maybe<Scalars['DateTime']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']>
   logoutAt?: Maybe<Scalars['DateTime']>
   masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>
   name: Scalars['String']
@@ -339,7 +346,6 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   me: UserMutation
   registerNewUser: LoginResponse
-  user?: Maybe<UserMutation>
 }
 
 export type MutationAddWebInputsArgs = {
@@ -365,10 +371,6 @@ export type MutationRegisterNewUserArgs = {
   userId: Scalars['UUID']
 }
 
-export type MutationUserArgs = {
-  userId: Scalars['String']
-}
-
 export type Query = {
   __typename?: 'Query'
   /** you need to be authenticated to call this resolver */
@@ -376,12 +378,7 @@ export type Query = {
   currentDevice: DeviceQuery
   me?: Maybe<UserQuery>
   osTime: Scalars['String']
-  user?: Maybe<UserQuery>
   webInputs: Array<WebInputGql>
-}
-
-export type QueryUserArgs = {
-  userId: Scalars['String']
 }
 
 export type QueryWebInputsArgs = {
@@ -495,6 +492,7 @@ export type UserGql = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   stripeId?: Maybe<Scalars['String']>
   tokenVersion: Scalars['Int']
+  uiLocalisation: Scalars['String']
   updatedAt?: Maybe<Scalars['DateTime']>
   username?: Maybe<Scalars['String']>
 }
@@ -518,6 +516,7 @@ export type UserMutation = {
   addEncryptedSecrets: Array<EncryptedSecretQuery>
   approveDevice: Scalars['Boolean']
   changeMasterPassword: Scalars['PositiveInt']
+  createCheckoutSession: Scalars['String']
   createSecretUsageEvent: SecretUsageEventGqlScalars
   createdAt: Scalars['DateTime']
   decryptionChallenge: DecryptionChallengeMutation
@@ -534,6 +533,7 @@ export type UserMutation = {
   sendEmailVerification: Scalars['NonNegativeInt']
   stripeId?: Maybe<Scalars['String']>
   tokenVersion: Scalars['Int']
+  uiLocalisation: Scalars['String']
   updateFireToken: DeviceGql
   updateSettings: SettingsConfigGql
   updatedAt?: Maybe<Scalars['DateTime']>
@@ -555,6 +555,10 @@ export type UserMutationApproveDeviceArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput
+}
+
+export type UserMutationCreateCheckoutSessionArgs = {
+  product: Scalars['String']
 }
 
 export type UserMutationCreateSecretUsageEventArgs = {
@@ -630,6 +634,7 @@ export type UserQuery = {
   settings: SettingsConfigGql
   stripeId?: Maybe<Scalars['String']>
   tokenVersion: Scalars['Int']
+  uiLocalisation: Scalars['String']
   updatedAt?: Maybe<Scalars['DateTime']>
   username?: Maybe<Scalars['String']>
 }
@@ -646,6 +651,7 @@ export type UserQuerySendAuthMessageArgs = {
 }
 
 export type WebInputElement = {
+  domOrdinal: Scalars['PositiveInt']
   domPath: Scalars['String']
   kind: WebInputType
   url: Scalars['String']
@@ -657,6 +663,7 @@ export type WebInputGql = {
   addedByUser: UserGql
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
+  domOrdinal: Scalars['Int']
   domPath: Scalars['String']
   host: Scalars['String']
   id: Scalars['Int']

@@ -3,7 +3,6 @@ import React, { ReactNode } from 'react'
 import {
   Box,
   Button,
-  Flex,
   Heading,
   HStack,
   List,
@@ -15,7 +14,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { FaCheck } from 'react-icons/fa'
-import { useMeQuery } from './AccountLimits.codegen'
+import { useMeExtensionQuery } from './AccountLimits.codegen'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -39,7 +38,7 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 const page_url = process.env.PAGE_URL as string
 
 export const AccountLimits = () => {
-  const { data, loading, error } = useMeQuery()
+  const { data, loading, error } = useMeExtensionQuery()
 
   return (
     <Box>

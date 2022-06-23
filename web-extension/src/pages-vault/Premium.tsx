@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { FaCheck } from 'react-icons/fa'
 import React from 'react'
-import { useCreateCheckoutSessionMutation } from './Premium.codegen'
+import { useCreateCheckoutSessionVaultMutation } from './Premium.codegen'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -36,7 +36,7 @@ export default function Premium() {
   const [
     createCheckoutSessionMutation,
     { data, loading: sessionLoading, error }
-  ] = useCreateCheckoutSessionMutation()
+  ] = useCreateCheckoutSessionVaultMutation()
 
   const handleCheckout = async () => {
     setLoading(true)
@@ -46,12 +46,7 @@ export default function Premium() {
         product: '2'
       }
     })
-    //@ts-expect-error
-    if (response.statusCode === 500) {
-      //@ts-expect-error
-      console.error(response.message)
-      return
-    }
+
     console.log(response)
 
     // // Redirect to Checkout.
