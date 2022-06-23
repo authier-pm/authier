@@ -13808,10 +13808,10 @@ mnemonist@^0.39.0:
   dependencies:
     obliterator "^2.0.1"
 
-mockzilla-webextension@^0.13.0:
-  version "0.13.0"
-  resolved "https://registry.yarnpkg.com/mockzilla-webextension/-/mockzilla-webextension-0.13.0.tgz#89a0d627d86e8a912abc149ee903882da0ebb648"
-  integrity sha512-HDfabHLTdd6p2OiFEFB7ravSVEN0HllAjMeWUP7iUNXuCQEkIMro6BzxRL/Xtfe6fKRqNRykTQcX/H8RbAkv0A==
+mockzilla-webextension@^0.14.0:
+  version "0.14.0"
+  resolved "https://registry.yarnpkg.com/mockzilla-webextension/-/mockzilla-webextension-0.14.0.tgz#c1bf33264e02c42452a12e8024217fa81e6f9e9b"
+  integrity sha512-NLMHq7oWkVGvUuBSxx1S/8QPHtFP9ZLRWlx3Fdrd+5cjrZ6hPwcPia/R9g9W6XIm4URbddCQDm2CYKCjPcu1Aw==
 
 mockzilla@^0.12.0:
   version "0.12.0"
