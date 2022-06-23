@@ -13,8 +13,12 @@ import {
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 
-import { bodyInputChangeEmitter } from './DOMObserver'
-import { autofill, IDecryptedSecrets } from './autofill'
+import { bodyInputChangeEmitter } from './domMutationObserver'
+import {
+  autofill,
+  autofillEventsDispatched,
+  IDecryptedSecrets
+} from './autofill'
 import {
   promptDiv,
   renderSaveCredentialsForm
@@ -243,10 +247,18 @@ export async function initInputWatch() {
   }
   bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
 
+  /**
+   * responsible for saving new web inputs
+   */
   const debouncedInputEventListener = debounce((ev) => {
+    if (autofillEventsDispatched.has(ev)) {
+      // this was dispatched by autofill, we don't need to do anything here
+      autofillEventsDispatched.delete(ev)
+      return
+    }
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
-    console.log(domRecorder.toJSON())
+    log('domRecorder', domRecorder.toJSON())
 
     const inputted = targetElement.value
 
@@ -272,7 +284,8 @@ export async function initInputWatch() {
                 targetElement as HTMLInputElement
               )
               const webInput: WebInputElement = {
-                domPath: elementSelector,
+                domPath: elementSelector.css,
+                domOrdinal: elementSelector.ordinal,
                 kind: WebInputType.TOTP,
                 url: location.href
               }
@@ -336,20 +349,6 @@ export async function initInputWatch() {
   }, 400)
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
 
-  setTimeout(() => {
-    // some websites like for example https://withribbon.zendesk.com/access/unauthenticated?theme=hc use iframes, so we have to listen for input in all iframes too
-    const iframe = document.querySelector('iframe')
-    const iframeDocument = iframe?.contentDocument
-    if (iframeDocument) {
-      iframeDocument.body.addEventListener(
-        'input',
-        debouncedInputEventListener,
-        true
-      )
-      document.addEventListener('keydown', onKeyDown, true)
-    }
-  }, 50)
-
   return () => {
     document.body.removeEventListener(
       'input',
@@ -361,4 +360,11 @@ export async function initInputWatch() {
   }
 }
 
-initInputWatch()
+document.addEventListener('readystatechange', (event) => {
+  if (
+    event.target instanceof Document &&
+    event.target?.readyState === 'complete'
+  ) {
+    initInputWatch()
+  }
+})

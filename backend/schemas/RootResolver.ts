@@ -75,22 +75,6 @@ export interface Payload {
 
 @Resolver()
 export class RootResolver {
-  @Query(() => UserQuery, { nullable: true })
-  @Mutation(() => UserMutation, { nullable: true })
-  async user(@Arg('userId', () => String) userId: string) {
-    const user = await prismaClient.user.findFirst({
-      where: {
-        id: userId
-      },
-      include: {
-        Devices: true,
-        EncryptedSecrets: true
-      }
-    })
-
-    return user
-  }
-
   @Query(() => String)
   osTime() {
     return new Date().toISOString()
@@ -108,10 +92,10 @@ export class RootResolver {
     try {
       if (inHeader) {
         const token = inHeader?.split(' ')[1]
-        const jwtPayload = verify(token, process.env.ACCESS_TOKEN_SECRET!)
+        verify(token, process.env.ACCESS_TOKEN_SECRET!)
         return true
       } else if (inCookies) {
-        const jwtPayload = verify(inCookies, process.env.ACCESS_TOKEN_SECRET!)
+        verify(inCookies, process.env.ACCESS_TOKEN_SECRET!)
         return true
       }
 

@@ -10,6 +10,7 @@ query webInputsForHost($host: String!) {
     host
     url
     domPath
+    domOrdinal
     kind
     createdAt
   }

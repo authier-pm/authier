@@ -48,6 +48,12 @@ export class DeviceGQLScalars {
   lastSyncAt?: Date
 
   @Field({ nullable: true })
+  lastUnlockAt?: Date
+
+  @Field({ nullable: true })
+  lastLockAt?: Date
+
+  @Field({ nullable: true })
   masterPasswordOutdatedAt?: Date
 
   @Field()
