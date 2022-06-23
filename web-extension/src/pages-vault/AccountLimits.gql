@@ -1,4 +1,4 @@
-query me {
+query meExtension {
   me {
     id
     accountType

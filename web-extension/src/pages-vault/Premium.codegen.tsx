@@ -3,44 +3,44 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type CreateCheckoutSessionMutationVariables = Types.Exact<{
+export type CreateCheckoutSessionVaultMutationVariables = Types.Exact<{
   product: Types.Scalars['String'];
 }>;
 
 
-export type CreateCheckoutSessionMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', createCheckoutSession: string } };
+export type CreateCheckoutSessionVaultMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', createCheckoutSession: string } };
 
 
-export const CreateCheckoutSessionDocument = gql`
-    mutation createCheckoutSession($product: String!) {
+export const CreateCheckoutSessionVaultDocument = gql`
+    mutation createCheckoutSessionVault($product: String!) {
   me {
     createCheckoutSession(product: $product)
   }
 }
     `;
-export type CreateCheckoutSessionMutationFn = Apollo.MutationFunction<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;
+export type CreateCheckoutSessionVaultMutationFn = Apollo.MutationFunction<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>;
 
 /**
- * __useCreateCheckoutSessionMutation__
+ * __useCreateCheckoutSessionVaultMutation__
  *
- * To run a mutation, you first call `useCreateCheckoutSessionMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useCreateCheckoutSessionMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useCreateCheckoutSessionVaultMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateCheckoutSessionVaultMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [createCheckoutSessionMutation, { data, loading, error }] = useCreateCheckoutSessionMutation({
+ * const [createCheckoutSessionVaultMutation, { data, loading, error }] = useCreateCheckoutSessionVaultMutation({
  *   variables: {
  *      product: // value for 'product'
  *   },
  * });
  */
-export function useCreateCheckoutSessionMutation(baseOptions?: Apollo.MutationHookOptions<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>) {
+export function useCreateCheckoutSessionVaultMutation(baseOptions?: Apollo.MutationHookOptions<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>(CreateCheckoutSessionDocument, options);
+        return Apollo.useMutation<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>(CreateCheckoutSessionVaultDocument, options);
       }
-export type CreateCheckoutSessionMutationHookResult = ReturnType<typeof useCreateCheckoutSessionMutation>;
-export type CreateCheckoutSessionMutationResult = Apollo.MutationResult<CreateCheckoutSessionMutation>;
-export type CreateCheckoutSessionMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;
+export type CreateCheckoutSessionVaultMutationHookResult = ReturnType<typeof useCreateCheckoutSessionVaultMutation>;
+export type CreateCheckoutSessionVaultMutationResult = Apollo.MutationResult<CreateCheckoutSessionVaultMutation>;
+export type CreateCheckoutSessionVaultMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>;
