@@ -84,11 +84,13 @@ export type AddSecretInput = Array<
 >
 
 export class DeviceState implements IBackgroundStateSerializable {
+  decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
+    this.decryptedSecrets = this.getAllSecretsDecrypted()
   }
 
   email: string
@@ -133,7 +135,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async save() {
     device.lockedState = null
-
+    this.decryptedSecrets = this.getAllSecretsDecrypted()
     browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({
       backgroundState: this,
@@ -160,6 +162,12 @@ export class DeviceState implements IBackgroundStateSerializable {
       )
     }
     return secrets.map((secret) => {
+      return this.decryptSecret(secret)
+    })
+  }
+
+  getAllSecretsDecrypted() {
+    return this.secrets.map((secret) => {
       return this.decryptSecret(secret)
     })
   }

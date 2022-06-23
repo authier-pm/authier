@@ -133,52 +133,55 @@ export const VaultImportExport = () => {
   )
 
   return (
-    <Center p={5} flexDir={'column'}>
-      <Heading size="sm">Import</Heading>
-      <Box p={30} width="100%">
-        {!importedStat ? (
-          <>
-            <ImportFromFile
-              onFileAccepted={async (f) => {
-                setImportedStat(await onFileAccepted(f))
-              }}
-            />
-            <Text fontSize={16} mt={8} mb={6}>
-              <Trans>
-                We support importing from <code>csv</code> files.
-                Lastpass/Bitwarden will fork fine, file exported from other
-                password managers might work as well, but it's not guaranteed.
-              </Trans>
-            </Text>
-          </>
-        ) : (
-          <>
-            <Alert status="success">
-              <Trans>
-                Successfully added {importedStat.added}, skipped{' '}
-                {importedStat.skipped}
-              </Trans>
-            </Alert>
-            <Center>
-              <Button
-                m={2}
-                onClick={() => {
-                  setImportedStat(null)
+    <Center p={5}>
+      <Flex maxW={'1200px'} flexDir={'column'}>
+        <Heading size="sm">Import</Heading>
+        <Box p={30} width="100%">
+          {!importedStat ? (
+            <>
+              <ImportFromFile
+                onFileAccepted={async (f) => {
+                  setImportedStat(await onFileAccepted(f))
                 }}
-              >
-                <Trans>Import another</Trans>
-              </Button>
-            </Center>
-          </>
-        )}
-      </Box>
+              />
+              <Text fontSize={16} mt={8} mb={6}>
+                <Trans>
+                  We support importing from <code>csv</code> files.
+                  Lastpass/Bitwarden will fork fine, file exported from other
+                  password managers might work as well, but it's not guaranteed.
+                </Trans>
+              </Text>
+            </>
+          ) : (
+            <>
+              <Alert status="success">
+                <Trans>
+                  Successfully added {importedStat.added}, skipped{' '}
+                  {importedStat.skipped}
+                </Trans>
+              </Alert>
+              <Center>
+                <Button
+                  m={2}
+                  onClick={() => {
+                    setImportedStat(null)
+                  }}
+                >
+                  <Trans>Import another</Trans>
+                </Button>
+              </Center>
+            </>
+          )}
+        </Box>
 
-      <Heading size="sm">Export</Heading>
+        <Heading size="sm">Export</Heading>
+        <Box m={8}>
+          <ExportLoginCredentialsToCsvButton />
+          <br />
 
-      <ExportLoginCredentialsToCsvButton />
-      <br />
-
-      <ExportTOTPToCsvButton />
+          <ExportTOTPToCsvButton />
+        </Box>
+      </Flex>
     </Center>
   )
 }

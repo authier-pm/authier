@@ -338,7 +338,6 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   me: UserMutation
   registerNewUser: LoginResponse
-  user?: Maybe<UserMutation>
 }
 
 export type MutationAddWebInputsArgs = {
@@ -359,10 +358,6 @@ export type MutationRegisterNewUserArgs = {
   userId: Scalars['UUID']
 }
 
-export type MutationUserArgs = {
-  userId: Scalars['String']
-}
-
 export type Query = {
   __typename?: 'Query'
   /** you need to be authenticated to call this resolver */
@@ -370,12 +365,7 @@ export type Query = {
   currentDevice: DeviceQuery
   me?: Maybe<UserQuery>
   osTime: Scalars['String']
-  user?: Maybe<UserQuery>
   webInputs: Array<WebInputGql>
-}
-
-export type QueryUserArgs = {
-  userId: Scalars['String']
 }
 
 export type QueryWebInputsArgs = {
@@ -634,6 +624,7 @@ export type UserQuerySendAuthMessageArgs = {
 }
 
 export type WebInputElement = {
+  domOrdinal: Scalars['PositiveInt']
   domPath: Scalars['String']
   kind: WebInputType
   url: Scalars['String']
@@ -645,6 +636,7 @@ export type WebInputGql = {
   addedByUser: UserGql
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
+  domOrdinal: Scalars['Int']
   domPath: Scalars['String']
   host: Scalars['String']
   id: Scalars['Int']

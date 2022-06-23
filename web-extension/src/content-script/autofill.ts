@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { bodyInputChangeEmitter } from './DOMObserver'
+import { bodyInputChangeEmitter } from './domMutationObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
@@ -20,6 +20,8 @@ export type IDecryptedSecrets = {
   totpSecrets: ITOTPSecret[]
 }
 
+export const autofillEventsDispatched = new Set()
+
 const autofillValueIntoInput = (element: HTMLInputElement, value) => {
   log('autofillValueIntoInput:', value)
   //
@@ -29,12 +31,13 @@ const autofillValueIntoInput = (element: HTMLInputElement, value) => {
 
   element.style.backgroundColor = authierColors.green[400]
   element.value = value
-  element.dispatchEvent(
-    new Event('input', {
-      bubbles: true,
-      cancelable: true
-    })
-  )
+  const event = new Event('input', {
+    bubbles: false,
+    cancelable: true
+  })
+  autofillEventsDispatched.add(event)
+
+  element.dispatchEvent(event)
 
   return element
 }
@@ -72,44 +75,31 @@ export const autofill = (initState: IInitStateRes) => {
   const totpSecret = secretsForHost.totpSecrets[0]
 
   // Should be renamed on scanOnInputs?
-  const scanKnownWebInputsAndFillWhenFound = () => {
+  const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
     //Distinguish between register and login from by the number of inputs
     //Then Distinguish between phased and not phased
 
-    const usefulInputs = Array.from(
-      document.body.querySelectorAll('input')
-    ).filter(
+    const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
     )
 
     if (usefulInputs.length > 2) {
-      // Autofill register form
+      // TODO Autofill register form if present
     }
 
     //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
-        const [urlNoQuery] = url.split('?')
-        const matches = location.href.startsWith(urlNoQuery)
+        const host = new URL(url).host
+        const matches = location.href.includes(host)
 
         return matches
       })
       .map((webInputGql) => {
-        let inputEl
-
-        inputEl = document.body.querySelector(
+        const inputEl = document.body.querySelector(
           webInputGql.domPath
         ) as HTMLInputElement
 
-        if (!inputEl) {
-          const iframeBody =
-            document.querySelector('iframe')?.contentDocument?.body // we want to detect elements in the first iframe as well. Some login pages have iframes with the inputs-for example *.zendesk.com
-          if (iframeBody) {
-            inputEl = iframeBody.querySelector(
-              webInputGql.domPath
-            ) as HTMLInputElement
-          }
-        }
         if (inputEl) {
           if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
@@ -143,29 +133,19 @@ export const autofill = (initState: IInitStateRes) => {
       webInputs.length === 0 &&
       secretsForHost.loginCredentials.length === 1
     ) {
-      const autofillRes = searchInputsAndAutofill(document.body)
-      console.log('~ autofillRes', autofillRes)
-      const iframe = document.createElement('iframe')
-      if (autofillRes === false && iframe.contentDocument?.body) {
-        // No input found, try first iframe
-        searchInputsAndAutofill(iframe.contentDocument?.body)
-      }
+      const autofillResult = searchInputsAndAutofill(document.body)
+      log('autofillResult', autofillResult)
     }
 
     if (onInputAddedHandler) {
-      bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
+      bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
     }
     onInputAddedHandler = debounce(
       (input) => {
-        console.log('~ input', input)
-
         const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
 
         // For one input on page
-        if (
-          input.autocomplete === 'new-password' ||
-          (webInputs.length === 0 && input.type === 'password')
-        ) {
+        if (input.autocomplete === 'new-password') {
           autofillValueIntoInput(input, generate(passwordGenOptions))
         } else {
           // More inputs on page
@@ -185,8 +165,6 @@ export const autofill = (initState: IInitStateRes) => {
 
               autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
             }
-          } else {
-            scanKnownWebInputsAndFillWhenFound()
           }
         }
       },
@@ -278,10 +256,12 @@ export const autofill = (initState: IInitStateRes) => {
     }
   }
 
-  setTimeout(scanKnownWebInputsAndFillWhenFound, 100) // let's wait a bit for the page to load
+  const scanGlobalDocument = () =>
+    scanKnownWebInputsAndFillWhenFound(document.body as HTMLBodyElement)
+  setTimeout(scanGlobalDocument, 150) // let's wait a bit for the page to load
 
   return () => {
     autofillEnabled = false
-    bodyInputChangeEmitter.off('inputAdded', scanKnownWebInputsAndFillWhenFound)
+    bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
   }
 }
