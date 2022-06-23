@@ -56,6 +56,8 @@ model Device {
   updatedAt                DateTime? @updatedAt
   registeredWithMasterAt   DateTime?
   lastSyncAt               DateTime?
+  lastUnlockAt             DateTime?
+  lastLockAt               DateTime?
   masterPasswordOutdatedAt DateTime? // we set it to a timestamp when user changes master password on one device
 
   userId String @db.Uuid

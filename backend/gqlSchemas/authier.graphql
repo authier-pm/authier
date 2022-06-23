@@ -407,6 +407,10 @@ type DeviceMutation {
   ): SecretUsageEventGQLScalars!
   rename(name: String!): DeviceGQL!
   logout: DeviceGQL!
+
+  """
+  user has to approve it when they log in again on that device
+  """
   removeDevice: Boolean!
 }
 
