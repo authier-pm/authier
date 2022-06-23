@@ -1,6 +1,6 @@
 import { Box } from '@chakra-ui/react'
 import Head from 'next/head'
-import React from 'react'
+
 import ReactMarkdown from 'react-markdown'
 import { AuPage } from '../components/AuPage'
 import ChakraUIRenderer from 'chakra-ui-markdown-renderer'

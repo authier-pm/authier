@@ -10,12 +10,13 @@
     "test": "vitest"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.8",
+    "@apollo/client": "^3.6.6",
     "@chakra-ui/icons": "^2.0.1",
-    "@chakra-ui/react": "1",
+    "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@lingui/react": "^3.13.3",
+    "@reach/alert": "^0.17.0",
     "@sentry/nextjs": "^7.0.0",
     "@stripe/react-stripe-js": "^1.8.1",
     "@stripe/stripe-js": "^1.31.0",
@@ -23,9 +24,10 @@
     "@testing-library/react": "^13.3.0",
     "framer-motion": "^6",
     "next": "^12.1.6",
-    "react": "^18",
-    "react-dom": "^18",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
     "react-intersection-observer": "^9.3.3",
+    "react-toastify": "^9.0.5",
     "remark": "^14.0.2",
     "remark-gfm": "^3.0.1",
     "remark-html": "^15.0.1"
@@ -35,7 +37,8 @@
     "@emotion/babel-plugin": "^11",
     "@lingui/cli": "^3.13.3",
     "@lingui/macro": "^3.13.3",
-    "@types/react": "^18.0.12",
+    "@types/react": "^18.0.14",
+    "@types/react-dom": "^18.0.5",
     "apollo-link-token-refresh": "^0.4.0",
     "babel-plugin-macros": "^3.1.0",
     "chakra-ui-markdown-renderer": "^4.0.0",
@@ -44,8 +47,7 @@
     "jwt-decode": "^3.1.2",
     "raw-loader": "^4.0.2",
     "react-markdown": "^8.0.3",
-    "react-toastify": "^9.0.3",
-    "typescript": "^4.7.4",
+    "typescript": "^4.7.3",
     "vite": "^2.9.10",
     "vitest": "^0.14.1"
   }
