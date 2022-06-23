@@ -8081,10 +8081,10 @@ constant-case@^3.0.4:
     tslib "^2.0.3"
     upper-case "^2.0.2"
 
-constructs@^10.1.31:
-  version "10.1.31"
-  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.1.31.tgz#5ff527578ca8e85320ff7da0b8a5569ee3bcd9c8"
-  integrity sha512-rL5Vmy65kr+7n4swyEmD8gwrpiCtoUfhb1wNdg8UsdfzZT5AoU+fYx1shDOBpwAibm6yTim3Vjs/ZPR2iUFFQw==
+constructs@^10.1.42:
+  version "10.1.42"
+  resolved "https://registry.yarnpkg.com/constructs/-/constructs-10.1.42.tgz#dc21bfa7d024a1c81c0982b69ed4585e4e9d5712"
+  integrity sha512-5AELa/PFtZG+WTjn9HoXhqsDZYV6l3J7Li9xw6vREYVMasF8cnVbTZvA4crP1gIyKtBAxAlnZCmzmCbicnH6eg==
 
 content-disposition@^0.5.3:
   version "0.5.4"
