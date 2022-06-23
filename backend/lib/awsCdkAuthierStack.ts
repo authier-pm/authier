@@ -28,6 +28,7 @@ export class AwsCdkAuthierStack extends Stack {
 
     backendApi.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
+
       cors: {
         // Allow this to be called from websites on https://example.com.
         // Can also be ['*'] to allow all domain.
