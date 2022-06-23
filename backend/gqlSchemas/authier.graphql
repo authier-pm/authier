@@ -119,6 +119,8 @@ type DeviceGQL {
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
+  lastUnlockAt: DateTime
+  lastLockAt: DateTime
   masterPasswordOutdatedAt: DateTime
   userId: String!
   User: UserGQL!
@@ -252,6 +254,8 @@ type DeviceQuery {
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
+  lastUnlockAt: DateTime
+  lastLockAt: DateTime
   masterPasswordOutdatedAt: DateTime
   userId: String!
   User: UserGQL!
@@ -397,6 +401,8 @@ type DeviceMutation {
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
+  lastUnlockAt: DateTime
+  lastLockAt: DateTime
   masterPasswordOutdatedAt: DateTime
   userId: String!
   markAsSynced: DateTime!
