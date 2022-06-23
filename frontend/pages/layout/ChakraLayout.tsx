@@ -28,14 +28,16 @@ export function ChakraLayout({ children }) {
     </NavLink>
   ))
   return (
-    <Box>
+    <Flex direction="column" justify="center">
       <Box
         bgColor={useColorModeValue('white', 'gray.900')}
         px={4}
         borderBottom={'1px'}
         borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-        position="sticky"
         top={0}
+        h="60px"
+        minH="60px"
+        zIndex={100}
       >
         <Flex h={16} alignItems={'center'} justifyContent={'space-between'}>
           <IconButton
@@ -49,6 +51,7 @@ export function ChakraLayout({ children }) {
             <Link href="/">
               <Box cursor="pointer">
                 <Image
+                  mt={5}
                   rounded={'full'}
                   boxSize={'60px'}
                   src="/assets/logos/logo.png"
@@ -79,11 +82,10 @@ export function ChakraLayout({ children }) {
           </Box>
         ) : null}
       </Box>
-
-      {children}
+      <Box>{children}</Box>
 
       <Footer />
-    </Box>
+    </Flex>
   )
 }
 

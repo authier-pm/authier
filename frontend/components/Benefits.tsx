@@ -38,8 +38,9 @@ export default function Benefits() {
             <Stack spacing={4}>
               <Heading>Encryption</Heading>
               <Text color={'gray.500'} fontSize={'lg'}>
-                We use the latest encryption technology to protect your
-                passwords.
+                Authier uses the similar proven encryption technology as the
+                likes of bitwarden to protect your passwords with an extra
+                attention to the additional layers like device management.
               </Text>
             </Stack>
           </HStack>
@@ -48,7 +49,8 @@ export default function Benefits() {
             <Stack spacing={4}>
               <Heading>Open Source</Heading>
               <Text color={'gray.500'} fontSize={'lg'}>
-                We are open source and are always looking for new features.
+                We are open source and are always adding new features and
+                tweaking existing ones.
               </Text>
             </Stack>
             <Flex w="lg">
@@ -73,8 +75,8 @@ export default function Benefits() {
             <Stack spacing={4}>
               <Heading>Cross platform</Heading>
               <Text color={'gray.500'} fontSize={'lg'}>
-                We will be available on all major platforms like Mac, Windows,
-                Linux, Android and IOS
+                Authier is available on all major platforms like Mac, Windows,
+                Linux, Android and IOS.
               </Text>
             </Stack>
           </HStack>

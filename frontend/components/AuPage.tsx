@@ -6,7 +6,7 @@ import React from 'react'
  */
 export const AuPage = ({ children, heading }) => {
   return (
-    <Container maxW="container.xl" flex="1 1 auto;">
+    <Container maxW="container.xl" flex="1 1 auto;" minH={'90vh'}>
       <Heading as="h1" size="lg" ml={150} my={6}>
         {heading}
       </Heading>
