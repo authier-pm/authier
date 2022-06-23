@@ -17,10 +17,12 @@
     ]
   },
   "resolutions": {
-    "graphql": "^15.8.0"
+    "graphql": "^15.8.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@apollo/client": "^3.6.8",
+    "@apollo/client": "^3.6.9",
     "@chakra-ui/react": "^2.2.1",
     "@emotion/react": "^11.9.3",
     "@emotion/styled": "^11.9.3",

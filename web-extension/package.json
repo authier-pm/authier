@@ -76,7 +76,7 @@
     "zod": "^3.17.3"
   },
   "dependencies": {
-    "@apollo/client": "^3.6.8",
+    "@apollo/client": "^3.6.9",
     "@apollo/react-hooks": "^4.0.0",
     "@chakra-ui/icons": "^2.0.1",
     "@chakra-ui/react": "^2.1.2",
