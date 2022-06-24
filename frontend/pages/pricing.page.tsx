@@ -50,7 +50,7 @@ function ToolTipButton({
   return (
     <Tooltip
       isDisabled={userId ? true : false}
-      label="Visit this page through yout vault"
+      label="Visit this page through your vault"
     >
       <span>
         <Button

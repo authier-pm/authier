@@ -1,8 +1,5 @@
-import { ReactElement } from 'react'
 import {
-  Box,
   Image,
-  Icon,
   Text,
   Stack,
   Flex,
@@ -10,7 +7,6 @@ import {
   HStack,
   Heading,
   Center,
-  VStack,
   SimpleGrid
 } from '@chakra-ui/react'
 
@@ -26,7 +22,7 @@ export default function Benefits() {
     <Fade in={inView}>
       <Center ref={ref}>
         <SimpleGrid>
-          <HStack spacing={20}>
+          <HStack spacing={20} m="auto">
             <Flex w={['lg', 'md', 'md']}>
               <Image
                 rounded={'md'}
@@ -45,7 +41,7 @@ export default function Benefits() {
             </Stack>
           </HStack>
 
-          <HStack w="70vw" spacing={20}>
+          <HStack w="70vw" spacing={20} m="auto">
             <Stack spacing={4}>
               <Heading>Open Source</Heading>
               <Text color={'gray.500'} fontSize={'lg'}>
@@ -63,7 +59,7 @@ export default function Benefits() {
             </Flex>
           </HStack>
 
-          <HStack w="70vw" spacing={20}>
+          <HStack w="70vw" spacing={20} m="auto">
             <Flex w="lg">
               <Image
                 rounded={'md'}

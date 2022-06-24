@@ -46,19 +46,13 @@ const Feature = ({ text, icon, iconBg }: FeatureProps) => {
 
 export default function AboutSection() {
   const { ref, inView } = useInView({
-    rootMargin: '-400px',
+    rootMargin: '-200px',
     triggerOnce: true
   })
   return (
     <Fade in={inView}>
-      <Center minHeight="90vh" mt={16} ref={ref}>
-        <SimpleGrid
-          gridGap={'10px'}
-          w="70vw"
-          mx={10}
-          columns={{ base: 1, md: 2 }}
-          spacing={20}
-        >
+      <Center h={'90vh'} m="25" ref={ref}>
+        <SimpleGrid gridGap={'10px'} columns={{ base: 1, md: 2 }} spacing={20}>
           <Stack spacing={4}>
             <Heading>Authier</Heading>
             <Text color={'gray.500'} fontSize={'lg'}>
