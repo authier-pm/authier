@@ -15,7 +15,7 @@ import {
 } from 'react-router-dom'
 import React, { useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
-import VaultConfig from '@src/components/vault/settings/VaultConfig'
+import VaultSecurity from '@src/components/vault/settings/VaultConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface LinkItemProps {
@@ -30,7 +30,7 @@ interface Props extends LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Account', path: '/account' },
-  { name: 'Config', path: '/config' }
+  { name: 'Security', path: '/security' }
 ]
 
 const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
@@ -63,16 +63,8 @@ export const VaultSettings = () => {
   const [selectedTab, setSelectedTab] = useState(LinkItems[0])
 
   return (
-    <Flex
-      rounded={'lg'}
-      boxShadow={'lg'}
-      align={'center'}
-      justify={'center'}
-      flexDirection={'column'}
-      m="auto"
-      bg={useColorModeValue('white', 'gray.900')}
-    >
-      <HStack as={'nav'} spacing={4}>
+    <Flex align={'center'} justify={'center'} flexDirection={'column'}>
+      <HStack as={'nav'} spacing={4} mb={10}>
         {LinkItems.map((link) => {
           const handleClick = () => {
             setSelectedTab(link)
@@ -93,7 +85,7 @@ export const VaultSettings = () => {
       <AnimatePresence exitBeforeEnter>
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/config'} element={<VaultConfig />}></Route>
+          <Route path={'/security'} element={<VaultSecurity />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>

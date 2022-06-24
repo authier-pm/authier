@@ -16,7 +16,7 @@ import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
 
-export default function VaultConfig() {
+export default function VaultSecurity() {
   const email = device.state?.email
 
   if (!email) {

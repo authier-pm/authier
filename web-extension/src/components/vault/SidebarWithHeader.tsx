@@ -114,7 +114,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Flex
       transition="1s ease"
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={useColorModeValue('white', 'gray.800')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
       w={{ base: 'full', md: 60 }}
