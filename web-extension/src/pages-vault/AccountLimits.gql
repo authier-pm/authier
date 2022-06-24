@@ -1,6 +1,5 @@
 query meExtension {
   me {
     id
-    accountType
   }
 }

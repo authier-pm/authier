@@ -13,8 +13,6 @@ type Query {
 type UserQuery {
   id: ID!
   email: EmailAddress
-  stripeId: String
-  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
@@ -83,8 +81,6 @@ enum TokenType {
 type UserGQL {
   id: ID!
   email: String
-  stripeId: String
-  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
@@ -346,8 +342,6 @@ type Mutation {
 type UserMutation {
   id: ID!
   email: EmailAddress
-  stripeId: String
-  accountType: String!
   tokenVersion: Int!
   username: String
   uiLocalisation: String!
