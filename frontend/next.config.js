@@ -22,15 +22,7 @@ const nextConfig = {
   typescript: {
     ignoreBuildErrors: true
   },
-  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js'],
-  async rewrites() {
-    return [
-      {
-        source: '/test',
-        destination: '/'
-      }
-    ]
-  }
+  pageExtensions: ['page.tsx', 'page.ts', 'page.jsx', 'page.js']
 }
 const SentryWebpackPluginOptions = {
   // Additional config options for the Sentry Webpack plugin. Keep in mind that

@@ -9,3 +9,7 @@ use this https://classic.yarnpkg.com/en/docs/cli/dedupe or reinstall node_module
 ### Firefox /graphiql white screen
 
 https://stackoverflow.com/questions/37298608/content-security-policy-the-pages-settings-blocked-the-loading-of-a-resource
+
+### Frontend theme does not work
+
+Remove all node_module and run `yarn`
