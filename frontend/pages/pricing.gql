@@ -1,0 +1,3 @@
+mutation createCheckoutSession($userId: String!, $product: String!) {
+  createCheckoutSession(userId: $userId, product: $product)
+}

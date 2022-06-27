@@ -12,11 +12,12 @@ import {
   Ctx,
   UseMiddleware,
   Info,
-  Int
+  Int,
+  Subscription
 } from 'type-graphql'
 import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
-
+import { stripe } from '../stripe'
 import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
@@ -437,5 +438,29 @@ export class RootResolver {
       returnedInputs.push(input)
     }
     return returnedInputs
+  }
+
+  @Mutation(() => String)
+  async createCheckoutSession(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('product', () => String) product: string
+  ) {
+    const productItem = await stripe.products.retrieve(product)
+
+    const session = await stripe.checkout.sessions.create({
+      billing_address_collection: 'auto',
+      line_items: [
+        {
+          price: productItem['default_price'] as string,
+          //For metered billing, do not pass quantity
+          quantity: 1
+        }
+      ],
+      mode: 'subscription',
+      success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${ctx.request.headers.referer}?canceled=true`
+    })
+
+    return session.id
   }
 }

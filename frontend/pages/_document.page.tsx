@@ -10,6 +10,9 @@ export default class Document extends NextDocument {
           <link rel="icon" href="/assets/logos/favicon.png" />
           <style>
             {`
+            body {
+              overflow: hidden;
+            }
             #__next {
               display: flex;
               flex-direction: column;

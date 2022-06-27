@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import fastify from 'fastify'
+import fastify, { FastifyRequest } from 'fastify'
 
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
@@ -22,6 +22,8 @@ import debug from 'debug'
 
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
+import { stripe } from './stripe'
+import fastifyCors from '@fastify/cors'
 
 const { env } = process
 const log = debug('au:server')
@@ -32,6 +34,8 @@ sentryInit({
   environment,
   release: `<project-name>@${pkg.version}`
 })
+
+const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
 
 export const app = fastify({
   logger: {
@@ -44,6 +48,12 @@ export const app = fastify({
           }
   }
 })
+
+app.register(fastifyCors, {
+  origin: true,
+  credentials: true
+})
+
 app.setErrorHandler(async (error, request, reply) => {
   // Logging locally
   console.log(error)
@@ -62,6 +72,82 @@ app.route({
   url: '/health/report',
   handler: healthReportHandler
 })
+
+app.register((fastify, opts, done) => {
+  fastify.addContentTypeParser(
+    'application/json',
+    { parseAs: 'string' },
+    function (req, body, done) {
+      try {
+        const newBody = {
+          raw: body,
+          parsed: JSON.parse(body as string)
+        }
+        done(null, newBody)
+      } catch (error: any) {
+        error.statusCode = 400
+        done(error, undefined)
+      }
+    }
+  )
+  fastify.post('/webhook', async (req: FastifyRequest, reply) => {
+    const sig = req.headers['stripe-signature']
+
+    let event
+
+    try {
+      event = stripe.webhooks.constructEvent(
+        //@ts-expect-error TODO @capaj
+        req.body.raw,
+        sig as string | string[] | Buffer,
+        endpointSecret
+      )
+    } catch (err: any) {
+      reply.status(400).send(`Webhook Error: ${err.message}`)
+      return
+    }
+
+    let subscription
+    let status
+
+    //Handle the event
+    switch (event.type) {
+      case 'customer.subscription.deleted':
+        subscription = event.data.object
+        status = subscription.status
+        console.log(`Subscription status is ${status}.`)
+        // Then define and call a method to handle the subscription deleted.
+        // handleSubscriptionDeleted(subscriptionDeleted);
+        break
+
+      case 'checkout.session.completed':
+        const session = event.data.object
+
+        await prismaClient.user.update({
+          where: {
+            email: session.customer_details.email
+          },
+          data: {
+            UserPaidProducts: {
+              create: {
+                checkoutSessionId: session.id,
+                productId: session.subscription
+              }
+            }
+          }
+        })
+
+        break
+      default:
+        console.log(`Unhandled event type ${event.type}.`)
+    }
+
+    //Return a 200 response to acknowledge receipt of the event
+    reply.send()
+  })
+  done()
+})
+
 app.post('/refresh_token', async (request, reply) => {
   const refreshToken = request.cookies['refresh-token']
 

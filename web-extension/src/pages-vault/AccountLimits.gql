@@ -1,0 +1,5 @@
+query meExtension {
+  me {
+    id
+  }
+}
