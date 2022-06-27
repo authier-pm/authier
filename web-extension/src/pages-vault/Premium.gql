@@ -1,0 +1,5 @@
+mutation createCheckoutSessionVault($product: String!) {
+  me {
+    createCheckoutSession(product: $product)
+  }
+}
