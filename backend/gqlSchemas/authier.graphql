@@ -336,7 +336,7 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
-  createCheckoutSession(product: String!, userId: String!): String!
+  createCheckoutSession(product: String!): String!
 }
 
 type UserMutation {

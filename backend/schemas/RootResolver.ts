@@ -443,7 +443,6 @@ export class RootResolver {
   @Mutation(() => String)
   async createCheckoutSession(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('userId', () => String) userId: string,
     @Arg('product', () => String) product: string
   ) {
     const productItem = await stripe.products.retrieve(product)
