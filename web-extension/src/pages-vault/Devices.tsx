@@ -27,12 +27,13 @@ import {
   useDisclosure,
   VStack,
   Grid,
-  Stat
+  Stat,
+  FormHelperText
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
-import { Formik, FormikHelpers, Field } from 'formik'
+import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { FiLogOut, FiSettings } from 'react-icons/fi'
 import { IoIosPhonePortrait } from 'react-icons/io'
@@ -46,17 +47,12 @@ import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
 
-interface configValues {
+interface SettingsValues {
   lockTime: number
   twoFA: boolean
+  autofill: boolean
+  language: string
 }
-
-const vaultLockTimeOptions = [
-  { value: 0, label: 'On web close' },
-  { value: 10000, label: '10 seconds' },
-  { value: 288000000, label: '8 hours' },
-  { value: 432000000, label: '12 hours' }
-]
 
 const DeviceListItem = (item: {
   id: string
@@ -83,14 +79,14 @@ const DeviceListItem = (item: {
           rounded={'lg'}
           p={6}
         >
-          <Flex flexDirection={'row'} justifyContent={'space-between'}>
-            <Icon as={IoIosPhonePortrait} boxSize={16} />
-            <Stack
-              direction={'row'}
-              spacing={3}
-              alignItems={'baseline'}
-              lineHeight={'6'}
-            >
+          <Stack
+            justifyContent="space-between"
+            direction={'row'}
+            spacing={3}
+            alignItems={'baseline'}
+            lineHeight={'6'}
+          >
+            <Box>
               {item.id === device.id && (
                 <Badge height="min-content" colorScheme="yellow">
                   Current
@@ -110,37 +106,42 @@ const DeviceListItem = (item: {
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
+            </Box>
 
-              <Menu>
-                <MenuButton
-                  as={IconButton}
-                  size="xs"
-                  variant="unstyled"
-                  aria-label="Favourite"
-                  fontSize="15px"
-                  icon={<SettingsIcon color="ButtonShadow" />}
-                />
-                <MenuList>
-                  <MenuItem onClick={() => onOpen()}>
-                    <FiLogOut></FiLogOut>
-                    <NbSp />
-                    <Trans>Logout</Trans>
-                  </MenuItem>
-                  <DeviceDeleteAlert
-                    id={item.id}
-                    isOpen={isOpen}
-                    onClose={onClose}
-                    refetch={item.refetch}
+            <Menu>
+              <MenuButton
+                as={IconButton}
+                size="xs"
+                variant="unstyled"
+                aria-label="Favourite"
+                fontSize="15px"
+                icon={
+                  <SettingsIcon
+                    color={useColorModeValue('gray.100', 'gray.800')}
                   />
-                  <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
-                    <FiSettings />
-                    <NbSp />
-                    <Trans>Config</Trans>
-                  </MenuItem>
-                </MenuList>
-              </Menu>
-            </Stack>
-          </Flex>
+                }
+              />
+              <MenuList>
+                <MenuItem onClick={() => onOpen()}>
+                  <FiLogOut></FiLogOut>
+                  <NbSp />
+                  <Trans>Logout</Trans>
+                </MenuItem>
+                <DeviceDeleteAlert
+                  id={item.id}
+                  isOpen={isOpen}
+                  onClose={onClose}
+                  refetch={item.refetch}
+                />
+                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
+                  <FiSettings />
+                  <NbSp />
+                  <Trans>Config</Trans>
+                </MenuItem>
+              </MenuList>
+            </Menu>
+          </Stack>
+
           <Heading fontSize={'xl'} fontFamily={'body'}>
             {item.name}
           </Heading>
@@ -149,76 +150,126 @@ const DeviceListItem = (item: {
               <Formik
                 initialValues={{
                   lockTime: 0,
-                  twoFA: false
+                  twoFA: false,
+                  autofill: true,
+                  language: 'en'
                 }}
                 onSubmit={async (
-                  values: configValues,
-                  { setSubmitting }: FormikHelpers<configValues>
+                  values: SettingsValues,
+                  { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
                   console.log(values)
                   setSubmitting(false)
                 }}
               >
-                <Stack spacing={3}>
-                  <Field name="lockTime">
-                    {({ form }) => (
+                {({
+                  isSubmitting,
+                  dirty,
+                  handleSubmit,
+                  errors,
+                  touched,
+                  values
+                }) => (
+                  <form onSubmit={handleSubmit}>
+                    <VStack spacing={4} align="flex-start">
                       <FormControl
-                        isInvalid={
-                          form.errors.lockTime && form.touched.lockTime
-                        }
+                        isInvalid={!!errors.lockTime && touched.lockTime}
                       >
-                        <FormLabel htmlFor="lockTime">Safe lock time</FormLabel>
-                        <Select
-                          name="lockTime"
-                          id="lockTime"
-                          defaultValue={vaultLockTimeOptions[0].label}
-                        >
-                          {vaultLockTimeOptions.map((i) => (
-                            <option key={i.value} value={i.value}>
-                              {i.label}
-                            </option>
-                          ))}
-                        </Select>
-                        <FormErrorMessage>
-                          {form.errors.lockTime}
-                        </FormErrorMessage>
+                        <FormLabel htmlFor="lockTime">
+                          <Trans>Lock time</Trans>
+                        </FormLabel>
+                        <Field as={Select} id="lockTime" name="lockTime">
+                          <option value={3600}>1 hour</option>
+                          <option value={14400}>4 hour</option>
+                          <option value={28800}>8 hours</option>
+                          <option value={86400}>1 day</option>
+                          <option value={604800}>1 week</option>
+                          <option value={2592000}>1 month</option>
+                          <option value={0}>Never</option>
+                        </Field>
+                        <FormHelperText>
+                          <Trans>
+                            Automatically locks vault after chosen period of
+                            time
+                          </Trans>
+                        </FormHelperText>
                       </FormControl>
-                    )}
-                  </Field>
-                  <Field name="TwoFA">
-                    {({ field, form }) => (
+
+                      {/* Not ideal, later refactor */}
+                      <Field name="twoFA">
+                        {({ field, form }: FieldProps) => {
+                          const { onChange, ...rest } = field
+                          return (
+                            <FormControl
+                              id="twoFA"
+                              isInvalid={
+                                !!form.errors['twoFA'] &&
+                                !!form.touched['twoFA']
+                              }
+                            >
+                              <Checkbox
+                                {...rest}
+                                id="twoFA"
+                                onChange={onChange}
+                                defaultChecked={values.twoFA}
+                              >
+                                2FA
+                              </Checkbox>
+                            </FormControl>
+                          )
+                        }}
+                      </Field>
+
+                      {/* Not ideal, later refactor */}
+                      <Field name="autofill">
+                        {({ field, form }: FieldProps) => {
+                          const { onChange, ...rest } = field
+                          return (
+                            <FormControl
+                              id="autofill"
+                              isInvalid={
+                                !!form.errors['autofill'] &&
+                                !!form.touched['autofill']
+                              }
+                            >
+                              <Checkbox
+                                {...rest}
+                                id="autofill"
+                                onChange={onChange}
+                                defaultChecked={values.autofill}
+                              >
+                                <Trans>Autofill</Trans>
+                              </Checkbox>
+                            </FormControl>
+                          )
+                        }}
+                      </Field>
+
+                      {/*  */}
                       <FormControl
-                        isInvalid={form.errors.name && form.touched.name}
+                        isInvalid={!!errors.language && touched.language}
                       >
-                        <Checkbox id="TwoFA" {...field}>
-                          2FA
-                        </Checkbox>
-                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                        <FormLabel htmlFor="language">
+                          <Trans>Language</Trans>
+                        </FormLabel>
+                        <Field as={Select} id="language" name="language">
+                          <option value="en">English</option>
+                          <option value="cz">Čeština</option>
+                        </Field>
                       </FormControl>
-                    )}
-                  </Field>
-                  <Flex justifyContent={'flex-end'}>
-                    <Button
-                      type="submit"
-                      size={'sm'}
-                      bg={'blue.400'}
-                      color={'white'}
-                      boxShadow={
-                        '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                      }
-                      _hover={{
-                        bg: 'blue.500'
-                      }}
-                      _focus={{
-                        bg: 'blue.500'
-                      }}
-                      aria-label="Save"
-                      rightIcon={<ArrowForwardIcon />}
-                    >
-                      Save
-                    </Button>
-                  </Flex>
-                </Stack>
+
+                      <Button
+                        mt={4}
+                        colorScheme="teal"
+                        disabled={isSubmitting || !dirty}
+                        isLoading={isSubmitting}
+                        type="submit"
+                      >
+                        <Trans>Save</Trans>
+                      </Button>
+                    </VStack>
+                  </form>
+                )}
               </Formik>
             </Box>
           ) : (

@@ -15,7 +15,7 @@ import {
 } from 'react-router-dom'
 import React, { useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
-import VaultSecurity from '@src/components/vault/settings/VaultConfig'
+import VaultConfig from '@src/components/vault/settings/VaultConfig'
 import { AnimatePresence, motion } from 'framer-motion'
 
 interface LinkItemProps {
@@ -85,7 +85,7 @@ export const VaultSettings = () => {
       <AnimatePresence exitBeforeEnter>
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/security'} element={<VaultSecurity />}></Route>
+          <Route path={'/security'} element={<VaultConfig />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>

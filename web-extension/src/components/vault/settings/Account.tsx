@@ -8,11 +8,10 @@ import {
   InputRightElement,
   Button,
   Spinner,
-  Flex,
   VStack,
   useColorModeValue
 } from '@chakra-ui/react'
-import { Formik, FormikHelpers, Form, Field } from 'formik'
+import { Formik, FormikHelpers, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -191,7 +190,7 @@ export default function Account() {
                       <Field
                         as={Input}
                         pr="4.5rem"
-                        type={showCurr ? 'text' : 'password'}
+                        type={showNew ? 'text' : 'password'}
                         placeholder="New master password"
                         id="newPassword"
                         name="newPassword"
