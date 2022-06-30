@@ -1,7 +1,4 @@
 import {
-  Box,
-  Center,
-  Heading,
   Stack,
   useColorModeValue,
   Button,
@@ -12,7 +9,6 @@ import {
   Progress,
   IconButton,
   useDisclosure,
-  SimpleGrid,
   Spinner,
   Alert,
   FormControl,
@@ -23,11 +19,7 @@ import {
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import {
-  ArrowForwardIcon,
-  ChevronDownIcon,
-  ChevronUpIcon
-} from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
@@ -35,7 +27,6 @@ import { useUpdateEncryptedSecretMutation } from './ItemSettings.codegen'
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
-import { log } from 'debug'
 
 enum Value {
   'Tooweak' = 1,

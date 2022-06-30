@@ -85,6 +85,12 @@ browser.runtime.onMessage.addListener(async function (
       if (!url || !deviceState) {
         return false // we can't do anything without a valid url
       }
+      let urlParsed: URL
+      try {
+        urlParsed = new URL(url)
+      } catch (err) {
+        return false
+      }
 
       const credentials: ILoginCredentialsFromContentScript = req.payload
 
@@ -103,7 +109,7 @@ browser.runtime.onMessage.addListener(async function (
           iconUrl: tab.favIconUrl,
           url: inputsUrl,
           createdAt: new Date().toJSON(),
-          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+          label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
         }
       ])
       if (!secret) {
@@ -134,7 +140,7 @@ browser.runtime.onMessage.addListener(async function (
       if (req.payload.openInVault) {
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
-      return { failed: false }
+      return true
 
     case BackgroundMessageType.saveCapturedInputEvents:
       capturedInputEvents = req.payload.inputEvents
