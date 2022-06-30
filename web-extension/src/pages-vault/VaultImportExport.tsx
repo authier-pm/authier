@@ -89,7 +89,7 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
         let skipped = 0
         const toAdd: AddSecretInput = []
         for (const creds of mapped) {
-          let hostname
+          let hostname: string
           try {
             hostname = new URL(creds.url).hostname
           } catch (error) {
