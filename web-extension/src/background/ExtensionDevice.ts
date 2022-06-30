@@ -35,7 +35,6 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
-import ms from 'ms'
 
 export const log = debug('au:Device')
 
@@ -87,7 +86,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
-    log('device state created', this)
+    //log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
     this.decryptedSecrets = this.getAllSecretsDecrypted()
@@ -100,7 +99,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = ms('30m')
+  lockTime = 14400
   authSecret: string
   authSecretEncrypted: string
 
@@ -134,6 +133,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
+    console.log('SAVE DEVICE STATE', this)
     device.lockedState = null
     this.decryptedSecrets = this.getAllSecretsDecrypted()
     browser.storage.onChanged.removeListener(this.onStorageChange)
@@ -348,6 +348,20 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
+
+  async startLockInterval(lockTime: number) {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.setLockInterval,
+      time: lockTime
+    })
+  }
+
+  async clearLockInterval() {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.clearLockInterval
+    })
+  }
+
   get platform() {
     return browserInfo.getOSName()
   }
@@ -362,6 +376,7 @@ class ExtensionDevice {
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
       storedState = storage.backgroundState
+
       log('device state init from storage', storedState)
     } else if (storage.lockedState) {
       this.lockedState = storage.lockedState
@@ -376,9 +391,13 @@ class ExtensionDevice {
       this.listenForUserLogin()
     }
 
+    if (this.state) {
+      this.startLockInterval(this.state.lockTime)
+    }
+
     // const fireToken = await generateFireToken()
     const fireToken = 'aaaa'
-    console.log('~ fireToken', fireToken)
+
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
@@ -393,6 +412,9 @@ class ExtensionDevice {
       log('storage change UL', changes, areaName)
       if (areaName === 'local' && changes.backgroundState) {
         this.state = new DeviceState(changes.backgroundState.newValue)
+        browser.storage.onChanged.removeListener(onStorageChangeLogin)
+      } else if (areaName === 'local' && changes.lockedState) {
+        this.lockedState = changes.lockedState.newValue
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
@@ -465,8 +487,11 @@ class ExtensionDevice {
 
   async lock() {
     if (!this.state) {
-      return
+      throw new Error('no state to lock')
     }
+
+    this.clearLockInterval()
+
     log('locking device')
 
     const { email, userId, secrets, encryptionSalt } = this.state
@@ -478,7 +503,8 @@ class ExtensionDevice {
       deviceName: this.name,
       encryptionSalt,
       authSecret: this.state.authSecret,
-      authSecretEncrypted: this.state.authSecretEncrypted
+      authSecretEncrypted: this.state.authSecretEncrypted,
+      lockTime: this.state.lockTime
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,

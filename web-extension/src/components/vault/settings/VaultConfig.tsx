@@ -15,6 +15,8 @@ import { device } from '@src/background/ExtensionDevice'
 import React from 'react'
 import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+import browser from 'webextension-polyfill'
 
 export default function VaultConfig() {
   const email = device.state?.email
@@ -24,7 +26,7 @@ export default function VaultConfig() {
   }
 
   interface SettingsValues {
-    lockTime: number
+    vaultLockTime: number
     twoFA: boolean
     autofill: boolean
     language: string
@@ -54,7 +56,7 @@ export default function VaultConfig() {
         <Box textAlign="start">
           <Formik
             initialValues={{
-              lockTime: 0,
+              vaultLockTime: 0,
               twoFA: false,
               autofill: true,
               language: 'en'
@@ -64,6 +66,11 @@ export default function VaultConfig() {
               { setSubmitting }: FormikHelpers<SettingsValues>
             ) => {
               console.log(values)
+              browser.runtime.sendMessage({
+                action: BackgroundMessageType.securitySettings,
+                settings: values
+              })
+
               setSubmitting(false)
             }}
           >
@@ -78,12 +85,14 @@ export default function VaultConfig() {
               <form onSubmit={handleSubmit}>
                 <VStack spacing={4} align="flex-start">
                   <FormControl
-                    isInvalid={!!errors.lockTime && touched.lockTime}
+                    isInvalid={!!errors.vaultLockTime && touched.vaultLockTime}
                   >
-                    <FormLabel htmlFor="lockTime">
+                    <FormLabel htmlFor="vaultLockTime">
                       <Trans>Lock time</Trans>
                     </FormLabel>
-                    <Field as={Select} id="lockTime" name="lockTime">
+                    <Field as={Select} id="vaultLockTime" name="vaultLockTime">
+                      <option value={20}>1 minute</option>
+                      <option value={120}>2 minutes</option>
                       <option value={3600}>1 hour</option>
                       <option value={14400}>4 hour</option>
                       <option value={28800}>8 hours</option>

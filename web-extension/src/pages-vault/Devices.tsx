@@ -1,4 +1,4 @@
-import { ArrowForwardIcon, SettingsIcon } from '@chakra-ui/icons'
+import { SettingsIcon } from '@chakra-ui/icons'
 import {
   Heading,
   Box,
@@ -7,7 +7,6 @@ import {
   Stack,
   Badge,
   useColorModeValue,
-  Icon,
   IconButton,
   Flex,
   Input,
@@ -17,7 +16,6 @@ import {
   MenuList,
   Spinner,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   Checkbox,
   Select,
@@ -36,7 +34,6 @@ import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { FiLogOut, FiSettings } from 'react-icons/fi'
-import { IoIosPhonePortrait } from 'react-icons/io'
 import {
   useApproveChallengeMutation,
   useDevicesPageQuery,
@@ -159,6 +156,7 @@ const DeviceListItem = (item: {
                   { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
                   console.log(values)
+
                   setSubmitting(false)
                 }}
               >
@@ -179,6 +177,8 @@ const DeviceListItem = (item: {
                           <Trans>Lock time</Trans>
                         </FormLabel>
                         <Field as={Select} id="lockTime" name="lockTime">
+                          <option value={60}>1 minute</option>
+                          <option value={120}>2 minutes</option>
                           <option value={3600}>1 hour</option>
                           <option value={14400}>4 hour</option>
                           <option value={28800}>8 hours</option>

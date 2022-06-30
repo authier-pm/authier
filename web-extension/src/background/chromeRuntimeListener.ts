@@ -3,7 +3,7 @@ import {
   ILoginSecret,
   ISecuritySettings
 } from '@src/util/useDeviceState'
-import { lockTime } from './backgroundPage'
+
 import { BackgroundMessageType } from './BackgroundMessageType'
 import { UISettings } from '@src/components/setting-screens/SettingsForm'
 import browser from 'webextension-polyfill'
@@ -18,9 +18,13 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
-import { device, isRunningInBgPage } from './ExtensionDevice'
+import { device, DeviceState, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
+import {
+  IBackgroundStateSerializable,
+  IBackgroundStateSerializableLocked
+} from './backgroundPage'
 
 const log = debug('au:chListener')
 
@@ -56,6 +60,11 @@ let capturedInputEvents: ICapturedInput[] = []
 //This is for saving URL of inputs
 let inputsUrl: string
 
+let lockTimeEnd
+let lockTimeStart
+let lockInterval
+
+log('background page loaded')
 browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
@@ -65,15 +74,17 @@ browser.runtime.onMessage.addListener(async function (
     auths: ITOTPSecret[]
     passwords: ILoginSecret[]
     settings: ISecuritySettings
+    time: number
+    state: IBackgroundStateSerializable
   },
   sender
 ) {
-  log(req)
-
   const tab = sender.tab
 
   const currentTabId = tab?.id
   const deviceState = device.state
+
+  log('req', req)
 
   switch (req.action) {
     case BackgroundMessageType.addLoginCredentials:
@@ -203,39 +214,51 @@ browser.runtime.onMessage.addListener(async function (
         return getContentScriptInitialState(tabUrl, currentTabId)
       }
 
-      break
-
     case BackgroundMessageType.getCapturedInputEvents:
       return { capturedInputEvents, inputsUrl }
-      break
 
     case BackgroundMessageType.wasClosed:
       return { wasClosed: safeClosed }
-      break
 
     case BackgroundMessageType.giveSecuritySettings:
       return {
         config: {
-          vaultTime: lockTime,
+          vaultTime: device.state?.lockTime,
           noHandsLogin: noHandsLogin
         }
       }
 
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
-        deviceState.lockTime = req.settings.vaultLockTime
+        deviceState.lockTime = parseInt(req.settings.vaultLockTime)
+        //Refresh the lock interval
+        lockInterval = clearInterval(lockInterval)
+        lockTimeStart = Date.now()
+        lockTimeEnd = lockTimeStart + deviceState.lockTime * 1000
+        noHandsLogin = req.settings.noHandsLogin
+
+        checkInterval(lockTimeEnd)
         deviceState.save()
       }
-      noHandsLogin = req.settings.noHandsLogin
 
-      console.log('config set on:', req.settings, lockTime, noHandsLogin)
-      break
+      console.log('config set on:', req.settings)
+      return true
 
-    case BackgroundMessageType.UISettings:
-      // homeList = req.config.homeList
+    case BackgroundMessageType.setLockInterval:
+      if (!lockInterval) {
+        lockTimeStart = Date.now()
+        lockTimeEnd = lockTimeStart + req.time * 1000
+      }
+      checkInterval(lockTimeEnd)
+      return true
 
-      console.log('UIconfig', req.config)
-      break
+    case BackgroundMessageType.clearLockInterval:
+      resetInterval()
+      return true
+
+    case BackgroundMessageType.setDeviceState:
+      device.save(req.state)
+      return true
 
     default:
       if (typeof req === 'string') {
@@ -245,3 +268,24 @@ browser.runtime.onMessage.addListener(async function (
       return true
   }
 })
+
+const checkInterval = (time: number) => {
+  log('lockCheckInterval', lockInterval, device)
+  if (!lockInterval) {
+    lockInterval = setInterval(() => {
+      log('checkTime', time)
+      if (time <= Date.now()) {
+        log('lock', Date.now(), device)
+
+        resetInterval()
+        device.lock()
+      }
+    }, 5000)
+  }
+}
+
+const resetInterval = () => {
+  lockTimeEnd = null
+  lockTimeStart = null
+  lockInterval = clearInterval(lockInterval)
+}

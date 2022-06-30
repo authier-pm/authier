@@ -1,29 +1,32 @@
-import React, { useEffect } from 'react'
+import React, { useContext, useEffect } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { ItemList } from '@src/pages-vault/ItemList'
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
-import { device } from '@src/background/ExtensionDevice'
+
 import Login from '@src/pages-vault/Login'
 import { Center } from '@chakra-ui/react'
 import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
-import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
+
 import { AddItem } from './AddItem'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 
 export function VaultRouter() {
+  const { deviceState, safeLocked } = useContext(DeviceStateContext)
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (device.lockedState) {
+    if (safeLocked) {
       navigate('/verify')
     }
-  }, [device.lockedState])
+  }, [safeLocked])
 
-  if (device.state === null) {
+  if (deviceState === null) {
     return (
       <Center marginX="50%" h="100vh">
         <Routes>
@@ -34,6 +37,7 @@ export function VaultRouter() {
       </Center>
     )
   }
+
   return (
     <SidebarWithHeader>
       <Routes>

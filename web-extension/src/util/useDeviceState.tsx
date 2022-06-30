@@ -8,7 +8,10 @@ import {
   UISettings
 } from '@src/components/setting-screens/SettingsForm'
 
-import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import {
+  IBackgroundStateSerializable,
+  IBackgroundStateSerializableLocked
+} from '@src/background/backgroundPage'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
@@ -41,7 +44,7 @@ export interface ILoginSecret extends ISecret {
 }
 
 export interface ISecuritySettings {
-  vaultLockTime: number
+  vaultLockTime: string
   noHandsLogin: boolean
 }
 
@@ -53,13 +56,11 @@ export interface ISecuritySettingsInBg {
 let registered = false // we need to only register once
 
 export function useDeviceState() {
-  //TODO use single useState hook for all of these
   const [currentURL, setCurrentURL] = useState<string>('')
 
-  const [safeLocked, setSafeLocked] = useState<boolean>(false)
+  const [safeLocked, setSafeLocked] =
+    useState<IBackgroundStateSerializableLocked | null>(null)
 
-  const [isFilling, setIsFilling] = useState<boolean>(false)
-  const [isCounting, setIsCounting] = useState<boolean>(false)
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
@@ -68,11 +69,6 @@ export function useDeviceState() {
     homeList: UIOptions.all
   })
   const [updateSettings] = useUpdateSettingsMutation()
-  log('~ deviceState', deviceState)
-
-  useEffect(() => {
-    setDeviceState(device.state)
-  }, [device.state])
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
@@ -80,6 +76,8 @@ export function useDeviceState() {
   ): Promise<void> => {
     if (areaName === 'local' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue)
+    } else if (areaName === 'local' && changes.lockedState) {
+      setSafeLocked(changes.lockedState.newValue)
     }
   }
 
@@ -106,7 +104,6 @@ export function useDeviceState() {
     currentURL,
     safeLocked,
     setSafeLocked,
-    isFilling,
     deviceState,
     currentTab,
     get loginCredentials() {
@@ -120,14 +117,13 @@ export function useDeviceState() {
       }) ?? []) as ITOTPSecret[]
     },
 
-    isCounting,
     setSecuritySettings: (config: ISecuritySettings) => {
       updateSettings({
         variables: {
-          lockTime: config.vaultLockTime,
+          lockTime: parseInt(config.vaultLockTime),
           noHandsLogin: config.noHandsLogin,
           homeUI: UIConfig.homeList,
-          twoFA: true //Not added in the settings yet
+          twoFA: false //Not added in the settings yet
         }
       })
 
@@ -147,8 +143,15 @@ export function useDeviceState() {
         config: config
       })
     },
-
-    UIConfig
+    UIConfig,
+    setDeviceState: (state: IBackgroundStateSerializable) => {
+      device.save(state)
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.setDeviceState,
+        state: state
+      })
+    },
+    device
   }
 
   window['backgroundState'] = backgroundStateContext
