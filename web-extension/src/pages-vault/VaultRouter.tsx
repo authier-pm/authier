@@ -22,8 +22,11 @@ export function VaultRouter() {
 
   useEffect(() => {
     if (safeLocked) {
-      navigate('/verify')
+      navigate('verify')
+    } else {
+      navigate('/')
     }
+    console.log('VaultRouter: useEffect')
   }, [safeLocked])
 
   if (deviceState === null) {

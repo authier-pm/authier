@@ -6,10 +6,11 @@ import { Popup } from './popup/Popup'
 import { DeviceStateContext } from './providers/DeviceStateProvider'
 
 export default function PopupRoutes(): ReactElement {
-  const { deviceState } = useContext(DeviceStateContext)
-  console.log('~ backgroundState', deviceState)
+  const { deviceState, safeLocked } = useContext(DeviceStateContext)
+  // console.log('~ backgroundState', deviceState)
+  // console.log('~ safeLocked', safeLocked)
 
-  if (device.lockedState) {
+  if (safeLocked) {
     return <VaultUnlockVerification />
   }
   if (!deviceState) {

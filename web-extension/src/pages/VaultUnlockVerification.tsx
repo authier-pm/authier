@@ -11,8 +11,6 @@ import {
   Heading,
   Center
 } from '@chakra-ui/react'
-import { UserContext } from '@src/providers/UserProvider'
-import browser from 'webextension-polyfill'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -20,9 +18,7 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 interface Values {

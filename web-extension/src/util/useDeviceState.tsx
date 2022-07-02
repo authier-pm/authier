@@ -70,13 +70,18 @@ export function useDeviceState() {
   })
   const [updateSettings] = useUpdateSettingsMutation()
 
+  useEffect(() => {
+    setDeviceState(device.state)
+    setSafeLocked(device.lockedState)
+  }, [device.state, device.lockedState])
+
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ): Promise<void> => {
+    console.log('onStorageChange useDevice', changes, areaName)
     if (areaName === 'local' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue)
-    } else if (areaName === 'local' && changes.lockedState) {
       setSafeLocked(changes.lockedState.newValue)
     }
   }
