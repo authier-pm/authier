@@ -43,6 +43,7 @@ import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
+import { useNavigate } from 'react-router-dom'
 
 interface SettingsValues {
   lockTime: number
@@ -64,6 +65,7 @@ const DeviceListItem = (item: {
 }) => {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
+  const navigate = useNavigate()
 
   return (
     <>
@@ -130,7 +132,15 @@ const DeviceListItem = (item: {
                   onClose={onClose}
                   refetch={item.refetch}
                 />
-                <MenuItem onClick={() => setIsConfigOpen(!isConfigOpen)}>
+                <MenuItem
+                  onClick={() => {
+                    if (item.id === device.id) {
+                      navigate('/settings/security')
+                    } else {
+                      setIsConfigOpen(!isConfigOpen)
+                    }
+                  }}
+                >
                   <FiSettings />
                   <NbSp />
                   <Trans>Config</Trans>

@@ -271,7 +271,7 @@ browser.runtime.onMessage.addListener(async function (
 
 const checkInterval = (time: number) => {
   log('lockCheckInterval', lockInterval, device)
-  if (!lockInterval) {
+  if (!lockInterval && lockTimeStart !== lockTimeEnd) {
     lockInterval = setInterval(() => {
       log('checkTime', time)
       if (time <= Date.now()) {
