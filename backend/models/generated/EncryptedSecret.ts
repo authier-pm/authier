@@ -26,21 +26,6 @@ export class EncryptedSecretGQLScalars {
   @Field({ nullable: true })
   deletedAt?: Date
 
-  @Field({ nullable: true })
-  url?: string
-
-  @Field({ nullable: true })
-  androidUri?: string
-
-  @Field({ nullable: true })
-  iosUri?: string
-
-  @Field({ nullable: true })
-  iconUrl?: string
-
-  @Field()
-  label: string
-
   @Field()
   userId: string
 }
