@@ -45,7 +45,9 @@ export interface ILoginSecret extends ISecret {
 
 export interface ISecuritySettings {
   vaultLockTime: string
-  noHandsLogin: boolean
+  autofill: boolean
+  language: string
+  twoFA: boolean
 }
 
 export interface ISecuritySettingsInBg {
@@ -123,16 +125,14 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: (config: ISecuritySettings) => {
-      updateSettings({
-        variables: {
-          lockTime: parseInt(config.vaultLockTime),
-          noHandsLogin: config.noHandsLogin,
-          homeUI: UIConfig.homeList,
-          twoFA: false //Not added in the settings yet
-        }
-      })
+      // updateSettings({
+      //   variables: {
+      //     lockTime: parseInt(config.vaultLockTime),
+      //     noHandsLogin: config.autofill,
+      //     twoFA: false //Not added in the settings yet
+      //   }
+      // })
 
-      // refetchSettings()
       //Call bg script to save settings to bg
       browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,

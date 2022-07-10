@@ -13,7 +13,7 @@ import {
   Routes,
   useMatch
 } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
 import VaultConfig from '@src/components/vault/settings/VaultConfig'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -58,9 +58,16 @@ const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
 }
 
 export const VaultSettings = () => {
-  // const { url } = useMatch('/secret/:secretId')
   const location = useLocation()
   const [selectedTab, setSelectedTab] = useState(LinkItems[0])
+
+  useEffect(() => {
+    if (location.pathname === '/settings/account') {
+      setSelectedTab(LinkItems[0])
+    } else if (location.pathname === '/settings/security') {
+      setSelectedTab(LinkItems[1])
+    }
+  }, [location])
 
   return (
     <Flex align={'center'} justify={'center'} flexDirection={'column'}>

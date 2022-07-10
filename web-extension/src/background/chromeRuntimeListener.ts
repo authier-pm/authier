@@ -74,7 +74,7 @@ browser.runtime.onMessage.addListener(async function (
     auths: ITOTPSecret[]
     passwords: ILoginSecret[]
     settings: ISecuritySettings
-    time: number
+    time: string
     state: IBackgroundStateSerializable
   },
   sender
@@ -230,24 +230,26 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
-        deviceState.lockTime = parseInt(req.settings.vaultLockTime)
+        deviceState.lockTime = req.settings.vaultLockTime
+        deviceState.language = req.settings.language
+        deviceState.autofill = req.settings.autofill
+        noHandsLogin = req.settings.autofill
+
         //Refresh the lock interval
         lockInterval = clearInterval(lockInterval)
         lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + deviceState.lockTime * 1000
-        noHandsLogin = req.settings.noHandsLogin
+        lockTimeEnd = lockTimeStart + parseInt(deviceState.lockTime) * 1000
 
         checkInterval(lockTimeEnd)
         deviceState.save()
       }
 
-      console.log('config set on:', req.settings)
       return true
 
     case BackgroundMessageType.setLockInterval:
       if (!lockInterval) {
         lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + req.time * 1000
+        lockTimeEnd = lockTimeStart + parseInt(req.time) * 1000
       }
       checkInterval(lockTimeEnd)
       return true
@@ -270,10 +272,8 @@ browser.runtime.onMessage.addListener(async function (
 })
 
 const checkInterval = (time: number) => {
-  log('lockCheckInterval', lockInterval, device)
   if (!lockInterval && lockTimeStart !== lockTimeEnd) {
     lockInterval = setInterval(() => {
-      log('checkTime', time)
       if (time <= Date.now()) {
         log('lock', Date.now(), device)
 

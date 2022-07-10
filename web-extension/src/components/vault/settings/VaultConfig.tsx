@@ -12,24 +12,19 @@ import {
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
-import React from 'react'
+import React, { useContext } from 'react'
 import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
+
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { ISecuritySettings } from '@src/util/useDeviceState'
 
 export default function VaultConfig() {
   const email = device.state?.email
+  const { setSecuritySettings } = useContext(DeviceStateContext)
 
   if (!email) {
     return <Spinner />
-  }
-
-  interface SettingsValues {
-    vaultLockTime: number
-    twoFA: boolean
-    autofill: boolean
-    language: string
   }
 
   // Split to container component to avoid rewriting the same code twice (Account and VaultConfig)
@@ -56,20 +51,16 @@ export default function VaultConfig() {
         <Box textAlign="start">
           <Formik
             initialValues={{
-              vaultLockTime: 0,
+              vaultLockTime: device.state?.lockTime || '0',
               twoFA: false,
               autofill: true,
               language: 'en'
             }}
             onSubmit={async (
-              values: SettingsValues,
-              { setSubmitting }: FormikHelpers<SettingsValues>
+              values: ISecuritySettings,
+              { setSubmitting }: FormikHelpers<ISecuritySettings>
             ) => {
-              console.log(values)
-              browser.runtime.sendMessage({
-                action: BackgroundMessageType.securitySettings,
-                settings: values
-              })
+              setSecuritySettings(values)
 
               setSubmitting(false)
             }}
@@ -173,7 +164,7 @@ export default function VaultConfig() {
                   <Button
                     mt={4}
                     colorScheme="teal"
-                    disabled={isSubmitting || !dirty}
+                    disabled={!dirty}
                     isLoading={isSubmitting}
                     type="submit"
                   >

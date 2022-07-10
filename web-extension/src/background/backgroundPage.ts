@@ -44,7 +44,7 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  lockTime: number
+  lockTime: string
 }
 
 export interface IBackgroundStateSerializable
