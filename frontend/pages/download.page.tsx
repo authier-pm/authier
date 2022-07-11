@@ -1,14 +1,11 @@
-import { Box, Center, Flex, Image, Link, Text } from '@chakra-ui/react'
+import { Center, Flex, Image, Link, Text } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 
-import Head from 'next/head'
-import React from 'react'
+import { AuPage } from '../components/AuPage'
 
 export default function DownloadPage() {
   return (
-    <Box>
-      <Head>
-        <title>Authier - Downloads</title>
-      </Head>
+    <AuPage heading={t`Downloads`}>
       <Center>
         <Flex flexDirection="column" justifyItems="center">
           <Link href="https://chrome.google.com/webstore/detail/authier/padmmdghcflnaellmmckicifafoenfdi">
@@ -28,6 +25,6 @@ export default function DownloadPage() {
           <Text>Other browsers coming soon</Text>
         </Flex>
       </Center>
-    </Box>
+    </AuPage>
   )
 }
