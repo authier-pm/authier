@@ -61,18 +61,10 @@ export default function VaultConfig() {
               { setSubmitting }: FormikHelpers<ISecuritySettings>
             ) => {
               setSecuritySettings(values)
-
               setSubmitting(false)
             }}
           >
-            {({
-              isSubmitting,
-              dirty,
-              handleSubmit,
-              errors,
-              touched,
-              values
-            }) => (
+            {({ dirty, handleSubmit, errors, touched, values }) => (
               <form onSubmit={handleSubmit}>
                 <VStack spacing={4} align="flex-start">
                   <FormControl
@@ -160,12 +152,11 @@ export default function VaultConfig() {
                       <option value="cz">Čeština</option>
                     </Field>
                   </FormControl>
-
+                  {/* Resolve dirty */}
                   <Button
                     mt={4}
                     colorScheme="teal"
                     disabled={!dirty}
-                    isLoading={isSubmitting}
                     type="submit"
                   >
                     <Trans>Save</Trans>

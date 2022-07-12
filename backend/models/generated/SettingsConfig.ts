@@ -13,10 +13,10 @@ export class SettingsConfigGQLScalars {
   twoFA: boolean
 
   @Field()
-  noHandsLogin: boolean
+  autofill: boolean
 
   @Field()
-  homeUI: string
+  language: string
 
   @Field({ nullable: true })
   updatedAt?: Date

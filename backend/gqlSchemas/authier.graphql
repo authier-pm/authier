@@ -214,8 +214,8 @@ type SettingsConfigGQL {
   userId: ID!
   lockTime: Int!
   twoFA: Boolean!
-  noHandsLogin: Boolean!
-  homeUI: String!
+  autofill: Boolean!
+  language: String!
   updatedAt: DateTime
   user: UserGQL!
 }
@@ -374,9 +374,9 @@ type UserMutation {
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(
-    noHandsLogin: Boolean!
+    language: String!
+    autofill: Boolean!
     lockTime: Int!
-    homeUI: String!
     twoFA: Boolean!
   ): SettingsConfigGQL!
   sendEmailVerification: NonNegativeInt!

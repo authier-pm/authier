@@ -188,9 +188,8 @@ export class RootResolver {
           SettingsConfigs: {
             create: {
               twoFA: true,
-              homeUI: 'all',
               lockTime: 28800000,
-              noHandsLogin: false
+              autofill: false
             }
           }
         },

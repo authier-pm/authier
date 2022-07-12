@@ -125,13 +125,14 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: (config: ISecuritySettings) => {
-      // updateSettings({
-      //   variables: {
-      //     lockTime: parseInt(config.vaultLockTime),
-      //     noHandsLogin: config.autofill,
-      //     twoFA: false //Not added in the settings yet
-      //   }
-      // })
+      updateSettings({
+        variables: {
+          lockTime: parseInt(config.vaultLockTime),
+          autofill: config.autofill,
+          twoFA: config.twoFA,
+          language: config.language
+        }
+      })
 
       //Call bg script to save settings to bg
       browser.runtime.sendMessage({

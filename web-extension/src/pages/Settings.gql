@@ -1,14 +1,14 @@
 mutation updateSettings(
-  $noHandsLogin: Boolean!
+  $autofill: Boolean!
   $lockTime: Int!
-  $homeUI: String!
+  $language: String!
   $twoFA: Boolean!
 ) {
   me {
     updateSettings(
-      noHandsLogin: $noHandsLogin
+      autofill: $autofill
       lockTime: $lockTime
-      homeUI: $homeUI
+      language: $language
       twoFA: $twoFA
     ) {
       userId

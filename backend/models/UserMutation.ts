@@ -147,9 +147,9 @@ export class UserMutation extends UserBase {
   @Field(() => SettingsConfigGQL)
   async updateSettings(
     @Arg('twoFA', () => Boolean) twoFA: boolean,
-    @Arg('homeUI', () => String) homeUI: string,
     @Arg('lockTime', () => Int) lockTime: number,
-    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean,
+    @Arg('autofill', () => Boolean) autofill: boolean,
+    @Arg('language', () => String) language: string,
     @Ctx() ctx: IContext
   ) {
     return ctx.prisma.settingsConfig.upsert({
@@ -157,18 +157,18 @@ export class UserMutation extends UserBase {
         userId: this.id
       },
       update: {
-        homeUI: homeUI,
-        lockTime: lockTime,
-        noHandsLogin: noHandsLogin,
-        twoFA: twoFA,
+        lockTime,
+        twoFA,
+        autofill,
+        language,
         userId: this.id
       },
       create: {
         userId: this.id,
-        homeUI: homeUI,
-        lockTime: lockTime,
-        noHandsLogin: noHandsLogin,
-        twoFA: twoFA
+        lockTime,
+        twoFA,
+        autofill,
+        language
       }
     })
   }
