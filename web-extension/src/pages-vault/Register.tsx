@@ -18,12 +18,13 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
-import { Trans } from '@lingui/macro'
+import { device } from '@src/background/ExtensionDevice'
+import { Trans, t } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from './registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 declare global {
   interface Crypto {
@@ -41,14 +42,13 @@ export default function Register(): ReactElement {
     useRegisterNewUserMutation()
   const navigate = useNavigate()
 
-  // console.log('~ fireToken', fireToken)
   const { fireToken } = device
   if (!fireToken) {
     return <Spinner />
   }
 
   if (registerError) {
-    console.log(registerError)
+    toast.error(t`Register failed, ${registerError.message}`)
   }
 
   return (
@@ -93,6 +93,7 @@ export default function Register(): ReactElement {
               }
             }
           })
+
           const registerResult = res.data?.registerNewUser
 
           if (registerResult?.accessToken) {
@@ -111,7 +112,7 @@ export default function Register(): ReactElement {
               encryptionSalt,
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
-              lockTime: 14400
+              lockTime: '14400'
             }
 
             device.save(deviceState)

@@ -223,38 +223,6 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Boolean)
-  async approveDevice(
-    @Arg('success', () => Boolean) success: boolean,
-    @Ctx() ctx: IContext
-  ) {
-    // TODO check current device is master
-    const user = await ctx.prisma.user.findFirst({
-      where: {
-        id: this.id
-      }
-    })
-    if (user?.masterDeviceId) {
-      const device = await ctx.prisma.device.findFirst({
-        where: {
-          id: user?.masterDeviceId
-        }
-      })
-
-      await admin.messaging().sendToDevice(
-        device?.firebaseToken as string,
-        {
-          data: {
-            success: success.toString()
-          }
-        },
-        {}
-      )
-
-      return true
-    }
-  }
-
   @Field(() => GraphQLPositiveInt)
   async changeMasterPassword(
     @Arg('input', () => ChangeMasterPasswordInput)

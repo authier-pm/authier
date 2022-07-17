@@ -381,7 +381,6 @@ type UserMutation {
   ): SettingsConfigGQL!
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
-  approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
 }

@@ -145,7 +145,7 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
             authSecretEncrypted: newAuthSecretEncrypted,
-            lockTime: 14400
+            lockTime: '14400'
           }
 
           setUserId(decodedToken.userId)
