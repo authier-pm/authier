@@ -47,6 +47,17 @@ export const throwIfNotAuthenticated: MiddlewareFn<
   }
   context.device = currentDevice
 
+  const user = await context.prisma.user.findFirst({
+    where: {
+      id: context.jwtPayload.userId
+    },
+    select: {
+      masterDeviceId: true
+    }
+  })
+
+  context.masterDeviceId = user?.masterDeviceId
+
   return next()
 }
 

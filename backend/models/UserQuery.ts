@@ -15,7 +15,6 @@ import * as admin from 'firebase-admin'
 import { GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/User'
 
-import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
@@ -112,16 +111,6 @@ export class UserQuery extends UserBase {
   @Field(() => [EmailVerificationGQLScalars])
   async emailVerifications() {
     return prismaClient.emailVerification.findMany({
-      where: {
-        userId: this.id
-      }
-    })
-  }
-
-  //Call this from the findFirst query in me??
-  @Field(() => SettingsConfigGQL)
-  async settings() {
-    return prismaClient.settingsConfig.findFirst({
       where: {
         userId: this.id
       }

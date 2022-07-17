@@ -4,16 +4,16 @@ import {
   FormErrorMessage,
   Checkbox,
   Button,
-  Spinner,
-  Divider
+  Spinner
 } from '@chakra-ui/react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { ISecuritySettings } from '@src/util/useDeviceState'
 import { Formik, FormikHelpers, Form, Field } from 'formik'
 import React, { useContext } from 'react'
 import Select from 'react-select'
-import { useSecuritySettingsQuery } from './SecuritySettings.codegen'
+
 import { Trans } from '@lingui/macro'
+import { useSyncSettingsQuery } from './SecuritySettings.codegen'
 
 export const vaultLockTimeOptions = [
   { value: 0, label: 'On web close' },
@@ -25,12 +25,12 @@ export const vaultLockTimeOptions = [
 export const SecuritySettings = () => {
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
-  const { data, loading } = useSecuritySettingsQuery()
+  const { data, loading } = useSyncSettingsQuery()
   if (loading) {
     return <Spinner />
   }
-  const settings = data?.me?.settings
-  if (settings) {
+
+  if (data) {
     return (
       <>
         <Formik
@@ -44,7 +44,7 @@ export const SecuritySettings = () => {
             alert(JSON.stringify(values, null, 2))
             setSecuritySettings({
               vaultLockTime: values.vaultLockTime,
-              noHandsLogin: values.noHandsLogin
+              noHandsLogin: values.autofill
             })
 
             setSubmitting(false)

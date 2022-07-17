@@ -46,6 +46,15 @@ export class UserGQLScalars {
 
   @Field(() => Int)
   deviceRecoveryCooldownMinutes: number
+
+  @Field()
+  autofill: boolean
+
+  @Field()
+  language: string
+
+  @Field()
+  theme: string
 }
 
 @ObjectType()
@@ -70,9 +79,6 @@ export class UserGQL extends UserGQLScalars {
 
   @Field(() => [WebInputGQL])
   WebInputsAdded: WebInputGQL[]
-
-  @Field(() => [SettingsConfigGQL])
-  SettingsConfigs: SettingsConfigGQL[]
 
   @Field(() => [TagGQL])
   Tags: TagGQL[]

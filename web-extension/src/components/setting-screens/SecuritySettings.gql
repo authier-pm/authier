@@ -1,11 +1,12 @@
-query SecuritySettings {
+query SyncSettings {
   me {
     id
-    settings {
-      lockTime
-      twoFA
-      noHandsLogin
-      homeUI
+    autofill
+    language
+    theme
+    device {
+      syncTOTP
+      vaultLockTimeoutSeconds
     }
   }
 }

@@ -47,10 +47,11 @@ model Device {
   firebaseToken           String
   name                    String
   platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
-  syncTOTP                Boolean   @default(true) //2FA
   ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  vaultLockTimeoutSeconds Int?
   logoutAt                DateTime?
+  // Device settings
+  syncTOTP                Boolean   @default(false) //2FA
+  vaultLockTimeoutSeconds Int?      @default(28800) // 8 hours
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -70,17 +71,6 @@ model Device {
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
   @@index([updatedAt])
   @@index([lastSyncAt])
-}
-
-model SettingsConfig {
-  userId    String    @id @unique @db.Uuid
-  lockTime  Int
-  twoFA     Boolean
-  autofill  Boolean
-  language  String    @default("en")
-  updatedAt DateTime? @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
 }
 
 // each row contains a single TOTP or Login credential
@@ -187,12 +177,15 @@ model User {
   recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
 
   deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
+  // User settings
+  autofill                      Boolean @default(false)
+  language                      String  @default("en")
+  theme                         String  @default("light")
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]
   Devices              Device[]              @relation("devices")
   WebInputsAdded       WebInput[]
-  SettingsConfigs      SettingsConfig[]
   Tags                 Tag[]
   UserPaidProducts     UserPaidProducts[]
   DecryptionChallenges DecryptionChallenge[]

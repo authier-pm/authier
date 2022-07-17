@@ -1,10 +1,11 @@
+import { vaultLockTimeOptions } from './../../web-extension/src/components/setting-screens/SecuritySettings'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput } from './models'
+import { EncryptedSecretInput, SettingsInput } from './models'
 import * as admin from 'firebase-admin'
 import { UserGQL } from './generated/User'
 import { SettingsConfigGQL } from './generated/SettingsConfig'
@@ -17,7 +18,7 @@ import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
-import { EmailVerificationType } from '@prisma/client'
+import { EmailVerificationType, prisma } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
@@ -144,31 +145,30 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => SettingsConfigGQL)
+  @Field(() => UserGQL)
   async updateSettings(
-    @Arg('twoFA', () => Boolean) twoFA: boolean,
-    @Arg('lockTime', () => Int) lockTime: number,
-    @Arg('autofill', () => Boolean) autofill: boolean,
-    @Arg('language', () => String) language: string,
-    @Ctx() ctx: IContext
+    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    return ctx.prisma.settingsConfig.upsert({
+    return await ctx.prisma.user.update({
       where: {
-        userId: this.id
+        id: this.id
       },
-      update: {
-        lockTime,
-        twoFA,
-        autofill,
-        language,
-        userId: this.id
-      },
-      create: {
-        userId: this.id,
-        lockTime,
-        twoFA,
-        autofill,
-        language
+      data: {
+        autofill: config.autofill,
+        language: config.language,
+        theme: config.theme,
+        Devices: {
+          update: {
+            where: {
+              id: ctx.device.id
+            },
+            data: {
+              syncTOTP: config.syncTOTP,
+              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+            }
+          }
+        }
       }
     })
   }

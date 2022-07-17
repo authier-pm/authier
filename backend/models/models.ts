@@ -92,6 +92,24 @@ export class EncryptedSecretInput {
 }
 
 @InputType()
+export class SettingsInput {
+  @Field(() => Boolean)
+  syncTOTP: boolean
+
+  @Field(() => Int)
+  vaultLockTimeoutSeconds: number
+
+  @Field(() => Boolean)
+  autofill: boolean
+
+  @Field(() => String)
+  language: string
+
+  @Field(() => String)
+  theme: string
+}
+
+@InputType()
 export class EncryptedSecretPatchInput extends EncryptedSecretInput {
   @Field(() => GraphQLUUID)
   id: string

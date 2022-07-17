@@ -59,7 +59,7 @@ let registered = false // we need to only register once
 
 export function useDeviceState() {
   const [currentURL, setCurrentURL] = useState<string>('')
-
+  const [isFilling, setIsFilling] = useState<boolean>(false)
   const [safeLocked, setSafeLocked] =
     useState<IBackgroundStateSerializableLocked | null>(null)
 
@@ -157,7 +157,8 @@ export function useDeviceState() {
         state: state
       })
     },
-    device
+    device,
+    isFilling
   }
 
   window['backgroundState'] = backgroundStateContext

@@ -3,49 +3,50 @@ import * as Types from '../../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type SecuritySettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SecuritySettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null };
+export type SyncSettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, autofill: boolean, language: string, theme: string, device: { __typename?: 'DeviceQuery', syncTOTP: boolean, vaultLockTimeoutSeconds?: number | null } } | null };
 
 
-export const SecuritySettingsDocument = gql`
-    query SecuritySettings {
+export const SyncSettingsDocument = gql`
+    query SyncSettings {
   me {
     id
-    settings {
-      lockTime
-      twoFA
-      noHandsLogin
-      homeUI
+    autofill
+    language
+    theme
+    device {
+      syncTOTP
+      vaultLockTimeoutSeconds
     }
   }
 }
     `;
 
 /**
- * __useSecuritySettingsQuery__
+ * __useSyncSettingsQuery__
  *
- * To run a query within a React component, call `useSecuritySettingsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSecuritySettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useSyncSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useSyncSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSecuritySettingsQuery({
+ * const { data, loading, error } = useSyncSettingsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useSecuritySettingsQuery(baseOptions?: Apollo.QueryHookOptions<SecuritySettingsQuery, SecuritySettingsQueryVariables>) {
+export function useSyncSettingsQuery(baseOptions?: Apollo.QueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SecuritySettingsQuery, SecuritySettingsQueryVariables>(SecuritySettingsDocument, options);
+        return Apollo.useQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
       }
-export function useSecuritySettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SecuritySettingsQuery, SecuritySettingsQueryVariables>) {
+export function useSyncSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SecuritySettingsQuery, SecuritySettingsQueryVariables>(SecuritySettingsDocument, options);
+          return Apollo.useLazyQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
         }
-export type SecuritySettingsQueryHookResult = ReturnType<typeof useSecuritySettingsQuery>;
-export type SecuritySettingsLazyQueryHookResult = ReturnType<typeof useSecuritySettingsLazyQuery>;
-export type SecuritySettingsQueryResult = Apollo.QueryResult<SecuritySettingsQuery, SecuritySettingsQueryVariables>;
+export type SyncSettingsQueryHookResult = ReturnType<typeof useSyncSettingsQuery>;
+export type SyncSettingsLazyQueryHookResult = ReturnType<typeof useSyncSettingsLazyQuery>;
+export type SyncSettingsQueryResult = Apollo.QueryResult<SyncSettingsQuery, SyncSettingsQueryVariables>;

@@ -23,6 +23,9 @@ type UserQuery {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -30,7 +33,6 @@ type UserQuery {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
@@ -40,7 +42,6 @@ type UserQuery {
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
-  settings: SettingsConfigGQL!
   encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
@@ -91,6 +92,9 @@ type UserGQL {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -98,7 +102,6 @@ type UserGQL {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
@@ -111,10 +114,10 @@ type DeviceGQL {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -210,16 +213,6 @@ type DecryptionChallengeGQL {
   User: [UserGQL!]!
 }
 
-type SettingsConfigGQL {
-  userId: ID!
-  lockTime: Int!
-  twoFA: Boolean!
-  autofill: Boolean!
-  language: String!
-  updatedAt: DateTime
-  user: UserGQL!
-}
-
 type TagGQL {
   id: Int!
   name: String!
@@ -246,10 +239,10 @@ type DeviceQuery {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -351,6 +344,9 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -358,7 +354,6 @@ type UserMutation {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
@@ -373,12 +368,7 @@ type UserMutation {
     secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
-  updateSettings(
-    language: String!
-    autofill: Boolean!
-    lockTime: Int!
-    twoFA: Boolean!
-  ): SettingsConfigGQL!
+  updateSettings(config: SettingsInput!): UserGQL!
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
@@ -392,10 +382,10 @@ type DeviceMutation {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -476,6 +466,14 @@ input SecretUsageEventInput {
   kind: String!
   secretId: String!
   url: String
+}
+
+input SettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
 }
 
 """

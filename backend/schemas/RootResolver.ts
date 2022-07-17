@@ -61,6 +61,7 @@ export interface IJWTPayload {
 export interface IContextAuthenticated extends IContext {
   jwtPayload: IJWTPayload
   device: Device
+  masterDeviceId: string | null | undefined
 }
 
 export interface IContextMaybeAuthenticated extends IContext {
@@ -183,13 +184,6 @@ export class RootResolver {
               lastIpAddress: ipAddress,
               firebaseToken: firebaseToken,
               name: deviceName
-            }
-          },
-          SettingsConfigs: {
-            create: {
-              twoFA: true,
-              lockTime: 28800000,
-              autofill: false
             }
           }
         },
@@ -339,7 +333,7 @@ export class RootResolver {
       })
     }
 
-    // use has approved this device in the past, we can return the challenge including salt and encrypted secret
+    // user has approved this device in the past, we can return the challenge including salt and encrypted secret
     return plainToClass(DecryptionChallengeApproved, {
       ...challenge,
 
