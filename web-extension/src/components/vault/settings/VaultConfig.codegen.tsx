@@ -6,17 +6,19 @@ const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, autofill: boolean, language: string, theme: string, device: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds?: number | null } } };
+export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename: 'UserQuery', id: string, autofill: boolean, language: string, theme: string, device: { __typename: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds?: number | null } } };
 
 
 export const SyncSettingsDocument = gql`
     query SyncSettings {
   me {
+    __typename
     id
     autofill
     language
     theme
     device {
+      __typename
       id
       syncTOTP
       vaultLockTimeoutSeconds

@@ -544,8 +544,8 @@ class ExtensionDevice {
     await removeToken()
     await device.clearLocalStorage()
 
-    //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-    //device.listenForUserLogin()
+    device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    device.listenForUserLogin()
     browser.runtime.reload()
   }
 

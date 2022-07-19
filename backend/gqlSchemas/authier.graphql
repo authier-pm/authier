@@ -36,6 +36,7 @@ type UserQuery {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
   device: DeviceQuery!
   lastChangeInSecrets: DateTime
@@ -105,6 +106,7 @@ type UserGQL {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
 }
 
 type DeviceGQL {
@@ -229,6 +231,16 @@ type UserPaidProductsGQL {
   productId: String!
   userId: String!
   checkoutSessionId: String!
+  user: UserGQL!
+}
+
+type MasterDeviceChangeGQL {
+  id: ID!
+  createdAt: DateTime!
+  processAt: DateTime!
+  oldDeviceId: String!
+  newDeviceId: String!
+  userId: String!
   user: UserGQL!
 }
 
@@ -357,6 +369,7 @@ type UserMutation {
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   addCookie: String!
   device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
@@ -373,6 +386,7 @@ type UserMutation {
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+  setMasterDevice(newMasterDeviceId: String!): DateTime!
 }
 
 type DeviceMutation {

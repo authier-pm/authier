@@ -91,6 +91,7 @@
     "@typescript-eslint/eslint-plugin": "^5.26.0",
     "@typescript-eslint/parser": "^5.26.0",
     "apollo-boost": "^0.4.9",
+    "apollo-link-serialize": "^4.0.0",
     "apollo-link-token-refresh": "^0.4.0",
     "arraybuffer-to-string": "^1.0.2",
     "babel-plugin-macros": "^3.1.0",

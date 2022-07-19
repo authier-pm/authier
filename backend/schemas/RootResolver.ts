@@ -123,10 +123,12 @@ export class RootResolver {
       rootModel: dmmf.modelMap.User
     })
 
-    return ctx.prisma.user.findUnique({
+    const tmp = await ctx.prisma.user.findUnique({
       where: { id: jwtPayload.userId },
       include
     })
+
+    return tmp
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

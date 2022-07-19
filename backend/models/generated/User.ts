@@ -9,6 +9,8 @@ import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
 
+import { MasterDeviceChangeGQL } from './MasterDeviceChange'
+
 @ObjectType()
 export class UserGQLScalars {
   @Field(() => ID)
@@ -88,6 +90,9 @@ export class UserGQL extends UserGQLScalars {
 
   @Field(() => [DecryptionChallengeGQL])
   DecryptionChallenges: DecryptionChallengeGQL[]
+
+  @Field(() => [MasterDeviceChangeGQL])
+  MasterDeviceChange: MasterDeviceChangeGQL[]
 
   // skip overwrite 👇
 }

@@ -119,6 +119,16 @@ model SecretUsageEvent {
 
 }
 
+model MasterDeviceChange {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  processAt   DateTime
+  oldDeviceId String
+  newDeviceId String
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
+}
+
 // recorded whenever user unlocks vault
 // model VaultUnlockEvents {
 //     id             Int       @id @default(autoincrement())
@@ -191,6 +201,7 @@ model User {
   DecryptionChallenges DecryptionChallenge[]
   // @skip
   EmailVerification    EmailVerification[]
+  MasterDeviceChange   MasterDeviceChange[]
 }
 
 model Token {

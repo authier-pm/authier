@@ -1,10 +1,12 @@
 query SyncSettings {
   me {
+    __typename
     id
     autofill
     language
     theme
     device {
+      __typename
       id
       syncTOTP
       vaultLockTimeoutSeconds

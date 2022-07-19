@@ -16,6 +16,7 @@ import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 import { useUpdateSettingsMutation } from './useDevice.codegen'
+import { SyncSettingsDocument } from '@src/components/vault/settings/VaultConfig.codegen'
 
 const log = debug('au:useDeviceState')
 
@@ -64,7 +65,6 @@ export function useDeviceState() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
-  const [updateSettings] = useUpdateSettingsMutation()
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
@@ -113,15 +113,7 @@ export function useDeviceState() {
       }) ?? []) as ITOTPSecret[]
     },
 
-    setSecuritySettings: (config: SettingsInput) => {
-      //! Split this out into a separate mutation
-      updateSettings({
-        variables: {
-          config
-        }
-      })
-
-      //Call bg script to save settings to bg
+    setSecuritySettings: async (config: SettingsInput) => {
       browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config

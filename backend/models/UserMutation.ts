@@ -270,4 +270,29 @@ export class UserMutation extends UserBase {
       }
     })
   }
+
+  @Field(() => Date)
+  async setMasterDevice(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string
+  ) {
+    if (ctx.device.id !== ctx.masterDeviceId) {
+      throw new Error('This can be done only from master device')
+    }
+    return ctx.prisma.user.update({
+      where: {
+        id: ctx.jwtPayload.userId
+      },
+      data: {
+        masterDeviceId: newMasterDeviceId,
+        MasterDeviceChange: {
+          create: {
+            oldDeviceId: ctx.masterDeviceId,
+            newDeviceId: newMasterDeviceId,
+            processAt: new Date()
+          }
+        }
+      }
+    })
+  }
 }

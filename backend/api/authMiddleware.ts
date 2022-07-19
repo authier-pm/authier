@@ -35,6 +35,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
       id: jwtPayload.deviceId
     }
   })
+
   if (!currentDevice) {
     context.reply.clearCookie('access-token')
     throw new Error('not authenticated')

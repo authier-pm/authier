@@ -15,7 +15,7 @@
   resolved "https://registry.yarnpkg.com/@anatine/esbuild-decorators/-/esbuild-decorators-0.2.19.tgz#d4137182abfdf0e6de680f69b447492813b62ef4"
   integrity sha512-pyj6ULyMacyzpDqlnbS2OCkOqxcVgk8IqiTMRJ5CrsF8Yl1azvlX/AM6xWR8UzHKUYDlWOw5mOpos3+7KKR0Lw==
 
-"@apollo/client@^3.6.8", "@apollo/client@^3.6.9":
+"@apollo/client@^3.3.20", "@apollo/client@^3.6.8", "@apollo/client@^3.6.9":
   version "3.6.9"
   resolved "https://registry.yarnpkg.com/@apollo/client/-/client-3.6.9.tgz#ad0ee2e3a3c92dbed4acd6917b6158a492739d94"
   integrity sha512-Y1yu8qa2YeaCUBVuw08x8NHenFi0sw2I3KCu7Kw9mDSu86HmmtHJkCAifKVrN2iPgDTW/BbP3EpSV8/EQCcxZA==
@@ -5874,6 +5874,14 @@ apollo-link-http@^1.3.1:
     apollo-link "^1.2.14"
     apollo-link-http-common "^0.2.16"
     tslib "^1.9.3"
+
+apollo-link-serialize@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/apollo-link-serialize/-/apollo-link-serialize-4.0.0.tgz#fe489fa151e08eb2bb46a48d244698fac29aff4e"
+  integrity sha512-GQJkwj1Fm/OQyte5+y64GsWBIL89AaALlJGc4plMzTttfMxMREXIttXdaP4BzU5xvC/PwVP0khKS/5CbEX8pjw==
+  dependencies:
+    "@apollo/client" "^3.3.20"
+    zen-observable-ts "^0.8.11"
 
 apollo-link-token-refresh@^0.4.0:
   version "0.4.0"
@@ -17724,7 +17732,7 @@ yup@^0.32.11:
     property-expr "^2.0.4"
     toposort "^2.0.2"
 
-zen-observable-ts@^0.8.21:
+zen-observable-ts@^0.8.11, zen-observable-ts@^0.8.21:
   version "0.8.21"
   resolved "https://registry.yarnpkg.com/zen-observable-ts/-/zen-observable-ts-0.8.21.tgz#85d0031fbbde1eba3cd07d3ba90da241215f421d"
   integrity sha512-Yj3yXweRc8LdRMrCC8nIc4kkjWecPAUVh0TI0OUrWXx6aX790vLcDlWca6I4vsyCGH3LpWxq0dJRcMOFoVqmeg==

@@ -18,9 +18,14 @@ import { Trans } from '@lingui/macro'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { SettingsInput } from '../../../../../shared/generated/graphqlBaseTypes'
 import { device } from '@src/background/ExtensionDevice'
+import { useUpdateSettingsMutation } from '@src/util/useDevice.codegen'
+import { SyncSettingsDocument } from './VaultConfig.codegen'
 
 export default function VaultConfig() {
   const { setSecuritySettings } = useContext(DeviceStateContext)
+  const [updateSettings] = useUpdateSettingsMutation({
+    refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
+  })
 
   // Split to container component to avoid rewriting the same code twice (Account and VaultConfig)
   if (device.state) {
@@ -57,12 +62,19 @@ export default function VaultConfig() {
                 values: SettingsInput,
                 { setSubmitting }: FormikHelpers<SettingsInput>
               ) => {
-                setSecuritySettings({
+                const config = {
                   ...values,
                   vaultLockTimeoutSeconds: parseInt(
                     values.vaultLockTimeoutSeconds.toString()
                   )
+                }
+
+                await updateSettings({
+                  variables: {
+                    config
+                  }
                 })
+                setSecuritySettings(config)
                 setSubmitting(false)
               }}
             >
