@@ -141,14 +141,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
               {link.title}
             </NavItem>
           ))}
-          <IconButton
-            size="lg"
-            variant="ghost"
-            aria-label="change color mode"
-            icon={<FiMoon />}
-            onClick={toggleColorMode}
-            mt="auto"
-          />
+          <ColorModeButton />
         </Flex>
 
         <HStack spacing={{ base: '0', md: '6' }} w="80%" m={4}>
