@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type DevicesPageQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } | null };
+export type DevicesPageQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } };
 
 export type ApproveChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int'];

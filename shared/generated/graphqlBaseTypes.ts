@@ -370,7 +370,7 @@ export type Query = {
   /** you need to be authenticated to call this resolver */
   authenticated: Scalars['Boolean'];
   currentDevice: DeviceQuery;
-  me?: Maybe<UserQuery>;
+  me: UserQuery;
   osTime: Scalars['String'];
   webInputs: Array<WebInputGql>;
 };

@@ -1,4 +1,4 @@
-import * as Types from '../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '../../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, autofill: boolean, language: string, theme: string, device: { __typename?: 'DeviceQuery', syncTOTP: boolean, vaultLockTimeoutSeconds?: number | null } } | null };
+export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, autofill: boolean, language: string, theme: string, device: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds?: number | null } } };
 
 
 export const SyncSettingsDocument = gql`
@@ -17,6 +17,7 @@ export const SyncSettingsDocument = gql`
     language
     theme
     device {
+      id
       syncTOTP
       vaultLockTimeoutSeconds
     }

@@ -1,4 +1,3 @@
-import { vaultLockTimeOptions } from './../../web-extension/src/components/setting-screens/SecuritySettings'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import {
@@ -6,9 +5,9 @@ import {
   EncryptedSecretQuery
 } from './EncryptedSecret'
 import { EncryptedSecretInput, SettingsInput } from './models'
-import * as admin from 'firebase-admin'
+
 import { UserGQL } from './generated/User'
-import { SettingsConfigGQL } from './generated/SettingsConfig'
+
 import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
@@ -18,7 +17,7 @@ import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
-import { EmailVerificationType, prisma } from '@prisma/client'
+import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'

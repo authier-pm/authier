@@ -1,23 +1,21 @@
 import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
-import { useUpdateSettingsMutation } from '@src/pages/Settings.codegen'
-
-import {
-  UIOptions,
-  UISettings
-} from '@src/components/setting-screens/SettingsForm'
 
 import {
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked
 } from '@src/background/backgroundPage'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  SettingsInput
+} from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
+import { useUpdateSettingsMutation } from './useDevice.codegen'
 
 const log = debug('au:useDeviceState')
 
@@ -58,53 +56,44 @@ export interface ISecuritySettingsInBg {
 let registered = false // we need to only register once
 
 export function useDeviceState() {
+  const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
   const [isFilling, setIsFilling] = useState<boolean>(false)
   const [safeLocked, setSafeLocked] =
     useState<IBackgroundStateSerializableLocked | null>(null)
-
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
-
-  const [UIConfig, setUIConfig] = useState<UISettings>({
-    homeList: UIOptions.all
-  })
   const [updateSettings] = useUpdateSettingsMutation()
-
-  useEffect(() => {
-    setDeviceState(device.state)
-    setSafeLocked(device.lockedState)
-  }, [device.state, device.lockedState])
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ): Promise<void> => {
-    console.log('onStorageChange useDevice', changes, areaName)
+    log('onStorageChange useDevice', areaName, changes)
     if (areaName === 'local' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue)
       setSafeLocked(changes.lockedState.newValue)
+
+      log('states loaded from storage')
     }
   }
 
   //TODO move this whole thing into it' own hook
   useEffect(() => {
+    log('registering storage change listener')
+
+    getCurrentTab().then((tab) => {
+      setCurrentTab(tab ?? null)
+      setCurrentURL(tab?.url ?? '')
+    })
+
     if (registered) {
       return
     }
     registered = true
 
     browser.storage.onChanged.addListener(onStorageChange)
-  }, [])
-
-  const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
-
-  useEffect(() => {
-    getCurrentTab().then((tab) => {
-      setCurrentTab(tab ?? null)
-      setCurrentURL(tab?.url ?? '')
-    })
   }, [])
 
   const backgroundStateContext = {
@@ -124,13 +113,11 @@ export function useDeviceState() {
       }) ?? []) as ITOTPSecret[]
     },
 
-    setSecuritySettings: (config: ISecuritySettings) => {
+    setSecuritySettings: (config: SettingsInput) => {
+      //! Split this out into a separate mutation
       updateSettings({
         variables: {
-          lockTime: parseInt(config.vaultLockTime),
-          autofill: config.autofill,
-          twoFA: config.twoFA,
-          language: config.language
+          config
         }
       })
 
@@ -141,15 +128,6 @@ export function useDeviceState() {
       })
     },
 
-    setUISettings: (config: UISettings) => {
-      setUIConfig(config)
-
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.UISettings,
-        config: config
-      })
-    },
-    UIConfig,
     setDeviceState: (state: IBackgroundStateSerializable) => {
       device.save(state)
       browser.runtime.sendMessage({
@@ -158,7 +136,8 @@ export function useDeviceState() {
       })
     },
     device,
-    isFilling
+    isFilling,
+    registered
   }
 
   window['backgroundState'] = backgroundStateContext

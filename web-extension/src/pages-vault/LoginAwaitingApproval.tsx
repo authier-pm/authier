@@ -145,7 +145,11 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
             authSecretEncrypted: newAuthSecretEncrypted,
-            lockTime: '14400'
+            lockTime: '28800',
+            autofill: false,
+            language: 'en',
+            syncTOTP: false,
+            theme: 'light'
           }
 
           setUserId(decodedToken.userId)

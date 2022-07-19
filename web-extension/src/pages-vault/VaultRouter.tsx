@@ -1,12 +1,12 @@
 import React, { useContext, useEffect } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
-import { ItemList } from '@src/pages-vault/ItemList'
+
 import { Route, Routes, useNavigate } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 
 import Login from '@src/pages-vault/Login'
-import { Center } from '@chakra-ui/react'
+import { Center, useColorMode } from '@chakra-ui/react'
 import Premium from './Premium'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
@@ -15,6 +15,7 @@ import Register from './Register'
 import { AddItem } from './AddItem'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
+import { VaultList } from './VaultList'
 
 export function VaultRouter() {
   const { deviceState, safeLocked } = useContext(DeviceStateContext)
@@ -44,7 +45,7 @@ export function VaultRouter() {
   return (
     <SidebarWithHeader>
       <Routes>
-        <Route path="/" element={<ItemList />}></Route>
+        <Route path="/" element={<VaultList />}></Route>
         <Route path="/secret/:secretId" element={<VaultItemSettings />} />
         <Route path="/account-limits" element={<Premium />}></Route>
         <Route path="/settings/*" element={<VaultSettings />}></Route>

@@ -5,7 +5,7 @@ import {
 } from '@src/util/useDeviceState'
 
 import { BackgroundMessageType } from './BackgroundMessageType'
-import { UISettings } from '@src/components/setting-screens/SettingsForm'
+
 import browser from 'webextension-polyfill'
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
@@ -16,15 +16,13 @@ import {
 } from './chromeRuntimeListener.codegen'
 import {
   EncryptedSecretType,
+  SettingsInput,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
-import { device, DeviceState, isRunningInBgPage } from './ExtensionDevice'
+import { device, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
-import {
-  IBackgroundStateSerializable,
-  IBackgroundStateSerializableLocked
-} from './backgroundPage'
+import { IBackgroundStateSerializable } from './backgroundPage'
 
 const log = debug('au:chListener')
 
@@ -70,10 +68,9 @@ browser.runtime.onMessage.addListener(async function (
     action: BackgroundMessageType
     payload: any
     lockTime: number
-    config: UISettings
     auths: ITOTPSecret[]
     passwords: ILoginSecret[]
-    settings: ISecuritySettings
+    settings: SettingsInput
     time: string
     state: IBackgroundStateSerializable
   },
@@ -230,7 +227,9 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
-        deviceState.lockTime = req.settings.vaultLockTime
+        deviceState.lockTime = req.settings.vaultLockTimeoutSeconds.toString()
+        deviceState.theme = req.settings.theme
+        deviceState.syncTOTP = req.settings.syncTOTP
         deviceState.language = req.settings.language
         deviceState.autofill = req.settings.autofill
         noHandsLogin = req.settings.autofill

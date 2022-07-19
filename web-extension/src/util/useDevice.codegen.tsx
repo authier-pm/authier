@@ -4,26 +4,18 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type UpdateSettingsMutationVariables = Types.Exact<{
-  autofill: Types.Scalars['Boolean'];
-  lockTime: Types.Scalars['Int'];
-  language: Types.Scalars['String'];
-  twoFA: Types.Scalars['Boolean'];
+  config: Types.SettingsInput;
 }>;
 
 
-export type UpdateSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateSettings: { __typename?: 'SettingsConfigGQL', userId: string } } };
+export type UpdateSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateSettings: { __typename?: 'UserGQL', id: string } } };
 
 
 export const UpdateSettingsDocument = gql`
-    mutation updateSettings($autofill: Boolean!, $lockTime: Int!, $language: String!, $twoFA: Boolean!) {
+    mutation updateSettings($config: SettingsInput!) {
   me {
-    updateSettings(
-      autofill: $autofill
-      lockTime: $lockTime
-      language: $language
-      twoFA: $twoFA
-    ) {
-      userId
+    updateSettings(config: $config) {
+      id
     }
   }
 }
@@ -43,10 +35,7 @@ export type UpdateSettingsMutationFn = Apollo.MutationFunction<UpdateSettingsMut
  * @example
  * const [updateSettingsMutation, { data, loading, error }] = useUpdateSettingsMutation({
  *   variables: {
- *      autofill: // value for 'autofill'
- *      lockTime: // value for 'lockTime'
- *      language: // value for 'language'
- *      twoFA: // value for 'twoFA'
+ *      config: // value for 'config'
  *   },
  * });
  */

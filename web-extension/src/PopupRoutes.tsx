@@ -1,19 +1,19 @@
 import React, { ReactElement, useContext } from 'react'
 import { AuthLinkPage } from './AuthLinkPage'
-import { device } from './background/ExtensionDevice'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
 import { DeviceStateContext } from './providers/DeviceStateProvider'
+import debug from 'debug'
+const log = debug('au:popupRoutes')
 
 export default function PopupRoutes(): ReactElement {
   const { deviceState, safeLocked } = useContext(DeviceStateContext)
-  // console.log('~ backgroundState', deviceState)
-  // console.log('~ safeLocked', safeLocked)
-
+  log('deviceState', deviceState)
   if (safeLocked) {
     return <VaultUnlockVerification />
   }
-  if (!deviceState) {
+
+  if (deviceState === null) {
     return <AuthLinkPage />
   }
 

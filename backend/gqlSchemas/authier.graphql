@@ -5,7 +5,7 @@ type Query {
   you need to be authenticated to call this resolver
   """
   authenticated: Boolean!
-  me: UserQuery
+  me: UserQuery!
   currentDevice: DeviceQuery!
   webInputs(host: String!): [WebInputGQL!]!
 }

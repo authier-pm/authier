@@ -5,6 +5,7 @@ query SyncSettings {
     language
     theme
     device {
+      id
       syncTOTP
       vaultLockTimeoutSeconds
     }

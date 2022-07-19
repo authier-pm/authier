@@ -42,7 +42,7 @@ import {
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
-import { RefreshDeviceButton } from '@src/components/RefreshDeviceButton'
+import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
 
 interface SettingsValues {

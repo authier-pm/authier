@@ -112,7 +112,11 @@ export default function Register(): ReactElement {
               encryptionSalt,
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
-              lockTime: '14400'
+              lockTime: '28800',
+              autofill: false,
+              language: 'en',
+              syncTOTP: false,
+              theme: 'light'
             }
 
             device.save(deviceState)

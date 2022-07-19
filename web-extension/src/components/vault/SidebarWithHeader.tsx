@@ -41,6 +41,7 @@ import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { t, Trans } from '@lingui/macro'
+import { ColorModeButton } from '../ColorModeButton'
 
 interface LinkItemProps {
   title: JSX.Element
@@ -290,13 +291,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="change color mode"
-          icon={<FiMoon />}
-          onClick={toggleColorMode}
-        />
+        <ColorModeButton />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

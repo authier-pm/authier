@@ -11,7 +11,8 @@ import {
 } from './backgroundPage'
 import {
   EncryptedSecretPatchInput,
-  EncryptedSecretType
+  EncryptedSecretType,
+  SettingsInput
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -99,9 +100,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = '14400'
-  autofill = false
-  language = 'en'
+  lockTime: string
+  autofill: boolean
+  language: string
+  theme: string
+  syncTOTP: boolean
   authSecret: string
   authSecretEncrypted: string
 
@@ -136,9 +139,9 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async save() {
     console.log('SAVE DEVICE STATE', this)
+    browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = this.getAllSecretsDecrypted()
-    browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
@@ -371,6 +374,7 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
+    log('Extension device initializing')
     this.id = await this.getDeviceId()
 
     let storedState: IBackgroundStateSerializable | null = null
@@ -388,6 +392,7 @@ class ExtensionDevice {
     if (storedState) {
       this.state = new DeviceState(storedState)
       this.name = storedState.deviceName
+      this.state.save()
     } else {
       this.name = this.generateDeviceName()
       this.listenForUserLogin()
@@ -496,7 +501,19 @@ class ExtensionDevice {
 
     log('locking device')
 
-    const { email, userId, secrets, encryptionSalt } = this.state
+    const {
+      email,
+      userId,
+      secrets,
+      encryptionSalt,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme,
+      authSecret,
+      authSecretEncrypted
+    } = this.state
 
     this.lockedState = {
       email,
@@ -504,9 +521,13 @@ class ExtensionDevice {
       secrets,
       deviceName: this.name,
       encryptionSalt,
-      authSecret: this.state.authSecret,
-      authSecretEncrypted: this.state.authSecretEncrypted,
-      lockTime: this.state.lockTime
+      authSecret,
+      authSecretEncrypted,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,
@@ -577,13 +598,23 @@ class ExtensionDevice {
     })
   }
 
+  syncSettings(config: SettingsInput) {
+    if (this.state) {
+      this.state.autofill = config.autofill
+      this.state.lockTime = config.vaultLockTimeoutSeconds.toString()
+      this.state.syncTOTP = config.syncTOTP
+      this.state.language = config.language
+      this.state.theme = config.theme
+    }
+  }
+
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     this.state.save()
     this.rerenderViews()
   }
 }
-
+log('Extension device started')
 export const device = new ExtensionDevice()
 
 device.initialize()

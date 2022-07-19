@@ -107,7 +107,7 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
-  @Query(() => UserQuery, { nullable: true })
+  @Query(() => UserQuery)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
@@ -246,7 +246,7 @@ export class RootResolver {
     })
 
     if (!user) {
-      throw new GraphqlError('login failed')
+      throw new GraphqlError('Login failed, create a new account.')
     }
     const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
@@ -256,7 +256,7 @@ export class RootResolver {
       }
     })
     if (isBlocked) {
-      throw new GraphqlError('login failed')
+      throw new GraphqlError('Login failed, try again later.')
     }
 
     const inLastHour = await ctx.prisma.decryptionChallenge.count({
