@@ -18,8 +18,11 @@ import { Trans } from '@lingui/macro'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { SettingsInput } from '../../../../../shared/generated/graphqlBaseTypes'
 import { device } from '@src/background/ExtensionDevice'
-import { useUpdateSettingsMutation } from '@src/util/useDevice.codegen'
-import { SyncSettingsDocument } from './VaultConfig.codegen'
+
+import {
+  SyncSettingsDocument,
+  useUpdateSettingsMutation
+} from './VaultConfig.codegen'
 
 export default function VaultConfig() {
   const { setSecuritySettings } = useContext(DeviceStateContext)
@@ -183,10 +186,10 @@ export default function VaultConfig() {
                     </FormControl>
                     {/* TODO Resolve dirty */}
                     <Button
-                      isLoading={isSubmitting}
                       mt={4}
                       colorScheme="teal"
-                      disabled={!dirty}
+                      disabled={isSubmitting || !dirty}
+                      isLoading={isSubmitting}
                       type="submit"
                     >
                       <Trans>Save</Trans>

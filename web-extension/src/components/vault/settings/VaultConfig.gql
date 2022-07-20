@@ -11,3 +11,11 @@ query SyncSettings {
     vaultLockTimeoutSeconds
   }
 }
+
+mutation updateSettings($config: SettingsInput!) {
+  me {
+    updateSettings(config: $config) {
+      id
+    }
+  }
+}

@@ -229,7 +229,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
   const [initPassword, setInitPassword] = useState('')
-  console.log(initPassword)
+
   const [updateSecret] = useUpdateEncryptedSecretMutation()
 
   return (

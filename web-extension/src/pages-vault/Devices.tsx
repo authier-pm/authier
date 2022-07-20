@@ -26,17 +26,19 @@ import {
   VStack,
   Grid,
   Stat,
-  FormHelperText
+  FormHelperText,
+  HStack
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import React, { useEffect, useState } from 'react'
-import { FiLogOut, FiSettings } from 'react-icons/fi'
+import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
 import {
   useApproveChallengeMutation,
-  useDevicesPageQuery,
+  useChangeMasterDeviceMutation,
+  useDevicesRequestsQuery,
   useRejectChallengeMutation
 } from './Devices.codegen'
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
@@ -44,25 +46,24 @@ import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
+import { DeviceQuery } from '../../../shared/generated/graphqlBaseTypes'
+import { useUpdateSettingsMutation } from '@src/components/vault/settings/VaultConfig.codegen'
 
 interface SettingsValues {
   lockTime: number
   twoFA: boolean
-  autofill: boolean
-  language: string
 }
 
-const DeviceListItem = (item: {
-  id: string
-  firstIpAddress: string
-  lastIpAddress: string
-  name: string
-  lastGeoLocation: string
-  createdAt: string
-  logoutAt?: string | null | undefined
-  masterId: string
+const DeviceListItem = ({
+  deviceInfo,
+  refetch,
+  masterDeviceId
+}: {
+  deviceInfo: Partial<DeviceQuery>
   refetch: () => void
+  masterDeviceId: string
 }) => {
+  const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
@@ -71,9 +72,8 @@ const DeviceListItem = (item: {
     <>
       <Flex py={6} m={5}>
         <Box
-          maxW={'380px'}
-          w={'full'}
-          bg={useColorModeValue('white', 'gray.900')}
+          w="350px"
+          bg={useColorModeValue('white', 'gray.800')}
           boxShadow={'2xl'}
           rounded={'lg'}
           p={6}
@@ -85,18 +85,18 @@ const DeviceListItem = (item: {
             alignItems={'baseline'}
             lineHeight={'6'}
           >
-            <Box>
-              {item.id === device.id && (
+            <HStack mb={2} spacing={3}>
+              {deviceInfo.id === device.id && (
                 <Badge height="min-content" colorScheme="yellow">
                   Current
                 </Badge>
               )}
-              {item.id === item.masterId && (
+              {deviceInfo.id === masterDeviceId && (
                 <Badge height="min-content" colorScheme="purple">
                   Master
                 </Badge>
               )}
-              {item.logoutAt ? (
+              {deviceInfo.logoutAt ? (
                 <Badge height="min-content" colorScheme="red">
                   <Trans>Logged out</Trans>
                 </Badge>
@@ -105,7 +105,7 @@ const DeviceListItem = (item: {
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
-            </Box>
+            </HStack>
 
             <Menu>
               <MenuButton
@@ -114,27 +114,39 @@ const DeviceListItem = (item: {
                 variant="unstyled"
                 aria-label="Favourite"
                 fontSize="15px"
-                icon={
-                  <SettingsIcon
-                    color={useColorModeValue('gray.100', 'gray.800')}
-                  />
-                }
+                icon={<SettingsIcon color={'white'} />}
               />
               <MenuList>
+                {masterDeviceId !== deviceInfo.id ? (
+                  <MenuItem
+                    onClick={() =>
+                      changeMasterDeviceMutation({
+                        variables: {
+                          newMasterDeviceId: deviceInfo.id as string
+                        }
+                      })
+                    }
+                  >
+                    <FiStar />
+                    <NbSp />
+                    <Trans>Set on master device</Trans>
+                  </MenuItem>
+                ) : null}
+
                 <MenuItem onClick={() => onOpen()}>
                   <FiLogOut></FiLogOut>
                   <NbSp />
                   <Trans>Logout</Trans>
                 </MenuItem>
                 <DeviceDeleteAlert
-                  id={item.id}
+                  id={deviceInfo.id as string}
                   isOpen={isOpen}
                   onClose={onClose}
-                  refetch={item.refetch}
+                  refetch={refetch}
                 />
                 <MenuItem
                   onClick={() => {
-                    if (item.id === device.id) {
+                    if (deviceInfo.id === device.id) {
                       navigate('/settings/security')
                     } else {
                       setIsConfigOpen(!isConfigOpen)
@@ -150,16 +162,14 @@ const DeviceListItem = (item: {
           </Stack>
 
           <Heading fontSize={'xl'} fontFamily={'body'}>
-            {item.name}
+            {deviceInfo.name}
           </Heading>
           {isConfigOpen ? (
             <Box mt={5}>
               <Formik
                 initialValues={{
-                  lockTime: 0,
-                  twoFA: false,
-                  autofill: true,
-                  language: 'en'
+                  lockTime: deviceInfo.vaultLockTimeoutSeconds as number,
+                  twoFA: deviceInfo.syncTOTP as boolean
                 }}
                 onSubmit={async (
                   values: SettingsValues,
@@ -230,44 +240,6 @@ const DeviceListItem = (item: {
                         }}
                       </Field>
 
-                      {/* Not ideal, later refactor */}
-                      <Field name="autofill">
-                        {({ field, form }: FieldProps) => {
-                          const { onChange, ...rest } = field
-                          return (
-                            <FormControl
-                              id="autofill"
-                              isInvalid={
-                                !!form.errors['autofill'] &&
-                                !!form.touched['autofill']
-                              }
-                            >
-                              <Checkbox
-                                {...rest}
-                                id="autofill"
-                                onChange={onChange}
-                                defaultChecked={values.autofill}
-                              >
-                                <Trans>Autofill</Trans>
-                              </Checkbox>
-                            </FormControl>
-                          )
-                        }}
-                      </Field>
-
-                      {/*  */}
-                      <FormControl
-                        isInvalid={!!errors.language && touched.language}
-                      >
-                        <FormLabel htmlFor="language">
-                          <Trans>Language</Trans>
-                        </FormLabel>
-                        <Field as={Select} id="language" name="language">
-                          <option value="en">English</option>
-                          <option value="cz">Čeština</option>
-                        </Field>
-                      </FormControl>
-
                       <Button
                         mt={4}
                         colorScheme="teal"
@@ -288,20 +260,20 @@ const DeviceListItem = (item: {
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                   Last IP Address
                 </Text>
-                <Text fontSize={'xl'}>{item.lastIpAddress}</Text>
+                <Text fontSize={'xl'}>{deviceInfo.lastIpAddress}</Text>
               </Box>
               <Box>
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                   Geolocation
                 </Text>
-                <Text fontSize={'xl'}>{item.lastGeoLocation}</Text>
+                <Text fontSize={'xl'}>{deviceInfo.lastGeoLocation}</Text>
               </Box>
               <Box>
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                   Added
                 </Text>
                 <Tooltip
-                  label={intlFormat(new Date(item.createdAt), {
+                  label={intlFormat(new Date(deviceInfo.createdAt ?? ''), {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -309,7 +281,11 @@ const DeviceListItem = (item: {
                   })}
                 >
                   <Text fontSize={'xl'}>
-                    {formatDistance(new Date(item.createdAt), new Date())} ago
+                    {formatDistance(
+                      new Date(deviceInfo.createdAt ?? ''),
+                      new Date()
+                    )}
+                    ago
                   </Text>
                 </Tooltip>
               </Box>
@@ -325,20 +301,20 @@ export default function Devices() {
   const {
     data,
     loading,
-    refetch: deviceRefetch
+    refetch: devicesRefetch
   } = useMyDevicesQuery({
     // TODO figure out why this is called twice
-    fetchPolicy: 'cache-first'
+    fetchPolicy: 'cache-and-network'
   })
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
   const [filterBy, setFilterBy] = useState('')
-  const { data: devicesPageData, refetch } = useDevicesPageQuery({
+  const { data: devicesRequests, refetch } = useDevicesRequestsQuery({
     fetchPolicy: 'cache-first'
   })
 
   useEffect(() => {
-    deviceRefetch()
+    devicesRefetch()
   }, [])
 
   return (
@@ -357,12 +333,12 @@ export default function Devices() {
             {data?.me?.devices.length} {t`devices`}
           </Stat>
 
-          <RefreshDeviceButton refetch={deviceRefetch} />
+          <RefreshDeviceButton refetch={devicesRefetch} />
         </Center>
       </Center>
 
       <VStack mt={3}>
-        {devicesPageData?.me?.decryptionChallengesWaiting.map(
+        {devicesRequests?.me?.decryptionChallengesWaiting.map(
           (challengeToApprove) => {
             return (
               <Alert
@@ -389,7 +365,6 @@ export default function Devices() {
                   <Button
                     w="100%"
                     colorScheme="red"
-                    // bgColor="red.100"
                     onClick={async () => {
                       await reject({
                         variables: {
@@ -436,10 +411,10 @@ export default function Devices() {
                 .map((el, i) => {
                   return (
                     <DeviceListItem
-                      {...el}
+                      deviceInfo={el}
                       key={i}
-                      masterId={devicesPageData?.me?.masterDeviceId as string}
-                      refetch={deviceRefetch}
+                      refetch={devicesRefetch}
+                      masterDeviceId={data.me.masterDeviceId as string}
                     />
                   )
                 })

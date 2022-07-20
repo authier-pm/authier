@@ -15,8 +15,6 @@ import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
-import { useUpdateSettingsMutation } from './useDevice.codegen'
-import { SyncSettingsDocument } from '@src/components/vault/settings/VaultConfig.codegen'
 
 const log = debug('au:useDeviceState')
 
