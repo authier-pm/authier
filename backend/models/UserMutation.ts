@@ -24,6 +24,7 @@ import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
+import { MasterDeviceChangeGQL } from './generated/MasterDeviceChange'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -271,7 +272,7 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Date)
+  @Field(() => MasterDeviceChangeGQL)
   async setMasterDevice(
     @Ctx() ctx: IContextAuthenticated,
     @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string

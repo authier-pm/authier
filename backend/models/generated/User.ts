@@ -8,7 +8,6 @@ import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
-
 import { MasterDeviceChangeGQL } from './MasterDeviceChange'
 
 @ObjectType()

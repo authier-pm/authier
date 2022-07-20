@@ -327,6 +327,17 @@ export type LoginResponse = {
   user: UserMutation;
 };
 
+export type MasterDeviceChangeGql = {
+  __typename?: 'MasterDeviceChangeGQL';
+  createdAt: Scalars['DateTime'];
+  id: Scalars['ID'];
+  newDeviceId: Scalars['String'];
+  oldDeviceId: Scalars['String'];
+  processAt: Scalars['DateTime'];
+  user: UserGql;
+  userId: Scalars['String'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
@@ -465,6 +476,7 @@ export type UserGql = {
   DecryptionChallenges: Array<DecryptionChallengeGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
+  MasterDeviceChange: Array<MasterDeviceChangeGql>;
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -494,6 +506,7 @@ export type UserMutation = {
   DecryptionChallenges: Array<DecryptionChallengeGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
+  MasterDeviceChange: Array<MasterDeviceChangeGql>;
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -521,6 +534,7 @@ export type UserMutation = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt'];
+  setMasterDevice: MasterDeviceChangeGql;
   theme: Scalars['String'];
   tokenVersion: Scalars['Int'];
   uiLocalisation: Scalars['String'];
@@ -567,6 +581,11 @@ export type UserMutationEncryptedSecretArgs = {
 };
 
 
+export type UserMutationSetMasterDeviceArgs = {
+  newMasterDeviceId: Scalars['String'];
+};
+
+
 export type UserMutationUpdateFireTokenArgs = {
   firebaseToken: Scalars['String'];
 };
@@ -593,6 +612,7 @@ export type UserQuery = {
   DecryptionChallenges: Array<DecryptionChallengeGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
+  MasterDeviceChange: Array<MasterDeviceChangeGql>;
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -624,6 +644,11 @@ export type UserQuery = {
   uiLocalisation: Scalars['String'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   username?: Maybe<Scalars['String']>;
+};
+
+
+export type UserQueryDeviceArgs = {
+  id: Scalars['UUID'];
 };
 
 

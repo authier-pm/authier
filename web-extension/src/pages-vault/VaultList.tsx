@@ -134,13 +134,10 @@ export const VaultList = () => {
   const debouncedSearchTerm = useDebounce(filterBy, 400)
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
-  const { data, loading } = useSyncSettingsQuery({
-    fetchPolicy: 'no-cache'
-  })
+  const { data, loading } = useSyncSettingsQuery()
   const { colorMode, toggleColorMode } = useColorMode()
 
   useEffect(() => {
-    console.log('data', data?.me.device.vaultLockTimeoutSeconds)
     if (data) {
       if (colorMode !== data.me.theme) {
         toggleColorMode()
@@ -149,13 +146,13 @@ export const VaultList = () => {
       setSecuritySettings({
         autofill: data.me?.autofill as boolean,
         language: data.me?.language as string,
-        syncTOTP: data.me?.device.syncTOTP as boolean,
+        syncTOTP: data.currentDevice.syncTOTP as boolean,
         theme: data.me?.theme as string,
-        vaultLockTimeoutSeconds: data.me?.device
+        vaultLockTimeoutSeconds: data.currentDevice
           .vaultLockTimeoutSeconds as number
       })
     }
-  }, [data])
+  }, [data, loading])
 
   return (
     <Flex flexDirection="column">

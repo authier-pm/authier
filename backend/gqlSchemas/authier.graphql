@@ -38,7 +38,7 @@ type UserQuery {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
-  device: DeviceQuery!
+  device(id: UUID!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
@@ -290,6 +290,11 @@ type EncryptedSecretQuery {
   lastUsedAt: DateTime
 }
 
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
 type EmailVerificationGQLScalars {
   address: ID!
   createdAt: DateTime!
@@ -310,11 +315,6 @@ type DecryptionChallengeForApproval {
   deviceName: String!
   deviceId: UUID!
 }
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
 
 type Mutation {
   """
@@ -386,7 +386,7 @@ type UserMutation {
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
-  setMasterDevice(newMasterDeviceId: String!): DateTime!
+  setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
 }
 
 type DeviceMutation {

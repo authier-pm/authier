@@ -1,5 +1,4 @@
 import { Field, ObjectType, ID } from 'type-graphql'
-
 import { UserGQL } from './User'
 
 @ObjectType()
