@@ -1,11 +1,12 @@
 import { ApolloProvider } from '@apollo/client'
 import { useRouter } from 'next/dist/client/router'
-import React from 'react'
 import { toastifyConfig } from '../../shared/toastifyConfig'
 import { apolloClient } from '../graphql/apolloClient'
 import { ChakraLayout } from './layout/ChakraLayout'
 import { ToastContainer, ToastTransitionProps } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
+import { chakraCustomTheme } from '../lib/chakraTheme'
+import { ChakraProvider } from '@chakra-ui/react'
 
 function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
   const router = useRouter()
@@ -16,14 +17,15 @@ function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
 
   return (
     <ApolloProvider client={apolloClient}>
-      <ChakraLayout>
-        {/* @ts-expect-error */}
-        <ToastContainer
-          {...(toastifyConfig('bottom-right') as ToastTransitionProps)}
-        />
-
-        <Component {...pageProps} />
-      </ChakraLayout>
+      <ChakraProvider theme={chakraCustomTheme}>
+        <ChakraLayout>
+          {/* @ts-expect-error */}
+          <ToastContainer
+            {...(toastifyConfig('bottom-right') as ToastTransitionProps)}
+          />
+          <Component {...pageProps} />
+        </ChakraLayout>
+      </ChakraProvider>
     </ApolloProvider>
   )
 }

@@ -341,6 +341,7 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
+  createCheckoutSession(product: String!): String!
 }
 
 type UserMutation {
@@ -387,6 +388,7 @@ type UserMutation {
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
+  createCheckoutSession(product: String!): String!
 }
 
 type DeviceMutation {

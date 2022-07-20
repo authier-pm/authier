@@ -341,6 +341,7 @@ export type MasterDeviceChangeGql = {
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
+  createCheckoutSession: Scalars['String'];
   currentDevice: DeviceMutation;
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
@@ -357,6 +358,11 @@ export type Mutation = {
 
 export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>;
+};
+
+
+export type MutationCreateCheckoutSessionArgs = {
+  product: Scalars['String'];
 };
 
 
@@ -519,6 +525,7 @@ export type UserMutation = {
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
   autofill: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
+  createCheckoutSession: Scalars['String'];
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
@@ -558,6 +565,11 @@ export type UserMutationAddEncryptedSecretsArgs = {
 
 export type UserMutationChangeMasterPasswordArgs = {
   input: ChangeMasterPasswordInput;
+};
+
+
+export type UserMutationCreateCheckoutSessionArgs = {
+  product: Scalars['String'];
 };
 
 

@@ -1,4 +1,4 @@
-#### Device management
+### Device management
 
 |                                                                                                                         | bitwarden | authier | 1password |
 | ----------------------------------------------------------------------------------------------------------------------- | --------- | ------- | --------- |
@@ -19,7 +19,7 @@
 
 &nbsp;
 
-#### Login credentials
+### Login credentials
 
 ---
 
@@ -42,7 +42,7 @@
 
 &nbsp;
 
-#### 2 FA features
+### 2 FA features
 
 ---
 
