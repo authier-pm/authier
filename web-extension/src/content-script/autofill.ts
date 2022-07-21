@@ -12,6 +12,7 @@ import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { debounce } from 'lodash'
+import { renderLoginCredOption } from './renderLoginCredOption'
 
 const log = debug('au:autofill')
 
@@ -74,10 +75,10 @@ export const autofill = (initState: IInitStateRes) => {
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
-  // Should be renamed on scanOnInputs?
+  //? Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
-    //Distinguish between register and login from by the number of inputs
-    //Then Distinguish between phased and not phased
+    //?Distinguish between register and login from by the number of inputs
+    //?Then Distinguish between phased and not phased
 
     const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
@@ -135,6 +136,9 @@ export const autofill = (initState: IInitStateRes) => {
     ) {
       const autofillResult = searchInputsAndAutofill(document.body)
       log('autofillResult', autofillResult)
+    } else {
+      log('Choose')
+      renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
     }
 
     if (onInputAddedHandler) {
@@ -221,6 +225,10 @@ export const autofill = (initState: IInitStateRes) => {
           for (let j = index - 1; j >= 0; j--) {
             if (inputElsArray[j].type !== 'hidden') {
               log('found username input', inputElsArray[j])
+
+              //! check here if we have more choices and then prompt the user to choose
+              //! we will have to add parameter to this function to be able to tell difference
+
               const autofilledElUsername = autofillValueIntoInput(
                 inputElsArray[j],
                 secretsForHost.loginCredentials[0].loginCredentials.username

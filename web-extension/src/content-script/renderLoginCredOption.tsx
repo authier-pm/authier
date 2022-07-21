@@ -27,6 +27,7 @@ export function renderLoginCredOption(
     createdAt: string
   }>
 ) {
+  console.log('PEPA')
   promptOption = document.createElement('div')
   render(
     <PromptPasswordOption

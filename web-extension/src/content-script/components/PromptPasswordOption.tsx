@@ -27,6 +27,7 @@ export const PromptPasswordOption = ({
   }>
 }) => {
   if (webInputs.length === 0) {
+    console.log('No web inputs in PromptPasswordOption')
     return null
   }
   console.log('GOT in option prompt', { webInputs, loginCredentials })
@@ -46,6 +47,7 @@ export const PromptPasswordOption = ({
     }
   }
   if (!pos) {
+    console.log('No pos in PromptPasswordOption')
     return null
   }
 
