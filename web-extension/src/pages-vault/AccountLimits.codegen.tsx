@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type MeExtensionQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MeExtensionQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string } | null };
+export type MeExtensionQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string } };
 
 
 export const MeExtensionDocument = gql`

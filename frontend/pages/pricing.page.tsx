@@ -89,8 +89,7 @@ export default function PricingPage() {
     //Create a Checkout Session.
     const response = await createCheckoutSessionMutation({
       variables: {
-        product: type,
-        userId: userId as string
+        product: type
       }
     })
 

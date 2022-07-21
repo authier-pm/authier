@@ -16,5 +16,9 @@ export enum BackgroundMessageType {
   hideLoginCredentialsModal = 'hideLoginCredentialsModal',
   saveLoginCredentialsModalShown = 'saveLoginCredentialsModalShown',
   saveCapturedInputEvents = 'saveCapturedInputEvents',
-  getCapturedInputEvents = 'getCapturedInputEvents'
+  getCapturedInputEvents = 'getCapturedInputEvents',
+  getLockInterval = 'getLockInterval',
+  setLockInterval = 'setLockInterval',
+  clearLockInterval = 'clearLockInterval',
+  setDeviceState = 'setDeviceState'
 }

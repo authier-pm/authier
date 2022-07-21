@@ -1,12 +1,5 @@
-import React, {
-  useContext,
-  useEffect,
-  useReducer,
-  useRef,
-  useState
-} from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {
-  Avatar,
   Box,
   Button,
   Flex,
@@ -16,28 +9,27 @@ import {
   useClipboard,
   Text,
   Heading,
-  IconButton,
   useColorModeValue
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
-import { CopyIcon, EditIcon, NotAllowedIcon } from '@chakra-ui/icons'
+import { CopyIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
 
-import { extractHostname } from '../util/extractHostname'
-import { useAddOtpEventMutation } from './AuthList.codegen'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
-import { SecretItemIcon } from './SecretItemIcon'
-import { SecretSerializedType } from '@src/background/backgroundPage'
+import { SecretItemIcon } from '../SecretItemIcon'
+import { extractHostname } from '@src/util/extractHostname'
+import { useAddOtpEventMutation } from './AuthList.codegen'
+
 const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
-  const [addOTPEvent, { data, loading, error }] = useAddOtpEventMutation() //ignore results??
+  const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
   const otpCode = authenticator.generate(totpData.totp)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)

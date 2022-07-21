@@ -12,15 +12,15 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import { GraphQLEmailAddress } from 'graphql-scalars'
+import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import { UserGQL } from './generated/User'
 
-import { SettingsConfigGQL } from './generated/SettingsConfig'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
+import { ChangeMasterPasswordInput } from './AuthInputs'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -65,7 +65,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => DeviceQuery)
-  async device(@Ctx() ctx: IContext, id: string) {
+  async device(@Ctx() ctx: IContext, @Arg('id', () => GraphQLUUID) id: string) {
     return ctx.prisma.device.findFirst({
       where: {
         userId: this.id,
@@ -112,16 +112,6 @@ export class UserQuery extends UserBase {
   @Field(() => [EmailVerificationGQLScalars])
   async emailVerifications() {
     return prismaClient.emailVerification.findMany({
-      where: {
-        userId: this.id
-      }
-    })
-  }
-
-  //Call this from the findFirst query in me??
-  @Field(() => SettingsConfigGQL)
-  async settings() {
-    return prismaClient.settingsConfig.findFirst({
       where: {
         userId: this.id
       }

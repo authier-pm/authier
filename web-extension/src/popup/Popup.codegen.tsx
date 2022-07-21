@@ -3,11 +3,6 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type SettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
-
-
-export type SettingsQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', settings: { __typename?: 'SettingsConfigGQL', lockTime: number, twoFA: boolean, noHandsLogin: boolean, homeUI: string } } | null };
-
 export type SendAuthMessageQueryVariables = Types.Exact<{
   device: Types.Scalars['String'];
   time: Types.Scalars['DateTime'];
@@ -16,7 +11,7 @@ export type SendAuthMessageQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendAuthMessageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', sendAuthMessage: boolean } | null };
+export type SendAuthMessageQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', sendAuthMessage: boolean } };
 
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
   firebaseToken: Types.Scalars['String'];
@@ -26,45 +21,6 @@ export type SaveFirebaseTokenMutationVariables = Types.Exact<{
 export type SaveFirebaseTokenMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateFireToken: { __typename?: 'DeviceGQL', id: string } } };
 
 
-export const SettingsDocument = gql`
-    query settings {
-  me {
-    settings {
-      lockTime
-      twoFA
-      noHandsLogin
-      homeUI
-    }
-  }
-}
-    `;
-
-/**
- * __useSettingsQuery__
- *
- * To run a query within a React component, call `useSettingsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useSettingsQuery({
- *   variables: {
- *   },
- * });
- */
-export function useSettingsQuery(baseOptions?: Apollo.QueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
-      }
-export function useSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SettingsQuery, SettingsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SettingsQuery, SettingsQueryVariables>(SettingsDocument, options);
-        }
-export type SettingsQueryHookResult = ReturnType<typeof useSettingsQuery>;
-export type SettingsLazyQueryHookResult = ReturnType<typeof useSettingsLazyQuery>;
-export type SettingsQueryResult = Apollo.QueryResult<SettingsQuery, SettingsQueryVariables>;
 export const SendAuthMessageDocument = gql`
     query sendAuthMessage($device: String!, $time: DateTime!, $location: String!, $pageName: String!) {
   me {

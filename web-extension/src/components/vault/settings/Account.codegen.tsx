@@ -16,7 +16,7 @@ export type ChangeMasterPasswordMutation = { __typename?: 'Mutation', me: { __ty
 export type AccountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type AccountQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null } | null } | null };
+export type AccountQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null } | null } };
 
 export type ResendEmailVerificationMutationVariables = Types.Exact<{ [key: string]: never; }>;
 

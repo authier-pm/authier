@@ -1,14 +1,3 @@
-query settings {
-  me {
-    settings {
-      lockTime
-      twoFA
-      noHandsLogin
-      homeUI
-    }
-  }
-}
-
 query sendAuthMessage(
   $device: String!
   $time: DateTime!

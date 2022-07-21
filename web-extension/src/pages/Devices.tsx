@@ -11,15 +11,15 @@ import {
   Tooltip
 } from '@chakra-ui/react'
 import { DeleteIcon, StarIcon } from '@chakra-ui/icons'
-import { UserContext } from '@src/providers/UserProvider'
-import React, { useContext } from 'react'
+
+import React from 'react'
 import { IoIosPhonePortrait } from 'react-icons/io'
 import { useLocation } from 'wouter'
 import { useMyDevicesQuery } from './Devices.codegen'
 
 export default function Devices() {
-  const [location, setLocation] = useLocation()
-  const { userId } = useContext(UserContext)
+  const [setLocation] = useLocation()
+
   const { data, loading, error } = useMyDevicesQuery()
 
   return (
@@ -73,7 +73,7 @@ export default function Devices() {
 
       <Button
         onClick={() => {
-          setLocation('/qr-code')
+          //setLocation('/qr-code')
         }}
       >
         Add device

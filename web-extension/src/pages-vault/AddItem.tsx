@@ -1,14 +1,5 @@
-import {
-  Box,
-  Center,
-  Heading,
-  Stack,
-  useColorModeValue,
-  Button,
-  Flex,
-  Select
-} from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import { useColorModeValue, Flex, Select } from '@chakra-ui/react'
+import React, { useState } from 'react'
 
 import { motion } from 'framer-motion'
 

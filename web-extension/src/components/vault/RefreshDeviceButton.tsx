@@ -1,7 +1,6 @@
 import React, { useState } from 'react'
 import { IconButton, Tooltip } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
-import { device } from '@src/background/ExtensionDevice'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 

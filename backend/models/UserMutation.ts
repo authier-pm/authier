@@ -4,10 +4,10 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput } from './models'
-import * as admin from 'firebase-admin'
+import { EncryptedSecretInput, SettingsInput } from './models'
+
 import { UserGQL } from './generated/User'
-import { SettingsConfigGQL } from './generated/SettingsConfig'
+
 import { DeviceGQL } from './generated/Device'
 import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
@@ -25,6 +25,7 @@ import { DeviceMutation } from './Device'
 import { stripe } from '../stripe'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
+import { MasterDeviceChangeGQL } from './generated/MasterDeviceChange'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -145,31 +146,30 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => SettingsConfigGQL)
+  @Field(() => UserGQL)
   async updateSettings(
-    @Arg('twoFA', () => Boolean) twoFA: boolean,
-    @Arg('homeUI', () => String) homeUI: string,
-    @Arg('lockTime', () => Int) lockTime: number,
-    @Arg('noHandsLogin', () => Boolean) noHandsLogin: boolean,
-    @Ctx() ctx: IContext
+    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    return ctx.prisma.settingsConfig.upsert({
+    return await ctx.prisma.user.update({
       where: {
-        userId: this.id
+        id: this.id
       },
-      update: {
-        homeUI: homeUI,
-        lockTime: lockTime,
-        noHandsLogin: noHandsLogin,
-        twoFA: twoFA,
-        userId: this.id
-      },
-      create: {
-        userId: this.id,
-        homeUI: homeUI,
-        lockTime: lockTime,
-        noHandsLogin: noHandsLogin,
-        twoFA: twoFA
+      data: {
+        autofill: config.autofill,
+        language: config.language,
+        theme: config.theme,
+        Devices: {
+          update: {
+            where: {
+              id: ctx.device.id
+            },
+            data: {
+              syncTOTP: config.syncTOTP,
+              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+            }
+          }
+        }
       }
     })
   }
@@ -224,38 +224,6 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => Boolean)
-  async approveDevice(
-    @Arg('success', () => Boolean) success: boolean,
-    @Ctx() ctx: IContext
-  ) {
-    // TODO check current device is master
-    const user = await ctx.prisma.user.findFirst({
-      where: {
-        id: this.id
-      }
-    })
-    if (user?.masterDeviceId) {
-      const device = await ctx.prisma.device.findFirst({
-        where: {
-          id: user?.masterDeviceId
-        }
-      })
-
-      await admin.messaging().sendToDevice(
-        device?.firebaseToken as string,
-        {
-          data: {
-            success: success.toString()
-          }
-        },
-        {}
-      )
-
-      return true
-    }
-  }
-
   @Field(() => GraphQLPositiveInt)
   async changeMasterPassword(
     @Arg('input', () => ChangeMasterPasswordInput)
@@ -301,6 +269,31 @@ export class UserMutation extends UserBase {
       where: {
         id,
         userId: ctx.jwtPayload.userId
+      }
+    })
+  }
+
+  @Field(() => MasterDeviceChangeGQL)
+  async setMasterDevice(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string
+  ) {
+    if (ctx.device.id !== ctx.masterDeviceId) {
+      throw new Error('This can be done only from master device')
+    }
+    return ctx.prisma.user.update({
+      where: {
+        id: ctx.jwtPayload.userId
+      },
+      data: {
+        masterDeviceId: newMasterDeviceId,
+        MasterDeviceChange: {
+          create: {
+            oldDeviceId: ctx.masterDeviceId,
+            newDeviceId: newMasterDeviceId,
+            processAt: new Date()
+          }
+        }
       }
     })
   }

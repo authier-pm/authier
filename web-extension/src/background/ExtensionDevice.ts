@@ -11,7 +11,8 @@ import {
 } from './backgroundPage'
 import {
   EncryptedSecretPatchInput,
-  EncryptedSecretType
+  EncryptedSecretType,
+  SettingsInput
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -35,7 +36,6 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
-import ms from 'ms'
 
 export const log = debug('au:Device')
 
@@ -87,7 +87,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
-    log('device state created', this)
+    //log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
     this.decryptedSecrets = this.getAllSecretsDecrypted()
@@ -100,7 +100,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = ms('30m')
+  lockTime: number
+  autofill: boolean
+  language: string
+  theme: string
+  syncTOTP: boolean
   authSecret: string
   authSecretEncrypted: string
 
@@ -134,9 +138,10 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
+    console.log('SAVE DEVICE STATE', this)
+    browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = this.getAllSecretsDecrypted()
-    browser.storage.onChanged.removeListener(this.onStorageChange)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
@@ -348,6 +353,20 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
+
+  async startLockInterval(lockTime: number) {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.setLockInterval,
+      time: lockTime
+    })
+  }
+
+  async clearLockInterval() {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.clearLockInterval
+    })
+  }
+
   get platform() {
     return browserInfo.getOSName()
   }
@@ -355,6 +374,7 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
+    log('Extension device initializing')
     this.id = await this.getDeviceId()
 
     let storedState: IBackgroundStateSerializable | null = null
@@ -362,6 +382,7 @@ class ExtensionDevice {
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
       storedState = storage.backgroundState
+
       log('device state init from storage', storedState)
     } else if (storage.lockedState) {
       this.lockedState = storage.lockedState
@@ -371,14 +392,19 @@ class ExtensionDevice {
     if (storedState) {
       this.state = new DeviceState(storedState)
       this.name = storedState.deviceName
+      this.state.save()
     } else {
       this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
 
+    if (this.state) {
+      this.startLockInterval(this.state.lockTime)
+    }
+
     // const fireToken = await generateFireToken()
     const fireToken = 'aaaa'
-    console.log('~ fireToken', fireToken)
+
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
@@ -393,6 +419,9 @@ class ExtensionDevice {
       log('storage change UL', changes, areaName)
       if (areaName === 'local' && changes.backgroundState) {
         this.state = new DeviceState(changes.backgroundState.newValue)
+        browser.storage.onChanged.removeListener(onStorageChangeLogin)
+      } else if (areaName === 'local' && changes.lockedState) {
+        this.lockedState = changes.lockedState.newValue
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
@@ -465,11 +494,26 @@ class ExtensionDevice {
 
   async lock() {
     if (!this.state) {
-      return
+      throw new Error('no state to lock')
     }
+
+    this.clearLockInterval()
+
     log('locking device')
 
-    const { email, userId, secrets, encryptionSalt } = this.state
+    const {
+      email,
+      userId,
+      secrets,
+      encryptionSalt,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme,
+      authSecret,
+      authSecretEncrypted
+    } = this.state
 
     this.lockedState = {
       email,
@@ -477,8 +521,13 @@ class ExtensionDevice {
       secrets,
       deviceName: this.name,
       encryptionSalt,
-      authSecret: this.state.authSecret,
-      authSecretEncrypted: this.state.authSecretEncrypted
+      authSecret,
+      authSecretEncrypted,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,
@@ -495,8 +544,8 @@ class ExtensionDevice {
     await removeToken()
     await device.clearLocalStorage()
 
-    //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-    //device.listenForUserLogin()
+    device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    device.listenForUserLogin()
     browser.runtime.reload()
   }
 
@@ -549,13 +598,23 @@ class ExtensionDevice {
     })
   }
 
+  syncSettings(config: SettingsInput) {
+    if (this.state) {
+      this.state.autofill = config.autofill
+      this.state.lockTime = config.vaultLockTimeoutSeconds
+      this.state.syncTOTP = config.syncTOTP
+      this.state.language = config.language
+      this.state.theme = config.theme
+    }
+  }
+
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     this.state.save()
     this.rerenderViews()
   }
 }
-
+log('Extension device started')
 export const device = new ExtensionDevice()
 
 device.initialize()
