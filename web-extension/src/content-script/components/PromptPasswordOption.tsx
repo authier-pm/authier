@@ -1,31 +1,19 @@
-// @ts-nocheck
-
 import { h } from 'preact'
-import { ILoginSecret } from '../../util/useDeviceState'
-import { WebInputType } from '../../../../shared/generated/graphqlBaseTypes'
-import { useState, useEffect } from 'preact/hooks'
-import { promptOption } from '../renderLoginCredOption'
+
+import { useState } from 'preact/hooks'
+import {
+  promptOption,
+  PromptPasswordOptionProps
+} from '../renderLoginCredOption'
+
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Option.css'
-import { autofill } from '../autofill'
+import { autofill, autofillEnabled } from '../autofill'
 
-export const PromptPasswordOption = ({
-  loginCredentials,
-  webInputs
-}: {
-  loginCredentials: ILoginSecret[]
-  webInputs: Array<{
-    __typename?: 'WebInputGQL'
-    id: number
-    url: string
-    host: string
-    domPath: string
-    kind: WebInputType
-    createdAt: string
-  }>
-}) => {
+export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
+  let { loginCredentials, webInputs } = props
   if (webInputs.length === 0) {
     console.log('No web inputs in PromptPasswordOption')
     return null
@@ -42,7 +30,7 @@ export const PromptPasswordOption = ({
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(function () {
         setPos(el?.getBoundingClientRect())
-        document.body.appendChild(promptOption)
+        document.body.appendChild(promptOption!)
       }, 100)
     }
   }
@@ -81,7 +69,7 @@ export const PromptPasswordOption = ({
                     saveLoginModalsState: undefined,
                     webInputs: webInputs
                   },
-                  true
+                  false
                 )
               }}
             >

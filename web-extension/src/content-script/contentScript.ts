@@ -42,7 +42,7 @@ export interface IInitStateRes {
   secretsForHost: IDecryptedSecrets
   webInputs: Array<{
     __typename?: 'WebInputGQL'
-    id: number
+    id?: number
     url: string
     host: string
     domPath: string
@@ -177,7 +177,10 @@ export async function initInputWatch() {
   }
 
   if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
-    renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
+    renderLoginCredOption({
+      loginCredentials: secretsForHost.loginCredentials,
+      webInputs
+    })
     return
   }
   const stopAutofillListener = autofill(stateInitRes)
@@ -202,7 +205,6 @@ export async function initInputWatch() {
     }
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
-    log('showSavePromptIfAppropriate', username, password)
 
     const existingCredentialWithSamePassword =
       secretsForHost?.loginCredentials.find(
@@ -222,6 +224,7 @@ export async function initInputWatch() {
   }
 
   const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
+    log('onSubmit Called')
     domRecorder.addInputEvent({
       element,
       eventType: 'submit',
@@ -245,6 +248,7 @@ export async function initInputWatch() {
       onSubmit(input)
     }
   }
+
   bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
 
   /**
@@ -360,11 +364,13 @@ export async function initInputWatch() {
   }
 }
 
-document.addEventListener('readystatechange', (event) => {
-  if (
-    event.target instanceof Document &&
-    event.target?.readyState === 'complete'
-  ) {
-    initInputWatch()
-  }
-})
+initInputWatch()
+
+// document.addEventListener('readystatechange', (event) => {
+//   if (
+//     event.target instanceof Document &&
+//     event.target?.readyState === 'complete'
+//   ) {
+//     initInputWatch()
+//   }
+// })

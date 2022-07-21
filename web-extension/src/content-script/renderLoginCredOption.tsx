@@ -1,9 +1,3 @@
-// @ts-nocheck
-
-import { PromptPassword } from './components/PromptPassword'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
-import { domRecorder } from './contentScript'
 import { ILoginSecret } from '../util/useDeviceState'
 
 import { h, render } from 'preact'
@@ -15,24 +9,26 @@ const nano = h
 
 export let promptOption: HTMLDivElement | null
 
-export function renderLoginCredOption(
-  loginCredentials: ILoginSecret[],
+export type PromptPasswordOptionProps = {
+  loginCredentials: ILoginSecret[]
   webInputs: Array<{
     __typename?: 'WebInputGQL'
-    id: number
+    id?: number
     url: string
     host: string
     domPath: string
     kind: WebInputType
     createdAt: string
   }>
-) {
+}
+
+export function renderLoginCredOption(props: PromptPasswordOptionProps) {
   console.log('PEPA')
   promptOption = document.createElement('div')
   render(
     <PromptPasswordOption
-      loginCredentials={loginCredentials}
-      webInputs={webInputs}
+      loginCredentials={props.loginCredentials}
+      webInputs={props.webInputs}
     />,
     promptOption
   )

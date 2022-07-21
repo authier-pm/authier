@@ -592,7 +592,7 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
-  domOrdinal: PositiveInt!
+  domOrdinal: Int!
   url: String!
   kind: WebInputType!
 }

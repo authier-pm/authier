@@ -168,7 +168,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       })
 
-      break
+      return true
 
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {

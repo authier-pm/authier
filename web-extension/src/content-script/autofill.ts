@@ -1,10 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { bodyInputChangeEmitter } from './domMutationObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-
+import browser from 'webextension-polyfill'
 import { isElementInViewport, isHidden } from './isElementInViewport'
 import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
@@ -13,12 +12,23 @@ import { toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
+import { getSelectorForElement } from './DOMEventsRecorder'
+import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
+import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 const log = debug('au:autofill')
 
 export type IDecryptedSecrets = {
   loginCredentials: ILoginSecret[]
   totpSecrets: ITOTPSecret[]
+}
+
+type webInput = {
+  url: string
+  host: string
+  domPath: string
+  kind: WebInputType
+  createdAt: string
 }
 
 export const autofillEventsDispatched = new Set()
@@ -62,7 +72,7 @@ const uselessInputTypes = [
 export let autofillEnabled = false
 let onInputAddedHandler
 
-export const autofill = (initState: IInitStateRes) => {
+export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const { secretsForHost, webInputs } = initState
 
   if (autofillEnabled === true) {
@@ -77,18 +87,7 @@ export const autofill = (initState: IInitStateRes) => {
 
   //? Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
-    //?Distinguish between register and login from by the number of inputs
-    //?Then Distinguish between phased and not phased
-
-    const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
-      (el) => uselessInputTypes.find((type) => type === el.type) === undefined
-    )
-
-    if (usefulInputs.length > 2) {
-      // TODO Autofill register form if present
-    }
-
-    //Fill known inputs
+    //!Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
         const host = new URL(url).host
@@ -129,16 +128,19 @@ export const autofill = (initState: IInitStateRes) => {
       })
       .filter((el) => !!el)
 
-    //Guess web input, if you have credentials
-    if (
-      webInputs.length === 0 &&
-      secretsForHost.loginCredentials.length === 1
-    ) {
+    //!Guess web inputs, if you have credentials
+    if (webInputs.length === 0) {
       const autofillResult = searchInputsAndAutofill(document.body)
+      if (autofillResult) {
+        browser.runtime.sendMessage({
+          action: BackgroundMessageType.saveCapturedInputEvents,
+          payload: {
+            inputEvents: domRecorder.toJSON(),
+            url: document.documentURI
+          }
+        })
+      }
       log('autofillResult', autofillResult)
-    } else {
-      log('Choose')
-      renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
     }
 
     if (onInputAddedHandler) {
@@ -183,12 +185,13 @@ export const autofill = (initState: IInitStateRes) => {
     bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
 
     if (!namePassSecret && !totpSecret) {
+      log('no secrets for host')
       return () => {}
     }
 
     if (filledElements.length === 2) {
       const form = filledElements[0]?.form
-      log('filled both', form)
+      log('filled both', domRecorder.toJSON())
       if (form) {
         // TODO try to submit the form
         // filledElements[0]?.form?.dispatchEvent(
@@ -213,6 +216,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     function searchInputsAndAutofill(documentBody: HTMLElement) {
+      let newWebInputs: webInput[] = []
       const inputEls = documentBody.querySelectorAll('input')
       const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
         (el) => uselessInputTypes.includes(el.type) === false
@@ -221,13 +225,51 @@ export const autofill = (initState: IInitStateRes) => {
       for (let index = 0; index < inputElsArray.length; index++) {
         const input = inputElsArray[index]
         if (input.type === 'password') {
+          if (
+            webInputs.length === 0 &&
+            secretsForHost.loginCredentials.length > 1
+          ) {
+            newWebInputs.push({
+              createdAt: new Date().toString(),
+              domPath: getSelectorForElement(input).css,
+              host: location.host,
+              url: location.href,
+              kind: WebInputType.PASSWORD
+            })
+
+            domRecorder.addInputEvent({
+              element: input,
+              eventType: 'input',
+              kind: WebInputType.PASSWORD,
+              inputted: input.value
+            })
+          }
           //Search for a username input
           for (let j = index - 1; j >= 0; j--) {
             if (inputElsArray[j].type !== 'hidden') {
               log('found username input', inputElsArray[j])
 
-              //! check here if we have more choices and then prompt the user to choose
-              //! we will have to add parameter to this function to be able to tell difference
+              if (
+                webInputs.length === 0 &&
+                secretsForHost.loginCredentials.length > 1
+              ) {
+                newWebInputs.push({
+                  createdAt: new Date().toString(),
+                  domPath: getSelectorForElement(inputElsArray[j]).css,
+                  host: location.host,
+                  url: location.href,
+                  kind: WebInputType.USERNAME
+                })
+
+                domRecorder.addInputEvent({
+                  element: inputElsArray[j],
+                  eventType: 'input',
+                  kind: WebInputType.USERNAME_OR_EMAIL,
+                  inputted: inputElsArray[j].value
+                })
+
+                break
+              }
 
               const autofilledElUsername = autofillValueIntoInput(
                 inputElsArray[j],
@@ -257,6 +299,21 @@ export const autofill = (initState: IInitStateRes) => {
               return !!autofilledElUsername || !!autofilledElPassword
             }
           }
+
+          //Let user choose which credential to use
+          if (
+            webInputs.length === 0 &&
+            secretsForHost.loginCredentials.length > 1
+          ) {
+            log('choose credential', domRecorder.toJSON())
+            renderLoginCredOption({
+              loginCredentials: secretsForHost.loginCredentials,
+              webInputs: newWebInputs
+            })
+
+            return true
+          }
+
           return false
         }
       }
