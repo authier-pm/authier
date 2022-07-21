@@ -22,7 +22,7 @@ export const ColorModeButton = () => {
             language: deviceState.language,
             syncTOTP: deviceState.syncTOTP,
             theme: deviceState.theme === 'light' ? 'dark' : 'light',
-            vaultLockTimeoutSeconds: parseInt(deviceState.lockTime)
+            vaultLockTimeoutSeconds: deviceState.lockTime
           }
 
           await updateSettings({

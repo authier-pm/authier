@@ -100,7 +100,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime: string
+  lockTime: number
   autofill: boolean
   language: string
   theme: string
@@ -354,7 +354,7 @@ class ExtensionDevice {
   id: string | null = null
   name: string
 
-  async startLockInterval(lockTime: string) {
+  async startLockInterval(lockTime: number) {
     await chrome.runtime.sendMessage({
       action: BackgroundMessageType.setLockInterval,
       time: lockTime
@@ -601,7 +601,7 @@ class ExtensionDevice {
   syncSettings(config: SettingsInput) {
     if (this.state) {
       this.state.autofill = config.autofill
-      this.state.lockTime = config.vaultLockTimeoutSeconds.toString()
+      this.state.lockTime = config.vaultLockTimeoutSeconds
       this.state.syncTOTP = config.syncTOTP
       this.state.language = config.language
       this.state.theme = config.theme

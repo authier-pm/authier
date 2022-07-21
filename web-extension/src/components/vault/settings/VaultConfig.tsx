@@ -59,7 +59,7 @@ export default function VaultConfig() {
                 language: device.state.language,
                 syncTOTP: device.state.syncTOTP,
                 theme: device.state.theme,
-                vaultLockTimeoutSeconds: parseInt(device.state.lockTime)
+                vaultLockTimeoutSeconds: device.state.lockTime
               }}
               onSubmit={async (
                 values: SettingsInput,

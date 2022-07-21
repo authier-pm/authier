@@ -143,7 +143,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
-    // TODO check current device is master
     const user = await ctx.prisma.user.findFirst({
       where: {
         id: ctx.jwtPayload.userId
