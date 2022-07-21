@@ -62,6 +62,7 @@ export interface IJWTPayload {
 export interface IContextAuthenticated extends IContext {
   jwtPayload: IJWTPayload
   device: Device
+  masterDeviceId: string | null | undefined
 }
 
 export interface IContextMaybeAuthenticated extends IContext {
@@ -107,7 +108,7 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
-  @Query(() => UserQuery, { nullable: true })
+  @Query(() => UserQuery)
   @Mutation(() => UserMutation, {
     description: 'you need to be authenticated to call this resolver',
     name: 'me',
@@ -123,10 +124,12 @@ export class RootResolver {
       rootModel: dmmf.modelMap.User
     })
 
-    return ctx.prisma.user.findUnique({
+    const tmp = await ctx.prisma.user.findUnique({
       where: { id: jwtPayload.userId },
       include
     })
+
+    return tmp
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
@@ -184,14 +187,6 @@ export class RootResolver {
               lastIpAddress: ipAddress,
               firebaseToken: firebaseToken,
               name: deviceName
-            }
-          },
-          SettingsConfigs: {
-            create: {
-              twoFA: true,
-              homeUI: 'all',
-              lockTime: 28800000,
-              noHandsLogin: false
             }
           }
         },
@@ -254,7 +249,7 @@ export class RootResolver {
     })
 
     if (!user) {
-      throw new GraphqlError('login failed')
+      throw new GraphqlError('Login failed, create a new account.')
     }
     const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
@@ -264,7 +259,7 @@ export class RootResolver {
       }
     })
     if (isBlocked) {
-      throw new GraphqlError('login failed')
+      throw new GraphqlError('Login failed, try again later.')
     }
 
     const inLastHour = await ctx.prisma.decryptionChallenge.count({
@@ -341,7 +336,7 @@ export class RootResolver {
       })
     }
 
-    // use has approved this device in the past, we can return the challenge including salt and encrypted secret
+    // user has approved this device in the past, we can return the challenge including salt and encrypted secret
     return plainToClass(DecryptionChallengeApproved, {
       ...challenge,
 

@@ -8,11 +8,10 @@ import {
   InputRightElement,
   Button,
   Spinner,
-  HStack,
-  Flex,
-  VStack
+  VStack,
+  useColorModeValue
 } from '@chakra-ui/react'
-import { Formik, FormikHelpers, Form, Field } from 'formik'
+import { Formik, FormikHelpers, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
@@ -20,7 +19,7 @@ import {
   useAccountQuery,
   useChangeMasterPasswordMutation
 } from './Account.codegen'
-import * as Yup from 'yup'
+
 import { useDeviceDecryptionChallengeMutation } from '../../../pages-vault/Login.codegen'
 import { toast } from 'react-toastify'
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
@@ -48,22 +47,6 @@ export default function Account() {
     confirmPassword: string
   }
 
-  const ChangePasswordSchema = Yup.object().shape({
-    newPassword: Yup.string()
-      .min(4, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('Required'),
-    currPassword: Yup.string()
-      .min(4, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('Required'),
-    confirmPassword: Yup.string()
-      .min(4, 'Too Short!')
-      .max(50, 'Too Long!')
-      .required('Required'),
-    email: Yup.string().email('Invalid email').required('Required')
-  })
-
   return (
     <motion.div
       animate={{ opacity: 1, y: 0 }}
@@ -71,19 +54,21 @@ export default function Account() {
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.35 }}
       style={{
-        width: '90%',
         display: 'contents'
       }}
     >
       <VStack
-        width={{ base: '90%', sm: '70%', md: '40%' }}
-        maxW="fit-content"
-        minH={'100vh'}
+        width={'70%'}
+        maxW="600px"
         alignItems={'normal'}
         spacing={20}
+        rounded={'lg'}
+        boxShadow={'lg'}
+        p={30}
+        bg={useColorModeValue('white', 'gray.800')}
       >
-        <Box textAlign="start" pt={5}>
-          <Heading as="h3" size="lg">
+        <Box>
+          <Heading as="h3" size="lg" mb={5}>
             Change master password
           </Heading>
           <Formik
@@ -97,6 +82,7 @@ export default function Account() {
               values: Values,
               { setSubmitting }: FormikHelpers<Values>
             ) => {
+              console.log(values.newPassword)
               if (
                 values.newPassword === values.confirmPassword &&
                 values.currPassword === device.state?.masterEncryptionKey
@@ -137,162 +123,144 @@ export default function Account() {
               return false
             }}
           >
-            {({ isSubmitting, dirty }) => (
-              <Form>
-                <Field name="email">
-                  {({ field, form }) => {
-                    return (
-                      <Flex>
-                        <FormControl
-                          isInvalid={form.errors.name && form.touched.name}
+            {({ isSubmitting, dirty, touched, handleSubmit, errors }) => (
+              <form onSubmit={handleSubmit}>
+                <VStack spacing={4} align="flex-start">
+                  <FormControl
+                    isRequired
+                    isInvalid={!!errors.email && touched.email}
+                  >
+                    <FormLabel htmlFor="email">
+                      Email
+                      <NbSp />
+                      {data?.me?.primaryEmailVerification?.verifiedAt ? (
+                        <CheckIcon boxSize={18} />
+                      ) : (
+                        <WarningIcon boxSize={18} />
+                      )}
+                    </FormLabel>
+                    <Field as={Input} id="email" name="email" type="email" />
+                    <FormErrorMessage>{errors.email}</FormErrorMessage>
+                  </FormControl>
+
+                  {/*  */}
+
+                  <FormControl
+                    isRequired
+                    isInvalid={!!errors.currPassword && touched.currPassword}
+                  >
+                    <FormLabel htmlFor="currPassword">
+                      <Trans>Current password</Trans>
+                    </FormLabel>
+
+                    <InputGroup size="md">
+                      <Field
+                        as={Input}
+                        pr="4.5rem"
+                        type={showCurr ? 'text' : 'password'}
+                        placeholder="Master password"
+                        id="currPassword"
+                        name="currPassword"
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={() => setShowCurr(!showCurr)}
                         >
-                          <FormLabel htmlFor="email">
-                            Email
-                            <NbSp />
-                            {data?.me?.primaryEmailVerification?.verifiedAt ? (
-                              <CheckIcon boxSize={18} />
-                            ) : (
-                              <WarningIcon boxSize={18} />
-                            )}
-                          </FormLabel>
+                          {showCurr ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
 
-                          <Input id="email" {...field} required />
+                    <FormErrorMessage>{errors.currPassword}</FormErrorMessage>
+                  </FormControl>
 
-                          <FormErrorMessage>
-                            {form.errors.name}
-                          </FormErrorMessage>
-                        </FormControl>
-                      </Flex>
-                    )
-                  }}
-                </Field>
+                  {/*  */}
 
-                <VStack pt={6}>
-                  <Box as={Field} name="currPassword">
-                    {/* @ts-expect-error */}
-                    {({ field, form }) => (
-                      <FormControl
-                        isRequired
-                        isInvalid={form.errors.name && form.touched.name}
-                      >
-                        <FormLabel htmlFor="currPassword">
-                          <Trans>Current password</Trans>
-                        </FormLabel>
+                  <FormControl
+                    isRequired
+                    isInvalid={!!errors.newPassword && touched.newPassword}
+                  >
+                    <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
+                      <Trans>Set new Master password</Trans>
+                    </FormLabel>
 
-                        <InputGroup size="md">
-                          <Input
-                            pr="4.5rem"
-                            type={showCurr ? 'text' : 'password'}
-                            placeholder="Master password"
-                            id="Current password"
-                            {...field}
-                            required
-                          />
-                          <InputRightElement width="4.5rem">
-                            <Button
-                              h="1.75rem"
-                              size="sm"
-                              onClick={() => setShowCurr(!showCurr)}
-                            >
-                              {showCurr ? 'Hide' : 'Show'}
-                            </Button>
-                          </InputRightElement>
-                        </InputGroup>
-
-                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                      </FormControl>
-                    )}
-                  </Box>
-
-                  <Box as={Field} name="newPassword">
-                    {/* @ts-expect-error */}
-                    {({ field, form }) => (
-                      <FormControl
-                        isRequired
-                        isInvalid={form.errors.name && form.touched.name}
-                      >
-                        <FormLabel htmlFor="newPassword" whiteSpace={'nowrap'}>
-                          <Trans>Set new Master password</Trans>
-                        </FormLabel>
-
-                        <InputGroup size="md">
-                          <Input
-                            pr="4.5rem"
-                            type={showNew ? 'text' : 'password'}
-                            placeholder="Master password"
-                            id="newPassword"
-                            {...field}
-                            required
-                          />
-                          <InputRightElement width="4.5rem">
-                            <Button
-                              h="1.75rem"
-                              size="sm"
-                              onClick={() => setShownNew(!showNew)}
-                            >
-                              {showNew ? 'Hide' : 'Show'}
-                            </Button>
-                          </InputRightElement>
-                        </InputGroup>
-
-                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                      </FormControl>
-                    )}
-                  </Box>
-
-                  <Box as={Field} name="confirmPassword">
-                    {/* @ts-expect-error */}
-                    {({ field, form }) => (
-                      <FormControl
-                        isRequired
-                        isInvalid={form.errors.name && form.touched.name}
-                      >
-                        <FormLabel
-                          htmlFor="confirmPassword"
-                          whiteSpace={'nowrap'}
+                    <InputGroup size="md">
+                      <Field
+                        as={Input}
+                        pr="4.5rem"
+                        type={showNew ? 'text' : 'password'}
+                        placeholder="New master password"
+                        id="newPassword"
+                        name="newPassword"
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={() => setShownNew(!showNew)}
                         >
-                          <Trans>Confirm new password</Trans>
-                        </FormLabel>
+                          {showNew ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
 
-                        <InputGroup size="md">
-                          <Input
-                            pr="4.5rem"
-                            type={showPass ? 'text' : 'password'}
-                            placeholder="Confirm password"
-                            id="confirmPassword"
-                            {...field}
-                            required
-                          />
-                          <InputRightElement width="4.5rem">
-                            <Button
-                              h="1.75rem"
-                              size="sm"
-                              onClick={() => setShowPass(!showPass)}
-                            >
-                              {showPass ? 'Hide' : 'Show'}
-                            </Button>
-                          </InputRightElement>
-                        </InputGroup>
+                    <FormErrorMessage>{errors.newPassword}</FormErrorMessage>
+                  </FormControl>
 
-                        <FormErrorMessage>{form.errors.name}</FormErrorMessage>
-                      </FormControl>
-                    )}
-                  </Box>
+                  {/*  */}
+
+                  <FormControl
+                    isRequired
+                    isInvalid={
+                      !!errors.confirmPassword && touched.confirmPassword
+                    }
+                  >
+                    <FormLabel htmlFor="confirmPassword" whiteSpace={'nowrap'}>
+                      <Trans>Confirm new password</Trans>
+                    </FormLabel>
+
+                    <InputGroup size="md">
+                      <Field
+                        as={Input}
+                        pr="4.5rem"
+                        type={showPass ? 'text' : 'password'}
+                        placeholder="Confirm password"
+                        id="confirmPassword"
+                        name="confirmPassword"
+                      />
+                      <InputRightElement width="4.5rem">
+                        <Button
+                          h="1.75rem"
+                          size="sm"
+                          onClick={() => setShowPass(!showPass)}
+                        >
+                          {showPass ? 'Hide' : 'Show'}
+                        </Button>
+                      </InputRightElement>
+                    </InputGroup>
+
+                    <FormErrorMessage>
+                      {errors.confirmPassword}
+                    </FormErrorMessage>
+                  </FormControl>
+
+                  <Button
+                    mt={4}
+                    colorScheme="teal"
+                    disabled={isSubmitting || !dirty}
+                    isLoading={isSubmitting}
+                    type="submit"
+                  >
+                    <Trans>Set master password</Trans>
+                  </Button>
                 </VStack>
-
-                <Button
-                  mt={4}
-                  colorScheme="teal"
-                  disabled={isSubmitting || !dirty}
-                  isLoading={isSubmitting}
-                  type="submit"
-                >
-                  <Trans>Set master password</Trans>
-                </Button>
-              </Form>
+              </form>
             )}
           </Formik>
         </Box>
+
         <Box>
           <Heading as="h3" size="lg" color={'red'}>
             Delete account

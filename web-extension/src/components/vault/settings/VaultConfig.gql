@@ -1,0 +1,21 @@
+query SyncSettings {
+  me {
+    id
+    autofill
+    language
+    theme
+  }
+  currentDevice {
+    id
+    syncTOTP
+    vaultLockTimeoutSeconds
+  }
+}
+
+mutation updateSettings($config: SettingsInput!) {
+  me {
+    updateSettings(config: $config) {
+      id
+    }
+  }
+}

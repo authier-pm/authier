@@ -3,10 +3,17 @@ import * as Types from '../../../shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type DevicesPageQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DevicesRequestsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesPageQuery = { __typename?: 'Query', me?: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } | null };
+export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: any }> } };
+
+export type ChangeMasterDeviceMutationVariables = Types.Exact<{
+  newMasterDeviceId: Types.Scalars['String'];
+}>;
+
+
+export type ChangeMasterDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', setMasterDevice: { __typename?: 'MasterDeviceChangeGQL', id: string } } };
 
 export type ApproveChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int'];
@@ -23,8 +30,8 @@ export type RejectChallengeMutationVariables = Types.Exact<{
 export type RejectChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', id: string, decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', reject: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
 
 
-export const DevicesPageDocument = gql`
-    query DevicesPage {
+export const DevicesRequestsDocument = gql`
+    query DevicesRequests {
   me {
     id
     masterDeviceId
@@ -39,31 +46,66 @@ export const DevicesPageDocument = gql`
     `;
 
 /**
- * __useDevicesPageQuery__
+ * __useDevicesRequestsQuery__
  *
- * To run a query within a React component, call `useDevicesPageQuery` and pass it any options that fit your needs.
- * When your component renders, `useDevicesPageQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useDevicesRequestsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDevicesRequestsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useDevicesPageQuery({
+ * const { data, loading, error } = useDevicesRequestsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useDevicesPageQuery(baseOptions?: Apollo.QueryHookOptions<DevicesPageQuery, DevicesPageQueryVariables>) {
+export function useDevicesRequestsQuery(baseOptions?: Apollo.QueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DevicesPageQuery, DevicesPageQueryVariables>(DevicesPageDocument, options);
+        return Apollo.useQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
       }
-export function useDevicesPageLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DevicesPageQuery, DevicesPageQueryVariables>) {
+export function useDevicesRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DevicesPageQuery, DevicesPageQueryVariables>(DevicesPageDocument, options);
+          return Apollo.useLazyQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
         }
-export type DevicesPageQueryHookResult = ReturnType<typeof useDevicesPageQuery>;
-export type DevicesPageLazyQueryHookResult = ReturnType<typeof useDevicesPageLazyQuery>;
-export type DevicesPageQueryResult = Apollo.QueryResult<DevicesPageQuery, DevicesPageQueryVariables>;
+export type DevicesRequestsQueryHookResult = ReturnType<typeof useDevicesRequestsQuery>;
+export type DevicesRequestsLazyQueryHookResult = ReturnType<typeof useDevicesRequestsLazyQuery>;
+export type DevicesRequestsQueryResult = Apollo.QueryResult<DevicesRequestsQuery, DevicesRequestsQueryVariables>;
+export const ChangeMasterDeviceDocument = gql`
+    mutation ChangeMasterDevice($newMasterDeviceId: String!) {
+  me {
+    setMasterDevice(newMasterDeviceId: $newMasterDeviceId) {
+      id
+    }
+  }
+}
+    `;
+export type ChangeMasterDeviceMutationFn = Apollo.MutationFunction<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>;
+
+/**
+ * __useChangeMasterDeviceMutation__
+ *
+ * To run a mutation, you first call `useChangeMasterDeviceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeMasterDeviceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeMasterDeviceMutation, { data, loading, error }] = useChangeMasterDeviceMutation({
+ *   variables: {
+ *      newMasterDeviceId: // value for 'newMasterDeviceId'
+ *   },
+ * });
+ */
+export function useChangeMasterDeviceMutation(baseOptions?: Apollo.MutationHookOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>(ChangeMasterDeviceDocument, options);
+      }
+export type ChangeMasterDeviceMutationHookResult = ReturnType<typeof useChangeMasterDeviceMutation>;
+export type ChangeMasterDeviceMutationResult = Apollo.MutationResult<ChangeMasterDeviceMutation>;
+export type ChangeMasterDeviceMutationOptions = Apollo.BaseMutationOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>;
 export const ApproveChallengeDocument = gql`
     mutation ApproveChallenge($id: Int!) {
   me {

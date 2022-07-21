@@ -41,6 +41,7 @@ import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
 import { t, Trans } from '@lingui/macro'
+import { ColorModeButton } from '../ColorModeButton'
 
 interface LinkItemProps {
   title: JSX.Element
@@ -114,7 +115,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Flex
       transition="1s ease"
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={useColorModeValue('white', 'gray.800')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
       w={{ base: 'full', md: 60 }}
@@ -140,14 +141,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
               {link.title}
             </NavItem>
           ))}
-          <IconButton
-            size="lg"
-            variant="ghost"
-            aria-label="change color mode"
-            icon={<FiMoon />}
-            onClick={toggleColorMode}
-            mt="auto"
-          />
+          <ColorModeButton />
         </Flex>
 
         <HStack spacing={{ base: '0', md: '6' }} w="80%" m={4}>
@@ -290,13 +284,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       </Text>
 
       <HStack spacing={{ base: '0', md: '6' }}>
-        <IconButton
-          size="lg"
-          variant="ghost"
-          aria-label="change color mode"
-          icon={<FiMoon />}
-          onClick={toggleColorMode}
-        />
+        <ColorModeButton />
         <Flex alignItems={'center'}>
           <Menu>
             <MenuButton

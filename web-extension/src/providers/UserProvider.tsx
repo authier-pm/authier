@@ -1,5 +1,4 @@
 import { getUserFromToken } from '@src/util/accessTokenExtension'
-import cryptoJS from 'crypto-js'
 
 import React, {
   useState,
@@ -9,7 +8,6 @@ import React, {
   useEffect
 } from 'react'
 import browser from 'webextension-polyfill'
-const { AES, enc } = cryptoJS
 
 export type IUserContext = {
   setUserId: Dispatch<SetStateAction<string | undefined>>

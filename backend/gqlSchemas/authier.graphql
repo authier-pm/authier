@@ -5,7 +5,7 @@ type Query {
   you need to be authenticated to call this resolver
   """
   authenticated: Boolean!
-  me: UserQuery
+  me: UserQuery!
   currentDevice: DeviceQuery!
   webInputs(host: String!): [WebInputGQL!]!
 }
@@ -23,6 +23,9 @@ type UserQuery {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -30,17 +33,16 @@ type UserQuery {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
-  device: DeviceQuery!
+  device(id: UUID!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
-  settings: SettingsConfigGQL!
   encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
@@ -91,6 +93,9 @@ type UserGQL {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -98,10 +103,10 @@ type UserGQL {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
 }
 
 type DeviceGQL {
@@ -111,10 +116,10 @@ type DeviceGQL {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -210,16 +215,6 @@ type DecryptionChallengeGQL {
   User: [UserGQL!]!
 }
 
-type SettingsConfigGQL {
-  userId: ID!
-  lockTime: Int!
-  twoFA: Boolean!
-  noHandsLogin: Boolean!
-  homeUI: String!
-  updatedAt: DateTime
-  user: UserGQL!
-}
-
 type TagGQL {
   id: Int!
   name: String!
@@ -239,6 +234,16 @@ type UserPaidProductsGQL {
   user: UserGQL!
 }
 
+type MasterDeviceChangeGQL {
+  id: ID!
+  createdAt: DateTime!
+  processAt: DateTime!
+  oldDeviceId: String!
+  newDeviceId: String!
+  userId: String!
+  user: UserGQL!
+}
+
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -246,10 +251,10 @@ type DeviceQuery {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -285,6 +290,11 @@ type EncryptedSecretQuery {
   lastUsedAt: DateTime
 }
 
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
+
 type EmailVerificationGQLScalars {
   address: ID!
   createdAt: DateTime!
@@ -305,11 +315,6 @@ type DecryptionChallengeForApproval {
   deviceName: String!
   deviceId: UUID!
 }
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
 
 type Mutation {
   """
@@ -352,6 +357,9 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -359,10 +367,10 @@ type UserMutation {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   addCookie: String!
   device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
@@ -374,17 +382,12 @@ type UserMutation {
     secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
-  updateSettings(
-    noHandsLogin: Boolean!
-    lockTime: Int!
-    homeUI: String!
-    twoFA: Boolean!
-  ): SettingsConfigGQL!
+  updateSettings(config: SettingsInput!): UserGQL!
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
-  approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+  setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createCheckoutSession(product: String!): String!
 }
 
@@ -395,10 +398,10 @@ type DeviceMutation {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -479,6 +482,14 @@ input SecretUsageEventInput {
   kind: String!
   secretId: String!
   url: String
+}
+
+input SettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
 }
 
 """

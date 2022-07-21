@@ -8,6 +8,7 @@ import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
 import { DecryptionChallengeGQL } from './DecryptionChallenge'
+import { MasterDeviceChangeGQL } from './MasterDeviceChange'
 
 @ObjectType()
 export class UserGQLScalars {
@@ -46,6 +47,15 @@ export class UserGQLScalars {
 
   @Field(() => Int)
   deviceRecoveryCooldownMinutes: number
+
+  @Field()
+  autofill: boolean
+
+  @Field()
+  language: string
+
+  @Field()
+  theme: string
 }
 
 @ObjectType()
@@ -71,9 +81,6 @@ export class UserGQL extends UserGQLScalars {
   @Field(() => [WebInputGQL])
   WebInputsAdded: WebInputGQL[]
 
-  @Field(() => [SettingsConfigGQL])
-  SettingsConfigs: SettingsConfigGQL[]
-
   @Field(() => [TagGQL])
   Tags: TagGQL[]
 
@@ -82,6 +89,9 @@ export class UserGQL extends UserGQLScalars {
 
   @Field(() => [DecryptionChallengeGQL])
   DecryptionChallenges: DecryptionChallengeGQL[]
+
+  @Field(() => [MasterDeviceChangeGQL])
+  MasterDeviceChange: MasterDeviceChangeGQL[]
 
   // skip overwrite 👇
 }

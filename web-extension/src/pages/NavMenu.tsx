@@ -4,7 +4,7 @@ import { Button, ButtonGroup, Stack, useColorModeValue } from '@chakra-ui/react'
 
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { Link } from 'wouter'
-import { AddTOTPSecretButton } from '@src/components/AddTOTPSecretButton'
+import { AddTOTPSecretButton } from '@src/components/pages/AddTOTPSecretButton'
 
 export const NavMenu: FunctionComponent = () => {
   const bg = useColorModeValue('teal.200', 'teal.700')

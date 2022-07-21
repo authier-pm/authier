@@ -24,16 +24,16 @@ export class DeviceGQLScalars {
   platform: string
 
   @Field()
-  syncTOTP: boolean
-
-  @Field()
   ipAddressLock: boolean
-
-  @Field(() => Int, { nullable: true })
-  vaultLockTimeoutSeconds?: number
 
   @Field({ nullable: true })
   logoutAt?: Date
+
+  @Field()
+  syncTOTP: boolean
+
+  @Field(() => Int, { nullable: true })
+  vaultLockTimeoutSeconds?: number
 
   @Field()
   createdAt: Date

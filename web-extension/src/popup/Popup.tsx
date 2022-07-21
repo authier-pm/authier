@@ -15,10 +15,8 @@ import Devices from '@src/pages/Devices'
 import { UserContext } from '@src/providers/UserProvider'
 
 import { deviceDetect } from 'react-device-detect'
-import { Settings } from '@src/pages/Settings'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AboutPage } from '@src/pages/AboutPage'
-//import { TransitionGroup, CSSTransition } from 'react-transition-group'
 import debug from 'debug'
 const log = debug('au:Popup')
 
@@ -70,7 +68,6 @@ export const Popup: FunctionComponent = () => {
         <Route path="/popup.html" component={Home} />
         <Route path="/qr-code" component={QRCode} />
         <Route path="/devices" component={Devices} />
-        <Route path="/settings" component={Settings} />
         <Route path="/about" component={AboutPage} />
       </Switch>
     </>

@@ -6,22 +6,23 @@ import {
   Box,
   Flex,
   Text,
-  Image,
   Input,
   useDisclosure,
-  Stat
+  Stat,
+  useColorMode
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
-import { useDeleteEncryptedSecretMutation } from '../components/vault/ItemList.codegen'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
 import { useDebounce } from './useDebounce'
+import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
+import { useSyncSettingsQuery } from '@src/components/vault/settings/VaultConfig.codegen'
 
 function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
@@ -125,12 +126,33 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
 }
 
 // TODO virtualize this
-export const ItemList = () => {
+export const VaultList = () => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
   const debouncedSearchTerm = useDebounce(filterBy, 400)
+  const { setSecuritySettings } = useContext(DeviceStateContext)
+
+  const { data, loading } = useSyncSettingsQuery()
+  const { colorMode, toggleColorMode } = useColorMode()
+
+  useEffect(() => {
+    if (data) {
+      if (colorMode !== data.me.theme) {
+        toggleColorMode()
+      }
+
+      setSecuritySettings({
+        autofill: data.me?.autofill as boolean,
+        language: data.me?.language as string,
+        syncTOTP: data.currentDevice.syncTOTP as boolean,
+        theme: data.me?.theme as string,
+        vaultLockTimeoutSeconds: data.currentDevice
+          .vaultLockTimeoutSeconds as number
+      })
+    }
+  }, [data, loading])
 
   return (
     <Flex flexDirection="column">

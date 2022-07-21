@@ -4,7 +4,6 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type CreateCheckoutSessionMutationVariables = Types.Exact<{
-  userId: Types.Scalars['String'];
   product: Types.Scalars['String'];
 }>;
 
@@ -13,8 +12,8 @@ export type CreateCheckoutSessionMutation = { __typename?: 'Mutation', createChe
 
 
 export const CreateCheckoutSessionDocument = gql`
-    mutation createCheckoutSession($userId: String!, $product: String!) {
-  createCheckoutSession(userId: $userId, product: $product)
+    mutation createCheckoutSession($product: String!) {
+  createCheckoutSession(product: $product)
 }
     `;
 export type CreateCheckoutSessionMutationFn = Apollo.MutationFunction<CreateCheckoutSessionMutation, CreateCheckoutSessionMutationVariables>;
@@ -32,7 +31,6 @@ export type CreateCheckoutSessionMutationFn = Apollo.MutationFunction<CreateChec
  * @example
  * const [createCheckoutSessionMutation, { data, loading, error }] = useCreateCheckoutSessionMutation({
  *   variables: {
- *      userId: // value for 'userId'
  *      product: // value for 'product'
  *   },
  * });

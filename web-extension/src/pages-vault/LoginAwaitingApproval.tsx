@@ -1,8 +1,8 @@
 import { t, Trans } from '@lingui/macro'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
+import { device } from '@src/background/ExtensionDevice'
 import { UserContext } from '@src/providers/UserProvider'
 import React, { useContext, useEffect, useState } from 'react'
-import { LoginContext, LoginFormValues } from './Login'
+import { LoginContext } from './Login'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
@@ -144,11 +144,17 @@ export const useLogin = (props: { deviceName: string }) => {
             encryptionSalt,
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncrypted
+            authSecretEncrypted: newAuthSecretEncrypted,
+            lockTime: 28800,
+            autofill: false,
+            language: 'en',
+            syncTOTP: false,
+            theme: 'dark'
           }
 
           setUserId(decodedToken.userId)
           device.save(deviceState)
+
           toast.success(
             t`Device approved at ${formatRelative(
               new Date(),
