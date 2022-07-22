@@ -51,6 +51,8 @@ type UserQuery {
     location: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
+  passwordLimitation: PositiveInt!
+  TOTPLimitation: PositiveInt!
 }
 
 """
@@ -316,6 +318,11 @@ type DecryptionChallengeForApproval {
   deviceId: UUID!
 }
 
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
+
 type Mutation {
   """
   you need to be authenticated to call this resolver
@@ -341,7 +348,6 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
-  createCheckoutSession(product: String!): String!
 }
 
 type UserMutation {
@@ -388,6 +394,7 @@ type UserMutation {
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
+  createPortalSession: String!
   createCheckoutSession(product: String!): String!
 }
 
@@ -435,11 +442,6 @@ type SecretUsageEventGQLScalars {
   deviceId: String!
   webInputId: Int
 }
-
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
 
 input DeviceInput {
   id: UUID!

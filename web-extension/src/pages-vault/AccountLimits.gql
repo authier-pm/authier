@@ -1,5 +1,12 @@
 query meExtension {
   me {
     id
+    encryptedSecrets {
+      kind
+    }
   }
+}
+
+mutation createCheckoutSession($product: String!) {
+  createCheckoutSession(product: $product)
 }

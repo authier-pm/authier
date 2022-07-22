@@ -12,7 +12,11 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLPositiveInt,
+  GraphQLUUID
+} from 'graphql-scalars'
 import { UserGQL } from './generated/User'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
@@ -20,7 +24,6 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
-import { ChangeMasterPasswordInput } from './AuthInputs'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -186,5 +189,43 @@ export class UserQuery extends UserBase {
         rejectedAt: null
       }
     })
+  }
+
+  @Field(() => GraphQLPositiveInt)
+  async passwordLimitation(@Ctx() ctx: IContextAuthenticated) {
+    const count = await ctx.prisma.userPaidProducts.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        OR: [
+          {
+            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+          },
+          {
+            productId: 'sub_1LOS1WI3AGASZpOV3KiMWraZ'
+          }
+        ]
+      }
+    })
+    //* One adds 60 passwords
+    return count * 60
+  }
+
+  @Field(() => GraphQLPositiveInt)
+  async TOTPLimitation(@Ctx() ctx: IContextAuthenticated) {
+    const data = await ctx.prisma.userPaidProducts.findMany({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        OR: [
+          {
+            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+          },
+          {
+            productId: 'sub_1LOS9CI3AGASZpOV38ghfsUi'
+          }
+        ]
+      }
+    })
+
+    return data
   }
 }

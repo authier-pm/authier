@@ -341,7 +341,6 @@ export type MasterDeviceChangeGql = {
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
-  createCheckoutSession: Scalars['String'];
   currentDevice: DeviceMutation;
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
@@ -358,11 +357,6 @@ export type Mutation = {
 
 export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>;
-};
-
-
-export type MutationCreateCheckoutSessionArgs = {
-  product: Scalars['String'];
 };
 
 
@@ -526,6 +520,7 @@ export type UserMutation = {
   autofill: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
   createCheckoutSession: Scalars['String'];
+  createPortalSession: Scalars['String'];
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
@@ -625,6 +620,7 @@ export type UserQuery = {
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
+  TOTPLimitation: Scalars['PositiveInt'];
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -648,6 +644,7 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
+  passwordLimitation: Scalars['PositiveInt'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   sendAuthMessage: Scalars['Boolean'];
@@ -677,7 +674,7 @@ export type UserQuerySendAuthMessageArgs = {
 };
 
 export type WebInputElement = {
-  domOrdinal: Scalars['PositiveInt'];
+  domOrdinal: Scalars['Int'];
   domPath: Scalars['String'];
   kind: WebInputType;
   url: Scalars['String'];
