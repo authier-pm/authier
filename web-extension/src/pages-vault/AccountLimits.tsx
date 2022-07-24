@@ -78,7 +78,7 @@ export const AccountLimits = () => {
                     ).length
                   }
                 </Td>
-                <Td isNumeric>40</Td>
+                <Td isNumeric>{data?.me.PasswordLimits}</Td>
               </Tr>
               <Tr>
                 <Td>TOTP</Td>
@@ -88,7 +88,7 @@ export const AccountLimits = () => {
                       .length
                   }
                 </Td>
-                <Td isNumeric>3</Td>
+                <Td isNumeric>{data?.me.TOTPlimit}</Td>
               </Tr>
             </Tbody>
           </Table>

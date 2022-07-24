@@ -620,7 +620,8 @@ export type UserQuery = {
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
-  TOTPLimitation: Scalars['PositiveInt'];
+  PasswordLimits: Scalars['PositiveInt'];
+  TOTPLimits: Scalars['PositiveInt'];
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -644,7 +645,6 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
-  passwordLimitation: Scalars['PositiveInt'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   sendAuthMessage: Scalars['Boolean'];

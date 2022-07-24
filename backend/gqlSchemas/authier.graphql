@@ -51,8 +51,8 @@ type UserQuery {
     location: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
-  passwordLimitation: PositiveInt!
-  TOTPLimitation: PositiveInt!
+  PasswordLimits: PositiveInt!
+  TOTPLimits: PositiveInt!
 }
 
 """

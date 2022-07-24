@@ -192,7 +192,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => GraphQLPositiveInt)
-  async passwordLimitation(@Ctx() ctx: IContextAuthenticated) {
+  async PasswordLimits(@Ctx() ctx: IContextAuthenticated) {
     const count = await ctx.prisma.userPaidProducts.count({
       where: {
         userId: ctx.jwtPayload.userId,
@@ -206,13 +206,19 @@ export class UserQuery extends UserBase {
         ]
       }
     })
-    //* One adds 60 passwords
-    return count * 60
+
+    if (count > 0) {
+      //* One adds 60 passwords
+      return count * 60
+    } else {
+      //* Default count
+      return 40
+    }
   }
 
   @Field(() => GraphQLPositiveInt)
-  async TOTPLimitation(@Ctx() ctx: IContextAuthenticated) {
-    const data = await ctx.prisma.userPaidProducts.findMany({
+  async TOTPLimits(@Ctx() ctx: IContextAuthenticated) {
+    const count = await ctx.prisma.userPaidProducts.count({
       where: {
         userId: ctx.jwtPayload.userId,
         OR: [
@@ -226,6 +232,12 @@ export class UserQuery extends UserBase {
       }
     })
 
-    return data
+    if (count > 0) {
+      //* One adds 60 passwords
+      return count * 20
+    } else {
+      //* Default count
+      return 3
+    }
   }
 }

@@ -134,7 +134,9 @@ export const VaultList = () => {
   const debouncedSearchTerm = useDebounce(filterBy, 400)
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
-  const { data, loading } = useSyncSettingsQuery()
+  const { data, loading } = useSyncSettingsQuery({
+    fetchPolicy: 'cache-and-network'
+  })
   const { colorMode, toggleColorMode } = useColorMode()
 
   useEffect(() => {

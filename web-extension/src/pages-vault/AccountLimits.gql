@@ -4,9 +4,7 @@ query meExtension {
     encryptedSecrets {
       kind
     }
+    PasswordLimits
+    TOTPlimit
   }
-}
-
-mutation createCheckoutSession($product: String!) {
-  createCheckoutSession(product: $product)
 }
