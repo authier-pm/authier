@@ -13,7 +13,7 @@ import {
   ExportTOTPToCsvButton
 } from '@src/components/vault/ExportCsvButtons'
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
-import React from 'react'
+import React, { useContext } from 'react'
 import papaparse from 'papaparse'
 import {
   AddSecretInput,
@@ -22,6 +22,8 @@ import {
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
+import { useMeExtensionQuery } from './AccountLimits.codegen'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 // const csvHeaderNames = {
 //   password: [
@@ -74,7 +76,10 @@ export interface IImportedStat {
 /**
  * should support lastpass and bitwarden for now, TODO write e2e specs
  */
-export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
+export const onFileAccepted: any = (
+  file: File,
+  pswCount: number
+): Promise<IImportedStat> => {
   return new Promise((resolve, reject) => {
     papaparse.parse<string[]>(file, {
       complete: async (results) => {
@@ -83,12 +88,20 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
         }
         const mapped = mapCsvToLoginCredentials(results.data)
 
-        // TODO add to device state
         const state = device.state as DeviceState
 
-        let skipped = 0
         const toAdd: AddSecretInput = []
+        let skipped = 0
+        let added = 0
         for (const creds of mapped) {
+          if (
+            (device.state?.decryptedSecrets.length as number) >= pswCount ||
+            added >= pswCount
+          ) {
+            toast.error('You have reached your limit of secrets')
+            break
+          }
+
           let hostname
           try {
             hostname = new URL(creds.url).hostname
@@ -110,16 +123,17 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
 
           if (state.findExistingSecret(input)) {
             skipped++
-            break
+            continue
           }
+
           toAdd.push(input)
+          added += 1
         }
-        console.log('~ toAdd', toAdd)
 
         await state.addSecrets(toAdd)
 
         resolve({
-          added: mapped.length - skipped,
+          added,
           skipped
         })
       }
@@ -131,7 +145,7 @@ export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
     null
   )
-
+  const { data } = useMeExtensionQuery()
   return (
     <Center p={5}>
       <Flex maxW={'1200px'} flexDir={'column'}>
@@ -141,14 +155,17 @@ export const VaultImportExport = () => {
             <>
               <ImportFromFile
                 onFileAccepted={async (f) => {
-                  setImportedStat(await onFileAccepted(f))
+                  setImportedStat(
+                    await onFileAccepted(f, data?.me.PasswordLimits)
+                  )
                 }}
               />
               <Text fontSize={16} mt={8} mb={6}>
                 <Trans>
                   We support importing from <code>csv</code> files.
                   Lastpass/Bitwarden will fork fine, file exported from other
-                  password managers might work as well, but it's not guaranteed.
+                  password managers might work as well, but it{`&apos`}s not
+                  guaranteed.
                 </Trans>
               </Text>
             </>
@@ -185,3 +202,30 @@ export const VaultImportExport = () => {
     </Center>
   )
 }
+
+//for (const creds of mapped) {
+//let hostname
+//try {
+//hostname = new URL(creds.url).hostname
+//} catch (error) {
+//skipped++
+//break
+//}
+
+//const input = {
+//kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+//loginCredentials: creds.loginCredential,
+//encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
+//iconUrl: null,
+//createdAt: new Date().toJSON(),
+//url: creds.url,
+//label:
+//creds.label ?? `${creds.loginCredential.username}@${hostname}`
+//}
+
+//if (state.findExistingSecret(input)) {
+//skipped++
+//break
+//}
+//toAdd.push(input)
+//}
