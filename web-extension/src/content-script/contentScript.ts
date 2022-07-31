@@ -285,7 +285,7 @@ export async function initInputWatch() {
               )
               const webInput: WebInputElement = {
                 domPath: elementSelector.css,
-                domOrdinal: elementSelector.ordinal,
+                domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
                 url: location.href
               }

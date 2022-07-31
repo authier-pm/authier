@@ -76,20 +76,34 @@ export const autofill = (initState: IInitStateRes) => {
 
   // Should be renamed on scanOnInputs?
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
+    const allInputs = Array.from(body.querySelectorAll('input'))
     //Distinguish between register and login from by the number of inputs
     //Then Distinguish between phased and not phased
 
-    const usefulInputs = Array.from(body.querySelectorAll('input')).filter(
+    /**
+     * text, email, password, tel
+     */
+    const usefulInputs = allInputs.filter(
       (el) => uselessInputTypes.find((type) => type === el.type) === undefined
     )
 
     if (usefulInputs.length > 2) {
-      // TODO Autofill register form if present
+      for (let index = 0; index < allInputs.length; index++) {
+        const input = allInputs[index]
+        if (
+          input.type === 'password' &&
+          allInputs[index + 1].type === 'password'
+        ) {
+          // TODO Autofill register form with a new password if present
+          break
+        }
+      }
     }
 
     //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
+        console.log('~ url', url)
         const host = new URL(url).host
         const matches = location.href.includes(host)
 
