@@ -13,7 +13,11 @@ import { UserBase } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
+import {
+  GraphQLDateTime,
+  GraphQLNonNegativeInt,
+  GraphQLPositiveInt
+} from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -258,6 +262,26 @@ export class UserMutation extends UserBase {
       })
     ])
     return secretsUpdates.length
+  }
+
+  @Field(() => GraphQLDateTime)
+  async setMasterDevice(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('deviceId', () => Int) deviceId: number
+  ) {
+    if (ctx.device.id !== (await ctx.getMasterDeviceId())) {
+      throw new Error('This can be done only from master device')
+    }
+
+    return ctx.prisma.user.update({
+      where: {
+        id: ctx.jwtPayload.userId
+      },
+      data: {
+        masterDeviceChangeInitiated: new Date(),
+        masterDeviceNewDeviceId: deviceId
+      }
+    })
   }
 
   @Field(() => DecryptionChallengeMutation)
