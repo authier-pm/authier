@@ -22,6 +22,7 @@ export function RefreshSecretsButton() {
         onClick={async () => {
           setIsSyncing(true)
           const res = await device.state?.backendSync()
+
           setIsSyncing(false)
           toast.success(
             t`Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`

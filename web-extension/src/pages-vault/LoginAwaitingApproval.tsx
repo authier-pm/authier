@@ -20,8 +20,7 @@ export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
 
   const { setUserId } = useContext(UserContext)
-  const [addNewDevice, { loading, data, error }] =
-    useAddNewDeviceForUserMutation()
+  const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
 
   const [getDeviceDecryptionChallenge, { data: decryptionData }] =
     useDeviceDecryptionChallengeMutation({
@@ -146,7 +145,7 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newAuthSecret,
             authSecretEncrypted: newAuthSecretEncrypted,
             lockTime: '28800',
-            autofill: false,
+            autofill: true,
             language: 'en',
             syncTOTP: false,
             theme: 'light'
@@ -174,8 +173,8 @@ export const useLogin = (props: { deviceName: string }) => {
 }
 
 export const LoginAwaitingApproval: React.FC = () => {
-  const [deviceName, setDeviceName] = useState(device.generateDeviceName())
-  const { deviceDecryptionChallenge, loading } = useLogin({
+  const [deviceName] = useState(device.generateDeviceName())
+  const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })
 

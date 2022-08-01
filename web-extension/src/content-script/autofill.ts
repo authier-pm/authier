@@ -129,7 +129,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       .filter((el) => !!el)
 
     //!Guess web inputs, if you have credentials
-    if (webInputs.length === 0) {
+    if (webInputs.length === 0 && secretsForHost.loginCredentials.length > 0) {
       const autofillResult = searchInputsAndAutofill(document.body)
       if (autofillResult) {
         browser.runtime.sendMessage({
@@ -222,9 +222,11 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         (el) => uselessInputTypes.includes(el.type) === false
       )
 
+      console.log(inputElsArray, 'test')
       for (let index = 0; index < inputElsArray.length; index++) {
         const input = inputElsArray[index]
         if (input.type === 'password') {
+          console.log('password', input)
           if (
             webInputs.length === 0 &&
             secretsForHost.loginCredentials.length > 1
@@ -244,6 +246,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               inputted: input.value
             })
           }
+
           //Search for a username input
           for (let j = index - 1; j >= 0; j--) {
             if (inputElsArray[j].type !== 'hidden') {
@@ -267,7 +270,6 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                   kind: WebInputType.USERNAME_OR_EMAIL,
                   inputted: inputElsArray[j].value
                 })
-
                 break
               }
 

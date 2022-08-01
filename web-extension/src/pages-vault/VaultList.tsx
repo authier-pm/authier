@@ -9,7 +9,8 @@ import {
   Input,
   useDisclosure,
   Stat,
-  useColorMode
+  useColorMode,
+  Tooltip
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useEffect, useState } from 'react'
@@ -139,6 +140,7 @@ export const VaultList = () => {
   })
   const { colorMode, toggleColorMode } = useColorMode()
 
+  // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
       if (colorMode !== data.me.theme) {
@@ -175,12 +177,30 @@ export const VaultList = () => {
 
           <RefreshSecretsButton />
         </Center>
-        <IconButton
-          aria-label="Add item"
-          icon={<AddIcon />}
-          rounded={'full'}
-          onClick={async () => navigate('/addItem')}
-        />
+
+        {data &&
+        data!.me.PasswordLimits >= device!.state!.decryptedSecrets.length ? (
+          <Tooltip
+            shouldWrapChildren
+            label="You have reached your limit"
+            aria-label="A tooltip"
+          >
+            <IconButton
+              disabled={true}
+              aria-label="Add item"
+              icon={<AddIcon />}
+              rounded={'full'}
+              onClick={async () => navigate('/addItem')}
+            />
+          </Tooltip>
+        ) : (
+          <IconButton
+            aria-label="Add item"
+            icon={<AddIcon />}
+            rounded={'full'}
+            onClick={async () => navigate('/addItem')}
+          />
+        )}
       </Center>
 
       <Center justifyContent={['flex-end', 'center', 'center']}>

@@ -43,7 +43,7 @@ type UserQuery {
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
-  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
+  encryptedSecrets: [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
     device: String!

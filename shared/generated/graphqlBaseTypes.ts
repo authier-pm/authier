@@ -661,11 +661,6 @@ export type UserQueryDeviceArgs = {
 };
 
 
-export type UserQueryEncryptedSecretsArgs = {
-  fromDate?: InputMaybe<Scalars['DateTime']>;
-};
-
-
 export type UserQuerySendAuthMessageArgs = {
   device: Scalars['String'];
   location: Scalars['String'];

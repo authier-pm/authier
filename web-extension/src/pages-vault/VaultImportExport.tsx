@@ -13,7 +13,7 @@ import {
   ExportTOTPToCsvButton
 } from '@src/components/vault/ExportCsvButtons'
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
-import React, { useContext } from 'react'
+import React from 'react'
 import papaparse from 'papaparse'
 import {
   AddSecretInput,
@@ -23,7 +23,6 @@ import {
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 // const csvHeaderNames = {
 //   password: [
@@ -80,7 +79,7 @@ export const onFileAccepted: any = (
   file: File,
   pswCount: number
 ): Promise<IImportedStat> => {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     papaparse.parse<string[]>(file, {
       complete: async (results) => {
         if (!results.data) {
@@ -95,8 +94,8 @@ export const onFileAccepted: any = (
         let added = 0
         for (const creds of mapped) {
           if (
-            (device.state?.decryptedSecrets.length as number) >= pswCount ||
-            added >= pswCount
+            (device.state?.decryptedSecrets.length as number) + added >=
+            pswCount
           ) {
             toast.error('You have reached your limit of secrets')
             break
@@ -107,7 +106,7 @@ export const onFileAccepted: any = (
             hostname = new URL(creds.url).hostname
           } catch (error) {
             skipped++
-            break
+            continue
           }
 
           const input = {
@@ -202,30 +201,3 @@ export const VaultImportExport = () => {
     </Center>
   )
 }
-
-//for (const creds of mapped) {
-//let hostname
-//try {
-//hostname = new URL(creds.url).hostname
-//} catch (error) {
-//skipped++
-//break
-//}
-
-//const input = {
-//kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-//loginCredentials: creds.loginCredential,
-//encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
-//iconUrl: null,
-//createdAt: new Date().toJSON(),
-//url: creds.url,
-//label:
-//creds.label ?? `${creds.loginCredential.username}@${hostname}`
-//}
-
-//if (state.findExistingSecret(input)) {
-//skipped++
-//break
-//}
-//toAdd.push(input)
-//}

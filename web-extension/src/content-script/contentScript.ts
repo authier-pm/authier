@@ -224,7 +224,6 @@ export async function initInputWatch() {
   }
 
   const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
-    log('onSubmit Called')
     domRecorder.addInputEvent({
       element,
       eventType: 'submit',

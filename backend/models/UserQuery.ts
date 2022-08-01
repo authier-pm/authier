@@ -122,10 +122,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecrets(
-    @Arg('fromDate', () => GraphQLISODateTime, { nullable: true })
-    fromDate: string
-  ) {
+  async encryptedSecrets() {
     return prismaClient.encryptedSecret.findMany({
       where: {
         userId: this.id,
