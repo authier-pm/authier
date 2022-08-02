@@ -11,10 +11,9 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Tooltip,
-  Spinner
+  Tooltip
 } from '@chakra-ui/react'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'

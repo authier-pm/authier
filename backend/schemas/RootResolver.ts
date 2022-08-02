@@ -44,7 +44,7 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
-import Stripe from 'stripe'
+import admin from 'firebase-admin'
 
 const log = debug('au:RootResolver')
 
@@ -246,7 +246,12 @@ export class RootResolver {
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
-      select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
+      select: {
+        id: true,
+        addDeviceSecretEncrypted: true,
+        encryptionSalt: true,
+        masterDevice: true
+      }
     })
 
     if (!user) {
@@ -318,7 +323,24 @@ export class RootResolver {
     }
 
     if (!challenge) {
+      console.log('PEPA')
       // TODO send notification to user
+      // TODO Will we have notifications for browser?
+      if (user.masterDevice!.firebaseToken.length > 10) {
+        console.log('Hey message')
+        await admin
+          .messaging()
+          .sendToDevice(user.masterDevice?.firebaseToken as string, {
+            notification: {
+              title: 'New device login!',
+              body: 'New device is trying to log in.'
+            },
+            data: {
+              type: 'test'
+            }
+          })
+      }
+
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: deviceInput.id,

@@ -1,13 +1,4 @@
-import {
-  Arg,
-  Ctx,
-  Field,
-  Info,
-  InputType,
-  Int,
-  Mutation,
-  ObjectType
-} from 'type-graphql'
+import { Arg, Ctx, Field, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
 import { GraphQLResolveInfo } from 'graphql'

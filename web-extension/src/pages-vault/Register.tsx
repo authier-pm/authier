@@ -115,7 +115,7 @@ export default function Register(): ReactElement {
               autofill: true,
               language: 'en',
               syncTOTP: false,
-              theme: 'light'
+              theme: 'dark'
             }
 
             device.save(deviceState)

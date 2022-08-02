@@ -10,7 +10,8 @@ import {
   useDisclosure,
   Stat,
   useColorMode,
-  Tooltip
+  Tooltip,
+  Spinner
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useEffect, useState } from 'react'
@@ -158,10 +159,25 @@ export const VaultList = () => {
     }
   }, [data, loading])
 
+  if (loading && !data) {
+    return <Spinner />
+  }
+
+  const totpCond =
+    data!.me.TOTPlimit <=
+    device!.state!.decryptedSecrets.filter((x) => x.kind === 'TOTP').length
+  const pswCond =
+    data!.me.PasswordLimits <=
+    device!.state!.decryptedSecrets.filter(
+      (x) => x.kind === 'LOGIN_CREDENTIALS'
+    ).length
+
   return (
     <Flex flexDirection="column">
       <Center>
         <Input
+          variant={'filled'}
+          color="grey.600"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}
           m="auto"
@@ -178,8 +194,7 @@ export const VaultList = () => {
           <RefreshSecretsButton />
         </Center>
 
-        {data &&
-        data!.me.PasswordLimits >= device!.state!.decryptedSecrets.length ? (
+        {totpCond || pswCond ? (
           <Tooltip
             shouldWrapChildren
             label="You have reached your limit"

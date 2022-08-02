@@ -148,7 +148,7 @@ export const useLogin = (props: { deviceName: string }) => {
             autofill: true,
             language: 'en',
             syncTOTP: false,
-            theme: 'light'
+            theme: 'dark'
           }
 
           setUserId(decodedToken.userId)
