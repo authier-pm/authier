@@ -11,7 +11,8 @@ import {
   Stat,
   useColorMode,
   Tooltip,
-  Spinner
+  Spinner,
+  VStack
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useEffect, useState } from 'react'
@@ -27,7 +28,7 @@ import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
 import { useSyncSettingsQuery } from '@src/components/vault/settings/VaultConfig.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 
-function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
+export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
@@ -36,7 +37,7 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
     return null
   }
   return (
-    <Center py={5} m={['auto', '3']}>
+    <Center key={data.id} py={5} m={['auto', '3']}>
       <Box
         w='250px'
         h='195px'
@@ -174,7 +175,7 @@ export const VaultList = () => {
     ).length
 
   return (
-    <Flex flexDirection='column'>
+    <VStack flexDirection='column' h={'90vh'}>
       <Center>
         <Input
           variant={'filled'}
@@ -219,28 +220,9 @@ export const VaultList = () => {
         )}
       </Center>
 
-      <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection='column'>
-          <Flex flexDirection='row' flexWrap='wrap' m='auto'>
-            {TOTPSecrets?.filter(({ label, url }) => {
-              return (
-                label.includes(debouncedSearchTerm) ||
-                url?.includes(debouncedSearchTerm)
-              )
-            }).map((el, i) => {
-              return <Item data={el as ITOTPSecret} key={el.label + i} />
-            })}
-            {LoginCredentials?.filter(({ label, url }) => {
-              return (
-                label.includes(debouncedSearchTerm) ||
-                url?.includes(debouncedSearchTerm)
-              )
-            }).map((el, i) => {
-              return <Item key={el.label + i} data={el as ILoginSecret} />
-            })}
-          </Flex>
-        </Flex>
-      </Center>
-    </Flex>
+      <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+        <VirtualizedList filter={filterBy} />
+      </div>
+    </VStack>
   )
 }
