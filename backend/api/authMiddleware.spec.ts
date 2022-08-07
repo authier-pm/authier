@@ -1,4 +1,4 @@
-// import { describe } from 'jest';
+import { describe, it } from 'vitest'
 
 describe('authMiddleware', () => {
   it.todo('should call next if user is authenticated')

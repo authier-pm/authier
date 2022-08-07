@@ -1,12 +1,12 @@
 import 'dotenv/config'
 
 import { execFile } from 'child_process'
-import os from 'os'
 
 import { prismaClient } from '../prisma/prismaClient'
+import { getDbCount } from './getDbCount'
 
 export const testDbsPrefix = 'authier_test'
-const dbCount = os.cpus().length ?? 16 // each jest worker uses one CPU and one DB, so we need that many DBs
+const dbCount = getDbCount() // each jest worker uses one CPU and one DB, so we need that many DBs
 
 const dbUrl = process.env.DATABASE_URL?.split(/(\d+)(?!.*\d)/)[0]
 const migrateOneDb = async (dbName: string) => {
