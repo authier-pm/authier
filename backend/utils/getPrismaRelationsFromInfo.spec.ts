@@ -1,6 +1,7 @@
 import { dmmf } from '../prisma/prismaClient'
 import { getPrismaRelationsFromInfo } from './getPrismaRelationsFromInfo'
 import gqlInfo from './fixtures/gqlInfo.json'
+import { describe, expect, it } from 'vitest'
 
 describe('getPrismaRelationsFromInfo', () => {
   it('should ignore fields where first letter is NOT capital', async () => {
@@ -62,7 +63,7 @@ describe('getPrismaRelationsFromInfo', () => {
     })
 
     expect(res).toMatchInlineSnapshot(`
-      Object {
+      {
         "EncryptedSecrets": true,
       }
     `)
@@ -75,9 +76,9 @@ describe('getPrismaRelationsFromInfo', () => {
     })
 
     expect(res).toMatchInlineSnapshot(`
-      Object {
-        "masterDevice": Object {
-          "include": Object {
+      {
+        "masterDevice": {
+          "include": {
             "User": true,
           },
         },

@@ -7,6 +7,7 @@ import {
   RegisterNewAccountInput
 } from '../models/AuthInputs'
 import { GraphQLResolveInfo } from 'graphql'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
@@ -70,9 +71,6 @@ describe('RootResolver', () => {
   })
 
   describe('registerNewUser', () => {
-    beforeEach(() => {
-      jest.setTimeout(10000)
-    })
     const userId = faker.datatype.uuid()
 
     it('should add new user', async () => {
@@ -157,7 +155,7 @@ describe('RootResolver', () => {
         'Device already exists. You cannot register this device for multiple accounts.'
       )
     })
-  })
+  }, 10000)
 
   describe('deviceDecryptionChallenge', () => {
     it('should return a DecryptionChallengeForApproval', async () => {
