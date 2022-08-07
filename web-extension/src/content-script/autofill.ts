@@ -69,6 +69,14 @@ const uselessInputTypes = [
   'time'
 ]
 
+const filterUselessInputs = (documentBody: HTMLElement) => {
+  const inputEls = documentBody.querySelectorAll('input')
+  const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
+    (el) => uselessInputTypes.includes(el.type) === false
+  )
+  return inputElsArray
+}
+
 export let autofillEnabled = false
 let onInputAddedHandler
 
@@ -86,8 +94,8 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const totpSecret = secretsForHost.totpSecrets[0]
 
   //? Should be renamed on scanOnInputs?
+  //!Fill known inputs
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
-    //!Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
         const host = new URL(url).host
@@ -128,7 +136,14 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       })
       .filter((el) => !!el)
 
-    //!Guess web inputs, if you have credentials
+    // Run here function that will recognise register screen and generate new password
+    //TODO Test if all register screen has more then 2 inputs
+    //TODO Test if filledElements is empty, maybe we should call it just when we know we have DOM PATHS
+    const inputs = filterUselessInputs(document.body)
+    if (inputs.length > 2) {
+    }
+
+    //!Guess web inputs, if we have credentials without DOM PATHS
     if (webInputs.length === 0 && secretsForHost.loginCredentials.length > 0) {
       const autofillResult = searchInputsAndAutofill(document.body)
       if (autofillResult) {
@@ -217,16 +232,14 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     function searchInputsAndAutofill(documentBody: HTMLElement) {
       let newWebInputs: webInput[] = []
-      const inputEls = documentBody.querySelectorAll('input')
-      const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
-        (el) => uselessInputTypes.includes(el.type) === false
-      )
+      const inputElsArray = filterUselessInputs(documentBody)
 
       console.log(inputElsArray, 'test')
       for (let index = 0; index < inputElsArray.length; index++) {
         const input = inputElsArray[index]
         if (input.type === 'password') {
           console.log('password', input)
+          //Save password input, if we have more credentials with no DOM PATH
           if (
             webInputs.length === 0 &&
             secretsForHost.loginCredentials.length > 1
@@ -252,6 +265,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
             if (inputElsArray[j].type !== 'hidden') {
               log('found username input', inputElsArray[j])
 
+              //Save username input, if we have more credentials wit no DOM PATH then break from loop and let user choose which psw to use
               if (
                 webInputs.length === 0 &&
                 secretsForHost.loginCredentials.length > 1

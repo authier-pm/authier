@@ -80,6 +80,68 @@ const hideToast = () => {
   }, 5000)
 }
 
+function onKeyDown(e?: KeyboardEvent) {
+  if (
+    e &&
+    e.shiftKey &&
+    e.ctrlKey &&
+    (e.key === 'q' || e.key === 'Q') &&
+    !recording
+  ) {
+    recording = true
+    renderToast({
+      header: 'Recording started',
+      text: 'Press Ctrl + shift + Q to stop'
+    })
+
+    document.addEventListener('click', clicked)
+  } else if (
+    e &&
+    e.shiftKey &&
+    e.ctrlKey &&
+    (e.key === 'q' || e.key === 'Q') &&
+    recording
+  ) {
+    domRecorder.clearCapturedEvents()
+    document.removeEventListener('click', clicked)
+    recordDiv?.remove()
+    clickCount = 0
+    recording = false
+    hideToast()
+  }
+}
+
+function clicked(e: MouseEvent) {
+  console.log(e)
+
+  //@ts-expect-error TODO
+  if (e.target.type === 'password' || e.target.type === 'text') {
+    domRecorder.addInputEvent({
+      element: e.target as HTMLInputElement,
+      eventType: 'input',
+      kind: getWebInputKind(e.target as HTMLInputElement)
+    })
+
+    clickCount = clickCount + 1
+  }
+
+  if (clickCount === 2) {
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
+    })
+
+    recordDiv?.remove()
+    recording = false
+    clickCount = 0
+    document.removeEventListener('click', clicked)
+
+    renderItemPopup()
+  }
+}
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
@@ -93,69 +155,6 @@ export async function initInputWatch() {
 
   if (stateInitRes) {
     document.addEventListener('keydown', onKeyDown, true)
-  }
-
-  function onKeyDown(e?: KeyboardEvent) {
-    if (
-      e &&
-      e.shiftKey &&
-      e.ctrlKey &&
-      (e.key === 'q' || e.key === 'Q') &&
-      !recording
-    ) {
-      recording = true
-      renderToast({
-        header: 'Recording started',
-        text: 'Press Ctrl + shift + Q to stop'
-      })
-
-      document.addEventListener('click', clicked)
-    } else if (
-      e &&
-      e.shiftKey &&
-      e.ctrlKey &&
-      (e.key === 'q' || e.key === 'Q') &&
-      recording
-    ) {
-      domRecorder.clearCapturedEvents()
-      document.removeEventListener('click', clicked)
-      recordDiv?.remove()
-      clickCount = 0
-      recording = false
-      hideToast()
-    }
-  }
-
-  function clicked(e: MouseEvent) {
-    console.log(e)
-
-    //@ts-expect-error TODO
-    if (e.target.type === 'password' || e.target.type === 'text') {
-      domRecorder.addInputEvent({
-        element: e.target as HTMLInputElement,
-        eventType: 'input',
-        kind: getWebInputKind(e.target as HTMLInputElement)
-      })
-
-      clickCount = clickCount + 1
-    }
-
-    if (clickCount === 2) {
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.saveCapturedInputEvents,
-        payload: {
-          inputEvents: domRecorder.toJSON(),
-          url: document.documentURI
-        }
-      })
-
-      recordDiv?.remove()
-      recording = false
-      clickCount = 0
-      document.removeEventListener('click', clicked)
-
-      renderItemPopup()
-    }
   }
 
   if (!stateInitRes) {
@@ -185,6 +184,7 @@ export async function initInputWatch() {
   }
   const stopAutofillListener = autofill(stateInitRes)
 
+  // Render save credential modal after page-rerender
   if (
     saveLoginModalsState &&
     saveLoginModalsState.username &&
@@ -203,6 +203,13 @@ export async function initInputWatch() {
     if (promptDiv) {
       return
     }
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
+    })
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
 
@@ -230,14 +237,6 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: {
-        inputEvents: domRecorder.toJSON(),
-        url: document.documentURI
-      }
-    })
-
     showSavePromptIfAppropriate()
   }
 
@@ -254,6 +253,7 @@ export async function initInputWatch() {
    * responsible for saving new web inputs
    */
   const debouncedInputEventListener = debounce((ev) => {
+    log('Catched action', ev)
     if (autofillEventsDispatched.has(ev)) {
       // this was dispatched by autofill, we don't need to do anything here
       autofillEventsDispatched.delete(ev)
@@ -261,7 +261,6 @@ export async function initInputWatch() {
     }
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
-    log('domRecorder', domRecorder.toJSON())
 
     const inputted = targetElement.value
 
@@ -278,6 +277,8 @@ export async function initInputWatch() {
           kind: getWebInputKind(targetElement)
         }
         domRecorder.addInputEvent(inputRecord)
+
+        // TOTP Recognision
         if (inputted.length === 6 && secretsForHost.totpSecrets.length > 0) {
           // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
 
@@ -309,6 +310,7 @@ export async function initInputWatch() {
           if (form) {
             // handle case when this is inside a form
             if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
+              log('includes')
               return
             }
 

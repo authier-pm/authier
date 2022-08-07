@@ -1,8 +1,4 @@
-import {
-  ITOTPSecret,
-  ILoginSecret,
-  ISecuritySettings
-} from '@src/util/useDeviceState'
+import { ITOTPSecret, ILoginSecret } from '@src/util/useDeviceState'
 
 import { BackgroundMessageType } from './BackgroundMessageType'
 
@@ -63,7 +59,7 @@ let lockTimeStart
 let lockInterval
 
 log('background page loaded')
-browser.runtime.onMessage.addListener(async function (
+browser.runtime.onMessage.addListener(async function(
   req: {
     action: BackgroundMessageType
     payload: any
@@ -145,6 +141,7 @@ browser.runtime.onMessage.addListener(async function (
       return { failed: false }
 
     case BackgroundMessageType.saveCapturedInputEvents:
+      log('saveCapturedInputEvents', req.payload)
       capturedInputEvents = req.payload.inputEvents
       inputsUrl = req.payload.url
 
@@ -203,8 +200,11 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
-
+      log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
       if (!tabUrl || !deviceState || !currentTabId) {
+        log(
+          '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId'
+        )
         return null
       } else {
         //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
@@ -212,7 +212,7 @@ browser.runtime.onMessage.addListener(async function (
       }
 
     case BackgroundMessageType.getCapturedInputEvents:
-      return { capturedInputEvents, inputsUrl }
+      return { capturedInputEvents, inputsUrl: tab?.url }
 
     case BackgroundMessageType.wasClosed:
       return { wasClosed: safeClosed }

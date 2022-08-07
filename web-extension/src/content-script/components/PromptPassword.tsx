@@ -1,10 +1,8 @@
 // @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
-import { domRecorder } from '../contentScript'
 import { promptDiv } from '../renderSaveCredentialsForm'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -99,7 +97,7 @@ export const PromptPassword = ({
       <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
       <h3 style={h3Style}>{username}</h3>
       <span style={spanStyle}>Password: </span>{' '}
-      <h3 style={h3Style} id="__AUTHIER__pswdDisplay">
+      <h3 style={h3Style} id='__AUTHIER__pswdDisplay'>
         {password.replaceAll(/./g, '*')}
       </h3>
       <button
