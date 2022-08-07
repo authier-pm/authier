@@ -102,7 +102,7 @@
     "crypto-js": "^4.1.1",
     "formik": "^2.2.9",
     "generate-password": "^1.7.0",
-    "graphql": "^15.8.0",
+    "graphql": "^16.5.0",
     "jsqr": "^1.4.0",
     "jwt-decode": "^3.1.2",
     "nano-jsx": "^0.0.31",

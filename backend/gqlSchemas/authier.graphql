@@ -157,11 +157,6 @@ type EncryptedSecretGQL {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -279,11 +274,6 @@ type EncryptedSecretQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -386,8 +376,11 @@ type UserMutation {
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
+  setMasterDevice(
+    deviceId: Int!
+    newMasterDeviceId: String!
+  ): MasterDeviceChangeGQL!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
-  setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createCheckoutSession(product: String!): String!
 }
 
@@ -455,11 +448,6 @@ type EncryptedSecretMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -592,7 +580,11 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
-  domOrdinal: PositiveInt!
+
+  """
+  The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day.
+  """
+  domOrdinal: NonNegativeInt!
   url: String!
   kind: WebInputType!
 }
