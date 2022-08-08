@@ -62,7 +62,7 @@
     "mz": "^2.7.0",
     "nodemon": "^2.0.16",
     "prisma-typegraphql-types-generator": "^1.5.12",
-    "sql-formatter": "^4.0.2",
+    "sql-formatter": "^9.0.0",
     "sql-highlight": "^4.0.1",
     "ts-jest": "^27.1.5"
   },
