@@ -15,6 +15,7 @@ import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
 import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
+import { renderPasswordGenerator } from './renderPasswordGenerator'
 
 const log = debug('au:autofill')
 
@@ -33,22 +34,53 @@ type webInput = {
 
 export const autofillEventsDispatched = new Set()
 
-const autofillValueIntoInput = (element: HTMLInputElement, value) => {
-  log('autofillValueIntoInput:', value)
-  //
+function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
+  if (el) {
+    const keyboardEventInit = {
+      bubbles: false,
+      cancelable: false,
+      composed: false,
+      key: '',
+      code: '',
+      location: 0
+    }
+    const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
+    autofillEventsDispatched.add(keyDown)
+    el.dispatchEvent(keyDown)
+
+    el.value = keyChar
+
+    const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
+    autofillEventsDispatched.add(keyUp)
+    el.dispatchEvent(keyUp)
+
+    const change = new Event('change', { bubbles: true })
+    autofillEventsDispatched.add(change)
+    el.dispatchEvent(change)
+  } else {
+    console.log('el is null')
+  }
+}
+
+export const autofillValueIntoInput = (
+  element: HTMLInputElement,
+  value: string
+) => {
+  log('autofillValueIntoInput:', value, element)
+
+  if (element.childNodes.length > 0) {
+    //we should again loop through the children of the element and find th right input
+    //@ts-ignore
+    imitateKeyInput(element.childNodes[0], value)
+  }
+
   if (isElementInViewport(element) === false || isHidden(element)) {
+    log('isHidden')
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
   }
 
   element.style.backgroundColor = authierColors.green[400]
-  element.value = value
-  const event = new Event('input', {
-    bubbles: false,
-    cancelable: true
-  })
-  autofillEventsDispatched.add(event)
-
-  element.dispatchEvent(event)
+  imitateKeyInput(element, value)
 
   return element
 }
@@ -72,7 +104,10 @@ const uselessInputTypes = [
 const filterUselessInputs = (documentBody: HTMLElement) => {
   const inputEls = documentBody.querySelectorAll('input')
   const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
-    (el) => uselessInputTypes.includes(el.type) === false
+    (el) =>
+      uselessInputTypes.includes(el.type) === false &&
+      el.offsetWidth > 0 &&
+      el.offsetHeight > 0
   )
   return inputElsArray
 }
@@ -85,7 +120,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
   if (autofillEnabled === true) {
     log('enabled is true, returning')
-    return () => {}
+    return () => { }
   }
   log('init autofill', initState)
 
@@ -136,11 +171,24 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       })
       .filter((el) => !!el)
 
-    // Run here function that will recognise register screen and generate new password
-    //TODO Test if all register screen has more then 2 inputs
-    //TODO Test if filledElements is empty, maybe we should call it just when we know we have DOM PATHS
+    //After ceraint condition is met, we can assume this is register page
     const inputs = filterUselessInputs(document.body)
-    if (inputs.length > 2) {
+    console.log('Ussefull inputs', inputs)
+    for (const el of inputs) {
+      if (el.getAttribute('autocomplete') === 'new-password') {
+        renderPasswordGenerator({ input: el })
+        //TODO: show icon for psw generation
+        const password = generate({
+          length: 10,
+          numbers: true,
+          uppercase: true,
+          symbols: true,
+          strict: true
+        })
+        autofillValueIntoInput(el, password)
+        log('Is register screen')
+        return
+      }
     }
 
     //!Guess web inputs, if we have credentials without DOM PATHS
@@ -161,6 +209,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     if (onInputAddedHandler) {
       bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
     }
+
+    //TODO: this does not work right
+    //Catch new inputs
     onInputAddedHandler = debounce(
       (input) => {
         const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
@@ -201,7 +252,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     if (!namePassSecret && !totpSecret) {
       log('no secrets for host')
-      return () => {}
+      return () => { }
     }
 
     if (filledElements.length === 2) {

@@ -323,7 +323,6 @@ export class RootResolver {
     }
 
     if (!challenge) {
-      console.log('PEPA')
       // TODO send notification to user
       // TODO Will we have notifications for browser?
       if (user.masterDevice!.firebaseToken.length > 10) {

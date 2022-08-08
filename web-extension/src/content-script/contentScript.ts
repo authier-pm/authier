@@ -31,6 +31,8 @@ import { renderItemPopup } from './renderItemPopup'
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
+log('STARTING')
+
 const inputKindMap = {
   email: WebInputType.EMAIL,
   username: WebInputType.USERNAME
@@ -50,12 +52,12 @@ export interface IInitStateRes {
     createdAt: string
   }>
   saveLoginModalsState?:
-    | {
-        password: string
-        username: string
-      }
-    | null
-    | undefined
+  | {
+    password: string
+    username: string
+  }
+  | null
+  | undefined
 }
 
 // TODO spec
@@ -75,7 +77,7 @@ let recording = false
 const hideToast = () => {
   const x = document.getElementById('toast')
 
-  setTimeout(function () {
+  setTimeout(function() {
     x?.remove()
   }, 5000)
 }
@@ -139,6 +141,7 @@ function clicked(e: MouseEvent) {
     clickCount = 0
     document.removeEventListener('click', clicked)
 
+    //TODO: We can use inputs on page???
     renderItemPopup()
   }
 }
@@ -182,6 +185,7 @@ export async function initInputWatch() {
     })
     return
   }
+
   const stopAutofillListener = autofill(stateInitRes)
 
   // Render save credential modal after page-rerender
@@ -247,7 +251,15 @@ export async function initInputWatch() {
     }
   }
 
+  const onInputAdded = (input) => {
+    // handle case when password input is added to DOM by javascript
+    if (input.type === 'password' && !domRecorder.hasInput(input)) {
+      autofill(stateInitRes)
+    }
+  }
+
   bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
+  bodyInputChangeEmitter.on('inputAdded', onInputAdded)
 
   /**
    * responsible for saving new web inputs
@@ -362,6 +374,7 @@ export async function initInputWatch() {
     )
     stopAutofillListener()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
+    bodyInputChangeEmitter.off('inputAdded', onInputAdded)
   }
 }
 
@@ -375,3 +388,13 @@ initInputWatch()
 //     initInputWatch()
 //   }
 // })
+
+// For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
+let lastUrl = location.href
+new MutationObserver(() => {
+  const url = location.href
+  if (url !== lastUrl) {
+    lastUrl = url
+    initInputWatch()
+  }
+}).observe(document, { subtree: true, childList: true })

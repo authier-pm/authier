@@ -40,17 +40,17 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
 
   return (
     <Box
-      p="3"
-      rounded="md"
+      p='3'
+      rounded='md'
       bg={useColorModeValue('gray.100', 'gray.700')}
-      minW="300px"
+      minW='300px'
     >
-      <Stat maxW="100%">
-        <Flex justify="space-between" align="center" w="100%">
-          <Flex flexDirection="column">
+      <Stat maxW='100%'>
+        <Flex justify='space-between' align='center' w='100%'>
+          <Flex flexDirection='column'>
             <SecretItemIcon {...totpData}></SecretItemIcon>
           </Flex>
-          <Box ml={4} mr="auto">
+          <Box ml={4} mr='auto'>
             <StatLabel>{totpData.label}</StatLabel>
 
             <StatNumber
@@ -86,9 +86,9 @@ const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
           </Box>
           <Tooltip label={t`Copy TOTP`}>
             <Button
-              size="md"
+              size='md'
               ml={2}
-              variant="solid"
+              variant='solid'
               colorScheme={'cyan'}
               onClick={() => {
                 onCopy()
@@ -113,28 +113,28 @@ const LoginCredentialsListItem = ({
   const { onCopy } = useClipboard(loginSecret.loginCredentials.password)
 
   return (
-    <Box boxShadow="xl" m={2}>
+    <Box boxShadow='xl' m={2}>
       <Flex
         key={loginSecret.url}
-        p="3"
-        rounded="md"
+        p='3'
+        rounded='md'
         bg={useColorModeValue('gray.100', 'gray.700')}
       >
-        <Stat maxW="100%">
-          <Flex justify="space-between" align="center" w="100%">
-            <Flex flexDirection="column">
+        <Stat maxW='100%'>
+          <Flex justify='space-between' align='center' w='100%'>
+            <Flex flexDirection='column'>
               <SecretItemIcon {...loginSecret} />
             </Flex>
-            <Box ml={2} mr="auto" maxW="200px">
+            <Box ml={2} mr='auto' maxW='200px'>
               <Heading
-                size="sm"
-                whiteSpace="nowrap"
-                textOverflow="ellipsis"
-                overflow="hidden"
+                size='sm'
+                whiteSpace='nowrap'
+                textOverflow='ellipsis'
+                overflow='hidden'
               >
                 {loginSecret.label}
               </Heading>
-              <Text fontSize="sm" whiteSpace="nowrap">
+              <Text fontSize='sm' whiteSpace='nowrap'>
                 {loginSecret.loginCredentials.username.replace(
                   /http:\/\/|https:\/\//,
                   ''
@@ -144,10 +144,10 @@ const LoginCredentialsListItem = ({
 
             <Tooltip label={t`Copy password`}>
               <Button
-                size="md"
-                ml="auto"
-                boxShadow="md"
-                variant="solid"
+                size='md'
+                ml='auto'
+                boxShadow='md'
+                variant='solid'
                 color={'green.700'}
                 bgColor={'green.200'}
                 onClick={() => {
@@ -198,7 +198,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
 
   return (
     <>
-      <Flex flexDirection="column">
+      <Flex flexDirection='column'>
         {hasNoSecrets === false &&
           filterByTLD &&
           TOTPForCurrentDomain.length === 0 &&
@@ -235,6 +235,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
               )
             }),
             getRecentlyUsed(loginCredentials).map((psw, i) => {
+              console.log(psw.url)
               return (
                 <LoginCredentialsListItem
                   loginSecret={psw as ILoginSecret}

@@ -4,6 +4,7 @@ export const getQrCodeFromUrl = async (imageUrl: string) => {
   const response = await fetch(imageUrl)
   const fileBlob = await response.blob()
   const bitmap = await createImageBitmap(fileBlob)
+  //TODO: Change, this option is limited on Firefox https://github.com/BabylonJS/Spector.js/issues/137#issue-550442024
   const canvas = new OffscreenCanvas(bitmap.width, bitmap.height)
   const context = canvas.getContext('2d')
   if (context) {

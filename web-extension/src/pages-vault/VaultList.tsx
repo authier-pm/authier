@@ -176,7 +176,7 @@ export const VaultList = () => {
 
   return (
     <VStack flexDirection='column' h={'90vh'}>
-      <Center>
+      <Center justifyContent={'space-evenly'} w={'100%'}>
         <Input
           variant={'filled'}
           color='grey.600'
@@ -219,10 +219,11 @@ export const VaultList = () => {
           />
         )}
       </Center>
-
-      <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
-        <VirtualizedList filter={filterBy} />
-      </div>
+      <Center w={'95%'} h={'95%'}>
+        <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+          <VirtualizedList filter={filterBy} />
+        </div>
+      </Center>
     </VStack>
   )
 }

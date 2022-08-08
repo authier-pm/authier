@@ -61,16 +61,20 @@ export class DeviceQuery extends DeviceGQL {
     const pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
-        kind: 'LOGIN_CREDENTIALS'
+        kind: 'LOGIN_CREDENTIALS',
+        deletedAt: null
       }
     })
 
     const TOTPCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
-        kind: 'LOGIN_CREDENTIALS'
+        kind: 'TOTP',
+        deletedAt: null
       }
     })
+
+    console.log(pswLimit, pswCount)
 
     if (pswCount > pswLimit) {
       throw new GraphqlError(

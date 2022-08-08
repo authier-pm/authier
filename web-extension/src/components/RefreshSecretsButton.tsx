@@ -14,15 +14,14 @@ export function RefreshSecretsButton() {
       aria-label={t`Synchronize vault`}
     >
       <IconButton
-        size="md"
-        ml="2"
-        aria-label="menu"
+        size='md'
+        ml='2'
+        aria-label='menu'
         icon={<IoMdRefreshCircle />}
         disabled={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
           const res = await device.state?.backendSync()
-
           setIsSyncing(false)
           toast.success(
             t`Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`

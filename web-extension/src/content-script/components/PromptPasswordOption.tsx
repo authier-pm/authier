@@ -10,7 +10,7 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Option.css'
-import { autofill, autofillEnabled } from '../autofill'
+import { autofill } from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   let { loginCredentials, webInputs } = props
@@ -24,11 +24,11 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer
-  window.onresize = function () {
+  window.onresize = function() {
     if (promptOption) {
       promptOption.remove()
       clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(function () {
+      resizeTimer = setTimeout(function() {
         setPos(el?.getBoundingClientRect())
         document.body.appendChild(promptOption!)
       }, 100)
@@ -41,7 +41,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
 
   return (
     <div
-      className="dropdown"
+      className='dropdown'
       style={{
         zIndex: '2147483647', // max z-index according to stackoverflow
         justifyContent: 'center',
@@ -54,9 +54,9 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         bottom: pos.bottom + 'px'
       }}
     >
-      <span className="iconAuthier"></span>
+      <span className='iconAuthier'></span>
 
-      <div className="dropdown-content">
+      <div className='dropdown-content'>
         {loginCredentials.map((el) => {
           return (
             <a

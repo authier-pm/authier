@@ -53,7 +53,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     // })
 
     const { id, deviceId, userId } = this
-    console.log('addNewDeviceForUser', id, deviceId, userId)
+
     const where = { id: userId }
 
     // TODO use findUnique when prisma bug gets fixed

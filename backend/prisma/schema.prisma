@@ -189,7 +189,7 @@ model User {
 
   deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofill                      Boolean @default(false)
+  autofill                      Boolean @default(true)
   language                      String  @default("en")
   theme                         String  @default("dark")
 
