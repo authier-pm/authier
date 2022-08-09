@@ -325,7 +325,10 @@ export class RootResolver {
 
     if (!challenge) {
       // TODO Will we have notifications for browser?
-      if (user.masterDevice!.firebaseToken.length > 10) {
+      if (
+        user.masterDevice?.firebaseToken &&
+        user.masterDevice.firebaseToken.length > 10
+      ) {
         await admin
           .messaging()
           .sendToDevice(user.masterDevice?.firebaseToken as string, {
