@@ -38,8 +38,8 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
   return (
     <Center key={data.id} py={5} m={['auto', '3']}>
       <Box
-        w='250px'
-        h='195px'
+        w="250px"
+        h="195px"
         bg={useColorModeValue('white', 'gray.800')}
         boxShadow={'2xl'}
         rounded={'md'}
@@ -47,25 +47,25 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
         onMouseOver={() => setIsVisible(true)}
         onMouseOut={() => setIsVisible(false)}
       >
-        <Box bg={'gray.100'} h='70%' pos={'relative'}>
+        <Box bg={'gray.100'} h="70%" pos={'relative'}>
           <Center h={130}>
             <SecretItemIcon {...data} />
           </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
-            alignItems='center'
-            justifyContent='center'
+            alignItems="center"
+            justifyContent="center"
             zIndex={9}
-            position='absolute'
+            position="absolute"
             top={0}
-            bgColor='blackAlpha.600'
-            w='100%'
-            h='full'
+            bgColor="blackAlpha.600"
+            w="100%"
+            h="full"
           >
             {data.url ? (
               <IconButton
-                aria-label='open item'
-                colorScheme='blackAlpha'
+                aria-label="open item"
+                colorScheme="blackAlpha"
                 icon={<UnlockIcon />}
                 onClick={() => chrome.tabs.create({ url: data.url })}
               />
@@ -79,8 +79,8 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
               backgroundColor={'red.400'}
               _hover={{ backgroundColor: 'red.500' }}
               position={'absolute'}
-              right='0'
-              top='inherit'
+              right="0"
+              top="inherit"
               onClick={onOpen}
             />
 
@@ -99,9 +99,9 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
           </Flex>
         </Box>
         <Flex
-          flexDirection='row'
-          align='center'
-          justifyContent='space-between'
+          flexDirection="row"
+          align="center"
+          justifyContent="space-between"
           p={4}
         >
           <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
@@ -115,10 +115,10 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
             state={{ data: data }}
           >
             <IconButton
-              size='sm'
+              size="sm"
               display={isVisible ? 'block' : 'none'}
-              aria-label='open item'
-              colorScheme='gray'
+              aria-label="open item"
+              colorScheme="gray"
               icon={<SettingsIcon />}
             />
           </Link>
@@ -172,21 +172,21 @@ export const VaultList = () => {
     ).length
 
   return (
-    <VStack flexDirection='column' h={'90vh'}>
+    <VStack flexDirection="column" h={'90vh'}>
       <Center justifyContent={'space-evenly'} w={'100%'}>
         <Input
           variant={'filled'}
-          color='grey.600'
+          color="grey.600"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}
-          m='auto'
+          m="auto"
           onChange={(ev) => {
             setFilterBy(ev.target.value)
           }}
         />
 
         <Center px={3}>
-          <Stat ml='auto' whiteSpace={'nowrap'}>
+          <Stat ml="auto" whiteSpace={'nowrap'}>
             {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
           </Stat>
 
@@ -196,12 +196,12 @@ export const VaultList = () => {
         {totpCond || pswCond ? (
           <Tooltip
             shouldWrapChildren
-            label='You have reached your limit'
-            aria-label='A tooltip'
+            label="You have reached your limit"
+            aria-label="A tooltip"
           >
             <IconButton
               disabled={true}
-              aria-label='Add item'
+              aria-label="Add item"
               icon={<AddIcon />}
               rounded={'full'}
               onClick={async () => navigate('/addItem')}
@@ -209,7 +209,7 @@ export const VaultList = () => {
           </Tooltip>
         ) : (
           <IconButton
-            aria-label='Add item'
+            aria-label="Add item"
             icon={<AddIcon />}
             rounded={'full'}
             onClick={async () => navigate('/addItem')}

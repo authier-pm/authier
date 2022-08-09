@@ -227,7 +227,7 @@ browser.runtime.onMessage.addListener(async function(
 
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
-        deviceState.lockTime = req.settings.vaultLockTimeoutSeconds.toString()
+        deviceState.lockTime = req.settings.vaultLockTimeoutSeconds
         deviceState.theme = req.settings.theme
         deviceState.syncTOTP = req.settings.syncTOTP
         deviceState.language = req.settings.language
@@ -237,7 +237,7 @@ browser.runtime.onMessage.addListener(async function(
         //Refresh the lock interval
         lockInterval = clearInterval(lockInterval)
         lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + parseInt(deviceState.lockTime) * 1000
+        lockTimeEnd = lockTimeStart + deviceState.lockTime * 1000
 
         checkInterval(lockTimeEnd)
         deviceState.save()

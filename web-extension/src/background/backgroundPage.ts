@@ -8,13 +8,13 @@ localStorage.debug = 'au:*' // enable all debug messages
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/firebase-messaging-sw.js')
-    .then(function (registration) {
+    .then(function(registration) {
       log(
         'ServiceWorker registration successful with scope: ',
         registration.scope
       )
     })
-    .catch(function (err) {
+    .catch(function(err) {
       //registration failed :(
       log('ServiceWorker registration failed: ', err)
     })
@@ -44,7 +44,7 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  lockTime: string
+  lockTime: number
   autofill: boolean
   language: string
   theme: string

@@ -69,6 +69,7 @@ model Device {
   SecretUsageEvents SecretUsageEvent[]
 
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
+
   @@index([updatedAt])
   @@index([lastSyncAt])
 }
@@ -118,7 +119,16 @@ model SecretUsageEvent {
   deviceId    String          @db.Uuid
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])
+}
 
+model MasterDeviceChange {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  processAt   DateTime
+  oldDeviceId String
+  newDeviceId String
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 model MasterDeviceChange {

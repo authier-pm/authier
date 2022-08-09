@@ -11,9 +11,9 @@ export const ColorModeButton = () => {
 
   return (
     <IconButton
-      size="lg"
-      variant="ghost"
-      aria-label="change color mode"
+      size='lg'
+      variant='ghost'
+      aria-label='change color mode'
       icon={<FiMoon />}
       onClick={async () => {
         if (deviceState) {
@@ -22,7 +22,7 @@ export const ColorModeButton = () => {
             language: deviceState.language,
             syncTOTP: deviceState.syncTOTP,
             theme: deviceState.theme === 'light' ? 'dark' : 'light',
-            vaultLockTimeoutSeconds: parseInt(deviceState.lockTime)
+            vaultLockTimeoutSeconds: deviceState.lockTime
           }
 
           await updateSettings({
@@ -35,7 +35,7 @@ export const ColorModeButton = () => {
         }
         toggleColorMode()
       }}
-      mt="auto"
+      mt='auto'
     />
   )
 }

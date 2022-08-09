@@ -71,14 +71,14 @@ const DeviceListItem = ({
     <>
       <Flex py={6} m={5}>
         <Box
-          w='350px'
+          w="350px"
           bg={useColorModeValue('white', 'gray.800')}
           boxShadow={'2xl'}
           rounded={'lg'}
           p={6}
         >
           <Stack
-            justifyContent='space-between'
+            justifyContent="space-between"
             direction={'row'}
             spacing={3}
             alignItems={'baseline'}
@@ -86,21 +86,21 @@ const DeviceListItem = ({
           >
             <HStack mb={2} spacing={3}>
               {deviceInfo.id === device.id && (
-                <Badge height='min-content' colorScheme='yellow'>
+                <Badge height="min-content" colorScheme="yellow">
                   Current
                 </Badge>
               )}
               {deviceInfo.id === masterDeviceId && (
-                <Badge height='min-content' colorScheme='purple'>
+                <Badge height="min-content" colorScheme="purple">
                   Master
                 </Badge>
               )}
               {deviceInfo.logoutAt ? (
-                <Badge height='min-content' colorScheme='red'>
+                <Badge height="min-content" colorScheme="red">
                   <Trans>Logged out</Trans>
                 </Badge>
               ) : (
-                <Badge height='min-content' colorScheme='green'>
+                <Badge height="min-content" colorScheme="green">
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
@@ -109,10 +109,10 @@ const DeviceListItem = ({
             <Menu>
               <MenuButton
                 as={IconButton}
-                size='xs'
-                variant='unstyled'
-                aria-label='Favourite'
-                fontSize='15px'
+                size="xs"
+                variant="unstyled"
+                aria-label="Favourite"
+                fontSize="15px"
                 icon={<SettingsIcon color={'white'} />}
               />
               <MenuList>
@@ -188,14 +188,14 @@ const DeviceListItem = ({
                   values
                 }) => (
                   <form onSubmit={handleSubmit}>
-                    <VStack spacing={4} align='flex-start'>
+                    <VStack spacing={4} align="flex-start">
                       <FormControl
                         isInvalid={!!errors.lockTime && touched.lockTime}
                       >
-                        <FormLabel htmlFor='lockTime'>
+                        <FormLabel htmlFor="lockTime">
                           <Trans>Lock time</Trans>
                         </FormLabel>
-                        <Field as={Select} id='lockTime' name='lockTime'>
+                        <Field as={Select} id="lockTime" name="lockTime">
                           <option value={60}>1 minute</option>
                           <option value={120}>2 minutes</option>
                           <option value={3600}>1 hour</option>
@@ -215,12 +215,12 @@ const DeviceListItem = ({
                       </FormControl>
 
                       {/* Not ideal, later refactor */}
-                      <Field name='twoFA'>
+                      <Field name="twoFA">
                         {({ field, form }: FieldProps) => {
                           const { onChange, ...rest } = field
                           return (
                             <FormControl
-                              id='twoFA'
+                              id="twoFA"
                               isInvalid={
                                 !!form.errors['twoFA'] &&
                                 !!form.touched['twoFA']
@@ -228,7 +228,7 @@ const DeviceListItem = ({
                             >
                               <Checkbox
                                 {...rest}
-                                id='twoFA'
+                                id="twoFA"
                                 onChange={onChange}
                                 defaultChecked={values.twoFA}
                               >
@@ -241,10 +241,10 @@ const DeviceListItem = ({
 
                       <Button
                         mt={4}
-                        colorScheme='teal'
+                        colorScheme="teal"
                         disabled={isSubmitting || !dirty}
                         isLoading={isSubmitting}
-                        type='submit'
+                        type="submit"
                       >
                         <Trans>Save</Trans>
                       </Button>
@@ -317,18 +317,18 @@ export default function Devices() {
   }, [])
 
   return (
-    <Flex flexDirection='column'>
+    <Flex flexDirection="column">
       <Center>
         <Input
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search for device`}
-          m='auto'
+          m="auto"
           onChange={(ev) => {
             setFilterBy(ev.target.value)
           }}
         />
         <Center px={3}>
-          <Stat ml='auto' whiteSpace={'nowrap'}>
+          <Stat ml="auto" whiteSpace={'nowrap'}>
             {data?.me?.devices.length} {t`devices`}
           </Stat>
 
@@ -341,8 +341,8 @@ export default function Devices() {
           (challengeToApprove) => {
             return (
               <Alert
-                status='warning'
-                display='grid'
+                status="warning"
+                display="grid"
                 gridRowGap={1}
                 maxW={500}
                 key={challengeToApprove.id}
@@ -358,12 +358,12 @@ export default function Devices() {
 
                 <Grid
                   gridGap={1}
-                  autoFlow='row'
-                  templateColumns='repeat(auto-fit, 49%)'
+                  autoFlow="row"
+                  templateColumns="repeat(auto-fit, 49%)"
                 >
                   <Button
-                    w='100%'
-                    colorScheme='red'
+                    w="100%"
+                    colorScheme="red"
                     onClick={async () => {
                       await reject({
                         variables: {
@@ -376,8 +376,8 @@ export default function Devices() {
                     <Trans>Reject</Trans>
                   </Button>
                   <Button
-                    w='100%'
-                    colorScheme='green'
+                    w="100%"
+                    colorScheme="green"
                     onClick={async () => {
                       await approve({
                         variables: {
@@ -396,11 +396,11 @@ export default function Devices() {
         )}
       </VStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection='column'>
-          <Flex flexDirection='row' flexWrap='wrap' m='auto'>
+        <Flex flexDirection="column">
+          <Flex flexDirection="row" flexWrap="wrap" m="auto">
             {loading ? (
               <Center pt={5}>
-                <Spinner size='lg' />
+                <Spinner size="lg" />
               </Center>
             ) : (
               data?.me?.devices
