@@ -131,16 +131,6 @@ model MasterDeviceChange {
   user        User     @relation(fields: [userId], references: [id])
 }
 
-model MasterDeviceChange {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  processAt   DateTime
-  oldDeviceId String
-  newDeviceId String
-  userId      String   @db.Uuid
-  user        User     @relation(fields: [userId], references: [id])
-}
-
 // recorded whenever user unlocks vault
 // model VaultUnlockEvents {
 //     id             Int       @id @default(autoincrement())
