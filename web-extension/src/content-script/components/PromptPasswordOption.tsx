@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { h } from 'preact'
 
 import { useState } from 'preact/hooks'
@@ -41,7 +42,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
 
   return (
     <div
-      className='dropdown'
+      className="dropdown"
       style={{
         zIndex: '2147483647', // max z-index according to stackoverflow
         justifyContent: 'center',
@@ -54,9 +55,9 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         bottom: pos.bottom + 'px'
       }}
     >
-      <span className='iconAuthier'></span>
+      <span className="iconAuthier"></span>
 
-      <div className='dropdown-content'>
+      <div className="dropdown-content">
         {loginCredentials.map((el) => {
           return (
             <a

@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { h, render } from 'preact'
 import { PromptPasswordGenerator } from './components/PromptPasswordGenerator'
 
