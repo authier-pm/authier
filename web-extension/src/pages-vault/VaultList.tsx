@@ -23,7 +23,6 @@ import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
-import { useDebounce } from './useDebounce'
 import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
 import { useSyncSettingsQuery } from '@src/components/vault/settings/VaultConfig.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
@@ -129,13 +128,11 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
   )
 }
 
-// TODO virtualize this
 export const VaultList = () => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
-  const debouncedSearchTerm = useDebounce(filterBy, 400)
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
   const { data, loading } = useSyncSettingsQuery({

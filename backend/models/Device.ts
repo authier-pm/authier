@@ -74,16 +74,14 @@ export class DeviceQuery extends DeviceGQL {
       }
     })
 
-    console.log(pswLimit, pswCount)
-
     if (pswCount > pswLimit) {
-      throw new GraphqlError(
+      return new GraphqlError(
         `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
       )
     }
 
     if (TOTPCount > TOTPLimit) {
-      throw new GraphqlError(
+      return new GraphqlError(
         `TOTP limit exceeded, remove ${TOTPCount - TOTPLimit} TOTP secrets`
       )
     }

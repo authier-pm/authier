@@ -9,7 +9,7 @@ import { EncryptedSecretInput, SettingsInput } from './models'
 import { UserGQL } from './generated/User'
 
 import { DeviceGQL } from './generated/Device'
-import { UserBase } from './UserQuery'
+import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
@@ -113,8 +113,42 @@ export class UserMutation extends UserBase {
   async addEncryptedSecrets(
     @Arg('secrets', () => [EncryptedSecretInput])
     secrets: EncryptedSecretInput[],
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContextAuthenticated
   ) {
+    const userData = ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.jwtPayload.userId
+      }
+    })
+
+    const userQuery = new UserQuery(userData)
+    const pswLimit = await userQuery.PasswordLimits(ctx)
+    const TOTPLimit = await userQuery.TOTPLimits(ctx)
+    const pswCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'LOGIN_CREDENTIALS',
+        deletedAt: null
+      }
+    })
+
+    const TOTPCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'TOTP',
+        deletedAt: null
+      }
+    })
+
+    console.log(pswLimit, pswCount)
+
+    if (pswCount >= pswLimit) {
+      return new GraphqlError(`Password limit exceeded.`)
+    }
+
+    if (TOTPCount >= TOTPLimit) {
+      return new GraphqlError(`TOTP limit exceeded.`)
+    }
     return ctx.prisma.$transaction(
       // prisma.createMany cannot be used here https://github.com/prisma/prisma/issues/8131
       secrets.map((secret) =>

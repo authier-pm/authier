@@ -22,24 +22,26 @@ export const useLogin = (props: { deviceName: string }) => {
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
 
-  const [getDeviceDecryptionChallenge, { data: decryptionData }] =
-    useDeviceDecryptionChallengeMutation({
-      variables: {
-        deviceInput: {
-          id: device.id,
-          name: props.deviceName,
-          platform: device.platform
-        },
-        email: formState.email
-      }
-    })
+  const [
+    getDeviceDecryptionChallenge,
+    { data: decryptionData, error: decrChallError }
+  ] = useDeviceDecryptionChallengeMutation({
+    variables: {
+      deviceInput: {
+        id: device.id,
+        name: props.deviceName,
+        platform: device.platform
+      },
+      email: formState.email
+    }
+  })
 
   useEffect(() => {
-    if (error) {
+    if (error || decrChallError) {
       toast.error('failed to create decryption challenge')
       setFormState(null)
     }
-  }, [error])
+  }, [error, decrChallError])
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
@@ -49,11 +51,12 @@ export const useLogin = (props: { deviceName: string }) => {
   useEffect(() => {
     console.log('~ decryptionData', decryptionData)
     const { fireToken } = device
+
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -124,7 +127,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -189,7 +192,7 @@ export const LoginAwaitingApproval: React.FC = () => {
     return (
       <>
         <Trans>Device: </Trans>
-        <Heading size="sm">{deviceName}</Heading>
+        <Heading size='sm'>{deviceName}</Heading>
         <br />
         <Trans>
           Approve this device in your device management in the vault on another

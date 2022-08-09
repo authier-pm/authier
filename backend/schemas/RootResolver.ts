@@ -264,6 +264,7 @@ export class RootResolver {
         ipAddress
       }
     })
+
     if (isBlocked) {
       throw new GraphqlError('Login failed, try again later.')
     }
@@ -323,10 +324,8 @@ export class RootResolver {
     }
 
     if (!challenge) {
-      // TODO send notification to user
       // TODO Will we have notifications for browser?
       if (user.masterDevice!.firebaseToken.length > 10) {
-        console.log('Hey message')
         await admin
           .messaging()
           .sendToDevice(user.masterDevice?.firebaseToken as string, {
@@ -335,7 +334,7 @@ export class RootResolver {
               body: 'New device is trying to log in.'
             },
             data: {
-              type: 'test'
+              type: 'Devices'
             }
           })
       }
