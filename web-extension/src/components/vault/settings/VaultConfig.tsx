@@ -11,13 +11,12 @@ import {
   Select
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
-import React, { useContext } from 'react'
+import React, { useContext, useState } from 'react'
 import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { SettingsInput } from '../../../../../shared/generated/graphqlBaseTypes'
-import { device } from '@src/background/ExtensionDevice'
 
 import {
   SyncSettingsDocument,
@@ -25,7 +24,7 @@ import {
 } from './VaultConfig.codegen'
 
 export default function VaultConfig() {
-  const { setSecuritySettings } = useContext(DeviceStateContext)
+  const { setSecuritySettings, device } = useContext(DeviceStateContext)
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
   })
@@ -87,9 +86,19 @@ export default function VaultConfig() {
                 errors,
                 touched,
                 values,
-                isSubmitting
+                isSubmitting,
+                submitForm,
+                resetForm
               }) => (
-                <form onSubmit={handleSubmit}>
+                <form
+                  onBlur={async () => {
+                    if (dirty) {
+                      await submitForm()
+                      resetForm({ values })
+                    }
+                  }}
+                  onSubmit={handleSubmit}
+                >
                   <VStack spacing={4} align="flex-start">
                     <FormControl
                       isInvalid={

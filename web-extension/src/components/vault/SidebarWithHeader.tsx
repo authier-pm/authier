@@ -21,7 +21,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  useColorMode,
   Spinner
 } from '@chakra-ui/react'
 import {
@@ -30,17 +29,15 @@ import {
   FiSettings,
   FiMenu,
   FiChevronDown,
-  FiMoon,
   FiHardDrive,
   FiDisc
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
-import { ReactText } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { t, Trans } from '@lingui/macro'
+import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Trans } from '@lingui/macro'
 import { ColorModeButton } from '../ColorModeButton'
 
 interface LinkItemProps {
@@ -75,7 +72,7 @@ export default function SidebarWithHeader({
 }) {
   const { isOpen, onOpen, onClose } = useDisclosure()
   return (
-    <Box minH='100vh' bg={useColorModeValue('gray.50', 'gray.900')}>
+    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
       <SidebarContent
         onClose={() => onClose}
         display={{ base: 'none', md: 'block' }}
@@ -83,11 +80,11 @@ export default function SidebarWithHeader({
       <Drawer
         autoFocus={false}
         isOpen={isOpen}
-        placement='left'
+        placement="left"
         onClose={onClose}
         returnFocusOnClose={false}
         onOverlayClick={onClose}
-        size='full'
+        size="full"
       >
         <DrawerContent>
           <SidebarContent onClose={onClose} />
@@ -95,7 +92,7 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p='7'>
+      <Box ml={{ base: 0, md: 60 }} p="7">
         {children}
       </Box>
     </Box>
@@ -113,20 +110,20 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   }
   return (
     <Flex
-      transition='1s ease'
+      transition="1s ease"
       bg={useColorModeValue('white', 'gray.800')}
-      borderRight='1px'
+      borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
       w={{ base: 'full', md: 60 }}
-      pos='fixed'
-      h='full'
-      flexDirection='column'
-      alignItems='center'
+      pos="fixed"
+      h="full"
+      flexDirection="column"
+      alignItems="center"
       {...rest}
     >
-      <Flex justifyContent={'flex-end'} flexDirection='column' height='inherit'>
-        <Flex h='20' alignItems='center' mx='8' justifyContent='space-between'>
-          <Text fontSize='2xl' fontFamily='monospace' fontWeight='bold'>
+      <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
+        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
             Authier
           </Text>
           <CloseButton
@@ -134,7 +131,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
             onClick={onClose}
           />
         </Flex>
-        <Flex flexDirection='column' height='100%'>
+        <Flex flexDirection="column" height="100%">
           {LinkItems.map((link, i) => (
             <NavItem key={i} icon={link.icon} path={link.path}>
               {link.title}
@@ -143,33 +140,33 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           <ColorModeButton />
         </Flex>
 
-        <HStack spacing={{ base: '0', md: '6' }} w='80%' m={4}>
-          <Flex alignItems={'center'} w='100%'>
+        <HStack spacing={{ base: '0', md: '6' }} w="80%" m={4}>
+          <Flex alignItems={'center'} w="100%">
             <Menu>
               <MenuButton
                 py={2}
-                transition='all 0.3s'
+                transition="all 0.3s"
                 _focus={{ boxShadow: 'none' }}
-                w='100%'
+                w="100%"
               >
-                <Flex w='100%'>
+                <Flex w="100%">
                   <Avatar
                     size={'sm'}
                     src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
                   />
                   <VStack
                     display={{ base: 'none', md: 'flex' }}
-                    alignItems='flex-start'
-                    spacing='1px'
-                    ml='2'
-                    mr='auto'
+                    alignItems="flex-start"
+                    spacing="1px"
+                    ml="2"
+                    mr="auto"
                   >
-                    <Text fontSize='sm'>{email}</Text>
-                    <Text fontSize='xs' color='gray.600'>
+                    <Text fontSize="sm">{email}</Text>
+                    <Text fontSize="xs" color="gray.600">
                       Admin
                     </Text>
                   </VStack>
-                  <Box display={{ base: 'none', md: 'flex' }} ml='auto'>
+                  <Box display={{ base: 'none', md: 'flex' }} ml="auto">
                     <ChevronDownIcon boxSize={19} />
                   </Box>
                 </Flex>
@@ -178,12 +175,15 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 bg={useColorModeValue('white', 'gray.900')}
                 borderColor={useColorModeValue('gray.200', 'gray.700')}
               >
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
-                <MenuItem>Billing</MenuItem>
+                <Link as={RouterLink} to="/settings/account">
+                  <MenuItem>Settings</MenuItem>
+                </Link>
+                <Link as={RouterLink} to="/account-limits">
+                  <MenuItem>Billing</MenuItem>
+                </Link>
                 <MenuDivider />
                 <MenuItem
-                  backgroundColor='red.500'
+                  backgroundColor="red.500"
                   _hover={{
                     backgroundColor: useColorModeValue('red.200', 'red.400')
                   }}
@@ -205,7 +205,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType
   path: string
-  children: ReactText | JSX.Element
+  children: JSX.Element
 }
 const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
   return (
@@ -218,12 +218,12 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
       }}
     >
       <Flex
-        align='center'
-        p='4'
-        mx='4'
-        borderRadius='lg'
-        role='group'
-        cursor='pointer'
+        align="center"
+        p="4"
+        mx="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
         _hover={{
           bg: 'cyan.100',
           color: 'gray.400'
@@ -232,8 +232,8 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
       >
         {icon && (
           <Icon
-            mr='4'
-            fontSize='16'
+            mr="4"
+            fontSize="16"
             _groupHover={{
               color: 'gray.400'
             }}
@@ -256,10 +256,10 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
     <Flex
       ml={{ base: 0, md: 60 }}
       px={{ base: 4, md: 4 }}
-      height='20'
-      alignItems='center'
+      height="20"
+      alignItems="center"
       bg={useColorModeValue('white', 'gray.900')}
-      borderBottomWidth='1px'
+      borderBottomWidth="1px"
       borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       justifyContent={{ base: 'space-between', md: 'flex-end' }}
       {...rest}
@@ -267,16 +267,16 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       <IconButton
         display={{ base: 'flex', md: 'none' }}
         onClick={onOpen}
-        variant='outline'
-        aria-label='open menu'
+        variant="outline"
+        aria-label="open menu"
         icon={<FiMenu />}
       />
 
       <Text
         display={{ base: 'flex', md: 'none' }}
-        fontSize='2xl'
-        fontFamily='monospace'
-        fontWeight='bold'
+        fontSize="2xl"
+        fontFamily="monospace"
+        fontWeight="bold"
       >
         Logo
       </Text>
@@ -287,7 +287,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
           <Menu>
             <MenuButton
               py={2}
-              transition='all 0.3s'
+              transition="all 0.3s"
               _focus={{ boxShadow: 'none' }}
             >
               <HStack>
@@ -297,12 +297,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                 />
                 <VStack
                   display={{ base: 'none', md: 'flex' }}
-                  alignItems='flex-start'
-                  spacing='1px'
-                  ml='2'
+                  alignItems="flex-start"
+                  spacing="1px"
+                  ml="2"
                 >
-                  <Text fontSize='sm'>{email}</Text>
-                  <Text fontSize='xs' color='gray.600'>
+                  <Text fontSize="sm">{email}</Text>
+                  <Text fontSize="xs" color="gray.600">
                     Admin
                   </Text>
                 </VStack>
@@ -315,12 +315,15 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
+              <Link as={RouterLink} to="/settings/account">
+                <MenuItem>Settings</MenuItem>
+              </Link>
+              <Link as={RouterLink} to="/account-limits">
+                <MenuItem>Billing</MenuItem>
+              </Link>
               <MenuDivider />
               <MenuItem
-                backgroundColor='red.400'
+                backgroundColor="red.400"
                 onClick={() => {
                   device.logout()
                 }}
