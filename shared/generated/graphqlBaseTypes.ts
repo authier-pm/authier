@@ -231,49 +231,34 @@ export enum EmailVerificationType {
 export type EncryptedSecretGql = {
   __typename?: 'EncryptedSecretGQL';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];
 };
 
 export type EncryptedSecretInput = {
-  androidUri?: InputMaybe<Scalars['String']>;
   encrypted: Scalars['String'];
-  iconUrl?: InputMaybe<Scalars['String']>;
-  iosUri?: InputMaybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
 };
 
 export type EncryptedSecretMutation = {
   __typename?: 'EncryptedSecretMutation';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   delete: EncryptedSecretGql;
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   lastUsedAt?: Maybe<Scalars['DateTime']>;
   update: EncryptedSecretGql;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];
@@ -285,31 +270,21 @@ export type EncryptedSecretMutationUpdateArgs = {
 };
 
 export type EncryptedSecretPatchInput = {
-  androidUri?: InputMaybe<Scalars['String']>;
   encrypted: Scalars['String'];
-  iconUrl?: InputMaybe<Scalars['String']>;
   id: Scalars['UUID'];
-  iosUri?: InputMaybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
 };
 
 export type EncryptedSecretQuery = {
   __typename?: 'EncryptedSecretQuery';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   lastUsedAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];

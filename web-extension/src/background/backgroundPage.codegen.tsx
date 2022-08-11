@@ -8,7 +8,7 @@ export type AddEncryptedSecretsMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, url?: string | null, iconUrl?: string | null, label: string, version: number, createdAt: string, updatedAt?: string | null }> } };
+export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, version: number, createdAt: string, updatedAt?: string | null }> } };
 
 
 export const AddEncryptedSecretsDocument = gql`
@@ -18,9 +18,6 @@ export const AddEncryptedSecretsDocument = gql`
       id
       kind
       encrypted
-      url
-      iconUrl
-      label
       version
       createdAt
       updatedAt

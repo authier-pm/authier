@@ -36,7 +36,7 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
     return null
   }
   return (
-    <Center key={data.id} py={5} m={['auto', '3']}>
+    <Center py={5} m={['auto', '3']}>
       <Box
         w="250px"
         h="195px"
@@ -161,7 +161,6 @@ export const VaultList = () => {
   if (loading && !data) {
     return <Spinner />
   }
-
   const totpCond =
     data!.me.TOTPlimit <=
     device!.state!.decryptedSecrets.filter((x) => x.kind === 'TOTP').length

@@ -60,7 +60,7 @@ const mapCsvToLoginCredentials = (csv: string[][]) => {
     .map((row) => ({
       url: row[indexUrl],
       label: row[indexLabel],
-      loginCredential: {
+      loginCredentials: {
         username: row[indexUsername],
         password: row[indexPassword]
       }
@@ -101,23 +101,23 @@ export const onFileAccepted: any = (
             break
           }
 
-          let hostname
+          let hostname: string
           try {
             hostname = new URL(creds.url).hostname
           } catch (error) {
             skipped++
-            continue
+            break
           }
 
           const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-            loginCredentials: creds.loginCredential,
-            encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
-            iconUrl: null,
-            createdAt: new Date().toJSON(),
+            loginCredentials: creds,
             url: creds.url,
+            encrypted: state?.encrypt(JSON.stringify(creds)),
+            createdAt: new Date().toJSON(),
+            iconUrl: null,
             label:
-              creds.label ?? `${creds.loginCredential.username}@${hostname}`
+              creds.label ?? `${creds.loginCredentials.username}@${hostname}`
           }
 
           if (state.findExistingSecret(input)) {

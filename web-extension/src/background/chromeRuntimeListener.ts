@@ -59,7 +59,7 @@ let lockTimeStart
 let lockInterval
 
 log('background page loaded')
-browser.runtime.onMessage.addListener(async function(
+browser.runtime.onMessage.addListener(async function (
   req: {
     action: BackgroundMessageType
     payload: any
@@ -104,10 +104,7 @@ browser.runtime.onMessage.addListener(async function(
           kind: EncryptedSecretType.LOGIN_CREDENTIALS,
           loginCredentials: namePassPair,
           encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
-          iconUrl: tab.favIconUrl,
-          url: inputsUrl,
-          createdAt: new Date().toJSON(),
-          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+          createdAt: new Date().toJSON()
         }
       ])
       if (!secret) {

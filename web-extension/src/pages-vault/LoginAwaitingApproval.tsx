@@ -56,7 +56,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ; (async () => {
+      ;(async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -127,7 +127,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-            'DecryptionChallengeApproved'
+          'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -192,7 +192,7 @@ export const LoginAwaitingApproval: React.FC = () => {
     return (
       <>
         <Trans>Device: </Trans>
-        <Heading size='sm'>{deviceName}</Heading>
+        <Heading size="sm">{deviceName}</Heading>
         <br />
         <Trans>
           Approve this device in your device management in the vault on another

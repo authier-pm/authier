@@ -30,7 +30,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
 
         return (
           <List
-            className='List'
+            className="List"
             width={width}
             height={height}
             rowCount={rowCount}
@@ -42,18 +42,21 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
 
               for (let i = fromIndex; i < toIndex; i++) {
                 items.push(
-                  <VaultListItem data={filteredItems[i]}></VaultListItem>
+                  <VaultListItem
+                    key={filteredItems[i].id}
+                    data={filteredItems[i]}
+                  ></VaultListItem>
                 )
               }
 
               return (
                 <Flex
                   flexDirection={'row'}
-                  justifyContent='center'
+                  justifyContent="center"
                   alignItems={'center'}
                   w={'100%'}
-                  h='100%'
-                  className='Row'
+                  h="100%"
+                  className="Row"
                   key={key}
                   style={style}
                 >
