@@ -1,10 +1,8 @@
 // @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
-import { domRecorder } from '../contentScript'
 import { promptDiv } from '../renderSaveCredentialsForm'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h

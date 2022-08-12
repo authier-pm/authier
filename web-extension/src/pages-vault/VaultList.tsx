@@ -9,7 +9,10 @@ import {
   Input,
   useDisclosure,
   Stat,
-  useColorMode
+  useColorMode,
+  Tooltip,
+  Spinner,
+  VStack
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import React, { useContext, useEffect, useState } from 'react'
@@ -20,11 +23,11 @@ import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
-import { useDebounce } from './useDebounce'
 import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
 import { useSyncSettingsQuery } from '@src/components/vault/settings/VaultConfig.codegen'
+import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 
-function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
+export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
@@ -125,18 +128,19 @@ function Item({ data }: { data: ILoginSecret | ITOTPSecret }) {
   )
 }
 
-// TODO virtualize this
 export const VaultList = () => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
-  const debouncedSearchTerm = useDebounce(filterBy, 400)
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
-  const { data, loading } = useSyncSettingsQuery()
+  const { data, loading } = useSyncSettingsQuery({
+    fetchPolicy: 'cache-and-network'
+  })
   const { colorMode, toggleColorMode } = useColorMode()
 
+  // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
       if (colorMode !== data.me.theme) {
@@ -154,10 +158,24 @@ export const VaultList = () => {
     }
   }, [data, loading])
 
+  if (loading && !data) {
+    return <Spinner />
+  }
+  const totpCond =
+    data!.me.TOTPlimit <=
+    device!.state!.decryptedSecrets.filter((x) => x.kind === 'TOTP').length
+  const pswCond =
+    data!.me.PasswordLimits <=
+    device!.state!.decryptedSecrets.filter(
+      (x) => x.kind === 'LOGIN_CREDENTIALS'
+    ).length
+
   return (
-    <Flex flexDirection="column">
-      <Center>
+    <VStack flexDirection="column" h={'90vh'}>
+      <Center justifyContent={'space-evenly'} w={'100%'}>
         <Input
+          variant={'filled'}
+          color="grey.600"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault`}
           m="auto"
@@ -173,36 +191,35 @@ export const VaultList = () => {
 
           <RefreshSecretsButton />
         </Center>
-        <IconButton
-          aria-label="Add item"
-          icon={<AddIcon />}
-          rounded={'full'}
-          onClick={async () => navigate('/addItem')}
-        />
-      </Center>
 
-      <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection="column">
-          <Flex flexDirection="row" flexWrap="wrap" m="auto">
-            {TOTPSecrets?.filter(({ label, url }) => {
-              return (
-                label.includes(debouncedSearchTerm) ||
-                url?.includes(debouncedSearchTerm)
-              )
-            }).map((el, i) => {
-              return <Item data={el as ITOTPSecret} key={el.label + i} />
-            })}
-            {LoginCredentials?.filter(({ label, url }) => {
-              return (
-                label.includes(debouncedSearchTerm) ||
-                url?.includes(debouncedSearchTerm)
-              )
-            }).map((el, i) => {
-              return <Item key={el.label + i} data={el as ILoginSecret} />
-            })}
-          </Flex>
-        </Flex>
+        {totpCond || pswCond ? (
+          <Tooltip
+            shouldWrapChildren
+            label="You have reached your limit"
+            aria-label="A tooltip"
+          >
+            <IconButton
+              disabled={true}
+              aria-label="Add item"
+              icon={<AddIcon />}
+              rounded={'full'}
+              onClick={async () => navigate('/addItem')}
+            />
+          </Tooltip>
+        ) : (
+          <IconButton
+            aria-label="Add item"
+            icon={<AddIcon />}
+            rounded={'full'}
+            onClick={async () => navigate('/addItem')}
+          />
+        )}
       </Center>
-    </Flex>
+      <Center w={'95%'} h={'95%'}>
+        <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+          <VirtualizedList filter={filterBy} />
+        </div>
+      </Center>
+    </VStack>
   )
 }

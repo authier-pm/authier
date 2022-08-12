@@ -21,7 +21,6 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  useColorMode,
   Spinner
 } from '@chakra-ui/react'
 import {
@@ -30,17 +29,15 @@ import {
   FiSettings,
   FiMenu,
   FiChevronDown,
-  FiMoon,
   FiHardDrive,
   FiDisc
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
-import { ReactText } from 'react'
 import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { AddIcon, ChevronDownIcon } from '@chakra-ui/icons'
-import { t, Trans } from '@lingui/macro'
+import { ChevronDownIcon } from '@chakra-ui/icons'
+import { Trans } from '@lingui/macro'
 import { ColorModeButton } from '../ColorModeButton'
 
 interface LinkItemProps {
@@ -107,7 +104,6 @@ interface SidebarProps extends BoxProps {
 }
 
 const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
-  const { toggleColorMode } = useColorMode()
   const email = device.state?.email
   if (!email) {
     return <Spinner />
@@ -179,9 +175,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 bg={useColorModeValue('white', 'gray.900')}
                 borderColor={useColorModeValue('gray.200', 'gray.700')}
               >
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Settings</MenuItem>
-                <MenuItem>Billing</MenuItem>
+                <Link as={RouterLink} to="/settings/account">
+                  <MenuItem>Settings</MenuItem>
+                </Link>
+                <Link as={RouterLink} to="/account-limits">
+                  <MenuItem>Billing</MenuItem>
+                </Link>
                 <MenuDivider />
                 <MenuItem
                   backgroundColor="red.500"
@@ -206,7 +205,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType
   path: string
-  children: ReactText | JSX.Element
+  children: JSX.Element
 }
 const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
   return (
@@ -253,7 +252,6 @@ interface MobileProps extends FlexProps {
 const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
   const email = device.state?.email as string
 
-  const { toggleColorMode } = useColorMode()
   return (
     <Flex
       ml={{ base: 0, md: 60 }}
@@ -317,9 +315,12 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               bg={useColorModeValue('white', 'gray.900')}
               borderColor={useColorModeValue('gray.200', 'gray.700')}
             >
-              <MenuItem>Profile</MenuItem>
-              <MenuItem>Settings</MenuItem>
-              <MenuItem>Billing</MenuItem>
+              <Link as={RouterLink} to="/settings/account">
+                <MenuItem>Settings</MenuItem>
+              </Link>
+              <Link as={RouterLink} to="/account-limits">
+                <MenuItem>Billing</MenuItem>
+              </Link>
               <MenuDivider />
               <MenuItem
                 backgroundColor="red.400"

@@ -1,22 +1,14 @@
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Link,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, HStack, Link, useColorModeValue } from '@chakra-ui/react'
 import {
   Link as RouterLink,
   Route,
   useLocation,
-  Routes,
-  useMatch
+  Routes
 } from 'react-router-dom'
 import React, { useEffect, useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
 import VaultConfig from '@src/components/vault/settings/VaultConfig'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 
 interface LinkItemProps {
   name: string

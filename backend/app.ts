@@ -126,7 +126,7 @@ app.register((fastify, opts, done) => {
 
       case 'checkout.session.completed':
         const session = event.data.object
-
+        console.log(session)
         await prismaClient.user.update({
           where: {
             email: session.customer_details.email
@@ -135,7 +135,8 @@ app.register((fastify, opts, done) => {
             UserPaidProducts: {
               create: {
                 checkoutSessionId: session.id,
-                productId: session.subscription
+                productId: session.subscription,
+                expiresAt: new Date(session.expires_at)
               }
             }
           }

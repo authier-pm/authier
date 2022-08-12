@@ -1,8 +1,5 @@
-import browser from 'webextension-polyfill'
-
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 export interface IInputRecord {
   element: HTMLInputElement | HTMLFormElement
@@ -17,7 +14,7 @@ interface ICSSSelectorDomOrdinal {
 }
 
 export function getCssSelectorForInput(
-  input: HTMLInputElement
+  input: HTMLInputElement | HTMLFormElement
 ): ICSSSelectorDomOrdinal {
   if (input.id) {
     return { css: `input#${input.id}`, domOrdinal: 0 }
@@ -46,7 +43,7 @@ export function getCssSelectorForInput(
 }
 
 export function getSelectorForElement(
-  target: HTMLInputElement
+  target: HTMLInputElement | HTMLFormElement
 ): ICSSSelectorDomOrdinal {
   let selector: ICSSSelectorDomOrdinal
   if (document.body.contains(target)) {
@@ -102,7 +99,7 @@ export class DOMEventsRecorder {
 
   toJSON() {
     return this.capturedInputEvents.map(
-      ({ element, eventType: type, inputted, kind }, i) => {
+      ({ element, inputted, eventType: type, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
 
         if (
@@ -113,10 +110,11 @@ export class DOMEventsRecorder {
           kind = WebInputType.USERNAME_OR_EMAIL
         }
         return {
-          element: getSelectorForElement(element as HTMLInputElement),
+          cssSelector: getSelectorForElement(element).css,
+          domOrdinal: getSelectorForElement(element).ordinal,
           type,
-          inputted,
-          kind
+          kind,
+          inputted
         }
       }
     )

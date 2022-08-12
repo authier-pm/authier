@@ -15,6 +15,7 @@ import { request } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
+import { UserQuery } from './UserQuery'
 
 @InputType()
 export class DeviceInput {
@@ -47,6 +48,43 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery])
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
+
+    const userData = ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.jwtPayload.userId
+      }
+    })
+
+    const userQuery = new UserQuery(userData)
+    const pswLimit = await userQuery.PasswordLimits(ctx)
+    const TOTPLimit = await userQuery.TOTPLimits(ctx)
+    const pswCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'LOGIN_CREDENTIALS',
+        deletedAt: null
+      }
+    })
+
+    const TOTPCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'TOTP',
+        deletedAt: null
+      }
+    })
+
+    if (pswCount > pswLimit) {
+      return new GraphqlError(
+        `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
+      )
+    }
+
+    if (TOTPCount > TOTPLimit) {
+      return new GraphqlError(
+        `TOTP limit exceeded, remove ${TOTPCount - TOTPLimit} TOTP secrets`
+      )
+    }
 
     const res = await ctx.prisma.encryptedSecret.findMany({
       where: {

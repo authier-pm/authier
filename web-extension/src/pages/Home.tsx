@@ -43,7 +43,6 @@ export const Home: FunctionComponent = () => {
           <Switch
             mr="auto"
             isChecked={filterByTLD}
-            // checked={filterByTLD}
             onChange={(enabled) => {
               setFilterByTLD(enabled.target.checked)
             }}

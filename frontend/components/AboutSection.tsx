@@ -51,8 +51,13 @@ export default function AboutSection() {
   })
   return (
     <Fade in={inView}>
-      <Center h={'90vh'} m="25" ref={ref}>
-        <SimpleGrid gridGap={'10px'} columns={{ base: 1, md: 2 }} spacing={20}>
+      <Center h={'90vh'} ref={ref}>
+        <SimpleGrid
+          maxW="80%"
+          gridGap={'10px'}
+          columns={{ base: 1, md: 2 }}
+          spacing={20}
+        >
           <Stack spacing={4}>
             <Heading>Authier</Heading>
             <Text color={'gray.500'} fontSize={'lg'}>

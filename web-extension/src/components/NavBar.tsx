@@ -29,7 +29,6 @@ export const NavBar: FunctionComponent = () => {
     onClose: onUserMenuClose
   } = useDisclosure()
   const [location, setLocation] = useLocation()
-  console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (

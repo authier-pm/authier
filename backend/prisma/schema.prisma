@@ -85,7 +85,7 @@ model Device {
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
   id        String              @id @default(uuid()) @db.Uuid
-  encrypted String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
+  encrypted String // for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
   version   Int
   kind      EncryptedSecretType
   createdAt DateTime            @default(now())
@@ -104,6 +104,8 @@ model EncryptedSecret {
 //   -- displays secret for manual entry
 //   -- secret is filled into input by authier extension
 //   -- secret is copied to clipboard by user
+//   -- secrets are exported
+
 model SecretUsageEvent {
   id          BigInt          @id @default(autoincrement())
   kind        String
@@ -189,7 +191,7 @@ model User {
 
   deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofill                      Boolean @default(false)
+  autofill                      Boolean @default(true)
   language                      String  @default("en")
   theme                         String  @default("dark")
 

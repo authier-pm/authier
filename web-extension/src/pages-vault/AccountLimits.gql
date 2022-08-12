@@ -1,5 +1,10 @@
 query meExtension {
   me {
     id
+    encryptedSecrets {
+      kind
+    }
+    PasswordLimits
+    TOTPlimit
   }
 }

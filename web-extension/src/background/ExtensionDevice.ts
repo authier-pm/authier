@@ -78,7 +78,7 @@ const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
 
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
-    totp?: string
+    totp?: any
     loginCredentials?: any
   }
 >
@@ -138,10 +138,10 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
-    console.log('SAVE DEVICE STATE', this)
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = this.getAllSecretsDecrypted()
+    console.log('SAVE DEVICE STATE', this.decryptedSecrets)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
@@ -151,18 +151,18 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretDecryptedById(id: string) {
-    const secret = this.secrets.find((secret) => secret.id === id)
+    const secret = this.decryptedSecrets.find((secret) => secret.id === id)
     if (secret) {
       return this.decryptSecret(secret)
     }
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.secrets.filter(
-      (secret) => host === new URL(secret.url ?? '').hostname
+    let secrets = this.decryptedSecrets.filter(
+      (secret) => host === new URL(secret.id ?? '').hostname
     )
     if (secrets.length === 0) {
-      secrets = this.secrets.filter((secret) =>
+      secrets = this.decryptedSecrets.filter((secret) =>
         host.endsWith(getTldPart(secret.url ?? ''))
       )
     }
@@ -189,14 +189,16 @@ export class DeviceState implements IBackgroundStateSerializable {
       const parsed = JSON.parse(decrypted)
 
       try {
-        loginCredentialsSchema.parse(parsed)
+        loginCredentialsSchema.parse(parsed.loginCredentials)
         secretDecrypted = {
-          ...secret,
-          loginCredentials: parsed
+          ...parsed,
+          ...secret
         } as ILoginSecret
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
+          label: parsed.label,
+          url: parsed.url,
           loginCredentials: {
             username: '',
             password: '',
@@ -304,17 +306,14 @@ export class DeviceState implements IBackgroundStateSerializable {
         secrets: secrets.map((secret) => {
           const stringToEncrypt =
             secret.kind === EncryptedSecretType.TOTP
-              ? secret.totp
+              ? JSON.stringify(secret.totp)
               : JSON.stringify(secret.loginCredentials)
 
           const encrypted = this.encrypt(stringToEncrypt as string)
 
           return {
             encrypted,
-            kind: secret.kind,
-            label: secret.label,
-            iconUrl: secret.iconUrl,
-            url: secret.url
+            kind: secret.kind
           }
         })
       }
@@ -579,7 +578,7 @@ class ExtensionDevice {
       throw new Error('device not initialized')
     }
     return secrets.map((secret) => {
-      const { id, encrypted, kind, label, iconUrl, url } = secret
+      const { id, encrypted, kind } = secret
       const decr = state.decrypt(encrypted)
       log('decrypted secret', decr)
       state.setMasterEncryptionKey(newPsw)
@@ -588,12 +587,7 @@ class ExtensionDevice {
       return {
         id,
         encrypted: enc as string,
-        kind,
-        label,
-        iconUrl: iconUrl as string,
-        url: url as string,
-        androidUri: null,
-        iosUri: null
+        kind
       }
     })
   }

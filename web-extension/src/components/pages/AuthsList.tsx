@@ -235,6 +235,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
               )
             }),
             getRecentlyUsed(loginCredentials).map((psw, i) => {
+              console.log(psw.url)
               return (
                 <LoginCredentialsListItem
                   loginSecret={psw as ILoginSecret}
