@@ -35,6 +35,7 @@ export const ExportLoginCredentialsToCsvButton = () => {
       colorScheme="teal"
       type="submit"
       onClick={() => {
+        // Call here export mutation for export notification
         const csv = papaparse.unparse(
           LoginCredentials.map(({ url, label, id, loginCredentials }) => ({
             id,

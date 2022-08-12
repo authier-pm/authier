@@ -47,7 +47,6 @@ import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
 import { DeviceQuery } from '../../../shared/generated/graphqlBaseTypes'
-import { useUpdateSettingsMutation } from '@src/components/vault/settings/VaultConfig.codegen'
 
 interface SettingsValues {
   lockTime: number

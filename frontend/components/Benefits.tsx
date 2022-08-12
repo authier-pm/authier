@@ -20,10 +20,10 @@ export default function Benefits() {
 
   return (
     <Fade in={inView}>
-      <Center ref={ref}>
+      <Center ref={ref} mb={10}>
         <SimpleGrid>
-          <HStack spacing={20} m="auto">
-            <Flex w={['lg', 'md', 'md']}>
+          <HStack w="70vw" spacing={15}>
+            <Flex w="lg">
               <Image
                 rounded={'md'}
                 alt={'feature image'}
@@ -42,7 +42,7 @@ export default function Benefits() {
             </Stack>
           </HStack>
 
-          <HStack w="70vw" spacing={20} m="auto">
+          <HStack w="70vw" spacing={15}>
             <Stack spacing={4}>
               <Heading>Open Source</Heading>
               <Text color={'gray.500'} fontSize={'lg'}>
@@ -61,7 +61,7 @@ export default function Benefits() {
             </Flex>
           </HStack>
 
-          <HStack w="70vw" spacing={20} m="auto">
+          <HStack w="70vw" spacing={15}>
             <Flex w="lg">
               <Image
                 rounded={'md'}

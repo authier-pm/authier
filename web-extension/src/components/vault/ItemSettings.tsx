@@ -63,7 +63,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.900')}
+        bg={useColorModeValue('white', 'gray.800')}
       >
         <Formik
           initialValues={{
@@ -80,17 +80,19 @@ const TOTPSecret = (data: ITOTPSecret) => {
             )
 
             if (secret && device.state) {
-              secret.encrypted = device.state.encrypt(data.totp)
-              secret.label = values.label
-              secret.url = values.url
+              secret.encrypted = device.state.encrypt(
+                JSON.stringify({
+                  totp: data.totp,
+                  url: data.url,
+                  label: data.label
+                })
+              )
 
               await updateSecret({
                 variables: {
                   id: data.id,
                   patch: {
                     encrypted: secret.encrypted,
-                    label: values.label,
-                    url: values.url,
                     kind: data.kind
                   }
                 }
@@ -243,7 +245,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.900')}
+        bg={useColorModeValue('white', 'gray.800')}
       >
         <Formik
           enableReinitialize
@@ -266,20 +268,20 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             if (secret && device.state) {
               secret.encrypted = device.state.encrypt(
                 JSON.stringify({
-                  username: values.username,
-                  password: values.password
+                  loginCredentials: {
+                    username: values.username,
+                    password: values.password
+                  },
+                  url: values.url,
+                  label: values.label
                 })
               )
-              secret.url = values.url
-              secret.label = values.label
 
               await updateSecret({
                 variables: {
                   id: secretProps.id,
                   patch: {
                     encrypted: secret.encrypted,
-                    label: values.label,
-                    url: values.url,
                     kind: secretProps.kind
                   }
                 }
@@ -293,7 +295,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           {({ values, isSubmitting, dirty }) => {
             const levelOfPsw = passwordStrength(values.password)
             return (
-              <Flex as={Form} flexDirection="column" width={'80%'}>
+              <Flex mt={3} as={Form} flexDirection="column" width={'80%'}>
                 <Field name="url">
                   {({ field, form }) => (
                     <FormControl
@@ -442,6 +444,7 @@ export const VaultItemSettings = () => {
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }
+  console.log('secret', secret)
   if (secret.kind === 'TOTP') {
     return <TOTPSecret {...secret} />
   } else if (secret.kind === 'LOGIN_CREDENTIALS') {

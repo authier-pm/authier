@@ -38,8 +38,7 @@ interface Values {
 }
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [register, { data, loading, error: registerError }] =
-    useRegisterNewUserMutation()
+  const [register, { error: registerError }] = useRegisterNewUserMutation()
   const navigate = useNavigate()
 
   const { fireToken } = device
@@ -113,7 +112,7 @@ export default function Register(): ReactElement {
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
-              autofill: false,
+              autofill: true,
               language: 'en',
               syncTOTP: false,
               theme: 'dark'

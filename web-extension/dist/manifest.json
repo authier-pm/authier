@@ -9,7 +9,7 @@
   },
   "background": {
     "scripts": ["js/backgroundPage.js"],
-    "persistent": true 
+    "persistent": true
   },
   "content_scripts": [
     {

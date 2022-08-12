@@ -1,5 +1,7 @@
 query SyncSettings {
   me {
+    PasswordLimits
+    TOTPlimit
     id
     autofill
     language

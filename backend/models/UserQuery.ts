@@ -12,7 +12,11 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLPositiveInt,
+  GraphQLUUID
+} from 'graphql-scalars'
 import { UserGQL } from './generated/User'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
@@ -20,7 +24,6 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
 import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
-import { ChangeMasterPasswordInput } from './AuthInputs'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -119,10 +122,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecrets(
-    @Arg('fromDate', () => GraphQLISODateTime, { nullable: true })
-    fromDate: string
-  ) {
+  async encryptedSecrets() {
     return prismaClient.encryptedSecret.findMany({
       where: {
         userId: this.id,
@@ -186,5 +186,55 @@ export class UserQuery extends UserBase {
         rejectedAt: null
       }
     })
+  }
+
+  @Field(() => GraphQLPositiveInt)
+  async PasswordLimits(@Ctx() ctx: IContextAuthenticated) {
+    const count = await ctx.prisma.userPaidProducts.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        OR: [
+          {
+            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+          },
+          {
+            productId: 'sub_1LOS1WI3AGASZpOV3KiMWraZ'
+          }
+        ]
+      }
+    })
+
+    if (count > 0) {
+      //* One adds 60 passwords
+      return count * 60
+    } else {
+      //* Default count
+      return 40
+    }
+  }
+
+  @Field(() => GraphQLPositiveInt)
+  async TOTPLimits(@Ctx() ctx: IContextAuthenticated) {
+    const count = await ctx.prisma.userPaidProducts.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        OR: [
+          {
+            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+          },
+          {
+            productId: 'sub_1LOS9CI3AGASZpOV38ghfsUi'
+          }
+        ]
+      }
+    })
+
+    if (count > 0) {
+      //* One adds 60 passwords
+      return count * 20
+    } else {
+      //* Default count
+      return 3
+    }
   }
 }

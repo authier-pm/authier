@@ -18,15 +18,15 @@ export const getContentScriptInitialState = async (
 ): Promise<IInitStateRes> => {
   console.log({ tabUrl })
   const hostname = new URL(tabUrl).hostname
-  console.log('getContentScriptInitialState', device.state)
+  console.log('~ getContentScriptInitialState')
   const decrypted =
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
-  console.log('getWebInputs', res.data.webInputs)
+  console.log('getWebInputs', res.data.webInputs, hostname)
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
-    autofillEnabled: true, // TODO
+    autofillEnabled: !!device.state?.autofill,
     webInputs: res.data.webInputs,
     secretsForHost: {
       loginCredentials: decrypted.filter(

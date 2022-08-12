@@ -24,9 +24,6 @@ fragment secretExtension on EncryptedSecretQuery {
   createdAt
   updatedAt
   deletedAt
-  iconUrl
-  url
-  label
   version
   lastUsedAt
 }

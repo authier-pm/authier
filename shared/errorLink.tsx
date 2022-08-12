@@ -1,4 +1,5 @@
 import { onError } from '@apollo/client/link/error'
+import 'react-toastify/dist/ReactToastify.css'
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
 //@ts-ignore
@@ -7,8 +8,6 @@ import { device } from '@src/background/ExtensionDevice'
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
   ({ graphQLErrors, networkError, operation }) => {
-    // const isExtension = window.location.href.startsWith('chrome-extension')
-
     if (graphQLErrors) {
       if (graphQLErrors[0].message === 'not authenticated') {
         //Here just logout the user
@@ -21,6 +20,7 @@ export const errorLink = onError(
         console.error('full operation: ', print(operation.query))
       })
 
+      // Does the toast even work from here?
       toast.error(graphQLErrors[0].message ?? 'There was API error.')
     } else if (networkError) {
       console.error(`[Network error]: ${networkError}`)

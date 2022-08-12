@@ -14,7 +14,7 @@ var firebaseConfig = {
 }
 
 firebase.initializeApp(firebaseConfig)
-const broadcast = new BroadcastChannel('test-channel')
+
 // Retrieve firebase messaging
 const messaging = firebase.messaging()
 
