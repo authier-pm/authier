@@ -20,27 +20,28 @@ export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
 
   const { setUserId } = useContext(UserContext)
-  const [addNewDevice, { loading, data, error }] =
-    useAddNewDeviceForUserMutation()
+  const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
 
-  const [getDeviceDecryptionChallenge, { data: decryptionData }] =
-    useDeviceDecryptionChallengeMutation({
-      variables: {
-        deviceInput: {
-          id: device.id,
-          name: props.deviceName,
-          platform: device.platform
-        },
-        email: formState.email
-      }
-    })
+  const [
+    getDeviceDecryptionChallenge,
+    { data: decryptionData, error: decrChallError }
+  ] = useDeviceDecryptionChallengeMutation({
+    variables: {
+      deviceInput: {
+        id: device.id,
+        name: props.deviceName,
+        platform: device.platform
+      },
+      email: formState.email
+    }
+  })
 
   useEffect(() => {
-    if (error) {
+    if (error || decrChallError) {
       toast.error('failed to create decryption challenge')
       setFormState(null)
     }
-  }, [error])
+  }, [error, decrChallError])
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
@@ -50,6 +51,7 @@ export const useLogin = (props: { deviceName: string }) => {
   useEffect(() => {
     console.log('~ decryptionData', decryptionData)
     const { fireToken } = device
+
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
@@ -146,7 +148,7 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newAuthSecret,
             authSecretEncrypted: newAuthSecretEncrypted,
             lockTime: 28800,
-            autofill: false,
+            autofill: true,
             language: 'en',
             syncTOTP: false,
             theme: 'dark'
@@ -174,8 +176,8 @@ export const useLogin = (props: { deviceName: string }) => {
 }
 
 export const LoginAwaitingApproval: React.FC = () => {
-  const [deviceName, setDeviceName] = useState(device.generateDeviceName())
-  const { deviceDecryptionChallenge, loading } = useLogin({
+  const [deviceName] = useState(device.generateDeviceName())
+  const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })
 

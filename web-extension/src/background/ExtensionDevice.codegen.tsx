@@ -16,9 +16,9 @@ export type LogoutMutation = { __typename?: 'Mutation', logout?: number | null }
 export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, iconUrl?: string | null, url?: string | null, label: string, version: number, lastUsedAt?: string | null }> } };
+export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number, lastUsedAt?: string | null }> } };
 
-export type SecretExtensionFragment = { __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, iconUrl?: string | null, url?: string | null, label: string, version: number, lastUsedAt?: string | null };
+export type SecretExtensionFragment = { __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number, lastUsedAt?: string | null };
 
 export const SecretExtensionFragmentDoc = gql`
     fragment secretExtension on EncryptedSecretQuery {
@@ -28,9 +28,6 @@ export const SecretExtensionFragmentDoc = gql`
   createdAt
   updatedAt
   deletedAt
-  iconUrl
-  url
-  label
   version
   lastUsedAt
 }

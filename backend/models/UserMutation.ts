@@ -9,7 +9,7 @@ import { EncryptedSecretInput, SettingsInput } from './models'
 import { UserGQL } from './generated/User'
 
 import { DeviceGQL } from './generated/Device'
-import { UserBase } from './UserQuery'
+import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
@@ -26,6 +26,7 @@ import { stripe } from '../stripe'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChange'
+import { GraphqlError } from '../api/GraphqlError'
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -112,8 +113,42 @@ export class UserMutation extends UserBase {
   async addEncryptedSecrets(
     @Arg('secrets', () => [EncryptedSecretInput])
     secrets: EncryptedSecretInput[],
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContextAuthenticated
   ) {
+    const userData = ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.jwtPayload.userId
+      }
+    })
+
+    const userQuery = new UserQuery(userData)
+    const pswLimit = await userQuery.PasswordLimits(ctx)
+    const TOTPLimit = await userQuery.TOTPLimits(ctx)
+    const pswCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'LOGIN_CREDENTIALS',
+        deletedAt: null
+      }
+    })
+
+    const TOTPCount = await ctx.prisma.encryptedSecret.count({
+      where: {
+        userId: ctx.jwtPayload.userId,
+        kind: 'TOTP',
+        deletedAt: null
+      }
+    })
+
+    console.log(pswLimit, pswCount)
+
+    if (pswCount >= pswLimit) {
+      return new GraphqlError(`Password limit exceeded.`)
+    }
+
+    if (TOTPCount >= TOTPLimit) {
+      return new GraphqlError(`TOTP limit exceeded.`)
+    }
     return ctx.prisma.$transaction(
       // prisma.createMany cannot be used here https://github.com/prisma/prisma/issues/8131
       secrets.map((secret) =>
@@ -299,28 +334,81 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => String)
+  async createPortalSession(@Ctx() ctx: IContextAuthenticated) {
+    const data = await ctx.prisma.userPaidProducts.findFirst({
+      where: {
+        userId: ctx.jwtPayload.userId
+      }
+    })
+
+    if (!data) {
+      throw new GraphqlError("You don't have a paid subscription")
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.retrieve(
+      data?.checkoutSessionId as string
+    )
+
+    // This is the url to which the customer will be redirected when they are done
+    // managing their billing with the portal.
+    const returnUrl = 'http://localhost:5450/pricing'
+
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: checkoutSession.customer as string,
+      return_url: returnUrl
+    })
+
+    return portalSession.url
+  }
+
+  @Field(() => String)
   async createCheckoutSession(
     @Ctx() ctx: IContextAuthenticated,
     @Arg('product', () => String) product: string
   ) {
-    // TODO Find price by name
-    const prices = await stripe.prices.list({})
-
-    const session = await stripe.checkout.sessions.create({
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price: 'price_1L7PGdI3AGASZpOVHvAwowhY',
-          //For metered billing, do not pass quantity
-          quantity: 1
-        }
-      ],
-      mode: 'subscription',
-      success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${ctx.request.headers.referer}?canceled=true`
+    const user = await ctx.prisma.userPaidProducts.findFirst({
+      where: { userId: ctx.jwtPayload.userId }
     })
-    console.log('test', session)
 
-    return session.id
+    const productItem = await stripe.products.retrieve(product)
+
+    if (user) {
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        user?.checkoutSessionId as string
+      )
+
+      const session = await stripe.checkout.sessions.create({
+        billing_address_collection: 'auto',
+        line_items: [
+          {
+            price: productItem['default_price'] as string,
+            //For metered billing, do not pass quantity
+            quantity: 1
+          }
+        ],
+        customer: checkoutSession.customer as string,
+        mode: 'subscription',
+        success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${ctx.request.headers.referer}?canceled=true`
+      })
+
+      return session.id
+    } else {
+      const session = await stripe.checkout.sessions.create({
+        billing_address_collection: 'auto',
+        line_items: [
+          {
+            price: productItem['default_price'] as string,
+            //For metered billing, do not pass quantity
+            quantity: 1
+          }
+        ],
+        mode: 'subscription',
+        success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${ctx.request.headers.referer}?canceled=true`
+      })
+
+      return session.id
+    }
   }
 }

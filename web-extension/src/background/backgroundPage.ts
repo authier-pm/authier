@@ -1,6 +1,7 @@
 import './chromeRuntimeListener'
 import debug from 'debug'
 import { EncryptedSecretQuery } from '../../../shared/generated/graphqlBaseTypes'
+import { ISecret } from '@src/util/useDeviceState'
 
 export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
@@ -8,13 +9,13 @@ localStorage.debug = 'au:*' // enable all debug messages
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker
     .register('/firebase-messaging-sw.js')
-    .then(function (registration) {
+    .then(function(registration) {
       log(
         'ServiceWorker registration successful with scope: ',
         registration.scope
       )
     })
-    .catch(function (err) {
+    .catch(function(err) {
       //registration failed :(
       log('ServiceWorker registration failed: ', err)
     })
@@ -27,9 +28,6 @@ export type SecretSerializedType = Pick<
   | 'id'
   | 'encrypted'
   | 'kind'
-  | 'label'
-  | 'iconUrl'
-  | 'url'
   | 'lastUsedAt'
   | 'createdAt'
   | 'deletedAt'

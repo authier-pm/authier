@@ -43,7 +43,7 @@ type UserQuery {
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
-  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
+  encryptedSecrets: [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
     device: String!
@@ -51,6 +51,8 @@ type UserQuery {
     location: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
+  PasswordLimits: PositiveInt!
+  TOTPLimits: PositiveInt!
 }
 
 """
@@ -157,11 +159,6 @@ type EncryptedSecretGQL {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -279,11 +276,6 @@ type EncryptedSecretQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -316,6 +308,11 @@ type DecryptionChallengeForApproval {
   deviceId: UUID!
 }
 
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
+
 type Mutation {
   """
   you need to be authenticated to call this resolver
@@ -341,7 +338,6 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
-  createCheckoutSession(product: String!): String!
 }
 
 type UserMutation {
@@ -388,6 +384,7 @@ type UserMutation {
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
+  createPortalSession: String!
   createCheckoutSession(product: String!): String!
 }
 
@@ -436,11 +433,6 @@ type SecretUsageEventGQLScalars {
   webInputId: Int
 }
 
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
-
 input DeviceInput {
   id: UUID!
   name: String!
@@ -455,11 +447,6 @@ type EncryptedSecretMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -470,11 +457,6 @@ type EncryptedSecretMutation {
 
 input EncryptedSecretInput {
   kind: EncryptedSecretType!
-  url: String
-  iconUrl: String
-  iosUri: String
-  androidUri: String
-  label: String!
   encrypted: String!
 }
 
@@ -506,11 +488,6 @@ input ChangeMasterPasswordInput {
 
 input EncryptedSecretPatchInput {
   kind: EncryptedSecretType!
-  url: String
-  iconUrl: String
-  iosUri: String
-  androidUri: String
-  label: String!
   encrypted: String!
   id: UUID!
 }
@@ -592,7 +569,7 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
-  domOrdinal: PositiveInt!
+  domOrdinal: Int!
   url: String!
   kind: WebInputType!
 }

@@ -33,17 +33,16 @@ export const Home: FunctionComponent = () => {
   const filterByTLD = !currentURL
     ? true
     : filterByTLDManual === null
-    ? currentURL.startsWith('http')
-    : filterByTLDManual
+      ? currentURL.startsWith('http')
+      : filterByTLDManual
   return (
     <>
-      <Flex position="sticky" align="center" pl={4} pr={4} mt={3}>
-        <FormControl display="flex" alignItems="center">
-          <FormLabel mb="0">Filter by TLD</FormLabel>
+      <Flex position='sticky' align='center' pl={4} pr={4} mt={3}>
+        <FormControl display='flex' alignItems='center'>
+          <FormLabel mb='0'>Filter by TLD</FormLabel>
           <Switch
-            mr="auto"
+            mr='auto'
             isChecked={filterByTLD}
-            // checked={filterByTLD}
             onChange={(enabled) => {
               setFilterByTLD(enabled.target.checked)
             }}
@@ -52,8 +51,8 @@ export const Home: FunctionComponent = () => {
 
         <IconButton
           mr={15}
-          colorScheme="blue"
-          aria-label="Add item"
+          colorScheme='blue'
+          aria-label='Add item'
           icon={<AddIcon />}
           rounded={'full'}
           onClick={async () => {
@@ -64,11 +63,11 @@ export const Home: FunctionComponent = () => {
         {deviceState && TOTPSecrets.length > 0 && (
           <CircularProgress
             min={1}
-            ml="auto"
+            ml='auto'
             max={30}
             value={30 - seconds}
             valueText={seconds.toString()}
-            size="40px"
+            size='40px'
           />
         )}
       </Flex>

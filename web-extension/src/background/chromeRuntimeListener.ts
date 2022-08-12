@@ -1,8 +1,4 @@
-import {
-  ITOTPSecret,
-  ILoginSecret,
-  ISecuritySettings
-} from '@src/util/useDeviceState'
+import { ITOTPSecret, ILoginSecret } from '@src/util/useDeviceState'
 
 import { BackgroundMessageType } from './BackgroundMessageType'
 
@@ -108,10 +104,7 @@ browser.runtime.onMessage.addListener(async function (
           kind: EncryptedSecretType.LOGIN_CREDENTIALS,
           loginCredentials: namePassPair,
           encrypted: deviceState.encrypt(JSON.stringify(namePassPair)),
-          iconUrl: tab.favIconUrl,
-          url: inputsUrl,
-          createdAt: new Date().toJSON(),
-          label: tab.title ?? `${credentials.username}@${new URL(url).hostname}`
+          createdAt: new Date().toJSON()
         }
       ])
       if (!secret) {
@@ -145,6 +138,7 @@ browser.runtime.onMessage.addListener(async function (
       return { failed: false }
 
     case BackgroundMessageType.saveCapturedInputEvents:
+      log('saveCapturedInputEvents', req.payload)
       capturedInputEvents = req.payload.inputEvents
       inputsUrl = req.payload.url
 
@@ -168,7 +162,7 @@ browser.runtime.onMessage.addListener(async function (
         }
       })
 
-      break
+      return true
 
     case BackgroundMessageType.addTOTPSecret:
       if (deviceState) {
@@ -203,8 +197,11 @@ browser.runtime.onMessage.addListener(async function (
 
     case BackgroundMessageType.getContentScriptInitialState:
       const tabUrl = tab?.url
-
+      log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
       if (!tabUrl || !deviceState || !currentTabId) {
+        log(
+          '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId'
+        )
         return null
       } else {
         //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
@@ -212,7 +209,7 @@ browser.runtime.onMessage.addListener(async function (
       }
 
     case BackgroundMessageType.getCapturedInputEvents:
-      return { capturedInputEvents, inputsUrl }
+      return { capturedInputEvents, inputsUrl: tab?.url }
 
     case BackgroundMessageType.wasClosed:
       return { wasClosed: safeClosed }
