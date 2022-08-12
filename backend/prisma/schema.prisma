@@ -20,14 +20,6 @@ generator PrismaTypeGraphQLTypesGenerator {
   exportedNameSuffix             = "GQL"
 }
 
-model MasterDeviceChange {
-  id          String @id @default(cuid())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @default(now())
-  oldDeviceId    String
-  newDeviceId    String
-}
-
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
 model DecryptionChallenge {
   id                       Int       @id @default(autoincrement())
@@ -91,7 +83,6 @@ model EncryptedSecret {
   createdAt DateTime            @default(now())
   updatedAt DateTime?           @updatedAt
   deletedAt DateTime?
-
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])
