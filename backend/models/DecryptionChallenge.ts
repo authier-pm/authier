@@ -1,13 +1,4 @@
-import {
-  Arg,
-  Ctx,
-  Field,
-  Info,
-  InputType,
-  Int,
-  Mutation,
-  ObjectType
-} from 'type-graphql'
+import { Arg, Ctx, Field, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
 import { GraphQLResolveInfo } from 'graphql'
@@ -62,7 +53,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     // })
 
     const { id, deviceId, userId } = this
-    console.log('addNewDeviceForUser', id, deviceId, userId)
+
     const where = { id: userId }
 
     // TODO use findUnique when prisma bug gets fixed
@@ -143,6 +134,18 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
+    const user = await ctx.prisma.user.findFirst({
+      where: {
+        id: ctx.jwtPayload.userId
+      }
+    })
+
+    if (user?.masterDeviceId !== ctx.device.id) {
+      throw new GraphqlError(
+        'Only the master device can approve a decryption challenge'
+      )
+    }
+
     return ctx.prisma.decryptionChallenge.update({
       where: { id: this.id },
       data: {

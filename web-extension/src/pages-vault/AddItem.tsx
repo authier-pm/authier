@@ -1,14 +1,5 @@
-import {
-  Box,
-  Center,
-  Heading,
-  Stack,
-  useColorModeValue,
-  Button,
-  Flex,
-  Select
-} from '@chakra-ui/react'
-import React, { useEffect, useState } from 'react'
+import { useColorModeValue, Flex, Select } from '@chakra-ui/react'
+import React, { useState } from 'react'
 
 import { motion } from 'framer-motion'
 
@@ -37,7 +28,7 @@ export const AddItem = () => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.900')}
+        bg={useColorModeValue('white', 'gray.800')}
       >
         <Select
           onChange={(e) => setType(e.target.value)}

@@ -1,11 +1,4 @@
-import {
-  ApolloClient,
-  FetchPolicy,
-  ErrorPolicy,
-  ApolloClientOptions,
-  InMemoryCache,
-  ApolloProvider
-} from '@apollo/client'
+import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
 import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'

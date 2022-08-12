@@ -5,7 +5,7 @@ type Query {
   you need to be authenticated to call this resolver
   """
   authenticated: Boolean!
-  me: UserQuery
+  me: UserQuery!
   currentDevice: DeviceQuery!
   webInputs(host: String!): [WebInputGQL!]!
 }
@@ -23,6 +23,9 @@ type UserQuery {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -30,18 +33,17 @@ type UserQuery {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
-  device: DeviceQuery!
+  device(id: UUID!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
-  settings: SettingsConfigGQL!
-  encryptedSecrets(fromDate: DateTime): [EncryptedSecretQuery!]!
+  encryptedSecrets: [EncryptedSecretQuery!]!
   sendAuthMessage(
     pageName: String!
     device: String!
@@ -49,6 +51,8 @@ type UserQuery {
     location: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
+  PasswordLimits: PositiveInt!
+  TOTPLimits: PositiveInt!
 }
 
 """
@@ -91,6 +95,9 @@ type UserGQL {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -98,10 +105,10 @@ type UserGQL {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
 }
 
 type DeviceGQL {
@@ -111,10 +118,10 @@ type DeviceGQL {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -152,11 +159,6 @@ type EncryptedSecretGQL {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -210,16 +212,6 @@ type DecryptionChallengeGQL {
   User: [UserGQL!]!
 }
 
-type SettingsConfigGQL {
-  userId: ID!
-  lockTime: Int!
-  twoFA: Boolean!
-  noHandsLogin: Boolean!
-  homeUI: String!
-  updatedAt: DateTime
-  user: UserGQL!
-}
-
 type TagGQL {
   id: Int!
   name: String!
@@ -239,6 +231,16 @@ type UserPaidProductsGQL {
   user: UserGQL!
 }
 
+type MasterDeviceChangeGQL {
+  id: ID!
+  createdAt: DateTime!
+  processAt: DateTime!
+  oldDeviceId: String!
+  newDeviceId: String!
+  userId: String!
+  user: UserGQL!
+}
+
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -246,10 +248,10 @@ type DeviceQuery {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -274,16 +276,16 @@ type EncryptedSecretQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
   lastUsedAt: DateTime
 }
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 type EmailVerificationGQLScalars {
   address: ID!
@@ -307,9 +309,9 @@ type DecryptionChallengeForApproval {
 }
 
 """
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+Integers that will have a value greater than 0.
 """
-scalar UUID
+scalar PositiveInt
 
 type Mutation {
   """
@@ -336,7 +338,6 @@ type Mutation {
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
-  createCheckoutSession(product: String!): String!
 }
 
 type UserMutation {
@@ -352,6 +353,9 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -359,10 +363,10 @@ type UserMutation {
   EncryptedSecrets: [EncryptedSecretGQL!]!
   Devices: [DeviceGQL!]!
   WebInputsAdded: [WebInputGQL!]!
-  SettingsConfigs: [SettingsConfigGQL!]!
   Tags: [TagGQL!]!
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
+  MasterDeviceChange: [MasterDeviceChangeGQL!]!
   addCookie: String!
   device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
@@ -374,17 +378,16 @@ type UserMutation {
     secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
-  updateSettings(
-    noHandsLogin: Boolean!
-    lockTime: Int!
-    homeUI: String!
-    twoFA: Boolean!
-  ): SettingsConfigGQL!
+  updateSettings(config: SettingsInput!): UserGQL!
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
-  approveDevice(success: Boolean!): Boolean!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
+  setMasterDevice(
+    deviceId: Int!
+    newMasterDeviceId: String!
+  ): MasterDeviceChangeGQL!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+  createPortalSession: String!
   createCheckoutSession(product: String!): String!
 }
 
@@ -395,10 +398,10 @@ type DeviceMutation {
   firebaseToken: String!
   name: String!
   platform: String!
-  syncTOTP: Boolean!
   ipAddressLock: Boolean!
-  vaultLockTimeoutSeconds: Int
   logoutAt: DateTime
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
   registeredWithMasterAt: DateTime
@@ -433,11 +436,6 @@ type SecretUsageEventGQLScalars {
   webInputId: Int
 }
 
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
-
 input DeviceInput {
   id: UUID!
   name: String!
@@ -452,11 +450,6 @@ type EncryptedSecretMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
-  url: String
-  androidUri: String
-  iosUri: String
-  iconUrl: String
-  label: String!
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -467,11 +460,6 @@ type EncryptedSecretMutation {
 
 input EncryptedSecretInput {
   kind: EncryptedSecretType!
-  url: String
-  iconUrl: String
-  iosUri: String
-  androidUri: String
-  label: String!
   encrypted: String!
 }
 
@@ -479,6 +467,14 @@ input SecretUsageEventInput {
   kind: String!
   secretId: String!
   url: String
+}
+
+input SettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofill: Boolean!
+  language: String!
+  theme: String!
 }
 
 """
@@ -495,11 +491,6 @@ input ChangeMasterPasswordInput {
 
 input EncryptedSecretPatchInput {
   kind: EncryptedSecretType!
-  url: String
-  iconUrl: String
-  iosUri: String
-  androidUri: String
-  label: String!
   encrypted: String!
   id: UUID!
 }
@@ -581,7 +572,11 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
-  domOrdinal: PositiveInt!
+
+  """
+  The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day.
+  """
+  domOrdinal: NonNegativeInt!
   url: String!
   kind: WebInputType!
 }

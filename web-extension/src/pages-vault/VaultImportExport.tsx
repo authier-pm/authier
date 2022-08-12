@@ -22,6 +22,17 @@ import {
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
+import { useMeExtensionQuery } from './AccountLimits.codegen'
+
+type MappedCSVInput = {
+  url: string
+  label: string
+  loginCredentials: {
+    username: string
+    password: string
+  }
+  iconUrl: null
+}[]
 
 // const csvHeaderNames = {
 //   password: [
@@ -34,7 +45,7 @@ import { toast } from 'react-toastify'
 //   ]
 // }
 
-const mapCsvToLoginCredentials = (csv: string[][]) => {
+const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
 
   const indexUsername = header.findIndex((x) => x.match(/username/i))
@@ -59,10 +70,11 @@ const mapCsvToLoginCredentials = (csv: string[][]) => {
     .map((row) => ({
       url: row[indexUrl],
       label: row[indexLabel],
-      loginCredential: {
+      loginCredentials: {
         username: row[indexUsername],
         password: row[indexPassword]
-      }
+      },
+      iconUrl: null
     }))
 }
 
@@ -74,20 +86,23 @@ export interface IImportedStat {
 /**
  * should support lastpass and bitwarden for now, TODO write e2e specs
  */
-export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
-  return new Promise((resolve, reject) => {
+export const onFileAccepted: any = (
+  file: File,
+  pswCount: number
+): Promise<IImportedStat> => {
+  return new Promise((resolve) => {
     papaparse.parse<string[]>(file, {
       complete: async (results) => {
         if (!results.data) {
           toast.error('failed to parse')
         }
-        const mapped = mapCsvToLoginCredentials(results.data)
+        const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
 
-        // TODO add to device state
         const state = device.state as DeviceState
 
-        let skipped = 0
         const toAdd: AddSecretInput = []
+        let skipped = 0
+        let added = 0
         for (const creds of mapped) {
           let hostname: string
           try {
@@ -99,27 +114,28 @@ export const onFileAccepted: any = (file: File): Promise<IImportedStat> => {
 
           const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-            loginCredentials: creds.loginCredential,
-            encrypted: state?.encrypt(JSON.stringify(creds.loginCredential)),
-            iconUrl: null,
-            createdAt: new Date().toJSON(),
+            loginCredentials: creds,
             url: creds.url,
+            encrypted: state?.encrypt(JSON.stringify(creds)),
+            createdAt: new Date().toJSON(),
+            iconUrl: null,
             label:
-              creds.label ?? `${creds.loginCredential.username}@${hostname}`
+              creds.label ?? `${creds.loginCredentials.username}@${hostname}`
           }
 
           if (state.findExistingSecret(input)) {
             skipped++
-            break
+            continue
           }
+
           toAdd.push(input)
+          added += 1
         }
-        console.log('~ toAdd', toAdd)
 
         await state.addSecrets(toAdd)
 
         resolve({
-          added: mapped.length - skipped,
+          added,
           skipped
         })
       }
@@ -131,7 +147,7 @@ export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
     null
   )
-
+  const { data } = useMeExtensionQuery()
   return (
     <Center p={5}>
       <Flex maxW={'1200px'} flexDir={'column'}>
@@ -141,14 +157,17 @@ export const VaultImportExport = () => {
             <>
               <ImportFromFile
                 onFileAccepted={async (f) => {
-                  setImportedStat(await onFileAccepted(f))
+                  setImportedStat(
+                    await onFileAccepted(f, data?.me.PasswordLimits)
+                  )
                 }}
               />
               <Text fontSize={16} mt={8} mb={6}>
                 <Trans>
                   We support importing from <code>csv</code> files.
                   Lastpass/Bitwarden will fork fine, file exported from other
-                  password managers might work as well, but it's not guaranteed.
+                  password managers might work as well, but it{`&apos`}s not
+                  guaranteed.
                 </Trans>
               </Text>
             </>

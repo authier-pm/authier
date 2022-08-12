@@ -1,3 +1,11 @@
-mutation createCheckoutSession($userId: String!, $product: String!) {
-  createCheckoutSession(userId: $userId, product: $product)
+mutation createCheckoutSession($product: String!) {
+  me {
+    createCheckoutSession(product: $product)
+  }
+}
+
+mutation createPortalSession {
+  me {
+    createPortalSession
+  }
 }

@@ -1,5 +1,4 @@
 // @ts-nocheck
-import { PromptPassword } from './components/PromptPassword'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import browser from 'webextension-polyfill'
 import { h, render } from 'preact'

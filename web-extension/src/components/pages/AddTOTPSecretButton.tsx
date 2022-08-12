@@ -3,7 +3,6 @@ import { t, Trans } from '@lingui/macro'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
-import { getQrCodeFromUrl } from '../util/getQrCodeFromUrl'
 
 import browser, { Tabs } from 'webextension-polyfill'
 
@@ -12,8 +11,8 @@ import queryString from 'query-string'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 import { device } from '@src/background/ExtensionDevice'
-
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
+import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)

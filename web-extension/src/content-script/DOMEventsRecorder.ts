@@ -1,8 +1,5 @@
-import browser from 'webextension-polyfill'
-
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 export interface IInputRecord {
   element: HTMLInputElement | HTMLFormElement
@@ -13,14 +10,14 @@ export interface IInputRecord {
 
 interface ICSSSelectorDomOrdinal {
   css: string
-  ordinal: number
+  domOrdinal: number
 }
 
 export function getCssSelectorForInput(
-  input: HTMLInputElement
+  input: HTMLInputElement | HTMLFormElement
 ): ICSSSelectorDomOrdinal {
   if (input.id) {
-    return { css: `input#${input.id}`, ordinal: 0 }
+    return { css: `input#${input.id}`, domOrdinal: 0 }
   }
   let proposedSelector = ''
   if (input.name) {
@@ -32,13 +29,13 @@ export function getCssSelectorForInput(
   }
 
   const inputsForProposedSelector = document.querySelectorAll(proposedSelector)
-  if (inputsForProposedSelector.length === 0) {
-    return { css: proposedSelector, ordinal: 0 }
+  if (inputsForProposedSelector.length === 1) {
+    return { css: proposedSelector, domOrdinal: 0 }
   } else {
     for (let index = 0; index < inputsForProposedSelector.length; index++) {
       const element = inputsForProposedSelector[index]
       if (element === input) {
-        return { css: proposedSelector, ordinal: index }
+        return { css: proposedSelector, domOrdinal: index }
       }
     }
     throw new Error('failed to resolve a CSS selector')
@@ -46,14 +43,14 @@ export function getCssSelectorForInput(
 }
 
 export function getSelectorForElement(
-  target: HTMLInputElement
+  target: HTMLInputElement | HTMLFormElement
 ): ICSSSelectorDomOrdinal {
   let selector: ICSSSelectorDomOrdinal
   if (document.body.contains(target)) {
     if (target.autocomplete && target.autocomplete !== 'off') {
       const autocompleteSelector = `[autocomplete="${target.autocomplete}"]`
       if (document.body.querySelectorAll(autocompleteSelector).length === 1) {
-        return { css: autocompleteSelector, ordinal: 0 } // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
+        return { css: autocompleteSelector, domOrdinal: 0 } // if the input has autocomplete, we always honor that. There are websites that generate ids for elements randomly
       }
     }
 
@@ -62,7 +59,7 @@ export function getSelectorForElement(
     // this input is not in DOM anymore--it was probably removed as part of the login flow(multi step login flow)
     selector = {
       css: generateQuerySelectorForOrphanedElement(target),
-      ordinal: 0
+      domOrdinal: 0
     } // we fallback to generating selector from the orphaned element
   }
 
@@ -102,7 +99,7 @@ export class DOMEventsRecorder {
 
   toJSON() {
     return this.capturedInputEvents.map(
-      ({ element, eventType: type, inputted, kind }, i) => {
+      ({ element, inputted, eventType: type, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
 
         if (
@@ -113,10 +110,11 @@ export class DOMEventsRecorder {
           kind = WebInputType.USERNAME_OR_EMAIL
         }
         return {
-          element: getSelectorForElement(element as HTMLInputElement),
+          cssSelector: getSelectorForElement(element).css,
+          domOrdinal: getSelectorForElement(element).ordinal,
           type,
-          inputted,
-          kind
+          kind,
+          inputted
         }
       }
     )

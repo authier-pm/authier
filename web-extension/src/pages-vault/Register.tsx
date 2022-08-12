@@ -18,12 +18,13 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
-import { Trans } from '@lingui/macro'
+import { device } from '@src/background/ExtensionDevice'
+import { Trans, t } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from './registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
+import { toast } from 'react-toastify'
 
 declare global {
   interface Crypto {
@@ -37,18 +38,16 @@ interface Values {
 }
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [register, { data, loading, error: registerError }] =
-    useRegisterNewUserMutation()
+  const [register, { error: registerError }] = useRegisterNewUserMutation()
   const navigate = useNavigate()
 
-  // console.log('~ fireToken', fireToken)
   const { fireToken } = device
   if (!fireToken) {
     return <Spinner />
   }
 
   if (registerError) {
-    console.log(registerError)
+    toast.error(t`Register failed, ${registerError.message}`)
   }
 
   return (
@@ -78,7 +77,7 @@ export default function Register(): ReactElement {
             masterEncryptionKey,
             userId
           )
-          console.log('~ params', params)
+
           const res = await register({
             variables: {
               userId,
@@ -93,6 +92,7 @@ export default function Register(): ReactElement {
               }
             }
           })
+
           const registerResult = res.data?.registerNewUser
 
           if (registerResult?.accessToken) {
@@ -110,7 +110,12 @@ export default function Register(): ReactElement {
               deviceName: device.name,
               encryptionSalt,
               authSecret: params.addDeviceSecret,
-              authSecretEncrypted: params.addDeviceSecretEncrypted
+              authSecretEncrypted: params.addDeviceSecretEncrypted,
+              lockTime: 28800,
+              autofill: true,
+              language: 'en',
+              syncTOTP: false,
+              theme: 'dark'
             }
 
             device.save(deviceState)

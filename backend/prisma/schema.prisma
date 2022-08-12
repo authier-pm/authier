@@ -11,13 +11,21 @@ generator client {
 }
 
 generator PrismaTypeGraphQLTypesGenerator {
-  provider                       = "npx prisma-typegraphql-types-generator"
+  provider                       = "prisma-typegraphql-types-generator"
   modelsOutput                   = "./models/generated"
   enumsOutput                    = "./models/types"
   useYarn                        = true
   removeTypeInFieldDecorator     = true
   splitScalarAndObjectTypeFields = true
   exportedNameSuffix             = "GQL"
+}
+
+model MasterDeviceChange {
+  id          String @id @default(cuid())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+  oldDeviceId    String
+  newDeviceId    String
 }
 
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
@@ -47,10 +55,11 @@ model Device {
   firebaseToken           String
   name                    String
   platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
-  syncTOTP                Boolean   @default(true) //2FA
   ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  vaultLockTimeoutSeconds Int?
   logoutAt                DateTime?
+  // Device settings
+  syncTOTP                Boolean   @default(false) //2FA
+  vaultLockTimeoutSeconds Int?      @default(28800) // 8 hours
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -68,25 +77,15 @@ model Device {
   SecretUsageEvents SecretUsageEvent[]
 
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
+
   @@index([updatedAt])
   @@index([lastSyncAt])
-}
-
-model SettingsConfig {
-  userId       String    @id @unique @db.Uuid
-  lockTime     Int
-  twoFA        Boolean
-  noHandsLogin Boolean
-  homeUI       String
-  updatedAt    DateTime? @updatedAt
-
-  user User @relation(fields: [userId], references: [id])
 }
 
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
   id        String              @id @default(uuid()) @db.Uuid
-  encrypted String // for TOTP and NEW_DEVICE it is a plain string, for LOGIN_CREDENTIALS it is a JSON array: [username, password]
+  encrypted String // for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
   version   Int
   kind      EncryptedSecretType
   createdAt DateTime            @default(now())
@@ -105,6 +104,8 @@ model EncryptedSecret {
 //   -- displays secret for manual entry
 //   -- secret is filled into input by authier extension
 //   -- secret is copied to clipboard by user
+//   -- secrets are exported
+
 model SecretUsageEvent {
   id          BigInt          @id @default(autoincrement())
   kind        String
@@ -120,7 +121,16 @@ model SecretUsageEvent {
   deviceId    String          @db.Uuid
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])
+}
 
+model MasterDeviceChange {
+  id          String   @id @default(cuid())
+  createdAt   DateTime @default(now())
+  processAt   DateTime
+  oldDeviceId String
+  newDeviceId String
+  userId      String   @db.Uuid
+  user        User     @relation(fields: [userId], references: [id])
 }
 
 // recorded whenever user unlocks vault
@@ -180,17 +190,21 @@ model User {
   recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
 
   deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
+  // User settings
+  autofill                      Boolean @default(true)
+  language                      String  @default("en")
+  theme                         String  @default("dark")
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]
   Devices              Device[]              @relation("devices")
   WebInputsAdded       WebInput[]
-  SettingsConfigs      SettingsConfig[]
   Tags                 Tag[]
   UserPaidProducts     UserPaidProducts[]
   DecryptionChallenges DecryptionChallenge[]
   // @skip
   EmailVerification    EmailVerification[]
+  MasterDeviceChange   MasterDeviceChange[]
 }
 
 model Token {

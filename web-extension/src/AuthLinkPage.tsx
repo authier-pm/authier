@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/layout'
 import { Center, Heading } from '@chakra-ui/react'
 import { Tooltip, IconButton } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
-import React, { ReactElement, useContext } from 'react'
+import React, { ReactElement } from 'react'
 import { IoMdArchive } from 'react-icons/io'
 
 export function AuthLinkPage(): ReactElement {

@@ -1,4 +1,4 @@
-query DevicesPage {
+query DevicesRequests {
   me {
     id
     masterDeviceId
@@ -7,6 +7,14 @@ query DevicesPage {
       createdAt
       deviceName
       deviceId
+    }
+  }
+}
+
+mutation ChangeMasterDevice($newMasterDeviceId: String!) {
+  me {
+    setMasterDevice(newMasterDeviceId: $newMasterDeviceId) {
+      id
     }
   }
 }

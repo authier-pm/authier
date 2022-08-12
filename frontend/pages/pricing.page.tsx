@@ -1,10 +1,9 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 
 import { FaCheckCircle } from 'react-icons/fa'
 import getStripe from '../utils/get-stripe'
 import {
   Box,
-  Button,
   Heading,
   HStack,
   List,
@@ -14,12 +13,16 @@ import {
   useColorModeValue,
   VStack,
   Text,
-  Tooltip
+  Center,
+  Spinner
 } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+
 import Head from 'next/head'
 
-import { useCreateCheckoutSessionMutation } from './pricing.codegen'
+import {
+  useCreateCheckoutSessionMutation,
+  useCreatePortalSessionMutation
+} from './pricing.codegen'
 
 import { useRouter } from 'next/router'
 
@@ -38,59 +41,23 @@ function PriceWrapper({ children }: { children: ReactNode }) {
   )
 }
 
-function ToolTipButton({
-  userId,
-  plan,
-  handleCheckout
-}: {
-  userId: string | string[] | undefined
-  plan: string
-  handleCheckout: (type: string) => Promise<void>
-}) {
-  return (
-    <Tooltip
-      isDisabled={userId ? true : false}
-      label="Visit this page through your vault"
-    >
-      <span>
-        <Button
-          disabled={!userId}
-          w="full"
-          colorScheme="red"
-          onClick={() => handleCheckout(plan)}
-        >
-          Buy
-        </Button>
-      </span>
-    </Tooltip>
-  )
-}
-
-const pricingPlan = {
-  Credentials: 'prod_LquWXgjk6kl5sM',
-  TOTP: 'prod_LquVrkwfsXjTAL',
-  TOTP_Credentials: 'prod_Lp3NU9UcNWduBm'
-}
-
 export default function PricingPage() {
   const router = useRouter()
-  const { userId } = router.query
-
+  const { product, portal } = router.query
   const [loading, setLoading] = useState(false)
 
-  const [
-    createCheckoutSessionMutation,
-    { data, loading: sessionLoading, error: sessionError }
-  ] = useCreateCheckoutSessionMutation()
+  const [createCheckoutSessionMutation, { error: sessionError }] =
+    useCreateCheckoutSessionMutation()
+
+  const [createPortalSession, { error: portalSession }] =
+    useCreatePortalSessionMutation()
 
   const handleCheckout = async (type: string) => {
     setLoading(true)
-
     //Create a Checkout Session.
     const response = await createCheckoutSessionMutation({
       variables: {
-        product: type,
-        userId: userId as string
+        product: type
       }
     })
 
@@ -107,13 +74,57 @@ export default function PricingPage() {
       //   // Make the id field from the Checkout Session creation API response
       //   // available to this file, so you can provide it as parameter here
       //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-      sessionId: response.data?.createCheckoutSession as string
+      sessionId: response.data?.me.createCheckoutSession as string
     })
     // // If `redirectToCheckout` fails due to a browser or network
     // // error, display the localized error message to your customer
     // // using `error.message`.
-    // console.warn(error.message)
+    console.warn(error.message)
     setLoading(false)
+  }
+
+  const handlePortal = async () => {
+    setLoading(true)
+    //Create a Checkout Session.
+    const response = await createPortalSession()
+
+    if (portalSession) {
+      console.error(portalSession.message)
+      router.push('/?error=true')
+      return
+    }
+    console.log(response)
+
+    window.location.href = response.data?.me.createPortalSession as string
+    setLoading(false)
+  }
+
+  useEffect(() => {
+    //TODO handle if product is not right string
+    if (product) {
+      handleCheckout(product as string)
+    }
+
+    if (portal) {
+      handlePortal()
+    }
+  }, [])
+
+  if (loading) {
+    return (
+      <Center height="88vh">
+        <VStack>
+          <Spinner
+            thickness="4px"
+            speed="0.65s"
+            emptyColor="gray.200"
+            color="blue.500"
+            size="xl"
+          />
+          <Heading>Loading</Heading>
+        </VStack>
+      </Center>
+    )
   }
 
   return (
@@ -121,7 +132,7 @@ export default function PricingPage() {
       <Head>
         <title>Authier - Pricing</title>
       </Head>
-      <Box minH="90vh" bgGradient="linear(to-l, teal.400, teal.600)">
+      <Box minH="90vh">
         <Box py={12}>
           <VStack spacing={2} textAlign="center">
             <Heading as="h1" fontSize="4xl">
@@ -175,7 +186,6 @@ export default function PricingPage() {
                 </Box>
               </VStack>
             </PriceWrapper>
-
             <PriceWrapper>
               <Box py={4} px={12}>
                 <Text fontWeight="500" fontSize="2xl">
@@ -204,13 +214,6 @@ export default function PricingPage() {
                     additional 60 login secrets
                   </ListItem>
                 </List>
-                <Box w="80%" pt={7}>
-                  <ToolTipButton
-                    userId={userId}
-                    plan={pricingPlan.Credentials}
-                    handleCheckout={handleCheckout}
-                  />
-                </Box>
               </VStack>
             </PriceWrapper>
             <PriceWrapper>
@@ -241,13 +244,6 @@ export default function PricingPage() {
                     additional 20 TOTP secrets
                   </ListItem>
                 </List>
-                <Box w="80%" pt={7}>
-                  <ToolTipButton
-                    userId={userId}
-                    plan={pricingPlan.TOTP}
-                    handleCheckout={handleCheckout}
-                  />
-                </Box>
               </VStack>
             </PriceWrapper>
             <PriceWrapper>
@@ -303,13 +299,6 @@ export default function PricingPage() {
                       additional 20 TOTP secrets
                     </ListItem>
                   </List>
-                  <Box w="80%" pt={7}>
-                    <ToolTipButton
-                      userId={userId}
-                      plan={pricingPlan.TOTP_Credentials}
-                      handleCheckout={handleCheckout}
-                    />
-                  </Box>
                 </VStack>
               </Box>
             </PriceWrapper>
