@@ -44,6 +44,7 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
+import admin from 'firebase-admin'
 
 const log = debug('au:RootResolver')
 
@@ -245,7 +246,12 @@ export class RootResolver {
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
-      select: { id: true, addDeviceSecretEncrypted: true, encryptionSalt: true }
+      select: {
+        id: true,
+        addDeviceSecretEncrypted: true,
+        encryptionSalt: true,
+        masterDevice: true
+      }
     })
 
     if (!user) {
@@ -258,6 +264,7 @@ export class RootResolver {
         ipAddress
       }
     })
+
     if (isBlocked) {
       throw new GraphqlError('Login failed, try again later.')
     }
@@ -317,7 +324,24 @@ export class RootResolver {
     }
 
     if (!challenge) {
-      // TODO send notification to user
+      // TODO Will we have notifications for browser?
+      if (
+        user.masterDevice?.firebaseToken &&
+        user.masterDevice.firebaseToken.length > 10
+      ) {
+        await admin
+          .messaging()
+          .sendToDevice(user.masterDevice?.firebaseToken as string, {
+            notification: {
+              title: 'New device login!',
+              body: 'New device is trying to log in.'
+            },
+            data: {
+              type: 'Devices'
+            }
+          })
+      }
+
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: deviceInput.id,
@@ -433,29 +457,5 @@ export class RootResolver {
       returnedInputs.push(input)
     }
     return returnedInputs
-  }
-
-  @Mutation(() => String)
-  async createCheckoutSession(
-    @Ctx() ctx: IContextAuthenticated,
-    @Arg('product', () => String) product: string
-  ) {
-    const productItem = await stripe.products.retrieve(product)
-
-    const session = await stripe.checkout.sessions.create({
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price: productItem['default_price'] as string,
-          //For metered billing, do not pass quantity
-          quantity: 1
-        }
-      ],
-      mode: 'subscription',
-      success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${ctx.request.headers.referer}?canceled=true`
-    })
-
-    return session.id
   }
 }

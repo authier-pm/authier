@@ -28,7 +28,7 @@ export const AddItem = () => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.900')}
+        bg={useColorModeValue('white', 'gray.800')}
       >
         <Select
           onChange={(e) => setType(e.target.value)}

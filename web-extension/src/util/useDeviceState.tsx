@@ -12,7 +12,7 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
-import { loginCredentialsSchema } from './loginCredentialsSchema'
+import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
@@ -21,11 +21,11 @@ const log = debug('au:useDeviceState')
 export interface ISecret {
   id: string
   encrypted: string
+  lastUsedAt?: string | null
+  createdAt: string
   label: string
   iconUrl: string | undefined | null
   url: string
-  lastUsedAt?: string | null
-  createdAt: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {

@@ -231,49 +231,34 @@ export enum EmailVerificationType {
 export type EncryptedSecretGql = {
   __typename?: 'EncryptedSecretGQL';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];
 };
 
 export type EncryptedSecretInput = {
-  androidUri?: InputMaybe<Scalars['String']>;
   encrypted: Scalars['String'];
-  iconUrl?: InputMaybe<Scalars['String']>;
-  iosUri?: InputMaybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
 };
 
 export type EncryptedSecretMutation = {
   __typename?: 'EncryptedSecretMutation';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   delete: EncryptedSecretGql;
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   lastUsedAt?: Maybe<Scalars['DateTime']>;
   update: EncryptedSecretGql;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];
@@ -285,31 +270,21 @@ export type EncryptedSecretMutationUpdateArgs = {
 };
 
 export type EncryptedSecretPatchInput = {
-  androidUri?: InputMaybe<Scalars['String']>;
   encrypted: Scalars['String'];
-  iconUrl?: InputMaybe<Scalars['String']>;
   id: Scalars['UUID'];
-  iosUri?: InputMaybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
 };
 
 export type EncryptedSecretQuery = {
   __typename?: 'EncryptedSecretQuery';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  androidUri?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
   deletedAt?: Maybe<Scalars['DateTime']>;
   encrypted: Scalars['String'];
-  iconUrl?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  iosUri?: Maybe<Scalars['String']>;
   kind: EncryptedSecretType;
-  label: Scalars['String'];
   lastUsedAt?: Maybe<Scalars['DateTime']>;
   updatedAt?: Maybe<Scalars['DateTime']>;
-  url?: Maybe<Scalars['String']>;
   user: UserGql;
   userId: Scalars['String'];
   version: Scalars['Int'];
@@ -341,7 +316,6 @@ export type MasterDeviceChangeGql = {
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
-  createCheckoutSession: Scalars['String'];
   currentDevice: DeviceMutation;
   /** returns a decryption challenge */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
@@ -358,11 +332,6 @@ export type Mutation = {
 
 export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>;
-};
-
-
-export type MutationCreateCheckoutSessionArgs = {
-  product: Scalars['String'];
 };
 
 
@@ -526,6 +495,7 @@ export type UserMutation = {
   autofill: Scalars['Boolean'];
   changeMasterPassword: Scalars['PositiveInt'];
   createCheckoutSession: Scalars['String'];
+  createPortalSession: Scalars['String'];
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
@@ -625,6 +595,8 @@ export type UserQuery = {
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
+  PasswordLimits: Scalars['PositiveInt'];
+  TOTPLimits: Scalars['PositiveInt'];
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;
@@ -664,11 +636,6 @@ export type UserQueryDeviceArgs = {
 };
 
 
-export type UserQueryEncryptedSecretsArgs = {
-  fromDate?: InputMaybe<Scalars['DateTime']>;
-};
-
-
 export type UserQuerySendAuthMessageArgs = {
   device: Scalars['String'];
   location: Scalars['String'];
@@ -677,7 +644,7 @@ export type UserQuerySendAuthMessageArgs = {
 };
 
 export type WebInputElement = {
-  domOrdinal: Scalars['PositiveInt'];
+  domOrdinal: Scalars['Int'];
   domPath: Scalars['String'];
   kind: WebInputType;
   url: Scalars['String'];

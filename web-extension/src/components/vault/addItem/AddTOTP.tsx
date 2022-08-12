@@ -17,7 +17,6 @@ import { useNavigate } from 'react-router-dom'
 interface LoginParsedValues {
   url: string
   label: string
-  username: string
   secret: string
 }
 
@@ -31,8 +30,7 @@ export const AddTOTP = () => {
         initialValues={{
           url: '',
           secret: '',
-          label: '',
-          username: ''
+          label: ''
         }}
         onSubmit={async (
           values: LoginParsedValues,
@@ -42,11 +40,14 @@ export const AddTOTP = () => {
             {
               kind: EncryptedSecretsType.TOTP as any,
               totp: values.secret,
-              encrypted: device.state!.encrypt(values.secret),
-              createdAt: new Date().toJSON(),
-              iconUrl: '',
-              label: values.label,
-              url: values.url
+              encrypted: device.state!.encrypt(
+                JSON.stringify({
+                  totp: values.secret,
+                  url: values.url,
+                  label: values.label
+                })
+              ),
+              createdAt: new Date().toJSON()
             }
           ])
 
@@ -54,7 +55,7 @@ export const AddTOTP = () => {
           navigate(-1)
         }}
       >
-        {({ values, isSubmitting, dirty }) => {
+        {({ isSubmitting, dirty }) => {
           return (
             <Flex as={Form} p={5} flexDirection="column" w="inherit">
               <Field name="url">

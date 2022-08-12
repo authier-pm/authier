@@ -29,7 +29,6 @@ export const NavBar: FunctionComponent = () => {
     onClose: onUserMenuClose
   } = useDisclosure()
   const [location, setLocation] = useLocation()
-  console.log('~ location', location)
   const [lastPage, SetLastPage] = useState<string>('/')
 
   const ActiveLink = (
@@ -52,21 +51,21 @@ export const NavBar: FunctionComponent = () => {
   }, [])
 
   return (
-    <Flex flexDir="column">
+    <Flex flexDir='column'>
       <Flex
         p={1}
-        textAlign="center"
+        textAlign='center'
         backgroundColor={bg}
-        fontSize="16px"
-        borderBottom="1px"
-        borderBottomColor="gray.300"
-        width="100%"
+        fontSize='16px'
+        borderBottom='1px'
+        borderBottomColor='gray.300'
+        width='100%'
       >
-        <Box mr="auto">
+        <Box mr='auto'>
           {isNavMenuOpen ? (
             <IconButton
-              size="md"
-              aria-label="menu"
+              size='md'
+              aria-label='menu'
               icon={<CloseIcon />}
               onClick={() => {
                 onNavMenuClose()
@@ -74,8 +73,8 @@ export const NavBar: FunctionComponent = () => {
             />
           ) : (
             <IconButton
-              size="md"
-              aria-label="menu"
+              size='md'
+              aria-label='menu'
               icon={<HamburgerIcon />}
               onClick={() => {
                 onNavMenuOpen()
@@ -86,9 +85,9 @@ export const NavBar: FunctionComponent = () => {
           <RefreshSecretsButton />
           <Tooltip label={t`Open vault`} aria-label={t`Open vault`}>
             <IconButton
-              size="md"
-              ml="2"
-              aria-label="menu"
+              size='md'
+              ml='2'
+              aria-label='menu'
               icon={<IoMdArchive />}
               onClick={async () => {
                 chrome.tabs.create({ url: 'vault.html' })
@@ -97,11 +96,11 @@ export const NavBar: FunctionComponent = () => {
           </Tooltip>
         </Box>
 
-        <Box ml="auto">
+        <Box ml='auto'>
           {isUserMenuOpen ? (
             <IconButton
-              size="md"
-              aria-label="menu"
+              size='md'
+              aria-label='menu'
               icon={<CloseIcon />}
               onClick={() => {
                 onUserMenuClose()
@@ -109,8 +108,8 @@ export const NavBar: FunctionComponent = () => {
             />
           ) : (
             <IconButton
-              size="md"
-              aria-label="menu"
+              size='md'
+              aria-label='menu'
               icon={<LockIcon />}
               onClick={() => {
                 onUserMenuOpen()

@@ -11,9 +11,9 @@ export const ColorModeButton = () => {
 
   return (
     <IconButton
-      size="lg"
-      variant="ghost"
-      aria-label="change color mode"
+      size='lg'
+      variant='ghost'
+      aria-label='change color mode'
       icon={<FiMoon />}
       onClick={async () => {
         if (deviceState) {
@@ -35,7 +35,7 @@ export const ColorModeButton = () => {
         }
         toggleColorMode()
       }}
-      mt="auto"
+      mt='auto'
     />
   )
 }
