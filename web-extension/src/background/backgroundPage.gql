@@ -4,9 +4,6 @@ mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {
       id
       kind
       encrypted
-      url
-      iconUrl
-      label
       version
       createdAt
       updatedAt

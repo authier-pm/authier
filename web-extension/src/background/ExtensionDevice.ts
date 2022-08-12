@@ -11,7 +11,8 @@ import {
 } from './backgroundPage'
 import {
   EncryptedSecretPatchInput,
-  EncryptedSecretType
+  EncryptedSecretType,
+  SettingsInput
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -35,7 +36,6 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
-import ms from 'ms'
 
 export const log = debug('au:Device')
 
@@ -78,7 +78,7 @@ const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
 
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
-    totp?: string
+    totp?: any
     loginCredentials?: any
   }
 >
@@ -87,7 +87,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
-    log('device state created', this)
+    //log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
     this.decryptedSecrets = this.getAllSecretsDecrypted()
@@ -100,7 +100,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime = ms('30m')
+  lockTime: number
+  autofill: boolean
+  language: string
+  theme: string
+  syncTOTP: boolean
   authSecret: string
   authSecretEncrypted: string
 
@@ -134,9 +138,10 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async save() {
+    browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = this.getAllSecretsDecrypted()
-    browser.storage.onChanged.removeListener(this.onStorageChange)
+    console.log('SAVE DEVICE STATE', this.decryptedSecrets)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
@@ -146,18 +151,18 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretDecryptedById(id: string) {
-    const secret = this.secrets.find((secret) => secret.id === id)
+    const secret = this.decryptedSecrets.find((secret) => secret.id === id)
     if (secret) {
       return this.decryptSecret(secret)
     }
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.secrets.filter(
-      (secret) => host === new URL(secret.url ?? '').hostname
+    let secrets = this.decryptedSecrets.filter(
+      (secret) => host === new URL(secret.id ?? '').hostname
     )
     if (secrets.length === 0) {
-      secrets = this.secrets.filter((secret) =>
+      secrets = this.decryptedSecrets.filter((secret) =>
         host.endsWith(getTldPart(secret.url ?? ''))
       )
     }
@@ -184,14 +189,16 @@ export class DeviceState implements IBackgroundStateSerializable {
       const parsed = JSON.parse(decrypted)
 
       try {
-        loginCredentialsSchema.parse(parsed)
+        loginCredentialsSchema.parse(parsed.loginCredentials)
         secretDecrypted = {
-          ...secret,
-          loginCredentials: parsed
+          ...parsed,
+          ...secret
         } as ILoginSecret
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
+          label: parsed.label,
+          url: parsed.url,
           loginCredentials: {
             username: '',
             password: '',
@@ -299,17 +306,14 @@ export class DeviceState implements IBackgroundStateSerializable {
         secrets: secrets.map((secret) => {
           const stringToEncrypt =
             secret.kind === EncryptedSecretType.TOTP
-              ? secret.totp
+              ? JSON.stringify(secret.totp)
               : JSON.stringify(secret.loginCredentials)
 
           const encrypted = this.encrypt(stringToEncrypt as string)
 
           return {
             encrypted,
-            kind: secret.kind,
-            label: secret.label,
-            iconUrl: secret.iconUrl,
-            url: secret.url
+            kind: secret.kind
           }
         })
       }
@@ -348,6 +352,20 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
+
+  async startLockInterval(lockTime: number) {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.setLockInterval,
+      time: lockTime
+    })
+  }
+
+  async clearLockInterval() {
+    await chrome.runtime.sendMessage({
+      action: BackgroundMessageType.clearLockInterval
+    })
+  }
+
   get platform() {
     return browserInfo.getOSName()
   }
@@ -355,6 +373,7 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
+    log('Extension device initializing')
     this.id = await this.getDeviceId()
 
     let storedState: IBackgroundStateSerializable | null = null
@@ -362,6 +381,7 @@ class ExtensionDevice {
     const storage = await browser.storage.local.get()
     if (storage.backgroundState) {
       storedState = storage.backgroundState
+
       log('device state init from storage', storedState)
     } else if (storage.lockedState) {
       this.lockedState = storage.lockedState
@@ -371,14 +391,19 @@ class ExtensionDevice {
     if (storedState) {
       this.state = new DeviceState(storedState)
       this.name = storedState.deviceName
+      this.state.save()
     } else {
       this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
 
+    if (this.state) {
+      this.startLockInterval(this.state.lockTime)
+    }
+
     // const fireToken = await generateFireToken()
     const fireToken = 'aaaa'
-    console.log('~ fireToken', fireToken)
+
     this.fireToken = fireToken
 
     this.rerenderViews() // for letting vault/popup know that the state has changed
@@ -393,6 +418,9 @@ class ExtensionDevice {
       log('storage change UL', changes, areaName)
       if (areaName === 'local' && changes.backgroundState) {
         this.state = new DeviceState(changes.backgroundState.newValue)
+        browser.storage.onChanged.removeListener(onStorageChangeLogin)
+      } else if (areaName === 'local' && changes.lockedState) {
+        this.lockedState = changes.lockedState.newValue
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
@@ -465,11 +493,26 @@ class ExtensionDevice {
 
   async lock() {
     if (!this.state) {
-      return
+      throw new Error('no state to lock')
     }
+
+    this.clearLockInterval()
+
     log('locking device')
 
-    const { email, userId, secrets, encryptionSalt } = this.state
+    const {
+      email,
+      userId,
+      secrets,
+      encryptionSalt,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme,
+      authSecret,
+      authSecretEncrypted
+    } = this.state
 
     this.lockedState = {
       email,
@@ -477,8 +520,13 @@ class ExtensionDevice {
       secrets,
       deviceName: this.name,
       encryptionSalt,
-      authSecret: this.state.authSecret,
-      authSecretEncrypted: this.state.authSecretEncrypted
+      authSecret,
+      authSecretEncrypted,
+      lockTime,
+      syncTOTP,
+      autofill,
+      language,
+      theme
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,
@@ -495,8 +543,8 @@ class ExtensionDevice {
     await removeToken()
     await device.clearLocalStorage()
 
-    //device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
-    //device.listenForUserLogin()
+    device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
+    device.listenForUserLogin()
     browser.runtime.reload()
   }
 
@@ -530,7 +578,7 @@ class ExtensionDevice {
       throw new Error('device not initialized')
     }
     return secrets.map((secret) => {
-      const { id, encrypted, kind, label, iconUrl, url } = secret
+      const { id, encrypted, kind } = secret
       const decr = state.decrypt(encrypted)
       log('decrypted secret', decr)
       state.setMasterEncryptionKey(newPsw)
@@ -539,14 +587,19 @@ class ExtensionDevice {
       return {
         id,
         encrypted: enc as string,
-        kind,
-        label,
-        iconUrl: iconUrl as string,
-        url: url as string,
-        androidUri: null,
-        iosUri: null
+        kind
       }
     })
+  }
+
+  syncSettings(config: SettingsInput) {
+    if (this.state) {
+      this.state.autofill = config.autofill
+      this.state.lockTime = config.vaultLockTimeoutSeconds
+      this.state.syncTOTP = config.syncTOTP
+      this.state.language = config.language
+      this.state.theme = config.theme
+    }
   }
 
   async save(deviceState: IBackgroundStateSerializable) {
@@ -555,7 +608,7 @@ class ExtensionDevice {
     this.rerenderViews()
   }
 }
-
+log('Extension device started')
 export const device = new ExtensionDevice()
 
 device.initialize()

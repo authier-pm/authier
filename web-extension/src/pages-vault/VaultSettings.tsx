@@ -1,22 +1,14 @@
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Link,
-  useColorModeValue
-} from '@chakra-ui/react'
+import { Box, Flex, HStack, Link, useColorModeValue } from '@chakra-ui/react'
 import {
   Link as RouterLink,
   Route,
   useLocation,
-  Routes,
-  useMatch
+  Routes
 } from 'react-router-dom'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
 import VaultConfig from '@src/components/vault/settings/VaultConfig'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence } from 'framer-motion'
 
 interface LinkItemProps {
   name: string
@@ -30,7 +22,7 @@ interface Props extends LinkItemProps {
 }
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Account', path: '/account' },
-  { name: 'Config', path: '/config' }
+  { name: 'Security', path: '/security' }
 ]
 
 const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
@@ -58,21 +50,20 @@ const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
 }
 
 export const VaultSettings = () => {
-  // const { url } = useMatch('/secret/:secretId')
   const location = useLocation()
   const [selectedTab, setSelectedTab] = useState(LinkItems[0])
 
+  useEffect(() => {
+    if (location.pathname === '/settings/account') {
+      setSelectedTab(LinkItems[0])
+    } else if (location.pathname === '/settings/security') {
+      setSelectedTab(LinkItems[1])
+    }
+  }, [location])
+
   return (
-    <Flex
-      rounded={'lg'}
-      boxShadow={'lg'}
-      align={'center'}
-      justify={'center'}
-      flexDirection={'column'}
-      m="auto"
-      bg={useColorModeValue('white', 'gray.900')}
-    >
-      <HStack as={'nav'} spacing={4}>
+    <Flex align={'center'} justify={'center'} flexDirection={'column'}>
+      <HStack as={'nav'} spacing={4} mb={10}>
         {LinkItems.map((link) => {
           const handleClick = () => {
             setSelectedTab(link)
@@ -93,7 +84,7 @@ export const VaultSettings = () => {
       <AnimatePresence exitBeforeEnter>
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/config'} element={<VaultConfig />}></Route>
+          <Route path={'/security'} element={<VaultConfig />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>

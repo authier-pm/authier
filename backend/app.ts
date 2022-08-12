@@ -4,6 +4,7 @@ import fastify, { FastifyRequest } from 'fastify'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
+import pino from 'pino'
 
 import cookie, { FastifyCookieOptions } from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'
@@ -36,17 +37,20 @@ sentryInit({
 })
 
 const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
+const logger = pino({
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      translateTime: 'HH:MM:ss Z',
+      ignore:
+        environment === 'production' ? 'pid,hostname,time' : 'pid,hostname',
+      colorize: true
+    }
+  }
+})
 
 export const app = fastify({
-  logger: {
-    prettyPrint:
-      environment === 'production'
-        ? false
-        : {
-            translateTime: 'HH:MM:ss Z',
-            ignore: 'pid,hostname'
-          }
-  }
+  logger
 })
 
 app.register(fastifyCors, {
@@ -122,7 +126,7 @@ app.register((fastify, opts, done) => {
 
       case 'checkout.session.completed':
         const session = event.data.object
-
+        console.log(session)
         await prismaClient.user.update({
           where: {
             email: session.customer_details.email
@@ -131,7 +135,8 @@ app.register((fastify, opts, done) => {
             UserPaidProducts: {
               create: {
                 checkoutSessionId: session.id,
-                productId: session.subscription
+                productId: session.subscription,
+                expiresAt: new Date(session.expires_at)
               }
             }
           }

@@ -24,7 +24,6 @@ export default function Providers({ parent }: { parent: string }) {
         <UserProvider>
           <I18nProvider i18n={i18n}>
             <ToastContainer {...toastifyConfig} />
-            {/* <Routes /> */}
             {parent === 'vault' ? <VaultRouter /> : <PopupRoutes />}
           </I18nProvider>
         </UserProvider>

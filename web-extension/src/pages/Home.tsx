@@ -12,11 +12,11 @@ import {
   useInterval
 } from '@chakra-ui/react'
 
-import { AuthsList } from '../components/AuthsList'
 import { authenticator } from 'otplib'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AddIcon } from '@chakra-ui/icons'
+import { AuthsList } from '@src/components/pages/AuthsList'
 
 export const Home: FunctionComponent = () => {
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
@@ -43,7 +43,6 @@ export const Home: FunctionComponent = () => {
           <Switch
             mr="auto"
             isChecked={filterByTLD}
-            // checked={filterByTLD}
             onChange={(enabled) => {
               setFilterByTLD(enabled.target.checked)
             }}

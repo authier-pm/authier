@@ -1,14 +1,4 @@
-import { prismaClient } from '../prisma/prismaClient'
-import {
-  Arg,
-  Ctx,
-  Field,
-  InputType,
-  Int,
-  ObjectType,
-  UseMiddleware
-} from 'type-graphql'
-import { UserGQL } from './generated/User'
+import { Field, InputType, Int, ObjectType } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { GraphQLUUID } from 'graphql-scalars'
 import { UserMutation } from './UserMutation'
@@ -72,23 +62,26 @@ export class EncryptedSecretInput {
   @Field(() => EncryptedSecretTypeGQL, { nullable: false })
   kind: EncryptedSecretTypeGQL
 
-  @Field(() => String, { nullable: true })
-  url: string
-
-  @Field(() => String, { nullable: true })
-  iconUrl: string | null
-
-  @Field(() => String, { nullable: true })
-  iosUri: string | null
-
-  @Field(() => String, { nullable: true })
-  androidUri: string | null
-
-  @Field(() => String, { nullable: false })
-  label: string
-
   @Field(() => String, { nullable: false })
   encrypted: string
+}
+
+@InputType()
+export class SettingsInput {
+  @Field(() => Boolean)
+  syncTOTP: boolean
+
+  @Field(() => Int)
+  vaultLockTimeoutSeconds: number
+
+  @Field(() => Boolean)
+  autofill: boolean
+
+  @Field(() => String)
+  language: string
+
+  @Field(() => String)
+  theme: string
 }
 
 @InputType()

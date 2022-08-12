@@ -11,8 +11,6 @@ import {
   Heading,
   Center
 } from '@chakra-ui/react'
-import { UserContext } from '@src/providers/UserProvider'
-import browser from 'webextension-polyfill'
 
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
@@ -20,8 +18,8 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
 import cryptoJS from 'crypto-js'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 interface Values {
   password: string
@@ -30,7 +28,12 @@ interface Values {
 export function VaultUnlockVerification() {
   const [showPassword, setShowPassword] = useState(false)
 
-  const { lockedState } = device
+  const {
+    setDeviceState,
+    safeLocked: lockedState,
+    device
+  } = useContext(DeviceStateContext)
+
   if (!lockedState) {
     return null
   }
@@ -65,11 +68,13 @@ export function VaultUnlockVerification() {
               throw new Error(t`Incorrect password`)
             }
 
-            device.state = new DeviceState({
+            setDeviceState({
               masterEncryptionKey,
               ...lockedState
             })
-            await device.state.save()
+
+            device.startLockInterval(lockedState.lockTime)
+
             device.rerenderViews()
             setSubmitting(false)
           } catch (err: any) {

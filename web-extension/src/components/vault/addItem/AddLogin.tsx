@@ -56,21 +56,22 @@ export const AddLogin = () => {
           { setSubmitting }: FormikHelpers<LoginParsedValues>
         ) => {
           const namePassPair = {
-            username: values.username,
-            password: values.password
+            loginCredentials: {
+              password: values.password,
+              username: values.username
+            },
+            url: values.url,
+            label: values.label
           }
 
-          loginCredentialsSchema.parse(namePassPair)
+          loginCredentialsSchema.parse(namePassPair.loginCredentials)
 
           await device.state?.addSecrets([
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: namePassPair,
               encrypted: device.state.encrypt(JSON.stringify(namePassPair)),
-              createdAt: new Date().toJSON(),
-              iconUrl: null,
-              url: values.url,
-              label: values.label
+              createdAt: new Date().toJSON()
             }
           ])
 

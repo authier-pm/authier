@@ -17,7 +17,7 @@
     ]
   },
   "resolutions": {
-    "graphql": "^15.8.0",
+    "graphql": "^16.5.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },
@@ -58,5 +58,8 @@
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",
     "schemas": "yarn gbs && yarn gfs"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1"
   }
 }

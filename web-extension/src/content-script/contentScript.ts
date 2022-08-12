@@ -31,6 +31,8 @@ import { renderItemPopup } from './renderItemPopup'
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
+log('STARTING')
+
 const inputKindMap = {
   email: WebInputType.EMAIL,
   username: WebInputType.USERNAME
@@ -42,7 +44,7 @@ export interface IInitStateRes {
   secretsForHost: IDecryptedSecrets
   webInputs: Array<{
     __typename?: 'WebInputGQL'
-    id: number
+    id?: number
     url: string
     host: string
     domPath: string
@@ -80,6 +82,69 @@ const hideToast = () => {
   }, 5000)
 }
 
+function onKeyDown(e?: KeyboardEvent) {
+  if (
+    e &&
+    e.shiftKey &&
+    e.ctrlKey &&
+    (e.key === 'q' || e.key === 'Q') &&
+    !recording
+  ) {
+    recording = true
+    renderToast({
+      header: 'Recording started',
+      text: 'Press Ctrl + shift + Q to stop'
+    })
+
+    document.addEventListener('click', clicked)
+  } else if (
+    e &&
+    e.shiftKey &&
+    e.ctrlKey &&
+    (e.key === 'q' || e.key === 'Q') &&
+    recording
+  ) {
+    domRecorder.clearCapturedEvents()
+    document.removeEventListener('click', clicked)
+    recordDiv?.remove()
+    clickCount = 0
+    recording = false
+    hideToast()
+  }
+}
+
+function clicked(e: MouseEvent) {
+  console.log(e)
+
+  //@ts-expect-error TODO
+  if (e.target.type === 'password' || e.target.type === 'text') {
+    domRecorder.addInputEvent({
+      element: e.target as HTMLInputElement,
+      eventType: 'input',
+      kind: getWebInputKind(e.target as HTMLInputElement)
+    })
+
+    clickCount = clickCount + 1
+  }
+
+  if (clickCount === 2) {
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
+    })
+
+    recordDiv?.remove()
+    recording = false
+    clickCount = 0
+    document.removeEventListener('click', clicked)
+
+    //TODO: We can use inputs on page???
+    renderItemPopup()
+  }
+}
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
@@ -93,69 +158,6 @@ export async function initInputWatch() {
 
   if (stateInitRes) {
     document.addEventListener('keydown', onKeyDown, true)
-  }
-
-  function onKeyDown(e?: KeyboardEvent) {
-    if (
-      e &&
-      e.shiftKey &&
-      e.ctrlKey &&
-      (e.key === 'q' || e.key === 'Q') &&
-      !recording
-    ) {
-      recording = true
-      renderToast({
-        header: 'Recording started',
-        text: 'Press Ctrl + shift + Q to stop'
-      })
-
-      document.addEventListener('click', clicked)
-    } else if (
-      e &&
-      e.shiftKey &&
-      e.ctrlKey &&
-      (e.key === 'q' || e.key === 'Q') &&
-      recording
-    ) {
-      domRecorder.clearCapturedEvents()
-      document.removeEventListener('click', clicked)
-      recordDiv?.remove()
-      clickCount = 0
-      recording = false
-      hideToast()
-    }
-  }
-
-  function clicked(e: MouseEvent) {
-    console.log(e)
-
-    //@ts-expect-error TODO
-    if (e.target.type === 'password' || e.target.type === 'text') {
-      domRecorder.addInputEvent({
-        element: e.target as HTMLInputElement,
-        eventType: 'input',
-        kind: getWebInputKind(e.target as HTMLInputElement)
-      })
-
-      clickCount = clickCount + 1
-    }
-
-    if (clickCount === 2) {
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.saveCapturedInputEvents,
-        payload: {
-          inputEvents: domRecorder.toJSON(),
-          url: document.documentURI
-        }
-      })
-
-      recordDiv?.remove()
-      recording = false
-      clickCount = 0
-      document.removeEventListener('click', clicked)
-
-      renderItemPopup()
-    }
   }
 
   if (!stateInitRes) {
@@ -177,11 +179,16 @@ export async function initInputWatch() {
   }
 
   if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
-    renderLoginCredOption(secretsForHost.loginCredentials, webInputs)
+    renderLoginCredOption({
+      loginCredentials: secretsForHost.loginCredentials,
+      webInputs
+    })
     return
   }
+
   const stopAutofillListener = autofill(stateInitRes)
 
+  // Render save credential modal after page-rerender
   if (
     saveLoginModalsState &&
     saveLoginModalsState.username &&
@@ -200,9 +207,15 @@ export async function initInputWatch() {
     if (promptDiv) {
       return
     }
+    browser.runtime.sendMessage({
+      action: BackgroundMessageType.saveCapturedInputEvents,
+      payload: {
+        inputEvents: domRecorder.toJSON(),
+        url: document.documentURI
+      }
+    })
     const username = domRecorder.getUsername()
     const password = domRecorder.getPassword()
-    log('showSavePromptIfAppropriate', username, password)
 
     const existingCredentialWithSamePassword =
       secretsForHost?.loginCredentials.find(
@@ -228,14 +241,6 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: {
-        inputEvents: domRecorder.toJSON(),
-        url: document.documentURI
-      }
-    })
-
     showSavePromptIfAppropriate()
   }
 
@@ -245,12 +250,22 @@ export async function initInputWatch() {
       onSubmit(input)
     }
   }
+
+  const onInputAdded = (input) => {
+    // handle case when password input is added to DOM by javascript
+    if (input.type === 'password' && !domRecorder.hasInput(input)) {
+      autofill(stateInitRes)
+    }
+  }
+
   bodyInputChangeEmitter.on('inputRemoved', onInputRemoved)
+  bodyInputChangeEmitter.on('inputAdded', onInputAdded)
 
   /**
    * responsible for saving new web inputs
    */
   const debouncedInputEventListener = debounce((ev) => {
+    log('Catched action', ev)
     if (autofillEventsDispatched.has(ev)) {
       // this was dispatched by autofill, we don't need to do anything here
       autofillEventsDispatched.delete(ev)
@@ -258,7 +273,6 @@ export async function initInputWatch() {
     }
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
-    log('domRecorder', domRecorder.toJSON())
 
     const inputted = targetElement.value
 
@@ -275,6 +289,8 @@ export async function initInputWatch() {
           kind: getWebInputKind(targetElement)
         }
         domRecorder.addInputEvent(inputRecord)
+
+        // TOTP Recognision
         if (inputted.length === 6 && secretsForHost.totpSecrets.length > 0) {
           // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
 
@@ -285,7 +301,7 @@ export async function initInputWatch() {
               )
               const webInput: WebInputElement = {
                 domPath: elementSelector.css,
-                domOrdinal: elementSelector.ordinal,
+                domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
                 url: location.href
               }
@@ -306,6 +322,7 @@ export async function initInputWatch() {
           if (form) {
             // handle case when this is inside a form
             if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
+              log('includes')
               return
             }
 
@@ -357,14 +374,27 @@ export async function initInputWatch() {
     )
     stopAutofillListener()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
+    bodyInputChangeEmitter.off('inputAdded', onInputAdded)
   }
 }
 
-document.addEventListener('readystatechange', (event) => {
-  if (
-    event.target instanceof Document &&
-    event.target?.readyState === 'complete'
-  ) {
+initInputWatch()
+
+// document.addEventListener('readystatechange', (event) => {
+//   if (
+//     event.target instanceof Document &&
+//     event.target?.readyState === 'complete'
+//   ) {
+//     initInputWatch()
+//   }
+// })
+
+// For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
+let lastUrl = location.href
+new MutationObserver(() => {
+  const url = location.href
+  if (url !== lastUrl) {
+    lastUrl = url
     initInputWatch()
   }
-})
+}).observe(document, { subtree: true, childList: true })

@@ -35,6 +35,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
       id: jwtPayload.deviceId
     }
   })
+
   if (!currentDevice) {
     context.reply.clearCookie('access-token')
     throw new Error('not authenticated')
@@ -46,6 +47,17 @@ export const throwIfNotAuthenticated: MiddlewareFn<
     throw new Error('not authenticated')
   }
   context.device = currentDevice
+
+  const user = await context.prisma.user.findFirst({
+    where: {
+      id: context.jwtPayload.userId
+    },
+    select: {
+      masterDeviceId: true
+    }
+  })
+
+  context.masterDeviceId = user?.masterDeviceId
 
   return next()
 }
