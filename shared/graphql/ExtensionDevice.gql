@@ -1,0 +1,41 @@
+mutation markAsSynced {
+  currentDevice {
+    markAsSynced
+  }
+}
+
+mutation logout {
+  logout
+}
+
+query SyncEncryptedSecrets {
+  currentDevice {
+    id
+    encryptedSecretsToSync {
+      ...secretExtension
+    }
+  }
+}
+
+fragment secretExtension on EncryptedSecretQuery {
+  id
+  encrypted
+  kind
+  createdAt
+  updatedAt
+  deletedAt
+  version
+}
+
+mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {
+  me {
+    addEncryptedSecrets(secrets: $secrets) {
+      id
+      kind
+      encrypted
+      version
+      createdAt
+      updatedAt
+    }
+  }
+}

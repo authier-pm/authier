@@ -1,0 +1,51 @@
+query myDevices {
+  me {
+    id
+    masterDeviceId
+    devices {
+      id
+      name
+      firstIpAddress
+      lastIpAddress
+      logoutAt
+      lastGeoLocation
+      createdAt
+      lastSyncAt
+      platform
+      createdAt
+    }
+  }
+}
+
+mutation RejectChallenge($id: Int!) {
+  me {
+    decryptionChallenge(id: $id) {
+      reject {
+        id
+      }
+    }
+  }
+}
+
+mutation ApproveChallenge($id: Int!) {
+  me {
+    decryptionChallenge(id: $id) {
+      approve {
+        id
+      }
+    }
+  }
+}
+
+query DeviceRequest {
+  me {
+    id
+    masterDeviceId
+    decryptionChallengesWaiting {
+      id
+      createdAt
+      deviceName
+      deviceId
+    }
+  }
+}

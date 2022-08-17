@@ -1,0 +1,20 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2022-06-21 23:12+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: en\n"
+
+#: src/screens/Login.tsx
+msgid "Forget Password?"
+msgstr ""
+
+#: src/screens/Vault/Vault.tsx
+msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
+msgstr ""
+
+#: src/screens/Login.tsx
+msgid "Submit"
+msgstr ""
