@@ -91,7 +91,6 @@ export const TOTPVault = ({
             return label.includes(filterBy) || url?.includes(filterBy)
           })}
           keyExtractor={(i) => i.id}
-          //@ts-expect-error TODO @capaj
           renderItem={({ item }) => <TOTPSecret item={item} />}
           onRefresh={() => onRefresh()}
           refreshing={refreshing}

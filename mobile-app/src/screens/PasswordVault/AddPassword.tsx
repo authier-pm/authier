@@ -49,20 +49,22 @@ export const AddPassword = () => {
         values: LoginParsedValues,
         { setSubmitting }: FormikHelpers<LoginParsedValues>
       ) => {
-        const namePassPair = {
-          username: values.username,
-          password: values.password
+        const unencryptedData = {
+          loginCredentials: {
+            password: values.password,
+            username: values.username
+          },
+          url: values.url,
+          label: values.label
         }
 
         try {
           await device.state?.addSecrets([
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-              loginCredentials: namePassPair,
-              encrypted: device.state.encrypt(JSON.stringify(namePassPair)),
-              iconUrl: null,
-              url: values.url,
-              label: values.label
+              loginCredentials: unencryptedData,
+              encrypted: device.state.encrypt(JSON.stringify(unencryptedData)),
+              createdAt: new Date().toJSON()
             }
           ])
         } catch (error: any) {
@@ -94,7 +96,7 @@ export const AddPassword = () => {
         const levelOfPsw = passwordStrength(values.password)
 
         return (
-          <Flex p={5} flexDirection='column'>
+          <Flex p={5} flexDirection="column">
             <FormControl>
               <InputHeader>URL</InputHeader>
               <Input
@@ -147,16 +149,16 @@ export const AddPassword = () => {
                       />
                     }
                     size={6}
-                    mr='2'
-                    color='muted.400'
+                    mr="2"
+                    color="muted.400"
                     onPress={() => setShow(!show)}
                   />
                 }
               />
               <Progress
                 value={levelOfPsw.id}
-                size='xs'
-                colorScheme='green'
+                size="xs"
+                colorScheme="green"
                 max={3}
                 min={0}
                 mb={1}
@@ -177,7 +179,7 @@ export const AddPassword = () => {
               _focus={{
                 bg: 'blue.500'
               }}
-              aria-label='Save'
+              aria-label="Save"
             >
               Save
             </Button>

@@ -61,10 +61,10 @@ export function Login({ navigation }: NavigationProps) {
 
   return (
     <View p="8" justifyContent="center">
-      <Heading fontWeight="600" color="coolGray.800">
+      <Heading fontWeight="600">
         <Trans>Welcome</Trans>
       </Heading>
-      <Heading mt="1" color="coolGray.600" fontWeight="medium" size="xs">
+      <Heading mt="1" fontWeight="medium" size="xs">
         <Trans>Log in to continue!</Trans>
       </Heading>
 
@@ -90,7 +90,6 @@ export function Login({ navigation }: NavigationProps) {
             <FormControl>
               <FormControl.Label
                 _text={{
-                  color: 'coolGray.800',
                   fontSize: 'xl',
                   fontWeight: 500
                 }}
@@ -111,7 +110,6 @@ export function Login({ navigation }: NavigationProps) {
             <FormControl>
               <FormControl.Label
                 _text={{
-                  color: 'coolGray.800',
                   fontSize: 'xl',
                   fontWeight: 500
                 }}
@@ -148,7 +146,7 @@ export function Login({ navigation }: NavigationProps) {
               <Trans>Submit</Trans>
             </Button>
             <HStack mt="2" justifyContent="center" space={1}>
-              <Text fontSize="sm" color="muted.700" fontWeight={400}>
+              <Text fontSize="sm" color="muted.500" fontWeight={400}>
                 <Trans>I'm a new user.</Trans>
               </Text>
               <Pressable onPress={() => navigation.navigate('Register')}>

@@ -33,14 +33,18 @@ export const AddTOTP = () => {
         values: LoginParsedValues,
         { setSubmitting }: FormikHelpers<LoginParsedValues>
       ) => {
+        const unencryptedData = {
+          totp: values.totp,
+          url: values.url,
+          label: values.label
+        }
+
         await device.state?.addSecrets([
           {
             kind: EncryptedSecretType.TOTP,
             totp: values.totp,
-            encrypted: device.state.encrypt(values.totp),
-            iconUrl: '',
-            url: values.url,
-            label: values.label
+            encrypted: device.state.encrypt(JSON.stringify(unencryptedData)),
+            createdAt: new Date().toJSON()
           }
         ])
 
@@ -58,7 +62,7 @@ export const AddTOTP = () => {
         handleSubmit
       }) => {
         return (
-          <Flex p={5} flexDirection='column'>
+          <Flex p={5} flexDirection="column">
             <FormControl>
               <InputHeader>URL:</InputHeader>
               <Input
@@ -109,7 +113,7 @@ export const AddTOTP = () => {
               _focus={{
                 bg: 'blue.500'
               }}
-              aria-label='Save'
+              aria-label="Save"
             >
               Save
             </Button>

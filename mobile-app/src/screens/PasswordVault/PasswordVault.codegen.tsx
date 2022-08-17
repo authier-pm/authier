@@ -7,7 +7,7 @@ export type EncryptedAuthsQueryVariables = Types.Exact<{ [key: string]: never }>
 
 export type EncryptedAuthsQuery = {
   __typename?: 'Query'
-  me?: {
+  me: {
     __typename?: 'UserQuery'
     id: string
     encryptedSecrets: Array<{
@@ -15,9 +15,8 @@ export type EncryptedAuthsQuery = {
       id: string
       kind: Types.EncryptedSecretType
       encrypted: string
-      iconUrl?: string | null
     }>
-  } | null
+  }
 }
 
 export const EncryptedAuthsDocument = gql`
@@ -28,7 +27,6 @@ export const EncryptedAuthsDocument = gql`
         id
         kind
         encrypted
-        iconUrl
       }
     }
   }

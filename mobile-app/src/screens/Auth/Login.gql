@@ -19,9 +19,6 @@ mutation addNewDeviceForUser(
             kind
             createdAt
             updatedAt
-            iconUrl
-            url
-            label
             version
           }
         }

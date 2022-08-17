@@ -47,9 +47,9 @@ export const PasswordVault = ({
   return (
     <View>
       <Flex
-        flexDirection='row'
-        justifyContent='space-between'
-        alignItems='center'
+        flexDirection="row"
+        justifyContent="space-between"
+        alignItems="center"
       >
         <SearchBar setFilterBy={setFilterBy} />
       </Flex>
@@ -67,11 +67,10 @@ export const PasswordVault = ({
         //Virtualize??
         <FlashList
           estimatedItemSize={104}
-          data={device.LoginCredentials.filter(({ label, url }) => {
+          data={device.loginCredentials.filter(({ label, url }) => {
             return label.includes(filterBy) || url?.includes(filterBy)
           })}
           keyExtractor={(i) => i.id}
-          //@ts-expect-error TODO @capaj
           renderItem={({ item }) => <LoginCredential item={item} />}
           onRefresh={() => onRefresh()}
           refreshing={refreshing}
@@ -82,11 +81,11 @@ export const PasswordVault = ({
         onPress={() => navigation.navigate('AddPassword')}
         m={2}
         borderRadius={60}
-        variant='solid'
+        variant="solid"
         renderInPortal={false}
         shadow={2}
-        size='sm'
-        icon={<AddIcon color='white' size={6} />}
+        size="sm"
+        icon={<AddIcon color="white" size={6} />}
       />
     </View>
   )

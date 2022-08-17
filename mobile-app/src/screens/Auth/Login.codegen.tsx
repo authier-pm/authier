@@ -28,9 +28,6 @@ export type AddNewDeviceForUserMutation = {
               kind: Types.EncryptedSecretType
               createdAt: string
               updatedAt?: string | null
-              iconUrl?: string | null
-              url?: string | null
-              label: string
               version: number
             }>
           }
@@ -82,9 +79,6 @@ export const AddNewDeviceForUserDocument = gql`
               kind
               createdAt
               updatedAt
-              iconUrl
-              url
-              label
               version
             }
           }

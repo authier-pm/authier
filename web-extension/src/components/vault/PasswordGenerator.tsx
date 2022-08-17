@@ -30,6 +30,7 @@ export const PasswordGenerator = ({
   setInitPassword: (password: string) => void
 }) => {
   return (
+    //@ts-ignore TODO: fix this
     <Collapse in={isOpen} animateOpacity>
       <Flex
         flexDirection="column"

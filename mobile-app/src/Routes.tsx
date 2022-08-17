@@ -1,4 +1,4 @@
-import * as React from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 import { DeviceContext } from './providers/DeviceProvider'
@@ -16,13 +16,13 @@ import { Loading } from './components/Loading'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
-  const device = React.useContext(DeviceContext)
+  const device = useContext(DeviceContext)
   const { colorMode } = useColorMode()
   const [isReady, setIsReady] = React.useState(__DEV__ ? false : true)
   const [initialState, setInitialState] = React.useState()
 
-  React.useEffect(() => {
-    console.log('lockTimeEnd', device.state?.lockTimeEnd)
+  useEffect(() => {
+    console.log(device.state?.lockTimeEnd)
     if (device.state && device.state!.lockTimeEnd <= Date.now()) {
       device.lock()
     } else if (device.state?.lockTimeEnd) {
