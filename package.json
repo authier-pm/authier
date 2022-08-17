@@ -13,7 +13,18 @@
     "packages": [
       "web-extension",
       "backend",
-      "frontend"
+      "frontend",
+      "mobile-app"
+    ],
+    "nohoist": [
+       "**/@react-native-async-storage/async-storage",
+      "**/react",
+      "**/react-dom",
+      "**/react-native",
+      "**/react-native/**",
+      "**/react-native-codegen",
+      "**/react-native-code-push",
+      "**/react-native-vector-icons"
     ]
   },
   "resolutions": {
