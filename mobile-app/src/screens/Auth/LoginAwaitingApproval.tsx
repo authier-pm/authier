@@ -1,15 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react'
 
-import {
-  Center,
-  Heading,
-  HStack,
-  Spinner,
-  Text,
-  useToast,
-  View
-} from 'native-base'
+import { Heading, Text, useToast } from 'native-base'
 import { LoginContext } from './Login'
 
 import cryptoJS from 'crypto-js'
@@ -84,7 +76,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -161,7 +153,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -207,7 +199,7 @@ export const useLogin = (props: { deviceName: string }) => {
 export const LoginAwaitingApproval = () => {
   let device = useContext(DeviceContext)
   const [deviceName, setDeviceName] = useState(device.name)
-  const { deviceDecryptionChallenge, loading } = useLogin({
+  const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })
 

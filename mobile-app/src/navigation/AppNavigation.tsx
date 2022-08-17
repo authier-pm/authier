@@ -78,6 +78,7 @@ function AppNavigation() {
       //@ts-expect-error
       initialRouteName={initialRoute}
       screenOptions={({ route }) => ({
+        // eslint-disable-next-line react/no-unstable-nested-components
         tabBarIcon: ({ focused, color, size }) => {
           // Make this questionMark or something
           let iconName = 'key'
@@ -100,10 +101,10 @@ function AppNavigation() {
         headerShown: false
       })}
     >
-      <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
-      <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
-      <RootStack.Screen name="Devices" component={DeviceStackNavigation} />
-      <RootStack.Screen name="User" component={AccountNavigation} />
+      <RootStack.Screen name='Passwords' component={PasswordsStackNavigation} />
+      <RootStack.Screen name='TOTP' component={TOTPStackNavigation} />
+      <RootStack.Screen name='Devices' component={DeviceStackNavigation} />
+      <RootStack.Screen name='User' component={AccountNavigation} />
     </RootStack.Navigator>
   )
 }

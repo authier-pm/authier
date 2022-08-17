@@ -63,10 +63,10 @@ export function Register({ navigation }: NavigationProps) {
 
   return (
     <View p="8" justifyContent="center">
-      <Heading size="lg" fontWeight="600" color="coolGray.800">
+      <Heading size="lg" fontWeight="600">
         Welcome
       </Heading>
-      <Heading mt="1" color="coolGray.600" fontWeight="medium" size="xs">
+      <Heading mt="1" fontWeight="medium" size="xs">
         Register!
       </Heading>
 
@@ -158,7 +158,6 @@ export function Register({ navigation }: NavigationProps) {
             <FormControl>
               <FormControl.Label
                 _text={{
-                  color: 'coolGray.800',
                   fontSize: 'xl',
                   fontWeight: 500
                 }}
@@ -179,7 +178,6 @@ export function Register({ navigation }: NavigationProps) {
             <FormControl>
               <FormControl.Label
                 _text={{
-                  color: 'coolGray.800',
                   fontSize: 'xl',
                   fontWeight: 500
                 }}

@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { ITOTPSecret } from '../../utils/Device'
-import { useUpdateEncryptedSecretMutation } from '../PasswordVault/EditPassword.codegen'
+import { useUpdateEncryptedSecretMutation } from '../../../../shared/graphql/ItemSettings.codegen'
 import { TOTPStackScreenProps } from '../../navigation/types'
 
 interface totpValues {
@@ -61,17 +61,19 @@ const TOTPSecret = (data: ITOTPSecret) => {
           const secret = device.state?.secrets.find(({ id }) => id === data.id)
 
           if (secret && device.state) {
-            secret.encrypted = device.state.encrypt(data.totp)
-            secret.label = values.label
-            secret.url = values.url
+            secret.encrypted = device.state.encrypt(
+              JSON.stringify({
+                totp: values.secret,
+                url: values.url,
+                label: values.label
+              })
+            )
 
             await updateSecret({
               variables: {
                 id: data.id,
                 patch: {
                   encrypted: secret.encrypted,
-                  label: values.label,
-                  url: values.url,
                   kind: data.kind
                 }
               }

@@ -22,7 +22,7 @@ import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { ILoginSecret } from '../../utils/Device'
-import { useUpdateEncryptedSecretMutation } from './EditPassword.codegen'
+import { useUpdateEncryptedSecretMutation } from '../../../../shared/graphql/ItemSettings.codegen'
 import { EncryptedAuthsDocument } from './PasswordVault.codegen'
 import { PasswordStackScreenProps } from '../../navigation/types'
 
@@ -74,20 +74,21 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           if (secret && device.state) {
             secret.encrypted = device.state.encrypt(
               JSON.stringify({
-                username: values.username,
-                password: values.password
+                loginCredentials: {
+                  username: values.username,
+                  password: values.password
+                },
+                url: values.url,
+                label: values.label,
+                iconUrl: null
               })
             )
-            secret.url = values.url
-            secret.label = values.label
 
             await updateSecret({
               variables: {
                 id: secretProps.id,
                 patch: {
                   encrypted: secret.encrypted,
-                  label: values.label,
-                  url: values.url,
                   kind: secretProps.kind
                 }
               }
@@ -111,7 +112,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           const levelOfPsw = passwordStrength(values.password)
 
           return (
-            <Flex p={5} flexDirection='column'>
+            <Flex p={5} flexDirection="column">
               <FormControl>
                 <InputHeader>URL:</InputHeader>
                 <Input
@@ -164,17 +165,17 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         />
                       }
                       size={6}
-                      mr='2'
-                      color='muted.400'
+                      mr="2"
+                      color="muted.400"
                       onPress={() => setShow(!show)}
                     />
                   }
-                  placeholder='Password'
+                  placeholder="Password"
                 />
                 <Progress
                   value={levelOfPsw.id}
-                  size='xs'
-                  colorScheme='green'
+                  size="xs"
+                  colorScheme="green"
                   max={3}
                   min={0}
                   mb={1}
@@ -182,7 +183,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               </FormControl>
 
               {secretProps.loginCredentials.parseError && (
-                <Alert status='error' mt={4}>
+                <Alert status="error" mt={4}>
                   <Text>Failed to parse this secret:</Text>
                   {JSON.stringify(secretProps.loginCredentials.parseError)}
                 </Alert>
@@ -204,7 +205,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                 _focus={{
                   bg: 'blue.500'
                 }}
-                aria-label='Save'
+                aria-label="Save"
               >
                 Save
               </Button>

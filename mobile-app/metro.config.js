@@ -4,6 +4,8 @@
  *
  * @format
  */
+const path = require('path')
+
 const exclusionList = require('metro-config/src/defaults/exclusionList')
 const {
   getMetroTools,
@@ -33,5 +35,8 @@ module.exports = {
   },
   // Add additional Yarn workspace package roots to the module map.
   // This allows importing from all the project's packages.
-  watchFolders: monorepoMetroTools.watchFolders
+  watchFolders: [
+    ...monorepoMetroTools.watchFolders,
+    path.resolve(__dirname, '../shared')
+  ]
 }

@@ -7,6 +7,7 @@ import { Register } from '../screens/Auth/Register'
 export type AuthStackParamList = {
   Login: undefined
   Register: undefined
+  QRLogin: undefined
 }
 
 const AuthStack = createNativeStackNavigator<AuthStackParamList>()

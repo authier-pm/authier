@@ -10,18 +10,17 @@ import {
 import { theme } from './Theme'
 import Routes from './Routes'
 import { DeviceProvider } from './providers/DeviceProvider'
-import SInfo from 'react-native-sensitive-info'
-
 import { I18nProvider } from '@lingui/react'
+import SInfo from 'react-native-sensitive-info'
 import { i18n } from '@lingui/core'
 import { messages } from './locales/en/messages'
-import * as Plurals from 'make-plural'
+import { en as enPlurals } from 'make-plural/plurals'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
 import { storage } from '../App'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
-i18n.loadLocaleData('en', { plurals: Plurals.en })
+i18n.loadLocaleData('en', { plurals: enPlurals })
 i18n.load('en', messages)
 i18n.activate('en')
 
@@ -37,7 +36,6 @@ const colorModeManager: StorageManager = {
       }
       return val === 'dark' ? 'dark' : 'light'
     } catch (e) {
-      console.log('colorModeError', e)
       return 'light'
     }
   },
@@ -48,7 +46,7 @@ const colorModeManager: StorageManager = {
         keychainService: 'myKeychain'
       })
     } catch (e) {
-      console.log('colorModeError', e)
+      console.log(e)
     }
   }
 }
