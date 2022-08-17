@@ -1,0 +1,1 @@
+/*eslint-disable*/module.exports={messages:{"Forget Password?":"Forget Password?","Start by adding a secret by logging onto any website or by adding a TOTP code":"Start by adding a secret by logging onto any website or by adding a TOTP code","Submit":"Submit"}};
