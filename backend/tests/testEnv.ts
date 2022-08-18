@@ -34,20 +34,21 @@ export const truncateAllTables = async () => {
 
 afterAll(truncateAllTables)
 
-// TODO mocking is somehow breaking
-// beforeAll(() => {
-//   const fakeMailjetPost = {
-//     request: vi.fn()
-//   }
-
-//   // we don't want to send anything from tests.
-//   vi.mock('node-mailjet', () => ({
-//     connect: () => {
-//       return {
-//         post: () => {
-//           return fakeMailjetPost
-//         }
-//       }
-//     }
-//   }))
-// })
+beforeAll(() => {
+  const fakeMailjetPost = {
+    request: vi.fn()
+  }
+  console.log('mocked mailjet post')
+  // we don't want to send anything from tests.
+  vi.mock('node-mailjet', () => ({
+    default: {
+      connect: () => {
+        return {
+          post: () => {
+            return fakeMailjetPost
+          }
+        }
+      }
+    }
+  }))
+})

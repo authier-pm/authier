@@ -382,11 +382,8 @@ type UserMutation {
   sendEmailVerification: NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
-  setMasterDevice(
-    deviceId: Int!
-    newMasterDeviceId: String!
-  ): MasterDeviceChangeGQL!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
+  setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!
 }
@@ -544,7 +541,7 @@ union DecryptionChallenge =
 type DecryptionChallengeApproved {
   id: Int!
   masterPasswordVerifiedAt: DateTime
-  approvedAt: DateTime!
+  approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!
