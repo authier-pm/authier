@@ -8,16 +8,16 @@ import cryptoJS from 'crypto-js'
 
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { IBackgroundStateSerializable, DeviceState } from '../../utils/Device'
-import { saveAccessToken } from '../../utils/tokenFromAsyncStorage'
-import useInterval from '../../utils/useInterval'
+import { IBackgroundStateSerializable, DeviceState } from '@utils/Device'
+import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
+import useInterval from '@src/utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
-} from './Login.codegen'
+} from '@shared/graphql/Login.codegen'
 import { Platform } from 'react-native'
-import { ToastAlert } from '../../components/ToastAlert'
-import { Loading } from '../../components/Loading'
+import { ToastAlert } from '@components/ToastAlert'
+import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 
 const ToastServerErrorDetails = {
@@ -76,7 +76,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ; (async () => {
+      ;(async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -153,7 +153,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-            'DecryptionChallengeApproved'
+          'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 

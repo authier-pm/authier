@@ -15,9 +15,9 @@ import {
 
 import { Trans } from '@lingui/macro'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { useUpdateSettingsMutation } from './Settings.codegen'
-import { SettingsInput } from '../../../shared/generated/graphqlBaseTypes'
-import { SyncSettingsDocument } from '../../navigation/AppNavigation.codegen'
+import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
+import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
+import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 
 export default function Settings() {
   let device = useContext(DeviceContext)

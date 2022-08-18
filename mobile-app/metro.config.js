@@ -37,6 +37,6 @@ module.exports = {
   // This allows importing from all the project's packages.
   watchFolders: [
     ...monorepoMetroTools.watchFolders,
-    path.resolve(__dirname, '../shared')
+    path.resolve(__dirname, '../shared/')
   ]
 }

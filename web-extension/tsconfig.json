@@ -4,6 +4,9 @@
     "paths": {
       "@src/*": [
         "src/*"
+      ],
+      "@shared/*": [
+        "../shared/*"
       ]
     },
     "target": "ES2015",

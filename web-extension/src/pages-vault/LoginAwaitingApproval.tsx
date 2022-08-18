@@ -6,7 +6,7 @@ import { LoginContext } from './Login'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
-} from './Login.codegen'
+} from '@shared/graphql/Login.codegen'
 import { toast } from 'react-toastify'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
