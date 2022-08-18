@@ -24,7 +24,7 @@ import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
 import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
-import { useSyncSettingsQuery } from '@src/components/vault/settings/VaultConfig.codegen'
+import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 
 export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {

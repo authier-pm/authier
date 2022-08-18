@@ -1,7 +1,0 @@
-mutation updateSettings($config: SettingsInput!) {
-  me {
-    updateSettings(config: $config) {
-      id
-    }
-  }
-}

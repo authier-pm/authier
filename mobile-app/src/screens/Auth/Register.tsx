@@ -12,20 +12,20 @@ import {
   HStack,
   useToast
 } from 'native-base'
-import { useRegisterNewUserMutation } from './registerNewUser.codegen'
+import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName } from 'react-native-device-info'
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { IBackgroundStateSerializable, DeviceState } from '../../utils/Device'
-import { saveAccessToken } from '../../utils/tokenFromAsyncStorage'
+import { IBackgroundStateSerializable, DeviceState } from '@utils/Device'
+import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
-import { Loading } from '../../components/Loading'
+import { Loading } from '@components/Loading'
 import { Trans } from '@lingui/macro'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../navigation/AuthNavigation'
-import { ToastAlert } from '../../components/ToastAlert'
+import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 
 interface Values {

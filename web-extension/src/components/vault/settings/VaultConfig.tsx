@@ -3,7 +3,6 @@ import {
   FormControl,
   FormLabel,
   Button,
-  Spinner,
   useColorModeValue,
   VStack,
   FormHelperText,
@@ -11,17 +10,17 @@ import {
   Select
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { SettingsInput } from '../../../../../shared/generated/graphqlBaseTypes'
+import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 
 import {
   SyncSettingsDocument,
   useUpdateSettingsMutation
-} from './VaultConfig.codegen'
+} from '@shared/graphql/Settings.codegen'
 
 export default function VaultConfig() {
   const { setSecuritySettings, device } = useContext(DeviceStateContext)

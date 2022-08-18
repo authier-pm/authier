@@ -1,4 +1,8 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "java.configuration.updateBuildConfiguration": "interactive"
+  "eslint.workingDirectories": [
+    {
+      "mode": "auto"
+    }
+  ],
 }

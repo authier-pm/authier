@@ -9,7 +9,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import AccountNavigation from './AccountNavigation'
 import TOTPStackNavigation from './TOTPStackNavigation'
 import { DeviceContext } from '../providers/DeviceProvider'
-import { useSyncSettingsQuery } from './AppNavigation.codegen'
+import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { useColorMode } from 'native-base'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
@@ -101,10 +101,10 @@ function AppNavigation() {
         headerShown: false
       })}
     >
-      <RootStack.Screen name='Passwords' component={PasswordsStackNavigation} />
-      <RootStack.Screen name='TOTP' component={TOTPStackNavigation} />
-      <RootStack.Screen name='Devices' component={DeviceStackNavigation} />
-      <RootStack.Screen name='User' component={AccountNavigation} />
+      <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
+      <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
+      <RootStack.Screen name="Devices" component={DeviceStackNavigation} />
+      <RootStack.Screen name="User" component={AccountNavigation} />
     </RootStack.Navigator>
   )
 }

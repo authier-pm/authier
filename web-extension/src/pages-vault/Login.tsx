@@ -17,8 +17,6 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 
-const log = debug('au:Login')
-
 import { Trans } from '@lingui/macro'
 
 import { device } from '@src/background/ExtensionDevice'
@@ -26,7 +24,7 @@ import { device } from '@src/background/ExtensionDevice'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { Link } from 'react-router-dom'
 
-//import { AuthKey, VaultKey } from '@src/util/encrypt'
+const log = debug('au:Login')
 
 export interface LoginFormValues {
   password: string
@@ -131,7 +129,7 @@ export default function Login(): ReactElement {
       <Flex>
         <Link to="/signup">
           <Text pt={3}>
-            <Trans>Don't have account?</Trans>
+            <Trans>Don`&apos;`t have account?</Trans>
           </Text>
         </Link>
       </Flex>

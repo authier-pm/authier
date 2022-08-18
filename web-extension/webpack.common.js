@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const webpack = require('webpack')
 
@@ -66,7 +67,8 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
-      '@src': path.resolve(__dirname, 'src/')
+      '@src': path.resolve(__dirname, 'src/'),
+      '@shared': path.resolve(__dirname, '../shared/')
     },
     fallback: {
       crypto: require.resolve('crypto-browserify'),

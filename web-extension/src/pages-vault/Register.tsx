@@ -22,7 +22,7 @@ import { device } from '@src/background/ExtensionDevice'
 import { Trans, t } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
-import { useRegisterNewUserMutation } from './registerNewUser.codegen'
+import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
 import { toast } from 'react-toastify'
 
