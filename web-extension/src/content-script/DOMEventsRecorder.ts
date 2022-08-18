@@ -111,7 +111,7 @@ export class DOMEventsRecorder {
         }
         return {
           cssSelector: getSelectorForElement(element).css,
-          domOrdinal: getSelectorForElement(element).ordinal,
+          domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
           kind,
           inputted
