@@ -23,7 +23,7 @@ import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { device } from '@src/background/ExtensionDevice'
-import { useDeleteEncryptedSecretMutation } from './VaultList.codegen'
+import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 

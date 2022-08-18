@@ -4,9 +4,11 @@ import { useNavigation } from '@react-navigation/native'
 import { AlertDialog, Button, Text, IconButton, Center } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { device } from '../utils/Device'
-import { useDeleteEncryptedSecretMutation } from './DeleteSecretAlert.codegen'
-import { EncryptedAuthsDocument } from '../screens/PasswordVault/PasswordVault.codegen'
+import { device } from '@utils/Device'
+import {
+  EncryptedSecretsDocument,
+  useDeleteEncryptedSecretMutation
+} from '@shared/graphql/EncryptedSecrets.codegen'
 
 export const DeleteSecretAlert = ({ id }: { id: string }) => {
   const navigation = useNavigation()
@@ -18,7 +20,7 @@ export const DeleteSecretAlert = ({ id }: { id: string }) => {
       variables: {
         id: id
       },
-      refetchQueries: [{ query: EncryptedAuthsDocument, variables: {} }]
+      refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
     })
 
     await device.state?.removeSecret(id)

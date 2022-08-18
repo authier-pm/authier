@@ -6,7 +6,7 @@ import { AlertDialog, Button, Box, Checkbox, Text, Icon } from 'native-base'
 import {
   useLogoutDeviceMutation,
   useRemoveDeviceMutation
-} from '../screens/Device/DeviceInfo.codegen'
+} from '@shared/graphql/AccountDevices.codegen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
 

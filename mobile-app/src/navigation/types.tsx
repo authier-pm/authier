@@ -3,9 +3,9 @@ import type {
   NavigatorScreenParams
 } from '@react-navigation/native'
 import type { StackScreenProps } from '@react-navigation/stack'
-import { ILoginSecret, ITOTPSecret } from '../utils/Device'
+import { ILoginSecret, ITOTPSecret } from '@utils/Device'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { DeviceQuery, UserQuery } from '../../shared/generated/graphqlBaseTypes'
+import { DeviceQuery, UserQuery } from '@shared/generated/graphqlBaseTypes'
 
 declare global {
   namespace ReactNavigation {

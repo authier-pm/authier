@@ -18,13 +18,15 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { passwordStrength } from 'check-password-strength'
 import { Formik, FormikHelpers } from 'formik'
 
-import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
+import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
-import { DeviceContext } from '../../providers/DeviceProvider'
-import { ILoginSecret } from '../../utils/Device'
-import { useUpdateEncryptedSecretMutation } from '../../../../shared/graphql/ItemSettings.codegen'
-import { EncryptedAuthsDocument } from './PasswordVault.codegen'
-import { PasswordStackScreenProps } from '../../navigation/types'
+import { DeviceContext } from '@providers/DeviceProvider'
+import { ILoginSecret } from '@utils/Device'
+import {
+  EncryptedSecretsDocument,
+  useUpdateEncryptedSecretMutation
+} from '@shared/graphql/EncryptedSecrets.codegen'
+import { PasswordStackScreenProps } from '@navigation/types'
 
 interface LoginParsedValues {
   url: string
@@ -52,7 +54,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   let device = useContext(DeviceContext)
 
   const [updateSecret] = useUpdateEncryptedSecretMutation({
-    refetchQueries: [{ query: EncryptedAuthsDocument, variables: {} }]
+    refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
   })
 
   return (

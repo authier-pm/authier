@@ -15,7 +15,9 @@ module.exports = {
           '@shared': '../shared/',
           '@src': './src/',
           '@utils': './src/utils/',
-          '@components': './src/components/'
+          '@components': './src/components/',
+          '@navigation': './src/navigation/',
+          '@providers': './src/providers/'
         },
         extensions: ['.js', '.jsx', '.tsx', '.ts']
       }

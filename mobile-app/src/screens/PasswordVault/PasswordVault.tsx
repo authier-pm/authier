@@ -2,12 +2,12 @@ import React, { useContext, useEffect, useState } from 'react'
 
 import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
 
-import { SearchBar } from '../../components/SearchBar'
-import { DeviceContext } from '../../providers/DeviceProvider'
-import LoginCredential from '../../components/LoginCredential'
+import { SearchBar } from '@components/SearchBar'
+import { DeviceContext } from '@providers/DeviceProvider'
+import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
-import { PasswordStackScreenProps } from '../../navigation/types'
+import { PasswordStackScreenProps } from '@navigation/types'
 
 export const PasswordVault = ({
   navigation
@@ -64,7 +64,7 @@ export const PasswordVault = ({
           </Text>
         </Box>
       ) : (
-        //Virtualize??
+        //Maybe we should do infinite scrolling pagination??
         <FlashList
           estimatedItemSize={104}
           data={device.loginCredentials.filter(({ label, url }) => {
