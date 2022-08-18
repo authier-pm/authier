@@ -12,9 +12,10 @@ import { device } from '../utils/Device'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051
 const httpLink = createHttpLink({
-  uri: __DEV__ ? Config.API_URL : Config.API_URL_RELEASE,
+  uri: __DEV__ ? 'http://10.0.2.2:5051/graphql' : Config.API_URL_RELEASE,
   credentials: 'include'
 })
+console.log('~ Config.API_URL', Config.API_URL)
 
 const retryLink = new RetryLink()
 export const queueLink = new QueueLink()

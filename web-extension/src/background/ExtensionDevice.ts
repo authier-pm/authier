@@ -1,5 +1,5 @@
 import debug from 'debug'
-import browser from 'webextension-polyfill'
+import browser, { storage } from 'webextension-polyfill'
 import bowser from 'bowser'
 import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'

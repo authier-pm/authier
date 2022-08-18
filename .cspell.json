@@ -1,8 +1,5 @@
 {
-  "ignorePaths": [
-    "*/node_modules/**",
-    "*/dist/**"
-  ],
+  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
   "words": [
     "appspot",
     "authier",
@@ -31,6 +28,8 @@
     "Localisation",
     "Mailjet",
     "mercurius",
+    "mmkv",
+    "netinfo",
     "otplib",
     "outfile",
     "papaparse",

@@ -33,7 +33,7 @@ let CodePushOptions = {
 
 export const storage = new MMKV({
   id: 'user-storage',
-  encryptionKey: 'test'
+  encryptionKey: 'test' // TODO
 })
 
 const App = () => {
