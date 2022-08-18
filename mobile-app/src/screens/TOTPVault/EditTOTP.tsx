@@ -18,7 +18,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { ITOTPSecret } from '../../utils/Device'
-import { useUpdateEncryptedSecretMutation } from '../../../../shared/graphql/ItemSettings.codegen'
+import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { TOTPStackScreenProps } from '../../navigation/types'
 
 interface totpValues {

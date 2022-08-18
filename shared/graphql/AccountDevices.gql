@@ -37,7 +37,7 @@ mutation ApproveChallenge($id: Int!) {
   }
 }
 
-query DeviceRequest {
+query DevicesRequests {
   me {
     id
     masterDeviceId
@@ -46,6 +46,32 @@ query DeviceRequest {
       createdAt
       deviceName
       deviceId
+    }
+  }
+}
+
+mutation logoutDevice($id: String!) {
+  me {
+    device(id: $id) {
+      logout {
+        id
+      }
+    }
+  }
+}
+
+mutation removeDevice($id: String!) {
+  me {
+    device(id: $id) {
+      removeDevice
+    }
+  }
+}
+
+mutation ChangeMasterDevice($newMasterDeviceId: String!) {
+  me {
+    setMasterDevice(newMasterDeviceId: $newMasterDeviceId) {
+      id
     }
   }
 }

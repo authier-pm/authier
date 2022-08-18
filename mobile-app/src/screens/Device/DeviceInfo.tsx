@@ -13,11 +13,11 @@ import {
 } from 'native-base'
 import React from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { LogoutDeviceAlert } from '../../components/LogoutDeviceAlert'
+import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
 import { DevicesStackScreenProps } from '../../navigation/types'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { useChangeMasterDeviceMutation } from './DeviceInfo.codegen'
+import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
 export default function DeviceInfo({
@@ -35,7 +35,7 @@ export default function DeviceInfo({
     <View p={5}>
       <VStack space={8}>
         <VStack space={8}>
-          <HStack justifyContent='space-between'>
+          <HStack justifyContent="space-between">
             <Heading fontSize={'2xl'}>{route.params.device.name}</Heading>
             {Object.keys(icons).map((i, el) => {
               if (
@@ -46,8 +46,8 @@ export default function DeviceInfo({
                 return (
                   <Icon
                     key={el}
-                    size='50'
-                    color='gray.500'
+                    size="50"
+                    color="gray.500"
                     as={<Ionicons name={icons[i]} />}
                   />
                 )
@@ -60,7 +60,7 @@ export default function DeviceInfo({
             {masterDeviceId !== selectedDeviceId &&
             currentDeviceId === masterDeviceId ? (
               <Button
-                colorScheme='warning'
+                colorScheme="warning"
                 rounded={15}
                 onPress={() => {
                   changeMasterDevice({
@@ -74,13 +74,13 @@ export default function DeviceInfo({
                   <Icon
                     alignSelf={'center'}
                     as={Ionicons}
-                    name='star'
+                    name="star"
                     size={'md'}
-                    color='black'
+                    color="black"
                   />
                 }
               >
-                <Text color='white' fontWeight={'bold'}>
+                <Text color="white" fontWeight={'bold'}>
                   <Trans>Set on master device</Trans>
                 </Text>
               </Button>
@@ -88,28 +88,28 @@ export default function DeviceInfo({
           </HStack>
 
           <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
-            <HStack alignItems={'center'} justifyContent='space-between'>
+            <HStack alignItems={'center'} justifyContent="space-between">
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Last IP Address
               </Text>
               <Text fontSize={'xl'}>{route.params.device.firstIpAddress}</Text>
             </HStack>
 
-            <HStack alignItems={'center'} justifyContent='space-between'>
+            <HStack alignItems={'center'} justifyContent="space-between">
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Geolocation
               </Text>
               <Text fontSize={'xl'}>{route.params.device.lastGeoLocation}</Text>
             </HStack>
 
-            <HStack alignItems={'center'} justifyContent='space-between'>
+            <HStack alignItems={'center'} justifyContent="space-between">
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Platform
               </Text>
               <Text fontSize={'xl'}>{route.params.device.platform}</Text>
             </HStack>
 
-            <HStack alignItems={'center'} justifyContent='space-between'>
+            <HStack alignItems={'center'} justifyContent="space-between">
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Logout at
               </Text>
@@ -118,7 +118,7 @@ export default function DeviceInfo({
               </Text>
             </HStack>
 
-            <HStack alignItems={'center'} justifyContent='space-between'>
+            <HStack alignItems={'center'} justifyContent="space-between">
               <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                 Created
               </Text>

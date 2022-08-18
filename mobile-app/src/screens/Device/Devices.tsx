@@ -17,22 +17,22 @@ import {
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { SearchBar } from '../../components/SearchBar'
+import { SearchBar } from '@components/SearchBar'
 import {
   useApproveChallengeMutation,
-  useDeviceRequestQuery,
+  useDevicesRequestsQuery,
   useMyDevicesQuery,
   useRejectChallengeMutation
-} from './Devices.codegen'
+} from '@shared/graphql/AccountDevices.codegen'
 import {
   DecryptionChallengeForApproval,
   DeviceQuery,
   UserQuery
-} from '../../../shared/generated/graphqlBaseTypes'
+} from '@shared/generated/graphqlBaseTypes'
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
-import { DevicesStackScreenProps } from '../../navigation/types'
-import { DeviceContext } from '../../providers/DeviceProvider'
+import { DevicesStackScreenProps } from '@navigation/types'
+import { DeviceContext } from '@providers/DeviceProvider'
 
 export const icons = {
   Android: 'logo-android',
@@ -56,7 +56,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
     data: dataRequests,
     refetch: requestsRefetch,
     loading: loadingRequests
-  } = useDeviceRequestQuery({
+  } = useDevicesRequestsQuery({
     fetchPolicy: 'cache-first'
   })
   const [reject] = useRejectChallengeMutation()
@@ -100,7 +100,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 ]
               }}
             >
-              <HStack space={5} alignItems='center'>
+              <HStack space={5} alignItems="center">
                 {Object.keys(icons).map((i, el) => {
                   if (
                     i.toLowerCase().includes(item.platform?.toLowerCase() ?? '')
@@ -108,9 +108,9 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                     return (
                       <Icon
                         key={el}
-                        ml='2'
-                        size='50'
-                        color='gray.500'
+                        ml="2"
+                        size="50"
+                        color="gray.500"
                         as={<Ionicons name={icons[i]} />}
                       />
                     )
@@ -120,24 +120,24 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 <VStack space={3}>
                   <HStack space={3}>
                     {item.logoutAt ? (
-                      <Badge colorScheme='red'>LOGGED OUT</Badge>
+                      <Badge colorScheme="red">LOGGED OUT</Badge>
                     ) : (
-                      <Badge colorScheme='success'>LOGGED IN</Badge>
+                      <Badge colorScheme="success">LOGGED IN</Badge>
                     )}
                     {item.id === masterDeviceId ? (
-                      <Badge colorScheme='yellow'>MASTER</Badge>
+                      <Badge colorScheme="yellow">MASTER</Badge>
                     ) : null}
                     {item.id === device.id ? (
-                      <Badge colorScheme='orange'>CURRENT</Badge>
+                      <Badge colorScheme="orange">CURRENT</Badge>
                     ) : null}
                   </HStack>
 
                   <VStack space={1}>
                     <Heading size={'md'}>{item.name}</Heading>
                     <Text>{item.lastIpAddress}</Text>
-                    <HStack alignItems='center' space={2}>
+                    <HStack alignItems="center" space={2}>
                       <Ionicons
-                        name='location-outline'
+                        name="location-outline"
                         color={'#00a8ff'}
                         size={20}
                       />
@@ -160,7 +160,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   }) => {
     return (
       <Alert
-        status='info'
+        status="info"
         key={item.id}
         mx={3}
         borderWidth={1}
@@ -169,18 +169,18 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
         rounded={'lg'}
         p={3}
       >
-        <VStack flexShrink={1} w='100%'>
+        <VStack flexShrink={1} w="100%">
           <HStack
             flexShrink={1}
             space={1}
-            alignItems='center'
-            justifyContent='space-between'
+            alignItems="center"
+            justifyContent="space-between"
           >
-            <HStack space={2} flexShrink={1} alignItems='center'>
+            <HStack space={2} flexShrink={1} alignItems="center">
               <Alert.Icon />
               <Text
-                fontSize='md'
-                fontWeight='medium'
+                fontSize="md"
+                fontWeight="medium"
                 _dark={{
                   color: 'coolGray.800'
                 }}
@@ -190,7 +190,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
             </HStack>
           </HStack>
           <Box
-            pl='6'
+            pl="6"
             _dark={{
               _text: {
                 color: 'coolGray.600'
@@ -206,8 +206,8 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
             w={'30%'}
             size={'lg'}
             rounded={'xl'}
-            colorScheme='green'
-            variant='solid'
+            colorScheme="green"
+            variant="solid"
             onPress={async () => {
               await approve({
                 variables: {
@@ -217,14 +217,14 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
               requestsRefetch()
             }}
           >
-            <Text fontWeight='bold' color='white'>
+            <Text fontWeight="bold" color="white">
               <Trans>Approve</Trans>
             </Text>
           </Button>
           <Button
             w={'30%'}
             rounded={'xl'}
-            colorScheme='red'
+            colorScheme="red"
             onPress={async () => {
               await reject({
                 variables: {
@@ -234,7 +234,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
               requestsRefetch()
             }}
           >
-            <Text fontWeight='bold' color='white'>
+            <Text fontWeight="bold" color="white">
               <Trans>Reject</Trans>
             </Text>
           </Button>

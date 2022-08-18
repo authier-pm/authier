@@ -7,7 +7,7 @@ import {
   EncryptedSecretGql,
   EncryptedSecretType,
   SettingsInput
-} from '../../../shared/generated/graphqlBaseTypes'
+} from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import {
@@ -20,7 +20,7 @@ import {
   SyncEncryptedSecretsDocument,
   SyncEncryptedSecretsQuery,
   SyncEncryptedSecretsQueryVariables
-} from '../../../shared/graphql/ExtensionDevice.codegen'
+} from '@shared/graphql/ExtensionDevice.codegen'
 import messaging from '@react-native-firebase/messaging'
 import {
   LogoutDocument,
