@@ -299,26 +299,6 @@ export class UserMutation extends UserBase {
     return secretsUpdates.length
   }
 
-  @Field(() => GraphQLDateTime)
-  async setMasterDevice(
-    @Ctx() ctx: IContextAuthenticated,
-    @Arg('deviceId', () => Int) deviceId: number
-  ) {
-    if (ctx.device.id !== (await ctx.getMasterDeviceId())) {
-      throw new Error('This can be done only from master device')
-    }
-
-    return ctx.prisma.user.update({
-      where: {
-        id: ctx.jwtPayload.userId
-      },
-      data: {
-        masterDeviceChangeInitiated: new Date(),
-        masterDeviceNewDeviceId: deviceId
-      }
-    })
-  }
-
   @Field(() => DecryptionChallengeMutation)
   async decryptionChallenge(
     @Ctx() ctx: IContextAuthenticated,

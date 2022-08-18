@@ -220,6 +220,7 @@ app.register(mercurius, {
         if (err instanceof GraphqlError === false) {
           captureException(err)
         }
+        // @ts-expect-error
         ctx.request.log.error(err)
       })
     }
