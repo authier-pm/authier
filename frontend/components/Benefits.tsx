@@ -19,7 +19,7 @@ export default function Benefits() {
   })
 
   return (
-    //@ts-ignore TODO fix this
+    // @ts-expect-error TODO fix this
     <Fade in={inView}>
       <Center ref={ref} mb={10}>
         <SimpleGrid>
