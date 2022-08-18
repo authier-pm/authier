@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import '../dotenv'
-import { DMMFClass } from '@prisma/client/runtime'
+import { DMMF, DMMFClass } from '@prisma/client/runtime'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
@@ -50,4 +50,4 @@ if (debugLogs) {
 }
 
 export default prismaClient
-export const dmmf = (prismaClient as any)._dmmf as DMMFClass
+export const dmmf = (prismaClient as any)._baseDmmf as DMMFClass

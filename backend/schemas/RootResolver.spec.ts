@@ -155,7 +155,7 @@ describe('RootResolver', () => {
         'Device already exists. You cannot register this device for multiple accounts.'
       )
     })
-  }, 10000)
+  })
 
   describe('deviceDecryptionChallenge', () => {
     it('should return a DecryptionChallengeForApproval', async () => {
