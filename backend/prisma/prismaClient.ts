@@ -1,6 +1,6 @@
 import { Prisma, PrismaClient } from '@prisma/client'
 import '../dotenv'
-import { DMMF, DMMFClass } from '@prisma/client/runtime'
+import { DMMFClass } from '@prisma/client/runtime'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
