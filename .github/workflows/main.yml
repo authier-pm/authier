@@ -71,7 +71,7 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn generate
+          yarn gen
           yarn tsc
           cp .env.sample .env
           yarn test:prepare
