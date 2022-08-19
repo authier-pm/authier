@@ -7,6 +7,7 @@ import {
   RegisterNewAccountInput
 } from '../models/AuthInputs'
 import { GraphQLResolveInfo } from 'graphql'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
@@ -70,9 +71,6 @@ describe('RootResolver', () => {
   })
 
   describe('registerNewUser', () => {
-    beforeEach(() => {
-      jest.setTimeout(10000)
-    })
     const userId = faker.datatype.uuid()
 
     it('should add new user', async () => {

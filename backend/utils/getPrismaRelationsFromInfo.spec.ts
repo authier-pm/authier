@@ -1,6 +1,8 @@
 import { dmmf } from '../prisma/prismaClient'
 import { getPrismaRelationsFromInfo } from './getPrismaRelationsFromInfo'
 import gqlInfo from './fixtures/gqlInfo.json'
+import { describe, expect, it } from 'vitest'
+import { Kind } from 'graphql'
 
 describe('getPrismaRelationsFromInfo', () => {
   it('should ignore fields where first letter is NOT capital', async () => {
@@ -9,17 +11,17 @@ describe('getPrismaRelationsFromInfo', () => {
         fieldName: 'me',
         fieldNodes: [
           {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'me' },
+            kind: Kind.FIELD,
+            name: { kind: Kind.NAME, value: 'me' },
             arguments: [],
             directives: [],
             selectionSet: {
-              kind: 'SelectionSet',
+              kind: Kind.SELECTION_SET,
               selections: [
                 {
-                  kind: 'Field',
+                  kind: Kind.FIELD,
                   name: {
-                    kind: 'Name',
+                    kind: Kind.NAME,
                     value: 'EncryptedSecrets',
                     //@ts-expect-error
                     loc: { start: 13, end: 29 }
@@ -27,12 +29,12 @@ describe('getPrismaRelationsFromInfo', () => {
                   arguments: [],
                   directives: [],
                   selectionSet: {
-                    kind: 'SelectionSet',
+                    kind: Kind.SELECTION_SET,
                     selections: [
                       {
-                        kind: 'Field',
+                        kind: Kind.FIELD,
                         name: {
-                          kind: 'Name',
+                          kind: Kind.NAME,
                           value: 'id',
                           //@ts-expect-error
                           loc: { start: 38, end: 40 }
@@ -62,7 +64,7 @@ describe('getPrismaRelationsFromInfo', () => {
     })
 
     expect(res).toMatchInlineSnapshot(`
-      Object {
+      {
         "EncryptedSecrets": true,
       }
     `)
@@ -75,9 +77,9 @@ describe('getPrismaRelationsFromInfo', () => {
     })
 
     expect(res).toMatchInlineSnapshot(`
-      Object {
-        "masterDevice": Object {
-          "include": Object {
+      {
+        "masterDevice": {
+          "include": {
             "User": true,
           },
         },

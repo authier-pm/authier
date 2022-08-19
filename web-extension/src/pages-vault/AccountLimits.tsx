@@ -27,8 +27,8 @@ function PriceWrapper({ children }: { children: ReactNode }) {
   return (
     <Box
       mb={4}
-      shadow='base'
-      borderWidth='1px'
+      shadow="base"
+      borderWidth="1px"
       alignSelf={{ base: 'center', lg: 'flex-start' }}
       borderColor={useColorModeValue('gray.200', 'gray.500')}
       borderRadius={'xl'}
@@ -55,11 +55,11 @@ export const AccountLimits = () => {
   })
   return (
     <Box>
-      <HStack spacing={10} justifyContent='center' alignItems={'center'}>
+      <HStack spacing={10} justifyContent="center" alignItems={'center'}>
         <ProfileCard />
 
         <TableContainer>
-          <Table size='lg'>
+          <Table size="lg">
             <Thead>
               <Tr>
                 <Th>Type</Th>
@@ -96,24 +96,24 @@ export const AccountLimits = () => {
 
       <Stack
         direction={{ base: 'column', md: 'row' }}
-        textAlign='center'
-        justify='center'
+        textAlign="center"
+        justify="center"
         spacing={{ base: 4, lg: 10 }}
         py={10}
       >
         <PriceWrapper>
           <Box px={12}>
-            <Text fontWeight='500' fontSize='2xl'>
+            <Text fontWeight="500" fontSize="2xl">
               Free tier
             </Text>
-            <HStack justifyContent='center'>
-              <Text fontSize='3xl' fontWeight='600'>
+            <HStack justifyContent="center">
+              <Text fontSize="3xl" fontWeight="600">
                 $
               </Text>
-              <Text fontSize='5xl' fontWeight='900'>
+              <Text fontSize="5xl" fontWeight="900">
                 0
               </Text>
-              <Text fontSize='3xl' color='gray.500'>
+              <Text fontSize="3xl" color="gray.500">
                 /month
               </Text>
             </HStack>
@@ -123,33 +123,33 @@ export const AccountLimits = () => {
             py={4}
             borderBottomRadius={'xl'}
           >
-            <List spacing={3} textAlign='start' px={12}>
+            <List spacing={3} textAlign="start" px={12}>
               <ListItem>
-                <ListIcon as={FaCheckCircle} color='green.500' />3 TOTP secrets
+                <ListIcon as={FaCheckCircle} color="green.500" />3 TOTP secrets
               </ListItem>
               <ListItem>
-                <ListIcon as={FaCheckCircle} color='green.500' />
+                <ListIcon as={FaCheckCircle} color="green.500" />
                 40 login secrets
               </ListItem>
             </List>
-            <Box w='80%' pt={7}>
+            <Box w="80%" pt={7}>
               Always free
             </Box>
           </VStack>
         </PriceWrapper>
         <PriceWrapper>
           <Box py={4} px={12}>
-            <Text fontWeight='500' fontSize='2xl'>
+            <Text fontWeight="500" fontSize="2xl">
               Credentials
             </Text>
-            <HStack justifyContent='center'>
-              <Text fontSize='3xl' fontWeight='600'>
+            <HStack justifyContent="center">
+              <Text fontSize="3xl" fontWeight="600">
                 $
               </Text>
-              <Text fontSize='5xl' fontWeight='900'>
+              <Text fontSize="5xl" fontWeight="900">
                 1
               </Text>
-              <Text fontSize='3xl' color='gray.500'>
+              <Text fontSize="3xl" color="gray.500">
                 /month
               </Text>
             </HStack>
@@ -159,16 +159,16 @@ export const AccountLimits = () => {
             py={4}
             borderBottomRadius={'xl'}
           >
-            <List spacing={3} textAlign='start' px={12}>
+            <List spacing={3} textAlign="start" px={12}>
               <ListItem>
-                <ListIcon as={FaCheckCircle} color='green.500' />
+                <ListIcon as={FaCheckCircle} color="green.500" />
                 additional 60 login secrets
               </ListItem>
             </List>
             <Button
               disabled={!data?.me.id}
-              w='80%'
-              colorScheme='red'
+              w="80%"
+              colorScheme="red"
               onClick={() =>
                 chrome.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.Credentials}`
@@ -181,17 +181,17 @@ export const AccountLimits = () => {
         </PriceWrapper>
         <PriceWrapper>
           <Box py={4} px={12}>
-            <Text fontWeight='500' fontSize='2xl'>
+            <Text fontWeight="500" fontSize="2xl">
               TOTP
             </Text>
-            <HStack justifyContent='center'>
-              <Text fontSize='3xl' fontWeight='600'>
+            <HStack justifyContent="center">
+              <Text fontSize="3xl" fontWeight="600">
                 $
               </Text>
-              <Text fontSize='5xl' fontWeight='900'>
+              <Text fontSize="5xl" fontWeight="900">
                 1
               </Text>
-              <Text fontSize='3xl' color='gray.500'>
+              <Text fontSize="3xl" color="gray.500">
                 /month
               </Text>
             </HStack>
@@ -201,16 +201,16 @@ export const AccountLimits = () => {
             py={4}
             borderBottomRadius={'xl'}
           >
-            <List spacing={3} textAlign='start' px={12}>
+            <List spacing={3} textAlign="start" px={12}>
               <ListItem>
-                <ListIcon as={FaCheckCircle} color='green.500' />
+                <ListIcon as={FaCheckCircle} color="green.500" />
                 additional 20 TOTP secrets
               </ListItem>
             </List>
             <Button
               disabled={!data?.me.id}
-              w='80%'
-              colorScheme='red'
+              w="80%"
+              colorScheme="red"
               onClick={() =>
                 chrome.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.TOTP}`
@@ -222,39 +222,39 @@ export const AccountLimits = () => {
           </VStack>
         </PriceWrapper>
         <PriceWrapper>
-          <Box position='relative'>
+          <Box position="relative">
             <Box
-              position='absolute'
-              top='-16px'
-              left='50%'
+              position="absolute"
+              top="-16px"
+              left="50%"
               style={{ transform: 'translate(-50%)' }}
             >
               <Text
-                textTransform='uppercase'
+                textTransform="uppercase"
                 noOfLines={1}
                 bg={useColorModeValue('red.300', 'red.700')}
                 px={3}
                 py={1}
                 color={useColorModeValue('white', 'gray.100')}
-                fontSize='sm'
-                fontWeight='600'
-                rounded='xl'
+                fontSize="sm"
+                fontWeight="600"
+                rounded="xl"
               >
                 Most Popular
               </Text>
             </Box>
             <Box py={4} px={12}>
-              <Text fontWeight='500' fontSize='2xl'>
+              <Text fontWeight="500" fontSize="2xl">
                 TOTP and Credentials
               </Text>
-              <HStack justifyContent='center'>
-                <Text fontSize='3xl' fontWeight='600'>
+              <HStack justifyContent="center">
+                <Text fontSize="3xl" fontWeight="600">
                   $
                 </Text>
-                <Text fontSize='5xl' fontWeight='900'>
+                <Text fontSize="5xl" fontWeight="900">
                   2
                 </Text>
-                <Text fontSize='3xl' color='gray.500'>
+                <Text fontSize="3xl" color="gray.500">
                   /month
                 </Text>
               </HStack>
@@ -264,20 +264,20 @@ export const AccountLimits = () => {
               py={4}
               borderBottomRadius={'xl'}
             >
-              <List spacing={3} textAlign='start' px={12}>
+              <List spacing={3} textAlign="start" px={12}>
                 <ListItem>
-                  <ListIcon as={FaCheckCircle} color='green.500' />
+                  <ListIcon as={FaCheckCircle} color="green.500" />
                   additional 60 login secrets
                 </ListItem>
                 <ListItem>
-                  <ListIcon as={FaCheckCircle} color='green.500' />
+                  <ListIcon as={FaCheckCircle} color="green.500" />
                   additional 20 TOTP secrets
                 </ListItem>
               </List>
               <Button
                 disabled={!data?.me.id}
-                w='80%'
-                colorScheme='red'
+                w="80%"
+                colorScheme="red"
                 onClick={() =>
                   chrome.tabs.create({
                     url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}`

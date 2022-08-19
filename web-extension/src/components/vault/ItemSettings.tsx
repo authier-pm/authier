@@ -27,7 +27,6 @@ import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecre
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
-import { log } from 'debug'
 
 enum Value {
   'Tooweak' = 1,

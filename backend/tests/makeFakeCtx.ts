@@ -1,5 +1,6 @@
 import { prismaClient } from '../prisma/prismaClient'
 import faker from 'faker'
+import { vi } from 'vitest'
 
 // afterAll(async () => {
 //   const deleteDevices = prismaClient.device.deleteMany()
@@ -10,7 +11,7 @@ import faker from 'faker'
 // })
 export const makeFakeCtx = (userId: string) =>
   ({
-    reply: { setCookie: jest.fn() },
+    reply: { setCookie: vi.fn() },
     request: { headers: {} },
     jwtPayload: { userId: userId },
     prisma: prismaClient,

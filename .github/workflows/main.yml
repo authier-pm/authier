@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: runs typescript and jest
+    name: runs typescript and tests
     services:
       postgres:
         image: postgres:latest
@@ -73,7 +73,7 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn generate
+          yarn gen
           yarn tsc
           cp .env.sample .env
           yarn test:prepare
