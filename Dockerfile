@@ -9,7 +9,7 @@ COPY backend/ /app
 COPY ./yarn.lock /app
 
 RUN yarn install --frozen-lockfile --non-interactive --ignore-optional --prefer-offline
-RUN yarn generate
+RUN yarn gen
 RUN yarn build
 
 # ENV DATABASE_URL "postgresql://authier:auth133r@localhost:5432/authier"

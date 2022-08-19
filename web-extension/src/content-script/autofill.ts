@@ -120,7 +120,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
   if (autofillEnabled === true) {
     log('enabled is true, returning')
-    return () => { }
+    return () => {}
   }
   log('init autofill', initState)
 
@@ -131,8 +131,34 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   //? Should be renamed on scanOnInputs?
   //!Fill known inputs
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
+    const allInputs = Array.from(body.querySelectorAll('input'))
+    //Distinguish between register and login from by the number of inputs
+    //Then Distinguish between phased and not phased
+
+    /**
+     * text, email, password, tel
+     */
+    const usefulInputs = allInputs.filter(
+      (el) => uselessInputTypes.find((type) => type === el.type) === undefined
+    )
+
+    if (usefulInputs.length > 2) {
+      for (let index = 0; index < allInputs.length; index++) {
+        const input = allInputs[index]
+        if (
+          input.type === 'password' &&
+          allInputs[index + 1].type === 'password'
+        ) {
+          // TODO Autofill register form with a new password if present
+          break
+        }
+      }
+    }
+
+    //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
+        console.log('~ url', url)
         const host = new URL(url).host
         const matches = location.href.includes(host)
 
@@ -252,7 +278,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     if (!namePassSecret && !totpSecret) {
       log('no secrets for host')
-      return () => { }
+      return () => {}
     }
 
     if (filledElements.length === 2) {

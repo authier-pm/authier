@@ -4,9 +4,10 @@ import { DMMFClass } from '@prisma/client/runtime'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
+import { getDbCount } from '../scripts/getDbCount'
 
 const log = debug('prisma:sql')
-const logQueries = debug('fase:prisma')
+const logQueries = debug('au:prisma')
 
 const nodeEnv = process.env.NODE_ENV || 'test'
 
@@ -23,9 +24,11 @@ const logConfig =
       ]
 
 let dbUrl = process.env.DATABASE_URL
+console.log('~ dbUrl', dbUrl)
 
-if (process.env.JEST_WORKER_ID) {
-  dbUrl = `${dbUrl}_test_${Number(process.env.JEST_WORKER_ID) + 1}` // this allows us to run tests in parallel against multiple dbs without conflicts
+if (process.env.VITEST_WORKER_ID) {
+  const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
+  dbUrl = `${dbUrl}_test_${vitestWorkerId + 1}` // this allows us to run tests in parallel against multiple dbs without conflicts
 } else {
   log('DATABASE_URL', dbUrl)
 }
@@ -47,4 +50,4 @@ if (debugLogs) {
 }
 
 export default prismaClient
-export const dmmf = (prismaClient as any)._dmmf as DMMFClass
+export const dmmf = (prismaClient as any)._baseDmmf as DMMFClass

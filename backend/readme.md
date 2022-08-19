@@ -27,3 +27,8 @@ you can use this:
 ```
 ALTER USER authier WITH SUPERUSER;
 ```
+
+## Testing
+
+We run tests across many local DBs to avoid problems when multiple parallel tests write into a single DB.
+One running test will always write to it's own DB. That's why when you run `yarn test:prepare` it creates many as many DBs as you have CPU cores on your machine.

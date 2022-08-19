@@ -13,12 +13,14 @@ import {
 import { sign } from 'jsonwebtoken'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
 import { User } from '@prisma/client'
+import { beforeAll, describe, expect, it, vi } from 'vitest'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
   loginCredentialsLimit: 50,
   TOTPlimit: 4
 }
+
 describe('DecryptionChallenge', () => {
   let challenge: DecryptionChallengeApproved
   let user: User
@@ -43,10 +45,10 @@ describe('DecryptionChallenge', () => {
       }
     })
   })
-  // })
+
   describe('addNewDeviceForUser', () => {
     const fakeCtx = {
-      reply: { setCookie: jest.fn() },
+      reply: { setCookie: () => {} },
       request: { headers: {} },
       prisma: prismaClient,
       jwtPayload: { userId: userId },

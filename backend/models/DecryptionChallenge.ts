@@ -33,9 +33,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   @Field()
   addDeviceSecretEncrypted: string
 
-  @Field({ nullable: false })
-  approvedAt: Date
-
   @Field()
   encryptionSalt: string
 

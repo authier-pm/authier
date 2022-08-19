@@ -541,7 +541,7 @@ union DecryptionChallenge =
 type DecryptionChallengeApproved {
   id: Int!
   masterPasswordVerifiedAt: DateTime
-  approvedAt: DateTime!
+  approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
   deviceName: String!
@@ -569,7 +569,11 @@ input AddNewDeviceInput {
 
 input WebInputElement {
   domPath: String!
-  domOrdinal: Int!
+
+  """
+  The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day.
+  """
+  domOrdinal: NonNegativeInt!
   url: String!
   kind: WebInputType!
 }

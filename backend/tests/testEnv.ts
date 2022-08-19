@@ -1,3 +1,10 @@
+import 'reflect-metadata'
+import faker from 'faker'
+import '../dotenv'
+import { afterAll, beforeAll, vi } from 'vitest'
+import debug from 'debug'
+faker.seed(1)
+const log = debug('au:test')
 /**
  * if you need to truncate inside your tests, just call this function. In regular tests, we only invoke this after all specs in current test file are done
  */
@@ -19,25 +26,29 @@ export const truncateAllTables = async () => {
         `TRUNCATE TABLE "public"."${tablename}" CASCADE;`
       )
     } catch (error) {
-      console.log({ error })
+      console.error({ error })
     }
   }
-  console.log('truncated all tables')
+  log('truncated all tables')
 }
 
 afterAll(truncateAllTables)
 
-export const fakeMailjetPost = {
-  request: jest.fn()
-}
-
-// we don't want to send anything from tests.
-jest.mock('node-mailjet', () => ({
-  connect: () => {
-    return {
-      post: () => {
-        return fakeMailjetPost
+beforeAll(() => {
+  const fakeMailjetPost = {
+    request: vi.fn()
+  }
+  console.log('mocked mailjet post')
+  // we don't want to send anything from tests.
+  vi.mock('node-mailjet', () => ({
+    default: {
+      connect: () => {
+        return {
+          post: () => {
+            return fakeMailjetPost
+          }
+        }
       }
     }
-  }
-}))
+  }))
+})

@@ -25,11 +25,11 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer
-  window.onresize = function() {
+  window.onresize = function () {
     if (promptOption) {
       promptOption.remove()
       clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(function() {
+      resizeTimer = setTimeout(function () {
         setPos(el?.getBoundingClientRect())
         document.body.appendChild(promptOption!)
       }, 100)
