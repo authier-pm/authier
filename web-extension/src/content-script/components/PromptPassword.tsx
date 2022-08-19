@@ -97,7 +97,7 @@ export const PromptPassword = ({
       <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
       <h3 style={h3Style}>{username}</h3>
       <span style={spanStyle}>Password: </span>{' '}
-      <h3 style={h3Style} id='__AUTHIER__pswdDisplay'>
+      <h3 style={h3Style} id="__AUTHIER__pswdDisplay">
         {password.replaceAll(/./g, '*')}
       </h3>
       <button

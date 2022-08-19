@@ -14,9 +14,9 @@ export function RefreshSecretsButton() {
       aria-label={t`Synchronize vault`}
     >
       <IconButton
-        size='md'
-        ml='2'
-        aria-label='menu'
+        size="md"
+        ml="2"
+        aria-label="menu"
         icon={<IoMdRefreshCircle />}
         disabled={isSyncing}
         onClick={async () => {

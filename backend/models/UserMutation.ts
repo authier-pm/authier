@@ -13,7 +13,11 @@ import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
+import {
+  GraphQLDateTime,
+  GraphQLNonNegativeInt,
+  GraphQLPositiveInt
+} from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 

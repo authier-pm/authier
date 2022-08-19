@@ -32,11 +32,11 @@ export const PromptPasswordGenerator = ({
   )
 
   let resizeTimer
-  window.onresize = function() {
+  window.onresize = function () {
     if (generatorDiv) {
       generatorDiv.remove()
       clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(function() {
+      resizeTimer = setTimeout(function () {
         setPos(input.getBoundingClientRect())
         document.body.appendChild(generatorDiv!)
       }, 100)

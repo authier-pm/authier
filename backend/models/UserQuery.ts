@@ -35,7 +35,7 @@ export class UserBase extends UserGQL {
   @Field(() => GraphQLEmailAddress, {
     nullable: true
   })
-  email?: string
+  declare email?: string
 
   setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
     setNewRefreshToken(this, deviceId, ctx)

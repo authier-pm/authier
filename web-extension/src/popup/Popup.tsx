@@ -31,12 +31,12 @@ export const Popup: FunctionComponent = () => {
       <NavBar />
 
       <Switch location={location}>
-        <Route path='/' component={Home} />
-        <Route path='/secrets' component={Home} />
-        <Route path='/popup.html' component={Home} />
-        <Route path='/qr-code' component={QRCode} />
-        <Route path='/devices' component={Devices} />
-        <Route path='/about' component={AboutPage} />
+        <Route path="/" component={Home} />
+        <Route path="/secrets" component={Home} />
+        <Route path="/popup.html" component={Home} />
+        <Route path="/qr-code" component={QRCode} />
+        <Route path="/devices" component={Devices} />
+        <Route path="/about" component={AboutPage} />
       </Switch>
     </>
   )

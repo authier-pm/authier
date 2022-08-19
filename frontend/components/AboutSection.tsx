@@ -62,7 +62,7 @@ export default function AboutSection() {
             <Heading>Authier</Heading>
             <Text color={'gray.500'} fontSize={'lg'}>
               Open-source password manager with a focus on security and trust.
-              Builded for the most demanding users.
+              Built from the ground up for the most demanding users.
             </Text>
             <Stack
               spacing={4}

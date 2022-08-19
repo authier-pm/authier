@@ -11,7 +11,7 @@ generator client {
 }
 
 generator PrismaTypeGraphQLTypesGenerator {
-  provider                       = "npx prisma-typegraphql-types-generator"
+  provider                       = "prisma-typegraphql-types-generator"
   modelsOutput                   = "./models/generated"
   enumsOutput                    = "./models/types"
   useYarn                        = true
@@ -83,13 +83,6 @@ model EncryptedSecret {
   createdAt DateTime            @default(now())
   updatedAt DateTime?           @updatedAt
   deletedAt DateTime?
-
-  // TODO move these 5 fields to encrypted
-  // url        String? // TODO should always be location.hostname, we autofill inputs based on WebInput where we store the path too
-  // androidUri String?
-  // iosUri     String?
-  // iconUrl    String?
-  // label      String
 
   userId String @db.Uuid
   user   User   @relation(fields: [userId], references: [id])

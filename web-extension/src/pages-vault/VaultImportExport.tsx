@@ -24,6 +24,16 @@ import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 
+type MappedCSVInput = {
+  url: string
+  label: string
+  loginCredentials: {
+    username: string
+    password: string
+  }
+  iconUrl: null
+}[]
+
 // const csvHeaderNames = {
 //   password: [
 //     'password',
@@ -35,7 +45,7 @@ import { useMeExtensionQuery } from './AccountLimits.codegen'
 //   ]
 // }
 
-const mapCsvToLoginCredentials = (csv: string[][]) => {
+const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
 
   const indexUsername = header.findIndex((x) => x.match(/username/i))
@@ -63,7 +73,8 @@ const mapCsvToLoginCredentials = (csv: string[][]) => {
       loginCredentials: {
         username: row[indexUsername],
         password: row[indexPassword]
-      }
+      },
+      iconUrl: null
     }))
 }
 
@@ -85,7 +96,7 @@ export const onFileAccepted: any = (
         if (!results.data) {
           toast.error('failed to parse')
         }
-        const mapped = mapCsvToLoginCredentials(results.data)
+        const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
 
         const state = device.state as DeviceState
 
@@ -93,14 +104,6 @@ export const onFileAccepted: any = (
         let skipped = 0
         let added = 0
         for (const creds of mapped) {
-          if (
-            (device.state?.decryptedSecrets.length as number) + added >=
-            pswCount
-          ) {
-            toast.error('You have reached your limit of secrets')
-            break
-          }
-
           let hostname: string
           try {
             hostname = new URL(creds.url).hostname

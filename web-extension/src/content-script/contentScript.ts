@@ -52,12 +52,12 @@ export interface IInitStateRes {
     createdAt: string
   }>
   saveLoginModalsState?:
-  | {
-    password: string
-    username: string
-  }
-  | null
-  | undefined
+    | {
+        password: string
+        username: string
+      }
+    | null
+    | undefined
 }
 
 // TODO spec
@@ -77,7 +77,7 @@ let recording = false
 const hideToast = () => {
   const x = document.getElementById('toast')
 
-  setTimeout(function() {
+  setTimeout(function () {
     x?.remove()
   }, 5000)
 }
@@ -301,7 +301,7 @@ export async function initInputWatch() {
               )
               const webInput: WebInputElement = {
                 domPath: elementSelector.css,
-                domOrdinal: elementSelector.ordinal,
+                domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
                 url: location.href
               }
