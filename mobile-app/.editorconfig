@@ -1,0 +1,7 @@
+# Windows files
+[*.bat]
+end_of_line = lf
+
+[*]
+end_of_line = lf
+insert_final_newline = true

@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "500382892914",
+    "project_id": "authier-bc184",
+    "storage_bucket": "authier-bc184.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:500382892914:android:154ed002acb7b0c2c213eb",
+        "android_client_info": {
+          "package_name": "com.authier"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "500382892914-s140131plp5kvabqfrk46fcco25djpmq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD1lVcFH-FqufCeLuALRs5R2VY97NRxEAg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "500382892914-s140131plp5kvabqfrk46fcco25djpmq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "500382892914-r1t4d1ci9nl9h41gbl50gomdacc1pjci.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.authier"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

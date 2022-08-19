@@ -1,8 +1,7 @@
+import React from 'react'
 import {
-  Avatar,
   Box,
   Flex,
-  Stat,
   Text,
   Icon,
   Button,
@@ -12,14 +11,10 @@ import {
 } from '@chakra-ui/react'
 import { DeleteIcon, StarIcon } from '@chakra-ui/icons'
 
-import React from 'react'
 import { IoIosPhonePortrait } from 'react-icons/io'
-import { useLocation } from 'wouter'
-import { useMyDevicesQuery } from './Devices.codegen'
+import { useMyDevicesQuery } from '@shared/graphql/AccountDevices.codegen'
 
 export default function Devices() {
-  const [setLocation] = useLocation()
-
   const { data, loading, error } = useMyDevicesQuery()
 
   return (

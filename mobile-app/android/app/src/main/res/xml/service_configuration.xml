@@ -1,0 +1,6 @@
+<autofill-service
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:settingsActivity="com.testmodule.android.SettingsActivity"
+  >
+    <compatibility-package android:name="com.android.chrome" android:maxLongVersionCode="1000000000"/>
+</autofill-service>

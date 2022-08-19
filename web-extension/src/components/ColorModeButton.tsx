@@ -2,7 +2,7 @@ import { IconButton, useColorMode } from '@chakra-ui/react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import React, { useContext } from 'react'
 import { FiMoon } from 'react-icons/fi'
-import { useUpdateSettingsMutation } from './vault/settings/VaultConfig.codegen'
+import { useUpdateSettingsMutation } from '../../../shared/graphql/Settings.codegen'
 
 export const ColorModeButton = () => {
   const { toggleColorMode } = useColorMode()

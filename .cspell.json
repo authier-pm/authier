@@ -1,5 +1,8 @@
 {
-  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
+  "ignorePaths": [
+    "*/node_modules/**",
+    "*/dist/**"
+  ],
   "words": [
     "appspot",
     "authier",
@@ -21,6 +24,7 @@
     "Formik",
     "graphiql",
     "IJWT",
+    "Ionicons",
     "ITOTP",
     "Keychain",
     "lastpass",
