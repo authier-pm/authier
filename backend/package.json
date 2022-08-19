@@ -19,7 +19,7 @@
     "class-validator": "^0.13.2",
     "cpy": "^8.1.2",
     "debug": "^4.3.4",
-    "dotenv": "^14.3.2",
+    "dotenv": "^16.0.1",
     "faker": "^5.5.3",
     "fastify": "^4.3.0",
     "fastify-cookie": "^5.7.0",
