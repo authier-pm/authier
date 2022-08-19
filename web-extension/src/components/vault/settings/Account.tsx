@@ -20,7 +20,7 @@ import {
   useChangeMasterPasswordMutation
 } from './Account.codegen'
 
-import { useDeviceDecryptionChallengeMutation } from '../../../pages-vault/Login.codegen'
+import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { toast } from 'react-toastify'
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'

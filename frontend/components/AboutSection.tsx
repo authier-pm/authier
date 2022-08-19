@@ -50,6 +50,7 @@ export default function AboutSection() {
     triggerOnce: true
   })
   return (
+    //@ts-ignore TODO fix this
     <Fade in={inView}>
       <Center h={'90vh'} ref={ref}>
         <SimpleGrid

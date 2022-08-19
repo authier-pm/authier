@@ -1,17 +1,16 @@
+import React from 'react'
 import {
   Button,
   Checkbox,
   Collapse,
   Flex,
   HStack,
-  Input,
   NumberDecrementStepper,
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
   NumberInputStepper
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
 import { generate } from 'generate-password'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 
@@ -31,6 +30,7 @@ export const PasswordGenerator = ({
   setInitPassword: (password: string) => void
 }) => {
   return (
+    //@ts-ignore TODO: fix this
     <Collapse in={isOpen} animateOpacity>
       <Flex
         flexDirection="column"

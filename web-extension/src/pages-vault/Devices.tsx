@@ -31,7 +31,6 @@ import {
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
-import { useMyDevicesQuery } from '@src/pages/Devices.codegen'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import React, { useEffect, useState } from 'react'
 import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
@@ -39,14 +38,15 @@ import {
   useApproveChallengeMutation,
   useChangeMasterDeviceMutation,
   useDevicesRequestsQuery,
-  useRejectChallengeMutation
-} from './Devices.codegen'
+  useRejectChallengeMutation,
+  useMyDevicesQuery
+} from '@shared/graphql/AccountDevices.codegen'
 import { formatDistance, formatRelative, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
-import { DeviceQuery } from '../../../shared/generated/graphqlBaseTypes'
+import { DeviceQuery } from '@shared/generated/graphqlBaseTypes'
 
 interface SettingsValues {
   lockTime: number

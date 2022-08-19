@@ -13,7 +13,18 @@
     "packages": [
       "web-extension",
       "backend",
-      "frontend"
+      "frontend",
+      "mobile-app"
+    ],
+    "nohoist": [
+       "**/@react-native-async-storage/async-storage",
+      "**/react",
+      "**/react-dom",
+      "**/react-native",
+      "**/react-native/**",
+      "**/react-native-codegen",
+      "**/react-native-code-push",
+      "**/react-native-vector-icons"
     ]
   },
   "resolutions": {
@@ -53,7 +64,7 @@
     "devBE": "cd backend && npm run dev",
     "devFE": "cd frontend && npm run dev",
     "devEX": "cd web-extension && npm run dev",
-    "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd frontend && tsc",
+    "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd frontend && tsc && cd .. && cd mobile-app && tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",

@@ -1,7 +1,6 @@
 import './chromeRuntimeListener'
 import debug from 'debug'
 import { EncryptedSecretQuery } from '../../../shared/generated/graphqlBaseTypes'
-import { ISecret } from '@src/util/useDeviceState'
 
 export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages
