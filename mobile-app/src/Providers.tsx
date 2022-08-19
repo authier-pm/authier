@@ -63,8 +63,6 @@ export const Providers = () => {
     <ApolloProvider client={apolloClient}>
       <DeviceProvider>
         <SafeAreaProvider>
-          {/* <NotifyProvider> */}
-          {/* <UserProvider> */}
           <I18nProvider i18n={i18n} defaultComponent={Text}>
             <NativeBaseProvider
               theme={theme}
@@ -73,9 +71,6 @@ export const Providers = () => {
               <Routes />
             </NativeBaseProvider>
           </I18nProvider>
-          {/* </UserProvider> */}
-
-          {/* </NotifyProvider> */}
         </SafeAreaProvider>
       </DeviceProvider>
     </ApolloProvider>

@@ -22,7 +22,7 @@ export default function Routes() {
   const [initialState, setInitialState] = React.useState()
 
   useEffect(() => {
-    console.log(device.state?.lockTimeEnd)
+    console.log('lockTimeEnd', device.state?.lockTimeEnd)
     if (device.state && device.state!.lockTimeEnd <= Date.now()) {
       device.lock()
     } else if (device.state?.lockTimeEnd) {

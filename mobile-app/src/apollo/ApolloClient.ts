@@ -10,7 +10,7 @@ import { getAccessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { device } from '../utils/Device'
 
-//REVERSE PORTS adb reverse tcp:5051 tcp:5051
+//REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const httpLink = createHttpLink({
   uri: __DEV__ ? Config.API_URL : Config.API_URL_RELEASE,
   credentials: 'include'

@@ -38,14 +38,4 @@ export const tokenRefresh = new TokenRefreshLink({
     console.log('handleFetch', accessToken)
     saveAccessToken(accessToken)
   }
-  // handleError: async (err) => {
-  //   let emitter = mitt()
-  //   if (device.state) {
-  //     console.warn('Your refresh token is invalid. You must login again', err)
-
-  //     await clearAccessToken()
-  //     await device.clearLocalStorage()
-  //     emitter.emit('stateChange')
-  //   }
-  // }
 })
