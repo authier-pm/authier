@@ -113,3 +113,4 @@ dist.crx
 dist.pem
 authier.zip
 .vercel
+**/.DS_Store
