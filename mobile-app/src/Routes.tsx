@@ -12,6 +12,7 @@ import {
 import { Linking, Platform } from 'react-native'
 import { storage } from '../App'
 import { Loading } from './components/Loading'
+import RNBootSplash from 'react-native-bootsplash'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
@@ -66,6 +67,7 @@ export default function Routes() {
 
   return (
     <NavigationContainer
+      onReady={() => RNBootSplash.hide({ fade: true })}
       initialState={initialState}
       onStateChange={(state) =>
         storage.set(PERSISTENCE_KEY, JSON.stringify(state))
