@@ -27,19 +27,3 @@ function App({ parent }: { parent: string }): ReactElement {
 }
 
 export default App
-
-// fetch('http://localhost:5051/refresh_token', {
-//   method: 'POST',
-//   credentials: 'include'
-// }).then(async (x) => {
-//   const { accessToken } = await x.json()
-//   setAccessToken(accessToken)
-//   setLoading(false)
-// })
-
-// async function token() {
-//   let s = await browser.storage.local.get('access-token'')
-//   setAccessToken(s.jid)
-//   setLoading(false)
-// }
-// token()

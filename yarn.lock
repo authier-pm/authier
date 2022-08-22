@@ -1812,10 +1812,28 @@
   dependencies:
     "@types/hammerjs" "^2.0.36"
 
-"@emotion/babel-plugin@^11", "@emotion/babel-plugin@^11.10.0", "@emotion/babel-plugin@^11.9.2":
+"@emotion/babel-plugin@^11", "@emotion/babel-plugin@^11.10.0":
   version "11.10.0"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.10.0.tgz#ae545b8faa6b42d3a50ec86b70b758296f3c4467"
   integrity sha512-xVnpDAAbtxL1dsuSelU5A7BnY/lftws0wUexNJZTPsvX/1tM4GZJbclgODhvW4E+NH7E5VFcH0bBn30NvniPJA==
+  dependencies:
+    "@babel/helper-module-imports" "^7.16.7"
+    "@babel/plugin-syntax-jsx" "^7.17.12"
+    "@babel/runtime" "^7.18.3"
+    "@emotion/hash" "^0.9.0"
+    "@emotion/memoize" "^0.8.0"
+    "@emotion/serialize" "^1.1.0"
+    babel-plugin-macros "^3.1.0"
+    convert-source-map "^1.5.0"
+    escape-string-regexp "^4.0.0"
+    find-root "^1.1.0"
+    source-map "^0.5.7"
+    stylis "4.0.13"
+
+"@emotion/babel-plugin@^11.10.2":
+  version "11.10.2"
+  resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.10.2.tgz#879db80ba622b3f6076917a1e6f648b1c7d008c7"
+  integrity sha512-xNQ57njWTFVfPAc3cjfuaPdsgLp5QOSuRsj9MA6ndEhH/AzuZM86qIQzt6rq+aGBwj3n5/TkLmU5lhAfdRmogA==
   dependencies:
     "@babel/helper-module-imports" "^7.16.7"
     "@babel/plugin-syntax-jsx" "^7.17.12"
@@ -1841,7 +1859,7 @@
     "@emotion/weak-memoize" "^0.3.0"
     stylis "4.0.13"
 
-"@emotion/css@^11.9.0":
+"@emotion/css@^11.10.0":
   version "11.10.0"
   resolved "https://registry.yarnpkg.com/@emotion/css/-/css-11.10.0.tgz#270b4fdf2419e59cb07081d0e9f7940d88b8b443"
   integrity sha512-dH9f+kSCucc8ilMg0MUA1AemabcyzYpe5EKX24F528PJjD7HyIY/VBNJHxfUdc8l400h2ncAjR6yEDu+DBj2cg==
@@ -1910,7 +1928,7 @@
   resolved "https://registry.yarnpkg.com/@emotion/sheet/-/sheet-1.2.0.tgz#771b1987855839e214fc1741bde43089397f7be5"
   integrity sha512-OiTkRgpxescko+M51tZsMq7Puu/KP55wMT8BgpcXVG2hqXc0Vo0mfymJ/Uj24Hp0i083ji/o0aLddh08UEjq8w==
 
-"@emotion/styled@^11", "@emotion/styled@^11.9.3":
+"@emotion/styled@11.10.0", "@emotion/styled@^11", "@emotion/styled@^11.9.3":
   version "11.10.0"
   resolved "https://registry.yarnpkg.com/@emotion/styled/-/styled-11.10.0.tgz#c19484dab4206ae46727c07efb4316423dd21312"
   integrity sha512-V9oaEH6V4KePeQpgUE83i8ht+4Ri3E8Djp/ZPJ4DQlqWhSKITvgzlR3/YQE2hdfP4Jw3qVRkANJz01LLqK9/TA==
@@ -2028,6 +2046,11 @@
     ajv "^8.10.0"
     ajv-formats "^2.1.1"
     fast-uri "^2.0.0"
+
+"@fastify/aws-lambda@3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@fastify/aws-lambda/-/aws-lambda-3.1.1.tgz#1c080ed8086632c9710e4dd2184fcbeb86fd2063"
+  integrity sha512-oKaTr1ZiT5ymDAoMvRhkC1ujOJLwJaScBcAAW6IxA2xlChgGStSH8vkeYSkJ68McOBFkzhrN15jBHikI7X+MSw==
 
 "@fastify/busboy@^1.1.0":
   version "1.1.0"
@@ -7469,19 +7492,6 @@ aws-cdk@2.38.1:
   integrity sha512-bIHRCkmbXBmJWw1Gq5UsAUUYKABuE/ah1iAA14hXLS8+9AJlF/Ptn+NsUCt9K5v17cRqtUoeaOAMAPrZs8l+YA==
   optionalDependencies:
     fsevents "2.3.2"
-
-"aws-lambda-fastify-deprecated@npm:aws-lambda-fastify@2.1.6":
-  version "2.1.6"
-  resolved "https://registry.yarnpkg.com/aws-lambda-fastify/-/aws-lambda-fastify-2.1.6.tgz#3e87f77a1c490e7c5613cfcdd6923158be975c35"
-  integrity sha512-56OHxiVrA5CjkjkLaO9VWGoWqLSIwMrrkZCDH+2XS/yprHqlGCJdzihaAhpTDB2FWrqwB9wp4ikINiHX3AcXXg==
-
-aws-lambda-fastify@^2.2.0:
-  version "2.2.0"
-  resolved "https://registry.yarnpkg.com/aws-lambda-fastify/-/aws-lambda-fastify-2.2.0.tgz#38a4d060676147bfe919f9fc771c3ee276c29c72"
-  integrity sha512-19AR/u7XEOEDFtWATWjSJMb5vCTR2+HXjOAf/b5SkBJIcCGzOcQkBLu72o6ZpLVzIssM1pz45vn40mbngwxy/g==
-  dependencies:
-    aws-lambda-fastify-deprecated "npm:aws-lambda-fastify@2.1.6"
-    process-warning "^1.0.0"
 
 babel-code-frame@^6.26.0:
   version "6.26.0"
@@ -15350,11 +15360,6 @@ omggif@^1.0.10, omggif@^1.0.9:
   resolved "https://registry.yarnpkg.com/omggif/-/omggif-1.0.10.tgz#ddaaf90d4a42f532e9e7cb3a95ecdd47f17c7b19"
   integrity sha512-LMJTtvgc/nugXj0Vcrrs68Mn2D1r0zf630VNtqtpI1FEO7e+O9FP4gqs9AcnBaSEeoHIPm28u6qgPR0oyEpGSw==
 
-on-exit-leak-free@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/on-exit-leak-free/-/on-exit-leak-free-1.0.0.tgz#4a2accb382278a266848bb1a21439e5fc3cd9881"
-  integrity sha512-Ve8ubhrXRdnuCJ5bQSQpP3uaV43K1PMcOfSRC1pqHgRZommXCgsXwh08jVC5NpjwScE23BPDwDvVg4cov3mwjw==
-
 on-exit-leak-free@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/on-exit-leak-free/-/on-exit-leak-free-2.1.0.tgz#5c703c968f7e7f851885f6459bf8a8a57edc9cc4"
@@ -15833,10 +15838,10 @@ pino-abstract-transport@^1.0.0, pino-abstract-transport@v1.0.0:
     readable-stream "^4.0.0"
     split2 "^4.0.0"
 
-pino-pretty@8.1.0:
-  version "8.1.0"
-  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-8.1.0.tgz#1dda4ca71701dfeaf1f72057da1b5b718a0d0f04"
-  integrity sha512-oKfI8qKXR2a3haHs/X8iB6QSnWLqoOGAjwxIAXem4+XOGIGNw7IKpozId1uE7j89Rj46HIfWnGbAgmQmr8+yRw==
+pino-pretty@9.0.1:
+  version "9.0.1"
+  resolved "https://registry.yarnpkg.com/pino-pretty/-/pino-pretty-9.0.1.tgz#25711c49a874950a894f5953929da11b9845cce6"
+  integrity sha512-5gFIIeDu1niFlL0pBACerwDR8Ts+i4gO0W9S0jRoHVvaQluvGOW4cUaDmC+/dSTCoG4VqfOQhP0dwuDLd0qJ6A==
   dependencies:
     colorette "^2.0.7"
     dateformat "^4.6.3"
@@ -15845,7 +15850,7 @@ pino-pretty@8.1.0:
     help-me "^4.0.1"
     joycon "^3.1.1"
     minimist "^1.2.6"
-    on-exit-leak-free "^1.0.0"
+    on-exit-leak-free "^2.1.0"
     pino-abstract-transport "^1.0.0"
     pump "^3.0.0"
     readable-stream "^4.0.0"

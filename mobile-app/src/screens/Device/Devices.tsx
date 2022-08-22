@@ -59,6 +59,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   } = useDevicesRequestsQuery({
     fetchPolicy: 'cache-first'
   })
+  console.log('devicesData', devicesData?.me.devices[0])
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
 
