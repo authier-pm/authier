@@ -166,3 +166,5 @@ keystore.properties
 
 .env
 vendor
+android/build/**
+android/.gradle/**
