@@ -19,6 +19,24 @@ import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import { MMKV } from 'react-native-mmkv'
 import messaging from '@react-native-firebase/messaging'
+import Config from 'react-native-config'
+import * as Sentry from '@sentry/react-native'
+
+export const routingInstrumentation =
+  new Sentry.ReactNavigationInstrumentation()
+
+Sentry.init({
+  dsn: Config.SENTRY_DSN,
+  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
+  // We recommend adjusting this value in production.
+  tracesSampleRate: 1.0,
+  integrations: [
+    new Sentry.ReactNativeTracing({
+      // Pass instrumentation to be used as `routingInstrumentation`
+      routingInstrumentation
+    })
+  ]
+})
 
 let CodePushOptions = {
   checkFrequency: __DEV__
@@ -78,4 +96,4 @@ const App = () => {
   )
 }
 
-export default CodePush(CodePushOptions)(App)
+export default Sentry.wrap(CodePush(CodePushOptions)(App))

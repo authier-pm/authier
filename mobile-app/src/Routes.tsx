@@ -7,10 +7,12 @@ import { useColorMode } from 'native-base'
 import {
   DarkTheme,
   DefaultTheme,
-  NavigationContainer
+  NavigationContainer,
+  NavigationContainerRef,
+  useNavigationContainerRef
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
-import { storage } from '../App'
+import { routingInstrumentation, storage } from '../App'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 
@@ -21,6 +23,7 @@ export default function Routes() {
   const { colorMode } = useColorMode()
   const [isReady, setIsReady] = React.useState(__DEV__ ? false : true)
   const [initialState, setInitialState] = React.useState()
+  const navigation = useNavigationContainerRef()
 
   useEffect(() => {
     console.log('lockTimeEnd', device.state?.lockTimeEnd)
@@ -67,7 +70,11 @@ export default function Routes() {
 
   return (
     <NavigationContainer
-      onReady={() => RNBootSplash.hide({ fade: true })}
+      ref={navigation}
+      onReady={() => {
+        RNBootSplash.hide({ fade: true })
+        routingInstrumentation.registerNavigationContainer(navigation)
+      }}
       initialState={initialState}
       onStateChange={(state) =>
         storage.set(PERSISTENCE_KEY, JSON.stringify(state))
