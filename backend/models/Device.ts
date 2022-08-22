@@ -11,7 +11,7 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
-import { request } from 'undici'
+import { request, fetch } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
@@ -39,10 +39,14 @@ export class DeviceQuery extends DeviceGQL {
         country_name: 'Czech Republic'
       }
     }
-    const res = await request(
-      `https://api.freegeoip.app/json/${ipAddress}apikey=${process.env.FREE_GEOIP_API_KEY}`
+    const res = await fetch(
+      `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
     )
-    return await res.body.json()
+    const json: any = await res.json()
+    return {
+      city: json.data.location.city.name,
+      country_name: json.data.location.country.name
+    }
   }
 
   @Field(() => [EncryptedSecretQuery])
@@ -110,6 +114,7 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => String)
   async lastGeoLocation() {
     const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
+    console.log(geoIp)
     return geoIp.city + ', ' + geoIp.country_name
   }
 

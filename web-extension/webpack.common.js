@@ -57,7 +57,6 @@ module.exports = {
           }
         }
       },
-
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
@@ -67,6 +66,7 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
+      react: path.resolve('./node_modules/react'),
       '@src': path.resolve(__dirname, 'src/'),
       '@shared': path.resolve(__dirname, '../shared/')
     },
