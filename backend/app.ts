@@ -37,6 +37,9 @@ sentryInit({
 })
 
 const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
+
+const isLambda = !!process.env.LAMBDA_TASK_ROOT
+
 const logger = pino({
   transport: {
     target: 'pino-pretty',
@@ -50,7 +53,7 @@ const logger = pino({
 })
 
 export const app = fastify({
-  logger
+  logger: isLambda ? undefined : logger
 })
 
 app.register(fastifyCors, {
