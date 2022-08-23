@@ -125,16 +125,24 @@ app.register((fastify, opts, done) => {
     //Handle the event
     switch (event.type) {
       case 'customer.subscription.deleted':
+        // Then define and call a method to handle the subscription deleted.
         subscription = event.data.object
         status = subscription.status
+        console.log('Subscription deleted:', subscription)
+        if (status === 'canceled') {
+          /* await prismaClient.userPaidProducts.delete({ */
+          /*   where: { */
+          /*     id: subscription.id */
+          /*   } */
+          /* }) */
+        }
+
         console.log(`Subscription status is ${status}.`)
-        // Then define and call a method to handle the subscription deleted.
-        // handleSubscriptionDeleted(subscriptionDeleted);
         break
 
       case 'checkout.session.completed':
         const session = event.data.object
-        console.log(session)
+        console.log('Session completed:', session.metadata)
         await prismaClient.user.update({
           where: {
             email: session.customer_details.email
@@ -143,7 +151,7 @@ app.register((fastify, opts, done) => {
             UserPaidProducts: {
               create: {
                 checkoutSessionId: session.id,
-                productId: session.subscription,
+                productId: session.metadata.productId,
                 expiresAt: new Date(session.expires_at)
               }
             }

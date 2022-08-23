@@ -1,20 +1,9 @@
 import { ReactNode } from 'react'
 
 import Head from 'next/head'
-import {
-  chakra,
-  Box,
-  GridItem,
-  useColorModeValue,
-  Text,
-  Center,
-  SimpleGrid,
-  Container,
-  Flex
-} from '@chakra-ui/react'
+import { Box, useColorModeValue } from '@chakra-ui/react'
 
 import NextLink from 'next/link'
-import { Link } from '../components/Link'
 import { useRouter } from 'next/router'
 import Success from '../components/Success'
 import Error from '../components/Error'

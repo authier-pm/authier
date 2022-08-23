@@ -195,10 +195,10 @@ export class UserQuery extends UserBase {
         userId: ctx.jwtPayload.userId,
         OR: [
           {
-            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+            productId: 'prod_LquWXgjk6kl5sM' // product name = Credentials
           },
           {
-            productId: 'sub_1LOS1WI3AGASZpOV3KiMWraZ'
+            productId: 'prod_Lp3NU9UcNWduBm' // TOTP and Credentials
           }
         ]
       }
@@ -220,10 +220,10 @@ export class UserQuery extends UserBase {
         userId: ctx.jwtPayload.userId,
         OR: [
           {
-            productId: 'sub_1LOLXQI3AGASZpOVLMWWlW36'
+            productId: 'prod_LquVrkwfsXjTAL' // TOTP
           },
           {
-            productId: 'sub_1LOS9CI3AGASZpOV38ghfsUi'
+            productId: 'prod_Lp3NU9UcNWduBm' // TOTP and Credentials
           }
         ]
       }
