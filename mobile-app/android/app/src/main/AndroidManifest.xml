@@ -21,7 +21,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:largeHeap="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/BootTheme">
 
         <service android:name="com.authier.AuthierAutofillService"
             android:label="Multi-Dataset Autofill Service"

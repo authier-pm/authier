@@ -129,7 +129,7 @@ export default function Login(): ReactElement {
       <Flex>
         <Link to="/signup">
           <Text pt={3}>
-            <Trans>Don`&apos;`t have account?</Trans>
+            <Trans>Don't have account?</Trans>
           </Text>
         </Link>
       </Flex>
