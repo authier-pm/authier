@@ -11,7 +11,7 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/Device'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
-import { request, fetch } from 'undici'
+import { fetch } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
@@ -114,7 +114,6 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => String)
   async lastGeoLocation() {
     const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
-    console.log(geoIp)
     return geoIp.city + ', ' + geoIp.country_name
   }
 
