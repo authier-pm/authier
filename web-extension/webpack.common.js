@@ -38,6 +38,16 @@ module.exports = {
       },
       {
         exclude: /node_modules/,
+        test: /\.tsx?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: ['@emotion', 'macros']
+          }
+        }
+      },
+      {
+        exclude: /node_modules/,
         test: /src\/content-script.*\.tsx?$/,
         use: {
           loader: 'ts-loader',
@@ -47,19 +57,15 @@ module.exports = {
           }
         }
       },
-      {
-        exclude: /node_modules/,
-        test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            plugins: ['macros', '@emotion']
-          }
-        }
-      },
+
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ['@svgr/webpack']
       }
     ]
   },
