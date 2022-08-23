@@ -18507,10 +18507,10 @@ sql-formatter@^4.0.2:
   dependencies:
     argparse "^2.0.1"
 
-sql-highlight@^4.1.1:
-  version "4.1.1"
-  resolved "https://registry.yarnpkg.com/sql-highlight/-/sql-highlight-4.1.1.tgz#de365c43e6d741bf1e97e4c0934b9c7c8504d1e0"
-  integrity sha512-x4yW923TV8KKuvJuiNH2SB+kwi+l9cRESU7ZdiPxnY4Wrt/eAmYrNoIaFnzojzz8HIwYXomrKNzRpOPEUFRd8g==
+sql-highlight@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/sql-highlight/-/sql-highlight-4.2.1.tgz#633f21682781f7cc403726c32b202df374c1a0b5"
+  integrity sha512-t6HyleY64lk3qAncCLxPx0XJ1oYcroN96C4tH2ttrT3DLsOQznthobU+T4iI7896qBrbACqtvK/Z8pSyLtcoDQ==
 
 stable-hash@^0.0.2:
   version "0.0.2"
