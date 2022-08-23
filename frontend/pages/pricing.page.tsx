@@ -20,11 +20,14 @@ import {
 import Head from 'next/head'
 
 import {
+  CreateCheckoutSessionMutation,
+  CreatePortalSessionMutation,
   useCreateCheckoutSessionMutation,
   useCreatePortalSessionMutation
 } from './pricing.codegen'
 
 import { useRouter } from 'next/router'
+import { FetchResult } from '@apollo/client'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -46,27 +49,30 @@ export default function PricingPage() {
   const { product, portal } = router.query
   const [loading, setLoading] = useState(false)
 
-  const [createCheckoutSessionMutation, { error: sessionError }] =
-    useCreateCheckoutSessionMutation()
+  const [createCheckoutSessionMutation] = useCreateCheckoutSessionMutation()
 
-  const [createPortalSession, { error: portalSession }] =
+  const [createPortalSession, { data: portalData }] =
     useCreatePortalSessionMutation()
 
   const handleCheckout = async (type: string) => {
     setLoading(true)
     //Create a Checkout Session.
-    const response = await createCheckoutSessionMutation({
-      variables: {
-        product: type
-      }
-    })
-
-    if (sessionError) {
-      console.error(sessionError.message)
+    let res: FetchResult<
+      CreateCheckoutSessionMutation,
+      Record<string, any>,
+      Record<string, any>
+    >
+    try {
+      res = await createCheckoutSessionMutation({
+        variables: {
+          product: type
+        }
+      })
+    } catch (error) {
+      console.error(error)
       router.push('/?error=true')
       return
     }
-    console.log(response)
 
     // // Redirect to Checkout.
     const stripe = await getStripe()
@@ -74,7 +80,7 @@ export default function PricingPage() {
       //   // Make the id field from the Checkout Session creation API response
       //   // available to this file, so you can provide it as parameter here
       //   // instead of the {{CHECKOUT_SESSION_ID}} placeholder.
-      sessionId: response.data?.me.createCheckoutSession as string
+      sessionId: res.data?.me.createCheckoutSession as string
     })
     // // If `redirectToCheckout` fails due to a browser or network
     // // error, display the localized error message to your customer
@@ -85,17 +91,20 @@ export default function PricingPage() {
 
   const handlePortal = async () => {
     setLoading(true)
-    //Create a Checkout Session.
-    const response = await createPortalSession()
-
-    if (portalSession) {
-      console.error(portalSession.message)
+    let res: FetchResult<
+      CreatePortalSessionMutation,
+      Record<string, any>,
+      Record<string, any>
+    >
+    try {
+      res = await createPortalSession()
+    } catch (error) {
+      console.error(error)
       router.push('/?error=true')
       return
     }
-    console.log(response)
 
-    window.location.href = response.data?.me.createPortalSession as string
+    window.location.href = res.data?.me.createPortalSession as string
     setLoading(false)
   }
 
