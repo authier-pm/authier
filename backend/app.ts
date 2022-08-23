@@ -4,7 +4,6 @@ import fastify, { FastifyRequest } from 'fastify'
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import './dotenv'
-import pino from 'pino'
 
 import cookie, { FastifyCookieOptions } from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'
@@ -37,23 +36,29 @@ sentryInit({
 })
 
 const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
+const isLambda = !!env.LAMBDA_TASK_ROOT
 
-const isLambda = !!process.env.LAMBDA_TASK_ROOT
-
-const logger = pino({
-  transport: {
-    target: 'pino-pretty',
-    options: {
-      translateTime: 'HH:MM:ss Z',
-      ignore:
-        environment === 'production' ? 'pid,hostname,time' : 'pid,hostname',
-      colorize: true
-    }
-  }
-})
+let logger: any = undefined
+let pino: any = undefined
+if (!isLambda) {
+  ;(async () => {
+    pino = await import('pino').then((m) => m.pino)
+    logger = pino({
+      transport: {
+        target: 'pino-pretty',
+        options: {
+          translateTime: 'HH:MM:ss Z',
+          ignore:
+            environment === 'production' ? 'pid,hostname,time' : 'pid,hostname',
+          colorize: true
+        }
+      }
+    })
+  })()
+}
 
 export const app = fastify({
-  logger: isLambda ? undefined : logger
+  logger: logger
 })
 
 app.register(fastifyCors, {

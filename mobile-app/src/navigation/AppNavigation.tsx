@@ -13,6 +13,7 @@ import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { useColorMode } from 'native-base'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
+import { Loading } from '@src/components/Loading'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -53,6 +54,7 @@ function AppNavigation() {
       })
   }, [])
 
+  // TODO: I think this is not ideal, but it works for now
   React.useEffect(() => {
     if (data) {
       if (colorMode !== data.me?.theme) {
@@ -70,7 +72,7 @@ function AppNavigation() {
   }, [data])
 
   if (loading) {
-    return null
+    return <Loading />
   }
 
   return (

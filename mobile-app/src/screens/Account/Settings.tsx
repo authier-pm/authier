@@ -10,7 +10,8 @@ import {
   VStack,
   Switch,
   HStack,
-  Divider
+  Divider,
+  useColorMode
 } from 'native-base'
 
 import { Trans } from '@lingui/macro'
@@ -26,6 +27,7 @@ export default function Settings() {
     awaitRefetchQueries: true
   })
   const [isEnabled, setIsEnabled] = useState(device.state!.biometricsEnabled)
+  const { toggleColorMode } = useColorMode()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
   const settings = (): SettingsInput => {
@@ -122,6 +124,7 @@ export default function Settings() {
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
                 onValueChange={(value) => {
+                  toggleColorMode()
                   device.state!.theme = value
                   updateSettings({
                     variables: {

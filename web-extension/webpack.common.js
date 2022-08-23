@@ -38,6 +38,16 @@ module.exports = {
       },
       {
         exclude: /node_modules/,
+        test: /\.tsx?$/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            plugins: ['@emotion', 'macros']
+          }
+        }
+      },
+      {
+        exclude: /node_modules/,
         test: /src\/content-script.*\.tsx?$/,
         use: {
           loader: 'ts-loader',
@@ -47,26 +57,24 @@ module.exports = {
           }
         }
       },
-      {
-        exclude: /node_modules/,
-        test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            plugins: ['macros', '@emotion']
-          }
-        }
-      },
 
       {
         test: /\.css$/i,
         use: ['style-loader', 'css-loader']
+      },
+      {
+        test: /\.svg$/i,
+        issuer: /\.[jt]sx?$/,
+        use: ['@svgr/webpack']
       }
     ]
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
+      react: path.resolve('./node_modules/react'),
+      '@emotion/react': path.resolve('./node_modules/@emotion/react'),
+      '@emotion/core': path.resolve('./node_modules/@emotion/core'),
       '@src': path.resolve(__dirname, 'src/'),
       '@shared': path.resolve(__dirname, '../shared/')
     },
