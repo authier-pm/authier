@@ -159,7 +159,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter(
-      (secret) => host === new URL(secret.id ?? '').hostname
+      (secret) => host === new URL(secret.url ?? '').hostname
     )
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>

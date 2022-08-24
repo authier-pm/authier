@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 
 import { Route, Routes, useNavigate } from 'react-router-dom'

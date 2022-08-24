@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Flex } from '@chakra-ui/react'
 import { AutoSizer, List } from 'react-virtualized'
