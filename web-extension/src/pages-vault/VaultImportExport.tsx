@@ -104,6 +104,14 @@ export const onFileAccepted: any = (
         let skipped = 0
         let added = 0
         for (const creds of mapped) {
+          if (
+            (device.state?.decryptedSecrets.length as number) + added >=
+            pswCount
+          ) {
+            toast.error('You have reached your limit of secrets')
+            break
+          }
+
           let hostname: string
           try {
             hostname = new URL(creds.url).hostname

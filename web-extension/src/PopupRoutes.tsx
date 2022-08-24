@@ -1,4 +1,4 @@
-import React, { ReactElement, useContext } from 'react'
+import { ReactElement, useContext } from 'react'
 import { AuthLinkPage } from './AuthLinkPage'
 import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
