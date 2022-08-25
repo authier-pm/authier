@@ -9,7 +9,8 @@ module.exports = merge(common, {
   },
   plugins: [
     new webpack.EnvironmentPlugin({
-      API_URL: 'http://api.authier.ml/graphql'
+      API_URL:
+        'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql'
     })
   ]
 })
