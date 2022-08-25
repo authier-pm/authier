@@ -602,7 +602,6 @@ export class Device {
 
   async checkBiometrics(): Promise<boolean> {
     const hasAnySensors = await SInfo.isSensorAvailable()
-
     return !!hasAnySensors
   }
 

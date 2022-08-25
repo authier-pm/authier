@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Heading,
@@ -10,7 +10,8 @@ import {
   Pressable,
   Text,
   HStack,
-  useToast
+  useToast,
+  Icon
 } from 'native-base'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
@@ -27,6 +28,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../navigation/AuthNavigation'
 import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
+import Ionicons from 'react-native-vector-icons/Ionicons'
 
 interface Values {
   password: string
@@ -37,6 +39,7 @@ type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
 export function Register({ navigation }: NavigationProps) {
   const [register, { error }] = useRegisterNewUserMutation()
+  const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
   let device = useContext(DeviceContext)
@@ -185,11 +188,28 @@ export function Register({ navigation }: NavigationProps) {
                 Password
               </FormControl.Label>
               <Input
-                onBlur={handleBlur('password')}
                 onChangeText={handleChange('password')}
+                onBlur={handleBlur('password')}
                 value={values.password}
-                type="password"
+                type={show ? 'text' : 'password'}
+                InputRightElement={
+                  <Icon
+                    as={
+                      <Ionicons
+                        name={show ? 'eye-outline' : 'eye-off-outline'}
+                      />
+                    }
+                    size={5}
+                    mr="2"
+                    color="muted.400"
+                    onPress={() => setShow(!show)}
+                  />
+                }
+                placeholder="Password"
               />
+              <FormControl.ErrorMessage>
+                {errors.password}
+              </FormControl.ErrorMessage>
             </FormControl>
 
             <Button onPress={handleSubmit} isLoading={isSubmitting}>

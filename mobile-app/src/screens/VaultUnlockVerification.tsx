@@ -18,6 +18,9 @@ import { DeviceState } from '../utils/Device'
 import cryptoJS from 'crypto-js'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceContext } from '../providers/DeviceProvider'
+import { Loading } from '@src/components/Loading'
+import { ToastAlert } from '@src/components/ToastAlert'
+import { ToastType } from '@src/ToastTypes'
 
 interface Values {
   password: string
@@ -25,15 +28,15 @@ interface Values {
 
 export function VaultUnlockVerification() {
   const toast = useToast()
+  const id = 'active-toast'
   let device = useContext(DeviceContext)
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
   const bgColor = useColorModeValue('white', 'black')
 
-  //TODO  create lock
   useEffect(() => {
     const loadBiometrics = async () => {
-      if (device.biometricsAvailable && device.state?.biometricsEnabled) {
+      if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
         const psw = await SInfo.getItem('psw', {
           sharedPreferencesName: 'mySharedPrefs',
           keychainService: 'myKeychain',
@@ -54,7 +57,7 @@ export function VaultUnlockVerification() {
   }, [])
 
   if (!lockedState) {
-    return null
+    return <Loading />
   }
 
   const unlockVault = async (psw: string) => {
@@ -106,6 +109,12 @@ export function VaultUnlockVerification() {
               title: 'Login failed',
               description: err.message
             })
+            if (!toast.isActive(id)) {
+              toast.show({
+                id,
+                render: () => <ToastAlert {...ToastType.LoginFailed} />
+              })
+            }
           }
         }}
       >
