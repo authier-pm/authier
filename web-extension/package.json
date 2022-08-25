@@ -1,6 +1,6 @@
 {
   "name": "authier-web-extension",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "A Chrome Extension starter kit built with React, TypeScript, SCSS, Bootstrap, EsLint, Prettier & Webpack",
   "license": "AGPL-3.0-or-later",
   "scripts": {
@@ -33,7 +33,7 @@
     "@types/crypto-js": "^4.1.1",
     "@types/debug": "^4.1.7",
     "@types/mz": "^2.7.4",
-    "@types/papaparse": "^5.3.3",
+    "@types/papaparse": "^5.3.4",
     "@types/react": "^18.0.17",
     "@types/react-dom": "^18.0.6",
     "@types/react-test-renderer": "^18.0.0",
@@ -80,8 +80,9 @@
   "dependencies": {
     "@apollo/client": "^3.6.9",
     "@apollo/react-hooks": "^4.0.0",
-    "@chakra-ui/icons": "^2.0.8",
-    "@chakra-ui/react": "^2.2.8",
+    "@chakra-ui/color-mode": "^2.1.7",
+    "@chakra-ui/icons": "^2.0.9",
+    "@chakra-ui/react": "^2.2.9",
     "@emotion/babel-plugin": "^11.10.2",
     "@emotion/css": "^11.10.0",
     "@emotion/styled": "11.10.0",
