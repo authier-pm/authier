@@ -26,15 +26,12 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    console.log('refetch JWT access token')
-    console.log('ENDPOINT', ENDPOINT)
     return await fetch(`${ENDPOINT.replace('/graphql', '')}/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })
   },
   handleFetch: async (accessToken) => {
-    console.log('handleFetch', accessToken)
     saveAccessToken(accessToken)
   },
   handleError: async (err) => {

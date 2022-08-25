@@ -434,7 +434,7 @@ type SecretUsageEventGQLScalars {
 }
 
 input DeviceInput {
-  id: UUID!
+  id: String!
   name: String!
   platform: String!
 }

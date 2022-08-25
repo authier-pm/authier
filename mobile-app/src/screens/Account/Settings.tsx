@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useContext } from 'react'
 
 import {
   Box,
@@ -26,7 +26,6 @@ export default function Settings() {
     refetchQueries: [{ query: SyncSettingsDocument }, 'SyncSettings'],
     awaitRefetchQueries: true
   })
-  const [bioEnabled, setBioEnabled] = useState(device.state!.biometricsEnabled)
   const { toggleColorMode } = useColorMode()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
@@ -62,10 +61,11 @@ export default function Settings() {
                     }
                   })
 
-                  device.resetInterval()
+                  device.clearInterval()
                   device.state!.lockTimeEnd =
                     Date.now() + device.state!.lockTime * 1000
                   device.startVaultLockTimer()
+                  device.save(false)
                 }}
                 defaultValue={device.state!.lockTime.toString()}
                 accessibilityLabel="Lock time"
@@ -101,6 +101,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
+                  device.save(false)
                 }}
                 defaultValue={device.state!.language}
                 accessibilityLabel="language"
@@ -127,6 +128,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
+                  device.save(false)
                 }}
                 defaultValue={device.state!.theme}
                 accessibilityLabel="theme"
@@ -158,6 +160,7 @@ export default function Settings() {
                         config: settings()
                       }
                     })
+                    device.save(false)
                   }}
                   size="md"
                 />
@@ -166,10 +169,10 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  value={bioEnabled}
+                  defaultIsChecked={device.state!.biometricsEnabled}
                   onValueChange={async (e) => {
                     device.state!.biometricsEnabled = e
-                    setBioEnabled(e)
+                    device.save(false)
                   }}
                   size="md"
                 />

@@ -19,9 +19,6 @@ const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
   const device = React.useContext(DeviceContext)
-  const { data } = useSyncSettingsQuery({
-    fetchPolicy: 'cache-and-network'
-  })
   const { toggleColorMode, colorMode } = useColorMode()
   const navigation = useNavigation()
   const [loading, setLoading] = React.useState(true)
@@ -53,23 +50,6 @@ function AppNavigation() {
         setLoading(false)
       })
   }, [])
-
-  // TODO: I think this is not ideal, but it works for now
-  React.useEffect(() => {
-    if (data) {
-      if (colorMode !== data.me?.theme) {
-        toggleColorMode()
-      }
-      device.syncSettings({
-        autofill: data.me?.autofill as boolean,
-        language: data.me?.language as string,
-        syncTOTP: data.currentDevice.syncTOTP as boolean,
-        theme: data.me?.theme as string,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number
-      })
-    }
-  }, [data])
 
   if (loading) {
     return <Loading />
