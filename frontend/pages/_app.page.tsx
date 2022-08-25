@@ -19,6 +19,7 @@ function MyApp({ Component, pageProps }: { Component: any; pageProps: any }) {
     <ApolloProvider client={apolloClient}>
       <ChakraProvider theme={chakraCustomTheme}>
         <ChakraLayout>
+          {/* @ts-expect-error */}
           <ToastContainer
             {...(toastifyConfig('bottom-right') as ToastTransitionProps)}
           />

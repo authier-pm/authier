@@ -15,7 +15,7 @@ import {
 } from 'native-base'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
-import { getDeviceName } from 'react-native-device-info'
+import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable, DeviceState } from '@utils/Device'
@@ -102,7 +102,7 @@ export function Register({ navigation }: NavigationProps) {
             masterEncryptionKey,
             userId as string
           )
-          const deviceId = await device.getDeviceId()
+          const deviceId = getUniqueId()
 
           const res = await register({
             variables: {
@@ -137,7 +137,6 @@ export function Register({ navigation }: NavigationProps) {
               autofill: false,
               language: 'en',
               lockTimeEnd: Date.now() + 28800000,
-              lockTimerRunning: false,
               syncTOTP: false,
               theme: 'dark'
             }
