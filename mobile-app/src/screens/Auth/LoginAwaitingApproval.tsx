@@ -198,7 +198,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   let device = useContext(DeviceContext)
-  const [deviceName, setDeviceName] = useState(device.name)
+  const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })

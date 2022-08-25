@@ -12,9 +12,21 @@ const Stack = createNativeStackNavigator<TOTPStackParamList>()
 function TOTPStackNavigation() {
   return (
     <Stack.Navigator>
-      <Stack.Screen name="TOTPVault" component={TOTPVault} />
-      <Stack.Screen name="AddTOTP" component={AddTOTP} />
-      <Stack.Screen name="EditTOTP" component={EditTOTP} />
+      <Stack.Screen
+        name="TOTPVault"
+        options={{ title: 'TOTP Vault' }}
+        component={TOTPVault}
+      />
+      <Stack.Screen
+        name="AddTOTP"
+        options={{ title: 'Add TOTP' }}
+        component={AddTOTP}
+      />
+      <Stack.Screen
+        name="EditTOTP"
+        options={{ title: 'Edit TOTP' }}
+        component={EditTOTP}
+      />
     </Stack.Navigator>
   )
 }

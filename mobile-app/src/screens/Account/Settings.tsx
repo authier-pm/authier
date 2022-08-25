@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, useState } from 'react'
 
 import {
   Box,
@@ -26,7 +26,7 @@ export default function Settings() {
     refetchQueries: [{ query: SyncSettingsDocument }, 'SyncSettings'],
     awaitRefetchQueries: true
   })
-  const [isEnabled, setIsEnabled] = useState(device.state!.biometricsEnabled)
+  const [bioEnabled, setBioEnabled] = useState(device.state!.biometricsEnabled)
   const { toggleColorMode } = useColorMode()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
@@ -39,10 +39,6 @@ export default function Settings() {
       vaultLockTimeoutSeconds: device.state!.lockTime
     }
   }
-
-  useEffect(() => {
-    device.state!.biometricsEnabled = isEnabled
-  }, [isEnabled, device])
 
   return (
     <View>
@@ -141,7 +137,7 @@ export default function Settings() {
             </Box>
           </VStack>
 
-          {/* //TODO Rewrite switches to one component and then re-use  */}
+          {/* // TODO: Rewrite switches to one component and then re-use  */}
           <VStack space={2}>
             <Text>
               <Trans>Security</Trans>
@@ -170,9 +166,10 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  value={isEnabled}
+                  value={bioEnabled}
                   onValueChange={async (e) => {
-                    setIsEnabled(e)
+                    device.state!.biometricsEnabled = e
+                    setBioEnabled(e)
                   }}
                   size="md"
                 />

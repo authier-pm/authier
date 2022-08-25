@@ -8,7 +8,6 @@ import {
   DarkTheme,
   DefaultTheme,
   NavigationContainer,
-  NavigationContainerRef,
   useNavigationContainerRef
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
@@ -21,15 +20,15 @@ const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 export default function Routes() {
   const device = useContext(DeviceContext)
   const { colorMode } = useColorMode()
-  const [isReady, setIsReady] = React.useState(__DEV__ ? false : true)
+  const [isReady, setIsReady] = React.useState(false ? false : true)
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
 
   useEffect(() => {
-    console.log('lockTimeEnd', device.state?.lockTimeEnd)
     if (device.state && device.state!.lockTimeEnd <= Date.now()) {
       device.lock()
     } else if (device.state?.lockTimeEnd) {
+      console.log('lockTimeEnd', device.state?.lockTimeEnd)
       device.startVaultLockTimer()
     }
   }, [])
