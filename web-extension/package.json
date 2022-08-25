@@ -4,7 +4,7 @@
   "description": "A Chrome Extension starter kit built with React, TypeScript, SCSS, Bootstrap, EsLint, Prettier & Webpack",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "prodbuild": "API_URL=https://api.authier.ml/graphql webpack --config webpack.prod.js",
+    "prodbuild": "webpack --config webpack.prod.js",
     "checkBuildOutput": "node ./check-es6.js",
     "dev": "webpack -w --config webpack.dev.js",
     "tsc": "tsc",
