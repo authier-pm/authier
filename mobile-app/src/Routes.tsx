@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useContext } from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 import { DeviceContext } from './providers/DeviceProvider'
