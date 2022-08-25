@@ -27,6 +27,12 @@ yarn install
 yarn dev
 ```
 
+### How to build
+
+```
+yarn prodbuild
+```
+
 **Scripts**
 
 - `yarn dev` - run `webpack` in `watch` mode
