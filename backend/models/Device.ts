@@ -19,7 +19,7 @@ import { UserQuery } from './UserQuery'
 
 @InputType()
 export class DeviceInput {
-  @Field(() => GraphQLUUID, { nullable: false })
+  @Field(() => String, { nullable: false })
   id: string
 
   @Field()

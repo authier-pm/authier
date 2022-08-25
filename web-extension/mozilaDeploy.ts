@@ -10,7 +10,7 @@ deploy({
   secret: env.JWT_SECRET,
 
   // the ID of your extension
-  id: 'exampleId@jetpack',
+  id: '18c8ffa6-f17c-4d43-bfab-5dae503c8c31',
   // the version to publish
   version: '1.0.0',
 
