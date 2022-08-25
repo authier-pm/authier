@@ -336,23 +336,26 @@ export class UserMutation extends UserBase {
 
   @Field(() => String)
   async createPortalSession(@Ctx() ctx: IContextAuthenticated) {
-    const data = await ctx.prisma.userPaidProducts.findFirst({
+    const product = await ctx.prisma.userPaidProducts.findFirst({
       where: {
         userId: ctx.jwtPayload.userId
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
     })
 
-    if (!data) {
+    if (!product) {
       throw new GraphqlError("You don't have a paid subscription")
     }
 
     const checkoutSession = await stripe.checkout.sessions.retrieve(
-      data?.checkoutSessionId as string
+      product?.checkoutSessionId as string
     )
 
     // This is the url to which the customer will be redirected when they are done
     // managing their billing with the portal.
-    const returnUrl = 'http://localhost:5450/pricing'
+    const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: checkoutSession.customer as string,
