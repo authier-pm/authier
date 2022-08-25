@@ -73,6 +73,7 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
       react: path.resolve('./node_modules/react'),
+      'react-dom': path.resolve('./node_modules/react-dom'),
       '@emotion/react': path.resolve('./node_modules/@emotion/react'),
       '@emotion/core': path.resolve('./node_modules/@emotion/core'),
       '@src': path.resolve(__dirname, 'src/'),
