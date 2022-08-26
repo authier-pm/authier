@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext } from 'react'
 
 import {
   Box,
@@ -26,7 +26,6 @@ export default function Settings() {
     refetchQueries: [{ query: SyncSettingsDocument }, 'SyncSettings'],
     awaitRefetchQueries: true
   })
-  const [isEnabled, setIsEnabled] = useState(device.state!.biometricsEnabled)
   const { toggleColorMode } = useColorMode()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
@@ -39,10 +38,6 @@ export default function Settings() {
       vaultLockTimeoutSeconds: device.state!.lockTime
     }
   }
-
-  useEffect(() => {
-    device.state!.biometricsEnabled = isEnabled
-  }, [isEnabled, device])
 
   return (
     <View>
@@ -66,10 +61,11 @@ export default function Settings() {
                     }
                   })
 
-                  device.resetInterval()
+                  device.clearInterval()
                   device.state!.lockTimeEnd =
                     Date.now() + device.state!.lockTime * 1000
                   device.startVaultLockTimer()
+                  device.save(false)
                 }}
                 defaultValue={device.state!.lockTime.toString()}
                 accessibilityLabel="Lock time"
@@ -105,6 +101,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
+                  device.save(false)
                 }}
                 defaultValue={device.state!.language}
                 accessibilityLabel="language"
@@ -131,6 +128,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
+                  device.save(false)
                 }}
                 defaultValue={device.state!.theme}
                 accessibilityLabel="theme"
@@ -141,7 +139,7 @@ export default function Settings() {
             </Box>
           </VStack>
 
-          {/* //TODO Rewrite switches to one component and then re-use  */}
+          {/* // TODO: Rewrite switches to one component and then re-use  */}
           <VStack space={2}>
             <Text>
               <Trans>Security</Trans>
@@ -162,6 +160,7 @@ export default function Settings() {
                         config: settings()
                       }
                     })
+                    device.save(false)
                   }}
                   size="md"
                 />
@@ -170,9 +169,10 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  value={isEnabled}
+                  defaultIsChecked={device.state!.biometricsEnabled}
                   onValueChange={async (e) => {
-                    setIsEnabled(e)
+                    device.state!.biometricsEnabled = e
+                    device.save(false)
                   }}
                   size="md"
                 />

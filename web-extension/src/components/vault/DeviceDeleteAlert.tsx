@@ -17,7 +17,7 @@ import { HStack } from '@chakra-ui/react'
 import {
   useRemoveDeviceMutation,
   useLogoutDeviceMutation
-} from './DeviceDeleteAlert.codegen'
+} from '@shared/graphql/AccountDevices.codegen'
 
 export function DeviceDeleteAlert({
   isOpen,

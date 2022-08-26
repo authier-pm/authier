@@ -1,23 +1,16 @@
 import { throwIfNotAuthenticated } from '../api/authMiddleware'
 import {
   Query,
-  //   Mutation,
-  //   Authorized,
-  //   Arg,
-  //   FieldResolver,
-  //   Root,
   Resolver,
   Mutation,
   Arg,
   Ctx,
   UseMiddleware,
   Info,
-  Int,
-  Subscription
+  Int
 } from 'type-graphql'
 import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
-import { stripe } from '../stripe'
 import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
@@ -324,7 +317,7 @@ export class RootResolver {
     }
 
     if (!challenge) {
-      // TODO Will we have notifications for browser?
+      // TODO: Will we have notifications for browser?
       if (
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10

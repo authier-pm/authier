@@ -31,7 +31,6 @@
     "storage",
     "http://*/",
     "https://*/",
-    "notifications",
     "<all_urls>"
   ],
   "web_accessible_resources": ["icon-16.png"],

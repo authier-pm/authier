@@ -14,7 +14,7 @@ export default function Error({
   message?: string
 }) {
   return (
-    <Box textAlign="center" py={10} px={6}>
+    <Box textAlign="center" py={10} px={6} height={'86vh'}>
       <Box display="inline-block">
         <Flex
           flexDirection="column"

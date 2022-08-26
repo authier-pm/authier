@@ -166,6 +166,7 @@ export const AddPassword = () => {
             </FormControl>
 
             <Button
+              mt={5}
               onPress={handleSubmit}
               isDisabled={isSubmitting || !dirty}
               isLoading={isSubmitting}

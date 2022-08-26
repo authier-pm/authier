@@ -30,8 +30,6 @@ const httpLink = createHttpLink({
 })
 
 const errorLink = onError(({ graphQLErrors, networkError, operation }) => {
-  // const isExtension = window.location.href.startsWith('chrome-extension')
-
   if (graphQLErrors) {
     graphQLErrors.map(({ message, path }) => {
       console.error(
