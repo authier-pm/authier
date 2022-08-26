@@ -17,7 +17,7 @@
     "chalk": "^5.0.1",
     "class-transformer": "^0.5.1",
     "class-validator": "^0.13.2",
-    "cpy": "^8.1.2",
+    "cpy": "^9.0.1",
     "debug": "^4.3.4",
     "dotenv": "^14.3.2",
     "faker": "^5.5.3",
