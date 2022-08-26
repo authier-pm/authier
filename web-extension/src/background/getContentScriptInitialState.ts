@@ -16,7 +16,6 @@ export const getContentScriptInitialState = async (
   tabUrl: string,
   currentTabId: number
 ): Promise<IInitStateRes> => {
-  console.log('TEST', tabUrl)
   const hostname = new URL(tabUrl).hostname
   console.log('~ getContentScriptInitialState')
   const decrypted =
