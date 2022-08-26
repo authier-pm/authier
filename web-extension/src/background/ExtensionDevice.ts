@@ -30,7 +30,7 @@ import {
   LogoutDocument,
   LogoutMutation,
   LogoutMutationVariables
-} from './ExtensionDevice.codegen'
+} from '@shared/graphql/ExtensionDevice.codegen'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'

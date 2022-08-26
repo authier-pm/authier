@@ -1,11 +1,10 @@
 import {
   GraphQLEmailAddress,
   GraphQLNonEmptyString,
-  GraphQLPositiveInt,
-  GraphQLUUID
+  GraphQLPositiveInt
 } from 'graphql-scalars'
-import { Field, InputType } from 'type-graphql'
-import { EncryptedSecretInput, EncryptedSecretPatchInput } from './models'
+import { Field, ID, InputType } from 'type-graphql'
+import { EncryptedSecretPatchInput } from './models'
 
 @InputType()
 export class AddNewDeviceInput {
@@ -21,7 +20,7 @@ export class AddNewDeviceInput {
 
 @InputType()
 export class RegisterNewAccountInput extends AddNewDeviceInput {
-  @Field(() => GraphQLUUID)
+  @Field(() => ID)
   deviceId: string
 
   @Field()

@@ -38,7 +38,7 @@ export const useLogin = (props: { deviceName: string }) => {
     useDeviceDecryptionChallengeMutation({
       variables: {
         deviceInput: {
-          id: device.id,
+          id: device.id as string,
           name: props.deviceName,
           platform: Platform.OS
         },
@@ -137,7 +137,7 @@ export const useLogin = (props: { deviceName: string }) => {
           variables: {
             email: formState.email,
             deviceInput: {
-              id: device.id,
+              id: device.id as string,
               name: props.deviceName,
               platform: Platform.OS
             },
