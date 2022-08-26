@@ -16,20 +16,18 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
-  AddEncryptedSecretsDocument,
-  AddEncryptedSecretsMutation,
-  AddEncryptedSecretsMutationVariables
-} from './backgroundPage.codegen'
-import {
   SyncEncryptedSecretsDocument,
   SyncEncryptedSecretsQuery,
   SyncEncryptedSecretsQueryVariables,
   MarkAsSyncedMutation,
   MarkAsSyncedMutationVariables,
   MarkAsSyncedDocument,
-  LogoutDocument,
+  AddEncryptedSecretsMutation,
+  AddEncryptedSecretsDocument,
+  AddEncryptedSecretsMutationVariables,
   LogoutMutation,
-  LogoutMutationVariables
+  LogoutMutationVariables,
+  LogoutDocument
 } from '@shared/graphql/ExtensionDevice.codegen'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'

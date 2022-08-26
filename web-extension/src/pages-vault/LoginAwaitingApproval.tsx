@@ -28,7 +28,7 @@ export const useLogin = (props: { deviceName: string }) => {
   ] = useDeviceDecryptionChallengeMutation({
     variables: {
       deviceInput: {
-        id: device.id,
+        id: device.id as string,
         name: props.deviceName,
         platform: device.platform
       },
@@ -56,7 +56,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -106,7 +106,7 @@ export const useLogin = (props: { deviceName: string }) => {
           variables: {
             email: formState.email,
             deviceInput: {
-              id: device.id,
+              id: device.id as string,
               name: props.deviceName,
               platform: device.platform
             },
@@ -127,7 +127,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -160,7 +160,7 @@ export const useLogin = (props: { deviceName: string }) => {
           toast.success(
             t`Device approved at ${formatRelative(
               new Date(),
-              new Date(deviceDecryptionChallenge.approvedAt)
+              new Date(deviceDecryptionChallenge.approvedAt as string)
             )}`
           )
         } else {

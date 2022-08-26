@@ -369,7 +369,7 @@ export type QueryWebInputsArgs = {
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString'];
   addDeviceSecretEncrypted: Scalars['NonEmptyString'];
-  deviceId: Scalars['UUID'];
+  deviceId: Scalars['ID'];
   deviceName: Scalars['String'];
   devicePlatform: Scalars['String'];
   email: Scalars['EmailAddress'];
