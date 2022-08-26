@@ -30,18 +30,18 @@ model DecryptionChallenge {
   rejectedAt               DateTime?
   blockIp                  Boolean? // when true, attempt to get a new challenge from the same IP address will fail
   deviceName               String
-  deviceId                 String    @db.Uuid // no reference as we might want to keep this even when device is deleted
+  deviceId                 String // no reference as we might want to keep this even when device is deleted
   userId                   String    @db.Uuid
   user                     User      @relation(fields: [userId], references: [id])
   createdAt                DateTime  @default(now())
   approvedByRecovery       Boolean   @default(false)
-  approvedFromDeviceId     String?   @db.Uuid // when non null it means user unlocked by using another device
+  approvedFromDeviceId     String? // when non null it means user unlocked by using another device
   approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
   User                     User[]    @relation("recoveryDecryptionChallenge")
 }
 
 model Device {
-  id                      String    @id @db.Uuid
+  id                      String    @id
   firstIpAddress          String    @db.Inet
   lastIpAddress           String    @db.Inet
   firebaseToken           String
@@ -109,7 +109,7 @@ model SecretUsageEvent {
   User        User            @relation(fields: [userId], references: [id])
   userId      String          @db.Uuid
   Device      Device          @relation(fields: [deviceId], references: [id])
-  deviceId    String          @db.Uuid
+  deviceId    String
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])
 }
@@ -172,7 +172,7 @@ model User {
   createdAt                     DateTime             @default(now())
   updatedAt                     DateTime?            @updatedAt
   masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
-  masterDeviceId                String?              @unique @db.Uuid
+  masterDeviceId                String?              @unique
   // Limits for the number of stored secrets
   TOTPlimit                     Int
   loginCredentialsLimit         Int

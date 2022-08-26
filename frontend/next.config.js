@@ -1,5 +1,6 @@
 // @ts-check
 const { withSentryConfig } = require('@sentry/nextjs')
+const path = require('path')
 
 /**
  * @type {import('next').NextConfig}
@@ -10,6 +11,12 @@ const nextConfig = {
       test: /\.md$/,
       use: 'raw-loader'
     })
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@emotion/react': path.resolve('./node_modules/@emotion/react'),
+      '@emotion/core': path.resolve('./node_modules/@emotion/core'),
+      react: path.resolve('./node_modules/react')
+    }
     return config
   },
   swcMinify: false,

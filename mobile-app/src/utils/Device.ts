@@ -29,7 +29,7 @@ import {
 } from '../providers/UserProvider.codegen'
 import { clearAccessToken } from './tokenFromAsyncStorage'
 import mitt from 'mitt'
-import { getDeviceName } from 'react-native-device-info'
+import { getDeviceName, getUniqueId } from 'react-native-device-info'
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
@@ -50,7 +50,6 @@ export interface IBackgroundStateSerializableLocked {
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number
-  lockTimerRunning: boolean
 }
 
 export interface IBackgroundStateSerializable
@@ -366,9 +365,13 @@ export class Device {
   lockInterval!: NodeJS.Timer | void
   emitter = mitt()
 
-  async save() {
+  async save(forceUpdate: boolean = true) {
+    //We must clear intervel, otherwise we will create a new one every time we save the state
+    //beacause we are creating a new interval every time we we start the app (in syncSettings)
     await this.state?.save()
-    this.emitter.emit('stateChange')
+    if (forceUpdate) {
+      this.emitter.emit('stateChange')
+    }
   }
 
   /**
@@ -376,7 +379,7 @@ export class Device {
    */
   async initialize() {
     this.initializePromise = new Promise(async (resolve) => {
-      this.id = await this.getDeviceId()
+      this.id = getUniqueId()
       this.biometricsAvailable = await this.checkBiometrics()
 
       let storedState: null | IBackgroundStateSerializable = null
@@ -414,32 +417,10 @@ export class Device {
       const token = await messaging().getToken()
 
       this.fireToken = token
-      console.log('token', token)
+      console.log('deviceId', this.id)
       resolve(this.state)
     })
     return this.initializePromise
-  }
-
-  /**
-   * @returns a stored deviceId or a new UUID if the extension was just installed
-   */
-  async getDeviceId() {
-    const deviceId = await SInfo.getItem('deviceId', {
-      sharedPreferencesName: 'mySharedPrefs',
-      keychainService: 'myKeychain'
-    })
-    if (!deviceId) {
-      const deviceId = uuid.v4()
-      await SInfo.setItem('deviceId', deviceId.toString(), {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
-      })
-      console.log('created deviceId', deviceId)
-      return deviceId
-    } else {
-      console.log('deviceId', deviceId)
-      return deviceId
-    }
   }
 
   syncSettings(config: SettingsInput) {
@@ -448,6 +429,21 @@ export class Device {
     this.state!.syncTOTP = config.syncTOTP
     this.state!.language = config.language
     this.state!.theme = config.theme
+
+    // Sync timer
+    if (this.state!.lockTime !== config.vaultLockTimeoutSeconds) {
+      this.state!.lockTimeEnd =
+        Date.now() + config.vaultLockTimeoutSeconds * 1000
+    }
+
+    if (device.state!.lockTimeEnd <= Date.now()) {
+      device.lock()
+    } else if (device.state?.lockTimeEnd) {
+      if (!this.lockInterval) {
+        console.log('lockTimeEnd', device.state?.lockTimeEnd)
+        device.startVaultLockTimer()
+      }
+    }
   }
 
   generateBackendSecret(): string {
@@ -465,9 +461,9 @@ export class Device {
     userId: string
   ):
     | {
-        addDeviceSecret: string
-        addDeviceSecretEncrypted: string
-      }
+      addDeviceSecret: string
+      addDeviceSecretEncrypted: string
+    }
     | undefined {
     try {
       const authSecret = this.generateBackendSecret()
@@ -492,7 +488,7 @@ export class Device {
   }
 
   async lock() {
-    this.resetInterval()
+    this.clearInterval()
 
     if (!this.state) {
       return
@@ -509,8 +505,7 @@ export class Device {
       language,
       theme,
       biometricsEnabled,
-      lockTimeEnd,
-      lockTimerRunning
+      lockTimeEnd
     } = this.state
 
     this.lockedState = {
@@ -527,8 +522,7 @@ export class Device {
       language,
       theme,
       biometricsEnabled,
-      lockTimeEnd,
-      lockTimerRunning
+      lockTimeEnd
     }
 
     await SInfo.setItem(
@@ -557,7 +551,7 @@ export class Device {
   }
 
   clearAndReload = async () => {
-    this.resetInterval()
+    this.clearInterval()
     await clearAccessToken()
     await device.clearLocalStorage()
     this.emitter.emit('stateChange')
@@ -602,25 +596,25 @@ export class Device {
 
   async checkBiometrics(): Promise<boolean> {
     const hasAnySensors = await SInfo.isSensorAvailable()
-
     return !!hasAnySensors
   }
 
   startVaultLockTimer = () => {
-    if (!device.state?.lockTimerRunning) {
-      this.lockInterval = setInterval(() => {
-        console.log('tick', (this.state!.lockTimeEnd - Date.now()) / 1000)
-        if (this.state!.lockTimeEnd <= Date.now()) {
-          console.log('Vault locked')
-          device.lock()
-        }
-      }, 5000)
-    }
+    this.lockInterval = setInterval(() => {
+      console.log(
+        'tick',
+        (this.state!.lockTimeEnd - Date.now()) / 1000,
+        this.state?.lockTimeEnd
+      )
+      if (this.state!.lockTimeEnd <= Date.now()) {
+        console.log('Vault locked')
+        device.lock()
+      }
+    }, 5000)
   }
 
-  resetInterval = () => {
+  clearInterval = () => {
     this.lockInterval = clearInterval(this.lockInterval!)
-    this.state!.lockTimerRunning = false
   }
 }
 

@@ -21,7 +21,9 @@ export const PasswordVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    let res
+    let res:
+      | { removedSecrets: number; newAndUpdatedSecrets: number }
+      | undefined
     try {
       res = await device.state?.backendSync()
     } catch (error) {
@@ -81,7 +83,6 @@ export const PasswordVault = ({
         onPress={() => navigation.navigate('AddPassword')}
         m={2}
         borderRadius={60}
-        variant="solid"
         renderInPortal={false}
         shadow={2}
         size="sm"

@@ -38,7 +38,7 @@ export const useLogin = (props: { deviceName: string }) => {
     useDeviceDecryptionChallengeMutation({
       variables: {
         deviceInput: {
-          id: device.id,
+          id: device.id as string,
           name: props.deviceName,
           platform: Platform.OS
         },
@@ -76,7 +76,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -137,7 +137,7 @@ export const useLogin = (props: { deviceName: string }) => {
           variables: {
             email: formState.email,
             deviceInput: {
-              id: device.id,
+              id: device.id as string,
               name: props.deviceName,
               platform: Platform.OS
             },
@@ -153,7 +153,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -175,7 +175,6 @@ export const useLogin = (props: { deviceName: string }) => {
             autofill: false,
             language: 'en',
             lockTimeEnd: Date.now() + 28800000,
-            lockTimerRunning: false,
             syncTOTP: false,
             theme: 'dark'
           }
@@ -198,7 +197,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   let device = useContext(DeviceContext)
-  const [deviceName, setDeviceName] = useState(device.name)
+  const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })

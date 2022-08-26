@@ -13,11 +13,7 @@ import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import {
-  GraphQLDateTime,
-  GraphQLNonNegativeInt,
-  GraphQLPositiveInt
-} from 'graphql-scalars'
+import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -31,6 +27,7 @@ import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChange'
 import { GraphqlError } from '../api/GraphqlError'
+
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
@@ -318,7 +315,7 @@ export class UserMutation extends UserBase {
     @Arg('newMasterDeviceId', () => String) newMasterDeviceId: string
   ) {
     if (ctx.device.id !== ctx.masterDeviceId) {
-      throw new Error('This can be done only from master device')
+      throw new GraphqlError('This can be done only from master device')
     }
     return ctx.prisma.user.update({
       where: {
@@ -375,6 +372,7 @@ export class UserMutation extends UserBase {
     })
 
     const productItem = await stripe.products.retrieve(product)
+    console.log('productItem', productItem)
 
     if (user) {
       const checkoutSession = await stripe.checkout.sessions.retrieve(
@@ -390,6 +388,9 @@ export class UserMutation extends UserBase {
             quantity: 1
           }
         ],
+        metadata: {
+          productId: productItem.id
+        },
         customer: checkoutSession.customer as string,
         mode: 'subscription',
         success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
@@ -407,6 +408,9 @@ export class UserMutation extends UserBase {
             quantity: 1
           }
         ],
+        metadata: {
+          productId: productItem.id
+        },
         mode: 'subscription',
         success_url: `${ctx.request.headers.referer}/?success=true&session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${ctx.request.headers.referer}?canceled=true`

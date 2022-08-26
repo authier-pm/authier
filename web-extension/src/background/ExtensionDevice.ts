@@ -16,21 +16,19 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
-  AddEncryptedSecretsDocument,
-  AddEncryptedSecretsMutation,
-  AddEncryptedSecretsMutationVariables
-} from './backgroundPage.codegen'
-import {
   SyncEncryptedSecretsDocument,
   SyncEncryptedSecretsQuery,
   SyncEncryptedSecretsQueryVariables,
   MarkAsSyncedMutation,
   MarkAsSyncedMutationVariables,
   MarkAsSyncedDocument,
-  LogoutDocument,
+  AddEncryptedSecretsMutation,
+  AddEncryptedSecretsDocument,
+  AddEncryptedSecretsMutationVariables,
   LogoutMutation,
-  LogoutMutationVariables
-} from './ExtensionDevice.codegen'
+  LogoutMutationVariables,
+  LogoutDocument
+} from '@shared/graphql/ExtensionDevice.codegen'
 
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
@@ -159,7 +157,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter(
-      (secret) => host === new URL(secret.id ?? '').hostname
+      (secret) => host === new URL(secret.url ?? '').hostname
     )
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>

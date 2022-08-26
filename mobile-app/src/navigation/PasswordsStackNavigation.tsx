@@ -19,8 +19,16 @@ function PasswordsStackNavigation() {
         }}
         component={PasswordVault}
       />
-      <Stack.Screen name="AddPassword" component={AddPassword} />
-      <Stack.Screen name="EditPassword" component={EditPassword} />
+      <Stack.Screen
+        options={{ title: 'Add password' }}
+        name="AddPassword"
+        component={AddPassword}
+      />
+      <Stack.Screen
+        name="EditPassword"
+        options={{ title: 'Edit password' }}
+        component={EditPassword}
+      />
     </Stack.Navigator>
   )
 }

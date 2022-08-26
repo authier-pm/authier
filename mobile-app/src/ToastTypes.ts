@@ -22,5 +22,11 @@ export const ToastType = {
     description: 'wrong password or email',
     variant: 'subtle',
     status: 'warning'
+  },
+  LoginFailed: {
+    title: 'Login failed',
+    description: 'login failed, check your password',
+    variant: 'subtle',
+    status: 'warning'
   }
 }
