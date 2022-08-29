@@ -29,7 +29,11 @@ export interface ISecret {
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  totp: string
+  totp: {
+    secret: string
+    digits: number
+    period: number
+  }
   kind: EncryptedSecretType.TOTP
 }
 
