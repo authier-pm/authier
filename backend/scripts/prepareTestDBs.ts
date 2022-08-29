@@ -19,17 +19,18 @@ const migrateOneDb = async (dbName: string) => {
     await prismaClient.$executeRawUnsafe(`CREATE DATABASE ${dbName}`)
 
     const exitCode = await new Promise((resolve, _) => {
+      const DATABASE_URL = `${dbUrl}/${dbName}`
       execFile(
         '../node_modules/prisma/build/index.js',
         ['migrate', command, '--force', '--skip-generate'],
         {
           env: {
             ...process.env,
-            DATABASE_URL: `${dbUrl}/${dbName}`
+            DATABASE_URL
           }
         },
         (error, stdout, stderr) => {
-          console.log(stdout)
+          console.log(`Migrated ${DATABASE_URL}`)
           if (error !== null) {
             console.log(`prisma exited with error ${error.message}`)
             resolve(error.code ?? 1)
@@ -48,9 +49,11 @@ const migrateOneDb = async (dbName: string) => {
 }
 
 ;(async () => {
-  for (let index = 0; index < dbCount; index++) {
-    await migrateOneDb(`${testDbsPrefix}_${index + 1}`)
-  }
+  await Promise.all(
+    Array.from({ length: dbCount }, (_, index) =>
+      migrateOneDb(`${testDbsPrefix}_${index + 1}`)
+    )
+  )
 
   console.log(`All ${dbCount} databases migrated successfully`)
 })()
