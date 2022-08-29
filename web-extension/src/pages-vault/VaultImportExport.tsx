@@ -26,9 +26,9 @@ import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 
 type MappedCSVInput = {
-  url: string
   label: string
   loginCredentials: {
+    url: string
     username: string
     password: string
   }
@@ -69,9 +69,9 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     .slice(1)
     .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
-      url: row[indexUrl],
       label: row[indexLabel],
       loginCredentials: {
+        url: row[indexUrl],
         username: row[indexUsername],
         password: row[indexPassword]
       },
@@ -115,7 +115,7 @@ export const onCSVFileAccepted: any = (
 
           let hostname: string
           try {
-            hostname = new URL(creds.url).hostname
+            hostname = new URL(creds.loginCredentials.url).hostname
           } catch (error) {
             skipped++
             break
@@ -124,7 +124,7 @@ export const onCSVFileAccepted: any = (
           const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
-            url: creds.url,
+
             encrypted: state?.encrypt(JSON.stringify(creds)),
             createdAt: new Date().toJSON(),
             iconUrl: null,
@@ -152,6 +152,31 @@ export const onCSVFileAccepted: any = (
   })
 }
 
+export const onJsonFileAccepted = async (file: File) => {
+  const state = device.state as DeviceState
+  const parsed: {
+    secret: string
+    period: number
+    originalName: string
+    createdDate: number
+    digits: number
+  }[] = JSON.parse(await file.text())
+  const toAdd: AddSecretInput = []
+  for (const totp of parsed) {
+    const input = {
+      kind: EncryptedSecretType.TOTP,
+      totp: totp.secret,
+
+      encrypted: state.encrypt(JSON.stringify(totp.secret)),
+      createdAt: new Date().toJSON(),
+      iconUrl: null,
+      label: totp.originalName
+    }
+    toAdd.push(input)
+  }
+  await state.addSecrets(toAdd)
+}
+
 export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
     null
@@ -171,7 +196,7 @@ export const VaultImportExport = () => {
                       await onCSVFileAccepted(f, data?.me.PasswordLimits)
                     )
                   } else if (f.type === 'application/json') {
-                    console.log('f.text', f.text)
+                    await onJsonFileAccepted(f)
                   }
                 }}
               />
