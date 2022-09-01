@@ -58,7 +58,7 @@
     "prettier": "^2.7.1",
     "pretty-quick": "^3.1.3",
     "react-toastify": "^9.0.8",
-    "typescript": "^4.7.4"
+    "typescript": "^4.8.2"
   },
   "scripts": {
     "devBE": "cd backend && npm run dev",

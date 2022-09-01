@@ -100,21 +100,22 @@ export default function Testimonials() {
         >
           <Testimonial>
             <TestimonialContent>
-              <TestimonialHeading>Efficient Collaborating</TestimonialHeading>
+              <TestimonialHeading>Less hassle when surfing</TestimonialHeading>
               <TestimonialText>
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Auctor
-                neque sed imperdiet nibh lectus feugiat nunc sem.
+                I am daily using my TOTP app to authenticate myself. It is a
+                buttery smooth auth flow, faster and easier compared to the
+                likes of one password or lastpass.
               </TestimonialText>
             </TestimonialContent>
             <TestimonialAvatar
               src={
-                'https://images.unsplash.com/photo-1586297135537-94bc9ba060aa?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=100&q=80'
+                'https://pbs.twimg.com/profile_images/1071136507786874880/BxJFRx5m_400x400.jpg'
               }
-              name={'Jane Cooper'}
-              title={'CEO at ABC Corporation'}
+              name={'Jiri Spac'}
+              title={'Tech lead at Official'}
             />
           </Testimonial>
-          <Testimonial>
+          {/* <Testimonial>
             <TestimonialContent>
               <TestimonialHeading>Intuitive Design</TestimonialHeading>
               <TestimonialText>
@@ -145,7 +146,7 @@ export default function Testimonials() {
               name={'Jane Cooper'}
               title={'CEO at ABC Corporation'}
             />
-          </Testimonial>
+          </Testimonial> */}
         </Stack>
       </Container>
     </Box>
