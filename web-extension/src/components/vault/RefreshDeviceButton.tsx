@@ -4,7 +4,13 @@ import { IoMdRefreshCircle } from 'react-icons/io'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 
-export function RefreshDeviceButton({ refetch }: { refetch: () => void }) {
+export function RefreshDeviceButton({
+  refetchDevices,
+  refetchRequests
+}: {
+  refetchDevices: () => void
+  refetchRequests: () => void
+}) {
   const [isSyncing, setIsSyncing] = useState(false)
 
   return (
@@ -20,7 +26,8 @@ export function RefreshDeviceButton({ refetch }: { refetch: () => void }) {
         disabled={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
-          refetch()
+          refetchDevices()
+          refetchRequests()
           setIsSyncing(false)
           toast.success(t`Sync successful`)
         }}

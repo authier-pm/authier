@@ -305,7 +305,7 @@ type DecryptionChallengeForApproval {
   rejectedAt: DateTime
   createdAt: DateTime!
   deviceName: String!
-  deviceId: UUID!
+  deviceId: ID!
 }
 
 """
@@ -527,7 +527,7 @@ input RegisterNewAccountInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
-  deviceId: UUID!
+  deviceId: ID!
   deviceName: String!
   devicePlatform: String!
   encryptionSalt: NonEmptyString!

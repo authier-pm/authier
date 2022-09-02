@@ -52,7 +52,7 @@ export type DecryptionChallengeApproved = {
   User: Array<UserGql>
   addDeviceSecretEncrypted: Scalars['String']
   addNewDeviceForUser: LoginResponse
-  approvedAt: Scalars['DateTime']
+  approvedAt?: Maybe<Scalars['DateTime']>
   approvedByRecovery: Scalars['Boolean']
   approvedFromDevice?: Maybe<DeviceGql>
   approvedFromDeviceId?: Maybe<Scalars['String']>
@@ -76,7 +76,7 @@ export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
 export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval'
   createdAt: Scalars['DateTime']
-  deviceId: Scalars['UUID']
+  deviceId: Scalars['ID']
   deviceName: Scalars['String']
   id: Scalars['Int']
   rejectedAt?: Maybe<Scalars['DateTime']>
@@ -148,7 +148,7 @@ export type DeviceGql = {
 }
 
 export type DeviceInput = {
-  id: Scalars['UUID']
+  id: Scalars['String']
   name: Scalars['String']
   platform: Scalars['String']
 }
@@ -368,7 +368,7 @@ export type QueryWebInputsArgs = {
 export type RegisterNewAccountInput = {
   addDeviceSecret: Scalars['NonEmptyString']
   addDeviceSecretEncrypted: Scalars['NonEmptyString']
-  deviceId: Scalars['UUID']
+  deviceId: Scalars['ID']
   deviceName: Scalars['String']
   devicePlatform: Scalars['String']
   email: Scalars['EmailAddress']
@@ -630,7 +630,8 @@ export type UserQuerySendAuthMessageArgs = {
 }
 
 export type WebInputElement = {
-  domOrdinal: Scalars['Int']
+  /** The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day. */
+  domOrdinal: Scalars['NonNegativeInt']
   domPath: Scalars['String']
   kind: WebInputType
   url: Scalars['String']

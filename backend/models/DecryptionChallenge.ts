@@ -1,4 +1,4 @@
-import { Arg, Ctx, Field, Info, Int, ObjectType } from 'type-graphql'
+import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
 import { GraphQLResolveInfo } from 'graphql'
@@ -24,7 +24,7 @@ export class DecryptionChallengeForApproval {
   @Field()
   deviceName: string
 
-  @Field(() => GraphQLUUID)
+  @Field(() => ID)
   deviceId: string
 }
 

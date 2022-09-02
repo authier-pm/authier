@@ -308,9 +308,10 @@ export default function Devices() {
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
   const [filterBy, setFilterBy] = useState('')
-  const { data: devicesRequests, refetch } = useDevicesRequestsQuery({
-    fetchPolicy: 'cache-first'
-  })
+  const { data: devicesRequests, refetch: devicesRequestsRefetch } =
+    useDevicesRequestsQuery({
+      fetchPolicy: 'cache-first'
+    })
 
   useEffect(() => {
     devicesRefetch()
@@ -332,7 +333,10 @@ export default function Devices() {
             {data?.me?.devices.length} {t`devices`}
           </Stat>
 
-          <RefreshDeviceButton refetch={devicesRefetch} />
+          <RefreshDeviceButton
+            refetchDevices={devicesRefetch}
+            refetchRequests={devicesRequestsRefetch}
+          />
         </Center>
       </Center>
 
@@ -370,7 +374,7 @@ export default function Devices() {
                           id: challengeToApprove.id
                         }
                       })
-                      refetch()
+                      devicesRefetch()
                     }}
                   >
                     <Trans>Reject</Trans>
@@ -384,7 +388,7 @@ export default function Devices() {
                           id: challengeToApprove.id
                         }
                       })
-                      refetch()
+                      devicesRefetch()
                     }}
                   >
                     <Trans>Approve</Trans>
