@@ -90,7 +90,7 @@ export default function Account() {
                 const decryptionChallenge = await deviceDecryptionChallenge({
                   variables: {
                     deviceInput: {
-                      id: device.id,
+                      id: device.id as string,
                       name: device.name,
                       platform: device.platform
                     },
