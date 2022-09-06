@@ -54,20 +54,10 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
-            frontend:
-              - 'frontend/**'
             webExtension:
               - 'web-extension/**'
             mobileApp:
               - 'mobile-app/**'
-
-        # run only if some file in 'src' folder was changed
-      - name: frontend install deps, check TS and run jest
-        working-directory: ./frontend
-        if: steps.changes.outputs.frontend == 'true'
-        run: |
-          yarn tsc
-          npm test
 
       - name: backend install deps, check TS and run jest
         working-directory: ./backend

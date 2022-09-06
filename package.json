@@ -13,7 +13,6 @@
     "packages": [
       "web-extension",
       "backend",
-      "frontend",
       "mobile-app"
     ],
     "nohoist": [
@@ -62,9 +61,8 @@
   },
   "scripts": {
     "devBE": "cd backend && npm run dev",
-    "devFE": "cd frontend && npm run dev",
     "devEX": "cd web-extension && npm run dev",
-    "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd frontend && tsc && cd .. && cd mobile-app && tsc",
+    "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && tsc && cd .. && cd mobile-app && tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && yarn gbs",
