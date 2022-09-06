@@ -6,10 +6,7 @@ export const loginCredentialsSchema = z.object({
 })
 
 export const totpSchema = z.object({
-  totp: z.string().min(1),
-  url: z.string().min(1),
-  label: z.string().min(1),
-  androidUri: z.string().min(1),
-  iosUri: z.string().min(1),
-  iconUrl: z.string().min(1)
+  secret: z.string().min(1),
+  digits: z.number(),
+  period: z.number()
 })

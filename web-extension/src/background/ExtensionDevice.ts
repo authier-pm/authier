@@ -181,7 +181,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
-        totp: decrypted
+        totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
       const parsed = JSON.parse(decrypted)

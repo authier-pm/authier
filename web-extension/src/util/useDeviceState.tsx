@@ -12,7 +12,7 @@ import {
 } from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
 import { device, DeviceState } from '@src/background/ExtensionDevice'
-import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
+import { loginCredentialsSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
