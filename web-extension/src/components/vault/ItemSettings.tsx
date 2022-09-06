@@ -67,7 +67,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
       >
         <Formik
           initialValues={{
-            secret: data.totp,
+            secret: data.totp.secret,
             url: data.url,
             label: data.label
           }}
