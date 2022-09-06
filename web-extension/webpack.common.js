@@ -26,13 +26,13 @@ module.exports = {
       // API_URL: 'https://api.authier.ml/graphql'
     })
   ],
-  optimization: {
-    splitChunks: {
-      chunks: 'all',
-      minChunks: 4,
-      maxSize: 3500000
-    }
-  },
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: 'all',
+  //     minChunks: 4,
+  //     maxSize: 3500000
+  //   }
+  // },
   module: {
     rules: [
       {

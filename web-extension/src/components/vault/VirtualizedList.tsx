@@ -4,6 +4,7 @@ import { Flex } from '@chakra-ui/react'
 import { AutoSizer, List } from 'react-virtualized'
 import { VaultListItem } from '@src/pages-vault/VaultList'
 import { useDebounce } from '@src/pages-vault/useDebounce'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
@@ -11,13 +12,15 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
 
-  const filteredItems = [...LoginCredentials, ...TOTPSecrets].filter(
-    ({ label, url }) => {
-      return (
-        label.includes(debouncedSearchTerm) || url.includes(debouncedSearchTerm)
-      )
-    }
-  )
+  const filteredItems = [...LoginCredentials, ...TOTPSecrets].filter((item) => {
+    console.log({ item })
+    const label =
+      item.kind === EncryptedSecretType.TOTP ? item.totp.label : item.label
+    const url = item.url
+    return (
+      label.includes(debouncedSearchTerm) || url.includes(debouncedSearchTerm)
+    )
+  })
 
   const ITEMS_COUNT = filteredItems.length
   const ITEM_SIZE = 270

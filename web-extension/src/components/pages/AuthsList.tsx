@@ -30,6 +30,7 @@ const log = debug('au:AuthsList')
 
 const OtpCode = ({ totpData }: { totpData: ITOTPSecret }) => {
   const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
+  console.log({ totpData })
   const otpCode = authenticator.generate(totpData.totp.secret)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
