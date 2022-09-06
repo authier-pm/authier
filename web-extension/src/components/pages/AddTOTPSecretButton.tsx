@@ -26,7 +26,7 @@ export const AddTOTPSecretButton = () => {
 
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = TOTPSecrets.find(
-      ({ totp }) => newTotpSecret.totp === totp
+      ({ totp }) => newTotpSecret.totp === totp.secret
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)

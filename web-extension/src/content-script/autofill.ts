@@ -190,7 +190,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
             return autofillValueIntoInput(
               inputEl,
-              authenticator.generate(totpSecret.totp)
+              authenticator.generate(totpSecret.totp.secret)
             )
           }
         }
