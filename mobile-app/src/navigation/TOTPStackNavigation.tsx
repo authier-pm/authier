@@ -6,6 +6,7 @@ import { TOTPVault } from '../screens/TOTPVault/TOTPVault'
 import { AddTOTP } from '../screens/TOTPVault/AddTOTP'
 import EditTOTP from '../screens/TOTPVault/EditTOTP'
 import { TOTPStackParamList } from './types'
+import { t } from '@lingui/macro'
 
 const Stack = createNativeStackNavigator<TOTPStackParamList>()
 
@@ -14,17 +15,17 @@ function TOTPStackNavigation() {
     <Stack.Navigator>
       <Stack.Screen
         name="TOTPVault"
-        options={{ title: 'TOTP Vault' }}
+        options={{ title: t`TOTPs` }}
         component={TOTPVault}
       />
       <Stack.Screen
         name="AddTOTP"
-        options={{ title: 'Add TOTP' }}
+        options={{ title: t`Add TOTP` }}
         component={AddTOTP}
       />
       <Stack.Screen
         name="EditTOTP"
-        options={{ title: 'Edit TOTP' }}
+        options={{ title: t`Edit TOTP` }}
         component={EditTOTP}
       />
     </Stack.Navigator>
