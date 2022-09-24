@@ -81,6 +81,12 @@ export type AddSecretInput = Array<
   }
 >
 
+export const getDecryptedSecretUrl = (secret: SecretTypeUnion) => {
+  return secret.kind === EncryptedSecretType.TOTP
+    ? secret.totp.url
+    : secret.loginCredentials.url
+}
+
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
@@ -156,12 +162,12 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.decryptedSecrets.filter(
-      (secret) => host === new URL(secret.url ?? '').hostname
-    )
+    let secrets = this.decryptedSecrets.filter((secret) => {
+      return host === new URL(getDecryptedSecretUrl(secret) ?? '').hostname
+    })
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>
-        host.endsWith(getTldPart(secret.url ?? ''))
+        host.endsWith(getTldPart(getDecryptedSecretUrl(secret) ?? ''))
       )
     }
     return secrets.map((secret) => {
@@ -195,12 +201,13 @@ export class DeviceState implements IBackgroundStateSerializable {
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
-          label: parsed.label,
-          url: parsed.url,
+
           loginCredentials: {
             username: '',
             password: '',
-            parseError: err as Error
+            parseError: err as Error,
+            label: parsed.label,
+            url: parsed.url
           }
         } as ILoginSecret
       }

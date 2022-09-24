@@ -250,12 +250,12 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         <Formik
           enableReinitialize
           initialValues={{
-            url: secretProps.url,
+            url: secretProps.loginCredentials.url,
             password:
               initPassword === ''
                 ? secretProps.loginCredentials.password
                 : initPassword,
-            label: secretProps.label,
+            label: secretProps.loginCredentials.label,
             username: secretProps.loginCredentials.username
           }}
           onSubmit={async (
