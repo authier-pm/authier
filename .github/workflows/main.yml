@@ -67,21 +67,21 @@ jobs:
           yarn tsc
           cp .env.sample .env
           yarn test:prepare
-          npm test
+          yarn test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           yarn tsc
-          npm test
+          yarn test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true'
         run: |
           yarn tsc
-          npm test
+          yarn test
 
       # - uses: AlexxNB/caprover-action@v1
       #   with:

@@ -34,7 +34,7 @@ export const AddTOTPSecretButton = () => {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
       await device.state?.addSecrets([newTotpSecret])
-      toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
+      toast.success(t`Successfully added TOTP for ${newTotpSecret.totp.label}`)
     }
   }
 
@@ -74,14 +74,15 @@ export function getTokenSecretFromQrCode(
     totp: {
       secret: secret as string,
       digits: 6,
-      period: 30
+      period: 30,
+      iconUrl: tab.favIconUrl ?? null,
+
+      label:
+        (parsedQuery.query.issuer as string) ??
+        decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
+      url: tab.url as string
     },
-    encrypted: device.state!.encrypt(secret),
-    iconUrl: tab.favIconUrl,
     createdAt: new Date().toJSON(),
-    label:
-      (parsedQuery.query.issuer as string) ??
-      decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
-    url: tab.url as string
+    encrypted: device.state!.encrypt(secret)
   }
 }
