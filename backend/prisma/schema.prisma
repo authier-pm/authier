@@ -70,6 +70,7 @@ model Device {
 
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
 
+  @@unique([userId, id])
   @@index([updatedAt])
   @@index([lastSyncAt])
 }
