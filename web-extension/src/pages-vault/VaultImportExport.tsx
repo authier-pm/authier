@@ -5,6 +5,7 @@ import {
   Center,
   Flex,
   Heading,
+  Link,
   Text
 } from '@chakra-ui/react'
 import { Trans } from '@lingui/macro'
@@ -25,9 +26,9 @@ import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 
 type MappedCSVInput = {
-  url: string
   label: string
   loginCredentials: {
+    url: string
     username: string
     password: string
   }
@@ -68,9 +69,9 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     .slice(1)
     .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
-      url: row[indexUrl],
       label: row[indexLabel],
       loginCredentials: {
+        url: row[indexUrl],
         username: row[indexUsername],
         password: row[indexPassword]
       },
@@ -86,7 +87,7 @@ export interface IImportedStat {
 /**
  * should support lastpass and bitwarden for now, TODO write e2e specs
  */
-export const onFileAccepted: any = (
+export const onCSVFileAccepted: any = (
   file: File,
   pswCount: number
 ): Promise<IImportedStat> => {
@@ -114,7 +115,7 @@ export const onFileAccepted: any = (
 
           let hostname: string
           try {
-            hostname = new URL(creds.url).hostname
+            hostname = new URL(creds.loginCredentials.url).hostname
           } catch (error) {
             skipped++
             break
@@ -123,7 +124,7 @@ export const onFileAccepted: any = (
           const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
-            url: creds.url,
+
             encrypted: state?.encrypt(JSON.stringify(creds)),
             createdAt: new Date().toJSON(),
             iconUrl: null,
@@ -151,6 +152,31 @@ export const onFileAccepted: any = (
   })
 }
 
+export const onJsonFileAccepted = async (file: File) => {
+  const state = device.state as DeviceState
+  const parsed: {
+    secret: string
+    period: number
+    originalName: string
+    createdDate: number
+    digits: number
+  }[] = JSON.parse(await file.text())
+  const toAdd: AddSecretInput = []
+  for (const totp of parsed) {
+    const input = {
+      kind: EncryptedSecretType.TOTP,
+      totp: totp.secret,
+
+      encrypted: state.encrypt(JSON.stringify(totp.secret)),
+      createdAt: new Date().toJSON(),
+      iconUrl: null,
+      label: totp.originalName
+    }
+    toAdd.push(input)
+  }
+  await state.addSecrets(toAdd)
+}
+
 export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
     null
@@ -165,17 +191,32 @@ export const VaultImportExport = () => {
             <>
               <ImportFromFile
                 onFileAccepted={async (f) => {
-                  setImportedStat(
-                    await onFileAccepted(f, data?.me.PasswordLimits)
-                  )
+                  if (f.type === 'text/csv') {
+                    setImportedStat(
+                      await onCSVFileAccepted(f, data?.me.PasswordLimits)
+                    )
+                  } else if (f.type === 'application/json') {
+                    await onJsonFileAccepted(f)
+                  }
                 }}
               />
               <Text fontSize={16} mt={8} mb={6}>
                 <Trans>
-                  We support importing from <code>csv</code> files.
-                  Lastpass/Bitwarden will fork fine, file exported from other
-                  password managers might work as well, but it{`&apos`}s not
-                  guaranteed.
+                  We support importing from <code>csv</code> and{' '}
+                  <code>json</code> files.
+                  <ul>
+                    <li>
+                      Lastpass/Bitwarden will work fine, file exported from
+                      other password managers might work as well, but it's not
+                      guaranteed.
+                    </li>
+                    <li>
+                      For JSON, it must be a file exported from{' '}
+                      <Link href="https://www.npmjs.com/package/authy-desktop-export">
+                        authy-desktop-export
+                      </Link>
+                    </li>
+                  </ul>
                 </Trans>
               </Text>
             </>

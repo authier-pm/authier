@@ -10,7 +10,6 @@ const fs = require('fs/promises')
       '**/*.key',
       '**/*.crt',
       '**/*.prisma'
-      // 'captain-definition',
       // 'Dockerfile'
     ],
     './dist',

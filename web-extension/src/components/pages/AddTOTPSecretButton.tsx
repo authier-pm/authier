@@ -4,6 +4,7 @@ import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 
+import { v4 as uuidv4 } from 'uuid'
 import browser, { Tabs } from 'webextension-polyfill'
 
 import { toast } from 'react-toastify'
@@ -13,6 +14,7 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { device } from '@src/background/ExtensionDevice'
 import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
+import { ITOTPSecret } from '@src/util/useDeviceState'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
@@ -26,13 +28,13 @@ export const AddTOTPSecretButton = () => {
 
     const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = TOTPSecrets.find(
-      ({ totp }) => newTotpSecret.totp === totp
+      ({ totp }) => newTotpSecret.totp.secret === totp.secret
     )
     if (existingTotpSecret) {
       toast.success(t`This TOTP secret is already in your vault`)
     } else {
       await device.state?.addSecrets([newTotpSecret])
-      toast.success(t`Successfully added TOTP for ${newTotpSecret.label}`)
+      toast.success(t`Successfully added TOTP for ${newTotpSecret.totp.label}`)
     }
   }
 
@@ -56,7 +58,10 @@ export const AddTOTPSecretButton = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
+export function getTokenSecretFromQrCode(
+  qr: QRCode,
+  tab: Tabs.Tab
+): ITOTPSecret {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {
@@ -64,14 +69,20 @@ export function getTokenSecretFromQrCode(qr: QRCode, tab: Tabs.Tab) {
     throw new Error('QR code does not have any secret')
   }
   return {
+    id: uuidv4(),
     kind: EncryptedSecretType.TOTP,
-    totp: secret as string,
-    encrypted: device.state!.encrypt(secret),
-    iconUrl: tab.favIconUrl,
+    totp: {
+      secret: secret as string,
+      digits: 6,
+      period: 30,
+      iconUrl: tab.favIconUrl ?? null,
+
+      label:
+        (parsedQuery.query.issuer as string) ??
+        decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
+      url: tab.url as string
+    },
     createdAt: new Date().toJSON(),
-    label:
-      (parsedQuery.query.issuer as string) ??
-      decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
-    url: tab.url as string
+    encrypted: device.state!.encrypt(secret)
   }
 }

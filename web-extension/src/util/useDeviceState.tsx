@@ -23,13 +23,10 @@ export interface ISecret {
   encrypted: string
   lastUsedAt?: string | null
   createdAt: string
-  label: string
-  iconUrl: string | undefined | null
-  url: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  totp: string
+  totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
 }
 
@@ -58,8 +55,7 @@ export function useDeviceState() {
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
   const [isFilling, setIsFilling] = useState<boolean>(false)
-  const [safeLocked, setSafeLocked] =
-    useState<IBackgroundStateSerializableLocked | null>(null)
+
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
@@ -71,7 +67,6 @@ export function useDeviceState() {
     log('onStorageChange useDevice', areaName, changes)
     if (areaName === 'local' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue)
-      setSafeLocked(changes.lockedState.newValue)
 
       log('states loaded from storage')
     }
@@ -96,8 +91,6 @@ export function useDeviceState() {
 
   const backgroundStateContext = {
     currentURL,
-    safeLocked,
-    setSafeLocked,
     deviceState,
     currentTab,
     get loginCredentials() {

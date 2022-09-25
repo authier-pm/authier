@@ -64,7 +64,7 @@ export const AccountLimits = () => {
               <Tr>
                 <Th>Type</Th>
                 <Th isNumeric>Current count</Th>
-                <Th isNumeric>Remaining</Th>
+                <Th isNumeric>Your limit</Th>
               </Tr>
             </Thead>
             <Tbody>

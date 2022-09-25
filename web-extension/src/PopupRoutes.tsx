@@ -7,9 +7,11 @@ import debug from 'debug'
 const log = debug('au:popupRoutes')
 
 export default function PopupRoutes(): ReactElement {
-  const { deviceState, safeLocked } = useContext(DeviceStateContext)
+  const { device, deviceState } = useContext(DeviceStateContext)
+
   log('deviceState', deviceState)
-  if (safeLocked) {
+  log({ device })
+  if (device.lockedState) {
     return <VaultUnlockVerification />
   }
 
