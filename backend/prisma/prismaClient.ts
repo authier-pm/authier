@@ -1,4 +1,4 @@
-import { Prisma, PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client'
 import '../dotenv'
 import { DMMFClass } from '@prisma/client/runtime'
 
@@ -11,22 +11,11 @@ const logQueries = debug('au:prisma')
 
 const nodeEnv = process.env.NODE_ENV || 'test'
 
-const logConfig =
-  nodeEnv === 'production'
-    ? (['info', 'warn'] as Array<Prisma.LogLevel>)
-    : [
-        {
-          emit: 'event',
-          level: 'query'
-        } as Prisma.LogDefinition,
-        'info' as Prisma.LogLevel,
-        'warn' as Prisma.LogLevel
-      ]
-
 let dbUrl = process.env.DATABASE_URL
 console.log('~ dbUrl', dbUrl)
 
-if (process.env.VITEST_WORKER_ID) {
+const workerId = process.env.VITEST_WORKER_ID
+if (workerId) {
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
   dbUrl = `${dbUrl}_test_${vitestWorkerId + 1}` // this allows us to run tests in parallel against multiple dbs without conflicts
 } else {
@@ -34,8 +23,18 @@ if (process.env.VITEST_WORKER_ID) {
 }
 
 export const prismaClient = new PrismaClient({
-  log: logConfig,
-  errorFormat: 'pretty',
+  log:
+    nodeEnv === 'production'
+      ? ['info', 'warn']
+      : [
+          {
+            emit: 'event',
+            level: 'query'
+          },
+          'info',
+          'warn'
+        ],
+  errorFormat: workerId ? 'pretty' : undefined,
   datasources: {
     db: {
       url: dbUrl

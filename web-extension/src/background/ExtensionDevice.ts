@@ -81,6 +81,17 @@ export type AddSecretInput = Array<
   }
 >
 
+export const getDecryptedSecretProp = (
+  secret: SecretTypeUnion,
+  prop: 'url' | 'label' | 'iconUrl'
+) => {
+  return (
+    (secret.kind === EncryptedSecretType.TOTP
+      ? secret.totp[prop]
+      : secret.loginCredentials[prop]) ?? ''
+  )
+}
+
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
@@ -156,12 +167,14 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.decryptedSecrets.filter(
-      (secret) => host === new URL(secret.url ?? '').hostname
-    )
+    let secrets = this.decryptedSecrets.filter((secret) => {
+      return (
+        host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
+      )
+    })
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>
-        host.endsWith(getTldPart(secret.url ?? ''))
+        host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
       )
     }
     return secrets.map((secret) => {
@@ -181,7 +194,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
-        totp: decrypted
+        totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
       const parsed = JSON.parse(decrypted)
@@ -195,12 +208,13 @@ export class DeviceState implements IBackgroundStateSerializable {
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
-          label: parsed.label,
-          url: parsed.url,
+
           loginCredentials: {
             username: '',
             password: '',
-            parseError: err as Error
+            parseError: err as Error,
+            label: parsed.label,
+            url: parsed.url
           }
         } as ILoginSecret
       }

@@ -19,7 +19,7 @@ export function ImportFromFile({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     onDrop,
     accept: {
-      'text/*': ['.csv']
+      'text/*': ['.csv', '.json']
     },
     maxFiles: 1,
     multiple: false
@@ -27,7 +27,7 @@ export function ImportFromFile({
 
   const dropText = isDragActive
     ? 'Drop the files here ...'
-    : "Drag 'n' drop .csv file here, or click to select files"
+    : "Drag 'n' drop .csv, json file here, or click to select files"
 
   const activeBg = useColorModeValue('gray.100', 'gray.600')
   const borderColor = useColorModeValue(

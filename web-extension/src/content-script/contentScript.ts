@@ -295,7 +295,7 @@ export async function initInputWatch() {
           // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
 
           secretsForHost.totpSecrets.forEach(async (totpSecret) => {
-            if (authenticator.generate(totpSecret.totp) === inputted) {
+            if (authenticator.generate(totpSecret.totp.secret) === inputted) {
               const elementSelector = getSelectorForElement(
                 targetElement as HTMLInputElement
               )

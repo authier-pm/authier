@@ -31,18 +31,13 @@ jobs:
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Get yarn cache directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/checkout@v3
 
-      - uses: actions/cache@v2
-        id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
         with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+          node-version: '16'
+          cache: 'yarn'
 
       - name: Yarn install
         run: |
@@ -54,20 +49,10 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
-            frontend:
-              - 'frontend/**'
             webExtension:
               - 'web-extension/**'
             mobileApp:
               - 'mobile-app/**'
-
-        # run only if some file in 'src' folder was changed
-      - name: frontend install deps, check TS and run jest
-        working-directory: ./frontend
-        if: steps.changes.outputs.frontend == 'true'
-        run: |
-          yarn tsc
-          npm test
 
       - name: backend install deps, check TS and run jest
         working-directory: ./backend
@@ -77,21 +62,21 @@ jobs:
           yarn tsc
           cp .env.sample .env
           yarn test:prepare
-          npm test
+          yarn test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           yarn tsc
-          npm test
+          yarn test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true'
         run: |
           yarn tsc
-          npm test
+          yarn test
 
       # - uses: AlexxNB/caprover-action@v1
       #   with:
