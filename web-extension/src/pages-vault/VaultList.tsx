@@ -22,12 +22,16 @@ import { Link, useNavigate } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
-import { device } from '@src/background/ExtensionDevice'
+import { device, getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 
-export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
+export function VaultListItem({
+  secret
+}: {
+  secret: ILoginSecret | ITOTPSecret
+}) {
   const [isVisible, setIsVisible] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
@@ -35,6 +39,7 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
   if (!deviceState) {
     return null
   }
+  const secretUrl = getDecryptedSecretProp(secret, 'url')
   return (
     <Center py={5} m={['auto', '3']}>
       <Box
@@ -49,7 +54,10 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
       >
         <Box bg={'gray.100'} h="70%" pos={'relative'}>
           <Center h={130}>
-            <SecretItemIcon {...data} />
+            <SecretItemIcon
+              url={secretUrl}
+              iconUrl={getDecryptedSecretProp(secret, 'iconUrl')}
+            />
           </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
@@ -62,12 +70,12 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
             w="100%"
             h="full"
           >
-            {data.url ? (
+            {secretUrl ? (
               <IconButton
                 aria-label="open item"
                 colorScheme="blackAlpha"
                 icon={<UnlockIcon />}
-                onClick={() => chrome.tabs.create({ url: data.url })}
+                onClick={() => chrome.tabs.create({ url: secretUrl })}
               />
             ) : null}
 
@@ -90,10 +98,10 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
               deleteItem={async () => {
                 await deleteEncryptedSecretMutation({
                   variables: {
-                    id: data.id
+                    id: secret.id
                   }
                 })
-                await device.state?.removeSecret(data.id)
+                await device.state?.removeSecret(secret.id)
               }}
             />
           </Flex>
@@ -105,14 +113,14 @@ export function VaultListItem({ data }: { data: ILoginSecret | ITOTPSecret }) {
           p={4}
         >
           <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
-            {data.label}
+            {getDecryptedSecretProp(secret, 'label')}
           </Text>
 
           <Link
             to={{
-              pathname: `secret/${data.id}`
+              pathname: `secret/${secret.id}`
             }}
-            state={{ data: data }}
+            state={{ data: secret }}
           >
             <IconButton
               size="sm"

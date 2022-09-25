@@ -41,7 +41,8 @@ interface totpValues {
   label: string
 }
 
-const TOTPSecret = (data: ITOTPSecret) => {
+const TOTPSecret = (secret: ITOTPSecret) => {
+  const { totp } = secret
   const navigate = useNavigate()
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
@@ -67,33 +68,33 @@ const TOTPSecret = (data: ITOTPSecret) => {
       >
         <Formik
           initialValues={{
-            secret: data.totp.secret,
-            url: data.url,
-            label: data.label
+            secret: totp.secret,
+            url: totp.url,
+            label: totp.label
           }}
           onSubmit={async (
             values: totpValues,
             { setSubmitting }: FormikHelpers<totpValues>
           ) => {
             const secret = device.state?.secrets.find(
-              ({ id }) => id === data.id
+              ({ id }) => id === secret.id
             )
 
             if (secret && device.state) {
               secret.encrypted = device.state.encrypt(
                 JSON.stringify({
-                  totp: data.totp,
-                  url: data.url,
-                  label: data.label
+                  totp: secret.totp,
+                  url: totp.url,
+                  label: totp.label
                 })
               )
 
               await updateSecret({
                 variables: {
-                  id: data.id,
+                  id: secret.id,
                   patch: {
                     encrypted: secret.encrypted,
-                    kind: data.kind
+                    kind: secret.kind
                   }
                 }
               })

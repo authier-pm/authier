@@ -211,7 +211,13 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => GraphQLNonNegativeInt)
-  async sendEmailVerification(@Ctx() ctx: IContext) {
+  async sendEmailVerification(
+    @Ctx() ctx: IContext,
+    @Arg('isMobile', () => Boolean, {
+      nullable: true
+    })
+    isMobile: boolean | null
+  ) {
     if (this.email) {
       let verification = await ctx.prisma.emailVerification.findFirst({
         where: {
@@ -232,13 +238,22 @@ export class UserMutation extends UserBase {
 
       const link = `${process.env.FRONTEND_URL}/verify-email?token=${verification.token}`
 
+      const notifMessage = isMobile
+        ? 'Verified email can be used to recover in case you lose your master device.'
+        : 'It will be used as your primary notification channel until you install the mobile app. If you prefer mobile notifications, install our mobile app.'
+
       const res = await sendEmail(
         this.email,
 
         {
           Subject: 'Verify your email',
-          TextPart: `To verify your email, please go here: ${link} \n It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`,
-          HTMLPart: `<a href="${link}">Please verify your email.</a> It will be used as your primary notification channel. If you prefer mobile notifications, install our mobile app.`
+          TextPart: `To verify your email, please go here: ${link} \n ${notifMessage}`,
+          HTMLPart: `<!DOCTYPE html>
+          <html>
+          <body>
+          <a href="${link}">Please verify your email.</a> ${notifMessage}
+          </body>
+          </html>`
         }
       )
       return res.body.Messages.length

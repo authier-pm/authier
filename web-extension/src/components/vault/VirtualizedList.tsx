@@ -5,7 +5,7 @@ import { AutoSizer, List } from 'react-virtualized'
 import { VaultListItem } from '@src/pages-vault/VaultList'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { getDecryptedSecretUrl } from '@src/background/ExtensionDevice'
+import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
@@ -19,7 +19,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
       (item.kind === EncryptedSecretType.TOTP
         ? item.totp.label
         : item.loginCredentials.label) ?? ''
-    const url = getDecryptedSecretUrl(item)
+    const url = getDecryptedSecretProp(item, 'url')
     return (
       label.includes(debouncedSearchTerm) || url.includes(debouncedSearchTerm)
     )
@@ -50,7 +50,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
                 items.push(
                   <VaultListItem
                     key={filteredItems[i].id}
-                    data={filteredItems[i]}
+                    secret={filteredItems[i]}
                   ></VaultListItem>
                 )
               }
