@@ -25,8 +25,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      CAPROVER_SERVER: ${{secrets.CAPROVER_SERVER}}
-      CAPROVER_PASSWORD: ${{secrets.CAPROVER_PASSWORD}}
       APPNAME: authier-api
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
@@ -78,9 +76,9 @@ jobs:
           yarn tsc
           yarn test
 
-      # - uses: AlexxNB/caprover-action@v1
-      #   with:
-      #     server: https://captain.caprover-root.subz.fun/
-      #     password: '${{ secrets.CAPROVER_PASSWORD }}'
-      #     appname: authier-api
-      #     branch: ${GITHUB_REF##*/}
+      - name: backend build and deploy
+        working-directory: ./backend
+        if: steps.changes.outputs.backend == 'true'
+        run: |
+          yarn migrate
+          yarn cdkDeploy
