@@ -366,8 +366,8 @@ export class Device {
   emitter = mitt()
 
   async save(forceUpdate: boolean = true) {
-    //We must clear intervel, otherwise we will create a new one every time we save the state
-    //beacause we are creating a new interval every time we we start the app (in syncSettings)
+    //We must clear interval, otherwise we will create a new one every time we save the state
+    //because we are creating a new interval every time we we start the app (in syncSettings)
     await this.state?.save()
     if (forceUpdate) {
       this.emitter.emit('stateChange')
@@ -461,9 +461,9 @@ export class Device {
     userId: string
   ):
     | {
-      addDeviceSecret: string
-      addDeviceSecretEncrypted: string
-    }
+        addDeviceSecret: string
+        addDeviceSecretEncrypted: string
+      }
     | undefined {
     try {
       const authSecret = this.generateBackendSecret()
