@@ -1,0 +1,7 @@
+packages:
+  # include packages in subfolders (e.g. apps/ and packages/)
+  - 'backend/**'
+  - 'web-extension/**'
+  - '!web-extension/dist/**'
+  - '!backend/dist/**'
+  - 'mobile-app/**'
