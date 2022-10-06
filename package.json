@@ -9,6 +9,23 @@
     "Jiri Spac <capajj@gmail.com>"
   ],
   "license": "AGPL-3.0-or-later",
+  "workspaces": {
+    "packages": [
+      "web-extension",
+      "backend",
+      "mobile-app"
+    ],
+    "nohoist": [
+      "**/@react-native-async-storage/async-storage",
+      "**/react",
+      "**/react-dom",
+      "**/react-native",
+      "**/react-native/**",
+      "**/react-native-codegen",
+      "**/react-native-code-push",
+      "**/react-native-vector-icons"
+    ]
+  },
   "resolutions": {
     "graphql": "^16.5.0",
     "react": "^18.2.0",
@@ -48,8 +65,7 @@
     "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && tsc && cd .. && cd mobile-app && tsc",
     "test": "cd backend && npm test && cd .. && cd web-extension && npm test",
     "gfs": "graphql-codegen --config codegen.yml",
-    "gbs": "cd backend && pnpm gbs",
-    "schemas": "pnpm gbs && pnpm gfs",
-    "preinstall": "npx only-allow pnpm"
+    "gbs": "cd backend && yarn gbs",
+    "schemas": "yarn gbs && yarn gfs"
   }
 }
