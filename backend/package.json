@@ -57,7 +57,7 @@
     "@types/uuid": "^8.3.4",
     "aws-cdk": "2.43.1",
     "aws-cdk-lib": "^2.43.1",
-    "constructs": "^10.1.111",
+    "constructs": "^10.1.123",
     "cross-env": "^7.0.3",
     "esbuild": "^0.15.9",
     "mz": "^2.7.0",
