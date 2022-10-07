@@ -17,6 +17,15 @@ Remove all node_module and run `yarn`
 
 ## React Native
 
+### cli-config/build/readConfigFromDisk.js not supported.
+`pnpm i @react-native-community/cli`
+
+### Unable to resolve module @babel/runtime/helpers/interopRequireDefault
+https://github.com/facebook/react-native/issues/27712#issuecomment-715780864
+
+###  Error: jest-haste-map: File to process was not found in the haste map.
+
+
 ### Migration from yarn
 
 https://dev.to/andreychernykh/yarn-npm-to-pnpm-migration-guide-2n04
