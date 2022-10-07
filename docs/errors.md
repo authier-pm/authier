@@ -19,6 +19,7 @@ Remove all node_module and run `yarn`
 
 ### cli-config/build/readConfigFromDisk.js not supported.
 `pnpm i @react-native-community/cli`
+`pnpm update`
 
 ### Unable to resolve module @babel/runtime/helpers/interopRequireDefault
 https://github.com/facebook/react-native/issues/27712#issuecomment-715780864
