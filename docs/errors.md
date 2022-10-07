@@ -13,3 +13,10 @@ https://stackoverflow.com/questions/37298608/content-security-policy-the-pages-s
 ### Frontend theme does not work
 
 Remove all node_module and run `yarn`
+
+
+## React Native
+
+### Migration from yarn
+
+https://dev.to/andreychernykh/yarn-npm-to-pnpm-migration-guide-2n04
