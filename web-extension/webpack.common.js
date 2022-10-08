@@ -81,10 +81,10 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
-      react: path.resolve('./node_modules/react'),
-      'react-dom': path.resolve('./node_modules/react-dom'),
-      '@emotion/react': path.resolve('./node_modules/@emotion/react'),
-      '@emotion/core': path.resolve('./node_modules/@emotion/core'),
+      react: path.resolve('../node_modules/react'),
+      'react-dom': path.resolve('../node_modules/react-dom'),
+      '@emotion/react': path.resolve('../node_modules/@emotion/react'),
+      '@emotion/core': path.resolve('../node_modules/@emotion/core'),
       '@src': path.resolve(__dirname, 'src/'),
       '@shared': path.resolve(__dirname, '../shared/')
     },

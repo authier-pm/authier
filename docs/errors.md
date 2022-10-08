@@ -28,6 +28,8 @@ https://github.com/facebook/react-native/issues/27712#issuecomment-715780864
 We have to find where this bug is coming from. Metro or Jest?
 https://github.com/facebook/metro/issues/1#issuecomment-421628147
 
+### plurals error
+add `sourceExts: ['js', 'ts', 'tsx', 'mjs']` to metro.config.js
 ### Migration from yarn
 
 https://dev.to/andreychernykh/yarn-npm-to-pnpm-migration-guide-2n04
