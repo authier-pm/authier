@@ -33,8 +33,9 @@ const authLink = setContext(async (_, { headers }) => {
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([
     tokenRefresh,
-    errorLink,
-    serializingLink,
+    //FIX: Remove any
+    errorLink as any,
+    serializingLink as any,
     authLink,
     httpLink
   ]),
