@@ -1,7 +1,7 @@
 import { format } from 'sql-formatter'
 import { highlight } from 'sql-highlight'
 import debug from 'debug'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '.prisma/client'
 
 export let queryCount = 0
 

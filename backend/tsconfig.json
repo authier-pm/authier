@@ -1,7 +1,17 @@
 {
   "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@shared/*": [
+        "../shared/*"
+      ]
+    },
     "target": "es2022",
-    "lib": ["esnext", "esnext.asynciterable", "dom"],
+    "lib": [
+      "esnext",
+      "esnext.asynciterable",
+      "dom"
+    ],
     "outDir": "dist",
     "module": "commonjs",
     "moduleResolution": "node",
@@ -11,7 +21,9 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
@@ -29,7 +41,6 @@
     "isolatedModules": true,
     "incremental": true
   },
-
   "exclude": [
     ".git",
     "**/node_modules/**",

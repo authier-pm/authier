@@ -1,8 +1,7 @@
-import { User } from '@prisma/client'
+import { User } from '.prisma/client'
 import { JwtPayload, sign } from 'jsonwebtoken'
 
 import { isProd } from './envUtils'
-import { UserGQL } from './models/generated/User'
 import { IContext } from './schemas/RootResolver'
 
 export const setNewAccessTokenIntoCookie = (
