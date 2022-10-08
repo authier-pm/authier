@@ -379,7 +379,7 @@ type UserMutation {
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(config: SettingsInput!): UserGQL!
-  sendEmailVerification: NonNegativeInt!
+  sendEmailVerification(isMobile: Boolean): NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
