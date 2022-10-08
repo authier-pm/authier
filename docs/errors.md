@@ -17,7 +17,7 @@ Remove all node_module and run `yarn`
 
 ## React Native
 
-### cli-config/build/readConfigFromDisk.js not supported.
+### Configuration not found cli-config/build/readConfigFromDisk.js not supported.
 `pnpm i @react-native-community/cli`
 `pnpm update`
 
@@ -25,7 +25,8 @@ Remove all node_module and run `yarn`
 https://github.com/facebook/react-native/issues/27712#issuecomment-715780864
 
 ###  Error: jest-haste-map: File to process was not found in the haste map.
-
+We have to find where this bug is coming from. Metro or Jest?
+https://github.com/facebook/metro/issues/1#issuecomment-421628147
 
 ### Migration from yarn
 
