@@ -30,16 +30,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
 
-      - name: Set up Node.js
+      - name: Set up Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'yarn'
+          node-version: ${{ matrix.node-version }}
+          cache: 'pnpm'
 
-      - name: Yarn install
+      - name: Install dependencies
         run: |
-          yarn --frozen-lockfile --ignore-optional --prefer-offline
+          pnpm install --frozen-lockfile --prefer-offline
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -56,29 +59,29 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn gen
-          yarn tsc
+          pnpm gen
+          pnpm tsc
           cp .env.sample .env
-          yarn test:prepare
-          yarn test
+          pnpm test:prepare
+          pnpm test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn tsc
-          yarn test
+          pnpm tsc
+          pnpm test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true'
         run: |
-          yarn tsc
-          yarn test
+          pnpm tsc
+          pnpm test
 
       - name: backend build and deploy
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn migrate
-          yarn cdkDeploy
+          pnpm migrate
+          pnpm cdkDeploy

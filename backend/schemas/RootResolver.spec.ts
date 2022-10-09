@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { prismaClient } from '../prisma/prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
-import faker, { fake } from 'faker'
-import {
-  AddNewDeviceInput,
-  RegisterNewAccountInput
-} from '../models/AuthInputs'
-import { GraphQLResolveInfo } from 'graphql'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import faker from 'faker'
+import { RegisterNewAccountInput } from '../models/AuthInputs'
+import { describe, expect, it } from 'vitest'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
