@@ -30,6 +30,9 @@ jobs:
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
+      - uses: actions/checkout@v2
+      - name: Setup upterm session
+        uses: lhotari/action-upterm@v1
       - uses: actions/checkout@v3
       - uses: pnpm/action-setup@v2.2.2
         with:
@@ -63,8 +66,8 @@ jobs:
           pnpm gen
           pnpm tsc
           cp .env.sample .env
-          sudo pnpm test:prepare
-          sudo pnpm test
+          pnpm test:prepare
+          pnpm test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
