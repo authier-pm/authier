@@ -31,14 +31,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
+      - uses: pnpm/action-setup@v2
         with:
           version: 7
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
-          # cache: 'pnpm'
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: |
