@@ -83,7 +83,7 @@
     "bundle": "tsnd scripts/bundle.ts",
     "studio": "prisma studio",
     "dbPush": "prisma db push",
-    "gen": "pnpm prisma generate",
+    "gen": "prisma generate",
     "tsc": "tsc",
     "start": "prisma migrate deploy && node server.js",
     "tar": "tar -czvf authier-api.tar.gz -C ./dist .",
