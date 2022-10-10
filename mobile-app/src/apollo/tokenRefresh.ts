@@ -6,6 +6,9 @@ import mitt from 'mitt'
 import { device } from '@src/utils/Device'
 
 const ENDPOINT = __DEV__ ? Config.API_URL : Config.API_URL_RELEASE
+if (!ENDPOINT) {
+  throw new Error('API_URL is not defined')
+}
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
