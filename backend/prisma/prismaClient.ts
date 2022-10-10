@@ -1,10 +1,12 @@
-import { PrismaClient } from '.prisma/client'
 import '../dotenv'
-import { DMMFClass } from '@prisma/client/runtime'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
+
+import { DMMFClass } from '.prisma/client/runtime'
+import { PrismaClient } from '.prisma/client/index'
+console.log(__dirname)
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
