@@ -30,19 +30,18 @@ jobs:
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Setup upterm session
-        uses: lhotari/action-upterm@v1
+      - name: Checkout
       - uses: actions/checkout@v3
-      - uses: pnpm/action-setup@v2.2.2
-        with:
-          version: 7
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 16
           # cache: 'pnpm'
+
+      - uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
 
       - name: Install dependencies
         run: |
