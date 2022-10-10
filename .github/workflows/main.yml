@@ -63,8 +63,8 @@ jobs:
           pnpm gen
           pnpm tsc
           cp .env.sample .env
-          pnpm test:prepare
-          pnpm test
+          sudo pnpm test:prepare
+          sudo pnpm test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
