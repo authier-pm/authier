@@ -82,7 +82,7 @@ jobs:
 
       - name: backend build and deploy
         working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
+        if: github.ref == 'refs/heads/main'
         run: |
           pnpm migrateDeploy
           pnpm cdkDeploy
