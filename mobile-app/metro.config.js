@@ -1,4 +1,5 @@
 const path = require('path')
+const exclusionList = require('metro-config/src/defaults/exclusionList')
 
 module.exports = {
   projectRoot: __dirname,
@@ -11,7 +12,8 @@ module.exports = {
     })
   },
   resolver: {
-    sourceExts: ['js', 'ts', 'tsx', 'mjs']
+    blacklistRE: exclusionList([/dist\/.*/]),
+    sourceExts: ['js', 'jsx', 'ts', 'tsx', 'cjs', 'json', 'mjs']
   },
   watchFolders: [`${__dirname}/..`]
 }
