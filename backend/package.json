@@ -21,7 +21,7 @@
     "debug": "^4.3.4",
     "dotenv": "^14.3.2",
     "faker": "^5.5.3",
-    "fastify": "^4.6.0",
+    "fastify": "^4.8.1",
     "fastify-cookie": "^5.7.0",
     "fastify-helmet": "^7.1.0",
     "fastify-jwt": "^4.2.0",
