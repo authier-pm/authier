@@ -106,6 +106,8 @@ export type AddSecretInput = Array<
     loginCredentials?: any
   }
 >
+
+// TODO move out of this file
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
