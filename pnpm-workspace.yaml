@@ -1,0 +1,7 @@
+packages:
+  - "backend/**"
+  - 'mobile-app/**'
+  - 'web-extension/**'
+  # if required, exclude some directories
+  - '!backend/dist/**'
+  - '!web-extension/dist/**'

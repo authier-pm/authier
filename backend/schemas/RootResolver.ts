@@ -23,7 +23,7 @@ import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 
-import { Device, User, WebInput } from '@prisma/client'
+import { Device, User, WebInput } from '.prisma/client'
 import { WebInputGQL } from '../models/generated/WebInput'
 
 import { GraphQLResolveInfo } from 'graphql'
