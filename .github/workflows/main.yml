@@ -24,22 +24,26 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+          --user root
     env:
       APPNAME: authier-api
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
 
     steps:
       - uses: actions/checkout@v3
-
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
-          cache: 'yarn'
+          node-version: 16
+          cache: 'pnpm'
 
-      - name: Yarn install
+      - name: Install dependencies
         run: |
-          yarn --frozen-lockfile --ignore-optional --prefer-offline
+          pnpm i --frozen-lockfile --prefer-offline
+          pnpm i ts-node -g
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -56,29 +60,29 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn gen
-          yarn tsc
+          pnpm gen
+          pnpm tsc
           cp .env.sample .env
-          yarn test:prepare
-          yarn test
+          pnpm test:prepare
+          pnpm test
 
       - name: web-extension, check TS and run jest
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          yarn tsc
-          yarn test
+          pnpm tsc
+          pnpm test
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true'
         run: |
-          yarn tsc
-          yarn test
+          pnpm tsc
+          pnpm test
 
       - name: backend build and deploy
         working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
+        if: github.ref == 'refs/heads/main'
         run: |
-          yarn migrate
-          yarn cdkDeploy
+          pnpm migrateDeploy
+          pnpm cdkDeploy
