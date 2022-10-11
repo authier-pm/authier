@@ -6,15 +6,102 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
 "Language: en\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
 
-#: src/screens/Login.tsx
-msgid "Forget Password?"
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Add TOTP"
 msgstr ""
 
-#: src/screens/Vault/Vault.tsx
+#: src/screens/Auth/Register.tsx
+msgid "Already have an account."
+msgstr ""
+
+#: src/screens/Device/Devices.tsx
+msgid "Approve"
+msgstr ""
+
+#: src/screens/Account/Settings.tsx
+msgid "Automatically locks vault after chosen period of time"
+msgstr ""
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Edit TOTP"
+msgstr ""
+
+#: src/screens/Login.tsx
+#~ msgid "Forget Password?"
+#~ msgstr ""
+
+#: src/screens/Auth/Login.tsx
+msgid "I'm a new user."
+msgstr ""
+
+#: src/screens/Account/Settings.tsx
+msgid "Language"
+msgstr ""
+
+#: src/screens/Account/Settings.tsx
+msgid "Lock time"
+msgstr ""
+
+#: src/screens/Auth/Register.tsx
+msgid "Log in"
+msgstr ""
+
+#: src/screens/Auth/Login.tsx
+msgid "Log in to continue!"
+msgstr ""
+
+#: src/components/LogoutDeviceAlert.tsx
+msgid "Log out"
+msgstr ""
+
+#: src/screens/Device/Devices.tsx
+msgid "New Device is trying to login!"
+msgstr ""
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Passwords"
+msgstr ""
+
+#: src/screens/Device/Devices.tsx
+msgid "Reject"
+msgstr ""
+
+#: src/screens/Account/Settings.tsx
+msgid "Security"
+msgstr ""
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Set on master device"
+msgstr ""
+
+#: src/screens/Auth/Login.tsx
+msgid "Sign Up"
+msgstr ""
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+#: src/screens/TOTPVault/TOTPVault.tsx
 msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
 msgstr ""
 
-#: src/screens/Login.tsx
+#: src/screens/Auth/Login.tsx
 msgid "Submit"
+msgstr ""
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "TOTPs"
+msgstr ""
+
+#: src/screens/Account/Settings.tsx
+msgid "Theme"
+msgstr ""
+
+#: src/screens/Auth/Login.tsx
+msgid "Welcome"
 msgstr ""

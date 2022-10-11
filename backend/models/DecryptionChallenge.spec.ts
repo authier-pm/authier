@@ -1,6 +1,6 @@
 import { prismaClient } from '../prisma/prismaClient'
 
-import faker, { fake } from 'faker'
+import faker from 'faker'
 import {
   AddNewDeviceInput,
   RegisterNewAccountInput
@@ -12,8 +12,8 @@ import {
 } from '../schemas/RootResolver.spec'
 import { sign } from 'jsonwebtoken'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
-import { User } from '@prisma/client'
-import { beforeAll, describe, expect, it, vi } from 'vitest'
+import { User } from '.prisma/client'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -22,10 +22,10 @@ const userSecurityProps = {
 }
 
 describe('DecryptionChallenge', () => {
-  let challenge: DecryptionChallengeApproved
   let user: User
 
-  challenge = new DecryptionChallengeApproved()
+  const challenge: DecryptionChallengeApproved =
+    new DecryptionChallengeApproved()
   challenge.deviceId = faker.datatype.uuid()
   challenge.deviceName = faker.random.word()
   const userId = faker.datatype.uuid()
@@ -48,6 +48,7 @@ describe('DecryptionChallenge', () => {
 
   describe('addNewDeviceForUser', () => {
     const fakeCtx = {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       reply: { setCookie: () => {} },
       request: { headers: {} },
       prisma: prismaClient,

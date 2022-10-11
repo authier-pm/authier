@@ -19,7 +19,11 @@ export default function AccountNavigation() {
         component={Account}
       />
       <DeviceStack.Screen name="Settings" component={Settings} />
-      <DeviceStack.Screen name="ImportPasswords" component={Account} />
+
+      <DeviceStack.Screen //@ts-expect-error TODO: fix this
+        name="ImportPasswords"
+        component={Account}
+      />
     </DeviceStack.Navigator>
   )
 }

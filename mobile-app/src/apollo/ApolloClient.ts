@@ -1,7 +1,7 @@
 import { onError } from '@apollo/client/link/error'
-import { ApolloClient, InMemoryCache, from } from '@apollo/client'
+import { ApolloClient, InMemoryCache, from, HttpLink } from '@apollo/client'
 import { RetryLink } from 'apollo-link-retry'
-import { createHttpLink } from 'apollo-link-http'
+
 import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
 import Config from 'react-native-config'
@@ -11,7 +11,7 @@ import { tokenRefresh } from './tokenRefresh'
 import { device } from '../utils/Device'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
-const httpLink = createHttpLink({
+const httpLink = new HttpLink({
   uri: __DEV__ ? Config.API_URL : Config.API_URL_RELEASE,
   credentials: 'include'
 })

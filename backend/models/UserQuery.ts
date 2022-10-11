@@ -22,7 +22,7 @@ import { UserGQL } from './generated/User'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerification'
-import { EmailVerificationType } from '@prisma/client'
+import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 
 @ObjectType()
