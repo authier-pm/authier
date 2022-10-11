@@ -78,6 +78,7 @@
     "pgn": "pnpm prisma migrate dev && pnpm prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
     "migrate": "prisma migrate dev && pnpm test:prepare",
+    "migrateDeploy": "prisma migrate deploy",
     "build": "rm -rf dist && pnpm bundle && node scripts/copyToDist.js",
     "buildAndDeploy": "pnpm build && pnpm deploy",
     "bundle": "tsnd scripts/bundle.ts",
