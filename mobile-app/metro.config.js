@@ -1,4 +1,3 @@
-const path = require('path')
 const exclusionList = require('metro-config/src/defaults/exclusionList')
 
 module.exports = {
@@ -12,7 +11,10 @@ module.exports = {
     })
   },
   resolver: {
-    blacklistRE: exclusionList([/dist\/.*/]),
+    blacklistRE: exclusionList([
+      /web-extension\/dist\/.*/,
+      /backend\/dist\/.*/
+    ]),
     sourceExts: ['js', 'jsx', 'ts', 'tsx', 'cjs', 'json', 'mjs']
   },
   watchFolders: [`${__dirname}/..`]
