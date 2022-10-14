@@ -30,7 +30,12 @@ import {
   LogoutDocument
 } from '@shared/graphql/ExtensionDevice.codegen'
 
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import {
+  ILoginSecret,
+  ITOTPSecret,
+  LoginCredentialsTypeWithMeta,
+  TotpTypeWithMeta
+} from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
@@ -76,8 +81,8 @@ const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
 
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
-    totp?: any
-    loginCredentials?: any
+    totp?: TotpTypeWithMeta
+    loginCredentials?: LoginCredentialsTypeWithMeta
   }
 >
 
@@ -338,6 +343,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
     this.secrets.push(...secretsAdded)
     await this.save()
+
     return secretsAdded
   }
 

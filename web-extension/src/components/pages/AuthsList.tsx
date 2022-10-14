@@ -31,6 +31,7 @@ const log = debug('au:AuthsList')
 const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
   const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
 
+  // const otpCode = '1111'
   const otpCode = authenticator.generate(totpSecret.totp.secret)
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
@@ -42,6 +43,7 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
   return (
     <Box
       p="3"
+      m={1}
       rounded="md"
       bg={useColorModeValue('gray.100', 'gray.700')}
       minW="300px"

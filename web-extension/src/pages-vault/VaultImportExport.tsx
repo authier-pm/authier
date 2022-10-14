@@ -25,15 +25,7 @@ import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 
-type MappedCSVInput = {
-  label: string
-  loginCredentials: {
-    url: string
-    username: string
-    password: string
-  }
-  iconUrl: null
-}[]
+type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 
 // const csvHeaderNames = {
 //   password: [
@@ -70,12 +62,10 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
       label: row[indexLabel],
-      loginCredentials: {
-        url: row[indexUrl],
-        username: row[indexUsername],
-        password: row[indexPassword]
-      },
-      iconUrl: null
+      url: row[indexUrl],
+      username: row[indexUsername],
+      password: row[indexPassword],
+      iconUrl: null // TODO add icon Url if it is in the CSV
     }))
 }
 
@@ -115,7 +105,7 @@ export const onCSVFileAccepted: any = (
 
           let hostname: string
           try {
-            hostname = new URL(creds.loginCredentials.url).hostname
+            hostname = new URL(creds.url).hostname
           } catch (error) {
             skipped++
             break
@@ -154,27 +144,31 @@ export const onCSVFileAccepted: any = (
 
 export const onJsonFileAccepted = async (file: File) => {
   const state = device.state as DeviceState
-  const parsed: {
+  type AuthyExportType = {
     secret: string
     period: number
     originalName: string
     createdDate: number
     digits: number
-  }[] = JSON.parse(await file.text())
+  }[]
+
+  const parsed: AuthyExportType = JSON.parse(await file.text())
   const toAdd: AddSecretInput = []
   for (const totp of parsed) {
-    const input = {
+    toAdd.push({
       kind: EncryptedSecretType.TOTP,
-      totp: totp.secret,
+      totp: {
+        ...totp,
+        iconUrl: null, // TODO ideally here we would use https://github.com/FritzH321/logo-scrape or something similar to get the icon
+        label: totp.originalName
+      },
 
-      encrypted: state.encrypt(JSON.stringify(totp.secret)),
-      createdAt: new Date().toJSON(),
-      iconUrl: null,
-      label: totp.originalName
-    }
-    toAdd.push(input)
+      encrypted: state.encrypt(JSON.stringify(totp)),
+      createdAt: new Date().toJSON()
+    })
   }
   await state.addSecrets(toAdd)
+  return { added: toAdd.length, skipped: 0 }
 }
 
 export const VaultImportExport = () => {
@@ -196,7 +190,7 @@ export const VaultImportExport = () => {
                       await onCSVFileAccepted(f, data?.me.PasswordLimits)
                     )
                   } else if (f.type === 'application/json') {
-                    await onJsonFileAccepted(f)
+                    setImportedStat(await onJsonFileAccepted(f))
                   }
                 }}
               />
