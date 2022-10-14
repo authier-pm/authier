@@ -155,6 +155,9 @@ export const onJsonFileAccepted = async (file: File) => {
   const parsed: AuthyExportType = JSON.parse(await file.text())
   const toAdd: AddSecretInput = []
   for (const totp of parsed) {
+    if (!totp.originalName) {
+      continue // for some reason authy has secrets without any name. These are not shown in the Authy app, so we are skipping. Nobody would know what these secrets are for anyway
+    }
     toAdd.push({
       kind: EncryptedSecretType.TOTP,
       totp: {
