@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const webpack = require('webpack')
+const Dotenv = require('dotenv-webpack')
 
 module.exports = {
   entry: {
@@ -19,12 +20,13 @@ module.exports = {
       Buffer: ['buffer', 'Buffer']
     }),
     new webpack.EnvironmentPlugin({
-      API_URL:
-        'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql',
-      // API_URL: 'http://localhost:5051/graphql',
-      PAGE_URL: 'http://localhost:5450'
-      // API_URL: 'https://api.authier.ml/graphql'
-    })
+      /* // API_URL: */
+      /* //   'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql', */
+      /* API_URL: 'http://localhost:5051/graphql', */
+      /* PAGE_URL: 'http://localhost:5450' */
+      /* // API_URL: 'https://api.authier.ml/graphql' */
+    }),
+    new Dotenv()
   ],
   // optimization: {
   //   splitChunks: {

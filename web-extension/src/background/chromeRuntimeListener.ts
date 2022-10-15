@@ -101,7 +101,7 @@ browser.runtime.onMessage.addListener(async function (
       const encryptedData = {
         username: credentials.username,
         password: credentials.password,
-        iconUrl: tab.favIconUrl,
+        iconUrl: tab.favIconUrl ?? null,
         url: inputsUrl,
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }

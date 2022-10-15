@@ -195,6 +195,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   private decryptSecret(secret: SecretSerializedType) {
     const decrypted = this.decrypt(secret.encrypted)
+
     let secretDecrypted: ILoginSecret | ITOTPSecret
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
@@ -202,18 +203,24 @@ export class DeviceState implements IBackgroundStateSerializable {
         totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-      const parsed = JSON.parse(decrypted)
+      const parsed: {
+        iconUrl: null
+        label: string
+        password: string
+        url: string
+        username: string
+      } = JSON.parse(decrypted)
 
+      console.log('parsed', parsed)
       try {
-        loginCredentialsSchema.parse(parsed.loginCredentials)
+        loginCredentialsSchema.parse(parsed)
         secretDecrypted = {
-          ...parsed,
+          loginCredentials: parsed,
           ...secret
         } as ILoginSecret
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
-
           loginCredentials: {
             username: '',
             password: '',
@@ -291,6 +298,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   findExistingSecret(secret) {
+    console.log('findExistingSecret', secret.url)
     const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
     )
