@@ -4,7 +4,7 @@ import { BiFileBlank } from 'react-icons/bi'
 
 export function SecretItemIcon(props: {
   iconUrl: string | null | undefined
-  url: string | null | undefined
+  url?: string | null | undefined
 }) {
   let hostname
   if (props.iconUrl) {

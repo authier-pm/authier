@@ -115,12 +115,11 @@ export const onCSVFileAccepted: any = (
           const input = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
-
+            url: creds.url,
             encrypted: state?.encrypt(JSON.stringify(creds)),
             createdAt: new Date().toJSON(),
             iconUrl: null,
-            label:
-              creds.label ?? `${creds.loginCredentials.username}@${hostname}`
+            label: creds.label ?? `${creds.username}@${hostname}`
           }
 
           if (state.findExistingSecret(input)) {
