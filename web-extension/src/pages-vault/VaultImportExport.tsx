@@ -24,6 +24,7 @@ import {
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
+import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 
@@ -158,15 +159,16 @@ export const onJsonFileAccepted = async (file: File) => {
     if (!totp.originalName) {
       continue // for some reason authy has secrets without any name. These are not shown in the Authy app, so we are skipping. Nobody would know what these secrets are for anyway
     }
+    const totpWithMeta = {
+      ...totp,
+      iconUrl: null,
+      label: totp.originalName
+    }
     toAdd.push({
       kind: EncryptedSecretType.TOTP,
-      totp: {
-        ...totp,
-        iconUrl: null, // TODO ideally here we would use https://github.com/FritzH321/logo-scrape or something similar to get the icon
-        label: totp.originalName
-      },
+      totp: totpWithMeta,
 
-      encrypted: state.encrypt(JSON.stringify(totp)),
+      encrypted: state.encrypt(JSON.stringify(totpWithMeta)),
       createdAt: new Date().toJSON()
     })
   }

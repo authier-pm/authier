@@ -29,4 +29,5 @@ export function SecretItemIcon(props: {
       return <BiFileBlank></BiFileBlank>
     }
   }
+  return <BiFileBlank></BiFileBlank>
 }

@@ -58,10 +58,11 @@ export const AddLogin = () => {
           const namePassPair = {
             loginCredentials: {
               password: values.password,
-              username: values.username
-            },
-            url: values.url,
-            label: values.label
+              username: values.username,
+              url: values.url,
+              label: values.label,
+              iconUrl: null
+            }
           }
 
           loginCredentialsSchema.parse(namePassPair.loginCredentials)
