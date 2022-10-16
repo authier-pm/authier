@@ -48,6 +48,7 @@ export type TOTPStackParamList = {
   TOTPVault: undefined
   AddTOTP: undefined
   EditTOTP: { item: ITOTPSecret }
+  QRScan: undefined
 }
 
 //DEVICES

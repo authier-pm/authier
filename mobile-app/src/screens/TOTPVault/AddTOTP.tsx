@@ -117,6 +117,24 @@ export const AddTOTP = () => {
             >
               Save
             </Button>
+
+            <Button
+              onPress={() => navigation.navigate('QRScan')}
+              mt={5}
+              size={'md'}
+              fontSize={'sm'}
+              bg={'blue.400'}
+              color={'white'}
+              _hover={{
+                bg: 'blue.500'
+              }}
+              _focus={{
+                bg: 'blue.500'
+              }}
+              aria-label="Save"
+            >
+              Scan QR Code
+            </Button>
           </Flex>
         )
       }}

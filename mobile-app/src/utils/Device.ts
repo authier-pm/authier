@@ -425,23 +425,29 @@ export class Device {
   }
 
   syncSettings(config: SettingsInput) {
-    this.state!.autofill = config.autofill
-    this.state!.lockTime = config.vaultLockTimeoutSeconds
-    this.state!.syncTOTP = config.syncTOTP
-    this.state!.language = config.language
-    this.state!.theme = config.theme
+    //HACK: this is a hack, we should not create a new interval every time we save the state
+    //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
+    if (!this.state) {
+      console.warn('device not initialized')
+      return
+    }
+    this.state.autofill = config.autofill
+    this.state.lockTime = config.vaultLockTimeoutSeconds
+    this.state.syncTOTP = config.syncTOTP
+    this.state.language = config.language
+    this.state.theme = config.theme
 
     // Sync timer
-    if (this.state!.lockTime !== config.vaultLockTimeoutSeconds) {
-      this.state!.lockTimeEnd =
+    if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
+      this.state.lockTimeEnd =
         Date.now() + config.vaultLockTimeoutSeconds * 1000
     }
 
-    if (device.state!.lockTimeEnd <= Date.now()) {
+    if (Date.now() >= device.state!.lockTimeEnd) {
       device.lock()
     } else if (device.state?.lockTimeEnd) {
       if (!this.lockInterval) {
-        console.log('lockTimeEnd', device.state?.lockTimeEnd)
+        console.log('syncSettigs', device.state?.lockTimeEnd)
         device.startVaultLockTimer()
       }
     }
@@ -462,9 +468,9 @@ export class Device {
     userId: string
   ):
     | {
-        addDeviceSecret: string
-        addDeviceSecretEncrypted: string
-      }
+      addDeviceSecret: string
+      addDeviceSecretEncrypted: string
+    }
     | undefined {
     try {
       const authSecret = this.generateBackendSecret()
