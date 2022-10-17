@@ -25,15 +25,21 @@ export interface ISecret {
   createdAt: string
   kind: EncryptedSecretType
 }
+export type TotpTypeWithMeta = z.infer<typeof totpSchema>
+
 export interface ITOTPSecret extends ISecret {
-  totp: z.infer<typeof totpSchema>
+  totp: TotpTypeWithMeta
   kind: EncryptedSecretType.TOTP
 }
 
+export type LoginCredentialsTypeWithMeta = z.infer<
+  typeof loginCredentialsSchema
+> & {
+  parseError?: ZodError | Error
+}
+
 export interface ILoginSecret extends ISecret {
-  loginCredentials: z.infer<typeof loginCredentialsSchema> & {
-    parseError?: ZodError | Error
-  }
+  loginCredentials: LoginCredentialsTypeWithMeta
   kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
 

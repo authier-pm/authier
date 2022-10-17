@@ -11,7 +11,6 @@ import { tokenRefresh } from './tokenRefresh'
 import SerializingLink from 'apollo-link-serialize'
 
 export const API_URL = process.env.API_URL
-
 const httpLink = createHttpLink({
   uri: API_URL,
   credentials: 'include'
