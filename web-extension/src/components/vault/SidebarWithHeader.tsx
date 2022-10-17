@@ -30,7 +30,9 @@ import {
   FiMenu,
   FiChevronDown,
   FiHardDrive,
-  FiDisc
+  FiDisc,
+  FiClock,
+  FiUserCheck
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { Link as RouterLink } from 'react-router-dom'
@@ -44,9 +46,26 @@ interface LinkItemProps {
   title: JSX.Element
   icon: IconType
   path: string
+  subSections?: {
+    title: JSX.Element
+    icon: IconType
+    path: string
+  }[]
 }
 const LinkItems: Array<LinkItemProps> = [
-  { title: <Trans>Vault</Trans>, icon: FiHome, path: '/' },
+  {
+    title: <Trans>Vault</Trans>,
+    icon: FiHome,
+    path: '/',
+    subSections: [
+      { title: <Trans>TOTP</Trans>, icon: FiClock, path: '/totp' },
+      {
+        title: <Trans>Login Creds</Trans>,
+        icon: FiUserCheck,
+        path: '/loginCreds'
+      }
+    ]
+  },
   {
     title: <Trans>Settings</Trans>,
     icon: FiSettings,
@@ -133,9 +152,25 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         </Flex>
         <Flex flexDirection="column" height="100%">
           {LinkItems.map((link, i) => (
-            <NavItem key={i} icon={link.icon} path={link.path}>
-              {link.title}
-            </NavItem>
+            <>
+              <NavItem key={i} icon={link.icon} path={link.path}>
+                <>{link.title}</>
+              </NavItem>
+
+              {link.subSections &&
+                link.subSections.map((subSection, i) => {
+                  return (
+                    <NavItem
+                      // bgColor="teal.500"
+                      icon={subSection.icon}
+                      path={subSection.path}
+                      ml={'40px'}
+                    >
+                      {subSection.title}
+                    </NavItem>
+                  )
+                })}
+            </>
           ))}
           <ColorModeButton />
         </Flex>
@@ -212,6 +247,7 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
     <Link
       as={RouterLink}
       to={path}
+      my="2"
       style={{ textDecoration: 'none' }}
       _activeLink={{
         bg: 'teal.100' // TODO fix

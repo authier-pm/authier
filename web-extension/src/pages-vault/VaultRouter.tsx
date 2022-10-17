@@ -16,6 +16,7 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
 import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 export function VaultRouter() {
   const { device, deviceState } = useContext(DeviceStateContext)
@@ -46,6 +47,14 @@ export function VaultRouter() {
     <SidebarWithHeader>
       <Routes>
         <Route path="/" element={<VaultList />}></Route>
+        <Route
+          path="/totp"
+          element={<VaultList kind={EncryptedSecretType.TOTP} />}
+        ></Route>
+        <Route
+          path="/loginCreds"
+          element={<VaultList kind={EncryptedSecretType.LOGIN_CREDENTIALS} />}
+        ></Route>
         <Route path="/secret/:secretId" element={<VaultItemSettings />} />
         <Route path="/account-limits" element={<AccountLimits />}></Route>
         <Route path="/settings/*" element={<VaultSettings />}></Route>

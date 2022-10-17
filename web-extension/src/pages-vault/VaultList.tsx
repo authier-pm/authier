@@ -1,6 +1,12 @@
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons'
+import {
+  UnlockIcon,
+  SettingsIcon,
+  DeleteIcon,
+  AddIcon,
+  TimeIcon
+} from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -26,6 +32,7 @@ import { device, getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 export function VaultListItem({
   secret
@@ -53,6 +60,9 @@ export function VaultListItem({
         onMouseOut={() => setIsVisible(false)}
       >
         <Box bg={'gray.100'} h="70%" pos={'relative'}>
+          {secret.kind === EncryptedSecretType.TOTP && (
+            <TimeIcon color="orange.300" m={4} boxSize={4} />
+          )}
           <Center h={130}>
             <SecretItemIcon
               url={secretUrl}
@@ -136,7 +146,7 @@ export function VaultListItem({
   )
 }
 
-export const VaultList = () => {
+export const VaultList = ({ kind }: { kind?: EncryptedSecretType }) => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
@@ -171,11 +181,13 @@ export const VaultList = () => {
   }
   const totpCond =
     data!.me.TOTPlimit <=
-    device!.state!.decryptedSecrets.filter((x) => x.kind === 'TOTP').length
+    device!.state!.decryptedSecrets.filter(
+      (x) => x.kind === EncryptedSecretType.TOTP
+    ).length
   const pswCond =
     data!.me.PasswordLimits <=
     device!.state!.decryptedSecrets.filter(
-      (x) => x.kind === 'LOGIN_CREDENTIALS'
+      (x) => x.kind === EncryptedSecretType.LOGIN_CREDENTIALS
     ).length
 
   return (

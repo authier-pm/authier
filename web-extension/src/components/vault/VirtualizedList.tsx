@@ -6,6 +6,7 @@ import { VaultListItem } from '@src/pages-vault/VaultList'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
+import { useLocation } from 'react-router-dom'
 
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
@@ -13,8 +14,16 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
 
-  const filteredItems = [...LoginCredentials, ...TOTPSecrets].filter((item) => {
-    console.log('item', { item })
+  const location = useLocation()
+
+  const selectedKindsOfSecrets =
+    location.pathname === '/'
+      ? [...LoginCredentials, ...TOTPSecrets]
+      : location.pathname === '/totp'
+      ? TOTPSecrets
+      : LoginCredentials
+
+  const filteredItems = selectedKindsOfSecrets.filter((item) => {
     const label =
       (item.kind === EncryptedSecretType.TOTP
         ? item.totp.label

@@ -9,8 +9,11 @@ import { getTokenFromLocalStorage } from '../util/accessTokenExtension'
 import { errorLink } from '../../../shared/errorLink'
 import { tokenRefresh } from './tokenRefresh'
 import SerializingLink from 'apollo-link-serialize'
+import debug from 'debug'
 
+const log = debug('au:apolloClient')
 export const API_URL = process.env.API_URL
+log('API_URL', API_URL)
 const httpLink = createHttpLink({
   uri: API_URL,
   credentials: 'include'
