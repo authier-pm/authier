@@ -37,7 +37,7 @@ enum Value {
 
 interface totpValues {
   secret: string
-  url: string
+  url: string | null | undefined
   label: string
 }
 
