@@ -169,7 +169,8 @@ export class Device {
   syncSettings(config: SettingsInput) {
     const { state } = this
     if (!state) {
-      throw new Error('cannot sync without state')
+      console.warn('syncSettings: state is null')
+      return
     }
     state.autofill = config.autofill
     state.lockTime = config.vaultLockTimeoutSeconds

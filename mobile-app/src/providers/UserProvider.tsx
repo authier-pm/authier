@@ -7,10 +7,7 @@ import React, {
 } from 'react'
 import messaging from '@react-native-firebase/messaging'
 import { useIsLoggedInQuery } from './UserProvider.codegen'
-import {
-  clearAccessToken,
-  getAccessToken
-} from '../utils/tokenFromAsyncStorage'
+import { accessToken, clearAccessToken } from '../utils/tokenFromAsyncStorage'
 import jwtDecode from 'jwt-decode'
 
 export const UserContext = createContext<{
@@ -40,7 +37,7 @@ export default function UserProvider({ children }) {
 
     //Check asyncStorage if is the accessToken valid
     async function isAccessTokenValid() {
-      const token = await getAccessToken()
+      const token = accessToken
 
       if (!token) {
         setIsLogged(false)
