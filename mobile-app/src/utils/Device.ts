@@ -425,6 +425,10 @@ export class Device {
   }
 
   syncSettings(config: SettingsInput) {
+    if (!this.state) {
+      console.warn('no state')
+      return
+    }
     this.state!.autofill = config.autofill
     this.state!.lockTime = config.vaultLockTimeoutSeconds
     this.state!.syncTOTP = config.syncTOTP

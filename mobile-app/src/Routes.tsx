@@ -15,6 +15,7 @@ import { routingInstrumentation, storage } from '../App'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
+import { accessToken } from './utils/tokenFromAsyncStorage'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
@@ -78,6 +79,7 @@ export default function Routes() {
   if (!isReady) {
     return <Loading />
   }
+  /* console.log('test', accessToken) */
 
   return (
     <NavigationContainer
