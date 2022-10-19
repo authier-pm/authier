@@ -556,6 +556,7 @@ export class Device {
   }
 
   clearAndReload = async () => {
+    console.log('test')
     this.clearInterval()
     await clearAccessToken()
     await device.clearLocalStorage()

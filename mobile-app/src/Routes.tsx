@@ -79,7 +79,6 @@ export default function Routes() {
   if (!isReady) {
     return <Loading />
   }
-  /* console.log('test', accessToken) */
 
   return (
     <NavigationContainer
