@@ -14,37 +14,15 @@ import { Linking, Platform } from 'react-native'
 import { routingInstrumentation, storage } from '../App'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
-import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { accessToken } from './utils/tokenFromAsyncStorage'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
   const device = useContext(DeviceContext)
-  const { data } = useSyncSettingsQuery({
-    fetchPolicy: 'cache-and-network'
-  })
-  const { toggleColorMode, colorMode } = useColorMode()
+  const { colorMode } = useColorMode()
   const [isReady, setIsReady] = React.useState(false ? false : true)
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
-
-  // TODO: I think this is not ideal, but it works for now
-  React.useEffect(() => {
-    if (data) {
-      if (colorMode !== data.me?.theme) {
-        toggleColorMode()
-      }
-      device.syncSettings({
-        autofill: data.me?.autofill as boolean,
-        language: data.me?.language as string,
-        syncTOTP: data.currentDevice.syncTOTP as boolean,
-        theme: data.me?.theme as string,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number
-      })
-    }
-  }, [data])
 
   React.useEffect(() => {
     const restoreState = async () => {
