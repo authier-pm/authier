@@ -8,7 +8,8 @@ import cryptoJS from 'crypto-js'
 
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { IBackgroundStateSerializable, DeviceState } from '@utils/Device'
+import { IBackgroundStateSerializable } from '@utils/Device'
+import { DeviceState } from '@utils/DeviceState'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
