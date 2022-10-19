@@ -14,7 +14,7 @@ import {
   VStack
 } from 'native-base'
 import { generateEncryptionKey } from '../../shared/generateEncryptionKey'
-import { DeviceState } from '../utils/Device'
+import { DeviceState } from '../utils/DeviceState'
 import cryptoJS from 'crypto-js'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceContext } from '../providers/DeviceProvider'
