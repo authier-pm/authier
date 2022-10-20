@@ -100,4 +100,5 @@ jobs:
 
         run: |
           pnpm migrateDeploy
+          pnpm gen
           pnpm cdkDeploy
