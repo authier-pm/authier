@@ -80,7 +80,6 @@
     "migrate": "prisma migrate dev && pnpm test:prepare",
     "migrateDeploy": "prisma migrate deploy",
     "build": "rm -rf dist && pnpm bundle && node scripts/copyToDist.js",
-    "buildAndDeploy": "pnpm build && pnpm deploy",
     "bundle": "ts-node-transpile-only scripts/bundle.ts",
     "studio": "prisma studio",
     "dbPush": "prisma db push",
