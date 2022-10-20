@@ -28,6 +28,9 @@ jobs:
     env:
       APPNAME: authier-api
       DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
+      AWS_REGION: us-central-1
+      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
+      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
 
     steps:
       - uses: actions/checkout@v3
