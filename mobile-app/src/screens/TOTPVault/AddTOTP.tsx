@@ -8,13 +8,7 @@ import { DeviceContext } from '../../providers/DeviceProvider'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
 import { TOTPStackScreenProps } from '../../navigation/types'
-
-interface LoginParsedValues {
-  url: string
-  totp: string
-  encrypted: string
-  label: string
-}
+import { TotpTypeWithMeta } from '@src/utils/Device'
 
 export const AddTOTP = () => {
   let device = useContext(DeviceContext)
@@ -25,30 +19,25 @@ export const AddTOTP = () => {
     <Formik
       initialValues={{
         url: '',
-        totp: '',
-        encrypted: '',
-        label: ''
+        secret: '',
+        label: '',
+        iconUrl: '',
+        digits: 6,
+        period: 30
       }}
       onSubmit={async (
-        values: LoginParsedValues,
-        { setSubmitting }: FormikHelpers<LoginParsedValues>
+        values: TotpTypeWithMeta,
+        { setSubmitting }: FormikHelpers<TotpTypeWithMeta>
       ) => {
-        const unencryptedData = {
-          totp: values.totp,
-          url: values.url,
-          label: values.label
-        }
-
         await device.state?.addSecrets([
           {
             kind: EncryptedSecretType.TOTP,
-            totp: values.totp,
-            encrypted: device.state.encrypt(JSON.stringify(unencryptedData)),
+            totp: values,
+            encrypted: device.state.encrypt(JSON.stringify(values)),
             createdAt: new Date().toJSON()
           }
         ])
 
-        console.log(values)
         setSubmitting(false)
         navigation.goBack()
       }}
@@ -66,7 +55,7 @@ export const AddTOTP = () => {
             <FormControl>
               <InputHeader>URL:</InputHeader>
               <Input
-                defaultValue={values.url}
+                defaultValue={values.url ?? ''}
                 onChangeText={handleChange('url')}
                 onBlur={handleBlur('url')}
                 isRequired
@@ -90,9 +79,9 @@ export const AddTOTP = () => {
               <InputHeader>OTP:</InputHeader>
 
               <Input
-                defaultValue={values.totp}
-                onChangeText={handleChange('totp')}
-                onBlur={handleBlur('totp')}
+                defaultValue={values.secret}
+                onChangeText={handleChange('secret')}
+                onBlur={handleBlur('secret')}
                 isRequired
                 size={'lg'}
               />

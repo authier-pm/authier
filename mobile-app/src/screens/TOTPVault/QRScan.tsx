@@ -1,59 +1,114 @@
+import { useNavigation } from '@react-navigation/native'
 import { Loading } from '@src/components/Loading'
+import { TOTPStackScreenProps } from '@src/navigation/types'
 import * as React from 'react'
-
-import { StyleSheet, Text } from 'react-native'
+import { useContext, useEffect } from 'react'
+import queryString from 'query-string'
+import { StyleSheet } from 'react-native'
+import Svg, { Defs, Mask, Rect } from 'react-native-svg'
 import { useCameraDevices } from 'react-native-vision-camera'
 import { Camera } from 'react-native-vision-camera'
 import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
+import { DeviceContext } from '@src/providers/DeviceProvider'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+
+function CameraFrame() {
+  return (
+    <Svg height="100%" width="100%">
+      <Defs>
+        <Mask id="mask" x="0" y="0" height="100%" width="100%">
+          <Rect height="100%" width="100%" fill="#fff" />
+          <Rect x="18%" y="30%" height="250" width="250" fill="black" />
+        </Mask>
+      </Defs>
+
+      <Rect
+        height="100%"
+        width="100%"
+        fill="rgba(0, 0, 0, 0.8)"
+        mask="url(#mask)"
+      />
+
+      {/* Frame Border */}
+      <Rect
+        x="18%"
+        y="30%"
+        height="250"
+        width="250"
+        stroke="white"
+        strokeWidth="5"
+      />
+    </Svg>
+  )
+}
 
 export const QRScan = () => {
+  const navigation =
+    useNavigation<TOTPStackScreenProps<'QRScan'>['navigation']>()
+  let device = useContext(DeviceContext)
   const [hasPermission, setHasPermission] = React.useState(false)
   const devices = useCameraDevices()
-  const device = devices.back
+  const cameraDevice = devices.back
 
   const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
     checkInverted: true
   })
 
-  // Alternatively you can use the underlying function:
-  //
-  // const frameProcessor = useFrameProcessor((frame) => {
-  //   'worklet';
-  //   const detectedBarcodes = scanBarcodes(frame, [BarcodeFormat.QR_CODE], { checkInverted: true });
-  //   runOnJS(setBarcodes)(detectedBarcodes);
-  // }, []);
+  useEffect(() => {
+    if (barcodes && barcodes.length > 0) {
+      //FIX: we should have here some kind of validation, that the scanned code is a valid TOTP code
+      if (barcodes[0].rawValue?.includes('otpauth://totp/')) {
+        let barcode = barcodes[0]
+        const parsedQuery = queryString.parseUrl(barcode.rawValue as string)
+        const secret = parsedQuery.query.secret as string
 
-  React.useEffect(() => {
+        const unencryptedData = {
+          secret: secret,
+          url: '',
+          label:
+            (parsedQuery.query.issuer as string) ??
+            decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
+          iconUrl: '',
+          digits: 6,
+          period: 30
+        }
+
+        ;(async () => {
+          await device.state?.addSecrets([
+            {
+              kind: EncryptedSecretType.TOTP,
+              totp: unencryptedData,
+              encrypted: device.state.encrypt(JSON.stringify(unencryptedData)),
+              createdAt: new Date().toJSON()
+            }
+          ])
+        })()
+
+        navigation.navigate('TOTPVault')
+      }
+    }
+  }, [barcodes])
+
+  useEffect(() => {
     ;(async () => {
       const status = await Camera.requestCameraPermission()
       setHasPermission(status === 'authorized')
     })()
   }, [])
 
-  if (device == null || !hasPermission) return <Loading />
+  if (cameraDevice == null || !hasPermission) return <Loading />
 
   return (
     <>
       <Camera
         style={StyleSheet.absoluteFill}
-        device={device}
+        device={cameraDevice}
         isActive={true}
         frameProcessor={frameProcessor}
         frameProcessorFps={5}
+        audio={false}
       />
-      {barcodes.map((barcode, idx) => (
-        <Text key={idx} style={styles.barcodeTextURL}>
-          {barcode.displayValue}
-        </Text>
-      ))}
+      <CameraFrame />
     </>
   )
 }
-
-const styles = StyleSheet.create({
-  barcodeTextURL: {
-    fontSize: 20,
-    color: 'white',
-    fontWeight: 'bold'
-  }
-})

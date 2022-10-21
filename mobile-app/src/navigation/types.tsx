@@ -34,7 +34,7 @@ export type PasswordStackScreenProps<T extends keyof PasswordsStackParamList> =
 export type PasswordsStackParamList = {
   PasswordsVault: undefined
   AddPassword: undefined
-  EditPassword: { item: ILoginSecret }
+  EditPassword: { loginSecret: ILoginSecret }
 }
 
 //TOTP VAULT

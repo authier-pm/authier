@@ -87,8 +87,8 @@ export const TOTPVault = ({
       ) : (
         <FlashList
           estimatedItemSize={104}
-          data={device.TOTPSecrets.filter(({ label, url }) => {
-            return label.includes(filterBy) || url?.includes(filterBy)
+          data={device.TOTPSecrets.filter(({ totp }) => {
+            return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
           })}
           keyExtractor={(i) => i.id}
           renderItem={({ item }) => <TOTPSecret item={item} />}

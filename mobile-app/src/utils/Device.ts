@@ -8,7 +8,7 @@ import {
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
-import { loginCredentialsSchema } from './loginCredentialsSchema'
+import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import {
   AddEncryptedSecretsDocument,
   AddEncryptedSecretsMutation,
@@ -61,14 +61,18 @@ export interface ISecret {
   encrypted: string
   lastUsedAt?: string | null
   createdAt: string
-  label: string
-  iconUrl: string | undefined | null
-  url: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  totp: string
+  totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
+}
+
+export type TotpTypeWithMeta = z.infer<typeof totpSchema>
+export type LoginCredentialsTypeWithMeta = z.infer<
+  typeof loginCredentialsSchema
+> & {
+  parseError?: ZodError
 }
 
 export interface ILoginSecret extends ISecret {
@@ -88,6 +92,22 @@ export interface ISecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
+const getTldPart = (url: string) => {
+  const host = new URL(url ?? '').hostname
+  const parts = host.split('.')
+  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
+}
+export const getDecryptedSecretProp = (
+  secret: SecretTypeUnion,
+  prop: 'url' | 'label' | 'iconUrl'
+) => {
+  return (
+    (secret.kind === EncryptedSecretType.TOTP
+      ? secret.totp[prop]
+      : secret.loginCredentials[prop]) ?? ''
+  )
+}
+
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min)
   max = Math.floor(max)
@@ -102,8 +122,8 @@ const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
 
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
-    totp?: string
-    loginCredentials?: any
+    totp?: TotpTypeWithMeta
+    loginCredentials?: LoginCredentialsTypeWithMeta
   }
 >
 
@@ -179,15 +199,19 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   getSecretsDecryptedByHostname(host: string) {
-    const secrets = this.decryptedSecrets.filter(
-      (secret) => host === new URL(secret.url ?? '').hostname
-    ) as Array<ILoginSecret | ITOTPSecret>
-    if (secrets) {
-      return secrets.map((secret) => {
-        return this.decryptSecret(secret)
-      })
+    let secrets = this.decryptedSecrets.filter((secret) => {
+      return (
+        host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
+      )
+    })
+    if (secrets.length === 0) {
+      secrets = this.decryptedSecrets.filter((secret) =>
+        host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
+      )
     }
-    return []
+    return secrets.map((secret) => {
+      return this.decryptSecret(secret)
+    })
   }
 
   getAllSecretsDecrypted() {
@@ -199,29 +223,37 @@ export class DeviceState implements IBackgroundStateSerializable {
   private decryptSecret(secret: SecretSerializedType) {
     const decrypted = this.decrypt(secret.encrypted)
     let secretDecrypted: ILoginSecret | ITOTPSecret
+
+    console.log('decrypted', decrypted, typeof decrypted)
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
-        totp: decrypted
+        totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-      const parsed = JSON.parse(decrypted)
+      const parsed: {
+        iconUrl: null
+        label: string
+        password: string
+        url: string
+        username: string
+      } = JSON.parse(decrypted)
 
       try {
-        loginCredentialsSchema.parse(parsed.loginCredentials)
+        loginCredentialsSchema.parse(parsed)
         secretDecrypted = {
-          ...parsed,
+          loginCredentials: parsed,
           ...secret
         } as ILoginSecret
       } catch (err: unknown) {
         secretDecrypted = {
           ...secret,
-          label: parsed.label,
-          url: parsed.url,
           loginCredentials: {
             username: '',
             password: '',
-            parseError: err as Error
+            parseError: err as Error,
+            label: parsed.label,
+            url: parsed.url
           }
         } as ILoginSecret
       }
@@ -326,7 +358,7 @@ export class DeviceState implements IBackgroundStateSerializable {
         secrets: secrets.map((secret) => {
           const stringToEncrypt =
             secret.kind === EncryptedSecretType.TOTP
-              ? secret.totp
+              ? JSON.stringify(secret.totp)
               : JSON.stringify(secret.loginCredentials)
 
           const encrypted = this.encrypt(stringToEncrypt as string)
@@ -468,9 +500,9 @@ export class Device {
     userId: string
   ):
     | {
-      addDeviceSecret: string
-      addDeviceSecretEncrypted: string
-    }
+        addDeviceSecret: string
+        addDeviceSecretEncrypted: string
+      }
     | undefined {
     try {
       const authSecret = this.generateBackendSecret()

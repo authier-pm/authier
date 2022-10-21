@@ -22,8 +22,9 @@ import { ITOTPSecret } from '../utils/Device'
 import { TOTPStackScreenProps } from '../navigation/types'
 
 export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
+  const { totp } = item
   const [showWhole, setShowWhole] = useState<boolean>(false)
-  const otp = generateOTP(item.totp)
+  const otp = generateOTP(totp.secret)
 
   const toast = useToast()
   const id = 'copied-toast'
@@ -36,13 +37,13 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
   return (
     <Pressable
       onPress={() => {
-        copyToClipboard(item.totp)
+        copyToClipboard(totp.secret)
         if (!toast.isActive(id)) {
           toast.show({
             id,
             render: () => {
               return (
-                <Box bg='emerald.500' px='2' py='1' rounded='md' mb={5}>
+                <Box bg="emerald.500" px="2" py="1" rounded="md" mb={5}>
                   Copied!
                 </Box>
               )
@@ -56,7 +57,7 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
           <View
             borderBottomWidth={0.5}
             borderBottomRadius={25}
-            borderBottomColor='#a7a7a7'
+            borderBottomColor="#a7a7a7"
             p={5}
             style={{
               transform: [
@@ -67,11 +68,11 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
             }}
           >
             <HStack space={5}>
-              <SecretItemIcon iconUrl={item.iconUrl} url={item.url as string} />
+              <SecretItemIcon iconUrl={totp.iconUrl} url={totp.url as string} />
 
               <HStack flexGrow={1} justifyContent={'space-between'}>
                 <VStack>
-                  <Heading size='md'>{item.label}</Heading>
+                  <Heading size="md">{totp.label}</Heading>
 
                   <Text
                     fontSize={30}
@@ -89,10 +90,10 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
                   icon={
                     <NativeIcon
                       size={'lg'}
-                      as={<Icon name='create-outline' />}
+                      as={<Icon name="create-outline" />}
                     />
                   }
-                  color='#949090'
+                  color="#949090"
                   size={'md'}
                   onPress={() => navigation.navigate('EditTOTP', { item })}
                 />
