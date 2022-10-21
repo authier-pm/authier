@@ -54,18 +54,12 @@ export default function Settings() {
               <Select
                 variant="rounded"
                 onValueChange={(value) => {
-                  device.state!.lockTime = parseInt(value, 10)
+                  device.setLockTime(parseInt(value, 10))
                   updateSettings({
                     variables: {
                       config: settings()
                     }
                   })
-
-                  device.clearInterval()
-                  device.state!.lockTimeEnd =
-                    Date.now() + device.state!.lockTime * 1000
-                  device.startVaultLockTimer()
-                  device.save(false)
                 }}
                 defaultValue={device.state!.lockTime.toString()}
                 accessibilityLabel="Lock time"
@@ -75,6 +69,7 @@ export default function Settings() {
                 <Select.Item label="1 hour" value="3600" />
                 <Select.Item label="4 hours" value="14400" />
                 <Select.Item label="8 hours" value="28800" />
+                <Select.Item label="never" value="0" />
               </Select>
 
               <Text>

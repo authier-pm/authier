@@ -13,12 +13,7 @@ import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
 import { useNavigate } from 'react-router-dom'
-
-interface LoginParsedValues {
-  url: string
-  label: string
-  secret: string
-}
+import { TotpTypeWithMeta } from '@src/util/useDeviceState'
 
 export const AddTOTP = () => {
   const navigate = useNavigate()
@@ -30,23 +25,20 @@ export const AddTOTP = () => {
         initialValues={{
           url: '',
           secret: '',
-          label: ''
+          label: '',
+          iconUrl: '',
+          digits: 6,
+          period: 30
         }}
         onSubmit={async (
-          values: LoginParsedValues,
-          { setSubmitting }: FormikHelpers<LoginParsedValues>
+          values: TotpTypeWithMeta,
+          { setSubmitting }: FormikHelpers<TotpTypeWithMeta>
         ) => {
           await device.state?.addSecrets([
             {
               kind: EncryptedSecretsType.TOTP as any,
-              totp: values.secret,
-              encrypted: device.state!.encrypt(
-                JSON.stringify({
-                  totp: values.secret,
-                  url: values.url,
-                  label: values.label
-                })
-              ),
+              totp: values,
+              encrypted: device.state!.encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
             }
           ])

@@ -16,5 +16,9 @@ export const loginCredentialsSchema = secretUrlsSchema.extend({
 export const totpSchema = secretUrlsSchema.extend({
   secret: z.string().min(1),
   digits: z.number(),
-  period: z.number()
+  period: z.number(),
+  url: z.string().min(1).nullish()
 })
+
+//NOTE: Take a look what was changed here?
+// I think I was right, but he changed it somehow

@@ -6,7 +6,7 @@ import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
 import Config from 'react-native-config'
 import { setContext } from '@apollo/client/link/context'
-import { getAccessToken } from '../utils/tokenFromAsyncStorage'
+import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { device } from '../utils/Device'
 
@@ -22,7 +22,6 @@ const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
-  const accessToken = await getAccessToken()
 
   //return the headers to the context so httpLink can read them
   return {

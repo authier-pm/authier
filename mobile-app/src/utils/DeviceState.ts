@@ -248,7 +248,6 @@ export class DeviceState implements IBackgroundStateSerializable {
     // if (existingSecret) {
     //   return null
     // }
-
     const { data } = await apolloClient.mutate<
       AddEncryptedSecretsMutation,
       AddEncryptedSecretsMutationVariables

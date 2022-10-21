@@ -260,7 +260,7 @@ export class Device {
   }
 
   async lock() {
-    this.clearInterval()
+    this.clearLockInterval()
 
     if (!this.state) {
       return
@@ -323,7 +323,7 @@ export class Device {
   }
 
   clearAndReload = async () => {
-    this.clearInterval()
+    this.clearLockInterval()
     await clearAccessToken()
     await device.clearLocalStorage()
     this.emitter.emit('stateChange')
@@ -385,7 +385,19 @@ export class Device {
     }, 5000)
   }
 
-  clearInterval = () => {
+  setLockTime(lockTime: number) {
+    this.state!.lockTime = lockTime
+
+    this.clearLockInterval()
+    if (lockTime > 0) {
+      this.state!.lockTimeEnd = Date.now() + this.state!.lockTime * 1000
+      this.startVaultLockTimer()
+    }
+
+    this.save(false)
+  }
+
+  clearLockInterval = () => {
     this.lockInterval = clearInterval(this.lockInterval!)
   }
 }
