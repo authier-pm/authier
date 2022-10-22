@@ -77,10 +77,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           if (secret && device.state) {
             secret.encrypted = device.state.encrypt(
               JSON.stringify({
-                loginCredentials: {
-                  username: values.username,
-                  password: values.password
-                },
+                password: values.password,
+                username: values.username,
                 url: values.url,
                 label: values.label,
                 iconUrl: null

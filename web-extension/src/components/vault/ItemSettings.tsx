@@ -28,21 +28,14 @@ import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
 
-enum Value {
-  'Tooweak' = 1,
-  'Weak' = 2,
-  'Medium' = 3,
-  'Strong' = 4
-}
-
 interface totpValues {
   secret: string
   url: string | null | undefined
   label: string
 }
 
-const TOTPSecret = (secret: ITOTPSecret) => {
-  const { totp } = secret
+const TOTPSecret = (secretProps: ITOTPSecret) => {
+  const { totp } = secretProps
   const navigate = useNavigate()
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
@@ -77,15 +70,16 @@ const TOTPSecret = (secret: ITOTPSecret) => {
             { setSubmitting }: FormikHelpers<totpValues>
           ) => {
             const secret = device.state?.secrets.find(
-              ({ id }) => id === secret.id
+              ({ id }) => id === secretProps.id
             )
 
             if (secret && device.state) {
               secret.encrypted = device.state.encrypt(
                 JSON.stringify({
-                  totp: secret.totp,
-                  url: totp.url,
-                  label: totp.label
+                  ...values,
+                  iconUrl: '',
+                  digits: 6,
+                  period: 30
                 })
               )
 
@@ -269,12 +263,11 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             if (secret && device.state) {
               secret.encrypted = device.state.encrypt(
                 JSON.stringify({
-                  loginCredentials: {
-                    username: values.username,
-                    password: values.password
-                  },
+                  password: values.password,
+                  username: values.username,
                   url: values.url,
-                  label: values.label
+                  label: values.label,
+                  iconUrl: null
                 })
               )
 

@@ -62,7 +62,6 @@ const TOTPSecret = (data: ITOTPSecret) => {
           const secret = device.state?.secrets.find(({ id }) => id === data.id)
 
           if (secret && device.state) {
-            //FIX: What should we do here? Decrypt the secret and update it? or just doesnt decrypt it and update it?
             secret.encrypted = device.state.encrypt(
               JSON.stringify({
                 ...values,
