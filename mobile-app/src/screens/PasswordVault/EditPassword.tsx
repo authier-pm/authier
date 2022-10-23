@@ -50,6 +50,7 @@ export const InputHeader = ({ children }) => {
 }
 
 const LoginSecret = (secretProps: ILoginSecret) => {
+  const { loginCredentials } = secretProps
   const [show, setShow] = useState(false)
   let device = useContext(DeviceContext)
 
@@ -61,10 +62,10 @@ const LoginSecret = (secretProps: ILoginSecret) => {
     <View>
       <Formik
         initialValues={{
-          url: secretProps.url!!,
-          password: secretProps.loginCredentials.password,
-          label: secretProps.label,
-          username: secretProps.loginCredentials.username
+          url: loginCredentials.url!!,
+          password: loginCredentials.password,
+          label: loginCredentials.label,
+          username: loginCredentials.username
         }}
         onSubmit={async (
           values: LoginParsedValues,
@@ -76,10 +77,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           if (secret && device.state) {
             secret.encrypted = device.state.encrypt(
               JSON.stringify({
-                loginCredentials: {
-                  username: values.username,
-                  password: values.password
-                },
+                password: values.password,
+                username: values.username,
                 url: values.url,
                 label: values.label,
                 iconUrl: null
@@ -229,7 +228,10 @@ export default function EditPassword({
     return <Spinner />
   }
 
-  const secret = device.state.getSecretDecryptedById(route.params.item.id)
+  console.log('route.params.secretId', route.params.loginSecret)
+  const secret = device.state.getSecretDecryptedById(
+    route.params.loginSecret.id
+  )
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {

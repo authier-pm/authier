@@ -9,7 +9,6 @@ import cryptoJS from 'crypto-js'
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
-import { DeviceState } from '@utils/DeviceState'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
@@ -20,6 +19,7 @@ import { Platform } from 'react-native'
 import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
+import { DeviceState } from '@src/utils/DeviceState'
 
 const ToastServerErrorDetails = {
   title: 'Something went wrong',

@@ -42,6 +42,7 @@ export const InputHeader = ({ children }) => {
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
+  const { totp } = data
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
   let device = useContext(DeviceContext)
@@ -50,9 +51,9 @@ const TOTPSecret = (data: ITOTPSecret) => {
     <View>
       <Formik
         initialValues={{
-          secret: data.totp,
-          url: data.url!!,
-          label: data.label
+          secret: totp.secret,
+          url: totp.url!!,
+          label: totp.label
         }}
         onSubmit={async (
           values: totpValues,
@@ -63,9 +64,10 @@ const TOTPSecret = (data: ITOTPSecret) => {
           if (secret && device.state) {
             secret.encrypted = device.state.encrypt(
               JSON.stringify({
-                totp: values.secret,
-                url: values.url,
-                label: values.label
+                ...values,
+                iconUrl: '',
+                digits: 6,
+                period: 30
               })
             )
 
@@ -102,40 +104,27 @@ const TOTPSecret = (data: ITOTPSecret) => {
                 onChangeText={handleChange('url')}
                 onBlur={handleBlur('url')}
                 isRequired
+                size={'lg'}
               />
             </FormControl>
 
             <FormControl>
-              <FormControl.Label
-                _text={{
-                  color: 'coolGray.800',
-                  fontSize: 'xl',
-                  fontWeight: 500
-                }}
-              >
-                Password
-              </FormControl.Label>
+              <InputHeader>Label:</InputHeader>
 
               <Input
                 onChangeText={handleChange('label')}
                 onBlur={handleBlur('label')}
                 defaultValue={values.label}
                 isRequired
+                size={'lg'}
               />
             </FormControl>
 
             <FormControl>
-              <FormControl.Label
-                _text={{
-                  color: 'coolGray.800',
-                  fontSize: 'xl',
-                  fontWeight: 500
-                }}
-              >
-                Secret:
-              </FormControl.Label>
+              <InputHeader>Secret:</InputHeader>
 
               <Input
+                size={'lg'}
                 pr="4.5rem"
                 type={show ? 'text' : 'password'}
                 defaultValue={values.secret}

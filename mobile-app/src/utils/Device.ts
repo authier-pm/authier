@@ -7,7 +7,8 @@ import {
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
-import { loginCredentialsSchema } from './loginCredentialsSchema'
+import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
+
 import messaging from '@react-native-firebase/messaging'
 import {
   LogoutDocument,
@@ -50,14 +51,18 @@ export interface ISecret {
   encrypted: string
   lastUsedAt?: string | null
   createdAt: string
-  label: string
-  iconUrl: string | undefined | null
-  url: string
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  totp: string
+  totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
+}
+
+export type TotpTypeWithMeta = z.infer<typeof totpSchema>
+export type LoginCredentialsTypeWithMeta = z.infer<
+  typeof loginCredentialsSchema
+> & {
+  parseError?: ZodError
 }
 
 export interface ILoginSecret extends ISecret {
@@ -77,6 +82,22 @@ export interface ISecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
+export const getTldPart = (url: string) => {
+  const host = new URL(url ?? '').hostname
+  const parts = host.split('.')
+  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
+}
+export const getDecryptedSecretProp = (
+  secret: SecretTypeUnion,
+  prop: 'url' | 'label' | 'iconUrl'
+) => {
+  return (
+    (secret.kind === EncryptedSecretType.TOTP
+      ? secret.totp[prop]
+      : secret.loginCredentials[prop]) ?? ''
+  )
+}
+
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min)
   max = Math.floor(max)
@@ -92,10 +113,12 @@ export const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
 
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
-    totp?: string
-    loginCredentials?: any
+    totp?: TotpTypeWithMeta
+    loginCredentials?: LoginCredentialsTypeWithMeta
   }
 >
+
+// TODO move out of this file
 
 export class Device {
   state: DeviceState | null = null
@@ -167,27 +190,29 @@ export class Device {
   }
 
   syncSettings(config: SettingsInput) {
-    const { state } = this
-    if (!state) {
-      console.warn('syncSettings: state is null')
+    //HACK: this is a hack, we should not create a new interval every time we save the state
+    //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
+    if (!this.state) {
+      console.warn('device not initialized')
       return
     }
-    state.autofill = config.autofill
-    state.lockTime = config.vaultLockTimeoutSeconds
-    state.syncTOTP = config.syncTOTP
-    state.language = config.language
-    state.theme = config.theme
+    this.state.autofill = config.autofill
+    this.state.lockTime = config.vaultLockTimeoutSeconds
+    this.state.syncTOTP = config.syncTOTP
+    this.state.language = config.language
+    this.state.theme = config.theme
 
     // Sync timer
-    if (state.lockTime !== config.vaultLockTimeoutSeconds) {
-      state.lockTimeEnd = Date.now() + config.vaultLockTimeoutSeconds * 1000
+    if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
+      this.state.lockTimeEnd =
+        Date.now() + config.vaultLockTimeoutSeconds * 1000
     }
 
-    if (state.lockTimeEnd <= Date.now()) {
+    if (Date.now() >= device.state!.lockTimeEnd) {
       device.lock()
-    } else if (state?.lockTimeEnd) {
-      if (!this.lockInterval && state.lockTime > 0) {
-        console.log('lockTimeEnd', state?.lockTimeEnd)
+    } else if (device.state?.lockTimeEnd) {
+      if (!this.lockInterval) {
+        console.log('syncSettigs', device.state?.lockTimeEnd)
         device.startVaultLockTimer()
       }
     }
