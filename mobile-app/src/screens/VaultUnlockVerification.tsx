@@ -14,13 +14,13 @@ import {
   VStack
 } from 'native-base'
 import { generateEncryptionKey } from '../../shared/generateEncryptionKey'
-import { DeviceState } from '../utils/DeviceState'
 import cryptoJS from 'crypto-js'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceContext } from '../providers/DeviceProvider'
 import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
+import { DeviceState } from '@src/utils/DeviceState'
 
 interface Values {
   password: string

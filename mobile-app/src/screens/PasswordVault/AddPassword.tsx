@@ -20,6 +20,7 @@ import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { PasswordStackScreenProps } from '../../navigation/types'
 import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
+import { loginCredentialsSchema } from '@src/utils/loginCredentialsSchema'
 
 interface LoginParsedValues {
   url: string
@@ -50,13 +51,14 @@ export const AddPassword = () => {
         { setSubmitting }: FormikHelpers<LoginParsedValues>
       ) => {
         const unencryptedData = {
-          loginCredentials: {
-            password: values.password,
-            username: values.username
-          },
+          password: values.password,
+          username: values.username,
           url: values.url,
-          label: values.label
+          label: values.label,
+          iconUrl: null
         }
+
+        loginCredentialsSchema.parse(unencryptedData)
 
         try {
           await device.state?.addSecrets([
@@ -98,7 +100,7 @@ export const AddPassword = () => {
         return (
           <Flex p={5} flexDirection="column">
             <FormControl>
-              <InputHeader>URL</InputHeader>
+              <InputHeader>URL:</InputHeader>
               <Input
                 value={values.url}
                 onChangeText={handleChange('url')}
@@ -109,7 +111,7 @@ export const AddPassword = () => {
             </FormControl>
 
             <FormControl>
-              <InputHeader>Label</InputHeader>
+              <InputHeader>Label:</InputHeader>
 
               <Input
                 value={values.label}
@@ -121,7 +123,7 @@ export const AddPassword = () => {
             </FormControl>
 
             <FormControl>
-              <InputHeader>Username</InputHeader>
+              <InputHeader>Username:</InputHeader>
 
               <Input
                 value={values.username}
@@ -133,7 +135,7 @@ export const AddPassword = () => {
             </FormControl>
 
             <FormControl>
-              <InputHeader>Password</InputHeader>
+              <InputHeader>Password:</InputHeader>
 
               <Input
                 onChangeText={handleChange('password')}

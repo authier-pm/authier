@@ -211,7 +211,6 @@ export class DeviceState implements IBackgroundStateSerializable {
         username: string
       } = JSON.parse(decrypted)
 
-      console.log('parsed', parsed)
       try {
         loginCredentialsSchema.parse(parsed)
         secretDecrypted = {
