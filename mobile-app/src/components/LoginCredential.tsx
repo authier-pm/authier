@@ -19,7 +19,8 @@ import { useNavigation } from '@react-navigation/native'
 import { ILoginSecret } from '../utils/Device'
 import { PasswordStackScreenProps } from '../navigation/types'
 
-const LoginCredential = ({ item }: { item: ILoginSecret }) => {
+const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
+  const { loginCredentials } = loginSecret
   const navigation =
     useNavigation<PasswordStackScreenProps<'PasswordsVault'>['navigation']>()
   const toast = useToast()
@@ -38,13 +39,13 @@ const LoginCredential = ({ item }: { item: ILoginSecret }) => {
   return (
     <Pressable
       onPress={() => {
-        copyToClipboard(item.loginCredentials.password)
+        copyToClipboard(loginCredentials.password)
         if (!toast.isActive(id)) {
           toast.show({
             id,
             render: () => {
               return (
-                <Box bg='emerald.500' px='2' py='1' rounded='md' mb={5}>
+                <Box bg="emerald.500" px="2" py="1" rounded="md" mb={5}>
                   Copied!
                 </Box>
               )
@@ -59,8 +60,8 @@ const LoginCredential = ({ item }: { item: ILoginSecret }) => {
           <View
             borderBottomWidth={0.5}
             borderBottomRadius={25}
-            borderBottomColor='#a7a7a7'
-            p='5'
+            borderBottomColor="#a7a7a7"
+            p="5"
             style={{
               transform: [
                 {
@@ -70,17 +71,20 @@ const LoginCredential = ({ item }: { item: ILoginSecret }) => {
             }}
           >
             <HStack space={5}>
-              <SecretItemIcon iconUrl={item.iconUrl} url={item.url!!} />
+              <SecretItemIcon
+                iconUrl={loginCredentials.iconUrl}
+                url={loginCredentials.url!!}
+              />
 
               <HStack flexGrow={1} justifyContent={'space-between'}>
                 <VStack>
-                  <Heading numberOfLines={1} size='md'>
-                    {makeShorter(item.label)}
+                  <Heading numberOfLines={1} size="md">
+                    {makeShorter(loginCredentials.label)}
                   </Heading>
 
-                  <Text fontSize='lg' numberOfLines={1} ellipsizeMode={'tail'}>
+                  <Text fontSize="lg" numberOfLines={1} ellipsizeMode={'tail'}>
                     {makeShorter(
-                      item.loginCredentials.username.replace(
+                      loginCredentials.username.replace(
                         /http:\/\/|https:\/\//,
                         ''
                       )
@@ -94,13 +98,13 @@ const LoginCredential = ({ item }: { item: ILoginSecret }) => {
                   icon={
                     <NativeIcon
                       size={'lg'}
-                      as={<Icon name='create-outline' />}
+                      as={<Icon name="create-outline" />}
                     />
                   }
-                  color='#949090'
+                  color="#949090"
                   size={'md'}
                   onPress={() => {
-                    navigation.navigate('EditPassword', { item })
+                    navigation.navigate('EditPassword', { loginSecret })
                   }}
                 />
               </Center>

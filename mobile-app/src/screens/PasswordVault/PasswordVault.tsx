@@ -8,6 +8,7 @@ import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
+import { ILoginSecret } from '@src/utils/Device'
 
 export const PasswordVault = ({
   navigation
@@ -69,11 +70,15 @@ export const PasswordVault = ({
         //Maybe we should do infinite scrolling pagination??
         <FlashList
           estimatedItemSize={104}
-          data={device.loginCredentials.filter(({ label, url }) => {
-            return label.includes(filterBy) || url?.includes(filterBy)
-          })}
+          data={device.loginCredentials.filter(
+            ({ loginCredentials: { url, label } }) => {
+              return label.includes(filterBy) || url?.includes(filterBy)
+            }
+          )}
           keyExtractor={(i) => i.id}
-          renderItem={({ item }) => <LoginCredential item={item} />}
+          renderItem={({ item }) => (
+            <LoginCredential loginSecret={item as ILoginSecret} />
+          )}
           onRefresh={() => onRefresh()}
           refreshing={refreshing}
         />

@@ -19,7 +19,6 @@ import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
-import { DeviceState } from '@utils/DeviceState'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
@@ -30,6 +29,7 @@ import { AuthStackParamList } from '../../navigation/AuthNavigation'
 import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { DeviceState } from '@src/utils/DeviceState'
 
 interface Values {
   password: string
