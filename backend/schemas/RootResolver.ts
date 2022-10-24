@@ -346,7 +346,7 @@ export class RootResolver {
     }
 
     if (!challenge.approvedAt) {
-      // TODO enable when we have device management in the vault
+      // TODO: enable when we have device management in the vault
       return plainToClass(DecryptionChallengeForApproval, {
         id: challenge.id,
         approvedAt: challenge.approvedAt

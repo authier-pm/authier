@@ -63,7 +63,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
-          toast.error(t`Login failed, check your username`)
+          toast.error(t`Login failed, check your email or password`)
           return
         }
 

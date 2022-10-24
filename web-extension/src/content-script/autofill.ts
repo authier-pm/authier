@@ -120,7 +120,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
   if (autofillEnabled === true) {
     log('enabled is true, returning')
-    return () => {}
+    return () => { }
   }
   log('init autofill', initState)
 
@@ -159,6 +159,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     const filledElements = webInputs
       .filter(({ url }) => {
         console.log('~ url', url)
+        //NOTE: FIX THIS
         const host = new URL(url).host
         const matches = location.href.includes(host)
 
@@ -278,7 +279,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     if (!namePassSecret && !totpSecret) {
       log('no secrets for host')
-      return () => {}
+      return () => { }
     }
 
     if (filledElements.length === 2) {
