@@ -32,9 +32,7 @@ export const test = base.extend<{
   }
 })
 
-test('Login page', async ({ page, extensionId }) => {
+test('Login page is visible', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
-  /* await page.locator('text=Login').first().isVisible() */
-  await page.locator('button', { hasText: 'Login' }).click()
-  await page.getByText('Authier').waitFor()
+  await page.locator('text=Login').first().isVisible()
 })

@@ -11,6 +11,7 @@
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",
     "test": "echo",
+    "playwright:run": "npx playwright test",
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen"
