@@ -11,7 +11,7 @@ export type MarkAsSyncedMutation = { __typename?: 'Mutation', currentDevice: { _
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout?: number | null };
+export type LogoutMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', logoutAt?: string | null } } };
 
 export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -72,7 +72,11 @@ export type MarkAsSyncedMutationResult = Apollo.MutationResult<MarkAsSyncedMutat
 export type MarkAsSyncedMutationOptions = Apollo.BaseMutationOptions<MarkAsSyncedMutation, MarkAsSyncedMutationVariables>;
 export const LogoutDocument = gql`
     mutation logout {
-  logout
+  currentDevice {
+    logout {
+      logoutAt
+    }
+  }
 }
     `;
 export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;

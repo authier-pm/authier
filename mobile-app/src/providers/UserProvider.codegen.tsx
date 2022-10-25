@@ -11,7 +11,7 @@ export type IsLoggedInQuery = { __typename?: 'Query', authenticated: boolean };
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', logout?: number | null };
+export type LogoutMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', logoutAt?: string | null } } };
 
 
 export const IsLoggedInDocument = gql`
@@ -48,7 +48,11 @@ export type IsLoggedInLazyQueryHookResult = ReturnType<typeof useIsLoggedInLazyQ
 export type IsLoggedInQueryResult = Apollo.QueryResult<IsLoggedInQuery, IsLoggedInQueryVariables>;
 export const LogoutDocument = gql`
     mutation logout {
-  logout
+  currentDevice {
+    logout {
+      logoutAt
+    }
+  }
 }
     `;
 export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>;

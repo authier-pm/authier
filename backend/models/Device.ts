@@ -178,13 +178,28 @@ export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
     const user = await ctx.prisma.user.findUnique({
-      where: {
-        id: this.userId
+      where: { id: this.userId },
+      include: {
+        DecryptionChallenges: {
+          where: {
+            deviceId: this.id,
+            ipAddress: ctx.getIpAddress()
+          }
+        }
       }
     })
 
-    if (this.id === user?.masterDeviceId) {
-      throw new GraphqlError('You cannot logout master device')
+    //NOTE: Create a new challenge for the device, only if the device doesn't have any active challenge
+    if (this.id === ctx.masterDeviceId && !user?.DecryptionChallenges.length) {
+      await ctx.prisma.decryptionChallenge.create({
+        data: {
+          deviceId: this.id,
+          ipAddress: ctx.getIpAddress(),
+          deviceName: this.name,
+          userId: this.userId,
+          approvedAt: new Date()
+        }
+      })
     }
 
     if (ctx.jwtPayload.deviceId === this.id) {

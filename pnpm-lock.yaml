@@ -403,6 +403,7 @@ importers:
       '@lingui/cli': ^3.14.0
       '@lingui/macro': ^3.14.0
       '@lingui/react': ^3.14.0
+      '@playwright/test': ^1.27.1
       '@sentry/browser': ^7.14.2
       '@sentry/tracing': ^7.14.2
       '@svgr/webpack': ^6.4.0
@@ -553,6 +554,7 @@ importers:
       '@babel/preset-react': 7.18.6_@babel+core@7.19.3
       '@babel/preset-typescript': 7.18.6_@babel+core@7.19.3
       '@lingui/react': 3.14.0_react@18.2.0
+      '@playwright/test': 1.27.1
       '@svgr/webpack': 6.4.0
       '@types/chrome': 0.0.197
       '@types/crypto-js': 4.1.1
@@ -7433,6 +7435,15 @@ packages:
       webcrypto-core: 1.7.5
     dev: true
 
+  /@playwright/test/1.27.1:
+    resolution: {integrity: sha512-mrL2q0an/7tVqniQQF6RBL2saskjljXzqNcCOVMUjRIgE6Y38nCNaP+Dc2FBW06bcpD3tqIws/HT9qiMHbNU0A==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dependencies:
+      '@types/node': 18.8.3
+      playwright-core: 1.27.1
+    dev: true
+
   /@popperjs/core/2.11.6:
     resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
 
@@ -11122,7 +11133,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.0_onqnqwb3ubg5opvemcqf7c2qhy
+      '@apollo/client': 3.7.0_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 
@@ -20243,6 +20254,12 @@ packages:
     engines: {node: '>=8'}
     dependencies:
       find-up: 3.0.0
+
+  /playwright-core/1.27.1:
+    resolution: {integrity: sha512-9EmeXDncC2Pmp/z+teoVYlvmPWUC6ejSSYZUln7YaP89Z6lpAaiaAnqroUt/BoLo8tn7WYShcfaCh+xofZa44Q==}
+    engines: {node: '>=14'}
+    hasBin: true
+    dev: true
 
   /plist/3.0.6:
     resolution: {integrity: sha512-WiIVYyrp8TD4w8yCvyeIr+lkmrGRd5u0VbRnU+tP/aRLxP/YadJUYOMZJ/6hIa3oUyVCsycXvtNRgd5XBJIbiA==}
