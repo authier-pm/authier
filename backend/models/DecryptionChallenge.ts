@@ -115,7 +115,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           firebaseToken: firebaseToken,
           name: this.deviceName,
           userId: user.id,
-          platform: 'chrome' // TODO: add this to input
+          platform: 'chrome' // TODO add this to input
         }
       })
     }
@@ -136,7 +136,7 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
         id: ctx.jwtPayload.userId
       }
     })
-
+    console.log('test', user?.masterDeviceId, ctx.device.id)
     if (user?.masterDeviceId !== ctx.device.id) {
       throw new GraphqlError(
         'Only the master device can approve a decryption challenge'
