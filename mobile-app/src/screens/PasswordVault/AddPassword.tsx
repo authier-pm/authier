@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react'
 
+import * as Yup from 'yup'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Flex,
@@ -28,6 +29,35 @@ interface LoginParsedValues {
   username: string
   password: string
 }
+export const PasswordSchema = Yup.object().shape({
+  url: Yup.string().url('Invalid URL').required('Required'),
+  label: Yup.string().required('Required'),
+  username: Yup.string().required('Required'),
+  password: Yup.string().required('Required')
+})
+
+const InputField = ({
+  errors,
+  values,
+  name,
+  handleBlur,
+  handleChange,
+  header
+}) => {
+  return (
+    <FormControl isInvalid={name in errors}>
+      <InputHeader>{header}:</InputHeader>
+      <Input
+        value={values[name]}
+        onChangeText={handleChange(name)}
+        onBlur={handleBlur(name)}
+        isRequired
+        size={'lg'}
+      />
+      <FormControl.ErrorMessage>{errors[name]}</FormControl.ErrorMessage>
+    </FormControl>
+  )
+}
 
 export const AddPassword = () => {
   const [show, setShow] = useState(false)
@@ -46,6 +76,7 @@ export const AddPassword = () => {
         label: '',
         username: ''
       }}
+      validationSchema={PasswordSchema}
       onSubmit={async (
         values: LoginParsedValues,
         { setSubmitting }: FormikHelpers<LoginParsedValues>
@@ -93,50 +124,49 @@ export const AddPassword = () => {
         dirty,
         handleChange,
         handleBlur,
-        handleSubmit
+        handleSubmit,
+        errors,
+        isValid
       }) => {
         const levelOfPsw = passwordStrength(values.password)
 
         return (
           <Flex p={5} flexDirection="column">
-            <FormControl>
-              <InputHeader>URL:</InputHeader>
-              <Input
-                value={values.url}
-                onChangeText={handleChange('url')}
-                onBlur={handleBlur('url')}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'url',
+                handleBlur,
+                handleChange,
+                header: 'URL'
+              }}
+            />
 
-            <FormControl>
-              <InputHeader>Label:</InputHeader>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'label',
+                header: 'Label',
+                handleBlur,
+                handleChange
+              }}
+            />
 
-              <Input
-                value={values.label}
-                isRequired
-                onChangeText={handleChange('label')}
-                onBlur={handleBlur('label')}
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'username',
+                handleChange,
+                handleBlur,
+                header: 'Username'
+              }}
+            />
 
-            <FormControl>
-              <InputHeader>Username:</InputHeader>
-
-              <Input
-                value={values.username}
-                onChangeText={handleChange('username')}
-                onBlur={handleBlur('username')}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
-
-            <FormControl>
+            <FormControl isInvalid={'password' in errors}>
               <InputHeader>Password:</InputHeader>
-
               <Input
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
@@ -165,12 +195,15 @@ export const AddPassword = () => {
                 min={0}
                 mb={1}
               />
+              <FormControl.ErrorMessage>
+                {errors.password}
+              </FormControl.ErrorMessage>
             </FormControl>
 
             <Button
               mt={5}
               onPress={handleSubmit}
-              isDisabled={isSubmitting || !dirty}
+              isDisabled={isSubmitting || !dirty || !isValid}
               isLoading={isSubmitting}
               size={'md'}
               fontSize={'sm'}

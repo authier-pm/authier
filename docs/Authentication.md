@@ -8,10 +8,16 @@ This is simple description of authentication process in authier
 
 1. Get password from user
 2. generate encryption salt
-3. Use PBFK2 for password encryption (password + encryption salt (random string) = masterEncryptionKey)
-4. Generate deviceSecret (initLocalDeviceAuthSecret = authSecret (random string) + masterEncryptionKey + (parsed) userId = adddeviceSecret + adddeviceSecretEncrypted)
+3. PBFK2 = password + encryption salt = masterEncryptionKey
+4. AES = `authSecret` + `masterEncryptionKey` + `userId` = addDeviceSecretEncrypted (+ addDeviceSecret)
+
+- authSecret = random string
+- we use AES cypher to get `addDeviceSecretEncrypted` from materEncryptionKey, userId and authSecret
+
 5. Call `registerNewUser` mutation
-6. If accessToken is in the responce we can create device state
+6. If accessToken is in the responce we create state
+
+#
 
 ```mermaid
 graph Register
@@ -31,7 +37,6 @@ graph Register
     }
 
     initLocalDeviceAuthSecret --> registerNewUser: Call register function on server
-    registerNewUser --> CreateUserInDB
 ```
 
 #### Login
@@ -45,4 +50,13 @@ graph Register
 6. Generate new deviceSecret and encrypt it with masterEncryptionKey
 7. Call `addNewDevice` mutation on backend
 
-## Server
+# Server mutations
+
+### registerNewUser
+
+1. create user with device in DB
+2. check if user with such email or device exists
+3. get the user device and set it on master
+4. returns signed accessToken with user data
+
+### deviceDecryptionChallenge

@@ -284,6 +284,7 @@ importers:
       styled-system: ^5.1.5
       typescript: ^4.8.4
       vision-camera-code-scanner: ^0.2.0
+      yup: ^0.32.11
       zod: ^3.19.1
     dependencies:
       '@apollo/client': 3.7.0_onqnqwb3ubg5opvemcqf7c2qhy
@@ -355,6 +356,7 @@ importers:
       react-native-vision-camera: 2.14.1_5ifwsx3kh4yeq2aw7ur5frzkxu
       styled-system: 5.1.5
       vision-camera-code-scanner: 0.2.0_fal4bqh6e5uqryivk23hv6zvpa
+      yup: 0.32.11
       zod: 3.19.1
     devDependencies:
       '@babel/core': 7.19.3
@@ -10162,6 +10164,7 @@ packages:
 
   /@types/lodash/4.14.183:
     resolution: {integrity: sha512-UXavyuxzXKMqJPEpFPri6Ku5F9af6ZJXUneHhvQJxavrEjuHkFp2YnDWHcxJiG7hk8ZkWqjcyNeW1s/smZv5cw==}
+    dev: true
 
   /@types/lodash/4.14.186:
     resolution: {integrity: sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==}
@@ -11133,7 +11136,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.0_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.0_onqnqwb3ubg5opvemcqf7c2qhy
       graphql: 16.6.0
     dev: false
 
@@ -24447,7 +24450,7 @@ packages:
     engines: {node: '>=10'}
     dependencies:
       '@babel/runtime': 7.19.4
-      '@types/lodash': 4.14.183
+      '@types/lodash': 4.14.186
       lodash: 4.17.21
       lodash-es: 4.17.21
       nanoclone: 0.2.1

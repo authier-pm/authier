@@ -27,6 +27,7 @@ import {
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 import { PasswordStackScreenProps } from '@navigation/types'
+import { PasswordSchema } from './AddPassword'
 
 interface LoginParsedValues {
   url: string
@@ -48,6 +49,28 @@ export const InputHeader = ({ children }) => {
     </FormControl.Label>
   )
 }
+const InputField = ({
+  errors,
+  values,
+  name,
+  handleBlur,
+  handleChange,
+  header
+}) => {
+  return (
+    <FormControl isInvalid={name in errors}>
+      <InputHeader>{header}:</InputHeader>
+      <Input
+        defaultValue={values[name]}
+        onChangeText={handleChange(name)}
+        onBlur={handleBlur(name)}
+        isRequired
+        size={'lg'}
+      />
+      <FormControl.ErrorMessage>{errors[name]}</FormControl.ErrorMessage>
+    </FormControl>
+  )
+}
 
 const LoginSecret = (secretProps: ILoginSecret) => {
   const { loginCredentials } = secretProps
@@ -67,6 +90,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           label: loginCredentials.label,
           username: loginCredentials.username
         }}
+        validationSchema={PasswordSchema}
         onSubmit={async (
           values: LoginParsedValues,
           { setSubmitting, resetForm }: FormikHelpers<LoginParsedValues>
@@ -108,54 +132,46 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           dirty,
           handleChange,
           handleBlur,
-          handleSubmit
+          handleSubmit,
+          isValid,
+          errors
         }) => {
           const levelOfPsw = passwordStrength(values.password)
 
           return (
             <Flex p={5} flexDirection="column">
-              <FormControl>
-                <InputHeader>URL:</InputHeader>
-                <Input
-                  defaultValue={values.url}
-                  onChangeText={handleChange('url')}
-                  onBlur={handleBlur('url')}
-                  isRequired
-                  size={'lg'}
-                />
-              </FormControl>
+              <InputField
+                errors={errors}
+                values={values}
+                name="url"
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                header="URL"
+              />
+              <InputField
+                errors={errors}
+                values={values}
+                name="label"
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                header="Label"
+              />
 
-              <FormControl>
-                <InputHeader>Label:</InputHeader>
+              <InputField
+                errors={errors}
+                values={values}
+                name="username"
+                handleBlur={handleBlur}
+                handleChange={handleChange}
+                header="Username"
+              />
 
-                <Input
-                  defaultValue={values.label}
-                  isRequired
-                  onChangeText={handleChange('label')}
-                  onBlur={handleBlur('label')}
-                  size={'lg'}
-                />
-              </FormControl>
-
-              <FormControl>
-                <InputHeader>Username:</InputHeader>
-
-                <Input
-                  defaultValue={values.username}
-                  onChangeText={handleChange('username')}
-                  onBlur={handleBlur('username')}
-                  isRequired
-                  size={'lg'}
-                />
-              </FormControl>
-
-              <FormControl>
+              <FormControl isInvalid={'password' in errors}>
                 <InputHeader>Password:</InputHeader>
-
                 <Input
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
-                  defaultValue={values.password}
+                  value={values.password}
                   type={show ? 'text' : 'password'}
                   size={'lg'}
                   InputRightElement={
@@ -171,7 +187,6 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       onPress={() => setShow(!show)}
                     />
                   }
-                  placeholder="Password"
                 />
                 <Progress
                   value={levelOfPsw.id}
@@ -181,6 +196,9 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                   min={0}
                   mb={1}
                 />
+                <FormControl.ErrorMessage>
+                  {errors.password}
+                </FormControl.ErrorMessage>
               </FormControl>
 
               {secretProps.loginCredentials.parseError && (
@@ -194,7 +212,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                 rounded={15}
                 mt={5}
                 onPress={handleSubmit}
-                isDisabled={isSubmitting || !dirty}
+                isDisabled={isSubmitting || !dirty || !isValid}
                 isLoading={isSubmitting}
                 size={'md'}
                 fontSize={'sm'}
