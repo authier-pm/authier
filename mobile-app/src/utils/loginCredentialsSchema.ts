@@ -17,5 +17,5 @@ export const totpSchema = secretUrlsSchema.extend({
   secret: z.string().min(1),
   digits: z.number(),
   period: z.number(),
-  url: z.string().min(1).nullish()
+  url: z.string().min(1).nullish() //FIX: This should not be nullish
 })

@@ -1,31 +1,14 @@
 import React, { useContext } from 'react'
 
 import { Formik, FormikHelpers } from 'formik'
-import {
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  HStack,
-  Input,
-  ScrollView
-} from 'native-base'
-import * as Yup from 'yup'
+import { Button, Flex, FormControl, Input, ScrollView } from 'native-base'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
 import { TOTPStackScreenProps } from '../../navigation/types'
 import { TotpTypeWithMeta } from '@src/utils/Device'
-
-export const TOTPSchema = Yup.object().shape({
-  url: Yup.string().url('Invalid URL').required('Required'),
-  label: Yup.string().required('Required'),
-  secret: Yup.string().required('Required'),
-  iconUrl: Yup.string().url('Invalid URL').nullable(),
-  digits: Yup.number().min(6).max(8).required('Required'),
-  period: Yup.number().min(30).max(120).required('Required')
-})
+import { TOTPSchema } from '@shared/formikSharedTypes'
 
 const InputField = ({
   errors,

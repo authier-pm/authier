@@ -116,7 +116,7 @@ export class UserMutation extends UserBase {
     secrets: EncryptedSecretInput[],
     @Ctx() ctx: IContextAuthenticated
   ) {
-    const userData = ctx.prisma.user.findFirst({
+    const userData = await ctx.prisma.user.findFirst({
       where: {
         id: ctx.jwtPayload.userId
       }
@@ -125,7 +125,7 @@ export class UserMutation extends UserBase {
     const userQuery = new UserQuery(userData)
     const pswLimit = await userQuery.PasswordLimits(ctx)
     const TOTPLimit = await userQuery.TOTPLimits(ctx)
-    const pswCount = await ctx.prisma.encryptedSecret.count({
+    let pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
         kind: 'LOGIN_CREDENTIALS',
@@ -133,7 +133,7 @@ export class UserMutation extends UserBase {
       }
     })
 
-    const TOTPCount = await ctx.prisma.encryptedSecret.count({
+    let TOTPCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
         kind: 'TOTP',
@@ -141,13 +141,22 @@ export class UserMutation extends UserBase {
       }
     })
 
-    console.log(pswLimit, pswCount)
+    secrets.forEach((secret) => {
+      if (secret.kind === 'LOGIN_CREDENTIALS') {
+        pswCount++
+      } else if (secret.kind === 'TOTP') {
+        TOTPCount++
+      }
+    })
 
-    if (pswCount >= pswLimit) {
+    console.log(pswCount, pswLimit, TOTPCount, TOTPLimit)
+    if (pswCount > pswLimit) {
+      console.log('psw exceeded')
       return new GraphqlError(`Password limit exceeded.`)
     }
 
-    if (TOTPCount >= TOTPLimit) {
+    if (TOTPCount > TOTPLimit) {
+      console.log('TOTP exceeded')
       return new GraphqlError(`TOTP limit exceeded.`)
     }
     return ctx.prisma.$transaction(

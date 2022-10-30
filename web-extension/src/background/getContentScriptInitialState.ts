@@ -21,20 +21,23 @@ export const getContentScriptInitialState = async (
   tabUrl: string,
   currentTabId: number
 ): Promise<IInitStateRes> => {
-  console.log('TEST', tabUrl)
+  console.log('tabUrl', tabUrl)
   const hostname = new URL(tabUrl).hostname
   console.log('~ getContentScriptInitialState')
   const decrypted =
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
-  const userInfo = await getPasswordLimit()
+  const userInfo = await getAccountLimits()
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     autofillEnabled: !!device.state?.autofill,
     webInputs: res.data.webInputs,
     passwordLimit: userInfo.data.me.PasswordLimits,
-    passwordCount: device.state?.secrets.length ?? 0,
+    passwordCount:
+      device.state?.secrets.filter(
+        (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+      ).length ?? 0,
     secretsForHost: {
       loginCredentials: decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
@@ -49,7 +52,7 @@ export const getContentScriptInitialState = async (
   }
 }
 
-const getPasswordLimit = () => {
+const getAccountLimits = () => {
   return apolloClient.query<MeExtensionQuery, MeExtensionQueryVariables>({
     query: MeExtensionDocument,
     fetchPolicy: 'network-only'

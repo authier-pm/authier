@@ -1,13 +1,35 @@
-import { useColorModeValue, Flex, Select } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import {
+  useColorModeValue,
+  Flex,
+  Select,
+  Box,
+  Text,
+  Spinner
+} from '@chakra-ui/react'
+import React, { useContext, useState } from 'react'
 
 import { motion } from 'framer-motion'
 
 import { AddLogin } from '@src/components/vault/addItem/AddLogin'
 import { AddTOTP } from '@src/components/vault/addItem/AddTOTP'
+import { useMeExtensionQuery } from './AccountLimits.codegen'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const AddItem = () => {
-  const [type, setType] = useState('Login')
+  const [type, setType] = useState<String | null>(null)
+  const { loginCredentials: LoginCredentials, TOTPSecrets } =
+    useContext(DeviceStateContext)
+  const { data, loading } = useMeExtensionQuery({
+    fetchPolicy: 'network-only'
+  })
+
+  const bg = useColorModeValue('white', 'gray.800')
+
+  if (loading) {
+    return <Spinner />
+  }
+  const totpCond = data!.me.TOTPlimit <= TOTPSecrets.length
+  const pswCond = data!.me.PasswordLimits <= LoginCredentials.length
 
   return (
     <motion.div
@@ -21,27 +43,39 @@ export const AddItem = () => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '50%' }}
+        width={{ base: '90%', sm: '70%', lg: '60%', xl: '50%', '2xl': '40%' }}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={bg}
       >
         <Select
           onChange={(e) => setType(e.target.value)}
-          defaultValue={'Login'}
+          defaultValue={undefined}
           placeholder="Select type"
           w={'50%'}
           mt={5}
         >
-          <option value="TOTP">TOTP</option>
-          <option value="Login">Login</option>
+          <option disabled={totpCond} value="TOTP">
+            TOTP
+          </option>
+          <option disabled={pswCond} value="Login">
+            Login
+          </option>
         </Select>
 
-        {type === 'Login' ? <AddLogin /> : <AddTOTP />}
+        {type === 'Login' ? (
+          <AddLogin />
+        ) : type === 'TOTP' ? (
+          <AddTOTP />
+        ) : (
+          <Box>
+            <Text>Select a type</Text>
+          </Box>
+        )}
       </Flex>
     </motion.div>
   )

@@ -1,6 +1,5 @@
 import React, { useContext, useState } from 'react'
 
-import * as Yup from 'yup'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Flex,
@@ -22,19 +21,7 @@ import { PasswordStackScreenProps } from '../../navigation/types'
 import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import { loginCredentialsSchema } from '@src/utils/loginCredentialsSchema'
-
-interface LoginParsedValues {
-  url: string
-  label: string
-  username: string
-  password: string
-}
-export const PasswordSchema = Yup.object().shape({
-  url: Yup.string().url('Invalid URL').required('Required'),
-  label: Yup.string().required('Required'),
-  username: Yup.string().required('Required'),
-  password: Yup.string().required('Required')
-})
+import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 
 const InputField = ({
   errors,
@@ -78,8 +65,8 @@ export const AddPassword = () => {
       }}
       validationSchema={PasswordSchema}
       onSubmit={async (
-        values: LoginParsedValues,
-        { setSubmitting }: FormikHelpers<LoginParsedValues>
+        values: credentialValues,
+        { setSubmitting }: FormikHelpers<credentialValues>
       ) => {
         const unencryptedData = {
           password: values.password,

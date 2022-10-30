@@ -1,14 +1,12 @@
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useLayoutEffect } from 'react'
 
 import {
   Alert,
   Button,
   Flex,
   FormControl,
-  Icon,
   Input,
   Spinner,
-  useColorModeValue,
   View
 } from 'native-base'
 
@@ -20,15 +18,7 @@ import { ITOTPSecret } from '../../utils/Device'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { TOTPStackScreenProps } from '../../navigation/types'
 import { InputHeader } from '../PasswordVault/EditPassword'
-import { TOTPSchema } from './AddTOTP'
-
-interface totpValues {
-  secret: string
-  url: string
-  label: string
-  digits: number
-  period: number
-}
+import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
 
 const InputField = ({
   errors,
