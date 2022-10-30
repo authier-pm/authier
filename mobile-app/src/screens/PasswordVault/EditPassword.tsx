@@ -27,7 +27,7 @@ import {
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 import { PasswordStackScreenProps } from '@navigation/types'
-import { PasswordSchema } from './AddPassword'
+import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
 
 interface LoginParsedValues {
   url: string
@@ -92,8 +92,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         }}
         validationSchema={PasswordSchema}
         onSubmit={async (
-          values: LoginParsedValues,
-          { setSubmitting, resetForm }: FormikHelpers<LoginParsedValues>
+          values: credentialValues,
+          { setSubmitting, resetForm }: FormikHelpers<credentialValues>
         ) => {
           const secret = device.state?.secrets.find(
             ({ id }) => id === secretProps.id
