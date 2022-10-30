@@ -11,6 +11,11 @@ import { device } from './ExtensionDevice'
 import mem from 'mem'
 import ms from 'ms'
 import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import {
+  MeExtensionDocument,
+  MeExtensionQuery,
+  MeExtensionQueryVariables
+} from '@src/pages-vault/AccountLimits.codegen'
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
@@ -23,11 +28,13 @@ export const getContentScriptInitialState = async (
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
-  console.log('getWebInputs', res.data.webInputs, hostname)
+  const userInfo = await getPasswordLimit()
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     autofillEnabled: !!device.state?.autofill,
     webInputs: res.data.webInputs,
+    passwordLimit: userInfo.data.me.PasswordLimits,
+    passwordCount: device.state?.secrets.length ?? 0,
     secretsForHost: {
       loginCredentials: decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
@@ -40,6 +47,13 @@ export const getContentScriptInitialState = async (
       ? saveLoginModalsStates.get(currentTabId)
       : null
   }
+}
+
+const getPasswordLimit = () => {
+  return apolloClient.query<MeExtensionQuery, MeExtensionQueryVariables>({
+    query: MeExtensionDocument,
+    fetchPolicy: 'network-only'
+  })
 }
 
 // TODO stop using mem for this, we should be able to use the apollo cache

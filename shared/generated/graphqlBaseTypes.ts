@@ -27,6 +27,7 @@ export type Scalars = {
 export type AddNewDeviceInput = {
   addDeviceSecret: Scalars['NonEmptyString'];
   addDeviceSecretEncrypted: Scalars['NonEmptyString'];
+  devicePlatform: Scalars['String'];
   firebaseToken: Scalars['String'];
 };
 

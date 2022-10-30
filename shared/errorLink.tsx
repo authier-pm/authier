@@ -20,7 +20,7 @@ export const errorLink = onError(
         console.error('full operation: ', print(operation.query))
       })
 
-      // Does the toast even work from here?
+      //FIX: Does the toast even work from here?
       toast.error(graphQLErrors[0].message ?? 'There was API error.')
     } else if (networkError) {
       console.error(`[Network error]: ${networkError}`)

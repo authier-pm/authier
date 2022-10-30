@@ -33,11 +33,11 @@ export const Home: FunctionComponent = () => {
   const filterByTLD = !currentURL
     ? true
     : filterByTLDManual === null
-    ? currentURL.startsWith('http')
-    : filterByTLDManual
+      ? currentURL.startsWith('http')
+      : filterByTLDManual
   return (
     <>
-      <Flex position="sticky" align="center" pl={4} pr={4} mt={3}>
+      <Flex position="sticky" align="center" pl={4} pr={4} mt={'56px'}>
         <FormControl display="flex" alignItems="center">
           <FormLabel mb="0">Filter by TLD</FormLabel>
           <Switch
@@ -71,7 +71,7 @@ export const Home: FunctionComponent = () => {
           />
         )}
       </Flex>
-      <Box height={300} width={350} p={5} mb={5}>
+      <Box height={300} width={350} pr={5} pl={5} mb={2}>
         <Grid gap={3} mb={5}>
           <AuthsList filterByTLD={filterByTLD} />
         </Grid>

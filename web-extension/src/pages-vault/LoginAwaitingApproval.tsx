@@ -36,6 +36,7 @@ export const useLogin = (props: { deviceName: string }) => {
     }
   })
 
+  //FIX: Should be handled by the error link
   useEffect(() => {
     if (error || decrChallError) {
       toast.error('failed to create decryption challenge')
@@ -56,7 +57,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -68,7 +69,7 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         if (!deviceDecryptionChallenge?.id) {
-          toast.error('failed to create decryption challenge')
+          toast.error('Failed to create decryption challenge')
           return
         }
 
@@ -88,7 +89,7 @@ export const useLogin = (props: { deviceName: string }) => {
         console.log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
-          toast.error('wrong password or email')
+          toast.error(t`Login failed, check your email or password`)
           setFormState(null)
           return
         }
@@ -114,7 +115,8 @@ export const useLogin = (props: { deviceName: string }) => {
             input: {
               addDeviceSecret: newAuthSecret,
               addDeviceSecretEncrypted: newAuthSecretEncrypted,
-              firebaseToken: fireToken
+              firebaseToken: fireToken,
+              devicePlatform: device.platform
             },
             currentAddDeviceSecret
           }
@@ -127,7 +129,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 

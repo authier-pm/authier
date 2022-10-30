@@ -44,18 +44,24 @@ export const NavBar: FunctionComponent = () => {
     )
   }
 
-  const bg = useColorModeValue('whitesmoke', 'white.500')
+  const bg = useColorModeValue('gray.100', 'gray.800')
 
   useEffect(() => {
     SetLastPage(location)
   }, [])
 
   return (
-    <Flex flexDir="column">
+    <Flex
+      flexDir="column"
+      position="fixed"
+      top="0"
+      w="100%"
+      backgroundColor={bg}
+      zIndex={2}
+    >
       <Flex
         p={1}
         textAlign="center"
-        backgroundColor={bg}
         fontSize="16px"
         borderBottom="1px"
         borderBottomColor="gray.300"
