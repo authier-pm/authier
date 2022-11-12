@@ -98,6 +98,7 @@ importers:
       graphql-list-fields: ^2.0.2
       graphql-scalars: ^1.20.1
       ip: ^1.1.8
+      is-ci: ^3.0.1
       jsonwebtoken: ^8.5.1
       lodash.set: ^4.3.2
       mem: '8'
@@ -175,6 +176,7 @@ importers:
       constructs: 10.1.157
       esbuild: 0.15.13
       graphql: 16.6.0
+      is-ci: 3.0.1
       mz: 2.7.0
       nodemon: 2.0.20
       prisma-typegraphql-types-generator: 1.5.14
@@ -2703,6 +2705,13 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+
+  /@balena/dockerignore/1.0.2:
+    resolution:
+      {
+        integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==
+      }
+    dev: true
 
   /@bcoe/v8-coverage/0.2.3:
     resolution:
@@ -14518,7 +14527,16 @@ packages:
     peerDependencies:
       constructs: ^10.0.0
     dependencies:
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.157
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.8
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -15602,6 +15620,14 @@ packages:
       no-case: 3.0.4
       tslib: 2.4.0
       upper-case-first: 2.0.2
+    dev: true
+
+  /case/1.6.3:
+    resolution:
+      {
+        integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
+      }
+    engines: { node: '>= 0.8.0' }
     dev: true
 
   /caseless/0.12.0:
@@ -21298,6 +21324,16 @@ packages:
     engines: { node: '>= 0.4' }
     dev: true
 
+  /is-ci/3.0.1:
+    resolution:
+      {
+        integrity: sha512-ZYvCgrefwqoQ6yTyYUbQu64HsITZ3NfKX1lzaEYdkTDcfKzzCI/wthRRYKkdjHKFVgNiXKAKm65Zo1pk2as/QQ==
+      }
+    hasBin: true
+    dependencies:
+      ci-info: 3.4.0
+    dev: true
+
   /is-core-module/2.10.0:
     resolution:
       {
@@ -23327,6 +23363,13 @@ packages:
     resolution:
       {
         integrity: sha512-trvBk1ki43VZptdBI5rIlG4YOzyeH/WefQt5rj1grasPn4iiZWKet8nkgc4GlsAylaztn0qZfUYOiTsASJFdNA==
+      }
+    dev: true
+
+  /jsonschema/1.4.1:
+    resolution:
+      {
+        integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==
       }
     dev: true
 
