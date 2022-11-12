@@ -97,8 +97,15 @@ jobs:
         if: github.ref == 'refs/heads/main'
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          NODE_ENV: production
+          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
+          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET}}
+          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET}}
+          FREE_GEOIP_API_KEY: ${{ secrets.FREE_GEOIP_API_KEY}}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN}}
+          MJ_APIKEY_PUBLIC: ${{ secrets.MJ_APIKEY_PUBLIC}}
+          MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE}}
 
         run: |
           pnpm migrateDeploy
-          pnpm gen
           pnpm cdkDeploy
