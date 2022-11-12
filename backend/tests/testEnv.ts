@@ -1,6 +1,6 @@
 import 'reflect-metadata'
 import faker from 'faker'
-import '../dotenv'
+import 'dotenv/config'
 import { afterAll, beforeAll, vi } from 'vitest'
 import debug from 'debug'
 faker.seed(1)

@@ -1,4 +1,4 @@
-import '../dotenv'
+import 'dotenv/config'
 
 import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'

@@ -3,7 +3,7 @@ import fastify, { FastifyRequest } from 'fastify'
 
 import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
-import './dotenv'
+import 'dotenv/config'
 
 import cookie, { FastifyCookieOptions } from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'

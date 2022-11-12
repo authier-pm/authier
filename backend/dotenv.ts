@@ -1,4 +1,4 @@
-import 'dotenv/config'
-// const { parsed } = dotenv.config()
+import dotenv from 'dotenv'
+const { parsed } = dotenv.config()
 
-// export default parsed
+export default parsed
