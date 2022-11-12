@@ -49,6 +49,10 @@ const fs = require('fs/promises')
     parents: true
   })
 
+  await cpy(['./prisma/schema.prisma'], './dist/node_modules/.prisma/client', {
+    parents: false
+  })
+
   console.log(`${r.length} files copied!`)
 
   // await Promise.all([moveFile('node_modules', '../dist/back-end/node_modules')])
