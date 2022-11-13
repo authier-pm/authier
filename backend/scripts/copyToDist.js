@@ -38,7 +38,7 @@ const fs = require('fs/promises')
     ]
   })
 
-  await cpy(['../node_modules/.prisma/**'], './dist/node_modules', {
+  await cpy(['./node_modules/.prisma/**'], './dist', {
     parents: true,
     ignore: [
       '../node_modules/.prisma/client/libquery_engine-debian-openssl-1.1.x.so.node',
