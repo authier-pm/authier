@@ -1,8 +1,8 @@
 # Authentication
 
-This is simple description of authentication process in authier
+This is (in progress) simple description of authentication process in authier
 
-## Client
+# Client
 
 #### Register
 
@@ -17,10 +17,8 @@ This is simple description of authentication process in authier
 5. Call `registerNewUser` mutation
 6. If accessToken is in the responce we create state
 
-#
-
 ```mermaid
-graph Register
+stateDiagram-v2
     generateBackendSecret --> authSecret*: Random string
 
     password --> PBFK2
@@ -56,7 +54,25 @@ graph Register
 
 1. create user with device in DB
 2. check if user with such email or device exists
-3. get the user device and set it on master
+3. get the current user device and set it on master
 4. returns signed accessToken with user data
 
 ### deviceDecryptionChallenge
+
+1. Get user by email (if exists)
+2. Check if is user blocked
+3. Check decryption challenge count
+4. Get current device with challenge
+5. If we find only one device in DB witout challenge, we create one challenge and mark it as approved
+6. Check if is challenge rejected
+7. If we dont find any challenge, we check for firebaseToken. If it has ont we send notification and create challenge
+8. Check if is challenge approved and return `addDeviceSecretEncrypted` with `encryptionSalt`
+
+## addNewDevice
+
+1. Get user by userId
+2. Check if user exists and if we got right addDeviceSecet (masterPassword validation)
+3. Update user with new `addDeviceSecret` and `addDeviceSecretEncrypted`
+4. Mark device's decryption challenge as masterPasswordVerified
+5. Check if is device registered for another user
+6. Create new device in DB

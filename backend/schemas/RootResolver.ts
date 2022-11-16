@@ -289,6 +289,7 @@ export class RootResolver {
       }
     })
 
+    //TODO: Check this condition, not sure what is this doing
     if (device) {
       if (!challenge) {
         const deviceCount = await ctx.prisma.device.count({
