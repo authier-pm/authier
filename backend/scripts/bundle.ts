@@ -1,7 +1,14 @@
 import { build } from 'esbuild'
 import { esbuildDecorators } from '@anatine/esbuild-decorators'
 import esbuildFileLocPlugin from './esbuildFileLocPlugin'
+
+import isCi from 'is-ci'
+import path from 'path'
 ;(async () => {
+  const parentFolderAtRuntime = isCi
+    ? '/var/task'
+    : path.resolve(process.cwd(), '..')
+  console.log('parentFolderAtRuntime', parentFolderAtRuntime)
   await build({
     entryPoints: ['lambda.ts'],
     bundle: true,
@@ -14,7 +21,7 @@ import esbuildFileLocPlugin from './esbuildFileLocPlugin'
         tsconfig: 'tsconfig.json',
         cwd: process.cwd()
       }),
-      esbuildFileLocPlugin('/var/task')
+      esbuildFileLocPlugin(parentFolderAtRuntime)
     ],
     sourcemap: true
   })

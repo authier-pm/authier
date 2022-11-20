@@ -181,7 +181,10 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
   })
   const loginCredentialForCurrentDomain = loginCredentials.filter(
     ({ loginCredentials }) => {
-      if (!currentURL || !loginCredentials.url) {
+      if (!loginCredentials.url) {
+        return false // for example TOTP secrets do not have any URL after import from authy
+      }
+      if (!currentURL) {
         return true
       }
 

@@ -33,6 +33,10 @@ ALTER USER authier WITH SUPERUSER;
 We run tests across many local DBs to avoid problems when multiple parallel tests write into a single DB.
 One running test will always write to it's own DB. That's why when you run `yarn test:prepare` it creates many as many DBs as you have CPU cores on your machine.
 
+### running the bundled code
+
+you can run bundled lambda locally to check for bundling issues etc. Just run `pnpm build` and `node dist/lambda.js`
+
 ## AWS URL
 
 https://stackoverflow.com/questions/63684133/prisma-cant-connect-to-postgresql#:~:text=replace%20special%20characters%20with%20percent-encodings
