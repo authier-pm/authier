@@ -1,7 +1,7 @@
 name: Playwright Tests
 on:
   push:
-    branches: [main]
+    branches: [main, docs-update]
   pull_request:
     branches: [main]
 jobs:
@@ -10,13 +10,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
+
       - uses: actions/setup-node@v3
         with:
           node-version: 16
+
       - name: Install dependencies
         run: pnpm install
+
+      - name: backend install deps, check TS and run jest
+        working-directory: ./backend
+        env:
+          DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
+        run: |
+          pnpm gen
+          pnpm tsc
+          cp .env.sample .env
+          pnpm dev
+
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+
       - name: Run Playwright tests
         run: xvfb-run --auto-servernum -- pnpm dlx playwright test
       - uses: actions/upload-artifact@v3

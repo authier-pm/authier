@@ -120,7 +120,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
   if (autofillEnabled === true) {
     log('enabled is true, returning')
-    return () => { }
+    return () => {}
   }
   log('init autofill', initState)
 
@@ -279,7 +279,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     if (!namePassSecret && !totpSecret) {
       log('no secrets for host')
-      return () => { }
+      return () => {}
     }
 
     if (filledElements.length === 2) {

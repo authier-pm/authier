@@ -1,9 +1,9 @@
 import { onError } from '@apollo/client/link/error'
-import 'react-toastify/dist/ReactToastify.css'
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
 //@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
+import 'react-toastify/dist/ReactToastify.css'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
