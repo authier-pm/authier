@@ -1,9 +1,9 @@
-import mailjet from 'node-mailjet'
+import Mailjet from 'node-mailjet'
 import debug from 'debug'
-
 const log = debug('au:email')
 
-const client = mailjet.apiConnect(
+// @ts-ignore
+const client = Mailjet.connect(
   process.env.MJ_APIKEY_PUBLIC!,
   process.env.MJ_APIKEY_PRIVATE!
 )
