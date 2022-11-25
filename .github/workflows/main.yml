@@ -75,7 +75,22 @@ jobs:
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           pnpm tsc
-          pnpm test
+
+      - name: Install Playwright Browsers and run backend
+        working-directory: ./web-extension
+        run: |
+          npx playwright install --with-deps
+          cd .. && cd backend && pnpm dev
+
+      - name: Run Playwright tests
+        working-directory: ./web-extension
+        run: xvfb-run --auto-servernum -- pnpm dlx playwright test
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app

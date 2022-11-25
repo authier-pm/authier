@@ -4,7 +4,7 @@ import { makeRegisterAccountInput } from '../schemas/RootResolver.spec'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
 import { User } from '.prisma/client'
 import faker from 'faker'
-import { beforeAll, describe, expect, it } from 'vitest'
+import { beforeAll, describe, it } from 'vitest'
 
 describe('Device', () => {
   let user: User
