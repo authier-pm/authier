@@ -266,7 +266,7 @@ export class UserMutation extends UserBase {
         }
       )
       // FIX: Not sure what we return here, might be wrong
-      return res.body.length
+      return res.body.Messages.length
     }
   }
 
