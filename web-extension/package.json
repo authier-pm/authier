@@ -14,7 +14,8 @@
     "playwright:run": "npx playwright test",
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
-    "gen": "graphql-codegen"
+    "gen": "graphql-codegen",
+    "test:run": "concurrently \"cd .. && cd backend && pnpm dev\" \" npx playwright install --with-deps\""
   },
   "keywords": [
     "react",

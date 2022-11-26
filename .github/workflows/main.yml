@@ -30,6 +30,15 @@ jobs:
       AWS_REGION: eu-central-1
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      NODE_ENV: production
+      ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
+      REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET}}
+      COOKIE_SECRET: ${{ secrets.COOKIE_SECRET}}
+      FREE_GEOIP_API_KEY: ${{ secrets.FREE_GEOIP_API_KEY}}
+      SENTRY_DSN: ${{ secrets.SENTRY_DSN}}
+      MJ_APIKEY_PUBLIC: ${{ secrets.MJ_APIKEY_PUBLIC}}
+      MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE}}
 
     steps:
       - uses: actions/checkout@v3
@@ -79,8 +88,7 @@ jobs:
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
         run: |
-          npx playwright install --with-deps
-          cd .. && cd backend && pnpm dev
+          pnpm test:run
 
       - name: Run Playwright tests
         working-directory: ./web-extension
@@ -110,17 +118,6 @@ jobs:
       - name: backend build and deploy
         working-directory: ./backend
         if: github.ref == 'refs/heads/main'
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          NODE_ENV: production
-          ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET}}
-          REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET}}
-          COOKIE_SECRET: ${{ secrets.COOKIE_SECRET}}
-          FREE_GEOIP_API_KEY: ${{ secrets.FREE_GEOIP_API_KEY}}
-          SENTRY_DSN: ${{ secrets.SENTRY_DSN}}
-          MJ_APIKEY_PUBLIC: ${{ secrets.MJ_APIKEY_PUBLIC}}
-          MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE}}
-
         run: |
           pnpm migrateDeploy
           pnpm cdkDeploy

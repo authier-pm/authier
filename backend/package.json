@@ -59,6 +59,7 @@
     "@types/uuid": "^8.3.4",
     "aws-cdk": "2.50.0",
     "aws-cdk-lib": "^2.50.0",
+    "concurrently": "^7.6.0",
     "constructs": "^10.1.157",
     "esbuild": "^0.15.13",
     "graphql": "^16.6.0",
