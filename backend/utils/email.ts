@@ -3,7 +3,7 @@ import debug from 'debug'
 
 const log = debug('au:email')
 
-const client = mailjet.connect(
+const client = mailjet.apiConnect(
   process.env.MJ_APIKEY_PUBLIC!,
   process.env.MJ_APIKEY_PRIVATE!
 )
