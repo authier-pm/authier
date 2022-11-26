@@ -1,9 +1,7 @@
 {
-  "ignorePaths": [
-    "*/node_modules/**",
-    "*/dist/**"
-  ],
+  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
   "words": [
+    "APIKEY",
     "appspot",
     "authier",
     "auths",
