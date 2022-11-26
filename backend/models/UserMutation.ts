@@ -265,8 +265,7 @@ export class UserMutation extends UserBase {
           </html>`
         }
       )
-      // FIX: Not sure what we return here, might be wrong
-      return res.body.Messages.length
+      return res.response.status === 200 ? 1 : 0
     }
   }
 
