@@ -42,7 +42,7 @@ beforeAll(() => {
   // we don't want to send anything from tests.
   vi.mock('node-mailjet', () => ({
     default: {
-      connect: () => {
+      apiConnect: () => {
         return {
           post: () => {
             return fakeMailjetPost
