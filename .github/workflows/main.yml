@@ -92,7 +92,7 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: ./web-extension
-        run: npx playwright test
+        run: xvfb-run --auto-servernum -- pnpm playwright:run
 
       - uses: actions/upload-artifact@v3
         if: always()
