@@ -85,7 +85,7 @@
     "bundle": "ts-node-transpile-only scripts/bundle.ts",
     "studio": "prisma studio",
     "dbPush": "prisma db push",
-    "gen": "prisma generate",
+    "gen": "npx prisma generate",
     "tsc": "tsc",
     "start": "prisma migrate deploy && node server.js",
     "tar": "tar -czvf authier-api.tar.gz -C ./dist .",
