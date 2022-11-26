@@ -15,7 +15,7 @@
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
-    "test:run": "cd .. && cd backend && pnpm dev & cd .. && cd web-extension && npx playwright install --with-deps"
+    "test:run": "cd .. && cd backend && pnpm dev"
   },
   "keywords": [
     "react",

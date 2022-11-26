@@ -87,8 +87,12 @@ jobs:
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
         run: |
-          pnpm test:run &
-          npx playwright test
+          pnpm test:run
+          npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        working-directory: ./web-extension
+        run: npx playwright test
 
       - uses: actions/upload-artifact@v3
         if: always()
