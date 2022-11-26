@@ -87,11 +87,9 @@ jobs:
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
         run: |
-          pnpm test:run
+          pnpm test:run &
+          xvfb-run --auto-servernum -- pnpm dlx playwright test
 
-      - name: Run Playwright tests
-        working-directory: ./web-extension
-        run: xvfb-run --auto-servernum -- pnpm dlx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
