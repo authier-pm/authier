@@ -87,7 +87,7 @@ jobs:
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
         run: |
-          pnpm test:run
+          pnpm test:run &
           npx playwright install --with-deps
 
       - name: Run Playwright tests
