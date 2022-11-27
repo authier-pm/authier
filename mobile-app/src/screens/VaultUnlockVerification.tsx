@@ -160,7 +160,7 @@ export function VaultUnlockVerification() {
             <Button
               colorScheme="teal"
               isDisabled={values.password.length < 3}
-              onPress={handleSubmit}
+              onPress={handleSubmit as (values: any) => void}
               isLoading={isSubmitting}
             >
               Unlock vault

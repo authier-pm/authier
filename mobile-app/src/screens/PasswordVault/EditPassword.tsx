@@ -211,8 +211,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               <Button
                 rounded={15}
                 mt={5}
-                onPress={handleSubmit}
-                isDisabled={isSubmitting || !dirty || !isValid}
+                onPress={handleSubmit as (values: any) => void}
+                isDisabled={isSubmitting || !dirty}
                 isLoading={isSubmitting}
                 size={'md'}
                 fontSize={'sm'}

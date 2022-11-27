@@ -189,8 +189,8 @@ export const AddPassword = () => {
 
             <Button
               mt={5}
-              onPress={handleSubmit}
-              isDisabled={isSubmitting || !dirty || !isValid}
+              onPress={handleSubmit as (values: any) => void}
+              isDisabled={isSubmitting || !dirty}
               isLoading={isSubmitting}
               size={'md'}
               fontSize={'sm'}

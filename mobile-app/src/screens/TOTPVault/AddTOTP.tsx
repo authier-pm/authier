@@ -100,24 +100,10 @@ export const AddTOTP = () => {
                 {...{ values, handleBlur, handleChange }}
               />
 
-              <InputField
-                errors={errors}
-                header="Digits"
-                name="digits"
-                {...{ values, handleBlur, handleChange }}
-              />
-
-              <InputField
-                errors={errors}
-                header="Period"
-                name="period"
-                {...{ values, handleBlur, handleChange }}
-              />
-
               <Button
                 mt={5}
-                onPress={handleSubmit}
-                isDisabled={isSubmitting || !dirty || !isValid}
+                onPress={handleSubmit as (values: any) => void}
+                isDisabled={isSubmitting || !dirty}
                 isLoading={isSubmitting}
                 size={'md'}
                 fontSize={'sm'}
@@ -133,6 +119,13 @@ export const AddTOTP = () => {
               >
                 Save
               </Button>
+
+              <InputField
+                errors={errors}
+                header="Period"
+                name="period"
+                {...{ values, handleBlur, handleChange }}
+              />
 
               <Button
                 onPress={() => navigation.navigate('QRScan')}

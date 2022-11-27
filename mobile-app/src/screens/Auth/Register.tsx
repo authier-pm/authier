@@ -213,7 +213,10 @@ export function Register({ navigation }: NavigationProps) {
               </FormControl.ErrorMessage>
             </FormControl>
 
-            <Button onPress={handleSubmit} isLoading={isSubmitting}>
+            <Button
+              onPress={handleSubmit as (values: any) => void}
+              isLoading={isSubmitting}
+            >
               Register
             </Button>
           </VStack>
