@@ -142,7 +142,10 @@ export function Login({ navigation }: NavigationProps) {
               </FormControl.ErrorMessage>
             </FormControl>
 
-            <Button onPress={handleSubmit} isLoading={isSubmitting}>
+            <Button
+              onPress={handleSubmit as (values: any) => void}
+              isLoading={isSubmitting}
+            >
               <Trans>Submit</Trans>
             </Button>
             <HStack mt="2" justifyContent="center" space={1}>
