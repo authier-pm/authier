@@ -150,7 +150,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
 
             <Button
               mt={5}
-              onPress={handleSubmit}
+              onPress={handleSubmit as (values: any) => void}
               isDisabled={isSubmitting || !dirty}
               isLoading={isSubmitting}
               size={'md'}
