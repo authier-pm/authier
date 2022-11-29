@@ -84,15 +84,19 @@ jobs:
         run: |
           pnpm tsc
 
+      - name: web-extension build
+        working-directory: ./web-extension
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+        run: |
+          pnpm prodbuild
+
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
-        if: false
         run: |
           pnpm test:run &
           npx playwright install --with-deps
 
       - name: Run Playwright tests
-        if: false
         working-directory: ./web-extension
         run: xvfb-run --auto-servernum -- pnpm playwright:run
 
