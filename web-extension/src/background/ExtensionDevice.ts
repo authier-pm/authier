@@ -39,11 +39,6 @@ import {
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import { toast } from 'react-toastify'
-import {
-  MeExtensionDocument,
-  MeExtensionQuery,
-  MeExtensionQueryVariables
-} from '@src/pages-vault/AccountLimits.codegen'
 
 export const log = debug('au:Device')
 

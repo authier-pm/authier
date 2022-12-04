@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "types": [
+      "vitest/globals",
+      "chrome"
+    ],
     "baseUrl": "./",
     "paths": {
       "@src/*": [
@@ -30,7 +34,7 @@
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "incremental": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
   "exclude": [
     "../backend/**",
