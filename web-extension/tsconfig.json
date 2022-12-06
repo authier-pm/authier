@@ -1,9 +1,5 @@
 {
   "compilerOptions": {
-    "types": [
-      "vitest/globals",
-      "chrome"
-    ],
     "baseUrl": "./",
     "paths": {
       "@src/*": [

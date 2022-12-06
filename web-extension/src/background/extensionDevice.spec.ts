@@ -1,4 +1,4 @@
-import { device } from '../src/background/ExtensionDevice'
+import { device } from './ExtensionDevice'
 
 describe('ExtensionDevice', () => {
   describe('startLockInterval', () => {

@@ -16,14 +16,16 @@ import {
   MeExtensionQuery,
   MeExtensionQueryVariables
 } from '@src/pages-vault/AccountLimits.codegen'
+import debug from 'debug'
+const log = debug('au:getContentScriptInitialState')
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
   currentTabId: number
 ): Promise<IInitStateRes> => {
-  console.log('tabUrl', tabUrl)
+  log('tabUrl', tabUrl)
   const hostname = new URL(tabUrl).hostname
-  console.log('~ getContentScriptInitialState')
+
   const decrypted =
     device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
 
