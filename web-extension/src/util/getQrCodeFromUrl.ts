@@ -9,9 +9,7 @@ export const getQrCodeFromUrl = async (imageUrl: string) => {
   const context = canvas.getContext('2d')
   if (context) {
     //TODO: Solve this error
-    //@ts-expect-error
     context.drawImage(bitmap, 0, 0)
-    //@ts-expect-error
     const imageData = context.getImageData(0, 0, bitmap.width, bitmap.height)
     const result = jsQR(imageData.data, imageData.width, imageData.height)
 
