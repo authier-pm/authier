@@ -19,11 +19,15 @@ const escapeHtml = (unsafe: string) => {
 export const PromptPassword = ({
   username,
   password,
-  inputEvents
+  inputEvents,
+  passwordLimit,
+  passwordCount
 }: {
   username: string
   password: string
   inputEvents: any
+  passwordLimit: number
+  passwordCount: number
 }) => {
   const h3Style = {
     margin: 0,
@@ -52,6 +56,14 @@ export const PromptPassword = ({
     }
   }
   const addCredential = async (openInVault = false) => {
+    if (passwordCount >= passwordLimit) {
+      alert(
+        'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
+      )
+      console.warn("You've reached the maximum number of passwords allowed.")
+      return
+    }
+
     const loginCredentials = {
       username,
       password,

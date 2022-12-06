@@ -14,7 +14,8 @@ import {
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Tooltip
+  Tooltip,
+  Box
 } from '@chakra-ui/react'
 import React, { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -27,12 +28,11 @@ import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecre
 import { Field, Form, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
-
-interface totpValues {
-  secret: string
-  url: string | null | undefined
-  label: string
-}
+import {
+  TOTPSchema,
+  totpValues,
+  credentialValues
+} from '@shared/formikSharedTypes'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -41,15 +41,21 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
 
+  const bg = useColorModeValue('white', 'gray.800')
+
   return (
     <motion.div
       animate={{ opacity: 1 }}
       initial={{ opacity: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.35 }}
+      style={{
+        width: '80%',
+        display: 'contents'
+      }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%', xl: '30%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -57,14 +63,17 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={bg}
       >
         <Formik
           initialValues={{
             secret: totp.secret,
-            url: totp.url,
-            label: totp.label
+            url: totp.url!!,
+            label: totp.label,
+            digits: totp.digits,
+            period: totp.period
           }}
+          validationSchema={TOTPSchema}
           onSubmit={async (
             values: totpValues,
             { setSubmitting }: FormikHelpers<totpValues>
@@ -98,47 +107,31 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
             }
           }}
         >
-          {({ isSubmitting, dirty }) => (
-            <Flex as={Form} width={'80%'} flexDirection="column">
-              <Field name="url">
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.name && form.touched.name}
-                  >
+          {({ isSubmitting, dirty, handleSubmit, errors, touched }) => (
+            <Box width={'80%'} mt={5}>
+              <form onSubmit={handleSubmit}>
+                <Flex flexDirection="column">
+                  <FormControl isInvalid={!!errors.url && touched.url}>
                     <FormLabel htmlFor="url">URL:</FormLabel>
-
-                    <Input id="url" {...field} required />
-
-                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    <Field as={Input} id="url" name="url" />
+                    <FormErrorMessage>{errors.url}</FormErrorMessage>
                   </FormControl>
-                )}
-              </Field>
-              <Field name="label">
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.name && form.touched.name}
-                  >
+
+                  <FormControl isInvalid={!!errors.label && touched.label}>
                     <FormLabel htmlFor="label">Label:</FormLabel>
-
-                    <Input id="label" {...field} required />
-
-                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    <Field as={Input} id="label" name="label" />
+                    <FormErrorMessage>{errors.label}</FormErrorMessage>
                   </FormControl>
-                )}
-              </Field>
-              <Field name="secret">
-                {({ field, form }) => (
-                  <FormControl
-                    isInvalid={form.errors.name && form.touched.name}
-                  >
-                    <FormLabel htmlFor="secret">Secret:</FormLabel>
 
+                  <FormControl isInvalid={!!errors.secret && touched.secret}>
+                    <FormLabel htmlFor="secret">Secret:</FormLabel>
                     <InputGroup size="md">
-                      <Input
+                      <Field
                         id="secret"
                         pr="4.5rem"
                         type={show ? 'text' : 'password'}
-                        {...field}
+                        as={Input}
+                        name="secret"
                       />
                       <InputRightElement width="4.5rem">
                         <Button
@@ -151,62 +144,68 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
                       </InputRightElement>
                     </InputGroup>
 
-                    <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                    <FormErrorMessage>{errors.secret}</FormErrorMessage>
                   </FormControl>
-                )}
-              </Field>
-              <Stack
-                direction={'row'}
-                justifyContent="flex-end"
-                spacing={1}
-                my={5}
-                alignItems={'baseline'}
-              >
-                <Button
-                  _focus={{
-                    bg: 'gray.200'
-                  }}
-                  fontSize={'sm'}
-                  size="sm"
-                  onClick={() => navigate(-1)}
-                >
-                  Go back
-                </Button>
-                <Button
-                  disabled={isSubmitting || !dirty}
-                  isLoading={isSubmitting}
-                  type="submit"
-                  size={'sm'}
-                  fontSize={'sm'}
-                  bg={'blue.400'}
-                  color={'white'}
-                  boxShadow={
-                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                  }
-                  _hover={{
-                    bg: 'blue.500'
-                  }}
-                  _focus={{
-                    bg: 'blue.500'
-                  }}
-                  aria-label="Save"
-                >
-                  Save
-                </Button>
-              </Stack>
-            </Flex>
+
+                  <FormControl isInvalid={!!errors.digits && touched.digits}>
+                    <FormLabel htmlFor="digits">Digits:</FormLabel>
+                    <Field as={Input} id="digits" name="digits" />
+                    <FormErrorMessage>{errors.digits}</FormErrorMessage>
+                  </FormControl>
+
+                  <FormControl isInvalid={!!errors.period && touched.period}>
+                    <FormLabel htmlFor="period">Period:</FormLabel>
+                    <Field as={Input} id="period" name="period" />
+                    <FormErrorMessage>{errors.period}</FormErrorMessage>
+                  </FormControl>
+
+                  <Stack
+                    direction={'row'}
+                    justifyContent="flex-end"
+                    spacing={1}
+                    my={5}
+                    alignItems={'baseline'}
+                  >
+                    <Button
+                      _focus={{
+                        bg: 'gray.200'
+                      }}
+                      fontSize={'sm'}
+                      size="sm"
+                      onClick={() => navigate(-1)}
+                    >
+                      Go back
+                    </Button>
+                    <Button
+                      disabled={isSubmitting || !dirty}
+                      isLoading={isSubmitting}
+                      type="submit"
+                      size={'sm'}
+                      fontSize={'sm'}
+                      bg={'blue.400'}
+                      color={'white'}
+                      boxShadow={
+                        '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                      }
+                      _hover={{
+                        bg: 'blue.500'
+                      }}
+                      _focus={{
+                        bg: 'blue.500'
+                      }}
+                      aria-label="Save"
+                    >
+                      Save
+                    </Button>
+                  </Stack>
+                </Flex>
+              </form>
+            </Box>
           )}
         </Formik>
       </Flex>
     </motion.div>
   )
-}
-
-interface LoginParsedValues {
-  url: string
-  label: string
-  username: string
-  password: string
 }
 
 const LoginSecret = (secretProps: ILoginSecret) => {
@@ -232,7 +231,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%' }}
+        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%', xl: '30%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -254,8 +253,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             username: secretProps.loginCredentials.username
           }}
           onSubmit={async (
-            values: LoginParsedValues,
-            { setSubmitting }: FormikHelpers<LoginParsedValues>
+            values: credentialValues,
+            { setSubmitting }: FormikHelpers<credentialValues>
           ) => {
             const secret = device.state?.secrets.find(
               ({ id }) => id === secretProps.id
@@ -286,56 +285,36 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             }
           }}
         >
-          {({ values, isSubmitting, dirty }) => {
+          {({ values, isSubmitting, dirty, handleSubmit, errors, touched }) => {
             const levelOfPsw = passwordStrength(values.password)
             return (
-              <Flex mt={3} as={Form} flexDirection="column" width={'80%'}>
-                <Field name="url">
-                  {({ field, form }) => (
-                    <FormControl
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
+              <Box w={'80%'}>
+                <form onSubmit={handleSubmit}>
+                  <Flex mt={3} flexDirection="column">
+                    <FormControl isInvalid={!!errors.url && touched.url}>
                       <FormLabel htmlFor="url">URL:</FormLabel>
-
-                      <Input id="url" {...field} required />
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      <Field as={Input} id="url" name="url" />
+                      <FormErrorMessage>{errors.url}</FormErrorMessage>
                     </FormControl>
-                  )}
-                </Field>
-                <Field name="label">
-                  {({ field, form }) => (
-                    <FormControl
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
+
+                    <FormControl isInvalid={!!errors.label && touched.label}>
                       <FormLabel htmlFor="label">Label:</FormLabel>
-
-                      <Input id="label" {...field} required />
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      <Field as={Input} id="label" name="label" />
+                      <FormErrorMessage>{errors.label}</FormErrorMessage>
                     </FormControl>
-                  )}
-                </Field>
-                <Field name="username">
-                  {({ field, form }) => (
+
                     <FormControl
-                      isInvalid={form.errors.name && form.touched.name}
+                      isInvalid={!!errors.username && touched.username}
                     >
                       <FormLabel htmlFor="username">Username:</FormLabel>
-
-                      <Input id="username" {...field} required />
-
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      <Field as={Input} id="username" name="username" />
+                      <FormErrorMessage>{errors.username}</FormErrorMessage>
                     </FormControl>
-                  )}
-                </Field>
-                <Field name="password">
-                  {({ field, form }) => (
-                    <FormControl
-                      isInvalid={form.errors.name && form.touched.name}
-                    >
-                      <FormLabel htmlFor="password">Password</FormLabel>
 
+                    <FormControl
+                      isInvalid={!!errors.password && touched.password}
+                    >
+                      <FormLabel htmlFor="password">Password:</FormLabel>
                       <Progress
                         value={levelOfPsw.id}
                         size="xs"
@@ -344,9 +323,12 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         min={0}
                         mb={1}
                       />
+
                       <InputGroup size="md">
-                        <Input
-                          {...field}
+                        <Field
+                          as={Input}
+                          id="password"
+                          name="password"
                           pr="4.5rem"
                           type={show ? 'text' : 'password'}
                         />
@@ -357,57 +339,59 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         </InputRightElement>
                       </InputGroup>
 
-                      <FormErrorMessage>{form.errors.name}</FormErrorMessage>
+                      <FormErrorMessage>{errors.password}</FormErrorMessage>
                     </FormControl>
-                  )}
-                </Field>
 
-                {secretProps.loginCredentials.parseError && (
-                  <Alert status="error" mt={4}>
-                    <Trans>Failed to parse this secret:</Trans>
-                    {JSON.stringify(secretProps.loginCredentials.parseError)}
-                  </Alert>
-                )}
-                <Stack
-                  direction={'row'}
-                  justifyContent="flex-end"
-                  spacing={1}
-                  my={5}
-                  alignItems={'baseline'}
-                >
-                  <Button
-                    _focus={{
-                      bg: 'gray.200'
-                    }}
-                    fontSize={'sm'}
-                    size="sm"
-                    onClick={() => navigate(-1)}
-                  >
-                    Go back
-                  </Button>
-                  <Button
-                    disabled={isSubmitting || !dirty}
-                    isLoading={isSubmitting}
-                    type="submit"
-                    size={'sm'}
-                    fontSize={'sm'}
-                    bg={'blue.400'}
-                    color={'white'}
-                    boxShadow={
-                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                    }
-                    _hover={{
-                      bg: 'blue.500'
-                    }}
-                    _focus={{
-                      bg: 'blue.500'
-                    }}
-                    aria-label="Save"
-                  >
-                    Save
-                  </Button>
-                </Stack>
-              </Flex>
+                    {secretProps.loginCredentials.parseError && (
+                      <Alert status="error" mt={4}>
+                        <Trans>Failed to parse this secret:</Trans>
+                        {JSON.stringify(
+                          secretProps.loginCredentials.parseError
+                        )}
+                      </Alert>
+                    )}
+                    <Stack
+                      direction={'row'}
+                      justifyContent="flex-end"
+                      spacing={1}
+                      my={5}
+                      alignItems={'baseline'}
+                    >
+                      <Button
+                        _focus={{
+                          bg: 'gray.200'
+                        }}
+                        fontSize={'sm'}
+                        size="sm"
+                        onClick={() => navigate(-1)}
+                      >
+                        Go back
+                      </Button>
+                      <Button
+                        disabled={isSubmitting || !dirty}
+                        isLoading={isSubmitting}
+                        type="submit"
+                        size={'sm'}
+                        fontSize={'sm'}
+                        bg={'blue.400'}
+                        color={'white'}
+                        boxShadow={
+                          '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                        }
+                        _hover={{
+                          bg: 'blue.500'
+                        }}
+                        _focus={{
+                          bg: 'blue.500'
+                        }}
+                        aria-label="Save"
+                      >
+                        Save
+                      </Button>
+                    </Stack>
+                  </Flex>
+                </form>
+              </Box>
             )
           }}
         </Formik>

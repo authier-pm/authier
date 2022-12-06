@@ -3,5 +3,9 @@ query isLoggedIn {
 }
 
 mutation logout {
-  logout
+  currentDevice {
+    logout {
+      logoutAt
+    }
+  }
 }

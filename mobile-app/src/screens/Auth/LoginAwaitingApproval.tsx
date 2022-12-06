@@ -119,7 +119,7 @@ export const useLogin = (props: { deviceName: string }) => {
         if (!currentAddDeviceSecret) {
           toast.show({
             id,
-            render: () => <ToastAlert {...ToastType.EmailPasswordError} />
+            render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
           })
           setFormState(null)
           return
@@ -146,7 +146,8 @@ export const useLogin = (props: { deviceName: string }) => {
             input: {
               addDeviceSecret: newAuthSecret,
               addDeviceSecretEncrypted: newAuthSecretEncrypted,
-              firebaseToken: fireToken
+              firebaseToken: fireToken,
+              devicePlatform: Platform.OS
             },
             currentAddDeviceSecret
           }

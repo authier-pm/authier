@@ -1,50 +1,51 @@
-import React, { useContext, useLayoutEffect, useState } from 'react'
+import React, { useContext, useLayoutEffect } from 'react'
 
 import {
   Alert,
   Button,
   Flex,
   FormControl,
-  Icon,
   Input,
   Spinner,
-  useColorModeValue,
   View
 } from 'native-base'
 
 import { Formik, FormikHelpers } from 'formik'
-import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { ITOTPSecret } from '../../utils/Device'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { TOTPStackScreenProps } from '../../navigation/types'
+import { InputHeader } from '../PasswordVault/EditPassword'
+import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
 
-interface totpValues {
-  secret: string
-  url: string
-  label: string
-}
-
-export const InputHeader = ({ children }) => {
+const InputField = ({
+  errors,
+  values,
+  name,
+  handleBlur,
+  handleChange,
+  header
+}) => {
   return (
-    <FormControl.Label
-      _text={{
-        color: useColorModeValue('coolGray.800', 'coolGray.100'),
-        fontSize: 'xl',
-        fontWeight: 500
-      }}
-    >
-      {children}
-    </FormControl.Label>
+    <FormControl isInvalid={name in errors}>
+      <InputHeader>{header}:</InputHeader>
+      <Input
+        defaultValue={values[name]}
+        onChangeText={handleChange(name)}
+        onBlur={handleBlur(name)}
+        isRequired
+        size={'lg'}
+      />
+      <FormControl.ErrorMessage>{errors[name]}</FormControl.ErrorMessage>
+    </FormControl>
   )
 }
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const { totp } = data
   const [updateSecret] = useUpdateEncryptedSecretMutation()
-  const [show, setShow] = useState(false)
   let device = useContext(DeviceContext)
 
   return (
@@ -53,8 +54,11 @@ const TOTPSecret = (data: ITOTPSecret) => {
         initialValues={{
           secret: totp.secret,
           url: totp.url!!,
-          label: totp.label
+          label: totp.label,
+          digits: totp.digits,
+          period: totp.period
         }}
+        validationSchema={TOTPSchema}
         onSubmit={async (
           values: totpValues,
           { setSubmitting, resetForm }: FormikHelpers<totpValues>
@@ -93,60 +97,45 @@ const TOTPSecret = (data: ITOTPSecret) => {
           dirty,
           handleChange,
           handleBlur,
-          handleSubmit
+          handleSubmit,
+          errors,
+          isValid
         }) => (
           <Flex p={5} flexDirection="column">
-            <FormControl>
-              <InputHeader>URL:</InputHeader>
+            <InputField
+              errors={errors}
+              header="URL"
+              name="url"
+              {...{ values, handleBlur, handleChange }}
+            />
 
-              <Input
-                defaultValue={values.url}
-                onChangeText={handleChange('url')}
-                onBlur={handleBlur('url')}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              errors={errors}
+              header="Label"
+              name="label"
+              {...{ values, handleBlur, handleChange }}
+            />
 
-            <FormControl>
-              <InputHeader>Label:</InputHeader>
+            <InputField
+              errors={errors}
+              header="Secret"
+              name="secret"
+              {...{ values, handleBlur, handleChange }}
+            />
 
-              <Input
-                onChangeText={handleChange('label')}
-                onBlur={handleBlur('label')}
-                defaultValue={values.label}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              errors={errors}
+              header="Digits"
+              name="digits"
+              {...{ values, handleBlur, handleChange }}
+            />
 
-            <FormControl>
-              <InputHeader>Secret:</InputHeader>
-
-              <Input
-                size={'lg'}
-                pr="4.5rem"
-                type={show ? 'text' : 'password'}
-                defaultValue={values.secret}
-                onChangeText={handleChange('secret')}
-                onBlur={handleBlur('secret')}
-                isRequired
-                InputRightElement={
-                  <Icon
-                    as={
-                      <Ionicons
-                        name={show ? 'eye-outline' : 'eye-off-outline'}
-                      />
-                    }
-                    size={5}
-                    mr="2"
-                    color="muted.400"
-                    onPress={() => setShow(!show)}
-                  />
-                }
-                placeholder="Password"
-              />
-            </FormControl>
+            <InputField
+              errors={errors}
+              header="Period"
+              name="period"
+              {...{ values, handleBlur, handleChange }}
+            />
 
             <Button
               mt={5}

@@ -527,9 +527,9 @@ input RegisterNewAccountInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
+  devicePlatform: String!
   deviceId: ID!
   deviceName: String!
-  devicePlatform: String!
   encryptionSalt: NonEmptyString!
   email: EmailAddress!
 }
@@ -565,6 +565,7 @@ input AddNewDeviceInput {
   firebaseToken: String!
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
+  devicePlatform: String!
 }
 
 input WebInputElement {

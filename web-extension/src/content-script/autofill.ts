@@ -159,6 +159,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     const filledElements = webInputs
       .filter(({ url }) => {
         console.log('~ url', url)
+        //NOTE: FIX THIS
         const host = new URL(url).host
         const matches = location.href.includes(host)
 

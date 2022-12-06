@@ -115,7 +115,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           firebaseToken: firebaseToken,
           name: this.deviceName,
           userId: user.id,
-          platform: 'chrome' // TODO add this to input
+          platform: input.devicePlatform
         }
       })
     }

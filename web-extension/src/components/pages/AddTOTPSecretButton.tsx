@@ -15,12 +15,31 @@ import { device } from '@src/background/ExtensionDevice'
 import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 import { ITOTPSecret } from '@src/util/useDeviceState'
+import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
+  const { data } = useMeExtensionQuery()
 
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
+
+    const TOTPCount =
+      device.state?.secrets.filter((s) => s.kind === EncryptedSecretType.TOTP)
+        .length ?? 0
+    const TOTPLimit = data?.me?.TOTPlimit ?? 0
+
+    console.log('TOTPCount', TOTPCount, 'TOTPLimit', TOTPLimit)
+
+    if (TOTPCount >= TOTPLimit) {
+      toast.error(
+        t`You have reached your password limit. Please upgrade your account to add more passwords.`
+      )
+      console.log(
+        'You have reached your password limit. Please upgrade your account to add more passwords.'
+      )
+      return
+    }
 
     if (!tab || !deviceState) {
       return

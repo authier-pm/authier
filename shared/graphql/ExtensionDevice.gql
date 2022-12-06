@@ -1,11 +1,15 @@
+mutation logout {
+  currentDevice {
+    logout {
+      logoutAt
+    }
+  }
+}
+
 mutation markAsSynced {
   currentDevice {
     markAsSynced
   }
-}
-
-mutation logout {
-  logout
 }
 
 query SyncEncryptedSecrets {
