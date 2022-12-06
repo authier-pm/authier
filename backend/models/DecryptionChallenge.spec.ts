@@ -11,7 +11,10 @@ import {
   makeRegisterAccountInput
 } from '../schemas/RootResolver.spec'
 import { sign } from 'jsonwebtoken'
-import { DecryptionChallengeApproved } from './DecryptionChallenge'
+import {
+  DecryptionChallengeApproved,
+  DecryptionChallengeMutation
+} from './DecryptionChallenge'
 import { User } from '.prisma/client'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -99,7 +102,7 @@ describe('DecryptionChallenge', () => {
       const input = makeAddNewDeviceInput()
       challenge.userId = userId
 
-      const user = await prismaClient.user.create({
+      await prismaClient.user.create({
         data: {
           id: userId,
           email: input.email,
@@ -118,6 +121,115 @@ describe('DecryptionChallenge', () => {
           {} as GraphQLResolveInfo
         )
       }).rejects.toThrow('Wrong master password used')
+    })
+  })
+
+  describe('approve', async () => {
+    const challengeMutation: DecryptionChallengeMutation =
+      new DecryptionChallengeMutation()
+    challengeMutation.id = faker.datatype.number()
+    challengeMutation.blockIp = false
+    const slaveDeviceId = faker.datatype.uuid()
+    const masterDeviceId = faker.datatype.uuid()
+    const userId = faker.datatype.uuid()
+
+    const createUserData = async () => {
+      const input: RegisterNewAccountInput = makeRegisterAccountInput()
+
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: input.email,
+          addDeviceSecret: faker.datatype.string(5),
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          encryptionSalt: faker.datatype.string(5),
+          ...userSecurityProps
+        }
+      })
+
+      await prismaClient.device.create({
+        data: {
+          id: masterDeviceId,
+          name: faker.random.word(),
+          firebaseToken: faker.datatype.string(5),
+          firstIpAddress: faker.internet.ip(),
+          lastIpAddress: faker.internet.ip(),
+          platform: faker.random.word(),
+          userId
+        }
+      })
+
+      await prismaClient.user.update({
+        where: { id: userId },
+        data: {
+          masterDeviceId
+        }
+      })
+
+      await prismaClient.decryptionChallenge.create({
+        data: {
+          id: challengeMutation.id,
+          userId,
+          deviceId: slaveDeviceId,
+          deviceName: faker.random.word(),
+          ipAddress: faker.internet.ip()
+        }
+      })
+    }
+    it('should approve challenge', async () => {
+      const fakeCtx = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        reply: { setCookie: () => {} },
+        request: { headers: {} },
+        prisma: prismaClient,
+        jwtPayload: { userId: userId },
+        getIpAddress: () => faker.internet.ip(),
+        device: { id: masterDeviceId }
+      } as any
+
+      await createUserData()
+
+      expect(await challengeMutation.approve(fakeCtx)).toMatchObject({
+        approvedAt: expect.any(Date),
+        rejectedAt: null,
+        blockIp: null,
+        deviceId: slaveDeviceId,
+        userId,
+        createdAt: expect.any(Date),
+        ipAddress: expect.any(String),
+        id: expect.any(Number)
+      })
+
+      await prismaClient.decryptionChallenge.deleteMany()
+      await prismaClient.device.deleteMany()
+      await prismaClient.user.deleteMany()
+    })
+
+    it("should show 'Only the master device can approve a decryption chllenge'", async () => {
+      challengeMutation.id = faker.datatype.number()
+
+      const fakeCtx = {
+        // eslint-disable-next-line @typescript-eslint/no-empty-function
+        reply: { setCookie: () => {} },
+        request: { headers: {} },
+        prisma: prismaClient,
+        jwtPayload: { userId: userId },
+        getIpAddress: () => faker.internet.ip(),
+        //NOTE: Change ID to be different from masterDeviceId
+        device: { id: faker.datatype.uuid() }
+      } as any
+
+      await createUserData()
+
+      await expect(
+        async () => await challengeMutation.approve(fakeCtx)
+      ).rejects.toThrow(
+        'Only the master device can approve a decryption challenge'
+      )
+
+      await prismaClient.decryptionChallenge.deleteMany()
+      await prismaClient.device.deleteMany()
+      await prismaClient.user.deleteMany()
     })
   })
 })

@@ -7,25 +7,19 @@ export const ToastType = {
   },
   UsernamePasswordError: {
     title: 'Login failed',
-    description: 'login failed, check your username and password',
+    description: 'Login failed, check your email or password',
     variant: 'subtle',
     status: 'warning'
   },
   DecryptionChallengeError: {
     title: 'Login failed',
-    description: 'failed to create decryption challenge',
-    variant: 'subtle',
-    status: 'warning'
-  },
-  EmailPasswordError: {
-    title: 'Login failed',
-    description: 'wrong password or email',
+    description: 'Failed to create decryption challenge',
     variant: 'subtle',
     status: 'warning'
   },
   LoginFailed: {
     title: 'Login failed',
-    description: 'login failed, check your password',
+    description: 'Login failed, check your password',
     variant: 'subtle',
     status: 'warning'
   }

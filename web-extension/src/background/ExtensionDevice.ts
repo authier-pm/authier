@@ -297,7 +297,6 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   findExistingSecret(secret) {
-    console.log('findExistingSecret', secret.url)
     const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
     )
@@ -321,7 +320,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     //   return null
     // }
 
-    const { data } = await apolloClient.mutate<
+    const { data, errors } = await apolloClient.mutate<
       AddEncryptedSecretsMutation,
       AddEncryptedSecretsMutationVariables
     >({
@@ -342,10 +341,14 @@ export class DeviceState implements IBackgroundStateSerializable {
         })
       }
     })
+
+    if (errors) {
+      console.log('errors', errors)
+      throw new Error('Erorror adding secret')
+    }
     if (!data) {
       throw new Error('failed to save secret')
     }
-    log('saved secret to the backend', secrets)
     const secretsAdded = data.me.addEncryptedSecrets
 
     this.secrets.push(...secretsAdded)
@@ -362,7 +365,6 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     })
     this.secrets = this.secrets.filter((s) => s.id !== secretId)
-    console.log('removed secret', secretId)
     this.save()
   }
 

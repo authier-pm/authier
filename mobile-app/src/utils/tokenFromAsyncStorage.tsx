@@ -1,6 +1,7 @@
 import jwtDecode from 'jwt-decode'
 import SInfo from 'react-native-sensitive-info'
 //TODO: Rename this file
+
 export let accessToken: string | null = null
 export const getAccessTokenFromStorage = async () => {
   const value = await SInfo.getItem('@accessToken', {

@@ -11,7 +11,9 @@ export let promptDiv: HTMLDivElement | null
 
 export async function renderSaveCredentialsForm(
   username: string,
-  password: string
+  password: string,
+  passwordLimit: number,
+  passwordCount: number
 ) {
   const inputEvents = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getCapturedInputEvents
@@ -23,6 +25,8 @@ export async function renderSaveCredentialsForm(
       username={username}
       password={password}
       inputEvents={inputEvents}
+      passwordLimit={passwordLimit}
+      passwordCount={passwordCount}
     />,
     promptDiv
   )

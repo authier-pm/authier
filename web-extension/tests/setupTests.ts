@@ -1,8 +1,7 @@
-// @ts-expect-error
 import { mock as mockDate, unmock } from 'proxy-date'
 
-import 'mockzilla-webextension' // does not work for some reason
-jest.mock('@firebase/messaging') // doesn't work in JEST
+// import 'mockzilla-webextension' // does not work for some reason
+// jest.mock('@firebase/messaging') // doesn't work in JEST
 
 import type { Browser } from 'webextension-polyfill'
 import { deepMock } from 'mockzilla'
@@ -10,7 +9,7 @@ const [browser, mockBrowser, mockBrowserNode] = deepMock<Browser>(
   'browser',
   false
 )
-jest.mock('webextension-polyfill', () => ({ browser }))
+// jest.mock('webextension-polyfill', () => ({ browser }))
 
 // @ts-expect-error
 window.BroadcastChannel = function BroadcastChannel(name) {}

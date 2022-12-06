@@ -2,10 +2,7 @@ import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 
-import {
-  IBackgroundStateSerializable,
-  IBackgroundStateSerializableLocked
-} from '@src/background/backgroundPage'
+import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   EncryptedSecretType,
   SettingsInput

@@ -96,7 +96,7 @@ export default function Register(): ReactElement {
           const registerResult = res.data?.registerNewUser
 
           if (registerResult?.accessToken) {
-            // is this right, maybe someone could use proxy and send random string
+            //FIX: is this right, maybe someone could use proxy and send random string
             await browser.storage.local.set({
               'access-token': res.data?.registerNewUser.accessToken
             })

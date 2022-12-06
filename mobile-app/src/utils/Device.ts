@@ -118,8 +118,6 @@ export type AddSecretInput = Array<
   }
 >
 
-// TODO move out of this file
-
 export class Device {
   state: DeviceState | null = null
   fireToken: string | null = null

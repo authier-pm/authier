@@ -12,16 +12,18 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
 
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
           node-version: '16'
-          cache: 'yarn'
+          cache: 'pnpm'
 
-      - name: Yarn install
+      - name: Install dependencies
         run: |
-          yarn --frozen-lockfile --ignore-optional --prefer-offline
+          pnpm i --frozen-lockfile --prefer-offline
+          pnpm i ts-node -g
 
       - uses: dorny/paths-filter@v2
         id: changes
@@ -38,6 +40,6 @@ jobs:
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         run: |
-          yarn gen
-          yarn migrate
-          yarn cdkDeploy
+          pnpm gen
+          pnpm migrate
+          pnpm cdkDeploy
