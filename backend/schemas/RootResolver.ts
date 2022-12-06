@@ -171,8 +171,8 @@ export class RootResolver {
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60, // 16 hours should be plenty enough
-          loginCredentialsLimit: 50,
-          TOTPlimit: 4,
+          loginCredentialsLimit: 40,
+          TOTPlimit: 3,
           Devices: {
             create: {
               platform: input.devicePlatform,
@@ -289,6 +289,7 @@ export class RootResolver {
       }
     })
 
+    //TODO: Check this condition, not sure what is this doing
     if (device) {
       if (!challenge) {
         const deviceCount = await ctx.prisma.device.count({
@@ -346,7 +347,7 @@ export class RootResolver {
     }
 
     if (!challenge.approvedAt) {
-      // TODO enable when we have device management in the vault
+      // TODO: enable when we have device management in the vault
       return plainToClass(DecryptionChallengeForApproval, {
         id: challenge.id,
         approvedAt: challenge.approvedAt

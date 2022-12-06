@@ -122,6 +122,7 @@ export function Register({ navigation }: NavigationProps) {
           })
           const registerResult = res.data?.registerNewUser
 
+          //FIX: Maybe we should check if is the access token valid?
           if (registerResult?.accessToken) {
             await saveAccessToken(registerResult.accessToken)
 

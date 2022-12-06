@@ -10,10 +10,10 @@ import { vi } from 'vitest'
 //   await prismaClient.$disconnect()
 // })
 export const makeFakeCtx = (userId: string) =>
-  ({
-    reply: { setCookie: vi.fn() },
-    request: { headers: {} },
-    jwtPayload: { userId: userId },
-    prisma: prismaClient,
-    getIpAddress: () => faker.internet.ip()
-  } as any)
+({
+  reply: { setCookie: vi.fn() },
+  request: { headers: {} },
+  jwtPayload: { userId: userId },
+  prisma: prismaClient,
+  getIpAddress: () => faker.internet.ip()
+} as any)

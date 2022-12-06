@@ -2,7 +2,7 @@ import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { DOMEventsRecorder } from './DOMEventsRecorder'
 
 describe('DOMEventsRecorder', () => {
-  it('should only add event once per input', async () => {
+  it.todo('should only add event once per input', async () => {
     // multiple events from single input must remove the previous ones stored in the recorder
   })
 
@@ -21,21 +21,23 @@ describe('DOMEventsRecorder', () => {
         kind: WebInputType.PASSWORD
       })
       expect(recorder.toJSON()).toMatchInlineSnapshot(`
-  Array [
-    Object {
-      "element": "INPUT",
-      "inputted": undefined,
-      "kind": "USERNAME_OR_EMAIL",
-      "type": "input",
-    },
-    Object {
-      "element": "INPUT",
-      "inputted": undefined,
-      "kind": "PASSWORD",
-      "type": "input",
-    },
-  ]
-  `)
+        [
+          {
+            "cssSelector": "INPUT",
+            "domOrdinal": 0,
+            "inputted": undefined,
+            "kind": "USERNAME_OR_EMAIL",
+            "type": "input",
+          },
+          {
+            "cssSelector": "INPUT",
+            "domOrdinal": 0,
+            "inputted": undefined,
+            "kind": "PASSWORD",
+            "type": "input",
+          },
+        ]
+      `)
     })
 
     it.todo('should use email input as username if there is one')

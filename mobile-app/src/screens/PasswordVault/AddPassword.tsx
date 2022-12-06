@@ -21,12 +21,29 @@ import { PasswordStackScreenProps } from '../../navigation/types'
 import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import { loginCredentialsSchema } from '@src/utils/loginCredentialsSchema'
+import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 
-interface LoginParsedValues {
-  url: string
-  label: string
-  username: string
-  password: string
+const InputField = ({
+  errors,
+  values,
+  name,
+  handleBlur,
+  handleChange,
+  header
+}) => {
+  return (
+    <FormControl isInvalid={name in errors}>
+      <InputHeader>{header}:</InputHeader>
+      <Input
+        value={values[name]}
+        onChangeText={handleChange(name)}
+        onBlur={handleBlur(name)}
+        isRequired
+        size={'lg'}
+      />
+      <FormControl.ErrorMessage>{errors[name]}</FormControl.ErrorMessage>
+    </FormControl>
+  )
 }
 
 export const AddPassword = () => {
@@ -46,9 +63,10 @@ export const AddPassword = () => {
         label: '',
         username: ''
       }}
+      validationSchema={PasswordSchema}
       onSubmit={async (
-        values: LoginParsedValues,
-        { setSubmitting }: FormikHelpers<LoginParsedValues>
+        values: credentialValues,
+        { setSubmitting }: FormikHelpers<credentialValues>
       ) => {
         const unencryptedData = {
           password: values.password,
@@ -93,50 +111,49 @@ export const AddPassword = () => {
         dirty,
         handleChange,
         handleBlur,
-        handleSubmit
+        handleSubmit,
+        errors,
+        isValid
       }) => {
         const levelOfPsw = passwordStrength(values.password)
 
         return (
           <Flex p={5} flexDirection="column">
-            <FormControl>
-              <InputHeader>URL:</InputHeader>
-              <Input
-                value={values.url}
-                onChangeText={handleChange('url')}
-                onBlur={handleBlur('url')}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'url',
+                handleBlur,
+                handleChange,
+                header: 'URL'
+              }}
+            />
 
-            <FormControl>
-              <InputHeader>Label:</InputHeader>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'label',
+                header: 'Label',
+                handleBlur,
+                handleChange
+              }}
+            />
 
-              <Input
-                value={values.label}
-                isRequired
-                onChangeText={handleChange('label')}
-                onBlur={handleBlur('label')}
-                size={'lg'}
-              />
-            </FormControl>
+            <InputField
+              {...{
+                errors,
+                values,
+                name: 'username',
+                handleChange,
+                handleBlur,
+                header: 'Username'
+              }}
+            />
 
-            <FormControl>
-              <InputHeader>Username:</InputHeader>
-
-              <Input
-                value={values.username}
-                onChangeText={handleChange('username')}
-                onBlur={handleBlur('username')}
-                isRequired
-                size={'lg'}
-              />
-            </FormControl>
-
-            <FormControl>
+            <FormControl isInvalid={'password' in errors}>
               <InputHeader>Password:</InputHeader>
-
               <Input
                 onChangeText={handleChange('password')}
                 onBlur={handleBlur('password')}
@@ -165,6 +182,9 @@ export const AddPassword = () => {
                 min={0}
                 mb={1}
               />
+              <FormControl.ErrorMessage>
+                {errors.password}
+              </FormControl.ErrorMessage>
             </FormControl>
 
             <Button

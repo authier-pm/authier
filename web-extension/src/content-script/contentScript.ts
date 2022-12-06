@@ -42,6 +42,8 @@ export interface IInitStateRes {
   extensionDeviceReady: boolean
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
+  passwordCount: number
+  passwordLimit: number
   webInputs: Array<{
     __typename?: 'WebInputGQL'
     id?: number
@@ -52,12 +54,12 @@ export interface IInitStateRes {
     createdAt: string
   }>
   saveLoginModalsState?:
-    | {
-        password: string
-        username: string
-      }
-    | null
-    | undefined
+  | {
+    password: string
+    username: string
+  }
+  | null
+  | undefined
 }
 
 // TODO spec
@@ -77,7 +79,7 @@ let recording = false
 const hideToast = () => {
   const x = document.getElementById('toast')
 
-  setTimeout(function () {
+  setTimeout(function() {
     x?.remove()
   }, 5000)
 }
@@ -170,7 +172,9 @@ export async function initInputWatch() {
     extensionDeviceReady,
     secretsForHost,
     autofillEnabled,
-    webInputs
+    webInputs,
+    passwordLimit,
+    passwordCount
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
@@ -197,7 +201,9 @@ export async function initInputWatch() {
     log('rendering save credentials form')
     renderSaveCredentialsForm(
       saveLoginModalsState.username,
-      saveLoginModalsState.password
+      saveLoginModalsState.password,
+      passwordLimit,
+      passwordCount
     )
     return // the modal is already displayed
   }
@@ -224,12 +230,22 @@ export async function initInputWatch() {
 
     if (password && !existingCredentialWithSamePassword) {
       if (username) {
-        renderSaveCredentialsForm(username, password)
+        renderSaveCredentialsForm(
+          username,
+          password,
+          passwordLimit,
+          passwordCount
+        )
       } else {
         const fallbackUsernames: string[] = await browser.runtime.sendMessage({
           action: BackgroundMessageType.getFallbackUsernames
         })
-        renderSaveCredentialsForm(fallbackUsernames[0], password)
+        renderSaveCredentialsForm(
+          fallbackUsernames[0],
+          password,
+          passwordLimit,
+          passwordCount
+        )
       }
     }
   }

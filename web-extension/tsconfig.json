@@ -30,7 +30,7 @@
     "noUnusedParameters": false,
     "skipLibCheck": true,
     "incremental": true,
-    "noImplicitAny": false,
+    "noImplicitAny": false
   },
   "exclude": [
     "../backend/**",

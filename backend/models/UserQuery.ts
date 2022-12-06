@@ -206,10 +206,10 @@ export class UserQuery extends UserBase {
 
     if (count > 0) {
       //* One adds 60 passwords
-      return count * 60
+      return count * 60 + this.loginCredentialsLimit
     } else {
       //* Default count
-      return 40
+      return this.loginCredentialsLimit
     }
   }
 
@@ -230,11 +230,11 @@ export class UserQuery extends UserBase {
     })
 
     if (count > 0) {
-      //* One adds 60 passwords
-      return count * 20
+      //* One adds 20 passwords
+      return count * 20 + this.TOTPlimit
     } else {
       //* Default count
-      return 3
+      return this.TOTPlimit
     }
   }
 }

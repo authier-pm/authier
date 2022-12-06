@@ -200,7 +200,7 @@ export const VaultList = () => {
           <RefreshSecretsButton />
         </Center>
 
-        {totpCond || pswCond ? (
+        {totpCond && pswCond ? (
           <Tooltip
             shouldWrapChildren
             label="You have reached your limit"

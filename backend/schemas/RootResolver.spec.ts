@@ -61,11 +61,6 @@ describe('RootResolver', () => {
     })
   })
 
-  describe('logout', () => {
-    it('should clear both cookies', async () => {})
-    it('should increment tokenVersion for the current user', async () => {})
-  })
-
   describe('registerNewUser', () => {
     const userId = faker.datatype.uuid()
 
@@ -223,8 +218,52 @@ describe('RootResolver', () => {
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })
 
-    it.todo(
-      'should block creation of a challenge from an IP which was blocked previously'
-    )
+    it('should block creation of a challenge from an IP which was blocked previously', async () => {
+      const userId = faker.datatype.uuid()
+      const blockedIp = faker.internet.ip()
+      const fakeCtx = {
+        reply: { setCookie: () => { } },
+        request: { headers: {} },
+        prisma: prismaClient,
+        jwtPayload: { userId: userId },
+        getIpAddress: () => blockedIp
+      } as any
+
+      const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
+      await prismaClient.user.create({
+        data: {
+          id: userId,
+          email: fakeData.email,
+          addDeviceSecret: fakeData.addDeviceSecret,
+          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+          encryptionSalt: fakeData.encryptionSalt,
+
+          ...userSecurityProps
+        }
+      })
+
+      await prismaClient.decryptionChallenge.create({
+        data: {
+          userId: userId,
+          ipAddress: blockedIp,
+          masterPasswordVerifiedAt: null,
+          deviceId: faker.datatype.uuid(),
+          deviceName: 'chrome',
+          blockIp: true
+        }
+      })
+
+      await expect(async () => {
+        await resolver.deviceDecryptionChallenge(
+          fakeData.email,
+          {
+            id: faker.datatype.uuid(),
+            name: 'chrome ',
+            platform: 'macOS'
+          },
+          fakeCtx
+        )
+      }).rejects.toThrow('Login failed, try again later')
+    })
   })
 })
