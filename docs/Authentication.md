@@ -1,6 +1,6 @@
 # Authentication
 
-This is (in progress) simple description of authentication process in authier
+This document (in progress) is a short description of authentication process in authier
 
 # Client
 
