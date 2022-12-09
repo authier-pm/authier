@@ -2,6 +2,7 @@ import { Flex } from '@chakra-ui/react'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import React, { ReactElement, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'
+import { toast } from 'react-toastify'
 
 import Providers from './Providers'
 

@@ -4,6 +4,7 @@ import { print } from 'graphql'
 //@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
 import 'react-toastify/dist/ReactToastify.css'
+import { chakraToast } from '@src/Providers'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
@@ -24,7 +25,14 @@ export const errorLink = onError(
       toast.error(graphQLErrors[0].message ?? 'There was API error.')
     } else if (networkError) {
       console.error(`[Network error]: ${networkError}`)
-      toast.error('There was network error.')
+      const id = toast.error('There was network error.', {
+        autoClose: false
+      })
+      chakraToast({
+        title: 'Network error',
+        colorScheme: 'red'
+      })
+      console.log({ id })
     }
   }
 )

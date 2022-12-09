@@ -12,6 +12,10 @@ import { DeviceStateProvider } from './providers/DeviceStateProvider'
 import { messages } from './locale/en-gb/messages'
 import { VaultRouter } from './pages-vault/VaultRouter'
 import 'react-toastify/dist/ReactToastify.css'
+import { createStandaloneToast } from '@chakra-ui/toast'
+
+export const { ToastContainer: ChakraToastContainer, toast: chakraToast } =
+  createStandaloneToast()
 
 i18n.load('en', messages)
 i18n.activate('en')
@@ -24,6 +28,7 @@ export default function Providers({ parent }: { parent: string }) {
         <UserProvider>
           <I18nProvider i18n={i18n}>
             <ToastContainer {...toastifyConfig} />
+            <ChakraToastContainer />
             {parent === 'vault' ? <VaultRouter /> : <PopupRoutes />}
           </I18nProvider>
         </UserProvider>
