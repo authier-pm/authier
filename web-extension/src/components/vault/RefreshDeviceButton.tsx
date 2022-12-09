@@ -3,16 +3,16 @@ import { IconButton, Tooltip } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
+import {
+  useDevicesRequestsQuery,
+  useMyDevicesQuery
+} from '@shared/graphql/AccountDevices.codegen'
 
-export function RefreshDeviceButton({
-  refetchDevices,
-  refetchRequests
-}: {
-  refetchDevices: () => void
-  refetchRequests: () => void
-}) {
+export function RefreshDeviceButton() {
   const [isSyncing, setIsSyncing] = useState(false)
 
+  const { refetch: devicesRequestsRefetch } = useDevicesRequestsQuery()
+  const { refetch: devicesRefetch } = useMyDevicesQuery()
   return (
     <Tooltip
       label={<Trans>Synchronize devices</Trans>}
@@ -26,8 +26,8 @@ export function RefreshDeviceButton({
         disabled={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
-          refetchDevices()
-          refetchRequests()
+          devicesRefetch()
+          devicesRequestsRefetch()
           setIsSyncing(false)
           toast.success(t`Sync successful`)
         }}

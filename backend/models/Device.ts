@@ -17,6 +17,30 @@ import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
 import { UserQuery } from './UserQuery'
 
+export async function getGeoIpLocation(ipAddress: string) {
+  if (ipAddress === '127.0.0.1') {
+    return {
+      // Mock data from https://ipbase.com/
+      data: {
+        location: {
+          city: {
+            name: 'Brno'
+          },
+          country: {
+            name: 'Czech Republic'
+          }
+        }
+      }
+    }
+  }
+  const res = await fetch(
+    `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
+  )
+  const json: any = await res.json()
+
+  return json
+}
+
 @InputType()
 export class DeviceInput {
   @Field(() => String, { nullable: false })
@@ -33,16 +57,8 @@ export class DeviceInput {
 export class DeviceQuery extends DeviceGQL {
   @mem({ maxAge: ms('2 days') })
   async getIpGeoLocation(ipAddress: string) {
-    if (ipAddress === '127.0.0.1') {
-      return {
-        city: 'Brno',
-        country_name: 'Czech Republic'
-      }
-    }
-    const res = await fetch(
-      `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
-    )
-    const json: any = await res.json()
+    const json = await getGeoIpLocation(ipAddress)
+
     return {
       city: json.data.location.city.name,
       country_name: json.data.location.country.name
@@ -177,20 +193,14 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
-    const user = await ctx.prisma.user.findUnique({
-      where: { id: this.userId },
-      include: {
-        DecryptionChallenges: {
-          where: {
-            deviceId: this.id,
-            ipAddress: ctx.getIpAddress()
-          }
-        }
+    await ctx.prisma.decryptionChallenge.deleteMany({
+      where: {
+        deviceId: this.id,
+        approvedAt: null
       }
     })
 
-    //NOTE: Create a new challenge for the device, only if the device doesn't have any active challenge
-    if (this.id === ctx.masterDeviceId && !user?.DecryptionChallenges.length) {
+    if (this.id === ctx.masterDeviceId) {
       await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: this.id,
@@ -219,7 +229,7 @@ export class DeviceMutation extends DeviceGQLScalars {
     description: 'user has to approve it when they log in again on that device'
   })
   async removeDevice(@Ctx() ctx: IContextAuthenticated) {
-    if (ctx.device.id === ctx.masterDeviceId) {
+    if (this.id === ctx.masterDeviceId) {
       throw new GraphqlError('You cannot remove master device from list.')
     }
     await this.logout(ctx)

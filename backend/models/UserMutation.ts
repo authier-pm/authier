@@ -260,7 +260,7 @@ export class UserMutation extends UserBase {
           HTMLPart: `<!DOCTYPE html>
           <html>
           <body>
-          <a href="${link}">Please verify your email.</a> ${notifMessage}
+          <a href="${link}" rel="notrack">Please verify your email.</a> ${notifMessage}
           </body>
           </html>`
         }

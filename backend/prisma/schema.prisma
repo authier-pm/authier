@@ -24,8 +24,8 @@ generator PrismaTypeGraphQLTypesGenerator {
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
 model DecryptionChallenge {
   id                       Int       @id @default(autoincrement())
-  // @skip
   ipAddress                String    @db.Inet
+  // @skip
   masterPasswordVerifiedAt DateTime?
   approvedAt               DateTime?
   rejectedAt               DateTime?

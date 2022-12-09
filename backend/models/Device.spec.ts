@@ -31,5 +31,10 @@ describe('Device', () => {
     })
   })
 
-  it.todo('logout')
+  describe('logout', () => {
+    it.todo('should logout user')
+    it.todo(
+      'should create a new pre approved device decryption challenge when logging out from master device'
+    )
+  })
 })

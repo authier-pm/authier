@@ -197,7 +197,7 @@ enum WebInputType {
 
 type DecryptionChallengeGQL {
   id: Int!
-  masterPasswordVerifiedAt: DateTime
+  ipAddress: String!
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
@@ -301,12 +301,22 @@ enum EmailVerificationType {
 }
 
 type DecryptionChallengeForApproval {
+  ipGeoLocation: JSON!
   id: Int!
+  ipAddress: String!
   rejectedAt: DateTime
   createdAt: DateTime!
   deviceName: String!
   deviceId: ID!
 }
+
+"""
+The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf).
+"""
+scalar JSON
+  @specifiedBy(
+    url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf"
+  )
 
 """
 Integers that will have a value greater than 0.
@@ -499,7 +509,7 @@ scalar NonEmptyString
 
 type DecryptionChallengeMutation {
   id: Int!
-  masterPasswordVerifiedAt: DateTime
+  ipAddress: String!
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean
@@ -540,7 +550,7 @@ union DecryptionChallenge =
 
 type DecryptionChallengeApproved {
   id: Int!
-  masterPasswordVerifiedAt: DateTime
+  ipAddress: String!
   approvedAt: DateTime
   rejectedAt: DateTime
   blockIp: Boolean

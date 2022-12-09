@@ -138,7 +138,7 @@ export class UserQuery extends UserBase {
     @Arg('device', () => String) device: string,
     @Arg('pageName', () => String) pageName: string
   ) {
-    const user = await prismaClient.user.findFirst({
+    const user = await prismaClient.user.findUnique({
       where: {
         id: this.id
       },
@@ -179,6 +179,10 @@ export class UserQuery extends UserBase {
 
   @Field(() => [DecryptionChallengeForApproval])
   async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
+    if (ctx.device.id !== ctx.masterDeviceId) {
+      return [] // no point in returning these to other devices than the master
+    }
+
     return ctx.prisma.decryptionChallenge.findMany({
       where: {
         userId: ctx.jwtPayload.userId,

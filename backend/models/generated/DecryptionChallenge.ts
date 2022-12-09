@@ -7,8 +7,8 @@ export class DecryptionChallengeGQLScalars {
   @Field(() => Int)
   id: number
 
-  @Field({ nullable: true })
-  masterPasswordVerifiedAt?: Date
+  @Field()
+  ipAddress: string
 
   @Field({ nullable: true })
   approvedAt?: Date
