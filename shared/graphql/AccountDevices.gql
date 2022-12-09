@@ -46,6 +46,8 @@ query DevicesRequests {
       createdAt
       deviceName
       deviceId
+      ipAddress
+      ipGeoLocation
     }
   }
 }

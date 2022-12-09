@@ -3,17 +3,33 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallenge'
 import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
-import { GraphQLNonEmptyString, GraphQLUUID } from 'graphql-scalars'
+import { GraphQLJSON, GraphQLNonEmptyString } from 'graphql-scalars'
 import { GraphqlError } from '../api/GraphqlError'
+import ms from 'ms'
 
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
+import { decorator as mem } from 'mem'
+import { getGeoIpLocation } from './Device'
 
 @ObjectType()
 export class DecryptionChallengeForApproval {
+  @mem({ maxAge: ms('2 days') })
+  @Field(() => GraphQLJSON)
+  async ipGeoLocation() {
+    const json: any = await getGeoIpLocation(this.ipAddress)
+    return {
+      city: json.data.location.city.name,
+      country_name: json.data.location.country.name
+    }
+  }
+
   @Field(() => Int)
   id: number
+
+  @Field()
+  ipAddress: string
 
   @Field({ nullable: true })
   rejectedAt?: Date

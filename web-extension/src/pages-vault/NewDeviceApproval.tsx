@@ -12,10 +12,9 @@ import { formatRelative } from 'date-fns'
 export const NewDevicesApprovalStack = () => {
   const { refetch: devicesRefetch } = useMyDevicesQuery()
 
-  const { data: devicesRequests, refetch: devicesRequestsRefetch } =
-    useDevicesRequestsQuery({
-      fetchPolicy: 'cache-first'
-    })
+  const { data: devicesRequests } = useDevicesRequestsQuery({
+    fetchPolicy: 'cache-first'
+  })
 
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
@@ -26,8 +25,10 @@ export const NewDevicesApprovalStack = () => {
         (challengeToApprove) => {
           return (
             <Alert
+              minW="90%"
               status="warning"
               display="grid"
+              rounded={4}
               gridRowGap={1}
               maxW={500}
               key={challengeToApprove.id}
@@ -38,7 +39,9 @@ export const NewDevicesApprovalStack = () => {
                   new Date(challengeToApprove.createdAt),
                   new Date()
                 )}
-                : {challengeToApprove.id}
+                : from IP {challengeToApprove.ipAddress} (
+                {challengeToApprove.ipGeoLocation.city},{' '}
+                {challengeToApprove.ipGeoLocation.country_name})
               </Center>
 
               <Grid
@@ -46,34 +49,38 @@ export const NewDevicesApprovalStack = () => {
                 autoFlow="row"
                 templateColumns="repeat(auto-fit, 49%)"
               >
-                <Button
-                  w="100%"
-                  colorScheme="red"
-                  onClick={async () => {
-                    await reject({
-                      variables: {
-                        id: challengeToApprove.id
-                      }
-                    })
-                    devicesRefetch()
-                  }}
-                >
-                  <Trans>Reject</Trans>
-                </Button>
-                <Button
-                  w="100%"
-                  colorScheme="green"
-                  onClick={async () => {
-                    await approve({
-                      variables: {
-                        id: challengeToApprove.id
-                      }
-                    })
-                    devicesRefetch()
-                  }}
-                >
-                  <Trans>Approve</Trans>
-                </Button>
+                <Center>
+                  <Button
+                    w="50%"
+                    colorScheme="red"
+                    onClick={async () => {
+                      await reject({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      devicesRefetch()
+                    }}
+                  >
+                    <Trans>Reject</Trans>
+                  </Button>
+                </Center>
+                <Center>
+                  <Button
+                    w="50%"
+                    colorScheme="green"
+                    onClick={async () => {
+                      await approve({
+                        variables: {
+                          id: challengeToApprove.id
+                        }
+                      })
+                      devicesRefetch()
+                    }}
+                  >
+                    <Trans>Approve</Trans>
+                  </Button>
+                </Center>
               </Grid>
             </Alert>
           )

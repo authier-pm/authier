@@ -38,8 +38,8 @@ sentryInit({
 const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
 const isLambda = !!env.LAMBDA_TASK_ROOT
 
-let logger: any = undefined
-let pino: any = undefined
+let logger
+let pino
 if (!isLambda) {
   ;(async () => {
     pino = await import('pino').then((m) => m.pino)
@@ -68,7 +68,7 @@ app.register(fastifyCors, {
 
 app.setErrorHandler(async (error, request, reply) => {
   // Logging locally
-  console.log(error)
+  console.error(error)
   // Sending error to be logged in Sentry
   captureException(error)
   reply.status(500).send({ error: 'Something went wrong' })
@@ -231,13 +231,14 @@ app.register(mercurius, {
     return { request, reply, getIpAddress, prisma: prismaClient }
   },
   errorFormatter: (res, ctx) => {
+    // console.error(ctx)
     if (res.errors) {
       res.errors.map((err) => {
         if (err instanceof GraphqlError === false) {
           captureException(err)
         }
-        // @ts-expect-error
-        ctx.request.log.error(err)
+        ctx.app.log.error(err)
+        console.error(err)
       })
     }
     const errResponse = mercurius.defaultErrorFormatter(res, ctx)

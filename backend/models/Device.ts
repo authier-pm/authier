@@ -17,6 +17,30 @@ import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
 import { UserQuery } from './UserQuery'
 
+export async function getGeoIpLocation(ipAddress: string) {
+  if (ipAddress === '127.0.0.1') {
+    return {
+      // Mock data from https://ipbase.com/
+      data: {
+        location: {
+          city: {
+            name: 'Brno'
+          },
+          country: {
+            name: 'Czech Republic'
+          }
+        }
+      }
+    }
+  }
+  const res = await fetch(
+    `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
+  )
+  const json: any = await res.json()
+
+  return json
+}
+
 @InputType()
 export class DeviceInput {
   @Field(() => String, { nullable: false })
@@ -33,16 +57,8 @@ export class DeviceInput {
 export class DeviceQuery extends DeviceGQL {
   @mem({ maxAge: ms('2 days') })
   async getIpGeoLocation(ipAddress: string) {
-    if (ipAddress === '127.0.0.1') {
-      return {
-        city: 'Brno',
-        country_name: 'Czech Republic'
-      }
-    }
-    const res = await fetch(
-      `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
-    )
-    const json: any = await res.json()
+    const json = await getGeoIpLocation(ipAddress)
+
     return {
       city: json.data.location.city.name,
       country_name: json.data.location.country.name
