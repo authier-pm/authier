@@ -59,9 +59,6 @@ export const NewDevicesApprovalStack = () => {
                         }
                       })
                       await refetch()
-                      setTimeout(() => {
-                        devicesRefetch() // this is needed, because it takes time one the client side to do the decryption challenge
-                      }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
                     }}
                   >
                     <Trans>Reject</Trans>
@@ -79,8 +76,8 @@ export const NewDevicesApprovalStack = () => {
                       })
                       await refetch()
                       setTimeout(() => {
-                        devicesRefetch() // TODO figure out why this does not refetch the devices
-                      }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
+                        devicesRefetch()
+                      }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL) // this is needed, because it takes time one the client side to do the decryption challenge
                     }}
                   >
                     <Trans>Approve</Trans>
