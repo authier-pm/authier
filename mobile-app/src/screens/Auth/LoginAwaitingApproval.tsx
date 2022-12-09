@@ -20,6 +20,7 @@ import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { DeviceState } from '@src/utils/DeviceState'
+import { Trans } from '@lingui/macro'
 
 const ToastServerErrorDetails = {
   title: 'Something went wrong',
@@ -219,8 +220,11 @@ export const LoginAwaitingApproval = () => {
         <Heading size="sm">{deviceName}</Heading>
 
         <Text>
-          Approve this device in your device management in the vault on another
-          device in order to finish login.
+          <Trans>
+            Approve this device in your device management in the vault on your
+            master device in order to finish adding new device. Afterwards your
+            vault will open automatically.
+          </Trans>
         </Text>
       </>
     )
