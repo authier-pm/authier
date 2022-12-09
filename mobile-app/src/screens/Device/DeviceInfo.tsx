@@ -1,5 +1,3 @@
-import { Trans } from '@lingui/macro'
-
 import { intlFormat } from 'date-fns'
 import {
   Button,
@@ -81,7 +79,8 @@ export default function DeviceInfo({
                 }
               >
                 <Text color="white" fontWeight={'bold'}>
-                  <Trans>Set on master device</Trans>
+                  {/* <Trans>Set on master device</Trans> */}
+                  Set on master device
                 </Text>
               </Button>
             ) : null}
