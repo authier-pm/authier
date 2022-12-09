@@ -75,7 +75,7 @@
     "vitest": "^0.25.4"
   },
   "scripts": {
-    "dev": "DEBUG=au:* && pnpm nodemon --exec ts-node-transpile-only server.ts",
+    "dev": "DEBUG=au:* pnpm nodemon --exec ts-node-transpile-only server.ts",
     "local": "nodemon server.ts",
     "pgn": "pnpm prisma migrate dev && pnpm prisma db push && prisma generate",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
