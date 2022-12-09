@@ -262,8 +262,8 @@ export default function Account() {
         </Box>
 
         <Box>
-          <Heading as="h3" size="lg" color={'red'}>
-            Delete account
+          <Heading as="h3" size="lg" color={'red'} mb={5}>
+            <Trans>Danger zone</Trans>
           </Heading>
           <Button colorScheme={'red'}>Delete your account</Button>
         </Box>

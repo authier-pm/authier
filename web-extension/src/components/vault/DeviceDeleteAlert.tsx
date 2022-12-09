@@ -16,20 +16,20 @@ import React, { useRef, useState } from 'react'
 import { HStack } from '@chakra-ui/react'
 import {
   useRemoveDeviceMutation,
-  useLogoutDeviceMutation
+  useLogoutDeviceMutation,
+  useMyDevicesQuery
 } from '@shared/graphql/AccountDevices.codegen'
 
 export function DeviceDeleteAlert({
   isOpen,
   id,
-  onClose,
-  refetch
+  onClose
 }: {
   onClose: () => void
   isOpen: boolean
   id: string
-  refetch: () => void
 }) {
+  const { refetch: devicesRefetch } = useMyDevicesQuery()
   const cancelRef = useRef()
   const [remove, setRemove] = useState(false)
   const [logoutDevice] = useLogoutDeviceMutation({
@@ -84,7 +84,7 @@ export function DeviceDeleteAlert({
                   await logoutDevice()
                 }
                 onClose()
-                refetch()
+                devicesRefetch()
               }}
             >
               Yes

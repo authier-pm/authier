@@ -198,7 +198,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       })
       .filter((el) => !!el)
 
-    //After ceraint condition is met, we can assume this is register page
+    //After certain condition is met, we can assume this is register page
     const inputs = filterUselessInputs(document.body)
     console.log('Ussefull inputs', inputs)
     for (const el of inputs) {

@@ -82,7 +82,7 @@
     "zod": "^3.19.1"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.1",
+    "@apollo/client": "^3.7.2",
     "@apollo/react-hooks": "^4.0.0",
     "@chakra-ui/color-mode": "^2.1.10",
     "@chakra-ui/icons": "^2.0.12",

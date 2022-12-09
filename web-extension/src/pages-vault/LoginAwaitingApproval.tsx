@@ -13,8 +13,20 @@ import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import { Heading, Spinner, useInterval } from '@chakra-ui/react'
+import {
+  Card,
+  Center,
+  Flex,
+  Heading,
+  Icon,
+  Spinner,
+  useInterval
+} from '@chakra-ui/react'
 import { formatRelative } from 'date-fns'
+import { Txt } from '@src/components/util/Txt'
+import { WarningIcon } from '@chakra-ui/icons'
+
+export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
@@ -46,7 +58,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
-  }, 6000)
+  }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {
@@ -57,7 +69,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ; (async () => {
+      ;(async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -129,7 +141,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-            'DecryptionChallengeApproved'
+          'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
@@ -192,15 +204,24 @@ export const LoginAwaitingApproval: React.FC = () => {
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
   ) {
     return (
-      <>
-        <Trans>Device: </Trans>
-        <Heading size="sm">{deviceName}</Heading>
-        <br />
-        <Trans>
-          Approve this device in your device management in the vault on another
-          device in order to finish login.
-        </Trans>
-      </>
+      <Card p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="600px">
+        <Flex align={'center'}>
+          <WarningIcon mr={2} boxSize={30} />
+          <Heading size="md" mr={4}>
+            <Trans>Device: </Trans>
+          </Heading>
+          <Heading size="sm">{deviceName}</Heading>
+        </Flex>
+        <Flex>
+          <Center mt={3}>
+            <Trans>
+              Approve this device in your device management in the vault on your
+              master device in order to finish adding new device. Afterwards
+              your vault will open automatically in this tab.
+            </Trans>
+          </Center>
+        </Flex>
+      </Card>
     )
   } else {
     return null
