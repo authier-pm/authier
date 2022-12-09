@@ -8,7 +8,7 @@ import { DeviceQuery, UserQuery } from '../../shared/generated/graphqlBaseTypes'
 const DeviceStack = createNativeStackNavigator<DeviceStackParamList>()
 
 export type DeviceStackParamList = {
-  DeviceList: undefined
+  DeviceList?: undefined
   DeviceInfo: {
     device: Partial<DeviceQuery>
     masterDeviceId: UserQuery['masterDeviceId']
@@ -30,6 +30,7 @@ export default function DeviceStackNavigation() {
         options={{
           title: 'Device info'
         }}
+        // @ts-expect-error TODO we need to fix this TS error
         component={DeviceInfo}
       />
     </DeviceStack.Navigator>
