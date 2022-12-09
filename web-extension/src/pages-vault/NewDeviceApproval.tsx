@@ -32,7 +32,7 @@ export const NewDevicesApprovalStack = () => {
               key={challengeToApprove.id}
             >
               <Center>
-                New Device trying to login{' '}
+                New device "{challengeToApprove.deviceName}" trying to login{' '}
                 {formatRelative(
                   new Date(challengeToApprove.createdAt),
                   new Date()
