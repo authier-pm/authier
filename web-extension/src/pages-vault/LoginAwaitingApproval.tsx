@@ -26,6 +26,8 @@ import { formatRelative } from 'date-fns'
 import { Txt } from '@src/components/util/Txt'
 import { WarningIcon } from '@chakra-ui/icons'
 
+export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
+
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
 
@@ -56,7 +58,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
-  }, 6000)
+  }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {

@@ -8,11 +8,12 @@ import {
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { formatRelative } from 'date-fns'
+import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from './LoginAwaitingApproval'
 
 export const NewDevicesApprovalStack = () => {
   const { refetch: devicesRefetch } = useMyDevicesQuery()
 
-  const { data: devicesRequests } = useDevicesRequestsQuery()
+  const { data: devicesRequests, refetch } = useDevicesRequestsQuery()
 
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
@@ -57,7 +58,10 @@ export const NewDevicesApprovalStack = () => {
                           id: challengeToApprove.id
                         }
                       })
-                      devicesRefetch()
+                      await refetch()
+                      setTimeout(() => {
+                        devicesRefetch() // this is needed, because it takes time one the client side to do the decryption challenge
+                      }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
                     }}
                   >
                     <Trans>Reject</Trans>
@@ -73,7 +77,10 @@ export const NewDevicesApprovalStack = () => {
                           id: challengeToApprove.id
                         }
                       })
-                      devicesRefetch()
+                      await refetch()
+                      setTimeout(() => {
+                        devicesRefetch() // TODO figure out why this does not refetch the devices
+                      }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
                     }}
                   >
                     <Trans>Approve</Trans>
