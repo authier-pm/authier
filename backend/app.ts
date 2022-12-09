@@ -26,7 +26,7 @@ import { stripe } from './stripe'
 import fastifyCors from '@fastify/cors'
 
 const { env } = process
-const log = debug('au:server')
+const log = debug('au:app')
 
 const environment = env.NODE_ENV
 sentryInit({
@@ -226,7 +226,11 @@ app.register(mercurius, {
     const getIpAddress = () => {
       return request.headers['x-forwarded-for'] || request.socket.remoteAddress
     }
-    log('body: ', request.body)
+    // @ts-expect-error
+    if (request.body?.operationName) {
+      // @ts-expect-error
+      log(request.body?.operationName, request.body?.variables ?? '')
+    }
 
     return { request, reply, getIpAddress, prisma: prismaClient }
   },

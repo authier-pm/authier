@@ -203,8 +203,8 @@ export const LoginAwaitingApproval: React.FC = () => {
   ) {
     return (
       <Card p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="600px">
-        <Flex>
-          <WarningIcon mr={2} size="xl" />
+        <Flex align={'center'}>
+          <WarningIcon mr={2} boxSize={30} />
           <Heading size="md" mr={4}>
             <Trans>Device: </Trans>
           </Heading>
