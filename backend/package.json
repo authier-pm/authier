@@ -39,6 +39,7 @@
     "mem": "8",
     "mercurius": "^11.4.0",
     "node-mailjet": "^5.1.1",
+    "pino": "^8.7.0",
     "pino-pretty": "9.1.1",
     "prisma": "^4.7.1",
     "raw-body": "^2.5.1",

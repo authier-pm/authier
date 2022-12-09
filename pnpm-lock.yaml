@@ -106,6 +106,7 @@ importers:
       mz: ^2.7.0
       node-mailjet: ^5.1.1
       nodemon: ^2.0.20
+      pino: ^8.7.0
       pino-pretty: 9.1.1
       prisma: ^4.7.1
       prisma-typegraphql-types-generator: ^1.5.14
@@ -154,6 +155,7 @@ importers:
       mem: 8.1.1
       mercurius: 11.4.0_graphql@16.6.0
       node-mailjet: 5.1.1_debug@4.3.4
+      pino: 8.7.0
       pino-pretty: 9.1.1
       prisma: 4.7.1
       raw-body: 2.5.1
@@ -4294,6 +4296,13 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+
+  /@balena/dockerignore/1.0.2:
+    resolution:
+      {
+        integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==
+      }
+    dev: true
 
   /@bcoe/v8-coverage/0.2.3:
     resolution:
@@ -16509,7 +16518,16 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.19
       '@aws-cdk/asset-kubectl-v20': 2.1.1
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.25
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.184
+      fs-extra: 9.1.0
+      ignore: 5.2.0
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.8
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -17689,6 +17707,14 @@ packages:
       no-case: 3.0.4
       tslib: 2.4.0
       upper-case-first: 2.0.2
+    dev: true
+
+  /case/1.6.3:
+    resolution:
+      {
+        integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
+      }
+    engines: { node: '>= 0.8.0' }
     dev: true
 
   /caseless/0.12.0:
@@ -21352,7 +21378,7 @@ packages:
       content-type: 1.0.4
       find-my-way: 7.3.1
       light-my-request: 5.6.1
-      pino: 8.6.1
+      pino: 8.7.0
       process-warning: 2.0.0
       proxy-addr: 2.0.7
       rfdc: 1.3.0
@@ -25262,6 +25288,13 @@ packages:
       }
     dev: true
 
+  /jsonschema/1.4.1:
+    resolution:
+      {
+        integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==
+      }
+    dev: true
+
   /jsonwebtoken/8.5.1:
     resolution:
       {
@@ -28661,10 +28694,10 @@ packages:
       }
     dev: false
 
-  /pino/8.6.1:
+  /pino/8.7.0:
     resolution:
       {
-        integrity: sha512-fi+V2K98eMZjQ/uEHHSiMALNrz7HaFdKNYuyA3ZUrbH0f1e8sPFDmeRGzg7ZH2q4QDxGnJPOswmqlEaTAZeDPA==
+        integrity: sha512-l9sA5uPxmZzwydhMWUcm1gI0YxNnYl8MfSr2h8cwLvOAzQLBLewzF247h/vqHe3/tt6fgtXeG9wdjjoetdI/vA==
       }
     hasBin: true
     dependencies:

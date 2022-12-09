@@ -25,7 +25,7 @@ export type ApproveChallengeMutation = { __typename?: 'Mutation', me: { __typena
 export type DevicesRequestsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string }> } };
+export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, ipGeoLocation: any }> } };
 
 export type LogoutDeviceMutationVariables = Types.Exact<{
   id: Types.Scalars['String'];
@@ -180,6 +180,8 @@ export const DevicesRequestsDocument = gql`
       createdAt
       deviceName
       deviceId
+      ipAddress
+      ipGeoLocation
     }
   }
 }
