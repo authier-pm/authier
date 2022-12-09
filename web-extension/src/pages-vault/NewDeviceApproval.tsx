@@ -12,9 +12,7 @@ import { formatRelative } from 'date-fns'
 export const NewDevicesApprovalStack = () => {
   const { refetch: devicesRefetch } = useMyDevicesQuery()
 
-  const { data: devicesRequests } = useDevicesRequestsQuery({
-    fetchPolicy: 'cache-first'
-  })
+  const { data: devicesRequests } = useDevicesRequestsQuery()
 
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
