@@ -235,7 +235,7 @@ export class DeviceMutation extends DeviceGQLScalars {
     description: 'user has to approve it when they log in again on that device'
   })
   async removeDevice(@Ctx() ctx: IContextAuthenticated) {
-    if (ctx.device.id === ctx.masterDeviceId) {
+    if (this.id === ctx.masterDeviceId) {
       throw new GraphqlError('You cannot remove master device from list.')
     }
     await this.logout(ctx)

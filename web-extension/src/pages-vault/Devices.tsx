@@ -51,11 +51,9 @@ interface SettingsValues {
 
 const DeviceListItem = ({
   deviceInfo,
-  refetch,
   masterDeviceId
 }: {
   deviceInfo: Partial<DeviceQuery>
-  refetch: () => void
   masterDeviceId: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
@@ -137,7 +135,6 @@ const DeviceListItem = ({
                   id={deviceInfo.id as string}
                   isOpen={isOpen}
                   onClose={onClose}
-                  refetch={refetch}
                 />
                 <MenuItem
                   onClick={() => {
@@ -293,13 +290,7 @@ const DeviceListItem = ({
 }
 
 export default function Devices() {
-  const {
-    data,
-    loading,
-    refetch: devicesRefetch
-  } = useMyDevicesQuery({
-    fetchPolicy: 'cache-and-network'
-  })
+  const { data, loading, refetch: devicesRefetch } = useMyDevicesQuery()
 
   const [filterBy, setFilterBy] = useState('')
 
@@ -341,7 +332,6 @@ export default function Devices() {
                     <DeviceListItem
                       deviceInfo={el}
                       key={i}
-                      refetch={devicesRefetch}
                       masterDeviceId={data.me.masterDeviceId as string}
                     />
                   )

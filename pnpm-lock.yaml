@@ -3,7 +3,7 @@ lockfileVersion: 5.4
 importers:
   .:
     specifiers:
-      '@apollo/client': ^3.7.1
+      '@apollo/client': ^3.7.2
       '@chakra-ui/react': ^2.4.1
       '@emotion/react': ^11.10.5
       '@emotion/styled': ^11.10.5
@@ -30,7 +30,7 @@ importers:
       react-toastify: ^9.1.1
       typescript: ^4.9.3
     devDependencies:
-      '@apollo/client': 3.7.1
+      '@apollo/client': 3.7.2
       '@chakra-ui/react': 2.4.1_hff336zmaxcweuutcq6cmf5psi
       '@emotion/react': 11.10.5
       '@emotion/styled': 11.10.5_@emotion+react@11.10.5
@@ -393,7 +393,7 @@ importers:
 
   web-extension:
     specifiers:
-      '@apollo/client': ^3.7.1
+      '@apollo/client': ^3.7.2
       '@apollo/react-hooks': ^4.0.0
       '@babel/core': ^7.20.2
       '@babel/preset-env': ^7.20.2
@@ -501,7 +501,7 @@ importers:
       yup: ^0.32.11
       zod: ^3.19.1
     dependencies:
-      '@apollo/client': 3.7.1_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.2_gdcq4dv6opitr3wbfwyjmanyra
       '@apollo/react-hooks': 4.0.0_gdcq4dv6opitr3wbfwyjmanyra
       '@chakra-ui/color-mode': 2.1.10_react@18.2.0
       '@chakra-ui/icons': 2.0.12_react@18.2.0
@@ -518,7 +518,7 @@ importers:
       '@typescript-eslint/parser': 5.44.0_typescript@4.9.3
       apollo-boost: 0.4.9_graphql@16.6.0
       apollo-link-serialize: 4.0.0_gdcq4dv6opitr3wbfwyjmanyra
-      apollo-link-token-refresh: 0.4.0_vyimhitoszmgfhxzjgw5jdtad4
+      apollo-link-token-refresh: 0.4.0_qyljuixjfow6vokwpa4ukudbla
       arraybuffer-to-string: 1.0.2
       babel-plugin-macros: 3.1.0
       bowser: 2.11.0
@@ -709,10 +709,10 @@ packages:
       zen-observable-ts: 1.2.5
     dev: false
 
-  /@apollo/client/3.7.1:
+  /@apollo/client/3.7.2:
     resolution:
       {
-        integrity: sha512-xu5M/l7p9gT9Fx7nF3AQivp0XukjB7TM7tOd5wifIpI8RskYveL4I+rpTijzWrnqCPZabkbzJKH7WEAKdctt9w==
+        integrity: sha512-ohAIpXl3mTa1Fd3GT/K37VwQJfTIuuJRp4aOlJ4q/hlx0Wxh+RqDrbn0awtVCOdhGDQN+CQQmVzIqFKn6GziXQ==
       }
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
@@ -744,45 +744,6 @@ packages:
       tslib: 2.4.0
       zen-observable-ts: 1.2.5
     dev: true
-
-  /@apollo/client/3.7.1_gdcq4dv6opitr3wbfwyjmanyra:
-    resolution:
-      {
-        integrity: sha512-xu5M/l7p9gT9Fx7nF3AQivp0XukjB7TM7tOd5wifIpI8RskYveL4I+rpTijzWrnqCPZabkbzJKH7WEAKdctt9w==
-      }
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-      graphql-ws: ^5.5.5
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
-    peerDependenciesMeta:
-      graphql-ws:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      subscriptions-transport-ws:
-        optional: true
-    dependencies:
-      '@graphql-typed-document-node/core': 3.1.1_graphql@16.6.0
-      '@wry/context': 0.7.0
-      '@wry/equality': 0.5.3
-      '@wry/trie': 0.3.2
-      graphql: 16.6.0
-      graphql-tag: 2.12.6_graphql@16.6.0
-      hoist-non-react-statics: 3.3.2
-      optimism: 0.16.1
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-      response-iterator: 0.2.6
-      symbol-observable: 4.0.0
-      ts-invariant: 0.10.3
-      tslib: 2.4.0
-      zen-observable-ts: 1.2.5
-    dev: false
 
   /@apollo/client/3.7.2_gdcq4dv6opitr3wbfwyjmanyra:
     resolution:
@@ -16001,7 +15962,7 @@ packages:
       graphql: 16.6.0
     dev: false
 
-  /apollo-link-token-refresh/0.4.0_vyimhitoszmgfhxzjgw5jdtad4:
+  /apollo-link-token-refresh/0.4.0_qyljuixjfow6vokwpa4ukudbla:
     resolution:
       {
         integrity: sha512-5P5nH//asgoz01r6tUYiBbHIuVwEEsBmA9WJ8LEiNtZcOq8AXdfR8aV4Pw/B86P3lRi1ykd8xyZLCHpLro9v+Q==
@@ -16010,7 +15971,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.1_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.2_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 
