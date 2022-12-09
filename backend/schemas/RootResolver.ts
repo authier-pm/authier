@@ -197,9 +197,19 @@ export class RootResolver {
       }
       if (err.code === 'P2002' && err.meta.target[0] === 'id') {
         log('deviceId', deviceId)
-        throw new GraphqlError(
-          `Device already exists. You cannot register this device for multiple accounts.`
-        )
+        if (process.env.NODE_ENV === 'development') {
+          console.warn(
+            `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
+          )
+          await prismaClient.device.delete({
+            where: { id: deviceId }
+          })
+          return this.registerNewUser(input, userId, ctx)
+        } else {
+          throw new GraphqlError(
+            `Device already exists. You cannot register this device for multiple accounts.`
+          )
+        }
       }
       throw err
     }

@@ -21,10 +21,8 @@ import {
   Select,
   Button,
   Tooltip,
-  Alert,
   useDisclosure,
   VStack,
-  Grid,
   Stat,
   FormHelperText,
   HStack
@@ -32,21 +30,19 @@ import {
 import { t, Trans } from '@lingui/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
-import React, { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
 import {
-  useApproveChallengeMutation,
   useChangeMasterDeviceMutation,
-  useDevicesRequestsQuery,
-  useRejectChallengeMutation,
   useMyDevicesQuery
 } from '@shared/graphql/AccountDevices.codegen'
-import { formatDistance, formatRelative, intlFormat } from 'date-fns'
+import { formatDistance, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
 import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
 import { DeviceQuery } from '@shared/generated/graphqlBaseTypes'
+import { NewDevicesApprovalStack } from './NewDeviceApproval'
 
 interface SettingsValues {
   lockTime: number
@@ -55,11 +51,9 @@ interface SettingsValues {
 
 const DeviceListItem = ({
   deviceInfo,
-  refetch,
   masterDeviceId
 }: {
   deviceInfo: Partial<DeviceQuery>
-  refetch: () => void
   masterDeviceId: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
@@ -141,7 +135,6 @@ const DeviceListItem = ({
                   id={deviceInfo.id as string}
                   isOpen={isOpen}
                   onClose={onClose}
-                  refetch={refetch}
                 />
                 <MenuItem
                   onClick={() => {
@@ -297,25 +290,9 @@ const DeviceListItem = ({
 }
 
 export default function Devices() {
-  const {
-    data,
-    loading,
-    refetch: devicesRefetch
-  } = useMyDevicesQuery({
-    // TODO figure out why this is called twice
-    fetchPolicy: 'cache-and-network'
-  })
-  const [reject] = useRejectChallengeMutation()
-  const [approve] = useApproveChallengeMutation()
-  const [filterBy, setFilterBy] = useState('')
-  const { data: devicesRequests, refetch: devicesRequestsRefetch } =
-    useDevicesRequestsQuery({
-      fetchPolicy: 'cache-first'
-    })
+  const { data, loading, refetch: devicesRefetch } = useMyDevicesQuery()
 
-  useEffect(() => {
-    devicesRefetch()
-  }, [])
+  const [filterBy, setFilterBy] = useState('')
 
   return (
     <Flex flexDirection="column">
@@ -333,72 +310,11 @@ export default function Devices() {
             {data?.me?.devices.length} {t`devices`}
           </Stat>
 
-          <RefreshDeviceButton
-            refetchDevices={devicesRefetch}
-            refetchRequests={devicesRequestsRefetch}
-          />
+          <RefreshDeviceButton />
         </Center>
       </Center>
 
-      <VStack mt={3}>
-        {devicesRequests?.me?.decryptionChallengesWaiting.map(
-          (challengeToApprove) => {
-            return (
-              <Alert
-                status="warning"
-                display="grid"
-                gridRowGap={1}
-                maxW={500}
-                key={challengeToApprove.id}
-              >
-                <Center>
-                  New Device trying to login{' '}
-                  {formatRelative(
-                    new Date(challengeToApprove.createdAt),
-                    new Date()
-                  )}
-                  : {challengeToApprove.id}
-                </Center>
-
-                <Grid
-                  gridGap={1}
-                  autoFlow="row"
-                  templateColumns="repeat(auto-fit, 49%)"
-                >
-                  <Button
-                    w="100%"
-                    colorScheme="red"
-                    onClick={async () => {
-                      await reject({
-                        variables: {
-                          id: challengeToApprove.id
-                        }
-                      })
-                      devicesRefetch()
-                    }}
-                  >
-                    <Trans>Reject</Trans>
-                  </Button>
-                  <Button
-                    w="100%"
-                    colorScheme="green"
-                    onClick={async () => {
-                      await approve({
-                        variables: {
-                          id: challengeToApprove.id
-                        }
-                      })
-                      devicesRefetch()
-                    }}
-                  >
-                    <Trans>Approve</Trans>
-                  </Button>
-                </Grid>
-              </Alert>
-            )
-          }
-        )}
-      </VStack>
+      <NewDevicesApprovalStack></NewDevicesApprovalStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
           <Flex flexDirection="row" flexWrap="wrap" m="auto">
@@ -416,7 +332,6 @@ export default function Devices() {
                     <DeviceListItem
                       deviceInfo={el}
                       key={i}
-                      refetch={devicesRefetch}
                       masterDeviceId={data.me.masterDeviceId as string}
                     />
                   )

@@ -33,7 +33,7 @@ import {
   FiDisc
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
-import { Link as RouterLink } from 'react-router-dom'
+import { NavLink as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { ChevronDownIcon } from '@chakra-ui/icons'
@@ -214,7 +214,7 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
       to={path}
       style={{ textDecoration: 'none' }}
       _activeLink={{
-        bg: 'teal.100' // TODO fix
+        bg: 'teal.700' // TODO fix
       }}
     >
       <Flex
@@ -225,8 +225,8 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
         role="group"
         cursor="pointer"
         _hover={{
-          bg: 'cyan.100',
-          color: 'gray.400'
+          bg: 'orange.300',
+          color: 'orange.800'
         }}
         {...rest}
       >
