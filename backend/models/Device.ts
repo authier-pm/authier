@@ -193,20 +193,14 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
-    const user = await ctx.prisma.user.findUnique({
-      where: { id: this.userId },
-      include: {
-        DecryptionChallenges: {
-          where: {
-            deviceId: this.id,
-            ipAddress: ctx.getIpAddress()
-          }
-        }
+    await ctx.prisma.decryptionChallenge.deleteMany({
+      where: {
+        deviceId: this.id,
+        approvedAt: null
       }
     })
 
-    //NOTE: Create a new challenge for the device, only if the device doesn't have any active challenge
-    if (this.id === ctx.masterDeviceId && !user?.DecryptionChallenges.length) {
+    if (this.id === ctx.masterDeviceId) {
       await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: this.id,
