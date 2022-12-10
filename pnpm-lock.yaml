@@ -293,6 +293,7 @@ importers:
       styled-system: ^5.1.5
       typescript: ^4.9.3
       vision-camera-code-scanner: ^0.2.0
+      vite-tsconfig-paths: ^4.0.2
       yup: ^0.32.11
       zod: ^3.19.1
     dependencies:
@@ -370,6 +371,7 @@ importers:
       react-native-vision-camera: 2.14.1_l5er75ggd46g36ntxfpkxjmgqq
       styled-system: 5.1.5
       vision-camera-code-scanner: 0.2.0_j64gsqsnp22xm7xz23brb5utou
+      vite-tsconfig-paths: 4.0.2_typescript@4.9.3
       yup: 0.32.11
       zod: 3.19.1
     devDependencies:
@@ -17506,6 +17508,10 @@ packages:
       - supports-color
     dev: false
 
+  /globrex/0.1.2:
+    resolution: {integrity: sha512-uHJgbwAMwNFf5mLst7IWLNg14x1CkeqglJb/K3doi4dw6q2IvAAmM/Y81kevy83wP+Sst+nutFTYOGg3d1lsxg==}
+    dev: false
+
   /google-auth-library/7.14.1:
     resolution: {integrity: sha512-5Rk7iLNDFhFeBYc3s8l1CqzbEBcdhwR193RlD4vSNFajIcINKI8W8P0JLmBpwymHqqWbX34pJDQu39cSy/6RsA==}
     engines: {node: '>=10'}
@@ -25315,6 +25321,19 @@ packages:
     resolution: {integrity: sha512-iV0GvHqOmilbIKJsfyfJY9/dNHCs969z3so90dQWsO1eMMozvTpnB1MEaUbb3FYtZTGjv5sIy/xmslEz0Rg2TA==}
     dev: false
 
+  /tsconfck/2.0.1_typescript@4.9.3:
+    resolution: {integrity: sha512-/ipap2eecmVBmBlsQLBRbUmUNFwNJV/z2E+X0FPtHNjPwroMZQ7m39RMaCywlCulBheYXgMdUlWDd9rzxwMA0Q==}
+    engines: {node: ^14.13.1 || ^16 || >=18, pnpm: ^7.0.1}
+    hasBin: true
+    peerDependencies:
+      typescript: ^4.3.5
+    peerDependenciesMeta:
+      typescript:
+        optional: true
+    dependencies:
+      typescript: 4.9.3
+    dev: false
+
   /tsconfig/7.0.0:
     resolution: {integrity: sha512-vZXmzPrL+EmC4T/4rVlT2jNVMWCi/O4DIiSj3UHg1OE5kCKbk4mfrXc6dZksLgRM/TZlKnousKH9bbTazUWRRw==}
     dependencies:
@@ -25791,6 +25810,19 @@ packages:
       react: 18.2.0
       react-native: 0.69.7_sxyvc5w76clw6xultp2jaqrfwi
       react-native-vision-camera: 2.14.1_l5er75ggd46g36ntxfpkxjmgqq
+    dev: false
+
+  /vite-tsconfig-paths/4.0.2_typescript@4.9.3:
+    resolution: {integrity: sha512-UzU8zwbCQrdUkj/Z0tnh293n4ScRcjJLoS8nPme2iB2FHoU5q8rhilb7AbhLlUC1uv4t6jSzVWnENjPnyGseeQ==}
+    peerDependencies:
+      vite: '>2.0.0-0'
+    dependencies:
+      debug: 4.3.4
+      globrex: 0.1.2
+      tsconfck: 2.0.1_typescript@4.9.3
+    transitivePeerDependencies:
+      - supports-color
+      - typescript
     dev: false
 
   /vite/3.0.8:
