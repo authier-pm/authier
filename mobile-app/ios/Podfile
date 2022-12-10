@@ -1,5 +1,5 @@
 require_relative '../node_modules/react-native/scripts/react_native_pods'
-require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
+require_relative '../../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
 platform :ios, '12.4'
 install! 'cocoapods', :deterministic_uuids => false
@@ -11,7 +11,7 @@ target 'authier' do
   pod 'Permission-Camera', :path => "#{permissions_path}/Camera"
 
   # Flags change depending on the env values.
-      flags = get_default_flags()
+  flags = get_default_flags()
 
     use_react_native!(
       :path => config[:reactNativePath],

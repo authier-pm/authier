@@ -192,7 +192,7 @@
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				CB84072E5D729B486AB5B73B /* [CP] Copy Pods Resources */,
-				7B2C20BC8CC177E5ACDA6CE0 /* [CP-User] [RNFB] Core Configuration */,
+				7911FE98CD0FFFECC19AF90E /* [CP-User] [RNFB] Core Configuration */,
 			);
 			buildRules = (
 			);
@@ -275,7 +275,7 @@
 			shellPath = /bin/sh;
 			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		7B2C20BC8CC177E5ACDA6CE0 /* [CP-User] [RNFB] Core Configuration */ = {
+		7911FE98CD0FFFECC19AF90E /* [CP-User] [RNFB] Core Configuration */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -584,6 +584,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				Multi_Deployment_Config = "";
 				ONLY_ACTIVE_ARCH = YES;
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 			};
@@ -644,6 +645,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				Multi_Deployment_Config = "$(BUILD_DIR)/$(CONFIGURATION)$(EFFECTIVE_PLATFORM_NAME)";
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
@@ -705,6 +707,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				Multi_Deployment_Config = "$(BUILD_DIR)/Release$(EFFECTIVE_PLATFORM_NAME)";
+				PRESERVE_DEAD_CODE_INITS_AND_TERMS = NO;
 				REACT_NATIVE_PATH = "${PODS_ROOT}/../../node_modules/react-native";
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;

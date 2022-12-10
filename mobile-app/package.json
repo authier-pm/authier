@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "gen": "graphql-codegen",
     "extract": "lingui extract",
-    "compile": "lingui compile"
+    "compile": "lingui compile",
+    "postinstall": "cd .. && cd node_modules && cp -r jsc-android/ ../mobile-app/node_modules"
   },
   "dependencies": {
     "@apollo/client": "^3.7.0",
@@ -62,12 +63,13 @@
     "native-base": "^3.4.17",
     "query-string": "^7.1.1",
     "react": "18.2.0",
-    "react-native": "0.69.4",
+    "react-native": "0.69.7",
     "react-native-biometrics": "^2.2.2",
     "react-native-bootsplash": "^4.3.2",
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.0",
     "react-native-code-push": "^7.0.5",
+    "react-native-codegen": "^0.71.3",
     "react-native-config": "1.4.6",
     "react-native-device-info": "^8.7.1",
     "react-native-gesture-handler": "2.7.0",
