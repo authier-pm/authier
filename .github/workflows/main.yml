@@ -100,12 +100,13 @@ jobs:
         working-directory: ./web-extension
         run: xvfb-run --auto-servernum -- pnpm playwright:run && ls
 
-      - uses: actions/upload-artifact@v3
+      - name: Upload test results
         if: always()
+        uses: actions/upload-artifact@v2
         with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+        name: playwright-report
+        path: playwright-report
+        retention-days: 30
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
