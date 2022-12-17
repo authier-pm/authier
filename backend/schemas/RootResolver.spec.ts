@@ -87,6 +87,7 @@ describe('RootResolver', () => {
       }).toMatchObject({ accessToken: accessToken, email: input.email })
 
       await prismaClient.device.deleteMany()
+      await prismaClient.decryptionChallenge.deleteMany()
       await prismaClient.user.deleteMany()
     })
 
@@ -95,6 +96,7 @@ describe('RootResolver', () => {
       await prismaClient.user.create({
         data: {
           id: faker.datatype.uuid(),
+          //Same email
           email: input.email,
           addDeviceSecret: input.addDeviceSecret,
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
@@ -222,7 +224,7 @@ describe('RootResolver', () => {
       const userId = faker.datatype.uuid()
       const blockedIp = faker.internet.ip()
       const fakeCtx = {
-        reply: { setCookie: () => { } },
+        reply: { setCookie: () => {} },
         request: { headers: {} },
         prisma: prismaClient,
         jwtPayload: { userId: userId },
