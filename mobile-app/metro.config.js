@@ -1,6 +1,8 @@
 const exclusionList = require('metro-config/src/defaults/exclusionList')
+const { makeMetroConfig } = require('@rnx-kit/metro-config')
+const MetroSymlinksResolver = require('@rnx-kit/metro-resolver-symlinks')
 
-module.exports = {
+module.exports = makeMetroConfig({
   projectRoot: __dirname,
   transformer: {
     getTransformOptions: async () => ({
@@ -11,6 +13,7 @@ module.exports = {
     })
   },
   resolver: {
+    resolveRequest: MetroSymlinksResolver(),
     blacklistRE: exclusionList([
       /web-extension\/dist\/.*/,
       /backend\/dist\/.*/
@@ -18,4 +21,4 @@ module.exports = {
     sourceExts: ['js', 'jsx', 'ts', 'tsx', 'cjs', 'json', 'mjs']
   },
   watchFolders: [`${__dirname}/..`]
-}
+})

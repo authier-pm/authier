@@ -16,7 +16,7 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
+import { generateEncryptionKey } from '../../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'

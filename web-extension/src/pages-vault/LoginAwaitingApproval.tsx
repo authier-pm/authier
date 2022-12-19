@@ -8,7 +8,6 @@ import {
   useDeviceDecryptionChallengeMutation
 } from '@shared/graphql/Login.codegen'
 import { toast } from 'react-toastify'
-import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
@@ -23,8 +22,8 @@ import {
   useInterval
 } from '@chakra-ui/react'
 import { formatRelative } from 'date-fns'
-import { Txt } from '@src/components/util/Txt'
 import { WarningIcon } from '@chakra-ui/icons'
+import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 

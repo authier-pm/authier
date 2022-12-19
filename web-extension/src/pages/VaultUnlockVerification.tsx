@@ -17,7 +17,7 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
-import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 

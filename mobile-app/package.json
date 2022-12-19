@@ -11,7 +11,8 @@
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "gen": "graphql-codegen",
     "extract": "lingui extract",
-    "compile": "lingui compile"
+    "compile": "lingui compile",
+    "postinstall": "cd .. && cd node_modules && cp -r jsc-android/ ../mobile-app/node_modules/jsc-android"
   },
   "dependencies": {
     "@apollo/client": "^3.7.0",
@@ -33,6 +34,10 @@
     "@react-navigation/native": "^6.0.13",
     "@react-navigation/native-stack": "^6.9.0",
     "@react-navigation/stack": "^6.3.2",
+    "@rnx-kit/babel-preset-metro-react-native": "^1.1.3",
+    "@rnx-kit/cli": "^0.15.2",
+    "@rnx-kit/metro-config": "^1.3.3",
+    "@rnx-kit/metro-resolver-symlinks": "^0.1.23",
     "@sentry/react-native": "5.0.0-alpha.5",
     "@shopify/flash-list": "^1.3.0",
     "apollo-link-http": "^1.5.17",
@@ -58,12 +63,13 @@
     "native-base": "^3.4.17",
     "query-string": "^7.1.1",
     "react": "18.2.0",
-    "react-native": "0.69.4",
+    "react-native": "0.69.7",
     "react-native-biometrics": "^2.2.2",
     "react-native-bootsplash": "^4.3.2",
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.0",
     "react-native-code-push": "^7.0.5",
+    "react-native-codegen": "^0.71.3",
     "react-native-config": "1.4.6",
     "react-native-device-info": "^8.7.1",
     "react-native-gesture-handler": "2.7.0",
@@ -83,6 +89,7 @@
     "react-native-vision-camera": "^2.14.0",
     "styled-system": "^5.1.5",
     "vision-camera-code-scanner": "^0.2.0",
+    "vite-tsconfig-paths": "^4.0.2",
     "yup": "^0.32.11",
     "zod": "^3.19.1"
   },
