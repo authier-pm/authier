@@ -37,7 +37,7 @@ import {
   TotpTypeWithMeta
 } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
-import { generateEncryptionKey } from '@src/util/generateEncryptionKey'
+import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import { toast } from 'react-toastify'
 
 export const log = debug('au:Device')

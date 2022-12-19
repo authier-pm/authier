@@ -69,7 +69,7 @@ export class DeviceQuery extends DeviceGQL {
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
 
-    const userData = ctx.prisma.user.findFirst({
+    const userData = await ctx.prisma.user.findFirst({
       where: {
         id: ctx.jwtPayload.userId
       }
@@ -95,13 +95,13 @@ export class DeviceQuery extends DeviceGQL {
     })
 
     if (pswCount > pswLimit) {
-      return new GraphqlError(
+      throw new GraphqlError(
         `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
       )
     }
 
     if (TOTPCount > TOTPLimit) {
-      return new GraphqlError(
+      throw new GraphqlError(
         `TOTP limit exceeded, remove ${TOTPCount - TOTPLimit} TOTP secrets`
       )
     }

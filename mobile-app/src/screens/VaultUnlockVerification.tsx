@@ -13,7 +13,7 @@ import {
   View,
   VStack
 } from 'native-base'
-import { generateEncryptionKey } from '../../shared/generateEncryptionKey'
+import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceContext } from '../providers/DeviceProvider'
