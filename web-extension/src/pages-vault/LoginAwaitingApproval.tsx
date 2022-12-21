@@ -16,7 +16,6 @@ import {
   Center,
   Flex,
   Heading,
-  Icon,
   Spinner,
   useInterval
 } from '@chakra-ui/react'
@@ -47,14 +46,8 @@ export const useLogin = (props: { deviceName: string }) => {
     }
   })
 
-  //FIX: Should be handled by the error link
   useEffect(() => {
     if (error || decrChallError) {
-      toast({
-        title: 'failed to create decryption challenge',
-        status: 'error',
-        isClosable: true
-      })
       setFormState(null)
     }
   }, [error, decrChallError])
