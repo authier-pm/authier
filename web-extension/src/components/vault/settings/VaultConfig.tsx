@@ -10,7 +10,7 @@ import {
   Select
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { motion } from 'framer-motion'
 import { Trans } from '@lingui/macro'
 
@@ -56,7 +56,6 @@ export default function VaultConfig() {
                 autofill: device.state.autofill,
                 language: device.state.language,
                 syncTOTP: device.state.syncTOTP,
-                theme: device.state.theme,
                 vaultLockTimeoutSeconds: device.state.lockTime
               }}
               onSubmit={async (

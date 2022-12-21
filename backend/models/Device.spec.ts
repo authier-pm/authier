@@ -179,7 +179,6 @@ describe('Device', () => {
 
       // Create mock objects
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
         prisma: prismaClient,
@@ -223,7 +222,6 @@ describe('Device', () => {
         getIpAddress: () => faker.internet.ip()
       } as any
 
-      //WARNING: Solve the await hell
       await expect(
         async () => await deviceMutation.removeDevice(fakeCtx)
       ).rejects.toThrow('You cannot remove master device from list.')

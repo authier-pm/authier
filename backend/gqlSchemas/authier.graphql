@@ -481,7 +481,7 @@ input SettingsInput {
   vaultLockTimeoutSeconds: Int!
   autofill: Boolean!
   language: String!
-  theme: String!
+  theme: String
 }
 
 """

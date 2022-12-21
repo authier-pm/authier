@@ -234,7 +234,6 @@ browser.runtime.onMessage.addListener(async function (
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
         deviceState.lockTime = req.settings.vaultLockTimeoutSeconds
-        deviceState.theme = req.settings.theme
         deviceState.syncTOTP = req.settings.syncTOTP
         deviceState.language = req.settings.language
         deviceState.autofill = req.settings.autofill

@@ -22,9 +22,9 @@ import {
   DeviceState
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
+import { toast } from '@src/Providers'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 
@@ -86,7 +86,11 @@ export const onCSVFileAccepted: any = (
     papaparse.parse<string[]>(file, {
       complete: async (results) => {
         if (!results.data) {
-          toast.error('failed to parse')
+          toast({
+            title: 'failed to parse',
+            status: 'error',
+            isClosable: true
+          })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
 
@@ -100,7 +104,11 @@ export const onCSVFileAccepted: any = (
             (device.state?.decryptedSecrets.length as number) + added >=
             pswCount
           ) {
-            toast.error('You have reached your limit of secrets')
+            toast({
+              title: 'You have reached your limit of secrets',
+              status: 'error',
+              isClosable: true
+            })
             break
           }
 

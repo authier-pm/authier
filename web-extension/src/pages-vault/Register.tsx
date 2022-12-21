@@ -24,7 +24,7 @@ import type { IBackgroundStateSerializable } from '@src/background/backgroundPag
 import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
+import { toast } from '@src/Providers'
 
 declare global {
   interface Crypto {
@@ -47,7 +47,11 @@ export default function Register(): ReactElement {
   }
 
   if (registerError) {
-    toast.error(t`Register failed, ${registerError.message}`)
+    toast({
+      title: t`Register failed, ${registerError.message}`,
+      status: 'error',
+      isClosable: true
+    })
   }
 
   return (

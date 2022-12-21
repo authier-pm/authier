@@ -15,11 +15,11 @@ import {
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
-import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { toast } from '@src/Providers'
 
 interface Values {
   password: string
@@ -77,7 +77,11 @@ export function VaultUnlockVerification() {
           } catch (err: any) {
             console.log(err)
 
-            toast.error(err.message)
+            toast({
+              title: err.message,
+              status: 'error',
+              isClosable: true
+            })
           }
         }}
       >
