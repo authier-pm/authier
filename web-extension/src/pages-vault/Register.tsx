@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react'
+import { ReactElement, useState } from 'react'
 import {
   Box,
   Button,
@@ -19,12 +19,11 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
-import { Trans, t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { generateEncryptionKey } from '@shared/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
-import { toast } from '@src/Providers'
 
 declare global {
   interface Crypto {
@@ -38,20 +37,12 @@ interface Values {
 }
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [register, { error: registerError }] = useRegisterNewUserMutation()
+  const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
 
   const { fireToken } = device
   if (!fireToken) {
     return <Spinner />
-  }
-
-  if (registerError) {
-    toast({
-      title: t`Register failed, ${registerError.message}`,
-      status: 'error',
-      isClosable: true
-    })
   }
 
   return (
