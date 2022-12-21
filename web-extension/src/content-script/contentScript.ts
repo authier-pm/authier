@@ -31,8 +31,6 @@ import { renderItemPopup } from './renderItemPopup'
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
 
-log('STARTING')
-
 const inputKindMap = {
   email: WebInputType.EMAIL,
   username: WebInputType.USERNAME
@@ -54,12 +52,12 @@ export interface IInitStateRes {
     createdAt: string
   }>
   saveLoginModalsState?:
-  | {
-    password: string
-    username: string
-  }
-  | null
-  | undefined
+    | {
+        password: string
+        username: string
+      }
+    | null
+    | undefined
 }
 
 // TODO spec
@@ -79,7 +77,7 @@ let recording = false
 const hideToast = () => {
   const x = document.getElementById('toast')
 
-  setTimeout(function() {
+  setTimeout(function () {
     x?.remove()
   }, 5000)
 }
@@ -159,6 +157,7 @@ export async function initInputWatch() {
   log('~ stateInitRes', stateInitRes)
 
   if (stateInitRes) {
+    log('started')
     document.addEventListener('keydown', onKeyDown, true)
   }
 

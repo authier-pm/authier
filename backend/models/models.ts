@@ -80,8 +80,8 @@ export class SettingsInput {
   @Field(() => String)
   language: string
 
-  @Field(() => String)
-  theme: string
+  @Field(() => String, { nullable: true })
+  theme?: string
 }
 
 @InputType()

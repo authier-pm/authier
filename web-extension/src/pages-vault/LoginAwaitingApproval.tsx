@@ -7,7 +7,6 @@ import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from '@shared/graphql/Login.codegen'
-import { toast } from 'react-toastify'
 import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
@@ -24,6 +23,7 @@ import {
 import { formatRelative } from 'date-fns'
 import { WarningIcon } from '@chakra-ui/icons'
 import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import { toast } from '@src/Providers'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 
@@ -50,7 +50,11 @@ export const useLogin = (props: { deviceName: string }) => {
   //FIX: Should be handled by the error link
   useEffect(() => {
     if (error || decrChallError) {
-      toast.error('failed to create decryption challenge')
+      toast({
+        title: 'failed to create decryption challenge',
+        status: 'error',
+        isClosable: true
+      })
       setFormState(null)
     }
   }, [error, decrChallError])
@@ -75,12 +79,20 @@ export const useLogin = (props: { deviceName: string }) => {
         const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
-          toast.error(t`Login failed, check your email or password`)
+          toast({
+            title: t`Login failed, check your email or password`,
+            status: 'error',
+            isClosable: true
+          })
           return
         }
 
         if (!deviceDecryptionChallenge?.id) {
-          toast.error('Failed to create decryption challenge')
+          toast({
+            title: 'Failed to create decryption challenge',
+            status: 'error',
+            isClosable: true
+          })
           return
         }
 
@@ -100,7 +112,11 @@ export const useLogin = (props: { deviceName: string }) => {
         console.log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
-          toast.error(t`Login failed, check your email or password`)
+          toast({
+            title: t`Login failed, check your email or password`,
+            status: 'error',
+            isClosable: true
+          })
           setFormState(null)
           return
         }
@@ -170,14 +186,20 @@ export const useLogin = (props: { deviceName: string }) => {
           setUserId(decodedToken.userId)
           device.save(deviceState)
 
-          toast.success(
-            t`Device approved at ${formatRelative(
+          toast({
+            title: t`Device approved at ${formatRelative(
               new Date(),
               new Date(deviceDecryptionChallenge.approvedAt as string)
-            )}`
-          )
+            )}`,
+            status: 'success',
+            isClosable: true
+          })
         } else {
-          toast.error(t`Login failed, check your username and password`)
+          toast({
+            title: t`Login failed, check your username or password`,
+            status: 'error',
+            isClosable: true
+          })
         }
       })()
     } else if (!deviceDecryptionChallenge) {

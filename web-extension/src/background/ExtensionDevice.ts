@@ -38,7 +38,7 @@ import {
 } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { generateEncryptionKey } from '@shared/generateEncryptionKey'
-import { toast } from 'react-toastify'
+import { toast } from '@src/Providers'
 
 export const log = debug('au:Device')
 
@@ -581,15 +581,13 @@ class ExtensionDevice {
         mutation: LogoutDocument
       })
     } catch (err: any) {
-      toast.error(
-        `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
-        {
-          autoClose: false,
-          onClose: () => {
-            this.clearAndReload()
-          }
+      toast({
+        title: `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
+        status: 'error',
+        onCloseComplete: () => {
+          this.clearAndReload()
         }
-      )
+      })
     } finally {
       await this.clearAndReload()
     }
@@ -625,7 +623,7 @@ class ExtensionDevice {
       this.state.lockTime = config.vaultLockTimeoutSeconds
       this.state.syncTOTP = config.syncTOTP
       this.state.language = config.language
-      this.state.theme = config.theme
+      this.state.theme = config.theme ?? 'dark'
     }
   }
 
