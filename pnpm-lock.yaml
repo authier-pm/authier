@@ -60,6 +60,7 @@ importers:
   backend:
     specifiers:
       '@anatine/esbuild-decorators': ^0.2.19
+      '@capaj/prisma-typegraphql-types-generator': ^1.6.3
       '@fastify/aws-lambda': 3.1.3
       '@fastify/cookie': 7.4.0
       '@fastify/cors': ^8.2.0
@@ -109,7 +110,6 @@ importers:
       pino: ^8.8.0
       pino-pretty: 9.1.1
       prisma: ^4.8.0
-      prisma-typegraphql-types-generator: ^1.5.14
       raw-body: ^2.5.1
       reflect-metadata: ^0.1.13
       source-map-support: ^0.5.21
@@ -167,6 +167,7 @@ importers:
       uuid: 8.3.2
     devDependencies:
       '@anatine/esbuild-decorators': 0.2.19_esbuild@0.16.10
+      '@capaj/prisma-typegraphql-types-generator': 1.6.3
       '@swc/core': 1.3.24
       '@types/bcrypt': 5.0.0
       '@types/graphql-list-fields': 2.0.3
@@ -181,7 +182,6 @@ importers:
       is-ci: 3.0.1
       mz: 2.7.0
       nodemon: 2.0.20
-      prisma-typegraphql-types-generator: 1.5.14
       sql-formatter: 4.0.2
       sql-highlight: 4.2.1
       ts-node: 10.9.1_q7u3722li5p3s3hvjnne4zfcwq
@@ -4306,11 +4306,33 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
 
+  /@balena/dockerignore/1.0.2:
+    resolution:
+      {
+        integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==
+      }
+    dev: true
+
   /@bcoe/v8-coverage/0.2.3:
     resolution:
       {
         integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
       }
+    dev: true
+
+  /@capaj/prisma-typegraphql-types-generator/1.6.3:
+    resolution:
+      {
+        integrity: sha512-lVRzlRJ3gwdq7qGmtruBuwJyeqO3DCo/zIJN2mceWNJCYH7B5HYEtx7IZNfyAV1CXs1Nbfx7qp1ay6YIEv763w==
+      }
+    engines: { node: '>=12.0' }
+    hasBin: true
+    dependencies:
+      '@prisma/generator-helper': 4.3.1
+      chalk: 4.1.2
+      prettier: 2.8.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@capaj/type-graphql/2.0.0-alpha.1_rq55dqxpbhywxwjvxttjguy4yy:
@@ -11237,10 +11259,10 @@ packages:
       prisma: 4.8.0
     dev: false
 
-  /@prisma/debug/4.0.0:
+  /@prisma/debug/4.3.1:
     resolution:
       {
-        integrity: sha512-3u+FEEwVSTXOkiWH+MEqy9T7VUrPxRZNKORKvuaJS1jL0bhDTCZOv7s/RsllVJRtEiAjWjy7il6Lj7DbQIiP0Q==
+        integrity: sha512-rvDiWvChaKHZO4F9UFX/qG3jqYIYUbkWySAGJG0B9AMhw7k0EtjwYef02p/aLoz7smM3+ZPKJU9E+sqS1nympg==
       }
     dependencies:
       '@types/debug': 4.1.7
@@ -11265,13 +11287,13 @@ packages:
     requiresBuild: true
     dev: false
 
-  /@prisma/generator-helper/4.0.0:
+  /@prisma/generator-helper/4.3.1:
     resolution:
       {
-        integrity: sha512-BuyfP1T+lGmvLsysKlFN12yNbVIJbtCm0lb+feIjCYwtFYVj3/+09wezLGzlaYPz+nnwqFohZrojcrBF0oBW8g==
+        integrity: sha512-tWIfbpXG30nvxYhyp0MZj4RX/3B4dnYWj5i4hanK7yTTXt6oRBm4b1veYbC/nW1KcBbJvbp+zvLN0dDSmSldqQ==
       }
     dependencies:
-      '@prisma/debug': 4.0.0
+      '@prisma/debug': 4.3.1
       '@types/cross-spawn': 6.0.2
       chalk: 4.1.2
       cross-spawn: 7.0.3
@@ -17082,7 +17104,16 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.38
       '@aws-cdk/asset-kubectl-v20': 2.1.1
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.38
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.198
+      fs-extra: 9.1.0
+      ignore: 5.2.4
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.1.1
+      semver: 7.3.8
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -18278,6 +18309,14 @@ packages:
       no-case: 3.0.4
       tslib: 2.4.0
       upper-case-first: 2.0.2
+    dev: true
+
+  /case/1.6.3:
+    resolution:
+      {
+        integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==
+      }
+    engines: { node: '>= 0.8.0' }
     dev: true
 
   /caseless/0.12.0:
@@ -23944,6 +23983,14 @@ packages:
       }
     engines: { node: '>= 4' }
 
+  /ignore/5.2.4:
+    resolution:
+      {
+        integrity: sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ==
+      }
+    engines: { node: '>= 4' }
+    dev: true
+
   /image-q/4.0.0:
     resolution:
       {
@@ -25948,6 +25995,13 @@ packages:
     resolution:
       {
         integrity: sha512-trvBk1ki43VZptdBI5rIlG4YOzyeH/WefQt5rj1grasPn4iiZWKet8nkgc4GlsAylaztn0qZfUYOiTsASJFdNA==
+      }
+    dev: true
+
+  /jsonschema/1.4.1:
+    resolution:
+      {
+        integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==
       }
     dev: true
 
@@ -29766,21 +29820,6 @@ packages:
       mri: 1.2.0
       multimatch: 4.0.0
       prettier: 2.8.0
-    dev: true
-
-  /prisma-typegraphql-types-generator/1.5.14:
-    resolution:
-      {
-        integrity: sha512-nGrClNMhKmj0fNmasckSRBPOv7uSL2ElOimN0+gScF3FNSO+UhZ95K/gHpVpodCn4a55k5pWizw/J5INYwqlbw==
-      }
-    engines: { node: '>=12.0' }
-    hasBin: true
-    dependencies:
-      '@prisma/generator-helper': 4.0.0
-      chalk: 4.1.2
-      prettier: 2.7.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /prisma/4.8.0:

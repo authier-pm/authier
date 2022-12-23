@@ -67,7 +67,7 @@
     "mz": "^2.7.0",
     "nodemon": "^2.0.20",
     "prisma": "^4.8.0",
-    "prisma-typegraphql-types-generator": "^1.5.14",
+    "@capaj/prisma-typegraphql-types-generator": "^1.6.3",
     "sql-formatter": "^4.0.2",
     "sql-highlight": "^4.2.1",
     "ts-node": "^10.9.1",
