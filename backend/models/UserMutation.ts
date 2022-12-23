@@ -6,9 +6,9 @@ import {
 } from './EncryptedSecret'
 import { EncryptedSecretInput, SettingsInput } from './models'
 
-import { UserGQL } from './generated/User'
+import { UserGQL } from './generated/UserGQL'
 
-import { DeviceGQL } from './generated/Device'
+import { DeviceGQL } from './generated/DeviceGQL'
 import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
@@ -24,8 +24,8 @@ import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
 import { stripe } from '../stripe'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
-import { SecretUsageEventGQLScalars } from './generated/SecretUsageEvent'
-import { MasterDeviceChangeGQL } from './generated/MasterDeviceChange'
+import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
+import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../api/GraphqlError'
 
 @ObjectType()
