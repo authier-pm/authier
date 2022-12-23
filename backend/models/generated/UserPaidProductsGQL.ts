@@ -1,19 +1,19 @@
-import { Field, ObjectType, Int } from 'type-graphql'
-import { UserGQL } from './User'
+import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
+import { UserGQL } from './UserGQL'
 
 @ObjectType()
 export class UserPaidProductsGQLScalars {
   @Field(() => Int)
   id: number
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field({ nullable: true })
-  updatedAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  updatedAt: Date | null
 
-  @Field({ nullable: true })
-  expiresAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  expiresAt: Date | null
 
   @Field()
   productId: string

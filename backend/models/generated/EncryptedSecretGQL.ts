@@ -1,7 +1,7 @@
-import { Field, ObjectType, ID, Int } from 'type-graphql'
+import { Field, ObjectType, ID, Int, GraphQLISODateTime } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from '../types/EncryptedSecretType'
-import { UserGQL } from './User'
-import { SecretUsageEventGQL } from './SecretUsageEvent'
+import { UserGQL } from './UserGQL'
+import { SecretUsageEventGQL } from './SecretUsageEventGQL'
 
 @ObjectType()
 export class EncryptedSecretGQLScalars {
@@ -17,14 +17,14 @@ export class EncryptedSecretGQLScalars {
   @Field(() => EncryptedSecretTypeGQL)
   kind: EncryptedSecretTypeGQL
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field({ nullable: true })
-  updatedAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  updatedAt: Date | null
 
-  @Field({ nullable: true })
-  deletedAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  deletedAt: Date | null
 
   @Field()
   userId: string
