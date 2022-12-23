@@ -41,7 +41,7 @@ export const AddTOTP = () => {
             {
               kind: EncryptedSecretsType.TOTP as any,
               totp: values,
-              encrypted: device.state!.encrypt(JSON.stringify(values)),
+              encrypted: await device.state!.encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
             }
           ])

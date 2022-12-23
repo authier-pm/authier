@@ -47,7 +47,7 @@ export const AddTOTPSecretButton = () => {
       return
     }
 
-    const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
+    const newTotpSecret = await getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = TOTPSecrets.find(
       ({ totp }) => newTotpSecret.totp.secret === totp.secret
     )
@@ -89,16 +89,19 @@ export const AddTOTPSecretButton = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(
+export async function getTokenSecretFromQrCode(
   qr: QRCode,
   tab: Tabs.Tab
-): ITOTPSecret {
+): Promise<ITOTPSecret> {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {
     console.error('QR code does not have any secret', qr.data)
     throw new Error('QR code does not have any secret')
   }
+
+  let encrypted = await device.state!.encrypt(secret)
+
   return {
     id: uuidv4(),
     kind: EncryptedSecretType.TOTP,
@@ -114,6 +117,6 @@ export function getTokenSecretFromQrCode(
       url: tab.url as string
     },
     createdAt: new Date().toJSON(),
-    encrypted: device.state!.encrypt(secret)
+    encrypted
   }
 }

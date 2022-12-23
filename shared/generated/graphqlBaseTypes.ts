@@ -654,6 +654,7 @@ export type UserQuerySendAuthMessageArgs = {
 };
 
 export type WebInputElement = {
+  domCoordinates: Scalars['JSON'];
   /** The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day. */
   domOrdinal: Scalars['NonNegativeInt'];
   domPath: Scalars['String'];
@@ -667,6 +668,7 @@ export type WebInputGql = {
   addedByUser: UserGql;
   addedByUserId: Scalars['String'];
   createdAt: Scalars['DateTime'];
+  domCoordinates: Scalars['JSON'];
   domOrdinal: Scalars['Int'];
   domPath: Scalars['String'];
   host: Scalars['String'];

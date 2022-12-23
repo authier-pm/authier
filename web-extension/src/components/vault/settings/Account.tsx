@@ -104,7 +104,7 @@ export default function Account() {
 
                 await changePassword({
                   variables: {
-                    secrets: device.serializeSecrets(
+                    secrets: await device.serializeSecrets(
                       secrets,
                       values.newPassword
                     ),

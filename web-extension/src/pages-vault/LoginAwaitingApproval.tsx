@@ -7,7 +7,6 @@ import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from '@shared/graphql/Login.codegen'
-import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
@@ -21,10 +20,17 @@ import {
 } from '@chakra-ui/react'
 import { formatRelative } from 'date-fns'
 import { WarningIcon } from '@chakra-ui/icons'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import debug from 'debug'
+import {
+  ab2str,
+  cryptoKeyToString,
+  str2Ab,
+  testGenerateEncryptionKey
+} from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
+export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
@@ -90,19 +96,24 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
-        const masterEncryptionKey = generateEncryptionKey(
+
+        const masterEncryptionKey = await testGenerateEncryptionKey(
           formState.password,
           encryptionSalt
         )
 
-        const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-          addDeviceSecretEncrypted,
-          masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString(cryptoJS.enc.Utf8)
-        console.log('~ currentAddDeviceSecret', currentAddDeviceSecret)
+        let currentAddDeviceSecret
+        try {
+          currentAddDeviceSecret = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv: str2Ab(userId) },
+            masterEncryptionKey,
+            str2Ab(addDeviceSecretEncrypted)
+          )
+        } catch (error) {
+          console.error(error)
+        }
+
+        log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
           toast({
@@ -115,13 +126,11 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const newAuthSecret = device.generateBackendSecret()
-        const newAuthSecretEncrypted = cryptoJS.AES.encrypt(
-          newAuthSecret,
+        const newAuthSecretEncrypted = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv: str2Ab(userId) },
           masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString()
+          str2Ab(newAuthSecret)
+        )
 
         const response = await addNewDevice({
           variables: {
@@ -134,11 +143,11 @@ export const useLogin = (props: { deviceName: string }) => {
 
             input: {
               addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncrypted,
+              addDeviceSecretEncrypted: ab2str(newAuthSecretEncrypted),
               firebaseToken: fireToken,
               devicePlatform: device.platform
             },
-            currentAddDeviceSecret
+            currentAddDeviceSecret: ab2str(currentAddDeviceSecret)
           }
         })
 
@@ -161,14 +170,14 @@ export const useLogin = (props: { deviceName: string }) => {
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
           const deviceState: IBackgroundStateSerializable = {
-            masterEncryptionKey,
+            masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
             encryptionSalt,
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncrypted,
+            authSecretEncrypted: ab2str(newAuthSecretEncrypted),
             lockTime: 28800,
             autofill: true,
             language: 'en',

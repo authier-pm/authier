@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Flex,
   Input,
@@ -16,7 +16,13 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { t, Trans } from '@lingui/macro'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import {
+  ab2str,
+  cryptoKeyToString,
+  generateEncryptionKey,
+  str2Ab,
+  testGenerateEncryptionKey
+} from '@shared/generateEncryptionKey'
 import cryptoJS from 'crypto-js'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/Providers'
@@ -48,25 +54,23 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            const masterEncryptionKey = generateEncryptionKey(
+            const masterEncryptionKey = await testGenerateEncryptionKey(
               values.password,
               lockedState.encryptionSalt
             )
 
-            const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-              lockedState.authSecretEncrypted,
+            const currentAddDeviceSecret = await window.crypto.subtle.decrypt(
+              { name: 'AES-GCM', iv: str2Ab(lockedState.userId) },
               masterEncryptionKey,
-              {
-                iv: cryptoJS.enc.Utf8.parse(lockedState.userId)
-              }
-            ).toString(cryptoJS.enc.Utf8)
+              str2Ab(lockedState.authSecretEncrypted)
+            )
 
-            if (currentAddDeviceSecret !== lockedState.authSecret) {
+            if (ab2str(currentAddDeviceSecret) !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
             }
 
             setDeviceState({
-              masterEncryptionKey,
+              masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
               ...lockedState
             })
 
