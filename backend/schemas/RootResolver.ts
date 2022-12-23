@@ -24,7 +24,7 @@ import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '.prisma/client'
-import { WebInputGQL } from '../models/generated/WebInput'
+import { WebInputGQL } from '../models/generated/WebInputGQL'
 
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
