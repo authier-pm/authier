@@ -150,6 +150,7 @@ model WebInput {
   kind          WebInputType
   domPath       String
   domOrdinal    Int                @default(0)
+  domCoordinates Json
   addedByUser   User               @relation(fields: [addedByUserId], references: [id])
   addedByUserId String             @db.Uuid
   UsageEvents   SecretUsageEvent[]

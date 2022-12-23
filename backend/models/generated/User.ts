@@ -1,13 +1,12 @@
 import { Field, ObjectType, ID, Int } from 'type-graphql'
 import { TokenGQL } from './Token'
 import { DeviceGQL } from './Device'
+import { DecryptionChallengeGQL } from './DecryptionChallenge'
 import { SecretUsageEventGQL } from './SecretUsageEvent'
 import { EncryptedSecretGQL } from './EncryptedSecret'
 import { WebInputGQL } from './WebInput'
-import { SettingsConfigGQL } from './SettingsConfig'
 import { TagGQL } from './Tag'
 import { UserPaidProductsGQL } from './UserPaidProducts'
-import { DecryptionChallengeGQL } from './DecryptionChallenge'
 import { MasterDeviceChangeGQL } from './MasterDeviceChange'
 
 @ObjectType()

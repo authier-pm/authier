@@ -4,10 +4,9 @@ import {
   extendTheme
 } from '@chakra-ui/react'
 import { I18nProvider } from '@lingui/react'
-
+import { i18n } from '@lingui/core'
 import { UserProvider } from './providers/UserProvider'
 import PopupRoutes from './PopupRoutes'
-import { i18n } from '@lingui/core'
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
 import { messages } from './locale/en-gb/messages'

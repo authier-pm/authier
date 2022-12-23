@@ -21,7 +21,10 @@ import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
 import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import {
+  cryptoKeyToString,
+  testGenerateEncryptionKey
+} from '@shared/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
 
@@ -62,13 +65,12 @@ export default function Register(): ReactElement {
 
           const encryptionSalt = device.generateBackendSecret()
 
-          const masterEncryptionKey = generateEncryptionKey(
+          const masterEncryptionKey = await testGenerateEncryptionKey(
             values.password,
             encryptionSalt
           )
-          console.log('~ masterEncryptionKey', masterEncryptionKey)
 
-          const params = device.initLocalDeviceAuthSecret(
+          const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
             userId
           )
@@ -77,7 +79,7 @@ export default function Register(): ReactElement {
             variables: {
               userId,
               input: {
-                encryptionSalt,
+                encryptionSalt: encryptionSalt,
                 email: values.email,
                 ...params,
                 deviceId,
@@ -96,9 +98,10 @@ export default function Register(): ReactElement {
               'access-token': res.data?.registerNewUser.accessToken
             })
             setAccessToken(registerResult.accessToken as string)
+            const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
             const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey: masterEncryptionKey,
+              masterEncryptionKey: stringKey,
               userId: userId,
               secrets: [],
               email: values.email,

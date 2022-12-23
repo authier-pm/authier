@@ -4,7 +4,7 @@ import debug from 'debug'
 import { generate } from 'generate-password'
 import browser from 'webextension-polyfill'
 import { isElementInViewport, isHidden } from './isElementInViewport'
-import { domRecorder, IInitStateRes } from './contentScript'
+import { Coords, domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
@@ -29,6 +29,7 @@ type webInput = {
   domPath: string
   kind: WebInputType
   createdAt: string
+  domCoordinates: Coords
 }
 
 export const autofillEventsDispatched = new Set()
@@ -57,7 +58,7 @@ function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
     autofillEventsDispatched.add(change)
     el.dispatchEvent(change)
   } else {
-    console.log('el is null')
+    console.error('el is null')
   }
 }
 
@@ -111,6 +112,14 @@ const filterUselessInputs = (documentBody: HTMLElement) => {
   return inputElsArray
 }
 
+export const getElementCoordinates = (el: HTMLElement) => {
+  let rect = el.getBoundingClientRect()
+  return {
+    x: rect.x,
+    y: rect.y
+  }
+}
+
 export let autofillEnabled = false
 let onInputAddedHandler
 
@@ -127,28 +136,46 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const namePassSecret = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
-  //? Should be renamed on scanOnInputs?
-  //!Fill known inputs
+  //NOTE: scan all inputs
   const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
-    const allInputs = Array.from(body.querySelectorAll('input'))
-    //Distinguish between register and login from by the number of inputs
-    //Then Distinguish between phased and not phased
-
     /**
      * text, email, password, tel
      */
-    const usefulInputs = allInputs.filter(
-      (el) => uselessInputTypes.find((type) => type === el.type) === undefined
-    )
+    const usefulInputs = filterUselessInputs(document.body)
 
+    //Distinguish between register and login from by the number of inputs
+    //Then Distinguish between phased and not phased
+
+    //Register screen
+    //After certain condition is met, we can assume this is register page
+    log('usefull', usefulInputs)
     if (usefulInputs.length > 2) {
-      for (let index = 0; index < allInputs.length; index++) {
-        const input = allInputs[index]
+      for (let index = 0; index < usefulInputs.length; index++) {
+        const input = usefulInputs[index]
         if (
           input.type === 'password' &&
-          allInputs[index + 1].type === 'password'
+          usefulInputs[index + 1].type === 'password'
         ) {
-          // TODO Autofill register form with a new password if present
+          const password = generate({
+            length: 10,
+            numbers: true,
+            uppercase: true,
+            symbols: true,
+            strict: true
+          })
+          autofillValueIntoInput(usefulInputs[index], password)
+          autofillValueIntoInput(usefulInputs[index + 1], password)
+          break
+        } else if (input.getAttribute('autocomplete') === 'new-password') {
+          renderPasswordGenerator({ input: input })
+          const password = generate({
+            length: 10,
+            numbers: true,
+            uppercase: true,
+            symbols: true,
+            strict: true
+          })
+          autofillValueIntoInput(input, password)
           break
         }
       }
@@ -158,18 +185,21 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     const filledElements = webInputs
       .filter(({ url }) => {
         console.log('~ url', url)
-        //NOTE: FIX THIS
+        //FIX: THIS
         const host = new URL(url).host
         const matches = location.href.includes(host)
 
         return matches
       })
       .map((webInputGql) => {
-        const inputEl = document.body.querySelector(
+        let inputEl = document.body.querySelector(
           webInputGql.domPath
         ) as HTMLInputElement
-
+        const rect = inputEl.getBoundingClientRect()
+        log('cords', rect.x, rect.y)
+        //NOTE: We found element by DOM path
         if (inputEl) {
+          log('autofilled by domPath')
           if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
               inputEl,
@@ -193,32 +223,22 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               authenticator.generate(totpSecret.totp.secret)
             )
           }
+          //NOTE: We did not find element by DOM path, so find it by input coords
+        } else if (
+          webInputGql.domCoordinates.x === rect.x &&
+          webInputGql.domCoordinates.y === rect.y
+        ) {
+          inputEl = document.elementFromPoint(rect.x, rect.y) as any
+          log('el', inputEl)
         }
       })
       .filter((el) => !!el)
 
-    //After certain condition is met, we can assume this is register page
-    const inputs = filterUselessInputs(document.body)
-    console.log('Ussefull inputs', inputs)
-    for (const el of inputs) {
-      if (el.getAttribute('autocomplete') === 'new-password') {
-        renderPasswordGenerator({ input: el })
-        //TODO: show icon for psw generation
-        const password = generate({
-          length: 10,
-          numbers: true,
-          uppercase: true,
-          symbols: true,
-          strict: true
-        })
-        autofillValueIntoInput(el, password)
-        log('Is register screen')
-        return
-      }
-    }
-
-    //!Guess web inputs, if we have credentials without DOM PATHS
-    if (webInputs.length === 0 && secretsForHost.loginCredentials.length > 0) {
+    //NOTE: Guess web inputs, if we have credentials without DOM PATHS
+    if (
+      (webInputs.length === 0 && secretsForHost.loginCredentials.length > 0) ||
+      filledElements.length === 0
+    ) {
       const autofillResult = searchInputsAndAutofill(document.body)
       if (autofillResult) {
         browser.runtime.sendMessage({
@@ -283,7 +303,6 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     if (filledElements.length === 2) {
       const form = filledElements[0]?.form
-      log('filled both', domRecorder.toJSON())
       if (form) {
         // TODO try to submit the form
         // filledElements[0]?.form?.dispatchEvent(
@@ -311,11 +330,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       let newWebInputs: webInput[] = []
       const inputElsArray = filterUselessInputs(documentBody)
 
-      console.log(inputElsArray, 'test')
       for (let index = 0; index < inputElsArray.length; index++) {
         const input = inputElsArray[index]
         if (input.type === 'password') {
-          console.log('password', input)
           //Save password input, if we have more credentials with no DOM PATH
           if (
             webInputs.length === 0 &&
@@ -326,7 +343,8 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               domPath: getSelectorForElement(input).css,
               host: location.host,
               url: location.href,
-              kind: WebInputType.PASSWORD
+              kind: WebInputType.PASSWORD,
+              domCoordinates: getElementCoordinates(input)
             })
 
             domRecorder.addInputEvent({
@@ -342,7 +360,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
             if (inputElsArray[j].type !== 'hidden') {
               log('found username input', inputElsArray[j])
 
-              //Save username input, if we have more credentials wit no DOM PATH then break from loop and let user choose which psw to use
+              //Save username input, if we have more credentials with no DOM PATH then break from loop and let user choose which psw to use
               if (
                 webInputs.length === 0 &&
                 secretsForHost.loginCredentials.length > 1
@@ -352,7 +370,8 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                   domPath: getSelectorForElement(inputElsArray[j]).css,
                   host: location.host,
                   url: location.href,
-                  kind: WebInputType.USERNAME
+                  kind: WebInputType.USERNAME,
+                  domCoordinates: getElementCoordinates(input)
                 })
 
                 domRecorder.addInputEvent({
@@ -381,6 +400,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                 input,
                 secretsForHost.loginCredentials[0].loginCredentials.password
               )
+
               domRecorder.addInputEvent({
                 element: input,
                 eventType: 'input',

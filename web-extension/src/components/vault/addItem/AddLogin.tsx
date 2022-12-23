@@ -14,7 +14,7 @@ import {
   Tooltip,
   Box
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
@@ -65,7 +65,9 @@ export const AddLogin = () => {
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: namePassPair,
-              encrypted: device.state.encrypt(JSON.stringify(namePassPair)),
+              encrypted: await device.state.encrypt(
+                JSON.stringify(namePassPair)
+              ),
               createdAt: new Date().toJSON()
             }
           ])
