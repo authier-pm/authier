@@ -17,11 +17,11 @@ import {
   GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
-import { UserGQL } from './generated/User'
+import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
-import { EmailVerificationGQLScalars } from './generated/EmailVerification'
+import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 
@@ -35,7 +35,7 @@ export class UserBase extends UserGQL {
   @Field(() => GraphQLEmailAddress, {
     nullable: true
   })
-  declare email?: string
+  declare email: string
 
   setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
     setNewRefreshToken(this, deviceId, ctx)

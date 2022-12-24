@@ -1,20 +1,20 @@
-import { Field, ObjectType, Int } from 'type-graphql'
+import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
 import { WebInputTypeGQL } from '../types/WebInputType'
-import { UserGQL } from './User'
-import { SecretUsageEventGQL } from './SecretUsageEvent'
+import { UserGQL } from './UserGQL'
+import { SecretUsageEventGQL } from './SecretUsageEventGQL'
+
 import { Prisma } from '@prisma/client'
-import { GraphQLJSON } from 'graphql-scalars'
-import GraphQLScalars from 'graphql-scalars'
+import * as GraphQLScalars from 'graphql-scalars'
 
 @ObjectType()
 export class WebInputGQLScalars {
   @Field(() => Int)
   id: number
 
-  @Field({ nullable: true })
-  layoutType?: string
+  @Field(() => String, { nullable: true })
+  layoutType: string | null
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
   @Field()
@@ -32,7 +32,7 @@ export class WebInputGQLScalars {
   @Field(() => Int)
   domOrdinal: number
 
-  @Field(() => GraphQLJSON)
+  @Field(() => GraphQLScalars.JSONResolver)
   domCoordinates: Prisma.JsonValue
 
   @Field()

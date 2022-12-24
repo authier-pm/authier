@@ -5,11 +5,21 @@ export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: 
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
+<<<<<<< HEAD
   ID: string;
   String: string;
   Boolean: boolean;
   Int: number;
   Float: number;
+=======
+  ID: string
+  String: string
+  Boolean: boolean
+  Int: number
+  Float: number
+  /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
+  BigInt: any
+>>>>>>> origin/main
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: string;
   /** A field whose value conforms to the standard internet email address format as specified in RFC822: https://www.w3.org/Protocols/rfc822/. */
@@ -383,6 +393,7 @@ export type RegisterNewAccountInput = {
 };
 
 export type SecretUsageEventGql = {
+<<<<<<< HEAD
   __typename?: 'SecretUsageEventGQL';
   Device: DeviceGql;
   Secret: EncryptedSecretGql;
@@ -409,6 +420,34 @@ export type SecretUsageEventGqlScalars = {
   userId: Scalars['String'];
   webInputId?: Maybe<Scalars['Int']>;
 };
+=======
+  __typename?: 'SecretUsageEventGQL'
+  Device: DeviceGql
+  Secret: EncryptedSecretGql
+  User: UserGql
+  WebOTPInput?: Maybe<WebInputGql>
+  deviceId: Scalars['String']
+  id: Scalars['BigInt']
+  kind: Scalars['String']
+  secretId: Scalars['String']
+  timestamp: Scalars['DateTime']
+  url?: Maybe<Scalars['String']>
+  userId: Scalars['String']
+  webInputId?: Maybe<Scalars['Int']>
+}
+
+export type SecretUsageEventGqlScalars = {
+  __typename?: 'SecretUsageEventGQLScalars'
+  deviceId: Scalars['String']
+  id: Scalars['BigInt']
+  kind: Scalars['String']
+  secretId: Scalars['String']
+  timestamp: Scalars['DateTime']
+  url?: Maybe<Scalars['String']>
+  userId: Scalars['String']
+  webInputId?: Maybe<Scalars['Int']>
+}
+>>>>>>> origin/main
 
 export type SecretUsageEventInput = {
   kind: Scalars['String'];
