@@ -1,15 +1,15 @@
-import { Field, ObjectType, ID } from 'type-graphql'
-import { UserGQL } from './User'
+import { Field, ObjectType, ID, GraphQLISODateTime } from 'type-graphql'
+import { UserGQL } from './UserGQL'
 
 @ObjectType()
 export class MasterDeviceChangeGQLScalars {
   @Field(() => ID)
   id: string
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   processAt: Date
 
   @Field()
