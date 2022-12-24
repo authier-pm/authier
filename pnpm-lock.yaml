@@ -11661,7 +11661,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.2_onqnqwb3ubg5opvemcqf7c2qhy
+      '@apollo/client': 3.7.2_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 

@@ -81,6 +81,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       throw new GraphqlError('User not found')
     }
 
+    console.log('test', user.addDeviceSecret)
+    console.log('test2', currentAddDeviceSecret)
     if (user?.addDeviceSecret !== currentAddDeviceSecret) {
       // TODO rate limit these attempts and notify current devices
       throw new GraphqlError('Wrong master password used')

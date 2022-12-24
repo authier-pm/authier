@@ -22,11 +22,11 @@ import { formatRelative } from 'date-fns'
 import { WarningIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 import {
-  ab2str,
-  base64ToStr,
+  base64_to_buf,
+  buff_to_base64,
   cryptoKeyToString,
-  str2ab,
-  strToBase64,
+  dec,
+  enc,
   testGenerateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
@@ -101,18 +101,21 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const masterEncryptionKey = await testGenerateEncryptionKey(
           formState.password,
-          encryptionSalt
+          base64_to_buf(encryptionSalt)
         )
-
-        console.log('authSEcret', base64ToStr(addDeviceSecretEncrypted))
 
         let currentAddDeviceSecret
         try {
-          currentAddDeviceSecret = await window.crypto.subtle.decrypt(
-            { name: 'AES-GCM', iv: str2ab(userId) },
+          const encryptedDataBuff = base64_to_buf(addDeviceSecretEncrypted)
+          const iv = encryptedDataBuff.slice(16, 16 + 12)
+          const data = encryptedDataBuff.slice(16 + 12)
+
+          let decryptedContent = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
             masterEncryptionKey,
-            str2ab(base64ToStr(addDeviceSecretEncrypted))
+            data
           )
+          currentAddDeviceSecret = dec.decode(decryptedContent)
         } catch (error) {
           console.error(error)
         }
@@ -130,11 +133,22 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const newAuthSecret = device.generateBackendSecret()
+        const iv = enc.encode(userId)
+        const salt = enc.encode(encryptionSalt)
         const newAuthSecretEncrypted = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv: str2ab(userId) },
+          { name: 'AES-GCM', iv },
           masterEncryptionKey,
-          str2ab(newAuthSecret)
+          enc.encode(newAuthSecret)
         )
+
+        const encryptedContentArr = new Uint8Array(newAuthSecretEncrypted)
+        let buff = new Uint8Array(
+          salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+        )
+        buff.set(salt, 0)
+        buff.set(iv, salt.byteLength)
+        buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+        const base64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -144,16 +158,13 @@ export const useLogin = (props: { deviceName: string }) => {
               name: props.deviceName,
               platform: device.platform
             },
-
             input: {
-              addDeviceSecret: strToBase64(newAuthSecret),
-              addDeviceSecretEncrypted: strToBase64(
-                ab2str(newAuthSecretEncrypted)
-              ),
+              addDeviceSecret: newAuthSecret,
+              addDeviceSecretEncrypted: base64Buff,
               firebaseToken: fireToken,
               devicePlatform: device.platform
             },
-            currentAddDeviceSecret: strToBase64(ab2str(currentAddDeviceSecret))
+            currentAddDeviceSecret: currentAddDeviceSecret
           }
         })
 
@@ -183,7 +194,7 @@ export const useLogin = (props: { deviceName: string }) => {
             encryptionSalt,
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: ab2str(newAuthSecretEncrypted),
+            authSecretEncrypted: base64Buff,
             lockTime: 28800,
             autofill: true,
             language: 'en',

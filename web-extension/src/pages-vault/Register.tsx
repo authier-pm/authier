@@ -22,6 +22,7 @@ import { device } from '@src/background/ExtensionDevice'
 import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
+  buff_to_base64,
   cryptoKeyToString,
   testGenerateEncryptionKey
 } from '@shared/generateEncryptionKey'
@@ -63,7 +64,9 @@ export default function Register(): ReactElement {
 
           const userId = crypto.randomUUID()
 
-          const encryptionSalt = device.generateBackendSecret()
+          const encryptionSalt = window.crypto.getRandomValues(
+            new Uint8Array(16)
+          )
 
           const masterEncryptionKey = await testGenerateEncryptionKey(
             values.password,
@@ -72,15 +75,16 @@ export default function Register(): ReactElement {
 
           const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
-            userId
+            userId,
+            encryptionSalt
           )
 
           const res = await register({
             variables: {
               userId,
               input: {
-                //string
-                encryptionSalt: encryptionSalt,
+                //base64
+                encryptionSalt: buff_to_base64(encryptionSalt),
                 email: values.email,
                 //base64
                 ...params,
@@ -108,7 +112,7 @@ export default function Register(): ReactElement {
               secrets: [],
               email: values.email,
               deviceName: device.name,
-              encryptionSalt,
+              encryptionSalt: buff_to_base64(encryptionSalt),
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
