@@ -1,6 +1,6 @@
 import { Arg, Ctx, Field, ObjectType } from 'type-graphql'
 import { IContextAuthenticated } from '../schemas/RootResolver'
-import { EncryptedSecretGQL } from './generated/EncryptedSecret'
+import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
 
 @ObjectType()

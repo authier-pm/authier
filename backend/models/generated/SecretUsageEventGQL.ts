@@ -1,25 +1,26 @@
-import { Field, ObjectType, ID, Int } from 'type-graphql'
-import { EncryptedSecretGQL } from './EncryptedSecret'
-import { UserGQL } from './User'
-import { DeviceGQL } from './Device'
-import { WebInputGQL } from './WebInput'
+import { Field, ObjectType, GraphQLISODateTime, Int } from 'type-graphql'
+import { EncryptedSecretGQL } from './EncryptedSecretGQL'
+import { UserGQL } from './UserGQL'
+import { DeviceGQL } from './DeviceGQL'
+import { WebInputGQL } from './WebInputGQL'
+import * as GraphQLScalars from 'graphql-scalars'
 
 @ObjectType()
 export class SecretUsageEventGQLScalars {
-  @Field(() => ID)
+  @Field(() => GraphQLScalars.BigIntResolver)
   id: number
 
   @Field()
   kind: string
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   timestamp: Date
 
   @Field()
   secretId: string
 
-  @Field({ nullable: true })
-  url?: string
+  @Field(() => String, { nullable: true })
+  url: string | null
 
   @Field()
   userId: string
@@ -28,7 +29,7 @@ export class SecretUsageEventGQLScalars {
   deviceId: string
 
   @Field(() => Int, { nullable: true })
-  webInputId?: number
+  webInputId: number | null
 }
 
 @ObjectType()
@@ -43,7 +44,7 @@ export class SecretUsageEventGQL extends SecretUsageEventGQLScalars {
   Device: DeviceGQL
 
   @Field(() => WebInputGQL, { nullable: true })
-  WebOTPInput?: WebInputGQL
+  WebOTPInput: WebInputGQL | null
 
   // skip overwrite 👇
 }
