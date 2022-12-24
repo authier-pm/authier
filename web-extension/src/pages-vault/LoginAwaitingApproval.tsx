@@ -23,8 +23,10 @@ import { WarningIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 import {
   ab2str,
+  base64ToStr,
   cryptoKeyToString,
-  str2Ab,
+  str2ab,
+  strToBase64,
   testGenerateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
@@ -102,12 +104,14 @@ export const useLogin = (props: { deviceName: string }) => {
           encryptionSalt
         )
 
+        console.log('authSEcret', base64ToStr(addDeviceSecretEncrypted))
+
         let currentAddDeviceSecret
         try {
           currentAddDeviceSecret = await window.crypto.subtle.decrypt(
-            { name: 'AES-GCM', iv: str2Ab(userId) },
+            { name: 'AES-GCM', iv: str2ab(userId) },
             masterEncryptionKey,
-            str2Ab(addDeviceSecretEncrypted)
+            str2ab(base64ToStr(addDeviceSecretEncrypted))
           )
         } catch (error) {
           console.error(error)
@@ -127,9 +131,9 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const newAuthSecret = device.generateBackendSecret()
         const newAuthSecretEncrypted = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv: str2Ab(userId) },
+          { name: 'AES-GCM', iv: str2ab(userId) },
           masterEncryptionKey,
-          str2Ab(newAuthSecret)
+          str2ab(newAuthSecret)
         )
 
         const response = await addNewDevice({
@@ -142,12 +146,14 @@ export const useLogin = (props: { deviceName: string }) => {
             },
 
             input: {
-              addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: ab2str(newAuthSecretEncrypted),
+              addDeviceSecret: strToBase64(newAuthSecret),
+              addDeviceSecretEncrypted: strToBase64(
+                ab2str(newAuthSecretEncrypted)
+              ),
               firebaseToken: fireToken,
               devicePlatform: device.platform
             },
-            currentAddDeviceSecret: ab2str(currentAddDeviceSecret)
+            currentAddDeviceSecret: strToBase64(ab2str(currentAddDeviceSecret))
           }
         })
 

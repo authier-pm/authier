@@ -14,12 +14,15 @@ export const generateEncryptionKey = (
     })
     .toString(cryptoJS.enc.Hex)
 
-export async function cryptoKeyToString(key: CryptoKey) {
+/**
+ * @returns string in base64
+ */
+export async function cryptoKeyToString(key: CryptoKey): Promise<string> {
   const raw = await crypto.subtle.exportKey('raw', key)
-  return ab2str(raw)
+  return strToBase64(ab2str(raw))
 }
 
-export async function abToCryptoKey(raw: BufferSource) {
+export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
   const cryptoKey = await crypto.subtle.importKey('raw', raw, 'AES-GCM', true, [
     'decrypt',
     'encrypt'
@@ -27,10 +30,11 @@ export async function abToCryptoKey(raw: BufferSource) {
   return cryptoKey
 }
 /*
-Get some key material to use as input to the deriveKey method.
-The key material is a password supplied by the user.
-*/
-async function getKeyMaterial(password: string) {
+ *
+ *  Get some key material to use as input to the deriveKey method.
+ *  The key material is a password supplied by the user.
+ */
+async function getKeyMaterial(password: string): Promise<CryptoKey> {
   const enc = new TextEncoder()
   return window.crypto.subtle.importKey(
     'raw',
@@ -42,15 +46,16 @@ async function getKeyMaterial(password: string) {
 }
 
 export function ab2str(buf: ArrayBuffer): string {
-  // const decoder = new TextDecoder()
-  // const decodedString = decoder.decode(buf)
-  // return decodedString
   return String.fromCharCode.apply(null, new Uint16Array(buf))
 }
 
-export function str2Ab(str: string): BufferSource {
-  // const enc = new TextEncoder()
-  // return enc.encode(str)
+export const base64ToStr = (str: string): string =>
+  Buffer.from(str, 'base64').toString('binary')
+
+export const strToBase64 = (str: string): string =>
+  Buffer.from(str, 'binary').toString('base64')
+
+export function str2ab(str: string): ArrayBuffer {
   const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
   const bufView = new Uint16Array(buf)
   for (let i = 0, strLen = str.length; i < strLen; i++) {
@@ -59,12 +64,15 @@ export function str2Ab(str: string): BufferSource {
   return buf
 }
 
-export async function testGenerateEncryptionKey(psw: string, salt: string) {
+export async function testGenerateEncryptionKey(
+  psw: string,
+  salt: string
+): Promise<CryptoKey> {
   const keyMaterial = await getKeyMaterial(psw)
   const key = await window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: str2Ab(salt),
+      salt: str2ab(salt),
       iterations: 130000,
       hash: 'SHA-512'
     },

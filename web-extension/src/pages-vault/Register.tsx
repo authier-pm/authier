@@ -79,8 +79,10 @@ export default function Register(): ReactElement {
             variables: {
               userId,
               input: {
+                //string
                 encryptionSalt: encryptionSalt,
                 email: values.email,
+                //base64
                 ...params,
                 deviceId,
                 devicePlatform: device.platform,
