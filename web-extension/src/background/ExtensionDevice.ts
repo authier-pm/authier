@@ -37,12 +37,16 @@ import {
 } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
-  ab2str,
   cryptoKeyToString,
-  str2Ab,
   testGenerateEncryptionKey,
-  abToCryptoKey
+  abToCryptoKey,
+  str2ab,
+  ab2str,
+  equal,
+  strToBase64,
+  base64ToStr
 } from '@shared/generateEncryptionKey'
+import { decode, encode } from 'base64-arraybuffer'
 import { toast } from '@src/Providers'
 
 export const log = debug('au:Device')
@@ -150,24 +154,33 @@ export class DeviceState implements IBackgroundStateSerializable {
     this.save()
   }
 
+  /**
+   * @returns string in base64
+   */
   async encrypt(stringToEncrypt: string) {
-    const cryptoKey = await abToCryptoKey(str2Ab(this.masterEncryptionKey))
-
-    const encrypted = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: str2Ab(this.userId) },
-      cryptoKey,
-      str2Ab(stringToEncrypt)
+    const cryptoKey = await abToCryptoKey(
+      str2ab(base64ToStr(this.masterEncryptionKey))
     )
 
-    return ab2str(encrypted)
-  }
-
-  async decrypt(encrypted: string) {
-    const cryptoKey = await abToCryptoKey(str2Ab(this.masterEncryptionKey))
-    return window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: str2Ab(this.userId) },
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: str2ab(this.userId) },
       cryptoKey,
-      str2Ab(encrypted)
+      str2ab(stringToEncrypt)
+    )
+
+    return strToBase64(ab2str(encrypted))
+  }
+  /**
+   * @param encrypted in base64
+   */
+  async decrypt(encrypted: string) {
+    const cryptoKey = await abToCryptoKey(
+      str2ab(base64ToStr(this.masterEncryptionKey))
+    )
+    return window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: str2ab(this.userId) },
+      cryptoKey,
+      str2ab(base64ToStr(encrypted))
     )
   }
 
@@ -336,7 +349,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   /**
    * invokes the backend mutation and pushes the new secret to the bgState
    * @param secrets
-   * @returns the added secret
+   * @returns the added secret in base64
    */
   async addSecrets(secrets: AddSecretInput) {
     const encryptedSecrets = await Promise.all(
@@ -524,6 +537,9 @@ class ExtensionDevice {
     return secret
   }
 
+  /**
+   * @returns strings in base64
+   */
   async initLocalDeviceAuthSecret(
     masterEncryptionKey: CryptoKey,
     userId: string
@@ -531,14 +547,15 @@ class ExtensionDevice {
     const authSecret = this.generateBackendSecret()
 
     const addDeviceSecretAb = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: str2Ab(userId) },
+      { name: 'AES-GCM', iv: str2ab(userId) },
       masterEncryptionKey,
-      str2Ab(authSecret)
+      str2ab(authSecret)
     )
 
+    console.log('authSEcret', authSecret, ab2str(addDeviceSecretAb))
     return {
-      addDeviceSecret: authSecret,
-      addDeviceSecretEncrypted: ab2str(addDeviceSecretAb)
+      addDeviceSecret: strToBase64(authSecret),
+      addDeviceSecretEncrypted: strToBase64(ab2str(addDeviceSecretAb))
     }
   }
 

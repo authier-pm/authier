@@ -79,7 +79,7 @@ model Device {
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
   id        String              @id @default(uuid()) @db.Uuid
-  encrypted String // for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
+  encrypted String // WARNING: in base64, for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
   version   Int
   kind      EncryptedSecretType
   createdAt DateTime            @default(now())
@@ -167,10 +167,10 @@ model User {
   username                      String?              @unique
   uiLocalisation                String               @default("en")
   // @skip
-  addDeviceSecret               String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted      String // client has to decrypt this to prove they have the correct master password
+  addDeviceSecret               String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted      String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt                String
+  encryptionSalt                String //WARNING: in pure string
   Token                         Token[]
   createdAt                     DateTime             @default(now())
   updatedAt                     DateTime?            @updatedAt
