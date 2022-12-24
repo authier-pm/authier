@@ -8,8 +8,12 @@ export default defineConfig({
     // Vite plugin
     swc.vite()
   ],
+
   test: {
-    setupFiles: ['./tests/testEnv.ts']
+    setupFiles: ['./tests/testEnv.ts'],
+    deps: {
+      interopDefault: true
+    }
   },
   resolve: {
     alias: {
