@@ -1,5 +1,5 @@
-import { Field, ObjectType, ID } from 'type-graphql'
-import { UserGQL } from './User'
+import { Field, ObjectType, ID, GraphQLISODateTime } from 'type-graphql'
+import { UserGQL } from './UserGQL'
 import { EmailVerificationTypeGQL } from '../types/EmailVerificationType'
 
 @ObjectType()
@@ -7,11 +7,11 @@ export class EmailVerificationGQLScalars {
   @Field(() => ID)
   address: string
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field({ nullable: true })
-  verifiedAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  verifiedAt: Date | null
 
   @Field()
   userId: string

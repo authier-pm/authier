@@ -5,6 +5,7 @@ import * as path from 'path'
 import * as cdk from 'aws-cdk-lib'
 import dotenv from 'dotenv'
 import { Architecture } from 'aws-cdk-lib/aws-lambda'
+import { Topic } from 'aws-cdk-lib/aws-sns'
 
 export class AwsCdkAuthierStack extends Stack {
   constructor(scope: cdk.App, id: string, props?: StackProps) {
@@ -32,6 +33,30 @@ export class AwsCdkAuthierStack extends Stack {
         MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE as string
       }
     })
+
+    const topic = new Topic(scope, 'Alarm topic', {
+      displayName: 'Alarm topic'
+    })
+
+    if (process.env.AWS_SNS_SUBSCRIPTION_EMAILS) {
+      topic.addSubscription(
+        new cdk.aws_sns_subscriptions.EmailSubscription('capajj@gmail.com')
+      )
+    }
+
+    const functionErrors = backendApi.metricErrors({
+      period: cdk.Duration.minutes(1)
+    })
+
+    // 👇 define an alarm for the metric
+    const errorsAlarm = new cdk.aws_cloudwatch.Alarm(this, 'ErrorsAlarm', {
+      metric: functionErrors,
+      threshold: 1,
+      evaluationPeriods: 1,
+      comparisonOperator:
+        cdk.aws_cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD
+    })
+    errorsAlarm.addAlarmAction(new cdk.aws_cloudwatch_actions.SnsAction(topic))
 
     backendApi.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,

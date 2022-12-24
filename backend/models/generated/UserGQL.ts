@@ -1,28 +1,27 @@
-import { Field, ObjectType, ID, Int } from 'type-graphql'
-import { TokenGQL } from './Token'
-import { DeviceGQL } from './Device'
-import { SecretUsageEventGQL } from './SecretUsageEvent'
-import { EncryptedSecretGQL } from './EncryptedSecret'
-import { WebInputGQL } from './WebInput'
-import { SettingsConfigGQL } from './SettingsConfig'
-import { TagGQL } from './Tag'
-import { UserPaidProductsGQL } from './UserPaidProducts'
-import { DecryptionChallengeGQL } from './DecryptionChallenge'
-import { MasterDeviceChangeGQL } from './MasterDeviceChange'
+import { Field, ObjectType, ID, Int, GraphQLISODateTime } from 'type-graphql'
+import { TokenGQL } from './TokenGQL'
+import { DeviceGQL } from './DeviceGQL'
+import { DecryptionChallengeGQL } from './DecryptionChallengeGQL'
+import { SecretUsageEventGQL } from './SecretUsageEventGQL'
+import { EncryptedSecretGQL } from './EncryptedSecretGQL'
+import { WebInputGQL } from './WebInputGQL'
+import { TagGQL } from './TagGQL'
+import { UserPaidProductsGQL } from './UserPaidProductsGQL'
+import { MasterDeviceChangeGQL } from './MasterDeviceChangeGQL'
 
 @ObjectType()
 export class UserGQLScalars {
   @Field(() => ID)
   id: string
 
-  @Field({ nullable: true })
-  email?: string
+  @Field(() => String, { nullable: true })
+  email: string | null
 
   @Field(() => Int)
   tokenVersion: number
 
-  @Field({ nullable: true })
-  username?: string
+  @Field(() => String, { nullable: true })
+  username: string | null
 
   @Field()
   uiLocalisation: string
@@ -30,14 +29,14 @@ export class UserGQLScalars {
   @Field()
   addDeviceSecretEncrypted: string
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field({ nullable: true })
-  updatedAt?: Date
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  updatedAt: Date | null
 
-  @Field({ nullable: true })
-  masterDeviceId?: string
+  @Field(() => String, { nullable: true })
+  masterDeviceId: string | null
 
   @Field(() => Int)
   TOTPlimit: number
@@ -64,10 +63,10 @@ export class UserGQL extends UserGQLScalars {
   Token: TokenGQL[]
 
   @Field(() => DeviceGQL, { nullable: true })
-  masterDevice?: DeviceGQL
+  masterDevice: DeviceGQL | null
 
   @Field(() => DecryptionChallengeGQL, { nullable: true })
-  recoveryDecryptionChallenge?: DecryptionChallengeGQL
+  recoveryDecryptionChallenge: DecryptionChallengeGQL | null
 
   @Field(() => [SecretUsageEventGQL])
   UsageEvents: SecretUsageEventGQL[]
