@@ -1,5 +1,5 @@
-import { Field, ObjectType, Int } from 'type-graphql'
-import { UserGQL } from './User'
+import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
+import { UserGQL } from './UserGQL'
 
 @ObjectType()
 export class TagGQLScalars {
@@ -9,7 +9,7 @@ export class TagGQLScalars {
   @Field()
   name: string
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
   @Field()

@@ -16,6 +16,8 @@ export type Scalars = {
   Boolean: boolean
   Int: number
   Float: number
+  /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
+  BigInt: any
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: string
   /** A field whose value conforms to the standard internet email address format as specified in RFC822: https://www.w3.org/Protocols/rfc822/. */
@@ -388,7 +390,7 @@ export type SecretUsageEventGql = {
   User: UserGql
   WebOTPInput?: Maybe<WebInputGql>
   deviceId: Scalars['String']
-  id: Scalars['ID']
+  id: Scalars['BigInt']
   kind: Scalars['String']
   secretId: Scalars['String']
   timestamp: Scalars['DateTime']
@@ -400,7 +402,7 @@ export type SecretUsageEventGql = {
 export type SecretUsageEventGqlScalars = {
   __typename?: 'SecretUsageEventGQLScalars'
   deviceId: Scalars['String']
-  id: Scalars['ID']
+  id: Scalars['BigInt']
   kind: Scalars['String']
   secretId: Scalars['String']
   timestamp: Scalars['DateTime']

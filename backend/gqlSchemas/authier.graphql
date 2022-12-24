@@ -137,7 +137,7 @@ type DeviceGQL {
 }
 
 type SecretUsageEventGQL {
-  id: ID!
+  id: BigInt!
   kind: String!
   timestamp: DateTime!
   secretId: String!
@@ -150,6 +150,11 @@ type SecretUsageEventGQL {
   Device: DeviceGQL!
   WebOTPInput: WebInputGQL
 }
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
 
 type EncryptedSecretGQL {
   id: ID!
@@ -433,7 +438,7 @@ type DeviceMutation {
 }
 
 type SecretUsageEventGQLScalars {
-  id: ID!
+  id: BigInt!
   kind: String!
   timestamp: DateTime!
   secretId: String!
