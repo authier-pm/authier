@@ -19,7 +19,7 @@ export const generateEncryptionKey = (
  */
 export async function cryptoKeyToString(key: CryptoKey): Promise<string> {
   const raw = await crypto.subtle.exportKey('raw', key)
-  return strToBase64(ab2str(raw))
+  return buff_to_base64(raw)
 }
 
 export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
@@ -29,13 +29,15 @@ export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
   ])
   return cryptoKey
 }
-/*
+
+export const enc = new TextEncoder()
+export const dec = new TextDecoder()
+/**
  *
  *  Get some key material to use as input to the deriveKey method.
  *  The key material is a password supplied by the user.
  */
 async function getKeyMaterial(password: string): Promise<CryptoKey> {
-  const enc = new TextEncoder()
   return window.crypto.subtle.importKey(
     'raw',
     enc.encode(password),
@@ -45,34 +47,15 @@ async function getKeyMaterial(password: string): Promise<CryptoKey> {
   )
 }
 
-export function ab2str(buf: ArrayBuffer): string {
-  return String.fromCharCode.apply(null, new Uint16Array(buf))
-}
-
-export const base64ToStr = (str: string): string =>
-  Buffer.from(str, 'base64').toString('binary')
-
-export const strToBase64 = (str: string): string =>
-  Buffer.from(str, 'binary').toString('base64')
-
-export function str2ab(str: string): ArrayBuffer {
-  const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
-  const bufView = new Uint16Array(buf)
-  for (let i = 0, strLen = str.length; i < strLen; i++) {
-    bufView[i] = str.charCodeAt(i)
-  }
-  return buf
-}
-
 export async function testGenerateEncryptionKey(
   psw: string,
-  salt: string
+  salt: ArrayBuffer
 ): Promise<CryptoKey> {
   const keyMaterial = await getKeyMaterial(psw)
   const key = await window.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
-      salt: str2ab(salt),
+      salt: salt,
       iterations: 130000,
       hash: 'SHA-512'
     },
@@ -83,3 +66,27 @@ export async function testGenerateEncryptionKey(
   )
   return key
 }
+
+export const buff_to_base64 = (buff: ArrayBuffer) =>
+  btoa(
+    new Uint8Array(buff).reduce(function (data, byte) {
+      return data + String.fromCharCode(byte)
+    }, '')
+  )
+
+export const base64_to_buf = (b64: string) =>
+  Uint8Array.from(atob(b64), (c) => c.charCodeAt(null))
+
+// export function ab2str(buf: ArrayBuffer): string {
+//   return String.fromCharCode.apply(null, new Uint16Array(buf))
+// }
+//
+//
+// export function str2ab(str: string): ArrayBuffer {
+//   const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
+//   const bufView = new Uint16Array(buf)
+//   for (let i = 0, strLen = str.length; i < strLen; i++) {
+//     bufView[i] = str.charCodeAt(i)
+//   }
+//   return buf
+// }

@@ -42,9 +42,12 @@ import {
   abToCryptoKey,
   str2ab,
   ab2str,
-  equal,
   strToBase64,
-  base64ToStr
+  base64ToStr,
+  buff_to_base64,
+  enc,
+  dec,
+  base64_to_buf
 } from '@shared/generateEncryptionKey'
 import { decode, encode } from 'base64-arraybuffer'
 import { toast } from '@src/Providers'
@@ -157,31 +160,35 @@ export class DeviceState implements IBackgroundStateSerializable {
   /**
    * @returns string in base64
    */
-  async encrypt(stringToEncrypt: string) {
+  async encrypt(stringToEncrypt: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      str2ab(base64ToStr(this.masterEncryptionKey))
+      base64_to_buf(this.masterEncryptionKey)
     )
 
     const encrypted = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: str2ab(this.userId) },
+      { name: 'AES-GCM', iv: enc.encode(this.userId) },
       cryptoKey,
-      str2ab(stringToEncrypt)
+      enc.encode(stringToEncrypt)
     )
 
-    return strToBase64(ab2str(encrypted))
+    return buff_to_base64(encrypted)
   }
+
   /**
    * @param encrypted in base64
+   * @returns pure string
    */
-  async decrypt(encrypted: string) {
+  async decrypt(encrypted: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      str2ab(base64ToStr(this.masterEncryptionKey))
+      base64_to_buf(this.masterEncryptionKey)
     )
-    return window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: str2ab(this.userId) },
+    const decrypted = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: enc.encode(this.userId) },
       cryptoKey,
-      str2ab(base64ToStr(encrypted))
+      base64_to_buf(encrypted)
     )
+
+    return dec.decode(decrypted)
   }
 
   async save() {
@@ -542,20 +549,39 @@ class ExtensionDevice {
    */
   async initLocalDeviceAuthSecret(
     masterEncryptionKey: CryptoKey,
-    userId: string
-  ) {
+    userId: string,
+    salt: ArrayBuffer
+  ): Promise<{
+    addDeviceSecret: string
+    addDeviceSecretEncrypted: string
+  }> {
     const authSecret = this.generateBackendSecret()
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
 
     const addDeviceSecretAb = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: str2ab(userId) },
+      { name: 'AES-GCM', iv },
       masterEncryptionKey,
-      str2ab(authSecret)
+      enc.encode(authSecret)
     )
 
-    console.log('authSEcret', authSecret, ab2str(addDeviceSecretAb))
+    const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
+    let buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    let test = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      masterEncryptionKey,
+      addDeviceSecretAb
+    )
+
     return {
-      addDeviceSecret: strToBase64(authSecret),
-      addDeviceSecretEncrypted: strToBase64(ab2str(addDeviceSecretAb))
+      addDeviceSecret: authSecret,
+      addDeviceSecretEncrypted: base64Buff
     }
   }
 
