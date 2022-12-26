@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     // Vite plugin
     swc.vite(),
+    // TODO fix vite, does not work for some reason
     tsconfigPaths({
       projects: [
         'backend/tsconfig.json',
