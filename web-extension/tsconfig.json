@@ -2,14 +2,10 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ],
-      "@shared/*": [
-        "../shared/*"
-      ]
+      "@src/*": ["src/*"],
+      "@shared/*": ["../shared/*"]
     },
-    "target": "ES2015",
+    "target": "es2022",
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "../../authier",
@@ -19,10 +15,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "esModuleInterop": true,
-    "lib": [
-      "es2021",
-      "dom"
-    ],
+    "lib": ["es2021", "dom"],
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
@@ -32,12 +25,6 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "exclude": [
-    "../backend/**",
-    "dist/**"
-  ],
-  "include": [
-    "./src/**/*",
-    "../shared/**/*"
-  ]
+  "exclude": ["../backend/**", "dist/**"],
+  "include": ["./src/**/*", "../shared/**/*"]
 }

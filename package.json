@@ -26,6 +26,7 @@
     "@graphql-codegen/typescript": "^2.8.2",
     "@graphql-codegen/typescript-operations": "^2.5.7",
     "@graphql-codegen/typescript-react-apollo": "^3.3.7",
+    "@swc/core": "^1.3.24",
     "@types/jest": "^28.1.8",
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
@@ -40,13 +41,17 @@
     "prettier": "^2.8.0",
     "pretty-quick": "^3.1.3",
     "react-toastify": "^9.1.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.3",
+    "unplugin-swc": "^1.3.2",
+    "vite": "^4.0.3",
+    "vite-tsconfig-paths": "^4.0.2",
+    "vitest": "^0.26.2"
   },
   "scripts": {
     "devBE": "cd backend && pnpm run dev",
     "devEX": "cd web-extension && pnpm run dev",
     "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd mobile-app && tsc",
-    "test": "cd backend && pnpm test && cd .. && cd web-extension && pnpm test",
+    "test": "vitest",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && pnpm gbs",
     "schemas": "pnpm gbs && pnpm gfs",

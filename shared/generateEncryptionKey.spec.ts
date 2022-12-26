@@ -1,4 +1,5 @@
 import { generateEncryptionKey } from './generateEncryptionKey'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('generateEncryptionKey', () => {
   it('should generate an encryption key from a password and an encryption salt', () => {

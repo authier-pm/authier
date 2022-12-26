@@ -9,14 +9,14 @@ export default {
   compileNamespace: 'ts',
 
   locales: [
-    'en-gb',
+    'en',
     // 'de-de',
     'pseudo'
   ],
 
   pseudoLocale: 'pseudo',
   fallbackLocales: {
-    pseudo: 'en-gb'
+    pseudo: 'en'
   },
   format: 'po',
   formatOptions: { origins: true, lineNumbers: false },

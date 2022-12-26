@@ -1,4 +1,5 @@
 import { getTokenSecretFromQrCode } from './AddTOTPSecretButton'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('getTokenSecretFromQrCode', () => {
   it('should work for bitfinex TOTP secret QR codes with/without issuer', () => {

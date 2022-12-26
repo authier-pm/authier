@@ -1,4 +1,5 @@
 import { device } from './ExtensionDevice'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('ExtensionDevice', () => {
   describe('startLockInterval', () => {

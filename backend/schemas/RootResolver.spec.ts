@@ -1,13 +1,13 @@
-/* eslint-disable @typescript-eslint/no-empty-function */
 import { prismaClient } from '../prisma/prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
 import faker from 'faker'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
-import { describe, expect, it } from 'vitest'
+import { afterAll, describe, expect, it } from 'vitest'
 
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
+import { truncateAllTables } from '../tests/truncateAllTables'
 
 export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
@@ -31,6 +31,7 @@ const userSecurityProps = {
   loginCredentialsLimit: 50,
   TOTPlimit: 4
 }
+afterAll(truncateAllTables)
 
 describe('RootResolver', () => {
   const resolver = new RootResolver()

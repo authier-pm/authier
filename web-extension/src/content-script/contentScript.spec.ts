@@ -1,3 +1,5 @@
+import { describe, it } from 'vitest'
+
 describe('contentScript', () => {
   it.todo('should not do anything if user is not logged in')
   it.todo(

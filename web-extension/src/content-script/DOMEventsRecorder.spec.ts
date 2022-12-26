@@ -1,3 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { DOMEventsRecorder } from './DOMEventsRecorder'
 

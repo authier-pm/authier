@@ -1,7 +1,6 @@
 import { onError } from '@apollo/client/link/error'
 import { toast } from 'react-toastify'
 import { print } from 'graphql'
-//@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
 import 'react-toastify/dist/ReactToastify.css'
 
