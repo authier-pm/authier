@@ -17,6 +17,9 @@ export class AddNewDeviceInput {
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecretEncrypted: string
 
+  @Field(() => GraphQLNonEmptyString)
+  encryptionSalt: string
+
   @Field()
   devicePlatform: string
 }
@@ -28,9 +31,6 @@ export class RegisterNewAccountInput extends AddNewDeviceInput {
 
   @Field()
   deviceName: string
-
-  @Field(() => GraphQLNonEmptyString)
-  encryptionSalt: string
 
   @Field(() => GraphQLEmailAddress)
   email: string
