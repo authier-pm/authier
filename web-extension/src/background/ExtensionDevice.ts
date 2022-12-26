@@ -40,16 +40,11 @@ import {
   cryptoKeyToString,
   testGenerateEncryptionKey,
   abToCryptoKey,
-  str2ab,
-  ab2str,
-  strToBase64,
-  base64ToStr,
   buff_to_base64,
   enc,
   dec,
   base64_to_buf
 } from '@shared/generateEncryptionKey'
-import { decode, encode } from 'base64-arraybuffer'
 import { toast } from '@src/Providers'
 
 export const log = debug('au:Device')
@@ -151,7 +146,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async setMasterEncryptionKey(masterPassword: string) {
     const key = await testGenerateEncryptionKey(
       masterPassword,
-      this.encryptionSalt
+      base64_to_buf(this.encryptionSalt)
     )
     this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
@@ -164,14 +159,25 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64_to_buf(this.masterEncryptionKey)
     )
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const salt = base64_to_buf(this.encryptionSalt)
 
     const encrypted = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: enc.encode(this.userId) },
+      { name: 'AES-GCM', iv },
       cryptoKey,
       enc.encode(stringToEncrypt)
     )
 
-    return buff_to_base64(encrypted)
+    const encryptedContentArr = new Uint8Array(encrypted)
+    let buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    return base64Buff
   }
 
   /**
@@ -182,10 +188,14 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64_to_buf(this.masterEncryptionKey)
     )
+    const encryptedDataBuff = base64_to_buf(encrypted)
+    const iv = encryptedDataBuff.slice(16, 16 + 12)
+    const data = encryptedDataBuff.slice(16 + 12)
+
     const decrypted = await window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: enc.encode(this.userId) },
+      { name: 'AES-GCM', iv },
       cryptoKey,
-      base64_to_buf(encrypted)
+      data
     )
 
     return dec.decode(decrypted)
@@ -244,7 +254,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
-        totp: JSON.parse(ab2str(decrypted))
+        totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
       const parsed: {
@@ -253,7 +263,7 @@ export class DeviceState implements IBackgroundStateSerializable {
         password: string
         url: string
         username: string
-      } = JSON.parse(ab2str(decrypted))
+      } = JSON.parse(decrypted)
 
       try {
         loginCredentialsSchema.parse(parsed)
@@ -568,16 +578,12 @@ class ExtensionDevice {
     let buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
     )
+    //FIX:
+    //@ts-expect-error
     buff.set(salt, 0)
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
     const base64Buff = buff_to_base64(buff)
-
-    let test = await window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
-      masterEncryptionKey,
-      addDeviceSecretAb
-    )
 
     return {
       addDeviceSecret: authSecret,
@@ -675,7 +681,7 @@ class ExtensionDevice {
         const decr = await state.decrypt(encrypted)
         log('decrypted secret', decr)
         await state.setMasterEncryptionKey(newPsw)
-        const enc = await state.encrypt(ab2str(decr))
+        const enc = await state.encrypt(decr)
 
         log('encrypted secret', enc, state.masterEncryptionKey)
         return {
