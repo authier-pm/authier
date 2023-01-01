@@ -40,10 +40,6 @@ import {
   cryptoKeyToString,
   testGenerateEncryptionKey,
   abToCryptoKey,
-  str2ab,
-  ab2str,
-  strToBase64,
-  base64ToStr,
   buff_to_base64,
   enc,
   dec,
@@ -151,7 +147,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async setMasterEncryptionKey(masterPassword: string) {
     const key = await testGenerateEncryptionKey(
       masterPassword,
-      this.encryptionSalt
+      base64_to_buf(this.encryptionSalt)
     )
     this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
@@ -244,7 +240,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
-        totp: JSON.parse(ab2str(decrypted))
+        totp: JSON.parse(decrypted)
       } as ITOTPSecret
     } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
       const parsed: {
@@ -253,7 +249,7 @@ export class DeviceState implements IBackgroundStateSerializable {
         password: string
         url: string
         username: string
-      } = JSON.parse(ab2str(decrypted))
+      } = JSON.parse(decrypted)
 
       try {
         loginCredentialsSchema.parse(parsed)
@@ -339,7 +335,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     }
   }
-
+  //TODO: type this
   async findExistingSecret(secret) {
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
@@ -510,7 +506,6 @@ class ExtensionDevice {
   generateDeviceName(): string {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
-
   async clearLocalStorage() {
     const deviceId = await this.getDeviceId()
     this.state?.destroy()
@@ -549,8 +544,7 @@ class ExtensionDevice {
    */
   async initLocalDeviceAuthSecret(
     masterEncryptionKey: CryptoKey,
-    userId: string,
-    salt: ArrayBuffer
+    salt: Uint8Array
   ): Promise<{
     addDeviceSecret: string
     addDeviceSecretEncrypted: string
@@ -572,12 +566,6 @@ class ExtensionDevice {
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
     const base64Buff = buff_to_base64(buff)
-
-    let test = await window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv },
-      masterEncryptionKey,
-      addDeviceSecretAb
-    )
 
     return {
       addDeviceSecret: authSecret,
@@ -675,12 +663,12 @@ class ExtensionDevice {
         const decr = await state.decrypt(encrypted)
         log('decrypted secret', decr)
         await state.setMasterEncryptionKey(newPsw)
-        const enc = await state.encrypt(ab2str(decr))
+        const enc = await state.encrypt(decr)
 
         log('encrypted secret', enc, state.masterEncryptionKey)
         return {
           id,
-          encrypted: enc as string,
+          encrypted: enc,
           kind
         }
       })

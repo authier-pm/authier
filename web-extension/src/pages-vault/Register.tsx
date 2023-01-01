@@ -75,7 +75,6 @@ export default function Register(): ReactElement {
 
           const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
-            userId,
             encryptionSalt
           )
 

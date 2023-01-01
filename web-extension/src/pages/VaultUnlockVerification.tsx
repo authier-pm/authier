@@ -17,13 +17,11 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { t, Trans } from '@lingui/macro'
 import {
-  ab2str,
+  base64_to_buf,
   cryptoKeyToString,
-  generateEncryptionKey,
-  str2Ab,
+  dec,
   testGenerateEncryptionKey
 } from '@shared/generateEncryptionKey'
-import cryptoJS from 'crypto-js'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/Providers'
 
@@ -56,16 +54,24 @@ export function VaultUnlockVerification() {
           try {
             const masterEncryptionKey = await testGenerateEncryptionKey(
               values.password,
-              lockedState.encryptionSalt
+              base64_to_buf(lockedState.encryptionSalt)
             )
 
-            const currentAddDeviceSecret = await window.crypto.subtle.decrypt(
-              { name: 'AES-GCM', iv: str2Ab(lockedState.userId) },
+            const encryptedDataBuff = base64_to_buf(
+              lockedState.authSecretEncrypted
+            )
+            const iv = encryptedDataBuff.slice(16, 16 + 12)
+            const data = encryptedDataBuff.slice(16 + 12)
+
+            let decryptedContent = await window.crypto.subtle.decrypt(
+              { name: 'AES-GCM', iv },
               masterEncryptionKey,
-              str2Ab(lockedState.authSecretEncrypted)
+              data
             )
 
-            if (ab2str(currentAddDeviceSecret) !== lockedState.authSecret) {
+            let currentAddDeviceSecret = dec.decode(decryptedContent)
+
+            if (currentAddDeviceSecret !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
             }
 
