@@ -133,15 +133,16 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const newAuthSecret = device.generateBackendSecret()
-        const iv = enc.encode(userId)
-        const salt = enc.encode(encryptionSalt)
-        const newAuthSecretEncrypted = await window.crypto.subtle.encrypt(
+        const iv = window.crypto.getRandomValues(new Uint8Array(12))
+        const salt = window.crypto.getRandomValues(new Uint8Array(16))
+
+        const newAuthSecretEncryptedAb = await window.crypto.subtle.encrypt(
           { name: 'AES-GCM', iv },
           masterEncryptionKey,
           enc.encode(newAuthSecret)
         )
 
-        const encryptedContentArr = new Uint8Array(newAuthSecretEncrypted)
+        const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
         let buff = new Uint8Array(
           salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
         )
@@ -162,7 +163,8 @@ export const useLogin = (props: { deviceName: string }) => {
               addDeviceSecret: newAuthSecret,
               addDeviceSecretEncrypted: base64Buff,
               firebaseToken: fireToken,
-              devicePlatform: device.platform
+              devicePlatform: device.platform,
+              encryptionSalt: buff_to_base64(salt)
             },
             currentAddDeviceSecret: currentAddDeviceSecret
           }
@@ -191,7 +193,7 @@ export const useLogin = (props: { deviceName: string }) => {
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
-            encryptionSalt,
+            encryptionSalt: buff_to_base64(salt),
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
             authSecretEncrypted: base64Buff,
