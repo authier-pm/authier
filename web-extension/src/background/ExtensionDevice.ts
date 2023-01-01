@@ -45,7 +45,6 @@ import {
   dec,
   base64_to_buf
 } from '@shared/generateEncryptionKey'
-import { decode, encode } from 'base64-arraybuffer'
 import { toast } from '@src/Providers'
 
 export const log = debug('au:Device')
@@ -160,14 +159,25 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64_to_buf(this.masterEncryptionKey)
     )
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const salt = base64_to_buf(this.encryptionSalt)
 
     const encrypted = await window.crypto.subtle.encrypt(
-      { name: 'AES-GCM', iv: enc.encode(this.userId) },
+      { name: 'AES-GCM', iv },
       cryptoKey,
       enc.encode(stringToEncrypt)
     )
 
-    return buff_to_base64(encrypted)
+    const encryptedContentArr = new Uint8Array(encrypted)
+    let buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    return base64Buff
   }
 
   /**
@@ -178,10 +188,14 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64_to_buf(this.masterEncryptionKey)
     )
+    const encryptedDataBuff = base64_to_buf(encrypted)
+    const iv = encryptedDataBuff.slice(16, 16 + 12)
+    const data = encryptedDataBuff.slice(16 + 12)
+
     const decrypted = await window.crypto.subtle.decrypt(
-      { name: 'AES-GCM', iv: enc.encode(this.userId) },
+      { name: 'AES-GCM', iv },
       cryptoKey,
-      base64_to_buf(encrypted)
+      data
     )
 
     return dec.decode(decrypted)
@@ -562,6 +576,8 @@ class ExtensionDevice {
     let buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
     )
+    //FIX:
+    //@ts-expect-error
     buff.set(salt, 0)
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
