@@ -21,6 +21,7 @@ import { MMKV } from 'react-native-mmkv'
 import messaging from '@react-native-firebase/messaging'
 import Config from 'react-native-config'
 import * as Sentry from '@sentry/react-native'
+import PolyfillCrypto from 'react-native-webview-crypto'
 
 export const routingInstrumentation =
   new Sentry.ReactNavigationInstrumentation()
@@ -91,6 +92,7 @@ const App = () => {
 
   return (
     <React.Fragment>
+      <PolyfillCrypto />
       <Providers key={JSON.stringify(device.state)} />
     </React.Fragment>
   )

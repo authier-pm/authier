@@ -16,7 +16,7 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { generateEncryptionKey } from '../../../../shared/generateEncryptionKey'
+import { generateEncryptionKey } from '@utils/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
@@ -30,6 +30,7 @@ import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceState } from '@src/utils/DeviceState'
+import { testGenerateEncryptionKey } from '@shared/generateEncryptionKey'
 
 interface Values {
   password: string
@@ -81,7 +82,6 @@ export function Register({ navigation }: NavigationProps) {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           const userId = uuid.v4()
-          const encryptionSalt = device.generateBackendSecret()
           const deviceName = await getDeviceName()
 
           if (device.biometricsAvailable) {
@@ -94,33 +94,62 @@ export function Register({ navigation }: NavigationProps) {
             })
           }
 
-          const masterEncryptionKey = generateEncryptionKey(
+          const encryptionSalt = window.crypto.getRandomValues(
+            new Uint8Array(16)
+          )
+
+          const masterEncryptionKey = await testGenerateEncryptionKey(
             values.password,
             encryptionSalt
           )
 
-          const params = device.initLocalDeviceAuthSecret(
+          const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
-            userId as string
+            encryptionSalt
           )
           const deviceId = getUniqueId()
 
-          const res = await register({
-            variables: {
-              userId: userId,
-              input: {
-                deviceId: deviceId,
-                addDeviceSecret: params?.addDeviceSecret,
-                addDeviceSecretEncrypted: params?.addDeviceSecretEncrypted,
-                deviceName: deviceName,
-                email: values.email,
-                encryptionSalt: encryptionSalt,
-                firebaseToken: device.fireToken as string,
-                devicePlatform: Platform.OS
-              }
-            }
-          })
-          const registerResult = res.data?.registerNewUser
+          // const deviceId = await device.getDeviceId()
+          //
+          try {
+            const test = crypto.getRandomValues(new Uint8Array(16))
+            console.log('test', params)
+          } catch (error) {
+            console.log('error', error)
+          }
+
+          //
+          // const test = crypto.getRandomValues(
+          //   new Uint8Array(16)
+          // )
+          //
+          // const masterEncryptionKey = await testGenerateEncryptionKey(
+          //   values.password,
+          //   encryptionSalt
+          // )
+          //
+          // const params = await device.initLocalDeviceAuthSecret(
+          //   masterEncryptionKey,
+          //   encryptionSalt
+          // )
+
+          // const res = await register({
+          //   variables: {
+          //     userId: userId,
+          //     input: {
+          //       deviceId: deviceId,
+          //       addDeviceSecret: params?.addDeviceSecret,
+          //       addDeviceSecretEncrypted: params?.addDeviceSecretEncrypted,
+          //       deviceName: deviceName,
+          //       email: values.email,
+          //       encryptionSalt: encryptionSalt,
+          //       firebaseToken: device.fireToken as string,
+          //       devicePlatform: Platform.OS
+          //     }
+          //   }
+          // })
+          // const registerResult = res.data?.registerNewUser
+          const registerResult = null
 
           //FIX: Maybe we should check if is the access token valid?
           if (registerResult?.accessToken) {

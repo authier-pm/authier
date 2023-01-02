@@ -6,7 +6,7 @@ import { LoginContext } from './Login'
 
 import cryptoJS from 'crypto-js'
 
-import { generateEncryptionKey } from '../../../../shared/generateEncryptionKey'
+import { generateEncryptionKey } from '@utils/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
@@ -74,7 +74,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useEffect(() => {
     const { fireToken } = device
-   
+
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
@@ -82,11 +82,11 @@ export const useLogin = (props: { deviceName: string }) => {
       ;(async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
-       
+
         const userId = deviceDecryptionChallenge?.userId
-        
+
         if (!addDeviceSecretEncrypted || !userId) {
-           console.log('test1')
+          console.log('test1')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
