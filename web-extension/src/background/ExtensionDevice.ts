@@ -169,7 +169,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     )
 
     const encryptedContentArr = new Uint8Array(encrypted)
-    let buff = new Uint8Array(
+    const buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
     )
     buff.set(salt, 0)
@@ -573,11 +573,10 @@ class ExtensionDevice {
     )
 
     const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
-    let buff = new Uint8Array(
+    const buff = new Uint8Array(
       salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
     )
-    //FIX:
-    //@ts-expect-error
+
     buff.set(salt, 0)
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)

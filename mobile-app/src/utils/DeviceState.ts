@@ -1,7 +1,7 @@
 import { apolloClient } from '../apollo/ApolloClient'
 import cryptoJS from 'crypto-js'
 import SInfo from 'react-native-sensitive-info'
-import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
+import { generateEncryptionKey } from '@utils/generateEncryptionKey'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import {

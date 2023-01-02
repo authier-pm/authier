@@ -1,4 +1,5 @@
 import cryptoJS from 'crypto-js'
+import Base64 from './Base64'
 
 const PBKDF2Iterations = 10
 
@@ -68,7 +69,7 @@ export async function testGenerateEncryptionKey(
 }
 
 export const buff_to_base64 = (buff: ArrayBuffer) =>
-  btoa(
+  Base64.btoa(
     new Uint8Array(buff).reduce(function (data, byte) {
       return data + String.fromCharCode(byte)
     }, '')
@@ -77,4 +78,4 @@ export const buff_to_base64 = (buff: ArrayBuffer) =>
 export const base64_to_buf = (b64: string) =>
   //FIX: What is this
   //@ts-expect-error
-  Uint8Array.from(atob(b64), (c) => c.charCodeAt(null))
+  Uint8Array.from(Base64.atob(b64), (c) => c.charCodeAt(null))
