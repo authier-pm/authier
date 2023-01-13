@@ -24,7 +24,7 @@ import type { IBackgroundStateSerializable } from '@src/background/backgroundPag
 import {
   buff_to_base64,
   cryptoKeyToString,
-  testGenerateEncryptionKey
+  generateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
@@ -60,15 +60,14 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
-          const deviceId = await device.getDeviceId()
-
           const userId = crypto.randomUUID()
+          const deviceId = await device.getDeviceId()
 
           const encryptionSalt = window.crypto.getRandomValues(
             new Uint8Array(16)
           )
 
-          const masterEncryptionKey = await testGenerateEncryptionKey(
+          const masterEncryptionKey = await generateEncryptionKey(
             values.password,
             encryptionSalt
           )

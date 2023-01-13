@@ -4,9 +4,14 @@ import React, { useContext, useEffect, useState } from 'react'
 import { Heading, Text, useToast } from 'native-base'
 import { LoginContext } from './Login'
 
-import cryptoJS from 'crypto-js'
-
-import { generateEncryptionKey } from '@utils/generateEncryptionKey'
+import {
+  base64_to_buf,
+  buff_to_base64,
+  cryptoKeyToString,
+  dec,
+  enc,
+  generateEncryptionKey
+} from '@utils/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
@@ -106,21 +111,29 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
-        const masterEncryptionKey = generateEncryptionKey(
+
+        const masterEncryptionKey = await generateEncryptionKey(
           formState.password,
-          encryptionSalt
+          base64_to_buf(encryptionSalt)
         )
 
-        const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-          addDeviceSecretEncrypted,
-          masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString(cryptoJS.enc.Utf8)
+        let currentAddDeviceSecret
+        try {
+          const encryptedDataBuff = base64_to_buf(addDeviceSecretEncrypted)
+          const iv = encryptedDataBuff.slice(16, 16 + 12)
+          const data = encryptedDataBuff.slice(16 + 12)
+
+          const decryptedContent = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
+            masterEncryptionKey,
+            data
+          )
+          currentAddDeviceSecret = dec.decode(decryptedContent)
+        } catch (error) {
+          console.error(error)
+        }
 
         if (!currentAddDeviceSecret) {
-          console.log('test2')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
@@ -130,13 +143,23 @@ export const useLogin = (props: { deviceName: string }) => {
         }
 
         const newAuthSecret = device.generateBackendSecret()
-        const newAuthSecretEncrypted = cryptoJS.AES.encrypt(
-          newAuthSecret,
+        const iv = window.crypto.getRandomValues(new Uint8Array(12))
+        const salt = window.crypto.getRandomValues(new Uint8Array(16))
+
+        const newAuthSecretEncryptedAb = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
           masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString()
+          enc.encode(newAuthSecret)
+        )
+
+        const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
+        let buff = new Uint8Array(
+          salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+        )
+        buff.set(salt, 0)
+        buff.set(iv, salt.byteLength)
+        buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+        const newAuthSecretEncryptedBase64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -149,9 +172,10 @@ export const useLogin = (props: { deviceName: string }) => {
 
             input: {
               addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncrypted,
+              addDeviceSecretEncrypted: newAuthSecretEncryptedBase64Buff,
               firebaseToken: fireToken,
-              devicePlatform: Platform.OS
+              devicePlatform: Platform.OS,
+              encryptionSalt: buff_to_base64(salt)
             },
             currentAddDeviceSecret
           }
@@ -169,14 +193,14 @@ export const useLogin = (props: { deviceName: string }) => {
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
           const deviceState: IBackgroundStateSerializable = {
-            masterEncryptionKey,
+            masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
-            encryptionSalt,
+            encryptionSalt: buff_to_base64(salt),
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncrypted,
+            authSecretEncrypted: newAuthSecretEncryptedBase64Buff,
             lockTime: 28800,
             autofill: false,
             language: 'en',

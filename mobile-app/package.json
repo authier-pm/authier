@@ -48,10 +48,7 @@
     "apollo3-cache-persist": "^0.14.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
     "check-password-strength": "^2.0.7",
-    "crypto-browserify": "^3.12.0",
-    "crypto-js": "3.3.0",
     "date-fns": "^2.29.3",
-    "fast-text-encoding": "^1.0.6",
     "formik": "^2.2.9",
     "graphql": "^16.6.0",
     "intl": "^1.2.5",
@@ -93,9 +90,9 @@
     "react-native-webview": "^11.26.0",
     "react-native-webview-crypto": "^0.0.25",
     "styled-system": "^5.1.5",
+    "text-decoding": "^1.0.0",
     "vision-camera-code-scanner": "^0.2.0",
     "vite-tsconfig-paths": "^4.0.2",
-    "yup": "^0.32.11",
     "zod": "^3.19.1"
   },
   "devDependencies": {

@@ -27,7 +27,7 @@ import {
   cryptoKeyToString,
   dec,
   enc,
-  testGenerateEncryptionKey
+  generateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
 
@@ -99,7 +99,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
 
-        const masterEncryptionKey = await testGenerateEncryptionKey(
+        const masterEncryptionKey = await generateEncryptionKey(
           formState.password,
           base64_to_buf(encryptionSalt)
         )
@@ -149,7 +149,7 @@ export const useLogin = (props: { deviceName: string }) => {
         buff.set(salt, 0)
         buff.set(iv, salt.byteLength)
         buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-        const base64Buff = buff_to_base64(buff)
+        const newAuthSecretEncryptedBase64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -161,7 +161,7 @@ export const useLogin = (props: { deviceName: string }) => {
             },
             input: {
               addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: base64Buff,
+              addDeviceSecretEncrypted: newAuthSecretEncryptedBase64Buff,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
               encryptionSalt: buff_to_base64(salt)
@@ -196,7 +196,7 @@ export const useLogin = (props: { deviceName: string }) => {
             encryptionSalt: buff_to_base64(salt),
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: base64Buff,
+            authSecretEncrypted: newAuthSecretEncryptedBase64Buff,
             lockTime: 28800,
             autofill: true,
             language: 'en',
