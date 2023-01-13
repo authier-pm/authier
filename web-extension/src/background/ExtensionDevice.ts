@@ -38,12 +38,12 @@ import {
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
   cryptoKeyToString,
-  testGenerateEncryptionKey,
   abToCryptoKey,
   buff_to_base64,
   enc,
   dec,
-  base64_to_buf
+  base64_to_buf,
+  generateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
 
@@ -144,7 +144,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async setMasterEncryptionKey(masterPassword: string) {
-    const key = await testGenerateEncryptionKey(
+    const key = await generateEncryptionKey(
       masterPassword,
       base64_to_buf(this.encryptionSalt)
     )

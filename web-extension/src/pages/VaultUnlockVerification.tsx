@@ -20,7 +20,7 @@ import {
   base64_to_buf,
   cryptoKeyToString,
   dec,
-  testGenerateEncryptionKey
+  generateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/Providers'
@@ -52,7 +52,7 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            const masterEncryptionKey = await testGenerateEncryptionKey(
+            const masterEncryptionKey = await generateEncryptionKey(
               values.password,
               base64_to_buf(lockedState.encryptionSalt)
             )

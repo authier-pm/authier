@@ -246,11 +246,8 @@ importers:
       babel-plugin-module-resolver: ^4.1.0
       babel-plugin-transform-remove-console: ^6.9.4
       check-password-strength: ^2.0.7
-      crypto-browserify: ^3.12.0
-      crypto-js: 3.3.0
       date-fns: ^2.29.3
       eslint: ^8.25.0
-      fast-text-encoding: ^1.0.6
       formik: ^2.2.9
       graphql: ^16.6.0
       intl: ^1.2.5
@@ -297,10 +294,10 @@ importers:
       react-native-webview-crypto: ^0.0.25
       react-test-renderer: 18.2.0
       styled-system: ^5.1.5
+      text-decoding: ^1.0.0
       typescript: ^4.9.3
       vision-camera-code-scanner: ^0.2.0
       vite-tsconfig-paths: ^4.0.2
-      yup: ^0.32.11
       zod: ^3.19.1
     dependencies:
       '@apollo/client': 3.7.2_ila5be2toiy6xjqjieu6owlh24
@@ -336,10 +333,7 @@ importers:
       apollo3-cache-persist: 0.14.1_@apollo+client@3.7.2
       babel-plugin-transform-remove-console: 6.9.4
       check-password-strength: 2.0.7
-      crypto-browserify: 3.12.0
-      crypto-js: 3.3.0
       date-fns: 2.29.3
-      fast-text-encoding: 1.0.6
       formik: 2.2.9_react@18.1.0
       graphql: 16.6.0
       intl: 1.2.5
@@ -381,9 +375,9 @@ importers:
       react-native-webview: 11.26.0_ed6hdicvoe3mtgaxburxkml6qq
       react-native-webview-crypto: 0.0.25_obbcasp6yy2alxls35nk6fstma
       styled-system: 5.1.5
+      text-decoding: 1.0.0
       vision-camera-code-scanner: 0.2.0_7txc6rzzilykmypmixg4kxe6zy
       vite-tsconfig-paths: 4.0.2_typescript@4.9.3
-      yup: 0.32.11
       zod: 3.19.1
     devDependencies:
       '@babel/core': 7.20.2
@@ -748,8 +742,8 @@ packages:
       zen-observable-ts: 1.2.5
     dev: false
 
-  /@apollo/client/3.7.3_gdcq4dv6opitr3wbfwyjmanyra:
-    resolution: {integrity: sha512-nzZ6d6a4flLpm3pZOGpuAUxLlp9heob7QcCkyIqZlCLvciUibgufRfYTwfkWCc4NaGHGSZyodzvfr79H6oUwGQ==}
+  /@apollo/client/3.7.4_gdcq4dv6opitr3wbfwyjmanyra:
+    resolution: {integrity: sha512-bgiCKRmLSBImX4JRrw8NjqGo0AQE/mowCdHX1PJp2r5zIXrJx0UeaAYmx1qJY69Oz/KR7SKlLt4xK+bOP1jx7A==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-ws: ^5.5.5
@@ -787,7 +781,7 @@ packages:
   /@apollo/react-hooks/4.0.0_gdcq4dv6opitr3wbfwyjmanyra:
     resolution: {integrity: sha512-fCu0cbne3gbUl0QbA8X4L33iuuFVQbC5Jo2MIKRK8CyawR6PoxDpFdFA1kc6033ODZuZZ9Eo4RdeJFlFIIYcLA==}
     dependencies:
-      '@apollo/client': 3.7.3_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.4_gdcq4dv6opitr3wbfwyjmanyra
     transitivePeerDependencies:
       - graphql
       - graphql-ws
@@ -13497,10 +13491,6 @@ packages:
       randomfill: 1.0.4
     dev: false
 
-  /crypto-js/3.3.0:
-    resolution: {integrity: sha512-DIT51nX0dCfKltpRiXV+/TVZq+Qq2NgF4644+K7Ttnla7zEzqc+kjJyiB96BHNyUTBxyjzRcZYpUdZa+QAqi6Q==}
-    dev: false
-
   /crypto-js/4.1.1:
     resolution: {integrity: sha512-o2JlM7ydqd3Qk9CA0L4NL6mTzU2sdx96a+oOfPu8Mkl/PK51vSyoi8/rQ8NknZtk44vq15lmhAj9CIAGwgeWKw==}
     dev: false
@@ -15258,10 +15248,6 @@ packages:
     resolution: {integrity: sha512-dtm4QZH9nZtcDt8qJiOH9fcQd1NAgi+K1O2DbE6GG1PPCK/BWfOH3idCTRQ4ImXRUOyopDEgDEnVEE7Y/2Wrig==}
     dev: false
     optional: true
-
-  /fast-text-encoding/1.0.6:
-    resolution: {integrity: sha512-VhXlQgj9ioXCqGstD37E/HBeqEGV/qOD/kmbVG8h5xKBYvM1L3lR1Zn4555cQ8GkYbJa8aJSipLPndE1k6zK2w==}
-    dev: false
 
   /fast-uri/2.1.0:
     resolution: {integrity: sha512-qKRta6N7BWEFVlyonVY/V+BMLgFqktCUV0QjT259ekAIlbVrMaFnFLxJ4s/JPl4tou56S1BzPufI60bLe29fHA==}

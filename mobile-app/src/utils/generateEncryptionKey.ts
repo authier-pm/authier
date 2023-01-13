@@ -1,19 +1,7 @@
-import cryptoJS from 'crypto-js'
 import Base64 from './Base64'
+import { TextEncoder, TextDecoder } from 'text-decoding'
 
-const PBKDF2Iterations = 10
-
-export const generateEncryptionKey = (
-  password: string,
-  encryptionSalt: string
-) =>
-  cryptoJS
-    .PBKDF2(password, encryptionSalt, {
-      // TODO: make sure this uses crypto.subtle, seems like it does not
-      iterations: PBKDF2Iterations, // TODO: make this customizable per user
-      keySize: 128
-    })
-    .toString(cryptoJS.enc.Hex)
+const PBKDF2Iterations = 300000
 
 /**
  * @returns string in base64
@@ -48,7 +36,7 @@ async function getKeyMaterial(password: string): Promise<CryptoKey> {
   )
 }
 
-export async function testGenerateEncryptionKey(
+export async function generateEncryptionKey(
   psw: string,
   salt: ArrayBuffer
 ): Promise<CryptoKey> {
@@ -57,7 +45,7 @@ export async function testGenerateEncryptionKey(
     {
       name: 'PBKDF2',
       salt: salt,
-      iterations: 130000,
+      iterations: PBKDF2Iterations,
       hash: 'SHA-512'
     },
     keyMaterial,

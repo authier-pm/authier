@@ -1,5 +1,4 @@
 import { apolloClient } from '../apollo/ApolloClient'
-import cryptoJS from 'crypto-js'
 import SInfo from 'react-native-sensitive-info'
 import {
   EncryptedSecretGql,
@@ -199,7 +198,7 @@ export class Device {
     this.state.lockTime = config.vaultLockTimeoutSeconds
     this.state.syncTOTP = config.syncTOTP
     this.state.language = config.language
-    this.state.theme = config.theme
+    this.state.theme = config.theme ?? 'dark'
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {

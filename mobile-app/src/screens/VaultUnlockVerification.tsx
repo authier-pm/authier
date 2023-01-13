@@ -13,14 +13,19 @@ import {
   View,
   VStack
 } from 'native-base'
-import { generateEncryptionKey } from '@utils/generateEncryptionKey'
-import cryptoJS from 'crypto-js'
+import {
+  base64_to_buf,
+  cryptoKeyToString,
+  dec,
+  generateEncryptionKey
+} from '@utils/generateEncryptionKey'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceContext } from '../providers/DeviceProvider'
 import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import { DeviceState } from '@src/utils/DeviceState'
+import RNBootSplash from 'react-native-bootsplash'
 
 interface Values {
   password: string
@@ -35,6 +40,7 @@ export function VaultUnlockVerification() {
   const bgColor = useColorModeValue('white', 'black')
 
   useEffect(() => {
+    RNBootSplash.hide({ fade: true })
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
         const psw = await SInfo.getItem('psw', {
@@ -61,25 +67,29 @@ export function VaultUnlockVerification() {
   }
 
   const unlockVault = async (psw: string) => {
-    const masterEncryptionKey = generateEncryptionKey(
+    const masterEncryptionKey = await generateEncryptionKey(
       psw,
-      lockedState!.encryptionSalt
+      base64_to_buf(lockedState.encryptionSalt)
     )
 
-    const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-      lockedState.authSecretEncrypted,
+    const encryptedDataBuff = base64_to_buf(lockedState.authSecretEncrypted)
+    const iv = encryptedDataBuff.slice(16, 16 + 12)
+    const data = encryptedDataBuff.slice(16 + 12)
+
+    let decryptedContent = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
       masterEncryptionKey,
-      {
-        iv: cryptoJS.enc.Utf8.parse(lockedState.userId)
-      }
-    ).toString(cryptoJS.enc.Utf8)
+      data
+    )
+
+    let currentAddDeviceSecret = dec.decode(decryptedContent)
 
     if (currentAddDeviceSecret !== lockedState.authSecret) {
       throw new Error(`Incorrect password`)
     }
 
     device.state = new DeviceState({
-      masterEncryptionKey,
+      masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
     })
     device.state.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
