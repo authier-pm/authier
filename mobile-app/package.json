@@ -68,7 +68,6 @@
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.0",
     "react-native-code-push": "^7.0.5",
-    "react-native-codegen": "^0.71.3",
     "react-native-config": "1.4.6",
     "react-native-device-info": "^8.7.1",
     "react-native-gesture-handler": "2.7.0",
@@ -121,6 +120,7 @@
     "metro-react-native-babel-preset": "0.72.3",
     "prettier": "^2.7.1",
     "pretty-quick": "^3.1.3",
+    "react-native-codegen": "^0.71.3",
     "react-test-renderer": "18.2.0",
     "typescript": "^4.9.3"
   },
