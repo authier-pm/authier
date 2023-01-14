@@ -459,6 +459,7 @@ export class RootResolver {
           }
         }
       })
+      // @ts-expect-error
       returnedInputs.push(input)
     }
     return returnedInputs
