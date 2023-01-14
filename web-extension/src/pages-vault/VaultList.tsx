@@ -14,18 +14,18 @@ import {
   Spinner,
   VStack
 } from '@chakra-ui/react'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import React, { useContext, useEffect, useState } from 'react'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { DeviceStateContext } from '../providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link, useNavigate } from 'react-router-dom'
 import { DeleteAlert } from '../components/vault/DeleteAlert'
-import { SecretItemIcon } from '@src/components/SecretItemIcon'
-import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
-import { device, getDecryptedSecretProp } from '@src/background/ExtensionDevice'
-import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
-import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { VirtualizedList } from '@src/components/vault/VirtualizedList'
+import { SecretItemIcon } from '../components/SecretItemIcon'
+import { RefreshSecretsButton } from '../components/RefreshSecretsButton'
+import { device, getDecryptedSecretProp } from '../background/ExtensionDevice'
+import { VirtualizedList } from '../components/vault/VirtualizedList'
+import { useDeleteEncryptedSecretMutation } from 'src/components/vault/ItemList.codegen'
+import { useSyncSettingsQuery } from '../../../shared/graphql/Settings.codegen'
 
 export function VaultListItem({
   secret

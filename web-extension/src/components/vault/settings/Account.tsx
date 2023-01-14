@@ -12,7 +12,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field } from 'formik'
-import { device } from '@src/background/ExtensionDevice'
+
 import React, { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
@@ -23,9 +23,11 @@ import {
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { toast } from 'react-toastify'
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
-import { NbSp } from '@src/components/util/NbSp'
+
 import { Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
+import { device } from 'src/background/ExtensionDevice'
+import { NbSp } from 'src/components/util/NbSp'
 
 export default function Account() {
   const email = device.state?.email

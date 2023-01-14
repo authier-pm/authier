@@ -1,10 +1,10 @@
-import { ITOTPSecret, ILoginSecret } from '@src/util/useDeviceState'
+import { ITOTPSecret, ILoginSecret } from '../util/useDeviceState'
 
 import { BackgroundMessageType } from './BackgroundMessageType'
 
 import browser from 'webextension-polyfill'
 import debug from 'debug'
-import { apolloClient } from '@src/apollo/apolloClient'
+import { apolloClient } from '../apollo/apolloClient'
 import {
   AddWebInputsDocument,
   AddWebInputsMutationResult,

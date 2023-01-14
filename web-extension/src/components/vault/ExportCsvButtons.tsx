@@ -2,9 +2,9 @@ import { Button } from '@chakra-ui/react'
 import React, { useContext } from 'react'
 import papaparse from 'papaparse'
 
-import { downloadAsFile } from '@src/util/downloadAsFile'
+import { downloadAsFile } from '../../util/downloadAsFile'
 import { Trans } from '@lingui/macro'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { DeviceStateContext } from '../../providers/DeviceStateProvider'
 
 export const ExportTOTPToCsvButton = () => {
   const { TOTPSecrets } = useContext(DeviceStateContext)

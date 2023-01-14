@@ -1,5 +1,5 @@
-import { apolloClient } from '@src/apollo/apolloClient'
-import { IInitStateRes } from '@src/content-script/contentScript'
+import { apolloClient } from '../apollo/apolloClient'
+import { IInitStateRes } from '../content-script/contentScript'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { saveLoginModalsStates } from './chromeRuntimeListener'
 import {
@@ -10,12 +10,12 @@ import {
 import { device } from './ExtensionDevice'
 import mem from 'mem'
 import ms from 'ms'
-import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ISecret, ITOTPSecret } from '../util/useDeviceState'
 import {
   MeExtensionDocument,
   MeExtensionQuery,
   MeExtensionQueryVariables
-} from '@src/pages-vault/AccountLimits.codegen'
+} from '../pages-vault/AccountLimits.codegen'
 import debug from 'debug'
 const log = debug('au:getContentScriptInitialState')
 

@@ -8,7 +8,7 @@ faker.seed(1)
 
 export const log = debug('au:test')
 
-beforeAll(() => {})
+// beforeAll(() => {})
 
 const fakeMailjetPost = {
   request: vi.fn()

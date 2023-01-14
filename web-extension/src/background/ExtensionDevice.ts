@@ -3,7 +3,7 @@ import browser from 'webextension-polyfill'
 import bowser from 'bowser'
 import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'
-import { removeToken } from '@src/util/accessTokenExtension'
+import { removeToken } from '../util/accessTokenExtension'
 import {
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked,
@@ -14,7 +14,7 @@ import {
   EncryptedSecretType,
   SettingsInput
 } from '../../../shared/generated/graphqlBaseTypes'
-import { apolloClient } from '@src/apollo/apolloClient'
+import { apolloClient } from '../apollo/apolloClient'
 import {
   SyncEncryptedSecretsDocument,
   SyncEncryptedSecretsQuery,
@@ -28,16 +28,16 @@ import {
   LogoutMutation,
   LogoutMutationVariables,
   LogoutDocument
-} from '@shared/graphql/ExtensionDevice.codegen'
+} from '../../../shared/graphql/ExtensionDevice.codegen'
 
 import {
   ILoginSecret,
   ITOTPSecret,
   LoginCredentialsTypeWithMeta,
   TotpTypeWithMeta
-} from '@src/util/useDeviceState'
-import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+} from '../util/useDeviceState'
+import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
+import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
 import { toast } from 'react-toastify'
 
 export const log = debug('au:Device')
@@ -64,7 +64,7 @@ const isPopup = location.href.includes('popup.html')
 
 async function rerenderViewInThisRuntime() {
   if (isVault) {
-    const index = await import('@src/vault-index')
+    const index = await import('../vault-index')
     index.renderVault()
   } else if (isPopup) {
     const index = await import('..')

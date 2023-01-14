@@ -7,7 +7,7 @@ import {
   Button,
   useColorModeValue
 } from '@chakra-ui/react'
-import { device } from '@src/background/ExtensionDevice'
+import { device } from '../../background/ExtensionDevice'
 import { MD5 } from 'crypto-js'
 
 const page_url = process.env.PAGE_URL as string

@@ -11,8 +11,8 @@ import {
 import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
-import { NavMenu } from '@src/pages/NavMenu'
-import { UserNavMenu } from '@src/pages/UserNavMenu'
+import { NavMenu } from '../pages/NavMenu'
+import { UserNavMenu } from '../pages/UserNavMenu'
 import { IoMdArchive } from 'react-icons/io'
 import { t } from '@lingui/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'

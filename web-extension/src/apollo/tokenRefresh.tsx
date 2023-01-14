@@ -7,7 +7,7 @@ import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
 import browser from 'webextension-polyfill'
 import { API_URL } from './apolloClient'
-import { device } from '@src/background/ExtensionDevice'
+import { device } from '../background/ExtensionDevice'
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',

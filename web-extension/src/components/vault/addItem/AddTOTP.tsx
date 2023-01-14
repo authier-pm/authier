@@ -11,11 +11,11 @@ import {
 import React from 'react'
 
 import { Field, Formik, FormikHelpers } from 'formik'
-import { device } from '@src/background/ExtensionDevice'
-import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
+import { device } from '../../../background/ExtensionDevice'
+import { EncryptedSecretsType } from '../../../generated/graphqlBaseTypes'
 import { useNavigate } from 'react-router-dom'
-import { TotpTypeWithMeta } from '@src/util/useDeviceState'
-import { TOTPSchema } from '@shared/formikSharedTypes'
+import { TotpTypeWithMeta } from '../../../util/useDeviceState'
+import { TOTPSchema } from '../../../../../shared/formikSharedTypes'
 
 export const AddTOTP = () => {
   const navigate = useNavigate()

@@ -34,7 +34,7 @@ import {
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { NavLink as RouterLink } from 'react-router-dom'
-import { device } from '@src/background/ExtensionDevice'
+import { device } from '../../background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { ChevronDownIcon } from '@chakra-ui/icons'
 import { Trans } from '@lingui/macro'

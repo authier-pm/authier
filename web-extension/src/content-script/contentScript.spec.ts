@@ -1,7 +1,7 @@
 import { describe, it } from 'vitest'
 
 describe('contentScript', () => {
-  it.todo('should not do anything if user is not logged in')
+  it('should not do anything if user is not logged in')
   it.todo(
     'should only display existing unsaved credential save modal if they exist'
   )

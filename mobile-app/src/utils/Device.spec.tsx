@@ -4,6 +4,8 @@ import { expect, describe, it } from 'vitest'
 
 describe('device', () => {
   it('should be defined', () => {
+    console.log(describe)
+
     // TODO
     expect(1).toBeDefined()
   })

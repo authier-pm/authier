@@ -4,6 +4,13 @@ import gqlInfo from './fixtures/gqlInfo.json'
 import { describe, expect, it } from 'vitest'
 import { Kind } from 'graphql'
 
+describe('device2', () => {
+  it('should be defined', () => {
+    // TODO
+    expect(1).toBeDefined()
+  })
+})
+
 describe('getPrismaRelationsFromInfo', () => {
   it('should ignore fields where first letter is NOT capital', async () => {
     const res = getPrismaRelationsFromInfo({

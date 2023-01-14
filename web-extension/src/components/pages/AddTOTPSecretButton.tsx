@@ -1,6 +1,6 @@
 import { Button } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
-import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
+import { getCurrentTab } from '../../util/executeScriptInCurrentTab'
 import React, { useContext } from 'react'
 import { QRCode } from 'jsqr'
 
@@ -9,13 +9,13 @@ import browser, { Tabs } from 'webextension-polyfill'
 
 import { toast } from 'react-toastify'
 import queryString from 'query-string'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { DeviceStateContext } from '../../providers/DeviceStateProvider'
 
-import { device } from '@src/background/ExtensionDevice'
-import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
+import { device } from '../../background/ExtensionDevice'
+import { getQrCodeFromUrl } from '../../util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
-import { ITOTPSecret } from '@src/util/useDeviceState'
-import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
+import { ITOTPSecret } from '../../util/useDeviceState'
+import { useMeExtensionQuery } from '../../pages-vault/AccountLimits.codegen'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)

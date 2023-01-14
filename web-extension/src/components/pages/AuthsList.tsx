@@ -18,12 +18,12 @@ import { Tooltip } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import browser from 'webextension-polyfill'
 
-import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ISecret, ITOTPSecret } from '../../util/useDeviceState'
 
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { DeviceStateContext } from '../../providers/DeviceStateProvider'
 import debug from 'debug'
 import { SecretItemIcon } from '../SecretItemIcon'
-import { extractHostname } from '@src/util/extractHostname'
+import { extractHostname } from '../../util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 
 const log = debug('au:AuthsList')

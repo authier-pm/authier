@@ -1,11 +1,12 @@
 import { useContext } from 'react'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { DeviceStateContext } from '../../providers/DeviceStateProvider'
 import { Flex } from '@chakra-ui/react'
 import { AutoSizer, List } from 'react-virtualized'
-import { VaultListItem } from '@src/pages-vault/VaultList'
-import { useDebounce } from '@src/pages-vault/useDebounce'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
+import { VaultListItem } from '../../pages-vault/VaultList'
+import { useDebounce } from '../../pages-vault/useDebounce'
+
+import { getDecryptedSecretProp } from '../../background/ExtensionDevice'
+import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
