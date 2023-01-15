@@ -447,7 +447,7 @@ export class RootResolver {
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId,
-        domCoordinates: webInput.domCoordinates
+        domCoordinates: webInput.domCoordinates as any
       }
       const input = await ctx.prisma.webInput.upsert({
         create: forUpsert,
@@ -459,7 +459,7 @@ export class RootResolver {
           }
         }
       })
-      // @ts-expect-error
+      // @ts-ignore TODO figure out why this errors only on local, but not on CI
       returnedInputs.push(input)
     }
     return returnedInputs
