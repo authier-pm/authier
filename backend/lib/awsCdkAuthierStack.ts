@@ -15,7 +15,7 @@ export class AwsCdkAuthierStack extends Stack {
     const backendApi = new lambda.Function(this, 'backend-api', {
       memorySize: 512,
       timeout: cdk.Duration.seconds(40),
-      runtime: lambda.Runtime.NODEJS_16_X,
+      runtime: lambda.Runtime.NODEJS_18_X,
       architecture: Architecture.ARM_64,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../dist')),
@@ -44,19 +44,19 @@ export class AwsCdkAuthierStack extends Stack {
       )
     }
 
-    const functionErrors = backendApi.metricErrors({
-      period: cdk.Duration.minutes(1)
-    })
+    // const functionErrors = backendApi.metricErrors({
+    //   period: cdk.Duration.minutes(1)
+    // })
 
     // 👇 define an alarm for the metric
-    const errorsAlarm = new cdk.aws_cloudwatch.Alarm(this, 'ErrorsAlarm', {
-      metric: functionErrors,
-      threshold: 1,
-      evaluationPeriods: 1,
-      comparisonOperator:
-        cdk.aws_cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD
-    })
-    errorsAlarm.addAlarmAction(new cdk.aws_cloudwatch_actions.SnsAction(topic))
+    // const errorsAlarm = new cdk.aws_cloudwatch.Alarm(this, 'ErrorsAlarm', {
+    //   metric: functionErrors,
+    //   threshold: 1,
+    //   evaluationPeriods: 1,
+    //   comparisonOperator:
+    //     cdk.aws_cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD
+    // })
+    // errorsAlarm.addAlarmAction(new cdk.aws_cloudwatch_actions.SnsAction(topic))
 
     backendApi.addFunctionUrl({
       authType: lambda.FunctionUrlAuthType.NONE,
