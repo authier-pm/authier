@@ -18,7 +18,8 @@ export const makeAddNewDeviceInput = () => ({
   addDeviceSecret: faker.datatype.string(5),
   addDeviceSecretEncrypted: faker.datatype.string(5),
   decryptionChallengeId: faker.datatype.number(),
-  deviceRecoveryCooldownMinutes: faker.datatype.number()
+  deviceRecoveryCooldownMinutes: faker.datatype.number(),
+  encryptionSalt: faker.datatype.string(5)
 })
 
 export const makeRegisterAccountInput = () => ({

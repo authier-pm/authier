@@ -29,12 +29,17 @@ if (!isRunningInBgPage) {
 const safeClosed = false // Is safe Closed ?
 export let noHandsLogin = false
 
+interface Coord {
+  x: number
+  y: number
+}
 interface ICapturedInput {
   cssSelector: string
   domOrdinal: number
   type: 'input' | 'submit' | 'keydown'
   kind: WebInputType
   inputted: string | undefined
+  domCoordinates: Coord
 }
 
 interface ILoginCredentialsFromContentScript {
@@ -44,6 +49,7 @@ interface ILoginCredentialsFromContentScript {
   openInVault: boolean
 }
 
+//NOTE: temporery storage for not yet saved credentials. (during page rerender)
 export const saveLoginModalsStates = new Map<
   number,
   { password: string; username: string }
@@ -108,11 +114,12 @@ browser.runtime.onMessage.addListener(async function (
 
       loginCredentialsSchema.parse(encryptedData)
 
+      let encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
       const [secret] = await deviceState.addSecrets([
         {
           kind: EncryptedSecretType.LOGIN_CREDENTIALS,
           loginCredentials: encryptedData,
-          encrypted: deviceState.encrypt(JSON.stringify(encryptedData)),
+          encrypted,
           createdAt: new Date().toJSON()
         }
       ])
@@ -126,7 +133,8 @@ browser.runtime.onMessage.addListener(async function (
           domPath: captured.cssSelector,
           kind: captured.kind,
           url: inputsUrl,
-          domOrdinal: captured.domOrdinal
+          domOrdinal: captured.domOrdinal,
+          domCoordinates: captured.domCoordinates
         }
       })
 
@@ -156,7 +164,8 @@ browser.runtime.onMessage.addListener(async function (
           domPath: captured.cssSelector,
           kind: captured.kind,
           url: inputsUrl,
-          domOrdinal: captured.domOrdinal
+          domOrdinal: captured.domOrdinal,
+          domCoordinates: captured.domCoordinates
         }
       })
 
@@ -234,7 +243,6 @@ browser.runtime.onMessage.addListener(async function (
     case BackgroundMessageType.securitySettings:
       if (deviceState) {
         deviceState.lockTime = req.settings.vaultLockTimeoutSeconds
-        deviceState.theme = req.settings.theme
         deviceState.syncTOTP = req.settings.syncTOTP
         deviceState.language = req.settings.language
         deviceState.autofill = req.settings.autofill

@@ -1,4 +1,4 @@
-import React, { useContext, useState, useLayoutEffect } from 'react'
+import React, { useContext, useState, useLayoutEffect, useEffect } from 'react'
 
 import {
   Alert,
@@ -21,13 +21,14 @@ import { Formik, FormikHelpers } from 'formik'
 import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
 import { DeviceContext } from '@providers/DeviceProvider'
-import { ILoginSecret } from '@utils/Device'
+import { ILoginSecret, ITOTPSecret } from '@utils/Device'
 import {
   EncryptedSecretsDocument,
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
+import { Loading } from '@src/components/Loading'
 
 interface LoginParsedValues {
   url: string
@@ -99,7 +100,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             ({ id }) => id === secretProps.id
           )
           if (secret && device.state) {
-            secret.encrypted = device.state.encrypt(
+            secret.encrypted = await device.state.encrypt(
               JSON.stringify({
                 password: values.password,
                 username: values.username,
@@ -241,15 +242,19 @@ export default function EditPassword({
   route
 }: PasswordStackScreenProps<'EditPassword'>) {
   let device = useContext(DeviceContext)
+  const [secret, setSecret] = useState<
+    ITOTPSecret | ILoginSecret | undefined | null
+  >(null)
 
-  if (!device.state) {
-    return <Spinner />
-  }
-
-  console.log('route.params.secretId', route.params.loginSecret)
-  const secret = device.state.getSecretDecryptedById(
-    route.params.loginSecret.id
-  )
+  useEffect(() => {
+    async function loadSecret() {
+      const secret = await device.state?.getSecretDecryptedById(
+        route.params.loginSecret.id
+      )
+      setSecret(secret)
+    }
+    loadSecret()
+  }, [])
 
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
@@ -260,9 +265,16 @@ export default function EditPassword({
     }
   }, [navigation, secret])
 
-  if (!secret) {
-    return <Alert>Could not find this secret, it may be deleted</Alert>
+  //QUESTION: Why cant I use !device.state || !secret
+  if (!device.state) {
+    return <Spinner />
   }
+
+  if (!secret) {
+    return <Loading />
+  }
+
+  console.log('route.params.secretId', route.params.loginSecret, secret)
 
   return <LoginSecret {...(secret as ILoginSecret)} />
 }

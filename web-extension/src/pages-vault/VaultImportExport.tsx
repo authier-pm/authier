@@ -22,9 +22,9 @@ import {
   DeviceState
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import { toast } from 'react-toastify'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
+import { toast } from '@src/Providers'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 
@@ -86,7 +86,11 @@ export const onCSVFileAccepted: any = (
     papaparse.parse<string[]>(file, {
       complete: async (results) => {
         if (!results.data) {
-          toast.error('failed to parse')
+          toast({
+            title: 'failed to parse',
+            status: 'error',
+            isClosable: true
+          })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
 
@@ -100,7 +104,11 @@ export const onCSVFileAccepted: any = (
             (device.state?.decryptedSecrets.length as number) + added >=
             pswCount
           ) {
-            toast.error('You have reached your limit of secrets')
+            toast({
+              title: 'You have reached your limit of secrets',
+              status: 'error',
+              isClosable: true
+            })
             break
           }
 
@@ -116,13 +124,13 @@ export const onCSVFileAccepted: any = (
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
             url: creds.url,
-            encrypted: state?.encrypt(JSON.stringify(creds)),
+            encrypted: await state?.encrypt(JSON.stringify(creds)),
             createdAt: new Date().toJSON(),
             iconUrl: null,
             label: creds.label ?? `${creds.username}@${hostname}`
           }
 
-          if (state.findExistingSecret(input)) {
+          if (await state.findExistingSecret(input)) {
             skipped++
             continue
           }
@@ -167,7 +175,7 @@ export const onJsonFileAccepted = async (file: File) => {
       kind: EncryptedSecretType.TOTP,
       totp: totpWithMeta,
 
-      encrypted: state.encrypt(JSON.stringify(totpWithMeta)),
+      encrypted: await state.encrypt(JSON.stringify(totpWithMeta)),
       createdAt: new Date().toJSON()
     })
   }

@@ -17,7 +17,7 @@ import {
   Tooltip,
   Box
 } from '@chakra-ui/react'
-import React, { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
 import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
@@ -25,7 +25,7 @@ import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
-import { Field, Form, Formik, FormikHelpers } from 'formik'
+import { Field, Formik, FormikHelpers } from 'formik'
 import { Trans } from '@lingui/macro'
 import { motion } from 'framer-motion'
 import {
@@ -83,7 +83,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
             )
 
             if (secret && device.state) {
-              secret.encrypted = device.state.encrypt(
+              secret.encrypted = await device.state.encrypt(
                 JSON.stringify({
                   ...values,
                   iconUrl: '',
@@ -260,7 +260,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               ({ id }) => id === secretProps.id
             )
             if (secret && device.state) {
-              secret.encrypted = device.state.encrypt(
+              secret.encrypted = await device.state.encrypt(
                 JSON.stringify({
                   password: values.password,
                   username: values.username,
@@ -412,16 +412,29 @@ const LoginSecret = (secretProps: ILoginSecret) => {
 }
 
 export const VaultItemSettings = () => {
+  const [secret, setSecret] = useState<
+    ITOTPSecret | ILoginSecret | undefined | null
+  >(null)
   const params = useParams()
 
-  if (!device.state) {
-    return <Spinner></Spinner>
+  useEffect(() => {
+    async function loadSecret() {
+      const secret = await device.state?.getSecretDecryptedById(
+        params.secretId as string
+      )
+      setSecret(secret)
+    }
+    loadSecret()
+  }, [])
+
+  if (!device.state && !secret) {
+    return <Spinner />
   }
 
-  const secret = device.state.getSecretDecryptedById(params.secretId as string)
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }
+
   console.log('secret', secret)
   if (secret.kind === 'TOTP') {
     return <TOTPSecret {...secret} />

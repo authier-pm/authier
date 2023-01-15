@@ -16,7 +16,6 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { generateEncryptionKey } from '../../../../shared/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
@@ -30,6 +29,11 @@ import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceState } from '@src/utils/DeviceState'
+import {
+  buff_to_base64,
+  cryptoKeyToString,
+  generateEncryptionKey
+} from '@src/utils/generateEncryptionKey'
 
 interface Values {
   password: string
@@ -81,7 +85,8 @@ export function Register({ navigation }: NavigationProps) {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           const userId = uuid.v4()
-          const encryptionSalt = device.generateBackendSecret()
+          //WARNING: Solve permission of uniqueID in google play
+          const deviceId = getUniqueId()
           const deviceName = await getDeviceName()
 
           if (device.biometricsAvailable) {
@@ -94,45 +99,49 @@ export function Register({ navigation }: NavigationProps) {
             })
           }
 
-          const masterEncryptionKey = generateEncryptionKey(
+          const encryptionSalt = window.crypto.getRandomValues(
+            new Uint8Array(16)
+          )
+
+          const masterEncryptionKey = await generateEncryptionKey(
             values.password,
             encryptionSalt
           )
 
-          const params = device.initLocalDeviceAuthSecret(
+          const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
-            userId as string
+            encryptionSalt
           )
-          const deviceId = getUniqueId()
 
           const res = await register({
             variables: {
               userId: userId,
               input: {
                 deviceId: deviceId,
-                addDeviceSecret: params?.addDeviceSecret,
-                addDeviceSecretEncrypted: params?.addDeviceSecretEncrypted,
+                ...params,
                 deviceName: deviceName,
                 email: values.email,
-                encryptionSalt: encryptionSalt,
+                encryptionSalt: buff_to_base64(encryptionSalt),
                 firebaseToken: device.fireToken as string,
                 devicePlatform: Platform.OS
               }
             }
           })
+
           const registerResult = res.data?.registerNewUser
 
           //FIX: Maybe we should check if is the access token valid?
           if (registerResult?.accessToken) {
             await saveAccessToken(registerResult.accessToken)
+            const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
             const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey: masterEncryptionKey,
+              masterEncryptionKey: stringKey,
               userId: userId as string,
               secrets: [],
               email: values.email,
               deviceName: device.name,
-              encryptionSalt,
+              encryptionSalt: buff_to_base64(encryptionSalt),
               authSecret: params?.addDeviceSecret as string,
               authSecretEncrypted: params?.addDeviceSecretEncrypted as string,
               lockTime: 28800,

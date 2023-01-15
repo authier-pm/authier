@@ -1,12 +1,12 @@
-import React, { useState } from 'react'
-import { IconButton, Tooltip } from '@chakra-ui/react'
+import { useState } from 'react'
+import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
 import { device } from '@src/background/ExtensionDevice'
-import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
 
 export function RefreshSecretsButton() {
   const [isSyncing, setIsSyncing] = useState(false)
+  const toast = useToast()
 
   return (
     <Tooltip
@@ -21,11 +21,21 @@ export function RefreshSecretsButton() {
         disabled={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
-          const res = await device.state?.backendSync()
+          let res
+          try {
+            res = await device.state?.backendSync()
+          } catch (error) {
+            setIsSyncing(false)
+            return
+          }
+          toast({
+            title: t`Sync successful`,
+            description: `added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`,
+            status: 'success',
+            position: 'bottom',
+            isClosable: true
+          })
           setIsSyncing(false)
-          toast.success(
-            t`Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
-          )
         }}
       />
     </Tooltip>

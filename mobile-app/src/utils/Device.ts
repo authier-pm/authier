@@ -1,5 +1,4 @@
 import { apolloClient } from '../apollo/ApolloClient'
-import cryptoJS from 'crypto-js'
 import SInfo from 'react-native-sensitive-info'
 import {
   EncryptedSecretGql,
@@ -19,6 +18,7 @@ import { clearAccessToken } from './tokenFromAsyncStorage'
 import mitt from 'mitt'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { DeviceState } from './DeviceState'
+import { buff_to_base64, enc } from '@utils/generateEncryptionKey'
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
@@ -198,7 +198,7 @@ export class Device {
     this.state.lockTime = config.vaultLockTimeoutSeconds
     this.state.syncTOTP = config.syncTOTP
     this.state.language = config.language
-    this.state.theme = config.theme
+    this.state.theme = config.theme ?? 'dark'
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
@@ -226,34 +226,35 @@ export class Device {
     return secret
   }
 
-  initLocalDeviceAuthSecret(
-    masterEncryptionKey: string,
-    userId: string
-  ):
-    | {
-        addDeviceSecret: string
-        addDeviceSecretEncrypted: string
-      }
-    | undefined {
-    try {
-      const authSecret = this.generateBackendSecret()
+  async initLocalDeviceAuthSecret(
+    masterEncryptionKey: CryptoKey,
+    salt: Uint8Array
+  ): Promise<{
+    addDeviceSecret: string
+    addDeviceSecretEncrypted: string
+  }> {
+    const authSecret = this.generateBackendSecret()
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
 
-      const addDeviceSecret = cryptoJS.AES.encrypt(
-        authSecret,
-        masterEncryptionKey,
-        {
-          iv: cryptoJS.enc.Utf8.parse(userId)
-        }
-      ).toString()
+    const addDeviceSecretAb = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      masterEncryptionKey,
+      enc.encode(authSecret)
+    )
 
-      return {
-        addDeviceSecret: authSecret,
-        addDeviceSecretEncrypted: addDeviceSecret
-      }
-    } catch (e) {
-      //@ts-expect-error
-      console.error(e.stack)
-      throw e
+    const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
+    const buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    return {
+      addDeviceSecret: authSecret,
+      addDeviceSecretEncrypted: base64Buff
     }
   }
 

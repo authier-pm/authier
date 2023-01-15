@@ -1,6 +1,11 @@
-import { GraphQLNonNegativeInt } from 'graphql-scalars'
+import { GraphQLJSON, GraphQLNonNegativeInt } from 'graphql-scalars'
 import { Field, InputType } from 'type-graphql'
 import { WebInputTypeGQL } from './types/WebInputType'
+
+export interface ICoordinates {
+  x: number
+  y: number
+}
 
 @InputType()
 export class WebInputElement {
@@ -15,4 +20,6 @@ export class WebInputElement {
   url: string
   @Field(() => WebInputTypeGQL)
   kind: WebInputTypeGQL
+  @Field(() => GraphQLJSON)
+  domCoordinates: ICoordinates
 }
