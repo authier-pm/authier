@@ -164,7 +164,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
   )
 }
 
-export default function EditTOTP({
+export function EditTOTP({
   navigation,
   route
 }: TOTPStackScreenProps<'EditTOTP'>) {
