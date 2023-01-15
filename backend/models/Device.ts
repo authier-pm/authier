@@ -16,6 +16,7 @@ import { decorator as mem } from 'mem'
 import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
 import { UserQuery } from './UserQuery'
+import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 export async function getGeoIpLocation(ipAddress: string) {
   if (ipAddress === '127.0.0.1') {
@@ -78,10 +79,11 @@ export class DeviceQuery extends DeviceGQL {
     const userQuery = new UserQuery(userData)
     const pswLimit = await userQuery.PasswordLimits(ctx)
     const TOTPLimit = await userQuery.TOTPLimits(ctx)
+
     const pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
-        kind: 'LOGIN_CREDENTIALS',
+        kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
         deletedAt: null
       }
     })
@@ -89,7 +91,7 @@ export class DeviceQuery extends DeviceGQL {
     const TOTPCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
-        kind: 'TOTP',
+        kind: EncryptedSecretTypeGQL.TOTP,
         deletedAt: null
       }
     })

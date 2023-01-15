@@ -1,7 +1,7 @@
 // @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
-import { promptDiv } from '../renderSaveCredentialsForm'
+import { loginPrompt } from '../renderSaveCredentialsForm'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -60,8 +60,10 @@ export const PromptPassword = ({
       alert(
         'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
       )
-      console.warn("You've reached the maximum number of passwords allowed.")
-      return
+
+      return chrome.runtime.sendMessage({
+        action: BackgroundMessageType.hideLoginCredentialsModal
+      })
     }
 
     const loginCredentials = {
@@ -82,7 +84,7 @@ export const PromptPassword = ({
   }
 
   const removeCredential = async () => {
-    promptDiv?.remove()
+    loginPrompt?.remove()
     return chrome.runtime.sendMessage({
       action: BackgroundMessageType.hideLoginCredentialsModal
     })
@@ -134,7 +136,7 @@ export const PromptPassword = ({
           style={buttonStyle('#57c7e9')}
           onClick={async () => {
             await addCredential()
-            promptDiv?.remove()
+            loginPrompt?.remove()
           }}
         >
           save
@@ -143,7 +145,7 @@ export const PromptPassword = ({
           style={buttonStyle('#1EAE9B')}
           onClick={async () => {
             await addCredential(true)
-            promptDiv?.remove()
+            loginPrompt?.remove()
           }}
         >
           save & edit

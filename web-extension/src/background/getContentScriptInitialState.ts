@@ -27,7 +27,8 @@ export const getContentScriptInitialState = async (
   const hostname = new URL(tabUrl).hostname
 
   const decrypted =
-    device.state?.getSecretsDecryptedByHostname(hostname) ?? ([] as ISecret[])
+    (await device.state?.getSecretsDecryptedByHostname(hostname)) ??
+    ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
   const userInfo = await getAccountLimits()

@@ -7,7 +7,7 @@ import { h, render } from 'preact'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
-export let promptDiv: HTMLDivElement | null
+export let loginPrompt: HTMLDivElement | null
 
 export async function renderSaveCredentialsForm(
   username: string,
@@ -19,7 +19,7 @@ export async function renderSaveCredentialsForm(
     action: BackgroundMessageType.getCapturedInputEvents
   })
 
-  promptDiv = document.createElement('div')
+  loginPrompt = document.createElement('div')
   render(
     <PromptPassword
       username={username}
@@ -28,10 +28,10 @@ export async function renderSaveCredentialsForm(
       passwordLimit={passwordLimit}
       passwordCount={passwordCount}
     />,
-    promptDiv
+    loginPrompt
   )
 
-  document.body.appendChild(promptDiv)
+  document.body.appendChild(loginPrompt)
 
   browser.runtime.sendMessage({
     action: BackgroundMessageType.saveLoginCredentialsModalShown,

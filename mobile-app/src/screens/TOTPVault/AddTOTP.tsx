@@ -2,7 +2,7 @@ import React, { useContext } from 'react'
 
 import { Formik, FormikHelpers } from 'formik'
 import { Button, Flex, FormControl, Input, ScrollView } from 'native-base'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
@@ -58,7 +58,7 @@ export const AddTOTP = () => {
             {
               kind: EncryptedSecretType.TOTP,
               totp: values,
-              encrypted: device.state.encrypt(JSON.stringify(values)),
+              encrypted: await device.state.encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
             }
           ])

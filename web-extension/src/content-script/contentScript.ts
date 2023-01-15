@@ -17,27 +17,24 @@ import { bodyInputChangeEmitter } from './domMutationObserver'
 import {
   autofill,
   autofillEventsDispatched,
+  getElementCoordinates,
   IDecryptedSecrets
 } from './autofill'
-import {
-  promptDiv,
-  renderSaveCredentialsForm
-} from './renderSaveCredentialsForm'
 import { authenticator } from 'otplib'
-import { renderLoginCredOption } from './renderLoginCredOption'
-import { recordDiv, renderToast } from './renderToast'
-import { renderItemPopup } from './renderItemPopup'
+import { recordInputs, renderer, showSavePromptIfAppropriate } from './renderer'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
-
-log('STARTING')
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
   username: WebInputType.USERNAME
 }
 
+export interface Coords {
+  x: number
+  y: number
+}
 export interface IInitStateRes {
   extensionDeviceReady: boolean
   autofillEnabled: boolean
@@ -52,14 +49,15 @@ export interface IInitStateRes {
     domPath: string
     kind: WebInputType
     createdAt: string
+    domCoordinates: Coords
   }>
   saveLoginModalsState?:
-  | {
-    password: string
-    username: string
-  }
-  | null
-  | undefined
+    | {
+        password: string
+        username: string
+      }
+    | null
+    | undefined
 }
 
 // TODO spec
@@ -73,80 +71,6 @@ export function getWebInputKind(
   )
 }
 
-let clickCount = 0
-let recording = false
-
-const hideToast = () => {
-  const x = document.getElementById('toast')
-
-  setTimeout(function() {
-    x?.remove()
-  }, 5000)
-}
-
-function onKeyDown(e?: KeyboardEvent) {
-  if (
-    e &&
-    e.shiftKey &&
-    e.ctrlKey &&
-    (e.key === 'q' || e.key === 'Q') &&
-    !recording
-  ) {
-    recording = true
-    renderToast({
-      header: 'Recording started',
-      text: 'Press Ctrl + shift + Q to stop'
-    })
-
-    document.addEventListener('click', clicked)
-  } else if (
-    e &&
-    e.shiftKey &&
-    e.ctrlKey &&
-    (e.key === 'q' || e.key === 'Q') &&
-    recording
-  ) {
-    domRecorder.clearCapturedEvents()
-    document.removeEventListener('click', clicked)
-    recordDiv?.remove()
-    clickCount = 0
-    recording = false
-    hideToast()
-  }
-}
-
-function clicked(e: MouseEvent) {
-  console.log(e)
-
-  //@ts-expect-error TODO
-  if (e.target.type === 'password' || e.target.type === 'text') {
-    domRecorder.addInputEvent({
-      element: e.target as HTMLInputElement,
-      eventType: 'input',
-      kind: getWebInputKind(e.target as HTMLInputElement)
-    })
-
-    clickCount = clickCount + 1
-  }
-
-  if (clickCount === 2) {
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: {
-        inputEvents: domRecorder.toJSON(),
-        url: document.documentURI
-      }
-    })
-
-    recordDiv?.remove()
-    recording = false
-    clickCount = 0
-    document.removeEventListener('click', clicked)
-
-    //TODO: We can use inputs on page???
-    renderItemPopup()
-  }
-}
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
@@ -159,7 +83,8 @@ export async function initInputWatch() {
   log('~ stateInitRes', stateInitRes)
 
   if (stateInitRes) {
-    document.addEventListener('keydown', onKeyDown, true)
+    log('Press key')
+    document.addEventListener('keydown', recordInputs, true)
   }
 
   if (!stateInitRes) {
@@ -168,87 +93,21 @@ export async function initInputWatch() {
   }
 
   const {
-    saveLoginModalsState,
     extensionDeviceReady,
     secretsForHost,
     autofillEnabled,
-    webInputs,
     passwordLimit,
     passwordCount
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
     log('no need to do anything-user locked out')
-    return // no need to do anything-user locked out
-  }
-
-  if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
-    renderLoginCredOption({
-      loginCredentials: secretsForHost.loginCredentials,
-      webInputs
-    })
     return
   }
 
+  renderer(stateInitRes)
+
   const stopAutofillListener = autofill(stateInitRes)
-
-  // Render save credential modal after page-rerender
-  if (
-    saveLoginModalsState &&
-    saveLoginModalsState.username &&
-    saveLoginModalsState.password
-  ) {
-    log('rendering save credentials form')
-    renderSaveCredentialsForm(
-      saveLoginModalsState.username,
-      saveLoginModalsState.password,
-      passwordLimit,
-      passwordCount
-    )
-    return // the modal is already displayed
-  }
-
-  const showSavePromptIfAppropriate = async () => {
-    log('showSavePromptIfAppropriate', domRecorder.toJSON())
-    if (promptDiv) {
-      return
-    }
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: {
-        inputEvents: domRecorder.toJSON(),
-        url: document.documentURI
-      }
-    })
-    const username = domRecorder.getUsername()
-    const password = domRecorder.getPassword()
-
-    const existingCredentialWithSamePassword =
-      secretsForHost?.loginCredentials.find(
-        ({ loginCredentials }) => loginCredentials.password === password
-      )
-
-    if (password && !existingCredentialWithSamePassword) {
-      if (username) {
-        renderSaveCredentialsForm(
-          username,
-          password,
-          passwordLimit,
-          passwordCount
-        )
-      } else {
-        const fallbackUsernames: string[] = await browser.runtime.sendMessage({
-          action: BackgroundMessageType.getFallbackUsernames
-        })
-        renderSaveCredentialsForm(
-          fallbackUsernames[0],
-          password,
-          passwordLimit,
-          passwordCount
-        )
-      }
-    }
-  }
 
   const onSubmit = (element: HTMLInputElement | HTMLFormElement) => {
     domRecorder.addInputEvent({
@@ -257,7 +116,7 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
-    showSavePromptIfAppropriate()
+    showSavePromptIfAppropriate(secretsForHost, passwordLimit, passwordCount)
   }
 
   const onInputRemoved = (input) => {
@@ -281,7 +140,7 @@ export async function initInputWatch() {
    * responsible for saving new web inputs
    */
   const debouncedInputEventListener = debounce((ev) => {
-    log('Catched action', ev)
+    log('Catched action', ev, ev.type)
     if (autofillEventsDispatched.has(ev)) {
       // this was dispatched by autofill, we don't need to do anything here
       autofillEventsDispatched.delete(ev)
@@ -319,7 +178,8 @@ export async function initInputWatch() {
                 domPath: elementSelector.css,
                 domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
-                url: location.href
+                url: location.href,
+                domCoordinates: getElementCoordinates(targetElement)
               }
               await browser.runtime.sendMessage({
                 action: BackgroundMessageType.addTOTPInput,
@@ -362,7 +222,11 @@ export async function initInputWatch() {
                   eventType: 'keydown',
                   kind: null
                 })
-                showSavePromptIfAppropriate()
+                showSavePromptIfAppropriate(
+                  secretsForHost,
+                  passwordLimit,
+                  passwordCount
+                )
               }
             },
             { once: true }
@@ -371,7 +235,12 @@ export async function initInputWatch() {
           // some login flows don't have any forms, in that case we are listening for click, keydown
           targetElement.ownerDocument.body.addEventListener(
             'click',
-            showSavePromptIfAppropriate,
+            () =>
+              showSavePromptIfAppropriate(
+                secretsForHost,
+                passwordLimit,
+                passwordCount
+              ),
             {
               once: true
             }

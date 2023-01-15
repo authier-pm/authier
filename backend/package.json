@@ -52,7 +52,7 @@
   },
   "devDependencies": {
     "@anatine/esbuild-decorators": "^0.2.19",
-    "@capaj/prisma-typegraphql-types-generator": "^1.6.3",
+    "@capaj/prisma-typegraphql-types-generator": "^1.6.4",
     "@swc/core": "^1.3.26",
     "@types/bcrypt": "^5.0.0",
     "@types/graphql-list-fields": "^2.0.3",

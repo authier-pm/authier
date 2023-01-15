@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   Flex,
   Input,
@@ -15,11 +15,15 @@ import {
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
-import { toast } from 'react-toastify'
 import { t, Trans } from '@lingui/macro'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
-import cryptoJS from 'crypto-js'
+import {
+  base64_to_buf,
+  cryptoKeyToString,
+  dec,
+  generateEncryptionKey
+} from '@shared/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { toast } from '@src/Providers'
 
 interface Values {
   password: string
@@ -48,25 +52,31 @@ export function VaultUnlockVerification() {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            const masterEncryptionKey = generateEncryptionKey(
+            const masterEncryptionKey = await generateEncryptionKey(
               values.password,
-              lockedState.encryptionSalt
+              base64_to_buf(lockedState.encryptionSalt)
             )
 
-            const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-              lockedState.authSecretEncrypted,
+            const encryptedDataBuff = base64_to_buf(
+              lockedState.authSecretEncrypted
+            )
+            const iv = encryptedDataBuff.slice(16, 16 + 12)
+            const data = encryptedDataBuff.slice(16 + 12)
+
+            let decryptedContent = await window.crypto.subtle.decrypt(
+              { name: 'AES-GCM', iv },
               masterEncryptionKey,
-              {
-                iv: cryptoJS.enc.Utf8.parse(lockedState.userId)
-              }
-            ).toString(cryptoJS.enc.Utf8)
+              data
+            )
+
+            let currentAddDeviceSecret = dec.decode(decryptedContent)
 
             if (currentAddDeviceSecret !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
             }
 
             setDeviceState({
-              masterEncryptionKey,
+              masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
               ...lockedState
             })
 
@@ -77,7 +87,11 @@ export function VaultUnlockVerification() {
           } catch (err: any) {
             console.log(err)
 
-            toast.error(err.message)
+            toast({
+              title: err.message,
+              status: 'error',
+              isClosable: true
+            })
           }
         }}
       >

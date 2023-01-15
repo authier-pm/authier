@@ -143,9 +143,7 @@ export const VaultList = () => {
   const navigate = useNavigate()
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
-  const { data, loading } = useSyncSettingsQuery({
-    fetchPolicy: 'cache-and-network'
-  })
+  const { data, loading, error } = useSyncSettingsQuery()
   const { colorMode, toggleColorMode } = useColorMode()
 
   // Here is bug wut theme change, this is not ideal
@@ -159,7 +157,6 @@ export const VaultList = () => {
         autofill: data.me?.autofill as boolean,
         language: data.me?.language as string,
         syncTOTP: data.currentDevice.syncTOTP as boolean,
-        theme: data.me?.theme as string,
         vaultLockTimeoutSeconds: data.currentDevice
           .vaultLockTimeoutSeconds as number
       })
@@ -169,14 +166,20 @@ export const VaultList = () => {
   if (loading && !data) {
     return <Spinner />
   }
-  const totpCond =
-    data!.me.TOTPlimit <=
-    device!.state!.decryptedSecrets.filter((x) => x.kind === 'TOTP').length
-  const pswCond =
-    data!.me.PasswordLimits <=
-    device!.state!.decryptedSecrets.filter(
-      (x) => x.kind === 'LOGIN_CREDENTIALS'
-    ).length
+
+  console.log(data?.me.TOTPlimit, device.state)
+  //TODO: resolve this bullshit
+  // const totpCond =
+  //   data?.me?.TOTPlimit ??
+  //   0 <=
+  //     device?.state?.decryptedSecrets.filter((x) => x.kind === 'TOTP').length ??
+  //   0
+  // const pswCond =
+  //   data.me.PasswordLimits ??
+  //   0 <=
+  //     device.state.decryptedSecrets.filter(
+  //       (x) => x.kind === 'LOGIN_CREDENTIALS'
+  //     ).length
 
   return (
     <VStack flexDirection="column" h={'90vh'}>
@@ -200,7 +203,7 @@ export const VaultList = () => {
           <RefreshSecretsButton />
         </Center>
 
-        {totpCond && pswCond ? (
+        {error ? (
           <Tooltip
             shouldWrapChildren
             label="You have reached your limit"

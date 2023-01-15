@@ -7,8 +7,6 @@ import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from '@shared/graphql/Login.codegen'
-import { toast } from 'react-toastify'
-import cryptoJS from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
@@ -17,15 +15,24 @@ import {
   Center,
   Flex,
   Heading,
-  Icon,
   Spinner,
   useInterval
 } from '@chakra-ui/react'
 import { formatRelative } from 'date-fns'
 import { WarningIcon } from '@chakra-ui/icons'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import debug from 'debug'
+import {
+  base64_to_buf,
+  buff_to_base64,
+  cryptoKeyToString,
+  dec,
+  enc,
+  generateEncryptionKey
+} from '@shared/generateEncryptionKey'
+import { toast } from '@src/Providers'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
+export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formState, setFormState } = useContext(LoginContext)
@@ -47,10 +54,8 @@ export const useLogin = (props: { deviceName: string }) => {
     }
   })
 
-  //FIX: Should be handled by the error link
   useEffect(() => {
     if (error || decrChallError) {
-      toast.error('failed to create decryption challenge')
       setFormState(null)
     }
   }, [error, decrChallError])
@@ -75,44 +80,76 @@ export const useLogin = (props: { deviceName: string }) => {
         const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
-          toast.error(t`Login failed, check your email or password`)
+          toast({
+            title: t`Login failed, check your email or password`,
+            status: 'error',
+            isClosable: true
+          })
           return
         }
 
         if (!deviceDecryptionChallenge?.id) {
-          toast.error('Failed to create decryption challenge')
+          toast({
+            title: 'Failed to create decryption challenge',
+            status: 'error',
+            isClosable: true
+          })
           return
         }
 
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
-        const masterEncryptionKey = generateEncryptionKey(
+
+        const masterEncryptionKey = await generateEncryptionKey(
           formState.password,
-          encryptionSalt
+          base64_to_buf(encryptionSalt)
         )
 
-        const currentAddDeviceSecret = cryptoJS.AES.decrypt(
-          addDeviceSecretEncrypted,
-          masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString(cryptoJS.enc.Utf8)
-        console.log('~ currentAddDeviceSecret', currentAddDeviceSecret)
+        let currentAddDeviceSecret
+        try {
+          const encryptedDataBuff = base64_to_buf(addDeviceSecretEncrypted)
+          const iv = encryptedDataBuff.slice(16, 16 + 12)
+          const data = encryptedDataBuff.slice(16 + 12)
+
+          const decryptedContent = await window.crypto.subtle.decrypt(
+            { name: 'AES-GCM', iv },
+            masterEncryptionKey,
+            data
+          )
+          currentAddDeviceSecret = dec.decode(decryptedContent)
+        } catch (error) {
+          console.error(error)
+        }
+
+        log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
-          toast.error(t`Login failed, check your email or password`)
+          toast({
+            title: t`Login failed, check your email or password`,
+            status: 'error',
+            isClosable: true
+          })
           setFormState(null)
           return
         }
 
         const newAuthSecret = device.generateBackendSecret()
-        const newAuthSecretEncrypted = cryptoJS.AES.encrypt(
-          newAuthSecret,
+        const iv = window.crypto.getRandomValues(new Uint8Array(12))
+        const salt = window.crypto.getRandomValues(new Uint8Array(16))
+
+        const newAuthSecretEncryptedAb = await window.crypto.subtle.encrypt(
+          { name: 'AES-GCM', iv },
           masterEncryptionKey,
-          {
-            iv: cryptoJS.enc.Utf8.parse(userId)
-          }
-        ).toString()
+          enc.encode(newAuthSecret)
+        )
+
+        const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
+        let buff = new Uint8Array(
+          salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+        )
+        buff.set(salt, 0)
+        buff.set(iv, salt.byteLength)
+        buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+        const newAuthSecretEncryptedBase64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -122,14 +159,14 @@ export const useLogin = (props: { deviceName: string }) => {
               name: props.deviceName,
               platform: device.platform
             },
-
             input: {
               addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncrypted,
+              addDeviceSecretEncrypted: newAuthSecretEncryptedBase64Buff,
               firebaseToken: fireToken,
-              devicePlatform: device.platform
+              devicePlatform: device.platform,
+              encryptionSalt: buff_to_base64(salt)
             },
-            currentAddDeviceSecret
+            currentAddDeviceSecret: currentAddDeviceSecret
           }
         })
 
@@ -152,14 +189,14 @@ export const useLogin = (props: { deviceName: string }) => {
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
           const deviceState: IBackgroundStateSerializable = {
-            masterEncryptionKey,
+            masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
-            encryptionSalt,
+            encryptionSalt: buff_to_base64(salt),
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncrypted,
+            authSecretEncrypted: newAuthSecretEncryptedBase64Buff,
             lockTime: 28800,
             autofill: true,
             language: 'en',
@@ -170,14 +207,20 @@ export const useLogin = (props: { deviceName: string }) => {
           setUserId(decodedToken.userId)
           device.save(deviceState)
 
-          toast.success(
-            t`Device approved at ${formatRelative(
+          toast({
+            title: t`Device approved at ${formatRelative(
               new Date(),
               new Date(deviceDecryptionChallenge.approvedAt as string)
-            )}`
-          )
+            )}`,
+            status: 'success',
+            isClosable: true
+          })
         } else {
-          toast.error(t`Login failed, check your username and password`)
+          toast({
+            title: t`Login failed, check your username or password`,
+            status: 'error',
+            isClosable: true
+          })
         }
       })()
     } else if (!deviceDecryptionChallenge) {

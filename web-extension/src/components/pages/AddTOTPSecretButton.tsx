@@ -1,13 +1,12 @@
 import { Button } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { QRCode } from 'jsqr'
 
 import { v4 as uuidv4 } from 'uuid'
 import browser, { Tabs } from 'webextension-polyfill'
 
-import { toast } from 'react-toastify'
 import queryString from 'query-string'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
@@ -16,6 +15,7 @@ import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 import { ITOTPSecret } from '@src/util/useDeviceState'
 import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
+import { toast } from '@src/Providers'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
@@ -32,9 +32,11 @@ export const AddTOTPSecretButton = () => {
     console.log('TOTPCount', TOTPCount, 'TOTPLimit', TOTPLimit)
 
     if (TOTPCount >= TOTPLimit) {
-      toast.error(
-        t`You have reached your password limit. Please upgrade your account to add more passwords.`
-      )
+      toast({
+        title: t`You have reached your password limit. Please upgrade your account to add more passwords.`,
+        status: 'error',
+        isClosable: true
+      })
       console.log(
         'You have reached your password limit. Please upgrade your account to add more passwords.'
       )
@@ -45,15 +47,23 @@ export const AddTOTPSecretButton = () => {
       return
     }
 
-    const newTotpSecret = getTokenSecretFromQrCode(qr, tab)
+    const newTotpSecret = await getTokenSecretFromQrCode(qr, tab)
     const existingTotpSecret = TOTPSecrets.find(
       ({ totp }) => newTotpSecret.totp.secret === totp.secret
     )
     if (existingTotpSecret) {
-      toast.success(t`This TOTP secret is already in your vault`)
+      toast({
+        title: t`This TOTP secret is already in your vault`,
+        status: 'success',
+        isClosable: true
+      })
     } else {
       await device.state?.addSecrets([newTotpSecret])
-      toast.success(t`Successfully added TOTP for ${newTotpSecret.totp.label}`)
+      toast({
+        title: t`Successfully added TOTP for ${newTotpSecret.totp.label}`,
+        status: 'success',
+        isClosable: true
+      })
     }
   }
 
@@ -66,9 +76,11 @@ export const AddTOTPSecretButton = () => {
         if (qr) {
           addToTOTPs(qr)
         } else {
-          toast.error(
-            t`could not find any QR code on this page. Make sure QR code is visible.`
-          )
+          toast({
+            title: t`could not find any QR code on this page. Make sure QR code is visible.`,
+            status: 'error',
+            isClosable: true
+          })
         }
       }}
     >
@@ -77,16 +89,19 @@ export const AddTOTPSecretButton = () => {
   )
 }
 
-export function getTokenSecretFromQrCode(
+export async function getTokenSecretFromQrCode(
   qr: QRCode,
   tab: Tabs.Tab
-): ITOTPSecret {
+): Promise<ITOTPSecret> {
   const parsedQuery = queryString.parseUrl(qr.data)
   const secret = parsedQuery.query.secret as string
   if (!secret) {
     console.error('QR code does not have any secret', qr.data)
     throw new Error('QR code does not have any secret')
   }
+
+  let encrypted = await device.state!.encrypt(secret)
+
   return {
     id: uuidv4(),
     kind: EncryptedSecretType.TOTP,
@@ -102,6 +117,6 @@ export function getTokenSecretFromQrCode(
       url: tab.url as string
     },
     createdAt: new Date().toJSON(),
-    encrypted: device.state!.encrypt(secret)
+    encrypted
   }
 }

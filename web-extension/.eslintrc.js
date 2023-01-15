@@ -16,7 +16,14 @@ module.exports = {
   rules: {
     // Place to specify ESLint rules. Can be used to overwrite rules specified from the extended configs
     // e.g. "@typescript-eslint/explicit-function-return-type": "off",
-    'react/react-in-jsx-scope': 'off',
-    'react/prop-types': 'off'
+    '@typescript-eslint/ban-ts-comment': 'off',
+    '@typescript-eslint/no-empty-function': 'off',
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off'
+  },
+  settings: {
+    react: {
+      version: 'detect' // Tells eslint-plugin-react to automatically detect the version of React to use
+    }
   }
 }
