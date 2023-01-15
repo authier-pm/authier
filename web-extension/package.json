@@ -5,6 +5,7 @@
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "prodbuild": "webpack --config webpack.prod.js",
+    "devBuild": "webpack --config webpack.dev.js",
     "checkBuildOutput": "node ./check-es6.js",
     "dev": "webpack -w --config webpack.dev.js",
     "tsc": "tsc",
