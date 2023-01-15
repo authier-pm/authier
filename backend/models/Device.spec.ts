@@ -6,6 +6,7 @@ import { User } from '.prisma/client'
 import faker from 'faker'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeviceMutation, DeviceQuery } from './Device'
+import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 describe('Device', () => {
   let user: User
@@ -280,7 +281,7 @@ describe('Device', () => {
       for (let i = 0; i < user.loginCredentialsLimit; i++) {
         testData.push({
           encrypted: faker.datatype.string(25),
-          kind: 'LOGIN_CREDENTIALS',
+          kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
           userId: userId,
           version: 1
         })
@@ -313,12 +314,15 @@ describe('Device', () => {
         data: testData
       })
 
+      const totps = testData.filter(
+        (secret: { kind: string }) =>
+          secret.kind === EncryptedSecretTypeGQL.TOTP
+      ).length
+
       await expect(
         async () => await deviceQuery.encryptedSecretsToSync(fakeCtx)
       ).rejects.toThrow(
-        `TOTP limit exceeded, remove ${
-          testData.length - user.TOTPlimit
-        } TOTP secrets`
+        `TOTP limit exceeded, remove ${totps - user.TOTPlimit} TOTP secrets`
       )
     })
   })

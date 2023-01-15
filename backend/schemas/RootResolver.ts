@@ -171,7 +171,7 @@ export class RootResolver {
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60, // 16 hours should be plenty enough
-          loginCredentialsLimit: 40,
+          loginCredentialsLimit: 40, // default limit
           TOTPlimit: 3,
           Devices: {
             create: {
