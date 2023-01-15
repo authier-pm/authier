@@ -98,9 +98,7 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: ./web-extension
-        run: |
-        pnpm devBuild &
-        xvfb-run --auto-servernum -- pnpm playwright:run
+        run: xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
         if: always()
