@@ -88,6 +88,7 @@
     "react-native-vision-camera": "^2.15.2",
     "react-native-webview": "^11.26.0",
     "react-native-webview-crypto": "^0.0.25",
+    "react-query": "^3.39.2",
     "styled-system": "^5.1.5",
     "text-decoding": "^1.0.0",
     "vision-camera-code-scanner": "^0.2.0",
