@@ -19,6 +19,7 @@ import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecre
 import { TOTPStackScreenProps } from '../../navigation/types'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
+import { useQuery } from 'react-query'
 
 const InputField = ({
   errors,
@@ -66,7 +67,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
           const secret = device.state?.secrets.find(({ id }) => id === data.id)
 
           if (secret && device.state) {
-            secret.encrypted = device.state.encrypt(
+            secret.encrypted = await device.state.encrypt(
               JSON.stringify({
                 ...values,
                 iconUrl: '',
@@ -169,13 +170,11 @@ export default function EditTOTP({
 }: TOTPStackScreenProps<'EditTOTP'>) {
   let device = useContext(DeviceContext)
 
-  if (!device.state) {
-    return <Spinner />
-  }
+  const { isLoading, data } = useQuery('repoData', () => {
+    return device.state?.getSecretDecryptedById(route.params.item.id)
+  })
+  const secret = data
 
-  const secret = device.state.getSecretDecryptedById(route.params.item.id)
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
     if (secret) {
       navigation.setOptions({
@@ -183,6 +182,12 @@ export default function EditTOTP({
       })
     }
   }, [navigation, secret])
+
+  if (isLoading) return 'Loading...'
+
+  if (!device.state || isLoading) {
+    return <Spinner />
+  }
 
   if (!secret) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
