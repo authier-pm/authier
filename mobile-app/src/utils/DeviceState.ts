@@ -132,8 +132,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       'deviceState',
       JSON.stringify({ backgroundState: this, lockedState: null }),
       {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
+        sharedPreferencesName: 'authierShared',
+        keychainService: 'authierKCH'
       }
     )
   }
@@ -264,10 +264,7 @@ export class DeviceState implements IBackgroundStateSerializable {
             return secretsBeforeSync.find(({ id }) => removedId === id)
           }
         )
-        console.log(
-          '~ actuallyRemovedOnThisDevice',
-          actuallyRemovedOnThisDevice
-        )
+
         return {
           removedSecrets: actuallyRemovedOnThisDevice.length,
           newAndUpdatedSecrets: newAndUpdatedSecrets.length
