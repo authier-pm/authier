@@ -4,7 +4,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import { TOTPVault } from '../screens/TOTPVault/TOTPVault'
 import { AddTOTP } from '../screens/TOTPVault/AddTOTP'
-import EditTOTP from '../screens/TOTPVault/EditTOTP'
+import { EditTOTP } from '../screens/TOTPVault/EditTOTP'
 import { TOTPStackParamList } from './types'
 import { t } from '@lingui/macro'
 import { QRScan } from '@src/screens/TOTPVault/QRScan'
@@ -27,6 +27,7 @@ function TOTPStackNavigation() {
       <Stack.Screen
         name="EditTOTP"
         options={{ title: t`Edit TOTP` }}
+        // @ts-expect-error TODO fix types of EditTOTP
         component={EditTOTP}
       />
 

@@ -78,7 +78,9 @@ export const QRScan = () => {
             {
               kind: EncryptedSecretType.TOTP,
               totp: unencryptedData,
-              encrypted: device.state.encrypt(JSON.stringify(unencryptedData)),
+              encrypted: await device.state.encrypt(
+                JSON.stringify(unencryptedData)
+              ),
               createdAt: new Date().toJSON()
             }
           ])

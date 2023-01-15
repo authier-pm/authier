@@ -109,12 +109,17 @@ export class DOMEventsRecorder {
         ) {
           kind = WebInputType.USERNAME_OR_EMAIL
         }
+        const rect = element.getBoundingClientRect()
         return {
           cssSelector: getSelectorForElement(element).css,
           domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
           kind,
-          inputted
+          inputted,
+          domCoordinates: {
+            x: rect.x,
+            y: rect.y
+          }
         }
       }
     )

@@ -1,9 +1,8 @@
 import { onError } from '@apollo/client/link/error'
-import { toast } from 'react-toastify'
 import { print } from 'graphql'
 //@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
-import 'react-toastify/dist/ReactToastify.css'
+import { toast } from '../web-extension/src/Providers'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
@@ -20,11 +19,19 @@ export const errorLink = onError(
         console.error('full operation: ', print(operation.query))
       })
 
-      //FIX: Does the toast even work from here?
-      toast.error(graphQLErrors[0].message ?? 'There was API error.')
+      toast({
+        title: graphQLErrors[0].message ?? 'There was API error.',
+        status: 'warning',
+        isClosable: true
+      })
     } else if (networkError) {
+      console.log('pepe')
       console.error(`[Network error]: ${networkError}`)
-      toast.error('There was network error.')
+      toast({
+        title: 'There was network error.',
+        status: 'error',
+        isClosable: true
+      })
     }
   }
 )

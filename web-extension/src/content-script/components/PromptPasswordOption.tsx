@@ -11,17 +11,25 @@ import {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Option.css'
+import debug from 'debug'
+const log = debug('au:PromptPasswordOption')
 import { autofill } from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   let { loginCredentials, webInputs } = props
+  log('GOT in option prompt', { webInputs, loginCredentials })
   if (webInputs.length === 0) {
-    console.log('No web inputs in PromptPasswordOption')
+    log('No web inputs in PromptPasswordOption')
     return null
   }
-  console.log('GOT in option prompt', { webInputs, loginCredentials })
 
-  const el = document.querySelector(webInputs[0].domPath)
+  if (!el) {
+    el = document.elementFromPoint(
+      webInputs[0].domCoordinates.x,
+      webInputs[0].domCoordinates.y
+    )
+    log('el', el)
+  }
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer
@@ -36,7 +44,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     }
   }
   if (!pos) {
-    console.log('No pos in PromptPasswordOption')
+    log('No pos in PromptPasswordOption')
     return null
   }
 

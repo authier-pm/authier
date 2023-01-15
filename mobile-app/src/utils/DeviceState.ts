@@ -1,7 +1,14 @@
 import { apolloClient } from '../apollo/ApolloClient'
-import cryptoJS from 'crypto-js'
 import SInfo from 'react-native-sensitive-info'
-import { generateEncryptionKey } from '../../../shared/generateEncryptionKey'
+import {
+  abToCryptoKey,
+  base64_to_buf,
+  buff_to_base64,
+  cryptoKeyToString,
+  dec,
+  enc,
+  generateEncryptionKey
+} from '@utils/generateEncryptionKey'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from './loginCredentialsSchema'
 import {
@@ -32,7 +39,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
-    this.decryptedSecrets = this.getAllSecretsDecrypted()
+    this.initialize()
   }
   email: string
   userId: string
@@ -58,28 +65,68 @@ export class DeviceState implements IBackgroundStateSerializable {
   lockTimeEnd: number
   lockTimerRunning = false
 
-  setMasterEncryptionKey(masterPassword: string) {
-    this.masterEncryptionKey = generateEncryptionKey(
+  async initialize() {
+    this.decryptedSecrets = await this.getAllSecretsDecrypted()
+  }
+
+  async setMasterEncryptionKey(masterPassword: string) {
+    const key = await generateEncryptionKey(
       masterPassword,
-      this.encryptionSalt
+      base64_to_buf(this.encryptionSalt)
     )
+    this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
   }
 
-  encrypt(stringToEncrypt: string) {
-    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterEncryptionKey, {
-      iv: cryptoJS.enc.Utf8.parse(this.userId)
-    }).toString()
+  async encrypt(stringToEncrypt: string): Promise<string> {
+    const cryptoKey = await abToCryptoKey(
+      base64_to_buf(this.masterEncryptionKey)
+    )
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const salt = base64_to_buf(this.encryptionSalt)
+
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      enc.encode(stringToEncrypt)
+    )
+
+    const encryptedContentArr = new Uint8Array(encrypted)
+    const buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    return base64Buff
   }
-  decrypt(encrypted: string) {
-    return cryptoJS.AES.decrypt(encrypted, this.masterEncryptionKey, {
-      iv: cryptoJS.enc.Utf8.parse(this.userId)
-    }).toString(cryptoJS.enc.Utf8)
+
+  /**
+   * @param encrypted in base64
+   * @returns pure string
+   */
+  async decrypt(encrypted: string): Promise<string> {
+    const cryptoKey = await abToCryptoKey(
+      base64_to_buf(this.masterEncryptionKey)
+    )
+    const encryptedDataBuff = base64_to_buf(encrypted)
+    const iv = encryptedDataBuff.slice(16, 16 + 12)
+    const data = encryptedDataBuff.slice(16 + 12)
+
+    const decrypted = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      data
+    )
+
+    return dec.decode(decrypted)
   }
 
   async save() {
     device.lockedState = null
-    this.decryptedSecrets = this.getAllSecretsDecrypted()
+    this.decryptedSecrets = await this.getAllSecretsDecrypted()
 
     await SInfo.setItem(
       'deviceState',
@@ -109,19 +156,23 @@ export class DeviceState implements IBackgroundStateSerializable {
         host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
       )
     }
-    return secrets.map((secret) => {
-      return this.decryptSecret(secret)
-    })
+    return Promise.all(
+      secrets.map((secret) => {
+        return this.decryptSecret(secret)
+      })
+    )
   }
 
   getAllSecretsDecrypted() {
-    return this.secrets.map((secret) => {
-      return this.decryptSecret(secret)
-    })
+    return Promise.all(
+      this.secrets.map((secret) => {
+        return this.decryptSecret(secret)
+      })
+    )
   }
 
-  private decryptSecret(secret: SecretSerializedType) {
-    const decrypted = this.decrypt(secret.encrypted)
+  private async decryptSecret(secret: SecretSerializedType) {
+    const decrypted = await this.decrypt(secret.encrypted)
     let secretDecrypted: ILoginSecret | ITOTPSecret
 
     console.log('decrypted', decrypted, typeof decrypted)
@@ -225,8 +276,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     }
   }
 
-  findExistingSecret(secret) {
-    const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
+  async findExistingSecret(secret) {
+    const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
     )
 
@@ -244,29 +295,29 @@ export class DeviceState implements IBackgroundStateSerializable {
    * @returns the added secret
    */
   async addSecrets(secrets: AddSecretInput) {
-    // const existingSecret = this.findExistingSecret(secrets)
-    // if (existingSecret) {
-    //   return null
-    // }
+    const encryptedSecrets = await Promise.all(
+      secrets.map(async (secret) => {
+        const stringToEncrypt =
+          secret.kind === EncryptedSecretType.TOTP
+            ? JSON.stringify(secret.totp)
+            : JSON.stringify(secret.loginCredentials)
+
+        const encrypted = await this.encrypt(stringToEncrypt)
+
+        return {
+          encrypted,
+          kind: secret.kind
+        }
+      })
+    )
+
     const { data } = await apolloClient.mutate<
       AddEncryptedSecretsMutation,
       AddEncryptedSecretsMutationVariables
     >({
       mutation: AddEncryptedSecretsDocument,
       variables: {
-        secrets: secrets.map((secret) => {
-          const stringToEncrypt =
-            secret.kind === EncryptedSecretType.TOTP
-              ? JSON.stringify(secret.totp)
-              : JSON.stringify(secret.loginCredentials)
-
-          const encrypted = this.encrypt(stringToEncrypt as string)
-
-          return {
-            encrypted,
-            kind: secret.kind
-          }
-        })
+        secrets: encryptedSecrets
       }
     })
     if (!data) {

@@ -1,7 +1,6 @@
 import debug from 'debug'
 import browser from 'webextension-polyfill'
 import bowser from 'bowser'
-import cryptoJS from 'crypto-js'
 import { BackgroundMessageType } from './BackgroundMessageType'
 import { removeToken } from '@src/util/accessTokenExtension'
 import {
@@ -37,8 +36,16 @@ import {
   TotpTypeWithMeta
 } from '@src/util/useDeviceState'
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
-import { toast } from 'react-toastify'
+import {
+  cryptoKeyToString,
+  abToCryptoKey,
+  buff_to_base64,
+  enc,
+  dec,
+  base64_to_buf,
+  generateEncryptionKey
+} from '@shared/generateEncryptionKey'
+import { toast } from '@src/Providers'
 
 export const log = debug('au:Device')
 
@@ -104,7 +111,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     //log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
-    this.decryptedSecrets = this.getAllSecretsDecrypted()
+    this.initialize()
   }
 
   email: string
@@ -132,30 +139,73 @@ export class DeviceState implements IBackgroundStateSerializable {
     }
   }
 
-  setMasterEncryptionKey(masterPassword: string) {
-    this.masterEncryptionKey = generateEncryptionKey(
+  async initialize() {
+    this.decryptedSecrets = await this.getAllSecretsDecrypted()
+  }
+
+  async setMasterEncryptionKey(masterPassword: string) {
+    const key = await generateEncryptionKey(
       masterPassword,
-      this.encryptionSalt
+      base64_to_buf(this.encryptionSalt)
     )
+    this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
   }
 
-  encrypt(stringToEncrypt: string) {
-    return cryptoJS.AES.encrypt(stringToEncrypt, this.masterEncryptionKey, {
-      iv: cryptoJS.enc.Utf8.parse(this.userId)
-    }).toString()
+  /**
+   * @returns string in base64
+   */
+  async encrypt(stringToEncrypt: string): Promise<string> {
+    const cryptoKey = await abToCryptoKey(
+      base64_to_buf(this.masterEncryptionKey)
+    )
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const salt = base64_to_buf(this.encryptionSalt)
+
+    const encrypted = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      enc.encode(stringToEncrypt)
+    )
+
+    const encryptedContentArr = new Uint8Array(encrypted)
+    const buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
+
+    return base64Buff
   }
-  decrypt(encrypted: string) {
-    return cryptoJS.AES.decrypt(encrypted, this.masterEncryptionKey, {
-      iv: cryptoJS.enc.Utf8.parse(this.userId)
-    }).toString(cryptoJS.enc.Utf8)
+
+  /**
+   * @param encrypted in base64
+   * @returns pure string
+   */
+  async decrypt(encrypted: string): Promise<string> {
+    const cryptoKey = await abToCryptoKey(
+      base64_to_buf(this.masterEncryptionKey)
+    )
+    const encryptedDataBuff = base64_to_buf(encrypted)
+    const iv = encryptedDataBuff.slice(16, 16 + 12)
+    const data = encryptedDataBuff.slice(16 + 12)
+
+    const decrypted = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      cryptoKey,
+      data
+    )
+
+    return dec.decode(decrypted)
   }
 
   async save() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
-    this.decryptedSecrets = this.getAllSecretsDecrypted()
-    console.log('SAVE DEVICE STATE', this.decryptedSecrets)
+    this.decryptedSecrets = await this.getAllSecretsDecrypted()
+    log('SAVE DEVICE STATE', this.decryptedSecrets)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
@@ -171,7 +221,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     }
   }
 
-  getSecretsDecryptedByHostname(host: string) {
+  async getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter((secret) => {
       return (
         host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
@@ -182,19 +232,23 @@ export class DeviceState implements IBackgroundStateSerializable {
         host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
       )
     }
-    return secrets.map((secret) => {
-      return this.decryptSecret(secret)
-    })
+    return Promise.all(
+      secrets.map((secret) => {
+        return this.decryptSecret(secret)
+      })
+    )
   }
 
   getAllSecretsDecrypted() {
-    return this.secrets.map((secret) => {
-      return this.decryptSecret(secret)
-    })
+    return Promise.all(
+      this.secrets.map((secret) => {
+        return this.decryptSecret(secret)
+      })
+    )
   }
 
-  private decryptSecret(secret: SecretSerializedType) {
-    const decrypted = this.decrypt(secret.encrypted)
+  private async decryptSecret(secret: SecretSerializedType) {
+    const decrypted = await this.decrypt(secret.encrypted)
 
     let secretDecrypted: ILoginSecret | ITOTPSecret
     if (secret.kind === EncryptedSecretType.TOTP) {
@@ -295,9 +349,9 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     }
   }
-
-  findExistingSecret(secret) {
-    const existingSecretsOnHostname = this.getSecretsDecryptedByHostname(
+  //TODO: type this
+  async findExistingSecret(secret) {
+    const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
       new URL(secret.url).hostname
     )
 
@@ -312,13 +366,24 @@ export class DeviceState implements IBackgroundStateSerializable {
   /**
    * invokes the backend mutation and pushes the new secret to the bgState
    * @param secrets
-   * @returns the added secret
+   * @returns the added secret in base64
    */
   async addSecrets(secrets: AddSecretInput) {
-    // const existingSecret = this.findExistingSecret(secrets)
-    // if (existingSecret) {
-    //   return null
-    // }
+    const encryptedSecrets = await Promise.all(
+      secrets.map(async (secret) => {
+        const stringToEncrypt =
+          secret.kind === EncryptedSecretType.TOTP
+            ? JSON.stringify(secret.totp)
+            : JSON.stringify(secret.loginCredentials)
+
+        const encrypted = await this.encrypt(stringToEncrypt)
+
+        return {
+          encrypted,
+          kind: secret.kind
+        }
+      })
+    )
 
     const { data, errors } = await apolloClient.mutate<
       AddEncryptedSecretsMutation,
@@ -326,19 +391,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     >({
       mutation: AddEncryptedSecretsDocument,
       variables: {
-        secrets: secrets.map((secret) => {
-          const stringToEncrypt =
-            secret.kind === EncryptedSecretType.TOTP
-              ? JSON.stringify(secret.totp)
-              : JSON.stringify(secret.loginCredentials)
-
-          const encrypted = this.encrypt(stringToEncrypt as string)
-
-          return {
-            encrypted,
-            kind: secret.kind
-          }
-        })
+        secrets: encryptedSecrets
       }
     })
 
@@ -467,7 +520,6 @@ class ExtensionDevice {
   generateDeviceName(): string {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
-
   async clearLocalStorage() {
     const deviceId = await this.getDeviceId()
     this.state?.destroy()
@@ -501,20 +553,38 @@ class ExtensionDevice {
     return secret
   }
 
-  initLocalDeviceAuthSecret(masterEncryptionKey: string, userId: string) {
+  /**
+   * @returns strings in base64
+   */
+  async initLocalDeviceAuthSecret(
+    masterEncryptionKey: CryptoKey,
+    salt: Uint8Array
+  ): Promise<{
+    addDeviceSecret: string
+    addDeviceSecretEncrypted: string
+  }> {
     const authSecret = this.generateBackendSecret()
+    const iv = window.crypto.getRandomValues(new Uint8Array(12))
 
-    const addDeviceSecret = cryptoJS.AES.encrypt(
-      authSecret,
+    const addDeviceSecretAb = await window.crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv },
       masterEncryptionKey,
-      {
-        iv: cryptoJS.enc.Utf8.parse(userId)
-      }
-    ).toString()
+      enc.encode(authSecret)
+    )
+
+    const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
+    const buff = new Uint8Array(
+      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    )
+
+    buff.set(salt, 0)
+    buff.set(iv, salt.byteLength)
+    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+    const base64Buff = buff_to_base64(buff)
 
     return {
       addDeviceSecret: authSecret,
-      addDeviceSecretEncrypted: addDeviceSecret
+      addDeviceSecretEncrypted: base64Buff
     }
   }
 
@@ -581,42 +651,43 @@ class ExtensionDevice {
         mutation: LogoutDocument
       })
     } catch (err: any) {
-      toast.error(
-        `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
-        {
-          autoClose: false,
-          onClose: () => {
-            this.clearAndReload()
-          }
+      toast({
+        title: `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
+        status: 'error',
+        onCloseComplete: () => {
+          this.clearAndReload()
         }
-      )
+      })
     } finally {
       await this.clearAndReload()
     }
     await this.clearAndReload()
   }
 
-  serializeSecrets(
+  async serializeSecrets(
     secrets: SecretSerializedType[],
     newPsw: string
-  ): EncryptedSecretPatchInput[] {
+  ): Promise<EncryptedSecretPatchInput[]> {
     const state = this.state
     if (!state) {
       throw new Error('device not initialized')
     }
-    return secrets.map((secret) => {
-      const { id, encrypted, kind } = secret
-      const decr = state.decrypt(encrypted)
-      log('decrypted secret', decr)
-      state.setMasterEncryptionKey(newPsw)
-      const enc = state.encrypt(decr as string)
-      log('encrypted secret', enc, state.masterEncryptionKey)
-      return {
-        id,
-        encrypted: enc as string,
-        kind
-      }
-    })
+    return Promise.all(
+      secrets.map(async (secret) => {
+        const { id, encrypted, kind } = secret
+        const decr = await state.decrypt(encrypted)
+        log('decrypted secret', decr)
+        await state.setMasterEncryptionKey(newPsw)
+        const enc = await state.encrypt(decr)
+
+        log('encrypted secret', enc, state.masterEncryptionKey)
+        return {
+          id,
+          encrypted: enc,
+          kind
+        }
+      })
+    )
   }
 
   syncSettings(config: SettingsInput) {
@@ -625,7 +696,7 @@ class ExtensionDevice {
       this.state.lockTime = config.vaultLockTimeoutSeconds
       this.state.syncTOTP = config.syncTOTP
       this.state.language = config.language
-      this.state.theme = config.theme
+      this.state.theme = config.theme ?? 'dark'
     }
   }
 

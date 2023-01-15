@@ -1,14 +1,13 @@
 datasource db {
-  provider             = "postgresql"
-  url                  = env("DATABASE_URL")
-  referentialIntegrity = "foreignKeys"
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 generator client {
   provider        = "prisma-client-js"
   output          = "../node_modules/.prisma/client"
   binaryTargets   = ["native", "linux-arm64-openssl-1.0.x"]
-  previewFeatures = ["referentialIntegrity"]
+  previewFeatures = ["extendedWhereUnique"]
 }
 
 generator PrismaTypeGraphQLTypesGenerator {
@@ -18,6 +17,7 @@ generator PrismaTypeGraphQLTypesGenerator {
   removeTypeInFieldDecorator     = true
   splitScalarAndObjectTypeFields = true
   exportedNameSuffix             = "GQL"
+  useDotPrismaImport             = true
 }
 
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
@@ -78,7 +78,7 @@ model Device {
 // each row contains a single TOTP or Login credential
 model EncryptedSecret {
   id        String              @id @default(uuid()) @db.Uuid
-  encrypted String // for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
+  encrypted String // WARNING: in base64, for TOTP and NEW_DEVICE it is a plain string JSON array: [totp, url, androidUri, iosUri, iconUrl, label] for LOGIN_CREDENTIALS it is a JSON array: [username, password]   JSON array: item: [url, androidUri, iosUri, iconUrl, label, cred: [username, password]]
   version   Int
   kind      EncryptedSecretType
   createdAt DateTime            @default(now())
@@ -141,17 +141,18 @@ model MasterDeviceChange {
 
 // a map of all inputs publicly available on the internet which we need to map in order for authier's automagic login to work
 model WebInput {
-  id            Int                @id @default(autoincrement())
-  layoutType    String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
-  createdAt     DateTime           @default(now())
-  host          String             @db.VarChar(253)
-  url           String             @db.VarChar(2048)
-  kind          WebInputType
-  domPath       String
-  domOrdinal    Int                @default(0)
-  addedByUser   User               @relation(fields: [addedByUserId], references: [id])
-  addedByUserId String             @db.Uuid
-  UsageEvents   SecretUsageEvent[]
+  id             Int                @id @default(autoincrement())
+  layoutType     String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
+  createdAt      DateTime           @default(now())
+  host           String             @db.VarChar(253)
+  url            String             @db.VarChar(2048)
+  kind           WebInputType
+  domPath        String
+  domOrdinal     Int                @default(0)
+  domCoordinates Json
+  addedByUser    User               @relation(fields: [addedByUserId], references: [id])
+  addedByUserId  String             @db.Uuid
+  UsageEvents    SecretUsageEvent[]
 
   @@unique([url, domPath], name: "webInputIdentifier")
   @@index([host])
@@ -165,10 +166,10 @@ model User {
   username                      String?              @unique
   uiLocalisation                String               @default("en")
   // @skip
-  addDeviceSecret               String // random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted      String // client has to decrypt this to prove they have the correct master password
+  addDeviceSecret               String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted      String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt                String
+  encryptionSalt                String //WARNING: in pure string
   Token                         Token[]
   createdAt                     DateTime             @default(now())
   updatedAt                     DateTime?            @updatedAt

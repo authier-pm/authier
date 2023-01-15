@@ -1,4 +1,4 @@
-import React, { ReactElement, useState } from 'react'
+import { ReactElement, useState } from 'react'
 import {
   Box,
   Button,
@@ -19,12 +19,15 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
-import { Trans, t } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import { generateEncryptionKey } from '@shared/generateEncryptionKey'
+import {
+  buff_to_base64,
+  cryptoKeyToString,
+  generateEncryptionKey
+} from '@shared/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
-import { toast } from 'react-toastify'
 
 declare global {
   interface Crypto {
@@ -38,16 +41,12 @@ interface Values {
 }
 export default function Register(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [register, { error: registerError }] = useRegisterNewUserMutation()
+  const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
 
   const { fireToken } = device
   if (!fireToken) {
     return <Spinner />
-  }
-
-  if (registerError) {
-    toast.error(t`Register failed, ${registerError.message}`)
   }
 
   return (
@@ -61,28 +60,28 @@ export default function Register(): ReactElement {
           values: Values,
           { setSubmitting }: FormikHelpers<Values>
         ) => {
+          const userId = crypto.randomUUID()
           const deviceId = await device.getDeviceId()
 
-          const userId = crypto.randomUUID()
+          const encryptionSalt = window.crypto.getRandomValues(
+            new Uint8Array(16)
+          )
 
-          const encryptionSalt = device.generateBackendSecret()
-
-          const masterEncryptionKey = generateEncryptionKey(
+          const masterEncryptionKey = await generateEncryptionKey(
             values.password,
             encryptionSalt
           )
-          console.log('~ masterEncryptionKey', masterEncryptionKey)
 
-          const params = device.initLocalDeviceAuthSecret(
+          const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
-            userId
+            encryptionSalt
           )
 
           const res = await register({
             variables: {
               userId,
               input: {
-                encryptionSalt,
+                encryptionSalt: buff_to_base64(encryptionSalt),
                 email: values.email,
                 ...params,
                 deviceId,
@@ -101,14 +100,15 @@ export default function Register(): ReactElement {
               'access-token': res.data?.registerNewUser.accessToken
             })
             setAccessToken(registerResult.accessToken as string)
+            const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
             const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey: masterEncryptionKey,
+              masterEncryptionKey: stringKey,
               userId: userId,
               secrets: [],
               email: values.email,
               deviceName: device.name,
-              encryptionSalt,
+              encryptionSalt: buff_to_base64(encryptionSalt),
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,

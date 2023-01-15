@@ -171,7 +171,7 @@ export class RootResolver {
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60, // 16 hours should be plenty enough
-          loginCredentialsLimit: 40,
+          loginCredentialsLimit: 40, // default limit
           TOTPlimit: 3,
           Devices: {
             create: {
@@ -446,7 +446,8 @@ export class RootResolver {
         host: new URL(webInput.url).host,
         domPath: webInput.domPath,
         kind: webInput.kind,
-        addedByUserId: ctx.jwtPayload.userId
+        addedByUserId: ctx.jwtPayload.userId,
+        domCoordinates: webInput.domCoordinates as any
       }
       const input = await ctx.prisma.webInput.upsert({
         create: forUpsert,
@@ -458,6 +459,7 @@ export class RootResolver {
           }
         }
       })
+      // @ts-ignore TODO figure out why this errors only on local, but not on CI
       returnedInputs.push(input)
     }
     return returnedInputs
