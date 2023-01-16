@@ -12,7 +12,7 @@
     "gen": "graphql-codegen",
     "extract": "lingui extract",
     "compile": "lingui compile",
-    "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules"
+    "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android"
   },
   "dependencies": {
     "@apollo/client": "^3.7.4",
