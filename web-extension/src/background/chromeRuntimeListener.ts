@@ -15,10 +15,13 @@ import {
   SettingsInput,
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
+import { initTRPC } from '@trpc/server'
+import { createChromeHandler } from 'trpc-chrome/adapter'
 import { device, isRunningInBgPage } from './ExtensionDevice'
 import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
 import { IBackgroundStateSerializable } from './backgroundPage'
+import { z } from 'zod'
 
 const log = debug('au:chListener')
 
@@ -42,12 +45,148 @@ interface ICapturedInput {
   domCoordinates: Coord
 }
 
+
 interface ILoginCredentialsFromContentScript {
   username: string
   password: string
   capturedInputEvents: ICapturedInput[]
   openInVault: boolean
 }
+
+const capturedInputSchema = z.object({
+  cssSelector: z.string().min(1),
+  domOrdinal: z.number(),
+  type: z.union([
+    z.literal('input'),
+    z.literal('submit'),
+    z.literal('keydown')
+  ]),
+  kind: z.nativeEnum(WebInputType),
+  inputted: z.string(),
+  domCoordinates: z.object({ x: z.number(), y: z.number() })
+})
+
+const payloadSchema = z.object({
+  username: z.string(),
+  password: z.string(),
+  capturedInputEvents: z.array(capturedInputSchema),
+  openInVault: z.boolean()
+})
+
+const t = initTRPC.create({
+  isServer: false,
+  allowOutsideOfServer: true
+})
+
+const appRouter = t.router({
+  addLoginCredentials: t.procedure
+    .input(payloadSchema)
+    .mutation(async ({ ctx, input }) => {
+      //@ts-ignore
+      const tab = ctx.sender.tab
+
+      const deviceState = device.state
+
+      const { url } = tab
+
+      if (!url || !deviceState) {
+        return false // we can't do anything without a valid url
+      }
+      let urlParsed: URL
+      try {
+        urlParsed = new URL(url)
+      } catch (err) {
+        return false
+      }
+
+      const credentials: ILoginCredentialsFromContentScript = input
+
+      const encryptedData = {
+        username: credentials.username,
+        password: credentials.password,
+        iconUrl: tab.favIconUrl ?? null,
+        url: inputsUrl,
+        label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
+      }
+
+      loginCredentialsSchema.parse(encryptedData)
+
+      const encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
+      const [secret] = await deviceState.addSecrets([
+        {
+          kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+          loginCredentials: encryptedData,
+          encrypted,
+          createdAt: new Date().toJSON()
+        }
+      ])
+      if (!secret) {
+        return false
+      }
+
+      tab.id && saveLoginModalsStates.delete(tab.id)
+      const webInputs = credentials.capturedInputEvents.map((captured) => {
+        return {
+          domPath: captured.cssSelector,
+          kind: captured.kind,
+          url: inputsUrl,
+          domOrdinal: captured.domOrdinal,
+          domCoordinates: captured.domCoordinates
+        }
+      })
+
+      await apolloClient.mutate<
+        AddWebInputsMutationResult,
+        AddWebInputsMutationVariables
+      >({
+        mutation: AddWebInputsDocument,
+        variables: {
+          webInputs
+        }
+      })
+
+      if (input.openInVault) {
+        browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
+      }
+    }),
+  saveCapturedInputEvents: t.procedure.input(z.array(capturedInputSchema)).mutation(async ({ctx, input}) => {
+
+      let capturedInputEvents: ICapturedInput[] = input 
+      let inputsUrl: string 
+
+      const newWebInputs = capturedInputEvents.map((captured) => {
+        return {
+          domPath: captured.cssSelector,
+          kind: captured.kind,
+          url: inputsUrl,
+          domOrdinal: captured.domOrdinal,
+          domCoordinates: captured.domCoordinates
+        }
+      })
+
+      //Update web inputs in DB
+      await apolloClient.mutate<
+        AddWebInputsMutationResult,
+        AddWebInputsMutationVariables
+      >({
+        mutation: AddWebInputsDocument,
+        variables: {
+          webInputs: newWebInputs
+        }
+      })
+
+
+  })
+})
+
+export type AppRouter = typeof appRouter
+
+createChromeHandler({
+  router: appRouter,
+  createContext: (ctx) => {
+    return { sender: ctx.req.sender }
+  }
+})
 
 //NOTE: temporery storage for not yet saved credentials. (during page rerender)
 export const saveLoginModalsStates = new Map<
@@ -114,7 +253,7 @@ browser.runtime.onMessage.addListener(async function (
 
       loginCredentialsSchema.parse(encryptedData)
 
-      let encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
+      const encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
       const [secret] = await deviceState.addSecrets([
         {
           kind: EncryptedSecretType.LOGIN_CREDENTIALS,
