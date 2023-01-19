@@ -1,6 +1,4 @@
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import { debounce } from 'lodash'
-import browser from 'webextension-polyfill'
 
 import {
   DOMEventsRecorder,
@@ -22,9 +20,17 @@ import {
 } from './autofill'
 import { authenticator } from 'otplib'
 import { recordInputs, renderer, showSavePromptIfAppropriate } from './renderer'
+import { createTRPCProxyClient } from '@trpc/client'
+import { AppRouter } from '../background/chromeRuntimeListener'
+import { chromeLink } from 'trpc-chrome/link'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
+
+const port = chrome.runtime.connect()
+export const trpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
@@ -76,9 +82,7 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
 export async function initInputWatch() {
-  stateInitRes = await browser.runtime.sendMessage({
-    action: BackgroundMessageType.getContentScriptInitialState
-  })
+  stateInitRes = await trpc.getContentScriptInitialState.query()
 
   log('~ stateInitRes', stateInitRes)
 
@@ -181,10 +185,7 @@ export async function initInputWatch() {
                 url: location.href,
                 domCoordinates: getElementCoordinates(targetElement)
               }
-              await browser.runtime.sendMessage({
-                action: BackgroundMessageType.addTOTPInput,
-                payload: webInput
-              })
+              await trpc.addTOTPInput.mutate(webInput)
               log(`TOTP WebInput added for selector "${elementSelector}"`)
             }
           })

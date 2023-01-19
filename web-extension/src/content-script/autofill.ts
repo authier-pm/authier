@@ -2,9 +2,8 @@ import { bodyInputChangeEmitter } from './domMutationObserver'
 import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-import browser from 'webextension-polyfill'
 import { isElementInViewport, isHidden } from './isElementInViewport'
-import { Coords, domRecorder, IInitStateRes } from './contentScript'
+import { Coords, domRecorder, IInitStateRes, trpc } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
@@ -13,7 +12,6 @@ import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
 import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 
 const log = debug('au:autofill')
@@ -113,7 +111,7 @@ const filterUselessInputs = (documentBody: HTMLElement) => {
 }
 
 export const getElementCoordinates = (el: HTMLElement) => {
-  let rect = el.getBoundingClientRect()
+  const rect = el.getBoundingClientRect()
   return {
     x: rect.x,
     y: rect.y
@@ -137,9 +135,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const totpSecret = secretsForHost.totpSecrets[0]
 
   //NOTE: scan all inputs
-  const scanKnownWebInputsAndFillWhenFound = (body: HTMLBodyElement) => {
+  const scanKnownWebInputsAndFillWhenFound = async (body: HTMLBodyElement) => {
     /**
-     * text, email, password, tel
+     * filter text, email, password, tel
      */
     const usefulInputs = filterUselessInputs(document.body)
 
@@ -150,7 +148,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //After certain condition is met, we can assume this is register page
     log('usefull', usefulInputs)
     if (usefulInputs.length > 2) {
-      for (let index = 0; index < usefulInputs.length; index++) {
+      for (let index = 0; index < usefulInputs.length - 1; index++) {
         const input = usefulInputs[index]
         if (
           input.type === 'password' &&
@@ -220,6 +218,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
             return autofillValueIntoInput(
               inputEl,
+              //@sleaper TODO: fix this
               authenticator.generate(totpSecret.totp.secret)
             )
           }
@@ -236,17 +235,15 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
 
     //NOTE: Guess web inputs, if we have credentials without DOM PATHS
     if (
-      (webInputs.length === 0 && secretsForHost.loginCredentials.length > 0) ||
-      filledElements.length === 0
+      webInputs.length === 0 &&
+      secretsForHost.loginCredentials.length > 0
+      // filledElements.length === 0
     ) {
       const autofillResult = searchInputsAndAutofill(document.body)
       if (autofillResult) {
-        browser.runtime.sendMessage({
-          action: BackgroundMessageType.saveCapturedInputEvents,
-          payload: {
-            inputEvents: domRecorder.toJSON(),
-            url: document.documentURI
-          }
+        await trpc.saveCapturedInputEvents.mutate({
+          inputEvents: domRecorder.toJSON(),
+          url: document.documentURI
         })
       }
       log('autofillResult', autofillResult)
@@ -327,7 +324,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     }
 
     function searchInputsAndAutofill(documentBody: HTMLElement) {
-      let newWebInputs: webInput[] = []
+      const newWebInputs: webInput[] = []
       const inputElsArray = filterUselessInputs(documentBody)
 
       for (let index = 0; index < inputElsArray.length; index++) {

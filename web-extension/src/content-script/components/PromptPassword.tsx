@@ -1,15 +1,8 @@
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
-import { BackgroundMessageType } from '../../background/BackgroundMessageType'
-import { createTRPCProxyClient } from '@trpc/client'
-import { chromeLink } from 'trpc-chrome/link'
-import { AppRouter } from '../../background/chromeRuntimeListener'
-
-const port = chrome.runtime.connect()
-const trpc = createTRPCProxyClient<AppRouter>({
-  links: [chromeLink({ port })]
-})
+import { trpc } from '../contentScript'
+import { ICapturedInput } from '../../background/chromeRuntimeListener'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -33,7 +26,11 @@ export const PromptPassword = ({
 }: {
   username: string
   password: string
-  inputEvents: any
+  inputEvents: {
+    capturedInputEvents: ICapturedInput[]
+    inputsUrl: any
+  }
+
   passwordLimit: number
   passwordCount: number
 }) => {
@@ -69,35 +66,20 @@ export const PromptPassword = ({
         'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
       )
 
-      return chrome.runtime.sendMessage({
-        action: BackgroundMessageType.hideLoginCredentialsModal
-      })
+      return await trpc.hideLoginCredentialsModal.mutate()
     }
 
-    const loginCredentials = {
-      username,
-      password,
+    await trpc.addLoginCredentials.mutate({
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault,
-      url: inputEvents.inputsUrl ? inputEvents.inputsUrl : ''
-    }
-
-    trpc.addLoginCredentials.mutate(loginCredentials)
-    console.log('PEPICEK NA STROME')
-    // return chrome.runtime.sendMessage(
-    //   {
-    //     action: BackgroundMessageType.addLoginCredentials,
-    //     payload: loginCredentials
-    //   },
-    //   (res) => console.log('popup')
-    // )
+      username,
+      password
+    })
   }
 
   const removeCredential = async () => {
     loginPrompt?.remove()
-    return chrome.runtime.sendMessage({
-      action: BackgroundMessageType.hideLoginCredentialsModal
-    })
+    await trpc.hideLoginCredentialsModal.mutate()
   }
 
   let passwordShown = false

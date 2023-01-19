@@ -46,8 +46,16 @@ import {
   generateEncryptionKey
 } from '@shared/generateEncryptionKey'
 import { toast } from '@src/Providers'
+import { createTRPCProxyClient } from '@trpc/client'
+import { AppRouter } from './chromeRuntimeListener'
+import { chromeLink } from 'trpc-chrome/link'
 
 export const log = debug('au:Device')
+
+const port = chrome.runtime.connect()
+export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
 
 const getTldPart = (url: string) => {
   const host = new URL(url ?? '').hostname
@@ -434,16 +442,11 @@ class ExtensionDevice {
   name: string
 
   async startLockInterval(lockTime: number) {
-    await chrome.runtime.sendMessage({
-      action: BackgroundMessageType.setLockInterval,
-      time: lockTime
-    })
+    await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
   }
 
   async clearLockInterval() {
-    await chrome.runtime.sendMessage({
-      action: BackgroundMessageType.clearLockInterval
-    })
+    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 
   get platform() {
@@ -511,9 +514,9 @@ class ExtensionDevice {
     if (isRunningInBgPage === false) {
       rerenderViewInThisRuntime()
 
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.rerenderViews
-      })
+      // browser.runtime.sendMessage({
+      //   action: BackgroundMessageType.rerenderViews
+      // })
     }
   }
 

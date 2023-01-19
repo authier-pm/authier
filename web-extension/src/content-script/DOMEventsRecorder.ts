@@ -1,4 +1,5 @@
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import { ICapturedInput } from '../background/chromeRuntimeListener'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 export interface IInputRecord {
@@ -97,7 +98,7 @@ export class DOMEventsRecorder {
     }
   }
 
-  toJSON() {
+  toJSON(): ICapturedInput[] {
     return this.capturedInputEvents.map(
       ({ element, inputted, eventType: type, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
@@ -114,7 +115,7 @@ export class DOMEventsRecorder {
           cssSelector: getSelectorForElement(element).css,
           domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
-          kind,
+          kind: kind as WebInputType,
           inputted,
           domCoordinates: {
             x: rect.x,
