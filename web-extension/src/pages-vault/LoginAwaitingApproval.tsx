@@ -143,7 +143,7 @@ export const useLogin = (props: { deviceName: string }) => {
         )
 
         const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
-        let buff = new Uint8Array(
+        const buff = new Uint8Array(
           salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
         )
         buff.set(salt, 0)

@@ -1,8 +1,16 @@
-// @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
+import { createTRPCProxyClient } from '@trpc/client'
+import { chromeLink } from 'trpc-chrome/link'
+import { AppRouter } from '../../background/chromeRuntimeListener'
+
+const port = chrome.runtime.connect()
+const trpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
+
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -74,13 +82,15 @@ export const PromptPassword = ({
       url: inputEvents.inputsUrl ? inputEvents.inputsUrl : ''
     }
 
-    return chrome.runtime.sendMessage(
-      {
-        action: BackgroundMessageType.addLoginCredentials,
-        payload: loginCredentials
-      },
-      (res) => console.log('popup')
-    )
+    trpc.addLoginCredentials.mutate(loginCredentials)
+    console.log('PEPICEK NA STROME')
+    // return chrome.runtime.sendMessage(
+    //   {
+    //     action: BackgroundMessageType.addLoginCredentials,
+    //     payload: loginCredentials
+    //   },
+    //   (res) => console.log('popup')
+    // )
   }
 
   const removeCredential = async () => {
