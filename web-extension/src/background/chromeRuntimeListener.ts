@@ -45,6 +45,7 @@ interface ILoginCredentialsFromContentScript {
   openInVault: boolean
 }
 
+//ERROR:
 const capturedInputSchema = z.object({
   cssSelector: z.string().min(1),
   domOrdinal: z.number(),
@@ -68,8 +69,53 @@ const loginCredentialSchema = z.object({
   password: z.string()
 })
 
+const testSchema = z.object({
+  capturedInputEvents: z.array(capturedInputSchema),
+  openInVault: z.boolean(),
+  username: z.string(),
+  password: z.string()
+})
+
 const loginCredentialsFromContentScriptSchema =
-  contextScriptContextSchema.merge(loginCredentialSchema)
+  contextScriptContextSchema.extend({
+    username: z.string(),
+    password: z.string()
+  })
+
+const testData = {
+  capturedInputEvents: [
+    {
+      cssSelector: 'input#JmenoUzivatele',
+      domOrdinal: 0,
+      type: 'input',
+      kind: 'USERNAME_OR_EMAIL',
+      inputted: 'spac.petr',
+      domCoordinates: {
+        x: 1093.25,
+        y: 204
+      }
+    },
+    {
+      cssSelector: 'input#HesloUzivatele',
+      domOrdinal: 0,
+      type: 'input',
+      kind: 'PASSWORD',
+      inputted: 'n2a4RV33',
+      domCoordinates: {
+        x: 1093.25,
+        y: 239
+      }
+    }
+  ],
+  openInVault: false,
+  username: 'spac.petr',
+  password: 'n2a4RV33'
+}
+console.log(
+  'HAHAHAHAH',
+  loginCredentialsFromContentScriptSchema.parse(testData)
+)
+//ERROR
 
 const capturedEventsPayloadSchema = z.object({
   url: z.string(),
@@ -140,7 +186,7 @@ let lockInterval
 
 const appRouter = t.router({
   addLoginCredentials: t.procedure
-    .input(loginCredentialsFromContentScriptSchema)
+    .input(testSchema)
     .mutation(async ({ ctx, input }) => {
       //@ts-ignore
       const tab = ctx.sender.tab
