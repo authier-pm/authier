@@ -87,7 +87,8 @@ module.exports = {
       '@emotion/react': path.resolve('../node_modules/@emotion/react'),
       '@emotion/core': path.resolve('../node_modules/@emotion/core'),
       '@src': path.resolve(__dirname, 'src/'),
-      '@shared': path.resolve(__dirname, '../shared/')
+      '@shared': path.resolve(__dirname, '../shared/'),
+      '@util': path.resolve(__dirname, 'src/util/')
     },
     fallback: {
       crypto: require.resolve('crypto-browserify'),

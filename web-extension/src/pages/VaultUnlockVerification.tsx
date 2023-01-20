@@ -21,7 +21,7 @@ import {
   cryptoKeyToString,
   dec,
   generateEncryptionKey
-} from '@shared/generateEncryptionKey'
+} from '@util/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/Providers'
 

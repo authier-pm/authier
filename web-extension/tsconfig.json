@@ -2,12 +2,9 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "@src/*": [
-        "src/*"
-      ],
-      "@shared/*": [
-        "../shared/*"
-      ]
+      "@src/*": ["src/*"],
+      "@shared/*": ["../shared/*"],
+      "@util/*": ["src/util/*"]
     },
     "target": "ES2015",
     "module": "commonjs",
@@ -19,10 +16,7 @@
     "jsx": "react-jsx",
     "jsxImportSource": "@emotion/react",
     "esModuleInterop": true,
-    "lib": [
-      "es2021",
-      "dom"
-    ],
+    "lib": ["es2021", "dom"],
     "experimentalDecorators": true,
     "allowSyntheticDefaultImports": true,
     "strictPropertyInitialization": false,
@@ -32,12 +26,6 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "exclude": [
-    "../backend/**",
-    "dist/**"
-  ],
-  "include": [
-    "./src/**/*",
-    "../shared/**/*"
-  ]
+  "exclude": ["../backend/**", "dist/**"],
+  "include": ["./src/**/*", "../shared/**/*"]
 }

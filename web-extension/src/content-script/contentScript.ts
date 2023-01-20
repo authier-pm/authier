@@ -82,7 +82,8 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
 export async function initInputWatch() {
-  stateInitRes = await trpc.getContentScriptInitialState.query()
+  stateInitRes =
+    (await trpc.getContentScriptInitialState.query()) as IInitStateRes
 
   log('~ stateInitRes', stateInitRes)
 

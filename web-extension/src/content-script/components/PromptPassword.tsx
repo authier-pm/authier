@@ -2,7 +2,7 @@ import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 import { trpc } from '../contentScript'
-import { ICapturedInput } from '../../background/chromeRuntimeListener'
+import { ICapturedInput } from '../../background/backgroundPage'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -71,14 +71,12 @@ export const PromptPassword = ({
 
     const loginCredential = {
       capturedInputEvents: inputEvents.capturedInputEvents,
-      openInVault: openInVault,
-      username: username,
-      password: password
+      openInVault,
+      username,
+      password
     }
 
-    await trpc.addLoginCredentials.mutate({
-      data: JSON.stringify(loginCredential)
-    })
+    await trpc.addLoginCredentials.mutate(loginCredential)
   }
 
   const removeCredential = async () => {
