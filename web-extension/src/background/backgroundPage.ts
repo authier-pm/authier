@@ -2,8 +2,9 @@ import './chromeRuntimeListener'
 import debug from 'debug'
 import {
   EncryptedSecretQuery,
-  EncryptedSecretType
-} from '../../../shared/generated/graphqlBaseTypes'
+  EncryptedSecretType,
+  WebInputType
+} from '@shared/generated/graphqlBaseTypes'
 import { z } from 'zod'
 
 export const log = debug('au:backgroundPage')
@@ -55,4 +56,24 @@ export interface IBackgroundStateSerializableLocked {
 export interface IBackgroundStateSerializable
   extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
+}
+
+export interface Coord {
+  x: number
+  y: number
+}
+export interface ICapturedInput {
+  cssSelector: string
+  domOrdinal: number
+  type: 'input' | 'submit' | 'keydown'
+  kind: WebInputType
+  inputted?: string | undefined
+  domCoordinates: Coord
+}
+
+export interface ILoginCredentialsFromContentScript {
+  username: string
+  password: string
+  capturedInputEvents: ICapturedInput[]
+  openInVault: boolean
 }

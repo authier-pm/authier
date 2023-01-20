@@ -25,7 +25,7 @@ import {
   buff_to_base64,
   cryptoKeyToString,
   generateEncryptionKey
-} from '@shared/generateEncryptionKey'
+} from '@util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
 

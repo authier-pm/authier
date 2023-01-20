@@ -1,5 +1,5 @@
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-import { ICapturedInput } from '../background/chromeRuntimeListener'
+import { ICapturedInput } from '../background/backgroundPage'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 export interface IInputRecord {

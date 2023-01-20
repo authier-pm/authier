@@ -27,8 +27,9 @@ import {
   cryptoKeyToString,
   dec,
   enc,
+  encryptedBuf_to_base64,
   generateEncryptionKey
-} from '@shared/generateEncryptionKey'
+} from '@util/generateEncryptionKey'
 import { toast } from '@src/Providers'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
@@ -142,14 +143,11 @@ export const useLogin = (props: { deviceName: string }) => {
           enc.encode(newAuthSecret)
         )
 
-        const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
-        const buff = new Uint8Array(
-          salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+        const newAuthSecretEncrypted = encryptedBuf_to_base64(
+          newAuthSecretEncryptedAb,
+          iv,
+          salt
         )
-        buff.set(salt, 0)
-        buff.set(iv, salt.byteLength)
-        buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-        const newAuthSecretEncryptedBase64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -161,7 +159,7 @@ export const useLogin = (props: { deviceName: string }) => {
             },
             input: {
               addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncryptedBase64Buff,
+              addDeviceSecretEncrypted: newAuthSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
               encryptionSalt: buff_to_base64(salt)
@@ -196,7 +194,7 @@ export const useLogin = (props: { deviceName: string }) => {
             encryptionSalt: buff_to_base64(salt),
             deviceName: props.deviceName,
             authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncryptedBase64Buff,
+            authSecretEncrypted: newAuthSecretEncrypted,
             lockTime: 28800,
             autofill: true,
             language: 'en',
