@@ -69,17 +69,15 @@ export const PromptPassword = ({
       return await trpc.hideLoginCredentialsModal.mutate()
     }
 
-    console.log('PEPA', {
+    const loginCredential = {
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault: openInVault,
       username: username,
       password: password
-    })
-    trpc.addLoginCredentials.mutate({
-      capturedInputEvents: inputEvents.capturedInputEvents,
-      openInVault: openInVault,
-      username: username,
-      password: password
+    }
+
+    await trpc.addLoginCredentials.mutate({
+      data: JSON.stringify(loginCredential)
     })
   }
 

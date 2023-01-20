@@ -111,11 +111,15 @@ const testData = {
   username: 'spac.petr',
   password: 'n2a4RV33'
 }
-console.log(
-  'HAHAHAHAH',
-  loginCredentialsFromContentScriptSchema.parse(testData)
-)
+const lol = testSchema.parse(testData)
+console.log('HAHAHAHAH', lol)
 //ERROR
+
+const encryptedDataSchema = loginCredentialSchema.extend({
+  iconUrl: z.string().nullable(),
+  url: z.string(),
+  label: z.string() 
+})
 
 const capturedEventsPayloadSchema = z.object({
   url: z.string(),
@@ -186,7 +190,7 @@ let lockInterval
 
 const appRouter = t.router({
   addLoginCredentials: t.procedure
-    .input(testSchema)
+    .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
       //@ts-ignore
       const tab = ctx.sender.tab
@@ -216,7 +220,7 @@ const appRouter = t.router({
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }
 
-      loginCredentialsFromContentScriptSchema.parse(encryptedData)
+      encryptedDataSchema.parse(encryptedData)
 
       const encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
       const [secret] = await deviceState.addSecrets([
