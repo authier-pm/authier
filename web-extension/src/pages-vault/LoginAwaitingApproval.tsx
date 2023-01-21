@@ -23,11 +23,8 @@ import { WarningIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 import {
   base64_to_buf,
-  buff_to_base64,
   cryptoKeyToString,
   dec,
-  enc,
-  encryptedBuf_to_base64,
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
 import { toast } from '@src/Providers'
@@ -133,20 +130,9 @@ export const useLogin = (props: { deviceName: string }) => {
           return
         }
 
-        const newAuthSecret = device.generateBackendSecret()
-        const iv = window.crypto.getRandomValues(new Uint8Array(12))
-        const salt = window.crypto.getRandomValues(new Uint8Array(16))
-
-        const newAuthSecretEncryptedAb = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv },
+        const newParams = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
-          enc.encode(newAuthSecret)
-        )
-
-        const newAuthSecretEncrypted = encryptedBuf_to_base64(
-          newAuthSecretEncryptedAb,
-          iv,
-          salt
+          base64_to_buf(encryptionSalt)
         )
 
         const response = await addNewDevice({
@@ -158,11 +144,12 @@ export const useLogin = (props: { deviceName: string }) => {
               platform: device.platform
             },
             input: {
-              addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncrypted,
+              addDeviceSecret: newParams.addDeviceSecret,
+              addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
-              encryptionSalt: buff_to_base64(salt)
+              //WARNING: Has to be the same all the time
+              encryptionSalt
             },
             currentAddDeviceSecret: currentAddDeviceSecret
           }
@@ -191,10 +178,10 @@ export const useLogin = (props: { deviceName: string }) => {
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
-            encryptionSalt: buff_to_base64(salt),
+            encryptionSalt,
             deviceName: props.deviceName,
-            authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncrypted,
+            authSecret: newParams.addDeviceSecret,
+            authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             lockTime: 28800,
             autofill: true,
             language: 'en',

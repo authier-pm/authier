@@ -63,13 +63,13 @@ export function VaultUnlockVerification() {
             const iv = encryptedDataBuff.slice(16, 16 + 12)
             const data = encryptedDataBuff.slice(16 + 12)
 
-            let decryptedContent = await window.crypto.subtle.decrypt(
+            const decryptedContent = await window.crypto.subtle.decrypt(
               { name: 'AES-GCM', iv },
               masterEncryptionKey,
               data
             )
 
-            let currentAddDeviceSecret = dec.decode(decryptedContent)
+            const currentAddDeviceSecret = dec.decode(decryptedContent)
 
             if (currentAddDeviceSecret !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
