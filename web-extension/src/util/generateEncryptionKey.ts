@@ -53,11 +53,11 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const buff_to_base64 = (buff: ArrayBuffer) =>
+export const buff_to_base64 = (buff) =>
   btoa(
-    new Uint8Array(buff).reduce(function (data, byte) {
-      return data + String.fromCharCode(byte)
-    }, '')
+    Array.from(new Uint8Array(buff))
+      .map((b) => String.fromCharCode(b))
+      .join('')
   )
 
 export const base64_to_buf = (b64: string) =>
