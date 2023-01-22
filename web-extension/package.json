@@ -16,7 +16,8 @@
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
-    "test:run": "cd .. && cd backend && pnpm dev"
+    "test:run": "cd .. && cd backend && pnpm dev",
+    "chromeExtension": "chrome-webstore-upload upload --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi --client-id 932916053369-vil9duntu9shj9803h3jn5k5hpnej80i.apps.googleusercontent.com --client-secret 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 --refresh-token \"4/0AWgavdc5MY7TIaQN_mcVNlixvNgufdQ87Y2v3s-Fv-Y6XJIQuGQly4M0ms5Q1BcZ165dsw\""
   },
   "keywords": [
     "react",
@@ -49,6 +50,7 @@
     "babel-loader": "^8.3.0",
     "babel-plugin-import-graphql": "^2.8.1",
     "chrome-webstore-upload": "^1.0.0",
+    "chrome-webstore-upload-cli": "^2.1.0",
     "css-loader": "^6.7.3",
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
