@@ -17,7 +17,9 @@
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
     "test:run": "cd .. && cd backend && pnpm dev",
-    "publishApp": "chrome-webstore-upload upload --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi --client-id 932916053369-t9bsb4tp26eprcpa6ao8i32pgjc2curs.apps.googleusercontent.com --client-secret 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 --refresh-token 4/0AWgavdcMhXwoEw7qykyOWKMXnZdQHEq9A1CPuvZ9NC1JR2cXwiPvpOdgPTRIfK_WsDR_cQ"
+    "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
+    "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi"
+
   },
   "keywords": [
     "react",
