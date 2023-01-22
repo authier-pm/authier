@@ -59,5 +59,7 @@ jobs:
           release_id: ${{ steps.createRelease.outputs.id }}
 
       - name: Publish on Firefox Add-ons
-        uses: ./.github/workflows/publish-firefox-addon.yml
+        uses: ./.github/workflows/publish-firefox-addon
         if: "!contains(github.event.head_commit.message, '[skip firefox]')"
+        with:
+          token: ${{ secrets.WORKFLOWS_TOKEN }}

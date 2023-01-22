@@ -1,8 +1,8 @@
 name: 'Obtain extension.zip asset'
 description: 'Downloads or builds zip asset'
 inputs:
-  githubToken:
-    description: GitHub token
+  token:
+    description: Workflow tokens
     required: true
 outputs:
   releaseUploadUrl:
