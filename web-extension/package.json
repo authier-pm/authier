@@ -7,7 +7,7 @@
     "prodbuild": "webpack --config webpack.prod.js",
     "devBuild": "webpack --config webpack.dev.js",
     "checkBuildOutput": "node ./check-es6.js",
-    "dev": "webpack -w --config webpack.dev.js",
+    "dev": "NODE_ENV=development webpack -w --config webpack.dev.js",
     "tsc": "tsc",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",
@@ -16,7 +16,8 @@
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
-    "test:run": "cd .. && cd backend && pnpm dev"
+    "test:run": "cd .. && cd backend && pnpm dev",
+    "publishApp": "chrome-webstore-upload upload --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi --client-id 932916053369-t9bsb4tp26eprcpa6ao8i32pgjc2curs.apps.googleusercontent.com --client-secret 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 --refresh-token 4/0AWgavdcMhXwoEw7qykyOWKMXnZdQHEq9A1CPuvZ9NC1JR2cXwiPvpOdgPTRIfK_WsDR_cQ"
   },
   "keywords": [
     "react",
@@ -44,11 +45,13 @@
     "@types/react-test-renderer": "^18.0.0",
     "@types/webextension-polyfill": "^0.10.0",
     "acorn": "^8.8.1",
+    "add": "^2.0.6",
     "babel-core": "^6.26.3",
     "babel-jest": "^28.1.3",
     "babel-loader": "^8.3.0",
     "babel-plugin-import-graphql": "^2.8.1",
     "chrome-webstore-upload": "^1.0.0",
+    "chrome-webstore-upload-cli": "^2.1.0",
     "css-loader": "^6.7.3",
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
@@ -79,8 +82,9 @@
     "vitest": "^0.27.1",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0",
-    "webpack-extension-reloader": "^1.1.4",
+    "webpack-ext-reloader": "^1.1.9",
     "webpack-merge": "^5.8.0",
+    "zip-folder": "^1.0.0",
     "zod": "^3.20.2"
   },
   "dependencies": {
