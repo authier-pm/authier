@@ -114,7 +114,5 @@ dist.pem
 authier.zip
 .vercel
 **/.DS_Store
-web-extension/dist/js/backgroundPage.js
-web-extension/dist/js/contentScript.js
-web-extension/dist/js/popup.js
-web-extension/dist/js/vault.js
+web-extension/dist/**
+
