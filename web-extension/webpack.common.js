@@ -19,13 +19,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
-    new webpack.EnvironmentPlugin({
-      /* // API_URL: */
-      /* //   'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql', */
-      /* API_URL: 'http://localhost:5051/graphql', */
-      /* PAGE_URL: 'http://localhost:5450' */
-      /* // API_URL: 'https://api.authier.ml/graphql' */
-    }),
     new Dotenv()
   ],
   // optimization: {

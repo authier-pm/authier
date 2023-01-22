@@ -29,7 +29,17 @@ export const test = base.extend<{
 
 export const expect = test.expect
 
-test('Login page is visible', async ({ page, extensionId }) => {
+test('Register, logout', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
-  await page.locator('text=Login').first().isVisible()
+  await page.getByRole('link', { name: "Don't have account?" }).click()
+  await page.getByRole('heading', { name: 'Create account' }).isVisible()
+
+  //TODO: Generate random account
+  await page.getByPlaceholder('bob@bob.com').fill('bob@bob.com')
+  await page.getByPlaceholder('*******').fill('bob')
+  await page.getByRole('button', { name: 'Register' }).click()
+
+  await page.getByPlaceholder('Search vault').isVisible()
+  await page.getByText('Admin').click()
+  await page.getByRole('button', { name: 'Logout' }).click()
 })

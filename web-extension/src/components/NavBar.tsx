@@ -13,7 +13,7 @@ import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
 import { UserNavMenu } from '@src/pages/UserNavMenu'
-import { IoMdArchive } from 'react-icons/io'
+import { IoIosListBox, IoMdArchive } from 'react-icons/io'
 import { t } from '@lingui/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
 
@@ -103,6 +103,17 @@ export const NavBar: FunctionComponent = () => {
         </Box>
 
         <Box ml="auto">
+          <Tooltip label={t`Add inputs`} aria-label={t`Add inputs`}>
+            <IconButton
+              size="md"
+              ml="2"
+              aria-label="menu"
+              icon={<IoIosListBox />}
+              onClick={async () => {
+                //TODO: Call here trpc procedure and start listening for clicks on inputs
+              }}
+            />
+          </Tooltip>
           {isUserMenuOpen ? (
             <IconButton
               size="md"

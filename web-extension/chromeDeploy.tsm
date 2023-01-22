@@ -1,0 +1,49 @@
+import chromeWebstoreUpload from 'chrome-webstore-upload'
+import { config } from 'dotenv'
+import { createReadStream } from 'fs'
+
+config()
+const { env } = process
+
+console.log(env.clientSecret)
+const store = chromeWebstoreUpload({
+  extensionId: env.EXTENSION_ID,
+  clientId: env.CLIENT_ID,
+  clientSecret: env.CLIENT_SECRET,
+  refreshToken: env.REFRESH_TOKEN
+})
+
+let uploadExisting
+let publishRes
+const upload = async () => {
+  const myZipFile = createReadStream('./dist.zip')
+  uploadExisting = await store.uploadExisting(myZipFile)
+}
+
+const publish = async () => {
+  publishRes = await store.publish()
+}
+
+const run = async () => {
+  await upload()
+  await publish()
+}
+
+run()
+// import zipFolder from 'zip-folder'
+// import chromeWebstoreUpload from 'chrome-webstore-upload'
+//
+// let folderName = 'path/to/folder'
+// // I too hate placeholders! will be attaching a sample file at the end of this writeup
+// let zipName = '/path/to/archive.zip'
+//
+// zipFolder(folderName, zipName, function (err) {
+//   if (err) {
+//     console.log('oh no! ', err)
+//   } else {
+//     console.log(
+//       `Successfully zipped the ${folderName} directory and store as ${zipName}`
+//     )
+//     // will be invoking upload process
+//   }
+// })
