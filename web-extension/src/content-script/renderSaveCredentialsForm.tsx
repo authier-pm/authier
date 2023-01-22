@@ -15,8 +15,6 @@ export async function renderSaveCredentialsForm(
   passwordCount: number
 ) {
   const inputEvents = await trpc.getCapturedInputEvents.query()
-  console.log('passwordLimit', passwordLimit)
-  console.log('passwordCount', passwordCount)
 
   loginPrompt = document.createElement('div')
   render(
