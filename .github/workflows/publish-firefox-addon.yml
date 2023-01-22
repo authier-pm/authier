@@ -1,6 +1,5 @@
-name: publish-on-firefox-add-ons
-on:
-  workflow_dispatch:
+name: publish-firefox-addon
+on: [workflow_dispatch]
 jobs:
   publish:
     runs-on: ubuntu-latest
