@@ -59,9 +59,5 @@ jobs:
           release_id: ${{ steps.createRelease.outputs.id }}
 
       - name: Publish on Firefox Add-ons
-        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
+        uses: ./.github/workflows/publish-firefox-addon.yml
         if: "!contains(github.event.head_commit.message, '[skip firefox]')"
-        with:
-          workflow: publish-firefox-addon
-          token: ${{ secrets.WORKFLOWS_TOKEN }}
-          wait-for-completion: workflow

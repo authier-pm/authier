@@ -1,5 +1,13 @@
 name: publish-firefox-addon
-on: [workflow_dispatch]
+on:
+  workflow_call:
+    inputs:
+      config-path:
+        required: true
+        type: string
+    secrets:
+      token:
+        required: true
 jobs:
   publish:
     runs-on: ubuntu-latest
