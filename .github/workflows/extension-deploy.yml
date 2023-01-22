@@ -51,7 +51,7 @@ jobs:
       uses: montudor/action-zip@v1
 
     - name: Zip output
-      run: zip -qq -r extension.zip dist
+      run: zip -qq -r extension.zip dist/
       working-directory: ./web-extension
 
     - name: Publish to Chrome store
