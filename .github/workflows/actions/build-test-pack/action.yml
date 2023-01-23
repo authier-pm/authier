@@ -10,6 +10,10 @@ runs:
   using: 'composite'
   steps:
     # Add additional build and test steps here
+    - name: web-extension build
+        working-directory: ./web-extension
+        run: |
+          pnpm prodbuild
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
