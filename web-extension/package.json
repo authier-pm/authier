@@ -16,7 +16,9 @@
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
-    "test:run": "cd .. && cd backend && pnpm dev"
+    "test:run": "cd .. && cd backend && pnpm dev",
+    "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
+    "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi"
   },
   "keywords": [
     "react",
@@ -49,6 +51,7 @@
     "babel-loader": "^8.3.0",
     "babel-plugin-import-graphql": "^2.8.1",
     "chrome-webstore-upload": "^1.0.0",
+    "chrome-webstore-upload-cli": "^2.1.0",
     "css-loader": "^6.7.3",
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
