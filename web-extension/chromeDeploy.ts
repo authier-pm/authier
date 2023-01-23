@@ -1,6 +1,6 @@
-import chromeWebstoreUpload from 'chrome-webstore-upload'
-import * as dotenv from 'dotenv'
-import fs from 'fs'
+const chromeWebstoreUpload = require('chrome-webstore-upload')
+const dotenv = require('dotenv')
+const fs = require('fs')
 
 dotenv.config()
 const { env } = process
@@ -12,13 +12,15 @@ const store = chromeWebstoreUpload({
   refreshToken: env.REFRESH_TOKEN
 })
 
-let uploadExisting
-let publishRes
-const upload = async () => {
-  const myZipFile = fs.createReadStream('./mypackage.zip')
-  uploadExisting = await store.uploadExisting(myZipFile)
-}
+const myZipFile = fs.createReadStream('./mypackage.zip')
+store.uploadExisting(myZipFile).then((res) => {
+  console.log(res)
+  // Response is a Resource Representation
+  // https://developer.chrome.com/webstore/webstore_api/items#resource
+})
 
-const publish = async () => {
-  publishRes = await store.publish()
-}
+store.publish(target).then((res) => {
+  console.log(res)
+  // Response is documented here:
+  // https://developer.chrome.com/webstore/webstore_api/items/publish
+})
