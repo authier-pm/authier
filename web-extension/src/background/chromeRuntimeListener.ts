@@ -181,7 +181,7 @@ const appRouter = t.router({
       }
     }),
   hideLoginCredentialsModal: t.procedure.mutation(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
     if (currentTabId) {
