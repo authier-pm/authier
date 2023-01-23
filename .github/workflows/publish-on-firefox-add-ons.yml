@@ -1,6 +1,9 @@
 name: publish-on-firefox-add-ons
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - 'CICD'
 jobs:
   publish:
     runs-on: ubuntu-latest
