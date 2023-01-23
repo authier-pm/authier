@@ -207,7 +207,7 @@ const appRouter = t.router({
     return [deviceState?.email]
   }),
   getContentScriptInitialState: t.procedure.query(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
     const tabUrl = tab?.url
