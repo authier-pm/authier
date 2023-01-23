@@ -74,7 +74,7 @@ const appRouter = t.router({
   addLoginCredentials: t.procedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
-      //@ts-ignore
+      // @ts-expect-error
       const tab = ctx.sender.tab
 
       const deviceState = device.state
