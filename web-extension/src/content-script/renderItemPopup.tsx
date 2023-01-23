@@ -1,8 +1,7 @@
 // @ts-nocheck
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
 import { h, render } from 'preact'
 import { PrompItemPopup } from './components/PromptItemPopup'
+import { trpc } from './contentScript'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -10,9 +9,7 @@ const nano = h
 export let popupDiv: HTMLDivElement | null
 
 export async function renderItemPopup() {
-  const inputEvents = await browser.runtime.sendMessage({
-    action: BackgroundMessageType.getCapturedInputEvents
-  })
+  const inputEvents = await trpc.getCapturedInputEvents.query()
 
   popupDiv = document.createElement('div')
   render(<PrompItemPopup inputEvents={inputEvents} />, popupDiv)

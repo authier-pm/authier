@@ -60,11 +60,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     @Ctx() ctx: IContext,
     @Info() info: GraphQLResolveInfo
   ) {
-    // const include = getPrismaRelationsFromInfo({
-    //   info,
-    //   rootModel: dmmf.modelMap.User
-    // })
-
     const { id, deviceId, userId } = this
 
     const where = { id: userId }

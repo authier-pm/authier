@@ -23,12 +23,10 @@ import { WarningIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 import {
   base64_to_buf,
-  buff_to_base64,
   cryptoKeyToString,
   dec,
-  enc,
   generateEncryptionKey
-} from '@shared/generateEncryptionKey'
+} from '@util/generateEncryptionKey'
 import { toast } from '@src/Providers'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
@@ -132,24 +130,10 @@ export const useLogin = (props: { deviceName: string }) => {
           return
         }
 
-        const newAuthSecret = device.generateBackendSecret()
-        const iv = window.crypto.getRandomValues(new Uint8Array(12))
-        const salt = window.crypto.getRandomValues(new Uint8Array(16))
-
-        const newAuthSecretEncryptedAb = await window.crypto.subtle.encrypt(
-          { name: 'AES-GCM', iv },
+        const newParams = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
-          enc.encode(newAuthSecret)
+          base64_to_buf(encryptionSalt)
         )
-
-        const encryptedContentArr = new Uint8Array(newAuthSecretEncryptedAb)
-        let buff = new Uint8Array(
-          salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
-        )
-        buff.set(salt, 0)
-        buff.set(iv, salt.byteLength)
-        buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-        const newAuthSecretEncryptedBase64Buff = buff_to_base64(buff)
 
         const response = await addNewDevice({
           variables: {
@@ -160,11 +144,12 @@ export const useLogin = (props: { deviceName: string }) => {
               platform: device.platform
             },
             input: {
-              addDeviceSecret: newAuthSecret,
-              addDeviceSecretEncrypted: newAuthSecretEncryptedBase64Buff,
+              addDeviceSecret: newParams.addDeviceSecret,
+              addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
-              encryptionSalt: buff_to_base64(salt)
+              //WARNING: Has to be the same all the time
+              encryptionSalt
             },
             currentAddDeviceSecret: currentAddDeviceSecret
           }
@@ -193,10 +178,10 @@ export const useLogin = (props: { deviceName: string }) => {
             userId: userId,
             secrets: EncryptedSecrets,
             email: formState.email,
-            encryptionSalt: buff_to_base64(salt),
+            encryptionSalt,
             deviceName: props.deviceName,
-            authSecret: newAuthSecret,
-            authSecretEncrypted: newAuthSecretEncryptedBase64Buff,
+            authSecret: newParams.addDeviceSecret,
+            authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             lockTime: 28800,
             autofill: true,
             language: 'en',
