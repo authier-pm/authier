@@ -53,14 +53,31 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const buff_to_base64 = (buff: ArrayBuffer) =>
+export const buff_to_base64 = (buff) =>
   btoa(
-    new Uint8Array(buff).reduce(function (data, byte) {
-      return data + String.fromCharCode(byte)
-    }, '')
+    Array.from(new Uint8Array(buff))
+      .map((b) => String.fromCharCode(b))
+      .join('')
   )
 
 export const base64_to_buf = (b64: string) =>
   //FIX: What is this
   //@ts-expect-error
   Uint8Array.from(atob(b64), (c) => c.charCodeAt(null))
+
+export const encryptedBuf_to_base64 = (
+  encryptedBuff: ArrayBuffer,
+  iv: Uint8Array,
+  salt: Uint8Array
+) => {
+  const encryptedContentArr = new Uint8Array(encryptedBuff)
+  const newBuff = new Uint8Array(
+    salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+  )
+
+  newBuff.set(salt, 0)
+  newBuff.set(iv, salt.byteLength)
+  newBuff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
+
+  return buff_to_base64(newBuff)
+}

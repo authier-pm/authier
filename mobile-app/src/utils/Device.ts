@@ -18,7 +18,7 @@ import { clearAccessToken } from './tokenFromAsyncStorage'
 import mitt from 'mitt'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { DeviceState } from './DeviceState'
-import { buff_to_base64, enc } from '@utils/generateEncryptionKey'
+import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
@@ -242,19 +242,15 @@ export class Device {
       enc.encode(authSecret)
     )
 
-    const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
-    const buff = new Uint8Array(
-      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    let addDeviceSecretEncrypted = encryptedBuf_to_base64(
+      addDeviceSecretAb,
+      iv,
+      salt
     )
-
-    buff.set(salt, 0)
-    buff.set(iv, salt.byteLength)
-    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-    const base64Buff = buff_to_base64(buff)
 
     return {
       addDeviceSecret: authSecret,
-      addDeviceSecretEncrypted: base64Buff
+      addDeviceSecretEncrypted: addDeviceSecretEncrypted
     }
   }
 

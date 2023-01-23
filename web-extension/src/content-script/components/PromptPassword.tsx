@@ -1,8 +1,9 @@
-// @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
-import { BackgroundMessageType } from '../../background/BackgroundMessageType'
+import { trpc } from '../contentScript'
+import { ICapturedInput } from '../../background/backgroundPage'
+
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -25,7 +26,11 @@ export const PromptPassword = ({
 }: {
   username: string
   password: string
-  inputEvents: any
+  inputEvents: {
+    capturedInputEvents: ICapturedInput[]
+    inputsUrl: any
+  }
+
   passwordLimit: number
   passwordCount: number
 }) => {
@@ -61,33 +66,22 @@ export const PromptPassword = ({
         'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
       )
 
-      return chrome.runtime.sendMessage({
-        action: BackgroundMessageType.hideLoginCredentialsModal
-      })
+      return await trpc.hideLoginCredentialsModal.mutate()
     }
 
-    const loginCredentials = {
-      username,
-      password,
+    const loginCredential = {
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault,
-      url: inputEvents.inputsUrl ? inputEvents.inputsUrl : ''
+      username,
+      password
     }
 
-    return chrome.runtime.sendMessage(
-      {
-        action: BackgroundMessageType.addLoginCredentials,
-        payload: loginCredentials
-      },
-      (res) => console.log('popup')
-    )
+    await trpc.addLoginCredentials.mutate(loginCredential)
   }
 
   const removeCredential = async () => {
     loginPrompt?.remove()
-    return chrome.runtime.sendMessage({
-      action: BackgroundMessageType.hideLoginCredentialsModal
-    })
+    await trpc.hideLoginCredentialsModal.mutate()
   }
 
   let passwordShown = false

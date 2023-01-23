@@ -1,4 +1,3 @@
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 
@@ -12,6 +11,14 @@ import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
+import { createTRPCProxyClient } from '@trpc/client'
+import { chromeLink } from 'trpc-chrome/link'
+import { AppRouter } from '@src/background/chromeRuntimeListener'
+
+const port = chrome.runtime.connect()
+const trpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
 
 const log = debug('au:useDeviceState')
 
@@ -108,18 +115,12 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.securitySettings,
-        settings: config
-      })
+      await trpc.securitySettings.mutate(config)
     },
 
-    setDeviceState: (state: IBackgroundStateSerializable) => {
+    setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.setDeviceState,
-        state: state
-      })
+      await trpc.setDeviceState.mutate(state)
     },
     device,
     isFilling,
