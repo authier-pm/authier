@@ -223,7 +223,7 @@ const appRouter = t.router({
     }
   }),
   getCapturedInputEvents: t.procedure.query(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     return { capturedInputEvents, inputsUrl: tab?.url }
   }),
