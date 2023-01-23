@@ -172,7 +172,7 @@ const appRouter = t.router({
   saveLoginCredentialsModalShown: t.procedure
     .input(loginCredentialSchema)
     .mutation(async ({ input, ctx }) => {
-      //@ts-ignore
+      // @ts-expect-error
       const tab = ctx.sender.tab
       const currentTabId = tab.id
 
