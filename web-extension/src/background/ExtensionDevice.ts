@@ -1,7 +1,6 @@
 import debug from 'debug'
 import browser from 'webextension-polyfill'
 import bowser from 'bowser'
-import { BackgroundMessageType } from './BackgroundMessageType'
 import { removeToken } from '@src/util/accessTokenExtension'
 import {
   IBackgroundStateSerializable,
@@ -43,11 +42,20 @@ import {
   enc,
   dec,
   base64_to_buf,
-  generateEncryptionKey
-} from '@shared/generateEncryptionKey'
+  generateEncryptionKey,
+  encryptedBuf_to_base64
+} from '@util/generateEncryptionKey'
 import { toast } from '@src/Providers'
+import { createTRPCProxyClient } from '@trpc/client'
+import { AppRouter } from './chromeRuntimeListener'
+import { chromeLink } from 'trpc-chrome/link'
 
 export const log = debug('au:Device')
+
+const port = chrome.runtime.connect()
+export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
 
 const getTldPart = (url: string) => {
   const host = new URL(url ?? '').hostname
@@ -168,16 +176,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       enc.encode(stringToEncrypt)
     )
 
-    const encryptedContentArr = new Uint8Array(encrypted)
-    const buff = new Uint8Array(
-      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
-    )
-    buff.set(salt, 0)
-    buff.set(iv, salt.byteLength)
-    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-    const base64Buff = buff_to_base64(buff)
-
-    return base64Buff
+    return encryptedBuf_to_base64(encrypted, iv, salt)
   }
 
   /**
@@ -434,16 +433,11 @@ class ExtensionDevice {
   name: string
 
   async startLockInterval(lockTime: number) {
-    await chrome.runtime.sendMessage({
-      action: BackgroundMessageType.setLockInterval,
-      time: lockTime
-    })
+    await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
   }
 
   async clearLockInterval() {
-    await chrome.runtime.sendMessage({
-      action: BackgroundMessageType.clearLockInterval
-    })
+    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 
   get platform() {
@@ -511,9 +505,9 @@ class ExtensionDevice {
     if (isRunningInBgPage === false) {
       rerenderViewInThisRuntime()
 
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.rerenderViews
-      })
+      // browser.runtime.sendMessage({
+      //   action: BackgroundMessageType.rerenderViews
+      // })
     }
   }
 
@@ -572,19 +566,15 @@ class ExtensionDevice {
       enc.encode(authSecret)
     )
 
-    const encryptedContentArr = new Uint8Array(addDeviceSecretAb)
-    const buff = new Uint8Array(
-      salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
+    const addDeviceSecretEncrypted = encryptedBuf_to_base64(
+      addDeviceSecretAb,
+      iv,
+      salt
     )
-
-    buff.set(salt, 0)
-    buff.set(iv, salt.byteLength)
-    buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-    const base64Buff = buff_to_base64(buff)
 
     return {
       addDeviceSecret: authSecret,
-      addDeviceSecretEncrypted: base64Buff
+      addDeviceSecretEncrypted: addDeviceSecretEncrypted
     }
   }
 

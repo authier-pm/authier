@@ -114,3 +114,5 @@ dist.pem
 authier.zip
 .vercel
 **/.DS_Store
+web-extension/dist/**
+
