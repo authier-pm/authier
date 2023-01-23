@@ -10,6 +10,22 @@ runs:
   using: 'composite'
   steps:
     # Add additional build and test steps here
+    - uses: actions/checkout@v3
+    - uses: pnpm/action-setup@v2
+      with:
+        version: 7
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: 16
+        cache: 'pnpm'
+
+    - name: Install dependencies
+      run: |
+        pnpm i --frozen-lockfile --prefer-offline
+        pnpm i ts-node -g
+
     - name: web-extension build
       working-directory: ./web-extension
       run: |
