@@ -16,7 +16,7 @@ jobs:
           envFile: './.github/workflows/constants.env'
           expand: true
 
-      - name: Look for existing release
+      - name: Look for an existing release
         id: getRelease
         uses: cardinalby/git-get-release-action@v1
         continue-on-error: true
@@ -33,7 +33,7 @@ jobs:
       - name: Create Release
         id: createRelease
         if: steps.getRelease.outcome != 'success'
-        uses: ncipollo/release-action@58ae73b360456532aafd58ee170c045abbeaee37 # pin@v1
+        uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: 'true'
@@ -52,14 +52,14 @@ jobs:
       # Should trigger build-assets-on-release.yml
       - name: Publish release
         if: steps.getRelease.outcome != 'success'
-        uses: eregon/publish-release@c2c0552ef2dd8209aea2a95c940a156eb8f6e9c1 # pin@v1
+        uses: eregon/publish-release@v1
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOWS_TOKEN }}
         with:
           release_id: ${{ steps.createRelease.outputs.id }}
 
       - name: Publish on Firefox Add-ons
-        uses: benc-uk/workflow-dispatch@4c044c1613fabbe5250deadc65452d54c4ad4fc7 # pin@v1
+        uses: benc-uk/workflow-dispatch@v1
         if: "!contains(github.event.head_commit.message, '[skip firefox]')"
         with:
           workflow: publish-on-firefox-add-ons.yml

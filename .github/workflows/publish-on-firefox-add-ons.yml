@@ -1,7 +1,6 @@
 name: publish-on-firefox-add-ons
 on:
   workflow_dispatch:
-  # Remove on push after dev
   push:
     branches:
       - 'CICD'
@@ -34,6 +33,5 @@ jobs:
       - name: Abort on upload error
         if: |
           steps.addonsDeploy.outcome == 'failure' &&
-          steps.addonsDeploy.outputs.sameVersionAlreadyUploadedError != 'true' &&
-          steps.addonsDeploy.outputs.timeoutError != 'true'
+          steps.addonsDeploy.outputs.sameVersionAlreadyUploadedError != 'true'
         run: exit 1
