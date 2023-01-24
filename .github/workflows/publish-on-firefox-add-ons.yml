@@ -22,6 +22,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Firefox Addons
+        uses: trmcnvn/firefox-addon@v1
         id: addonsDeploy
         with:
           #uuid is only necessary when updating an existing addon,
