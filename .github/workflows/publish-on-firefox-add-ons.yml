@@ -29,7 +29,7 @@ jobs:
           # omitting it will create a new addon
           uuid: ${{ secrets.FF_EXTENSION_ID }}
           xpi: ${{ env.ZIP_FILE_PATH }}
-          manifest: manifest.json
+          manifest: ${{ env.EXTENSION_DIR}}/manifest.json
           api-key: ${{ secrets.FF_JWT_ISSUER }}
           api-secret: ${{ secrets.FF_JWT_SECRET }}
 

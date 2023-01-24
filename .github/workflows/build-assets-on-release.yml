@@ -113,7 +113,7 @@ jobs:
         continue-on-error: true
         uses: kewisch/action-web-ext@v1
         with:
-          cmd: sign
+          cmd: sign --id ${{ secrets.FF_OFFLINE_EXT_ID }}
           source: ${{ env.ZIP_FILE_PATH }}
           channel: unlisted
           apiKey: ${{ secrets.FF_JWT_ISSUER }}
