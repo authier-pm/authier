@@ -74,7 +74,7 @@ const appRouter = t.router({
   addLoginCredentials: t.procedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
-      //@ts-ignore
+      // @ts-expect-error
       const tab = ctx.sender.tab
 
       const deviceState = device.state
@@ -172,7 +172,7 @@ const appRouter = t.router({
   saveLoginCredentialsModalShown: t.procedure
     .input(loginCredentialSchema)
     .mutation(async ({ input, ctx }) => {
-      //@ts-ignore
+      // @ts-expect-error
       const tab = ctx.sender.tab
       const currentTabId = tab.id
 
@@ -181,7 +181,7 @@ const appRouter = t.router({
       }
     }),
   hideLoginCredentialsModal: t.procedure.mutation(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
     if (currentTabId) {
@@ -207,7 +207,7 @@ const appRouter = t.router({
     return [deviceState?.email]
   }),
   getContentScriptInitialState: t.procedure.query(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
     const tabUrl = tab?.url
@@ -223,7 +223,7 @@ const appRouter = t.router({
     }
   }),
   getCapturedInputEvents: t.procedure.query(async ({ ctx }) => {
-    //@ts-ignore
+    // @ts-expect-error
     const tab = ctx.sender.tab
     return { capturedInputEvents, inputsUrl: tab?.url }
   }),

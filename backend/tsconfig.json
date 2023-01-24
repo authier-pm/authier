@@ -51,5 +51,4 @@
     "./generated/typegraphql-prisma/resolvers/**/*",
     "cdk.out/**/*"
   ]
-  // "include": ["**/*.ts", "**/*.tsx"]
 }

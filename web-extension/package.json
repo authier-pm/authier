@@ -3,6 +3,9 @@
   "version": "1.0.0",
   "description": "Authier web Extension for all our supported browsers",
   "license": "AGPL-3.0-or-later",
+  "webExt": {
+    "sourceDir": "dist/"
+  },
   "scripts": {
     "prodbuild": "webpack --config webpack.prod.js",
     "devBuild": "webpack --config webpack.dev.js",
@@ -18,8 +21,8 @@
     "gen": "graphql-codegen",
     "test:run": "cd .. && cd backend && pnpm dev",
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
-    "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi"
-
+    "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi",
+    "publish:firefox": "dotenv web-ext sign --verbose" 
   },
   "keywords": [
     "react",
@@ -82,6 +85,7 @@
     "type-graphql": "^1.1.1",
     "typescript": "^4.9.4",
     "vitest": "^0.27.1",
+    "web-ext": "^7.4.0",
     "webpack": "^5.75.0",
     "webpack-cli": "^4.10.0",
     "webpack-ext-reloader": "^1.1.9",
