@@ -1,5 +1,17 @@
-name: 'Obtain extension.zip asset'
-description: 'Downloads or builds zip asset'
+# Assumes that:
+# 1. the following env variables are set:
+# - ZIP_ASSET_NAME
+# - ZIP_FILE_PATH
+# - ZIP_FILE_NAME
+# - EXTENSION_DIR
+# 2. repository checked out
+# Effects:
+# - extension.zip saved to env.ZIP_FILE_PATH
+# - outputs.releaseUploadUrl is set if ref_type == 'tag' and release exists
+# - extension.zip uploaded as build artifact to the job if it wasn't found in release
+
+name: "Obtain extension.zip asset"
+description: "Downloads zip asset from a release (if exists) or builds it from the scratch"
 inputs:
   githubToken:
     description: GitHub token
@@ -9,7 +21,7 @@ outputs:
     description: Release upload url, if exists
     value: ${{ steps.getRelease.outputs.upload_url }}
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - name: Get release
       id: getRelease
@@ -31,8 +43,7 @@ runs:
       with:
         expression: |
           JSON.parse(env.ASSETS_JSON)
-            .find(asset => asset.name == env.ZIP_ASSET_NAME)
-            ?.id || ''
+            .find(asset => asset.name == env.ZIP_ASSET_NAME)?.id || ''
 
     - name: Download found zip release asset
       id: downloadZipAsset

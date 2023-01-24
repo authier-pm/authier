@@ -461,6 +461,7 @@ importers:
       css-loader: ^6.7.3
       date-fns: ^2.29.3
       debug: ^4.3.4
+      dotenv-cli: ^7.0.0
       dotenv-webpack: ^8.0.1
       firebase: 9.15.0
       firefox-extension-deploy: ^1.1.2
@@ -602,6 +603,7 @@ importers:
       css-loader: 6.7.3_webpack@5.75.0
       date-fns: 2.29.3
       debug: 4.3.4
+      dotenv-cli: 7.0.0
       dotenv-webpack: 8.0.1_webpack@5.75.0
       firebase: 9.15.0
       gqlSchemas: file:backend/schemas
@@ -8956,7 +8958,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/conf': 3.15.0_typescript@4.9.4
       '@lingui/core': 3.15.0
-      '@lingui/react': 3.15.0_react@18.1.0
+      '@lingui/react': 3.15.0_react@18.2.0
       babel-plugin-macros: 3.1.0
       ramda: 0.27.2
     transitivePeerDependencies:
@@ -8974,6 +8976,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.1.0
+    dev: false
 
   /@lingui/react/3.15.0_react@18.2.0:
     resolution: {integrity: sha512-Xq/48yf2IQhOPpgpqydj1OUyfDgNOY4aattmG4195LeqGPhN0ckiUCBLlNm0vHRsO3ZGwzfprTLYfI9WbfLBzA==}
@@ -8984,7 +8987,6 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.2.0
-    dev: true
 
   /@lukeed/ms/2.0.0:
     resolution: {integrity: sha512-NOlhE40rGptwLwJhE0ZW259hcoa+nkpQRQ1FUKV4Sr2z1Eh2WfkHQ3jjBNF7YEqOrF0TOpqnyU1wClvWBrXByg==}
@@ -13265,7 +13267,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.4_ila5be2toiy6xjqjieu6owlh24
+      '@apollo/client': 3.7.4_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 
@@ -16036,10 +16038,25 @@ packages:
       is-obj: 2.0.0
     dev: true
 
+  /dotenv-cli/7.0.0:
+    resolution: {integrity: sha512-XfMzVdpdDTRnlcgvFLg3lSyiLXqFxS4tH7RbK5IxkC4XIUuxPyrGoDufkfLjy/dA28EILzEu+mros6h8aQmyGg==}
+    hasBin: true
+    dependencies:
+      cross-spawn: 7.0.3
+      dotenv: 16.0.3
+      dotenv-expand: 10.0.0
+      minimist: 1.2.6
+    dev: true
+
   /dotenv-defaults/2.0.2:
     resolution: {integrity: sha512-iOIzovWfsUHU91L5i8bJce3NYK5JXeAwH50Jh6+ARUdLiiGlYWfGw6UkzsYqaXZH/hjE/eCd/PlfM/qqyK0AMg==}
     dependencies:
       dotenv: 8.6.0
+    dev: true
+
+  /dotenv-expand/10.0.0:
+    resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
+    engines: {node: '>=12'}
     dev: true
 
   /dotenv-webpack/8.0.1_webpack@5.75.0:

@@ -22,19 +22,18 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Deploy to Firefox Addons
-        uses: trmcnvn/firefox-addon@v1
         id: addonsDeploy
+        uses: cardinalby/webext-buildtools-firefox-addons-action@v1
+        continue-on-error: true
         with:
-          #uuid is only necessary when updating an existing addon,
-          # omitting it will create a new addon
-          uuid: ${{ secrets.FF_EXTENSION_ID }}
-          xpi: ${{ env.ZIP_FILE_PATH }}
-          manifest: ${{ env.EXTENSION_DIR}}/manifest.json
-          api-key: ${{ secrets.FF_JWT_ISSUER }}
-          api-secret: ${{ secrets.FF_JWT_SECRET }}
+          zipFilePath: ${{ env.ZIP_FILE_PATH }}
+          extensionId: ${{ secrets.FF_EXTENSION_ID }}
+          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
+          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
 
       - name: Abort on upload error
         if: |
           steps.addonsDeploy.outcome == 'failure' &&
-          steps.addonsDeploy.outputs.sameVersionAlreadyUploadedError != 'true'
+          steps.addonsDeploy.outputs.sameVersionAlreadyUploadedError != 'true' &&
+          steps.addonsDeploy.outputs.timeoutError != 'true'
         run: exit 1

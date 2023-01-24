@@ -22,7 +22,7 @@
     "test:run": "cd .. && cd backend && pnpm dev",
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi",
-    "publish:firefox": "dotenv web-ext sign --verbose" 
+    "sign:firefox": "dotenv -- web-ext sign --config=testConfig.js --id=$FF_OFFLINE_ID"
   },
   "keywords": [
     "react",
@@ -60,6 +60,7 @@
     "css-loader": "^6.7.3",
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
+    "dotenv-cli": "^7.0.0",
     "dotenv-webpack": "^8.0.1",
     "firebase": "9.15.0",
     "gqlSchemas": "file:../backend/schemas",
