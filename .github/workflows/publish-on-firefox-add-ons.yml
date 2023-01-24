@@ -23,13 +23,14 @@ jobs:
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
-        uses: cardinalby/webext-buildtools-firefox-addons-action@v1
-        continue-on-error: true
         with:
-          zipFilePath: ${{ env.ZIP_FILE_PATH }}
-          extensionId: ${{ secrets.FF_EXTENSION_ID }}
-          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
-          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+          #uuid is only necessary when updating an existing addon,
+          # omitting it will create a new addon
+          uuid: ${{ secrets.FF_EXTENSION_ID }}
+          xpi: ${{ env.ZIP_FILE_PATH }}
+          manifest: manifest.json
+          api-key: ${{ secrets.FF_JWT_ISSUER }}
+          api-secret: ${{ secrets.FF_JWT_SECRET }}
 
       - name: Abort on upload error
         if: |
