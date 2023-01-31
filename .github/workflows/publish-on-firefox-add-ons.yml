@@ -1,6 +1,7 @@
 name: publish-on-firefox-add-ons
 on:
   workflow_dispatch:
+  # Remove after development
   push:
     branches:
       - 'CICD'
