@@ -14,10 +14,6 @@ on:
         description: 'publish-on-webstore job environment'
         required: false
         default: ''
-  # Remove after development
-  push:
-    branches:
-      - 'CICD'
 jobs:
   publish-on-webstore:
     runs-on: ubuntu-latest
