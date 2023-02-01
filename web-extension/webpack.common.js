@@ -2,6 +2,7 @@
 const path = require('path')
 const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
+const ExtensionReloader = require('webpack-ext-reloader')
 
 module.exports = {
   entry: {
@@ -19,6 +20,7 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
+    new ExtensionReloader(),
     new webpack.EnvironmentPlugin({
       /* // API_URL: */
       /* //   'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql', */
@@ -28,13 +30,13 @@ module.exports = {
     }),
     new Dotenv()
   ],
-  // optimization: {
-  //   splitChunks: {
-  //     chunks: 'all',
-  //     minChunks: 4,
-  //     maxSize: 3500000
-  //   }
-  // },
+  optimization: {
+    splitChunks: {
+      chunks: 'all',
+      minChunks: 4,
+      maxSize: 3500000
+    }
+  },
   module: {
     rules: [
       {
