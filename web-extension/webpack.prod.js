@@ -5,7 +5,11 @@ const webpack = require('webpack')
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
-    minimize: false // TODO when true, the output cannot be parsed. This can be checked using the
+    splitChunks: {
+      chunks: 'all',
+      minChunks: 4,
+      maxSize: 3500000
+    }
   },
   plugins: [
     new webpack.EnvironmentPlugin({

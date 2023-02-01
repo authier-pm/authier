@@ -420,6 +420,7 @@ importers:
       '@emotion/babel-plugin': ^11.10.5
       '@emotion/css': ^11.10.5
       '@emotion/styled': 11.10.5
+      '@faker-js/faker': ^7.6.0
       '@lingui/cli': ^3.15.0
       '@lingui/core': ^3.15.0
       '@lingui/macro': ^3.15.0
@@ -576,6 +577,7 @@ importers:
       '@babel/preset-env': 7.20.2_@babel+core@7.20.12
       '@babel/preset-react': 7.18.6_@babel+core@7.20.12
       '@babel/preset-typescript': 7.18.6_@babel+core@7.20.12
+      '@faker-js/faker': 7.6.0
       '@lingui/core': 3.15.0
       '@lingui/react': 3.15.0_react@18.2.0
       '@playwright/test': 1.29.2
@@ -752,8 +754,8 @@ packages:
       zen-observable-ts: 1.2.5
     dev: false
 
-  /@apollo/client/3.7.5_gdcq4dv6opitr3wbfwyjmanyra:
-    resolution: {integrity: sha512-HEAhX2n2Y8Y2BwRr0UdteT94OTM7pn64K5/rTk/oLIdg/h7R2d83LdsCGDxSH5sBiqDqlv9vou4xdyTxxRWj/g==}
+  /@apollo/client/3.7.6_gdcq4dv6opitr3wbfwyjmanyra:
+    resolution: {integrity: sha512-K0l8+wgcdVDjdgI8O2YuhX1CiQlavGuBp8HR/+PEbc2+jqM/BaVpL0g7YAuXrTW20np/MXHNRDxK20/ujF9hjA==}
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
       graphql-ws: ^5.5.5
@@ -791,7 +793,7 @@ packages:
   /@apollo/react-hooks/4.0.0_gdcq4dv6opitr3wbfwyjmanyra:
     resolution: {integrity: sha512-fCu0cbne3gbUl0QbA8X4L33iuuFVQbC5Jo2MIKRK8CyawR6PoxDpFdFA1kc6033ODZuZZ9Eo4RdeJFlFIIYcLA==}
     dependencies:
-      '@apollo/client': 3.7.5_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.6_gdcq4dv6opitr3wbfwyjmanyra
     transitivePeerDependencies:
       - graphql
       - graphql-ws
@@ -6156,6 +6158,11 @@ packages:
   /@expo/sdk-runtime-versions/1.0.0:
     resolution: {integrity: sha512-Doz2bfiPndXYFPMRwPyGa1k5QaKDVpY806UJj570epIiMzWaYyCtobasyfC++qfIXVb5Ocy7r3tP9d62hAQ7IQ==}
     dev: false
+
+  /@faker-js/faker/7.6.0:
+    resolution: {integrity: sha512-XK6BTq1NDMo9Xqw/YkYyGjSsg44fbNwYRx7QK2CuoQgyy+f1rrTDHoExVM5PsyXCtfl2vs2vVJ0MN0yN6LppRw==}
+    engines: {node: '>=14.0.0', npm: '>=6.0.0'}
+    dev: true
 
   /@fastify/accept-negotiator/1.0.0:
     resolution: {integrity: sha512-4R/N2KfYeld7A5LGkai+iUFMahXcxxYbDp+XS2B1yuL3cdmZLJ9TlCnNzT3q5xFTqsYm0GPpinLUwfSwjcVjyA==}
