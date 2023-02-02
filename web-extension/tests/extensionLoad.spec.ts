@@ -52,7 +52,7 @@ test('Register account', async ({ page, extensionId }) => {
   await page.getByText(`Authier`).isVisible()
 })
 
-test('Add login credential', async ({ page, extensionId }) => {
+test('Add login credential, TOTP', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
   await page.getByText(`Don't have account?`).click()
   await page.getByPlaceholder('bob@bob.com').fill(faker.internet.email())
@@ -71,4 +71,13 @@ test('Add login credential', async ({ page, extensionId }) => {
   await page.getByRole('button', { name: /create/i }).click()
   await page.getByText(`Authier`).isVisible()
   await page.getByText('secret').isVisible()
+
+  await page.getByRole('button', { name: 'Add item' }).click()
+  await page.getByRole('combobox').selectOption('TOTP')
+  await page.getByLabel('url').fill(faker.internet.url())
+  await page.getByLabel('label').fill('totp')
+  await page.getByLabel('secret').fill('JBSWY3DPEHPK3PXP')
+  await page.getByRole('button', { name: /create/i }).click()
+  await page.getByText(`Authier`).isVisible()
+  await page.getByText('totp').isVisible()
 })
