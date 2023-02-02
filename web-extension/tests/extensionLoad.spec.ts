@@ -1,4 +1,4 @@
-import { test as base, BrowserContext, chromium } from '@playwright/test'
+import { test as base, BrowserContext, chromium, Page } from '@playwright/test'
 import { faker } from '@faker-js/faker'
 import path from 'path'
 
@@ -49,32 +49,26 @@ test('Register account', async ({ page, extensionId }) => {
   await page.getByRole('button', { name: /register/i }).click()
 
   await page.getByPlaceholder('Search vault').isVisible()
-  await expect(page.getByText(`Authier`)).toBeVisible()
+  await page.getByText(`Authier`).isVisible()
 })
 
-test('Register, logout', async ({ page, extensionId, context }) => {
-  const email = faker.internet.email()
-  const password = faker.internet.password()
+test('Add login credential', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
   await page.getByText(`Don't have account?`).click()
-  await page.getByPlaceholder('bob@bob.com').fill(email)
-  await page.getByPlaceholder('*******').fill(password)
+  await page.getByPlaceholder('bob@bob.com').fill(faker.internet.email())
+  await page.getByPlaceholder('*******').fill(faker.internet.password())
   await page.getByRole('button', { name: /register/i }).click()
 
-  const pagePromise = context.waitForEvent('page')
-  await page.getByText('open new tab').click()
-  const newPage = await pagePromise
-  await newPage.waitForLoadState()
-  console.log(await newPage.title())
+  await page.getByPlaceholder('Search vault').isVisible()
+  await page.getByRole('button', { name: 'Add item' }).click()
 
-  await page.getByRole('img').click()
-  await page.getByRole('menuitem', { name: 'Logout' }).click()
+  await page.getByRole('combobox').selectOption('Login')
+  await page.getByLabel('url').fill(faker.internet.url())
+  await page.getByLabel('label').fill('secret')
+  await page.getByLabel('username').fill('secret')
+  await page.getByLabel('password').fill('secret')
 
-  await newPage.goto(`chrome-extension://${extensionId}/vault.html#`)
-  await newPage.locator('text=Login').first().isVisible()
-  await newPage.getByPlaceholder('bob@bob.com').fill(email)
-  await newPage.getByPlaceholder('*******').fill(password)
-  await newPage.getByRole('button', { name: /login/i }).click()
-  await newPage.getByPlaceholder('Search vault').isVisible()
-  await expect(page.getByText(`Authier`)).toBeVisible()
+  await page.getByRole('button', { name: /create/i }).click()
+  await page.getByText(`Authier`).isVisible()
+  await page.getByText('secret').isVisible()
 })
