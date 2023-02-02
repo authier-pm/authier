@@ -30,8 +30,6 @@ export const test = base.extend<{
 
 export const expect = test.expect
 
-test.describe.configure({ mode: 'parallel' })
-
 test('Login page is visible', async ({ page, extensionId }) => {
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
   await page.locator('text=Login').first().isVisible()
@@ -54,38 +52,29 @@ test('Register account', async ({ page, extensionId }) => {
   await expect(page.getByText(`Authier`)).toBeVisible()
 })
 
-test.describe.configure({ mode: 'serial' })
-
-let page: Page
-
-test.beforeAll(async ({ page, extensionId }) => {
-  page = page
-  await page.goto(`chrome-extension://${extensionId}/vault.html#`)
-  await page.getByText(`Don't have account?`).click()
-  await page.getByPlaceholder('bob@bob.com').fill(faker.internet.email())
-  await page.getByPlaceholder('*******').fill(faker.internet.password())
-  await page.getByRole('button', { name: /register/i }).click()
-})
-
-const email = faker.internet.email()
-const password = faker.internet.password()
-test('Register, logout', async ({ page, extensionId }) => {
+test('Register, logout', async ({ page, extensionId, context }) => {
+  const email = faker.internet.email()
+  const password = faker.internet.password()
   await page.goto(`chrome-extension://${extensionId}/vault.html#`)
   await page.getByText(`Don't have account?`).click()
   await page.getByPlaceholder('bob@bob.com').fill(email)
   await page.getByPlaceholder('*******').fill(password)
   await page.getByRole('button', { name: /register/i }).click()
+
+  const pagePromise = context.waitForEvent('page')
+  await page.getByText('open new tab').click()
+  const newPage = await pagePromise
+  await newPage.waitForLoadState()
+  console.log(await newPage.title())
 
   await page.getByRole('img').click()
   await page.getByRole('menuitem', { name: 'Logout' }).click()
-})
 
-test('Login', async ({ page, extensionId }) => {
-  await page.goto(`chrome-extension://${extensionId}/vault.html#`)
-  await page.locator('text=Login').first().isVisible()
-  await page.getByPlaceholder('bob@bob.com').fill(email)
-  await page.getByPlaceholder('*******').fill(password)
-  await page.getByRole('button', { name: /login/i }).click()
-  await page.getByPlaceholder('Search vault').isVisible()
+  await newPage.goto(`chrome-extension://${extensionId}/vault.html#`)
+  await newPage.locator('text=Login').first().isVisible()
+  await newPage.getByPlaceholder('bob@bob.com').fill(email)
+  await newPage.getByPlaceholder('*******').fill(password)
+  await newPage.getByRole('button', { name: /login/i }).click()
+  await newPage.getByPlaceholder('Search vault').isVisible()
   await expect(page.getByText(`Authier`)).toBeVisible()
 })
