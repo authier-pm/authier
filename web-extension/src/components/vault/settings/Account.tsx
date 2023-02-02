@@ -83,6 +83,7 @@ export default function Account() {
               { setSubmitting }: FormikHelpers<Values>
             ) => {
               console.log(values.newPassword)
+              //TODO: Fix this
               if (
                 values.newPassword === values.confirmPassword &&
                 values.currPassword === device.state?.masterEncryptionKey
