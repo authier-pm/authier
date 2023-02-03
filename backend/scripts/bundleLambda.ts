@@ -14,8 +14,9 @@ import path from 'path'
     bundle: true,
     tsconfig: 'tsconfig.json',
     outfile: 'dist/lambda.js',
+    external: ['aws-sdk', '@prisma/client', 'knex', 'pg-native'],
     platform: 'node',
-    target: 'node16',
+    target: 'node18',
     plugins: [
       esbuildDecorators({
         tsconfig: 'tsconfig.json',
