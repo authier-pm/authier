@@ -1,38 +1,35 @@
 {
   "manifest_version": 2,
-  "name": "Authier",
-  "description": "Authier chrome extension",
+  "name": "authier-web-extension",
   "version": "1.0.4",
+  "description": "Authier web Extension for all our supported browsers",
   "browser_action": {
     "default_icon": "icon-16.png",
     "default_popup": "popup.html"
   },
   "background": {
-    "scripts": ["js/backgroundPage.js"],
+    "scripts": [
+      "js/backgroundPage.js"
+    ],
     "persistent": true
   },
-  "content_scripts": [
-    {
-      "matches": ["*://*/*"],
-      "js": ["js/contentScript.js"],
-      "all_frames": true
-    }
-  ],
   "icons": {
     "16": "icon-16.png",
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
   "permissions": [
-    "idle",
     "tabs",
     "activeTab",
     "notifications",
     "storage",
     "http://*/",
     "https://*/",
-    "<all_urls>"
+    "<all_urls>",
+    "webNavigation"
   ],
-  "web_accessible_resources": ["icon-16.png"],
-  "content_security_policy": "script-src 'self' https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"
+  "web_accessible_resources": [
+    "icon-16.png"
+  ],
+  "content_security_policy": "script-src 'self' http://localhost:3303; object-src 'self'"
 }

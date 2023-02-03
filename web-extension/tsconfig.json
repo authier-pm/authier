@@ -12,7 +12,7 @@
         "src/util/*"
       ]
     },
-    "target": "esnext",
+    "target": "ES2015",
     "module": "commonjs",
     "moduleResolution": "node",
     "rootDir": "../../authier",

@@ -2,10 +2,8 @@ import './chromeRuntimeListener'
 import debug from 'debug'
 import {
   EncryptedSecretQuery,
-  EncryptedSecretType,
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
-import { z } from 'zod'
 
 export const log = debug('au:backgroundPage')
 localStorage.debug = 'au:*' // enable all debug messages

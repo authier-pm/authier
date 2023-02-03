@@ -1,20 +1,12 @@
 import { defineConfig, UserConfig } from 'vitest/config'
 import tsconfigPaths from 'vite-tsconfig-paths'
-import path, { resolve } from 'path'
+import path from 'path'
 import AutoImport from 'unplugin-auto-import/vite'
 import Icons from 'unplugin-icons/vite'
-
-export const port = parseInt(process.env.PORT || '') || 3303
-export const r = (...args: string[]) => resolve(__dirname, '..', ...args)
-export const isDev = process.env.NODE_ENV !== 'production'
+import { isDev, r } from './scripts/utils'
 
 export const sharedConfig: UserConfig = {
   root: r('src'),
-  resolve: {
-    alias: {
-      '~/': `${r('src')}/`
-    }
-  },
 
   plugins: [
     AutoImport({
@@ -58,8 +50,8 @@ export default defineConfig({
     'process.env': {}
   },
   build: {
+    target: 'esnext',
     sourcemap: isDev ? 'inline' : false,
-    outDir: '../dist/js',
     rollupOptions: {
       input: {
         backgroundPage: path.join(
@@ -77,12 +69,13 @@ export default defineConfig({
         // Change name of output files
         entryFileNames: '[name].js',
         // change path of output files
-        dir: '../dist/js'
+        dir: 'dist/js'
       }
     },
     terserOptions: {
       mangle: false
     },
-    emptyOutDir: false
+    emptyOutDir: false,
+    minify: 'terser'
   }
 })

@@ -1,7 +1,8 @@
 import { defineConfig } from 'vite'
-import { isDev, r, sharedConfig } from './vite.config'
-
+import { sharedConfig } from './vite.config'
 import packageJson from './package.json'
+
+import { isDev, r } from './scripts/utils'
 
 // bundling the content script using Vite
 export default defineConfig({
@@ -14,7 +15,7 @@ export default defineConfig({
   },
   build: {
     watch: isDev ? {} : undefined,
-    outDir: r('../dist/contentScripts'),
+    outDir: r('dist/js'),
     cssCodeSplit: false,
     emptyOutDir: false,
     sourcemap: isDev ? 'inline' : false,
