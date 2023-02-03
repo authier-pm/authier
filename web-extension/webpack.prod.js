@@ -6,14 +6,7 @@ module.exports = merge(common, {
   mode: 'production',
   optimization: {
     minimize: false // TODO when true, the output cannot be parsed. This can be checked using the
-  },
-  plugins: [
-    new webpack.EnvironmentPlugin({
-      API_URL:
-        'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql',
-      PAGE_URL: 'https://www.authier.pm'
-    })
-  ]
+  }
   // TODO: this is not working. breaks with error on init in popup
   // optimization: {
   //   splitChunks: {
