@@ -510,6 +510,8 @@ importers:
       ts-node-dev: ^2.0.0
       type-graphql: ^1.1.1
       typescript: ^4.9.4
+      unplugin-auto-import: ^0.13.0
+      unplugin-icons: ^0.15.2
       vitest: ^0.27.1
       web-ext: ^7.4.0
       webextension-polyfill: ^0.10.0
@@ -625,6 +627,8 @@ importers:
       ts-node-dev: 2.0.0_typescript@4.9.4
       type-graphql: 1.1.1_graphql@16.6.0
       typescript: 4.9.4
+      unplugin-auto-import: 0.13.0
+      unplugin-icons: 0.15.2
       vitest: 0.27.1_jsdom@20.0.3
       web-ext: 7.5.0
       webpack: 5.75.0_webpack-cli@4.10.0
@@ -648,6 +652,17 @@ packages:
       esbuild: ~0.14.29
     dependencies:
       esbuild: 0.17.5
+    dev: true
+
+  /@antfu/install-pkg/0.1.1:
+    resolution: {integrity: sha512-LyB/8+bSfa0DFGC06zpCEfs89/XoWZwws5ygEa5D+Xsm3OfI+aXQ86VgVG7Acyef+rSZ5HE7J8rrxzrQeM3PjQ==}
+    dependencies:
+      execa: 5.1.1
+      find-up: 5.0.0
+    dev: true
+
+  /@antfu/utils/0.7.2:
+    resolution: {integrity: sha512-vy9fM3pIxZmX07dL+VX1aZe7ynZ+YyB0jY+jE6r3hOK6GNY2t6W8rzpFC4tgpbXUYABkFQwgJq2XYXlxbXAI0g==}
     dev: true
 
   /@apollo/client/3.7.4:
@@ -7092,7 +7107,7 @@ packages:
       '@graphql-codegen/plugin-helpers': 2.7.2
       '@graphql-tools/schema': 9.0.4
       '@graphql-tools/utils': 9.1.1
-      tslib: 2.4.0
+      tslib: 2.4.1
     dev: true
 
   /@graphql-codegen/core/2.6.6_graphql@16.6.0:
@@ -7186,7 +7201,7 @@ packages:
       common-tags: 1.8.2
       import-from: 4.0.0
       lodash: 4.17.21
-      tslib: 2.4.0
+      tslib: 2.4.1
     dev: true
 
   /@graphql-codegen/plugin-helpers/2.7.1_graphql@16.6.0:
@@ -7213,7 +7228,7 @@ packages:
       common-tags: 1.8.2
       import-from: 4.0.0
       lodash: 4.17.21
-      tslib: 2.4.0
+      tslib: 2.4.1
     dev: true
 
   /@graphql-codegen/plugin-helpers/2.7.2_graphql@16.6.0:
@@ -7360,7 +7375,7 @@ packages:
       dependency-graph: 0.11.0
       graphql-tag: 2.12.6
       parse-filepath: 1.0.2
-      tslib: 2.4.0
+      tslib: 2.4.1
     transitivePeerDependencies:
       - encoding
       - supports-color
@@ -7477,7 +7492,7 @@ packages:
       '@ardatan/sync-fetch': 0.0.1
       '@graphql-tools/utils': 8.12.0
       '@whatwg-node/fetch': 0.4.7
-      tslib: 2.4.0
+      tslib: 2.4.1
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -7527,7 +7542,7 @@ packages:
       '@graphql-tools/graphql-tag-pluck': 7.4.0
       '@graphql-tools/utils': 9.1.1
       globby: 11.1.0
-      tslib: 2.4.0
+      tslib: 2.4.1
       unixify: 1.0.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -7586,7 +7601,7 @@ packages:
       '@graphql-tools/utils': 9.1.1
       is-glob: 4.0.3
       micromatch: 4.0.5
-      tslib: 2.4.0
+      tslib: 2.4.1
       unixify: 1.0.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -7619,7 +7634,7 @@ packages:
       '@graphql-tools/graphql-tag-pluck': 7.4.0
       '@graphql-tools/utils': 9.1.1
       '@whatwg-node/fetch': 0.5.3
-      tslib: 2.4.0
+      tslib: 2.4.1
     transitivePeerDependencies:
       - '@babel/core'
       - encoding
@@ -7651,7 +7666,7 @@ packages:
       '@graphql-tools/import': 6.7.6
       '@graphql-tools/utils': 8.12.0
       globby: 11.1.0
-      tslib: 2.4.0
+      tslib: 2.4.1
       unixify: 1.0.0
     dev: true
 
@@ -7729,7 +7744,7 @@ packages:
     dependencies:
       '@graphql-tools/utils': 8.12.0
       globby: 11.1.0
-      tslib: 2.4.0
+      tslib: 2.4.1
       unixify: 1.0.0
     dev: true
 
@@ -7753,7 +7768,7 @@ packages:
       '@graphql-tools/schema': 9.0.4
       '@graphql-tools/utils': 8.12.0
       p-limit: 3.1.0
-      tslib: 2.4.0
+      tslib: 2.4.1
     dev: true
 
   /@graphql-tools/load/7.8.0_graphql@16.6.0:
@@ -7826,7 +7841,7 @@ packages:
       jsonwebtoken: 8.5.1
       lodash: 4.17.21
       scuid: 1.1.0
-      tslib: 2.4.0
+      tslib: 2.4.1
       yaml-ast-parser: 0.0.43
     transitivePeerDependencies:
       - '@types/node'
@@ -7935,7 +7950,7 @@ packages:
       graphql-ws: 5.11.2
       isomorphic-ws: 5.0.0_ws@8.11.0
       meros: 1.2.1_@types+node@18.11.9
-      tslib: 2.4.0
+      tslib: 2.4.1
       value-or-promise: 1.0.11
       ws: 8.11.0
     transitivePeerDependencies:
@@ -7977,7 +7992,7 @@ packages:
     peerDependencies:
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
     dependencies:
-      tslib: 2.4.0
+      tslib: 2.4.1
     dev: true
 
   /@graphql-tools/utils/8.12.0_graphql@16.6.0:
@@ -8126,6 +8141,23 @@ packages:
 
   /@iarna/toml/2.2.5:
     resolution: {integrity: sha512-trnsAYxU3xnS1gPHPyU961coFyLkh4gAD/0zQ5mymY4yOZ+CYvsPqUbOFSw0aDM4y0tV7tiFxL/1XfXPNC6IPg==}
+    dev: true
+
+  /@iconify/types/2.0.0:
+    resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
+    dev: true
+
+  /@iconify/utils/2.1.0:
+    resolution: {integrity: sha512-ouXv1hQfOKq4k3wxQ2OJBYQ2gXBMeFoUCIiORmuUVUNlSq9oOTzQBF3jpFRb0+/P0bnV+RIoHcbZKufZTlJ16g==}
+    dependencies:
+      '@antfu/install-pkg': 0.1.1
+      '@antfu/utils': 0.7.2
+      '@iconify/types': 2.0.0
+      debug: 4.3.4
+      kolorist: 1.6.0
+      local-pkg: 0.4.3
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /@internationalized/date/3.0.1:
@@ -9069,7 +9101,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/conf': 3.15.0_typescript@4.9.4
       '@lingui/core': 3.15.0
-      '@lingui/react': 3.15.0_react@18.1.0
+      '@lingui/react': 3.15.0_react@18.2.0
       babel-plugin-macros: 3.1.0
       ramda: 0.27.2
     transitivePeerDependencies:
@@ -9087,6 +9119,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.1.0
+    dev: false
 
   /@lingui/react/3.15.0_react@18.2.0:
     resolution: {integrity: sha512-Xq/48yf2IQhOPpgpqydj1OUyfDgNOY4aattmG4195LeqGPhN0ckiUCBLlNm0vHRsO3ZGwzfprTLYfI9WbfLBzA==}
@@ -9097,7 +9130,6 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.2.0
-    dev: true
 
   /@lukeed/ms/2.0.0:
     resolution: {integrity: sha512-NOlhE40rGptwLwJhE0ZW259hcoa+nkpQRQ1FUKV4Sr2z1Eh2WfkHQ3jjBNF7YEqOrF0TOpqnyU1wClvWBrXByg==}
@@ -11262,6 +11294,20 @@ packages:
       typescript: 4.9.5
     dev: false
 
+  /@rollup/pluginutils/5.0.2:
+    resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@types/estree': 1.0.0
+      estree-walker: 2.0.2
+      picomatch: 2.3.1
+    dev: true
+
   /@sentry/browser/7.14.1:
     resolution: {integrity: sha512-b9nW2+kT9Jl/tfzJmvzpnS6F8ziC62TDx04a7kZDtuaVA5rKKTTlLDg8ZamCRFjjnuwuFhLnzxO34N0KfeTqHg==}
     engines: {node: '>=8'}
@@ -13396,7 +13442,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.4_ila5be2toiy6xjqjieu6owlh24
+      '@apollo/client': 3.7.4_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 
@@ -16674,6 +16720,11 @@ packages:
     resolution: {integrity: sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==}
     engines: {node: '>=10'}
 
+  /escape-string-regexp/5.0.0:
+    resolution: {integrity: sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==}
+    engines: {node: '>=12'}
+    dev: true
+
   /escodegen/1.14.3:
     resolution: {integrity: sha512-qFcX0XJkdg+PB3xjZZG/wKSuT1PnQWx57+TVSjIMmILd2yC/6ByYElPwJnslDsuWuSAp4AwJGumarAAmJch5Kw==}
     engines: {node: '>=4.0'}
@@ -17059,6 +17110,10 @@ packages:
   /estraverse/5.3.0:
     resolution: {integrity: sha512-MMdARuVEQziNTeJD8DgMqmhwR11BRQ/cBP+pLtYdSTnf3MIO8fFeiINEbX36ZdNlfU/7A9f3gUw49B3oQsvwBA==}
     engines: {node: '>=4.0'}
+    dev: true
+
+  /estree-walker/2.0.2:
+    resolution: {integrity: sha512-Rfkk/Mp/DL7JVje3u18FxFujQlTNR2q6QfMSMB7AvCBx91NGj/ba3kCfza0f6dVDbw7YlRf/nDrn7pQrCCyQ/w==}
     dev: true
 
   /esutils/2.0.3:
@@ -18441,7 +18496,7 @@ packages:
       minimatch: 4.2.1
       string-env-interpolation: 1.0.1
       ts-node: 10.9.1_3v2cms72gsblw7jmali7btb3pu
-      tslib: 2.4.0
+      tslib: 2.4.1
     transitivePeerDependencies:
       - '@swc/core'
       - '@swc/wasm'
@@ -20753,6 +20808,10 @@ packages:
     engines: {node: '>= 8'}
     dev: true
 
+  /kolorist/1.6.0:
+    resolution: {integrity: sha512-dLkz37Ab97HWMx9KTes3Tbi3D1ln9fCAy2zr2YVExJasDRPGRaKcoE4fycWNtnCAJfjFqe0cnY+f8KT2JePEXQ==}
+    dev: true
+
   /latest-version/7.0.0:
     resolution: {integrity: sha512-KvNT4XqAMzdcL6ka6Tl3i2lYeFDgXNCuIX+xNx6ZMVR1dFq+idXd9FLKNMOIx0t9mJ9/HudyX4oZWXZQ0UJHeg==}
     engines: {node: '>=14.16'}
@@ -20879,6 +20938,11 @@ packages:
 
   /local-pkg/0.4.2:
     resolution: {integrity: sha512-mlERgSPrbxU3BP4qBqAvvwlgW4MTg78iwJdGGnv7kibKjWcJksrG3t6LB5lXI93wXRDvG4NpUgJFmTG4T6rdrg==}
+    engines: {node: '>=14'}
+    dev: true
+
+  /local-pkg/0.4.3:
+    resolution: {integrity: sha512-SFppqq5p42fe2qcZQqqEOiVRXl+WCP1MdT6k7BDEW1j++sp5fIY+/fdRQitvKgB5BrBcmrs5m/L0v2FrU5MY1g==}
     engines: {node: '>=14'}
     dev: true
 
@@ -21112,6 +21176,13 @@ packages:
   /lru_map/0.3.3:
     resolution: {integrity: sha512-Pn9cox5CsMYngeDbmChANltQl+5pi6XmTrraMSzhPmMBbmgcxmqWry0U3PGapCU1yB4/LqCcom7qhHZiF/jGfQ==}
     dev: false
+
+  /magic-string/0.27.0:
+    resolution: {integrity: sha512-8UnnX2PeRAPZuN12svgR9j7M1uWMovg/CEnIwIG0LFkXSJJe4PdfUGiTGl8V9bsBHFUtfVINcSyYxd7q+kx9fA==}
+    engines: {node: '>=12'}
+    dependencies:
+      '@jridgewell/sourcemap-codec': 1.4.14
+    dev: true
 
   /make-dir/2.1.0:
     resolution: {integrity: sha512-LS9X+dc8KLxXCb8dni79fLIIUA5VyZoyjSMCwTluaXA0o27cCK0bhXkpgw+sTXVpPy/lSO57ilRixqk0vDmtRA==}
@@ -24998,6 +25069,10 @@ packages:
     resolution: {integrity: sha512-MuCAyrGZcTLfQoH2XoBlQ8C6bzwN88XT/0slOGz0pn8+gIP85BOAfYa44ZXQUTOwRwPU0QvgU+V+OSajl/59Xg==}
     dev: true
 
+  /scule/1.0.0:
+    resolution: {integrity: sha512-4AsO/FrViE/iDNEPaAQlb77tf0csuq27EsVpy6ett584EcRTp6pTDLoGWVxCD77y5iU5FauOvhsI4o1APwPoSQ==}
+    dev: true
+
   /secure-json-parse/2.4.0:
     resolution: {integrity: sha512-Q5Z/97nbON5t/L/sH6mY2EacfjVGwrCcSi5D3btRO2GZ8pf1K1UN7Z9H5J57hjVU2Qzxr1xO+FmBhOvEkzCMmg==}
     dev: false
@@ -26700,6 +26775,24 @@ packages:
     resolution: {integrity: sha512-6t3foTQI9qne+OZoVQB/8x8rk2k1eVy1gRXhV3oFQ5T6R1dqQ1xtin3XqSlx3+ATBkliTaR/hHyJBm+LVPNM8w==}
     engines: {node: '>=4'}
 
+  /unimport/2.1.0:
+    resolution: {integrity: sha512-GDVIxATluUquX8EqelT6DtnmnZaXGID1jsO9IXwlnxb0OIEqKAxTOnTlnGmHbseoGTh+ZC9kcNDaO18HYQj9KA==}
+    dependencies:
+      '@rollup/pluginutils': 5.0.2
+      escape-string-regexp: 5.0.0
+      fast-glob: 3.2.12
+      local-pkg: 0.4.3
+      magic-string: 0.27.0
+      mlly: 1.1.0
+      pathe: 1.1.0
+      pkg-types: 1.0.1
+      scule: 1.0.0
+      strip-literal: 1.0.0
+      unplugin: 1.0.1
+    transitivePeerDependencies:
+      - rollup
+    dev: true
+
   /union-value/1.0.1:
     resolution: {integrity: sha512-tJfXmxMeWYnczCVs7XAEvIV7ieppALdyepWMkHkwciRpZraG/xwT+s2JN8+pr1+8jCRf80FFzvr+MpQeeoF4Xg==}
     engines: {node: '>=0.10.0'}
@@ -26762,6 +26855,53 @@ packages:
     engines: {node: '>= 0.8'}
     dev: false
 
+  /unplugin-auto-import/0.13.0:
+    resolution: {integrity: sha512-nKMxDbkjM4FRPInFfm7sWrJOKgxfKKwb5yLPP+DEGl/SG0/FtBoW1LnZL4PQfx0FXjertoHO1P/5nDf+RSip2Q==}
+    engines: {node: '>=14'}
+    peerDependencies:
+      '@vueuse/core': '*'
+    peerDependenciesMeta:
+      '@vueuse/core':
+        optional: true
+    dependencies:
+      '@antfu/utils': 0.7.2
+      '@rollup/pluginutils': 5.0.2
+      local-pkg: 0.4.3
+      magic-string: 0.27.0
+      unimport: 2.1.0
+      unplugin: 1.0.1
+    transitivePeerDependencies:
+      - rollup
+    dev: true
+
+  /unplugin-icons/0.15.2:
+    resolution: {integrity: sha512-oWTTdLMuqfEYfZcko+KZHDEOIsqT4OeyJB1e4U7luCOo9gto/JLyHkqfbqjmjkjdQqA3DNHS18WOKh5esqQM5g==}
+    peerDependencies:
+      '@svgr/core': '>=5.5.0'
+      '@vue/compiler-sfc': ^3.0.2 || ^2.7.0
+      vue-template-compiler: ^2.6.12
+      vue-template-es2015-compiler: ^1.9.0
+    peerDependenciesMeta:
+      '@svgr/core':
+        optional: true
+      '@vue/compiler-sfc':
+        optional: true
+      vue-template-compiler:
+        optional: true
+      vue-template-es2015-compiler:
+        optional: true
+    dependencies:
+      '@antfu/install-pkg': 0.1.1
+      '@antfu/utils': 0.7.2
+      '@iconify/utils': 2.1.0
+      debug: 4.3.4
+      kolorist: 1.6.0
+      local-pkg: 0.4.2
+      unplugin: 1.0.1
+    transitivePeerDependencies:
+      - supports-color
+    dev: true
+
   /unplugin-swc/1.3.2_hlhpg3gfwsexhsa4pjlgwbk3x4:
     resolution: {integrity: sha512-x0+NTM4NR1jWpailVhK5sXO9svyL4iWZ+yah0WZ1G+SaI1hPysa95nVSzXqLP7y4+MKTO17wP+EVqjrREqgBsw==}
     peerDependencies:
@@ -26798,6 +26938,15 @@ packages:
       vite: 4.1.1
       webpack-sources: 3.2.3
       webpack-virtual-modules: 0.4.4
+    dev: true
+
+  /unplugin/1.0.1:
+    resolution: {integrity: sha512-aqrHaVBWW1JVKBHmGo33T5TxeL0qWzfvjWokObHA9bYmN7eNDkwOxmLjhioHl9878qDFMAaT51XNroRyuz7WxA==}
+    dependencies:
+      acorn: 8.8.1
+      chokidar: 3.5.3
+      webpack-sources: 3.2.3
+      webpack-virtual-modules: 0.5.0
     dev: true
 
   /unset-value/1.0.0:
@@ -27500,6 +27649,10 @@ packages:
 
   /webpack-virtual-modules/0.4.4:
     resolution: {integrity: sha512-h9atBP/bsZohWpHnr+2sic8Iecb60GxftXsWNLLLSqewgIsGzByd2gcIID4nXcG+3tNe4GQG3dLcff3kXupdRA==}
+    dev: true
+
+  /webpack-virtual-modules/0.5.0:
+    resolution: {integrity: sha512-kyDivFZ7ZM0BVOUteVbDFhlRt7Ah/CSPwJdi8hBpkK7QLumUqdLtVfm/PX/hkcnrvr0i77fO5+TjZ94Pe+C9iw==}
     dev: true
 
   /webpack/5.75.0_webpack-cli@4.10.0:
