@@ -1,4 +1,4 @@
-const PBKDF2Iterations = 300000
+const PBKDF2Iterations = 600000
 
 /**
  * @returns string in base64

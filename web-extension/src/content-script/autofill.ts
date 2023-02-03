@@ -182,7 +182,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //Fill known inputs
     const filledElements = webInputs
       .filter(({ url }) => {
-        console.log('~ url', url)
+        log('~ url', url)
         //FIX: THIS
         const host = new URL(url).host
         const matches = location.href.includes(host)
@@ -197,7 +197,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         log('cords', rect.x, rect.y)
         //NOTE: We found element by DOM path
         if (inputEl) {
-          log('autofilled by domPath')
+          log('autofilled by domPath', inputEl)
           if (webInputGql.kind === WebInputType.PASSWORD && namePassSecret) {
             return autofillValueIntoInput(
               inputEl,

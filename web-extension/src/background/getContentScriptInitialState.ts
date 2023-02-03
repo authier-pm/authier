@@ -31,6 +31,7 @@ export const getContentScriptInitialState = async (
     ([] as ISecret[])
 
   const res = await getWebInputs(hostname)
+  log('res', res)
   const userInfo = await getAccountLimits()
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,

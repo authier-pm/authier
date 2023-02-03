@@ -66,7 +66,6 @@ export interface IInitStateRes {
     | undefined
 }
 
-// TODO spec
 export function getWebInputKind(
   targetElement: HTMLInputElement
 ): WebInputType | null {
@@ -81,7 +80,7 @@ export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
-export async function initInputWatch() {
+export async function initInputWatch(addManualInput = false) {
   stateInitRes =
     (await trpc.getContentScriptInitialState.query()) as IInitStateRes
 
@@ -91,6 +90,25 @@ export async function initInputWatch() {
     log('Press key')
     document.addEventListener('keydown', recordInputs, true)
   }
+
+  // if(addManualInput) {
+  //   document.addEventListener('click', (e) => {
+  //     if(e.target instanceof HTMLInputElement) {
+  //       const kind = getWebInputKind(e.target)
+  //       if(kind === WebInputType.PASSWORD) {
+  //         const coords = getElementCoordinates(e.target)
+  //         const inputRecord: IInputRecord = {
+  //           element: e.target,
+  //           eventType: 'input',
+  //           kind,
+  //           inputted: e.target.value,
+  //           domCoordinates: coords
+  //         }
+  //         domRecorder.addInputEvent(inputRecord)
+  //       }
+  //     }
+  //   })
+  // }
 
   if (!stateInitRes) {
     log('no state')
@@ -106,7 +124,7 @@ export async function initInputWatch() {
   } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
-    log('no need to do anything-user locked out')
+    log('no need to do anything-user locked out or autofill disabled')
     return
   }
 
@@ -126,14 +144,21 @@ export async function initInputWatch() {
 
   const onInputRemoved = (input) => {
     // handle case when password input is removed from DOM by javascript
-    if (input.type === 'password' && domRecorder.hasInput(input)) {
+    if (
+      (input.type === 'password' && !domRecorder.hasInput(input)) ||
+      (input.type === 'text' && !domRecorder.hasInput(input))
+    ) {
       onSubmit(input)
     }
   }
 
   const onInputAdded = (input) => {
+    log('input added', input.type, domRecorder.hasInput(input))
     // handle case when password input is added to DOM by javascript
-    if (input.type === 'password' && !domRecorder.hasInput(input)) {
+    if (
+      (input.type === 'password' && !domRecorder.hasInput(input)) ||
+      (input.type === 'text' && !domRecorder.hasInput(input))
+    ) {
       autofill(stateInitRes)
     }
   }

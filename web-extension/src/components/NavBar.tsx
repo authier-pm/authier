@@ -100,6 +100,17 @@ export const NavBar: FunctionComponent = () => {
               }}
             />
           </Tooltip>
+          <Tooltip label={t`Add Input`} aria-label={t`Add Input`}>
+            <IconButton
+              size="md"
+              ml="2"
+              aria-label="menu"
+              icon={<IoMdArchive />}
+              onClick={async () => {
+                chrome.tabs.create({ url: 'vault.html' })
+              }}
+            />
+          </Tooltip>
         </Box>
 
         <Box ml="auto">

@@ -38,7 +38,6 @@ import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
   cryptoKeyToString,
   abToCryptoKey,
-  buff_to_base64,
   enc,
   dec,
   base64_to_buf,
