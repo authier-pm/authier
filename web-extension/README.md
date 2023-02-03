@@ -23,6 +23,7 @@
 Run the following commands to install dependencies and start developing
 
 ```
+cp .env.example .env
 yarn install
 yarn dev
 ```
