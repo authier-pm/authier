@@ -13,4 +13,12 @@ module.exports = merge(common, {
         'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql'
     })
   ]
+  // TODO: this is not working. breaks with error on init in popup
+  // optimization: {
+  //   splitChunks: {
+  //     chunks: 'all',
+  //     minChunks: 4,
+  //     maxSize: 3500000
+  //   }
+  // },
 })
