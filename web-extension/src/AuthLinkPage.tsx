@@ -7,6 +7,7 @@ import { IoMdArchive } from 'react-icons/io'
 import browser from 'webextension-polyfill'
 
 export function openVaultTab(afterHash: string = '') {
+  //WARNING: In firefox, the path does not need js/ but in chrome it does
   browser.tabs.create({ url: `vault.html#${afterHash}` })
 }
 
