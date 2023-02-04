@@ -31,7 +31,7 @@ runs:
       shell: bash
       working-directory: ./web-extension
       run: |
-        pnpm prodbuild
+        pnpm prodBuild
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1

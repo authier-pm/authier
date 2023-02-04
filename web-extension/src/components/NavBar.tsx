@@ -96,7 +96,7 @@ export const NavBar: FunctionComponent = () => {
               aria-label="menu"
               icon={<IoMdArchive />}
               onClick={async () => {
-                chrome.tabs.create({ url: 'vault.html' })
+                openVault()
               }}
             />
           </Tooltip>
