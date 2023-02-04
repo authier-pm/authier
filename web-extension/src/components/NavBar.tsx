@@ -16,6 +16,7 @@ import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdArchive } from 'react-icons/io'
 import { t } from '@lingui/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
+import { openVaultTab } from '@src/AuthLinkPage'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -49,10 +50,6 @@ export const NavBar: FunctionComponent = () => {
   useEffect(() => {
     SetLastPage(location)
   }, [])
-
-  function openVault() {
-    throw new Error('Function not implemented.')
-  }
 
   return (
     <Flex
@@ -100,7 +97,7 @@ export const NavBar: FunctionComponent = () => {
               aria-label="menu"
               icon={<IoMdArchive />}
               onClick={async () => {
-                openVault()
+                openVaultTab()
               }}
             />
           </Tooltip>
