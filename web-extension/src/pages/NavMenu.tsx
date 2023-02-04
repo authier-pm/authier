@@ -5,6 +5,7 @@ import { Button, ButtonGroup, Stack, useColorModeValue } from '@chakra-ui/react'
 import { InfoOutlineIcon } from '@chakra-ui/icons'
 import { Link } from 'wouter'
 import { AddTOTPSecretButton } from '@src/components/pages/AddTOTPSecretButton'
+import { openVaultTab } from '@src/AuthLinkPage'
 
 export const NavMenu: FunctionComponent = () => {
   const bg = useColorModeValue('teal.200', 'teal.700')
@@ -27,7 +28,7 @@ export const NavMenu: FunctionComponent = () => {
 
           <Button
             onClick={() => {
-              chrome.tabs.create({ url: 'vault.html' })
+              openVaultTab()
             }}
           >
             My vault

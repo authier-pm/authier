@@ -139,7 +139,7 @@ const appRouter = t.router({
       })
 
       if (input.openInVault) {
-        browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
+        browser.tabs.create({ url: `js/vault.html#/secret/${secret.id}` })
       }
     }),
   saveCapturedInputEvents: t.procedure

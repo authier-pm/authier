@@ -31,7 +31,7 @@ yarn dev
 ### How to build
 
 ```
-yarn prodbuild
+yarn prodBuild
 ```
 
 **Scripts**
