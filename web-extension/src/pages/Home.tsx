@@ -11,12 +11,13 @@ import {
   Switch,
   useInterval
 } from '@chakra-ui/react'
-
+import browser from 'webextension-polyfill'
 import { authenticator } from 'otplib'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AddIcon } from '@chakra-ui/icons'
 import { AuthsList } from '@src/components/pages/AuthsList'
+import { openVaultTab } from '@src/AuthLinkPage'
 
 export const Home: FunctionComponent = () => {
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
@@ -33,8 +34,8 @@ export const Home: FunctionComponent = () => {
   const filterByTLD = !currentURL
     ? true
     : filterByTLDManual === null
-      ? currentURL.startsWith('http')
-      : filterByTLDManual
+    ? currentURL.startsWith('http')
+    : filterByTLDManual
   return (
     <>
       <Flex position="sticky" align="center" pl={4} pr={4} mt={'56px'}>
@@ -56,7 +57,7 @@ export const Home: FunctionComponent = () => {
           icon={<AddIcon />}
           rounded={'full'}
           onClick={async () => {
-            chrome.tabs.create({ url: 'vault.html#/addItem' })
+            openVaultTab('/addItem')
           }}
         />
 

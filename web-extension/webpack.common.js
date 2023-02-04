@@ -3,7 +3,7 @@ const path = require('path')
 const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
 const ExtensionReloader = require('webpack-ext-reloader')
-
+const HtmlWebpackPlugin = require('html-webpack-plugin')
 module.exports = {
   entry: {
     backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
@@ -13,14 +13,43 @@ module.exports = {
   },
   output: {
     path: path.join(__dirname, 'dist/js'),
-    filename: '[name].js'
+    filename: '[name].js',
+    chunkFilename: '[name].[chunkhash].chunk.js'
   },
 
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
-    new ExtensionReloader(),
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['popup'],
+      filename: 'popup.html',
+      templateContent: `
+    <html>
+    <head>
+      <title>Authier Extension - Popup</title>
+    </head>
+      <body>
+        <div id="popup"></div>
+      </body>
+    </html>`
+    }),
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['vault'],
+      filename: 'vault.html',
+      templateContent: `
+    <html>
+    <head>
+      <title>Authier Extension - Vault</title>
+    </head>
+      <body>
+        <div id="vault"></div>
+      </body>
+    </html>`
+    }),
+    // new ExtensionReloader(),
     new Dotenv()
   ],
   module: {

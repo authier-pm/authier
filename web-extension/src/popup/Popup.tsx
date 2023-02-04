@@ -17,7 +17,7 @@ import debug from 'debug'
 const log = debug('au:Popup')
 
 i18n.activate('en')
-
+console.log('aaaa')
 export const Popup: FunctionComponent = () => {
   const [location, setLocation] = useLocation()
 

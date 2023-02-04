@@ -30,6 +30,6 @@ export const test = base.extend<{
 export const expect = test.expect
 
 test('Login page is visible', async ({ page, extensionId }) => {
-  await page.goto(`chrome-extension://${extensionId}/vault.html#`)
+  await page.goto(`chrome-extension://${extensionId}/js/vault.html#`)
   await page.locator('text=Login').first().isVisible()
 })

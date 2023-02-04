@@ -37,7 +37,7 @@ export const LoginContext = React.createContext<{
   setFormState: Dispatch<SetStateAction<LoginFormValues | null>>
 }>()
 
-// export const isRunningInVault = location.href.includes('/vault.html#')
+// export const isRunningInVault = location.href.includes('js/vault.html#')
 
 export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
