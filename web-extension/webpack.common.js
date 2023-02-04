@@ -4,6 +4,9 @@ const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
 const ExtensionReloader = require('webpack-ext-reloader')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const BundleAnalyzerPlugin =
+  require('webpack-bundle-analyzer').BundleAnalyzerPlugin
+
 module.exports = {
   entry: {
     backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
@@ -50,7 +53,8 @@ module.exports = {
     </html>`
     }),
     // new ExtensionReloader(),
-    new Dotenv()
+    new Dotenv(),
+    new BundleAnalyzerPlugin()
   ],
   module: {
     rules: [
