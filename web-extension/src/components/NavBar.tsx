@@ -50,6 +50,10 @@ export const NavBar: FunctionComponent = () => {
     SetLastPage(location)
   }, [])
 
+  function openVault() {
+    throw new Error('Function not implemented.')
+  }
+
   return (
     <Flex
       flexDir="column"
