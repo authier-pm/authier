@@ -516,6 +516,7 @@ importers:
       web-ext: ^7.4.0
       webextension-polyfill: ^0.10.0
       webpack: ^5.75.0
+      webpack-bundle-analyzer: ^4.7.0
       webpack-cli: ^4.10.0
       webpack-ext-reloader: ^1.1.9
       webpack-merge: ^5.8.0
@@ -632,7 +633,8 @@ importers:
       vitest: 0.27.1_jsdom@20.0.3
       web-ext: 7.5.0
       webpack: 5.75.0_webpack-cli@4.10.0
-      webpack-cli: 4.10.0_webpack@5.75.0
+      webpack-bundle-analyzer: 4.7.0
+      webpack-cli: 4.10.0_zfjer5eiwvoit4zaxwbfe5plkm
       webpack-ext-reloader: 1.1.9_pda42hcaj7d62cr262fr632kue
       webpack-merge: 5.8.0
       zod: 3.20.2
@@ -9299,6 +9301,10 @@ packages:
       config-chain: 1.1.13
     dev: true
 
+  /@polka/url/1.0.0-next.21:
+    resolution: {integrity: sha512-a5Sab1C4/icpTZVzZc5Ghpz88yQtGOyNqYXcZgOssB2uuAr+wF/MvN6bgtW32q7HHrvBki+BsZ0OuNv6EV3K9g==}
+    dev: true
+
   /@popperjs/core/2.11.6:
     resolution: {integrity: sha512-50/17A98tWUfQ176raKiOGXuYpLyyVMkxxG6oylzL3BPOlA6ADGdK7EYunSa4I064xerltq9TGXs8HmOk5E+vw==}
 
@@ -12845,7 +12851,7 @@ packages:
       webpack-cli: 4.x.x
     dependencies:
       webpack: 5.75.0_webpack-cli@4.10.0
-      webpack-cli: 4.10.0_webpack@5.75.0
+      webpack-cli: 4.10.0_zfjer5eiwvoit4zaxwbfe5plkm
     dev: true
 
   /@webpack-cli/info/1.5.0_webpack-cli@4.10.0:
@@ -12854,7 +12860,7 @@ packages:
       webpack-cli: 4.x.x
     dependencies:
       envinfo: 7.8.1
-      webpack-cli: 4.10.0_webpack@5.75.0
+      webpack-cli: 4.10.0_zfjer5eiwvoit4zaxwbfe5plkm
     dev: true
 
   /@webpack-cli/serve/1.7.0_webpack-cli@4.10.0:
@@ -12866,7 +12872,7 @@ packages:
       webpack-dev-server:
         optional: true
     dependencies:
-      webpack-cli: 4.10.0_webpack@5.75.0
+      webpack-cli: 4.10.0_zfjer5eiwvoit4zaxwbfe5plkm
     dev: true
 
   /@whatwg-node/fetch/0.3.2:
@@ -16220,6 +16226,10 @@ packages:
     dev: true
     optional: true
 
+  /duplexer/0.1.2:
+    resolution: {integrity: sha512-jtD6YG370ZCIi/9GTaJKQxWTZD045+4R4hTk/x1UyoqadyJ9x9CgSi1RlVDQF8U2sxLLSnFkCaMihqljHIWgMg==}
+    dev: true
+
   /duplexify/4.1.2:
     resolution: {integrity: sha512-fz3OjcNCHmRP12MJoZMPglx8m4rrFP8rovnk4vT8Fs+aonZoCwGg10dSsQsfP/E62eZcPTMSMP6686fu9Qlqtw==}
     dependencies:
@@ -18651,6 +18661,13 @@ packages:
       - supports-color
     dev: false
     optional: true
+
+  /gzip-size/6.0.0:
+    resolution: {integrity: sha512-ax7ZYomf6jqPTQ4+XCpUGyXKHk5WweS+e05MBO4/y3WJ5RkmPXNKvX+bx1behVILVwr6JSQvZAku021CHPXG3Q==}
+    engines: {node: '>=10'}
+    dependencies:
+      duplexer: 0.1.2
+    dev: true
 
   /har-schema/2.0.0:
     resolution: {integrity: sha512-Oqluz6zhGX8cyRaTQlFMPw80bSJVG2x/cFb8ZPhUILGgHka9SsokCCOQgpveePerqidZOrT14ipqfJb7ILcW5Q==}
@@ -21936,6 +21953,11 @@ packages:
     engines: {node: '>=4'}
     dev: true
 
+  /mrmime/1.0.1:
+    resolution: {integrity: sha512-hzzEagAgDyoU1Q6yg5uI+AorQgdvMCur3FcKf7NhMKWsaYg+RnbTyHRa/9IlLF9rf455MOCtcqqrQQ83pPP7Uw==}
+    engines: {node: '>=10'}
+    dev: true
+
   /ms/2.0.0:
     resolution: {integrity: sha512-Tpp60P6IUJDTuOq/5Z8cdskzJujfwqfOTkrwIwj7IRISpnkJnT6SyJ4PCPnGMoFjC9ddhal5KVIYtAt97ix05A==}
 
@@ -22496,6 +22518,11 @@ packages:
     resolution: {integrity: sha512-8AV/sCtuzUeTo8gQK5qDZzARrulB3egtLzFgteqB2tcT4Mw7B8Kt7JcDHmltjz6FOAHsvTevk70gZEbhM4ZS9Q==}
     hasBin: true
     dev: false
+
+  /opener/1.5.2:
+    resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
+    hasBin: true
+    dev: true
 
   /optimism/0.10.3:
     resolution: {integrity: sha512-9A5pqGoQk49H6Vhjb9kPgAeeECfUDF6aIICbMDL23kDLStBn1MWk3YvcZ4xWF9CsSf6XEgvRLkXy4xof/56vVw==}
@@ -25297,6 +25324,15 @@ packages:
       safe-stable-stringify: 2.3.1
     dev: false
 
+  /sirv/1.0.19:
+    resolution: {integrity: sha512-JuLThK3TnZG1TAKDwNIqNq6QA2afLOCcm+iE8D1Kj3GA40pSPsxQjjJl0J8X3tsR7T+CP1GavpzLwYkgVLWrZQ==}
+    engines: {node: '>= 10'}
+    dependencies:
+      '@polka/url': 1.0.0-next.21
+      mrmime: 1.0.1
+      totalist: 1.1.0
+    dev: true
+
   /sisteransi/1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
@@ -26318,6 +26354,11 @@ packages:
   /tosource/1.0.0:
     resolution: {integrity: sha512-N6g8eQ1eerw6Y1pBhdgkubWIiPFwXa2POSUrlL8jth5CyyEWNWzoGKRkO3CaO7Jx27hlJP54muB3btIAbx4MPg==}
     engines: {node: '>=0.4.0'}
+    dev: true
+
+  /totalist/1.1.0:
+    resolution: {integrity: sha512-gduQwd1rOdDMGxFG1gEvhV88Oirdo2p+KjoYFU7k2g+i7n6AFFbDQ5kMPUsW0pNbfQsB/cwXvT1i4Bue0s9g5g==}
+    engines: {node: '>=6'}
     dev: true
 
   /touch/3.1.0:
@@ -27489,7 +27530,26 @@ packages:
     engines: {node: '>=12'}
     dev: true
 
-  /webpack-cli/4.10.0_webpack@5.75.0:
+  /webpack-bundle-analyzer/4.7.0:
+    resolution: {integrity: sha512-j9b8ynpJS4K+zfO5GGwsAcQX4ZHpWV+yRiHDiL+bE0XHJ8NiPYLTNVQdlFYWxtpg9lfAQNlwJg16J9AJtFSXRg==}
+    engines: {node: '>= 10.13.0'}
+    hasBin: true
+    dependencies:
+      acorn: 8.8.1
+      acorn-walk: 8.2.0
+      chalk: 4.1.2
+      commander: 7.2.0
+      gzip-size: 6.0.0
+      lodash: 4.17.21
+      opener: 1.5.2
+      sirv: 1.0.19
+      ws: 7.5.9
+    transitivePeerDependencies:
+      - bufferutil
+      - utf-8-validate
+    dev: true
+
+  /webpack-cli/4.10.0_zfjer5eiwvoit4zaxwbfe5plkm:
     resolution: {integrity: sha512-NLhDfH/h4O6UOy+0LSso42xvYypClINuMNBVVzX4vX98TmTaTUxwRbXdhucbFMd2qLaCTcLq/PdYrvi8onw90w==}
     engines: {node: '>=10.13.0'}
     hasBin: true
@@ -27521,6 +27581,7 @@ packages:
       interpret: 2.2.0
       rechoir: 0.7.1
       webpack: 5.75.0_webpack-cli@4.10.0
+      webpack-bundle-analyzer: 4.7.0
       webpack-merge: 5.8.0
     dev: true
 
@@ -27602,7 +27663,7 @@ packages:
       tapable: 2.2.1
       terser-webpack-plugin: 5.3.6_webpack@5.75.0
       watchpack: 2.4.0
-      webpack-cli: 4.10.0_webpack@5.75.0
+      webpack-cli: 4.10.0_zfjer5eiwvoit4zaxwbfe5plkm
       webpack-sources: 3.2.3
     transitivePeerDependencies:
       - '@swc/core'
@@ -27824,7 +27885,6 @@ packages:
         optional: true
       utf-8-validate:
         optional: true
-    dev: false
 
   /ws/8.11.0:
     resolution: {integrity: sha512-HPG3wQd9sNQoT9xHyNCXoDUa+Xw/VevmY9FoHyQ+g+rrMn4j6FB4np7Z0OhdTgjx6MgQLK7jwSy1YecU1+4Asg==}
