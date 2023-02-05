@@ -53,8 +53,8 @@ module.exports = {
     </html>`
     }),
     // new ExtensionReloader(),
-    new Dotenv(),
-    new BundleAnalyzerPlugin()
+    new Dotenv()
+    //new BundleAnalyzerPlugin()
   ],
   module: {
     rules: [
