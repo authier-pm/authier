@@ -425,14 +425,14 @@ class ExtensionDevice {
   name: string
 
   async startLockInterval(lockTime: number) {
-    await chrome.runtime.sendMessage({
+    await browser.runtime.sendMessage({
       action: BackgroundMessageType.setLockInterval,
       time: lockTime
     })
   }
 
   async clearLockInterval() {
-    await chrome.runtime.sendMessage({
+    await browser.runtime.sendMessage({
       action: BackgroundMessageType.clearLockInterval
     })
   }

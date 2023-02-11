@@ -3,6 +3,7 @@ import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { popupDiv } from '../renderItemPopup'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
+import browser from 'webextension-polyfill'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -30,7 +31,7 @@ export const PrompItemPopup = ({ inputEvents }: { inputEvents: any }) => {
       }
     })
 
-    return chrome.runtime.sendMessage({
+    return browser.runtime.sendMessage({
       action: BackgroundMessageType.addLoginCredentials,
       payload: loginCredentials
     })

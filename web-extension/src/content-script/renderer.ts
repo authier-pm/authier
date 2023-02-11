@@ -163,9 +163,6 @@ export const showSavePromptIfAppropriate = async (
         action: BackgroundMessageType.getFallbackUsernames
       })
       log('fallbackUsernames', fallbackUsernames)
-      // const fallbackUsernames: string[] = await browser.runtime.sendMessage({
-      //   action: BackgroundMessageType.getFallbackUsernames
-      // })
       renderSaveCredentialsForm(
         fallbackUsernames[0],
         password,
