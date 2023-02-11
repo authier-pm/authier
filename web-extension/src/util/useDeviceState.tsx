@@ -108,7 +108,7 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      browser.runtime.sendMessage({
+      await browser.runtime.sendMessage({
         action: BackgroundMessageType.securitySettings,
         settings: config
       })
@@ -116,7 +116,7 @@ export function useDeviceState() {
 
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      browser.runtime.sendMessage({
+      await browser.runtime.sendMessage({
         action: BackgroundMessageType.setDeviceState,
         state: state
       })
