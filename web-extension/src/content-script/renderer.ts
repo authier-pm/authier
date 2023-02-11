@@ -1,9 +1,4 @@
-import {
-  domRecorder,
-  getWebInputKind,
-  IInitStateRes,
-  trpc
-} from './contentScript'
+import { domRecorder, getWebInputKind, IInitStateRes } from './contentScript'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import {
   loginPrompt,
