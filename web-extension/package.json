@@ -24,7 +24,7 @@
     "test:run": "cd .. && cd backend && pnpm dev",
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi",
-    "build:js": "vite build --config vite.config.content.ts",
+    "build:js": "vite build --config vite.config.ts",
     "dev:prepare": "ts-node scripts/prepare.ts",
     "dev:js": "pnpm build:js --mode development",
     "dev:test": "cross-env NODE_ENV=development pnpm dev:prepare && pnpm dev:js"
