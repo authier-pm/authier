@@ -20,17 +20,11 @@ import {
 } from './autofill'
 import { authenticator } from 'otplib'
 import { recordInputs, renderer, showSavePromptIfAppropriate } from './renderer'
-import { createTRPCProxyClient } from '@trpc/client'
-import { AppRouter } from '../background/chromeRuntimeListener'
-import { chromeLink } from 'trpc-chrome/link'
+import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
-
-const port = chrome.runtime.connect()
-export const trpc = createTRPCProxyClient<AppRouter>({
-  links: [chromeLink({ port })]
-})
+console.log('content script loaded2')
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
@@ -82,6 +76,7 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
 export async function initInputWatch() {
+  const trpc = getTRPCCached()
   stateInitRes =
     (await trpc.getContentScriptInitialState.query()) as IInitStateRes
 
@@ -145,7 +140,7 @@ export async function initInputWatch() {
    * responsible for saving new web inputs
    */
   const debouncedInputEventListener = debounce((ev) => {
-    log('Catched action', ev, ev.type)
+    log('Caught action', ev, ev.type)
     if (autofillEventsDispatched.has(ev)) {
       // this was dispatched by autofill, we don't need to do anything here
       autofillEventsDispatched.delete(ev)

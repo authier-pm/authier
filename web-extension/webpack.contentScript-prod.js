@@ -1,27 +1,17 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path')
 const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
-const ExtensionReloader = require('webpack-ext-reloader')
-const HtmlWebpackPlugin = require('html-webpack-plugin')
-const BundleAnalyzerPlugin =
-  require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
-const entries = {
-  backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
-  popup: path.join(__dirname, 'src/index.tsx'),
-  vault: path.join(__dirname, 'src/vault-index.tsx')
-}
-
-if (process.env.AUTHIER_ENV === 'dev') {
-  entries.contentScript = path.join(
-    __dirname,
-    'src/content-script/contentScript.ts'
-  )
-}
-
+// special config for content script because we cannot use split chunks with it
 module.exports = {
-  entry: entries,
+  mode: 'production',
+  devtool: 'eval',
+  optimization: {
+    minimize: false
+  },
+  entry: {
+    contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
+  },
   output: {
     path: path.join(__dirname, 'dist/js'),
     filename: '[name].js',
@@ -31,34 +21,6 @@ module.exports = {
   plugins: [
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
-    }),
-    new HtmlWebpackPlugin({
-      scriptLoading: 'blocking',
-      chunks: ['popup'],
-      filename: 'popup.html',
-      templateContent: `
-    <html>
-    <head>
-      <title>Authier Extension - Popup</title>
-    </head>
-      <body>
-        <div id="popup"></div>
-      </body>
-    </html>`
-    }),
-    new HtmlWebpackPlugin({
-      scriptLoading: 'blocking',
-      chunks: ['vault'],
-      filename: 'vault.html',
-      templateContent: `
-    <html>
-    <head>
-      <title>Authier Extension - Vault</title>
-    </head>
-      <body>
-        <div id="vault"></div>
-      </body>
-    </html>`
     }),
     // new ExtensionReloader(),
     new Dotenv()
