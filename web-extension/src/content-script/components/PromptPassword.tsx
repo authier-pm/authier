@@ -1,9 +1,8 @@
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
-
+import { BackgroundMessageType } from '../../background/BackgroundMessageType'
 import { ICapturedInput } from '../../background/backgroundPage'
-import { getTRPCCached } from '../connectTRPC'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -35,8 +34,6 @@ export const PromptPassword = ({
   passwordLimit: number
   passwordCount: number
 }) => {
-  const trpc = getTRPCCached()
-
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',
@@ -69,7 +66,9 @@ export const PromptPassword = ({
         'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
       )
 
-      return await trpc.hideLoginCredentialsModal.mutate()
+      return chrome.runtime.sendMessage({
+        action: BackgroundMessageType.hideLoginCredentialsModal
+      })
     }
 
     const loginCredential = {
@@ -79,12 +78,17 @@ export const PromptPassword = ({
       password
     }
 
-    await trpc.addLoginCredentials.mutate(loginCredential)
+    return chrome.runtime.sendMessage({
+      action: BackgroundMessageType.addLoginCredentials,
+      payload: loginCredential
+    })
   }
 
   const removeCredential = async () => {
     loginPrompt?.remove()
-    await trpc.hideLoginCredentialsModal.mutate()
+    return chrome.runtime.sendMessage({
+      action: BackgroundMessageType.hideLoginCredentialsModal
+    })
   }
 
   let passwordShown = false

@@ -2,6 +2,7 @@
 import { h } from 'preact'
 import { useState } from 'preact/hooks'
 import { popupDiv } from '../renderItemPopup'
+import { BackgroundMessageType } from '../../background/BackgroundMessageType'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -29,7 +30,10 @@ export const PrompItemPopup = ({ inputEvents }: { inputEvents: any }) => {
       }
     })
 
-    return await trpc.addLoginCredentials.mutate(loginCredentials)
+    return chrome.runtime.sendMessage({
+      action: BackgroundMessageType.addLoginCredentials,
+      payload: loginCredentials
+    })
   }
 
   const onInput = (e) => {

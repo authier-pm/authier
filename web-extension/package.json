@@ -11,7 +11,7 @@
     "devBuild": "AUTHIER_ENV=dev webpack --config webpack.dev.js",
     "clean": "rm -rf dist/js",
     "checkBuildOutput": "node ./check-es6.js",
-    "dev": "NODE_ENV=development webpack -w --config webpack.dev.js",
+    "dev": "AUTHIER_ENV=dev webpack -w --config webpack.dev.js",
     "tsc": "tsc",
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",

@@ -11,14 +11,7 @@ import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
-import { createTRPCProxyClient } from '@trpc/client'
-import { chromeLink } from 'trpc-chrome/link'
-import { AppRouter } from '@src/background/chromeRuntimeListener'
-
-const port = chrome.runtime.connect()
-const trpc = createTRPCProxyClient<AppRouter>({
-  links: [chromeLink({ port })]
-})
+import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
 
 const log = debug('au:useDeviceState')
 
@@ -115,12 +108,18 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      await trpc.securitySettings.mutate(config)
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.securitySettings,
+        settings: config
+      })
     },
 
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      await trpc.setDeviceState.mutate(state)
+      browser.runtime.sendMessage({
+        action: BackgroundMessageType.setDeviceState,
+        state: state
+      })
     },
     device,
     isFilling,

@@ -13,7 +13,8 @@ import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
 import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
-import { getTRPCCached } from './connectTRPC'
+import { BackgroundMessageType } from '../background/BackgroundMessageType'
+import browser from 'webextension-polyfill'
 
 const log = debug('au:autofill')
 
@@ -123,7 +124,6 @@ export let autofillEnabled = false
 let onInputAddedHandler
 
 export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
-  const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
   if (autofillEnabled === true) {
@@ -243,9 +243,12 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     ) {
       const autofillResult = searchInputsAndAutofill(document.body)
       if (autofillResult) {
-        await trpc.saveCapturedInputEvents.mutate({
-          inputEvents: domRecorder.toJSON(),
-          url: document.documentURI
+        browser.runtime.sendMessage({
+          action: BackgroundMessageType.saveCapturedInputEvents,
+          payload: {
+            inputEvents: domRecorder.toJSON(),
+            url: document.documentURI
+          }
         })
       }
       log('autofillResult', autofillResult)
