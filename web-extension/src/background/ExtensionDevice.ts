@@ -502,9 +502,9 @@ class ExtensionDevice {
     if (isRunningInBgPage === false) {
       rerenderViewInThisRuntime()
 
-      browser.runtime.sendMessage({
-        action: BackgroundMessageType.rerenderViews
-      })
+      // browser.runtime.sendMessage({
+      //   action: BackgroundMessageType.rerenderViews
+      // })
     }
   }
 
