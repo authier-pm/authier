@@ -1,3 +1,7 @@
+import { ITOTPSecret, ILoginSecret } from '@src/util/useDeviceState'
+
+import { BackgroundMessageType } from './BackgroundMessageType'
+
 import browser from 'webextension-polyfill'
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
@@ -8,40 +12,33 @@ import {
 } from './chromeRuntimeListener.codegen'
 import {
   EncryptedSecretType,
+  SettingsInput,
   WebInputType
-} from '@shared/generated/graphqlBaseTypes'
-import { initTRPC } from '@trpc/server'
-import { createChromeHandler } from 'trpc-chrome/adapter'
+} from '../../../shared/generated/graphqlBaseTypes'
 import { device, isRunningInBgPage } from './ExtensionDevice'
+import { loginCredentialsSchema } from '../util/loginCredentialsSchema'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
-
-import {
-  backgroundStateSerializableLockedSchema,
-  capturedEventsPayloadSchema,
-  encryptedDataSchema,
-  loginCredentialSchema,
-  loginCredentialsFromContentScriptSchema,
-  settingsSchema,
-  webInputElementSchema
-} from './backgroundSchemas'
-import { z } from 'zod'
+import { IBackgroundStateSerializable } from './backgroundPage'
 
 const log = debug('au:chListener')
-
+log('background page loaded')
 if (!isRunningInBgPage) {
   throw new Error('this file should only be imported in the background page')
 }
+
+const safeClosed = false // Is safe Closed ?
+export let noHandsLogin = false
 
 interface Coord {
   x: number
   y: number
 }
-export interface ICapturedInput {
+interface ICapturedInput {
   cssSelector: string
   domOrdinal: number
   type: 'input' | 'submit' | 'keydown'
   kind: WebInputType
-  inputted?: string | undefined
+  inputted: string | undefined
   domCoordinates: Coord
 }
 
@@ -52,33 +49,47 @@ interface ILoginCredentialsFromContentScript {
   openInVault: boolean
 }
 
-const t = initTRPC.create({
-  isServer: false,
-  allowOutsideOfServer: true
-})
-
 //NOTE: temporery storage for not yet saved credentials. (during page rerender)
 export const saveLoginModalsStates = new Map<
   number,
   { password: string; username: string }
 >()
 
-export let noHandsLogin = false
 let capturedInputEvents: ICapturedInput[] = []
+
+//This is for saving URL of inputs
 let inputsUrl: string
-let lockTimeEnd: number | null
-let lockTimeStart: number | null
-let lockInterval: any
 
-const appRouter = t.router({
-  addLoginCredentials: t.procedure
-    .input(loginCredentialsFromContentScriptSchema)
-    .mutation(async ({ ctx, input }) => {
-      // @ts-expect-error
-      const tab = ctx.sender.tab
+let lockTimeEnd
+let lockTimeStart
+let lockInterval
 
-      const deviceState = device.state
+log('background page loaded')
+browser.runtime.onMessage.addListener(async function (
+  req: {
+    action: BackgroundMessageType
+    payload: any
+    lockTime: number
+    auths: ITOTPSecret[]
+    passwords: ILoginSecret[]
+    settings: SettingsInput
+    time: string
+    state: IBackgroundStateSerializable
+  },
+  sender
+) {
+  const tab = sender.tab
 
+  const currentTabId = tab?.id
+  const deviceState = device.state
+
+  log('req', req)
+
+  switch (req.action) {
+    case BackgroundMessageType.addLoginCredentials:
+      if (!tab) {
+        return false
+      }
       const { url } = tab
 
       if (!url || !deviceState) {
@@ -91,8 +102,7 @@ const appRouter = t.router({
         return false
       }
 
-      const credentials: ILoginCredentialsFromContentScript = input
-      log('addLoginCredentials', credentials)
+      const credentials: ILoginCredentialsFromContentScript = req.payload
 
       const encryptedData = {
         username: credentials.username,
@@ -102,7 +112,7 @@ const appRouter = t.router({
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }
 
-      encryptedDataSchema.parse(encryptedData)
+      loginCredentialsSchema.parse(encryptedData)
 
       const encrypted = await deviceState.encrypt(JSON.stringify(encryptedData))
       const [secret] = await deviceState.addSecrets([
@@ -138,15 +148,16 @@ const appRouter = t.router({
         }
       })
 
-      if (input.openInVault) {
-        browser.tabs.create({ url: `js/vault.html#/secret/${secret.id}` })
+      console.log(credentials.capturedInputEvents)
+      if (req.payload.openInVault) {
+        browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
-    }),
-  saveCapturedInputEvents: t.procedure
-    .input(capturedEventsPayloadSchema)
-    .mutation(async ({ input }) => {
-      capturedInputEvents = input.inputEvents
-      inputsUrl = input.url
+      return true
+
+    case BackgroundMessageType.saveCapturedInputEvents:
+      log('saveCapturedInputEvents', req.payload)
+      capturedInputEvents = req.payload.inputEvents
+      inputsUrl = req.payload.url
 
       const newWebInputs = capturedInputEvents.map((captured) => {
         return {
@@ -168,82 +179,74 @@ const appRouter = t.router({
           webInputs: newWebInputs
         }
       })
-    }),
-  saveLoginCredentialsModalShown: t.procedure
-    .input(loginCredentialSchema)
-    .mutation(async ({ input, ctx }) => {
-      // @ts-expect-error
-      const tab = ctx.sender.tab
-      const currentTabId = tab.id
 
-      if (currentTabId) {
-        saveLoginModalsStates.set(currentTabId, input)
+      return true
+
+    case BackgroundMessageType.addTOTPSecret:
+      if (deviceState) {
+        deviceState.addSecrets([req.payload])
       }
-    }),
-  hideLoginCredentialsModal: t.procedure.mutation(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
-    const currentTabId = tab.id
-    if (currentTabId) {
-      saveLoginModalsStates.delete(currentTabId)
-    }
-  }),
-  addTOTPInput: t.procedure
-    .input(webInputElementSchema)
-    .mutation(async ({ input }) => {
+    case BackgroundMessageType.saveLoginCredentialsModalShown:
+      if (currentTabId) {
+        saveLoginModalsStates.set(currentTabId, req.payload)
+      }
+
+      break
+    case BackgroundMessageType.hideLoginCredentialsModal:
+      if (currentTabId) {
+        saveLoginModalsStates.delete(currentTabId)
+      }
+      console.log(saveLoginModalsStates)
+      break
+
+    case BackgroundMessageType.addTOTPInput:
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
       >({
         mutation: AddWebInputsDocument,
         variables: {
-          webInputs: [input]
+          webInputs: [req.payload]
         }
       })
-    }),
-  getFallbackUsernames: t.procedure.query(async () => {
-    const deviceState = device.state
-    log('Getting fallback usernames', deviceState?.email)
-    return [deviceState?.email]
-  }),
-  getContentScriptInitialState: t.procedure.query(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
-    const currentTabId = tab.id
-    const tabUrl = tab?.url
-    const deviceState = device.state
+      break
+    case BackgroundMessageType.getFallbackUsernames:
+      return [deviceState?.email]
 
-    log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
-    if (!tabUrl || !deviceState || !currentTabId) {
-      log(
-        '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId',
-        {
-          tabUrl,
-          deviceState,
-          currentTabId
+    case BackgroundMessageType.getContentScriptInitialState:
+      const tabUrl = tab?.url
+      log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
+      if (!tabUrl || !deviceState || !currentTabId) {
+        log(
+          '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId'
+        )
+        return null
+      } else {
+        //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
+        return getContentScriptInitialState(tabUrl, currentTabId)
+      }
+
+    case BackgroundMessageType.getCapturedInputEvents:
+      return { capturedInputEvents, inputsUrl: tab?.url }
+
+    case BackgroundMessageType.wasClosed:
+      return { wasClosed: safeClosed }
+
+    case BackgroundMessageType.giveSecuritySettings:
+      return {
+        config: {
+          vaultTime: device.state?.lockTime,
+          noHandsLogin: noHandsLogin
         }
-      )
-      return null
-    } else {
-      //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
-      return getContentScriptInitialState(tabUrl, currentTabId)
-    }
-  }),
-  getCapturedInputEvents: t.procedure.query(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
-    return { capturedInputEvents, inputsUrl: tab?.url }
-  }),
-  securitySettings: t.procedure
-    .input(settingsSchema)
-    .mutation(async ({ input }) => {
-      const deviceState = device.state
+      }
+
+    case BackgroundMessageType.securitySettings:
       if (deviceState) {
-        deviceState.lockTime = input.vaultLockTimeoutSeconds
-        deviceState.syncTOTP = input.syncTOTP
-        deviceState.language = input.language
-        deviceState.autofill = input.autofill
-        noHandsLogin = input.autofill
+        deviceState.lockTime = req.settings.vaultLockTimeoutSeconds
+        deviceState.syncTOTP = req.settings.syncTOTP
+        deviceState.language = req.settings.language
+        deviceState.autofill = req.settings.autofill
+        noHandsLogin = req.settings.autofill
 
         //Refresh the lock interval
         lockInterval = clearInterval(lockInterval)
@@ -255,47 +258,36 @@ const appRouter = t.router({
       }
 
       return true
-    }),
-  setLockInterval: t.procedure
-    .input(z.object({ time: z.number() }))
-    .mutation(async ({ input }) => {
+
+    case BackgroundMessageType.setLockInterval:
       if (!lockInterval) {
         lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + input.time * 1000
+        lockTimeEnd = lockTimeStart + parseInt(req.time) * 1000
       }
       checkInterval(lockTimeEnd)
       return true
-    }),
-  clearLockInterval: t.procedure.mutation(async () => {
-    resetInterval()
-    return true
-  }),
-  setDeviceState: t.procedure
-    .input(backgroundStateSerializableLockedSchema)
-    .mutation(async ({ input }) => {
-      device.save(input)
+
+    case BackgroundMessageType.clearLockInterval:
+      resetInterval()
       return true
-    })
-})
 
-export type AppRouter = typeof appRouter
+    case BackgroundMessageType.setDeviceState:
+      device.save(req.state)
+      return true
 
-createChromeHandler({
-  router: appRouter,
-  createContext: (ctx) => {
-    return { sender: ctx.req.sender }
-  },
-  onError: (err) => {
-    console.error('TRPC ERROR', err)
+    default:
+      if (typeof req === 'string') {
+        throw new Error(`${req} not supported`)
+      }
+
+      return true
   }
 })
 
-log('background page loaded')
-
-const checkInterval = (time: number | null) => {
+const checkInterval = (time: number) => {
   if (!lockInterval && lockTimeStart !== lockTimeEnd) {
     lockInterval = setInterval(() => {
-      if (time && time <= Date.now()) {
+      if (time <= Date.now()) {
         log('lock', Date.now(), device)
 
         resetInterval()

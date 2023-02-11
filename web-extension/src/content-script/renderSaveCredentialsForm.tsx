@@ -1,7 +1,8 @@
 // @ts-nocheck
 import { PromptPassword } from './components/PromptPassword'
 import { h, render } from 'preact'
-import { trpc } from './contentScript'
+import { BackgroundMessageType } from '../background/BackgroundMessageType'
+import browser from 'webextension-polyfill'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -14,7 +15,9 @@ export async function renderSaveCredentialsForm(
   passwordLimit: number,
   passwordCount: number
 ) {
-  const inputEvents = await trpc.getCapturedInputEvents.query()
+  const inputEvents = await browser.runtime.sendMessage({
+    action: BackgroundMessageType.getCapturedInputEvents
+  })
 
   loginPrompt = document.createElement('div')
   render(
@@ -30,5 +33,11 @@ export async function renderSaveCredentialsForm(
 
   document.body.appendChild(loginPrompt)
 
-  await trpc.saveLoginCredentialsModalShown.mutate({ username, password })
+  browser.runtime.sendMessage({
+    action: BackgroundMessageType.saveLoginCredentialsModalShown,
+    payload: {
+      username,
+      password
+    }
+  })
 }
