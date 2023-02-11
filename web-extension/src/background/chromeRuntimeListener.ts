@@ -215,7 +215,14 @@ const appRouter = t.router({
 
     log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
     if (!tabUrl || !deviceState || !currentTabId) {
-      log('~ chromeRuntimeListener We dont have tabURL or deviceState or tabId')
+      log(
+        '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId',
+        {
+          tabUrl,
+          deviceState,
+          currentTabId
+        }
+      )
       return null
     } else {
       //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
