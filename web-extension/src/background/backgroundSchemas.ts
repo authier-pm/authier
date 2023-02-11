@@ -85,3 +85,14 @@ export const backgroundStateSerializableLockedSchema = z.object({
   syncTOTP: z.boolean(),
   masterEncryptionKey: z.string()
 })
+
+export const payloadSchema = z.union([
+  capturedEventsPayloadSchema,
+  webInputElementSchema,
+  settingsSchema,
+  backgroundStateSerializableLockedSchema,
+  loginCredentialsFromContentScriptSchema,
+  encryptedDataSchema,
+  loginCredentialSchema,
+  contentScriptContextSchema
+])
