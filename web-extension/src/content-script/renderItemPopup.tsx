@@ -2,7 +2,6 @@
 import { h, render } from 'preact'
 import { PrompItemPopup } from './components/PromptItemPopup'
 import { BackgroundMessageType } from '../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h

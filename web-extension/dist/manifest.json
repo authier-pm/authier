@@ -24,6 +24,7 @@
     "128": "icon-128.png"
   },
   "permissions": [
+    "idle",
     "tabs",
     "activeTab",
     "notifications",
@@ -33,5 +34,5 @@
     "<all_urls>"
   ],
   "web_accessible_resources": ["icon-16.png"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; www.googleapis.com *.firebaseio.com; object-src 'self' "
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"
 }

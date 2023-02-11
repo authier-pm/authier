@@ -1,8 +1,10 @@
+// @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 import { BackgroundMessageType } from '../../background/BackgroundMessageType'
 import { ICapturedInput } from '../../background/backgroundPage'
+import browser from 'webextension-polyfill'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -66,7 +68,7 @@ export const PromptPassword = ({
         'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
       )
 
-      return chrome.runtime.sendMessage({
+      return browser.runtime.sendMessage({
         action: BackgroundMessageType.hideLoginCredentialsModal
       })
     }
@@ -78,7 +80,7 @@ export const PromptPassword = ({
       password
     }
 
-    return chrome.runtime.sendMessage({
+    return browser.runtime.sendMessage({
       action: BackgroundMessageType.addLoginCredentials,
       payload: loginCredential
     })
@@ -86,7 +88,7 @@ export const PromptPassword = ({
 
   const removeCredential = async () => {
     loginPrompt?.remove()
-    return chrome.runtime.sendMessage({
+    return browser.runtime.sendMessage({
       action: BackgroundMessageType.hideLoginCredentialsModal
     })
   }
