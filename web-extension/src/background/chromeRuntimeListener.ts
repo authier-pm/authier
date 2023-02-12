@@ -76,7 +76,8 @@ browser.runtime.onMessage.addListener(async function (
     time: string
     state: IBackgroundStateSerializable
   },
-  sender
+  sender,
+  sendResponse
 ) {
   const tab = sender.tab
 
@@ -152,6 +153,7 @@ browser.runtime.onMessage.addListener(async function (
       if (req.payload.openInVault) {
         browser.tabs.create({ url: `vault.html#/secret/${secret.id}` })
       }
+
       return true
 
     case BackgroundMessageType.saveCapturedInputEvents:

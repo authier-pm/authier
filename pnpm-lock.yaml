@@ -456,6 +456,7 @@ importers:
       buffer: ^6.0.3
       check-password-strength: ^2.0.7
       chrome-webstore-upload-cli: ^2.1.0
+      copy-webpack-plugin: ^11.0.0
       crypto-browserify: ^3.12.0
       crypto-js: ^4.1.1
       css-loader: ^6.7.3
@@ -600,6 +601,7 @@ importers:
       babel-loader: 9.1.2_la66t7xldg4uecmyawueag5wkm
       babel-plugin-import-graphql: 2.8.1_graphql@16.6.0
       chrome-webstore-upload-cli: 2.1.0
+      copy-webpack-plugin: 11.0.0_webpack@5.75.0
       css-loader: 6.7.3_webpack@5.75.0
       date-fns: 2.29.3
       debug: 4.3.4
@@ -6168,7 +6170,7 @@ packages:
       debug: 4.3.4
       espree: 9.4.0
       globals: 13.17.0
-      ignore: 5.2.0
+      ignore: 5.2.4
       import-fresh: 3.3.0
       js-yaml: 4.1.0
       minimatch: 3.1.2
@@ -9071,7 +9073,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/conf': 3.15.0_typescript@4.9.4
       '@lingui/core': 3.15.0
-      '@lingui/react': 3.15.0_react@18.1.0
+      '@lingui/react': 3.15.0_react@18.2.0
       babel-plugin-macros: 3.1.0
       ramda: 0.27.2
     transitivePeerDependencies:
@@ -9089,6 +9091,7 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.1.0
+    dev: false
 
   /@lingui/react/3.15.0_react@18.2.0:
     resolution: {integrity: sha512-Xq/48yf2IQhOPpgpqydj1OUyfDgNOY4aattmG4195LeqGPhN0ckiUCBLlNm0vHRsO3ZGwzfprTLYfI9WbfLBzA==}
@@ -9099,7 +9102,6 @@ packages:
       '@babel/runtime': 7.19.4
       '@lingui/core': 3.15.0
       react: 18.2.0
-    dev: true
 
   /@lukeed/ms/2.0.0:
     resolution: {integrity: sha512-NOlhE40rGptwLwJhE0ZW259hcoa+nkpQRQ1FUKV4Sr2z1Eh2WfkHQ3jjBNF7YEqOrF0TOpqnyU1wClvWBrXByg==}
@@ -13415,7 +13417,7 @@ packages:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.4_ila5be2toiy6xjqjieu6owlh24
+      '@apollo/client': 3.7.4_gdcq4dv6opitr3wbfwyjmanyra
       graphql: 16.6.0
     dev: false
 
@@ -15361,6 +15363,21 @@ packages:
     resolution: {integrity: sha512-i13qo6kIHTTpCm8/Wup+0b1mVWETvu2kIMzKoK8FpkLkFxlt0znUAHcMzox+T8sPlqtZXq3CulEjQHsYiGFJUw==}
     dependencies:
       toggle-selection: 1.0.6
+
+  /copy-webpack-plugin/11.0.0_webpack@5.75.0:
+    resolution: {integrity: sha512-fX2MWpamkW0hZxMEg0+mYnA40LTosOSa5TqZ9GYIBzyJa9C3QUaMPSE2xAi/buNr8u89SfD9wHSQVBzrRa/SOQ==}
+    engines: {node: '>= 14.15.0'}
+    peerDependencies:
+      webpack: ^5.1.0
+    dependencies:
+      fast-glob: 3.2.12
+      glob-parent: 6.0.2
+      globby: 13.1.3
+      normalize-path: 3.0.0
+      schema-utils: 4.0.0
+      serialize-javascript: 6.0.0
+      webpack: 5.75.0_webpack-cli@4.10.0
+    dev: true
 
   /core-js-compat/3.25.5:
     resolution: {integrity: sha512-ovcyhs2DEBUIE0MGEKHP4olCUW/XYte3Vroyxuh38rD1wAO4dHohsovUC4eAOuzFxE6b+RXvBU3UZ9o0YhUTkA==}
@@ -18297,6 +18314,17 @@ packages:
       ignore: 5.2.4
       merge2: 1.4.1
       slash: 3.0.0
+    dev: true
+
+  /globby/13.1.3:
+    resolution: {integrity: sha512-8krCNHXvlCgHDpegPzleMq07yMYTO2sXKASmZmquEYWEmCx6J5UTRbp5RwMJkTJGtcQ44YpiUYUiN0b9mzy8Bw==}
+    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
+    dependencies:
+      dir-glob: 3.0.1
+      fast-glob: 3.2.12
+      ignore: 5.2.4
+      merge2: 1.4.1
+      slash: 4.0.0
     dev: true
 
   /globby/6.1.0:
@@ -25339,6 +25367,11 @@ packages:
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+
+  /slash/4.0.0:
+    resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
+    engines: {node: '>=12'}
+    dev: true
 
   /slice-ansi/2.1.0:
     resolution: {integrity: sha512-Qu+VC3EwYLldKa1fCxuuvULvSJOKEgk9pi8dZeCVK7TqBfUNTH4sFkk4joj8afVSfAYgJoSOetjx9QWOJ5mYoQ==}

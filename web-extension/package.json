@@ -55,6 +55,7 @@
     "babel-loader": "^9.1.2",
     "babel-plugin-import-graphql": "^2.8.1",
     "chrome-webstore-upload-cli": "^2.1.0",
+    "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.3",
     "date-fns": "^2.29.3",
     "debug": "^4.3.4",
