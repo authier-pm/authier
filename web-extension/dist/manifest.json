@@ -8,13 +8,13 @@
     "default_popup": "js/popup.html"
   },
   "background": {
-    "scripts": ["js/backgroundPage.js"],
+    "scripts": ["js/browser-polyfill.js", "js/backgroundPage.js"],
     "persistent": true
   },
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["js/contentScript.js"],
+      "js": ["js/browser-polyfill.js", "js/contentScript.js" ],
       "all_frames": true
     }
   ],
