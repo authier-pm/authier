@@ -263,9 +263,8 @@ export async function initInputWatch() {
     bodyInputChangeEmitter.off('inputAdded', onInputAdded)
   }
 }
-setTimeout(() => {
-  initInputWatch()
-}, 2000)
+
+initInputWatch()
 
 // document.addEventListener('readystatechange', (event) => {
 //   if (
