@@ -9,6 +9,7 @@ import {
 } from '@chakra-ui/react'
 import { device } from '@src/background/ExtensionDevice'
 import { MD5 } from 'crypto-js'
+import browser from 'webextension-polyfill'
 
 const page_url = process.env.PAGE_URL as string
 
@@ -49,7 +50,7 @@ export default function ProfileCard() {
 
         <Button
           onClick={() =>
-            chrome.tabs.create({
+            browser.tabs.create({
               url: `${page_url}/pricing?portal=true`
             })
           }

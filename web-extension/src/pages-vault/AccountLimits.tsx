@@ -22,6 +22,7 @@ import {
 import { FaCheckCircle } from 'react-icons/fa'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import ProfileCard from '@src/components/vault/ProfileCard'
+import browser from 'webextension-polyfill'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -170,7 +171,7 @@ export const AccountLimits = () => {
               w="80%"
               colorScheme="red"
               onClick={() =>
-                chrome.tabs.create({
+                browser.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.Credentials}`
                 })
               }
@@ -212,7 +213,7 @@ export const AccountLimits = () => {
               w="80%"
               colorScheme="red"
               onClick={() =>
-                chrome.tabs.create({
+                browser.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.TOTP}`
                 })
               }
@@ -279,7 +280,7 @@ export const AccountLimits = () => {
                 w="80%"
                 colorScheme="red"
                 onClick={() =>
-                  chrome.tabs.create({
+                  browser.tabs.create({
                     url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}`
                   })
                 }
