@@ -194,9 +194,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       .map((webInputGql) => {
         let inputEl = document.body.querySelector(
           webInputGql.domPath
-        ) as HTMLInputElement
-        const rect = inputEl.getBoundingClientRect()
-        log('cords', rect.x, rect.y)
+        ) as HTMLInputElement | null
+        const rect = inputEl?.getBoundingClientRect()
+        log('cords', rect?.x, rect?.y)
         //NOTE: We found element by DOM path
         if (inputEl) {
           log('autofilled by domPath')
@@ -226,10 +226,10 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           }
           //NOTE: We did not find element by DOM path, so find it by input coords
         } else if (
-          webInputGql.domCoordinates.x === rect.x &&
-          webInputGql.domCoordinates.y === rect.y
+          webInputGql.domCoordinates.x === rect?.x &&
+          webInputGql.domCoordinates.y === rect?.y
         ) {
-          inputEl = document.elementFromPoint(rect.x, rect.y) as any
+          inputEl = document.elementFromPoint(rect?.x, rect?.y) as any
           log('el', inputEl)
         }
       })

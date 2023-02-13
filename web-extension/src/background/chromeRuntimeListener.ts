@@ -220,7 +220,8 @@ browser.runtime.onMessage.addListener(async function (
       log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
       if (!tabUrl || !deviceState || !currentTabId) {
         log(
-          '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId'
+          '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId',
+          { tabUrl, deviceState, currentTabId }
         )
         return null
       } else {
