@@ -387,8 +387,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
 
     if (errors) {
-      console.log('errors', errors)
-      throw new Error('Erorror adding secret')
+      console.error('errors', errors)
+      throw new Error('Error adding secret')
     }
     if (!data) {
       throw new Error('failed to save secret')
@@ -468,7 +468,7 @@ class ExtensionDevice {
       this.listenForUserLogin()
     }
 
-    if (this.state) {
+    if (this.state && (isVault || isPopup)) {
       this.startLockInterval(this.state.lockTime)
     }
 

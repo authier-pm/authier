@@ -446,8 +446,7 @@ export class RootResolver {
         host: new URL(webInput.url).host,
         domPath: webInput.domPath,
         kind: webInput.kind,
-        addedByUserId: ctx.jwtPayload.userId,
-        domCoordinates: webInput.domCoordinates as any
+        addedByUserId: ctx.jwtPayload.userId
       }
       const input = await ctx.prisma.webInput.upsert({
         create: forUpsert,
