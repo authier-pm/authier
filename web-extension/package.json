@@ -7,7 +7,7 @@
     "sourceDir": "dist/"
   },
   "scripts": {
-    "prodBuild": "AUTHIER_ENV=prod webpack --config webpack.prod.js && webpack --config webpack.contentScript-prod.js",
+    "prodBuild": "AUTHIER_ENV=prod webpack --config webpack.prod.js",
     "devBuild": "AUTHIER_ENV=dev webpack --config webpack.dev.js",
     "clean": "rm -rf dist/js",
     "checkBuildOutput": "node ./check-es6.js",

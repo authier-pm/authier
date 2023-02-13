@@ -10,14 +10,8 @@ const BundleAnalyzerPlugin =
 const entries = {
   backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
   popup: path.join(__dirname, 'src/index.tsx'),
-  vault: path.join(__dirname, 'src/vault-index.tsx')
-}
-
-if (process.env.AUTHIER_ENV === 'dev') {
-  entries.contentScript = path.join(
-    __dirname,
-    'src/content-script/contentScript.ts'
-  )
+  vault: path.join(__dirname, 'src/vault-index.tsx'),
+  contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
 }
 
 module.exports = {
@@ -72,6 +66,11 @@ module.exports = {
         <script type="application/javascript" src="browser-polyfill.js"></script>
       </body>
     </html>`
+    }),
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['backgroundPage'],
+      filename: 'backgroundPage.html'
     }),
     // new ExtensionReloader(),
     new Dotenv()
