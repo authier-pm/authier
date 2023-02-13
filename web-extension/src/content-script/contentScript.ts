@@ -25,7 +25,6 @@ import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
-console.log('content script loaded2')
 
 const inputKindMap = {
   email: WebInputType.EMAIL,
@@ -77,6 +76,7 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
 export async function initInputWatch() {
+  // log('initInputWatch starts')
   stateInitRes = await browser.runtime.sendMessage({
     action: BackgroundMessageType.getContentScriptInitialState
   })
@@ -263,8 +263,9 @@ export async function initInputWatch() {
     bodyInputChangeEmitter.off('inputAdded', onInputAdded)
   }
 }
-
-initInputWatch()
+setTimeout(() => {
+  initInputWatch()
+}, 2000)
 
 // document.addEventListener('readystatechange', (event) => {
 //   if (
