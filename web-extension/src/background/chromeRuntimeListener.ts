@@ -25,6 +25,7 @@ import {
   webInputElementSchema
 } from './backgroundSchemas'
 import { z } from 'zod'
+import { openVaultTab } from '@src/AuthLinkPage'
 
 const log = debug('au:chListener')
 
@@ -139,7 +140,7 @@ const appRouter = t.router({
       })
 
       if (input.openInVault) {
-        browser.tabs.create({ url: `js/vault.html#/secret/${secret.id}` })
+        openVaultTab(`/secret/${secret.id}`)
       }
     }),
   saveCapturedInputEvents: t.procedure
@@ -238,6 +239,7 @@ const appRouter = t.router({
     .input(settingsSchema)
     .mutation(async ({ input }) => {
       const deviceState = device.state
+      log('securitySettings', input, device.state)
       if (deviceState) {
         deviceState.lockTime = input.vaultLockTimeoutSeconds
         deviceState.syncTOTP = input.syncTOTP
@@ -252,6 +254,7 @@ const appRouter = t.router({
 
         checkInterval(lockTimeEnd)
         deviceState.save()
+        log('device.state', device.state)
       }
 
       return true
