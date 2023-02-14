@@ -23,7 +23,7 @@ export const Popup: FunctionComponent = () => {
 
   useEffect(() => {
     setLocation('/')
-    browser.runtime.sendMessage({ popupMounted: true })
+    //browser.runtime.sendMessage({ popupMounted: true })
   }, [])
 
   return (

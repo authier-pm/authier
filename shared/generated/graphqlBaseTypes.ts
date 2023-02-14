@@ -656,6 +656,7 @@ export type WebInputGql = {
   addedByUser: UserGql
   addedByUserId: Scalars['String']
   createdAt: Scalars['DateTime']
+  domCoordinates: Scalars['JSON']
   domOrdinal: Scalars['Int']
   domPath: Scalars['String']
   host: Scalars['String']

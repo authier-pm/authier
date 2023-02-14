@@ -20,8 +20,7 @@ import {
 } from './autofill'
 import { authenticator } from 'otplib'
 import { recordInputs, renderer, showSavePromptIfAppropriate } from './renderer'
-import browser from 'webextension-polyfill'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
+import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -76,10 +75,9 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 let stateInitRes: IInitStateRes
 export async function initInputWatch() {
-  // log('initInputWatch starts')
-  stateInitRes = await browser.runtime.sendMessage({
-    action: BackgroundMessageType.getContentScriptInitialState
-  })
+  const trpc = getTRPCCached()
+  stateInitRes =
+    (await trpc.getContentScriptInitialState.query()) as IInitStateRes
 
   log('~ stateInitRes', stateInitRes)
 
@@ -182,10 +180,7 @@ export async function initInputWatch() {
                 url: location.href,
                 domCoordinates: getElementCoordinates(targetElement)
               }
-              await browser.runtime.sendMessage({
-                action: BackgroundMessageType.addTOTPInput,
-                payload: webInput
-              })
+              await trpc.addTOTPInput.mutate(webInput)
               log(`TOTP WebInput added for selector "${elementSelector}"`)
             }
           })
