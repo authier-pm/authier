@@ -1,7 +1,7 @@
 import { prismaClient } from '../../prisma/prismaClient'
 import faker from 'faker'
 import { RegisterNewAccountInput } from '../../models/AuthInputs'
-import { makeRegisterAccountInput } from '../RootResolver.spec'
+import { makeRegisterAccountInput } from './makeRegisterAccountInput'
 
 export const fakeUserAndContext = async () => {
   const userId = faker.datatype.uuid()

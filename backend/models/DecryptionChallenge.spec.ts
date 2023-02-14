@@ -9,7 +9,7 @@ import { GraphQLResolveInfo } from 'graphql'
 import {
   makeAddNewDeviceInput,
   makeRegisterAccountInput
-} from '../schemas/RootResolver.spec'
+} from '../schemas/__test__/makeRegisterAccountInput'
 import { sign } from 'jsonwebtoken'
 import {
   DecryptionChallengeApproved,
@@ -200,8 +200,6 @@ describe('DecryptionChallenge', () => {
         id: expect.any(Number)
       })
 
-      await prismaClient.decryptionChallenge.deleteMany()
-      await prismaClient.device.deleteMany()
       await prismaClient.user.deleteMany()
     })
 
