@@ -1,14 +1,14 @@
-// @ts-nocheck
+// @ts-nochec
 import { h } from 'preact'
 import { useState } from 'preact/hooks'
+import { getTRPCCached } from '../connectTRPC'
 import { popupDiv } from '../renderItemPopup'
-import { BackgroundMessageType } from '../../background/BackgroundMessageType'
-import browser from 'webextension-polyfill'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
 export const PrompItemPopup = ({ inputEvents }: { inputEvents: any }) => {
+  const trpc = getTRPCCached()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -31,10 +31,7 @@ export const PrompItemPopup = ({ inputEvents }: { inputEvents: any }) => {
       }
     })
 
-    return browser.runtime.sendMessage({
-      action: BackgroundMessageType.addLoginCredentials,
-      payload: loginCredentials
-    })
+    return await trpc.addLoginCredentials.mutate(loginCredentials)
   }
 
   const onInput = (e) => {

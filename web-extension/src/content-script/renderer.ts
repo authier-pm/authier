@@ -4,14 +4,13 @@ import {
   loginPrompt,
   renderSaveCredentialsForm
 } from './renderSaveCredentialsForm'
-import browser from 'webextension-polyfill'
-import { BackgroundMessageType } from '../background/BackgroundMessageType'
 
 import debug from 'debug'
 
 import { IDecryptedSecrets } from './autofill'
 import { renderItemPopup } from './renderItemPopup'
 import { recordDiv, renderToast } from './renderToast'
+import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:contentScript:renderer')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -26,6 +25,7 @@ const hideToast = () => {
     x?.remove()
   }, 5000)
 }
+const trpc = getTRPCCached()
 
 export function recordInputs(e?: KeyboardEvent) {
   if (
@@ -73,12 +73,9 @@ async function clicked(e: MouseEvent) {
   }
 
   if (clickCount === 2) {
-    browser.runtime.sendMessage({
-      action: BackgroundMessageType.saveCapturedInputEvents,
-      payload: {
-        inputEvents: domRecorder.toJSON(),
-        url: document.documentURI
-      }
+    await trpc.saveCapturedInputEvents.mutate({
+      inputEvents: domRecorder.toJSON(),
+      url: document.documentURI
     })
 
     recordDiv?.remove()
@@ -134,12 +131,9 @@ export const showSavePromptIfAppropriate = async (
   if (loginPrompt) {
     return
   }
-  browser.runtime.sendMessage({
-    action: BackgroundMessageType.saveCapturedInputEvents,
-    payload: {
-      inputEvents: domRecorder.toJSON(),
-      url: document.documentURI
-    }
+  await trpc.saveCapturedInputEvents.mutate({
+    inputEvents: domRecorder.toJSON(),
+    url: document.documentURI
   })
 
   const username = domRecorder.getUsername()
@@ -159,9 +153,9 @@ export const showSavePromptIfAppropriate = async (
         passwordCount
       )
     } else {
-      const fallbackUsernames: string[] = await browser.runtime.sendMessage({
-        action: BackgroundMessageType.getFallbackUsernames
-      })
+      // @ts-expect-error
+      const fallbackUsernames: string[] =
+        await trpc.getFallbackUsernames.query()
       log('fallbackUsernames', fallbackUsernames)
       renderSaveCredentialsForm(
         fallbackUsernames[0],

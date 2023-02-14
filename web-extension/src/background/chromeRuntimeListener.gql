@@ -13,5 +13,6 @@ query webInputsForHost($host: String!) {
     domOrdinal
     kind
     createdAt
+    domCoordinates
   }
 }

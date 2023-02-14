@@ -38,6 +38,7 @@ import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
   cryptoKeyToString,
   abToCryptoKey,
+  buff_to_base64,
   enc,
   dec,
   base64_to_buf,
@@ -45,9 +46,16 @@ import {
   encryptedBuf_to_base64
 } from '@util/generateEncryptionKey'
 import { toast } from '@src/Providers'
-import { BackgroundMessageType } from './BackgroundMessageType'
+import { createTRPCProxyClient } from '@trpc/client'
+import { AppRouter } from './chromeRuntimeListener'
+import { chromeLink } from 'trpc-chrome/link'
 
 export const log = debug('au:Device')
+
+const port = chrome.runtime.connect()
+export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
+  links: [chromeLink({ port })]
+})
 
 const getTldPart = (url: string) => {
   const host = new URL(url ?? '').hostname
@@ -423,16 +431,11 @@ class ExtensionDevice {
   name: string
 
   async startLockInterval(lockTime: number) {
-    await browser.runtime.sendMessage({
-      action: BackgroundMessageType.setLockInterval,
-      time: lockTime
-    })
+    await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
   }
 
   async clearLockInterval() {
-    await browser.runtime.sendMessage({
-      action: BackgroundMessageType.clearLockInterval
-    })
+    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 
   get platform() {

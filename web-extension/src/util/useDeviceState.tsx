@@ -11,7 +11,10 @@ import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
-import { BackgroundMessageType } from '@src/background/BackgroundMessageType'
+
+import { getTRPCCached } from '@src/content-script/connectTRPC'
+
+const port = chrome.runtime.connect()
 
 const log = debug('au:useDeviceState')
 
@@ -55,6 +58,7 @@ export interface ISecuritySettingsInBg {
 let registered = false // we need to only register once
 
 export function useDeviceState() {
+  const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
   const [isFilling, setIsFilling] = useState<boolean>(false)
@@ -108,18 +112,12 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      await browser.runtime.sendMessage({
-        action: BackgroundMessageType.securitySettings,
-        settings: config
-      })
+      await trpc.securitySettings.mutate(config)
     },
 
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      await browser.runtime.sendMessage({
-        action: BackgroundMessageType.setDeviceState,
-        state: state
-      })
+      await trpc.setDeviceState.mutate(state)
     },
     device,
     isFilling,
