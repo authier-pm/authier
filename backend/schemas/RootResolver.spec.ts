@@ -10,24 +10,7 @@ import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from 'models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
-
-export const makeAddNewDeviceInput = () => ({
-  email: faker.internet.email(),
-  deviceName: faker.internet.userName(),
-  devicePlatform: faker.internet.domainWord(),
-  deviceId: faker.datatype.uuid(),
-  firebaseToken: faker.datatype.uuid(),
-  addDeviceSecret: faker.datatype.string(5),
-  addDeviceSecretEncrypted: faker.datatype.string(5),
-  decryptionChallengeId: faker.datatype.number(),
-  deviceRecoveryCooldownMinutes: faker.datatype.number(),
-  encryptionSalt: faker.datatype.string(5)
-})
-
-export const makeRegisterAccountInput = () => ({
-  ...makeAddNewDeviceInput(),
-  encryptionSalt: faker.datatype.string(5)
-})
+import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,

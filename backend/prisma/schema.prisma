@@ -32,7 +32,7 @@ model DecryptionChallenge {
   deviceName               String
   deviceId                 String // no reference as we might want to keep this even when device is deleted
   userId                   String    @db.Uuid
-  user                     User      @relation(fields: [userId], references: [id])
+  user                     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   createdAt                DateTime  @default(now())
   approvedByRecovery       Boolean   @default(false)
   approvedFromDeviceId     String? // when non null it means user unlocked by using another device
@@ -62,7 +62,7 @@ model Device {
   masterPasswordOutdatedAt DateTime? // we set it to a timestamp when user changes master password on one device
 
   userId String @db.Uuid
-  User   User   @relation("devices", fields: [userId], references: [id])
+  User   User   @relation("devices", fields: [userId], references: [id], onDelete: Cascade)
 
   UserMaster User? @relation("masterDevice")
 
@@ -86,7 +86,7 @@ model EncryptedSecret {
   deletedAt DateTime?
 
   userId String @db.Uuid
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   SecretUsageEvent SecretUsageEvent[]
 }
@@ -107,7 +107,7 @@ model SecretUsageEvent {
   // @skip
   ipAddress   String          @db.Inet
   url         String?
-  User        User            @relation(fields: [userId], references: [id])
+  User        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String          @db.Uuid
   Device      Device          @relation(fields: [deviceId], references: [id])
   deviceId    String
@@ -122,7 +122,7 @@ model MasterDeviceChange {
   oldDeviceId String
   newDeviceId String
   userId      String   @db.Uuid
-  user        User     @relation(fields: [userId], references: [id])
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 // recorded whenever user unlocks vault
@@ -150,8 +150,8 @@ model WebInput {
   domPath        String
   domOrdinal     Int                @default(0)
   domCoordinates Json
-  addedByUser    User               @relation(fields: [addedByUserId], references: [id])
-  addedByUserId  String             @db.Uuid
+  addedByUser    User?              @relation(fields: [addedByUserId], references: [id], onDelete: SetNull)
+  addedByUserId  String?            @db.Uuid
   UsageEvents    SecretUsageEvent[]
 
   @@unique([url, domPath], name: "webInputIdentifier")
@@ -210,7 +210,7 @@ model Token {
   expiration DateTime
 
   // Relation fields
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
 }
 
@@ -221,7 +221,7 @@ model UserPaidProducts {
   expiresAt         DateTime?
   productId         String    @unique
   userId            String    @db.Uuid
-  user              User      @relation(fields: [userId], references: [id])
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   checkoutSessionId String
 }
 
@@ -251,7 +251,7 @@ model Tag {
   id        Int      @id @default(autoincrement())
   name      String
   createdAt DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.Uuid
 }
 
@@ -265,7 +265,7 @@ model EmailVerification {
   createdAt  DateTime              @default(now())
   verifiedAt DateTime?
   userId     String                @db.Uuid
-  user       User                  @relation(fields: [userId], references: [id])
+  user       User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
   // @skip
   token      String                @unique @db.Uuid
   kind       EmailVerificationType
