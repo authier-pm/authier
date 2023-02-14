@@ -24,6 +24,7 @@ import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '.prisma/client'
+
 import { WebInputGQL } from '../models/generated/WebInputGQL'
 
 import { GraphQLResolveInfo } from 'graphql'
@@ -447,7 +448,7 @@ export class RootResolver {
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId,
-        domCoordinates: webInput.domCoordinates
+        domCoordinates: webInput.domCoordinates as any // TODO prisma types for JSON fields suck
       }
       const input = await ctx.prisma.webInput.upsert({
         create: forUpsert,
