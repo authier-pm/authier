@@ -1,8 +1,11 @@
+// @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
-import { trpc } from '../contentScript'
+
 import { ICapturedInput } from '../../background/backgroundPage'
+import browser from 'webextension-polyfill'
+import { getTRPCCached } from '../connectTRPC'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -34,6 +37,8 @@ export const PromptPassword = ({
   passwordLimit: number
   passwordCount: number
 }) => {
+  const trpc = getTRPCCached()
+
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',
@@ -44,7 +49,8 @@ export const PromptPassword = ({
 
   const spanStyle = {
     fontSize: '13px',
-    color: '#000'
+    color: '#000',
+    marginRight: '8px'
   }
 
   const buttonStyle = (bgColor: string) => {

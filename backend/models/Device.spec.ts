@@ -1,6 +1,6 @@
 import { prismaClient } from '../prisma/prismaClient'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
-import { makeRegisterAccountInput } from '../schemas/RootResolver.spec'
+import { makeRegisterAccountInput } from '../schemas/__test__/makeRegisterAccountInput'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
 import { User } from '.prisma/client'
 import faker from 'faker'
@@ -321,8 +321,8 @@ describe('Device', () => {
 
       await expect(
         async () => await deviceQuery.encryptedSecretsToSync(fakeCtx)
-      ).rejects.toThrow(
-        `TOTP limit exceeded, remove ${totps - user.TOTPlimit} TOTP secrets`
+      ).rejects.toThrowErrorMatchingInlineSnapshot(
+        '"Password limit exceeded, remove 9 passwords"'
       )
     })
   })

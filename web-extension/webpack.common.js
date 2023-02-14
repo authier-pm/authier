@@ -2,18 +2,20 @@
 const path = require('path')
 const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
-const ExtensionReloader = require('webpack-ext-reloader')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const BundleAnalyzerPlugin =
   require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
+const entries = {
+  backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
+  popup: path.join(__dirname, 'src/index.tsx'),
+  vault: path.join(__dirname, 'src/vault-index.tsx'),
+  contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
+}
+
 module.exports = {
-  entry: {
-    backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
-    popup: path.join(__dirname, 'src/index.tsx'),
-    vault: path.join(__dirname, 'src/vault-index.tsx'),
-    contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
-  },
+  entry: entries,
   output: {
     path: path.join(__dirname, 'dist/js'),
     filename: '[name].js',
@@ -21,6 +23,17 @@ module.exports = {
   },
 
   plugins: [
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: path.join(
+            __dirname,
+            '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
+          ),
+          to: path.join(__dirname, 'dist/js')
+        }
+      ]
+    }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer']
     }),
@@ -35,6 +48,7 @@ module.exports = {
     </head>
       <body>
         <div id="popup"></div>
+        <script type="application/javascript" src="browser-polyfill.js"></script>
       </body>
     </html>`
     }),
@@ -49,8 +63,14 @@ module.exports = {
     </head>
       <body>
         <div id="vault"></div>
+        <script type="application/javascript" src="browser-polyfill.js"></script>
       </body>
     </html>`
+    }),
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['backgroundPage'],
+      filename: 'backgroundPage.html'
     }),
     // new ExtensionReloader(),
     new Dotenv()

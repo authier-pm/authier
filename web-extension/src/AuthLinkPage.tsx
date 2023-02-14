@@ -8,7 +8,11 @@ import browser from 'webextension-polyfill'
 
 export function openVaultTab(afterHash: string = '') {
   //WARNING: In firefox, the path does not need js/ but in chrome it does
-  browser.tabs.create({ url: `vault.html#${afterHash}` })
+  const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1
+
+  browser.tabs.create({
+    url: isChrome ? `js/vault.html#${afterHash}` : `vault.html#${afterHash}`
+  })
 }
 
 export function AuthLinkPage(): ReactElement {

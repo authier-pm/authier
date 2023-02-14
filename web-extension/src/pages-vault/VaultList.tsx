@@ -26,6 +26,7 @@ import { device, getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
+import browser from 'webextension-polyfill'
 
 export function VaultListItem({
   secret
@@ -75,7 +76,7 @@ export function VaultListItem({
                 aria-label="open item"
                 colorScheme="blackAlpha"
                 icon={<UnlockIcon />}
-                onClick={() => chrome.tabs.create({ url: secretUrl })}
+                onClick={() => browser.tabs.create({ url: secretUrl })}
               />
             ) : null}
 

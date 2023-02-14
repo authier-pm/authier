@@ -1,10 +1,11 @@
 import { device } from './ExtensionDevice'
+import browser from 'webextension-polyfill'
 
 describe('ExtensionDevice', () => {
   describe('startLockInterval', () => {
     it('should send a message to the background page to set the lock interval', async () => {
       const mockRuntimeSendMessage = jest.fn()
-      chrome.runtime.sendMessage = mockRuntimeSendMessage
+      browser.runtime.sendMessage = mockRuntimeSendMessage
 
       await device.startLockInterval(1234)
       expect(mockRuntimeSendMessage).toHaveBeenCalledWith({
@@ -17,7 +18,7 @@ describe('ExtensionDevice', () => {
   describe('clearLockInterval', () => {
     it('should send a message to the background page to clear the lock interval', async () => {
       const mockRuntimeSendMessage = jest.fn()
-      chrome.runtime.sendMessage = mockRuntimeSendMessage
+      browser.runtime.sendMessage = mockRuntimeSendMessage
 
       await device.clearLockInterval()
       expect(mockRuntimeSendMessage).toHaveBeenCalledWith({
@@ -45,7 +46,7 @@ describe('ExtensionDevice', () => {
           lockTime: 1234
         }
       })
-      chrome.storage.local.get = mockGet
+      browser.storage.local.get = mockGet
 
       const mockStartLockInterval = jest.fn()
       device.startLockInterval = mockStartLockInterval
@@ -64,7 +65,7 @@ describe('ExtensionDevice', () => {
           id: 'Mock locked state ID'
         }
       })
-      chrome.storage.local.get = mockGet
+      browser.storage.local.get = mockGet
 
       const mockGenerateDeviceName = jest
         .fn()
