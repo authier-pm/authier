@@ -46,7 +46,8 @@ export const PromptPassword = ({
 
   const spanStyle = {
     fontSize: '13px',
-    color: '#000'
+    color: '#000',
+    marginRight: '8px'
   }
 
   const buttonStyle = (bgColor: string) => {
