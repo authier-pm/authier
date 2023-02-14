@@ -141,17 +141,18 @@ model MasterDeviceChange {
 
 // a map of all inputs publicly available on the internet which we need to map in order for authier's automagic login to work
 model WebInput {
-  id            Int                @id @default(autoincrement())
-  layoutType    String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
-  createdAt     DateTime           @default(now())
-  host          String             @db.VarChar(253)
-  url           String             @db.VarChar(2048)
-  kind          WebInputType
-  domPath       String
-  domOrdinal    Int                @default(0)
-  addedByUser   User               @relation(fields: [addedByUserId], references: [id])
-  addedByUserId String             @db.Uuid
-  UsageEvents   SecretUsageEvent[]
+  id             Int                @id @default(autoincrement())
+  layoutType     String? // for OTP inputs can be 'simple' or 'multi' for when pages where they have 6 input elements-one for each OTP code digit
+  createdAt      DateTime           @default(now())
+  host           String             @db.VarChar(253)
+  url            String             @db.VarChar(2048)
+  kind           WebInputType
+  domPath        String
+  domOrdinal     Int                @default(0)
+  domCoordinates Json
+  addedByUser    User               @relation(fields: [addedByUserId], references: [id])
+  addedByUserId  String             @db.Uuid
+  UsageEvents    SecretUsageEvent[]
 
   @@unique([url, domPath], name: "webInputIdentifier")
   @@index([host])

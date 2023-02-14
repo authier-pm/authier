@@ -8,6 +8,8 @@ import { describe, expect, it } from 'vitest'
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
+import { WebInputTypeGQL } from 'models/types/WebInputType'
+import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 
 export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
@@ -267,6 +269,36 @@ describe('RootResolver', () => {
           fakeCtx
         )
       }).rejects.toThrow('Login failed, try again later')
+    })
+  })
+
+  describe('addWebInputs', () => {
+    it('should add to the DB', async () => {
+      const { fakeCtx } = await fakeUserAndContext()
+
+      const inputs = await resolver.addWebInputs(
+        [
+          {
+            url: 'https://google.com',
+            kind: WebInputTypeGQL.PASSWORD,
+            domOrdinal: 1,
+            domPath: 'body',
+
+            domCoordinates: {
+              x: 2.234,
+              y: 3.234
+            }
+          }
+        ],
+        fakeCtx
+      )
+
+      expect(inputs).toHaveLength(1)
+      // @ts-expect-error
+      delete inputs[0].createdAt
+      // @ts-expect-error
+      delete inputs[0].id
+      expect(inputs[0]).toMatchSnapshot()
     })
   })
 })
