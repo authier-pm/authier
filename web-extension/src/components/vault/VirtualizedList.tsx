@@ -14,7 +14,6 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
     useContext(DeviceStateContext)
 
   const filteredItems = [...LoginCredentials, ...TOTPSecrets].filter((item) => {
-    console.log('item', { item })
     const label =
       (item.kind === EncryptedSecretType.TOTP
         ? item.totp.label

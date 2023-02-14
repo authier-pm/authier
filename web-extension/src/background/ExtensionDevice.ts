@@ -38,7 +38,6 @@ import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
   cryptoKeyToString,
   abToCryptoKey,
-  buff_to_base64,
   enc,
   dec,
   base64_to_buf,
@@ -451,6 +450,7 @@ class ExtensionDevice {
     let storedState: IBackgroundStateSerializable | null = null
 
     const storage = await browser.storage.local.get()
+    log('storage', storage)
     if (storage.backgroundState) {
       storedState = storage.backgroundState
 
@@ -465,6 +465,14 @@ class ExtensionDevice {
       this.name = storedState.deviceName
       this.state.save()
     } else {
+      if (this.lockedState) {
+        await browser.storage.local.set({
+          backgroundState: null,
+          lockedState: this.lockedState
+        })
+        this.rerenderViews()
+        return
+      }
       this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
@@ -581,7 +589,8 @@ class ExtensionDevice {
       throw new Error('no state to lock')
     }
 
-    this.clearLockInterval()
+    //QUESTION: When I call here this.clearLockInterval() it doesn't work, trpc port get closed
+    //this.clearLockInterval()
 
     log('locking device')
 

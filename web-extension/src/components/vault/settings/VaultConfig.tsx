@@ -21,15 +21,17 @@ import {
   SyncSettingsDocument,
   useUpdateSettingsMutation
 } from '@shared/graphql/Settings.codegen'
-
+import debug from 'debug'
+const log = debug('au:vaultSettings')
 export default function VaultConfig() {
-  const { setSecuritySettings, device } = useContext(DeviceStateContext)
+  const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
   })
 
   // Split to container component to avoid rewriting the same code twice (Account and VaultConfig)
-  if (device.state) {
+  if (deviceState) {
+    log('device', deviceState)
     return (
       <motion.div
         animate={{ opacity: 1, y: 0 }}
@@ -53,10 +55,10 @@ export default function VaultConfig() {
           <Box textAlign="start">
             <Formik
               initialValues={{
-                autofill: device.state.autofill,
-                language: device.state.language,
-                syncTOTP: device.state.syncTOTP,
-                vaultLockTimeoutSeconds: device.state.lockTime
+                autofill: deviceState.autofill,
+                language: deviceState.language,
+                syncTOTP: deviceState.syncTOTP,
+                vaultLockTimeoutSeconds: deviceState.lockTime
               }}
               onSubmit={async (
                 values: SettingsInput,
