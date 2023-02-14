@@ -8,13 +8,13 @@
     "default_popup": "js/popup.html"
   },
   "background": {
-    "scripts": ["js/backgroundPage.js"],
+    "page": "js/backgroundPage.html",
     "persistent": true
   },
   "content_scripts": [
     {
       "matches": ["*://*/*"],
-      "js": ["js/contentScript.js"],
+      "js": ["js/browser-polyfill.js", "js/contentScript.js"],
       "all_frames": true
     }
   ],
@@ -33,5 +33,5 @@
     "<all_urls>"
   ],
   "web_accessible_resources": ["icon-16.png"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.gstatic.com/firebasejs/8.2.0/firebase-app.js https://www.gstatic.com/firebasejs/8.2.0/firebase-messaging.js https://www.googleapis.com https://*.firebaseio.com; object-src 'self' "
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"
 }

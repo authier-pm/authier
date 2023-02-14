@@ -35,14 +35,14 @@ export class WebInputGQLScalars {
   @Field(() => GraphQLScalars.JSONResolver)
   domCoordinates: Prisma.JsonValue
 
-  @Field()
-  addedByUserId: string
+  @Field(() => String, { nullable: true })
+  addedByUserId: string | null
 }
 
 @ObjectType()
 export class WebInputGQL extends WebInputGQLScalars {
-  @Field(() => UserGQL)
-  addedByUser: UserGQL
+  @Field(() => UserGQL, { nullable: true })
+  addedByUser: UserGQL | null
 
   @Field(() => [SecretUsageEventGQL])
   UsageEvents: SecretUsageEventGQL[]

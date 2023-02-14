@@ -1,9 +1,4 @@
-import {
-  domRecorder,
-  getWebInputKind,
-  IInitStateRes,
-  trpc
-} from './contentScript'
+import { domRecorder, getWebInputKind, IInitStateRes } from './contentScript'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import {
   loginPrompt,
@@ -15,6 +10,7 @@ import debug from 'debug'
 import { IDecryptedSecrets } from './autofill'
 import { renderItemPopup } from './renderItemPopup'
 import { recordDiv, renderToast } from './renderToast'
+import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:contentScript:renderer')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -29,6 +25,7 @@ const hideToast = () => {
     x?.remove()
   }, 5000)
 }
+const trpc = getTRPCCached()
 
 export function recordInputs(e?: KeyboardEvent) {
   if (
@@ -156,13 +153,10 @@ export const showSavePromptIfAppropriate = async (
         passwordCount
       )
     } else {
-      //@ts-expect-error
+      // @ts-expect-error
       const fallbackUsernames: string[] =
         await trpc.getFallbackUsernames.query()
       log('fallbackUsernames', fallbackUsernames)
-      // const fallbackUsernames: string[] = await browser.runtime.sendMessage({
-      //   action: BackgroundMessageType.getFallbackUsernames
-      // })
       renderSaveCredentialsForm(
         fallbackUsernames[0],
         password,

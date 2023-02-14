@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react'
 import browser from 'webextension-polyfill'
 
-import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import {
+  IBackgroundStateSerializable,
+  IBackgroundStateSerializableLocked
+} from '@src/background/backgroundPage'
 import {
   EncryptedSecretType,
   SettingsInput
@@ -11,14 +14,8 @@ import { device, DeviceState } from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
-import { createTRPCProxyClient } from '@trpc/client'
-import { chromeLink } from 'trpc-chrome/link'
-import { AppRouter } from '@src/background/chromeRuntimeListener'
 
-const port = chrome.runtime.connect()
-const trpc = createTRPCProxyClient<AppRouter>({
-  links: [chromeLink({ port })]
-})
+import { getTRPCCached } from '@src/content-script/connectTRPC'
 
 const log = debug('au:useDeviceState')
 
@@ -62,10 +59,12 @@ export interface ISecuritySettingsInBg {
 let registered = false // we need to only register once
 
 export function useDeviceState() {
+  const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
   const [isFilling, setIsFilling] = useState<boolean>(false)
-
+  const [lockedState, setLockedState] =
+    useState<IBackgroundStateSerializableLocked | null>(device.lockedState)
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
@@ -74,9 +73,13 @@ export function useDeviceState() {
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ): Promise<void> => {
-    log('onStorageChange useDevice', areaName, changes)
+    log('onStorageChange', areaName, changes)
+    //WARNING: Not sure if this condition is correct
     if (areaName === 'local' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue)
+      if (changes.lockedState) {
+        setLockedState(changes.lockedState.newValue)
+      }
 
       log('states loaded from storage')
     }
@@ -115,6 +118,7 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
+      log('setSecuritySettings', config)
       await trpc.securitySettings.mutate(config)
     },
 
@@ -122,6 +126,7 @@ export function useDeviceState() {
       device.save(state)
       await trpc.setDeviceState.mutate(state)
     },
+    lockedState,
     device,
     isFilling,
     registered

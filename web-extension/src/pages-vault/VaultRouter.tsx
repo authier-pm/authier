@@ -18,17 +18,16 @@ import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
 
 export function VaultRouter() {
-  const { device, deviceState } = useContext(DeviceStateContext)
+  const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (device.lockedState) {
+    if (lockedState) {
       navigate('verify')
-    } else {
-      navigate('/')
     }
-    console.log('VaultRouter: useEffect')
-  }, [device.lockedState])
+    console.log('VaultRouter: deviceState', deviceState)
+    console.log('VaultRouter: lockedState', lockedState)
+  }, [lockedState])
 
   if (deviceState === null) {
     return (
