@@ -30,7 +30,9 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    return await fetch(`${API_URL?.replace('/graphql', '')}/refresh_token`, {
+    const url = `${API_URL?.replace('/graphql', '')}/refresh_token`
+
+    return await fetch(url, {
       method: 'POST',
       credentials: 'include'
     })

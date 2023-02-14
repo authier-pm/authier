@@ -1,6 +1,5 @@
 // @ts-nocheck
 import { h } from 'preact'
-
 import { useState } from 'preact/hooks'
 import {
   promptOption,
@@ -16,7 +15,7 @@ const log = debug('au:PromptPasswordOption')
 import { autofill } from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
-  let { loginCredentials, webInputs } = props
+  const { loginCredentials, webInputs } = props
   log('GOT in option prompt', { webInputs, loginCredentials })
   if (webInputs.length === 0) {
     log('No web inputs in PromptPasswordOption')
@@ -69,6 +68,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         {loginCredentials.map((el) => {
           return (
             <a
+              key={el.id}
               onClick={async () => {
                 autofill(
                   {

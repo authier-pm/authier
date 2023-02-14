@@ -1,0 +1,17 @@
+// Vitest Snapshot v1
+
+exports[`RootResolver > addWebInputs > should add to the DB 1`] = `
+{
+  "addedByUserId": "bc5eb381-1354-4ee2-8343-214a9f507771",
+  "domCoordinates": {
+    "x": 2.234,
+    "y": 3.234,
+  },
+  "domOrdinal": 0,
+  "domPath": "body",
+  "host": "google.com",
+  "kind": "PASSWORD",
+  "layoutType": null,
+  "url": "https://google.com",
+}
+`;

@@ -3,7 +3,7 @@ import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementInViewport, isHidden } from './isElementInViewport'
-import { Coords, domRecorder, IInitStateRes, trpc } from './contentScript'
+import { Coords, domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { toast } from 'react-toastify'
@@ -13,6 +13,7 @@ import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
 import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
+import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:autofill')
 
@@ -122,6 +123,7 @@ export let autofillEnabled = false
 let onInputAddedHandler
 
 export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
+  const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
   if (autofillEnabled === true) {
@@ -192,9 +194,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       .map((webInputGql) => {
         let inputEl = document.body.querySelector(
           webInputGql.domPath
-        ) as HTMLInputElement
-        const rect = inputEl.getBoundingClientRect()
-        log('cords', rect.x, rect.y)
+        ) as HTMLInputElement | null
+        const rect = inputEl?.getBoundingClientRect()
+        log('cords', rect?.x, rect?.y)
         //NOTE: We found element by DOM path
         if (inputEl) {
           log('autofilled by domPath')
@@ -224,10 +226,10 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           }
           //NOTE: We did not find element by DOM path, so find it by input coords
         } else if (
-          webInputGql.domCoordinates.x === rect.x &&
-          webInputGql.domCoordinates.y === rect.y
+          webInputGql.domCoordinates.x === rect?.x &&
+          webInputGql.domCoordinates.y === rect?.y
         ) {
-          inputEl = document.elementFromPoint(rect.x, rect.y) as any
+          inputEl = document.elementFromPoint(rect?.x, rect?.y) as any
           log('el', inputEl)
         }
       })

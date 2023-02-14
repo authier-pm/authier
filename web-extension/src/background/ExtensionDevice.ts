@@ -38,7 +38,6 @@ import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import {
   cryptoKeyToString,
   abToCryptoKey,
-  buff_to_base64,
   enc,
   dec,
   base64_to_buf,
@@ -70,9 +69,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 const browserInfo = bowser.getParser(navigator.userAgent)
-export const isRunningInBgPage = location.href.includes(
-  '_generated_background_page.html'
-)
+export const isRunningInBgPage = location.href.includes('backgroundPage.html')
 
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
@@ -395,8 +392,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
 
     if (errors) {
-      console.log('errors', errors)
-      throw new Error('Erorror adding secret')
+      console.error('errors', errors)
+      throw new Error('Error adding secret')
     }
     if (!data) {
       throw new Error('failed to save secret')
@@ -453,6 +450,7 @@ class ExtensionDevice {
     let storedState: IBackgroundStateSerializable | null = null
 
     const storage = await browser.storage.local.get()
+    log('storage', storage)
     if (storage.backgroundState) {
       storedState = storage.backgroundState
 
@@ -467,11 +465,19 @@ class ExtensionDevice {
       this.name = storedState.deviceName
       this.state.save()
     } else {
+      if (this.lockedState) {
+        await browser.storage.local.set({
+          backgroundState: null,
+          lockedState: this.lockedState
+        })
+        this.rerenderViews()
+        return
+      }
       this.name = this.generateDeviceName()
       this.listenForUserLogin()
     }
 
-    if (this.state) {
+    if (this.state && (isVault || isPopup)) {
       this.startLockInterval(this.state.lockTime)
     }
 
@@ -583,7 +589,8 @@ class ExtensionDevice {
       throw new Error('no state to lock')
     }
 
-    this.clearLockInterval()
+    //QUESTION: When I call here this.clearLockInterval() it doesn't work, trpc port get closed
+    //this.clearLockInterval()
 
     log('locking device')
 
