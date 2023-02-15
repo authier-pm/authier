@@ -88,7 +88,9 @@ jobs:
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
-          pnpm prodBuild
+          pnpm prodBuild &
+          cd dist &
+          ls -al
 
       - name: Install Playwright Browsers and run backend
         working-directory: ./web-extension
