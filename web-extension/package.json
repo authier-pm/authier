@@ -20,7 +20,7 @@
     "test2": "jest --config=jest.config.js",
     "lint": "eslint --fix -c ../.eslintrc.js \"src/**/*.ts*\"",
     "gen": "graphql-codegen",
-    "test:run": "cd .. && cd backend && pnpm dev",
+    "test:run": "cd .. && cd backend && pnpm gen && pnpm dev",
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "publishApp": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi"
   },
