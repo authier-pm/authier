@@ -184,8 +184,8 @@ type WebInputGQL {
   domPath: String!
   domOrdinal: Int!
   domCoordinates: JSON!
-  addedByUserId: String!
-  addedByUser: UserGQL!
+  addedByUserId: String
+  addedByUser: UserGQL
   UsageEvents: [SecretUsageEventGQL!]!
 }
 
