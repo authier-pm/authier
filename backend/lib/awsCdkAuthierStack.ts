@@ -65,6 +65,7 @@ export class AwsCdkAuthierStack extends Stack {
         // Allow this to be called from websites on https://example.com.
         // Can also be ['*'] to allow all domain.
         allowedOrigins: ['*'],
+        allowedHeaders: ['*'],
         allowCredentials: true
       }
     })
