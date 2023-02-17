@@ -19,6 +19,7 @@ export async function renderSaveCredentialsForm(
     <PromptPassword
       username={username}
       password={password}
+      // @ts-expect-error TODO fix
       inputEvents={inputEvents}
     />,
     loginPrompt
