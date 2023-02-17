@@ -13,8 +13,13 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
-      "js": ["js/browser-polyfill.js", "js/contentScript.js"],
+      "matches": [
+        "*://*/*"
+      ],
+      "js": [
+        "js/browser-polyfill.js",
+        "js/contentScript.js"
+      ],
       "all_frames": true
     }
   ],
@@ -32,6 +37,8 @@
     "https://*/",
     "<all_urls>"
   ],
-  "web_accessible_resources": ["icon-16.png"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://*.firebaseio.com; object-src 'self'"
+  "web_accessible_resources": [
+    "icon-16.png"
+  ],
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
 }

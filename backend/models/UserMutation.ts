@@ -27,6 +27,8 @@ import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../api/GraphqlError'
+import debug from 'debug'
+const log = debug('au:userMutation')
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -399,7 +401,6 @@ export class UserMutation extends UserBase {
     })
 
     const productItem = await stripe.products.retrieve(product)
-    console.log('productItem', productItem)
 
     if (user) {
       const checkoutSession = await stripe.checkout.sessions.retrieve(

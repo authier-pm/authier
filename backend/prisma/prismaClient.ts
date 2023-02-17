@@ -5,7 +5,7 @@ import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
 import { DMMFClass } from '.prisma/client/runtime'
-import { PrismaClient } from '.prisma/client/index'
+import { PrismaClient } from '.prisma/client'
 console.log(__dirname)
 
 const log = debug('prisma:sql')

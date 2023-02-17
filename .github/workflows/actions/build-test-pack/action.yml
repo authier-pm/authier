@@ -30,7 +30,7 @@ runs:
       shell: bash
       working-directory: ./web-extension
       run: |
-          echo "${{ secrets.ENV_PROD }}" > .env
+          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
 
     # Add additional build and test steps here
     - name: web-extension build

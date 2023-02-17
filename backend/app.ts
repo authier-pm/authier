@@ -35,8 +35,9 @@ sentryInit({
   release: `<project-name>@${pkg.version}`
 })
 
-const endpointSecret = env.STRIPE_ENDPOINT_SECRET_TEST_MODE as string
+const endpointSecret = env.STRIPE_ENDPOINT as string
 const isLambda = !!env.LAMBDA_TASK_ROOT
+log('endpointSecret', endpointSecret)
 
 let logger
 let pino
@@ -104,6 +105,7 @@ app.register((fastify, opts, done) => {
       }
     }
   )
+
   fastify.post('/webhook', async (req: FastifyRequest, reply) => {
     const sig = req.headers['stripe-signature']
 
@@ -132,19 +134,25 @@ app.register((fastify, opts, done) => {
         status = subscription.status
         console.log('Subscription deleted:', subscription)
         if (status === 'canceled') {
-          /* await prismaClient.userPaidProducts.delete({ */
-          /*   where: { */
-          /*     id: subscription.id */
-          /*   } */
-          /* }) */
+          //TODO: Finish this
+          // await prismaClient.userPaidProducts.delete({
+          //   where: {
+          //     id: subscription.id
+          //   }
+          // })
         }
 
         console.log(`Subscription status is ${status}.`)
         break
 
+      case 'customer.subscription.deleted':
+        // Then define and call a method to handle the subscription deleted.
+        subscription = event.data.object
+        status = subscription.status
+        console.log('Subscription deleted:', subscription)
+
       case 'checkout.session.completed':
         const session = event.data.object
-        console.log('Session completed:', session.metadata)
         await prismaClient.user.update({
           where: {
             email: session.customer_details.email
