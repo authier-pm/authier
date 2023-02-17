@@ -21,7 +21,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
-  const el = document.querySelector(webInputs[0].domPath)
+  let el = document.querySelector(webInputs[0].domPath)
   if (!el) {
     el = document.elementFromPoint(
       webInputs[0].domCoordinates.x,

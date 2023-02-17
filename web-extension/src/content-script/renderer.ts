@@ -114,9 +114,7 @@ export const renderer = (stateInit: IInitStateRes) => {
     log('rendering save credentials form')
     renderSaveCredentialsForm(
       saveLoginModalsState.username,
-      saveLoginModalsState.password,
-      passwordLimit,
-      passwordCount
+      saveLoginModalsState.password
     )
     return // the modal is already displayed
   }

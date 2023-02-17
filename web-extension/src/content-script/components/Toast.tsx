@@ -8,7 +8,9 @@ import './Toast.css'
 export const Toast = ({ header, text }: { header: string; text: string }) => {
   useEffect(() => {
     const x = document.getElementById('toast')
-    x.className = 'show'
+    if (x) {
+      x.className = 'show'
+    }
     // setTimeout(function () {
     //   x.className = x.className.replace('show', '')
     // }, 5000)
