@@ -6,11 +6,11 @@ import {
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 import { UserProvider } from './providers/UserProvider'
-import PopupRoutes from './PopupRoutes'
+
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
 import { messages } from './locale/en-gb/messages'
-import { VaultRouter } from './pages-vault/VaultRouter'
+
 export const { ToastContainer, toast } = createStandaloneToast({
   theme: chakraRawTheme
 })
@@ -20,15 +20,13 @@ i18n.load('en', messages)
 i18n.activate('en')
 export const chakraCustomTheme = extendTheme(chakraRawTheme)
 
-export default function Providers({ parent }: { parent: 'vault' | 'popup' }) {
+export function ExtensionProviders({ children }) {
   return (
     <>
       <ChakraProvider theme={chakraCustomTheme}>
         <DeviceStateProvider>
           <UserProvider>
-            <I18nProvider i18n={i18n}>
-              {parent === 'vault' ? <VaultRouter /> : <PopupRoutes />}
-            </I18nProvider>
+            <I18nProvider i18n={i18n}>{children}</I18nProvider>
           </UserProvider>
         </DeviceStateProvider>
       </ChakraProvider>
