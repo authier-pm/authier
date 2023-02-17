@@ -14,6 +14,7 @@ import { getSelectorForElement } from './DOMEventsRecorder'
 import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import { getTRPCCached } from './connectTRPC'
+import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 
 const log = debug('au:autofill')
 
@@ -328,6 +329,25 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     function searchInputsAndAutofill(documentBody: HTMLElement) {
       const newWebInputs: webInput[] = []
       const inputElsArray = filterUselessInputs(documentBody)
+      console.log('inputElsArray', inputElsArray)
+
+      //
+      if (inputElsArray.length === 1) {
+        // this branch handles multi step google login pages specifically. We might add more cases in the future
+        const visibleText = getAllVisibleTextOnDocumentBody()
+
+        const matchingLogin = secretsForHost.loginCredentials.find((login) => {
+          return visibleText.includes(login.loginCredentials.username)
+        })
+        if (matchingLogin) {
+          const autofilledElPassword = autofillValueIntoInput(
+            inputElsArray[0],
+            matchingLogin.loginCredentials.password
+          )
+          // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
+          return autofilledElPassword
+        }
+      }
 
       for (let index = 0; index < inputElsArray.length; index++) {
         const input = inputElsArray[index]
@@ -354,7 +374,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
             })
           }
 
-          //Search for a username input
+          //Search for a username input by going backwards in the array from the password input
           for (let j = index - 1; j >= 0; j--) {
             if (inputElsArray[j].type !== 'hidden') {
               log('found username input', inputElsArray[j])
@@ -381,30 +401,33 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                 })
                 break
               }
+              const recentlyUsedLogin = secretsForHost.loginCredentials.sort(
+                (a, b) => {
+                  return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
+                }
+              )[0]
 
               const autofilledElUsername = autofillValueIntoInput(
                 inputElsArray[j],
-                secretsForHost.loginCredentials[0].loginCredentials.username
+                recentlyUsedLogin.loginCredentials.username
               )
 
               domRecorder.addInputEvent({
                 element: inputElsArray[j],
                 eventType: 'input',
-                inputted:
-                  secretsForHost.loginCredentials[0].loginCredentials.username,
+                inputted: recentlyUsedLogin.loginCredentials.username,
                 kind: WebInputType.USERNAME
               })
 
               const autofilledElPassword = autofillValueIntoInput(
                 input,
-                secretsForHost.loginCredentials[0].loginCredentials.password
+                recentlyUsedLogin.loginCredentials.password
               )
 
               domRecorder.addInputEvent({
                 element: input,
                 eventType: 'input',
-                inputted:
-                  secretsForHost.loginCredentials[0].loginCredentials.password,
+                inputted: recentlyUsedLogin.loginCredentials.password,
                 kind: WebInputType.PASSWORD
               })
 
