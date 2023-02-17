@@ -265,6 +265,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         // For one input on page
         if (input.autocomplete === 'new-password') {
           autofillValueIntoInput(input, generate(passwordGenOptions))
+          // TODO show prompt to user to save the newly generated password
         } else {
           // More inputs on page
           if (input.type === 'password') {
