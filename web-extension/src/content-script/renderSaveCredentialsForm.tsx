@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { PromptPassword } from './components/PromptPassword'
 import { h, render } from 'preact'
 import { getTRPCCached } from './connectTRPC'
@@ -10,9 +9,7 @@ export let loginPrompt: HTMLDivElement | null
 
 export async function renderSaveCredentialsForm(
   username: string,
-  password: string,
-  passwordLimit: number,
-  passwordCount: number
+  password: string
 ) {
   const trpc = getTRPCCached()
   const inputEvents = await trpc.getCapturedInputEvents.query()
@@ -23,8 +20,6 @@ export async function renderSaveCredentialsForm(
       username={username}
       password={password}
       inputEvents={inputEvents}
-      passwordLimit={passwordLimit}
-      passwordCount={passwordCount}
     />,
     loginPrompt
   )

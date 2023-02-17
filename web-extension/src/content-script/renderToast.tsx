@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { h, render } from 'preact'
 import { Toast } from './components/Toast'
 
