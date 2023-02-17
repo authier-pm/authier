@@ -331,8 +331,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       const inputElsArray = filterUselessInputs(documentBody)
       console.log('inputElsArray', inputElsArray)
 
-      //
-      if (inputElsArray.length === 1) {
+      if (inputElsArray.length === 1 && inputElsArray[0].type === 'password') {
         // this branch handles multi step google login pages specifically. We might add more cases in the future
         const visibleText = getAllVisibleTextOnDocumentBody()
 
