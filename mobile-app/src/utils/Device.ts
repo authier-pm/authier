@@ -82,11 +82,6 @@ export interface ISecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
-export const getTldPart = (url: string) => {
-  const host = new URL(url ?? '').hostname
-  const parts = host.split('.')
-  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
-}
 export const getDecryptedSecretProp = (
   secret: SecretTypeUnion,
   prop: 'url' | 'label' | 'iconUrl'

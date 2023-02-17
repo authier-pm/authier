@@ -25,6 +25,7 @@ import debug from 'debug'
 import { SecretItemIcon } from '../SecretItemIcon'
 import { extractHostname } from '@src/util/extractHostname'
 import { useAddOtpEventMutation } from './AuthList.codegen'
+import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 
 const log = debug('au:AuthsList')
 
@@ -177,7 +178,10 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
     if (!currentURL || !totp.url) {
       return true
     }
-    return extractHostname(totp.url) === extractHostname(currentURL)
+    return (
+      getDomainNameAndTldFromUrl(totp.url) ===
+      getDomainNameAndTldFromUrl(currentURL)
+    )
   })
   const loginCredentialForCurrentDomain = loginCredentials.filter(
     ({ loginCredentials }) => {
@@ -189,7 +193,8 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
       }
 
       return (
-        extractHostname(loginCredentials.url) === extractHostname(currentURL)
+        getDomainNameAndTldFromUrl(loginCredentials.url) ===
+        getDomainNameAndTldFromUrl(currentURL)
       )
     }
   )

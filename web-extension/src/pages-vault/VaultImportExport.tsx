@@ -24,7 +24,7 @@ import {
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
-import { toast } from '@src/Providers'
+import { toast } from '@src/ExtensionProviders'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 
