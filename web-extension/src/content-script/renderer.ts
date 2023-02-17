@@ -89,13 +89,7 @@ async function clicked(e: MouseEvent) {
 }
 
 export const renderer = (stateInit: IInitStateRes) => {
-  const {
-    saveLoginModalsState,
-    secretsForHost,
-    webInputs,
-    passwordLimit,
-    passwordCount
-  } = stateInit
+  const { saveLoginModalsState, secretsForHost, webInputs } = stateInit
 
   if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
     renderLoginCredOption({

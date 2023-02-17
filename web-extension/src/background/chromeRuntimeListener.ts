@@ -10,7 +10,6 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
-import { initTRPC } from '@trpc/server'
 import { createChromeHandler } from 'trpc-chrome/adapter'
 import { device, isRunningInBgPage } from './ExtensionDevice'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
@@ -26,6 +25,8 @@ import {
 } from './backgroundSchemas'
 import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
+import { tc } from './tc'
+import { loggerMiddleware } from './loggerMiddleware'
 
 const log = debug('au:chListener')
 
@@ -53,12 +54,7 @@ interface ILoginCredentialsFromContentScript {
   openInVault: boolean
 }
 
-const t = initTRPC.create({
-  isServer: false,
-  allowOutsideOfServer: true
-})
-
-//NOTE: temporery storage for not yet saved credentials. (during page rerender)
+//NOTE: temporary storage for not yet saved credentials. (during page rerender)
 export const saveLoginModalsStates = new Map<
   number,
   { password: string; username: string }
@@ -71,8 +67,10 @@ let lockTimeEnd: number | null
 let lockTimeStart: number | null
 let lockInterval: any
 
-const appRouter = t.router({
-  addLoginCredentials: t.procedure
+const tcProcedure = tc.procedure.use(loggerMiddleware)
+
+const appRouter = tc.router({
+  addLoginCredentials: tcProcedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
       // @ts-expect-error
@@ -143,7 +141,7 @@ const appRouter = t.router({
         openVaultTab(`/secret/${secret.id}`)
       }
     }),
-  saveCapturedInputEvents: t.procedure
+  saveCapturedInputEvents: tcProcedure
     .input(capturedEventsPayloadSchema)
     .mutation(async ({ input }) => {
       capturedInputEvents = input.inputEvents
@@ -170,7 +168,7 @@ const appRouter = t.router({
         }
       })
     }),
-  saveLoginCredentialsModalShown: t.procedure
+  saveLoginCredentialsModalShown: tcProcedure
     .input(loginCredentialSchema)
     .mutation(async ({ input, ctx }) => {
       // @ts-expect-error
@@ -181,7 +179,7 @@ const appRouter = t.router({
         saveLoginModalsStates.set(currentTabId, input)
       }
     }),
-  hideLoginCredentialsModal: t.procedure.mutation(async ({ ctx }) => {
+  hideLoginCredentialsModal: tcProcedure.mutation(async ({ ctx }) => {
     // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
@@ -189,7 +187,7 @@ const appRouter = t.router({
       saveLoginModalsStates.delete(currentTabId)
     }
   }),
-  addTOTPInput: t.procedure
+  addTOTPInput: tcProcedure
     .input(webInputElementSchema)
     .mutation(async ({ input }) => {
       await apolloClient.mutate<
@@ -202,12 +200,12 @@ const appRouter = t.router({
         }
       })
     }),
-  getFallbackUsernames: t.procedure.query(async () => {
+  getFallbackUsernames: tcProcedure.query(async () => {
     const deviceState = device.state
     log('Getting fallback usernames', deviceState?.email)
     return [deviceState?.email]
   }),
-  getContentScriptInitialState: t.procedure.query(async ({ ctx }) => {
+  getContentScriptInitialState: tcProcedure.query(async ({ ctx }) => {
     // @ts-expect-error
     const tab = ctx.sender.tab
     const currentTabId = tab.id
@@ -230,12 +228,12 @@ const appRouter = t.router({
       return getContentScriptInitialState(tabUrl, currentTabId)
     }
   }),
-  getCapturedInputEvents: t.procedure.query(async ({ ctx }) => {
+  getCapturedInputEvents: tcProcedure.query(async ({ ctx }) => {
     // @ts-expect-error
     const tab = ctx.sender.tab
     return { capturedInputEvents, inputsUrl: tab?.url }
   }),
-  securitySettings: t.procedure
+  securitySettings: tcProcedure
     .input(settingsSchema)
     .mutation(async ({ input }) => {
       const deviceState = device.state
@@ -259,7 +257,7 @@ const appRouter = t.router({
 
       return true
     }),
-  setLockInterval: t.procedure
+  setLockInterval: tcProcedure
     .input(z.object({ time: z.number() }))
     .mutation(async ({ input }) => {
       if (!lockInterval) {
@@ -269,11 +267,11 @@ const appRouter = t.router({
       checkInterval(lockTimeEnd)
       return true
     }),
-  clearLockInterval: t.procedure.mutation(async () => {
+  clearLockInterval: tcProcedure.mutation(async () => {
     resetInterval()
     return true
   }),
-  setDeviceState: t.procedure
+  setDeviceState: tcProcedure
     .input(backgroundStateSerializableLockedSchema)
     .mutation(async ({ input }) => {
       device.save(input)
