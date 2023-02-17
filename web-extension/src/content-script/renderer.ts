@@ -114,18 +114,14 @@ export const renderer = (stateInit: IInitStateRes) => {
     log('rendering save credentials form')
     renderSaveCredentialsForm(
       saveLoginModalsState.username,
-      saveLoginModalsState.password,
-      passwordLimit,
-      passwordCount
+      saveLoginModalsState.password
     )
     return // the modal is already displayed
   }
 }
 
 export const showSavePromptIfAppropriate = async (
-  secretsForHost: IDecryptedSecrets,
-  passwordLimit: number,
-  passwordCount: number
+  secretsForHost: IDecryptedSecrets
 ) => {
   log('showSavePromptIfAppropriate', domRecorder.toJSON(), document.documentURI)
   if (loginPrompt) {
@@ -146,23 +142,13 @@ export const showSavePromptIfAppropriate = async (
 
   if (password && !existingCredentialWithSamePassword) {
     if (username) {
-      renderSaveCredentialsForm(
-        username,
-        password,
-        passwordLimit,
-        passwordCount
-      )
+      renderSaveCredentialsForm(username, password)
     } else {
       // @ts-expect-error
       const fallbackUsernames: string[] =
         await trpc.getFallbackUsernames.query()
       log('fallbackUsernames', fallbackUsernames)
-      renderSaveCredentialsForm(
-        fallbackUsernames[0],
-        password,
-        passwordLimit,
-        passwordCount
-      )
+      renderSaveCredentialsForm(fallbackUsernames[0], password)
     }
   }
 }

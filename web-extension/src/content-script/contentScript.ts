@@ -73,7 +73,7 @@ export function getWebInputKind(
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-let stateInitRes: IInitStateRes
+export let stateInitRes: IInitStateRes
 export async function initInputWatch() {
   const trpc = getTRPCCached()
   stateInitRes =
@@ -91,13 +91,7 @@ export async function initInputWatch() {
     return
   }
 
-  const {
-    extensionDeviceReady,
-    secretsForHost,
-    autofillEnabled,
-    passwordLimit,
-    passwordCount
-  } = stateInitRes
+  const { extensionDeviceReady, secretsForHost, autofillEnabled } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
     log('no need to do anything-user locked out')
@@ -115,7 +109,7 @@ export async function initInputWatch() {
       kind: WebInputType.SUBMIT_BUTTON
     })
 
-    showSavePromptIfAppropriate(secretsForHost, passwordLimit, passwordCount)
+    showSavePromptIfAppropriate(secretsForHost)
   }
 
   const onInputRemoved = (input) => {
@@ -218,11 +212,7 @@ export async function initInputWatch() {
                   eventType: 'keydown',
                   kind: null
                 })
-                showSavePromptIfAppropriate(
-                  secretsForHost,
-                  passwordLimit,
-                  passwordCount
-                )
+                showSavePromptIfAppropriate(secretsForHost)
               }
             },
             { once: true }
@@ -231,12 +221,7 @@ export async function initInputWatch() {
           // some login flows don't have any forms, in that case we are listening for click, keydown
           targetElement.ownerDocument.body.addEventListener(
             'click',
-            () =>
-              showSavePromptIfAppropriate(
-                secretsForHost,
-                passwordLimit,
-                passwordCount
-              ),
+            () => showSavePromptIfAppropriate(secretsForHost),
             {
               once: true
             }
