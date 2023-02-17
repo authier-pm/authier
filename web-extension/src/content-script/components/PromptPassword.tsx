@@ -1,11 +1,13 @@
-// @ts-nocheck
 import { h } from 'preact'
 import { authierColors } from '../../../../shared/chakraRawTheme'
 import { loginPrompt } from '../renderSaveCredentialsForm'
 
 import { ICapturedInput } from '../../background/backgroundPage'
-import browser from 'webextension-polyfill'
+import debug from 'debug'
+
 import { getTRPCCached } from '../connectTRPC'
+import { stateInitRes } from '../contentScript'
+const log = debug('au:PromptPassword')
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -23,9 +25,7 @@ const escapeHtml = (unsafe: string) => {
 export const PromptPassword = ({
   username,
   password,
-  inputEvents,
-  passwordLimit,
-  passwordCount
+  inputEvents
 }: {
   username: string
   password: string
@@ -33,12 +33,11 @@ export const PromptPassword = ({
     capturedInputEvents: ICapturedInput[]
     inputsUrl: any
   }
-
-  passwordLimit: number
-  passwordCount: number
 }) => {
   const trpc = getTRPCCached()
 
+  const { passwordCount, passwordLimit } = stateInitRes
+  log({ passwordCount, passwordLimit })
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',
@@ -92,7 +91,6 @@ export const PromptPassword = ({
 
   let passwordShown = false
 
-  console.log('nanojsx')
   return (
     <div
       style={{
