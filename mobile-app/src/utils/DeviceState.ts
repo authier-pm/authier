@@ -31,9 +31,10 @@ import {
   AddSecretInput,
   isLoginSecret,
   isTotpSecret,
-  getDecryptedSecretProp,
-  getTldPart
+  getDecryptedSecretProp
 } from './Device'
+
+import { getDomainNameAndTldFromUrl } from '../../../shared/urlUtils'
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
@@ -153,7 +154,11 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>
-        host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
+        host.endsWith(
+          getDomainNameAndTldFromUrl(
+            getDecryptedSecretProp(secret, 'url') ?? ''
+          )
+        )
       )
     }
     return Promise.all(
