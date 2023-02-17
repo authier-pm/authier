@@ -27,7 +27,7 @@ import {
   dec,
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
-import { toast } from '@src/Providers'
+import { toast } from '@src/ExtensionProviders'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 export const log = debug('au:LoginAwaitingApproval')
