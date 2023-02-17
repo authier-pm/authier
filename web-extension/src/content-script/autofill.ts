@@ -15,6 +15,8 @@ import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import { getTRPCCached } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
+import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
+import { device } from '../background/ExtensionDevice'
 
 const log = debug('au:autofill')
 
@@ -160,15 +162,11 @@ export const autofill = (
           input.type === 'password' &&
           usefulInputs[index + 1].type === 'password'
         ) {
-          const password = generate({
-            length: 10,
-            numbers: true,
-            uppercase: true,
-            symbols: true,
-            strict: true
-          })
-          autofillValueIntoInput(usefulInputs[index], password)
-          autofillValueIntoInput(usefulInputs[index + 1], password)
+          const newPassword = generatePasswordBasedOnUserConfig()
+          autofillValueIntoInput(usefulInputs[index], newPassword)
+          autofillValueIntoInput(usefulInputs[index + 1], newPassword)
+
+          renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
           break
         } else if (input.getAttribute('autocomplete') === 'new-password') {
           renderPasswordGenerator({ input: input })
@@ -263,11 +261,11 @@ export const autofill = (
     //Catch new inputs
     onInputAddedHandler = debounce(
       (input) => {
-        const passwordGenOptions = { length: 12, numbers: true, symbols: true } // TODO get from user's options
-
+        let newPassword: string | null = null
         // For one input on page
         if (input.autocomplete === 'new-password') {
-          autofillValueIntoInput(input, generate(passwordGenOptions))
+          const newPassword = generatePasswordBasedOnUserConfig()
+          autofillValueIntoInput(input, newPassword)
           // TODO show prompt to user to save the newly generated password
         } else {
           // More inputs on page
@@ -281,13 +279,18 @@ export const autofill = (
               passwordInputsOnPage[0].autocomplete !== 'current-password' &&
               passwordInputsOnPage[1].autocomplete !== 'current-password'
             ) {
-              const newPassword = generate(passwordGenOptions)
+              const newPassword = generatePasswordBasedOnUserConfig()
+
               // must be some kind of signup page
               autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
 
               autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
             }
           }
+        }
+
+        if (newPassword) {
+          renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
         }
       },
       500,
@@ -467,4 +470,15 @@ export const autofill = (
     autofillEnabled = false
     bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
   }
+}
+function generatePasswordBasedOnUserConfig() {
+  const config = {
+    // TODO get config from device.state
+    length: 12,
+    numbers: true,
+    uppercase: true,
+    symbols: true,
+    strict: true
+  }
+  return generate(config)
 }
