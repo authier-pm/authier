@@ -61,10 +61,12 @@ export const app = fastify({
   logger: logger
 })
 
-app.register(fastifyCors, {
-  origin: true,
-  credentials: true
-})
+if (!isLambda) {
+  app.register(fastifyCors, {
+    origin: true,
+    credentials: true
+  })
+}
 
 app.setErrorHandler(async (error, request, reply) => {
   // Logging locally
@@ -105,7 +107,7 @@ app.register((fastify, opts, done) => {
   fastify.post('/webhook', async (req: FastifyRequest, reply) => {
     const sig = req.headers['stripe-signature']
 
-    let event
+    let event: { type: any; data: { object: any } }
 
     try {
       event = stripe.webhooks.constructEvent(
@@ -119,8 +121,8 @@ app.register((fastify, opts, done) => {
       return
     }
 
-    let subscription
-    let status
+    let subscription: { status: string }
+    let status: string
 
     //Handle the event
     switch (event.type) {
