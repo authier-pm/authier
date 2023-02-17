@@ -20,7 +20,7 @@ i18n.load('en', messages)
 i18n.activate('en')
 export const chakraCustomTheme = extendTheme(chakraRawTheme)
 
-export default function Providers({ parent }: { parent: string }) {
+export default function Providers({ parent }: { parent: 'vault' | 'popup' }) {
   return (
     <>
       <ChakraProvider theme={chakraCustomTheme}>
