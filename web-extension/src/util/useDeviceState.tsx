@@ -99,6 +99,9 @@ export function useDeviceState() {
     }
     registered = true
 
+    device.onInitDone(() => {
+      setDeviceState(device.state)
+    })
     browser.storage.onChanged.addListener(onStorageChange)
   }, [])
 

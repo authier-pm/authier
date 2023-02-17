@@ -44,7 +44,7 @@ import {
   generateEncryptionKey,
   encryptedBuf_to_base64
 } from '@util/generateEncryptionKey'
-import { toast } from '@src/Providers'
+import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
@@ -427,6 +427,7 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
+  initCallbacks: (() => void)[] = []
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
@@ -434,6 +435,10 @@ class ExtensionDevice {
 
   async clearLockInterval() {
     await extensionDeviceTrpc.clearLockInterval.mutate()
+  }
+
+  onInitDone(callback: () => void) {
+    this.initCallbacks.push(callback)
   }
 
   get platform() {
@@ -484,7 +489,7 @@ class ExtensionDevice {
     const fireToken = 'aaaa'
 
     this.fireToken = fireToken
-
+    this.initCallbacks.forEach((cb) => cb())
     this.rerenderViews() // for letting vault/popup know that the state has changed
   }
 

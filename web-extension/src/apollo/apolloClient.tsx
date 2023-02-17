@@ -21,6 +21,7 @@ const serializingLink = new SerializingLink()
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
   const accessToken = await getTokenFromLocalStorage()
+
   //return the headers to the context so httpLink can read them
   return {
     headers: {
