@@ -44,10 +44,11 @@ import {
   generateEncryptionKey,
   encryptedBuf_to_base64
 } from '@util/generateEncryptionKey'
-import { toast } from '@src/Providers'
+import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
+import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 
 export const log = debug('au:Device')
 
@@ -55,12 +56,6 @@ const port = chrome.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
   links: [chromeLink({ port })]
 })
-
-const getTldPart = (url: string) => {
-  const host = new URL(url ?? '').hostname
-  const parts = host.split('.')
-  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
-}
 
 function getRandomInt(min: number, max: number) {
   min = Math.ceil(min)
@@ -225,7 +220,11 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
     if (secrets.length === 0) {
       secrets = this.decryptedSecrets.filter((secret) =>
-        host.endsWith(getTldPart(getDecryptedSecretProp(secret, 'url') ?? ''))
+        host.endsWith(
+          getDomainNameAndTldFromUrl(
+            getDecryptedSecretProp(secret, 'url') ?? ''
+          )
+        )
       )
     }
     return Promise.all(
@@ -428,6 +427,7 @@ class ExtensionDevice {
   lockedState: IBackgroundStateSerializableLocked | null = null
   id: string | null = null
   name: string
+  initCallbacks: (() => void)[] = []
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
@@ -435,6 +435,10 @@ class ExtensionDevice {
 
   async clearLockInterval() {
     await extensionDeviceTrpc.clearLockInterval.mutate()
+  }
+
+  onInitDone(callback: () => void) {
+    this.initCallbacks.push(callback)
   }
 
   get platform() {
@@ -485,7 +489,7 @@ class ExtensionDevice {
     const fireToken = 'aaaa'
 
     this.fireToken = fireToken
-
+    this.initCallbacks.forEach((cb) => cb())
     this.rerenderViews() // for letting vault/popup know that the state has changed
   }
 

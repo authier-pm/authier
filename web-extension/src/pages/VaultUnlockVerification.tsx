@@ -23,7 +23,7 @@ import {
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { toast } from '@src/Providers'
+import { toast } from '@src/ExtensionProviders'
 import { useNavigate } from 'react-router-dom'
 
 interface Values {

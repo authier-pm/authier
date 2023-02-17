@@ -2,7 +2,7 @@ import { onError } from '@apollo/client/link/error'
 import { print } from 'graphql'
 //@ts-ignore
 import { device } from '@src/background/ExtensionDevice'
-import { toast } from '../web-extension/src/Providers'
+import { toast } from '../web-extension/src/ExtensionProviders'
 
 // Log any GraphQL errors or network error that occurred
 export const errorLink = onError(
