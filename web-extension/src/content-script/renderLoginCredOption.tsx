@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { ILoginSecret } from '../util/useDeviceState'
 
 import { h, render } from 'preact'
