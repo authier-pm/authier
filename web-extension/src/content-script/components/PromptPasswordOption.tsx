@@ -22,6 +22,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
+  const el = document.querySelector(webInputs[0].domPath)
   if (!el) {
     el = document.elementFromPoint(
       webInputs[0].domCoordinates.x,
@@ -31,7 +32,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   }
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
-  let resizeTimer
+  let resizeTimer: string | number | NodeJS.Timeout | undefined
   window.onresize = function () {
     if (promptOption) {
       promptOption.remove()
