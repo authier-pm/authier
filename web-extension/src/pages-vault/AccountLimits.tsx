@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 
 import {
   Box,
@@ -23,6 +23,7 @@ import { FaCheckCircle } from 'react-icons/fa'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import ProfileCard from '@src/components/vault/ProfileCard'
 import browser from 'webextension-polyfill'
+import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -88,7 +89,7 @@ export const AccountLimits = () => {
                       .length
                   }
                 </Td>
-                <Td isNumeric>{data?.me.TOTPlimit}</Td>
+                <Td isNumeric>{data?.me.TOTPLimits}</Td>
               </Tr>
             </Tbody>
           </Table>
@@ -170,11 +171,12 @@ export const AccountLimits = () => {
               disabled={!data?.me.id}
               w="80%"
               colorScheme="red"
-              onClick={() =>
+              onClick={async () => {
+                const token = await getTokenFromLocalStorage()
                 browser.tabs.create({
-                  url: `${page_url}/pricing?product=${pricingPlan.Credentials}`
+                  url: `${page_url}/pricing?product=${pricingPlan.Credentials}&acToken=${token}`
                 })
-              }
+              }}
             >
               Buy
             </Button>
@@ -212,11 +214,12 @@ export const AccountLimits = () => {
               disabled={!data?.me.id}
               w="80%"
               colorScheme="red"
-              onClick={() =>
+              onClick={async () => {
+                const token = await getTokenFromLocalStorage()
                 browser.tabs.create({
-                  url: `${page_url}/pricing?product=${pricingPlan.TOTP}`
+                  url: `${page_url}/pricing?product=${pricingPlan.TOTP}&acToken=${token}`
                 })
-              }
+              }}
             >
               Buy
             </Button>
@@ -279,11 +282,12 @@ export const AccountLimits = () => {
                 disabled={!data?.me.id}
                 w="80%"
                 colorScheme="red"
-                onClick={() =>
+                onClick={async () => {
+                  const token = await getTokenFromLocalStorage()
                   browser.tabs.create({
-                    url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}`
+                    url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}&acToken=${token}`
                   })
-                }
+                }}
               >
                 Buy
               </Button>

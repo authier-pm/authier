@@ -217,6 +217,8 @@ export class UserQuery extends UserBase {
     }
   }
 
+  //@Capajj
+  //TODO: Should rename, it gets confused with TOTPlimit
   @Field(() => GraphQLPositiveInt)
   async TOTPLimits(@Ctx() ctx: IContextAuthenticated) {
     const count = await ctx.prisma.userPaidProducts.count({

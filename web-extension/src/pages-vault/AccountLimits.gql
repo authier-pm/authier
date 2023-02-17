@@ -5,6 +5,6 @@ query meExtension {
       kind
     }
     PasswordLimits
-    TOTPlimit
+    TOTPLimits
   }
 }

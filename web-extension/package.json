@@ -108,6 +108,7 @@
     "@lingui/macro": "^3.17.1",
     "@sentry/browser": "^7.37.2",
     "@sentry/tracing": "^7.37.2",
+    "@stripe/stripe-js": "^1.46.0",
     "@trpc/client": "^10.11.1",
     "@trpc/server": "^10.11.1",
     "@types/offscreencanvas": "^2019.7.0",

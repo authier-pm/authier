@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type MeExtensionQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MeExtensionQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, PasswordLimits: number, TOTPlimit: number, encryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', kind: Types.EncryptedSecretType }> } };
+export type MeExtensionQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, PasswordLimits: number, TOTPLimits: number, encryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', kind: Types.EncryptedSecretType }> } };
 
 
 export const MeExtensionDocument = gql`
@@ -17,7 +17,7 @@ export const MeExtensionDocument = gql`
       kind
     }
     PasswordLimits
-    TOTPlimit
+    TOTPLimits
   }
 }
     `;
