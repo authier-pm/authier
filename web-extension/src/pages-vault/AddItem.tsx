@@ -6,7 +6,7 @@ import {
   Text,
   Spinner
 } from '@chakra-ui/react'
-import React, { useContext, useState } from 'react'
+import { useContext, useState } from 'react'
 
 import { motion } from 'framer-motion'
 
@@ -16,7 +16,7 @@ import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const AddItem = () => {
-  const [type, setType] = useState<String | null>(null)
+  const [type, setType] = useState<string | null>(null)
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const { data, loading } = useMeExtensionQuery({
@@ -28,7 +28,7 @@ export const AddItem = () => {
   if (loading) {
     return <Spinner />
   }
-  const totpCond = data!.me.TOTPlimit <= TOTPSecrets.length
+  const totpCond = data!.me.TOTPLimits <= TOTPSecrets.length
   const pswCond = data!.me.PasswordLimits <= LoginCredentials.length
 
   return (
