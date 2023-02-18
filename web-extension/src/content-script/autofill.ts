@@ -15,6 +15,7 @@ import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import { getTRPCCached } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
+import { Handler } from 'mitt'
 
 const log = debug('au:autofill')
 
@@ -121,7 +122,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
 }
 
 export let autofillEnabled = false
-let onInputAddedHandler
+let onInputAddedHandler: Handler<HTMLInputElement> | undefined
 
 export const autofill = (
   initState: Omit<IInitStateRes, 'passwordCount' | 'passwordLimit'>,
