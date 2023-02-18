@@ -154,7 +154,7 @@ export const autofill = (
 
     //Register screen
     //After certain condition is met, we can assume this is register page
-    log('usefull', usefulInputs)
+    log('useful', usefulInputs)
     if (usefulInputs.length > 2) {
       for (let index = 0; index < usefulInputs.length - 1; index++) {
         const input = usefulInputs[index]
