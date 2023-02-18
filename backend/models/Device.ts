@@ -77,8 +77,8 @@ export class DeviceQuery extends DeviceGQL {
     })
 
     const userQuery = new UserQuery(userData)
-    const pswLimit = await userQuery.PasswordLimits(ctx)
-    const TOTPLimit = await userQuery.TOTPLimits(ctx)
+    const pswLimit = await userQuery.passwordLimit(ctx)
+    const TOTPLimit = await userQuery.totpLimit(ctx)
 
     const pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
