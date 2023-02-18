@@ -30,7 +30,9 @@ export class AwsCdkAuthierStack extends Stack {
         FREE_GEOIP_API_KEY: process.env.FREE_GEOIP_API_KEY as string,
         SENTRY_DSN: process.env.SENTRY_DSN as string,
         MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC as string,
-        MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE as string
+        MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE as string,
+        STRIPE_ENDPOINT: process.env.STRIPE_ENDPOINT as string,
+        STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string
       }
     })
 
