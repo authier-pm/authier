@@ -37,7 +37,7 @@ export const PromptPassword = ({
   const trpc = getTRPCCached()
 
   const { passwordCount, passwordLimit } = stateInitRes
-  log({ passwordCount, passwordLimit })
+
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',
