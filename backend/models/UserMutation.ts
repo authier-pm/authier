@@ -124,9 +124,9 @@ export class UserMutation extends UserBase {
       }
     })
 
-    const userQuery = new UserQuery(userData)
-    const pswLimit = await userQuery.passwordLimit(ctx)
-    const TOTPLimit = await userQuery.totpLimit(ctx)
+    const pswLimit = userData?.loginCredentialsLimit ?? 40
+    const TOTPLimit = userData?.TOTPlimit ?? 3
+
     let pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
@@ -151,7 +151,12 @@ export class UserMutation extends UserBase {
       }
     })
 
-    console.log(pswCount, pswLimit, TOTPCount, TOTPLimit)
+    console.log(
+      pswCount,
+      userData?.loginCredentialsLimit,
+      TOTPCount,
+      userData?.TOTPlimit
+    )
     if (pswCount > pswLimit) {
       console.log('psw exceeded')
       return new GraphqlError(`Password limit exceeded.`)
