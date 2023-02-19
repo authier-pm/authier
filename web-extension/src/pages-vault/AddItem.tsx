@@ -28,8 +28,8 @@ export const AddItem = () => {
   if (loading) {
     return <Spinner />
   }
-  const totpCond = data!.me.TOTPLimits <= TOTPSecrets.length
-  const pswCond = data!.me.PasswordLimits <= LoginCredentials.length
+  const totpCond = data!.me.TOTPlimit <= TOTPSecrets.length
+  const pswCond = data!.me.loginCredentialsLimit <= LoginCredentials.length
 
   return (
     <motion.div

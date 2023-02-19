@@ -608,8 +608,6 @@ export type UserQuery = {
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
-  PasswordLimits: Scalars['PositiveInt'];
-  TOTPLimits: Scalars['PositiveInt'];
   TOTPlimit: Scalars['Int'];
   Tags: Array<TagGql>;
   Token: Array<TokenGql>;

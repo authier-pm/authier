@@ -36,7 +36,7 @@ export const getContentScriptInitialState = async (
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     autofillEnabled: !!device.state?.autofill,
     webInputs: res.data.webInputs,
-    passwordLimit: userInfo.data.me.PasswordLimits,
+    passwordLimit: userInfo.data.me.loginCredentialsLimit,
     passwordCount:
       device.state?.secrets.filter(
         (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
