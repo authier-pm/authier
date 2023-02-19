@@ -276,7 +276,7 @@ const DeviceListItem = ({
                     {formatDistance(
                       new Date(deviceInfo.createdAt ?? ''),
                       new Date()
-                    )}
+                    )}{' '}
                     ago
                   </Text>
                 </Tooltip>
