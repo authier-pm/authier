@@ -131,7 +131,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
 }
 
 export let autofillEnabled = false
-let onInputAddedHandler: Handler<HTMLInputElement> | undefined
+let onInputAddedHandler
 
 export const autofill = (
   initState: Omit<IInitStateRes, 'passwordCount' | 'passwordLimit'>,
