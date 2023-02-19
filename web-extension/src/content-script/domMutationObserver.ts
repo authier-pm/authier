@@ -25,38 +25,42 @@ function emitDebounced(
   inputDebounceMap.set(input, timer)
 }
 
-/**
- * inspired from https://usefulangle.com/post/357/javascript-detect-element-removed-from-dom
- */
-export const domMutationObserver = new MutationObserver(function (
-  mutationsList
-) {
-  mutationsList.forEach(function (mutation) {
-    mutation.removedNodes.forEach(function (removedNode) {
-      if (removedNode.nodeName === 'INPUT') {
-        emitDebounced('inputRemoved', removedNode as HTMLInputElement)
-      }
-    })
-    mutation.addedNodes.forEach(function (addedNode) {
-      const node = addedNode as HTMLElement
-
-      if (node.nodeName === 'INPUT') {
-        emitDebounced('inputAdded', node as HTMLInputElement)
-      } else if (node['querySelectorAll']) {
-        node.querySelectorAll('input').forEach((input) => {
-          emitDebounced('inputAdded', input)
-        })
-
-        const childIframe = node.querySelector('input')
-        if (childIframe) {
-          emitDebounced('inputAdded', node as HTMLInputElement)
+export const startBodyInputChangeObserver = () => {
+  /**
+   * inspired from https://usefulangle.com/post/357/javascript-detect-element-removed-from-dom
+   */
+  const domMutationObserver = new MutationObserver(function (mutationsList) {
+    mutationsList.forEach(function (mutation) {
+      mutation.removedNodes.forEach(function (removedNode) {
+        if (removedNode.nodeName === 'INPUT') {
+          emitDebounced('inputRemoved', removedNode as HTMLInputElement)
         }
-      }
+      })
+      mutation.addedNodes.forEach(function (addedNode) {
+        const node = addedNode as HTMLElement
+
+        if (node.nodeName === 'INPUT') {
+          emitDebounced('inputAdded', node as HTMLInputElement)
+        } else if (node['querySelectorAll']) {
+          node.querySelectorAll('input').forEach((input) => {
+            emitDebounced('inputAdded', input)
+          })
+
+          const childIframe = node.querySelector('input')
+          if (childIframe) {
+            emitDebounced('inputAdded', node as HTMLInputElement)
+          }
+        }
+      })
     })
   })
-})
 
-domMutationObserver.observe(document.body, {
-  subtree: true,
-  childList: true
-})
+  const body = document.body
+
+  domMutationObserver.observe(body, {
+    subtree: true,
+    childList: true
+  })
+
+  return domMutationObserver
+}
