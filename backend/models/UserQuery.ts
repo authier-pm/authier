@@ -12,11 +12,7 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import {
-  GraphQLEmailAddress,
-  GraphQLPositiveInt,
-  GraphQLUUID
-} from 'graphql-scalars'
+import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'

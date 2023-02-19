@@ -76,59 +76,58 @@ export class DeviceQuery extends DeviceGQL {
       }
     })
 
-    const pswLimit = userData?.loginCredentialsLimit
+    if (userData) {
+      const pswLimit = userData?.loginCredentialsLimit
+      const totpLimit = userData?.TOTPlimit
 
-    const pswCount = await ctx.prisma.encryptedSecret.count({
-      where: {
-        userId: ctx.jwtPayload.userId,
-        kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
-        deletedAt: null
+      const pswCount = await ctx.prisma.encryptedSecret.count({
+        where: {
+          userId: ctx.jwtPayload.userId,
+          kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
+          deletedAt: null
+        }
+      })
+
+      const TOTPCount = await ctx.prisma.encryptedSecret.count({
+        where: {
+          userId: ctx.jwtPayload.userId,
+          kind: EncryptedSecretTypeGQL.TOTP,
+          deletedAt: null
+        }
+      })
+
+      if (pswCount > pswLimit) {
+        throw new GraphqlError(
+          `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
+        )
       }
-    })
 
-    const TOTPCount = await ctx.prisma.encryptedSecret.count({
-      where: {
-        userId: ctx.jwtPayload.userId,
-        kind: EncryptedSecretTypeGQL.TOTP,
-        deletedAt: null
+      if (TOTPCount > totpLimit) {
+        throw new GraphqlError(
+          `TOTP limit exceeded, remove ${TOTPCount - totpLimit} TOTP secrets`
+        )
       }
-    })
 
-    if (pswCount > this.User.loginCredentialsLimit) {
-      throw new GraphqlError(
-        `Password limit exceeded, remove ${
-          pswCount - this.User.loginCredentialsLimit
-        } passwords`
-      )
+      const res = await ctx.prisma.encryptedSecret.findMany({
+        where: {
+          OR: [
+            {
+              userId: this.userId,
+              createdAt: lastSyncCondition
+            },
+            {
+              userId: this.userId,
+              updatedAt: lastSyncCondition
+            },
+            {
+              userId: this.userId,
+              deletedAt: lastSyncCondition
+            }
+          ]
+        }
+      })
+      return res
     }
-
-    if (TOTPCount > this.User.TOTPlimit) {
-      throw new GraphqlError(
-        `TOTP limit exceeded, remove ${
-          TOTPCount - this.User.TOTPlimit
-        } TOTP secrets`
-      )
-    }
-
-    const res = await ctx.prisma.encryptedSecret.findMany({
-      where: {
-        OR: [
-          {
-            userId: this.userId,
-            createdAt: lastSyncCondition
-          },
-          {
-            userId: this.userId,
-            updatedAt: lastSyncCondition
-          },
-          {
-            userId: this.userId,
-            deletedAt: lastSyncCondition
-          }
-        ]
-      }
-    })
-    return res
   }
 
   @Field(() => String)
