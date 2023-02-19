@@ -185,7 +185,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 <MenuItem
                   backgroundColor="red.500"
                   _hover={{
-                    backgroundColor: useColorModeValue('red.200', 'red.400')
+                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
                   }}
                   onClick={async () => {
                     await device.logout()
