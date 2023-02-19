@@ -11,7 +11,10 @@ import {
   WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 
-import { bodyInputChangeEmitter } from './domMutationObserver'
+import {
+  bodyInputChangeEmitter,
+  startBodyInputChangeObserver
+} from './domMutationObserver'
 import {
   autofill,
   autofillEventsDispatched,
@@ -98,6 +101,7 @@ export async function initInputWatch() {
     return
   }
 
+  startBodyInputChangeObserver()
   renderer(stateInitRes)
 
   const stopAutofillListener = autofill(stateInitRes)
@@ -158,7 +162,7 @@ export async function initInputWatch() {
         }
         domRecorder.addInputEvent(inputRecord)
 
-        // TOTP Recognision
+        // TOTP Recognition
         if (inputted.length === 6 && secretsForHost.totpSecrets.length > 0) {
           // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
 
