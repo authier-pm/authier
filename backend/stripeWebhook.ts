@@ -50,16 +50,64 @@ app.register((fastify, opts, done) => {
         // Then define and call a method to handle the subscription deleted.
         subscription = event.data.object
         status = subscription.status
-        console.log('Subscription deleted:', subscription)
         if (status === 'canceled') {
-          /* await prismaClient.userPaidProducts.delete({ */
-          /*   where: { */
-          /*     id: subscription.id */
-          /*   } */
-          /* }) */
-          // TODO: decrement limits on user
-        }
+          const session = event.data.object
+          const productId = session.metadata.productId
 
+          await prismaClient.$transaction(async () => {
+            await prismaClient.user.update({
+              where: {
+                email: session.customer_details.email
+              },
+              data: {
+                UserPaidProducts: {
+                  delete: {
+                    id: productId,
+                    expiresAt: session.expires_at
+                  }
+                }
+              }
+            })
+          })
+
+          if (productId === TOTP_SUBSCRIPTION_ID) {
+            await prismaClient.user.update({
+              where: {
+                email: session.customer_details.email
+              },
+              data: {
+                TOTPlimit: {
+                  decrement: 20
+                }
+              }
+            })
+          } else if (productId === CREDS_SUBSCRIPTION_ID) {
+            await prismaClient.user.update({
+              where: {
+                email: session.customer_details.email
+              },
+              data: {
+                loginCredentialsLimit: {
+                  decrement: 60
+                }
+              }
+            })
+          } else if (productId === TOTP_AND_CREDS_SUBSCRIPTION_ID) {
+            await prismaClient.user.update({
+              where: {
+                email: session.customer_details.email
+              },
+              data: {
+                TOTPlimit: {
+                  decrement: 20
+                },
+                loginCredentialsLimit: {
+                  decrement: 60
+                }
+              }
+            })
+          }
+        }
         console.log(`Subscription status is ${status}.`)
         break
 
