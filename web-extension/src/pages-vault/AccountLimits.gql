@@ -4,7 +4,7 @@ query meExtension {
     encryptedSecrets {
       kind
     }
-    PasswordLimits
-    TOTPLimits
+    loginCredentialsLimit
+    TOTPlimit
   }
 }

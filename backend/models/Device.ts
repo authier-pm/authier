@@ -76,9 +76,7 @@ export class DeviceQuery extends DeviceGQL {
       }
     })
 
-    const userQuery = new UserQuery(userData)
-    const pswLimit = await userQuery.passwordLimit(ctx)
-    const TOTPLimit = await userQuery.totpLimit(ctx)
+    const pswLimit = userData?.loginCredentialsLimit
 
     const pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
@@ -96,15 +94,19 @@ export class DeviceQuery extends DeviceGQL {
       }
     })
 
-    if (pswCount > pswLimit) {
+    if (pswCount > this.User.loginCredentialsLimit) {
       throw new GraphqlError(
-        `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
+        `Password limit exceeded, remove ${
+          pswCount - this.User.loginCredentialsLimit
+        } passwords`
       )
     }
 
-    if (TOTPCount > TOTPLimit) {
+    if (TOTPCount > this.User.TOTPlimit) {
       throw new GraphqlError(
-        `TOTP limit exceeded, remove ${TOTPCount - TOTPLimit} TOTP secrets`
+        `TOTP limit exceeded, remove ${
+          TOTPCount - this.User.TOTPlimit
+        } TOTP secrets`
       )
     }
 

@@ -34,7 +34,7 @@ sentryInit({
   release: `<project-name>@${pkg.version}`
 })
 
-const endpointSecret = env.STRIPE_ENDPOINT as string
+export const endpointSecret = env.STRIPE_ENDPOINT as string
 const isLambda = !!env.LAMBDA_TASK_ROOT
 log('endpointSecret', endpointSecret)
 
