@@ -99,7 +99,7 @@ jobs:
           xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
-        if: always()
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: playwright-report
