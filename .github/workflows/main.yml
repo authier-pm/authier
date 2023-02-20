@@ -95,8 +95,8 @@ jobs:
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         working-directory: ./web-extension
         run: |
-        npx playwright install --with-deps
-        xvfb-run --auto-servernum -- pnpm playwright:run
+          npx playwright install --with-deps
+          xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
         if: always()
