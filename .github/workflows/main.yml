@@ -94,6 +94,8 @@ jobs:
       - name: Install Playwright Browsers
         working-directory: ./web-extension
         run: |
+          cd dist
+          ls -al
           npx playwright install --with-deps
 
       - name: Run Playwright tests
