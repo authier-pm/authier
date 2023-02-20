@@ -31,9 +31,10 @@ runs:
       working-directory: ./web-extension
       run: |
         echo inputs
-        echo $API_URL
-        echo $ENV_FILE > .env
+        echo $API_URL > .env
+        echo $PAGE_URL > .env
         cat .env
+        ls -al
 
     # Add additional build and test steps here
     - name: web-extension build
