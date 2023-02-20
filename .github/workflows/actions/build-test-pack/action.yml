@@ -5,7 +5,7 @@ inputs:
   doNotPackZip:
     description: 'Set `true` to omit pack step'
     required: false
-  secret_input:
+  env_file:
     description: '.env file'
     required: true
 
@@ -33,7 +33,7 @@ runs:
       shell: bash
       working-directory: ./web-extension
       env:
-        ENV_PROD: ${{ inputs.EXTENSION_ENV_PROD }}
+        ENV_PROD: ${{ inputs.env_file }}
       run: |
         echo $ENV_PROD > .env
         cat .env
