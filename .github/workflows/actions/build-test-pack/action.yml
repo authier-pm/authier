@@ -29,8 +29,10 @@ runs:
     - name: 'Create prod_env file'
       shell: bash
       working-directory: ./web-extension
+      env:
+        ENV_PROD: ${{ secrets.EXTENSION_ENV_PROD }}
       run: |
-          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
+        echo $ENV_PROD > .env
 
     # Add additional build and test steps here
     - name: web-extension build
