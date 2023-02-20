@@ -33,7 +33,9 @@ export const AddLogin = () => {
   const [show, setShow] = useState(false)
   const [initPassword, setInitPassword] = useState('')
 
-  const { isOpen, onToggle } = useDisclosure()
+  const { isOpen, onToggle } = useDisclosure({
+    defaultIsOpen: true
+  })
   const handleClick = () => setShow(!show)
 
   return (
@@ -80,16 +82,36 @@ export const AddLogin = () => {
           const levelOfPsw = passwordStrength(values.password)
           return (
             <form onSubmit={handleSubmit}>
-              <Flex p={5} flexDirection="column" w="inherit">
+              <Flex
+                p={5}
+                flexDirection="column"
+                w="inherit"
+                sx={{
+                  label: {
+                    marginBottom: '0px',
+                    marginTop: '10px'
+                  }
+                }}
+              >
                 <FormControl isInvalid={!!errors.url && touched.url}>
                   <FormLabel htmlFor="url">URL:</FormLabel>
-                  <Field as={Input} id="url" name="url" />
+                  <Field
+                    as={Input}
+                    id="url"
+                    name="url"
+                    placeholder="google.com"
+                  />
                   <FormErrorMessage>{errors.url}</FormErrorMessage>
                 </FormControl>
 
                 <FormControl isInvalid={!!errors.label && touched.label}>
                   <FormLabel htmlFor="label">Label:</FormLabel>
-                  <Field as={Input} id="label" name="label" />
+                  <Field
+                    as={Input}
+                    id="label"
+                    name="label"
+                    placeholder="Work email"
+                  />
                   <FormErrorMessage>{errors.label}</FormErrorMessage>
                 </FormControl>
 
