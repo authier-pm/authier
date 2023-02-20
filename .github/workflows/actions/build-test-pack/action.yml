@@ -30,6 +30,7 @@ runs:
         pnpm i ts-node -g
 
     - name: 'Create prod_env file'
+      shell: bash
       working-directory: ./web-extension
       env:
         ENV_PROD: ${{ inputs.EXTENSION_ENV_PROD }}
