@@ -27,8 +27,10 @@ jobs:
 
       - name: Build, test and pack to zip
         id: buildPack
-        with:
-          env_file: ${{ secrets.EXTENSION_ENV_PROD }}
+        env:
+          ENV_FILE: ${{ secrets.EXTENSION_ENV_PROD }}
+          API_URL: ${{ secrets.API_URL }}
+          PAGE_URL: ${{ secrets.PAGE_URL }}
         if: steps.getRelease.outcome != 'success'
         uses: ./.github/workflows/actions/build-test-pack
 
