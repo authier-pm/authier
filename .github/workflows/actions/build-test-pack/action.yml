@@ -36,6 +36,7 @@ runs:
         ENV_PROD: ${{ inputs.EXTENSION_ENV_PROD }}
       run: |
         echo $ENV_PROD > .env
+        cat .env
 
     # Add additional build and test steps here
     - name: web-extension build
