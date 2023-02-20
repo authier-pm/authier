@@ -5,6 +5,9 @@ inputs:
   doNotPackZip:
     description: 'Set `true` to omit pack step'
     required: false
+  secret_input: 
+    description: ".env file"
+     required: true
 
 runs:
   using: 'composite'
@@ -27,10 +30,9 @@ runs:
         pnpm i ts-node -g
 
     - name: 'Create prod_env file'
-      shell: bash
       working-directory: ./web-extension
       env:
-        ENV_PROD: ${{ secrets.EXTENSION_ENV_PROD }}
+        ENV_PROD: ${{ inputs.EXTENSION_ENV_PROD }}
       run: |
         echo $ENV_PROD > .env
 
