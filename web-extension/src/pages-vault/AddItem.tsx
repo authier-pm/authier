@@ -16,7 +16,9 @@ import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const AddItem = () => {
-  const [type, setType] = useState<string | null>(null)
+  type secretType = 'login' | 'totp'
+
+  const [type, setType] = useState<secretType>('login')
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
   const { data, loading } = useMeExtensionQuery({
@@ -43,7 +45,7 @@ export const AddItem = () => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', lg: '60%', xl: '50%', '2xl': '40%' }}
+        width={{ base: '90%', sm: '70%', lg: '60%' }}
         flexDirection="column"
         boxShadow={'2xl'}
         rounded={'md'}
@@ -53,29 +55,21 @@ export const AddItem = () => {
         bg={bg}
       >
         <Select
-          onChange={(e) => setType(e.target.value)}
-          defaultValue={undefined}
+          onChange={(e) => setType(e.target.value as secretType)}
+          value={type}
           placeholder="Select type"
           w={'50%'}
           mt={5}
         >
-          <option disabled={totpCond} value="TOTP">
+          <option disabled={totpCond} value="totp">
             TOTP
           </option>
-          <option disabled={pswCond} value="Login">
+          <option disabled={pswCond} value="login">
             Login
           </option>
         </Select>
 
-        {type === 'Login' ? (
-          <AddLogin />
-        ) : type === 'TOTP' ? (
-          <AddTOTP />
-        ) : (
-          <Box>
-            <Text>Select a type</Text>
-          </Box>
-        )}
+        {type === 'login' ? <AddLogin /> : type === 'totp' ? <AddTOTP /> : null}
       </Flex>
     </motion.div>
   )
