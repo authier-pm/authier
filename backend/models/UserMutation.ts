@@ -27,6 +27,8 @@ import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../api/GraphqlError'
+import debug from 'debug'
+const log = debug('au:userMutation')
 
 @ObjectType()
 export class UserMutation extends UserBase {
@@ -122,9 +124,9 @@ export class UserMutation extends UserBase {
       }
     })
 
-    const userQuery = new UserQuery(userData)
-    const pswLimit = await userQuery.PasswordLimits(ctx)
-    const TOTPLimit = await userQuery.TOTPLimits(ctx)
+    const pswLimit = userData?.loginCredentialsLimit ?? 40
+    const TOTPLimit = userData?.TOTPlimit ?? 3
+
     let pswCount = await ctx.prisma.encryptedSecret.count({
       where: {
         userId: ctx.jwtPayload.userId,
@@ -149,7 +151,12 @@ export class UserMutation extends UserBase {
       }
     })
 
-    console.log(pswCount, pswLimit, TOTPCount, TOTPLimit)
+    console.log(
+      pswCount,
+      userData?.loginCredentialsLimit,
+      TOTPCount,
+      userData?.TOTPlimit
+    )
     if (pswCount > pswLimit) {
       console.log('psw exceeded')
       return new GraphqlError(`Password limit exceeded.`)
@@ -382,6 +389,7 @@ export class UserMutation extends UserBase {
     const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
     const portalSession = await stripe.billingPortal.sessions.create({
+      email: this.email,
       customer: checkoutSession.customer as string,
       return_url: returnUrl
     })
@@ -399,7 +407,6 @@ export class UserMutation extends UserBase {
     })
 
     const productItem = await stripe.products.retrieve(product)
-    console.log('productItem', productItem)
 
     if (user) {
       const checkoutSession = await stripe.checkout.sessions.retrieve(

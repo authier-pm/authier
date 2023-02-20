@@ -12,11 +12,7 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import {
-  GraphQLEmailAddress,
-  GraphQLPositiveInt,
-  GraphQLUUID
-} from 'graphql-scalars'
+import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
@@ -190,55 +186,5 @@ export class UserQuery extends UserBase {
         rejectedAt: null
       }
     })
-  }
-
-  @Field(() => GraphQLPositiveInt)
-  async PasswordLimits(@Ctx() ctx: IContextAuthenticated) {
-    const count = await ctx.prisma.userPaidProducts.count({
-      where: {
-        userId: ctx.jwtPayload.userId,
-        OR: [
-          {
-            productId: 'prod_LquWXgjk6kl5sM' // product name = Credentials
-          },
-          {
-            productId: 'prod_Lp3NU9UcNWduBm' // TOTP and Credentials
-          }
-        ]
-      }
-    })
-
-    if (count > 0) {
-      //* One adds 60 passwords
-      return count * 60 + this.loginCredentialsLimit
-    } else {
-      //* Default count
-      return this.loginCredentialsLimit
-    }
-  }
-
-  @Field(() => GraphQLPositiveInt)
-  async TOTPLimits(@Ctx() ctx: IContextAuthenticated) {
-    const count = await ctx.prisma.userPaidProducts.count({
-      where: {
-        userId: ctx.jwtPayload.userId,
-        OR: [
-          {
-            productId: 'prod_LquVrkwfsXjTAL' // TOTP
-          },
-          {
-            productId: 'prod_Lp3NU9UcNWduBm' // TOTP and Credentials
-          }
-        ]
-      }
-    })
-
-    if (count > 0) {
-      //* One adds 20 passwords
-      return count * 20 + this.TOTPlimit
-    } else {
-      //* Default count
-      return this.TOTPlimit
-    }
   }
 }

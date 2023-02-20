@@ -51,8 +51,6 @@ type UserQuery {
     location: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
-  PasswordLimits: PositiveInt!
-  TOTPLimits: PositiveInt!
 }
 
 """
@@ -324,11 +322,6 @@ type DecryptionChallengeForApproval {
   deviceId: ID!
 }
 
-"""
-Integers that will have a value greater than 0.
-"""
-scalar PositiveInt
-
 type Mutation {
   """
   you need to be authenticated to call this resolver
@@ -448,6 +441,11 @@ type SecretUsageEventGQLScalars {
   deviceId: String!
   webInputId: Int
 }
+
+"""
+Integers that will have a value greater than 0.
+"""
+scalar PositiveInt
 
 input DeviceInput {
   id: String!

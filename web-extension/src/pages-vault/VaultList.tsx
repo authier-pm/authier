@@ -15,7 +15,7 @@ import {
   VStack
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link, useNavigate } from 'react-router-dom'
