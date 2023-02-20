@@ -95,7 +95,7 @@ export type AddSecretInput = Array<
 
 export const getDecryptedSecretProp = (
   secret: SecretTypeUnion,
-  prop: 'url' | 'label' | 'iconUrl'
+  prop: 'url' | 'label' | 'iconUrl' | 'username' | 'password' | 'totp'
 ) => {
   return (
     (secret.kind === EncryptedSecretType.TOTP

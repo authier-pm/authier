@@ -227,7 +227,7 @@ export const VaultList = () => {
           />
         )}
       </Center>
-      <Center w={'95%'} h={'95%'}>
+      <Center w={'95%'} h={'100%'}>
         <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
           <VirtualizedList filter={filterBy} />
         </div>

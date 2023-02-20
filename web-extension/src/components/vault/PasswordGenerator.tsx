@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   Checkbox,
@@ -30,7 +30,6 @@ export const PasswordGenerator = ({
   setInitPassword: (password: string) => void
 }) => {
   return (
-    //@ts-ignore TODO: fix this
     <Collapse in={isOpen} animateOpacity>
       <Flex
         flexDirection="column"
@@ -40,11 +39,11 @@ export const PasswordGenerator = ({
       >
         <Formik
           initialValues={{
-            numbers: false,
-            symbols: false,
+            numbers: true,
+            symbols: true,
             uppercase: true,
             lowercase: true,
-            length: 8
+            length: 14 // TODO make this configurable per user
           }}
           onSubmit={(
             values: Values,
@@ -58,45 +57,6 @@ export const PasswordGenerator = ({
             <Form>
               <Flex justifyContent="center" flexDirection="column">
                 <HStack>
-                  <Field name="numbers">
-                    {({ field }) => (
-                      <Checkbox id="numbers" name="numbers" {...field}>
-                        numbers
-                      </Checkbox>
-                    )}
-                  </Field>
-                  <Field name="symbols">
-                    {({ field }) => (
-                      <Checkbox id="symbols" name="symbols" {...field}>
-                        symbols
-                      </Checkbox>
-                    )}
-                  </Field>
-                  <Field name="uppercase">
-                    {({ field }) => (
-                      <Checkbox
-                        id="uppercase"
-                        name="uppercase"
-                        {...field}
-                        defaultChecked
-                      >
-                        uppercase
-                      </Checkbox>
-                    )}
-                  </Field>
-                  <Field name="lowercase">
-                    {({ field }) => (
-                      <Checkbox
-                        id="lowercase"
-                        name="lowercase"
-                        {...field}
-                        defaultChecked
-                      >
-                        lowercase
-                      </Checkbox>
-                    )}
-                  </Field>
-
                   <Field name="length">
                     {({ field, form }) => (
                       <NumberInput
@@ -104,7 +64,7 @@ export const PasswordGenerator = ({
                         name="length"
                         size="md"
                         maxW={20}
-                        defaultValue={8}
+                        value={field.value} // TODO make this configurable per user
                         min={5}
                         onChange={(val) => {
                           form.setFieldValue(field.name, parseInt(val))
@@ -116,6 +76,54 @@ export const PasswordGenerator = ({
                           <NumberDecrementStepper />
                         </NumberInputStepper>
                       </NumberInput>
+                    )}
+                  </Field>
+                  <Field name="numbers">
+                    {({ field }) => (
+                      <Checkbox
+                        id="numbers"
+                        name="numbers"
+                        isChecked={field.value}
+                        {...field}
+                      >
+                        numbers
+                      </Checkbox>
+                    )}
+                  </Field>
+                  <Field name="symbols">
+                    {({ field }) => (
+                      <Checkbox
+                        id="symbols"
+                        name="symbols"
+                        isChecked={field.value}
+                        {...field}
+                      >
+                        symbols
+                      </Checkbox>
+                    )}
+                  </Field>
+                  <Field name="uppercase">
+                    {({ field }) => (
+                      <Checkbox
+                        id="uppercase"
+                        name="uppercase"
+                        isChecked={field.value}
+                        {...field}
+                      >
+                        uppercase
+                      </Checkbox>
+                    )}
+                  </Field>
+                  <Field name="lowercase">
+                    {({ field }) => (
+                      <Checkbox
+                        id="lowercase"
+                        name="lowercase"
+                        isChecked={field.value}
+                        {...field}
+                      >
+                        lowercase
+                      </Checkbox>
                     )}
                   </Field>
                 </HStack>
