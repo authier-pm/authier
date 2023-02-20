@@ -5,9 +5,6 @@ inputs:
   doNotPackZip:
     description: 'Set `true` to omit pack step'
     required: false
-  env_file:
-    description: '.env file'
-    required: true
 
 runs:
   using: 'composite'
@@ -32,10 +29,10 @@ runs:
     - name: 'Create prod_env file'
       shell: bash
       working-directory: ./web-extension
-      env:
-        ENV_PROD: ${{ inputs.env_file }}
       run: |
-        echo $ENV_PROD > .env
+        echo inputs
+        echo $API_URL
+        echo $ENV_FILE > .env
         cat .env
 
     # Add additional build and test steps here
