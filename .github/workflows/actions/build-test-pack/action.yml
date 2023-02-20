@@ -5,9 +5,9 @@ inputs:
   doNotPackZip:
     description: 'Set `true` to omit pack step'
     required: false
-  secret_input: 
-    description: ".env file"
-     required: true
+  secret_input:
+    description: '.env file'
+    required: true
 
 runs:
   using: 'composite'
