@@ -26,21 +26,17 @@ runs:
         pnpm i --frozen-lockfile --prefer-offline
         pnpm i ts-node -g
 
-    - name: 'Create prod_env file'
-      shell: bash
-      working-directory: ./web-extension
-      run: |
-        echo inputs
-        echo $API_URL > .env
-        echo $PAGE_URL > .env
-        cat .env
-        ls -al
-
-    # Add additional build and test steps here
+    # Add additional build and test steps here  #echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
     - name: web-extension build
       shell: bash
       working-directory: ./web-extension
       run: |
+        echo $API_URL | sed 's/./& /g'
+        echo $PAGE_URL | sed 's/./& /g'
+        echo $API_URL > .env
+        echo $PAGE_URL > .env
+        cat .env
+        ls -al
         pnpm prodBuild
 
     - name: Validate manifest.json of the extension
