@@ -31,13 +31,18 @@ runs:
       shell: bash
       working-directory: ./web-extension
       run: |
-        echo $API_URL | sed 's/./& /g'
-        echo $PAGE_URL | sed 's/./& /g'
         echo $API_URL > .env
         echo $PAGE_URL > .env
         cat .env
         ls -al
         pnpm prodBuild
+
+    - name: Upload .env
+      uses: actions/upload-artifact@v3
+      with:
+        name: .env
+        path: web-extension/.env
+        retention-days: 30
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
