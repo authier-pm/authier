@@ -91,17 +91,15 @@ jobs:
           echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
           pnpm prodBuild
 
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browsers & Run Playwright tests
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         working-directory: ./web-extension
         run: |
           npx playwright install --with-deps
-
-      - name: Run Playwright tests
-        working-directory: ./web-extension
-        run: xvfb-run --auto-servernum -- pnpm playwright:run
+          xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
-        if: always()
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         uses: actions/upload-artifact@v3
         with:
           name: playwright-report
