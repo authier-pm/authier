@@ -88,14 +88,12 @@ jobs:
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
+          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
           pnpm prodBuild
 
-      - name: Install Playwright Browsers and run backend
+      - name: Install Playwright Browsers
         working-directory: ./web-extension
         run: |
-          cd dist &
-          ls -al &
-          pnpm test:run &
           npx playwright install --with-deps
 
       - name: Run Playwright tests

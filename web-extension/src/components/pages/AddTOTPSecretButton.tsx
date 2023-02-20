@@ -27,9 +27,10 @@ export const AddTOTPSecretButton = () => {
     const TOTPCount =
       device.state?.secrets.filter((s) => s.kind === EncryptedSecretType.TOTP)
         .length ?? 0
-    const TOTPLimit = data?.me?.TOTPlimit ?? 0
-
-    console.log('TOTPCount', TOTPCount, 'TOTPLimit', TOTPLimit)
+    const TOTPLimit =
+      device.state?.secrets.filter(
+        (s) => s.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+      ).length ?? 0
 
     if (TOTPCount >= TOTPLimit) {
       toast({
@@ -100,7 +101,7 @@ export async function getTokenSecretFromQrCode(
     throw new Error('QR code does not have any secret')
   }
 
-  let encrypted = await device.state!.encrypt(secret)
+  const encrypted = await device.state!.encrypt(secret)
 
   return {
     id: uuidv4(),

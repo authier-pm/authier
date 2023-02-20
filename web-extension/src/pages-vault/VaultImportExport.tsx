@@ -199,7 +199,7 @@ export const VaultImportExport = () => {
                 onFileAccepted={async (f) => {
                   if (f.type === 'text/csv') {
                     setImportedStat(
-                      await onCSVFileAccepted(f, data?.me.PasswordLimits)
+                      await onCSVFileAccepted(f, data?.me.loginCredentialsLimit)
                     )
                   } else if (f.type === 'application/json') {
                     setImportedStat(await onJsonFileAccepted(f))

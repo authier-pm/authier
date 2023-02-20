@@ -1,6 +1,6 @@
 query SyncSettings {
   me {
-    PasswordLimits
+    loginCredentialsLimit
     TOTPlimit
     id
     autofill
