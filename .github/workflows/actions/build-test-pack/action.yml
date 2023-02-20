@@ -26,23 +26,15 @@ runs:
         pnpm i --frozen-lockfile --prefer-offline
         pnpm i ts-node -g
 
-    # Add additional build and test steps here  #echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
-    - name: web-extension build
+    # Add additional build and test steps here
+    - name: create .env & web-extension build
       shell: bash
       working-directory: ./web-extension
       run: |
         touch .env
         echo $API_URL >> .env
         echo $PAGE_URL >> .env
-        cat .env
         pnpm prodBuild
-
-    - name: Upload .env
-      uses: actions/upload-artifact@v3
-      with:
-        name: .env
-        path: web-extension/.env
-        retention-days: 30
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
