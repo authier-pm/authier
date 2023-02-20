@@ -12,6 +12,7 @@ import SerializingLink from 'apollo-link-serialize'
 
 export const API_URL = process.env.API_URL
 console.log('API_URL', API_URL)
+console.log('PAGE_URL', process.env.PAGE_URL)
 const httpLink = createHttpLink({
   uri: API_URL,
   credentials: 'include'

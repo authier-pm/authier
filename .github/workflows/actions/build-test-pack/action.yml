@@ -31,10 +31,10 @@ runs:
       shell: bash
       working-directory: ./web-extension
       run: |
-        echo $API_URL > .env
-        echo $PAGE_URL > .env
+        touch .env
+        echo $API_URL >> .env
+        echo $PAGE_URL >> .env
         cat .env
-        ls -al
         pnpm prodBuild
 
     - name: Upload .env
