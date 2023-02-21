@@ -354,7 +354,6 @@ export const autofill = (
           // @ts-expect-error TODO
           form.submit.dispatchEvent(clickEvent)
         }
-        // TODO show notification
 
         notyf.success(
           `Submitted autofilled form for user ${filledElements[0]?.value}}`
