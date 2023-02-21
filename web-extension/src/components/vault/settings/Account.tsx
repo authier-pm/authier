@@ -9,7 +9,8 @@ import {
   Button,
   Spinner,
   VStack,
-  useColorModeValue
+  useColorModeValue,
+  useToast
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
@@ -21,10 +22,10 @@ import {
 } from './Account.codegen'
 
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
-import { toast } from 'react-toastify'
+
 import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'
-import { Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
 
 export default function Account() {
@@ -35,6 +36,7 @@ export default function Account() {
   const [changePassword] = useChangeMasterPasswordMutation()
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const { data } = useAccountQuery()
+  const toast = useToast()
 
   if (!email) {
     return <Spinner />
@@ -116,7 +118,7 @@ export default function Account() {
                 })
                 await device.logout()
               } else {
-                toast.warning('Wrong password')
+                toast({ title: t`Wrong password` })
               }
               setSubmitting(false)
 

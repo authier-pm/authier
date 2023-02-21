@@ -57,7 +57,7 @@ export const Home: FunctionComponent = () => {
           icon={<AddIcon />}
           rounded={'full'}
           onClick={async () => {
-            openVaultTab('/addItem')
+            openVaultTab('/addItem?url=' + currentURL)
           }}
         />
 
