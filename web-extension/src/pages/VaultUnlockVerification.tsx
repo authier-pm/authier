@@ -17,7 +17,7 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { t, Trans } from '@lingui/macro'
 import {
-  base64_to_buf,
+  base64ToBuffer,
   cryptoKeyToString,
   dec,
   generateEncryptionKey
@@ -25,6 +25,7 @@ import {
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/ExtensionProviders'
 import { useNavigate } from 'react-router-dom'
+import { renderVault } from '@src/vault-index'
 
 interface Values {
   password: string
@@ -55,10 +56,10 @@ export function VaultUnlockVerification() {
           try {
             const masterEncryptionKey = await generateEncryptionKey(
               values.password,
-              base64_to_buf(lockedState.encryptionSalt)
+              base64ToBuffer(lockedState.encryptionSalt)
             )
 
-            const encryptedDataBuff = base64_to_buf(
+            const encryptedDataBuff = base64ToBuffer(
               lockedState.authSecretEncrypted
             )
             const iv = encryptedDataBuff.slice(16, 16 + 12)
@@ -82,9 +83,9 @@ export function VaultUnlockVerification() {
             })
 
             device.startLockInterval(lockedState.lockTime)
-
-            device.rerenderViews()
             navigate('/')
+            renderVault()
+
             setSubmitting(false)
           } catch (err: any) {
             console.log(err)

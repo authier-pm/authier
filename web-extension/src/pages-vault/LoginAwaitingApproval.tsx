@@ -22,7 +22,7 @@ import { formatRelative } from 'date-fns'
 import { WarningIcon } from '@chakra-ui/icons'
 import debug from 'debug'
 import {
-  base64_to_buf,
+  base64ToBuffer,
   cryptoKeyToString,
   dec,
   generateEncryptionKey
@@ -64,9 +64,9 @@ export const useLogin = (props: { deviceName: string }) => {
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {
-    console.log('~ decryptionData', decryptionData)
     const { fireToken } = device
 
+    console.log('~ decryptionData', decryptionData, fireToken)
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
@@ -99,12 +99,12 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const masterEncryptionKey = await generateEncryptionKey(
           formState.password,
-          base64_to_buf(encryptionSalt)
+          base64ToBuffer(encryptionSalt)
         )
 
         let currentAddDeviceSecret
         try {
-          const encryptedDataBuff = base64_to_buf(addDeviceSecretEncrypted)
+          const encryptedDataBuff = base64ToBuffer(addDeviceSecretEncrypted)
           const iv = encryptedDataBuff.slice(16, 16 + 12)
           const data = encryptedDataBuff.slice(16 + 12)
 
@@ -132,7 +132,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const newParams = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
-          base64_to_buf(encryptionSalt)
+          base64ToBuffer(encryptionSalt)
         )
 
         const response = await addNewDevice({

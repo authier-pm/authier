@@ -45,6 +45,5 @@ export const tokenRefresh = new TokenRefreshLink({
     console.warn('Your refresh token is invalid. You must login again', err)
     await removeToken()
     await device.clearLocalStorage()
-    device.rerenderViews()
   }
 })
