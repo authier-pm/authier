@@ -127,6 +127,7 @@ const appRouter = tc.router({
         }
       })
 
+      // TODO handle scenario where user has reached the limit of secrets, and the secret is not added. We should show a message to the user and remove the secret from local device
       await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
