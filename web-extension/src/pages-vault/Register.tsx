@@ -22,7 +22,7 @@ import { device } from '@src/background/ExtensionDevice'
 import { Trans } from '@lingui/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
-  buff_to_base64,
+  bufferToBase64,
   cryptoKeyToString,
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
@@ -81,7 +81,7 @@ export default function Register(): ReactElement {
             variables: {
               userId,
               input: {
-                encryptionSalt: buff_to_base64(encryptionSalt),
+                encryptionSalt: bufferToBase64(encryptionSalt),
                 email: values.email,
                 ...params,
                 deviceId,
@@ -108,7 +108,7 @@ export default function Register(): ReactElement {
               secrets: [],
               email: values.email,
               deviceName: device.name,
-              encryptionSalt: buff_to_base64(encryptionSalt),
+              encryptionSalt: bufferToBase64(encryptionSalt),
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,

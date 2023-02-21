@@ -40,7 +40,7 @@ import {
   abToCryptoKey,
   enc,
   dec,
-  base64_to_buf,
+  base64ToBuffer,
   generateEncryptionKey,
   encryptedBuf_to_base64
 } from '@util/generateEncryptionKey'
@@ -69,15 +69,6 @@ export const isRunningInBgPage = location.href.includes('backgroundPage.html')
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
-async function rerenderViewInThisRuntime() {
-  if (isVault) {
-    const index = await import('@src/vault-index')
-    index.renderVault()
-  } else if (isPopup) {
-    const index = await import('..')
-    index.renderPopup()
-  }
-}
 type SecretTypeUnion = ILoginSecret | ITOTPSecret
 
 const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
@@ -146,7 +137,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async setMasterEncryptionKey(masterPassword: string) {
     const key = await generateEncryptionKey(
       masterPassword,
-      base64_to_buf(this.encryptionSalt)
+      base64ToBuffer(this.encryptionSalt)
     )
     this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
@@ -157,10 +148,10 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async encrypt(stringToEncrypt: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
-    const salt = base64_to_buf(this.encryptionSalt)
+    const salt = base64ToBuffer(this.encryptionSalt)
 
     const encrypted = await window.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
@@ -177,9 +168,9 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async decrypt(encrypted: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
-    const encryptedDataBuff = base64_to_buf(encrypted)
+    const encryptedDataBuff = base64ToBuffer(encrypted)
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
@@ -474,7 +465,7 @@ class ExtensionDevice {
           backgroundState: null,
           lockedState: this.lockedState
         })
-        this.rerenderViews()
+
         return
       }
       this.name = this.generateDeviceName()
@@ -490,7 +481,6 @@ class ExtensionDevice {
 
     this.fireToken = fireToken
     this.initCallbacks.forEach((cb) => cb())
-    this.rerenderViews() // for letting vault/popup know that the state has changed
   }
 
   private listenForUserLogin() {
@@ -509,16 +499,6 @@ class ExtensionDevice {
       }
     }
     browser.storage.onChanged.addListener(onStorageChangeLogin)
-  }
-
-  rerenderViews() {
-    if (isRunningInBgPage === false) {
-      rerenderViewInThisRuntime()
-
-      // browser.runtime.sendMessage({
-      //   action: BackgroundMessageType.rerenderViews
-      // })
-    }
   }
 
   generateDeviceName(): string {
@@ -633,15 +613,12 @@ class ExtensionDevice {
     this.state.destroy()
 
     this.state = null
-
-    this.rerenderViews()
   }
 
   async clearAndReload() {
     await removeToken()
     await device.clearLocalStorage()
 
-    device.rerenderViews() // TODO figure out if we can have logout without full extensions reload
     device.listenForUserLogin()
     browser.runtime.reload()
   }
@@ -704,7 +681,6 @@ class ExtensionDevice {
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     this.state.save()
-    this.rerenderViews()
   }
 }
 log('Extension device started')

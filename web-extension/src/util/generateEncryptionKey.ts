@@ -5,7 +5,7 @@ const PBKDF2Iterations = 300000
  */
 export async function cryptoKeyToString(key: CryptoKey): Promise<string> {
   const raw = await crypto.subtle.exportKey('raw', key)
-  return buff_to_base64(raw)
+  return bufferToBase64(raw)
 }
 
 export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
@@ -53,14 +53,14 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const buff_to_base64 = (buff) =>
+export const bufferToBase64 = (buff) =>
   btoa(
     Array.from(new Uint8Array(buff))
       .map((b) => String.fromCharCode(b))
       .join('')
   )
 
-export const base64_to_buf = (b64: string) =>
+export const base64ToBuffer = (b64: string) =>
   //FIX: What is this
   //@ts-expect-error
   Uint8Array.from(atob(b64), (c) => c.charCodeAt(null))
@@ -79,5 +79,5 @@ export const encryptedBuf_to_base64 = (
   newBuff.set(iv, salt.byteLength)
   newBuff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
 
-  return buff_to_base64(newBuff)
+  return bufferToBase64(newBuff)
 }
