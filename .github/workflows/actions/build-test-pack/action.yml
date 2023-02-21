@@ -36,19 +36,6 @@ runs:
         echo $PAGE_URL >> .env
         pnpm prodBuild
 
-    - name: source code zip test
-      uses: vimtor/action-zip@v1
-      with:
-        files: web-extension/
-        dest: web-extension/result.zip
-
-    - name: Upload test results
-      uses: actions/upload-artifact@v3
-      with:
-        name: source-code
-        path: web-extension/result.zip
-        retention-days: 3
-
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
       with:
