@@ -75,6 +75,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
                     secretsForHost: { loginCredentials: [el], totpSecrets: [] },
                     autofillEnabled: true,
                     extensionDeviceReady: true,
+                    passwordCount: 0,
                     saveLoginModalsState: undefined,
                     webInputs: webInputs
                   },
