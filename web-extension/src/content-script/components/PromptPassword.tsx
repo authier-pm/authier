@@ -6,7 +6,6 @@ import { ICapturedInput } from '../../background/backgroundPage'
 import debug from 'debug'
 
 import { getTRPCCached } from '../connectTRPC'
-import { stateInitRes } from '../contentScript'
 const log = debug('au:PromptPassword')
 
 //import { css } from '@emotion/css'
@@ -36,8 +35,6 @@ export const PromptPassword = ({
 }) => {
   const trpc = getTRPCCached()
 
-  const { passwordCount, passwordLimit } = stateInitRes
-
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',
@@ -66,14 +63,6 @@ export const PromptPassword = ({
     }
   }
   const addCredential = async (openInVault = false) => {
-    if (passwordCount >= passwordLimit) {
-      alert(
-        'You have reached the maximum number of passwords allowed in your vault. Please delete some passwords to add more.'
-      )
-
-      return await trpc.hideLoginCredentialsModal.mutate()
-    }
-
     const loginCredential = {
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault,
