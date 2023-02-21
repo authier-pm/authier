@@ -17,7 +17,6 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const AddItem = () => {
   type secretType = 'login' | 'totp'
-
   const [type, setType] = useState<secretType>('login')
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)

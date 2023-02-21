@@ -6,8 +6,8 @@ import { isElementInViewport, isHidden } from './isElementInViewport'
 import { Coords, domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
-import { toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import { Notyf } from 'notyf'
+import 'notyf/notyf.min.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
@@ -36,6 +36,8 @@ type webInput = {
 }
 
 export const autofillEventsDispatched = new Set()
+
+const notyf = new Notyf()
 
 function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
   if (el) {
@@ -354,7 +356,9 @@ export const autofill = (
         }
         // TODO show notification
 
-        toast.success('Submitted autofilled form')
+        notyf.success(
+          `Submitted autofilled form for user ${filledElements[0]?.value}}`
+        )
       }
     }
 
