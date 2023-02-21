@@ -1,12 +1,10 @@
-export const generateQuerySelectorForOrphanedElement = (el: HTMLElement) => {
-  if (el.tagName.toLowerCase() == 'html') return 'HTML'
-  let str = el.tagName
-  str += el.id != '' ? '#' + el.id : ''
-  if (el.className) {
-    const classes = el.className.split(/\s/)
-    for (let i = 0; i < classes.length; i++) {
-      str += '.' + classes[i]
-    }
-  }
-  return str
+export const generateQuerySelectorForOrphanedElement = (
+  el: HTMLInputElement | HTMLFormElement
+) => {
+  if (el.tagName.toLowerCase() === 'html') return 'HTML'
+  let selector = el.tagName
+  selector += el.type ? `[type="${el.type}"]` : ''
+  selector += el.autocomplete ? `[autocomplete="${el.autocomplete}"]` : ''
+
+  return selector
 }
