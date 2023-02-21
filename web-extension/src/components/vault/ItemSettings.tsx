@@ -33,6 +33,7 @@ import {
   totpValues,
   credentialValues
 } from '@shared/formikSharedTypes'
+import { EditFormButtons } from './EditFormButtons'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -55,7 +56,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%', xl: '30%' }}
+        width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -159,45 +160,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
                     <FormErrorMessage>{errors.period}</FormErrorMessage>
                   </FormControl>
 
-                  <Stack
-                    direction={'row'}
-                    justifyContent="flex-end"
-                    spacing={1}
-                    my={5}
-                    alignItems={'baseline'}
-                  >
-                    <Button
-                      _focus={{
-                        bg: 'gray.200'
-                      }}
-                      fontSize={'sm'}
-                      size="sm"
-                      onClick={() => navigate(-1)}
-                    >
-                      Go back
-                    </Button>
-                    <Button
-                      disabled={isSubmitting || !dirty}
-                      isLoading={isSubmitting}
-                      type="submit"
-                      size={'sm'}
-                      fontSize={'sm'}
-                      bg={'blue.400'}
-                      color={'white'}
-                      boxShadow={
-                        '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                      }
-                      _hover={{
-                        bg: 'blue.500'
-                      }}
-                      _focus={{
-                        bg: 'blue.500'
-                      }}
-                      aria-label="Save"
-                    >
-                      Save
-                    </Button>
-                  </Stack>
+                  <EditFormButtons />
                 </Flex>
               </form>
             </Box>
@@ -231,7 +194,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
       }}
     >
       <Flex
-        width={{ base: '90%', sm: '70%', md: '60%', lg: '40%', xl: '30%' }}
+        width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
         flexDirection="column"
         boxShadow={'2xl'}
@@ -350,62 +313,26 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         )}
                       </Alert>
                     )}
-                    <Stack
-                      direction={'row'}
-                      justifyContent="flex-end"
-                      spacing={1}
-                      my={5}
-                      alignItems={'baseline'}
-                    >
-                      <Button
-                        _focus={{
-                          bg: 'gray.200'
-                        }}
-                        fontSize={'sm'}
-                        size="sm"
-                        onClick={() => navigate(-1)}
-                      >
-                        Go back
-                      </Button>
-                      <Button
-                        disabled={isSubmitting || !dirty}
-                        isLoading={isSubmitting}
-                        type="submit"
-                        size={'sm'}
-                        fontSize={'sm'}
-                        bg={'blue.400'}
-                        color={'white'}
-                        boxShadow={
-                          '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                        }
-                        _hover={{
-                          bg: 'blue.500'
-                        }}
-                        _focus={{
-                          bg: 'blue.500'
-                        }}
-                        aria-label="Save"
-                      >
-                        Save
-                      </Button>
-                    </Stack>
+                    <Tooltip label="Password generator">
+                      <IconButton
+                        w="min-content"
+                        aria-label="Open password generator"
+                        icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                        onClick={onToggle}
+                        m={3}
+                      />
+                    </Tooltip>
+                    <PasswordGenerator
+                      isOpen={isOpen}
+                      setInitPassword={setInitPassword}
+                    />
+                    <EditFormButtons />
                   </Flex>
                 </form>
               </Box>
             )
           }}
         </Formik>
-        {/* TODO generator is broken for settings */}
-        <Tooltip label="Password generator">
-          <IconButton
-            w="min-content"
-            aria-label="Open password generator"
-            icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-            onClick={onToggle}
-            m={3}
-          />
-        </Tooltip>
-        <PasswordGenerator isOpen={isOpen} setInitPassword={setInitPassword} />
       </Flex>
     </motion.div>
   )

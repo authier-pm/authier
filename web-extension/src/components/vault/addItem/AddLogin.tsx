@@ -20,15 +20,16 @@ import { passwordStrength } from 'check-password-strength'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
 import { Field, Formik, FormikHelpers } from 'formik'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
 import { device } from '@src/background/ExtensionDevice'
 
 import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { EncryptedSecretType } from '../../../../../shared/generated/graphqlBaseTypes'
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
+import { EditFormButtons } from '../EditFormButtons'
 
 export const AddLogin = () => {
   const navigate = useNavigate()
+  const urlQuery = new URLSearchParams(window.location.hash.split('?')[1])
 
   const [show, setShow] = useState(false)
   const [initPassword, setInitPassword] = useState('')
@@ -43,7 +44,7 @@ export const AddLogin = () => {
       <Formik
         enableReinitialize
         initialValues={{
-          url: '',
+          url: urlQuery.get('url') || '',
           password: initPassword,
           label: '',
           username: ''
@@ -123,15 +124,6 @@ export const AddLogin = () => {
 
                 <FormControl isInvalid={!!errors.password && touched.password}>
                   <FormLabel htmlFor="password">Password:</FormLabel>
-                  <Progress
-                    value={levelOfPsw.id}
-                    size="xs"
-                    colorScheme="green"
-                    max={3}
-                    min={0}
-                    mb={1}
-                  />
-
                   <InputGroup size="md">
                     <Field
                       as={Input}
@@ -146,65 +138,28 @@ export const AddLogin = () => {
                       </Button>
                     </InputRightElement>
                   </InputGroup>
+                  <Progress
+                    value={levelOfPsw.id}
+                    size="xs"
+                    colorScheme="green"
+                    max={3}
+                    min={0}
+                    mb={1}
+                  />
 
                   <FormErrorMessage>{errors.password}</FormErrorMessage>
                 </FormControl>
+                <PasswordGenerator
+                  isOpen={isOpen}
+                  setInitPassword={setInitPassword}
+                />
 
-                <Stack
-                  direction={'row'}
-                  justifyContent="flex-end"
-                  spacing={1}
-                  my={5}
-                  alignItems={'baseline'}
-                >
-                  <Button
-                    _focus={{
-                      bg: 'gray.200'
-                    }}
-                    fontSize={'sm'}
-                    size="sm"
-                    onClick={() => navigate('/')}
-                  >
-                    Go back
-                  </Button>
-                  <Button
-                    disabled={isSubmitting || !dirty}
-                    isLoading={isSubmitting}
-                    type="submit"
-                    size={'sm'}
-                    fontSize={'sm'}
-                    bg={'blue.400'}
-                    color={'white'}
-                    boxShadow={
-                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                    }
-                    _hover={{
-                      bg: 'blue.500'
-                    }}
-                    _focus={{
-                      bg: 'blue.500'
-                    }}
-                    aria-label="Create"
-                  >
-                    Create
-                  </Button>
-                </Stack>
+                <EditFormButtons />
               </Flex>
             </form>
           )
         }}
       </Formik>
-
-      <Tooltip label="Password generator">
-        <IconButton
-          w="min-content"
-          aria-label="Open password generator"
-          icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
-          onClick={onToggle}
-          m={3}
-        />
-      </Tooltip>
-      <PasswordGenerator isOpen={isOpen} setInitPassword={setInitPassword} />
     </Box>
   )
 }

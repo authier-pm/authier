@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { IconButton, Tooltip } from '@chakra-ui/react'
+import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
-import { toast } from 'react-toastify'
+
 import { t, Trans } from '@lingui/macro'
 import {
   useDevicesRequestsQuery,
@@ -10,6 +10,7 @@ import {
 
 export function RefreshDeviceButton() {
   const [isSyncing, setIsSyncing] = useState(false)
+  const toast = useToast()
 
   const { refetch: devicesRequestsRefetch } = useDevicesRequestsQuery()
   const { refetch: devicesRefetch } = useMyDevicesQuery()
@@ -29,7 +30,9 @@ export function RefreshDeviceButton() {
           devicesRefetch()
           devicesRequestsRefetch()
           setIsSyncing(false)
-          toast.success(t`Sync successful`)
+          toast({
+            title: t`Sync successful`
+          })
         }}
       />
     </Tooltip>
