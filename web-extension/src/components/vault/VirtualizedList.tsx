@@ -18,9 +18,14 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
       (item.kind === EncryptedSecretType.TOTP
         ? item.totp.label
         : item.loginCredentials.label) ?? ''
+
+    const username = getDecryptedSecretProp(item, 'username')
     const url = getDecryptedSecretProp(item, 'url')
     return (
-      label.includes(debouncedSearchTerm) || url.includes(debouncedSearchTerm)
+      label.includes(debouncedSearchTerm) ||
+      url.includes(debouncedSearchTerm) ||
+      username.includes(debouncedSearchTerm) ||
+      getDecryptedSecretProp(item, 'password').includes(debouncedSearchTerm) // make sure user can search by password. This can be useful for searching where a concrete password is used
     )
   })
 

@@ -168,20 +168,6 @@ export const VaultList = () => {
     return <Spinner />
   }
 
-  console.log(data?.me.TOTPlimit, device.state)
-  //TODO: resolve this bullshit
-  // const totpCond =
-  //   data?.me?.TOTPlimit ??
-  //   0 <=
-  //     device?.state?.decryptedSecrets.filter((x) => x.kind === 'TOTP').length ??
-  //   0
-  // const pswCond =
-  //   data.me.PasswordLimits ??
-  //   0 <=
-  //     device.state.decryptedSecrets.filter(
-  //       (x) => x.kind === 'LOGIN_CREDENTIALS'
-  //     ).length
-
   return (
     <VStack flexDirection="column" h={'90vh'}>
       <Center justifyContent={'space-evenly'} w={'100%'}>
@@ -189,7 +175,7 @@ export const VaultList = () => {
           variant={'filled'}
           color="grey.600"
           w={['300px', '350px', '400px', '500px']}
-          placeholder={t`Search vault`}
+          placeholder={t`Search vault by url, username, label or password`}
           m="auto"
           onChange={(ev) => {
             setFilterBy(ev.target.value)
