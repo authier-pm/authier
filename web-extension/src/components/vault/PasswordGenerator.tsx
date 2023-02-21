@@ -12,7 +12,7 @@ import {
   NumberInputStepper
 } from '@chakra-ui/react'
 import { generate } from 'generate-password'
-import { Formik, Form, Field, FormikHelpers } from 'formik'
+import { Formik, Field, FormikHelpers } from 'formik'
 
 interface Values {
   numbers: boolean
@@ -36,6 +36,12 @@ export const PasswordGenerator = ({
         justifyContent="center"
         alignItems="center"
         m={2}
+        sx={{
+          label: {
+            marginBottom: '0px',
+            marginTop: '0px'
+          }
+        }}
       >
         <Formik
           initialValues={{
@@ -53,17 +59,22 @@ export const PasswordGenerator = ({
             setSubmitting(false)
           }}
         >
-          {({ isSubmitting }) => (
-            <Form>
-              <Flex justifyContent="center" flexDirection="column">
-                <HStack>
+          {({ isSubmitting, handleSubmit }) => (
+            <div>
+              <Flex justifyContent="flex-end" flexDirection="column">
+                <Flex
+                  flexWrap={'wrap'}
+                  alignItems="center"
+                  alignContent="center"
+                  justifyContent={'right'}
+                >
                   <Field name="length">
                     {({ field, form }) => (
                       <NumberInput
                         id="length"
+                        mr={5}
                         name="length"
                         size="md"
-                        maxW={20}
                         value={field.value} // TODO make this configurable per user
                         min={5}
                         onChange={(val) => {
@@ -82,6 +93,8 @@ export const PasswordGenerator = ({
                     {({ field }) => (
                       <Checkbox
                         id="numbers"
+                        mr={5}
+                        mb={2}
                         name="numbers"
                         isChecked={field.value}
                         {...field}
@@ -96,6 +109,7 @@ export const PasswordGenerator = ({
                         id="symbols"
                         name="symbols"
                         isChecked={field.value}
+                        mr={5}
                         {...field}
                       >
                         symbols
@@ -108,6 +122,7 @@ export const PasswordGenerator = ({
                         id="uppercase"
                         name="uppercase"
                         isChecked={field.value}
+                        mr={5}
                         {...field}
                       >
                         uppercase
@@ -120,26 +135,30 @@ export const PasswordGenerator = ({
                         id="lowercase"
                         name="lowercase"
                         isChecked={field.value}
+                        mr={5}
                         {...field}
                       >
                         lowercase
                       </Checkbox>
                     )}
                   </Field>
-                </HStack>
 
-                <Button
-                  w={150}
-                  alignSelf="center"
-                  mt={4}
-                  colorScheme="teal"
-                  isLoading={isSubmitting}
-                  type="submit"
-                >
-                  Generate
-                </Button>
+                  <Button
+                    w={150}
+                    alignSelf="center"
+                    justifySelf={'right'}
+                    size={'md'}
+                    colorScheme="teal"
+                    isLoading={isSubmitting}
+                    onClick={() => {
+                      handleSubmit()
+                    }}
+                  >
+                    Generate
+                  </Button>
+                </Flex>
               </Flex>
-            </Form>
+            </div>
           )}
         </Formik>
       </Flex>
