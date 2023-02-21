@@ -135,10 +135,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
 export let autofillEnabled = false
 let onInputAddedHandler
 
-export const autofill = (
-  initState: Omit<IInitStateRes, 'passwordCount' | 'passwordLimit'>,
-  autofillEnabled = false
-) => {
+export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
