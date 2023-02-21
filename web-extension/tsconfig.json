@@ -7,7 +7,7 @@
       "@util/*": ["src/util/*"]
     },
     "target": "ES2015",
-    "module": "commonjs",
+    "module": "ES6",
     "moduleResolution": "node",
     "rootDir": "../../authier",
     "outDir": "dist/js",

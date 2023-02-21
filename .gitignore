@@ -116,3 +116,4 @@ authier.zip
 **/.DS_Store
 web-extension/dist/**
 
+web-extension/stats.json
