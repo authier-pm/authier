@@ -276,6 +276,10 @@ type DeviceQuery {
   UserMaster: UserGQL
   SecretUsageEvents: [SecretUsageEventGQL!]!
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
+
+  """
+  Get all secrets that were change since last device sync
+  """
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
   lastGeoLocation: String!
 }
