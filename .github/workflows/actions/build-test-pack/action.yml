@@ -36,6 +36,19 @@ runs:
         echo $PAGE_URL >> .env
         pnpm prodBuild
 
+    - name: source code zip test
+      uses: cardinalby/webext-buildtools-pack-extension-dir-action@v1
+      with:
+        extensionDir: 'web-extension'
+        zipFilePath: 'web-extension/extension.zip'
+
+    - name: Upload test results
+      uses: actions/upload-artifact@v3
+      with:
+        name: source-code
+        path: web-extension/extension.zip
+        retention-days: 3
+
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
       with:
