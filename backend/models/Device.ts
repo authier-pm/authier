@@ -66,7 +66,9 @@ export class DeviceQuery extends DeviceGQL {
     }
   }
 
-  @Field(() => [EncryptedSecretQuery])
+  @Field(() => [EncryptedSecretQuery], {
+    description: 'Get all secrets that were change since last device sync'
+  })
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
 
