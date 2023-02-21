@@ -42,7 +42,6 @@ export interface IInitStateRes {
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   passwordCount: number
-  passwordLimit: number
   webInputs: Array<{
     __typename?: 'WebInputGQL'
     id?: number
