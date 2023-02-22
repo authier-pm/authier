@@ -120,11 +120,16 @@ export class DeviceState implements IBackgroundStateSerializable {
   authSecret: string
   authSecretEncrypted: string
 
-  onStorageChange(
+  async onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ) {
     log('storage changed', changes, areaName)
+
+    if (!device.state) {
+      // this can happen for example when the backend is down/unreachable when the background pages is started-it fails to initialize. Then when user logs in, state is ok in vault/popup but not in background page
+      await device.initialize()
+    }
     if (areaName === 'local' && changes.backgroundState && device.state) {
       Object.assign(device.state, changes.backgroundState.newValue)
     }
