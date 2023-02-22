@@ -9,7 +9,8 @@ import {
   useClipboard,
   Text,
   Heading,
-  useColorModeValue
+  useColorModeValue,
+  Center
 } from '@chakra-ui/react'
 import { authenticator } from 'otplib'
 
@@ -23,9 +24,10 @@ import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { SecretItemIcon } from '../SecretItemIcon'
-import { extractHostname } from '@src/util/extractHostname'
+
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 const log = debug('au:AuthsList')
 
@@ -166,14 +168,25 @@ const LoginCredentialsListItem = ({
     </Box>
   )
 }
-export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
-  const { deviceState, TOTPSecrets, loginCredentials, currentURL } =
-    useContext(DeviceStateContext)
+export const AuthsList = ({
+  filterByTLD,
+  search
+}: {
+  filterByTLD: boolean
+  search: string
+}) => {
+  console.log('search:', search)
+  const {
+    deviceState,
+    TOTPSecrets,
+    loginCredentials,
+    currentURL,
+    searchSecrets
+  } = useContext(DeviceStateContext)
 
   if (!deviceState) {
     return null
   }
-
   const TOTPForCurrentDomain = TOTPSecrets.filter(({ totp }) => {
     if (!currentURL || !totp.url) {
       return true
@@ -198,7 +211,6 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
       )
     }
   )
-
   const hasNoSecrets = deviceState.secrets.length === 0
 
   const getRecentlyUsed = <T extends ISecret>(secrets: T[]) => {
@@ -209,6 +221,12 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
       .slice(0, 20) // we get items
   }
 
+  const totps = searchSecrets(search, [
+    EncryptedSecretType.TOTP
+  ]) as ITOTPSecret[]
+  const creds = searchSecrets(search, [
+    EncryptedSecretType.LOGIN_CREDENTIALS
+  ]) as ILoginSecret[]
   return (
     <>
       <Flex flexDirection="column">
@@ -216,12 +234,12 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           filterByTLD &&
           TOTPForCurrentDomain.length === 0 &&
           loginCredentialForCurrentDomain.length === 0 && (
-            <>
+            <Center h="50vh">
               <Text>
                 <NotAllowedIcon></NotAllowedIcon>
                 There are no stored secrets for current domain.
               </Text>
-            </>
+            </Center>
           )}
 
         {filterByTLD ? (
@@ -246,7 +264,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
           </>
         ) : (
           [
-            getRecentlyUsed(TOTPSecrets).map((auth, i) => {
+            totps.slice(0, 20).map((auth, i) => {
               return (
                 <OtpCode
                   totpSecret={auth as ITOTPSecret}
@@ -254,7 +272,7 @@ export const AuthsList = ({ filterByTLD }: { filterByTLD: boolean }) => {
                 />
               )
             }),
-            getRecentlyUsed(loginCredentials).map((psw, i) => {
+            creds.slice(0, 20).map((psw, i) => {
               // console.log(psw.loginCredentials.url)
               return (
                 <LoginCredentialsListItem
