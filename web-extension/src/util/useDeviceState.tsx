@@ -10,7 +10,11 @@ import {
   SettingsInput
 } from '../../../shared/generated/graphqlBaseTypes'
 import debug from 'debug'
-import { device, DeviceState } from '@src/background/ExtensionDevice'
+import {
+  device,
+  DeviceState,
+  getDecryptedSecretProp
+} from '@src/background/ExtensionDevice'
 import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
@@ -132,7 +136,44 @@ export function useDeviceState() {
     lockedState,
     device,
     isFilling,
-    registered
+    registered,
+    /*
+     * searches for secrets in the vault, tries to include all fields which can be searched, returns sorted by lastUsedAt
+     */
+    searchSecrets: (
+      filterBy: string,
+      types = [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+    ) => {
+      const { loginCredentials, TOTPSecrets } = backgroundStateContext
+      let secrets = [] as (ILoginSecret | ITOTPSecret)[]
+
+      if (types.includes(EncryptedSecretType.LOGIN_CREDENTIALS)) {
+        secrets = secrets.concat(loginCredentials)
+      }
+
+      if (types.includes(EncryptedSecretType.TOTP)) {
+        secrets = secrets.concat(TOTPSecrets)
+      }
+      secrets = secrets.filter((item) => {
+        const label =
+          (item.kind === EncryptedSecretType.TOTP
+            ? item.totp.label
+            : item.loginCredentials.label) ?? ''
+
+        const username = getDecryptedSecretProp(item, 'username')
+        const url = getDecryptedSecretProp(item, 'url')
+        return (
+          label.includes(filterBy) ||
+          url.includes(filterBy) ||
+          username.includes(filterBy) ||
+          getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
+        )
+      })
+
+      return secrets.sort((a, b) =>
+        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
+      )
+    }
   }
 
   window['backgroundState'] = backgroundStateContext

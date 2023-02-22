@@ -1,4 +1,9 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, {
+  FunctionComponent,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
 import {
   Flex,
@@ -8,7 +13,7 @@ import {
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon, LockIcon } from '@chakra-ui/icons'
+import { HamburgerIcon, CloseIcon, LockIcon, AddIcon } from '@chakra-ui/icons'
 
 import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
 import { NavMenu } from '@src/pages/NavMenu'
@@ -17,6 +22,7 @@ import { IoMdArchive } from 'react-icons/io'
 import { t } from '@lingui/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
 import { openVaultTab } from '@src/AuthLinkPage'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const NavBar: FunctionComponent = () => {
   const {
@@ -31,7 +37,7 @@ export const NavBar: FunctionComponent = () => {
   } = useDisclosure()
   const [location, setLocation] = useLocation()
   const [lastPage, SetLastPage] = useState<string>('/')
-
+  const { currentURL } = useContext(DeviceStateContext)
   const ActiveLink = (
     props: JSX.IntrinsicAttributes &
       React.PropsWithChildren<LinkProps<LocationHook>>
@@ -68,42 +74,7 @@ export const NavBar: FunctionComponent = () => {
         borderBottomColor="gray.300"
         width="100%"
       >
-        <Box mr="auto">
-          {isNavMenuOpen ? (
-            <IconButton
-              size="md"
-              aria-label="menu"
-              icon={<CloseIcon />}
-              onClick={() => {
-                onNavMenuClose()
-              }}
-            />
-          ) : (
-            <IconButton
-              size="md"
-              aria-label="menu"
-              icon={<HamburgerIcon />}
-              onClick={() => {
-                onNavMenuOpen()
-                onUserMenuClose()
-              }}
-            />
-          )}
-          <RefreshSecretsButton />
-          <Tooltip label={t`Open vault`} aria-label={t`Open vault`}>
-            <IconButton
-              size="md"
-              ml="2"
-              aria-label="menu"
-              icon={<IoMdArchive />}
-              onClick={async () => {
-                openVaultTab()
-              }}
-            />
-          </Tooltip>
-        </Box>
-
-        <Box ml="auto">
+        <Box>
           {isUserMenuOpen ? (
             <IconButton
               size="md"
@@ -121,6 +92,52 @@ export const NavBar: FunctionComponent = () => {
               onClick={() => {
                 onUserMenuOpen()
                 onNavMenuClose()
+              }}
+            />
+          )}
+        </Box>
+
+        <RefreshSecretsButton />
+        <Tooltip label={t`Open vault`} aria-label={t`Open vault`} mr={4}>
+          <IconButton
+            size="md"
+            ml="2"
+            aria-label="menu"
+            icon={<IoMdArchive />}
+            onClick={async () => {
+              openVaultTab()
+            }}
+          />
+        </Tooltip>
+        <IconButton
+          mr={15}
+          ml="2"
+          colorScheme="blue"
+          aria-label="Add item"
+          icon={<AddIcon />}
+          rounded={'full'}
+          onClick={async () => {
+            openVaultTab('/addItem?url=' + currentURL)
+          }}
+        />
+        <Box ml="auto">
+          {isNavMenuOpen ? (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<CloseIcon />}
+              onClick={() => {
+                onNavMenuClose()
+              }}
+            />
+          ) : (
+            <IconButton
+              size="md"
+              aria-label="menu"
+              icon={<HamburgerIcon />}
+              onClick={() => {
+                onNavMenuOpen()
+                onUserMenuClose()
               }}
             />
           )}
