@@ -65,10 +65,10 @@ jobs:
               - 'backend/**' 
               - '.github/**'
             webExtension:
-              - 'web-extension/**',
+              - 'web-extension/**'
               - '.github/**'
             mobileApp:
-              - 'mobile-app/**',
+              - 'mobile-app/**'
               - '.github/**'
 
       - name: backend install deps, check TS and run jest
