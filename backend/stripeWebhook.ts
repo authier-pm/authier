@@ -7,7 +7,7 @@ const CREDS_SUBSCRIPTION_ID = 'prod_LquWXgjk6kl5sM'
 const TOTP_SUBSCRIPTION_ID = 'prod_LquVrkwfsXjTAL'
 const TOTP_AND_CREDS_SUBSCRIPTION_ID = 'prod_Lp3NU9UcNWduBm'
 
-app.register((fastify, opts, done) => {
+export const stripeWebhook = (fastify, opts, done) => {
   fastify.addContentTypeParser(
     'application/json',
     { parseAs: 'string' },
@@ -180,4 +180,4 @@ app.register((fastify, opts, done) => {
     reply.send()
   })
   done()
-})
+}
