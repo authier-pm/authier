@@ -25,7 +25,6 @@ import {
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/ExtensionProviders'
 import { useNavigate } from 'react-router-dom'
-import { renderVault } from '@src/vault-index'
 
 interface Values {
   password: string
@@ -84,7 +83,6 @@ export function VaultUnlockVerification() {
 
             device.startLockInterval(lockedState.lockTime)
             navigate('/')
-            renderVault()
 
             setSubmitting(false)
           } catch (err: any) {
