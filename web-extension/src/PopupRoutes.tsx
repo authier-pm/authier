@@ -1,6 +1,5 @@
 import { ReactElement, useContext } from 'react'
 import { AuthLinkPage } from './AuthLinkPage'
-import { VaultUnlockVerification } from './pages/VaultUnlockVerification'
 import { Popup } from './popup/Popup'
 import { DeviceStateContext } from './providers/DeviceStateProvider'
 import debug from 'debug'
@@ -11,11 +10,11 @@ export default function PopupRoutes(): ReactElement {
 
   log('deviceState', deviceState, lockedState)
 
-  if (lockedState) {
-    return <VaultUnlockVerification />
-  }
+  // if (lockedState) { // TODO this would be nice, but we cannot reuse VaultUnlockVerification because it depends on react-router and stuff
+  //   return <VaultUnlockVerification />
+  // }
 
-  if (deviceState === null) {
+  if (lockedState || deviceState === null) {
     return <AuthLinkPage />
   }
 
