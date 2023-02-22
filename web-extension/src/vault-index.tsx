@@ -17,7 +17,7 @@ Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
 })
 
-let vaultRoot
+let vaultRoot: ReactDOM.Root
 export const renderVault = () => {
   vaultRoot.render(
     <HashRouter basename="/">
@@ -34,9 +34,11 @@ export const renderVault = () => {
 }
 
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-  vaultRoot = ReactDOM.createRoot(
-    document.getElementById('vault') as HTMLElement
-  )
+  document.addEventListener('DOMContentLoaded', () => {
+    vaultRoot = ReactDOM.createRoot(
+      document.getElementById('vault') as HTMLElement
+    )
 
-  renderVault()
+    renderVault()
+  })
 })
