@@ -62,11 +62,14 @@ jobs:
         with:
           filters: |
             backend:
-              - 'backend/**'
+              - 'backend/**' 
+              - '.github/**'
             webExtension:
-              - 'web-extension/**'
+              - 'web-extension/**',
+              - '.github/**'
             mobileApp:
-              - 'mobile-app/**'
+              - 'mobile-app/**',
+              - '.github/**'
 
       - name: backend install deps, check TS and run jest
         working-directory: ./backend
