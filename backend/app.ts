@@ -23,6 +23,7 @@ import debug from 'debug'
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import fastifyCors from '@fastify/cors'
+import { stripeWebhook } from './stripeWebhook'
 
 const { env } = process
 const log = debug('au:app')
@@ -86,6 +87,8 @@ app.route({
   url: '/health/report',
   handler: healthReportHandler
 })
+
+app.register(stripeWebhook)
 
 app.post('/refresh_token', async (request, reply) => {
   const refreshToken = request.cookies['refresh-token']
