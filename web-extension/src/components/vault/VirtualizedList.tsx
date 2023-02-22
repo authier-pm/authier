@@ -10,24 +10,9 @@ import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
   const debouncedSearchTerm = useDebounce(filter, 400)
-  const { loginCredentials: LoginCredentials, TOTPSecrets } =
-    useContext(DeviceStateContext)
+  const { searchSecrets: search } = useContext(DeviceStateContext)
 
-  const filteredItems = [...LoginCredentials, ...TOTPSecrets].filter((item) => {
-    const label =
-      (item.kind === EncryptedSecretType.TOTP
-        ? item.totp.label
-        : item.loginCredentials.label) ?? ''
-
-    const username = getDecryptedSecretProp(item, 'username')
-    const url = getDecryptedSecretProp(item, 'url')
-    return (
-      label.includes(debouncedSearchTerm) ||
-      url.includes(debouncedSearchTerm) ||
-      username.includes(debouncedSearchTerm) ||
-      getDecryptedSecretProp(item, 'password').includes(debouncedSearchTerm) // make sure user can search by password. This can be useful for searching where a concrete password is used
-    )
-  })
+  const filteredItems = search(debouncedSearchTerm)
 
   const ITEMS_COUNT = filteredItems.length
   const ITEM_SIZE = 270
