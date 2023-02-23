@@ -133,7 +133,7 @@ export default function Register(): ReactElement {
                   isRequired
                 >
                   <FormLabel htmlFor="email">Email</FormLabel>
-                  <Input {...field} id="Email" placeholder="bob@bob.com" />
+                  <Input {...field} id="Email" />
                   <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                 </FormControl>
               )}
