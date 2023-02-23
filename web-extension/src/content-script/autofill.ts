@@ -162,7 +162,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //Register screen
     //After certain condition is met, we can assume this is register page
     log('usefulInputs', usefulInputs)
-    if (usefulInputs.length > 2) {
+    if (usefulInputs.length >= 2) {
       for (let index = 0; index < usefulInputs.length - 1; index++) {
         const input = usefulInputs[index]
         if (

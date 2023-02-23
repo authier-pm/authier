@@ -97,7 +97,7 @@ const appRouter = tc.router({
         username: credentials.username,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
-        url: inputsUrl,
+        url: inputsUrl ?? url,
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }
 
@@ -284,6 +284,7 @@ export type AppRouter = typeof appRouter
 
 createChromeHandler({
   router: appRouter,
+
   createContext: (ctx) => {
     return { sender: ctx.req.sender }
   },
