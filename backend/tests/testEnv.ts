@@ -1,5 +1,5 @@
 import 'reflect-metadata'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import 'dotenv/config'
 import { afterAll, beforeAll, vi } from 'vitest'
 import debug from 'debug'
