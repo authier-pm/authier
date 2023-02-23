@@ -35,6 +35,20 @@ runs:
         echo $API_URL >> .env
         echo $PAGE_URL >> .env
         pnpm prodBuild
+    
+    - name: Upload .env
+      uses: actions/upload-artifact@v3
+      with:
+        name: .env-test
+        path: web-extension/.env
+        retention-days: 3
+    
+    - name: Upload prodBuild
+      uses: actions/upload-artifact@v3
+      with:
+        name: prodBuild
+        path: web-extension/dist/
+        retention-days: 3
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
