@@ -81,7 +81,7 @@ importers:
       bytes: ^3.1.2
       chalk: ^5.2.0
       class-transformer: ^0.5.1
-      class-validator: 0.14.0
+      class-validator: 0.13.2
       constructs: ^10.1.257
       cpy: ^9.0.1
       debug: ^4.3.4
@@ -133,7 +133,7 @@ importers:
       bytes: 3.1.2
       chalk: 5.2.0
       class-transformer: 0.5.1
-      class-validator: 0.14.0
+      class-validator: 0.13.2
       cpy: 9.0.1
       debug: 4.3.4
       dotenv: 16.0.3
@@ -159,7 +159,7 @@ importers:
       reflect-metadata: 0.1.13
       source-map-support: 0.5.21
       stripe: 11.11.0
-      type-graphql: /@capaj/type-graphql/2.0.0-alpha.1_y4roju44775djskduzf2jupeyy
+      type-graphql: /@capaj/type-graphql/2.0.0-alpha.1_rq55dqxpbhywxwjvxttjguy4yy
       typescript: 4.9.5
       uuid: 9.0.0
     devDependencies:
@@ -3478,7 +3478,7 @@ packages:
       - supports-color
     dev: true
 
-  /@capaj/type-graphql/2.0.0-alpha.1_y4roju44775djskduzf2jupeyy:
+  /@capaj/type-graphql/2.0.0-alpha.1_rq55dqxpbhywxwjvxttjguy4yy:
     resolution: {integrity: sha512-AIMVUwa8ReBv6qOx0GDcAJaJFkHEA2LbaEZ8uBC7p4Y5Ewi5fv3xoGQM0/j35Mp64xoEE+C5BMNQYbg+mRU30g==}
     engines: {node: '>= 14'}
     requiresBuild: true
@@ -3489,7 +3489,7 @@ packages:
       '@types/glob': 7.2.0
       '@types/node': 18.11.9
       '@types/semver': 7.3.12
-      class-validator: 0.14.0
+      class-validator: 0.13.2
       glob: 7.2.3
       graphql: 16.6.0
       graphql-query-complexity: 0.11.0_graphql@16.6.0
@@ -12454,10 +12454,6 @@ packages:
     resolution: {integrity: sha512-rFT3ak0/2trgvp4yYZo5iKFEPsET7vKydKF+VRCxlQ9bpheehyAJH89dAkaLEq/j/RZXJIqcgsmPJKUP1Z28HA==}
     dev: true
 
-  /@types/validator/13.7.12:
-    resolution: {integrity: sha512-YVtyAPqpefU+Mm/qqnOANW6IkqKpCSrarcyV269C8MA8Ux0dbkEuQwM/4CjL47kVEM2LgBef/ETfkH+c6+moFA==}
-    dev: false
-
   /@types/webextension-polyfill/0.10.0:
     resolution: {integrity: sha512-If4EcaHzYTqcbNMp/FdReVdRmLL/Te42ivnJII551bYjhX19bWem5m14FERCqdJA732OloGuxCRvLBvcMGsn4A==}
     dev: true
@@ -15026,10 +15022,9 @@ packages:
       isobject: 3.0.1
       static-extend: 0.1.2
 
-  /class-validator/0.14.0:
-    resolution: {integrity: sha512-ct3ltplN8I9fOwUd8GrP8UQixwff129BkEtuWDKL5W45cQuLd19xqmTLu5ge78YDm/fdje6FMt0hGOhl0lii3A==}
+  /class-validator/0.13.2:
+    resolution: {integrity: sha512-yBUcQy07FPlGzUjoLuUfIOXzgynnQPPruyK1Ge2B74k9ROwnle1E+NxLWnUv5OLU8hA/qL5leAE9XnXq3byaBw==}
     dependencies:
-      '@types/validator': 13.7.12
       libphonenumber-js: 1.10.18
       validator: 13.7.0
     dev: false
