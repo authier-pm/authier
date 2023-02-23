@@ -14,7 +14,7 @@ jobs:
   ensure-zip:
     runs-on: ubuntu-latest
     outputs:
-      zipAssetId: | 
+      zipAssetId: |
         ${{ steps.getZipAssetId.outputs.result || 
             steps.uploadZipAsset.outputs.id }}
     steps:
@@ -40,6 +40,9 @@ jobs:
       - name: Build, test and pack
         if: '!steps.getZipAssetId.outputs.result'
         id: buildPack
+        env:
+          API_URL: ${{ secrets.API_URL }}
+          PAGE_URL: ${{ secrets.PAGE_URL }}
         uses: ./.github/workflows/actions/build-test-pack
 
       - name: Upload "extension.zip" asset to the release
