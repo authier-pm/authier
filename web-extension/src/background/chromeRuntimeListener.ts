@@ -97,7 +97,7 @@ const appRouter = tc.router({
         username: credentials.username,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
-        url: inputsUrl ?? url,
+        url: url,
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }
 
