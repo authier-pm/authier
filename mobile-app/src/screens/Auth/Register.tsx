@@ -79,7 +79,7 @@ export function Register({ navigation }: NavigationProps) {
       </Heading>
 
       <Formik
-        initialValues={{ email: 'bob@bob.com', password: 'bob' }}
+        initialValues={{ email: '', password: '' }}
         onSubmit={async (
           values: Values,
           { setSubmitting }: FormikHelpers<Values>

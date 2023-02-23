@@ -62,7 +62,7 @@ export default function Login(): ReactElement {
       </Flex>
 
       <Formik
-        initialValues={{ email: 'bob@bob.com', password: 'bob' }}
+        initialValues={{ email: '', password: '' }}
         onSubmit={async (
           values: LoginFormValues,
           { setSubmitting }: FormikHelpers<LoginFormValues>
@@ -81,7 +81,7 @@ export default function Login(): ReactElement {
                   isRequired
                 >
                   <FormLabel htmlFor="email">Email</FormLabel>
-                  <Input {...field} id="Email" placeholder="bob@bob.com" />
+                  <Input {...field} id="Email" />
                   <FormErrorMessage>{form.errors.email}</FormErrorMessage>
                 </FormControl>
               )}

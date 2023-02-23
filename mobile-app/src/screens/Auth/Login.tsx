@@ -36,8 +36,8 @@ export const LoginContext = React.createContext<{
 
 export function Login({ navigation }: NavigationProps) {
   const initialValues: LoginFormValues = {
-    email: 'bob@bob.com',
-    password: 'bob'
+    email: '',
+    password: ''
   }
   const [show, setShow] = React.useState(false)
   const [formState, setFormState] = useState<LoginFormValues | null>(null)
