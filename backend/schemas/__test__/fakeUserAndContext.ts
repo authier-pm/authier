@@ -1,5 +1,5 @@
 import { prismaClient } from '../../prisma/prismaClient'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { RegisterNewAccountInput } from '../../models/AuthInputs'
 import { makeRegisterAccountInput } from './makeRegisterAccountInput'
 

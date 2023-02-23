@@ -1,4 +1,4 @@
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 
 export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),

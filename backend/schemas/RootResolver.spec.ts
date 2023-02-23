@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { prismaClient } from '../prisma/prismaClient'
 import { IContextAuthenticated, RootResolver } from './RootResolver'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
