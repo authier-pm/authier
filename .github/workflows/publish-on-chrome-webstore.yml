@@ -51,6 +51,8 @@ jobs:
         uses: ./.github/workflows/actions/get-zip-asset
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          apiURL: ${{ secrets.API_URL }}
+          pageURL: ${{ secrets.PAGE_URL }}
 
       - name: Fetch Google API access token
         id: fetchAccessToken
