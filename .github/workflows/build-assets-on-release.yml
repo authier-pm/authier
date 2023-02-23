@@ -116,7 +116,7 @@ jobs:
         continue-on-error: true
         uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
         with:
-          timeoutMs: 1200000
+          timeoutMs: 600000
           extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
           zipFilePath: ${{ env.ZIP_FILE_PATH }}
           xpiFilePath: ${{ env.XPI_FILE_PATH }}
