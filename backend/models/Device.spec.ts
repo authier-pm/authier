@@ -3,7 +3,7 @@ import { RegisterNewAccountInput } from '../models/AuthInputs'
 import { makeRegisterAccountInput } from '../schemas/__test__/makeRegisterAccountInput'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
 import { User } from '.prisma/client'
-import faker from 'faker'
+import { faker } from '@faker-js/faker'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeviceMutation, DeviceQuery } from './Device'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
@@ -298,7 +298,7 @@ describe('Device', () => {
 
     it("should show 'TOTP limit exceeded, remove TOTP secrets'", async () => {
       //Generate fake secrets for user
-      const numOverLimit = faker.datatype.number(5)
+      const numOverLimit = 5
       //TODO: Make function for generating random secrets, revise this code and remove duplicate lines
 
       for (let i = 0; i < user.TOTPlimit + numOverLimit; i++) {
@@ -314,15 +314,10 @@ describe('Device', () => {
         data: testData
       })
 
-      const totps = testData.filter(
-        (secret: { kind: string }) =>
-          secret.kind === EncryptedSecretTypeGQL.TOTP
-      ).length
-
       await expect(
         async () => await deviceQuery.encryptedSecretsToSync(fakeCtx)
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        '"Password limit exceeded, remove 9 passwords"'
+        '"TOTP limit exceeded, remove 5 TOTP secrets"'
       )
     })
   })
