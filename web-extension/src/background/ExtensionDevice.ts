@@ -439,7 +439,6 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
-    log('Extension device initializing')
     this.id = await this.getDeviceId()
 
     let storedState: IBackgroundStateSerializable | null = null
@@ -481,6 +480,7 @@ class ExtensionDevice {
 
     this.fireToken = fireToken
     this.initCallbacks.forEach((cb) => cb())
+    log('Extension device initialized')
   }
 
   private listenForUserLogin() {
