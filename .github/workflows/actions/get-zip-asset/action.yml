@@ -16,6 +16,12 @@ inputs:
   githubToken:
     description: GitHub token
     required: true
+  apiURL:
+    description: production API_URL
+    required: true
+  pageURL:
+    description: production PAGE_URL
+    required: true
 outputs:
   releaseUploadUrl:
     description: Release upload url, if exists
@@ -57,8 +63,8 @@ runs:
     - name: Build and pack zip
       id: buildZip
       env:
-        API_URL: ${{ secrets.API_URL }}
-        PAGE_URL: ${{ secrets.PAGE_URL }}
+        API_URL: ${{ inputs.apiURL }}
+        PAGE_URL: ${{ inputs.pageURL }}
       if: steps.downloadZipAsset.outcome != 'success'
       uses: ./.github/workflows/actions/build-test-pack
 
