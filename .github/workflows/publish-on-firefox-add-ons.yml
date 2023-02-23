@@ -16,6 +16,8 @@ jobs:
         uses: ./.github/workflows/actions/get-zip-asset
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
+          apiURL: ${{ secrets.API_URL }}
+          pageURL: ${{ secrets.PAGE_URL }}
       
       - name: Zip source code
         uses: vimtor/action-zip@v1
