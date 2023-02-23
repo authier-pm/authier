@@ -2,7 +2,7 @@ import cpy from '@cjsa/cpy'
 
 const relativePath = './node_modules'
 
-const modulesToCopy = ['pg', 'prisma', 'xtend', 'split2', 'pgpass']
+const modulesToCopy = ['pg', 'prisma', 'xtend', 'split2', 'pgpass', 'stripe']
 
 // copies all node_modules needed for lambda as prisma generated files are not bundled
 ;(async () => {
