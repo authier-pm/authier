@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "license": "AGPL-3.0-or-later",
   "scripts": {
-    "android": "npx react-native run-android",
+    "android": "pnpm exec react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "start:nocache": "react-native start --reset-cache",
@@ -121,6 +121,7 @@
     "metro-react-native-babel-preset": "0.72.3",
     "prettier": "^2.7.1",
     "pretty-quick": "^3.1.3",
+    "react-native-cli": "^2.0.1",
     "react-native-codegen": "^0.71.3",
     "react-test-renderer": "18.2.0",
     "typescript": "^4.9.5"
