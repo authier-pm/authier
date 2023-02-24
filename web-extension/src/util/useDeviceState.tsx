@@ -60,7 +60,7 @@ export interface ISecuritySettingsInBg {
   noHandsLogin: boolean
 }
 
-let registered = false // we need to only register once
+let storageOnchangeListenerRegistered = false // we need to only register once
 
 export function useDeviceState() {
   const trpc = getTRPCCached()
@@ -91,22 +91,24 @@ export function useDeviceState() {
 
   //TODO move this whole thing into it' own hook
   useEffect(() => {
-    log('registering storage change listener')
-
     getCurrentTab().then((tab) => {
       setCurrentTab(tab ?? null)
       setCurrentURL(tab?.url ?? '')
     })
 
-    if (registered) {
+    device.onInitDone(() => {
+      console.log('device.onInitDone')
+      setDeviceState(device.state)
+      if (device.lockedState) {
+        setLockedState(device.lockedState)
+      }
+    })
+    if (storageOnchangeListenerRegistered) {
       return
     }
-    registered = true
-
-    device.onInitDone(() => {
-      setDeviceState(device.state)
-    })
     browser.storage.onChanged.addListener(onStorageChange)
+    storageOnchangeListenerRegistered = true
+    log('registered storage change listener')
   }, [])
 
   const backgroundStateContext = {
@@ -136,7 +138,7 @@ export function useDeviceState() {
     lockedState,
     device,
     isFilling,
-    registered,
+    registered: storageOnchangeListenerRegistered,
     /*
      * searches for secrets in the vault, tries to include all fields which can be searched, returns sorted by lastUsedAt
      */
