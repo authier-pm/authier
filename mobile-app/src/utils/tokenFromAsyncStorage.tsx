@@ -5,8 +5,8 @@ import SInfo from 'react-native-sensitive-info'
 export let accessToken: string | null = null
 export const getAccessTokenFromStorage = async () => {
   const value = await SInfo.getItem('@accessToken', {
-    sharedPreferencesName: 'mySharedPrefs',
-    keychainService: 'myKeychain'
+    sharedPreferencesName: 'authierShared',
+    keychainService: 'authierKCH'
   })
 
   return value
@@ -15,16 +15,16 @@ export const getAccessTokenFromStorage = async () => {
 export const saveAccessToken = async (s: string) => {
   accessToken = s
   await SInfo.setItem('@accessToken', s, {
-    sharedPreferencesName: 'mySharedPrefs',
-    keychainService: 'myKeychain'
+    sharedPreferencesName: 'authierShared',
+    keychainService: 'authierKCH'
   })
 }
 
 export const clearAccessToken = async () => {
   accessToken = ''
   return await SInfo.deleteItem('@accessToken', {
-    sharedPreferencesName: 'mySharedPrefs',
-    keychainService: 'myKeychain'
+    sharedPreferencesName: 'authierShared',
+    keychainService: 'authierKCH'
   })
 }
 export const getUserFromToken = async () => {

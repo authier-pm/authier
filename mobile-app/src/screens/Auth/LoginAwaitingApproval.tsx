@@ -6,10 +6,8 @@ import { LoginContext } from './Login'
 
 import {
   base64_to_buf,
-  buff_to_base64,
   cryptoKeyToString,
   dec,
-  enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { DeviceContext } from '../../providers/DeviceProvider'

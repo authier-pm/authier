@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react'
+import { ReactNode } from 'react'
 import {
   IconButton,
   Avatar,
@@ -21,7 +21,8 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Spinner
+  Spinner,
+  Button
 } from '@chakra-ui/react'
 import {
   FiHome,
@@ -171,7 +172,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                   </Box>
                 </Flex>
               </MenuButton>
-              <MenuList bg={useColorModeValue('white', 'gray.800')}>
+              <MenuList justifyContent="center">
                 <Link as={RouterLink} to="/settings/account">
                   <MenuItem>Settings</MenuItem>
                 </Link>
@@ -211,10 +212,10 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
       to={path}
       style={{ textDecoration: 'none' }}
       _activeLink={{
-        bg: 'teal.700'
+        bg: useColorModeValue('teal.200', 'teal.700')
       }}
       _hover={{
-        bg: 'teal.700'
+        bg: useColorModeValue('teal.200', 'teal.700')
       }}
     >
       <Flex
@@ -307,10 +308,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                 </Box>
               </HStack>
             </MenuButton>
-            <MenuList
-              bg={useColorModeValue('white', 'gray.900')}
-              borderColor={useColorModeValue('gray.200', 'gray.700')}
-            >
+            <MenuList>
               <Link as={RouterLink} to="/settings/account">
                 <MenuItem>Settings</MenuItem>
               </Link>
@@ -320,8 +318,11 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
               <MenuDivider />
               <MenuItem
                 backgroundColor="red.400"
-                onClick={() => {
-                  device.logout()
+                _hover={{
+                  backgroundColor: 'red.600'
+                }}
+                onClick={async () => {
+                  await device.logout()
                 }}
               >
                 Logout

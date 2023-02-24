@@ -15,7 +15,6 @@ import { fetch } from 'undici'
 import { decorator as mem } from 'mem'
 import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
-import { UserQuery } from './UserQuery'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 export async function getGeoIpLocation(ipAddress: string) {

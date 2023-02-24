@@ -86,13 +86,23 @@ export function VaultUnlockVerification() {
 
             setSubmitting(false)
           } catch (err: any) {
-            console.log(err)
-
-            toast({
-              title: err.message,
-              status: 'error',
-              isClosable: true
-            })
+            console.log('TEST', err)
+            if (
+              err.message ===
+              'DOMException: The operation failed for an operation-specific reason'
+            ) {
+              toast({
+                title: 'Incorrect password',
+                status: 'error',
+                isClosable: true
+              })
+            } else {
+              toast({
+                title: err.message,
+                status: 'error',
+                isClosable: true
+              })
+            }
           }
         }}
       >

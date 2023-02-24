@@ -1,13 +1,12 @@
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, DeleteIcon, AddIcon } from '@chakra-ui/icons'
+import { UnlockIcon, SettingsIcon, AddIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
   Flex,
   Text,
   Input,
-  useDisclosure,
   Stat,
   useColorMode,
   Tooltip,
@@ -19,11 +18,9 @@ import { useContext, useEffect, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { Link, useNavigate } from 'react-router-dom'
-import { DeleteAlert } from '../components/vault/DeleteAlert'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
-import { device, getDecryptedSecretProp } from '@src/background/ExtensionDevice'
-import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
+import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 import browser from 'webextension-polyfill'
@@ -131,9 +128,10 @@ export const VaultList = () => {
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
-      if (colorMode !== data.me.theme) {
-        toggleColorMode()
-      }
+      console.log(data.me.theme)
+      // if (colorMode !== data.me.theme) {
+      //   toggleColorMode()
+      // }
 
       setSecuritySettings({
         autofill: data.me?.autofill as boolean,

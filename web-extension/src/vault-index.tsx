@@ -1,11 +1,7 @@
 import * as Sentry from '@sentry/browser'
-
-import React from 'react'
 import ReactDOM from 'react-dom/client'
-
 import browser from 'webextension-polyfill'
 import { ApolloProvider } from '@apollo/client'
-
 import { apolloClient } from './apollo/apolloClient'
 import { HashRouter } from 'react-router-dom'
 import { ColorModeScript } from '@chakra-ui/react'

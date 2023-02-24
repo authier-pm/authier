@@ -44,8 +44,8 @@ export function VaultUnlockVerification() {
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
         const psw = await SInfo.getItem('psw', {
-          sharedPreferencesName: 'mySharedPrefs',
-          keychainService: 'myKeychain',
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH',
           touchID: true,
           showModal: true,
           strings: {

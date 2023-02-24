@@ -144,8 +144,8 @@ export class Device {
       let storedState: null | IBackgroundStateSerializable = null
 
       const storedDeviceState = await SInfo.getItem('deviceState', {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
+        sharedPreferencesName: 'authierShared',
+        keychainService: 'authierKCH'
       })
 
       let storage: {
