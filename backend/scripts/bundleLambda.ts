@@ -14,7 +14,7 @@ import path from 'path'
     bundle: true,
     tsconfig: 'tsconfig.json',
     outfile: 'dist/lambda.js',
-    external: ['aws-sdk', '@prisma/client', 'knex', 'pg-native', 'stripe'],
+    external: ['@prisma/client', 'stripe'],
     platform: 'node',
     target: 'node18',
     plugins: [
