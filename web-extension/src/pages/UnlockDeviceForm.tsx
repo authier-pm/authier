@@ -24,15 +24,13 @@ import {
 } from '@util/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/ExtensionProviders'
-import { useNavigate } from 'react-router-dom'
 
 interface Values {
   password: string
 }
 
-export function VaultUnlockVerification() {
+export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
   const [showPassword, setShowPassword] = useState(false)
-  const navigate = useNavigate()
 
   const { setDeviceState, lockedState, device } = useContext(DeviceStateContext)
 
@@ -82,7 +80,8 @@ export function VaultUnlockVerification() {
             })
 
             device.startLockInterval(lockedState.lockTime)
-            navigate('/')
+
+            onUnlocked()
 
             setSubmitting(false)
           } catch (err: any) {
