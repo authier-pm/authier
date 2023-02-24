@@ -34,6 +34,7 @@ import {
   credentialValues
 } from '@shared/formikSharedTypes'
 import { EditFormButtons } from './EditFormButtons'
+import { DeleteSecretButton } from '@src/pages-vault/DeleteSecretButton'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -55,6 +56,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         display: 'contents'
       }}
     >
+      <DeleteSecretButton secret={secretProps} />
       <Flex
         width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
@@ -204,6 +206,8 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         alignItems={'center'}
         bg={useColorModeValue('white', 'gray.800')}
       >
+        <DeleteSecretButton secret={secretProps} />
+
         <Formik
           enableReinitialize
           initialValues={{
