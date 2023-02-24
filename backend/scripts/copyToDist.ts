@@ -1,6 +1,6 @@
 import cpy from '@cjsa/cpy'
 
-const relativePath = '../node_modules'
+const relativePath = './node_modules'
 
 const modulesToCopy = ['stripe']
 
@@ -13,7 +13,7 @@ const modulesToCopy = ['stripe']
 
   for (const mod of modulesToCopy) {
     const res = await cpy(
-      [`${relativePath}/${mod}/**`],
+      [`.${relativePath}/${mod}/**`], // going one directory up is needed, because pnpm only stores the node_modules in the root
       `dist/node_modules/${mod}`
     )
     console.log(`Copied ${res.length} files for ${mod}`)
