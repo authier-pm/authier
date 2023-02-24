@@ -43,7 +43,7 @@ export const DeleteSecretAlert = ({ id }: { id: string }) => {
         <AlertDialog.Content>
           <AlertDialog.Header>Remove item</AlertDialog.Header>
           <AlertDialog.Body>
-            <Text fontSize={16}>You cant take this back!</Text>
+            <Text fontSize={16}>You can't take this back!</Text>
           </AlertDialog.Body>
 
           <AlertDialog.Footer>
