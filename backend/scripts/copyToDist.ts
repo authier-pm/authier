@@ -1,8 +1,8 @@
 import cpy from '@cjsa/cpy'
 
-const relativePath = './node_modules'
+const relativePath = '../node_modules'
 
-const modulesToCopy = ['pg', 'prisma', 'xtend', 'split2', 'pgpass', 'stripe']
+const modulesToCopy = ['stripe']
 
 // copies all node_modules needed for lambda as prisma generated files are not bundled
 ;(async () => {
@@ -12,8 +12,11 @@ const modulesToCopy = ['pg', 'prisma', 'xtend', 'split2', 'pgpass', 'stripe']
   await cpy([`${relativePath}/postgres-*/**`], `dist/node_modules`) // needed for knex
 
   for (const mod of modulesToCopy) {
-    await cpy([`${relativePath}/${mod}/**`], `dist/node_modules/${mod}`)
-    console.log(`${mod} module copied!`)
+    const res = await cpy(
+      [`${relativePath}/${mod}/**`],
+      `dist/node_modules/${mod}`
+    )
+    console.log(`Copied ${res.length} files for ${mod}`)
   }
 
   await cpy(
