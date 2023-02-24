@@ -34,11 +34,9 @@ export const renderVault = () => {
 }
 
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-  document.addEventListener('DOMContentLoaded', () => {
-    vaultRoot = ReactDOM.createRoot(
-      document.getElementById('vault') as HTMLElement
-    )
+  vaultRoot = ReactDOM.createRoot(
+    document.getElementById('vault') as HTMLElement
+  )
 
-    renderVault()
-  })
+  renderVault()
 })
