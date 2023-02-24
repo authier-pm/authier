@@ -429,7 +429,11 @@ class ExtensionDevice {
   }
 
   onInitDone(callback: () => void) {
-    this.initCallbacks.push(callback)
+    if (this.state || this.lockedState) {
+      callback()
+    } else {
+      this.initCallbacks.push(callback)
+    }
   }
 
   get platform() {
@@ -464,11 +468,11 @@ class ExtensionDevice {
           backgroundState: null,
           lockedState: this.lockedState
         })
-
-        return
+      } else {
+        // no state and no locked state, this is a new device
+        this.name = this.generateDeviceName()
+        this.listenForUserLogin()
       }
-      this.name = this.generateDeviceName()
-      this.listenForUserLogin()
     }
 
     if (this.state && (isVault || isPopup)) {
@@ -476,7 +480,7 @@ class ExtensionDevice {
     }
 
     // const fireToken = await generateFireToken()
-    const fireToken = 'aaaa'
+    const fireToken = 'aaaa' // TODO remove this
 
     this.fireToken = fireToken
     this.initCallbacks.forEach((cb) => cb())
