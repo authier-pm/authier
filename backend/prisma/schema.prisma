@@ -69,6 +69,7 @@ model Device {
   SecretUsageEvents SecretUsageEvent[]
 
   DeviceDecryptionChallengesApproved DecryptionChallenge[] @relation("approvedFromDevice")
+  DeviceEvent                        DeviceEvent[]
 
   @@unique([userId, id])
   @@index([updatedAt])
@@ -113,6 +114,18 @@ model SecretUsageEvent {
   deviceId    String
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])
+}
+
+model DeviceEvent {
+  id        BigInt   @id @default(autoincrement())
+  kind      String
+  timestamp DateTime @default(now())
+
+  // @skip
+  ipAddress String @db.Inet
+
+  Device   Device @relation(fields: [deviceId], references: [id])
+  deviceId String
 }
 
 model MasterDeviceChange {
@@ -258,6 +271,13 @@ model Tag {
 enum EmailVerificationType {
   PRIMARY
   CONTACT
+}
+
+enum DeviceEventEnum {
+  LOCK
+  UNLOCK
+  LOGGED_IN
+  LOGGED_OUT
 }
 
 model EmailVerification {
