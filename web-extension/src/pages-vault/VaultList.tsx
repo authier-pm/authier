@@ -27,6 +27,7 @@ import { useDeleteEncryptedSecretMutation } from '@shared/graphql/EncryptedSecre
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 import browser from 'webextension-polyfill'
+import { DeleteSecretButton } from './DeleteSecretButton'
 
 export function VaultListItem({
   secret
@@ -34,8 +35,7 @@ export function VaultListItem({
   secret: ILoginSecret | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
-  const { isOpen, onOpen, onClose } = useDisclosure()
-  const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
+
   const { deviceState } = useContext(DeviceStateContext)
   if (!deviceState) {
     return null
@@ -70,7 +70,14 @@ export function VaultListItem({
             bgColor="blackAlpha.600"
             w="100%"
             h="full"
+            sx={{
+              svg: {
+                position: 'absolute' // needed for DeleteSecretButton
+              }
+            }}
           >
+            <DeleteSecretButton secret={secret} />
+
             {secretUrl ? (
               <IconButton
                 aria-label="open item"
@@ -79,32 +86,6 @@ export function VaultListItem({
                 onClick={() => browser.tabs.create({ url: secretUrl })}
               />
             ) : null}
-
-            <DeleteIcon
-              cursor={'pointer'}
-              boxSize={26}
-              padding={1.5}
-              overflow={'visible'}
-              backgroundColor={'red.400'}
-              _hover={{ backgroundColor: 'red.500' }}
-              position={'absolute'}
-              right="0"
-              top="inherit"
-              onClick={onOpen}
-            />
-
-            <DeleteAlert
-              isOpen={isOpen}
-              onClose={onClose}
-              deleteItem={async () => {
-                await deleteEncryptedSecretMutation({
-                  variables: {
-                    id: secret.id
-                  }
-                })
-                await device.state?.removeSecret(secret.id)
-              }}
-            />
           </Flex>
         </Box>
         <Flex
