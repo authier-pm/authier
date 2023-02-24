@@ -171,10 +171,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                   </Box>
                 </Flex>
               </MenuButton>
-              <MenuList
-                bg={useColorModeValue('white', 'gray.900')}
-                borderColor={useColorModeValue('gray.200', 'gray.700')}
-              >
+              <MenuList bg={useColorModeValue('white', 'gray.800')}>
                 <Link as={RouterLink} to="/settings/account">
                   <MenuItem>Settings</MenuItem>
                 </Link>
@@ -183,9 +180,9 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 </Link>
                 <MenuDivider />
                 <MenuItem
-                  backgroundColor="red.500"
+                  backgroundColor="red.400"
                   _hover={{
-                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
+                    backgroundColor: 'red.600'
                   }}
                   onClick={async () => {
                     await device.logout()
@@ -214,7 +211,10 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
       to={path}
       style={{ textDecoration: 'none' }}
       _activeLink={{
-        bg: 'teal.700' // TODO fix
+        bg: 'teal.700'
+      }}
+      _hover={{
+        bg: 'teal.700'
       }}
     >
       <Flex
@@ -224,10 +224,6 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
         borderRadius="lg"
         role="group"
         cursor="pointer"
-        _hover={{
-          bg: 'orange.300',
-          color: 'orange.800'
-        }}
         {...rest}
       >
         {icon && (
