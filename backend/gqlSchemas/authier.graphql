@@ -395,6 +395,7 @@ type UserMutation {
   sendEmailVerification(isMobile: Boolean): NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): PositiveInt!
+  changeEmail(email: EmailAddress!): UserQuery!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
