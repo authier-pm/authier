@@ -64,7 +64,7 @@ describe('RootResolver', () => {
       const data = await resolver.registerNewUser(
         input,
         userId,
-        makeFakeCtx(userId)
+        makeFakeCtx({ userId })
       )
 
       expect({
@@ -93,7 +93,7 @@ describe('RootResolver', () => {
 
       await expect(
         async () =>
-          await resolver.registerNewUser(input, userId, makeFakeCtx(userId))
+          await resolver.registerNewUser(input, userId, makeFakeCtx({ userId }))
       ).rejects.toThrow('User with such email already exists.')
     })
 
@@ -128,7 +128,7 @@ describe('RootResolver', () => {
           await resolver.registerNewUser(
             input,
             faker.datatype.uuid(),
-            makeFakeCtx(userId)
+            makeFakeCtx({ userId })
           )
       ).rejects.toThrow(
         'Device already exists. You cannot register this device for multiple accounts.'
@@ -159,7 +159,7 @@ describe('RootResolver', () => {
           name: 'chrome ',
           platform: 'macOS'
         },
-        makeFakeCtx(userId)
+        makeFakeCtx({ userId })
       )) as DecryptionChallengeApproved
 
       expect(data?.addDeviceSecretEncrypted).toBe(undefined)
@@ -201,7 +201,7 @@ describe('RootResolver', () => {
             name: 'chrome ',
             platform: 'macOS'
           },
-          makeFakeCtx(userId)
+          makeFakeCtx({ userId })
         )
       }).rejects.toThrow('Too many decryption challenges, wait for cooldown')
     })

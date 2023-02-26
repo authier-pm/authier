@@ -121,7 +121,7 @@ importers:
       unplugin-swc: ^1.3.2
       uuid: ^9.0.0
       vite: ^4.1.4
-      vitest: ^0.28.5
+      vitest: ^0.29.1
     dependencies:
       '@fastify/aws-lambda': 3.2.0
       '@fastify/cookie': 8.3.0
@@ -185,7 +185,7 @@ importers:
       ts-node: 10.9.1_yfhgfzi43swbioau7ykdgo6mvi
       unplugin-swc: 1.3.2_ek2zcw4jtc5tjoi5l3bqbsuvau
       vite: 4.1.4
-      vitest: 0.28.5
+      vitest: 0.29.1
 
   mobile-app:
     specifiers:
@@ -422,10 +422,10 @@ importers:
       '@emotion/babel-plugin': ^11.10.6
       '@emotion/css': ^11.10.6
       '@emotion/styled': 11.10.6
-      '@lingui/cli': ^3.17.1
-      '@lingui/core': ^3.17.1
-      '@lingui/macro': ^3.17.1
-      '@lingui/react': ^3.17.1
+      '@lingui/cli': ^3.17.2
+      '@lingui/core': ^3.17.2
+      '@lingui/macro': ^3.17.2
+      '@lingui/react': ^3.17.2
       '@playwright/test': ^1.31.1
       '@sentry/browser': ^7.38.0
       '@sentry/tracing': ^7.38.0
@@ -485,7 +485,7 @@ importers:
       notyf: ^3.10.0
       otplib: ^12.0.1
       papaparse: ^5.3.2
-      preact: ^10.12.1
+      preact: ^10.13.0
       pretty-quick: ^3.1.3
       proxy-date: ^0.1.1
       query-string: ^8
@@ -513,7 +513,7 @@ importers:
       ts-node-dev: ^2.0.0
       type-graphql: ^1.1.1
       typescript: ^4.9.5
-      vitest: ^0.28.5
+      vitest: ^0.29.1
       web-ext: ^7.5.0
       webextension-polyfill: ^0.10.0
       webpack: ^5.75.0
@@ -533,8 +533,8 @@ importers:
       '@emotion/babel-plugin': 11.10.6
       '@emotion/css': 11.10.6
       '@emotion/styled': 11.10.6_pmekkgnqduwlme35zpnqhenc34
-      '@lingui/cli': 3.17.1_giktsxq2x54yft4uqnq2fjfuym
-      '@lingui/macro': 3.17.1_ymhilrhcdpxxrflkcn7ixxbzoe
+      '@lingui/cli': 3.17.2_giktsxq2x54yft4uqnq2fjfuym
+      '@lingui/macro': 3.17.2_vr74sp5sl3l265kpej3bhnwdty
       '@sentry/browser': 7.38.0
       '@sentry/tracing': 7.38.0
       '@trpc/client': 10.12.0_@trpc+server@10.12.0
@@ -559,7 +559,7 @@ importers:
       nano-jsx: 0.0.36
       notyf: 3.10.0
       otplib: 12.0.1
-      preact: 10.12.1
+      preact: 10.13.0
       query-string: 8.1.0
       react: 18.2.0
       react-device-detect: 2.2.3_biqbaboplfbrettd7655fr4n2y
@@ -582,8 +582,8 @@ importers:
       '@babel/preset-env': 7.20.2_@babel+core@7.21.0
       '@babel/preset-react': 7.18.6_@babel+core@7.21.0
       '@babel/preset-typescript': 7.21.0_@babel+core@7.21.0
-      '@lingui/core': 3.17.1
-      '@lingui/react': 3.17.1_react@18.2.0
+      '@lingui/core': 3.17.2
+      '@lingui/react': 3.17.2_react@18.2.0
       '@playwright/test': 1.31.1
       '@svgr/webpack': 6.5.1
       '@types/chrome': 0.0.217
@@ -632,7 +632,7 @@ importers:
       ts-node-dev: 2.0.0_typescript@4.9.5
       type-graphql: 1.1.1_graphql@16.6.0
       typescript: 4.9.5
-      vitest: 0.28.5_jsdom@21.1.0
+      vitest: 0.29.1_jsdom@21.1.0
       web-ext: 7.5.0
       webpack: 5.75.0_webpack-cli@5.0.1
       webpack-bundle-analyzer: 4.8.0
@@ -929,15 +929,6 @@ packages:
       eslint-visitor-keys: 2.1.0
       semver: 6.3.0
     dev: true
-
-  /@babel/generator/7.20.14:
-    resolution: {integrity: sha512-AEmuXHdcD3A52HHXxaTmYlb8q/xMEhoRP67B3T4Oq7lbmSoqroMZzjnGj3+i1io3pdnF8iBYVu4Ilj+c4hBxYg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/types': 7.21.0
-      '@jridgewell/gen-mapping': 0.3.2
-      jsesc: 2.5.2
-    dev: false
 
   /@babel/generator/7.20.4:
     resolution: {integrity: sha512-luCf7yk/cm7yab6CAW1aiFnmEfBJplb/JojV56MYEK7ziWfGmFlTfmL9Ehwfy4gFhbjBfWO1wj7/TuSbVNEEtA==}
@@ -1339,14 +1330,6 @@ packages:
       '@babel/helper-validator-identifier': 7.19.1
       chalk: 2.4.2
       js-tokens: 4.0.0
-
-  /@babel/parser/7.20.15:
-    resolution: {integrity: sha512-DI4a1oZuf8wC+oAJA9RW6ga3Zbe8RZFt7kD9i4qAspz3I/yHet1VvC3DiSy/fsUvv5pvJuNPh0LPOdCcqinDPg==}
-    engines: {node: '>=6.0.0'}
-    hasBin: true
-    dependencies:
-      '@babel/types': 7.21.0
-    dev: false
 
   /@babel/parser/7.20.3:
     resolution: {integrity: sha512-OP/s5a94frIPXwjzEcv5S/tpQfc6XhxYUnmWpgdqMWGgYCuErA3SzozaRAMQgSZWKeTJxht9aWAkUY+0UzvOFg==}
@@ -3404,15 +3387,6 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
-
-  /@babel/types/7.20.7:
-    resolution: {integrity: sha512-69OnhBxSSgK0OzTJai4kyPDiKTIe3j+ctaHdIGVbRahTLAT7L3R9oeXHC2aVSuGYt3cVnoAMDmOCgJ2yaiLMvg==}
-    engines: {node: '>=6.9.0'}
-    dependencies:
-      '@babel/helper-string-parser': 7.19.4
-      '@babel/helper-validator-identifier': 7.19.1
-      to-fast-properties: 2.0.0
-    dev: false
 
   /@babel/types/7.21.0:
     resolution: {integrity: sha512-uR7NWq2VNFnDi7EYqiRz2Jv/VQIu38tu64Zy8TX2nQFQ6etJ9V/Rr2msW8BS132mum2rL645qpDrLtAJtVpuow==}
@@ -8922,13 +8896,13 @@ packages:
       - typescript
     dev: true
 
-  /@lingui/babel-plugin-extract-messages/3.17.1_typescript@4.9.5:
-    resolution: {integrity: sha512-L6ULaPbLIp02z4c/bcG6Dk/DaGYrJrQkgmRdHqfmPitBhfT1ziCwnYHNJn2D8Q+Rkqi/lfcHfkBvLWg7Za0ZCw==}
+  /@lingui/babel-plugin-extract-messages/3.17.2_typescript@4.9.5:
+    resolution: {integrity: sha512-Ovhf8a6dBlIZJFOqk6/+LRgQvSlVMol6hxvnVGLsCr/0xNcKlpGUAJ+bvY6NrmxZubpTvZqNkH23u5nEAdXtfg==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@babel/generator': 7.21.1
       '@babel/runtime': 7.20.13
-      '@lingui/conf': 3.17.1_typescript@4.9.5
+      '@lingui/conf': 3.17.2_typescript@4.9.5
       mkdirp: 1.0.4
     transitivePeerDependencies:
       - '@types/node'
@@ -8984,8 +8958,8 @@ packages:
       - '@types/node'
     dev: true
 
-  /@lingui/cli/3.17.1_giktsxq2x54yft4uqnq2fjfuym:
-    resolution: {integrity: sha512-997MGOsgSxQi1YAAq0a5zSMkT8fjH0w898/cVT1xDFMuoArdCc1Y2eYupmbe86tu+aqK8kZgRL5agnbkDbiapg==}
+  /@lingui/cli/3.17.2_giktsxq2x54yft4uqnq2fjfuym:
+    resolution: {integrity: sha512-8hPZOfwB7KZolZ01diUqtprKva1RNAUUNdzISN9pmAUGw9zCPRY/dlOvM6obZi8v0VC/JKrcadOs4Z8krIS2QQ==}
     engines: {node: '>=14.0.0'}
     hasBin: true
     peerDependencies:
@@ -8994,14 +8968,14 @@ packages:
       typescript: 2 || 3 || 4
     dependencies:
       '@babel/core': 7.21.0
-      '@babel/generator': 7.20.14
-      '@babel/parser': 7.20.15
+      '@babel/generator': 7.21.1
+      '@babel/parser': 7.21.1
       '@babel/plugin-syntax-jsx': 7.18.6_@babel+core@7.21.0
       '@babel/runtime': 7.20.13
-      '@babel/types': 7.20.7
-      '@lingui/babel-plugin-extract-messages': 3.17.1_typescript@4.9.5
-      '@lingui/conf': 3.17.1_typescript@4.9.5
-      '@lingui/core': 3.17.1
+      '@babel/types': 7.21.0
+      '@lingui/babel-plugin-extract-messages': 3.17.2_typescript@4.9.5
+      '@lingui/conf': 3.17.2_typescript@4.9.5
+      '@lingui/core': 3.17.2
       '@messageformat/parser': 5.0.0
       babel-plugin-macros: 3.1.0
       bcp-47: 1.0.8
@@ -9049,8 +9023,8 @@ packages:
       - typescript
     dev: true
 
-  /@lingui/conf/3.17.1_typescript@4.9.5:
-    resolution: {integrity: sha512-lO55gQPPzy+N7PcU1hlj8mTYNp8TgFpaF+7AOAI2tSdRy8BbPD/o/RK4TEqNzhhuLOvGlgPu791X5b0w0b2C7g==}
+  /@lingui/conf/3.17.2_typescript@4.9.5:
+    resolution: {integrity: sha512-q3ADfpMYCYMgiu/lrYOOvE3ptxXIqYhA1ozyAq6ynguL8ppqfyaTluLoHfVJVWxnTMI/es9s2W9Kg81QH+nuXQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       ts-node: '>=10'
@@ -9080,8 +9054,8 @@ packages:
       make-plural: 6.2.2
       messageformat-parser: 4.1.3
 
-  /@lingui/core/3.17.1:
-    resolution: {integrity: sha512-IUR+07aWFDQB8LkMFRM1UWTOj2spPNHukqX+9i9vPDpbPTiNjUO68aHqAXfpnMu/kUJBZJtN6V37wlJi8dc0oQ==}
+  /@lingui/core/3.17.2:
+    resolution: {integrity: sha512-YOd068NanznN8lLQqOKPlAY0ill3rrgmiAvPRKuYkrxzJMIHqlIFO/2Kcc/RH5vClOmLfg+wgR4rsHK/kLKelQ==}
     engines: {node: '>=14.0.0'}
     dependencies:
       '@babel/runtime': 7.20.13
@@ -9109,8 +9083,8 @@ packages:
       - typescript
     dev: true
 
-  /@lingui/macro/3.17.1_ymhilrhcdpxxrflkcn7ixxbzoe:
-    resolution: {integrity: sha512-C2Zt31p8iBHRCQrv2WR24wrbuhw1Z1YWOrOBdO7z93mxfUeySwlgIKyhMB8OJc1prD1QB7tPvXRa3PrR7k3lKQ==}
+  /@lingui/macro/3.17.2_vr74sp5sl3l265kpej3bhnwdty:
+    resolution: {integrity: sha512-kk1ZtwYSx5Knu/5LsRGisTqfNoLIeVkJJPn6xjZXcItoxUgRsykyKb3BqCJwxqYUClz4i4A8Ld/aA4xBi4apRQ==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@lingui/core': ^3.13.0
@@ -9118,10 +9092,10 @@ packages:
       babel-plugin-macros: 2 || 3
     dependencies:
       '@babel/runtime': 7.20.13
-      '@babel/types': 7.20.7
-      '@lingui/conf': 3.17.1_typescript@4.9.5
-      '@lingui/core': 3.17.1
-      '@lingui/react': 3.17.1_react@18.2.0
+      '@babel/types': 7.21.0
+      '@lingui/conf': 3.17.2_typescript@4.9.5
+      '@lingui/core': 3.17.2
+      '@lingui/react': 3.17.2_react@18.2.0
       babel-plugin-macros: 3.1.0
       ramda: 0.27.2
     transitivePeerDependencies:
@@ -9140,14 +9114,14 @@ packages:
       '@lingui/core': 3.15.0
       react: 18.1.0
 
-  /@lingui/react/3.17.1_react@18.2.0:
-    resolution: {integrity: sha512-5kThGxJ91hkmxP8rzeC0Wx20LfOz1z3RGjoss6S4hTk9YtOKV2Jy5F+2d+L1vTc7479fZ/P7HJEuXfCF2ZvxdA==}
+  /@lingui/react/3.17.2_react@18.2.0:
+    resolution: {integrity: sha512-+PECPknIiQn/zdXgrXVTCbcJUSjPFZTtPOuIO72huGNh/QA+iRVsGTvef0/Q+pWkiPEOU6CmaGHkwdtgFMtJ8g==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
       '@babel/runtime': 7.20.13
-      '@lingui/core': 3.17.1
+      '@lingui/core': 3.17.2
       react: 18.2.0
 
   /@lukeed/ms/2.0.0:
@@ -12632,30 +12606,30 @@ packages:
       eslint-visitor-keys: 3.3.0
     dev: true
 
-  /@vitest/expect/0.28.5:
-    resolution: {integrity: sha512-gqTZwoUTwepwGIatnw4UKpQfnoyV0Z9Czn9+Lo2/jLIt4/AXLTn+oVZxlQ7Ng8bzcNkR+3DqLJ08kNr8jRmdNQ==}
+  /@vitest/expect/0.29.1:
+    resolution: {integrity: sha512-VFt1u34D+/L4pqjLA8VGPdHbdF8dgjX9Nq573L9KG6/7MIAL9jmbEIKpXudmxjoTwcyczOXRyDuUWBQHZafjoA==}
     dependencies:
-      '@vitest/spy': 0.28.5
-      '@vitest/utils': 0.28.5
+      '@vitest/spy': 0.29.1
+      '@vitest/utils': 0.29.1
       chai: 4.3.7
     dev: true
 
-  /@vitest/runner/0.28.5:
-    resolution: {integrity: sha512-NKkHtLB+FGjpp5KmneQjTcPLWPTDfB7ie+MmF1PnUBf/tGe2OjGxWyB62ySYZ25EYp9krR5Bw0YPLS/VWh1QiA==}
+  /@vitest/runner/0.29.1:
+    resolution: {integrity: sha512-VZ6D+kWpd/LVJjvxkt79OA29FUpyrI5L/EEwoBxH5m9KmKgs1QWNgobo/CGQtIWdifLQLvZdzYEK7Qj96w/ixQ==}
     dependencies:
-      '@vitest/utils': 0.28.5
+      '@vitest/utils': 0.29.1
       p-limit: 4.0.0
       pathe: 1.1.0
     dev: true
 
-  /@vitest/spy/0.28.5:
-    resolution: {integrity: sha512-7if6rsHQr9zbmvxN7h+gGh2L9eIIErgf8nSKYDlg07HHimCxp4H6I/X/DPXktVPPLQfiZ1Cw2cbDIx9fSqDjGw==}
+  /@vitest/spy/0.29.1:
+    resolution: {integrity: sha512-sRXXK44pPzaizpiZOIQP7YMhxIs80J/b6v1yR3SItpxG952c8tdA7n0O2j4OsVkjiO/ZDrjAYFrXL3gq6hLx6Q==}
     dependencies:
       tinyspy: 1.0.2
     dev: true
 
-  /@vitest/utils/0.28.5:
-    resolution: {integrity: sha512-UyZdYwdULlOa4LTUSwZ+Paz7nBHGTT72jKwdFSV4IjHF1xsokp+CabMdhjvVhYwkLfO88ylJT46YMilnkSARZA==}
+  /@vitest/utils/0.29.1:
+    resolution: {integrity: sha512-6npOEpmyE6zPS2wsWb7yX5oDpp6WY++cC5BX6/qaaMhGC3ZlPd8BbTz3RtGPi1PfPerPvfs4KqS/JDOIaB6J3w==}
     dependencies:
       cli-truncate: 3.1.0
       diff: 5.1.0
@@ -23341,8 +23315,8 @@ packages:
       source-map-js: 1.0.2
     dev: true
 
-  /preact/10.12.1:
-    resolution: {integrity: sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==}
+  /preact/10.13.0:
+    resolution: {integrity: sha512-ERdIdUpR6doqdaSIh80hvzebHB7O6JxycOhyzAeLEchqOq/4yueslQbfnPwXaNhAYacFTyCclhwkEbOumT0tHw==}
     dev: false
 
   /prelude-ls/1.1.2:
@@ -27410,8 +27384,8 @@ packages:
       react-native-vision-camera: 2.15.2_ed6hdicvoe3mtgaxburxkml6qq
     dev: false
 
-  /vite-node/0.28.5_@types+node@18.11.9:
-    resolution: {integrity: sha512-LmXb9saMGlrMZbXTvOveJKwMTBTNUH66c8rJnQ0ZPNX+myPEol64+szRzXtV5ORb0Hb/91yq+/D3oERoyAt6LA==}
+  /vite-node/0.29.1_@types+node@18.11.9:
+    resolution: {integrity: sha512-Ey9bTlQOQrCxQN0oJ7sTg+GrU4nTMLg44iKTFCKf31ry60csqQz4E+Q04hdWhwE4cTgpxUC+zEB1kHbf5jNkFA==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     dependencies:
@@ -27420,8 +27394,6 @@ packages:
       mlly: 1.1.0
       pathe: 1.1.0
       picocolors: 1.0.0
-      source-map: 0.6.1
-      source-map-support: 0.5.21
       vite: 4.1.4_@types+node@18.11.9
     transitivePeerDependencies:
       - '@types/node'
@@ -27513,8 +27485,8 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /vitest/0.28.5:
-    resolution: {integrity: sha512-pyCQ+wcAOX7mKMcBNkzDwEHRGqQvHUl0XnoHR+3Pb1hytAHISgSxv9h0gUiSiYtISXUU3rMrKiKzFYDrI6ZIHA==}
+  /vitest/0.29.1:
+    resolution: {integrity: sha512-iSy6d9VwsIn7pz5I8SjVwdTLDRGKNZCRJVzROwjt0O0cffoymKwazIZ2epyMpRGpeL5tsXAl1cjXiT7agTyVug==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -27538,10 +27510,10 @@ packages:
       '@types/chai': 4.3.4
       '@types/chai-subset': 1.3.3
       '@types/node': 18.11.9
-      '@vitest/expect': 0.28.5
-      '@vitest/runner': 0.28.5
-      '@vitest/spy': 0.28.5
-      '@vitest/utils': 0.28.5
+      '@vitest/expect': 0.29.1
+      '@vitest/runner': 0.29.1
+      '@vitest/spy': 0.29.1
+      '@vitest/utils': 0.29.1
       acorn: 8.8.2
       acorn-walk: 8.2.0
       cac: 6.7.14
@@ -27557,7 +27529,7 @@ packages:
       tinypool: 0.3.1
       tinyspy: 1.0.2
       vite: 4.1.4_@types+node@18.11.9
-      vite-node: 0.28.5_@types+node@18.11.9
+      vite-node: 0.29.1_@types+node@18.11.9
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less
@@ -27568,8 +27540,8 @@ packages:
       - terser
     dev: true
 
-  /vitest/0.28.5_jsdom@21.1.0:
-    resolution: {integrity: sha512-pyCQ+wcAOX7mKMcBNkzDwEHRGqQvHUl0XnoHR+3Pb1hytAHISgSxv9h0gUiSiYtISXUU3rMrKiKzFYDrI6ZIHA==}
+  /vitest/0.29.1_jsdom@21.1.0:
+    resolution: {integrity: sha512-iSy6d9VwsIn7pz5I8SjVwdTLDRGKNZCRJVzROwjt0O0cffoymKwazIZ2epyMpRGpeL5tsXAl1cjXiT7agTyVug==}
     engines: {node: '>=v14.16.0'}
     hasBin: true
     peerDependencies:
@@ -27593,10 +27565,10 @@ packages:
       '@types/chai': 4.3.4
       '@types/chai-subset': 1.3.3
       '@types/node': 18.11.9
-      '@vitest/expect': 0.28.5
-      '@vitest/runner': 0.28.5
-      '@vitest/spy': 0.28.5
-      '@vitest/utils': 0.28.5
+      '@vitest/expect': 0.29.1
+      '@vitest/runner': 0.29.1
+      '@vitest/spy': 0.29.1
+      '@vitest/utils': 0.29.1
       acorn: 8.8.2
       acorn-walk: 8.2.0
       cac: 6.7.14
@@ -27613,7 +27585,7 @@ packages:
       tinypool: 0.3.1
       tinyspy: 1.0.2
       vite: 4.1.4_@types+node@18.11.9
-      vite-node: 0.28.5_@types+node@18.11.9
+      vite-node: 0.29.1_@types+node@18.11.9
       why-is-node-running: 2.2.2
     transitivePeerDependencies:
       - less

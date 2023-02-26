@@ -13,7 +13,11 @@ import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLNonNegativeInt, GraphQLPositiveInt } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLNonNegativeInt,
+  GraphQLPositiveInt
+} from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -325,6 +329,47 @@ export class UserMutation extends UserBase {
       })
     ])
     return secretsUpdates.length
+  }
+
+  @Field(() => UserQuery)
+  async updateEmail(
+    @Arg('email', () => GraphQLEmailAddress)
+    email: string,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    if (ctx.device.id !== this.masterDeviceId) {
+      console.log(`${ctx.device.id} vs ${this.masterDeviceId}`)
+      throw new GraphqlError(
+        'You can only change login email from master device'
+      )
+    }
+
+    return ctx.prisma.$transaction(
+      async (trx) => {
+        const oldEmail = this.email
+        const updatedUser = await trx.user.update({
+          where: {
+            id: this.id
+          },
+          data: {
+            email
+          }
+        })
+        await sendEmail(oldEmail, {
+          Subject: 'Your login email has been changed',
+          TextPart: `Your login email has been changed from ${oldEmail} to ${email}. 
+        If you did not do this you should consider your master device compromised.
+        Request was made from ip: ${ctx.getIpAddress()}
+        `
+        })
+
+        return updatedUser
+      },
+      {
+        maxWait: 30000,
+        timeout: 40000
+      }
+    )
   }
 
   @Field(() => DecryptionChallengeMutation)
