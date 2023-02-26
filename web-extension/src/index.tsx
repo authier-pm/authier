@@ -15,7 +15,6 @@ Sentry.init({
 
 let popupRoot: ReactDOM.Root
 export const renderPopup = () => {
-  console.log('renderPopup inside')
   popupRoot.render(
     <ApolloProvider client={apolloClient}>
       <ColorModeScript

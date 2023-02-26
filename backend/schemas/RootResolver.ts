@@ -114,6 +114,7 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
+    //TODO: Ask @Capajj how it works.
     const include = getPrismaRelationsFromInfo({
       info,
       rootModel: dmmf.modelMap.User
