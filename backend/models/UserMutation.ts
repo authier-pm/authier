@@ -332,7 +332,7 @@ export class UserMutation extends UserBase {
   }
 
   @Field(() => UserQuery)
-  async updateEmail(
+  async changeEmail(
     @Arg('email', () => GraphQLEmailAddress)
     email: string,
     @Ctx() ctx: IContextAuthenticated
