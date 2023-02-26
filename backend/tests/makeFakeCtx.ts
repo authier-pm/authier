@@ -9,11 +9,12 @@ import { vi } from 'vitest'
 //   await prismaClient.$transaction([deleteDevices, deleteSettings, deleteUsers])
 //   await prismaClient.$disconnect()
 // })
-export const makeFakeCtx = (userId: string) =>
+export const makeFakeCtx = (overload: { userId: string; device?: any }) =>
   ({
     reply: { setCookie: vi.fn() },
     request: { headers: {} },
-    jwtPayload: { userId: userId },
+    jwtPayload: { userId: overload.userId },
+    device: overload.device,
     prisma: prismaClient,
     getIpAddress: () => faker.internet.ip()
   } as any)
