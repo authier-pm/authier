@@ -51,7 +51,7 @@ describe('UserMutation', () => {
       const user = plainToClass(UserMutation, userRaw)
 
       const newEmail = faker.internet.email()
-      const res = await user.updateEmail(
+      const res = await user.changeEmail(
         newEmail,
         makeFakeCtx({
           userId: user.id,
