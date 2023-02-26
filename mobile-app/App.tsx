@@ -57,7 +57,13 @@ export const storage = new MMKV({
 
 const App = () => {
   const forceUpdate = useForceUpdate()
+
   async function requestUserPermission() {
+    messaging().onTokenRefresh(async (fcm) => {
+      console.log('ressetting token', fcm)
+      return
+    })
+    const Token = await messaging().getToken()
     const authStatus = await messaging().requestPermission()
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -89,6 +95,8 @@ const App = () => {
       device.emitter.off('stateChange', forceUpdate)
     }
   }, [])
+
+  console.log('test')
 
   return (
     <React.Fragment>

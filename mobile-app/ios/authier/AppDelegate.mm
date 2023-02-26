@@ -1,5 +1,5 @@
-#import <Firebase.h>
 #import "AppDelegate.h"
+#import <Firebase.h>
 #import "RNBootSplash.h"
 #import <CodePush/CodePush.h>
 
@@ -9,9 +9,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
-   if ([FIRApp defaultApp] == nil) {
-      [FIRApp configure];
-    }
+  [FIRApp configure];
 
   self.moduleName = @"authier";
   // You can add your custom initial props in the dictionary below.
