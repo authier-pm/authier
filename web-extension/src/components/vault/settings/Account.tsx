@@ -27,6 +27,14 @@ import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'
 import { t, Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
+import {
+  base64ToBuffer,
+  bufferToBase64,
+  cryptoKeyToString,
+  decryptDeviceSecretWithPassword,
+  generateEncryptionKey
+} from '@src/util/generateEncryptionKey'
+import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 
 export default function Account() {
   const email = device.state?.email
@@ -84,45 +92,60 @@ export default function Account() {
               values: Values,
               { setSubmitting }: FormikHelpers<Values>
             ) => {
-              console.log(values.newPassword)
-              if (
-                values.newPassword === values.confirmPassword &&
-                values.currPassword === device.state?.masterEncryptionKey
-              ) {
-                const decryptionChallenge = await deviceDecryptionChallenge({
-                  variables: {
-                    deviceInput: {
-                      id: device.id as string,
-                      name: device.name,
-                      platform: device.platform
-                    },
-                    email: values.email
-                  }
-                })
+              try {
+                const { addDeviceSecret, masterEncryptionKey } =
+                  await decryptDeviceSecretWithPassword(
+                    values.currPassword,
+                    device.state as IBackgroundStateSerializable
+                  )
 
-                const secrets = device.state.secrets
-
+                console.log({ addDeviceSecret })
+                if (!addDeviceSecret) {
+                  toast({ title: t`Wrong password` })
+                  return
+                }
                 const { state } = device
 
-                await changePassword({
-                  variables: {
-                    secrets: await device.serializeSecrets(
-                      secrets,
-                      values.newPassword
-                    ),
-                    addDeviceSecret: state.authSecret,
-                    addDeviceSecretEncrypted: state.authSecretEncrypted,
-                    decryptionChallengeId: decryptionChallenge.data
-                      ?.deviceDecryptionChallenge?.id as number
-                  }
-                })
-                await device.logout()
-              } else {
-                toast({ title: t`Wrong password` })
-              }
-              setSubmitting(false)
+                if (values.newPassword === values.confirmPassword) {
+                  const decryptionChallenge = await deviceDecryptionChallenge({
+                    variables: {
+                      deviceInput: {
+                        id: device.id as string,
+                        name: device.name,
+                        platform: device.platform
+                      },
+                      email: values.email
+                    }
+                  })
 
-              return false
+                  const secrets = state.secrets
+
+                  await changePassword({
+                    variables: {
+                      secrets: await device.serializeSecrets(
+                        secrets,
+                        values.newPassword
+                      ),
+                      addDeviceSecret: state.authSecret,
+                      addDeviceSecretEncrypted: state.authSecretEncrypted,
+                      decryptionChallengeId: decryptionChallenge.data
+                        ?.deviceDecryptionChallenge?.id as number
+                    }
+                  })
+                  await device.logout()
+                } else {
+                  toast({ title: t`Wrong password` })
+                }
+                setSubmitting(false)
+
+                return false
+              } catch (err: any) {
+                console.error(err)
+                toast({
+                  title: err.message,
+                  colorScheme: 'red'
+                })
+              }
             }}
           >
             {({ isSubmitting, dirty, touched, handleSubmit, errors }) => (

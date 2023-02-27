@@ -577,8 +577,7 @@ class ExtensionDevice {
       throw new Error('no state to lock')
     }
 
-    //QUESTION: When I call here this.clearLockInterval() it doesn't work, trpc port get closed
-    //this.clearLockInterval()
+    this.clearLockInterval()
 
     log('locking device')
 
