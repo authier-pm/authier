@@ -1,4 +1,5 @@
 import { PBKDF2Iterations } from '@shared/constants'
+import { IBackgroundStateSerializableLocked } from '@src/background/backgroundPage'
 
 /**
  * @returns string in base64
@@ -80,4 +81,32 @@ export const encryptedBuf_to_base64 = (
   newBuff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
 
   return bufferToBase64(newBuff)
+}
+
+export async function decryptDeviceSecretWithPassword(
+  plainPassword: string,
+  lockedState: { encryptionSalt: string; authSecretEncrypted: string }
+) {
+  console.log('lockedState:', lockedState)
+  const masterEncryptionKey = await generateEncryptionKey(
+    plainPassword,
+    base64ToBuffer(lockedState.encryptionSalt)
+  )
+
+  const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
+  const iv = encryptedDataBuff.slice(16, 16 + 12)
+  const data = encryptedDataBuff.slice(16 + 12)
+  try {
+    const decryptedContent = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      masterEncryptionKey,
+      data
+    )
+
+    const addDeviceSecret = dec.decode(decryptedContent)
+    return { addDeviceSecret, masterEncryptionKey }
+  } catch (error) {
+    console.log('error:', error)
+    return { error: 'Wrong password' }
+  }
 }

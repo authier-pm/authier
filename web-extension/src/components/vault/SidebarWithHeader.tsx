@@ -93,7 +93,7 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="7">
+      <Box ml={{ base: 0, md: 60 }} paddingBottom={0}>
         {children}
       </Box>
     </Box>
@@ -123,7 +123,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}
     >
       <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
-        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Flex
+          h={'72px'}
+          alignItems="center"
+          mx="8"
+          justifyContent="space-between"
+        >
           <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
             Authier
           </Text>
@@ -172,14 +177,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                   </Box>
                 </Flex>
               </MenuButton>
-              <MenuList justifyContent="center">
-                <Link as={RouterLink} to="/settings/account">
-                  <MenuItem>Settings</MenuItem>
-                </Link>
-                <Link as={RouterLink} to="/account-limits">
-                  <MenuItem>Billing</MenuItem>
-                </Link>
-                <MenuDivider />
+              <MenuList
+                bg={useColorModeValue('white', 'gray.900')}
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+              >
                 <MenuItem
                   backgroundColor="red.400"
                   _hover={{
@@ -190,6 +191,17 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                   }}
                 >
                   Logout
+                </MenuItem>
+                <MenuItem
+                  backgroundColor="yellow.500"
+                  _hover={{
+                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
+                  }}
+                  onClick={async () => {
+                    await device.lock()
+                  }}
+                >
+                  Lock device
                 </MenuItem>
               </MenuList>
             </Menu>

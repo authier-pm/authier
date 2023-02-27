@@ -290,13 +290,18 @@ const DeviceListItem = ({
 }
 
 export default function Devices() {
-  const { data, loading, refetch: devicesRefetch } = useMyDevicesQuery()
+  const { data, loading } = useMyDevicesQuery()
 
   const [filterBy, setFilterBy] = useState('')
 
   return (
     <Flex flexDirection="column">
-      <Center>
+      <Center
+        justifyContent={'space-evenly'}
+        w={'100%'}
+        bgColor={'teal.900'}
+        p={3}
+      >
         <Input
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search for device`}
