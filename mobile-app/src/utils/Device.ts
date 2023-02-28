@@ -6,7 +6,11 @@ import {
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
-import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
+
+import {
+  loginCredentialsSchema,
+  totpSchema
+} from '../../../shared/loginCredentialsSchema'
 
 import messaging from '@react-native-firebase/messaging'
 import {

@@ -15,11 +15,15 @@ import {
   DeviceState,
   getDecryptedSecretProp
 } from '@src/background/ExtensionDevice'
-import { loginCredentialsSchema, totpSchema } from './loginCredentialsSchema'
+
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
 import { getTRPCCached } from '@src/content-script/connectTRPC'
+import {
+  totpSchema,
+  loginCredentialsSchema
+} from '@shared/loginCredentialsSchema'
 
 const log = debug('au:useDeviceState')
 

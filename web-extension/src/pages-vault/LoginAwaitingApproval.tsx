@@ -130,7 +130,7 @@ export const useLogin = (props: { deviceName: string }) => {
           return
         }
 
-        const newParams = await device.initLocalDeviceAuthSecret(
+        const newDeviceSecretsPair = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
           base64ToBuffer(encryptionSalt)
         )
@@ -144,8 +144,9 @@ export const useLogin = (props: { deviceName: string }) => {
               platform: device.platform
             },
             input: {
-              addDeviceSecret: newParams.addDeviceSecret,
-              addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
+              addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+              addDeviceSecretEncrypted:
+                newDeviceSecretsPair.addDeviceSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
               //WARNING: Has to be the same all the time
@@ -180,8 +181,8 @@ export const useLogin = (props: { deviceName: string }) => {
             email: formState.email,
             encryptionSalt,
             deviceName: props.deviceName,
-            authSecret: newParams.addDeviceSecret,
-            authSecretEncrypted: newParams.addDeviceSecretEncrypted,
+            authSecret: newDeviceSecretsPair.addDeviceSecret,
+            authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
             lockTime: 28800,
             autofill: true,
             language: 'en',
