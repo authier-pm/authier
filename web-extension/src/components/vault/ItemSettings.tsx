@@ -328,7 +328,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                     </Tooltip>
                     <PasswordGenerator
                       isOpen={isOpen}
-                      setInitPassword={setInitPassword}
+                      onGenerate={setInitPassword}
                     />
                     <EditFormButtons />
                   </Flex>
