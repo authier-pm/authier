@@ -11,7 +11,6 @@ export function renderPasswordGenerator({
 }: {
   input: HTMLInputElement
 }) {
-  console.log('PEPA')
   generatorDiv = document.createElement('div')
   render(<PromptPasswordGenerator input={input} />, generatorDiv)
 

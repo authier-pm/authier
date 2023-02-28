@@ -72,7 +72,7 @@
     "ts-node": "^10.9.1",
     "unplugin-swc": "^1.3.2",
     "vite": "^4.1.4",
-    "vitest": "^0.28.5"
+    "vitest": "^0.29.1"
   },
   "scripts": {
     "dev": "DEBUG=au:* pnpm nodemon --exec ts-node-transpile-only server.ts",
@@ -91,7 +91,7 @@
     "tar": "tar -czvf authier-api.tar.gz -C ./dist .",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
-    "test": "pnpm vitest",
+    "test": "NODE_ENV=test pnpm vitest",
     "test:prepare": "NODE_ENV=test pnpm ts-node scripts/prepareTestDBs",
     "test:docker": "pnpm docker:up && DATABASE_URL=postgresql://authier:auth133r@localhost:6432/authier && pnpm prisma db push && jest -i && pnpm docker:down",
     "dbReset": "prisma migrate reset --preview-feature",

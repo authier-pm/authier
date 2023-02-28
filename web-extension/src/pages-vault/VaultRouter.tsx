@@ -13,9 +13,11 @@ import Register from './Register'
 
 import { AddItem } from './AddItem'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { VaultUnlockVerification } from '@src/pages/VaultUnlockVerification'
+import { UnlockDeviceForm } from '@src/pages/UnlockDeviceForm'
 import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
+import debug from 'debug'
+const log = debug('au:VaultRouter')
 
 export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
@@ -25,8 +27,7 @@ export function VaultRouter() {
     if (lockedState) {
       navigate('verify')
     }
-    console.log('VaultRouter: deviceState', deviceState)
-    console.log('VaultRouter: lockedState', lockedState)
+    log('VaultRouter: deviceState', deviceState, lockedState)
   }, [lockedState])
 
   if (deviceState === null) {
@@ -35,7 +36,16 @@ export function VaultRouter() {
         <Routes>
           <Route path="/" element={<Login />}></Route>
           <Route path="/signup" element={<Register />}></Route>
-          <Route path="/verify" element={<VaultUnlockVerification />}></Route>
+          <Route
+            path="/verify"
+            element={
+              <UnlockDeviceForm
+                onUnlocked={() => {
+                  navigate('/')
+                }}
+              />
+            }
+          ></Route>
         </Routes>
       </Center>
     )

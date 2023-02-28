@@ -1,4 +1,4 @@
-const PBKDF2Iterations = 600000
+import { PBKDF2Iterations } from '@shared/constants'
 
 /**
  * @returns string in base64
