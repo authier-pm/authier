@@ -84,8 +84,6 @@ export class RootResolver {
     const inCookies = ctx.request.cookies['access-token']
     const inHeader = ctx.request.headers['authorization']
 
-    log('inCookies', inCookies, 'inHeader', inHeader)
-
     try {
       if (inHeader) {
         const token = inHeader?.split(' ')[1]
@@ -114,7 +112,7 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
-    //TODO: Ask @Capajj how it works.
+    //? Ask @Capajj how it works.
     const include = getPrismaRelationsFromInfo({
       info,
       rootModel: dmmf.modelMap.User

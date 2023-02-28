@@ -138,7 +138,7 @@ export class Device {
    */
   async initialize() {
     this.initializePromise = new Promise(async (resolve) => {
-      this.id = getUniqueId()
+      this.id = await getUniqueId()
       this.biometricsAvailable = await this.checkBiometrics()
 
       let storedState: null | IBackgroundStateSerializable = null
@@ -174,9 +174,8 @@ export class Device {
       }
 
       const token = await messaging().getToken()
-
       this.fireToken = token
-      console.log('deviceId', this.id)
+
       resolve(this.state)
     })
     return this.initializePromise

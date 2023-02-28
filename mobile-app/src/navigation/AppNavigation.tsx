@@ -65,7 +65,7 @@ function AppNavigation() {
             'Notification caused app to open from quit state:',
             remoteMessage.data!.type
           )
-          setInitialRoute(remoteMessage.data!.type) // e.g. "Settings"
+          setInitialRoute(remoteMessage.data!.type)
         }
         setLoading(false)
       })

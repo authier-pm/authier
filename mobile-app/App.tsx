@@ -59,11 +59,6 @@ const App = () => {
   const forceUpdate = useForceUpdate()
 
   async function requestUserPermission() {
-    messaging().onTokenRefresh(async (fcm) => {
-      console.log('ressetting token', fcm)
-      return
-    })
-    const Token = await messaging().getToken()
     const authStatus = await messaging().requestPermission()
     const enabled =
       authStatus === messaging.AuthorizationStatus.AUTHORIZED ||
@@ -79,6 +74,7 @@ const App = () => {
 
     requestUserPermission()
 
+    //? What is this for?
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
         queueLink.open()
@@ -95,8 +91,6 @@ const App = () => {
       device.emitter.off('stateChange', forceUpdate)
     }
   }, [])
-
-  console.log('test')
 
   return (
     <React.Fragment>
