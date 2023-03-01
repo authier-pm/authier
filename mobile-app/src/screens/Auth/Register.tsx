@@ -86,7 +86,7 @@ export function Register({ navigation }: NavigationProps) {
         ) => {
           const userId = uuid.v4()
           //WARNING: Solve permission of uniqueID in google play
-          const deviceId = getUniqueId()
+          const deviceId = await getUniqueId()
           const deviceName = await getDeviceName()
 
           if (device.biometricsAvailable) {

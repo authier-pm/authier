@@ -35,7 +35,6 @@ export interface jwtPayloadRefreshToken extends JwtPayload {
 export const setNewRefreshToken = (
   user: Pick<User, 'id' | 'tokenVersion'>,
   deviceId: string,
-
   ctx: IContext
 ) => {
   const payload = {

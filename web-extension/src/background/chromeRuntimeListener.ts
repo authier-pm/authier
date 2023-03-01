@@ -251,7 +251,7 @@ const appRouter = tc.router({
         lockTimeStart = Date.now()
         lockTimeEnd = lockTimeStart + deviceState.lockTime * 1000
 
-        checkInterval(lockTimeEnd)
+        createInterval(lockTimeEnd)
         deviceState.save()
         log('device.state', device.state)
       }
@@ -265,7 +265,7 @@ const appRouter = tc.router({
         lockTimeStart = Date.now()
         lockTimeEnd = lockTimeStart + input.time * 1000
       }
-      checkInterval(lockTimeEnd)
+      createInterval(lockTimeEnd)
       return true
     }),
   clearLockInterval: tcProcedure.mutation(async () => {
@@ -295,7 +295,7 @@ createChromeHandler({
 
 log('background page loaded')
 
-const checkInterval = (time: number | null) => {
+const createInterval = (time: number | null) => {
   if (!lockInterval && lockTimeStart !== lockTimeEnd) {
     lockInterval = setInterval(() => {
       if (time && time <= Date.now()) {

@@ -137,10 +137,6 @@ app.post('/refresh_token', async (request, reply) => {
 })
 
 app.register(mercurius, {
-  // errorHandler: (err, ctx) => {
-  //   console.error(err)
-  //   return err
-  // },
   schema: gqlSchema,
   graphiql: true,
   context: (request, reply) => {
