@@ -10,8 +10,8 @@ module.exports = async () => {
 
     //Wrong dataset
     const gettingFirstData = await RNSInfo.getItem('data', {
-      sharedPreferencesName: 'mySharedPrefs',
-      keychainService: 'myKeychain'
+      sharedPreferencesName: 'authierShared',
+      keychainService: 'authierKCH'
     })
     console.log('initial data', JSON.parse(gettingFirstData))
     if (gettingFirstData) {
@@ -23,8 +23,8 @@ module.exports = async () => {
     console.log(event)
 
     const savingFirstData = await RNSInfo.setItem('data', event.pswSaved, {
-      sharedPreferencesName: 'mySharedPrefs',
-      keychainService: 'myKeychain'
+      sharedPreferencesName: 'authierShared',
+      keychainService: 'authierKCH'
     })
     console.log('saving', savingFirstData)
   })

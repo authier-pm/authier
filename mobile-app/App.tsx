@@ -57,6 +57,7 @@ export const storage = new MMKV({
 
 const App = () => {
   const forceUpdate = useForceUpdate()
+
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
     const enabled =
@@ -73,6 +74,7 @@ const App = () => {
 
     requestUserPermission()
 
+    //? What is this for?
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
         queueLink.open()

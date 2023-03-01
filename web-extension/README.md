@@ -24,23 +24,22 @@ Run the following commands to install dependencies and start developing
 
 ```
 cp .env.example .env
-yarn install
-yarn dev
+pnpm install
+pnpm dev
 ```
 
 ### How to build
 
 ```
-yarn prodBuild
+pnpm prodBuild
 ```
 
 **Scripts**
 
-- `yarn dev` - run `webpack` in `watch` mode
-- `yarn storybook` - runs the Storybook server
-- `yarn build` - builds the production-ready unpacked extension
-- `yarn test -u` - runs Jest + updates test snapshots
-- `yarn lint` - runs EsLint
+- `pnpm dev` - run `webpack` in `watch` mode
+- `pnpm build` - builds the production-ready unpacked extension
+- `pnpm test -u` - runs Jest + updates test snapshots
+- `pnpm lint` - runs EsLint
 
 <details>
   <summary>Loading the extension in Google Chrome</summary>
@@ -107,4 +106,4 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 
 ## Check output in dist
 
-since it is common to bump into a dependency which breaks webpack silently, it's best to check at least parsing on the webpack output. We can do this by `yarn checkBuildOutput`
+since it is common to bump into a dependency which breaks webpack silently, it's best to check at least parsing on the webpack output. We can do this by `pnpm checkBuildOutput`

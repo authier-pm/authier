@@ -15,7 +15,6 @@ Sentry.init({
 
 let popupRoot: ReactDOM.Root
 export const renderPopup = () => {
-  console.log('renderPopup')
   popupRoot.render(
     <ApolloProvider client={apolloClient}>
       <ColorModeScript
@@ -27,11 +26,22 @@ export const renderPopup = () => {
     </ApolloProvider>
   )
 }
+
+const createRoot = () => {
+  popupRoot = ReactDOM.createRoot(
+    document.getElementById('popup') as HTMLElement
+  )
+  renderPopup()
+}
+
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-  document.addEventListener('DOMContentLoaded', () => {
-    popupRoot = ReactDOM.createRoot(
-      document.getElementById('popup') as HTMLElement
-    )
-    renderPopup()
-  })
+  //WARNING: https://developer.mozilla.org/en-US/docs/Web/API/Document/DOMContentLoaded_event#checking_whether_loading_is_already_complete
+  //Did not work in Firefox
+  if (document.readyState === 'loading') {
+    //Loading hasn't finished yet
+    document.addEventListener('DOMContentLoaded', createRoot)
+  } else {
+    //`DOMContentLoaded` has already fired
+    createRoot()
+  }
 })

@@ -180,7 +180,6 @@ export class DeviceState implements IBackgroundStateSerializable {
     const decrypted = await this.decrypt(secret.encrypted)
     let secretDecrypted: ILoginSecret | ITOTPSecret
 
-    console.log('decrypted', decrypted, typeof decrypted)
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
