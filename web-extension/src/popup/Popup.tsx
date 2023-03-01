@@ -1,7 +1,6 @@
-import React, { FunctionComponent, useEffect } from 'react'
+import { FunctionComponent, useEffect } from 'react'
 
 import { Route, Switch, useLocation } from 'wouter'
-import browser from 'webextension-polyfill'
 
 import { NavBar } from '@src/components/NavBar'
 import { Home } from '../pages/Home'

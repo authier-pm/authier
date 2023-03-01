@@ -29,8 +29,8 @@ const colorModeManager: StorageManager = {
   get: async () => {
     try {
       let val = await SInfo.getItem('@color-mode', {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
+        sharedPreferencesName: 'authierShared',
+        keychainService: 'authierKCH'
       })
       if (val === null) {
         return 'dark'
@@ -43,8 +43,8 @@ const colorModeManager: StorageManager = {
   set: async (value: ColorMode) => {
     try {
       await SInfo.setItem('@color-mode', value as string, {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
+        sharedPreferencesName: 'authierShared',
+        keychainService: 'authierKCH'
       })
     } catch (e) {
       console.log(e)

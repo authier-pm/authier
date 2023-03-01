@@ -6,6 +6,8 @@ import { app, endpointSecret } from './app'
 const CREDS_SUBSCRIPTION_ID = 'prod_LquWXgjk6kl5sM'
 const TOTP_SUBSCRIPTION_ID = 'prod_LquVrkwfsXjTAL'
 const TOTP_AND_CREDS_SUBSCRIPTION_ID = 'prod_Lp3NU9UcNWduBm'
+const CREDS_SUBSCRIPTION = 60
+const TOTP_SUBSCRIPTION = 20
 
 export const stripeWebhook = (fastify, opts, done) => {
   fastify.addContentTypeParser(
@@ -139,7 +141,7 @@ export const stripeWebhook = (fastify, opts, done) => {
               },
               data: {
                 TOTPlimit: {
-                  increment: 20
+                  increment: TOTP_SUBSCRIPTION
                 }
               }
             })
@@ -150,7 +152,7 @@ export const stripeWebhook = (fastify, opts, done) => {
               },
               data: {
                 loginCredentialsLimit: {
-                  increment: 60
+                  increment: CREDS_SUBSCRIPTION
                 }
               }
             })
@@ -161,10 +163,10 @@ export const stripeWebhook = (fastify, opts, done) => {
               },
               data: {
                 TOTPlimit: {
-                  increment: 20
+                  increment: TOTP_SUBSCRIPTION
                 },
                 loginCredentialsLimit: {
-                  increment: 60
+                  increment: CREDS_SUBSCRIPTION
                 }
               }
             })

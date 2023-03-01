@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import { ReactNode, useState } from 'react'
 
 import {
   Box,
@@ -55,10 +55,14 @@ export const AccountLimits = () => {
   const { data } = useMeExtensionQuery({
     fetchPolicy: 'network-only'
   })
+  const [refreshAccountTooltip, setRefreshAccountTooltip] = useState(false)
   return (
     <Box>
       <HStack spacing={10} justifyContent="center" alignItems={'center'}>
-        <ProfileCard />
+        <ProfileCard
+          refreshAccountTooltip={refreshAccountTooltip}
+          setRefreshAccountTooltip={setRefreshAccountTooltip}
+        />
 
         <TableContainer>
           <Table size="lg">
@@ -176,6 +180,7 @@ export const AccountLimits = () => {
                 browser.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.Credentials}&acToken=${token}`
                 })
+                setRefreshAccountTooltip(true)
               }}
             >
               Buy
@@ -219,6 +224,7 @@ export const AccountLimits = () => {
                 browser.tabs.create({
                   url: `${page_url}/pricing?product=${pricingPlan.TOTP}&acToken=${token}`
                 })
+                setRefreshAccountTooltip(true)
               }}
             >
               Buy
@@ -287,6 +293,7 @@ export const AccountLimits = () => {
                   browser.tabs.create({
                     url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}&acToken=${token}`
                   })
+                  setRefreshAccountTooltip(true)
                 }}
               >
                 Buy
