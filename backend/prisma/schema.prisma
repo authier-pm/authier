@@ -10,10 +10,6 @@ generator client {
   previewFeatures = ["extendedWhereUnique"]
 }
 
-generator erd {
-  provider = "prisma-erd-generator"
-}
-
 generator PrismaTypeGraphQLTypesGenerator {
   provider                       = "prisma-typegraphql-types-generator"
   modelsOutput                   = "./models/generated"
