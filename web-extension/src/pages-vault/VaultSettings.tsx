@@ -9,6 +9,7 @@ import React, { useEffect, useState } from 'react'
 import Account from '@src/components/vault/settings/Account'
 import VaultConfig from '@src/components/vault/settings/VaultConfig'
 import { AnimatePresence } from 'framer-motion'
+import MyPage from '@src/components/util/Test'
 
 interface LinkItemProps {
   name: string
@@ -81,10 +82,10 @@ export const VaultSettings = () => {
         })}
       </HStack>
 
-      <AnimatePresence exitBeforeEnter>
+      <AnimatePresence mode="wait">
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/security'} element={<VaultConfig />}></Route>
+          <Route path={'/security'} element={<MyPage />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>
