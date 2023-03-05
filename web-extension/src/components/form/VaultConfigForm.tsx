@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { Form, selectFieldSchema } from './tsForm'
+import { Form, selectFieldSchema } from '../util/tsForm'
 
 const VaultConfigFormSchema = z.object({
   lockTime: selectFieldSchema,
