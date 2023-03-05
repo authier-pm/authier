@@ -1,9 +1,9 @@
 import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 import { z } from 'zod'
-import SelectField from './SelectField'
-import CheckBoxField from './CheckBoxField'
-import { TextField } from './TextFiled'
-import FormComponent from './FormComponent'
+import SelectField from '../form/SelectField'
+import CheckBoxField from '../form/CheckBoxField'
+import { TextField } from '../form/TextFiled'
+import FormComponent from '../form/FormComponent'
 
 export const selectFieldSchema = createUniqueFieldSchema(
   z.string(),
