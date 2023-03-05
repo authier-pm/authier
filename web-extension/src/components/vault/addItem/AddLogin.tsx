@@ -68,6 +68,7 @@ export const AddLogin = () => {
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: namePassPair,
+              //TODO: Remove this, useless (this is here just for the type)
               encrypted: await device.state.encrypt(
                 JSON.stringify(namePassPair)
               ),

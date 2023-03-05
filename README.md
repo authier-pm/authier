@@ -17,7 +17,7 @@ pnpm schemas
 
 ## Getting started
 
-`pnpm` in the root, pnpm workspaces should install all deps even in subfolders.
+`pnpm i` in the root, pnpm workspaces should install all deps even in subfolders.
 
 ## Updating packages
 
