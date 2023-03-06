@@ -38,7 +38,6 @@ import { DeleteSecretButton } from '@src/pages-vault/DeleteSecretButton'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
-  const navigate = useNavigate()
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
@@ -110,7 +109,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
             }
           }}
         >
-          {({ isSubmitting, dirty, handleSubmit, errors, touched }) => (
+          {({ handleSubmit, errors, touched }) => (
             <Box width={'80%'} mt={5}>
               <form onSubmit={handleSubmit}>
                 <Flex flexDirection="column">
@@ -174,8 +173,6 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
 }
 
 const LoginSecret = (secretProps: ILoginSecret) => {
-  const navigate = useNavigate()
-
   const [show, setShow] = useState(false)
 
   const { isOpen, onToggle } = useDisclosure()
@@ -252,7 +249,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             }
           }}
         >
-          {({ values, isSubmitting, dirty, handleSubmit, errors, touched }) => {
+          {({ values, handleSubmit, errors, touched }) => {
             const levelOfPsw = passwordStrength(values.password)
             return (
               <Box w={'80%'}>
@@ -282,14 +279,6 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       isInvalid={!!errors.password && touched.password}
                     >
                       <FormLabel htmlFor="password">Password:</FormLabel>
-                      <Progress
-                        value={levelOfPsw.id}
-                        size="xs"
-                        colorScheme="green"
-                        max={3}
-                        min={0}
-                        mb={1}
-                      />
 
                       <InputGroup size="md">
                         <Field
@@ -305,6 +294,14 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                           </Button>
                         </InputRightElement>
                       </InputGroup>
+                      <Progress
+                        value={levelOfPsw.id}
+                        size="xs"
+                        colorScheme="green"
+                        max={3}
+                        min={0}
+                        mb={1}
+                      />
 
                       <FormErrorMessage>{errors.password}</FormErrorMessage>
                     </FormControl>

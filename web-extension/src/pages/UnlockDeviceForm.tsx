@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Flex,
   Input,
@@ -32,10 +32,15 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
 
   const { setDeviceState, lockedState, device } = useContext(DeviceStateContext)
 
+  useEffect(() => {
+    if (lockedState === null) {
+      onUnlocked()
+    }
+  }, [lockedState])
+
   if (!lockedState) {
     return null
   }
-
   return (
     <Flex flexDirection="column" width="315px" p={4}>
       <Center>

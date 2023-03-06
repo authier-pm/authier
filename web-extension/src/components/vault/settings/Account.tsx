@@ -79,7 +79,7 @@ export default function Account() {
       >
         <Box>
           <Heading as="h3" size="lg" mb={5}>
-            Change master password
+            Change vault password
           </Heading>
           <Formik
             initialValues={{
@@ -93,7 +93,7 @@ export default function Account() {
               { setSubmitting }: FormikHelpers<Values>
             ) => {
               try {
-                const { addDeviceSecret, masterEncryptionKey } =
+                const { addDeviceSecret } =
                   await decryptDeviceSecretWithPassword(
                     values.currPassword,
                     device.state as IBackgroundStateSerializable
@@ -101,12 +101,22 @@ export default function Account() {
 
                 console.log({ addDeviceSecret })
                 if (!addDeviceSecret) {
-                  toast({ title: t`Wrong password` })
+                  toast({ title: t`Wrong password`, status: 'error' })
+                  return
+                }
+
+                if (values.newPassword !== values.confirmPassword) {
+                  toast({ title: t`Passwords do not match`, status: 'error' })
                   return
                 }
                 const { state } = device
 
-                if (values.newPassword === values.confirmPassword) {
+                if (state && values.newPassword === values.confirmPassword) {
+                  const newEncryptionKey = await generateEncryptionKey(
+                    values.newPassword,
+                    base64ToBuffer(state.encryptionSalt)
+                  )
+
                   const decryptionChallenge = await deviceDecryptionChallenge({
                     variables: {
                       deviceInput: {
@@ -120,21 +130,29 @@ export default function Account() {
 
                   const secrets = state.secrets
 
+                  const newDeviceSecretsPair =
+                    await device.initLocalDeviceAuthSecret(
+                      newEncryptionKey,
+                      base64ToBuffer(state.encryptionSalt)
+                    )
+
                   await changePassword({
                     variables: {
                       secrets: await device.serializeSecrets(
                         secrets,
                         values.newPassword
                       ),
-                      addDeviceSecret: state.authSecret,
-                      addDeviceSecretEncrypted: state.authSecretEncrypted,
+                      addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+                      addDeviceSecretEncrypted:
+                        newDeviceSecretsPair.addDeviceSecretEncrypted,
                       decryptionChallengeId: decryptionChallenge.data
                         ?.deviceDecryptionChallenge?.id as number
                     }
                   })
+                  toast({ title: t`Password changed`, status: 'success' })
                   await device.logout()
                 } else {
-                  toast({ title: t`Wrong password` })
+                  toast({ title: t`Wrong password`, status: 'error' })
                 }
                 setSubmitting(false)
 
@@ -274,7 +292,7 @@ export default function Account() {
                   <Button
                     mt={4}
                     colorScheme="teal"
-                    disabled={isSubmitting || !dirty}
+                    isDisabled={isSubmitting || !dirty}
                     isLoading={isSubmitting}
                     type="submit"
                   >

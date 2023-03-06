@@ -235,7 +235,7 @@ const DeviceListItem = ({
                       <Button
                         mt={4}
                         colorScheme="teal"
-                        disabled={isSubmitting || !dirty}
+                        isDisabled={isSubmitting || !dirty}
                         isLoading={isSubmitting}
                         type="submit"
                       >
