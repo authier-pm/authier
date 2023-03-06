@@ -36,7 +36,7 @@ export const Home: FunctionComponent = () => {
     : filterByTLDManual
   return (
     <>
-      <Flex position="sticky" align="center" pl={4} pr={4} mt={'56px'}>
+      <Flex position="sticky" align="center" pl={4} pr={4} mt={'10px'}>
         <FormControl display="flex" alignItems="center">
           <Flex alignItems="center">
             <FormLabel mb="0">
