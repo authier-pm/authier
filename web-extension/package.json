@@ -93,7 +93,7 @@
     "webpack-cli": "^5.0.1",
     "webpack-ext-reloader": "^1.1.9",
     "webpack-merge": "^5.8.0",
-    "zod": "^3.21.0"
+    "zod": "3.20.6"
   },
   "dependencies": {
     "@apollo/client": "^3.7.10",

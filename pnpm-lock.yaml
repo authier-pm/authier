@@ -525,7 +525,7 @@ importers:
       webpack-merge: ^5.8.0
       wouter: ^2.10.0
       yup: ^1.0.2
-      zod: ^3.21.0
+      zod: 3.20.6
     dependencies:
       '@apollo/client': 3.7.10_gdcq4dv6opitr3wbfwyjmanyra
       '@apollo/react-hooks': 4.0.0_gdcq4dv6opitr3wbfwyjmanyra
@@ -641,7 +641,7 @@ importers:
       webpack-cli: 5.0.1_lmj6qa3mg72rqf6j7oefmqaw4a
       webpack-ext-reloader: 1.1.9_rjsyjcrmk25kqsjzwkvj3a2evq
       webpack-merge: 5.8.0
-      zod: 3.21.0
+      zod: 3.20.6
 
 packages:
 
@@ -26302,11 +26302,6 @@ packages:
 
   /zod/3.20.6:
     resolution: {integrity: sha512-oyu0m54SGCtzh6EClBVqDDlAYRz4jrVtKwQ7ZnsEmMI9HnzuZFj8QFwAY1M5uniIYACdGvv0PBWPF2kO0aNofA==}
-    dev: false
-
-  /zod/3.21.0:
-    resolution: {integrity: sha512-UYdykTcVxB6lfdyLzAqLyyYAlOcpoluECvjsdoaqfQmz9p+3LRaIqYcNiL/J2kFYp66fBM8wwBvIGVEjq7KtZw==}
-    dev: true
 
   file:backend/schemas:
     resolution: {directory: backend/schemas, type: directory}
