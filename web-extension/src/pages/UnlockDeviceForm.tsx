@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   Flex,
   Input,
@@ -17,10 +17,8 @@ import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
 import { t, Trans } from '@lingui/macro'
 import {
-  base64ToBuffer,
   cryptoKeyToString,
-  dec,
-  generateEncryptionKey
+  decryptDeviceSecretWithPassword
 } from '@util/generateEncryptionKey'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { toast } from '@src/ExtensionProviders'
@@ -34,10 +32,15 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
 
   const { setDeviceState, lockedState, device } = useContext(DeviceStateContext)
 
+  useEffect(() => {
+    if (lockedState === null) {
+      onUnlocked()
+    }
+  }, [lockedState])
+
   if (!lockedState) {
     return null
   }
-
   return (
     <Flex flexDirection="column" width="315px" p={4}>
       <Center>
@@ -51,26 +54,13 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
           { setSubmitting }: FormikHelpers<Values>
         ) => {
           try {
-            const masterEncryptionKey = await generateEncryptionKey(
-              values.password,
-              base64ToBuffer(lockedState.encryptionSalt)
-            )
+            const { addDeviceSecret, masterEncryptionKey } =
+              await decryptDeviceSecretWithPassword(
+                values.password,
+                lockedState
+              )
 
-            const encryptedDataBuff = base64ToBuffer(
-              lockedState.authSecretEncrypted
-            )
-            const iv = encryptedDataBuff.slice(16, 16 + 12)
-            const data = encryptedDataBuff.slice(16 + 12)
-
-            const decryptedContent = await window.crypto.subtle.decrypt(
-              { name: 'AES-GCM', iv },
-              masterEncryptionKey,
-              data
-            )
-
-            const currentAddDeviceSecret = dec.decode(decryptedContent)
-
-            if (currentAddDeviceSecret !== lockedState.authSecret) {
+            if (addDeviceSecret !== lockedState.authSecret) {
               throw new Error(t`Incorrect password`)
             }
 

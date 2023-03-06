@@ -16,14 +16,14 @@ export interface totpValues {
 }
 export const PasswordSchema = Yup.object().shape({
   url: Yup.string().url('Invalid URL').required('Required'),
-  label: Yup.string().required('Required'),
+  label: Yup.string(),
   username: Yup.string().required('Required'),
   password: Yup.string().required('Required')
 })
 
 export const TOTPSchema = Yup.object().shape({
   url: Yup.string().url('Invalid URL').required('Required'),
-  label: Yup.string().required('Required'),
+  label: Yup.string(),
   secret: Yup.string().required('Required'),
   iconUrl: Yup.string().url('Invalid URL').nullable(),
   digits: Yup.number().min(6).max(8).required('Required'),

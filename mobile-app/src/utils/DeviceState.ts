@@ -10,7 +10,8 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { loginCredentialsSchema } from './loginCredentialsSchema'
+import { loginCredentialsSchema } from '../../../shared/loginCredentialsSchema'
+
 import {
   AddEncryptedSecretsDocument,
   AddEncryptedSecretsMutation,

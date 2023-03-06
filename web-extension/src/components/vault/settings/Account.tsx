@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   useAccountQuery,
@@ -27,6 +27,12 @@ import { CheckIcon, WarningIcon } from '@chakra-ui/icons'
 import { NbSp } from '@src/components/util/NbSp'
 import { t, Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
+import {
+  base64ToBuffer,
+  decryptDeviceSecretWithPassword,
+  generateEncryptionKey
+} from '@src/util/generateEncryptionKey'
+import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 
 export default function Account() {
   const email = device.state?.email
@@ -71,7 +77,7 @@ export default function Account() {
       >
         <Box>
           <Heading as="h3" size="lg" mb={5}>
-            Change master password
+            Change vault password
           </Heading>
           <Formik
             initialValues={{
@@ -82,47 +88,85 @@ export default function Account() {
             }}
             onSubmit={async (
               values: Values,
-              { setSubmitting }: FormikHelpers<Values>
+              { setSubmitting, resetForm }: FormikHelpers<Values>
             ) => {
-              console.log(values.newPassword)
-              if (
-                values.newPassword === values.confirmPassword &&
-                values.currPassword === device.state?.masterEncryptionKey
-              ) {
-                const decryptionChallenge = await deviceDecryptionChallenge({
-                  variables: {
-                    deviceInput: {
-                      id: device.id as string,
-                      name: device.name,
-                      platform: device.platform
-                    },
-                    email: values.email
-                  }
-                })
+              try {
+                const { addDeviceSecret } =
+                  await decryptDeviceSecretWithPassword(
+                    values.currPassword,
+                    device.state as IBackgroundStateSerializable
+                  )
 
-                const secrets = device.state.secrets
+                if (!addDeviceSecret) {
+                  toast({ title: t`Wrong password`, status: 'error' })
+                  return
+                }
 
+                if (values.newPassword !== values.confirmPassword) {
+                  toast({ title: t`Passwords do not match`, status: 'error' })
+                  return
+                }
                 const { state } = device
 
-                await changePassword({
-                  variables: {
-                    secrets: await device.serializeSecrets(
-                      secrets,
-                      values.newPassword
-                    ),
-                    addDeviceSecret: state.authSecret,
-                    addDeviceSecretEncrypted: state.authSecretEncrypted,
-                    decryptionChallengeId: decryptionChallenge.data
-                      ?.deviceDecryptionChallenge?.id as number
-                  }
-                })
-                await device.logout()
-              } else {
-                toast({ title: t`Wrong password` })
-              }
-              setSubmitting(false)
+                if (state && values.newPassword === values.confirmPassword) {
+                  const newEncryptionKey = await generateEncryptionKey(
+                    values.newPassword,
+                    base64ToBuffer(state.encryptionSalt)
+                  )
 
-              return false
+                  const decryptionChallenge = await deviceDecryptionChallenge({
+                    variables: {
+                      deviceInput: {
+                        id: device.id as string,
+                        name: device.name,
+                        platform: device.platform
+                      },
+                      email: values.email
+                    }
+                  })
+
+                  const secrets = state.secrets
+
+                  const newDeviceSecretsPair =
+                    await device.initLocalDeviceAuthSecret(
+                      newEncryptionKey,
+                      base64ToBuffer(state.encryptionSalt)
+                    )
+
+                  await changePassword({
+                    variables: {
+                      secrets: await device.serializeSecrets(
+                        secrets,
+                        values.newPassword
+                      ),
+                      addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+                      addDeviceSecretEncrypted:
+                        newDeviceSecretsPair.addDeviceSecretEncrypted,
+                      decryptionChallengeId: decryptionChallenge.data
+                        ?.deviceDecryptionChallenge?.id as number
+                    }
+                  })
+                  toast({
+                    title: t`Password changed, all your other devices will be logged out and you will need to log in again`,
+                    status: 'success',
+                    duration: null,
+                    isClosable: true
+                  })
+
+                  resetForm()
+                } else {
+                  toast({ title: t`Wrong password`, status: 'error' })
+                }
+                setSubmitting(false)
+
+                return false
+              } catch (err: any) {
+                console.error(err)
+                toast({
+                  title: err.message,
+                  colorScheme: 'red'
+                })
+              }
             }}
           >
             {({ isSubmitting, dirty, touched, handleSubmit, errors }) => (
@@ -251,7 +295,7 @@ export default function Account() {
                   <Button
                     mt={4}
                     colorScheme="teal"
-                    disabled={isSubmitting || !dirty}
+                    isDisabled={isSubmitting || !dirty}
                     isLoading={isSubmitting}
                     type="submit"
                   >

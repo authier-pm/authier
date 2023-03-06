@@ -30,13 +30,6 @@ import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
 import { Loading } from '@src/components/Loading'
 
-interface LoginParsedValues {
-  url: string
-  label: string
-  username: string
-  password: string
-}
-
 export const InputHeader = ({ children }) => {
   return (
     <FormControl.Label

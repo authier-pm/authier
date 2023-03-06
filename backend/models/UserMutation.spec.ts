@@ -65,4 +65,12 @@ describe('UserMutation', () => {
       // expect(sentEmails.length).toBe(1) // TODO figure out why this is not working
     })
   })
+
+  describe('changeMasterPassword', () => {
+    it.todo(
+      'should change master password and increment token version to force user to relog on all other devices'
+    )
+
+    it.todo('should throw error when user is not ona master device')
+  })
 })

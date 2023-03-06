@@ -22,12 +22,19 @@ interface Values {
   length: number
 }
 
+export const defaultPasswordGeneratorConfig = {
+  numbers: true,
+  symbols: true,
+  uppercase: true,
+  lowercase: true,
+  length: 14
+}
 export const PasswordGenerator = ({
   isOpen,
-  setInitPassword
+  onGenerate: setInitPassword
 }: {
   isOpen: boolean
-  setInitPassword: (password: string) => void
+  onGenerate: (password: string) => void
 }) => {
   return (
     <Collapse in={isOpen} animateOpacity>
@@ -44,13 +51,7 @@ export const PasswordGenerator = ({
         }}
       >
         <Formik
-          initialValues={{
-            numbers: true,
-            symbols: true,
-            uppercase: true,
-            lowercase: true,
-            length: 14 // TODO make this configurable per user
-          }}
+          initialValues={defaultPasswordGeneratorConfig}
           onSubmit={(
             values: Values,
             { setSubmitting }: FormikHelpers<Values>
