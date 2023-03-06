@@ -150,7 +150,6 @@ export default function Account() {
                     }
                   })
                   toast({ title: t`Password changed`, status: 'success' })
-                  await device.logout()
                 } else {
                   toast({ title: t`Wrong password`, status: 'error' })
                 }
