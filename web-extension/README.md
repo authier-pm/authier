@@ -20,6 +20,8 @@
 
 **Getting Started**
 
+Install pnpm: https://pnpm.io/installation
+
 Run the following commands to install dependencies and start developing
 
 ```
