@@ -121,7 +121,11 @@ export async function initInputWatch() {
 
   const onInputAdded = (input) => {
     // handle case when password input is added to DOM by javascript
-    if (input.type === 'password' && !domRecorder.hasInput(input)) {
+    if (
+      input.type === 'password' &&
+      !domRecorder.hasInput(input) &&
+      stateInitRes
+    ) {
       autofill(stateInitRes)
     }
   }
