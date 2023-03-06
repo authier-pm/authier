@@ -37,9 +37,10 @@ import { IconType } from 'react-icons'
 import { NavLink as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, LockIcon } from '@chakra-ui/icons'
 import { Trans } from '@lingui/macro'
 import { ColorModeButton } from '../ColorModeButton'
+import { TbLogout } from 'react-icons/tb'
 
 interface LinkItemProps {
   title: JSX.Element
@@ -168,9 +169,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                     mr="auto"
                   >
                     <Text fontSize="sm">{email}</Text>
-                    <Text fontSize="xs" color="gray.600">
-                      Admin
-                    </Text>
                   </VStack>
                   <Box display={{ base: 'none', md: 'flex' }} ml="auto">
                     <ChevronDownIcon boxSize={19} />
@@ -184,13 +182,14 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 <MenuItem
                   backgroundColor="red.400"
                   _hover={{
-                    backgroundColor: 'red.600'
+                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
                   }}
                   onClick={async () => {
                     await device.logout()
                   }}
                 >
-                  Logout
+                  <TbLogout size={16} />
+                  <Box ml={3}>Logout</Box>
                 </MenuItem>
                 <MenuItem
                   backgroundColor="yellow.500"
@@ -201,7 +200,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                     await device.lock()
                   }}
                 >
-                  Lock device
+                  <LockIcon />
+                  <Box ml={3}>
+                    <Trans>Lock device</Trans>
+                  </Box>
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -311,9 +313,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   ml="2"
                 >
                   <Text fontSize="sm">{email}</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    Admin
-                  </Text>
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
