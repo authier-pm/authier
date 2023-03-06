@@ -149,7 +149,12 @@ export default function Account() {
                         ?.deviceDecryptionChallenge?.id as number
                     }
                   })
-                  toast({ title: t`Password changed`, status: 'success' })
+                  toast({
+                    title: t`Password changed, all your other devices will be logged out and you will need to log in again`,
+                    status: 'success',
+                    duration: null,
+                    isClosable: true
+                  })
                 } else {
                   toast({ title: t`Wrong password`, status: 'error' })
                 }
