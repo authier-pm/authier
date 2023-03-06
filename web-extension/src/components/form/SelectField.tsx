@@ -4,27 +4,30 @@ import {
   FormLabel,
   Select
 } from '@chakra-ui/react'
-import { useTsController } from '@ts-react/form'
+import { useTsController, useDescription } from '@ts-react/form'
 
 export default function SelectField({
-  label,
   options
 }: {
-  label: string
   options: Array<Array<string | number>> | Array<string>
 }) {
-  const { field, error } = useTsController<string>()
-
+  const {
+    field: { onChange, value },
+    error
+  } = useTsController<string>()
+  const { label, placeholder } = useDescription()
+  console.log(value)
   return (
     <FormControl>
       <FormLabel>{label}</FormLabel>
       <Select
-        value={field.value ? field.value : 'none'}
+        value={value ? value : ''}
+        placeholder={placeholder}
         onChange={(e) => {
-          field.onChange(e.target.value)
+          onChange(e.target.value)
         }}
       >
-        {!field.value && <option value="none">Please select...</option>}
+        {!value && <option value="">Please select...</option>}
         {options.map((option) => {
           return (
             <option

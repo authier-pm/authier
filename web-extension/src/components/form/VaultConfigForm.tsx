@@ -1,24 +1,37 @@
 import { z } from 'zod'
 import { Form, selectFieldSchema } from '../util/tsForm'
+import { useForm } from 'react-hook-form'
 
 const VaultConfigFormSchema = z.object({
-  lockTime: selectFieldSchema,
-  language: selectFieldSchema,
+  lockTime: selectFieldSchema.describe('Lock time // Choose lock time'),
+  language: selectFieldSchema.describe('Language // Choose language'),
   twoFA: z.boolean(),
   autofill: z.boolean()
 })
 
 export default function VaultConfigForm() {
+  const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
+    defaultValues: {
+      language: 'cz',
+      lockTime: '4 hours',
+      twoFA: false,
+      autofill: true
+    }
+  })
+  const { reset, formState } = form
+
   function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
     // gets typesafe data when form is submitted
+
+    console.log('data', data, form.formState.defaultValues)
   }
 
   return (
     <Form
+      form={form}
       props={{
         language: {
-          options: ['cz', 'en'],
-          label: 'Language'
+          options: ['cz', 'en']
         },
         lockTime: {
           //TODO: This data structure is retarded,
@@ -32,8 +45,7 @@ export default function VaultConfigForm() {
             ['1 week', 604800],
             ['1 month', 2592000],
             ['Never', 0]
-          ],
-          label: 'Lock time'
+          ]
         }
       }}
       schema={VaultConfigFormSchema}
