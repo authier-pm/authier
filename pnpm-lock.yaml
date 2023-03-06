@@ -809,7 +809,7 @@ packages:
   /@apollo/react-hooks/4.0.0_gdcq4dv6opitr3wbfwyjmanyra:
     resolution: {integrity: sha512-fCu0cbne3gbUl0QbA8X4L33iuuFVQbC5Jo2MIKRK8CyawR6PoxDpFdFA1kc6033ODZuZZ9Eo4RdeJFlFIIYcLA==}
     dependencies:
-      '@apollo/client': 3.7.9_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.10_gdcq4dv6opitr3wbfwyjmanyra
     transitivePeerDependencies:
       - graphql
       - graphql-ws

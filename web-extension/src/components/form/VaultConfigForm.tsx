@@ -1,55 +1,98 @@
 import { z } from 'zod'
-import { Form, selectFieldSchema } from '../util/tsForm'
+import {
+  Form,
+  selectTextFieldSchema,
+  selectNumberFieldSchema
+} from '../util/tsForm'
 import { useForm } from 'react-hook-form'
+import {
+  useUpdateSettingsMutation,
+  SyncSettingsDocument
+} from '@shared/graphql/Settings.codegen'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { useContext, useEffect } from 'react'
 
 const VaultConfigFormSchema = z.object({
-  lockTime: selectFieldSchema.describe('Lock time // Choose lock time'),
-  language: selectFieldSchema.describe('Language // Choose language'),
-  twoFA: z.boolean(),
+  vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
+    'Lock time // Choose lock time'
+  ),
+  language: selectTextFieldSchema.describe('Language // Choose language'),
+  syncTOTP: z.boolean(),
   autofill: z.boolean()
 })
 
 export default function VaultConfigForm() {
-  const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
-    defaultValues: {
-      language: 'cz',
-      lockTime: '4 hours',
-      twoFA: false,
-      autofill: true
-    }
+  const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
+  const [updateSettings] = useUpdateSettingsMutation({
+    refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
   })
-  const { reset, formState } = form
 
-  function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
-    // gets typesafe data when form is submitted
+  if (deviceState) {
+    const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
+      defaultValues: {
+        autofill: deviceState.autofill,
+        language: deviceState.language,
+        syncTOTP: deviceState.syncTOTP,
+        vaultLockTimeoutSeconds: deviceState.lockTime
+      },
+      mode: 'onChange'
+    })
 
-    console.log('data', data, form.formState.defaultValues)
-  }
+    const { formState, reset } = form
 
-  return (
-    <Form
-      form={form}
-      props={{
-        language: {
-          options: ['cz', 'en']
-        },
-        lockTime: {
-          //TODO: This data structure is retarded,
-          options: [
-            ['1 minute', 20],
-            ['2 minutes', 120],
-            ['1 hour', 3600],
-            ['4 hours', 14400],
-            ['8 hours', 28800],
-            ['1 day', 86400],
-            ['1 week', 604800],
-            ['1 month', 2592000],
-            ['Never', 0]
-          ]
+    async function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
+      console.log('data', data.vaultLockTimeoutSeconds)
+      const config = {
+        ...data,
+        vaultLockTimeoutSeconds: parseInt(
+          data.vaultLockTimeoutSeconds.toString()
+        )
+      }
+
+      await updateSettings({
+        variables: {
+          config
         }
-      }}
-      schema={VaultConfigFormSchema}
-      onSubmit={onSubmit}
-    />
-  )
+      })
+      setSecuritySettings(config)
+    }
+
+    useEffect(() => {
+      reset({
+        autofill: deviceState.autofill,
+        language: deviceState.language,
+        syncTOTP: deviceState.syncTOTP,
+        vaultLockTimeoutSeconds: deviceState.lockTime
+      })
+    }, [formState.isSubmitSuccessful])
+
+    return (
+      <Form
+        form={form}
+        props={{
+          language: {
+            options: ['cz', 'en']
+          },
+          vaultLockTimeoutSeconds: {
+            //TODO: This data structure is retarded,
+            options: [
+              { label: '1 minute', value: 20 },
+              { label: '2 minutes', value: 120 },
+              { label: '1 hour', value: 3600 },
+              { label: '4 hours', value: 14400 },
+              { label: '8 hours', value: 28800 },
+              { label: '1 day', value: 86400 },
+              { label: '1 week', value: 604800 },
+              { label: '1 month', value: 2592000 },
+              { label: 'Never', value: 0 }
+            ]
+          }
+        }}
+        schema={VaultConfigFormSchema}
+        onSubmit={onSubmit}
+        formProps={{ formState }}
+      />
+    )
+  }
+  return null
 }
