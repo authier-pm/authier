@@ -6,15 +6,20 @@ import {
 } from '@chakra-ui/react'
 import { useTsController, useDescription } from '@ts-react/form'
 
-export default function SelectTextField({
+type OptionType = {
+  value: number
+  label: string
+}
+
+export default function SelectNumberField({
   options
 }: {
-  options: Array<string>
+  options: OptionType[]
 }) {
   const {
     field: { onChange, value },
     error
-  } = useTsController<string>()
+  } = useTsController<number>()
   const { label } = useDescription()
 
   return (
@@ -23,13 +28,15 @@ export default function SelectTextField({
       <Select
         defaultValue={value ? value : ''}
         onChange={(e) => {
-          onChange(e.target.value)
+          const value = parseInt(e.target.value)
+          if (isNaN(value)) onChange(undefined)
+          else onChange(value)
         }}
       >
         {options.map((option) => {
           return (
-            <option key={option} value={option}>
-              {option}
+            <option key={option['value']} value={option['value']}>
+              {option['label']}
             </option>
           )
         })}

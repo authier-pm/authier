@@ -9,7 +9,7 @@ export default function CheckboxField({ name }: { name: string }) {
   return (
     <Checkbox
       onChange={(e) => onChange(e.target.checked)}
-      checked={value ? value : false}
+      defaultChecked={value ? value : false}
     >
       {name}
     </Checkbox>
