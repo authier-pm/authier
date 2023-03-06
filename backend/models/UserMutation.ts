@@ -32,6 +32,7 @@ import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../api/GraphqlError'
 import debug from 'debug'
+import { setNewRefreshToken } from '../userAuth'
 const log = debug('au:userMutation')
 
 @ObjectType()
@@ -301,6 +302,10 @@ export class UserMutation extends UserBase {
     input: ChangeMasterPasswordInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
+    if (ctx.device.id !== this.masterDeviceId) {
+      throw new Error('You can only change password on a master device')
+    }
+
     const secretsUpdates = input.secrets.map(({ id, ...patch }) => {
       return ctx.prisma.encryptedSecret.update({
         where: { id: id },
@@ -308,12 +313,14 @@ export class UserMutation extends UserBase {
       })
     })
 
-    await ctx.prisma.$transaction([
-      ...secretsUpdates,
+    const [user] = await ctx.prisma.$transaction([
       ctx.prisma.user.update({
         data: {
           addDeviceSecret: input.addDeviceSecret,
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+          tokenVersion: {
+            increment: 1
+          }
         },
         where: {
           id: this.id
@@ -327,8 +334,11 @@ export class UserMutation extends UserBase {
           userId: this.id
         },
         data: { masterPasswordVerifiedAt: new Date() }
-      })
+      }),
+      ...secretsUpdates
     ])
+
+    setNewRefreshToken(user, ctx.device.id, ctx) // set new refresh token to force all other devices to re-login
     return secretsUpdates.length
   }
 
