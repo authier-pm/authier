@@ -75,7 +75,7 @@ export function getWebInputKind(
 export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
-export let stateInitRes: IInitStateRes
+export let stateInitRes: IInitStateRes | null = null
 
 export async function initInputWatch() {
   const trpc = getTRPCCached()
