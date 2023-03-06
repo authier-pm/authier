@@ -15,12 +15,13 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native'
 import { DeviceContext } from '../../providers/DeviceProvider'
+import { loginCredentialsSchema } from '../../../../shared/loginCredentialsSchema'
 import { InputHeader } from './EditPassword'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { PasswordStackScreenProps } from '../../navigation/types'
 import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
-import { loginCredentialsSchema } from '@src/utils/loginCredentialsSchema'
+
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 
 const InputField = ({

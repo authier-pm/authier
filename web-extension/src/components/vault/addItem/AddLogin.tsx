@@ -1,51 +1,50 @@
 import {
-  Stack,
   Button,
   Flex,
   Input,
   InputGroup,
   InputRightElement,
   Progress,
-  IconButton,
   useDisclosure,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Tooltip,
   Box
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
+import {
+  defaultPasswordGeneratorConfig,
+  PasswordGenerator
+} from '@src/components/vault/PasswordGenerator'
 
 import { Field, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 
-import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
 import { EncryptedSecretType } from '../../../../../shared/generated/graphqlBaseTypes'
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import { EditFormButtons } from '../EditFormButtons'
+import { generate } from 'generate-password'
+import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const AddLogin = () => {
   const navigate = useNavigate()
   const urlQuery = new URLSearchParams(window.location.hash.split('?')[1])
 
-  const [show, setShow] = useState(false)
-  const [initPassword, setInitPassword] = useState('')
+  const [showPassword, setShow] = useState(false)
 
   const { isOpen, onToggle } = useDisclosure({
     defaultIsOpen: true
   })
-  const handleClick = () => setShow(!show)
+  const handleClick = () => setShow(!showPassword)
 
   return (
     <Box width={{ base: '90%', sm: '70%', lg: '60%', xl: '70%' }}>
       <Formik
-        enableReinitialize
         initialValues={{
           url: urlQuery.get('url') || '',
-          password: initPassword,
+          password: generate(defaultPasswordGeneratorConfig),
           label: '',
           username: ''
         }}
@@ -61,6 +60,7 @@ export const AddLogin = () => {
             label: values.label,
             iconUrl: null
           }
+          console.log('namePassPair:', namePassPair)
 
           loginCredentialsSchema.parse(namePassPair)
 
@@ -79,7 +79,7 @@ export const AddLogin = () => {
           navigate(-1)
         }}
       >
-        {({ values, isSubmitting, dirty, handleSubmit, errors, touched }) => {
+        {({ values, handleSubmit, errors, touched, setFieldValue }) => {
           const levelOfPsw = passwordStrength(values.password)
           return (
             <form onSubmit={handleSubmit}>
@@ -130,11 +130,11 @@ export const AddLogin = () => {
                       id="password"
                       name="password"
                       pr="4.5rem"
-                      type={show ? 'text' : 'password'}
+                      type={showPassword ? 'text' : 'password'}
                     />
                     <InputRightElement width="4.5rem">
                       <Button h="1.75rem" size="sm" onClick={handleClick}>
-                        {show ? 'Hide' : 'Show'}
+                        {showPassword ? 'Hide' : 'Show'}
                       </Button>
                     </InputRightElement>
                   </InputGroup>
@@ -151,7 +151,9 @@ export const AddLogin = () => {
                 </FormControl>
                 <PasswordGenerator
                   isOpen={isOpen}
-                  setInitPassword={setInitPassword}
+                  onGenerate={(password) => {
+                    setFieldValue('password', password)
+                  }}
                 />
 
                 <EditFormButtons />

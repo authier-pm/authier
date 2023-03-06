@@ -1,4 +1,11 @@
-import { Box, Flex, HStack, Link, useColorModeValue } from '@chakra-ui/react'
+import {
+  Box,
+  Center,
+  Flex,
+  HStack,
+  Link,
+  useColorModeValue
+} from '@chakra-ui/react'
 import {
   Link as RouterLink,
   Route,
@@ -62,31 +69,35 @@ export const VaultSettings = () => {
   }, [location])
 
   return (
-    <Flex align={'center'} justify={'center'} flexDirection={'column'}>
-      <HStack as={'nav'} spacing={4} mb={10}>
-        {LinkItems.map((link) => {
-          const handleClick = () => {
-            setSelectedTab(link)
-          }
-          return (
-            <NavLink
-              key={link.name}
-              path={link.path}
-              selected={selectedTab}
-              handleClick={handleClick}
-              name={link.name}
-              url={'/settings'}
-            />
-          )
-        })}
-      </HStack>
+    <Flex align={'center'} justify={'center'} flexDirection={'column'} mb={10}>
+      <Center w={'100%'} bgColor={'teal.900'} p={3}>
+        <HStack as={'nav'} spacing={4}>
+          {LinkItems.map((link) => {
+            const handleClick = () => {
+              setSelectedTab(link)
+            }
+            return (
+              <NavLink
+                key={link.name}
+                path={link.path}
+                selected={selectedTab}
+                handleClick={handleClick}
+                name={link.name}
+                url={'/settings'}
+              />
+            )
+          })}
+        </HStack>
+      </Center>
 
-      <AnimatePresence exitBeforeEnter>
-        <Routes key={location.pathname}>
-          <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/security'} element={<VaultConfig />}></Route>
-        </Routes>
-      </AnimatePresence>
+      <Center mt="20px" w={'100%'}>
+        <AnimatePresence exitBeforeEnter>
+          <Routes key={location.pathname}>
+            <Route path={'/account'} element={<Account />}></Route>
+            <Route path={'/security'} element={<VaultConfig />}></Route>
+          </Routes>
+        </AnimatePresence>
+      </Center>
     </Flex>
   )
 }

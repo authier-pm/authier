@@ -29,7 +29,7 @@ export const EditFormButtons = () => {
         Go back
       </Button>
       <Button
-        disabled={isSubmitting || !dirty}
+        isDisabled={isSubmitting || !dirty}
         isLoading={isSubmitting}
         type="submit"
         bg={'blue.400'}

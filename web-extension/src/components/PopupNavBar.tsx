@@ -24,7 +24,7 @@ import { RefreshSecretsButton } from './RefreshSecretsButton'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
-export const NavBar: FunctionComponent = () => {
+export const PopupNavBar: FunctionComponent = () => {
   const {
     isOpen: isNavMenuOpen,
     onOpen: onNavMenuOpen,

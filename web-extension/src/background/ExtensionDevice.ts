@@ -34,7 +34,7 @@ import {
   LoginCredentialsTypeWithMeta,
   TotpTypeWithMeta
 } from '@src/util/useDeviceState'
-import { loginCredentialsSchema } from '@src/util/loginCredentialsSchema'
+
 import {
   cryptoKeyToString,
   abToCryptoKey,
@@ -49,6 +49,7 @@ import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
+import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const log = debug('au:Device')
 
@@ -577,8 +578,7 @@ class ExtensionDevice {
       throw new Error('no state to lock')
     }
 
-    //QUESTION: When I call here this.clearLockInterval() it doesn't work, trpc port get closed
-    //this.clearLockInterval()
+    this.clearLockInterval()
 
     log('locking device')
 
