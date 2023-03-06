@@ -24,11 +24,10 @@ export const UserNavMenu: FunctionComponent = () => {
           <Button
             colorScheme="yellow"
             onClick={async () => {
-              device.clearLockInterval()
               device.lock()
             }}
           >
-            <Trans>Lock vault</Trans>
+            <Trans>Lock device</Trans>
           </Button>
           <Button
             colorScheme="red"
