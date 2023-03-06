@@ -58,14 +58,7 @@ export const PopupNavBar: FunctionComponent = () => {
   }, [])
 
   return (
-    <Flex
-      flexDir="column"
-      position="fixed"
-      top="0"
-      w="100%"
-      backgroundColor={bg}
-      zIndex={2}
-    >
+    <Flex flexDir="column" top="0" w="100%" backgroundColor={bg} zIndex={2}>
       <Flex
         p={1}
         textAlign="center"
