@@ -90,7 +90,7 @@ export default function Account() {
             }}
             onSubmit={async (
               values: Values,
-              { setSubmitting }: FormikHelpers<Values>
+              { setSubmitting, resetForm }: FormikHelpers<Values>
             ) => {
               try {
                 const { addDeviceSecret } =
@@ -155,6 +155,8 @@ export default function Account() {
                     duration: null,
                     isClosable: true
                   })
+
+                  resetForm()
                 } else {
                   toast({ title: t`Wrong password`, status: 'error' })
                 }
