@@ -16,7 +16,7 @@
   },
   "devDependencies": {
     "@apollo/client": "^3.7.9",
-    "@chakra-ui/react": "^2.4.1",
+    "@chakra-ui/react": "^2.5.1",
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
     "@graphql-codegen/cli": "^2.14.1",

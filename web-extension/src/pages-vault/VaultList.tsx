@@ -39,7 +39,7 @@ export function VaultListItem({
   }
   const secretUrl = getDecryptedSecretProp(secret, 'url')
   return (
-    <Center py={5} m={['auto', '3']}>
+    <Center py={3} m={['auto', '3']}>
       <Box
         w="250px"
         h="195px"
@@ -146,13 +146,22 @@ export const VaultList = () => {
   if (loading && !data) {
     return <Spinner />
   }
+  const screenHeight =
+    window.innerHeight ||
+    document.documentElement.clientHeight ||
+    document.body.clientHeight
 
   return (
-    <VStack flexDirection="column" h={'90vh'}>
-      <Center justifyContent={'space-evenly'} w={'100%'}>
+    <>
+      <Center
+        justifyContent={'space-evenly'}
+        w={'100%'}
+        bgColor={'teal.900'}
+        p={3}
+      >
         <Input
           variant={'filled'}
-          color="grey.600"
+          color="grey.500"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault by url, username, label or password`}
           m="auto"
@@ -192,11 +201,14 @@ export const VaultList = () => {
           />
         )}
       </Center>
-      <Center w={'95%'} h={'100%'}>
-        <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
-          <VirtualizedList filter={filterBy} />
-        </div>
-      </Center>
-    </VStack>
+
+      <VStack flexDirection="column" h={screenHeight - 42}>
+        <Center w={'95%'} h={'100%'}>
+          <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+            <VirtualizedList filter={filterBy} />
+          </div>
+        </Center>
+      </VStack>
+    </>
   )
 }

@@ -37,9 +37,10 @@ import { IconType } from 'react-icons'
 import { NavLink as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { ChevronDownIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, LockIcon } from '@chakra-ui/icons'
 import { Trans } from '@lingui/macro'
 import { ColorModeButton } from '../ColorModeButton'
+import { TbLogout } from 'react-icons/tb'
 
 interface LinkItemProps {
   title: JSX.Element
@@ -93,7 +94,7 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} p="7">
+      <Box ml={{ base: 0, md: 60 }} paddingBottom={0}>
         {children}
       </Box>
     </Box>
@@ -123,7 +124,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       {...rest}
     >
       <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
-        <Flex h="20" alignItems="center" mx="8" justifyContent="space-between">
+        <Flex
+          h={'72px'}
+          alignItems="center"
+          mx="8"
+          justifyContent="space-between"
+        >
           <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
             Authier
           </Text>
@@ -163,33 +169,41 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                     mr="auto"
                   >
                     <Text fontSize="sm">{email}</Text>
-                    <Text fontSize="xs" color="gray.600">
-                      Admin
-                    </Text>
                   </VStack>
                   <Box display={{ base: 'none', md: 'flex' }} ml="auto">
                     <ChevronDownIcon boxSize={19} />
                   </Box>
                 </Flex>
               </MenuButton>
-              <MenuList justifyContent="center">
-                <Link as={RouterLink} to="/settings/account">
-                  <MenuItem>Settings</MenuItem>
-                </Link>
-                <Link as={RouterLink} to="/account-limits">
-                  <MenuItem>Billing</MenuItem>
-                </Link>
-                <MenuDivider />
+              <MenuList
+                bg={useColorModeValue('white', 'gray.900')}
+                borderColor={useColorModeValue('gray.200', 'gray.700')}
+              >
                 <MenuItem
                   backgroundColor="red.400"
                   _hover={{
-                    backgroundColor: 'red.600'
+                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
                   }}
                   onClick={async () => {
                     await device.logout()
                   }}
                 >
-                  Logout
+                  <TbLogout size={16} />
+                  <Box ml={3}>Logout</Box>
+                </MenuItem>
+                <MenuItem
+                  backgroundColor="yellow.500"
+                  _hover={{
+                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
+                  }}
+                  onClick={async () => {
+                    await device.lock()
+                  }}
+                >
+                  <LockIcon />
+                  <Box ml={3}>
+                    <Trans>Lock device</Trans>
+                  </Box>
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -299,9 +313,6 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
                   ml="2"
                 >
                   <Text fontSize="sm">{email}</Text>
-                  <Text fontSize="xs" color="gray.600">
-                    Admin
-                  </Text>
                 </VStack>
                 <Box display={{ base: 'none', md: 'flex' }}>
                   <FiChevronDown />
