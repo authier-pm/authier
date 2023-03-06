@@ -29,25 +29,30 @@ const log = debug('au:Login')
 export interface LoginFormValues {
   password: string
   email: string
+  isSubmitted: boolean
 }
 
 // @ts-expect-error TODO: fix types
 export const LoginContext = React.createContext<{
   formState: LoginFormValues
-  setFormState: Dispatch<SetStateAction<LoginFormValues | null>>
+  setFormState: Dispatch<SetStateAction<LoginFormValues>>
 }>()
 
 // export const isRunningInVault = location.href.includes('js/vault.html#')
 
 export default function Login(): ReactElement {
   const [showPassword, setShowPassword] = useState(false)
-  const [formState, setFormState] = useState<LoginFormValues | null>(null)
+  const [formState, setFormState] = useState<LoginFormValues>({
+    password: '',
+    email: '',
+    isSubmitted: false
+  })
 
   if (!device.id) {
     return <Spinner />
   }
 
-  if (formState) {
+  if (formState.isSubmitted) {
     return (
       <LoginContext.Provider value={{ formState, setFormState }}>
         <LoginAwaitingApproval />
@@ -62,12 +67,15 @@ export default function Login(): ReactElement {
       </Flex>
 
       <Formik
-        initialValues={{ email: '', password: '' }}
+        initialValues={formState}
         onSubmit={async (
           values: LoginFormValues,
           { setSubmitting }: FormikHelpers<LoginFormValues>
         ) => {
-          setFormState(values)
+          setFormState({
+            ...values,
+            isSubmitted: true
+          })
 
           setSubmitting(false)
         }}

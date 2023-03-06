@@ -38,6 +38,7 @@ export async function generateEncryptionKey(
   psw: string,
   salt: ArrayBuffer
 ): Promise<CryptoKey> {
+  console.log('psw:', psw)
   const keyMaterial = await getKeyMaterial(psw)
   const key = await window.crypto.subtle.deriveKey(
     {

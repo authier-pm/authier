@@ -319,7 +319,8 @@ export class UserMutation extends UserBase {
           id: this.id
         }
       }),
-      ctx.prisma.decryptionChallenge.updateMany({
+      ctx.prisma.decryptionChallenge.update({
+        // need to update the challenge to let user log in
         where: {
           id: input.decryptionChallengeId,
           deviceId: ctx.jwtPayload.deviceId,
