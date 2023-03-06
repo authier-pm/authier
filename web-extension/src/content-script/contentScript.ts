@@ -76,22 +76,19 @@ export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 export let stateInitRes: IInitStateRes
+
 export async function initInputWatch() {
   const trpc = getTRPCCached()
-  stateInitRes =
-    (await trpc.getContentScriptInitialState.query()) as IInitStateRes
+  stateInitRes = await trpc.getContentScriptInitialState.query()
 
   log('~ stateInitRes', stateInitRes)
-
-  if (stateInitRes) {
-    log('Press key')
-    document.addEventListener('keydown', recordInputs, true)
-  }
 
   if (!stateInitRes) {
     log('no state')
     return
   }
+
+  document.addEventListener('keydown', recordInputs, true)
 
   const { extensionDeviceReady, secretsForHost, autofillEnabled } = stateInitRes
 
