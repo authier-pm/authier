@@ -14,7 +14,7 @@ import {
 } from '@chakra-ui/react'
 import { Formik, FormikHelpers, Field } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { motion } from 'framer-motion'
 import {
   useAccountQuery,
@@ -29,8 +29,6 @@ import { t, Trans } from '@lingui/macro'
 import { Heading } from '@chakra-ui/react'
 import {
   base64ToBuffer,
-  bufferToBase64,
-  cryptoKeyToString,
   decryptDeviceSecretWithPassword,
   generateEncryptionKey
 } from '@src/util/generateEncryptionKey'
@@ -99,7 +97,6 @@ export default function Account() {
                     device.state as IBackgroundStateSerializable
                   )
 
-                console.log({ addDeviceSecret })
                 if (!addDeviceSecret) {
                   toast({ title: t`Wrong password`, status: 'error' })
                   return
