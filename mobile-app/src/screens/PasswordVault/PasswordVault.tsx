@@ -60,10 +60,7 @@ export const PasswordVault = ({
       {hasNoSecrets ? ( // TODO login form illustration
         <Box p={4}>
           <Text>
-            <Trans>
-              Start by adding a secret by logging onto any website or by adding
-              a TOTP code
-            </Trans>
+            <Trans>Start by adding a login secret or a TOTP code</Trans>
           </Text>
         </Box>
       ) : (

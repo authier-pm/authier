@@ -28,6 +28,7 @@ import {
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
 import { toast } from '@src/ExtensionProviders'
+import { Txt } from '@src/components/util/Txt'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 export const log = debug('au:LoginAwaitingApproval')
@@ -40,7 +41,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
   const [
     getDeviceDecryptionChallenge,
-    { data: decryptionData, error: decrChallError }
+    { data: decryptionData, error: decryptionChallengeError }
   ] = useDeviceDecryptionChallengeMutation({
     variables: {
       deviceInput: {
@@ -53,10 +54,13 @@ export const useLogin = (props: { deviceName: string }) => {
   })
 
   useEffect(() => {
-    if (error || decrChallError) {
-      setFormState(null)
+    if (error || decryptionChallengeError) {
+      setFormState({
+        ...formState,
+        isSubmitted: false
+      })
     }
-  }, [error, decrChallError])
+  }, [error, decryptionChallengeError])
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
@@ -79,7 +83,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         if (!addDeviceSecretEncrypted || !userId) {
           toast({
-            title: t`Login failed, check your email or password`,
+            title: t`Login failed, try removing and adding the extension again`,
             status: 'error',
             isClosable: true
           })
@@ -102,7 +106,7 @@ export const useLogin = (props: { deviceName: string }) => {
           base64ToBuffer(encryptionSalt)
         )
 
-        let currentAddDeviceSecret
+        let currentAddDeviceSecret: string | null = null
         try {
           const encryptedDataBuff = base64ToBuffer(addDeviceSecretEncrypted)
           const iv = encryptedDataBuff.slice(16, 16 + 12)
@@ -126,11 +130,14 @@ export const useLogin = (props: { deviceName: string }) => {
             status: 'error',
             isClosable: true
           })
-          setFormState(null)
+          setFormState({
+            ...formState,
+            isSubmitted: false
+          })
           return
         }
 
-        const newParams = await device.initLocalDeviceAuthSecret(
+        const newDeviceSecretsPair = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
           base64ToBuffer(encryptionSalt)
         )
@@ -144,8 +151,9 @@ export const useLogin = (props: { deviceName: string }) => {
               platform: device.platform
             },
             input: {
-              addDeviceSecret: newParams.addDeviceSecret,
-              addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
+              addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+              addDeviceSecretEncrypted:
+                newDeviceSecretsPair.addDeviceSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
               //WARNING: Has to be the same all the time
@@ -180,8 +188,8 @@ export const useLogin = (props: { deviceName: string }) => {
             email: formState.email,
             encryptionSalt,
             deviceName: props.deviceName,
-            authSecret: newParams.addDeviceSecret,
-            authSecretEncrypted: newParams.addDeviceSecretEncrypted,
+            authSecret: newDeviceSecretsPair.addDeviceSecret,
+            authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
             lockTime: 28800,
             autofill: true,
             language: 'en',
@@ -213,12 +221,12 @@ export const useLogin = (props: { deviceName: string }) => {
     }
   }, [deviceDecryptionChallenge])
 
-  return { deviceDecryptionChallenge, loading }
+  return { deviceDecryptionChallenge, loading, formState }
 }
 
 export const LoginAwaitingApproval: React.FC = () => {
   const [deviceName] = useState(device.generateDeviceName())
-  const { deviceDecryptionChallenge } = useLogin({
+  const { deviceDecryptionChallenge, formState } = useLogin({
     deviceName
   })
 
@@ -232,6 +240,9 @@ export const LoginAwaitingApproval: React.FC = () => {
   ) {
     return (
       <Card p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="600px">
+        <Heading size="sm" mb={2}>
+          <Trans>Username: {formState.email}</Trans>
+        </Heading>
         <Flex align={'center'}>
           <WarningIcon mr={2} boxSize={30} />
           <Heading size="md" mr={4}>
@@ -239,15 +250,23 @@ export const LoginAwaitingApproval: React.FC = () => {
           </Heading>
           <Heading size="sm">{deviceName}</Heading>
         </Flex>
-        <Flex>
-          <Center mt={3}>
-            <Trans>
-              Approve this device in your device management in the vault on your
-              master device in order to finish adding new device. Afterwards
-              your vault will open automatically in this tab.
-            </Trans>
-          </Center>
-        </Flex>
+        <Center mt={3}>
+          <Flex flexDir="column">
+            <Txt fontSize="md" mb={2}>
+              <Trans>
+                Approve this device in your device management in the vault on
+                your master device in order to proceed adding new device.
+              </Trans>
+            </Txt>
+
+            <Txt fontSize="sm">
+              <Trans>
+                After you approve it, the vault password will be checked and
+                your vault will open automatically in this tab.
+              </Trans>
+            </Txt>
+          </Flex>
+        </Center>
       </Card>
     )
   } else {

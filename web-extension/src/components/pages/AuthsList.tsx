@@ -285,10 +285,7 @@ export const AuthsList = ({
         )}
         {hasNoSecrets && (
           // TODO login form illustration
-          <Text>
-            Start by adding a secret by logging onto any website or by adding a
-            TOTP code
-          </Text>
+          <Text>Start by adding a login secret or TOTP code</Text>
         )}
       </Flex>
     </>
