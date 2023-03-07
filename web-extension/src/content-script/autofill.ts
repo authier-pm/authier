@@ -352,9 +352,14 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           form.submit.dispatchEvent(clickEvent)
         }
 
-        notyf.success(
-          `Submitted autofilled form for user ${filledElements[0]?.value}}`
+        const notAPasswordInput = filledElements.find(
+          (el) => el?.type !== 'password'
         )
+        if (notAPasswordInput) {
+          notyf.success(
+            `Submitted autofilled form for user "${notAPasswordInput[0]?.value}}"`
+          )
+        }
       }
     }
 
