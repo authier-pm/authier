@@ -46,19 +46,14 @@ export default function Security() {
     } = form
 
     async function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
-      const config = {
-        ...data,
-        vaultLockTimeoutSeconds: parseInt(
-          data.vaultLockTimeoutSeconds.toString()
-        )
-      }
-
       await updateSettings({
         variables: {
-          config
+          config: {
+            ...data
+          }
         }
       })
-      setSecuritySettings(config)
+      setSecuritySettings({ ...data })
     }
 
     useEffect(() => {
