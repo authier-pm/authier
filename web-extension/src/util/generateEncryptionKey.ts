@@ -1,5 +1,4 @@
 import { PBKDF2Iterations } from '@shared/constants'
-import { IBackgroundStateSerializableLocked } from '@src/background/backgroundPage'
 
 /**
  * @returns string in base64
@@ -38,7 +37,6 @@ export async function generateEncryptionKey(
   psw: string,
   salt: ArrayBuffer
 ): Promise<CryptoKey> {
-  console.log('psw:', psw)
   const keyMaterial = await getKeyMaterial(psw)
   const key = await window.crypto.subtle.deriveKey(
     {
@@ -88,7 +86,6 @@ export async function decryptDeviceSecretWithPassword(
   plainPassword: string,
   lockedState: { encryptionSalt: string; authSecretEncrypted: string }
 ) {
-  console.log('lockedState:', lockedState)
   const masterEncryptionKey = await generateEncryptionKey(
     plainPassword,
     base64ToBuffer(lockedState.encryptionSalt)

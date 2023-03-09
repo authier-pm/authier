@@ -13,9 +13,9 @@ import {
   Routes
 } from 'react-router-dom'
 import { useEffect, useState } from 'react'
-import Account from '@src/components/vault/settings/Account'
 import { AnimatePresence } from 'framer-motion'
-import VaultConfigForm from '@src/components/form/VaultConfigForm'
+import Security from '@src/components/vault/settings/Security'
+import Account from '@src/components/vault/settings/Account'
 
 interface LinkItemProps {
   name: string
@@ -93,7 +93,7 @@ export const VaultSettings = () => {
       <AnimatePresence mode="wait">
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/security'} element={<VaultConfigForm />}></Route>
+          <Route path={'/security'} element={<Security />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>
