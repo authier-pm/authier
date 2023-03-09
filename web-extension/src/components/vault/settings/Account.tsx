@@ -14,7 +14,8 @@ import { device } from '@src/background/ExtensionDevice'
 import {
   decryptDeviceSecretWithPassword,
   generateEncryptionKey,
-  base64ToBuffer
+  base64ToBuffer,
+  cryptoKeyToString
 } from '@src/util/generateEncryptionKey'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
@@ -112,6 +113,15 @@ export default function Account() {
               ?.deviceDecryptionChallenge?.id as number
           }
         })
+
+        const deviceState: IBackgroundStateSerializable = {
+          ...state,
+          authSecret: newDeviceSecretsPair.addDeviceSecret,
+          authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
+          masterEncryptionKey: await cryptoKeyToString(newEncryptionKey)
+        }
+        device.save(deviceState)
+
         toast({
           title: t`Password changed, all your other devices will be logged out and you will need to log in again`,
           status: 'success'
