@@ -18,12 +18,12 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           apiURL: ${{ secrets.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
-      
+
       - name: Zip source code
         uses: vimtor/action-zip@v1
         with:
-          files: web-extension/
-          dest: web-extension/source-code.zip
+          files: ./
+          dest: source-code.zip
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
@@ -31,7 +31,7 @@ jobs:
         continue-on-error: true
         with:
           zipFilePath: ${{ env.ZIP_FILE_PATH }}
-          sourcesZipFilePath: web-extension/source-code.zip
+          sourcesZipFilePath: source-code.zip
           extensionId: ${{ secrets.FF_EXTENSION_ID }}
           jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
           jwtSecret: ${{ secrets.FF_JWT_SECRET }}
