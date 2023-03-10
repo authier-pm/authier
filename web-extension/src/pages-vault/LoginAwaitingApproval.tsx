@@ -92,7 +92,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         if (!deviceDecryptionChallenge?.id) {
           toast({
-            title: 'Failed to create decryption challenge',
+            title: t`Failed to create decryption challenge`,
             status: 'error',
             isClosable: true
           })
@@ -121,8 +121,6 @@ export const useLogin = (props: { deviceName: string }) => {
         } catch (error) {
           console.error(error)
         }
-
-        log('~ currentAddDeviceSecret', currentAddDeviceSecret)
 
         if (!currentAddDeviceSecret) {
           toast({

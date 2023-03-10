@@ -22,7 +22,7 @@ import {
 import { Field, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 
-import { EncryptedSecretType } from '../../../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import { EditFormButtons } from '../EditFormButtons'
 import { generate } from 'generate-password'
@@ -34,7 +34,7 @@ export const AddLogin = () => {
 
   const [showPassword, setShow] = useState(false)
 
-  const { isOpen, onToggle } = useDisclosure({
+  const { isOpen } = useDisclosure({
     defaultIsOpen: true
   })
   const handleClick = () => setShow(!showPassword)
@@ -63,12 +63,11 @@ export const AddLogin = () => {
           console.log('namePassPair:', namePassPair)
 
           loginCredentialsSchema.parse(namePassPair)
-
           await device.state?.addSecrets([
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: namePassPair,
-              //TODO: Remove this, useless (this is here just for the type)
+              //TODO: check up on this
               encrypted: await device.state.encrypt(
                 JSON.stringify(namePassPair)
               ),

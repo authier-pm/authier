@@ -13,12 +13,13 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useContext, useEffect } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { VStack } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 
 const VaultConfigFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
-    'Lock time // Choose lock time'
+    t`Lock time // Choose lock time`
   ),
-  language: selectTextFieldSchema.describe('Language // Choose language'),
+  language: selectTextFieldSchema.describe(t`Language // Choose language`),
   syncTOTP: z.boolean(),
   autofill: z.boolean()
 })
@@ -83,17 +84,16 @@ export default function Security() {
               options: ['cz', 'en']
             },
             vaultLockTimeoutSeconds: {
-              //TODO: This data structure is retarded,
               options: [
-                { label: '1 minute', value: 20 },
-                { label: '2 minutes', value: 120 },
-                { label: '1 hour', value: 3600 },
-                { label: '4 hours', value: 14400 },
-                { label: '8 hours', value: 28800 },
-                { label: '1 day', value: 86400 },
-                { label: '1 week', value: 604800 },
-                { label: '1 month', value: 2592000 },
-                { label: 'Never', value: 0 }
+                { label: t`1 minute`, value: 20 },
+                { label: t`2 minutes`, value: 120 },
+                { label: t`1 hour`, value: 3600 },
+                { label: t`4 hours`, value: 14400 },
+                { label: t`8 hours`, value: 28800 },
+                { label: t`1 day`, value: 86400 },
+                { label: t`1 week`, value: 604800 },
+                { label: t`1 month`, value: 2592000 },
+                { label: t`Never`, value: 0 }
               ]
             }
           }}
@@ -102,7 +102,7 @@ export default function Security() {
           formProps={{
             isDirty,
             isSubmitting,
-            formHeading: 'Basic security settings'
+            formHeading: t`Basic security settings`
           }}
         />
       </VStack>
