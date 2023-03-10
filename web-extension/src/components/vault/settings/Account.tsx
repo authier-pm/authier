@@ -26,13 +26,13 @@ import { useChangeMasterPasswordMutation } from './Account.codegen'
 const AccountFormSchema = z.object({
   email: inputFieldSchema.describe('Email'),
   currPassword: inputPswFieldSchema.describe(
-    'Current password // Master password'
+    t`Current password // Master password`
   ),
   newPassword: inputPswFieldSchema.describe(
-    'Set new master password // New master password'
+    t`Set new master password // New master password`
   ),
   confirmPassword: inputPswFieldSchema.describe(
-    'Confirm new password // Confirm password'
+    t`Confirm new password // Confirm password`
   )
 })
 
@@ -164,14 +164,16 @@ export default function Account() {
         formProps={{
           isDirty,
           isSubmitting,
-          formHeading: 'Change vault password'
+          formHeading: t`Change vault password`
         }}
       />
       <Box>
         <Heading as="h3" size="lg" color={'red'} mb={5}>
           <Trans>Danger zone</Trans>
         </Heading>
-        <Button colorScheme={'red'}>Delete your account</Button>
+        <Button colorScheme={'red'}>
+          <Trans>Delete your account</Trans>
+        </Button>
       </Box>
     </VStack>
   )

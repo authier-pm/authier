@@ -7,6 +7,7 @@ import {
   InputGroup,
   InputRightElement
 } from '@chakra-ui/react'
+import { t } from '@lingui/macro'
 import { Trans } from '@lingui/react'
 import { useTsController, useDescription } from '@ts-react/form'
 import { useState } from 'react'
@@ -37,7 +38,7 @@ export function PasswordTextField() {
         />
         <InputRightElement width="4.5rem">
           <Button h="1.75rem" size="sm" onClick={() => setShownNew(!showNew)}>
-            {showNew ? 'Hide' : 'Show'}
+            {showNew ? t`Hide` : t`Show`}
           </Button>
         </InputRightElement>
       </InputGroup>
