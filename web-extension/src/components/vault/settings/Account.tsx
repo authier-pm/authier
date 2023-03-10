@@ -36,6 +36,37 @@ const AccountFormSchema = z.object({
   )
 })
 
+export const SettingsSubmitButton = ({
+  isSubmitting,
+  isDirty
+}: {
+  isSubmitting: boolean
+  isDirty: boolean
+}) => {
+  return (
+    <Button
+      mt={4}
+      bg={'blue.400'}
+      color={'white'}
+      boxShadow={
+        '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+      }
+      _hover={{
+        bg: 'blue.500'
+      }}
+      _focus={{
+        bg: 'blue.500'
+      }}
+      aria-label="Submit"
+      type="submit"
+      isDisabled={isSubmitting || !isDirty}
+      isLoading={isSubmitting}
+    >
+      <Trans>Submit</Trans>
+    </Button>
+  )
+}
+
 export default function Account() {
   const email = device.state?.email
   const [changePassword] = useChangeMasterPasswordMutation()
@@ -162,9 +193,13 @@ export default function Account() {
         schema={AccountFormSchema}
         onSubmit={onSubmit}
         formProps={{
-          isDirty,
-          isSubmitting,
-          formHeading: t`Change vault password`
+          formHeading: t`Change vault password`,
+          submitButton: (
+            <SettingsSubmitButton
+              isDirty={isDirty}
+              isSubmitting={isSubmitting}
+            />
+          )
         }}
       />
       <Box>
