@@ -12,10 +12,10 @@ import {
   useLocation,
   Routes
 } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
-import Account from '@src/components/vault/settings/Account'
-import VaultConfig from '@src/components/vault/settings/VaultConfig'
+import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
+import Security from '@src/components/vault/settings/Security'
+import Account from '@src/components/vault/settings/Account'
 
 interface LinkItemProps {
   name: string
@@ -90,14 +90,12 @@ export const VaultSettings = () => {
         </HStack>
       </Center>
 
-      <Center mt="20px" w={'100%'}>
-        <AnimatePresence exitBeforeEnter>
-          <Routes key={location.pathname}>
-            <Route path={'/account'} element={<Account />}></Route>
-            <Route path={'/security'} element={<VaultConfig />}></Route>
-          </Routes>
-        </AnimatePresence>
-      </Center>
+      <AnimatePresence mode="wait">
+        <Routes key={location.pathname}>
+          <Route path={'/account'} element={<Account />}></Route>
+          <Route path={'/security'} element={<Security />}></Route>
+        </Routes>
+      </AnimatePresence>
     </Flex>
   )
 }

@@ -1,30 +1,21 @@
 import React, { Dispatch, ReactElement, SetStateAction, useState } from 'react'
-import {
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Box,
-  Text,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Spinner
-} from '@chakra-ui/react'
-import { Formik, Form, Field, FormikHelpers } from 'formik'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import debug from 'debug'
-
-import { Trans } from '@lingui/macro'
-
+import { Box, Button, Flex, Spinner, Text } from '@chakra-ui/react'
+import { t, Trans } from '@lingui/macro'
 import { device } from '@src/background/ExtensionDevice'
-
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
+import { z } from 'zod'
 import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import {
+  Form,
+  inputEmailFieldSchema,
+  inputPswFieldSchema
+} from '@src/components/util/tsForm'
 
-const log = debug('au:Login')
+const LoginFormSchema = z.object({
+  email: inputEmailFieldSchema.describe('Email'),
+  password: inputPswFieldSchema.describe(t`Password // *******`)
+})
 
 export interface LoginFormValues {
   password: string
@@ -34,106 +25,79 @@ export interface LoginFormValues {
 
 // @ts-expect-error TODO: fix types
 export const LoginContext = React.createContext<{
-  formState: LoginFormValues
-  setFormState: Dispatch<SetStateAction<LoginFormValues>>
+  formStateContext: LoginFormValues
+  setFormStateContext: Dispatch<SetStateAction<LoginFormValues>>
 }>()
 
-// export const isRunningInVault = location.href.includes('js/vault.html#')
+const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
+  return (
+    <Button
+      colorScheme="teal"
+      variant="outline"
+      type="submit"
+      width="full"
+      mt={4}
+      isLoading={isSubmitting}
+    >
+      <Trans>Submit</Trans>
+    </Button>
+  )
+}
 
 export default function Login(): ReactElement {
-  const [showPassword, setShowPassword] = useState(false)
-  const [formState, setFormState] = useState<LoginFormValues>({
+  const [formStateContext, setFormStateContext] = useState<LoginFormValues>({
     password: '',
     email: '',
     isSubmitted: false
   })
 
+  const form = useForm<z.infer<typeof LoginFormSchema>>({
+    defaultValues: {
+      email: '',
+      password: ''
+    },
+    mode: 'onChange'
+  })
+
+  const {
+    formState: { isSubmitting, isSubmitSuccessful }
+  } = form
+
   if (!device.id) {
     return <Spinner />
   }
 
-  if (formState.isSubmitted) {
+  if (isSubmitSuccessful) {
     return (
-      <LoginContext.Provider value={{ formState, setFormState }}>
+      <LoginContext.Provider
+        value={{
+          formStateContext,
+          setFormStateContext
+        }}
+      >
         <LoginAwaitingApproval />
       </LoginContext.Provider>
     )
   }
 
+  async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
+    setFormStateContext({
+      ...data,
+      isSubmitted: true
+    })
+  }
+
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
-      <Flex alignItems="center" justifyContent="center">
-        <Heading size="lg">Login</Heading>
-      </Flex>
-
-      <Formik
-        initialValues={formState}
-        onSubmit={async (
-          values: LoginFormValues,
-          { setSubmitting }: FormikHelpers<LoginFormValues>
-        ) => {
-          setFormState({
-            ...values,
-            isSubmitted: true
-          })
-
-          setSubmitting(false)
+      <Form
+        form={form}
+        schema={LoginFormSchema}
+        onSubmit={onSubmit}
+        formProps={{
+          formHeading: t`Login`,
+          submitButton: <SubmitButton isSubmitting={isSubmitting} />
         }}
-      >
-        {(props) => (
-          <Form>
-            <Field name="email">
-              {({ field, form }: any) => (
-                <FormControl
-                  isInvalid={form.errors.email && form.touched.email}
-                  isRequired
-                >
-                  <FormLabel htmlFor="email">Email</FormLabel>
-                  <Input {...field} id="Email" />
-                  <FormErrorMessage>{form.errors.email}</FormErrorMessage>
-                </FormControl>
-              )}
-            </Field>
-            <Field name="password">
-              {({ field, form }: any) => (
-                <FormControl
-                  isInvalid={form.errors.password && form.touched.password}
-                  isRequired
-                >
-                  <FormLabel htmlFor="password">Password</FormLabel>
-                  <InputGroup>
-                    <Input
-                      {...field}
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="*******"
-                    />
-                    <InputRightElement width="3rem">
-                      <Button
-                        h="1.5rem"
-                        size="sm"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                  <FormErrorMessage>{form.errors.password}</FormErrorMessage>
-                </FormControl>
-              )}
-            </Field>
-            <Button
-              colorScheme="teal"
-              variant="outline"
-              type="submit"
-              width="full"
-              mt={4}
-              isLoading={props.isSubmitting}
-            >
-              <Trans>Login</Trans>
-            </Button>
-          </Form>
-        )}
-      </Formik>
+      />
       <Flex>
         <Link to="/signup">
           <Text pt={3}>
