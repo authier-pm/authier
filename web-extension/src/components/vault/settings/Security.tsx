@@ -14,6 +14,7 @@ import { useContext, useEffect } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { VStack } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
+import { SettingsSubmitButton } from './Account'
 
 const VaultConfigFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
@@ -100,8 +101,12 @@ export default function Security() {
           schema={VaultConfigFormSchema}
           onSubmit={onSubmit}
           formProps={{
-            isDirty,
-            isSubmitting,
+            submitButton: (
+              <SettingsSubmitButton
+                isDirty={isDirty}
+                isSubmitting={isSubmitting}
+              />
+            ),
             formHeading: t`Basic security settings`
           }}
         />

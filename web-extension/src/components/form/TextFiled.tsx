@@ -19,6 +19,7 @@ export function TextField() {
     <FormControl isInvalid={isError}>
       <FormLabel>{label}</FormLabel>
       <Input
+        required
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
         value={value ? value : ''}

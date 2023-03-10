@@ -1,3 +1,4 @@
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import {
   Button,
   FormControl,
@@ -18,27 +19,31 @@ export function PasswordTextField() {
     error
   } = useTsController<string>()
   const { label, placeholder } = useDescription()
-  const [showNew, setShownNew] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
   const isError = error?.errorMessage !== undefined
 
   return (
     <FormControl isInvalid={isError}>
       <FormLabel>
-        {/* WARNING: What is this ID? */}
         <Trans id={label as string}>{label}</Trans>
       </FormLabel>
 
       <InputGroup size="md">
         <Input
+          required
           pr="4.5rem"
-          type={showNew ? 'text' : 'password'}
+          type={showPassword ? 'text' : 'password'}
           placeholder={placeholder}
           onChange={(e) => onChange(e.target.value)}
           value={value ? value : ''}
         />
         <InputRightElement width="4.5rem">
-          <Button h="1.75rem" size="sm" onClick={() => setShownNew(!showNew)}>
-            {showNew ? t`Hide` : t`Show`}
+          <Button
+            h="1.75rem"
+            size="sm"
+            onClick={() => setShowPassword(!showPassword)}
+          >
+            {showPassword ? <ViewOffIcon /> : <ViewIcon />}
           </Button>
         </InputRightElement>
       </InputGroup>
