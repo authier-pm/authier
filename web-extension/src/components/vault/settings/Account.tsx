@@ -20,11 +20,15 @@ import {
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import { Form, inputFieldSchema, inputPswFieldSchema } from '../../util/tsForm'
+import {
+  Form,
+  inputEmailFieldSchema,
+  inputPswFieldSchema
+} from '../../util/tsForm'
 import { useChangeMasterPasswordMutation } from './Account.codegen'
 
 const AccountFormSchema = z.object({
-  email: inputFieldSchema.describe('Email'),
+  email: inputEmailFieldSchema.describe('Email'),
   currPassword: inputPswFieldSchema.describe(
     t`Current password // Master password`
   ),
@@ -94,6 +98,11 @@ export default function Account() {
 
   async function onSubmit(data: z.infer<typeof AccountFormSchema>) {
     try {
+      if (data.newPassword !== data.confirmPassword) {
+        toast({ title: t`Passwords do not match`, status: 'error' })
+        return
+      }
+
       const { addDeviceSecret } = await decryptDeviceSecretWithPassword(
         data.currPassword,
         device.state as IBackgroundStateSerializable
@@ -104,10 +113,6 @@ export default function Account() {
         return
       }
 
-      if (data.newPassword !== data.confirmPassword) {
-        toast({ title: t`Passwords do not match`, status: 'error' })
-        return
-      }
       const { state } = device
 
       if (state && data.newPassword === data.confirmPassword) {

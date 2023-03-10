@@ -16,18 +16,24 @@ export const selectNumberFieldSchema = createUniqueFieldSchema(
   'selectNumberId'
 )
 
+export const inputEmailFieldSchema = createUniqueFieldSchema(
+  z.string().email(),
+  'inputEmailId'
+)
+
 export const inputFieldSchema = createUniqueFieldSchema(
   z.string(),
   'inputStringId'
 )
 export const inputPswFieldSchema = createUniqueFieldSchema(
-  z.string(),
+  z.string().min(process.env.NODE_ENV === 'development' ? 1 : 10),
   'inputPswId'
 )
 
 // create the mapping
 const mapping = [
   [inputFieldSchema, TextField],
+  [inputEmailFieldSchema, TextField],
   [z.boolean(), CheckBoxField],
   [inputPswFieldSchema, PasswordTextField],
   [selectTextFieldSchema, SelectTextField] as const,

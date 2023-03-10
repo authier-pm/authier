@@ -8,12 +8,12 @@ import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import {
   Form,
-  inputFieldSchema,
+  inputEmailFieldSchema,
   inputPswFieldSchema
 } from '@src/components/util/tsForm'
 
 const LoginFormSchema = z.object({
-  email: inputFieldSchema.describe('Email'),
+  email: inputEmailFieldSchema.describe('Email'),
   password: inputPswFieldSchema.describe(t`Password // *******`)
 })
 
@@ -60,14 +60,14 @@ export default function Login(): ReactElement {
   })
 
   const {
-    formState: { isSubmitting, isSubmitted }
+    formState: { isSubmitting, isSubmitSuccessful }
   } = form
 
   if (!device.id) {
     return <Spinner />
   }
 
-  if (isSubmitted) {
+  if (isSubmitSuccessful) {
     return (
       <LoginContext.Provider
         value={{
@@ -80,7 +80,6 @@ export default function Login(): ReactElement {
     )
   }
 
-  //WARNING: How to validate form before submit?
   async function onSubmit(data: z.infer<typeof LoginFormSchema>) {
     setFormStateContext({
       ...data,
