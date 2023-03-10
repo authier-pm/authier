@@ -5,7 +5,6 @@ import { Route, Routes, useNavigate } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/ItemSettings'
 import { VaultSettings } from './VaultSettings'
 
-import Login from '@src/pages-vault/Login'
 import { Center } from '@chakra-ui/react'
 import Devices from './Devices'
 import { VaultImportExport } from './VaultImportExport'
@@ -17,6 +16,8 @@ import { UnlockDeviceForm } from '@src/pages/UnlockDeviceForm'
 import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
+import Login from './Login'
+
 const log = debug('au:VaultRouter')
 
 export function VaultRouter() {
