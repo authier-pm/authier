@@ -34,7 +34,7 @@ export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
-  const { formState, setFormState } = useContext(LoginContext)
+  const { formStateContext, setFormStateContext } = useContext(LoginContext)
 
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
@@ -49,14 +49,14 @@ export const useLogin = (props: { deviceName: string }) => {
         name: props.deviceName,
         platform: device.platform
       },
-      email: formState.email
+      email: formStateContext.email
     }
   })
 
   useEffect(() => {
     if (error || decryptionChallengeError) {
-      setFormState({
-        ...formState,
+      setFormStateContext({
+        ...formStateContext,
         isSubmitted: false
       })
     }
@@ -92,7 +92,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         if (!deviceDecryptionChallenge?.id) {
           toast({
-            title: 'Failed to create decryption challenge',
+            title: t`Failed to create decryption challenge`,
             status: 'error',
             isClosable: true
           })
@@ -102,7 +102,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
 
         const masterEncryptionKey = await generateEncryptionKey(
-          formState.password,
+          formStateContext.password,
           base64ToBuffer(encryptionSalt)
         )
 
@@ -122,16 +122,14 @@ export const useLogin = (props: { deviceName: string }) => {
           console.error(error)
         }
 
-        log('~ currentAddDeviceSecret', currentAddDeviceSecret)
-
         if (!currentAddDeviceSecret) {
           toast({
             title: t`Login failed, check your email or password`,
             status: 'error',
             isClosable: true
           })
-          setFormState({
-            ...formState,
+          setFormStateContext({
+            ...formStateContext,
             isSubmitted: false
           })
           return
@@ -144,7 +142,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const response = await addNewDevice({
           variables: {
-            email: formState.email,
+            email: formStateContext.email,
             deviceInput: {
               id: device.id as string,
               name: props.deviceName,
@@ -185,7 +183,7 @@ export const useLogin = (props: { deviceName: string }) => {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
-            email: formState.email,
+            email: formStateContext.email,
             encryptionSalt,
             deviceName: props.deviceName,
             authSecret: newDeviceSecretsPair.addDeviceSecret,
@@ -221,7 +219,7 @@ export const useLogin = (props: { deviceName: string }) => {
     }
   }, [deviceDecryptionChallenge])
 
-  return { deviceDecryptionChallenge, loading, formState }
+  return { deviceDecryptionChallenge, loading, formState: formStateContext }
 }
 
 export const LoginAwaitingApproval: React.FC = () => {

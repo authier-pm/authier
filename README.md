@@ -2,6 +2,18 @@
 
 monorepo for authier FE and BE.
 
+## Running the extension build on Ubuntu
+
+To build the browser extension please follow these commands:
+
+```
+curl -fsSL https://get.pnpm.io/install.sh | sh -
+cp .env.example .env
+pnpm install
+cd web-extension
+pnpm prodBuild
+```
+
 ## Schema generation
 
 ```shell
@@ -17,7 +29,7 @@ pnpm schemas
 
 ## Getting started
 
-`pnpm` in the root, pnpm workspaces should install all deps even in subfolders.
+`pnpm i` in the root, pnpm workspaces should install all deps even in subfolders.
 
 ## Updating packages
 
