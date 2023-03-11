@@ -8,9 +8,9 @@ To build the browser extension please follow these commands:
 
 ```
 curl -fsSL https://get.pnpm.io/install.sh | sh -
-cp .env.example .env
 pnpm install
 cd web-extension
+cp .env.example .env
 pnpm prodBuild
 ```
 

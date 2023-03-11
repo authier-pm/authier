@@ -18,11 +18,21 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           apiURL: ${{ secrets.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
+      
+      - name: Create source code
+        shell: bash
+        run: |
+          mkdir source
+          cp ./* ./source
+          cp -r backend/schemas backend/package.json web-extension source
+          cd source
+          mkdir backend
+          mv schemas package.json backend
 
       - name: Zip source code
         uses: vimtor/action-zip@v1
         with:
-          files: ./
+          files: source
           dest: source-code.zip
 
       - name: Deploy to Firefox Addons
