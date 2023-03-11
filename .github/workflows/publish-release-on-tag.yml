@@ -53,21 +53,21 @@ jobs:
           asset_content_type: application/zip
 
       # Should trigger build-assets-on-release.yml
-      # - name: Publish release
-      #   if: steps.getRelease.outcome != 'success'
-      #   uses: eregon/publish-release@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.WORKFLOWS_TOKEN }}
-      #   with:
-      #     release_id: ${{ steps.createRelease.outputs.id }}
+      - name: Publish release
+        if: steps.getRelease.outcome != 'success'
+        uses: eregon/publish-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOWS_TOKEN }}
+        with:
+          release_id: ${{ steps.createRelease.outputs.id }}
 
-      # - name: Publish on Chrome Webstore
-      #   uses: benc-uk/workflow-dispatch@v1
-      #   if: "!contains(github.event.head_commit.message, '[skip chrome]')"
-      #   with:
-      #     workflow: publish-on-chrome-webstore
-      #     token: ${{ secrets.WORKFLOWS_TOKEN }}
-      #     wait-for-completion: false
+      - name: Publish on Chrome Webstore
+        uses: benc-uk/workflow-dispatch@v1
+        if: "!contains(github.event.head_commit.message, '[skip chrome]')"
+        with:
+          workflow: publish-on-chrome-webstore
+          token: ${{ secrets.WORKFLOWS_TOKEN }}
+          wait-for-completion: false
 
       - name: Publish on Firefox Add-ons
         uses: benc-uk/workflow-dispatch@v1
