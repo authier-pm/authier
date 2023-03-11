@@ -19,20 +19,16 @@ jobs:
           apiURL: ${{ secrets.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
       
-      - name: Create source code
+      - name: Clean source code
         shell: bash
         run: |
-          mkdir source
-          cp ./* ./source
-          cp -r backend/schemas backend/package.json web-extension source
-          cd source
-          mkdir backend
-          mv schemas package.json backend
+          find . -name 'node_modules' -type d -prune -exec rm -rf '{}' \;
+          rm -rf .git
 
       - name: Zip source code
         uses: vimtor/action-zip@v1
         with:
-          files: source
+          files: ./
           dest: source-code.zip
 
       - name: Deploy to Firefox Addons
