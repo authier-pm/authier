@@ -201,6 +201,7 @@ export type DeviceQuery = {
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime'];
+  /** Get all secrets that were change since last device sync */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>;
   firebaseToken: Scalars['String'];
   firstIpAddress: Scalars['String'];
@@ -501,7 +502,8 @@ export type UserMutation = {
   addDeviceSecretEncrypted: Scalars['String'];
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
   autofill: Scalars['Boolean'];
-  changeMasterPassword: Scalars['PositiveInt'];
+  changeEmail: UserQuery;
+  changeMasterPassword: Scalars['Int'];
   createCheckoutSession: Scalars['String'];
   createPortalSession: Scalars['String'];
   createSecretUsageEvent: SecretUsageEventGqlScalars;
@@ -538,6 +540,11 @@ export type UserMutationAddDeviceArgs = {
 
 export type UserMutationAddEncryptedSecretsArgs = {
   secrets: Array<EncryptedSecretInput>;
+};
+
+
+export type UserMutationChangeEmailArgs = {
+  email: Scalars['EmailAddress'];
 };
 
 
@@ -655,7 +662,6 @@ export type UserQuerySendAuthMessageArgs = {
 };
 
 export type WebInputElement = {
-  domCoordinates: Scalars['JSON'];
   /** The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day. */
   domOrdinal: Scalars['NonNegativeInt'];
   domPath: Scalars['String'];
@@ -669,7 +675,6 @@ export type WebInputGql = {
   addedByUser?: Maybe<UserGql>;
   addedByUserId?: Maybe<Scalars['String']>;
   createdAt: Scalars['DateTime'];
-  domCoordinates: Scalars['JSON'];
   domOrdinal: Scalars['Int'];
   domPath: Scalars['String'];
   host: Scalars['String'];

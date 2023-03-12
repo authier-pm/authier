@@ -13,8 +13,7 @@ export const capturedInputSchema = z.object({
     z.literal('keydown')
   ]),
   kind: z.nativeEnum(WebInputType),
-  inputted: z.string().optional(),
-  domCoordinates: z.object({ x: z.number(), y: z.number() })
+  inputted: z.string().optional()
 })
 
 export const contentScriptContextSchema = z.object({
@@ -45,7 +44,6 @@ export const capturedEventsPayloadSchema = z.object({
 })
 
 export const webInputElementSchema = z.object({
-  domCoordinates: z.object({ x: z.number(), y: z.number() }),
   domOrdinal: z.number(),
   domPath: z.string(),
   kind: z.nativeEnum(WebInputType),

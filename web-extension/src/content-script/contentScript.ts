@@ -50,7 +50,6 @@ export interface IInitStateRes {
     domPath: string
     kind: WebInputType
     createdAt: string
-    domCoordinates: Coords
   }>
   saveLoginModalsState?:
     | {
@@ -175,8 +174,7 @@ export async function initInputWatch() {
                 domPath: elementSelector.css,
                 domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
-                url: location.href,
-                domCoordinates: getElementCoordinates(targetElement)
+                url: location.href
               }
               await trpc.addTOTPInput.mutate(webInput)
               log(`TOTP WebInput added for selector "${elementSelector}"`)

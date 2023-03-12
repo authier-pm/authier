@@ -20,6 +20,4 @@ export class WebInputElement {
   url: string
   @Field(() => WebInputTypeGQL)
   kind: WebInputTypeGQL
-  @Field(() => GraphQLJSON)
-  domCoordinates: ICoordinates
 }

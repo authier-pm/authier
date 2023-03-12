@@ -22,13 +22,6 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   }
 
   let el = document.querySelector(webInputs[0].domPath)
-  if (!el) {
-    el = document.elementFromPoint(
-      webInputs[0].domCoordinates.x,
-      webInputs[0].domCoordinates.y
-    )
-    log('el', el)
-  }
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer: string | number | NodeJS.Timeout | undefined

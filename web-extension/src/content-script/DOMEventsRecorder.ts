@@ -116,11 +116,7 @@ export class DOMEventsRecorder {
           domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
           kind: kind as WebInputType,
-          inputted,
-          domCoordinates: {
-            x: rect.x,
-            y: rect.y
-          }
+          inputted
         }
       }
     )
