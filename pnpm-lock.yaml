@@ -433,6 +433,7 @@ importers:
       '@sentry/browser': ^7.40.0
       '@sentry/tracing': ^7.40.0
       '@svgr/webpack': ^6.5.1
+      '@tanstack/react-table': ^8.7.9
       '@trpc/client': ^10.14.0
       '@trpc/server': ^10.14.0
       '@ts-react/form': ^1.3.0
@@ -494,6 +495,7 @@ importers:
       proxy-date: ^0.1.1
       query-string: ^8
       react: ^18.2.0
+      react-data-grid: 7.0.0-beta.26
       react-device-detect: ^2.2.3
       react-dom: ^18.2.0
       react-dropzone: ^14.2.3
@@ -505,6 +507,7 @@ importers:
       react-test-renderer: ^18.2.0
       react-toastify: ^9.1.1
       react-transition-group: ^4.4.5
+      react-virtual: ^2.10.4
       react-virtualized: ^9.22.3
       reflect-metadata: ^0.1.13
       sass-loader: ^13.2.0
@@ -543,6 +546,7 @@ importers:
       '@lingui/macro': 3.17.2_vr74sp5sl3l265kpej3bhnwdty
       '@sentry/browser': 7.40.0
       '@sentry/tracing': 7.40.0
+      '@tanstack/react-table': 8.7.9_biqbaboplfbrettd7655fr4n2y
       '@trpc/client': 10.14.0_@trpc+server@10.14.0
       '@trpc/server': 10.14.0
       '@ts-react/form': 1.3.0_yddhllb56fjaab5oslhijcuxbe
@@ -569,6 +573,7 @@ importers:
       preact: 10.13.0
       query-string: 8.1.0
       react: 18.2.0
+      react-data-grid: 7.0.0-beta.26_biqbaboplfbrettd7655fr4n2y
       react-device-detect: 2.2.3_biqbaboplfbrettd7655fr4n2y
       react-dom: 18.2.0_react@18.2.0
       react-hook-form: 7.43.5_react@18.2.0
@@ -578,6 +583,7 @@ importers:
       react-select: 5.7.0_etgemzlavky3k4ooobeqgg2miu
       react-test-renderer: 18.2.0_react@18.2.0
       react-transition-group: 4.4.5_biqbaboplfbrettd7655fr4n2y
+      react-virtual: 2.10.4_react@18.2.0
       react-virtualized: 9.22.3_biqbaboplfbrettd7655fr4n2y
       reflect-metadata: 0.1.13
       stream-browserify: 3.0.0
@@ -7880,6 +7886,10 @@ packages:
   /@protobufjs/utf8/1.1.0:
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
 
+  /@reach/observe-rect/1.2.0:
+    resolution: {integrity: sha512-Ba7HmkFgfQxZqqaeIWWkNK0rEhpxVQHIoVyW1YDSkGsGIXzcaW4deC8B0pZrNSSyLTdIk7y+5olKt5+g0GmFIQ==}
+    dev: false
+
   /@react-aria/checkbox/3.6.0_react@18.2.0:
     resolution: {integrity: sha512-E2MZoMZhtHtlS1mYjxTI29JRq4s3Y6d92KHj7tzvcC308d4Bzz0IHJd0bMz/8whoNteU02pQyZ3rDAcGf92bHQ==}
     peerDependencies:
@@ -10179,6 +10189,23 @@ packages:
     dependencies:
       defer-to-connect: 2.0.1
     dev: true
+
+  /@tanstack/react-table/8.7.9_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-6MbbQn5AupSOkek1+6IYu+1yZNthAKTRZw9tW92Vi6++iRrD1GbI3lKTjJalf8lEEKOqapPzQPE20nywu0PjCA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      react: '>=16'
+      react-dom: '>=16'
+    dependencies:
+      '@tanstack/table-core': 8.7.9
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /@tanstack/table-core/8.7.9:
+    resolution: {integrity: sha512-4RkayPMV1oS2SKDXfQbFoct1w5k+pvGpmX18tCXMofK/VDRdA2hhxfsQlMvsJ4oTX8b0CI4Y3GDKn5T425jBCw==}
+    engines: {node: '>=12'}
+    dev: false
 
   /@tootallnate/once/1.1.2:
     resolution: {integrity: sha512-RbzJvlNzmRq5c3O09UipeuXno4tA1FE6ikOjxZK0tuxVv3412l64l5t1W5pj4+rJq9vpkm/kwiR07aZXnsKPxw==}
@@ -21946,6 +21973,17 @@ packages:
       react: 18.2.0
     dev: false
 
+  /react-data-grid/7.0.0-beta.26_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-UYYkz5y6RR5IZDu/dMtH2RrOY+7TWun3AzyekrCxenleuWf+X92HUNxi074MEa3ab7E5YW46B6nGpanQGt9I2Q==}
+    peerDependencies:
+      react: ^18.0
+      react-dom: ^18.0
+    dependencies:
+      clsx: 1.2.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /react-device-detect/2.2.3_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
     peerDependencies:
@@ -22649,6 +22687,15 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
+    dev: false
+
+  /react-virtual/2.10.4_react@18.2.0:
+    resolution: {integrity: sha512-Ir6+oPQZTVHfa6+JL9M7cvMILstFZH/H3jqeYeKI4MSUX+rIruVwFC6nGVXw9wqAw8L0Kg2KvfXxI85OvYQdpQ==}
+    peerDependencies:
+      react: ^16.6.3 || ^17.0.0
+    dependencies:
+      '@reach/observe-rect': 1.2.0
+      react: 18.2.0
     dev: false
 
   /react-virtualized/9.22.3_biqbaboplfbrettd7655fr4n2y:

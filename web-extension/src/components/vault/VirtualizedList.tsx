@@ -4,8 +4,6 @@ import { Flex } from '@chakra-ui/react'
 import { AutoSizer, List } from 'react-virtualized'
 import { VaultListItem } from '@src/pages-vault/VaultList'
 import { useDebounce } from '@src/pages-vault/useDebounce'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 
 //Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
 export const VirtualizedList = ({ filter }: { filter: string }) => {
@@ -17,6 +15,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   const ITEMS_COUNT = filteredItems.length
   const ITEM_SIZE = 270
 
+  console.log(filteredItems)
   return (
     <AutoSizer>
       {({ height, width }) => {
