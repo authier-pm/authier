@@ -32,9 +32,6 @@ export class WebInputGQLScalars {
   @Field(() => Int)
   domOrdinal: number
 
-  @Field(() => GraphQLScalars.JSONResolver)
-  domCoordinates: Prisma.JsonValue
-
   @Field(() => String, { nullable: true })
   addedByUserId: string | null
 }
