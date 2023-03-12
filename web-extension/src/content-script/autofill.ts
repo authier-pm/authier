@@ -32,7 +32,6 @@ type webInput = {
   domPath: string
   kind: WebInputType
   createdAt: string
-  domCoordinates: Coords
 }
 
 export const autofillEventsDispatched = new Set()
@@ -235,13 +234,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               authenticator.generate(totpSecret.totp.secret)
             )
           }
-          //NOTE: We did not find element by DOM path, so find it by input coords
-        } else if (
-          webInputGql.domCoordinates.x === rect?.x &&
-          webInputGql.domCoordinates.y === rect?.y
-        ) {
-          inputEl = document.elementFromPoint(rect?.x, rect?.y) as any
-          log('el', inputEl)
+          //NOTE: We did not find element by DOM path
         }
       })
       .filter((el) => !!el)
@@ -418,8 +411,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                 domPath: getSelectorForElement(input).css,
                 host: location.host,
                 url: location.href,
-                kind: WebInputType.PASSWORD,
-                domCoordinates: getElementCoordinates(input)
+                kind: WebInputType.PASSWORD
               })
 
               domRecorder.addInputEvent({
@@ -445,8 +437,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
                     domPath: getSelectorForElement(inputElsArray[j]).css,
                     host: location.host,
                     url: location.href,
-                    kind: WebInputType.USERNAME,
-                    domCoordinates: getElementCoordinates(input)
+                    kind: WebInputType.USERNAME
                   })
 
                   domRecorder.addInputEvent({

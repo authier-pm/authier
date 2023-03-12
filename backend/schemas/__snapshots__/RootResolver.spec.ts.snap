@@ -3,10 +3,6 @@
 exports[`RootResolver > addWebInputs > should add to the DB 1`] = `
 {
   "addedByUserId": "811354ee-2834-4321-8a9f-507771d96955",
-  "domCoordinates": {
-    "x": 2.234,
-    "y": 3.234,
-  },
   "domOrdinal": 0,
   "domPath": "body",
   "host": "google.com",

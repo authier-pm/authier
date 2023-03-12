@@ -265,12 +265,7 @@ describe('RootResolver', () => {
             url: 'https://google.com',
             kind: WebInputTypeGQL.PASSWORD,
             domOrdinal: 1,
-            domPath: 'body',
-
-            domCoordinates: {
-              x: 2.234,
-              y: 3.234
-            }
+            domPath: 'body'
           }
         ],
         fakeCtx

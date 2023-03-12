@@ -34,17 +34,12 @@ if (!isRunningInBgPage) {
   throw new Error('this file should only be imported in the background page')
 }
 
-interface Coord {
-  x: number
-  y: number
-}
 export interface ICapturedInput {
   cssSelector: string
   domOrdinal: number
   type: 'input' | 'submit' | 'keydown'
   kind: WebInputType
   inputted?: string | undefined
-  domCoordinates: Coord
 }
 
 interface ILoginCredentialsFromContentScript {
@@ -122,8 +117,7 @@ const appRouter = tc.router({
           domPath: captured.cssSelector,
           kind: captured.kind,
           url: inputsUrl,
-          domOrdinal: captured.domOrdinal,
-          domCoordinates: captured.domCoordinates
+          domOrdinal: captured.domOrdinal
         }
       })
 
@@ -153,8 +147,7 @@ const appRouter = tc.router({
           domPath: captured.cssSelector,
           kind: captured.kind,
           url: inputsUrl,
-          domOrdinal: captured.domOrdinal,
-          domCoordinates: captured.domCoordinates
+          domOrdinal: captured.domOrdinal
         }
       })
 

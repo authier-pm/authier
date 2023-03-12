@@ -49,7 +49,6 @@ export interface ICapturedInput {
   type: 'input' | 'submit' | 'keydown'
   kind: WebInputType
   inputted?: string | undefined
-  domCoordinates: Coord
 }
 
 export interface ILoginCredentialsFromContentScript {
