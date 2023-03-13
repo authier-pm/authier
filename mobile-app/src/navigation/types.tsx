@@ -77,4 +77,5 @@ export type AccountStackParamList = {
   Account: undefined
   Settings: undefined
   ImportPasswords: undefined
+  ChangeMasterPassword: undefined
 }
