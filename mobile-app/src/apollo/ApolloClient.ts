@@ -4,15 +4,18 @@ import { RetryLink } from 'apollo-link-retry'
 
 import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
-import Config from 'react-native-config'
+
 import { setContext } from '@apollo/client/link/context'
 import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { device } from '../utils/Device'
+import { API_URL, API_URL_RELEASE } from '@env'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
+const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
+console.log('apiUrl:', apiUrl)
 const httpLink = new HttpLink({
-  uri: __DEV__ ? Config.API_URL : Config.API_URL_RELEASE,
+  uri: apiUrl,
   credentials: 'include'
 })
 
@@ -33,7 +36,7 @@ const authLink = setContext(async (_, { headers }) => {
 })
 
 // Log any GraphQL errors or network error that occurred
-const errorLink = onError(({ graphQLErrors, networkError }) => {
+const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (graphQLErrors) {
     if (graphQLErrors[0].message === 'not authenticated') {
       //Here just logout the user
@@ -47,6 +50,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
   if (networkError) {
     console.error(`[Network error]: ${networkError}`)
+    console.error(response)
   }
 })
 

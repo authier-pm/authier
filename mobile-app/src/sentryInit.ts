@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native'
-import Config from 'react-native-config'
+import { SENTRY_DSN } from '@env'
 
 export const routingInstrumentation =
   new Sentry.ReactNavigationInstrumentation()
