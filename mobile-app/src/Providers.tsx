@@ -18,7 +18,7 @@ import { en as enPlurals } from 'make-plural/plurals'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
-import { storage } from '../App'
+import { storage } from './storage'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 i18n.loadLocaleData('en', { plurals: enPlurals })
