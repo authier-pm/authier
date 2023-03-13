@@ -11,9 +11,11 @@ import {
   useNavigationContainerRef
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
-import { routingInstrumentation, storage } from '../App'
+
+import { storage } from './storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
+import { routingInstrumentation } from './sentryInit'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 

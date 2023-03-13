@@ -17,27 +17,10 @@ import { Alert } from 'react-native'
 import CodePush from 'react-native-code-push'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
-import { MMKV } from 'react-native-mmkv'
 import messaging from '@react-native-firebase/messaging'
-import Config from 'react-native-config'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
-
-export const routingInstrumentation =
-  new Sentry.ReactNavigationInstrumentation()
-
-Sentry.init({
-  dsn: Config.SENTRY_DSN,
-  // Set tracesSampleRate to 1.0 to capture 100% of transactions for performance monitoring.
-  // We recommend adjusting this value in production.
-  tracesSampleRate: 1.0,
-  integrations: [
-    new Sentry.ReactNativeTracing({
-      // Pass instrumentation to be used as `routingInstrumentation`
-      routingInstrumentation
-    })
-  ]
-})
+import './src/sentryInit'
 
 let CodePushOptions = {
   checkFrequency: __DEV__
@@ -49,11 +32,6 @@ let CodePushOptions = {
     title: 'a new update is available!'
   }
 }
-
-export const storage = new MMKV({
-  id: 'user-storage',
-  encryptionKey: 'test'
-})
 
 const App = () => {
   const forceUpdate = useForceUpdate()
