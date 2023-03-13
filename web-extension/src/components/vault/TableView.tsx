@@ -101,15 +101,18 @@ export function DataTable({ filter }: { filter: string }) {
       : 0
 
   return (
-    <Center>
-      <Table>
-        <Thead>
+    <Box ref={tableContainerRef} height="900px" border="1px">
+      <Table cellSpacing={0} width="100%" layout="fixed">
+        <Thead m={0} top={0} pos="sticky">
           {table.getHeaderGroups().map((headerGroup) => (
             <Tr key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
                 return (
                   <Th
+                    m={0}
+                    top={0}
                     key={header.id}
+                    position="sticky"
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {flexRender(
@@ -144,18 +147,16 @@ export function DataTable({ filter }: { filter: string }) {
                 {row.getVisibleCells().map((cell) => {
                   return (
                     <Td
-                      maxW="50vw"
-                      overflow={'hidden'}
-                      whiteSpace="nowrap"
-                      textOverflow={'ellipsis'}
                       key={cell.id}
+                      p="6px"
+                      textOverflow="ellipsis"
+                      overflow="hidden"
+                      whiteSpace="nowrap"
                     >
-                      <Text textOverflow="ellipsis" overflow="hidden">
-                        {flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
-                      </Text>
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </Td>
                   )
                 })}
@@ -169,6 +170,6 @@ export function DataTable({ filter }: { filter: string }) {
           )}
         </Tbody>
       </Table>
-    </Center>
+    </Box>
   )
 }
