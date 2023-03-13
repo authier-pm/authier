@@ -9,7 +9,10 @@ let client = Mailjet.apiConnect(
 
 export const sentEmails = [] as any[]
 
-if (process.env.NODE_ENV === 'test') {
+if (
+  process.env.NODE_ENV === 'test' ||
+  process.env.DISABLE_EMAIL_SENDING !== 'false'
+) {
   client = {
     post: () => ({
       request: (attrs) => {
