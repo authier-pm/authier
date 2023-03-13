@@ -1,6 +1,13 @@
 import { onError } from '@apollo/client/link/error'
-import { ApolloClient, InMemoryCache, from, HttpLink } from '@apollo/client'
+import {
+  ApolloClient,
+  InMemoryCache,
+  from,
+  HttpLink,
+  ApolloLink
+} from '@apollo/client'
 import { RetryLink } from 'apollo-link-retry'
+import { print } from 'graphql'
 
 import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
@@ -17,6 +24,31 @@ console.log('apiUrl:', apiUrl)
 const httpLink = new HttpLink({
   uri: apiUrl,
   credentials: 'include'
+})
+
+const timeStartLink = new ApolloLink((operation, forward) => {
+  operation.setContext({ start: performance.now() })
+  return forward(operation)
+})
+
+const logTimeLink = new ApolloLink((operation, forward) => {
+  return forward(operation).map((data) => {
+    // data from a previous link
+    const time = performance.now() - operation.getContext().start
+    const opIdentifier = operation.operationName
+      ? `operation ${operation.operationName}`
+      : `operation ${print(operation.query).substring(0, 160)}`
+    if (time > 3000) {
+      console.warn(`${opIdentifier} ${time.toFixed()}ms`)
+      if (__DEV__) {
+        console.warn('operation', print(operation.query))
+        console.warn('variables', operation.variables)
+      }
+    } else {
+      console.log(`${opIdentifier} ${time.toFixed()}ms`)
+    }
+    return data
+  })
 })
 
 const retryLink = new RetryLink()
@@ -58,6 +90,8 @@ export const cache = new InMemoryCache()
 
 export const apolloClient = new ApolloClient({
   link: from([
+    timeStartLink,
+    logTimeLink,
     tokenRefresh,
     errorLink,
     queueLink,

@@ -16,7 +16,8 @@ import { AccountStackScreenProps } from '../../navigation/types'
 
 const settingsOptions = [
   { name: 'Settings', route: 'Settings' },
-  { name: 'Import passwords', route: 'ImportPasswords' }
+  { name: 'Import passwords', route: 'ImportPasswords' },
+  { name: 'Change master password', route: 'ChangeMasterPassword' }
 ]
 
 const SettingsItem = ({
