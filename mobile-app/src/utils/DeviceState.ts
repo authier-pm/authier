@@ -3,7 +3,7 @@ import SInfo from 'react-native-sensitive-info'
 import {
   abToCryptoKey,
   base64ToBuffer,
-  buff_to_base64,
+  bufferToBase64,
   cryptoKeyToString,
   dec,
   enc,
@@ -100,7 +100,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     buff.set(salt, 0)
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-    const base64Buff = buff_to_base64(buff)
+    const base64Buff = bufferToBase64(buff)
 
     return base64Buff
   }
