@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 import { DeviceContext } from './providers/DeviceProvider'
@@ -11,16 +11,18 @@ import {
   useNavigationContainerRef
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
-import { routingInstrumentation, storage } from '../App'
+
+import { storage } from './storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
+import { routingInstrumentation } from './sentryInit'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
   const device = useContext(DeviceContext)
   const { colorMode } = useColorMode()
-  const [isReady, setIsReady] = React.useState(false ? false : true)
+  const [isReady, setIsReady] = React.useState(__DEV__ ? false : true)
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
 
@@ -50,8 +52,16 @@ export default function Routes() {
     }
   }, [isReady])
 
+  useEffect(() => {}, [device.lockedState])
+
   if (device.lockedState) {
-    return <VaultUnlockVerification />
+    return (
+      <VaultUnlockVerification
+        onUnlocked={() => {
+          setIsReady(true)
+        }}
+      />
+    )
   }
 
   if (!isReady) {

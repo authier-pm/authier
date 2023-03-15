@@ -1,11 +1,12 @@
 import { accessToken, saveAccessToken } from '../utils/tokenFromAsyncStorage'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
-import Config from 'react-native-config'
+import { API_URL, API_URL_RELEASE } from '@env'
+
 import mitt from 'mitt'
 import { device } from '@src/utils/Device'
 
-const ENDPOINT = __DEV__ ? Config.API_URL : Config.API_URL_RELEASE
+const ENDPOINT = __DEV__ ? API_URL : API_URL_RELEASE
 if (!ENDPOINT) {
   throw new Error('API_URL is not defined')
 }
