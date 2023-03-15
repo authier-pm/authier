@@ -11,14 +11,27 @@ import {
   FormControl,
   Stack,
   WarningOutlineIcon,
-  Button
+  Button,
+  useToast
 } from 'native-base'
 
-import { Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import { DeviceContext } from '../../providers/DeviceProvider'
+import { useChangeMasterPasswordMutation } from './ChangeMasterPassword.codegen'
+import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
+import {
+  base64ToBuffer,
+  cryptoKeyToString,
+  decryptDeviceSecretWithPassword,
+  generateEncryptionKey
+} from '@src/utils/generateEncryptionKey'
+import { IBackgroundStateSerializable } from '@src/utils/Device'
 
 export function ChangeMasterPassword() {
   let device = useContext(DeviceContext)
+  const [changePassword] = useChangeMasterPasswordMutation()
+  const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
+  const toast = useToast()
 
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const [form, setForm] = React.useState({
@@ -92,6 +105,95 @@ export function ChangeMasterPassword() {
             onPress={async () => {
               console.log(form)
               // TODO: implement change password
+
+              try {
+                if (form.newPassword !== form.newPasswordConfirmation) {
+                  toast.show({
+                    title: t`Passwords do not match`,
+                    variant: 'error'
+                  })
+                  return
+                }
+
+                const { addDeviceSecret } =
+                  await decryptDeviceSecretWithPassword(
+                    form.currentPassword,
+                    device.state as IBackgroundStateSerializable
+                  )
+
+                if (addDeviceSecret !== device.state?.authSecret) {
+                  toast.show({ title: t`Wrong password`, variant: 'error' })
+                  return
+                }
+
+                const { state } = device
+
+                if (
+                  state &&
+                  form.newPassword === form.newPasswordConfirmation
+                ) {
+                  const newEncryptionKey = await generateEncryptionKey(
+                    form.newPassword,
+                    base64ToBuffer(state.encryptionSalt)
+                  )
+
+                  const decryptionChallenge = await deviceDecryptionChallenge({
+                    variables: {
+                      deviceInput: {
+                        id: device.id as string,
+                        name: device.name,
+                        platform: device.platform
+                      },
+                      email: device.state?.email
+                    }
+                  })
+
+                  const secrets = state.secrets
+
+                  const newDeviceSecretsPair =
+                    await device.initLocalDeviceAuthSecret(
+                      newEncryptionKey,
+                      base64ToBuffer(state.encryptionSalt)
+                    )
+
+                  await changePassword({
+                    variables: {
+                      secrets: await device.serializeSecrets(
+                        secrets,
+                        form.newPassword
+                      ),
+                      addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+                      addDeviceSecretEncrypted:
+                        newDeviceSecretsPair.addDeviceSecretEncrypted,
+                      decryptionChallengeId: decryptionChallenge.data
+                        ?.deviceDecryptionChallenge?.id as number
+                    }
+                  })
+
+                  const deviceState: IBackgroundStateSerializable = {
+                    ...state,
+                    authSecret: newDeviceSecretsPair.addDeviceSecret,
+                    authSecretEncrypted:
+                      newDeviceSecretsPair.addDeviceSecretEncrypted,
+                    masterEncryptionKey: await cryptoKeyToString(
+                      newEncryptionKey
+                    )
+                  }
+                  device.save(deviceState)
+
+                  toast.show({
+                    title: t`Password changed, all your other devices will be logged out and you will need to log in again`,
+                    variant: 'success'
+                  })
+                } else {
+                  toast.show({ title: t`Wrong password`, variant: 'error' })
+                }
+              } catch (err: any) {
+                toast.show({
+                  title: err.message,
+                  colorScheme: 'red'
+                })
+              }
             }}
           >
             <Trans>Change password</Trans>

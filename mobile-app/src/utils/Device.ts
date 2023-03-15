@@ -2,6 +2,7 @@ import { apolloClient } from '../apollo/ApolloClient'
 import SInfo from 'react-native-sensitive-info'
 import {
   EncryptedSecretGql,
+  EncryptedSecretPatchInput,
   EncryptedSecretType,
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
@@ -123,18 +124,18 @@ export class Device {
   lockedState: IBackgroundStateSerializableLocked | null = null
   initializePromise!: Promise<unknown>
   id: string | null | number[] = null
+  platform: 'android' | 'ios'
   name!: string
   biometricsAvailable = false
   lockInterval!: NodeJS.Timer | void
   emitter = mitt()
 
-  async save(forceUpdate: boolean = true) {
+  async save(deviceState) {
     //We must clear interval, otherwise we will create a new one every time we save the state
     //because we are creating a new interval every time we we start the app (in syncSettings)
+    this.state = new DeviceState(deviceState)
     await this.state?.save()
-    if (forceUpdate) {
-      this.emitter.emit('stateChange')
-    }
+    this.emitter.emit('stateChange')
   }
 
   /**
@@ -342,6 +343,32 @@ export class Device {
     }
   }
 
+  async serializeSecrets(
+    secrets: SecretSerializedType[],
+    newPsw: string
+  ): Promise<EncryptedSecretPatchInput[]> {
+    const state = this.state
+    if (!state) {
+      throw new Error('device not initialized')
+    }
+    return Promise.all(
+      secrets.map(async (secret) => {
+        const { id, encrypted, kind } = secret
+        const decr = await state.decrypt(encrypted)
+        console.log('decrypted secret', decr)
+        await state.setMasterEncryptionKey(newPsw)
+        const enc = await state.encrypt(decr)
+
+        console.log('encrypted secret', enc, state.masterEncryptionKey)
+        return {
+          id,
+          encrypted: enc,
+          kind
+        }
+      })
+    )
+  }
+
   get loginCredentials() {
     return (this.state?.decryptedSecrets.filter(({ kind }) => {
       return kind === EncryptedSecretType.LOGIN_CREDENTIALS
@@ -366,11 +393,6 @@ export class Device {
 
   startVaultLockTimer = () => {
     this.lockInterval = setInterval(() => {
-      console.log(
-        'tick',
-        (this.state!.lockTimeEnd - Date.now()) / 1000,
-        this.state?.lockTimeEnd
-      )
       if (this.state!.lockTimeEnd <= Date.now()) {
         console.log('Vault locked')
         device.lock()

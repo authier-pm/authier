@@ -2,7 +2,7 @@ import { apolloClient } from '../apollo/ApolloClient'
 import SInfo from 'react-native-sensitive-info'
 import {
   abToCryptoKey,
-  base64_to_buf,
+  base64ToBuffer,
   buff_to_base64,
   cryptoKeyToString,
   dec,
@@ -74,7 +74,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async setMasterEncryptionKey(masterPassword: string) {
     const key = await generateEncryptionKey(
       masterPassword,
-      base64_to_buf(this.encryptionSalt)
+      base64ToBuffer(this.encryptionSalt)
     )
     this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
@@ -82,10 +82,10 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async encrypt(stringToEncrypt: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
-    const salt = base64_to_buf(this.encryptionSalt)
+    const salt = base64ToBuffer(this.encryptionSalt)
 
     const encrypted = await window.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
@@ -111,9 +111,9 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async decrypt(encrypted: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
-    const encryptedDataBuff = base64_to_buf(encrypted)
+    const encryptedDataBuff = base64ToBuffer(encrypted)
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
