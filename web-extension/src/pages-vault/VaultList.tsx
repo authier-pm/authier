@@ -1,6 +1,6 @@
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, AddIcon } from '@chakra-ui/icons'
+import { UnlockIcon, SettingsIcon, AddIcon, DeleteIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -36,6 +36,7 @@ export function VaultListItem({
   secret: ILoginSecret | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
+  const [selected, isSelected] = useState(false)
 
   const { deviceState } = useContext(DeviceStateContext)
   if (!deviceState) {
@@ -77,6 +78,17 @@ export function VaultListItem({
               }
             }}
           >
+            <DeleteIcon
+              cursor={'pointer'}
+              boxSize={26}
+              padding={1.5}
+              alignSelf="end"
+              overflow={'visible'}
+              backgroundColor={'red.400'}
+              _hover={{ backgroundColor: 'red.500' }}
+              left="0"
+              top="inherit"
+            />
             <DeleteSecretButton secret={secret} />
 
             {secretUrl ? (

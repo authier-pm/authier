@@ -1,6 +1,7 @@
 import * as React from 'react'
 import {
   ColumnDef,
+  ColumnResizeMode,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
@@ -25,6 +26,7 @@ import {
   Tr
 } from '@chakra-ui/react'
 import { TriangleDownIcon, TriangleUpIcon } from '@chakra-ui/icons'
+import { HTMLProps } from 'react'
 
 export type DataTableProps<Data extends object> = {
   data: Data[]
@@ -39,6 +41,29 @@ type DataProperties = {
   }
 }
 
+function IndeterminateCheckbox({
+  indeterminate,
+  className = '',
+  ...rest
+}: { indeterminate?: boolean } & HTMLProps<HTMLInputElement>) {
+  const ref = React.useRef<HTMLInputElement>(null!)
+
+  React.useEffect(() => {
+    if (typeof indeterminate === 'boolean') {
+      ref.current.indeterminate = !rest.checked && indeterminate
+    }
+  }, [ref, indeterminate])
+
+  return (
+    <input
+      type="checkbox"
+      ref={ref}
+      className={className + ' cursor-pointer'}
+      {...rest}
+    />
+  )
+}
+
 export function DataTable({ filter }: { filter: string }) {
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets: search } = React.useContext(DeviceStateContext)
@@ -47,8 +72,32 @@ export function DataTable({ filter }: { filter: string }) {
 
   const [sorting, setSorting] = React.useState<SortingState>([])
 
-  const columns = React.useMemo<ColumnDef<DataProperties>[]>(
+  const defaultColumns = React.useMemo<ColumnDef<DataProperties>[]>(
     () => [
+      {
+        id: 'select',
+        header: ({ table }) => (
+          <IndeterminateCheckbox
+            {...{
+              checked: table.getIsAllRowsSelected(),
+              indeterminate: table.getIsSomeRowsSelected(),
+              onChange: table.getToggleAllRowsSelectedHandler()
+            }}
+          />
+        ),
+        cell: ({ row }) => (
+          <div className="px-1">
+            <IndeterminateCheckbox
+              {...{
+                checked: row.getIsSelected(),
+                disabled: !row.getCanSelect(),
+                indeterminate: row.getIsSomeSelected(),
+                onChange: row.getToggleSelectedHandler()
+              }}
+            />
+          </div>
+        )
+      },
       {
         id: 'username',
         accessorFn: (row) => row.loginCredentials.username,
@@ -73,9 +122,17 @@ export function DataTable({ filter }: { filter: string }) {
     []
   )
 
+  const [columns] = React.useState<typeof defaultColumns>(() => [
+    ...defaultColumns
+  ])
+
+  const [columnResizeMode, setColumnResizeMode] =
+    React.useState<ColumnResizeMode>('onChange')
+
   const table = useReactTable({
     data,
     columns,
+    columnResizeMode,
     state: {
       sorting
     },
@@ -101,75 +158,86 @@ export function DataTable({ filter }: { filter: string }) {
       : 0
 
   return (
-    <Box ref={tableContainerRef} height="900px" border="1px">
-      <Table cellSpacing={0} width="100%" layout="fixed">
-        <Thead m={0} top={0} pos="sticky">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <Tr key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <Th
-                    m={0}
-                    top={0}
-                    key={header.id}
-                    position="sticky"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext()
-                    )}
-                    <chakra.span pl="4">
-                      {header.column.getIsSorted() ? (
-                        header.column.getIsSorted() === 'desc' ? (
-                          <TriangleDownIcon aria-label="sorted descending" />
-                        ) : (
-                          <TriangleUpIcon aria-label="sorted ascending" />
-                        )
-                      ) : null}
-                    </chakra.span>
-                  </Th>
-                )
-              })}
-            </Tr>
-          ))}
-        </Thead>
-        <Tbody>
-          {paddingTop > 0 && (
-            <Tr>
-              <Td style={{ height: `${paddingTop}px` }} />
-            </Tr>
-          )}
-          {virtualRows.map((virtualRow) => {
-            const row = rows[virtualRow.index] as Row<DataProperties>
-            return (
-              <Tr key={row.id}>
-                {row.getVisibleCells().map((cell) => {
-                  return (
-                    <Td
-                      key={cell.id}
-                      p="6px"
-                      textOverflow="ellipsis"
-                      overflow="hidden"
-                      whiteSpace="nowrap"
-                    >
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext()
-                      )}
-                    </Td>
-                  )
-                })}
-              </Tr>
-            )
-          })}
-          {paddingBottom > 0 && (
-            <Tr>
-              <Td style={{ height: `${paddingBottom}px` }} />
-            </Tr>
-          )}
-        </Tbody>
-      </Table>
-    </Box>
+    <Table overflow="hidden" layout="fixed">
+      <Thead>
+        {table.getHeaderGroups().map((headerGroup) => (
+          <Tr display="flex" key={headerGroup.id}>
+            {headerGroup.headers.map((header) => {
+              return (
+                <Th
+                  key={header.id}
+                  onClick={header.column.getToggleSortingHandler()}
+                >
+                  {flexRender(
+                    header.column.columnDef.header,
+                    header.getContext()
+                  )}
+
+                  <chakra.span pl="4" cursor="pointer">
+                    {header.column.getIsSorted() ? (
+                      header.column.getIsSorted() === 'desc' ? (
+                        <TriangleDownIcon aria-label="sorted descending" />
+                      ) : (
+                        <TriangleUpIcon aria-label="sorted ascending" />
+                      )
+                    ) : null}
+                  </chakra.span>
+                  <Box
+                    h="10px"
+                    w="10px"
+                    bgColor="red"
+                    onMouseDown={() => header.getResizeHandler()}
+                    onTouchStart={() => header.getResizeHandler()}
+                    // Fix here CSS FOR THE RESIZING
+                    {...{
+                      className: `resizer ${
+                        header.column.getIsResizing() ? 'isResizing' : ''
+                      }`,
+                      style: {
+                        transform:
+                          columnResizeMode === 'onEnd' &&
+                          header.column.getIsResizing()
+                            ? `translateX(${
+                                table.getState().columnSizingInfo.deltaOffset
+                              }px)`
+                            : ''
+                      }
+                    }}
+                  />
+                </Th>
+              )
+            })}
+          </Tr>
+        ))}
+      </Thead>
+      <Tbody>
+        {paddingTop > 0 && (
+          <Tr>
+            <Td height={`${paddingTop}px`} />
+          </Tr>
+        )}
+        {table.getRowModel().rows.map((row) => (
+          <Tr key={row.id}>
+            {row.getVisibleCells().map((cell) => {
+              return (
+                <Td
+                  key={cell.id}
+                  textOverflow="ellipsis"
+                  overflow="hidden"
+                  whiteSpace="nowrap"
+                >
+                  {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </Td>
+              )
+            })}
+          </Tr>
+        ))}
+        {paddingBottom > 0 && (
+          <Tr>
+            <Td height={`${paddingBottom}px`} />
+          </Tr>
+        )}
+      </Tbody>
+    </Table>
   )
 }
