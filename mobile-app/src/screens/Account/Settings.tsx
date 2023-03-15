@@ -23,7 +23,7 @@ import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 export default function Settings() {
   let device = useContext(DeviceContext)
   const [updateSettings] = useUpdateSettingsMutation({
-    refetchQueries: [{ query: SyncSettingsDocument }, 'SyncSettings'],
+    refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
     awaitRefetchQueries: true
   })
   const { toggleColorMode } = useColorMode()

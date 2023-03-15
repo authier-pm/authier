@@ -22,7 +22,7 @@ const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 export default function Routes() {
   const device = useContext(DeviceContext)
   const { colorMode } = useColorMode()
-  const [isReady, setIsReady] = React.useState(false ? false : true)
+  const [isReady, setIsReady] = React.useState(__DEV__ ? false : true)
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
 
