@@ -30,7 +30,7 @@ import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { DeviceState } from '@src/utils/DeviceState'
 import {
-  buff_to_base64,
+  bufferToBase64,
   cryptoKeyToString,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
@@ -91,8 +91,8 @@ export function Register({ navigation }: NavigationProps) {
 
           if (device.biometricsAvailable) {
             await SInfo.setItem('psw', values.password, {
-              sharedPreferencesName: 'mySharedPrefs',
-              keychainService: 'myKeychain',
+              sharedPreferencesName: 'authierShared',
+              keychainService: 'authierKCH',
               touchID: true,
               showModal: true,
               kSecAccessControl: 'kSecAccessControlBiometryAny'
@@ -121,7 +121,7 @@ export function Register({ navigation }: NavigationProps) {
                 ...params,
                 deviceName: deviceName,
                 email: values.email,
-                encryptionSalt: buff_to_base64(encryptionSalt),
+                encryptionSalt: bufferToBase64(encryptionSalt),
                 firebaseToken: device.fireToken as string,
                 devicePlatform: Platform.OS
               }
@@ -135,13 +135,13 @@ export function Register({ navigation }: NavigationProps) {
             await saveAccessToken(registerResult.accessToken)
             const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
-            const deviceState: IBackgroundStateSerializable = {
+            const newDeviceState: IBackgroundStateSerializable = {
               masterEncryptionKey: stringKey,
               userId: userId as string,
               secrets: [],
               email: values.email,
               deviceName: device.name,
-              encryptionSalt: buff_to_base64(encryptionSalt),
+              encryptionSalt: bufferToBase64(encryptionSalt),
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
@@ -152,8 +152,7 @@ export function Register({ navigation }: NavigationProps) {
               theme: 'dark'
             }
 
-            device.state = new DeviceState(deviceState)
-            device.save()
+            device.save(newDeviceState)
             setSubmitting(false)
           }
           setSubmitting(false)

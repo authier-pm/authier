@@ -22,6 +22,7 @@ module.exports = {
         extensions: ['.js', '.jsx', '.tsx', '.ts']
       }
     ],
+    'module:react-native-dotenv',
     'macros',
     [
       'react-native-reanimated/plugin',

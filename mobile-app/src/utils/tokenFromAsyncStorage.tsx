@@ -1,23 +1,18 @@
 import jwtDecode from 'jwt-decode'
 import SInfo from 'react-native-sensitive-info'
+import { getSensitiveItem, setSensitiveItem } from './secretStorage'
 //TODO: Rename this file
 
 export let accessToken: string | null = null
 export const getAccessTokenFromStorage = async () => {
-  const value = await SInfo.getItem('@accessToken', {
-    sharedPreferencesName: 'authierShared',
-    keychainService: 'authierKCH'
-  })
+  const value = await getSensitiveItem('@accessToken')
 
   return value
 }
 
 export const saveAccessToken = async (s: string) => {
   accessToken = s
-  await SInfo.setItem('@accessToken', s, {
-    sharedPreferencesName: 'authierShared',
-    keychainService: 'authierKCH'
-  })
+  await setSensitiveItem('@accessToken', s)
 }
 
 export const clearAccessToken = async () => {

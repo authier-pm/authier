@@ -2,8 +2,8 @@ import { apolloClient } from '../apollo/ApolloClient'
 import SInfo from 'react-native-sensitive-info'
 import {
   abToCryptoKey,
-  base64_to_buf,
-  buff_to_base64,
+  base64ToBuffer,
+  bufferToBase64,
   cryptoKeyToString,
   dec,
   enc,
@@ -36,6 +36,7 @@ import {
 } from './Device'
 
 import { getDomainNameAndTldFromUrl } from '../../../shared/urlUtils'
+import { setSensitiveItem } from './secretStorage'
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
@@ -74,7 +75,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async setMasterEncryptionKey(masterPassword: string) {
     const key = await generateEncryptionKey(
       masterPassword,
-      base64_to_buf(this.encryptionSalt)
+      base64ToBuffer(this.encryptionSalt)
     )
     this.masterEncryptionKey = await cryptoKeyToString(key)
     this.save()
@@ -82,10 +83,10 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async encrypt(stringToEncrypt: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
     const iv = window.crypto.getRandomValues(new Uint8Array(12))
-    const salt = base64_to_buf(this.encryptionSalt)
+    const salt = base64ToBuffer(this.encryptionSalt)
 
     const encrypted = await window.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
@@ -100,7 +101,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     buff.set(salt, 0)
     buff.set(iv, salt.byteLength)
     buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-    const base64Buff = buff_to_base64(buff)
+    const base64Buff = bufferToBase64(buff)
 
     return base64Buff
   }
@@ -111,9 +112,9 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async decrypt(encrypted: string): Promise<string> {
     const cryptoKey = await abToCryptoKey(
-      base64_to_buf(this.masterEncryptionKey)
+      base64ToBuffer(this.masterEncryptionKey)
     )
-    const encryptedDataBuff = base64_to_buf(encrypted)
+    const encryptedDataBuff = base64ToBuffer(encrypted)
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
@@ -130,14 +131,10 @@ export class DeviceState implements IBackgroundStateSerializable {
     device.lockedState = null
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
 
-    await SInfo.setItem(
-      'deviceState',
-      JSON.stringify({ backgroundState: this, lockedState: null }),
-      {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      }
-    )
+    await setSensitiveItem('deviceState', {
+      backgroundState: this,
+      lockedState: null
+    })
   }
 
   getSecretDecryptedById(id: string) {

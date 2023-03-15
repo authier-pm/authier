@@ -18,8 +18,9 @@ import { en as enPlurals } from 'make-plural/plurals'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
-import { storage } from '../App'
+import { storage } from './storage'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { getSensitiveItem, setSensitiveItem } from './utils/secretStorage'
 
 i18n.loadLocaleData('en', { plurals: enPlurals })
 i18n.load('en', messages)
@@ -28,10 +29,7 @@ i18n.activate('en')
 const colorModeManager: StorageManager = {
   get: async () => {
     try {
-      let val = await SInfo.getItem('@color-mode', {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      })
+      let val = await getSensitiveItem('@color-mode')
       if (val === null) {
         return 'dark'
       }
@@ -42,10 +40,7 @@ const colorModeManager: StorageManager = {
   },
   set: async (value: ColorMode) => {
     try {
-      await SInfo.setItem('@color-mode', value as string, {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      })
+      await setSensitiveItem('@color-mode', value as string)
     } catch (e) {
       console.log(e)
     }

@@ -228,7 +228,7 @@ importers:
       '@rnx-kit/cli': ^0.16.3
       '@rnx-kit/metro-config': ^1.3.5
       '@rnx-kit/metro-resolver-symlinks': ^0.1.26
-      '@sentry/react-native': 5.0.0
+      '@sentry/react-native': 5.1.1
       '@shopify/flash-list': ^1.4.1
       '@types/crypto-js': ^4.1.1
       '@types/jest': ^29.4.0
@@ -272,8 +272,8 @@ importers:
       react-native-circular-progress-indicator: ^4.4.2
       react-native-code-push: https://github.com/johnf/react-native-code-push#rn-0.71
       react-native-codegen: ^0.71.5
-      react-native-config: 1.5.0
       react-native-device-info: ^10.4.0
+      react-native-dotenv: ^3.4.8
       react-native-gesture-handler: 2.9.0
       react-native-get-random-values: ^1.8.0
       react-native-gradle-plugin: ^0.71.15
@@ -324,7 +324,7 @@ importers:
       '@rnx-kit/cli': 0.16.3_ftvp4kc2qsednkl3utykigxscu
       '@rnx-kit/metro-config': 1.3.5_y4hu7v4yvjtcefe5k2apmgngb4
       '@rnx-kit/metro-resolver-symlinks': 0.1.26
-      '@sentry/react-native': 5.0.0_yqouayos4dnow7nnkhah4yzuzq
+      '@sentry/react-native': 5.1.1_yqouayos4dnow7nnkhah4yzuzq
       '@shopify/flash-list': 1.4.1_guwohi4nlpi5pltiuinnykzlhi
       apollo-link-http: 1.5.17_graphql@16.6.0
       apollo-link-queue: 3.1.0_onqnqwb3ubg5opvemcqf7c2qhy
@@ -354,7 +354,6 @@ importers:
       react-native-camera: 4.2.1
       react-native-circular-progress-indicator: 4.4.2_uzdgta7hjs6df6scxpfora2rz4
       react-native-code-push: github.com/johnf/react-native-code-push/112b8fbabe8bf21f43c411ab8cedaccf3da4aad1
-      react-native-config: 1.5.0
       react-native-device-info: 10.4.0_react-native@0.71.3
       react-native-gesture-handler: 2.9.0_yqouayos4dnow7nnkhah4yzuzq
       react-native-get-random-values: 1.8.0_react-native@0.71.3
@@ -407,6 +406,7 @@ importers:
       prettier: 2.8.4
       pretty-quick: 3.1.3_prettier@2.8.4
       react-native-codegen: 0.71.5_@babel+preset-env@7.20.2
+      react-native-dotenv: 3.4.8_@babel+runtime@7.21.0
       react-test-renderer: 18.2.0_react@18.2.0
       typescript: 4.9.5
 
@@ -2296,6 +2296,10 @@ packages:
       '@babel/helper-string-parser': 7.19.4
       '@babel/helper-validator-identifier': 7.19.1
       to-fast-properties: 2.0.0
+
+  /@balena/dockerignore/1.0.2:
+    resolution: {integrity: sha512-wMue2Sy4GAVTk6Ic4tJVcnfdau+gx2EnG7S+uAEe+TWJFqE4YoWN4/H8MSLj4eYJKxGg26lZwboEniNiNwZQ6Q==}
+    dev: true
 
   /@bcoe/v8-coverage/0.2.3:
     resolution: {integrity: sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==}
@@ -6241,7 +6245,7 @@ packages:
       '@ardatan/sync-fetch': 0.0.1
       '@graphql-tools/utils': 8.12.0
       '@whatwg-node/fetch': 0.4.7
-      tslib: 2.4.1
+      tslib: 2.5.0
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -6255,7 +6259,7 @@ packages:
       '@graphql-tools/utils': 8.12.0_graphql@16.6.0
       '@whatwg-node/fetch': 0.4.7
       graphql: 16.6.0
-      tslib: 2.4.1
+      tslib: 2.5.0
     transitivePeerDependencies:
       - encoding
     dev: true
@@ -6442,7 +6446,7 @@ packages:
       '@graphql-tools/utils': 9.1.1
       is-glob: 4.0.3
       micromatch: 4.0.5
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -6459,7 +6463,7 @@ packages:
       graphql: 16.6.0
       is-glob: 4.0.3
       micromatch: 4.0.5
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     transitivePeerDependencies:
       - '@babel/core'
@@ -6475,7 +6479,7 @@ packages:
       '@graphql-tools/graphql-tag-pluck': 7.4.0
       '@graphql-tools/utils': 9.1.1
       '@whatwg-node/fetch': 0.5.3
-      tslib: 2.4.1
+      tslib: 2.5.0
     transitivePeerDependencies:
       - '@babel/core'
       - encoding
@@ -6492,7 +6496,7 @@ packages:
       '@graphql-tools/utils': 9.1.1_graphql@16.6.0
       '@whatwg-node/fetch': 0.5.3
       graphql: 16.6.0
-      tslib: 2.4.1
+      tslib: 2.5.0
     transitivePeerDependencies:
       - '@babel/core'
       - encoding
@@ -6507,7 +6511,7 @@ packages:
       '@graphql-tools/import': 6.7.6
       '@graphql-tools/utils': 8.12.0
       globby: 11.1.0
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     dev: true
 
@@ -6520,7 +6524,7 @@ packages:
       '@graphql-tools/utils': 8.12.0_graphql@16.6.0
       globby: 11.1.0
       graphql: 16.6.0
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     dev: true
 
@@ -6602,7 +6606,7 @@ packages:
     dependencies:
       '@graphql-tools/utils': 8.12.0
       globby: 11.1.0
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     dev: true
 
@@ -6614,7 +6618,7 @@ packages:
       '@graphql-tools/utils': 8.12.0_graphql@16.6.0
       globby: 11.1.0
       graphql: 16.6.0
-      tslib: 2.4.1
+      tslib: 2.5.0
       unixify: 1.0.0
     dev: true
 
@@ -6626,7 +6630,7 @@ packages:
       '@graphql-tools/schema': 9.0.4
       '@graphql-tools/utils': 8.12.0
       p-limit: 3.1.0
-      tslib: 2.4.1
+      tslib: 2.5.0
     dev: true
 
   /@graphql-tools/load/7.8.0_graphql@16.6.0:
@@ -6638,7 +6642,7 @@ packages:
       '@graphql-tools/utils': 8.12.0_graphql@16.6.0
       graphql: 16.6.0
       p-limit: 3.1.0
-      tslib: 2.4.1
+      tslib: 2.5.0
     dev: true
 
   /@graphql-tools/merge/8.3.18_graphql@16.6.0:
@@ -6830,7 +6834,7 @@ packages:
       graphql-ws: 5.11.2
       isomorphic-ws: 5.0.0_ws@8.11.0
       meros: 1.2.1_@types+node@18.11.9
-      tslib: 2.4.1
+      tslib: 2.5.0
       value-or-promise: 1.0.11
       ws: 8.11.0
     transitivePeerDependencies:
@@ -6857,7 +6861,7 @@ packages:
       graphql-ws: 5.11.2_graphql@16.6.0
       isomorphic-ws: 5.0.0_ws@8.11.0
       meros: 1.2.1
-      tslib: 2.4.1
+      tslib: 2.5.0
       value-or-promise: 1.0.11
       ws: 8.11.0
     transitivePeerDependencies:
@@ -9579,17 +9583,6 @@ packages:
       picomatch: 2.3.1
     dev: false
 
-  /@sentry/browser/7.37.2:
-    resolution: {integrity: sha512-UvKfpx6+BUdV+rGAXqDBznagfz44Ut+x2h/i0OZPNCEpXaH9KAQOlv06I66861aXiucWFRb1lAMrN4+cE9aJIg==}
-    engines: {node: '>=8'}
-    dependencies:
-      '@sentry/core': 7.37.2
-      '@sentry/replay': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
-      tslib: 1.14.1
-    dev: false
-
   /@sentry/browser/7.40.0:
     resolution: {integrity: sha512-07rZ+cTcpmYB1r84/oZtmSPJJvLCxW8yIh/5s4MdKRyZpqIDKhOz6cCS/4j+l1V+MeLcNLZBjFtNdKA2eocTpg==}
     engines: {node: '>=8'}
@@ -9601,8 +9594,8 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sentry/cli/2.10.0:
-    resolution: {integrity: sha512-VQnGXPQCqJyxirmUWkNznq3YYklDwDfbogok3lPHaL3r0bhgcNwt/bZxeycpaqk5I7myKNUYW8RG+F1YERODSw==}
+  /@sentry/cli/2.14.4:
+    resolution: {integrity: sha512-PPtb5qA2sKnYvj2QBBGOrla4kyG6AqOTVaELoc80mZgZ+yDjuaPH/Xmbg/K+rzZyypVlv4XleTtju44830Q/SA==}
     engines: {node: '>= 10'}
     hasBin: true
     requiresBuild: true
@@ -9615,15 +9608,6 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
-    dev: false
-
-  /@sentry/core/7.37.2:
-    resolution: {integrity: sha512-LjofMDSTyVeBErl9N7TTqlyEVuW1g6U4iuJtdZ75JohnvVxzWdpZfWfddwQ6h7nGWfe9dNg0fGs1wxKtMhY+MA==}
-    engines: {node: '>=8'}
-    dependencies:
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
-      tslib: 1.14.1
     dev: false
 
   /@sentry/core/7.40.0:
@@ -9644,22 +9628,22 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sentry/hub/7.37.2:
-    resolution: {integrity: sha512-DxZCMTAVnoliJ+18OeocWUIBuzlVNIZI0hOvugaIxEf5sGPrC2HEfq6vyhJyHz2oNc68xs/f9k0maOgGpWUqmg==}
+  /@sentry/hub/7.40.0:
+    resolution: {integrity: sha512-68GG6wV76qEUyL0tIKB0N+tF7vNyBjHHwHmHk8PElAAkJyIewCXdGuhjpoDshDe7aQ3iLOg1u68rMDN0d3z29w==}
     engines: {node: '>=8'}
     dependencies:
-      '@sentry/core': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
+      '@sentry/core': 7.40.0
+      '@sentry/types': 7.40.0
+      '@sentry/utils': 7.40.0
       tslib: 1.14.1
     dev: false
 
-  /@sentry/integrations/7.37.2:
-    resolution: {integrity: sha512-kqfXo2hRLo3y0vM9ZcjbrB3grOYfPuKpSHN8MZVx3MHTbAUkjHVwjPf5dfi5a0nMvMYAjg2v/Olt8OGayBgjmg==}
+  /@sentry/integrations/7.40.0:
+    resolution: {integrity: sha512-8TLo7RKKpTXRDdeeBFNaA3YA4NG5hbAkl2o9wDHJW5NJouyr7IK6ia6qd2v94RXJAVB7nnjtQUdnkXGR59E4RA==}
     engines: {node: '>=8'}
     dependencies:
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
+      '@sentry/types': 7.40.0
+      '@sentry/utils': 7.40.0
       localforage: 1.10.0
       tslib: 1.14.1
     dev: false
@@ -9679,21 +9663,21 @@ packages:
       - supports-color
     dev: false
 
-  /@sentry/react-native/5.0.0_yqouayos4dnow7nnkhah4yzuzq:
-    resolution: {integrity: sha512-C/KcHD8PHzMutXtPvLghVzeGoJwWFWZfL1wkPX32UBZ8z32ATNUkDut/ng61KB/3nn2xYLskjbz7FKO7DDyclw==}
+  /@sentry/react-native/5.1.1_yqouayos4dnow7nnkhah4yzuzq:
+    resolution: {integrity: sha512-umQAq2HEnYU8mhl1aLQY+YSd4vd56SIyiXn4yFSwwVuzOaPfxG3oGEVAFb6ulI3iOO/7ZeGrsc0SbrxMnBx4HA==}
     peerDependencies:
       react: '>=17.0.0'
       react-native: '>=0.65.0'
     dependencies:
-      '@sentry/browser': 7.37.2
-      '@sentry/cli': 2.10.0
-      '@sentry/core': 7.37.2
-      '@sentry/hub': 7.37.2
-      '@sentry/integrations': 7.37.2
-      '@sentry/react': 7.37.2_react@18.2.0
-      '@sentry/tracing': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
+      '@sentry/browser': 7.40.0
+      '@sentry/cli': 2.14.4
+      '@sentry/core': 7.40.0
+      '@sentry/hub': 7.40.0
+      '@sentry/integrations': 7.40.0
+      '@sentry/react': 7.40.0_react@18.2.0
+      '@sentry/tracing': 7.40.0
+      '@sentry/types': 7.40.0
+      '@sentry/utils': 7.40.0
       react: 18.2.0
       react-native: 0.71.3_raab37p3ikkajcivlo24zcd7ie
     transitivePeerDependencies:
@@ -9701,27 +9685,18 @@ packages:
       - supports-color
     dev: false
 
-  /@sentry/react/7.37.2_react@18.2.0:
-    resolution: {integrity: sha512-e5NFQAwHSGVyMUGYjvYXLI/QECkXkZ2BNUo+OHr5mAYqcIyGSA38tX7RJetrhonVjjpJp/ZVzlOyxQkpnBfBLw==}
+  /@sentry/react/7.40.0_react@18.2.0:
+    resolution: {integrity: sha512-7yYagpOCdsXnVTtLL8Y7wAf2xXgsk2ncuju3O/G4kEckkLewZWmQeoknOSGFlAgVdGNhTaXc2WGzgOiBMOkhug==}
     engines: {node: '>=8'}
     peerDependencies:
       react: 15.x || 16.x || 17.x || 18.x
     dependencies:
-      '@sentry/browser': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
+      '@sentry/browser': 7.40.0
+      '@sentry/types': 7.40.0
+      '@sentry/utils': 7.40.0
       hoist-non-react-statics: 3.3.2
       react: 18.2.0
       tslib: 1.14.1
-    dev: false
-
-  /@sentry/replay/7.37.2:
-    resolution: {integrity: sha512-y8Gfc7EGfGU4eVae5HAtch2YgkiTzNPi16dcqPX9jtIHDwiurGqWcaOgs5HoGJm45eMfl6LvcE7MPbwqcDkPIA==}
-    engines: {node: '>=12'}
-    dependencies:
-      '@sentry/core': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
     dev: false
 
   /@sentry/replay/7.40.0:
@@ -9731,16 +9706,6 @@ packages:
       '@sentry/core': 7.40.0
       '@sentry/types': 7.40.0
       '@sentry/utils': 7.40.0
-    dev: false
-
-  /@sentry/tracing/7.37.2:
-    resolution: {integrity: sha512-XBVvxbV5TADq2rHg/kJqGqDfOP8n2myMUxMMpfHMb38NrxkxQwXy+gDe41bA8FJKA2k7Y3Wkn8ZC/PelQ8c+ag==}
-    engines: {node: '>=8'}
-    dependencies:
-      '@sentry/core': 7.37.2
-      '@sentry/types': 7.37.2
-      '@sentry/utils': 7.37.2
-      tslib: 1.14.1
     dev: false
 
   /@sentry/tracing/7.40.0:
@@ -9753,11 +9718,6 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /@sentry/types/7.37.2:
-    resolution: {integrity: sha512-SxKQOCX94ZaQM4C2ysNjHdJsjYapu/NYZCz1cnPyCdDvYfhwiVge1uq6ZHiQ/ARfxAAOmc3R4Mh3VvEz7WUOdw==}
-    engines: {node: '>=8'}
-    dev: false
-
   /@sentry/types/7.40.0:
     resolution: {integrity: sha512-dIbqBenbmDx1F8pvfC11C88J83ecwumUhV+YOIxcmVd1fmlPF2hXWZ01+NTkTDkCu341sJx4wPQogByFy8FwGA==}
     engines: {node: '>=8'}
@@ -9766,14 +9726,6 @@ packages:
   /@sentry/types/7.43.0:
     resolution: {integrity: sha512-5XxCWqYWJNoS+P6Ie2ZpUDxLRCt7FTEzmlQkCdjW6MFWOX26hAbF/wEuOTYAFKZXMIXOz0Egofik1e8v1Cg6/A==}
     engines: {node: '>=8'}
-    dev: false
-
-  /@sentry/utils/7.37.2:
-    resolution: {integrity: sha512-5irN1nN/mtdOoWwsJiwBK0gPgNMkciUubEMbCaaXqJaGyGz8+yfDvXj7L+xGYiU57z+7+QkkSKxKEZ/IcBpjVQ==}
-    engines: {node: '>=8'}
-    dependencies:
-      '@sentry/types': 7.37.2
-      tslib: 1.14.1
     dev: false
 
   /@sentry/utils/7.40.0:
@@ -11905,7 +11857,7 @@ packages:
       call-bind: 1.0.2
       define-properties: 1.1.4
       es-abstract: 1.20.4
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
       is-string: 1.0.7
     dev: true
 
@@ -12102,7 +12054,16 @@ packages:
       '@aws-cdk/asset-awscli-v1': 2.2.106
       '@aws-cdk/asset-kubectl-v20': 2.1.1
       '@aws-cdk/asset-node-proxy-agent-v5': 2.0.85
+      '@balena/dockerignore': 1.0.2
+      case: 1.6.3
       constructs: 10.1.278
+      fs-extra: 9.1.0
+      ignore: 5.2.4
+      jsonschema: 1.4.1
+      minimatch: 3.1.2
+      punycode: 2.3.0
+      semver: 7.3.8
+      yaml: 1.10.2
     dev: true
     bundledDependencies:
       - '@balena/dockerignore'
@@ -12824,7 +12785,7 @@ packages:
     resolution: {integrity: sha512-7O+FbCihrB5WGbFYesctwmTKae6rOiIzmz1icreWJ+0aA7LJfuqhEso2T9ncpcFtzMQtzXf2QGGueWJGTYsqrA==}
     dependencies:
       function-bind: 1.1.1
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
 
   /caller-callsite/2.0.0:
     resolution: {integrity: sha512-JuG3qI4QOftFsZyOn1qq87fq5grLIyk1JYd5lJmdA+fG7aQ9pA/i3JIJGcO3q0MrRcHlOt1U+ZeHW8Dq9axALQ==}
@@ -12888,6 +12849,11 @@ packages:
       no-case: 3.0.4
       tslib: 2.5.0
       upper-case-first: 2.0.2
+    dev: true
+
+  /case/1.6.3:
+    resolution: {integrity: sha512-mzDSXIPaFwVDvZAHqZ9VlbyF4yyXRuX6IvB06WvPYkqJVO24kX1PPhv9bfpKNFZyxYFmmgo03HUiD8iklmJYRQ==}
+    engines: {node: '>= 0.8.0'}
     dev: true
 
   /caseless/0.12.0:
@@ -14548,7 +14514,7 @@ packages:
       es-to-primitive: 1.2.1
       function-bind: 1.1.1
       function.prototype.name: 1.1.5
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
       get-symbol-description: 1.0.0
       has: 1.0.3
       has-property-descriptors: 1.0.0
@@ -16190,6 +16156,7 @@ packages:
       function-bind: 1.1.1
       has: 1.0.3
       has-symbols: 1.0.3
+    dev: true
 
   /get-intrinsic/1.2.0:
     resolution: {integrity: sha512-L049y6nFOuom5wGyRc3/gdTLO94dySVKRACj1RmJZBQXlbTMhtNIgkWkUHq+jYmZvKf14EW1EoJnnjbmoHij0Q==}
@@ -16197,7 +16164,6 @@ packages:
       function-bind: 1.1.1
       has: 1.0.3
       has-symbols: 1.0.3
-    dev: true
 
   /get-nonce/1.0.1:
     resolution: {integrity: sha512-FJhYRoDaiatfEkUK8HKlicmu/3SGFD51q3itKDGoSTysQJBnfOcxU5GxnhE1E6soB76MbT0MBtnKJuXyAx+96Q==}
@@ -16769,7 +16735,7 @@ packages:
   /has-property-descriptors/1.0.0:
     resolution: {integrity: sha512-62DVLZGoiEBDHQyqG4w9xCuZ7eJEwNmJRWw2VY84Oedb7WFcA27fiEVe8oUQx9hAUJ4ekurquucTGwsyO1XGdQ==}
     dependencies:
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
     dev: true
 
   /has-symbols/1.0.3:
@@ -17248,7 +17214,7 @@ packages:
     resolution: {integrity: sha512-O0DB1JC/sPyZl7cIo78n5dR7eUSwwpYPiXRhTzNxZVAMUuB8vlnRFyLxdrVToks6XPLVnFfbzaVd5WLjhgg+vA==}
     engines: {node: '>= 0.4'}
     dependencies:
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
       has: 1.0.3
       side-channel: 1.0.4
     dev: true
@@ -18664,6 +18630,10 @@ packages:
 
   /jsonify/0.0.0:
     resolution: {integrity: sha512-trvBk1ki43VZptdBI5rIlG4YOzyeH/WefQt5rj1grasPn4iiZWKet8nkgc4GlsAylaztn0qZfUYOiTsASJFdNA==}
+    dev: true
+
+  /jsonschema/1.4.1:
+    resolution: {integrity: sha512-S6cATIPVv1z0IlxdN+zUk5EPjkGCdnhN4wVSBlvoUO1tOLJootbo9CquNJmbIh4yikWHiUedhRYrNPn1arpEmQ==}
     dev: true
 
   /jsonwebtoken/8.5.1:
@@ -22116,15 +22086,6 @@ packages:
       - '@babel/preset-env'
       - supports-color
 
-  /react-native-config/1.5.0:
-    resolution: {integrity: sha512-slecooA/0tCwhb+RuWEbwLqtKirGh9vWPRpgDfH7uPAraCciqHNH2XjS9ylW+Spn4FUrHg5KWTqUGs9BdBADHg==}
-    peerDependencies:
-      react-native-windows: '>=0.61'
-    peerDependenciesMeta:
-      react-native-windows:
-        optional: true
-    dev: false
-
   /react-native-device-info/10.4.0_react-native@0.71.3:
     resolution: {integrity: sha512-Z37e0HtpBvfkPRgv4xN7lXpvmJyzjwCXSFTXEkw6m2UgnnIsWlOD02Avu4hJXBlIMMazaW3ZLKal3o9h3AYvCw==}
     peerDependencies:
@@ -22132,6 +22093,15 @@ packages:
     dependencies:
       react-native: 0.71.3_raab37p3ikkajcivlo24zcd7ie
     dev: false
+
+  /react-native-dotenv/3.4.8_@babel+runtime@7.21.0:
+    resolution: {integrity: sha512-fg9F8X/cG1kDTwRLgLz3t+AMbsULoFHbUVltdQarmrJ3kNllD1Zq7ZgY85bp8BnPwk0DnYQzKbooiLsUoKd10w==}
+    peerDependencies:
+      '@babel/runtime': ^7.20.6
+    dependencies:
+      '@babel/runtime': 7.21.0
+      dotenv: 16.0.3
+    dev: true
 
   /react-native-gesture-handler/2.9.0_yqouayos4dnow7nnkhah4yzuzq:
     resolution: {integrity: sha512-a0BcH3Qb1tgVqUutc6d3VuWQkI1AM3+fJx8dkxzZs9t06qA27QgURYFoklpabuWpsUTzuKRpxleykp25E8m7tg==}
@@ -23468,7 +23438,7 @@ packages:
     resolution: {integrity: sha512-q5XPytqFEIKHkGdiMIrY10mvLRvnQh42/+GoBlFW3b2LXLE2xxJpZFdm94we0BaoV3RwJyGqg5wS7epxTv0Zvw==}
     dependencies:
       call-bind: 1.0.2
-      get-intrinsic: 1.1.3
+      get-intrinsic: 1.2.0
       object-inspect: 1.12.2
 
   /siginfo/2.0.0:
