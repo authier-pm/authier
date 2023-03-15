@@ -130,11 +130,18 @@ export class Device {
   lockInterval!: NodeJS.Timer | void
   emitter = mitt()
 
-  async save(deviceState) {
+  async save(deviceState?: IBackgroundStateSerializable) {
     //We must clear interval, otherwise we will create a new one every time we save the state
     //because we are creating a new interval every time we we start the app (in syncSettings)
-    this.state = new DeviceState(deviceState)
-    await this.state?.save()
+    if (deviceState) {
+      this.state = new DeviceState(deviceState)
+    }
+    if (!this.state) {
+      throw new Error(
+        'Device state is not initialized and it was not supplied as an argument'
+      )
+    }
+    await this.state.save()
     this.emitter.emit('stateChange')
   }
 

@@ -88,12 +88,12 @@ export function VaultUnlockVerification() {
       throw new Error(`Incorrect password`)
     }
 
-    device.state = new DeviceState({
+    const newState = {
       masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
-    })
-    device.state.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
-    await device.save()
+    }
+    newState.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
+    await device.save(newState)
   }
 
   return (

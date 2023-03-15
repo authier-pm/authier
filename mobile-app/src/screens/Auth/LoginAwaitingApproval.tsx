@@ -192,8 +192,8 @@ export const useLogin = (props: { deviceName: string }) => {
             syncTOTP: false,
             theme: 'dark'
           }
-          device.state = new DeviceState(deviceState)
-          device.save()
+
+          device.save(deviceState)
         } else {
           console.log('test3')
           toast.show({

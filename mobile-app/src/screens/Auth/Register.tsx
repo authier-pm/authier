@@ -135,7 +135,7 @@ export function Register({ navigation }: NavigationProps) {
             await saveAccessToken(registerResult.accessToken)
             const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
-            const deviceState: IBackgroundStateSerializable = {
+            const newDeviceState: IBackgroundStateSerializable = {
               masterEncryptionKey: stringKey,
               userId: userId as string,
               secrets: [],
@@ -152,8 +152,7 @@ export function Register({ navigation }: NavigationProps) {
               theme: 'dark'
             }
 
-            device.state = new DeviceState(deviceState)
-            device.save()
+            device.save(newDeviceState)
             setSubmitting(false)
           }
           setSubmitting(false)
