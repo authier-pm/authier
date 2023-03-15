@@ -23,7 +23,7 @@ import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 export default function Settings() {
   let device = useContext(DeviceContext)
   const [updateSettings] = useUpdateSettingsMutation({
-    refetchQueries: [{ query: SyncSettingsDocument }, 'SyncSettings'],
+    refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
     awaitRefetchQueries: true
   })
   const { toggleColorMode } = useColorMode()
@@ -96,7 +96,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
-                  device.save(false)
+                  device.save()
                 }}
                 defaultValue={device.state!.language}
                 accessibilityLabel="language"
@@ -123,7 +123,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
-                  device.save(false)
+                  device.save()
                 }}
                 defaultValue={device.state!.theme}
                 accessibilityLabel="theme"
@@ -155,7 +155,7 @@ export default function Settings() {
                         config: settings()
                       }
                     })
-                    device.save(false)
+                    device.save()
                   }}
                   size="md"
                 />
@@ -167,7 +167,7 @@ export default function Settings() {
                   defaultIsChecked={device.state!.biometricsEnabled}
                   onValueChange={async (e) => {
                     device.state!.biometricsEnabled = e
-                    device.save(false)
+                    device.save()
                   }}
                   size="md"
                 />

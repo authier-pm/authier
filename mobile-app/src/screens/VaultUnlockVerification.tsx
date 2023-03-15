@@ -14,7 +14,7 @@ import {
   VStack
 } from 'native-base'
 import {
-  base64_to_buf,
+  base64ToBuffer,
   cryptoKeyToString,
   dec,
   generateEncryptionKey
@@ -24,14 +24,17 @@ import { DeviceContext } from '../providers/DeviceProvider'
 import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
-import { DeviceState } from '@src/utils/DeviceState'
 import RNBootSplash from 'react-native-bootsplash'
 
 interface Values {
   password: string
 }
 
-export function VaultUnlockVerification() {
+export function VaultUnlockVerification({
+  onUnlocked
+}: {
+  onUnlocked: () => any
+}) {
   const toast = useToast()
   const id = 'active-toast'
   let device = useContext(DeviceContext)
@@ -69,10 +72,10 @@ export function VaultUnlockVerification() {
   const unlockVault = async (psw: string) => {
     const masterEncryptionKey = await generateEncryptionKey(
       psw,
-      base64_to_buf(lockedState.encryptionSalt)
+      base64ToBuffer(lockedState.encryptionSalt)
     )
 
-    const encryptedDataBuff = base64_to_buf(lockedState.authSecretEncrypted)
+    const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
@@ -88,12 +91,12 @@ export function VaultUnlockVerification() {
       throw new Error(`Incorrect password`)
     }
 
-    device.state = new DeviceState({
+    const newState = {
       masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
-    })
-    device.state.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
-    await device.save()
+    }
+    newState.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
+    await device.save(newState)
   }
 
   return (
@@ -110,7 +113,7 @@ export function VaultUnlockVerification() {
         ) => {
           try {
             await unlockVault(values.password)
-
+            onUnlocked()
             setSubmitting(false)
           } catch (err: any) {
             console.log(err)

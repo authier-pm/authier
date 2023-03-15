@@ -7,7 +7,7 @@ import { PBKDF2Iterations } from '../../../shared/constants'
  */
 export async function cryptoKeyToString(key: CryptoKey): Promise<string> {
   const raw = await crypto.subtle.exportKey('raw', key)
-  return buff_to_base64(raw)
+  return bufferToBase64(raw)
 }
 
 export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
@@ -55,14 +55,14 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const buff_to_base64 = (buff: ArrayBuffer) =>
+export const bufferToBase64 = (buff: ArrayBuffer) =>
   Base64.btoa(
     Array.from(new Uint8Array(buff))
       .map((b) => String.fromCharCode(b))
       .join('')
   )
 
-export const base64_to_buf = (b64: string) =>
+export const base64ToBuffer = (b64: string) =>
   //FIX: What is this
   //@ts-expect-error
   Uint8Array.from(Base64.atob(b64), (c) => c.charCodeAt(null))
@@ -81,5 +81,32 @@ export const encryptedBuf_to_base64 = (
   newBuff.set(iv, salt.byteLength)
   newBuff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
 
-  return buff_to_base64(newBuff)
+  return bufferToBase64(newBuff)
+}
+
+export async function decryptDeviceSecretWithPassword(
+  plainPassword: string,
+  lockedState: { encryptionSalt: string; authSecretEncrypted: string }
+) {
+  const masterEncryptionKey = await generateEncryptionKey(
+    plainPassword,
+    base64ToBuffer(lockedState.encryptionSalt)
+  )
+
+  const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
+  const iv = encryptedDataBuff.slice(16, 16 + 12)
+  const data = encryptedDataBuff.slice(16 + 12)
+  try {
+    const decryptedContent = await window.crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv },
+      masterEncryptionKey,
+      data
+    )
+
+    const addDeviceSecret = dec.decode(decryptedContent)
+    return { addDeviceSecret, masterEncryptionKey }
+  } catch (error) {
+    console.log('error:', error)
+    return { error: 'Wrong password' }
+  }
 }

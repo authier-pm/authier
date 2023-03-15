@@ -5,7 +5,7 @@ import { Heading, Text, useToast } from 'native-base'
 import { LoginContext } from './Login'
 
 import {
-  base64_to_buf,
+  base64ToBuffer,
   cryptoKeyToString,
   dec,
   generateEncryptionKey
@@ -112,12 +112,12 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const masterEncryptionKey = await generateEncryptionKey(
           formState.password,
-          base64_to_buf(encryptionSalt)
+          base64ToBuffer(encryptionSalt)
         )
 
         let currentAddDeviceSecret
         try {
-          const encryptedDataBuff = base64_to_buf(addDeviceSecretEncrypted)
+          const encryptedDataBuff = base64ToBuffer(addDeviceSecretEncrypted)
           const iv = encryptedDataBuff.slice(16, 16 + 12)
           const data = encryptedDataBuff.slice(16 + 12)
 
@@ -142,7 +142,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const newParams = await device.initLocalDeviceAuthSecret(
           masterEncryptionKey,
-          base64_to_buf(encryptionSalt)
+          base64ToBuffer(encryptionSalt)
         )
 
         const response = await addNewDevice({
@@ -192,8 +192,8 @@ export const useLogin = (props: { deviceName: string }) => {
             syncTOTP: false,
             theme: 'dark'
           }
-          device.state = new DeviceState(deviceState)
-          device.save()
+
+          device.save(deviceState)
         } else {
           console.log('test3')
           toast.show({
