@@ -24,14 +24,17 @@ import { DeviceContext } from '../providers/DeviceProvider'
 import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
-import { DeviceState } from '@src/utils/DeviceState'
 import RNBootSplash from 'react-native-bootsplash'
 
 interface Values {
   password: string
 }
 
-export function VaultUnlockVerification() {
+export function VaultUnlockVerification({
+  onUnlocked
+}: {
+  onUnlocked: () => any
+}) {
   const toast = useToast()
   const id = 'active-toast'
   let device = useContext(DeviceContext)
@@ -110,7 +113,7 @@ export function VaultUnlockVerification() {
         ) => {
           try {
             await unlockVault(values.password)
-
+            onUnlocked()
             setSubmitting(false)
           } catch (err: any) {
             console.log(err)

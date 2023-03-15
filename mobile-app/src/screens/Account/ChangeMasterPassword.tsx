@@ -48,7 +48,7 @@ export function ChangeMasterPassword() {
             <FormControl isRequired>
               <Stack mx="4">
                 <FormControl.Label>
-                  <Trans>Current Password</Trans>
+                  <Trans>Current Passwor2d</Trans>
                 </FormControl.Label>
                 <Input
                   type="password"
@@ -179,16 +179,19 @@ export function ChangeMasterPassword() {
                       newEncryptionKey
                     )
                   }
-                  device.save(deviceState)
+                  await device.save(deviceState)
 
                   toast.show({
-                    title: t`Password changed, all your other devices will be logged out and you will need to log in again`,
+                    title: t`Password changed, all your devices will be logged out and you will need to log in again`,
                     variant: 'success'
                   })
+
+                  await device.logout() // TODO remove this logout. We want to force user to relog only on all other devices, but we have some problem with locking the device when changing master password.
                 } else {
                   toast.show({ title: t`Wrong password`, variant: 'error' })
                 }
               } catch (err: any) {
+                console.error(err)
                 toast.show({
                   title: err.message,
                   colorScheme: 'red'

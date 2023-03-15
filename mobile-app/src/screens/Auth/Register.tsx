@@ -91,8 +91,8 @@ export function Register({ navigation }: NavigationProps) {
 
           if (device.biometricsAvailable) {
             await SInfo.setItem('psw', values.password, {
-              sharedPreferencesName: 'mySharedPrefs',
-              keychainService: 'myKeychain',
+              sharedPreferencesName: 'authierShared',
+              keychainService: 'authierKCH',
               touchID: true,
               showModal: true,
               kSecAccessControl: 'kSecAccessControlBiometryAny'
