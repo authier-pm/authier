@@ -5,13 +5,16 @@
   "scripts": {
     "android": "pnpm exec react-native run-android",
     "ios": "react-native run-ios",
+    "start2": "react-native start --port 8088",
     "start": "react-native start",
     "start:nocache": "react-native start --reset-cache",
     "test": "jest",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "adb:reverse": "adb reverse tcp:8088 tcp:8088",
     "gen": "graphql-codegen",
     "extract": "lingui extract",
     "compile": "lingui compile",
+    "killPort": "lsof -ti tcp:8088 | xargs kill",
     "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android"
   },
   "dependencies": {

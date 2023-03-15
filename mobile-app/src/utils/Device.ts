@@ -24,6 +24,8 @@ import mitt from 'mitt'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { DeviceState } from './DeviceState'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
+import { Platform } from 'react-native'
+import { getSensitiveItem, setSensitiveItem } from './secretStorage'
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
@@ -122,9 +124,8 @@ export class Device {
   state: DeviceState | null = null
   fireToken: string | null = null
   lockedState: IBackgroundStateSerializableLocked | null = null
-  initializePromise!: Promise<unknown>
   id: string | null | number[] = null
-  platform: 'android' | 'ios'
+  platform: 'android' | 'ios' | 'web' | 'windows' | 'macos' | 'linux'
   name!: string
   biometricsAvailable = false
   lockInterval!: NodeJS.Timer | void
@@ -149,48 +150,44 @@ export class Device {
    * runs on startup
    */
   async initialize() {
-    this.initializePromise = new Promise(async (resolve) => {
-      this.id = await getUniqueId()
-      this.biometricsAvailable = await this.checkBiometrics()
+    this.id = await getUniqueId()
+    this.platform = Platform.OS
+    this.biometricsAvailable = await this.checkBiometrics()
 
-      let storedState: null | IBackgroundStateSerializable = null
+    let storedState: null | IBackgroundStateSerializable = null
 
-      const storedDeviceState = await SInfo.getItem('deviceState', {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      })
+    const storedDeviceState = await getSensitiveItem('deviceState')
 
-      let storage: {
-        backgroundState: IBackgroundStateSerializable
-        lockedState: null | IBackgroundStateSerializableLocked
-      } | null = null
+    let storage: {
+      backgroundState: IBackgroundStateSerializable
+      lockedState: null | IBackgroundStateSerializableLocked
+    } | null = null
 
-      if (storedDeviceState) {
-        storage = JSON.parse(storedDeviceState)
-      }
+    if (storedDeviceState) {
+      storage = JSON.parse(storedDeviceState)
+    }
 
-      if (storage?.backgroundState) {
-        storedState = storage.backgroundState
-        console.log('device state init from storage')
-      } else if (storage?.lockedState) {
-        this.lockedState = storage.lockedState
-        console.log('device state locked')
-      }
+    if (storage?.backgroundState) {
+      storedState = storage.backgroundState
+      console.log('device state init from storage')
+    } else if (storage?.lockedState) {
+      this.lockedState = storage.lockedState
+      console.log('device state locked')
+    }
 
-      if (storedState) {
-        this.state = new DeviceState(storedState)
-        this.name = storedState.deviceName
-      } else {
-        this.name = await getDeviceName()
-        this.state = null
-      }
+    if (storedState) {
+      this.state = new DeviceState(storedState)
+      this.name = storedState.deviceName
+    } else {
+      this.name = await getDeviceName()
+      this.state = null
+    }
 
-      const token = await messaging().getToken()
-      this.fireToken = token
+    const token = await messaging().getToken()
+    this.fireToken = token
 
-      resolve(this.state)
-    })
-    return this.initializePromise
+    this.emitter.emit('stateChange')
+    return this.state
   }
 
   syncSettings(config: SettingsInput) {
@@ -298,14 +295,10 @@ export class Device {
       lockTimeEnd
     }
 
-    await SInfo.setItem(
-      'deviceState',
-      JSON.stringify({ backgroundState: null, lockedState: this.lockedState }),
-      {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
-      }
-    )
+    await setSensitiveItem('deviceState', {
+      backgroundState: null,
+      lockedState: this.lockedState
+    })
 
     this.state = null
     this.emitter.emit('stateChange')
@@ -313,14 +306,10 @@ export class Device {
 
   async clearLocalStorage() {
     this.state = null
-    await SInfo.setItem(
-      'deviceState',
-      JSON.stringify({ backgroundState: null, lockedState: null }),
-      {
-        sharedPreferencesName: 'mySharedPrefs',
-        keychainService: 'myKeychain'
-      }
-    )
+    await setSensitiveItem('deviceState', {
+      backgroundState: null,
+      lockedState: null
+    })
   }
 
   clearAndReload = async () => {

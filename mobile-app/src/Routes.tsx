@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 import { DeviceContext } from './providers/DeviceProvider'
@@ -52,8 +52,16 @@ export default function Routes() {
     }
   }, [isReady])
 
+  useEffect(() => {}, [device.lockedState])
+
   if (device.lockedState) {
-    return <VaultUnlockVerification />
+    return (
+      <VaultUnlockVerification
+        onUnlocked={() => {
+          setIsReady(true)
+        }}
+      />
+    )
   }
 
   if (!isReady) {
