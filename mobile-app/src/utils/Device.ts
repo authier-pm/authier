@@ -416,7 +416,7 @@ export class Device {
       this.startVaultLockTimer()
     }
 
-    this.save(false)
+    this.save()
   }
 
   clearLockInterval = () => {
