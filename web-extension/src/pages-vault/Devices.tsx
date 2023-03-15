@@ -167,6 +167,7 @@ const DeviceListItem = ({
                   values: SettingsValues,
                   { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
+                  //TODO: What property can user update?
                   console.log(values)
 
                   setSubmitting(false)

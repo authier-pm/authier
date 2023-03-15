@@ -187,10 +187,10 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             lockTime: 28800,
             autofill: false,
-            language: 'en',
+            language: addNewDeviceForUser.user.uiLocalisation,
             lockTimeEnd: Date.now() + 28800000,
             syncTOTP: false,
-            theme: 'dark'
+            theme: addNewDeviceForUser.user.theme
           }
 
           device.save(deviceState)

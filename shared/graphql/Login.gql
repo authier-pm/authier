@@ -21,6 +21,8 @@ mutation addNewDeviceForUser(
             updatedAt
             version
           }
+          theme
+          uiLocalisation
         }
       }
     }

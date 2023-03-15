@@ -190,7 +190,7 @@ export class Device {
     return this.state
   }
 
-  syncSettings(config: SettingsInput) {
+  syncSettings(config: Omit<SettingsInput, 'theme' | 'language'>) {
     //HACK: this is a hack, we should not create a new interval every time we save the state
     //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
     if (!this.state) {
@@ -200,8 +200,6 @@ export class Device {
     this.state.autofill = config.autofill
     this.state.lockTime = config.vaultLockTimeoutSeconds
     this.state.syncTOTP = config.syncTOTP
-    this.state.language = config.language
-    this.state.theme = config.theme ?? 'dark'
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {

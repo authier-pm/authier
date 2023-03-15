@@ -4,8 +4,6 @@ query SyncSettings {
     TOTPlimit
     id
     autofill
-    language
-    theme
   }
   currentDevice {
     id

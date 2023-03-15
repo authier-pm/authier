@@ -118,11 +118,6 @@ export default function Settings() {
                 onValueChange={(value) => {
                   toggleColorMode()
                   device.state!.theme = value
-                  updateSettings({
-                    variables: {
-                      config: settings()
-                    }
-                  })
                   device.save()
                 }}
                 defaultValue={device.state!.theme}
