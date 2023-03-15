@@ -36,6 +36,7 @@ import {
 } from './Device'
 
 import { getDomainNameAndTldFromUrl } from '../../../shared/urlUtils'
+import { setSensitiveItem } from './secretStorage'
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
@@ -130,14 +131,10 @@ export class DeviceState implements IBackgroundStateSerializable {
     device.lockedState = null
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
 
-    await SInfo.setItem(
-      'deviceState',
-      JSON.stringify({ backgroundState: this, lockedState: null }),
-      {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      }
-    )
+    await setSensitiveItem('deviceState', {
+      backgroundState: this,
+      lockedState: null
+    })
   }
 
   getSecretDecryptedById(id: string) {
