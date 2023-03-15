@@ -14,7 +14,7 @@ import {
   VStack
 } from 'native-base'
 import {
-  base64_to_buf,
+  base64ToBuffer,
   cryptoKeyToString,
   dec,
   generateEncryptionKey
@@ -69,10 +69,10 @@ export function VaultUnlockVerification() {
   const unlockVault = async (psw: string) => {
     const masterEncryptionKey = await generateEncryptionKey(
       psw,
-      base64_to_buf(lockedState.encryptionSalt)
+      base64ToBuffer(lockedState.encryptionSalt)
     )
 
-    const encryptedDataBuff = base64_to_buf(lockedState.authSecretEncrypted)
+    const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
