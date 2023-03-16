@@ -136,6 +136,7 @@ export class Device {
     //because we are creating a new interval every time we we start the app (in syncSettings)
     if (deviceState) {
       this.state = new DeviceState(deviceState)
+      this.emitter.emit('stateChange')
     }
     if (!this.state) {
       throw new Error(
@@ -143,7 +144,6 @@ export class Device {
       )
     }
     await this.state.save()
-    this.emitter.emit('stateChange')
   }
 
   /**

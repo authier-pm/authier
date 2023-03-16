@@ -28,7 +28,6 @@ import { AuthStackParamList } from '../../navigation/AuthNavigation'
 import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { DeviceState } from '@src/utils/DeviceState'
 import {
   bufferToBase64,
   cryptoKeyToString,

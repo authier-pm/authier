@@ -64,9 +64,9 @@ function AppNavigation() {
       })
   }, [])
 
-  if (loading) {
-    return <Loading />
-  }
+  // if (loading) {
+  //   return <Loading />
+  // }
 
   return (
     <RootStack.Navigator

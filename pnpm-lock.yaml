@@ -205,6 +205,7 @@ importers:
       '@graphql-codegen/typescript': ^3.0.1
       '@graphql-codegen/typescript-operations': ^3.0.1
       '@graphql-codegen/typescript-react-apollo': ^3.3.7
+      '@hookform/resolvers': ^2.9.11
       '@lingui/cli': ^3.17.2
       '@lingui/core': ^3.17.2
       '@lingui/macro': ^3.17.2
@@ -230,6 +231,7 @@ importers:
       '@rnx-kit/metro-resolver-symlinks': ^0.1.26
       '@sentry/react-native': 5.1.1
       '@shopify/flash-list': ^1.4.1
+      '@ts-react/form': ^1.3.0
       '@types/crypto-js': ^4.1.1
       '@types/jest': ^29.4.0
       '@types/react-native': ^0.71.3
@@ -265,6 +267,7 @@ importers:
       pretty-quick: ^3.1.3
       query-string: ^8.1.0
       react: 18.2.0
+      react-hook-form: ^7.43.5
       react-native: 0.71.3
       react-native-biometrics: ^3.0.1
       react-native-bootsplash: ^4.5.2
@@ -304,6 +307,7 @@ importers:
       '@apollo/client': 3.7.9_onqnqwb3ubg5opvemcqf7c2qhy
       '@babel/preset-env': 7.20.2_@babel+core@7.21.0
       '@babel/preset-react': 7.18.6_@babel+core@7.21.0
+      '@hookform/resolvers': 2.9.11_react-hook-form@7.43.5
       '@lingui/core': 3.17.2
       '@lingui/react': 3.17.2_react@18.2.0
       '@react-native-async-storage/async-storage': 1.17.11_react-native@0.71.3
@@ -326,6 +330,7 @@ importers:
       '@rnx-kit/metro-resolver-symlinks': 0.1.26
       '@sentry/react-native': 5.1.1_yqouayos4dnow7nnkhah4yzuzq
       '@shopify/flash-list': 1.4.1_guwohi4nlpi5pltiuinnykzlhi
+      '@ts-react/form': 1.3.0_yddhllb56fjaab5oslhijcuxbe
       apollo-link-http: 1.5.17_graphql@16.6.0
       apollo-link-queue: 3.1.0_onqnqwb3ubg5opvemcqf7c2qhy
       apollo-link-retry: 2.2.16_graphql@16.6.0
@@ -348,6 +353,7 @@ importers:
       native-base: 3.4.26_bifmjzumoyofvjl4ufb7cdiunq
       query-string: 8.1.0
       react: 18.2.0
+      react-hook-form: 7.43.5_react@18.2.0
       react-native: 0.71.3_raab37p3ikkajcivlo24zcd7ie
       react-native-biometrics: 3.0.1_react-native@0.71.3
       react-native-bootsplash: 4.5.2_react-native@0.71.3
