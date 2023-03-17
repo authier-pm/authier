@@ -127,9 +127,10 @@ export const VaultList = () => {
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
+      console.log('NEW DATA', data)
       setSecuritySettings({
         autofillCredentialsEnabled: data.me?.autofillCredentialsEnabled,
-        autofillTOTPEnabled: data.me.autofillTOTPEnabled,
+        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
         uiLanguage: data.me?.uiLanguage,
         sync2FA: data.currentDevice.sync2FA,
         vaultLockTimeoutSeconds: data.currentDevice

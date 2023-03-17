@@ -21,9 +21,9 @@ const VaultConfigFormSchema = z.object({
     t`Lock time // Choose lock time`
   ),
   uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
-  autofillCredentialsEnabled: z.boolean(),
-  autofillTOTPEnabled: z.boolean(),
-  sync2FA: z.boolean()
+  autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
+  autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),
+  sync2FA: z.boolean().describe(t`2FA sync`)
 })
 
 export default function Security() {
@@ -36,6 +36,7 @@ export default function Security() {
     const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
       defaultValues: {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+        autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         sync2FA: deviceState.sync2FA,
         vaultLockTimeoutSeconds: deviceState.lockTime
@@ -62,6 +63,7 @@ export default function Security() {
     useEffect(() => {
       reset({
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+        autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         sync2FA: deviceState.sync2FA,
         vaultLockTimeoutSeconds: deviceState.lockTime
