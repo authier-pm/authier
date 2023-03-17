@@ -31,7 +31,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 declare global {
   interface Crypto {
-    randomUUID: () => string
+    randomUUID: () => `${string}-${string}-${string}-${string}-${string}`
   }
 }
 
@@ -39,7 +39,7 @@ interface Values {
   password: string
   email: string
 }
-export default function Register(): ReactElement {
+export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()

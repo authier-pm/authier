@@ -8,6 +8,7 @@
     },
     "target": "ES2015",
     "module": "ESNext",
+    "noEmit": true,
     "moduleResolution": "node",
     "rootDir": "../../authier",
     "outDir": "dist/js",

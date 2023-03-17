@@ -2,7 +2,7 @@ import { Box } from '@chakra-ui/layout'
 import { Center, Heading } from '@chakra-ui/react'
 import { Tooltip, IconButton } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
-import { ReactElement } from 'react'
+
 import { IoMdArchive } from 'react-icons/io'
 import browser from 'webextension-polyfill'
 
@@ -15,11 +15,12 @@ export function openVaultTab(afterHash: string = '') {
   })
 }
 
-export function AuthLinkPage(): ReactElement {
+export function AuthLinkPage() {
   return (
     <>
       <Box width="315px" p={30}>
         <Center>
+          {/* @ts-expect-error */}
           <Heading size="sm">
             <Trans>Open vault to login or sign up</Trans>
           </Heading>
