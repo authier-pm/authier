@@ -13,14 +13,20 @@ import {
   Icon,
   Center
 } from 'native-base'
-import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState
+} from 'react'
 
-import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
-import { DeviceContext } from '../../providers/DeviceProvider'
+import { DeviceContext } from '@providers/DeviceProvider'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { AuthStackParamList } from '../../navigation/AuthNavigation'
+import { AuthStackParamList } from '@navigation/AuthNavigation'
+import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 interface LoginFormValues {
   email: string
@@ -39,11 +45,19 @@ export function Login({ navigation }: NavigationProps) {
     email: '',
     password: ''
   }
+  const [loading, setLoading] = useState(false)
   const [show, setShow] = React.useState(false)
   const [formState, setFormState] = useState<LoginFormValues | null>(null)
   let device = useContext(DeviceContext)
 
-  if (!device.fireToken) {
+  useEffect(() => {
+    if (!device.fireToken) {
+      setLoading(true)
+    }
+    setLoading(false)
+  }, [device.fireToken])
+
+  if (loading) {
     return (
       <Center>
         <Spinner />

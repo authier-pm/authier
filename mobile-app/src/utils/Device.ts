@@ -185,6 +185,7 @@ export class Device {
     }
 
     const token = await messaging().getToken()
+    console.log('token', token)
     this.fireToken = token
 
     this.emitter.emit('stateChange')
