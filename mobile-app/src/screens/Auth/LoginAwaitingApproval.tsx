@@ -22,7 +22,6 @@ import { Platform } from 'react-native'
 import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
-import { DeviceState } from '@src/utils/DeviceState'
 import { Trans } from '@lingui/macro'
 
 const ToastServerErrorDetails = {
@@ -89,7 +88,6 @@ export const useLogin = (props: { deviceName: string }) => {
         const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
-          console.log('test1')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
@@ -186,16 +184,16 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             lockTime: 28800,
-            autofill: false,
-            language: addNewDeviceForUser.user.uiLocalisation,
+            autofillCredentialsEnabled: false,
+            autofillTOTPEnabled: false,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
-            syncTOTP: false,
-            theme: addNewDeviceForUser.user.theme
+            sync2FA: false,
+            theme: addNewDeviceForUser.user.defaultDeviceTheme
           }
 
           device.save(deviceState)
         } else {
-          console.log('test3')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />

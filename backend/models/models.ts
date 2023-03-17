@@ -69,19 +69,19 @@ export class EncryptedSecretInput {
 @InputType()
 export class SettingsInput {
   @Field(() => Boolean)
-  syncTOTP: boolean
+  sync2FA: boolean
 
   @Field(() => Int)
   vaultLockTimeoutSeconds: number
 
   @Field(() => Boolean)
-  autofill: boolean
+  autofillCredentialsEnabled: boolean
+
+  @Field(() => Boolean)
+  autofillTOTPEnabled: boolean
 
   @Field(() => String)
-  language: string
-
-  @Field(() => String, { nullable: true })
-  theme?: string
+  uiLanguage: string
 }
 
 @InputType()

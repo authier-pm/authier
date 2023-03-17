@@ -485,11 +485,11 @@ input SecretUsageEventInput {
 }
 
 input SettingsInput {
-  syncTOTP: Boolean!
+  sync2FA: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofill: Boolean!
-  language: String!
-  theme: String
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
 }
 
 """

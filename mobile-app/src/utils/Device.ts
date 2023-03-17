@@ -40,9 +40,10 @@ export interface IBackgroundStateSerializableLocked {
   authSecretEncrypted: string
   authSecret: string
   lockTime: number
-  syncTOTP: boolean
-  autofill: boolean
-  language: string
+  sync2FA: boolean
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  uiLanguage: string
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number
@@ -61,21 +62,18 @@ export interface ISecret {
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  // @ts-expect-error TODO fix this ZOD typing issue
   totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
 }
-// @ts-expect-error TODO fix this ZOD typing issue
+
 export type TotpTypeWithMeta = z.infer<typeof totpSchema>
 export type LoginCredentialsTypeWithMeta = z.infer<
-  // @ts-expect-error TODO fix this ZOD typing issue
   typeof loginCredentialsSchema
 > & {
   parseError?: ZodError
 }
 
 export interface ILoginSecret extends ISecret {
-  // @ts-expect-error TODO fix this ZOD typing issue
   loginCredentials: z.infer<typeof loginCredentialsSchema> & {
     parseError?: ZodError
   }
@@ -193,16 +191,17 @@ export class Device {
     return this.state
   }
 
-  syncSettings(config: Omit<SettingsInput, 'theme' | 'language'>) {
+  syncSettings(config: SettingsInput) {
     //HACK: this is a hack, we should not create a new interval every time we save the state
     //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
     if (!this.state) {
       console.warn('device not initialized')
       return
     }
-    this.state.autofill = config.autofill
+    this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
+    this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.lockTime = config.vaultLockTimeoutSeconds
-    this.state.syncTOTP = config.syncTOTP
+    this.state.sync2FA = config.sync2FA
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
@@ -271,9 +270,10 @@ export class Device {
       secrets,
       encryptionSalt,
       lockTime,
-      syncTOTP,
-      autofill,
-      language,
+      sync2FA,
+      autofillTOTPEnabled,
+      autofillCredentialsEnabled,
+      uiLanguage,
       theme,
       biometricsEnabled,
       lockTimeEnd
@@ -288,9 +288,10 @@ export class Device {
       authSecret: this.state.authSecret,
       authSecretEncrypted: this.state.authSecretEncrypted,
       lockTime,
-      syncTOTP,
-      autofill,
-      language,
+      sync2FA,
+      autofillCredentialsEnabled,
+      autofillTOTPEnabled,
+      uiLanguage,
       theme,
       biometricsEnabled,
       lockTimeEnd

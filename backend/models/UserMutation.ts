@@ -209,16 +209,15 @@ export class UserMutation extends UserBase {
         id: this.id
       },
       data: {
-        autofill: config.autofill,
-        language: config.language,
-        theme: config.theme,
+        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+        uiLanguage: config.uiLanguage,
         Devices: {
           update: {
             where: {
               id: ctx.device.id
             },
             data: {
-              syncTOTP: config.syncTOTP,
+              sync2FA: config.sync2FA,
               vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
             }
           }

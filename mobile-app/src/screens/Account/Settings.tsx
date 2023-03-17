@@ -31,10 +31,10 @@ export default function Settings() {
 
   const settings = (): SettingsInput => {
     return {
-      autofill: device.state!.autofill,
-      language: device.state!.language,
-      syncTOTP: device.state!.syncTOTP,
-      theme: device.state!.theme,
+      autofillTOTPEnabled: device.state!.autofillTOTPEnabled,
+      autofillCredentialsEnabled: device.state!.autofillCredentialsEnabled,
+      uiLanguage: device.state!.uiLanguage,
+      sync2FA: device.state!.sync2FA,
       vaultLockTimeoutSeconds: device.state!.lockTime
     }
   }
@@ -90,7 +90,7 @@ export default function Settings() {
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
                 onValueChange={(value) => {
-                  device.state!.language = value
+                  device.state!.uiLanguage = value
                   updateSettings({
                     variables: {
                       config: settings()
@@ -98,7 +98,7 @@ export default function Settings() {
                   })
                   device.save()
                 }}
-                defaultValue={device.state!.language}
+                defaultValue={device.state!.uiLanguage}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
@@ -142,9 +142,9 @@ export default function Settings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  defaultIsChecked={device.state!.syncTOTP}
+                  defaultIsChecked={device.state!.sync2FA}
                   onValueChange={(e) => {
-                    device.state!.syncTOTP = e
+                    device.state!.sync2FA = e
                     updateSettings({
                       variables: {
                         config: settings()

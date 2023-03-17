@@ -1,5 +1,4 @@
 import { apolloClient } from '../apollo/ApolloClient'
-import SInfo from 'react-native-sensitive-info'
 import {
   abToCryptoKey,
   base64ToBuffer,
@@ -57,9 +56,10 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   //Settings
   lockTime: number
-  syncTOTP: boolean
-  autofill: boolean
-  language: string
+  sync2FA: boolean
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  uiLanguage: string
   theme: string
   biometricsEnabled = false
 

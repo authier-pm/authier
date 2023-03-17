@@ -29,10 +29,12 @@ function AppNavigation() {
   React.useEffect(() => {
     if (data) {
       device.syncSettings({
-        autofill: data.me?.autofill as boolean,
-        syncTOTP: data.currentDevice.syncTOTP as boolean,
+        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
+        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
+        sync2FA: data.currentDevice.sync2FA,
         vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number
+          .vaultLockTimeoutSeconds as number,
+        uiLanguage: data.me.uiLanguage
       })
     }
   }, [data])
@@ -64,9 +66,9 @@ function AppNavigation() {
       })
   }, [])
 
-  // if (loading) {
-  //   return <Loading />
-  // }
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <RootStack.Navigator

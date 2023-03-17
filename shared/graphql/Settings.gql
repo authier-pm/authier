@@ -3,11 +3,13 @@ query SyncSettings {
     loginCredentialsLimit
     TOTPlimit
     id
-    autofill
+    autofillCredentialsEnabled
+    autofillTOTPEnabled
+    uiLanguage
   }
   currentDevice {
     id
-    syncTOTP
+    sync2FA
     vaultLockTimeoutSeconds
   }
 }
