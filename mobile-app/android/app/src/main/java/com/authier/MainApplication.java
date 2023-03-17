@@ -12,17 +12,18 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import com.facebook.react.bridge.JSIModulePackage;
 import com.swmansion.reanimated.ReanimatedJSIModulePackage;
-import com.microsoft.codepush.react.CodePush;
+//TODO: Fix CodePush
+// import com.microsoft.codepush.react.CodePush;
 
 public class MainApplication extends Application implements ReactApplication {
 
   private final ReactNativeHost mReactNativeHost =
       new DefaultReactNativeHost(this) {
 
-        @Override
-        protected String getJSBundleFile() {
-            return CodePush.getJSBundleFile();
-        }
+        // @Override
+        // protected String getJSBundleFile() {
+        //     return CodePush.getJSBundleFile();
+        // }
         
         @Override
         public boolean getUseDeveloperSupport() {

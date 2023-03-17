@@ -15,11 +15,11 @@ react {
     //   The root of your project, i.e. where "package.json" lives. Default is '..'
     // root = file("../")
     //   The folder where the react-native NPM package is. Default is ../node_modules/react-native
-    reactNativeDir = file("../../../node_modules/react-native")
+    reactNativeDir = file("../../node_modules/react-native")
     //   The folder where the react-native Codegen package is. Default is ../node_modules/react-native-codegen
     // codegenDir = file("../node_modules/react-native-codegen")
     //   The cli.js file which is the React Native CLI entrypoint. Default is ../node_modules/react-native/cli.js
-    cliFile = file("../../../node_modules/react-native/cli.js")
+    cliFile = file("../../node_modules/react-native/cli.js")
     /* Variants */
     //   The list of variants to that are debuggable. For those we're going to
     //   skip the bundling of the JS bundle and the assets. By default is just 'debug'.
@@ -52,7 +52,8 @@ react {
     // hermesFlags = ["-O", "-output-source-map"]
 }
 
-apply from: "../../../node_modules/react-native-code-push/android/codepush.gradle"
+//TODO: Fix Codepush
+//apply from: "../../../node_modules/react-native-code-push/android/codepush.gradle"
 
 /**
  * Set this to true to create four separate APKs instead of one,
@@ -101,7 +102,7 @@ android {
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName "1.0.1"
         missingDimensionStrategy 'react-native-camera', 'general'
         resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
     }
@@ -132,12 +133,12 @@ android {
     }
     buildTypes {
         debug {
-            resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             signingConfig signingConfigs.debug
         }
         releaseStaging {
             
-            resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             // Note: It's a good idea to provide matchingFallbacks for the new buildType you create to prevent build issues
             // Add the following line if not already there
             matchingFallbacks = ['release']
@@ -149,7 +150,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
+            // resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
         }
     }
 

@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "0.0.1",
+  "version": "1.0.1",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -70,7 +70,6 @@
     "react-native-bootsplash": "^4.5.2",
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.2",
-    "react-native-code-push": "https://github.com/johnf/react-native-code-push#rn-0.71",
     "react-native-device-info": "^10.4.0",
     "react-native-gesture-handler": "2.9.0",
     "react-native-get-random-values": "^1.8.0",
