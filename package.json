@@ -21,7 +21,7 @@
     "@emotion/styled": "^11.10.6",
     "@graphql-codegen/cli": "^2.16.5",
     "@graphql-codegen/fragment-matcher": "^3.3.3",
-    "@graphql-codegen/introspection": "^2.2.3",
+    "@graphql-codegen/introspection": "^3.0.1",
     "@graphql-codegen/near-operation-file-preset": "^2.5.0",
     "@graphql-codegen/typescript": "^2.8.8",
     "@graphql-codegen/typescript-operations": "^2.5.13",
