@@ -1,4 +1,4 @@
-import { Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 
 import { intlFormat } from 'date-fns'
 import {
@@ -11,7 +11,7 @@ import {
   View,
   VStack
 } from 'native-base'
-import React from 'react'
+import React, { ReactElement } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
@@ -19,6 +19,23 @@ import { DevicesStackScreenProps } from '../../navigation/types'
 import { DeviceContext } from '../../providers/DeviceProvider'
 import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
+
+const ColumnWrapper = ({
+  text,
+  children
+}: {
+  text: string
+  children: ReactElement
+}) => {
+  return (
+    <HStack alignItems={'center'} justifyContent="space-between">
+      <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+        {text}
+      </Text>
+      {children}
+    </HStack>
+  )
+}
 
 export default function DeviceInfo({
   route,
@@ -87,52 +104,55 @@ export default function DeviceInfo({
             ) : null}
           </HStack>
 
-          <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
-            <HStack alignItems={'center'} justifyContent="space-between">
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Last IP Address
-              </Text>
-              <Text fontSize={'xl'}>{route.params.device.firstIpAddress}</Text>
-            </HStack>
+          <VStack>
+            <Text fontWeight={600} color={'gray.500'} fontSize={'md'} m={3}>
+              About
+            </Text>
+            <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
+              <ColumnWrapper text={t`Last IP Address`}>
+                <Text fontSize={'xl'}>
+                  {route.params.device.firstIpAddress}
+                </Text>
+              </ColumnWrapper>
 
-            <HStack alignItems={'center'} justifyContent="space-between">
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Geolocation
-              </Text>
-              <Text fontSize={'xl'}>{route.params.device.lastGeoLocation}</Text>
-            </HStack>
+              <ColumnWrapper text={t`Geolocation`}>
+                <Text fontSize={'xl'}>
+                  {route.params.device.lastGeoLocation}
+                </Text>
+              </ColumnWrapper>
 
-            <HStack alignItems={'center'} justifyContent="space-between">
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Platform
-              </Text>
-              <Text fontSize={'xl'}>{route.params.device.platform}</Text>
-            </HStack>
+              <ColumnWrapper text={t`Platform`}>
+                <Text fontSize={'xl'}>{route.params.device.platform}</Text>
+              </ColumnWrapper>
 
-            <HStack alignItems={'center'} justifyContent="space-between">
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Logout at
-              </Text>
-              <Text fontSize={'xl'}>
-                {route.params.device.logoutAt ?? 'Logged in'}
-              </Text>
-            </HStack>
+              <ColumnWrapper text={t`Logout at`}>
+                <Text fontSize={'xl'}>
+                  {route.params.device.logoutAt ?? 'Logged in'}
+                </Text>
+              </ColumnWrapper>
 
-            <HStack alignItems={'center'} justifyContent="space-between">
-              <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                Created
-              </Text>
-              <Text fontSize={'xl'}>
-                {intlFormat(new Date(route.params.device.createdAt ?? ''), {
-                  weekday: 'long',
-                  year: 'numeric',
-                  month: 'long',
-                  day: 'numeric'
-                })}
-              </Text>
-            </HStack>
+              <HStack alignItems={'center'} justifyContent="space-between">
+                <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                  Created
+                </Text>
+                <Text fontSize={'xl'}>
+                  {intlFormat(new Date(route.params.device.createdAt ?? ''), {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </Text>
+              </HStack>
+            </VStack>
           </VStack>
         </VStack>
+      </VStack>
+
+      <VStack>
+        <Text fontWeight={600} color={'gray.500'} fontSize={'md'} m={3}>
+          Settings
+        </Text>
       </VStack>
     </View>
   )

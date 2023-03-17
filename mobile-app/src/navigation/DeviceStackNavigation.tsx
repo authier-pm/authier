@@ -28,7 +28,7 @@ export default function DeviceStackNavigation() {
       <DeviceStack.Screen
         name="DeviceInfo"
         options={{
-          title: 'Device info'
+          title: 'Device'
         }}
         // @ts-expect-error TODO we need to fix this TS error
         component={DeviceInfo}
