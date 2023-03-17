@@ -10,7 +10,6 @@ import AccountNavigation from './AccountNavigation'
 import TOTPStackNavigation from './TOTPStackNavigation'
 import { DeviceContext } from '../providers/DeviceProvider'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { useColorMode } from 'native-base'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
 import { Loading } from '@src/components/Loading'
@@ -19,7 +18,6 @@ const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
   const device = React.useContext(DeviceContext)
-  const { toggleColorMode, colorMode } = useColorMode()
   const { data } = useSyncSettingsQuery({
     fetchPolicy: 'cache-and-network'
   })
@@ -27,17 +25,12 @@ function AppNavigation() {
   const [loading, setLoading] = React.useState(true)
   const [initialRoute, setInitialRoute] = React.useState('Passwords')
 
-  // TODO: I think this is not ideal, but it works for now
+  //TODO: I think this is not ideal, but it works for now
   React.useEffect(() => {
     if (data) {
-      if (colorMode !== data.me?.theme) {
-        toggleColorMode()
-      }
       device.syncSettings({
         autofill: data.me?.autofill as boolean,
-        language: data.me?.language as string,
         syncTOTP: data.currentDevice.syncTOTP as boolean,
-        theme: data.me?.theme as string,
         vaultLockTimeoutSeconds: data.currentDevice
           .vaultLockTimeoutSeconds as number
       })
@@ -71,9 +64,9 @@ function AppNavigation() {
       })
   }, [])
 
-  if (loading) {
-    return <Loading />
-  }
+  // if (loading) {
+  //   return <Loading />
+  // }
 
   return (
     <RootStack.Navigator

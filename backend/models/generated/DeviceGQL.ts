@@ -30,7 +30,7 @@ export class DeviceGQLScalars {
   logoutAt: Date | null
 
   @Field()
-  syncTOTP: boolean
+  sync2FA: boolean
 
   @Field(() => Int, { nullable: true })
   vaultLockTimeoutSeconds: number | null

@@ -15,7 +15,6 @@ type UserQuery {
   email: EmailAddress
   tokenVersion: Int!
   username: String
-  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -23,9 +22,10 @@ type UserQuery {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofill: Boolean!
-  language: String!
-  theme: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  defaultDeviceTheme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -85,7 +85,6 @@ type UserGQL {
   email: String
   tokenVersion: Int!
   username: String
-  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -93,9 +92,10 @@ type UserGQL {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofill: Boolean!
-  language: String!
-  theme: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  defaultDeviceTheme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -118,7 +118,7 @@ type DeviceGQL {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  syncTOTP: Boolean!
+  sync2FA: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -253,7 +253,7 @@ type DeviceQuery {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  syncTOTP: Boolean!
+  sync2FA: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -357,7 +357,6 @@ type UserMutation {
   email: EmailAddress
   tokenVersion: Int!
   username: String
-  uiLocalisation: String!
   addDeviceSecretEncrypted: String!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -365,9 +364,10 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofill: Boolean!
-  language: String!
-  theme: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  defaultDeviceTheme: String!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -410,7 +410,7 @@ type DeviceMutation {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  syncTOTP: Boolean!
+  sync2FA: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
