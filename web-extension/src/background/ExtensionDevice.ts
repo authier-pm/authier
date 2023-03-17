@@ -114,10 +114,11 @@ export class DeviceState implements IBackgroundStateSerializable {
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime: number
-  autofill: boolean
-  language: string
+  sync2FA: boolean
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  uiLanguage: string
   theme: string
-  syncTOTP: boolean
   authSecret: string
   authSecretEncrypted: string
 
@@ -588,9 +589,10 @@ class ExtensionDevice {
       secrets,
       encryptionSalt,
       lockTime,
-      syncTOTP,
-      autofill,
-      language,
+      sync2FA,
+      autofillCredentialsEnabled,
+      autofillTOTPEnabled,
+      uiLanguage,
       theme,
       authSecret,
       authSecretEncrypted
@@ -605,9 +607,10 @@ class ExtensionDevice {
       authSecret,
       authSecretEncrypted,
       lockTime,
-      syncTOTP,
-      autofill,
-      language,
+      sync2FA,
+      autofillTOTPEnabled,
+      autofillCredentialsEnabled,
+      uiLanguage,
       theme
     }
     await browser.storage.local.set({
@@ -674,11 +677,11 @@ class ExtensionDevice {
 
   syncSettings(config: SettingsInput) {
     if (this.state) {
-      this.state.autofill = config.autofill
+      this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
+      this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
       this.state.lockTime = config.vaultLockTimeoutSeconds
-      this.state.syncTOTP = config.syncTOTP
-      this.state.language = config.language
-      this.state.theme = config.theme ?? 'dark'
+      this.state.sync2FA = config.sync2FA
+      this.state.uiLanguage = config.uiLanguage
     }
   }
 

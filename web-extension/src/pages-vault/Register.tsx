@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react'
+import { useState } from 'react'
 import {
   Box,
   Button,
@@ -112,9 +112,10 @@ export default function Register() {
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
-              autofill: true,
-              language: 'en',
-              syncTOTP: false,
+              autofillTOTPEnabled: true,
+              autofillCredentialsEnabled: true,
+              uiLanguage: 'en',
+              sync2FA: false,
               theme: 'dark'
             }
 

@@ -46,7 +46,7 @@ import { NewDevicesApprovalStack } from './NewDeviceApproval'
 
 interface SettingsValues {
   lockTime: number
-  twoFA: boolean
+  sync2FA: boolean
 }
 
 const DeviceListItem = ({
@@ -162,7 +162,7 @@ const DeviceListItem = ({
               <Formik
                 initialValues={{
                   lockTime: deviceInfo.vaultLockTimeoutSeconds as number,
-                  twoFA: deviceInfo.syncTOTP as boolean
+                  sync2FA: deviceInfo.sync2FA as boolean
                 }}
                 onSubmit={async (
                   values: SettingsValues,
@@ -210,22 +210,22 @@ const DeviceListItem = ({
                       </FormControl>
 
                       {/* Not ideal, later refactor */}
-                      <Field name="twoFA">
+                      <Field name="sync2FA">
                         {({ field, form }: FieldProps) => {
                           const { onChange, ...rest } = field
                           return (
                             <FormControl
-                              id="twoFA"
+                              id="sync2FA"
                               isInvalid={
-                                !!form.errors['twoFA'] &&
-                                !!form.touched['twoFA']
+                                !!form.errors['sync2FA'] &&
+                                !!form.touched['sync2FA']
                               }
                             >
                               <Checkbox
                                 {...rest}
-                                id="twoFA"
+                                id="sync2FA"
                                 onChange={onChange}
-                                defaultChecked={values.twoFA}
+                                defaultChecked={values.sync2FA}
                               >
                                 2FA
                               </Checkbox>

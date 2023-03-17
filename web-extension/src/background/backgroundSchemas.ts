@@ -51,10 +51,10 @@ export const webInputElementSchema = z.object({
 })
 
 export const settingsSchema = z.object({
-  autofill: z.boolean(),
-  language: z.string(),
-  syncTOTP: z.boolean(),
-  theme: z.string().optional().nullable(),
+  autofillCredentialsEnabled: z.boolean(),
+  autofillTOTPEnabled: z.boolean(),
+  uiLanguage: z.string(),
+  sync2FA: z.boolean(),
   vaultLockTimeoutSeconds: z.number()
 })
 
@@ -77,10 +77,11 @@ export const backgroundStateSerializableLockedSchema = z.object({
   authSecretEncrypted: z.string(),
   authSecret: z.string(),
   lockTime: z.number(),
-  autofill: z.boolean(),
-  language: z.string(),
+  autofillCredentialsEnabled: z.boolean(),
+  autofillTOTPEnabled: z.boolean(),
+  uiLanguage: z.string(),
+  sync2FA: z.boolean(),
   theme: z.string(),
-  syncTOTP: z.boolean(),
   masterEncryptionKey: z.string()
 })
 

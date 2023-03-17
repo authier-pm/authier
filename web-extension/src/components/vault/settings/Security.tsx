@@ -20,9 +20,10 @@ const VaultConfigFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
     t`Lock time // Choose lock time`
   ),
-  language: selectTextFieldSchema.describe(t`Language // Choose language`),
-  syncTOTP: z.boolean(),
-  autofill: z.boolean()
+  uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
+  autofillCredentialsEnabled: z.boolean(),
+  autofillTOTPEnabled: z.boolean(),
+  sync2FA: z.boolean()
 })
 
 export default function Security() {
@@ -34,9 +35,9 @@ export default function Security() {
   if (deviceState) {
     const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
       defaultValues: {
-        autofill: deviceState.autofill,
-        language: deviceState.language,
-        syncTOTP: deviceState.syncTOTP,
+        autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+        uiLanguage: deviceState.uiLanguage,
+        sync2FA: deviceState.sync2FA,
         vaultLockTimeoutSeconds: deviceState.lockTime
       },
       mode: 'onChange'
@@ -60,9 +61,9 @@ export default function Security() {
 
     useEffect(() => {
       reset({
-        autofill: deviceState.autofill,
-        language: deviceState.language,
-        syncTOTP: deviceState.syncTOTP,
+        autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+        uiLanguage: deviceState.uiLanguage,
+        sync2FA: deviceState.sync2FA,
         vaultLockTimeoutSeconds: deviceState.lockTime
       })
     }, [isSubmitSuccessful])
@@ -81,7 +82,7 @@ export default function Security() {
         <Form
           form={form}
           props={{
-            language: {
+            uiLanguage: {
               options: ['cz', 'en']
             },
             vaultLockTimeoutSeconds: {
