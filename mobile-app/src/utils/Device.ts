@@ -61,18 +61,21 @@ export interface ISecret {
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
+  // @ts-expect-error TODO fix this ZOD typing issue
   totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
 }
-
+// @ts-expect-error TODO fix this ZOD typing issue
 export type TotpTypeWithMeta = z.infer<typeof totpSchema>
 export type LoginCredentialsTypeWithMeta = z.infer<
+  // @ts-expect-error TODO fix this ZOD typing issue
   typeof loginCredentialsSchema
 > & {
   parseError?: ZodError
 }
 
 export interface ILoginSecret extends ISecret {
+  // @ts-expect-error TODO fix this ZOD typing issue
   loginCredentials: z.infer<typeof loginCredentialsSchema> & {
     parseError?: ZodError
   }
