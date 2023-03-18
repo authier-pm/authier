@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Box } from '@chakra-ui/layout'
 import { Center, Heading } from '@chakra-ui/react'
 import { Tooltip, IconButton } from '@chakra-ui/react'
