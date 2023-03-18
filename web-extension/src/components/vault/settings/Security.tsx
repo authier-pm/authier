@@ -23,7 +23,7 @@ const VaultConfigFormSchema = z.object({
   uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
   autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
   autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),
-  sync2FA: z.boolean().describe(t`2FA sync`)
+  syncTOTP: z.boolean().describe(t`2FA sync`)
 })
 
 export default function Security() {
@@ -38,7 +38,7 @@ export default function Security() {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
-        sync2FA: deviceState.sync2FA,
+        syncTOTP: deviceState.syncTOTP,
         vaultLockTimeoutSeconds: deviceState.lockTime
       },
       mode: 'onChange'
@@ -65,7 +65,7 @@ export default function Security() {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
-        sync2FA: deviceState.sync2FA,
+        syncTOTP: deviceState.syncTOTP,
         vaultLockTimeoutSeconds: deviceState.lockTime
       })
     }, [isSubmitSuccessful])

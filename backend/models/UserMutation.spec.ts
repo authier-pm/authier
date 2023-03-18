@@ -109,7 +109,7 @@ describe('UserMutation', () => {
       const user = plainToClass(UserMutation, userRaw)
 
       const newSettings = {
-        sync2FA: true,
+        syncTOTP: true,
         vaultLockTimeoutSeconds: 3600,
         uiLanguage: 'cz',
         autofillCredentialsEnabled: false,
@@ -136,6 +136,7 @@ describe('UserMutation', () => {
       expect(deviceData?.vaultLockTimeoutSeconds).toBe(
         newSettings.vaultLockTimeoutSeconds
       )
+      expect(deviceData?.syncTOTP).toBe(newSettings.syncTOTP)
     })
   })
 })

@@ -69,7 +69,7 @@ export class EncryptedSecretInput {
 @InputType()
 export class SettingsInput {
   @Field(() => Boolean)
-  sync2FA: boolean
+  syncTOTP: boolean
 
   @Field(() => Int)
   vaultLockTimeoutSeconds: number

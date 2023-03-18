@@ -148,7 +148,7 @@ export function Register({ navigation }: NavigationProps) {
               autofillCredentialsEnabled: false,
               uiLanguage: 'en',
               lockTimeEnd: Date.now() + 28800000,
-              sync2FA: false,
+              syncTOTP: false,
               theme: 'dark'
             }
 

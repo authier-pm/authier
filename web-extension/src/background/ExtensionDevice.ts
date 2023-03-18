@@ -114,7 +114,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
   lockTime: number
-  sync2FA: boolean
+  syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
   uiLanguage: string
@@ -589,7 +589,7 @@ class ExtensionDevice {
       secrets,
       encryptionSalt,
       lockTime,
-      sync2FA,
+      syncTOTP,
       autofillCredentialsEnabled,
       autofillTOTPEnabled,
       uiLanguage,
@@ -607,7 +607,7 @@ class ExtensionDevice {
       authSecret,
       authSecretEncrypted,
       lockTime,
-      sync2FA,
+      syncTOTP,
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
       uiLanguage,
@@ -680,7 +680,7 @@ class ExtensionDevice {
       this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
       this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
       this.state.lockTime = config.vaultLockTimeoutSeconds
-      this.state.sync2FA = config.sync2FA
+      this.state.syncTOTP = config.syncTOTP
       this.state.uiLanguage = config.uiLanguage
     }
   }

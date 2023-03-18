@@ -202,7 +202,7 @@ export const useLogin = (props: { deviceName: string }) => {
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
             //TODO: Take this from DB
-            sync2FA: false,
+            syncTOTP: false,
             theme: addNewDeviceForUser.user.defaultDeviceTheme
           }
 

@@ -234,7 +234,7 @@ const appRouter = tc.router({
       log('securitySettings', input, device.state)
       if (deviceState) {
         deviceState.lockTime = input.vaultLockTimeoutSeconds
-        deviceState.sync2FA = input.sync2FA
+        deviceState.syncTOTP = input.syncTOTP
         deviceState.uiLanguage = input.uiLanguage
         deviceState.autofillTOTPEnabled = input.autofillTOTPEnabled
         deviceState.autofillCredentialsEnabled =

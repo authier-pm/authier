@@ -34,7 +34,7 @@ export default function Settings() {
       autofillTOTPEnabled: device.state!.autofillTOTPEnabled,
       autofillCredentialsEnabled: device.state!.autofillCredentialsEnabled,
       uiLanguage: device.state!.uiLanguage,
-      sync2FA: device.state!.sync2FA,
+      syncTOTP: device.state!.syncTOTP,
       vaultLockTimeoutSeconds: device.state!.lockTime
     }
   }
@@ -142,9 +142,9 @@ export default function Settings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  defaultIsChecked={device.state!.sync2FA}
+                  defaultIsChecked={device.state!.syncTOTP}
                   onValueChange={(e) => {
-                    device.state!.sync2FA = e
+                    device.state!.syncTOTP = e
                     updateSettings({
                       variables: {
                         config: settings()

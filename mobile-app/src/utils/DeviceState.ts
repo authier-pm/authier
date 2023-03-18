@@ -56,7 +56,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   //Settings
   lockTime: number
-  sync2FA: boolean
+  syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
   uiLanguage: string

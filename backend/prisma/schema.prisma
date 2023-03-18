@@ -50,7 +50,7 @@ model Device {
   ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   logoutAt                DateTime?
   // Device settings
-  sync2FA                 Boolean   @default(false) // sync2FA
+  syncTOTP                Boolean   @default(false) // sync2FA
   vaultLockTimeoutSeconds Int?      @default(28800) // 8 hours
 
   createdAt                DateTime  @default(now())

@@ -31,7 +31,7 @@ function AppNavigation() {
       device.syncSettings({
         autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
         autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
-        sync2FA: data.currentDevice.sync2FA,
+        syncTOTP: data.currentDevice.syncTOTP,
         vaultLockTimeoutSeconds: data.currentDevice
           .vaultLockTimeoutSeconds as number,
         uiLanguage: data.me.uiLanguage

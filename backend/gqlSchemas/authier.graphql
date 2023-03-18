@@ -118,7 +118,7 @@ type DeviceGQL {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  sync2FA: Boolean!
+  syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -253,7 +253,7 @@ type DeviceQuery {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  sync2FA: Boolean!
+  syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -410,7 +410,7 @@ type DeviceMutation {
   platform: String!
   ipAddressLock: Boolean!
   logoutAt: DateTime
-  sync2FA: Boolean!
+  syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -485,7 +485,7 @@ input SecretUsageEventInput {
 }
 
 input SettingsInput {
-  sync2FA: Boolean!
+  syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!

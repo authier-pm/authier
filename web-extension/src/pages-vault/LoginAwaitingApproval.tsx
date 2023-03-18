@@ -192,7 +192,7 @@ export const useLogin = (props: { deviceName: string }) => {
             autofillTOTPEnabled: true,
             autofillCredentialsEnabled: true,
             uiLanguage: 'en',
-            sync2FA: false,
+            syncTOTP: false,
             theme: 'dark'
           }
 

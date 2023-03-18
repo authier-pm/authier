@@ -40,7 +40,7 @@ export interface IBackgroundStateSerializableLocked {
   authSecretEncrypted: string
   authSecret: string
   lockTime: number
-  sync2FA: boolean
+  syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
   uiLanguage: string
@@ -202,7 +202,7 @@ export class Device {
     this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
     this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.lockTime = config.vaultLockTimeoutSeconds
-    this.state.sync2FA = config.sync2FA
+    this.state.syncTOTP = config.syncTOTP
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
@@ -271,7 +271,7 @@ export class Device {
       secrets,
       encryptionSalt,
       lockTime,
-      sync2FA,
+      syncTOTP,
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
       uiLanguage,
@@ -289,7 +289,7 @@ export class Device {
       authSecret: this.state.authSecret,
       authSecretEncrypted: this.state.authSecretEncrypted,
       lockTime,
-      sync2FA,
+      syncTOTP,
       autofillCredentialsEnabled,
       autofillTOTPEnabled,
       uiLanguage,

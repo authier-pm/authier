@@ -54,7 +54,7 @@ export const settingsSchema = z.object({
   autofillCredentialsEnabled: z.boolean(),
   autofillTOTPEnabled: z.boolean(),
   uiLanguage: z.string(),
-  sync2FA: z.boolean(),
+  syncTOTP: z.boolean(),
   vaultLockTimeoutSeconds: z.number()
 })
 
@@ -80,7 +80,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
   autofillCredentialsEnabled: z.boolean(),
   autofillTOTPEnabled: z.boolean(),
   uiLanguage: z.string(),
-  sync2FA: z.boolean(),
+  syncTOTP: z.boolean(),
   theme: z.string(),
   masterEncryptionKey: z.string()
 })

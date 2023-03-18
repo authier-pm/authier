@@ -9,7 +9,7 @@ query SyncSettings {
   }
   currentDevice {
     id
-    sync2FA
+    syncTOTP
     vaultLockTimeoutSeconds
   }
 }

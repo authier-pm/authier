@@ -217,7 +217,7 @@ export class UserMutation extends UserBase {
               id: ctx.device.id
             },
             data: {
-              sync2FA: config.sync2FA,
+              syncTOTP: config.syncTOTP,
               vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
             }
           }

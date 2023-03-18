@@ -142,7 +142,7 @@ export type DeviceGql = {
   name: Scalars['String'];
   platform: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
-  sync2FA: Scalars['Boolean'];
+  syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
@@ -176,7 +176,7 @@ export type DeviceMutation = {
   removeDevice: Scalars['Boolean'];
   rename: DeviceGql;
   reportSecretUsageEvent: SecretUsageEventGqlScalars;
-  sync2FA: Scalars['Boolean'];
+  syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
@@ -217,7 +217,7 @@ export type DeviceQuery = {
   name: Scalars['String'];
   platform: Scalars['String'];
   registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
-  sync2FA: Scalars['Boolean'];
+  syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
   vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
@@ -423,7 +423,7 @@ export type SecretUsageEventInput = {
 export type SettingsInput = {
   autofillCredentialsEnabled: Scalars['Boolean'];
   autofillTOTPEnabled: Scalars['Boolean'];
-  sync2FA: Scalars['Boolean'];
+  syncTOTP: Scalars['Boolean'];
   uiLanguage: Scalars['String'];
   vaultLockTimeoutSeconds: Scalars['Int'];
 };

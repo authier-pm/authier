@@ -115,7 +115,7 @@ export default function Register() {
               autofillTOTPEnabled: true,
               autofillCredentialsEnabled: true,
               uiLanguage: 'en',
-              sync2FA: false,
+              syncTOTP: false,
               theme: 'dark'
             }
 
