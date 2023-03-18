@@ -9,7 +9,7 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { loginCredentialsSchema } from '../../../shared/loginCredentialsSchema'
+import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
   AddEncryptedSecretsDocument,
@@ -34,7 +34,7 @@ import {
   getDecryptedSecretProp
 } from './Device'
 
-import { getDomainNameAndTldFromUrl } from '../../../shared/urlUtils'
+import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { setSensitiveItem } from './secretStorage'
 
 export class DeviceState implements IBackgroundStateSerializable {

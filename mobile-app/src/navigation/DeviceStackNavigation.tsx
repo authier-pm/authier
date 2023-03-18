@@ -30,7 +30,7 @@ export default function DeviceStackNavigation() {
         options={{
           title: 'Device'
         }}
-        // @ts-expect-error TODO we need to fix this TS error
+        // @ts-expect-error TODO: we need to fix this TS error
         component={DeviceInfo}
       />
     </DeviceStack.Navigator>

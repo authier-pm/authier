@@ -73,4 +73,69 @@ describe('UserMutation', () => {
 
     it.todo('should throw error when user is not ona master device')
   })
+
+  describe('updateSettings', () => {
+    it('Should update settings', async () => {
+      const masterDeviceId = faker.datatype.uuid()
+
+      const userRaw = await prismaClient.user.create({
+        data: {
+          email: faker.internet.email(),
+          loginCredentialsLimit: 3,
+          TOTPlimit: 3,
+          deviceRecoveryCooldownMinutes: 960,
+          addDeviceSecret: faker.datatype.string(5),
+          addDeviceSecretEncrypted: faker.datatype.string(5),
+          encryptionSalt: faker.datatype.string(5)
+        }
+      })
+
+      const masterDevice = await prismaClient.device.create({
+        data: {
+          id: masterDeviceId,
+          User: {
+            connect: {
+              id: userRaw.id
+            }
+          },
+          name: faker.random.word(),
+          firebaseToken: faker.datatype.string(5),
+          firstIpAddress: faker.internet.ip(),
+          lastIpAddress: faker.internet.ip(),
+          platform: 'ios'
+        }
+      })
+
+      const user = plainToClass(UserMutation, userRaw)
+
+      const newSettings = {
+        sync2FA: true,
+        vaultLockTimeoutSeconds: 3600,
+        uiLanguage: 'cz',
+        autofillCredentialsEnabled: false,
+        autofillTOTPEnabled: false
+      }
+
+      const res = await user.updateSettings(
+        newSettings,
+        makeFakeCtx({
+          userId: user.id,
+          device: {
+            id: masterDevice.id
+          } as any
+        })
+      )
+
+      const deviceData = await prismaClient.device.findFirst({
+        where: {
+          id: masterDevice.id
+        }
+      })
+      //TODO: Eventually add all settings
+      expect(res.uiLanguage).toBe(newSettings.uiLanguage)
+      expect(deviceData?.vaultLockTimeoutSeconds).toBe(
+        newSettings.vaultLockTimeoutSeconds
+      )
+    })
+  })
 })
