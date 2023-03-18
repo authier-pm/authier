@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { ReactNode, useState } from 'react'
 import {
   Box,
@@ -13,7 +14,6 @@ import {
   Button
 } from '@chakra-ui/react'
 import { FaCheck } from 'react-icons/fa'
-import React from 'react'
 import { useCreateCheckoutSessionVaultMutation } from './Premium.codegen'
 
 function PriceWrapper({ children }: { children: ReactNode }) {

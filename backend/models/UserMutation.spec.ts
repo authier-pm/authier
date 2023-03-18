@@ -111,7 +111,7 @@ describe('UserMutation', () => {
       const newSettings = {
         syncTOTP: true,
         vaultLockTimeoutSeconds: 3600,
-        uiLanguage: 'cz',
+        uiLanguage: 'cs',
         autofillCredentialsEnabled: false,
         autofillTOTPEnabled: false
       }

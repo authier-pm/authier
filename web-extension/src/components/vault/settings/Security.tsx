@@ -85,7 +85,7 @@ export default function Security() {
           form={form}
           props={{
             uiLanguage: {
-              options: ['cz', 'en']
+              options: ['cs', 'en']
             },
             vaultLockTimeoutSeconds: {
               options: [

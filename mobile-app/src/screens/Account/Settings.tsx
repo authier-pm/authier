@@ -102,7 +102,7 @@ export default function Settings() {
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
-                <Select.Item label="Čeština" value="cz" />
+                <Select.Item label="Čeština" value="cs" />
               </Select>
             </Box>
           </VStack>
