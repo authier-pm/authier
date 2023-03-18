@@ -24,9 +24,6 @@ export class UserGQLScalars {
   username: string | null
 
   @Field()
-  uiLocalisation: string
-
-  @Field()
   addDeviceSecretEncrypted: string
 
   @Field(() => GraphQLISODateTime)
@@ -48,13 +45,16 @@ export class UserGQLScalars {
   deviceRecoveryCooldownMinutes: number
 
   @Field()
-  autofill: boolean
+  autofillCredentialsEnabled: boolean
 
   @Field()
-  language: string
+  autofillTOTPEnabled: boolean
 
   @Field()
-  theme: string
+  uiLanguage: string
+
+  @Field()
+  defaultDeviceTheme: string
 }
 
 @ObjectType()

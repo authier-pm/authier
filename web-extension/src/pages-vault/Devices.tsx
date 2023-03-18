@@ -46,7 +46,7 @@ import { NewDevicesApprovalStack } from './NewDeviceApproval'
 
 interface SettingsValues {
   lockTime: number
-  twoFA: boolean
+  syncTOTP: boolean
 }
 
 const DeviceListItem = ({
@@ -101,7 +101,6 @@ const DeviceListItem = ({
             </HStack>
 
             <Menu>
-              {/* @ts-expect-error */}
               <MenuButton
                 as={IconButton}
                 size="xs"
@@ -162,12 +161,13 @@ const DeviceListItem = ({
               <Formik
                 initialValues={{
                   lockTime: deviceInfo.vaultLockTimeoutSeconds as number,
-                  twoFA: deviceInfo.syncTOTP as boolean
+                  syncTOTP: deviceInfo.syncTOTP as boolean
                 }}
                 onSubmit={async (
                   values: SettingsValues,
                   { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
+                  //TODO: What property can user update?
                   console.log(values)
 
                   setSubmitting(false)
@@ -209,22 +209,22 @@ const DeviceListItem = ({
                       </FormControl>
 
                       {/* Not ideal, later refactor */}
-                      <Field name="twoFA">
+                      <Field name="syncTOTP">
                         {({ field, form }: FieldProps) => {
                           const { onChange, ...rest } = field
                           return (
                             <FormControl
-                              id="twoFA"
+                              id="syncTOTP"
                               isInvalid={
-                                !!form.errors['twoFA'] &&
-                                !!form.touched['twoFA']
+                                !!form.errors['syncTOTP'] &&
+                                !!form.touched['syncTOTP']
                               }
                             >
                               <Checkbox
                                 {...rest}
-                                id="twoFA"
+                                id="syncTOTP"
                                 onChange={onChange}
-                                defaultChecked={values.twoFA}
+                                defaultChecked={values.syncTOTP}
                               >
                                 2FA
                               </Checkbox>

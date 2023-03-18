@@ -48,7 +48,7 @@ export const LogoutDeviceAlert = ({ id }: { id: string }) => {
             as={Ionicons}
             name="log-out"
             size={'md'}
-            color="black"
+            color="white"
           />
         }
         onPress={() => setIsOpen(!isOpen)}

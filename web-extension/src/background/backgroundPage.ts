@@ -28,10 +28,11 @@ export interface IBackgroundStateSerializableLocked {
   authSecretEncrypted: string
   authSecret: string
   lockTime: number
-  autofill: boolean
-  language: string
-  theme: string
   syncTOTP: boolean
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  uiLanguage: string
+  theme: string
 }
 
 export interface IBackgroundStateSerializable

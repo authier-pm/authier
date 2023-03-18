@@ -1,4 +1,4 @@
-import { ReactElement, useState } from 'react'
+import { useState } from 'react'
 import {
   Box,
   Button,
@@ -31,6 +31,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 declare global {
   interface Crypto {
+    //@ts-expect-error
     randomUUID: () => `${string}-${string}-${string}-${string}-${string}`
   }
 }
@@ -112,8 +113,9 @@ export default function Register() {
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
-              autofill: true,
-              language: 'en',
+              autofillTOTPEnabled: true,
+              autofillCredentialsEnabled: true,
+              uiLanguage: 'en',
               syncTOTP: false,
               theme: 'dark'
             }
