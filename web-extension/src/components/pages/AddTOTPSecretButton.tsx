@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { Button } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
