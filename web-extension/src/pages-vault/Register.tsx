@@ -31,6 +31,7 @@ import { Link, useNavigate } from 'react-router-dom'
 
 declare global {
   interface Crypto {
+    //@ts-expect-error
     randomUUID: () => `${string}-${string}-${string}-${string}-${string}`
   }
 }

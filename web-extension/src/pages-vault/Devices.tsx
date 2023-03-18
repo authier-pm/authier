@@ -101,7 +101,6 @@ const DeviceListItem = ({
             </HStack>
 
             <Menu>
-              {/* @ts-expect-error */}
               <MenuButton
                 as={IconButton}
                 size="xs"

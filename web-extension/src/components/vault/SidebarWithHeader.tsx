@@ -111,7 +111,6 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
     return <Spinner />
   }
   return (
-    // @ts-expect-error
     <Flex
       transition="1s ease"
       bg={useColorModeValue('white', 'gray.800')}
