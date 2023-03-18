@@ -421,10 +421,10 @@ export type SecretUsageEventInput = {
 };
 
 export type SettingsInput = {
-  autofill: Scalars['Boolean'];
-  language: Scalars['String'];
+  autofillCredentialsEnabled: Scalars['Boolean'];
+  autofillTOTPEnabled: Scalars['Boolean'];
   syncTOTP: Scalars['Boolean'];
-  theme?: InputMaybe<Scalars['String']>;
+  uiLanguage: Scalars['String'];
   vaultLockTimeoutSeconds: Scalars['Int'];
 };
 
@@ -468,19 +468,19 @@ export type UserGql = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String'];
-  autofill: Scalars['Boolean'];
+  autofillCredentialsEnabled: Scalars['Boolean'];
+  autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
+  defaultDeviceTheme: Scalars['String'];
   deviceRecoveryCooldownMinutes: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
   id: Scalars['ID'];
-  language: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
-  theme: Scalars['String'];
   tokenVersion: Scalars['Int'];
-  uiLocalisation: Scalars['String'];
+  uiLanguage: Scalars['String'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   username?: Maybe<Scalars['String']>;
 };
@@ -501,7 +501,8 @@ export type UserMutation = {
   addDevice: DeviceGql;
   addDeviceSecretEncrypted: Scalars['String'];
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
-  autofill: Scalars['Boolean'];
+  autofillCredentialsEnabled: Scalars['Boolean'];
+  autofillTOTPEnabled: Scalars['Boolean'];
   changeEmail: UserQuery;
   changeMasterPassword: Scalars['Int'];
   createCheckoutSession: Scalars['String'];
@@ -509,12 +510,12 @@ export type UserMutation = {
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
+  defaultDeviceTheme: Scalars['String'];
   device: DeviceMutation;
   deviceRecoveryCooldownMinutes: Scalars['Int'];
   email?: Maybe<Scalars['EmailAddress']>;
   encryptedSecret: EncryptedSecretMutation;
   id: Scalars['ID'];
-  language: Scalars['String'];
   loginCredentialsLimit: Scalars['Int'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
@@ -522,9 +523,8 @@ export type UserMutation = {
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt'];
   setMasterDevice: MasterDeviceChangeGql;
-  theme: Scalars['String'];
   tokenVersion: Scalars['Int'];
-  uiLocalisation: Scalars['String'];
+  uiLanguage: Scalars['String'];
   updateFireToken: DeviceGql;
   updateSettings: UserGql;
   updatedAt?: Maybe<Scalars['DateTime']>;
@@ -622,9 +622,11 @@ export type UserQuery = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String'];
-  autofill: Scalars['Boolean'];
+  autofillCredentialsEnabled: Scalars['Boolean'];
+  autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
+  defaultDeviceTheme: Scalars['String'];
   device: DeviceQuery;
   deviceRecoveryCooldownMinutes: Scalars['Int'];
   devices: Array<DeviceQuery>;
@@ -633,7 +635,6 @@ export type UserQuery = {
   emailVerifications: Array<EmailVerificationGqlScalars>;
   encryptedSecrets: Array<EncryptedSecretQuery>;
   id: Scalars['ID'];
-  language: Scalars['String'];
   lastChangeInSecrets?: Maybe<Scalars['DateTime']>;
   loginCredentialsLimit: Scalars['Int'];
   masterDevice?: Maybe<DeviceGql>;
@@ -641,9 +642,8 @@ export type UserQuery = {
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   sendAuthMessage: Scalars['Boolean'];
-  theme: Scalars['String'];
   tokenVersion: Scalars['Int'];
-  uiLocalisation: Scalars['String'];
+  uiLanguage: Scalars['String'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   username?: Maybe<Scalars['String']>;
 };

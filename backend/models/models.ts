@@ -75,13 +75,13 @@ export class SettingsInput {
   vaultLockTimeoutSeconds: number
 
   @Field(() => Boolean)
-  autofill: boolean
+  autofillCredentialsEnabled: boolean
+
+  @Field(() => Boolean)
+  autofillTOTPEnabled: boolean
 
   @Field(() => String)
-  language: string
-
-  @Field(() => String, { nullable: true })
-  theme?: string
+  uiLanguage: string
 }
 
 @InputType()

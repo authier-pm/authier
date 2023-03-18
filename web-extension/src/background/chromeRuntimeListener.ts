@@ -235,9 +235,12 @@ const appRouter = tc.router({
       if (deviceState) {
         deviceState.lockTime = input.vaultLockTimeoutSeconds
         deviceState.syncTOTP = input.syncTOTP
-        deviceState.language = input.language
-        deviceState.autofill = input.autofill
-        noHandsLogin = input.autofill
+        deviceState.uiLanguage = input.uiLanguage
+        deviceState.autofillTOTPEnabled = input.autofillTOTPEnabled
+        deviceState.autofillCredentialsEnabled =
+          input.autofillCredentialsEnabled
+        //TODO: Split this into TOTP and credentials
+        noHandsLogin = input.autofillCredentialsEnabled
 
         //Refresh the lock interval
         lockInterval = clearInterval(lockInterval)

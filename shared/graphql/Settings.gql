@@ -3,9 +3,9 @@ query SyncSettings {
     loginCredentialsLimit
     TOTPlimit
     id
-    autofill
-    language
-    theme
+    autofillCredentialsEnabled
+    autofillTOTPEnabled
+    uiLanguage
   }
   currentDevice {
     id

@@ -1,7 +1,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react'
 
-import { Heading, Text, useToast } from 'native-base'
+import {
+  Box,
+  Card,
+  Center,
+  Flex,
+  HStack,
+  Heading,
+  Text,
+  VStack,
+  WarningIcon,
+  useColorModeValue,
+  useToast
+} from 'native-base'
 import { LoginContext } from './Login'
 
 import {
@@ -22,7 +34,6 @@ import { Platform } from 'react-native'
 import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
-import { DeviceState } from '@src/utils/DeviceState'
 import { Trans } from '@lingui/macro'
 
 const ToastServerErrorDetails = {
@@ -37,7 +48,8 @@ export const useLogin = (props: { deviceName: string }) => {
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
   let device = useContext(DeviceContext)
-  const [addNewDevice, { loading }] = useAddNewDeviceForUserMutation()
+  const [addNewDevice, { loading, error: newDeviceError }] =
+    useAddNewDeviceForUserMutation()
 
   const [getDeviceDecryptionChallenge, { data: decryptionData, error }] =
     useDeviceDecryptionChallengeMutation({
@@ -52,14 +64,14 @@ export const useLogin = (props: { deviceName: string }) => {
     })
 
   useEffect(() => {
-    if (error) {
+    if (error || newDeviceError) {
       if (!toast.isActive(id)) {
         toast.show({
           id,
           render: () => (
             <ToastAlert
               {...ToastServerErrorDetails}
-              description={error.message}
+              description={error ? error.message : newDeviceError?.message}
             />
           )
         })
@@ -67,7 +79,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
       setFormState(null)
     }
-  }, [error])
+  }, [error, newDeviceError])
 
   useInterval(() => {
     getDeviceDecryptionChallenge()
@@ -89,7 +101,6 @@ export const useLogin = (props: { deviceName: string }) => {
         const userId = deviceDecryptionChallenge?.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
-          console.log('test1')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
@@ -186,16 +197,17 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             lockTime: 28800,
-            autofill: false,
-            language: 'en',
+            autofillCredentialsEnabled: false,
+            autofillTOTPEnabled: false,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
+            //TODO: Take this from DB
             syncTOTP: false,
-            theme: 'dark'
+            theme: addNewDeviceForUser.user.defaultDeviceTheme
           }
 
           device.save(deviceState)
         } else {
-          console.log('test3')
           toast.show({
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
@@ -211,11 +223,14 @@ export const useLogin = (props: { deviceName: string }) => {
 }
 
 export const LoginAwaitingApproval = () => {
+  const { formState } = useContext(LoginContext)
   let device = useContext(DeviceContext)
   const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })
+
+  const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
   if (!deviceDecryptionChallenge) {
     return <Loading />
@@ -227,18 +242,42 @@ export const LoginAwaitingApproval = () => {
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
   ) {
     return (
-      <>
-        <Text>Device: </Text>
-        <Heading size="sm">{deviceName}</Heading>
+      <Flex flex={1} justifyContent={'center'}>
+        <Box bgColor={bgColor} p={5} m={2} pt={8} pb={8} rounded="2xl">
+          <VStack>
+            <Heading size="sm" mb={2}>
+              <Trans>Username: {formState.email}</Trans>
+            </Heading>
+            <HStack alignItems={'center'}>
+              <WarningIcon mr={2} boxSize={30} />
+              <Heading size="md" mr={4}>
+                <Trans>Device:</Trans>
+              </Heading>
+              <Heading alignSelf={'center'} size="sm">
+                {deviceName}
+              </Heading>
+            </HStack>
+          </VStack>
 
-        <Text>
-          <Trans>
-            Approve this device in your device management in the vault on your
-            master device in order to finish adding new device. Afterwards your
-            vault will open automatically.
-          </Trans>
-        </Text>
-      </>
+          <Center mt={3}>
+            <Flex flexDir="column">
+              <Text fontSize="md" mb={2}>
+                <Trans>
+                  Approve this device in your device management in the vault on
+                  your master device in order to proceed adding new device.
+                </Trans>
+              </Text>
+
+              <Text fontSize="sm">
+                <Trans>
+                  After you approve it, your vault will open automatically in
+                  this tab.
+                </Trans>
+              </Text>
+            </Flex>
+          </Center>
+        </Box>
+      </Flex>
     )
   }
 
