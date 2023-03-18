@@ -31,10 +31,10 @@ export default function Settings() {
 
   const settings = (): SettingsInput => {
     return {
-      autofill: device.state!.autofill,
-      language: device.state!.language,
+      autofillTOTPEnabled: device.state!.autofillTOTPEnabled,
+      autofillCredentialsEnabled: device.state!.autofillCredentialsEnabled,
+      uiLanguage: device.state!.uiLanguage,
       syncTOTP: device.state!.syncTOTP,
-      theme: device.state!.theme,
       vaultLockTimeoutSeconds: device.state!.lockTime
     }
   }
@@ -90,7 +90,7 @@ export default function Settings() {
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
                 onValueChange={(value) => {
-                  device.state!.language = value
+                  device.state!.uiLanguage = value
                   updateSettings({
                     variables: {
                       config: settings()
@@ -98,11 +98,11 @@ export default function Settings() {
                   })
                   device.save()
                 }}
-                defaultValue={device.state!.language}
+                defaultValue={device.state!.uiLanguage}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
-                <Select.Item label="Čeština" value="cz" />
+                <Select.Item label="Čeština" value="cs" />
               </Select>
             </Box>
           </VStack>
@@ -118,11 +118,6 @@ export default function Settings() {
                 onValueChange={(value) => {
                   toggleColorMode()
                   device.state!.theme = value
-                  updateSettings({
-                    variables: {
-                      config: settings()
-                    }
-                  })
                   device.save()
                 }}
                 defaultValue={device.state!.theme}

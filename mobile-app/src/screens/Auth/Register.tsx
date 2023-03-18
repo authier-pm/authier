@@ -28,7 +28,6 @@ import { AuthStackParamList } from '../../navigation/AuthNavigation'
 import { ToastAlert } from '@components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { DeviceState } from '@src/utils/DeviceState'
 import {
   bufferToBase64,
   cryptoKeyToString,
@@ -145,8 +144,9 @@ export function Register({ navigation }: NavigationProps) {
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               lockTime: 28800,
-              autofill: false,
-              language: 'en',
+              autofillTOTPEnabled: false,
+              autofillCredentialsEnabled: false,
+              uiLanguage: 'en',
               lockTimeEnd: Date.now() + 28800000,
               syncTOTP: false,
               theme: 'dark'

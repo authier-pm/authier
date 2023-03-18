@@ -123,20 +123,15 @@ export const VaultList = () => {
   const { setSecuritySettings } = useContext(DeviceStateContext)
 
   const { data, loading, error } = useSyncSettingsQuery()
-  const { colorMode, toggleColorMode } = useColorMode()
 
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
-      console.log(data.me.theme)
-      // if (colorMode !== data.me.theme) {
-      //   toggleColorMode()
-      // }
-
       setSecuritySettings({
-        autofill: data.me?.autofill as boolean,
-        language: data.me?.language as string,
-        syncTOTP: data.currentDevice.syncTOTP as boolean,
+        autofillCredentialsEnabled: data.me?.autofillCredentialsEnabled,
+        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
+        uiLanguage: data.me?.uiLanguage,
+        syncTOTP: data.currentDevice.syncTOTP,
         vaultLockTimeoutSeconds: data.currentDevice
           .vaultLockTimeoutSeconds as number
       })

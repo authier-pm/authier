@@ -30,7 +30,8 @@ export const getContentScriptInitialState = async (
 
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
-    autofillEnabled: !!device.state?.autofill,
+    //TODO: Add autofill for TOTP
+    autofillEnabled: !!device.state?.autofillCredentialsEnabled,
     webInputs: res.data.webInputs,
     passwordCount:
       device.state?.secrets.filter(

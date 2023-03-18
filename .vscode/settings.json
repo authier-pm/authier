@@ -1,5 +1,5 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.tsdk": "web-extension/node_modules/typescript/lib",
   "eslint.workingDirectories": [
     {
       "mode": "auto"
@@ -8,4 +8,5 @@
   "cSpell.words": [
     "trpc"
   ],
+  "typescript.enablePromptUseWorkspaceTsdk": true
 }

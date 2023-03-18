@@ -20,7 +20,6 @@ export function AuthLinkPage() {
     <>
       <Box width="315px" p={30}>
         <Center>
-          {/* @ts-expect-error */}
           <Heading size="sm">
             <Trans>Open vault to login or sign up</Trans>
           </Heading>

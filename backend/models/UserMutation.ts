@@ -209,9 +209,8 @@ export class UserMutation extends UserBase {
         id: this.id
       },
       data: {
-        autofill: config.autofill,
-        language: config.language,
-        theme: config.theme,
+        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+        uiLanguage: config.uiLanguage,
         Devices: {
           update: {
             where: {

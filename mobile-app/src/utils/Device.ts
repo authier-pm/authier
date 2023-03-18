@@ -41,8 +41,9 @@ export interface IBackgroundStateSerializableLocked {
   authSecret: string
   lockTime: number
   syncTOTP: boolean
-  autofill: boolean
-  language: string
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  uiLanguage: string
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number
@@ -61,21 +62,18 @@ export interface ISecret {
   kind: EncryptedSecretType
 }
 export interface ITOTPSecret extends ISecret {
-  // @ts-expect-error TODO fix this ZOD typing issue
   totp: z.infer<typeof totpSchema>
   kind: EncryptedSecretType.TOTP
 }
-// @ts-expect-error TODO fix this ZOD typing issue
+
 export type TotpTypeWithMeta = z.infer<typeof totpSchema>
 export type LoginCredentialsTypeWithMeta = z.infer<
-  // @ts-expect-error TODO fix this ZOD typing issue
   typeof loginCredentialsSchema
 > & {
   parseError?: ZodError
 }
 
 export interface ILoginSecret extends ISecret {
-  // @ts-expect-error TODO fix this ZOD typing issue
   loginCredentials: z.infer<typeof loginCredentialsSchema> & {
     parseError?: ZodError
   }
@@ -139,6 +137,7 @@ export class Device {
     //because we are creating a new interval every time we we start the app (in syncSettings)
     if (deviceState) {
       this.state = new DeviceState(deviceState)
+      this.emitter.emit('stateChange')
     }
     if (!this.state) {
       throw new Error(
@@ -146,7 +145,6 @@ export class Device {
       )
     }
     await this.state.save()
-    this.emitter.emit('stateChange')
   }
 
   /**
@@ -187,6 +185,7 @@ export class Device {
     }
 
     const token = await messaging().getToken()
+    console.log('token', token)
     this.fireToken = token
 
     this.emitter.emit('stateChange')
@@ -200,11 +199,10 @@ export class Device {
       console.warn('device not initialized')
       return
     }
-    this.state.autofill = config.autofill
+    this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
+    this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.lockTime = config.vaultLockTimeoutSeconds
     this.state.syncTOTP = config.syncTOTP
-    this.state.language = config.language
-    this.state.theme = config.theme ?? 'dark'
 
     // Sync timer
     if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
@@ -274,8 +272,9 @@ export class Device {
       encryptionSalt,
       lockTime,
       syncTOTP,
-      autofill,
-      language,
+      autofillTOTPEnabled,
+      autofillCredentialsEnabled,
+      uiLanguage,
       theme,
       biometricsEnabled,
       lockTimeEnd
@@ -291,8 +290,9 @@ export class Device {
       authSecretEncrypted: this.state.authSecretEncrypted,
       lockTime,
       syncTOTP,
-      autofill,
-      language,
+      autofillCredentialsEnabled,
+      autofillTOTPEnabled,
+      uiLanguage,
       theme,
       biometricsEnabled,
       lockTimeEnd
