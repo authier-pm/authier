@@ -269,6 +269,9 @@ describe('Device', () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
       request: { headers: {} },
+      device: {
+        syncTOTP: true
+      },
       prisma: prismaClient,
       jwtPayload: { userId: userId },
       masterDeviceId: masterDeviceId,
@@ -296,6 +299,26 @@ describe('Device', () => {
       expect(secrets).toHaveLength(user.loginCredentialsLimit)
     })
 
+    it('should not sync TOTP when device has syncTOTP set to false', async () => {
+      testData.push({
+        encrypted: faker.datatype.string(25),
+        kind: EncryptedSecretTypeGQL.TOTP,
+        userId: userId,
+        version: 1
+      })
+      fakeCtx.device.syncTOTP = false
+      await prismaClient.encryptedSecret.createMany({
+        data: testData
+      })
+
+      const res = await deviceQuery.encryptedSecretsToSync(fakeCtx)
+      expect(res).toHaveLength(0)
+
+      fakeCtx.device.syncTOTP = true
+
+      testData.length = 0
+    })
+
     it("should show 'TOTP limit exceeded, remove TOTP secrets'", async () => {
       //Generate fake secrets for user
       const numOverLimit = 5
@@ -304,7 +327,7 @@ describe('Device', () => {
       for (let i = 0; i < user.TOTPlimit + numOverLimit; i++) {
         testData.push({
           encrypted: faker.datatype.string(25),
-          kind: 'TOTP',
+          kind: EncryptedSecretTypeGQL.TOTP,
           userId: userId,
           version: 1
         })

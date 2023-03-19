@@ -62,11 +62,9 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   ) {
     const { id, deviceId, userId } = this
 
-    const where = { id: userId }
-
     // TODO use findUnique when prisma bug gets fixed
     const user = await ctx.prisma.user.findFirst({
-      where: where,
+      where: { id: userId },
       include: {
         EncryptedSecrets: true
       }
@@ -110,7 +108,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 
     if (device) {
       if (device.userId !== user.id) {
-        throw new GraphqlError('Device is already registered for another user')
+        throw new GraphqlError('Device is already registered for another user') // prevents users from circumventing our limits by using multiple accounts
       }
 
       device = await ctx.prisma.device.update({
@@ -121,6 +119,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       device = await ctx.prisma.device.create({
         data: {
           id: deviceId,
+          syncTOTP: user.defaultDeviceSyncTOTP,
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
