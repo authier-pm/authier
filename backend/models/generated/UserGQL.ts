@@ -55,6 +55,9 @@ export class UserGQLScalars {
 
   @Field()
   defaultDeviceTheme: string
+
+  @Field()
+  defaultDeviceSyncTOTP: boolean
 }
 
 @ObjectType()
