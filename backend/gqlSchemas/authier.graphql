@@ -26,6 +26,7 @@ type UserQuery {
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
   defaultDeviceTheme: String!
+  defaultDeviceSyncTOTP: Boolean!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -96,6 +97,7 @@ type UserGQL {
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
   defaultDeviceTheme: String!
+  defaultDeviceSyncTOTP: Boolean!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -368,6 +370,7 @@ type UserMutation {
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
   defaultDeviceTheme: String!
+  defaultDeviceSyncTOTP: Boolean!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
