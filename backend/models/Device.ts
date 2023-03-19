@@ -109,19 +109,27 @@ export class DeviceQuery extends DeviceGQL {
         )
       }
 
+      const kindOfSecret =
+        ctx.device.syncTOTP === true
+          ? undefined // returns all secrets
+          : EncryptedSecretTypeGQL.LOGIN_CREDENTIALS // returns only login credentials
+
       const res = await ctx.prisma.encryptedSecret.findMany({
         where: {
           OR: [
             {
               userId: this.userId,
+              kind: kindOfSecret,
               createdAt: lastSyncCondition
             },
             {
               userId: this.userId,
+              kind: kindOfSecret,
               updatedAt: lastSyncCondition
             },
             {
               userId: this.userId,
+              kind: kindOfSecret,
               deletedAt: lastSyncCondition
             }
           ]
