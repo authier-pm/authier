@@ -18,6 +18,7 @@ import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBo
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 import { device } from '../background/ExtensionDevice'
 import browser from 'webextension-polyfill'
+import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 const log = debug('au:autofill')
 
@@ -211,10 +212,16 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         if (inputEl) {
           log('autofilled by domPath')
           if (webInputGql.kind === WebInputType.PASSWORD && firstLoginCred) {
-            return autofillValueIntoInput(
+            const el = autofillValueIntoInput(
               inputEl,
               firstLoginCred.loginCredentials.password
             )
+
+            notyf.success(
+              `Autofilled password into element ${webInputGql.domPath}`
+            )
+
+            return el
           } else if (
             [
               WebInputType.EMAIL,
@@ -393,6 +400,16 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               inputElsArray[0],
               matchingLogin.loginCredentials.password
             )
+
+            autofilledElPassword &&
+              notyf.success(
+                `Autofilled password for ${
+                  matchingLogin.loginCredentials.username
+                } into element ${generateQuerySelectorForOrphanedElement(
+                  autofilledElPassword
+                )}`
+              )
+
             // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
             return autofilledElPassword
           }
