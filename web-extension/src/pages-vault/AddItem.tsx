@@ -18,6 +18,7 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Txt } from '@src/components/util/Txt'
 import { Trans } from '@lingui/macro'
 import { Link as RouterLink } from 'react-router-dom'
+import { device } from '@src/background/ExtensionDevice'
 
 export const AddItem = () => {
   type secretType = 'login' | 'totp'
@@ -67,22 +68,32 @@ export const AddItem = () => {
             </Trans>
           </Txt>
         ) : null}
-        <Select
-          onChange={(e) => setType(e.target.value as secretType)}
-          value={type}
-          placeholder="Select type"
-          w={'50%'}
-          mt={5}
-        >
-          <option disabled={totpLimitReached} value="totp">
-            TOTP
-          </option>
-          <option disabled={pswLimitReached} value="login">
-            Login
-          </option>
-        </Select>
-
-        {type === 'login' ? <AddLogin /> : type === 'totp' ? <AddTOTP /> : null}
+        {device.state?.syncTOTP ? (
+          <>
+            <Select
+              onChange={(e) => setType(e.target.value as secretType)}
+              value={type}
+              placeholder="Select type"
+              w={'50%'}
+              mt={5}
+            >
+              <option disabled={totpLimitReached} value="totp">
+                TOTP
+              </option>
+              <option disabled={pswLimitReached} value="login">
+                Login
+              </option>
+            </Select>
+            {type === 'login' ? (
+              <AddLogin />
+            ) : type === 'totp' ? (
+              <AddTOTP />
+            ) : null}
+          </>
+        ) : (
+          // we only allow to add logins if the user has synced TOTP secrets false on this device
+          <AddLogin />
+        )}
       </Flex>
     </motion.div>
   )
