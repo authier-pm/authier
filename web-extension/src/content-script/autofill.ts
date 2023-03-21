@@ -18,6 +18,7 @@ import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBo
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 import { device } from '../background/ExtensionDevice'
 import browser from 'webextension-polyfill'
+import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
 const log = debug('au:autofill')
 
@@ -36,7 +37,9 @@ type webInput = {
 
 export const autofillEventsDispatched = new Set()
 
-const notyf = new Notyf()
+const notyf = new Notyf({
+  duration: 5000
+})
 
 function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
   if (el) {
@@ -205,16 +208,22 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         let inputEl = document.body.querySelector(
           webInputGql.domPath
         ) as HTMLInputElement | null
-        const rect = inputEl?.getBoundingClientRect()
-        log('cords', rect?.x, rect?.y)
+
+        // log('inputEl', inputEl)
         //NOTE: We found element by DOM path
         if (inputEl) {
           log('autofilled by domPath')
           if (webInputGql.kind === WebInputType.PASSWORD && firstLoginCred) {
-            return autofillValueIntoInput(
+            const el = autofillValueIntoInput(
               inputEl,
               firstLoginCred.loginCredentials.password
             )
+
+            notyf.success(
+              `Autofilled password for ${firstLoginCred.loginCredentials.username} into element ${webInputGql.domPath}`
+            )
+
+            return el
           } else if (
             [
               WebInputType.EMAIL,
@@ -271,6 +280,13 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
             autofillValueIntoInput(
               inputEl,
               firstLoginCred.loginCredentials.username
+            )
+            notyf.success(
+              `Autofilled password for ${
+                firstLoginCred.loginCredentials.username
+              } into element ${generateQuerySelectorForOrphanedElement(
+                inputEl
+              )}`
             )
           } else {
             // todo show prompt to user to select which credential to use
@@ -348,9 +364,9 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         const notAPasswordInput = filledElements.find(
           (el) => el?.type !== 'password'
         )
-        if (notAPasswordInput) {
+        if (notAPasswordInput?.[0]) {
           notyf.success(
-            `Submitted autofilled form for user "${notAPasswordInput[0]?.value}}"`
+            `Submitted autofilled form for user "${notAPasswordInput[0].value}}"`
           )
         }
       }
@@ -393,6 +409,16 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
               inputElsArray[0],
               matchingLogin.loginCredentials.password
             )
+
+            autofilledElPassword &&
+              notyf.success(
+                `Autofilled password for ${
+                  matchingLogin.loginCredentials.username
+                } into element ${generateQuerySelectorForOrphanedElement(
+                  autofilledElPassword
+                )}`
+              )
+
             // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
             return autofilledElPassword
           }
@@ -537,6 +563,12 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
   }
 }
+
+export const debouncedAutofill = debounce(autofill, 300, {
+  trailing: true,
+  leading: false
+})
+
 function generatePasswordBasedOnUserConfig() {
   const config = {
     // TODO get config from device.state
