@@ -18,6 +18,7 @@ import {
 import {
   autofill,
   autofillEventsDispatched,
+  debouncedAutofill,
   getElementCoordinates,
   IDecryptedSecrets
 } from './autofill'
@@ -111,21 +112,21 @@ export async function initInputWatch() {
     showSavePromptIfAppropriate(secretsForHost)
   }
 
-  const onInputRemoved = (input) => {
+  const onInputRemoved = (input: HTMLInputElement) => {
     // handle case when password input is removed from DOM by javascript
     if (input.type === 'password' && domRecorder.hasInput(input)) {
       onSubmit(input)
     }
   }
 
-  const onInputAdded = (input) => {
+  const onInputAdded = (input: HTMLInputElement) => {
     // handle case when password input is added to DOM by javascript
     if (
       input.type === 'password' &&
       !domRecorder.hasInput(input) &&
       stateInitRes
     ) {
-      autofill(stateInitRes)
+      debouncedAutofill(stateInitRes)
     }
   }
 
