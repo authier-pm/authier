@@ -19,7 +19,9 @@ console.log('~ dbUrl', dbUrl)
 const workerId = process.env.VITEST_WORKER_ID
 if (workerId) {
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
-  dbUrl = `${dbUrl}_test_${vitestWorkerId + 1}` // this allows us to run tests in parallel against multiple dbs without conflicts
+  dbUrl = `${dbUrl}_test_${
+    vitestWorkerId + 1
+  }?connection_limit=500&pool_timeout=0&connect_timeout=0` // this allows us to run tests in parallel against multiple dbs without conflicts
 } else {
   log('DATABASE_URL', dbUrl)
 }
