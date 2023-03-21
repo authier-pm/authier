@@ -28,7 +28,6 @@ importers:
       husky: ^8.0.3
       prettier: ^2.8.4
       pretty-quick: ^3.1.3
-      react-toastify: ^9.1.1
       typescript: ^5.0.2
     devDependencies:
       '@apollo/client': 3.7.10
@@ -55,7 +54,6 @@ importers:
       husky: 8.0.3
       prettier: 2.8.4
       pretty-quick: 3.1.3_prettier@2.8.4
-      react-toastify: 9.1.1
       typescript: 5.0.2
 
   backend:
@@ -507,7 +505,6 @@ importers:
       react-router-dom: ^6.9.0
       react-select: ^5.7.0
       react-test-renderer: ^18.2.0
-      react-toastify: ^9.1.1
       react-transition-group: ^4.4.5
       react-virtualized: ^9.22.3
       reflect-metadata: ^0.1.13
@@ -634,7 +631,6 @@ importers:
       pretty-quick: 3.1.3
       proxy-date: 0.1.1
       react-dropzone: 14.2.3_react@18.2.0
-      react-toastify: 9.1.1_biqbaboplfbrettd7655fr4n2y
       sass-loader: 13.2.0_webpack@5.76.2
       slugify: 1.6.5
       style-loader: 3.3.2_webpack@5.76.2
@@ -14543,6 +14539,7 @@ packages:
   /clsx/1.2.1:
     resolution: {integrity: sha512-EcR6r5a8bj6pu3ycsa/E/cKVGuTgZJZdsyUYHOksG/UHIiKfjxzRxYJpyVBwYaQeOvghal9fcc4PidlgzugAQg==}
     engines: {node: '>=6'}
+    dev: false
 
   /co/4.6.0:
     resolution: {integrity: sha512-QVb0dM5HvG+uaxitm8wONl7jltx8dqhfU33DcqtOZcLSVIKSDDLDi7+0LbAKiyI8hD9u42m2YxXSkMGWThaecQ==}
@@ -22997,6 +22994,7 @@ packages:
       loose-envify: 1.4.0
       react: 18.2.0
       scheduler: 0.23.0
+    dev: false
 
   /react-dropzone/14.2.3_react@18.2.0:
     resolution: {integrity: sha512-O3om8I+PkFKbxCukfIR3QAGftYXDZfOE2N1mr/7qebQJHs7U+/RSL/9xomJNpRg9kM5h9soQSdf0Gc7OHF5Fug==}
@@ -23638,26 +23636,6 @@ packages:
       react-is: 18.2.0
       react-shallow-renderer: 16.15.0_react@18.2.0
       scheduler: 0.23.0
-
-  /react-toastify/9.1.1:
-    resolution: {integrity: sha512-pkFCla1z3ve045qvjEmn2xOJOy4ZciwRXm1oMPULVkELi5aJdHCN/FHnuqXq8IwGDLB7PPk2/J6uP9D8ejuiRw==}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-    dependencies:
-      clsx: 1.2.1
-    dev: true
-
-  /react-toastify/9.1.1_biqbaboplfbrettd7655fr4n2y:
-    resolution: {integrity: sha512-pkFCla1z3ve045qvjEmn2xOJOy4ZciwRXm1oMPULVkELi5aJdHCN/FHnuqXq8IwGDLB7PPk2/J6uP9D8ejuiRw==}
-    peerDependencies:
-      react: '>=16'
-      react-dom: '>=16'
-    dependencies:
-      clsx: 1.2.1
-      react: 18.2.0
-      react-dom: 18.2.0_react@18.2.0
-    dev: true
 
   /react-transition-group/4.4.5_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
