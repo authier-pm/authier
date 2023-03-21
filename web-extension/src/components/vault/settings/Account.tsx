@@ -187,6 +187,7 @@ export default function Account() {
       width={'70%'}
       maxW="600px"
       alignItems={'normal'}
+      mt={8}
       spacing={20}
       rounded={'lg'}
       boxShadow={'lg'}
