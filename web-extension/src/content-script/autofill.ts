@@ -209,7 +209,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           webInputGql.domPath
         ) as HTMLInputElement | null
 
-        log('inputEl', inputEl)
+        // log('inputEl', inputEl)
         //NOTE: We found element by DOM path
         if (inputEl) {
           log('autofilled by domPath')
@@ -272,7 +272,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //Catch new inputs
     onInputAddedHandler = debounce(
       (inputEl) => {
-        log('onInputAddedHandler', inputEl)
+        // log('onInputAddedHandler', inputEl)
         let newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
