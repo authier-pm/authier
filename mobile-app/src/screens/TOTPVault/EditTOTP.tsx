@@ -1,25 +1,18 @@
-import React, { useContext, useLayoutEffect } from 'react'
+import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
 
-import {
-  Alert,
-  Button,
-  Flex,
-  FormControl,
-  Input,
-  Spinner,
-  View
-} from 'native-base'
+import { Alert, Input, Button, Flex, FormControl, View } from 'native-base'
 
 import { Formik, FormikHelpers } from 'formik'
 
 import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { ITOTPSecret } from '../../utils/Device'
+import { ILoginSecret, ITOTPSecret } from '../../utils/Device'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { TOTPStackScreenProps } from '../../navigation/types'
-import { InputHeader } from '../PasswordVault/EditPassword'
 import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
-import { useQuery } from 'react-query'
+import { InputHeader } from '../PasswordVault/EditPassword'
+import { SyncEncryptedSecretsDocument } from '@shared/graphql/ExtensionDevice.codegen'
+import { Loading } from '@src/components/Loading'
 
 const InputField = ({
   errors,
@@ -33,10 +26,9 @@ const InputField = ({
     <FormControl isInvalid={name in errors}>
       <InputHeader>{header}:</InputHeader>
       <Input
-        defaultValue={values[name]}
+        defaultValue={values[name].toString()}
         onChangeText={handleChange(name)}
         onBlur={handleBlur(name)}
-        isRequired
         size={'lg'}
       />
       <FormControl.ErrorMessage>{errors[name]}</FormControl.ErrorMessage>
@@ -46,15 +38,17 @@ const InputField = ({
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const { totp } = data
-  const [updateSecret] = useUpdateEncryptedSecretMutation()
   let device = useContext(DeviceContext)
+  const [updateSecret] = useUpdateEncryptedSecretMutation({
+    refetchQueries: [{ query: SyncEncryptedSecretsDocument, variables: {} }]
+  })
 
   return (
     <View>
       <Formik
         initialValues={{
           secret: totp.secret,
-          url: totp.url!!,
+          url: totp.url ?? '',
           label: totp.label,
           digits: totp.digits,
           period: totp.period
@@ -70,9 +64,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
             secret.encrypted = await device.state.encrypt(
               JSON.stringify({
                 ...values,
-                iconUrl: '',
-                digits: 6,
-                period: 30
+                iconUrl: ''
               })
             )
 
@@ -99,15 +91,18 @@ const TOTPSecret = (data: ITOTPSecret) => {
           handleChange,
           handleBlur,
           handleSubmit,
-          errors,
-          isValid
+          errors
         }) => (
           <Flex p={5} flexDirection="column">
             <InputField
-              errors={errors}
-              header="URL"
-              name="url"
-              {...{ values, handleBlur, handleChange }}
+              {...{
+                errors,
+                values,
+                name: 'url',
+                handleBlur,
+                handleChange,
+                header: 'URL'
+              }}
             />
 
             <InputField
@@ -169,11 +164,20 @@ export function EditTOTP({
   route
 }: TOTPStackScreenProps<'EditTOTP'>) {
   let device = useContext(DeviceContext)
+  const [secret, setSecret] = useState<
+    ITOTPSecret | ILoginSecret | undefined | null
+  >(null)
 
-  const { isLoading, data } = useQuery('repoData', () => {
-    return device.state?.getSecretDecryptedById(route.params.item.id)
-  })
-  const secret = data
+  //TODO: @Capajj Is this the right way to do this? It did not work with react-query
+  useEffect(() => {
+    async function loadSecret() {
+      const secret = await device.state?.getSecretDecryptedById(
+        route.params.item.id
+      )
+      setSecret(secret)
+    }
+    loadSecret()
+  }, [])
 
   useLayoutEffect(() => {
     if (secret) {
@@ -183,10 +187,12 @@ export function EditTOTP({
     }
   }, [navigation, secret])
 
-  if (isLoading) return 'Loading...'
+  if (!secret) {
+    return <Loading />
+  }
 
-  if (!device.state || isLoading) {
-    return <Spinner />
+  if (!device.state) {
+    return <Loading />
   }
 
   if (!secret) {

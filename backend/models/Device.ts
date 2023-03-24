@@ -247,6 +247,12 @@ export class DeviceMutation extends DeviceGQLScalars {
     await this.logout(ctx)
 
     await ctx.prisma.$transaction([
+      //TODO: Should we remove secret usage events? they depend on device id
+      ctx.prisma.secretUsageEvent.deleteMany({
+        where: {
+          deviceId: this.id
+        }
+      }),
       ctx.prisma.device.delete({
         where: {
           id: this.id

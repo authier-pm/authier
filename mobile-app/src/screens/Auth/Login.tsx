@@ -27,6 +27,7 @@ import { DeviceContext } from '@providers/DeviceProvider'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
+import { Loading } from '@src/components/Loading'
 
 interface LoginFormValues {
   email: string
@@ -58,11 +59,7 @@ export function Login({ navigation }: NavigationProps) {
   }, [device.fireToken])
 
   if (loading) {
-    return (
-      <Center>
-        <Spinner />
-      </Center>
-    )
+    return <Loading />
   }
 
   if (formState) {

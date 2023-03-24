@@ -245,7 +245,6 @@ importers:
       babel-plugin-macros: ^3.1.0
       babel-plugin-module-resolver: ^5.0.0
       babel-plugin-transform-remove-console: ^6.9.4
-      check-password-strength: ^2.0.7
       date-fns: ^2.29.3
       eslint: ^8.34.0
       formik: ^2.2.9
@@ -300,6 +299,7 @@ importers:
       vision-camera-code-scanner: ^0.2.0
       vite-tsconfig-paths: ^4.0.5
       zod: ^3.20.6
+      zxcvbn-typescript: ^5.0.1
     dependencies:
       '@apollo/client': 3.7.9_onqnqwb3ubg5opvemcqf7c2qhy
       '@babel/preset-env': 7.20.2_@babel+core@7.21.0
@@ -335,7 +335,6 @@ importers:
       apollo-link-token-refresh: 0.4.0_c4ymifursyympcfzievhzyjcri
       apollo3-cache-persist: 0.14.1_@apollo+client@3.7.9
       babel-plugin-transform-remove-console: 6.9.4
-      check-password-strength: 2.0.7
       date-fns: 2.29.3
       formik: 2.2.9_react@18.2.0
       graphql: 16.6.0
@@ -381,6 +380,7 @@ importers:
       vision-camera-code-scanner: 0.2.0_vxxn6jomnfzxfan5bvel66nqli
       vite-tsconfig-paths: 4.0.5_typescript@5.0.2
       zod: 3.20.6
+      zxcvbn-typescript: 5.0.1
     devDependencies:
       '@babel/core': 7.21.0
       '@babel/preset-typescript': 7.21.0_@babel+core@7.21.0
@@ -27235,6 +27235,10 @@ packages:
 
   /zod/3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+
+  /zxcvbn-typescript/5.0.1:
+    resolution: {integrity: sha512-If2a6jdm278dfWmn6NL7oC1lNYRHOthBw0C78LsKvtAHHFNsMudvFhDn2fF/b74txWtSosJJiuJ7jBPn/xP6HQ==}
+    dev: false
 
   file:backend/schemas:
     resolution: {directory: backend/schemas, type: directory}

@@ -22,7 +22,7 @@ export const PasswordSchema = Yup.object().shape({
 })
 
 export const TOTPSchema = Yup.object().shape({
-  url: Yup.string().url('Invalid URL').required('Required'),
+  url: Yup.string().url('Invalid URL'),
   label: Yup.string(),
   secret: Yup.string().required('Required'),
   iconUrl: Yup.string().url('Invalid URL').nullable(),
