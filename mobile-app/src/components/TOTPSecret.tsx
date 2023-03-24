@@ -24,7 +24,7 @@ import { TOTPStackScreenProps } from '../navigation/types'
 export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
   const { totp } = item
   const [showWhole, setShowWhole] = useState<boolean>(false)
-  const otp = generateOTP(totp.secret)
+  const totpCode = generateOTP(totp.secret)
 
   const toast = useToast()
   const id = 'copied-toast'
@@ -37,7 +37,7 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
   return (
     <Pressable
       onPress={() => {
-        copyToClipboard(totp.secret)
+        copyToClipboard(totpCode)
         if (!toast.isActive(id)) {
           toast.show({
             id,
@@ -80,7 +80,7 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
                       setShowWhole(!showWhole)
                     }}
                   >
-                    {showWhole ? otp : otp.substring(0, 3) + '***'}
+                    {showWhole ? totpCode : totpCode.substring(0, 3) + '***'}
                   </Text>
                 </VStack>
               </HStack>
