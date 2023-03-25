@@ -471,6 +471,7 @@ export type UserGql = {
   autofillCredentialsEnabled: Scalars['Boolean'];
   autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   deviceRecoveryCooldownMinutes: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
@@ -510,6 +511,7 @@ export type UserMutation = {
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   device: DeviceMutation;
   deviceRecoveryCooldownMinutes: Scalars['Int'];
@@ -626,6 +628,7 @@ export type UserQuery = {
   autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   device: DeviceQuery;
   deviceRecoveryCooldownMinutes: Scalars['Int'];
