@@ -1,6 +1,6 @@
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, AddIcon, DeleteIcon } from '@chakra-ui/icons'
+import { UnlockIcon, AddIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -8,7 +8,6 @@ import {
   Text,
   Input,
   Stat,
-  useColorMode,
   Tooltip,
   Spinner,
   VStack,
@@ -27,8 +26,7 @@ import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 import browser from 'webextension-polyfill'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { IoList } from 'react-icons/io5'
-import { ListView } from '@src/components/vault/ListView'
-import { DataTable } from '@src/components/vault/TableView'
+import { TableList } from '@src/components/vault/TableList'
 
 export function VaultListItem({
   secret
@@ -36,7 +34,6 @@ export function VaultListItem({
   secret: ILoginSecret | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
-  const [selected, isSelected] = useState(false)
 
   const { deviceState } = useContext(DeviceStateContext)
   if (!deviceState) {
@@ -78,17 +75,6 @@ export function VaultListItem({
               }
             }}
           >
-            <DeleteIcon
-              cursor={'pointer'}
-              boxSize={26}
-              padding={1.5}
-              alignSelf="end"
-              overflow={'visible'}
-              backgroundColor={'red.400'}
-              _hover={{ backgroundColor: 'red.500' }}
-              left="0"
-              top="inherit"
-            />
             <DeleteSecretButton secret={secret} />
 
             {secretUrl ? (
@@ -120,9 +106,9 @@ export function VaultListItem({
             <IconButton
               size="sm"
               display={isVisible ? 'block' : 'none'}
-              aria-label="open item"
+              aria-label="Edit item"
               colorScheme="gray"
-              icon={<SettingsIcon />}
+              icon={<EditIcon />}
             />
           </Link>
         </Flex>
@@ -221,13 +207,12 @@ export const VaultList = () => {
           )}
         </HStack>
       </Center>
-      {/*//TODO: Here change views*/}
       <VStack flexDirection="column" h={screenHeight - 42}>
         <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
           {!tableView ? (
             <VirtualizedList filter={filterBy} />
           ) : (
-            <DataTable filter={filterBy} />
+            <TableList filter={filterBy} />
           )}
         </div>
       </VStack>

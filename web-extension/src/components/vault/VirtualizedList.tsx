@@ -24,7 +24,6 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
 
         return (
           <List
-            className="List"
             width={width}
             height={height}
             rowCount={rowCount}
@@ -50,7 +49,6 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
                   alignItems={'center'}
                   w={'100%'}
                   h="100%"
-                  className="Row"
                   key={key}
                   style={style}
                 >
