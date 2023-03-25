@@ -15,5 +15,9 @@ module.exports = merge(common, {
       minChunks: 3,
       maxSize: 3500000
     }
-  }
+  },
+  output: {
+    filename: '[name].[contenthash].js'
+  },
+  plugins: [new HashedModuleIdsPlugin()]
 })
