@@ -129,6 +129,7 @@ export type DeviceGql = {
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   firebaseToken: Scalars['String'];
   firstIpAddress: Scalars['String'];
   id: Scalars['ID'];
@@ -157,6 +158,7 @@ export type DeviceInput = {
 export type DeviceMutation = {
   __typename?: 'DeviceMutation';
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   firebaseToken: Scalars['String'];
   firstIpAddress: Scalars['String'];
   id: Scalars['ID'];
@@ -201,6 +203,7 @@ export type DeviceQuery = {
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   /** Get all secrets that were change since last device sync */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>;
   firebaseToken: Scalars['String'];

@@ -55,6 +55,7 @@ model Device {
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
+  deletedAt                DateTime?
   registeredWithMasterAt   DateTime?
   lastSyncAt               DateTime?
   lastUnlockAt             DateTime?
@@ -109,7 +110,7 @@ model SecretUsageEvent {
   url         String?
   User        User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      String          @db.Uuid
-  Device      Device          @relation(fields: [deviceId], references: [id])
+  Device      Device          @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   deviceId    String
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])

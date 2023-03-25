@@ -93,7 +93,8 @@ export class UserQuery extends UserBase {
   async devicesCount() {
     return prismaClient.device.count({
       where: {
-        userId: this.id
+        userId: this.id,
+        deletedAt: null
       }
     })
   }

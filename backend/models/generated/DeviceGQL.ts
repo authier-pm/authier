@@ -42,6 +42,9 @@ export class DeviceGQLScalars {
   updatedAt: Date | null
 
   @Field(() => GraphQLISODateTime, { nullable: true })
+  deletedAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
   registeredWithMasterAt: Date | null
 
   @Field(() => GraphQLISODateTime, { nullable: true })

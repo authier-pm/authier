@@ -124,6 +124,7 @@ type DeviceGQL {
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
   lastUnlockAt: DateTime
@@ -259,6 +260,7 @@ type DeviceQuery {
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
   lastUnlockAt: DateTime
@@ -417,6 +419,7 @@ type DeviceMutation {
   vaultLockTimeoutSeconds: Int
   createdAt: DateTime!
   updatedAt: DateTime
+  deletedAt: DateTime
   registeredWithMasterAt: DateTime
   lastSyncAt: DateTime
   lastUnlockAt: DateTime
