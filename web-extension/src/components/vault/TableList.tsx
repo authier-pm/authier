@@ -15,7 +15,7 @@ import { FixedSizeList as List } from 'react-window'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
 
 export function TableList({ filter }: { filter: string }) {
@@ -54,6 +54,9 @@ export function TableList({ filter }: { filter: string }) {
     })
   }
 
+  const [showAllPasswords, setShowAllPasswords] = useState(false)
+  const showText = showAllPasswords ? 'Hide' : 'Show'
+
   const Row = ({
     index,
     style
@@ -61,7 +64,8 @@ export function TableList({ filter }: { filter: string }) {
     index: number
     style: React.CSSProperties
   }) => {
-    const [isVisible, setIsVisible] = useState(false)
+    const [areIconsVisible, setAreIconsVisible] = useState(false)
+    const [showPassword, setShowPassword] = useState(false)
     const row = data[index]
 
     return (
@@ -74,8 +78,8 @@ export function TableList({ filter }: { filter: string }) {
         justify="space-between"
         align="center"
         style={style}
-        onMouseOver={() => setIsVisible(true)}
-        onMouseOut={() => setIsVisible(false)}
+        onMouseOver={() => setAreIconsVisible(true)}
+        onMouseOut={() => setAreIconsVisible(false)}
       >
         <Flex
           p={1}
@@ -85,12 +89,7 @@ export function TableList({ filter }: { filter: string }) {
             backgroundColor: useColorModeValue('gray.400', 'gray.700')
           }}
         >
-          <HStack
-            w="80%"
-            justifyContent="space-between"
-            onClick={() => handleSelect(row.id)}
-            alignItems="center"
-          >
+          <HStack w="80%" justifyContent="space-between" alignItems="center">
             <Box>
               <Checkbox
                 isChecked={selected.includes(row.id)}
@@ -127,18 +126,41 @@ export function TableList({ filter }: { filter: string }) {
               overflow="hidden"
               whiteSpace="nowrap"
             >
-              {row.kind === 'TOTP'
-                ? row.totp.secret
-                : row.loginCredentials.password}
+              {showPassword || showAllPasswords
+                ? row.kind === 'TOTP'
+                  ? row.totp.secret
+                  : row.loginCredentials.password
+                : '*'.repeat(
+                    row.kind === 'TOTP'
+                      ? row.totp.secret.length
+                      : row.loginCredentials.password.length
+                  )}
             </Text>
           </HStack>
-          <Flex justifyContent="flex-end" display={isVisible ? 'flex' : 'none'}>
+          <HStack
+            justifyContent="flex-end"
+            display={areIconsVisible ? 'flex' : 'none'}
+            spacing={2}
+          >
+            <Tooltip label={showText} aria-label={showText}>
+              <IconButton
+                display={areIconsVisible ? 'block' : 'none'}
+                aria-label={showText}
+                icon={
+                  showPassword || showAllPasswords ? (
+                    <ViewOffIcon />
+                  ) : (
+                    <ViewIcon />
+                  )
+                }
+                onClick={() => setShowPassword(!showPassword)}
+              />
+            </Tooltip>
             <Tooltip label="Edit" aria-label="Edit">
               <IconButton
                 aria-label="Edit"
                 icon={<EditIcon />}
                 onClick={() => handleEdit(row)}
-                mr={2}
               />
             </Tooltip>
             <Tooltip label="Delete" aria-label="Delete">
@@ -148,7 +170,7 @@ export function TableList({ filter }: { filter: string }) {
                 onClick={() => handleRemove(row)}
               />
             </Tooltip>
-          </Flex>
+          </HStack>
         </Flex>
       </Flex>
     )
@@ -172,9 +194,18 @@ export function TableList({ filter }: { filter: string }) {
           <Text w="inherit" textAlign="center" fontWeight="bold">
             URL
           </Text>
-          <Text pr={4} w="inherit" textAlign="end" fontWeight="bold">
-            Secret
-          </Text>
+          <HStack>
+            <Text pr={4} w="inherit" textAlign="end" fontWeight="bold">
+              Secret
+            </Text>
+            <IconButton
+              size="sm"
+              aria-label={showText}
+              icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
+              onClick={() => setShowAllPasswords(!showAllPasswords)}
+              ml={2}
+            />
+          </HStack>
         </HStack>
       </Flex>
       <AutoSizer>
