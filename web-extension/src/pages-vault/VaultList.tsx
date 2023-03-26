@@ -154,12 +154,12 @@ export const VaultList = () => {
       <Center
         justifyContent={'space-evenly'}
         w={'100%'}
-        bgColor={'teal.900'}
+        bg={useColorModeValue('white', 'gray.800')}
         p={3}
       >
         <Input
           variant={'filled'}
-          color="grey.500"
+          color="grey.300"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault by url, username, label or password`}
           m="auto"

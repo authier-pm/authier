@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Authier",
   "description": "Authier chrome extension",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "browser_action": {
     "default_icon": "icon-16.png",
     "default_popup": "js/popup.html"
