@@ -23,7 +23,11 @@ import {
   IDecryptedSecrets
 } from './autofill'
 import { authenticator } from 'otplib'
-import { recordInputs, renderer, showSavePromptIfAppropriate } from './renderer'
+import {
+  recordInputs,
+  contentScriptRender,
+  showSavePromptIfAppropriate
+} from './contentScriptRender'
 import { getTRPCCached } from './connectTRPC'
 
 const log = debug('au:contentScript')
@@ -98,7 +102,7 @@ export async function initInputWatch() {
   }
 
   startBodyInputChangeObserver()
-  renderer(stateInitRes)
+  contentScriptRender(stateInitRes)
 
   const stopAutofillListener = autofill(stateInitRes)
 
