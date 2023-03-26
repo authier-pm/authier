@@ -88,7 +88,10 @@ async function clicked(e: MouseEvent) {
   }
 }
 
-export const renderer = (stateInit: IInitStateRes) => {
+/**
+ * this handles showing the login credential options modal and the save credentials top bar
+ */
+export const contentScriptRender = (stateInit: IInitStateRes) => {
   const { saveLoginModalsState, secretsForHost, webInputs } = stateInit
 
   if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
@@ -97,6 +100,11 @@ export const renderer = (stateInit: IInitStateRes) => {
       webInputs
     })
     return
+  }
+
+  const isIframe = window.location !== window.parent.location
+  if (isIframe) {
+    return // don't show the save prompt in iframes, we only want to show it in the top-level page
   }
 
   // Render save credential modal after page-rerender
@@ -121,6 +129,7 @@ export const showSavePromptIfAppropriate = async (
   if (loginPrompt) {
     return
   }
+
   await trpc.saveCapturedInputEvents.mutate({
     inputEvents: domRecorder.toJSON(),
     url: document.documentURI
