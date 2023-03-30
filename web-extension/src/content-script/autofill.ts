@@ -212,8 +212,12 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         // log('inputEl', inputEl)
         //NOTE: We found element by DOM path
         if (inputEl) {
-          log('autofilled by domPath')
-          if (webInputGql.kind === WebInputType.PASSWORD && firstLoginCred) {
+          log(`autofilled by domPath ${webInputGql.domPath}`)
+          if (
+            webInputGql.kind === WebInputType.PASSWORD &&
+            firstLoginCred &&
+            inputEl.type === 'password' // we don't want to autofill password to any other type of input
+          ) {
             const el = autofillValueIntoInput(
               inputEl,
               firstLoginCred.loginCredentials.password
@@ -328,7 +332,8 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
       },
       500,
       {
-        trailing: true
+        trailing: true,
+        leading: false
       }
     )
 
