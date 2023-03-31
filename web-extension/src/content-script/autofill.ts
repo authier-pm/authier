@@ -119,7 +119,8 @@ const filterUselessInputs = (documentBody: HTMLElement) => {
       return (
         uselessInputTypes.includes(el.type) === false &&
         el.offsetWidth > 0 && // filter out hidden elements
-        el.offsetHeight > 0
+        el.offsetHeight > 0 &&
+        el.value === '' // filter out elements that already have a value
       )
     }
   )
@@ -136,6 +137,8 @@ export const getElementCoordinates = (el: HTMLElement) => {
 
 export let autofillEnabled = false
 let onInputAddedHandler
+
+const filledElements: Array<HTMLInputElement | null> = []
 
 export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
   const trpc = getTRPCCached()
@@ -164,6 +167,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //Register screen
     //After certain condition is met, we can assume this is register page
     log('usefulInputs', usefulInputs)
+
     if (usefulInputs.length >= 2) {
       for (let index = 0; index < usefulInputs.length - 1; index++) {
         const input = usefulInputs[index]
@@ -193,64 +197,67 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         }
       }
     }
+    let matchingWebInputs = webInputs.filter(({ url }) => {
+      const matches = url.startsWith(location.href)
 
+      return matches
+    })
+    if (matchingWebInputs.length < 2) {
+      matchingWebInputs = webInputs
+    }
     //Fill known inputs
-    const filledElements = webInputs
-      .filter(({ url }) => {
-        // console.log('~ url', url)
-        //FIX: THIS
-        const host = new URL(url).host
-        const matches = location.href.includes(host)
+    for (const webInputGql of matchingWebInputs) {
+      let inputEl = document.body.querySelector(
+        webInputGql.domPath
+      ) as HTMLInputElement | null
 
-        return matches
-      })
-      .map((webInputGql) => {
-        let inputEl = document.body.querySelector(
-          webInputGql.domPath
-        ) as HTMLInputElement | null
+      // log('inputEl', inputEl)
+      //NOTE: We found element by DOM path
+      if (inputEl) {
+        log(`autofilled by domPath ${webInputGql.domPath}`)
+        if (
+          webInputGql.kind === WebInputType.PASSWORD &&
+          firstLoginCred &&
+          inputEl.type === 'password' // we don't want to autofill password to any other type of input
+        ) {
+          const el = autofillValueIntoInput(
+            inputEl,
+            firstLoginCred.loginCredentials.password
+          )
 
-        // log('inputEl', inputEl)
-        //NOTE: We found element by DOM path
-        if (inputEl) {
-          log(`autofilled by domPath ${webInputGql.domPath}`)
-          if (
-            webInputGql.kind === WebInputType.PASSWORD &&
-            firstLoginCred &&
-            inputEl.type === 'password' // we don't want to autofill password to any other type of input
-          ) {
-            const el = autofillValueIntoInput(
-              inputEl,
-              firstLoginCred.loginCredentials.password
-            )
+          notyf.success(
+            `Autofilled password for ${firstLoginCred.loginCredentials.username} into element ${webInputGql.domPath}`
+          )
 
-            notyf.success(
-              `Autofilled password for ${firstLoginCred.loginCredentials.username} into element ${webInputGql.domPath}`
-            )
-
-            return el
-          } else if (
-            [
-              WebInputType.EMAIL,
-              WebInputType.USERNAME,
-              WebInputType.USERNAME_OR_EMAIL
-            ].includes(webInputGql.kind) &&
-            firstLoginCred
-          ) {
-            return autofillValueIntoInput(
-              inputEl,
-              firstLoginCred.loginCredentials.username
-            )
-          } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
-            return autofillValueIntoInput(
-              inputEl,
-              //@sleaper TODO: fix this
-              authenticator.generate(totpSecret.totp.secret)
-            )
-          }
-          //NOTE: We did not find element by DOM path
+          filledElements.push(el)
+        } else if (
+          [
+            WebInputType.EMAIL,
+            WebInputType.USERNAME,
+            WebInputType.USERNAME_OR_EMAIL
+          ].includes(webInputGql.kind) &&
+          firstLoginCred
+        ) {
+          const el = autofillValueIntoInput(
+            inputEl,
+            firstLoginCred.loginCredentials.username
+          )
+          filledElements.push(el)
+        } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
+          const el = autofillValueIntoInput(
+            inputEl,
+            //@sleaper TODO: fix this
+            authenticator.generate(totpSecret.totp.secret)
+          )
+          filledElements.push(el)
         }
-      })
-      .filter((el) => !!el)
+
+        if (filledElements.length >= 2) {
+          break
+        }
+        //NOTE: We did not find element by DOM path
+      }
+    }
 
     //NOTE: Guess web inputs, if we have credentials without DOM PATHS
     if (
@@ -276,7 +283,10 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     //Catch new inputs
     onInputAddedHandler = debounce(
       (inputEl) => {
-        // log('onInputAddedHandler', inputEl)
+        if (filledElements.length >= 2) {
+          return // we have already filled 2 inputs on this page, we don't need to fill any more
+        }
+        log('onInputAddedHandler', inputEl)
         let newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
@@ -336,10 +346,6 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         leading: false
       }
     )
-
-    //If input shows on loaded page
-
-    bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
 
     if (!firstLoginCred && !totpSecret) {
       log('no secrets for host')
@@ -559,13 +565,18 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     }
   }
 
-  const scanGlobalDocument = () =>
+  const initAutofill = () => {
     scanKnownWebInputsAndFillWhenFound(document.body as HTMLBodyElement)
-  setTimeout(scanGlobalDocument, 150) // let's wait a bit for the page to load
+
+    //If input shows on loaded page
+
+    bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
+  }
+  setTimeout(initAutofill, 150) // let's wait a bit for the page to load
 
   return () => {
     autofillEnabled = false
-    bodyInputChangeEmitter.off('inputAdded', scanGlobalDocument)
+    bodyInputChangeEmitter.off('inputAdded', initAutofill)
   }
 }
 
