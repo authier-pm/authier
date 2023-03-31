@@ -4,7 +4,9 @@ import { I18nProvider } from '@lingui/react'
 import React from 'react'
 import { Router } from 'wouter'
 
-import { gqlSchema } from '../../backend/schemas/gqlSchema'
+// import { gqlSchema } from '../../backend/schemas/gqlSchema'
+const gqlSchemas = require('../../backend/schemas/gqlSchema').gqlSchema // we need to require it because when we use regular import typescript starts to compile whole BE codebase with extensions config
+
 import { i18n } from '@lingui/core'
 import staticLocationHook from 'wouter/static-location'
 
@@ -13,7 +15,7 @@ export const makeSsrClient = (ctx: any) => {
     cache: new InMemoryCache(),
     ssrMode: true,
     link: new SchemaLink({
-      schema: gqlSchema,
+      schema: gqlSchemas,
       context: ctx
     })
   })
