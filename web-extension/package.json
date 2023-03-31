@@ -62,7 +62,6 @@
     "dotenv-cli": "^7.1.0",
     "dotenv-webpack": "^8.0.1",
     "firebase": "9.18.0",
-    "gqlSchemas": "file:../backend/schemas",
     "html-webpack-plugin": "^5.5.0",
     "js-file-download": "^0.4.12",
     "jsdom": "^21.1.1",
