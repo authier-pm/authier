@@ -18,7 +18,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           apiURL: ${{ secrets.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
-      
+
       - name: Clean source code
         shell: bash
         env:
@@ -27,6 +27,7 @@ jobs:
         run: |
           find . -name 'node_modules' -type d -prune -exec rm -rf '{}' \;
           rm -rf .git
+          rm -rf backend
           cd web-extension
           touch .env
           echo $API_URL >> .env
@@ -37,7 +38,7 @@ jobs:
         with:
           files: ./
           dest: source-code.zip
-      
+
       - uses: actions/upload-artifact@v3
         with:
           name: test
