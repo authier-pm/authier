@@ -39,11 +39,6 @@ jobs:
           files: ./
           dest: source-code.zip
 
-      - uses: actions/upload-artifact@v3
-        with:
-          name: test
-          path: ./source-code.zip
-
       - name: Deploy to Firefox Addons
         id: addonsDeploy
         uses: cardinalby/webext-buildtools-firefox-addons-action@v1
