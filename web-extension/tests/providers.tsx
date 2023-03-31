@@ -3,8 +3,8 @@ import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
 import { Router } from 'wouter'
-//@ts-expect-error
-import { gqlSchema } from 'gqlSchemas'
+
+import { gqlSchema } from '../../backend/schemas/gqlSchema'
 import { i18n } from '@lingui/core'
 import staticLocationHook from 'wouter/static-location'
 
