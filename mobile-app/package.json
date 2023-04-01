@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -52,7 +52,6 @@
     "apollo-link-token-refresh": "^0.4.0",
     "apollo3-cache-persist": "^0.14.1",
     "babel-plugin-transform-remove-console": "^6.9.4",
-    "check-password-strength": "^2.0.7",
     "date-fns": "^2.29.3",
     "formik": "^2.2.9",
     "graphql": "^16.6.0",
@@ -97,7 +96,8 @@
     "text-decoding": "^1.0.0",
     "vision-camera-code-scanner": "^0.2.0",
     "vite-tsconfig-paths": "^4.0.5",
-    "zod": "^3.20.6"
+    "zod": "^3.20.6",
+    "zxcvbn-typescript": "^5.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.0",

@@ -14,15 +14,14 @@ import { Providers } from './src/Providers'
 import { device } from './src/utils/Device'
 import { useForceUpdate } from './useForceUpdate'
 import { Alert } from 'react-native'
-// import CodePush from 'react-native-code-push'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
+//import CodePush from 'react-native-code-push'
 import './src/sentryInit'
-
-//TODO: Fix CodePush
+//FIX: CodePush
 // let CodePushOptions = {
 //   checkFrequency: __DEV__
 //     ? CodePush.CheckFrequency.MANUAL
@@ -79,4 +78,5 @@ const App = () => {
   )
 }
 export default Sentry.wrap(App)
-// export default Sentry.wrap(CodePush(CodePushOptions)(App))
+//FIX: CodePush
+//export default Sentry.wrap(CodePush(CodePushOptions)(App))

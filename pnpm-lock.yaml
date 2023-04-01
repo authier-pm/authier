@@ -245,7 +245,6 @@ importers:
       babel-plugin-macros: ^3.1.0
       babel-plugin-module-resolver: ^5.0.0
       babel-plugin-transform-remove-console: ^6.9.4
-      check-password-strength: ^2.0.7
       date-fns: ^2.29.3
       eslint: ^8.34.0
       formik: ^2.2.9
@@ -300,6 +299,7 @@ importers:
       vision-camera-code-scanner: ^0.2.0
       vite-tsconfig-paths: ^4.0.5
       zod: ^3.20.6
+      zxcvbn-typescript: ^5.0.1
     dependencies:
       '@apollo/client': 3.7.9_onqnqwb3ubg5opvemcqf7c2qhy
       '@babel/preset-env': 7.20.2_@babel+core@7.21.0
@@ -335,7 +335,6 @@ importers:
       apollo-link-token-refresh: 0.4.0_c4ymifursyympcfzievhzyjcri
       apollo3-cache-persist: 0.14.1_@apollo+client@3.7.9
       babel-plugin-transform-remove-console: 6.9.4
-      check-password-strength: 2.0.7
       date-fns: 2.29.3
       formik: 2.2.9_react@18.2.0
       graphql: 16.6.0
@@ -381,6 +380,7 @@ importers:
       vision-camera-code-scanner: 0.2.0_vxxn6jomnfzxfan5bvel66nqli
       vite-tsconfig-paths: 4.0.5_typescript@5.0.2
       zod: 3.20.6
+      zxcvbn-typescript: 5.0.1
     devDependencies:
       '@babel/core': 7.21.0
       '@babel/preset-typescript': 7.21.0_@babel+core@7.21.0
@@ -495,6 +495,7 @@ importers:
       proxy-date: ^0.1.1
       query-string: ^8
       react: ^18.2.0
+      react-data-grid: 7.0.0-beta.26
       react-device-detect: ^2.2.3
       react-dom: ^18.2.0
       react-dropzone: ^14.2.3
@@ -505,7 +506,10 @@ importers:
       react-select: ^5.7.2
       react-test-renderer: ^18.2.0
       react-transition-group: ^4.4.5
+      react-virtual: ^2.10.4
       react-virtualized: ^9.22.3
+      react-virtualized-auto-sizer: ^1.0.7
+      react-window: ^1.8.8
       reflect-metadata: ^0.1.13
       sass-loader: ^13.2.2
       slugify: ^1.6.6
@@ -569,6 +573,7 @@ importers:
       preact: 10.13.2
       query-string: 8.1.0
       react: 18.2.0
+      react-data-grid: 7.0.0-beta.26_biqbaboplfbrettd7655fr4n2y
       react-device-detect: 2.2.3_biqbaboplfbrettd7655fr4n2y
       react-dom: 18.2.0_react@18.2.0
       react-hook-form: 7.43.8_react@18.2.0
@@ -578,7 +583,10 @@ importers:
       react-select: 5.7.2_6ayuu6vm2uqggsikytom4xssc4
       react-test-renderer: 18.2.0_react@18.2.0
       react-transition-group: 4.4.5_biqbaboplfbrettd7655fr4n2y
+      react-virtual: 2.10.4_react@18.2.0
       react-virtualized: 9.22.3_biqbaboplfbrettd7655fr4n2y
+      react-virtualized-auto-sizer: 1.0.7_biqbaboplfbrettd7655fr4n2y
+      react-window: 1.8.8_biqbaboplfbrettd7655fr4n2y
       reflect-metadata: 0.1.13
       stream-browserify: 3.0.0
       trpc-chrome: 1.0.0_yppqjnaiqvvtvv6neohrrkd67m
@@ -733,6 +741,42 @@ packages:
       zen-observable-ts: 1.2.5
     dev: false
 
+  /@apollo/client/3.7.11_gdcq4dv6opitr3wbfwyjmanyra:
+    resolution: {integrity: sha512-uLg2KtxoAyj9ta7abLxXx8cGRM7HypCkXVmxtL7Ko//N5g37aoJ3ca7VYoFCMUFO1BXBulj+yKVl0U3+ILj5AQ==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+      graphql-ws: ^5.5.5
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
+    peerDependenciesMeta:
+      graphql-ws:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      subscriptions-transport-ws:
+        optional: true
+    dependencies:
+      '@graphql-typed-document-node/core': 3.1.2_graphql@16.6.0
+      '@wry/context': 0.7.0
+      '@wry/equality': 0.5.3
+      '@wry/trie': 0.3.2
+      graphql: 16.6.0
+      graphql-tag: 2.12.6_graphql@16.6.0
+      hoist-non-react-statics: 3.3.2
+      optimism: 0.16.2
+      prop-types: 15.8.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+      response-iterator: 0.2.6
+      symbol-observable: 4.0.0
+      ts-invariant: 0.10.3
+      tslib: 2.5.0
+      zen-observable-ts: 1.2.5
+    dev: false
+
   /@apollo/client/3.7.9_gdcq4dv6opitr3wbfwyjmanyra:
     resolution: {integrity: sha512-YnJvrJOVWrp4y/zdNvUaM8q4GuSHCEIecsRDTJhK/veT33P/B7lfqGJ24NeLdKMj8tDEuXYF7V0t+th4+rgC+Q==}
     peerDependencies:
@@ -807,7 +851,7 @@ packages:
   /@apollo/react-hooks/4.0.0_gdcq4dv6opitr3wbfwyjmanyra:
     resolution: {integrity: sha512-fCu0cbne3gbUl0QbA8X4L33iuuFVQbC5Jo2MIKRK8CyawR6PoxDpFdFA1kc6033ODZuZZ9Eo4RdeJFlFIIYcLA==}
     dependencies:
-      '@apollo/client': 3.7.10_gdcq4dv6opitr3wbfwyjmanyra
+      '@apollo/client': 3.7.11_gdcq4dv6opitr3wbfwyjmanyra
     transitivePeerDependencies:
       - graphql
       - graphql-ws
@@ -8981,6 +9025,10 @@ packages:
 
   /@protobufjs/utf8/1.1.0:
     resolution: {integrity: sha512-Vvn3zZrhQZkkBE8LSuW3em98c0FwgO4nxzv6OdSxPKJIEKY2bGbHn+mhGIPerzI4twdxaP8/0+06HBpwf345Lw==}
+
+  /@reach/observe-rect/1.2.0:
+    resolution: {integrity: sha512-Ba7HmkFgfQxZqqaeIWWkNK0rEhpxVQHIoVyW1YDSkGsGIXzcaW4deC8B0pZrNSSyLTdIk7y+5olKt5+g0GmFIQ==}
+    dev: false
 
   /@react-aria/checkbox/3.6.0_react@18.2.0:
     resolution: {integrity: sha512-E2MZoMZhtHtlS1mYjxTI29JRq4s3Y6d92KHj7tzvcC308d4Bzz0IHJd0bMz/8whoNteU02pQyZ3rDAcGf92bHQ==}
@@ -21977,6 +22025,13 @@ packages:
       '@wry/context': 0.6.1
       '@wry/trie': 0.3.2
 
+  /optimism/0.16.2:
+    resolution: {integrity: sha512-zWNbgWj+3vLEjZNIh/okkY2EUfX+vB9TJopzIZwT1xxaMqC5hRLLraePod4c5n4He08xuXNH+zhKFFCu390wiQ==}
+    dependencies:
+      '@wry/context': 0.7.0
+      '@wry/trie': 0.3.2
+    dev: false
+
   /optionator/0.8.3:
     resolution: {integrity: sha512-+IW9pACdk3XWmmTXG8m3upGUJst5XRGzxMRjXzAuJ1XnIFNvfhjjIuYkDvysnPQ7qzqVzLt78BCruntqRhWQbA==}
     engines: {node: '>= 0.8.0'}
@@ -23168,6 +23223,17 @@ packages:
       react: 18.2.0
     dev: false
 
+  /react-data-grid/7.0.0-beta.26_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-UYYkz5y6RR5IZDu/dMtH2RrOY+7TWun3AzyekrCxenleuWf+X92HUNxi074MEa3ab7E5YW46B6nGpanQGt9I2Q==}
+    peerDependencies:
+      react: ^18.0
+      react-dom: ^18.0
+    dependencies:
+      clsx: 1.2.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /react-device-detect/2.2.3_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-buYY3qrCnQVlIFHrC5UcUoAj7iANs/+srdkwsnNjI7anr3Tt7UY6MqNxtMLlr0tMBied0O49UZVK8XKs3ZIiPw==}
     peerDependencies:
@@ -23862,6 +23928,26 @@ packages:
       react-dom: 18.2.0_react@18.2.0
     dev: false
 
+  /react-virtual/2.10.4_react@18.2.0:
+    resolution: {integrity: sha512-Ir6+oPQZTVHfa6+JL9M7cvMILstFZH/H3jqeYeKI4MSUX+rIruVwFC6nGVXw9wqAw8L0Kg2KvfXxI85OvYQdpQ==}
+    peerDependencies:
+      react: ^16.6.3 || ^17.0.0
+    dependencies:
+      '@reach/observe-rect': 1.2.0
+      react: 18.2.0
+    dev: false
+
+  /react-virtualized-auto-sizer/1.0.7_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-Mxi6lwOmjwIjC1X4gABXMJcKHsOo0xWl3E3ugOgufB8GJU+MqrtY35aBuvCYv/razQ1Vbp7h1gWJjGjoNN5pmA==}
+    engines: {node: '>8.0.0'}
+    peerDependencies:
+      react: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
+      react-dom: ^15.3.0 || ^16.0.0-alpha || ^17.0.0 || ^18.0.0-rc
+    dependencies:
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
+    dev: false
+
   /react-virtualized/9.22.3_biqbaboplfbrettd7655fr4n2y:
     resolution: {integrity: sha512-MKovKMxWTcwPSxE1kK1HcheQTWfuCxAuBoSTf2gwyMM21NdX/PXUhnoP8Uc5dRKd+nKm8v41R36OellhdCpkrw==}
     peerDependencies:
@@ -23876,6 +23962,19 @@ packages:
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-lifecycles-compat: 3.0.4
+    dev: false
+
+  /react-window/1.8.8_biqbaboplfbrettd7655fr4n2y:
+    resolution: {integrity: sha512-D4IiBeRtGXziZ1n0XklnFGu7h9gU684zepqyKzgPNzrsrk7xOCxni+TCckjg2Nr/DiaEEGVVmnhYSlT2rB47dQ==}
+    engines: {node: '>8.0.0'}
+    peerDependencies:
+      react: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^15.0.0 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    dependencies:
+      '@babel/runtime': 7.21.0
+      memoize-one: 5.2.1
+      react: 18.2.0
+      react-dom: 18.2.0_react@18.2.0
     dev: false
 
   /react/18.2.0:
@@ -27489,3 +27588,7 @@ packages:
 
   /zod/3.21.4:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
+
+  /zxcvbn-typescript/5.0.1:
+    resolution: {integrity: sha512-If2a6jdm278dfWmn6NL7oC1lNYRHOthBw0C78LsKvtAHHFNsMudvFhDn2fF/b74txWtSosJJiuJ7jBPn/xP6HQ==}
+    dev: false

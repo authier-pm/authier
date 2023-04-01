@@ -43,9 +43,7 @@ export const PasswordVault = ({
         description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
       })
     }
-  } //Maybe?
-
-  useEffect(() => navigation.addListener('focus', () => onRefresh()), [])
+  }
 
   return (
     <View>

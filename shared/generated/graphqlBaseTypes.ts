@@ -129,6 +129,7 @@ export type DeviceGql = {
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   firebaseToken: Scalars['String'];
   firstIpAddress: Scalars['String'];
   id: Scalars['ID'];
@@ -157,6 +158,7 @@ export type DeviceInput = {
 export type DeviceMutation = {
   __typename?: 'DeviceMutation';
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   firebaseToken: Scalars['String'];
   firstIpAddress: Scalars['String'];
   id: Scalars['ID'];
@@ -201,6 +203,7 @@ export type DeviceQuery = {
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime'];
+  deletedAt?: Maybe<Scalars['DateTime']>;
   /** Get all secrets that were change since last device sync */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>;
   firebaseToken: Scalars['String'];
@@ -471,6 +474,7 @@ export type UserGql = {
   autofillCredentialsEnabled: Scalars['Boolean'];
   autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   deviceRecoveryCooldownMinutes: Scalars['Int'];
   email?: Maybe<Scalars['String']>;
@@ -510,6 +514,7 @@ export type UserMutation = {
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime'];
   decryptionChallenge: DecryptionChallengeMutation;
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   device: DeviceMutation;
   deviceRecoveryCooldownMinutes: Scalars['Int'];
@@ -626,6 +631,7 @@ export type UserQuery = {
   autofillTOTPEnabled: Scalars['Boolean'];
   createdAt: Scalars['DateTime'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
+  defaultDeviceSyncTOTP: Scalars['Boolean'];
   defaultDeviceTheme: Scalars['String'];
   device: DeviceQuery;
   deviceRecoveryCooldownMinutes: Scalars['Int'];

@@ -27,7 +27,6 @@ function TOTPStackNavigation() {
       <Stack.Screen
         name="EditTOTP"
         options={{ title: t`Edit TOTP` }}
-        // @ts-expect-error TODO fix types of EditTOTP
         component={EditTOTP}
       />
 

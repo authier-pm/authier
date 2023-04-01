@@ -17,17 +17,10 @@ function CameraFrame() {
     <Svg height="100%" width="100%">
       <Defs>
         <Mask id="mask" x="0" y="0" height="100%" width="100%">
-          <Rect height="100%" width="100%" fill="#fff" />
-          <Rect x="18%" y="30%" height="250" width="250" fill="black" />
+          <Rect height="100%" width="100%" fill="white" opacity="0" />
+          <Rect x="18%" y="30%" height="250" width="250" />
         </Mask>
       </Defs>
-
-      <Rect
-        height="100%"
-        width="100%"
-        fill="rgba(0, 0, 0, 0.8)"
-        mask="url(#mask)"
-      />
 
       {/* Frame Border */}
       <Rect
@@ -37,6 +30,7 @@ function CameraFrame() {
         width="250"
         stroke="white"
         strokeWidth="5"
+        fill="transparent" // Add this line to make the rectangle transparent
       />
     </Svg>
   )
