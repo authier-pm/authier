@@ -52,7 +52,7 @@ react {
     // hermesFlags = ["-O", "-output-source-map"]
 }
 
-//TODO: Fix Codepush
+//FIX: CodePush
 //apply from: "../../../node_modules/react-native-code-push/android/codepush.gradle"
 
 /**
@@ -101,8 +101,8 @@ android {
         applicationId "com.authier"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 2
-        versionName "1.0.1"
+        versionCode 3
+        versionName "1.0.2"
         missingDimensionStrategy 'react-native-camera', 'general'
         resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
     }
@@ -133,12 +133,13 @@ android {
     }
     buildTypes {
         debug {
-            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            //FIX: CodePush
+            //resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             signingConfig signingConfigs.debug
         }
         releaseStaging {
             
-            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            //resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             // Note: It's a good idea to provide matchingFallbacks for the new buildType you create to prevent build issues
             // Add the following line if not already there
             matchingFallbacks = ['release']
@@ -150,7 +151,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            // resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
+            //resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
         }
     }
 

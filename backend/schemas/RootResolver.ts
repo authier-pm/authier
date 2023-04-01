@@ -202,8 +202,11 @@ export class RootResolver {
           console.warn(
             `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
           )
-          await prismaClient.device.delete({
-            where: { id: deviceId }
+          await prismaClient.device.update({
+            where: { id: deviceId },
+            data: {
+              deletedAt: new Date()
+            }
           })
           return this.registerNewUser(input, userId, ctx)
         } else {

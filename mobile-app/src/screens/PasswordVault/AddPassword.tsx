@@ -10,12 +10,11 @@ import {
   Button,
   useToast
 } from 'native-base'
-import { passwordStrength } from 'check-password-strength'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native'
 import { DeviceContext } from '../../providers/DeviceProvider'
-import { loginCredentialsSchema } from '../../../../shared/loginCredentialsSchema'
+import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import { InputHeader } from './EditPassword'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { PasswordStackScreenProps } from '../../navigation/types'
@@ -23,6 +22,7 @@ import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
+import zxcvbn from 'zxcvbn-typescript'
 
 const InputField = ({
   errors,
@@ -115,10 +115,10 @@ export const AddPassword = () => {
         handleChange,
         handleBlur,
         handleSubmit,
-        errors,
-        isValid
+        errors
       }) => {
-        const levelOfPsw = passwordStrength(values.password)
+        const passwordScore = zxcvbn(values.password).score // Estimate password strength from 0 to 4
+        const progress = passwordScore * 25 // Convert the score to a percentage
 
         return (
           <Flex p={5} flexDirection="column">
@@ -178,11 +178,10 @@ export const AddPassword = () => {
                 }
               />
               <Progress
-                value={levelOfPsw.id}
+                value={progress}
                 size="xs"
                 colorScheme="green"
-                max={3}
-                min={0}
+                max={4}
                 mb={1}
               />
               <FormControl.ErrorMessage>

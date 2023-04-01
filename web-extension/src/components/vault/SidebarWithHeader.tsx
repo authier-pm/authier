@@ -21,8 +21,7 @@ import {
   MenuDivider,
   MenuItem,
   MenuList,
-  Spinner,
-  Button
+  Spinner
 } from '@chakra-ui/react'
 import {
   FiHome,

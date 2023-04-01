@@ -6,6 +6,8 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
+    chunkIds: 'deterministic',
+    moduleIds: 'deterministic',
     minimizer: [new TerserPlugin()],
     runtimeChunk: false,
     splitChunks: {

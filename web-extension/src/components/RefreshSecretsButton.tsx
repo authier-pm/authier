@@ -15,7 +15,6 @@ export function RefreshSecretsButton() {
     >
       <IconButton
         size="md"
-        ml="2"
         aria-label="menu"
         icon={<IoMdRefreshCircle />}
         disabled={isSyncing}
