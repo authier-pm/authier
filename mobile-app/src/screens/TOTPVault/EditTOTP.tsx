@@ -168,6 +168,7 @@ export function EditTOTP({
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
 
+  //TODO: Change to react-query, invalidate cache on update
   useEffect(() => {
     async function loadSecret() {
       const secret = await device.state?.getSecretDecryptedById(
