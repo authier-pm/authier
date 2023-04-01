@@ -52,8 +52,7 @@ react {
     // hermesFlags = ["-O", "-output-source-map"]
 }
 
-//TODO: Fix Codepush
-//apply from: "../../../node_modules/react-native-code-push/android/codepush.gradle"
+apply from: "../../../node_modules/react-native-code-push/android/codepush.gradle"
 
 /**
  * Set this to true to create four separate APKs instead of one,
@@ -133,12 +132,12 @@ android {
     }
     buildTypes {
         debug {
-            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             signingConfig signingConfigs.debug
         }
         releaseStaging {
             
-            // resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
+            resValue "string", "CodePushDeploymentKey", '"5tlFkXDQofp1czjfQWZvGsv-4lFNKxv18aPzA"'
             // Note: It's a good idea to provide matchingFallbacks for the new buildType you create to prevent build issues
             // Add the following line if not already there
             matchingFallbacks = ['release']
@@ -150,7 +149,7 @@ android {
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
-            // resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
+            resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'
         }
     }
 
