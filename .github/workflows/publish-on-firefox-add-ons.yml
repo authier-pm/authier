@@ -27,17 +27,17 @@ jobs:
         run: |
           find . -name 'node_modules' -type d -prune -exec rm -rf '{}' \;
           rm -rf .git
+          rm -rf backend
+          cd web-extension
+          touch .env
+          echo $API_URL >> .env
+          echo $PAGE_URL >> .env
 
       - name: Zip source code
         uses: vimtor/action-zip@v1
         with:
           files: ./
           dest: source-code.zip
-
-      - uses: actions/upload-artifact@v3
-        with:
-          name: test
-          path: ./source-code.zip
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
