@@ -142,6 +142,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret) {
       return this.decryptSecret(secret)
     }
+    return undefined
   }
 
   getSecretsDecryptedByHostname(host: string) {

@@ -168,7 +168,6 @@ export function EditTOTP({
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
 
-  //TODO: @Capajj Is this the right way to do this? It did not work with react-query
   useEffect(() => {
     async function loadSecret() {
       const secret = await device.state?.getSecretDecryptedById(
@@ -187,15 +186,11 @@ export function EditTOTP({
     }
   }, [navigation, secret])
 
-  if (!secret) {
+  if (secret === null || !device.state) {
     return <Loading />
   }
 
-  if (!device.state) {
-    return <Loading />
-  }
-
-  if (!secret) {
+  if (secret === undefined) {
     return <Alert>Could not find this secret, it may be deleted</Alert>
   }
 
