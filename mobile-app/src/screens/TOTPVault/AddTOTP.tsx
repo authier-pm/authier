@@ -10,7 +10,7 @@ import { TOTPStackScreenProps } from '../../navigation/types'
 import { TotpTypeWithMeta } from '@src/utils/Device'
 import { TOTPSchema } from '@shared/formikSharedTypes'
 
-const InputField = ({
+export const InputField = ({
   errors,
   values,
   name,
@@ -22,7 +22,7 @@ const InputField = ({
     <FormControl isInvalid={name in errors}>
       <InputHeader>{header}:</InputHeader>
       <Input
-        value={values[name]}
+        value={values[name].toString()}
         onChangeText={handleChange(name)}
         onBlur={handleBlur(name)}
         isRequired
@@ -74,16 +74,19 @@ export const AddTOTP = () => {
           handleChange,
           handleBlur,
           handleSubmit,
-          errors,
-          isValid
+          errors
         }) => {
           return (
             <Flex p={5} flexDirection="column">
               <InputField
-                errors={errors}
-                header="URL"
-                name="url"
-                {...{ values, handleBlur, handleChange }}
+                {...{
+                  errors,
+                  values,
+                  name: 'url',
+                  handleBlur,
+                  handleChange,
+                  header: 'URL'
+                }}
               />
 
               <InputField
@@ -97,6 +100,13 @@ export const AddTOTP = () => {
                 errors={errors}
                 header="Secret"
                 name="secret"
+                {...{ values, handleBlur, handleChange }}
+              />
+
+              <InputField
+                errors={errors}
+                header="Period"
+                name="period"
                 {...{ values, handleBlur, handleChange }}
               />
 
@@ -119,14 +129,6 @@ export const AddTOTP = () => {
               >
                 Save
               </Button>
-
-              <InputField
-                errors={errors}
-                header="Period"
-                name="period"
-                {...{ values, handleBlur, handleChange }}
-              />
-
               <Button
                 onPress={() => navigation.navigate('QRScan')}
                 mt={5}

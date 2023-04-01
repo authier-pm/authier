@@ -142,6 +142,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (secret) {
       return this.decryptSecret(secret)
     }
+    return undefined
   }
 
   getSecretsDecryptedByHostname(host: string) {
@@ -317,7 +318,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       mutation: AddEncryptedSecretsDocument,
       variables: {
         secrets: encryptedSecrets
-      }
+      },
+      refetchQueries: [{ query: SyncEncryptedSecretsDocument }]
     })
     if (!data) {
       throw new Error('failed to save secret')

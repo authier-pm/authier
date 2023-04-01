@@ -7,7 +7,6 @@ import {
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
-
 import {
   loginCredentialsSchema,
   totpSchema

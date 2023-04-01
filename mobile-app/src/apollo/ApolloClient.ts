@@ -20,7 +20,6 @@ import { API_URL, API_URL_RELEASE } from '@env'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
-console.log('apiUrl:', apiUrl)
 const httpLink = new HttpLink({
   uri: apiUrl,
   credentials: 'include'

@@ -3,7 +3,6 @@ import React, { useContext, useEffect, useState } from 'react'
 
 import {
   Box,
-  Card,
   Center,
   Flex,
   HStack,

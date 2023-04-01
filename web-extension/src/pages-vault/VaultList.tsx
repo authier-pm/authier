@@ -1,6 +1,6 @@
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, SettingsIcon, AddIcon } from '@chakra-ui/icons'
+import { UnlockIcon, AddIcon, EditIcon } from '@chakra-ui/icons'
 import {
   Center,
   Box,
@@ -8,10 +8,10 @@ import {
   Text,
   Input,
   Stat,
-  useColorMode,
   Tooltip,
   Spinner,
-  VStack
+  VStack,
+  HStack
 } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { useContext, useEffect, useState } from 'react'
@@ -25,6 +25,8 @@ import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { VirtualizedList } from '@src/components/vault/VirtualizedList'
 import browser from 'webextension-polyfill'
 import { DeleteSecretButton } from './DeleteSecretButton'
+import { IoList } from 'react-icons/io5'
+import { TableList } from '@src/components/vault/TableList'
 
 export function VaultListItem({
   secret
@@ -104,9 +106,9 @@ export function VaultListItem({
             <IconButton
               size="sm"
               display={isVisible ? 'block' : 'none'}
-              aria-label="open item"
+              aria-label="Edit item"
               colorScheme="gray"
-              icon={<SettingsIcon />}
+              icon={<EditIcon />}
             />
           </Link>
         </Flex>
@@ -121,6 +123,7 @@ export const VaultList = () => {
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
   const { setSecuritySettings } = useContext(DeviceStateContext)
+  const [tableView, setTableView] = useState<boolean>(false)
 
   const { data, loading, error } = useSyncSettingsQuery()
 
@@ -151,12 +154,12 @@ export const VaultList = () => {
       <Center
         justifyContent={'space-evenly'}
         w={'100%'}
-        bgColor={'teal.900'}
+        bg={useColorModeValue('white', 'gray.800')}
         p={3}
       >
         <Input
           variant={'filled'}
-          color="grey.500"
+          color="grey.300"
           w={['300px', '350px', '400px', '500px']}
           placeholder={t`Search vault by url, username, label or password`}
           m="auto"
@@ -165,44 +168,53 @@ export const VaultList = () => {
           }}
         />
 
-        <Center px={3}>
-          <Stat ml="auto" whiteSpace={'nowrap'}>
-            {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
-          </Stat>
+        <HStack spacing={4}>
+          <Center>
+            <Stat px={3} ml="auto" whiteSpace={'nowrap'}>
+              {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
+            </Stat>
+            <RefreshSecretsButton />
+          </Center>
+          <IconButton
+            size="md"
+            ml="2"
+            aria-label="menu"
+            icon={<IoList />}
+            onClick={() => setTableView(!tableView)}
+          />
 
-          <RefreshSecretsButton />
-        </Center>
-
-        {error ? (
-          <Tooltip
-            shouldWrapChildren
-            label="You have reached your limit"
-            aria-label="A tooltip"
-          >
+          {error ? (
+            <Tooltip
+              shouldWrapChildren
+              label="You have reached your limit"
+              aria-label="A tooltip"
+            >
+              <IconButton
+                disabled={true}
+                aria-label="Add item"
+                icon={<AddIcon />}
+                rounded={'full'}
+                onClick={async () => navigate('/addItem')}
+              />
+            </Tooltip>
+          ) : (
             <IconButton
-              disabled={true}
               aria-label="Add item"
               icon={<AddIcon />}
               rounded={'full'}
               onClick={async () => navigate('/addItem')}
             />
-          </Tooltip>
-        ) : (
-          <IconButton
-            aria-label="Add item"
-            icon={<AddIcon />}
-            rounded={'full'}
-            onClick={async () => navigate('/addItem')}
-          />
-        )}
+          )}
+        </HStack>
       </Center>
-
       <VStack flexDirection="column" h={screenHeight - 42}>
-        <Center w={'95%'} h={'100%'}>
-          <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+        <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
+          {!tableView ? (
             <VirtualizedList filter={filterBy} />
-          </div>
-        </Center>
+          ) : (
+            <TableList filter={filterBy} />
+          )}
+        </div>
       </VStack>
     </>
   )

@@ -8,14 +8,12 @@ import {
   Icon,
   Input,
   Progress,
-  Spinner,
   Text,
   useColorModeValue,
   View
 } from 'native-base'
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { passwordStrength } from 'check-password-strength'
 import { Formik, FormikHelpers } from 'formik'
 
 import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
@@ -29,6 +27,7 @@ import {
 import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
 import { Loading } from '@src/components/Loading'
+import zxcvbn from 'zxcvbn-typescript'
 
 export const InputHeader = ({ children }) => {
   return (
@@ -127,10 +126,10 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           handleChange,
           handleBlur,
           handleSubmit,
-          isValid,
           errors
         }) => {
-          const levelOfPsw = passwordStrength(values.password)
+          const passwordScore = zxcvbn(values.password).score // Estimate password strength from 0 to 4
+          const progress = passwordScore * 25 // Convert the score to a percentage
 
           return (
             <Flex p={5} flexDirection="column">
@@ -183,11 +182,10 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                   }
                 />
                 <Progress
-                  value={levelOfPsw.id}
+                  value={progress}
                   size="xs"
                   colorScheme="green"
-                  max={3}
-                  min={0}
+                  max={4}
                   mb={1}
                 />
                 <FormControl.ErrorMessage>
@@ -260,14 +258,12 @@ export default function EditPassword({
 
   //QUESTION: Why cant I use !device.state || !secret
   if (!device.state) {
-    return <Spinner />
+    return <Loading />
   }
 
   if (!secret) {
     return <Loading />
   }
-
-  console.log('route.params.secretId', route.params.loginSecret, secret)
 
   return <LoginSecret {...(secret as ILoginSecret)} />
 }
