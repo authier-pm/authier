@@ -72,7 +72,6 @@
     "react-native-bootsplash": "^4.5.2",
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.2",
-    "react-native-code-push": "^8.0.0",
     "react-native-device-info": "^10.4.0",
     "react-native-gesture-handler": "2.9.0",
     "react-native-get-random-values": "^1.8.0",

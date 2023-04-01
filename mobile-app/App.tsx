@@ -14,25 +14,24 @@ import { Providers } from './src/Providers'
 import { device } from './src/utils/Device'
 import { useForceUpdate } from './useForceUpdate'
 import { Alert } from 'react-native'
-// import CodePush from 'react-native-code-push'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
-import CodePush from 'react-native-code-push'
+//import CodePush from 'react-native-code-push'
 import './src/sentryInit'
-
-let CodePushOptions = {
-  checkFrequency: __DEV__
-    ? CodePush.CheckFrequency.MANUAL
-    : CodePush.CheckFrequency.ON_APP_RESUME,
-  mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
-  updateDialog: {
-    appendReleaseDescription: true,
-    title: 'a new update is available!'
-  }
-}
+//FIX: CodePush
+// let CodePushOptions = {
+//   checkFrequency: __DEV__
+//     ? CodePush.CheckFrequency.MANUAL
+//     : CodePush.CheckFrequency.ON_APP_RESUME,
+//   mandatoryInstallMode: CodePush.InstallMode.IMMEDIATE,
+//   updateDialog: {
+//     appendReleaseDescription: true,
+//     title: 'a new update is available!'
+//   }
+// }
 
 const App = () => {
   const forceUpdate = useForceUpdate()
@@ -78,4 +77,6 @@ const App = () => {
     </React.Fragment>
   )
 }
-export default Sentry.wrap(CodePush(CodePushOptions)(App))
+export default Sentry.wrap(App)
+//FIX: CodePush
+//export default Sentry.wrap(CodePush(CodePushOptions)(App))
