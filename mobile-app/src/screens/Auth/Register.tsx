@@ -98,9 +98,7 @@ export function Register({ navigation }: NavigationProps) {
             })
           }
 
-          const encryptionSalt = window.crypto.getRandomValues(
-            new Uint8Array(16)
-          )
+          const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
 
           const masterEncryptionKey = await generateEncryptionKey(
             values.password,

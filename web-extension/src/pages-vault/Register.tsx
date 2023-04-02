@@ -64,9 +64,7 @@ export default function Register() {
           const userId = crypto.randomUUID()
           const deviceId = await device.getDeviceId()
 
-          const encryptionSalt = window.crypto.getRandomValues(
-            new Uint8Array(16)
-          )
+          const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
 
           const masterEncryptionKey = await generateEncryptionKey(
             values.password,
