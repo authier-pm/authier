@@ -85,10 +85,10 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64ToBuffer(this.masterEncryptionKey)
     )
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const iv = self.crypto.getRandomValues(new Uint8Array(12))
     const salt = base64ToBuffer(this.encryptionSalt)
 
-    const encrypted = await window.crypto.subtle.encrypt(
+    const encrypted = await self.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       cryptoKey,
       enc.encode(stringToEncrypt)
@@ -118,7 +118,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       cryptoKey,
       data
