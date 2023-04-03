@@ -79,7 +79,7 @@ export function VaultUnlockVerification({
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
-    let decryptedContent = await window.crypto.subtle.decrypt(
+    let decryptedContent = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       data

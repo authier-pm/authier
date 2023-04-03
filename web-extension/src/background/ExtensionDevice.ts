@@ -65,7 +65,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 const browserInfo = bowser.getParser(navigator.userAgent)
-export const isRunningInBgPage = location.href.includes('backgroundPage.html')
+export const isRunningInBgServiceWorker = typeof window === 'undefined'
 
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
@@ -152,10 +152,10 @@ export class DeviceState implements IBackgroundStateSerializable {
     const cryptoKey = await abToCryptoKey(
       base64ToBuffer(this.masterEncryptionKey)
     )
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const iv = self.crypto.getRandomValues(new Uint8Array(12))
     const salt = base64ToBuffer(this.encryptionSalt)
 
-    const encrypted = await window.crypto.subtle.encrypt(
+    const encrypted = await self.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       cryptoKey,
       enc.encode(stringToEncrypt)
@@ -176,7 +176,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
-    const decrypted = await window.crypto.subtle.decrypt(
+    const decrypted = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       cryptoKey,
       data
@@ -554,9 +554,9 @@ class ExtensionDevice {
     addDeviceSecretEncrypted: string
   }> {
     const authSecret = this.generateBackendSecret()
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const iv = self.crypto.getRandomValues(new Uint8Array(12))
 
-    const addDeviceSecretAb = await window.crypto.subtle.encrypt(
+    const addDeviceSecretAb = await self.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       enc.encode(authSecret)
@@ -694,5 +694,3 @@ log('Extension device started')
 export const device = new ExtensionDevice()
 
 device.initialize()
-// @ts-expect-error TODO fix types
-window.extensionDevice = device
