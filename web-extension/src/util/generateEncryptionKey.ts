@@ -24,7 +24,7 @@ export const dec = new TextDecoder()
  *  The key material is a password supplied by the user.
  */
 async function getKeyMaterial(password: string): Promise<CryptoKey> {
-  return window.crypto.subtle.importKey(
+  return self.crypto.subtle.importKey(
     'raw',
     enc.encode(password),
     'PBKDF2',
@@ -38,7 +38,7 @@ export async function generateEncryptionKey(
   salt: ArrayBuffer
 ): Promise<CryptoKey> {
   const keyMaterial = await getKeyMaterial(psw)
-  const key = await window.crypto.subtle.deriveKey(
+  const key = await self.crypto.subtle.deriveKey(
     {
       name: 'PBKDF2',
       salt: salt,
@@ -95,7 +95,7 @@ export async function decryptDeviceSecretWithPassword(
   const iv = encryptedDataBuff.slice(16, 16 + 12)
   const data = encryptedDataBuff.slice(16 + 12)
   try {
-    const decryptedContent = await window.crypto.subtle.decrypt(
+    const decryptedContent = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       data

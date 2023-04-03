@@ -4,9 +4,12 @@ import {
   EncryptedSecretQuery,
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
+import { isRunningInBgServiceWorker } from './ExtensionDevice'
 
 export const log = debug('au:backgroundPage')
-localStorage.debug = 'au:*' // enable all debug messages
+if (!isRunningInBgServiceWorker) {
+  localStorage.debug = 'au:*' // enable all debug messages
+}
 // log('background page loaded')
 export type SecretSerializedType = Pick<
   EncryptedSecretQuery,
