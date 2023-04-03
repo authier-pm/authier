@@ -237,9 +237,9 @@ export class Device {
     addDeviceSecretEncrypted: string
   }> {
     const authSecret = this.generateBackendSecret()
-    const iv = window.crypto.getRandomValues(new Uint8Array(12))
+    const iv = self.crypto.getRandomValues(new Uint8Array(12))
 
-    const addDeviceSecretAb = await window.crypto.subtle.encrypt(
+    const addDeviceSecretAb = await self.crypto.subtle.encrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       enc.encode(authSecret)
