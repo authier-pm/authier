@@ -27,7 +27,6 @@ import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
-
 // const csvHeaderNames = {
 //   password: [
 //     'password',
