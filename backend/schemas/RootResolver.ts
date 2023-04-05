@@ -211,7 +211,7 @@ export class RootResolver {
           return this.registerNewUser(input, userId, ctx)
         } else {
           throw new GraphqlError(
-            `Device already exists. You cannot register this device for multiple accounts.`
+            `Device ${deviceId} already exists. You cannot use a device with multiple accounts.`
           )
         }
       }
