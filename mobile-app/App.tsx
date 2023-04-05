@@ -61,7 +61,9 @@ const App = () => {
       }
     })
     const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage))
+      if (__DEV__) {
+        Alert.alert('FCM message arrived:', JSON.stringify(remoteMessage))
+      }
     })
     return () => {
       unsubscribe()
