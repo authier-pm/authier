@@ -191,7 +191,7 @@ export class Device {
     return this.state
   }
 
-  syncSettings(config: SettingsInput) {
+  setDeviceSettings(config: SettingsInput) {
     //HACK: this is a hack, we should not create a new interval every time we save the state
     //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
     if (!this.state) {
