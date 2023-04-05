@@ -41,18 +41,8 @@ export const TOTPVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    const res = await device.state?.backendSync()
+    const res = await device.state?.backendSync(toast)
     setRefreshing(false)
-
-    if (
-      (res?.newAndUpdatedSecrets as number) > 0 ||
-      (res?.removedSecrets as number) > 0
-    ) {
-      toast.show({
-        title: 'Vault synced',
-        description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
-      })
-    }
   }
 
   return (
