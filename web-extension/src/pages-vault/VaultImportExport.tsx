@@ -213,7 +213,8 @@ export const VaultImportExport = () => {
                     <li>
                       Lastpass/Bitwarden will work fine, file exported from
                       other password managers might work as well, but it's not
-                      guaranteed.
+                      guaranteed. Please send as a request for a supported
+                      format <a href="https://twitter.com/authierpm">here</a>.
                     </li>
                     <li>
                       For JSON, it must be a file exported from{' '}
