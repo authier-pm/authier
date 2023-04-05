@@ -36,6 +36,7 @@ import {
 
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { setSensitiveItem } from './secretStorage'
+import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
@@ -221,7 +222,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   /**
    * fetches newly added/deleted/updated secrets from the backend and updates the device state
    */
-  async backendSync() {
+  async backendSync(toast: IToastService) {
     const { data } = await apolloClient.query<
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
@@ -268,10 +269,22 @@ export class DeviceState implements IBackgroundStateSerializable {
           }
         )
 
-        return {
+        const res = {
           removedSecrets: actuallyRemovedOnThisDevice.length,
           newAndUpdatedSecrets: newAndUpdatedSecrets.length
         }
+
+        if (
+          (res?.newAndUpdatedSecrets as number) > 0 ||
+          (res?.removedSecrets as number) > 0
+        ) {
+          toast.show({
+            title: 'Vault synced',
+            description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
+          })
+        }
+
+        return res
       }
     }
   }
