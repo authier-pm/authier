@@ -39,7 +39,7 @@ import { setSensitiveItem } from './secretStorage'
 import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
 
 export class DeviceState implements IBackgroundStateSerializable {
-  decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  decryptedSecrets: (ILoginSecret | ITOTPSecret)[] = []
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     this.initialize()
