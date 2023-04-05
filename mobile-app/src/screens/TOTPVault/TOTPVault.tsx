@@ -41,7 +41,7 @@ export const TOTPVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    const res = await device.state?.backendSync(toast)
+    await device.state?.backendSync(toast)
     setRefreshing(false)
   }
 
