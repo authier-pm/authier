@@ -31,6 +31,14 @@ jobs:
         if: steps.getRelease.outcome != 'success'
         uses: ./.github/workflows/actions/build-test-pack
 
+      - name: Get latest tag name
+        id: getLatestTagName
+        run: echo ::set-output name=tag_name::$(git describe --abbrev=0 --tags)
+
+      - name: Format tag name
+        id: formatTagName
+        run: echo ::set-output name=formatted_tag_name::${{ steps.getLatestTagName.outputs.tag_name }}-firefox
+
       - name: Create Release
         id: createRelease
         if: steps.getRelease.outcome != 'success'
@@ -38,7 +46,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: 'true'
-          tag: ${{ github.ref }}
+          tag: ${{ steps.formatTagName.outputs.formatted_tag_name }}
 
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
