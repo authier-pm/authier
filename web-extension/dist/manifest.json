@@ -4,11 +4,7 @@
   "description": "Authier chrome extension",
   "version": "1.0.16",
   "action": {
-    "default_icon": {
-      "16": "icon-16.png",
-      "48": "icon-48.png",
-      "128": "icon-128.png"
-    },
+    "default_icon": "icon-16.png",
     "default_popup": "js/popup.html"
   },
   "background": {
