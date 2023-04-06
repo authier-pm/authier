@@ -13,6 +13,7 @@ import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
 import { Loading } from '@src/components/Loading'
+import { useToast } from 'native-base'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -21,22 +22,28 @@ function AppNavigation() {
   const { data } = useSyncSettingsQuery({
     fetchPolicy: 'cache-and-network'
   })
+  const toast = useToast()
+
   const navigation = useNavigation()
   const [loading, setLoading] = React.useState(true)
   const [initialRoute, setInitialRoute] = React.useState('Passwords')
 
   //TODO: I think this is not ideal, but it works for now
   React.useEffect(() => {
-    if (data) {
-      device.syncSettings({
-        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
-        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
-        syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number,
-        uiLanguage: data.me.uiLanguage
-      })
-    }
+    ;(async () => {
+      if (data) {
+        device.setDeviceSettings({
+          autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
+          autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
+          syncTOTP: data.currentDevice.syncTOTP,
+          vaultLockTimeoutSeconds: data.currentDevice
+            .vaultLockTimeoutSeconds as number,
+          uiLanguage: data.me.uiLanguage
+        })
+      }
+
+      await device.state?.backendSync(toast)
+    })()
   }, [data])
 
   React.useEffect(() => {
