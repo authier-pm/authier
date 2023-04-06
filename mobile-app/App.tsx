@@ -79,4 +79,6 @@ const App = () => {
     </React.Fragment>
   )
 }
-export default Sentry.wrap(CodePush(CodePushOptions)(App))
+export default CodePush(CodePushOptions)(App)
+// export default Sentry.wrap(App)
+//export default Sentry.wrap(CodePush(CodePushOptions)(App))

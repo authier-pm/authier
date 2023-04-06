@@ -76,7 +76,7 @@ export const useLogin = (props: { deviceName: string }) => {
         })
       }
 
-      setFormState(null)
+      setFormState({ ...formState, password: '', submitted: false })
     }
   }, [error, newDeviceError])
 
@@ -104,7 +104,7 @@ export const useLogin = (props: { deviceName: string }) => {
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
           })
-          setFormState(null)
+          setFormState({ ...formState, password: '', submitted: false })
           return
         }
 
@@ -113,7 +113,7 @@ export const useLogin = (props: { deviceName: string }) => {
             id,
             render: () => <ToastAlert {...ToastType.DecryptionChallengeError} />
           })
-          setFormState(null)
+          setFormState({ ...formState, password: '', submitted: false })
 
           return
         }
@@ -146,7 +146,7 @@ export const useLogin = (props: { deviceName: string }) => {
             id,
             render: () => <ToastAlert {...ToastType.UsernamePasswordError} />
           })
-          setFormState(null)
+          setFormState({ ...formState, password: '', submitted: false })
           return
         }
 
