@@ -40,7 +40,7 @@ runs:
       uses: cardinalby/schema-validator-action@v1
       with:
         file: ${{ env.EXTENSION_DIR }}manifest.json
-        schema: 'https://json.schemastore.org/webextension.json'
+        schema: 'https://json.schemastore.org/chrome-manifest'
 
     - name: Pack directory to zip
       if: inputs.doNotPackZip != 'true'
