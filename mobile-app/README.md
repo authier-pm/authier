@@ -7,6 +7,10 @@ react-native mobile app
 Install dependencies with `yarn`
 Make sure you have your own `.env` file with API key and secrets: `cp env.sample .env`
 
+## Release build
+
+in order to build you need `mobile-app/android/local.properties`
+
 Add `local.properties` to `android/` folder with the following content:
 
 ```
@@ -17,6 +21,8 @@ keyAlias=XXXXXXXX
 keyPassword=XXXXXXXX
 storeFile=XXXXXXXX
 ```
+
+if you have this, make sure the storeFile path is correct. Then run `buildRelease`
 
 ### How to run locally in android emulator
 
