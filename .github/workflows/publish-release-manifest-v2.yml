@@ -38,7 +38,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: 'true'
-          name: ${{ github.ref }}
+          tag: ${{ github.ref }}
 
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
