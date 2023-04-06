@@ -18,9 +18,9 @@ export const test = base.extend<{
     await context.close()
   },
   extensionId: async ({ context }, use) => {
-    // for manifest v3:
-    let [background] = context.serviceWorkers()
-    if (!background) background = await context.waitForEvent('serviceworker')
+    // for manifest v2:
+    let [background] = context.backgroundPages()
+    if (!background) background = await context.waitForEvent('backgroundpage')
 
     const extensionId = background.url().split('/')[2]
     await use(extensionId)

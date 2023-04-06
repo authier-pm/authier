@@ -67,7 +67,11 @@ module.exports = {
       </body>
     </html>`
     }),
-
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['backgroundPage'],
+      filename: 'backgroundPage.html'
+    }),
     // new ExtensionReloader(),
     new Dotenv()
     //new BundleAnalyzerPlugin()
