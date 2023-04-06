@@ -15,7 +15,7 @@
     "extract": "lingui extract",
     "compile": "lingui compile",
     "killPort": "lsof -ti tcp:8088 | xargs kill",
-    "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android"
+    "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android && cp -R react-native/ ../mobile-app/node_modules/react-native && cp -R react-native-code-push/ ../mobile-app/node_modules/react-native-code-push"
   },
   "dependencies": {
     "@apollo/client": "^3.7.9",
@@ -72,6 +72,7 @@
     "react-native-bootsplash": "^4.5.2",
     "react-native-camera": "^4.2.1",
     "react-native-circular-progress-indicator": "^4.4.2",
+    "react-native-code-push": "^8.0.0",
     "react-native-device-info": "^10.4.0",
     "react-native-gesture-handler": "2.9.0",
     "react-native-get-random-values": "^1.8.0",
