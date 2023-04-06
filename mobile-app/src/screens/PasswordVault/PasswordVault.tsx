@@ -26,23 +26,13 @@ export const PasswordVault = ({
       | { removedSecrets: number; newAndUpdatedSecrets: number }
       | undefined
     try {
-      res = await device.state?.backendSync()
+      res = await device.state?.backendSync(toast)
     } catch (error) {
       console.log(error)
       setRefreshing(false)
     }
 
     setRefreshing(false)
-
-    if (
-      (res?.newAndUpdatedSecrets as number) > 0 ||
-      (res?.removedSecrets as number) > 0
-    ) {
-      toast.show({
-        title: 'Vault synced',
-        description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
-      })
-    }
   }
 
   return (
