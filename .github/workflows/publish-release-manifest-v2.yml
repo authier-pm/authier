@@ -31,6 +31,14 @@ jobs:
         if: steps.getRelease.outcome != 'success'
         uses: ./.github/workflows/actions/build-test-pack
 
+      - name: Create Release
+        id: createRelease
+        if: steps.getRelease.outcome != 'success'
+        uses: ncipollo/release-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          draft: 'true'
+
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
         uses: actions/upload-release-asset@v1
