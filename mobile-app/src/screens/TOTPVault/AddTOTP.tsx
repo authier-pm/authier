@@ -129,7 +129,7 @@ export const AddTOTP = () => {
               >
                 Save
               </Button>
-              <Button
+              {/* <Button
                 onPress={() => navigation.navigate('QRScan')}
                 mt={5}
                 size={'md'}
@@ -145,7 +145,7 @@ export const AddTOTP = () => {
                 aria-label="Save"
               >
                 Scan QR Code
-              </Button>
+              </Button> */}
             </Flex>
           )
         }}

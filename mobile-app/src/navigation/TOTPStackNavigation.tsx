@@ -7,7 +7,7 @@ import { AddTOTP } from '../screens/TOTPVault/AddTOTP'
 import { EditTOTP } from '../screens/TOTPVault/EditTOTP'
 import { TOTPStackParamList } from './types'
 import { t } from '@lingui/macro'
-import { QRScan } from '@src/screens/TOTPVault/QRScan'
+// import { QRScan } from '@src/screens/TOTPVault/QRScan'
 
 const Stack = createNativeStackNavigator<TOTPStackParamList>()
 
@@ -30,11 +30,11 @@ function TOTPStackNavigation() {
         component={EditTOTP}
       />
 
-      <Stack.Screen
+      {/* <Stack.Screen
         name="QRScan"
         options={{ title: t`Scan QR` }}
         component={QRScan}
-      />
+      /> */}
     </Stack.Navigator>
   )
 }
