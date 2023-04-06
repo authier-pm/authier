@@ -29,26 +29,24 @@ import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { Loading } from '@src/components/Loading'
 
-interface LoginFormValues {
+export interface ILoginFormValues {
   email: string
   password: string
+  submitted: boolean
 }
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Login'>
 
 export const LoginContext = React.createContext<{
-  formState: LoginFormValues
-  setFormState: Dispatch<SetStateAction<LoginFormValues | null>>
+  formState: ILoginFormValues
+  setFormState: Dispatch<SetStateAction<ILoginFormValues>>
 }>({} as any)
 
 export function Login({ navigation }: NavigationProps) {
-  const initialValues: LoginFormValues = {
-    email: '',
-    password: ''
-  }
   const [loading, setLoading] = useState(false)
   const [show, setShow] = React.useState(false)
-  const [formState, setFormState] = useState<LoginFormValues | null>(null)
+  const { formState, setFormState } = useContext(LoginContext)
+
   let device = useContext(DeviceContext)
 
   useEffect(() => {
@@ -62,12 +60,8 @@ export function Login({ navigation }: NavigationProps) {
     return <Loading />
   }
 
-  if (formState) {
-    return (
-      <LoginContext.Provider value={{ formState, setFormState }}>
-        <LoginAwaitingApproval />
-      </LoginContext.Provider>
-    )
+  if (formState.submitted) {
+    return <LoginAwaitingApproval />
   }
 
   return (
@@ -80,12 +74,16 @@ export function Login({ navigation }: NavigationProps) {
       </Heading>
 
       <Formik
-        initialValues={initialValues}
+        initialValues={formState}
+        enableReinitialize
         onSubmit={async (
-          values: LoginFormValues,
-          { setSubmitting }: FormikHelpers<LoginFormValues>
+          values: ILoginFormValues,
+          { setSubmitting }: FormikHelpers<ILoginFormValues>
         ) => {
-          setFormState(values)
+          setFormState({
+            ...values,
+            submitted: true
+          })
           setSubmitting(false)
         }}
       >
@@ -96,88 +94,91 @@ export function Login({ navigation }: NavigationProps) {
           values,
           isSubmitting,
           errors
-        }) => (
-          <VStack space={3} mt="5">
-            <FormControl>
-              <FormControl.Label
-                _text={{
-                  fontSize: 'xl',
-                  fontWeight: 500
-                }}
-              >
-                Email
-              </FormControl.Label>
-              <Input
-                onChangeText={handleChange('email')}
-                onBlur={handleBlur('email')}
-                value={values.email}
-              />
-
-              <FormControl.ErrorMessage>
-                {errors.email}
-              </FormControl.ErrorMessage>
-            </FormControl>
-
-            <FormControl>
-              <FormControl.Label
-                _text={{
-                  fontSize: 'xl',
-                  fontWeight: 500
-                }}
-              >
-                Password
-              </FormControl.Label>
-              <Input
-                onChangeText={handleChange('password')}
-                onBlur={handleBlur('password')}
-                value={values.password}
-                type={show ? 'text' : 'password'}
-                InputRightElement={
-                  <Icon
-                    as={
-                      <Ionicons
-                        name={show ? 'eye-outline' : 'eye-off-outline'}
-                      />
-                    }
-                    size={5}
-                    mr="2"
-                    color="muted.400"
-                    onPress={() => setShow(!show)}
-                  />
-                }
-                placeholder="Password"
-              />
-
-              <FormControl.ErrorMessage>
-                {errors.password}
-              </FormControl.ErrorMessage>
-            </FormControl>
-
-            <Button
-              onPress={handleSubmit as (values: any) => void}
-              isLoading={isSubmitting}
-            >
-              <Trans>Submit</Trans>
-            </Button>
-            <HStack mt="2" justifyContent="center" space={1}>
-              <Text fontSize="sm" color="muted.500" fontWeight={400}>
-                <Trans>I'm a new user.</Trans>
-              </Text>
-              <Pressable onPress={() => navigation.navigate('Register')}>
-                <Text
-                  color={'indigo.500'}
-                  fontWeight={'medium'}
-                  fontSize={'sm'}
+        }) => {
+          setFormState(values)
+          return (
+            <VStack space={3} mt="5">
+              <FormControl>
+                <FormControl.Label
+                  _text={{
+                    fontSize: 'xl',
+                    fontWeight: 500
+                  }}
                 >
-                  <Trans>Sign Up</Trans>
+                  Email
+                </FormControl.Label>
+                <Input
+                  onChangeText={handleChange('email')}
+                  onBlur={handleBlur('email')}
+                  value={values.email}
+                />
+
+                <FormControl.ErrorMessage>
+                  {errors.email}
+                </FormControl.ErrorMessage>
+              </FormControl>
+
+              <FormControl>
+                <FormControl.Label
+                  _text={{
+                    fontSize: 'xl',
+                    fontWeight: 500
+                  }}
+                >
+                  Password
+                </FormControl.Label>
+                <Input
+                  onChangeText={handleChange('password')}
+                  onBlur={handleBlur('password')}
+                  value={values.password}
+                  type={show ? 'text' : 'password'}
+                  InputRightElement={
+                    <Icon
+                      as={
+                        <Ionicons
+                          name={show ? 'eye-outline' : 'eye-off-outline'}
+                        />
+                      }
+                      size={5}
+                      mr="2"
+                      color="muted.400"
+                      onPress={() => setShow(!show)}
+                    />
+                  }
+                  placeholder="Password"
+                />
+
+                <FormControl.ErrorMessage>
+                  {errors.password}
+                </FormControl.ErrorMessage>
+              </FormControl>
+
+              <Button
+                onPress={handleSubmit as (values: any) => void}
+                isLoading={isSubmitting}
+              >
+                <Trans>Submit</Trans>
+              </Button>
+              <HStack mt="2" justifyContent="center" space={1}>
+                <Text fontSize="sm" color="muted.500" fontWeight={400}>
+                  <Trans>I'm a new user.</Trans>
                 </Text>
-              </Pressable>
-            </HStack>
-            {/* <Button onPress={() => navigation.navigate('QRLogin')}>
+                <Pressable onPress={() => navigation.navigate('Register')}>
+                  <Text
+                    color={'indigo.500'}
+                    fontWeight={'medium'}
+                    fontSize={'sm'}
+                  >
+                    <Trans>Sign Up</Trans>
+                  </Text>
+                </Pressable>
+              </HStack>
+              {/* <Button onPress={() => navigation.navigate('QRLogin')}>
               With QR Code
             </Button> */}
-          </VStack>
-        )}
+            </VStack>
+          )
+        }}
       </Formik>
     </View>
   )
