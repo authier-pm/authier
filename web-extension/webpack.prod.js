@@ -1,14 +1,12 @@
 const { merge } = require('webpack-merge')
 const common = require('./webpack.common.js')
-const webpack = require('webpack')
-const TerserPlugin = require('terser-webpack-plugin')
 
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
     chunkIds: 'deterministic',
     moduleIds: 'deterministic',
-    minimizer: [new TerserPlugin()],
+    minimize: false,
     runtimeChunk: false,
     splitChunks: {
       chunks(chunk) {
