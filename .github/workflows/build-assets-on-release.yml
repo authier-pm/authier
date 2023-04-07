@@ -62,9 +62,7 @@ jobs:
   build-signed-crx-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
-    if: |
-      github.event.action == 'published' &&
-      github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
 
@@ -102,9 +100,7 @@ jobs:
   build-signed-xpi-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
-    if: |
-      github.event.action == 'published' &&
-      github.ref == 'refs/heads/manifest-v2'
+    if: github.ref == 'refs/heads/manifest-v2'
     steps:
       - uses: actions/checkout@v2
 
