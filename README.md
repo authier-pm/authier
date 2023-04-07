@@ -4,11 +4,12 @@ monorepo for authier FE and BE.
 
 ## Running the extension build on Ubuntu
 
-To build the browser extension please follow these commands:
+To build the browser extension make sure you run on node.js 18.15.0.
+Please follow these commands:
 
 ```
 curl -fsSL https://get.pnpm.io/install.sh | sh -
-pnpm install
+pnpm install --frozen-lockfile --prefer-offline
 cd web-extension
 cp .env.example .env
 pnpm prodBuild
