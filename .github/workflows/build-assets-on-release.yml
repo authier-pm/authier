@@ -14,8 +14,8 @@ jobs:
   ensure-zip:
     runs-on: ubuntu-latest
     if: |
-      github.event.release.target_commitish == 'main' &&
-      github.event.action == 'published'
+      github.event.action == 'published' &&
+      github.ref == 'refs/heads/main'
     timeout-minutes: 30
     outputs:
       zipAssetId: |
