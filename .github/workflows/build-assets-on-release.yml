@@ -64,7 +64,7 @@ jobs:
   build-signed-crx-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/main'
+    if: !contains(github.ref , 'firefox')
     steps:
       - uses: actions/checkout@v2
 
@@ -102,7 +102,7 @@ jobs:
   build-signed-xpi-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/manifest-v2'
+    if: contains(github.ref , 'firefox')
     steps:
       - uses: actions/checkout@v2
 
