@@ -37,9 +37,7 @@ jobs:
           repository: authier-pm/authier # The repository to scan.
           releases-only: true # We know that all relevant tags have a GitHub release for them.
           prefix: '1.'
-        id: octokit # The step ID to refer to later.
-
-      - run: echo "Octokit is at version ${{ steps.octokit.outputs.tag }}"
+        id: previoustag # The step ID to refer to later.
 
       - name: Create Release
         id: createRelease
@@ -48,7 +46,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: 'true'
-          tag: ${{ steps.octokit.outputs.tag }}-firefox
+          tag: ${{ steps.previoustag.outputs.tag }}-firefox
 
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
