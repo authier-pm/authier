@@ -11,7 +11,7 @@ import {
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
 import { createChromeHandler } from 'trpc-chrome/adapter'
-import { device, isRunningInBgServiceWorker } from './ExtensionDevice'
+import { device, isRunningInBgPage } from './ExtensionDevice'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
 
 import {
@@ -30,7 +30,7 @@ import { loggerMiddleware } from './loggerMiddleware'
 
 const log = debug('au:chListener')
 
-if (!isRunningInBgServiceWorker) {
+if (!isRunningInBgPage) {
   throw new Error('this file should only be imported in the background page')
 }
 
