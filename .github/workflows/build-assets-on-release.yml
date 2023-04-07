@@ -58,6 +58,8 @@ jobs:
           asset_name: ${{ env.ZIP_FILE_NAME }}
           asset_content_type: application/zip
 
+      - run: echo "TEST ${{ github.ref }}"
+
   # Chrome offline-signed crx
   build-signed-crx-asset:
     needs: ensure-zip
