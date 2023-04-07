@@ -38,6 +38,7 @@ jobs:
         with:
           files: ./
           dest: source-code.zip
+          wait-for-completion: false
 
       - name: Deploy to Firefox Addons
         id: addonsDeploy
