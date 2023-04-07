@@ -44,7 +44,7 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           draft: 'true'
-          tag: ${{ github.event.head_commit }}-firefox
+          tag: ${{ github.event.head_commit.id }}-firefox
 
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
