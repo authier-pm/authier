@@ -13,9 +13,6 @@ jobs:
   # build and attach it to the release and use its asset id
   ensure-zip:
     runs-on: ubuntu-latest
-    if: |
-      github.event.action == 'published' &&
-      github.ref == 'refs/heads/main'
     timeout-minutes: 30
     outputs:
       zipAssetId: |
@@ -61,9 +58,13 @@ jobs:
           asset_name: ${{ env.ZIP_FILE_NAME }}
           asset_content_type: application/zip
 
+  # Chrome offline-signed crx
   build-signed-crx-asset:
     needs: ensure-zip
     runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'published' &&
+      github.ref == 'refs/heads/main'
     steps:
       - uses: actions/checkout@v2
 
@@ -96,3 +97,54 @@ jobs:
           asset_path: ${{ env.OFFLINE_CRX_FILE_PATH }}
           asset_name: ${{ env.OFFLINE_CRX_FILE_NAME }}
           asset_content_type: application/x-chrome-extension
+
+  # Firefox offline-signed xpi
+  build-signed-xpi-asset:
+    needs: ensure-zip
+    runs-on: ubuntu-latest
+    if: |
+      github.event.action == 'published' &&
+      github.ref == 'refs/heads/manifest-v2'
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: cardinalby/export-env-action@v1
+        with:
+          envFile: './.github/workflows/constants.env'
+          expand: true
+
+      - name: Download zip release asset
+        uses: cardinalby/download-release-asset-action@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          assetId: ${{ needs.ensure-zip.outputs.zipAssetId }}
+          targetPath: ${{ env.ZIP_FILE_PATH }}
+
+      - name: Sign Firefox xpi for offline distribution
+        id: ffSignXpi
+        continue-on-error: true
+        uses: cardinalby/webext-buildtools-firefox-sign-xpi-action@v1
+        with:
+          timeoutMs: 600000
+          extensionId: ${{ secrets.FF_OFFLINE_EXT_ID }}
+          zipFilePath: ${{ env.ZIP_FILE_PATH }}
+          xpiFilePath: ${{ env.XPI_FILE_PATH }}
+          jwtIssuer: ${{ secrets.FF_JWT_ISSUER }}
+          jwtSecret: ${{ secrets.FF_JWT_SECRET }}
+
+      - name: Abort on sign error
+        if: |
+          steps.ffSignXpi.outcome == 'failure' &&
+          steps.ffSignXpi.outputs.sameVersionAlreadyUploadedError != 'true'
+        run: exit 1
+
+      - name: Upload offline xpi release asset
+        if: steps.ffSignXpi.outcome == 'success'
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: ${{ env.XPI_FILE_PATH }}
+          asset_name: ${{ env.XPI_FILE_NAME }}
+          asset_content_type: application/x-xpinstall
