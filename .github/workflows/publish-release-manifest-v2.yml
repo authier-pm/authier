@@ -34,8 +34,8 @@ jobs:
       - name: 'Get Previous tag'
         uses: oprypin/find-latest-tag@v1
         with:
-          repository: authier-pm/authier # The repository to scan.
-          releases-only: true # We know that all relevant tags have a GitHub release for them.
+          repository: authier-pm/authier
+          releases-only: true
           prefix: '1.'
         id: previoustag
 
