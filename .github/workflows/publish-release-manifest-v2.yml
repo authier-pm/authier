@@ -37,7 +37,7 @@ jobs:
           repository: authier-pm/authier # The repository to scan.
           releases-only: true # We know that all relevant tags have a GitHub release for them.
           prefix: '1.'
-        id: previoustag # The step ID to refer to later.
+        id: previoustag
 
       - name: Create Release
         id: createRelease
