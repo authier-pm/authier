@@ -3,6 +3,8 @@ on:
   push:
     tags:
       - '*.*.*'
+    tags-ignore:
+      - '*.*.*-firefox'
   workflow_dispatch:
 jobs:
   build-release-publish:
