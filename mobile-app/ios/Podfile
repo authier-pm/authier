@@ -19,6 +19,24 @@ target 'authier' do
   pod 'GoogleUtilities', :modular_headers => true;
   pod 'FirebaseCore', :modular_headers => true;
 
+  pre_install do |installer|
+    installer.pod_targets.each do |pod|
+      if pod.name.eql?('vision-camera-code-scanner') || pod.name.eql?('VisionCamera')
+        def pod.build_type
+          Pod::BuildType.static_library
+        end
+      end
+    end
+  end
+
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['EXCLUDED_ARCHS[sdk=iphonesimulator*]'] = "arm64"
+      end
+    end
+  end
+
     use_react_native!(
       :path => config[:reactNativePath],
       # Hermes is now enabled by default. Disable by setting this flag to false.

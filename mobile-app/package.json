@@ -14,7 +14,8 @@
     "gen": "graphql-codegen",
     "extract": "lingui extract",
     "compile": "lingui compile",
-    "killPort": "lsof -ti tcp:8088 | xargs kill",
+    "killPortUbuntu": "lsof -ti tcp:8081 | xargs kill",
+    "killPortMac": "lsof -ti:8081 | xargs kill",
     "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android && cp -R react-native/ ../mobile-app/node_modules/react-native && cp -R react-native-code-push/ ../mobile-app/node_modules/react-native-code-push",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release"
@@ -132,6 +133,11 @@
     "react-native-dotenv": "^3.4.8",
     "react-test-renderer": "18.2.0",
     "typescript": "^5.0.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "react-native-gesture-handler": "^2.9.0"
+    }
   },
   "jest": {
     "testEnvironmentOptions": {},

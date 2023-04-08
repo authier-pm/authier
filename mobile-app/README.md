@@ -22,7 +22,7 @@ keyPassword=XXXXXXXX
 storeFile=XXXXXXXX
 ```
 
-if you have this, make sure the storeFile path is correct. Then run `buildRelease`
+if you have this, make sure the storeFile path is correct. Then run `pnpm buildRelease`
 
 ### How to run locally in android emulator
 
