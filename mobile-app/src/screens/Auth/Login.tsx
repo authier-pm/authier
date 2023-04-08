@@ -111,6 +111,9 @@ export function Login({ navigation }: NavigationProps) {
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
                   value={values.email}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
                 />
 
                 <FormControl.ErrorMessage>
@@ -131,6 +134,7 @@ export function Login({ navigation }: NavigationProps) {
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
                   value={values.password}
+                  autoCapitalize="none"
                   type={show ? 'text' : 'password'}
                   InputRightElement={
                     <Icon

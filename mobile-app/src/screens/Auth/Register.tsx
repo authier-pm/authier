@@ -180,6 +180,9 @@ export function Register({ navigation }: NavigationProps) {
                   onBlur={handleBlur('email')}
                   onChangeText={handleChange('email')}
                   value={values.email}
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  autoComplete="email"
                 />
                 <FormControl.ErrorMessage>
                   {errors.email}
@@ -199,6 +202,7 @@ export function Register({ navigation }: NavigationProps) {
                   onChangeText={handleChange('password')}
                   onBlur={handleBlur('password')}
                   value={values.password}
+                  autoCapitalize="none"
                   type={show ? 'text' : 'password'}
                   InputRightElement={
                     <Icon
