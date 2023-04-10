@@ -36,16 +36,22 @@ export function VaultListItem({
   const [isVisible, setIsVisible] = useState(false)
 
   const { deviceState } = useContext(DeviceStateContext)
+
+  const secretUrl = getDecryptedSecretProp(secret, 'url')
+  const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
+  const label = getDecryptedSecretProp(secret, 'label')
+  const bg = useColorModeValue('white', 'gray.800')
+
   if (!deviceState) {
     return null
   }
-  const secretUrl = getDecryptedSecretProp(secret, 'url')
+
   return (
     <Center py={3} m={['auto', '3']}>
       <Box
         w="250px"
         h="195px"
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={bg}
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
@@ -54,10 +60,7 @@ export function VaultListItem({
       >
         <Box bg={'gray.100'} h="70%" pos={'relative'}>
           <Center h={130}>
-            <SecretItemIcon
-              url={secretUrl}
-              iconUrl={getDecryptedSecretProp(secret, 'iconUrl')}
-            />
+            <SecretItemIcon url={secretUrl} iconUrl={iconUrl} />
           </Center>
           <Flex
             display={isVisible ? 'flex' : 'none'}
@@ -94,7 +97,7 @@ export function VaultListItem({
           p={4}
         >
           <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
-            {getDecryptedSecretProp(secret, 'label')}
+            {label}
           </Text>
 
           <Link
@@ -124,8 +127,13 @@ export const VaultList = () => {
   const navigate = useNavigate()
   const { setSecuritySettings } = useContext(DeviceStateContext)
   const [tableView, setTableView] = useState<boolean>(false)
-
   const { data, loading, error } = useSyncSettingsQuery()
+
+  const screenHeight =
+    window.innerHeight ||
+    document.documentElement.clientHeight ||
+    document.body.clientHeight
+  const bg = useColorModeValue('white', 'gray.800')
 
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
@@ -144,19 +152,10 @@ export const VaultList = () => {
   if (loading && !data) {
     return <Spinner />
   }
-  const screenHeight =
-    window.innerHeight ||
-    document.documentElement.clientHeight ||
-    document.body.clientHeight
 
   return (
     <>
-      <Center
-        justifyContent={'space-evenly'}
-        w={'100%'}
-        bg={useColorModeValue('white', 'gray.800')}
-        p={3}
-      >
+      <Center justifyContent={'space-evenly'} w={'100%'} bg={bg} p={3}>
         <Input
           variant={'filled'}
           color="grey.300"
