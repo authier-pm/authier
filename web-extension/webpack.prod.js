@@ -12,7 +12,7 @@ module.exports = merge(common, {
     runtimeChunk: false,
     splitChunks: {
       chunks(chunk) {
-        return chunk.name !== 'contentScript'
+        return chunk.name !== 'contentScript' && chunk.name !== 'backgroundPage'
       },
       minChunks: 3,
       maxSize: 3500000
