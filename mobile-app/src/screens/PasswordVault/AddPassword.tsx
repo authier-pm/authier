@@ -106,7 +106,7 @@ export const AddPassword = () => {
 
         setSubmitting(false)
 
-        navigation.navigate('PasswordsVault') // TODO this navigation is not working in dev mode for some reason, has to be something with Routes component which makes sure we stay on the same page with reloads
+        navigation.navigate('PasswordsVault')
       }}
     >
       {({
