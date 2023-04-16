@@ -105,7 +105,8 @@ export const AddPassword = () => {
         }
 
         setSubmitting(false)
-        navigation.goBack()
+
+        navigation.navigate('PasswordsVault')
       }}
     >
       {({
