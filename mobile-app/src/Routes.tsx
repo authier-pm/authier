@@ -22,7 +22,7 @@ const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 export default function Routes() {
   const device = useContext(DeviceContext)
   const { colorMode } = useColorMode()
-  const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true.
+  const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
 
