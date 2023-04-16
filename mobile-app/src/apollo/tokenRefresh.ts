@@ -41,11 +41,9 @@ export const tokenRefresh = new TokenRefreshLink({
   handleError: async (err) => {
     // TODO: What should we do here?
     if (device.state) {
-      let emitter = mitt()
       console.warn('Your refresh token is invalid. You must login again', err)
 
       await device.clearAndReload()
-      emitter.emit('stateChange')
     }
   }
 })

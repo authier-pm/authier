@@ -28,8 +28,8 @@ export const TOTPVault = ({
   const [filterBy, setFilterBy] = useState('')
 
   const timer = () => {
-    var epoch = Math.round(new Date().getTime() / 1000.0)
-    var countDown = 30 - (epoch % 30)
+    const epoch = Math.round(new Date().getTime() / 1000.0)
+    const countDown = 30 - (epoch % 30)
     setRemainingSeconds(countDown)
   }
 

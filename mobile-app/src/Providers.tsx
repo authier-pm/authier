@@ -57,21 +57,18 @@ export const Providers = () => {
   }, [])
 
   return (
-    <ApolloProvider client={apolloClient}>
-      <DeviceProvider>
+    <NativeBaseProvider theme={theme} colorModeManager={colorModeManager}>
+      <ApolloProvider client={apolloClient}>
         <SafeAreaProvider>
           <I18nProvider i18n={i18n} defaultComponent={Text}>
-            <NativeBaseProvider
-              theme={theme}
-              colorModeManager={colorModeManager}
-            >
-              <QueryClientProvider client={queryClient}>
+            <QueryClientProvider client={queryClient}>
+              <DeviceProvider>
                 <Routes />
-              </QueryClientProvider>
-            </NativeBaseProvider>
+              </DeviceProvider>
+            </QueryClientProvider>
           </I18nProvider>
         </SafeAreaProvider>
-      </DeviceProvider>
-    </ApolloProvider>
+      </ApolloProvider>
+    </NativeBaseProvider>
   )
 }
