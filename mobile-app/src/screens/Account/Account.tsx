@@ -1,18 +1,24 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Avatar,
+  Box,
   Button,
+  Center,
   Divider,
+  Flex,
   Heading,
   Text,
   useColorModeValue,
   View,
   VStack
 } from 'native-base'
+import { StyleSheet } from 'react-native'
 import { ButtonWithAlert } from '../../components/ButtonWithAlert'
 import { device } from '../../utils/Device'
 import { AccountStackScreenProps } from '../../navigation/types'
+import codePush, { LocalPackage } from 'react-native-code-push'
+import DeviceInfo from 'react-native-device-info'
 
 const settingsOptions = [
   { name: 'Settings', route: 'Settings' },
@@ -48,6 +54,14 @@ const SettingsItem = ({
 }
 
 function Account({ navigation }: AccountStackScreenProps<'Account'>) {
+  const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
+
+  useEffect(() => {
+    codePush.getUpdateMetadata().then((metadata) => {
+      setAppMetadata(metadata)
+    })
+  }, [])
+
   return (
     <View>
       <VStack
@@ -93,6 +107,23 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           onPress={() => device.logout()}
         />
       </VStack>
+      <Center>
+        <Flex
+          height={'20%'}
+          width={'90%'}
+          flexDirection={'row'}
+          justifyContent="space-between"
+        >
+          <Box>
+            <Text>Version</Text>
+            <Text>{DeviceInfo.getVersion()}</Text>
+          </Box>
+          <Box>
+            <Text>Codepush version</Text>
+            <Text>{appMetadata?.label || 'Native'}</Text>
+          </Box>
+        </Flex>
+      </Center>
     </View>
   )
 }
