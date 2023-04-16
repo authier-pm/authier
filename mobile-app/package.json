@@ -20,7 +20,7 @@
     "installBundle": "npx react-native run-android --mode=release"
   },
   "dependencies": {
-    "@apollo/client": "^3.7.9",
+    "@apollo/client": "^3.7.12",
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
     "@hookform/resolvers": "^2.9.11",
@@ -65,7 +65,7 @@
     "make-plural": "^7.2.0",
     "mitt": "^3.0.0",
     "ms": "^2.1.3",
-    "native-base": "^3.4.25",
+    "native-base": "^3.4.28",
     "query-string": "^8.1.0",
     "react": "18.2.0",
     "react-hook-form": "^7.43.5",
