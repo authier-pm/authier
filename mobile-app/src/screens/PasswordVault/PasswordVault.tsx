@@ -22,13 +22,12 @@ export const PasswordVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    let res:
-      | { removedSecrets: number; newAndUpdatedSecrets: number }
-      | undefined
+
     try {
-      res = await device.state?.backendSync(toast)
+      await device.state?.backendSync(toast)
     } catch (error) {
       console.log(error)
+    } finally {
       setRefreshing(false)
     }
 
