@@ -15,14 +15,14 @@ export interface totpValues {
   period: number
 }
 export const PasswordSchema = Yup.object().shape({
-  url: Yup.string().url('Invalid URL').required('Required'),
+  url: Yup.string().required('Required'),
   label: Yup.string(),
   username: Yup.string().required('Required'),
   password: Yup.string().required('Required')
 })
 
 export const TOTPSchema = Yup.object().shape({
-  url: Yup.string().url('Invalid URL'),
+  url: Yup.string(),
   label: Yup.string(),
   secret: Yup.string().required('Required'),
   iconUrl: Yup.string().url('Invalid URL').nullable(),

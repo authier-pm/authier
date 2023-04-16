@@ -10,7 +10,7 @@ export function SecretItemIcon(props: {
   let hostname
 
   if (props.url) {
-    hostname = new URL(props.url).hostname
+    hostname = getHostnameFromUrl(props)
   } else {
     hostname = ''
   }
@@ -37,4 +37,15 @@ export function SecretItemIcon(props: {
       )}
     </>
   )
+}
+function getHostnameFromUrl(props: {
+  iconUrl: string | null | undefined
+  url: string
+}): string {
+  try {
+    const hostname = new URL(props.url).hostname
+    return hostname
+  } catch (err) {
+    return props.url
+  }
 }
