@@ -69,7 +69,8 @@ function AppNavigation() {
         },
         tabBarActiveTintColor: '#00a8ff',
         tabBarInactiveTintColor: 'gray',
-        headerShown: false
+        headerShown: false,
+        tabBarHideOnKeyboard: true
       })}
     >
       <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
