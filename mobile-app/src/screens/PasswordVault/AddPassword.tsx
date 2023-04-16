@@ -105,7 +105,9 @@ export const AddPassword = () => {
         }
 
         setSubmitting(false)
-        navigation.goBack()
+
+        console.log('navigate to passwords vault')
+        navigation.navigate('PasswordsVault') // TODO this navigation is not working for some reason
       }}
     >
       {({

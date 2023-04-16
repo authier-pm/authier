@@ -17,8 +17,6 @@ const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
   const navigation = useNavigation()
-  const [loading, setLoading] = React.useState(true)
-  const [initialRoute, setInitialRoute] = React.useState('Passwords')
 
   React.useEffect(() => {
     // Assume a message-notification contains a "type" property in the data payload of the screen to open
@@ -28,7 +26,7 @@ function AppNavigation() {
         remoteMessage.notification
       )
 
-      //@ts-ignore
+      // @ts-expect-error
       navigation.navigate(remoteMessage.data.type)
     })
 
@@ -41,20 +39,15 @@ function AppNavigation() {
             'Notification caused app to open from quit state:',
             remoteMessage.data!.type
           )
-          setInitialRoute(remoteMessage.data!.type)
+          // @ts-expect-error
+          navigation.navigate(remoteMessage.data!.type)
         }
-        setLoading(false)
       })
   }, [])
 
-  if (loading) {
-    return <Loading />
-  }
-
   return (
     <RootStack.Navigator
-      //@ts-expect-error
-      initialRouteName={initialRoute}
+      initialRouteName={'Passwords'}
       screenOptions={({ route }) => ({
         // eslint-disable-next-line react/no-unstable-nested-components
         tabBarIcon: ({ focused, color, size }) => {
