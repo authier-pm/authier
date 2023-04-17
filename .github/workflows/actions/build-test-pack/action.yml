@@ -23,8 +23,8 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
+        pnpm i ts-node zx -g
         pnpm i --frozen-lockfile --prefer-offline
-        pnpm i ts-node -g
 
     # Add additional build and test steps here
     - name: create .env & web-extension build
