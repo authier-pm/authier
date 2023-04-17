@@ -15,9 +15,10 @@
     "extract": "lingui extract",
     "compile": "lingui compile",
     "killPort": "lsof -ti tcp:8088 | xargs kill",
-    "postinstall": "cd .. && cd node_modules && cp -R jsc-android/ ../mobile-app/node_modules/jsc-android && cp -R react-native/ ../mobile-app/node_modules/react-native && cp -R react-native-code-push/ ../mobile-app/node_modules/react-native-code-push",
+    "postinstall": "./scripts/copyNodeModulesHack.mjs",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
-    "installBundle": "npx react-native run-android --mode=release"
+    "installBundle": "npx react-native run-android --mode=release",
+    "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory"
   },
   "dependencies": {
     "@apollo/client": "^3.7.12",
@@ -106,7 +107,6 @@
     "@babel/core": "^7.21.0",
     "@babel/preset-typescript": "^7.21.0",
     "@babel/runtime": "^7.21.0",
-    "@graphql-codegen/cli": "^3.2.1",
     "@graphql-codegen/introspection": "^3.0.1",
     "@graphql-codegen/near-operation-file-preset": "^2.5.0",
     "@graphql-codegen/typescript": "^3.0.1",
@@ -120,6 +120,7 @@
     "@types/react-native": "^0.71.3",
     "@types/react-native-vector-icons": "^6.4.13",
     "@types/react-test-renderer": "^18.0.0",
+    "appcenter-cli": "^2.13.4",
     "babel-jest": "^29.4.3",
     "babel-plugin-macros": "^3.1.0",
     "babel-plugin-module-resolver": "^5.0.0",
