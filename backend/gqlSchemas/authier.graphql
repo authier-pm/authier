@@ -315,7 +315,7 @@ enum EmailVerificationType {
 }
 
 type DecryptionChallengeForApproval {
-  ipGeoLocation: JSON!
+  ipGeoLocation: JSON
   id: Int!
   ipAddress: String!
   rejectedAt: DateTime
