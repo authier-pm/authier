@@ -16,9 +16,12 @@ import { getGeoIpLocation } from './Device'
 @ObjectType()
 export class DecryptionChallengeForApproval {
   @mem({ maxAge: ms('2 days') })
-  @Field(() => GraphQLJSON)
+  @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
     const json: any = await getGeoIpLocation(this.ipAddress)
+    if (!json.data) {
+      return null
+    }
     return {
       city: json.data.location.city.name,
       country_name: json.data.location.country.name
