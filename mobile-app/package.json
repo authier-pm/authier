@@ -99,7 +99,6 @@
     "styled-system": "^5.1.5",
     "text-decoding": "^1.0.0",
     "vision-camera-code-scanner": "^0.2.0",
-    "vite-tsconfig-paths": "^4.0.5",
     "zod": "^3.20.6",
     "zxcvbn-typescript": "^5.0.1"
   },
