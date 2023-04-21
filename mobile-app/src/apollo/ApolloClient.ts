@@ -17,6 +17,7 @@ import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { device } from '../utils/Device'
 import { API_URL, API_URL_RELEASE } from '@env'
+import { Toast } from 'native-base'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
@@ -73,11 +74,15 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
       //Here just logout the user
       device.clearAndReload()
     }
-    graphQLErrors.map(({ message, locations, path }) =>
+    graphQLErrors.map(({ message, locations, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
-    )
+      Toast.show({
+        title: message,
+        variant: 'danger'
+      })
+    })
   }
   if (networkError) {
     console.error(`[Network error]: ${networkError}`)
