@@ -64,7 +64,7 @@ export default function Routes() {
     )
   }
 
-  if (!isReady) {
+  if (!isReady || device.isInitialized === false) {
     return <Loading />
   }
 
