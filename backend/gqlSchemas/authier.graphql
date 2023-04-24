@@ -316,6 +316,7 @@ enum EmailVerificationType {
 
 type DecryptionChallengeForApproval {
   ipGeoLocation: JSON
+  deviceLocationFromIp: DeviceLocation
   id: Int!
   ipAddress: String!
   rejectedAt: DateTime
@@ -331,6 +332,11 @@ scalar JSON
   @specifiedBy(
     url: "http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf"
   )
+
+type DeviceLocation {
+  city: String!
+  countryName: String!
+}
 
 type Mutation {
   """

@@ -14,10 +14,20 @@ import { decorator as mem } from 'mem'
 import { getGeoIpLocation } from './Device'
 
 @ObjectType()
+class DeviceLocation {
+  @Field(() => String, { nullable: false })
+  city: string
+
+  @Field(() => String, { nullable: false })
+  countryName: string
+}
+
+@ObjectType()
 export class DecryptionChallengeForApproval {
   @mem({ maxAge: ms('2 days') })
   @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
+    // TODO remove in favor of deviceLocationFromIp
     const json: any = await getGeoIpLocation(this.ipAddress)
     if (!json.data) {
       return null
@@ -25,6 +35,19 @@ export class DecryptionChallengeForApproval {
     return {
       city: json.data.location.city.name,
       country_name: json.data.location.country.name
+    }
+  }
+
+  @mem({ maxAge: ms('2 days') })
+  @Field(() => DeviceLocation, { nullable: true })
+  async deviceLocationFromIp() {
+    const json: any = await getGeoIpLocation(this.ipAddress)
+    if (!json.data) {
+      return null
+    }
+    return {
+      city: json.data.location.city.name,
+      countryName: json.data.location.country.name
     }
   }
 
