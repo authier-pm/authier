@@ -291,17 +291,19 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
-            autofillValueIntoInput(
+            const autofillReturn = autofillValueIntoInput(
               inputEl,
               firstLoginCred.loginCredentials.username
             )
-            notyf.success(
-              `Autofilled password for ${
-                firstLoginCred.loginCredentials.username
-              } into element ${generateQuerySelectorForOrphanedElement(
-                inputEl
-              )}`
-            )
+            if (autofillReturn) {
+              notyf.success(
+                `Autofilled password for ${
+                  firstLoginCred.loginCredentials.username
+                } into element ${generateQuerySelectorForOrphanedElement(
+                  inputEl
+                )}`
+              )
+            }
           } else {
             // todo show prompt to user to select which credential to use
           }
