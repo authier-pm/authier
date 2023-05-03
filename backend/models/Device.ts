@@ -215,12 +215,13 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
-    await ctx.prisma.decryptionChallenge.deleteMany({
-      where: {
-        deviceId: this.id,
-        approvedAt: null
-      }
-    })
+    //FIX: This is not right
+    // await ctx.prisma.decryptionChallenge.deleteMany({
+    //   where: {
+    //     deviceId: this.id,
+    //     approvedAt: null
+    //   }
+    // })
 
     if (this.id === ctx.masterDeviceId) {
       await ctx.prisma.decryptionChallenge.create({
