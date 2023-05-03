@@ -9,6 +9,7 @@ import {
 } from '@shared/graphql/AccountDevices.codegen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
+import { emitter } from '@src/screens/Device/Devices'
 
 export const LogoutDeviceAlert = ({ id }: { id: string }) => {
   const navigation = useNavigation()
@@ -32,7 +33,7 @@ export const LogoutDeviceAlert = ({ id }: { id: string }) => {
     if (goBack) {
       navigation.goBack()
     }
-
+    emitter.emit('refresh')
     setIsOpen(false)
   }
 
