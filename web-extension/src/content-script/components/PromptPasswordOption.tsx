@@ -21,7 +21,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
-  let el = document.querySelector(webInputs[0].domPath)
+  const el = document.querySelector(webInputs[0].domPath)
   const [pos, setPos] = useState(el?.getBoundingClientRect())
 
   let resizeTimer: string | number | NodeJS.Timeout | undefined
@@ -74,6 +74,9 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
                   },
                   false
                 )
+                if (promptOption) {
+                  promptOption.remove()
+                }
               }}
             >
               {el.loginCredentials.username}
