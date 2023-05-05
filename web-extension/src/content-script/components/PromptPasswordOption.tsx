@@ -4,6 +4,7 @@ import {
   promptOption,
   PromptPasswordOptionProps
 } from '../renderLoginCredOption'
+import browser from 'webextension-polyfill'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -49,13 +50,20 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         alignItems: 'baseline',
         fontFamily: 'sans-serif !important',
         position: 'fixed',
-        top: (pos.top as number) - 10 + 'px',
-        left: pos.left + pos.width + 'px',
+        top: (pos.top as number) + 'px',
+        left: pos.left + pos.width + 35 + 'px', // 35 because 25 is width of icon and 10 is extra padding
         right: pos.right + 'px',
         bottom: pos.bottom + 'px'
       }}
     >
-      <span className="iconAuthier"></span>
+      <span
+        className="iconAuthier"
+        style={{
+          backgroundImage: `url('${browser.runtime.getURL('icon-128.png')}')`,
+          backgroundSize: 'contain',
+          borderRadius: '20%'
+        }}
+      ></span>
 
       <div className="dropdown-content">
         {loginCredentials.map((el) => {
