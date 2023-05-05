@@ -130,6 +130,7 @@ export class Device {
   biometricsAvailable = false
   lockInterval!: NodeJS.Timer | void
   emitter = mitt()
+  isInitialized = false
 
   async save(deviceState?: IBackgroundStateSerializable) {
     //We must clear interval, otherwise we will create a new one every time we save the state
@@ -186,6 +187,7 @@ export class Device {
     const token = await messaging().getToken()
     console.log('token', token)
     this.fireToken = token
+    this.isInitialized = true
 
     this.emitter.emit('stateChange')
     return this.state

@@ -15,7 +15,6 @@
     "strict": true,
     "sourceMap": true,
     "jsx": "react-jsx",
-    "jsxImportSource": "@emotion/react",
     "esModuleInterop": true,
     "lib": ["es2021", "dom"],
     "experimentalDecorators": true,

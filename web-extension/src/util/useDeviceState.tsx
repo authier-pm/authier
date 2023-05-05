@@ -34,7 +34,7 @@ export interface ISecret {
   createdAt: string
   kind: EncryptedSecretType
 }
-// @ts-expect-error TODO fix this ZOD typing issue
+
 export type TotpTypeWithMeta = z.infer<typeof totpSchema>
 
 export interface ITOTPSecret extends ISecret {
@@ -43,7 +43,6 @@ export interface ITOTPSecret extends ISecret {
 }
 
 export type LoginCredentialsTypeWithMeta = z.infer<
-  // @ts-expect-error TODO fix this ZOD typing issue
   typeof loginCredentialsSchema
 > & {
   parseError?: ZodError | Error

@@ -15,7 +15,6 @@ export const { ToastContainer, toast } = createStandaloneToast({
   theme: chakraRawTheme
 })
 
-// @ts-expect-error
 i18n.load('en', messages)
 i18n.activate('en')
 export const chakraCustomTheme = extendTheme(chakraRawTheme)

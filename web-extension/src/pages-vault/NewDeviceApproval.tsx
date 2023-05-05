@@ -39,8 +39,8 @@ export const NewDevicesApprovalStack = () => {
                   new Date()
                 )}
                 : from IP {challengeToApprove.ipAddress} (
-                {challengeToApprove.ipGeoLocation.city},{' '}
-                {challengeToApprove.ipGeoLocation.country_name})
+                {challengeToApprove.ipGeoLocation?.city},{' '}
+                {challengeToApprove.ipGeoLocation?.country_name})
               </Center>
 
               <Grid
