@@ -30,7 +30,7 @@
   "permissions": ["activeTab", "storage", "tabs"],
   "web_accessible_resources": [
     {
-      "resources": ["icon-16.png"],
+      "resources": ["*.png"],
       "matches": ["<all_urls>"]
     }
   ]
