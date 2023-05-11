@@ -36,7 +36,7 @@ sentryInit({
 })
 
 export const endpointSecret = env.STRIPE_ENDPOINT as string
-// const isLambda = !!env.LAMBDA_TASK_ROOT
+const isLambda = !!env.LAMBDA_TASK_ROOT
 log('endpointSecret', endpointSecret)
 
 const logger = pino({
@@ -53,11 +53,12 @@ const logger = pino({
 export const app = fastify({
   logger: logger
 })
-
-app.register(fastifyCors, {
-  origin: true,
-  credentials: true
-})
+if (!isLambda) {
+  app.register(fastifyCors, {
+    origin: true,
+    credentials: true
+  })
+}
 
 app.setErrorHandler(async (error, request, reply) => {
   // Logging locally
