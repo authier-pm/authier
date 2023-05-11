@@ -19,7 +19,7 @@ import { GraphqlError } from './api/GraphqlError'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import debug from 'debug'
-
+import pino from 'pino'
 import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import fastifyCors from '@fastify/cors'
@@ -36,45 +36,35 @@ sentryInit({
 })
 
 export const endpointSecret = env.STRIPE_ENDPOINT as string
-const isLambda = !!env.LAMBDA_TASK_ROOT
+// const isLambda = !!env.LAMBDA_TASK_ROOT
 log('endpointSecret', endpointSecret)
 
-let logger
-let pino
-if (!isLambda) {
-  ;(async () => {
-    pino = await import('pino').then((m) => m.pino)
-    logger = pino({
-      transport: {
-        target: 'pino-pretty',
-        options: {
-          translateTime: 'HH:MM:ss Z',
-          ignore:
-            environment === 'production' ? 'pid,hostname,time' : 'pid,hostname',
-          colorize: true
-        }
-      }
-    })
-  })()
-}
+const logger = pino({
+  transport: {
+    target: 'pino-pretty',
+    options: {
+      translateTime: 'HH:MM:ss Z',
+      ignore: 'pid,hostname,time',
+      colorize: true
+    }
+  }
+})
 
 export const app = fastify({
   logger: logger
 })
 
-if (!isLambda) {
-  app.register(fastifyCors, {
-    origin: true,
-    credentials: true
-  })
-}
+app.register(fastifyCors, {
+  origin: true,
+  credentials: true
+})
 
 app.setErrorHandler(async (error, request, reply) => {
   // Logging locally
   console.error(error)
   // Sending error to be logged in Sentry
   captureException(error)
-  reply.status(500).send({ error: 'Something went wrong' })
+  reply.status(error.statusCode ?? 500).send({ error })
 })
 
 app.register(cookie, {
