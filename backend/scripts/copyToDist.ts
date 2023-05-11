@@ -9,6 +9,7 @@ const modulesToCopy = [
   'call-bind',
   'function-bind',
   'get-intrinsic',
+  'pino-pretty',
   'object-inspect',
   'has',
   'has-symbols'
