@@ -1,12 +1,12 @@
 import { dmmf } from '../prisma/prismaClient'
-import { getPrismaRelationsFromInfo } from './getPrismaRelationsFromInfo'
+import { getPrismaRelationsFromGQLInfo } from './getPrismaRelationsFromInfo'
 import gqlInfo from './fixtures/gqlInfo.json'
 import { describe, expect, it } from 'vitest'
 import { Kind } from 'graphql'
 
 describe('getPrismaRelationsFromInfo', () => {
   it('should ignore fields where first letter is NOT capital', async () => {
-    const res = getPrismaRelationsFromInfo({
+    const res = getPrismaRelationsFromGQLInfo({
       info: {
         fieldName: 'me',
         fieldNodes: [
@@ -60,7 +60,7 @@ describe('getPrismaRelationsFromInfo', () => {
           }
         ]
       },
-      rootModel: dmmf.modelMap.User
+      rootModel: dmmf.models.User
     })
 
     expect(res).toMatchInlineSnapshot(`
@@ -71,9 +71,9 @@ describe('getPrismaRelationsFromInfo', () => {
   })
 
   it('should load even nested relation fields', async () => {
-    const res = getPrismaRelationsFromInfo({
+    const res = getPrismaRelationsFromGQLInfo({
       info: gqlInfo as any,
-      rootModel: dmmf.modelMap.User
+      rootModel: dmmf.models.User
     })
 
     expect(res).toMatchInlineSnapshot(`

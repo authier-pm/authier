@@ -16,6 +16,8 @@ export default defineConfig({
     }
   },
   resolve: {
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'], // by default vite also resolves mjs files, but we run in CJS mode so we don't want to load ESM modules
+
     alias: {
       '.prisma/client': path.resolve(__dirname, './node_modules/.prisma/client')
     }
