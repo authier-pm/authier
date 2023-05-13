@@ -27,6 +27,7 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
+import { constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -80,7 +81,7 @@ const appRouter = tc.router({
       }
       let urlParsed: URL
       try {
-        urlParsed = new URL(url)
+        urlParsed = constructURL(url)
       } catch (err) {
         return false
       }

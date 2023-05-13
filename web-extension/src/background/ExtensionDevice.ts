@@ -48,7 +48,7 @@ import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
-import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
+import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const log = debug('au:Device')
@@ -208,7 +208,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   async getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter((secret) => {
       return (
-        host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
+        host ===
+        constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
       )
     })
     if (secrets.length === 0) {
@@ -340,7 +341,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   //TODO: type this
   async findExistingSecret(secret) {
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      new URL(secret.url).hostname
+      constructURL(secret.url).hostname
     )
 
     return existingSecretsOnHostname.find(

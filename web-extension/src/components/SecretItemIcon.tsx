@@ -1,6 +1,7 @@
 import React from 'react'
 import { Image } from '@chakra-ui/react'
 import { BiFileBlank } from 'react-icons/bi'
+import { constructURL } from '@shared/urlUtils'
 
 export function SecretItemIcon(props: {
   iconUrl: string | null | undefined
@@ -14,7 +15,7 @@ export function SecretItemIcon(props: {
   }
   if (props.url) {
     try {
-      hostname = new URL(props.url).hostname
+      hostname = constructURL(props.url).hostname
 
       return (
         <Image

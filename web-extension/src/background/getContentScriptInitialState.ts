@@ -13,6 +13,7 @@ import ms from 'ms'
 import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
+import { constructURL } from '@shared/urlUtils'
 const log = debug('au:getContentScriptInitialState')
 
 export const getContentScriptInitialState = async (
@@ -20,7 +21,7 @@ export const getContentScriptInitialState = async (
   currentTabId: number
 ): Promise<IInitStateRes> => {
   log('tabUrl', tabUrl)
-  const hostname = new URL(tabUrl).hostname
+  const hostname = constructURL(tabUrl).hostname
 
   const decrypted =
     (await device.state?.getSecretsDecryptedByHostname(hostname)) ??

@@ -16,6 +16,7 @@ import { LoginResponse } from '../models/models'
 import { verify } from 'jsonwebtoken'
 import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
+import { constructURL } from '../../shared/urlUtils'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
@@ -444,7 +445,7 @@ export class RootResolver {
     for (const webInput of webInputs) {
       const forUpsert = {
         url: webInput.url,
-        host: new URL(webInput.url).host,
+        host: constructURL(webInput.url).host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
