@@ -37,6 +37,7 @@ import {
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { setSensitiveItem } from './secretStorage'
 import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
+import { constructURL } from './urlUtils'
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[] = []
@@ -151,7 +152,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter((secret) => {
       return (
-        host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
+        host ===
+        constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
       )
     })
     if (secrets.length === 0) {
@@ -299,7 +301,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async findExistingSecret(secret) {
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      new URL(secret.url).hostname
+      constructURL(secret.url).hostname
     )
 
     return existingSecretsOnHostname.find(
