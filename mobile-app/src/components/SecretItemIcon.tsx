@@ -51,5 +51,7 @@ export function SecretItemIcon(props: {
     } catch (err) {
       return FallbackElement
     }
+  } else {
+    return FallbackElement
   }
 }
