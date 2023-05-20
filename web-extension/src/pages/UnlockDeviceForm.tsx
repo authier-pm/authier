@@ -75,7 +75,6 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
 
             setSubmitting(false)
           } catch (err: any) {
-            console.log('TEST', err)
             if (
               err.message ===
               'DOMException: The operation failed for an operation-specific reason'

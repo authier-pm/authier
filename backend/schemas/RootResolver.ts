@@ -135,7 +135,7 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
-    console.log('id', jwtPayload.deviceId, dmmf)
+
     return ctx.prisma.device.findUnique({
       where: { id: jwtPayload.deviceId },
       include: getPrismaRelationsFromGQLInfo({

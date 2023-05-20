@@ -87,7 +87,7 @@ export class DeviceQuery extends DeviceGQL {
     if (userData) {
       const pswLimit = userData?.loginCredentialsLimit
       const totpLimit = userData?.TOTPlimit
-      console.log('pswLimit', pswLimit)
+
       const pswCount = await ctx.prisma.encryptedSecret.count({
         where: {
           userId: ctx.jwtPayload.userId,

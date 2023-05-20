@@ -253,7 +253,6 @@ export const AuthsList = ({
               )
             })}
             {loginCredentialForCurrentDomain.map((credentials, i) => {
-              console.log('credentials', credentials)
               return (
                 <LoginCredentialsListItem
                   loginSecret={credentials as ILoginSecret}
