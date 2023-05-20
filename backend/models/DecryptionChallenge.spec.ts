@@ -127,7 +127,7 @@ describe('DecryptionChallenge', () => {
   describe('approve', async () => {
     const challengeMutation: DecryptionChallengeMutation =
       new DecryptionChallengeMutation()
-    challengeMutation.id = faker.datatype.number()
+    challengeMutation.id = faker.number.int({ min: 1, max: 1000 })
     challengeMutation.blockIp = false
     const slaveDeviceId = faker.string.uuid()
     const masterDeviceId = faker.string.uuid()
@@ -204,7 +204,7 @@ describe('DecryptionChallenge', () => {
     })
 
     it("should show 'Only the master device can approve a decryption chllenge'", async () => {
-      challengeMutation.id = faker.datatype.number()
+      challengeMutation.id = faker.number.int({ min: 1, max: 1000 })
 
       const fakeCtx = {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
