@@ -59,8 +59,6 @@ export function recordInputs(e?: KeyboardEvent) {
 }
 
 async function clicked(e: MouseEvent) {
-  console.log(e)
-
   //@ts-expect-error TODO
   if (e.target.type === 'password' || e.target.type === 'text') {
     domRecorder.addInputEvent({

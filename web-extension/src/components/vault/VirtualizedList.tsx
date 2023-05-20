@@ -15,7 +15,6 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   const ITEMS_COUNT = filteredItems.length
   const ITEM_SIZE = 270
 
-  console.log(filteredItems)
   return (
     <AutoSizer>
       {({ height, width }) => {

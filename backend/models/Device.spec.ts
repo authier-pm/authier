@@ -11,22 +11,25 @@ import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 describe('Device', () => {
   let user: User
 
-  const masterDeviceId = faker.datatype.uuid()
-  const slaveDeviceId = faker.datatype.uuid()
-  const masterDeviceName = faker.random.word()
-  const slaveDeviceName = faker.random.word()
-  const userId = faker.datatype.uuid()
-  const slaveDeviceChallenge = faker.datatype.number()
+  const masterDeviceId = faker.string.uuid()
+  const slaveDeviceId = faker.string.uuid()
+  const masterDeviceName = faker.lorem.word()
+  const slaveDeviceName = faker.lorem.word()
+  const slaveDeviceApproved = faker.date.recent()
+  const userId = faker.string.uuid()
+  const slaveDeviceChallenge = faker.number.int({ max: 1000, min: 1 })
+  const TOTPlimit = faker.number.int({ min: 4, max: 20 })
+  const loginCredentialsLimit = faker.number.int({ min: 4, max: 20 })
 
   const challenge: DecryptionChallengeApproved =
     new DecryptionChallengeApproved()
   const deviceMutation = new DeviceMutation()
   const deviceQuery = new DeviceQuery()
 
-  challenge.id = faker.datatype.number()
+  challenge.id = faker.number.int({ max: 1000, min: 1 })
   challenge.blockIp = false
-  challenge.deviceId = faker.datatype.uuid()
-  challenge.deviceName = faker.random.word()
+  challenge.deviceId = faker.string.uuid()
+  challenge.deviceName = faker.lorem.word()
 
   const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
@@ -38,8 +41,8 @@ describe('Device', () => {
         addDeviceSecret: input.addDeviceSecret,
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
-        loginCredentialsLimit: faker.datatype.number(20),
-        TOTPlimit: faker.datatype.number(5),
+        loginCredentialsLimit,
+        TOTPlimit,
         deviceRecoveryCooldownMinutes: 960
       }
     })
@@ -48,11 +51,11 @@ describe('Device', () => {
     await prismaClient.device.create({
       data: {
         id: masterDeviceId,
-        name: faker.random.word(),
-        firebaseToken: faker.datatype.string(5),
+        name: faker.lorem.word(),
+        firebaseToken: faker.string.sample(5),
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
-        platform: faker.random.word(),
+        platform: faker.lorem.word(),
         userId: userId
       }
     })
@@ -61,11 +64,11 @@ describe('Device', () => {
     await prismaClient.device.create({
       data: {
         id: slaveDeviceId,
-        name: faker.random.word(),
-        firebaseToken: faker.datatype.string(5),
+        name: faker.lorem.word(),
+        firebaseToken: faker.string.sample(5),
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
-        platform: faker.random.word(),
+        platform: faker.lorem.word(),
         userId: userId
       }
     })
@@ -75,8 +78,9 @@ describe('Device', () => {
         id: slaveDeviceChallenge,
         userId: userId,
         deviceId: slaveDeviceId,
-        deviceName: faker.random.word(),
-        ipAddress: faker.internet.ip()
+        deviceName: slaveDeviceName,
+        ipAddress: faker.internet.ip(),
+        approvedAt: slaveDeviceApproved
       }
     })
   })
@@ -118,14 +122,19 @@ describe('Device', () => {
 
       const logout = await deviceMutation.logout(fakeCtx)
 
-      const challenges = await prismaClient.decryptionChallenge.findMany({
+      const challenges = await prismaClient.decryptionChallenge.findFirst({
         where: {
-          deviceId: slaveDeviceId,
-          approvedAt: null
+          deviceId: slaveDeviceId
         }
       })
 
-      expect(challenges).toHaveLength(0)
+      expect(challenges).toMatchObject({
+        id: slaveDeviceChallenge,
+        userId: userId,
+        deviceId: slaveDeviceId,
+        deviceName: slaveDeviceName,
+        approvedAt: slaveDeviceApproved
+      })
 
       expect(logout).toMatchObject({
         id: slaveDeviceId,
@@ -235,7 +244,7 @@ describe('Device', () => {
       deviceMutation.id = masterDeviceId
       deviceMutation.userId = userId
       deviceMutation.name = masterDeviceName
-      const newName = faker.random.word()
+      const newName = faker.lorem.word()
 
       // Create mock objects
       const fakeCtx = {
@@ -259,7 +268,7 @@ describe('Device', () => {
 
   describe('encryptedSecretsToSync', async () => {
     //Device info
-    deviceQuery.lastSyncAt = faker.date.past(1)
+    deviceQuery.lastSyncAt = faker.date.past({ years: 1 })
     deviceQuery.userId = userId
 
     const testData: any = []
@@ -283,7 +292,7 @@ describe('Device', () => {
 
       for (let i = 0; i < user.loginCredentialsLimit; i++) {
         testData.push({
-          encrypted: faker.datatype.string(25),
+          encrypted: faker.string.sample(25),
           kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
           userId: userId,
           version: 1
@@ -297,26 +306,27 @@ describe('Device', () => {
       const secrets = await deviceQuery.encryptedSecretsToSync(fakeCtx)
 
       expect(secrets).toHaveLength(user.loginCredentialsLimit)
+      testData.length = 0
     })
 
     it('should not sync TOTP when device has syncTOTP set to false', async () => {
-      testData.push({
-        encrypted: faker.datatype.string(25),
-        kind: EncryptedSecretTypeGQL.TOTP,
-        userId: userId,
-        version: 1
-      })
+      for (let i = 0; i < user.TOTPlimit; i++) {
+        testData.push({
+          encrypted: faker.string.sample(25),
+          kind: EncryptedSecretTypeGQL.TOTP,
+          userId: userId,
+          version: 1
+        })
+      }
       fakeCtx.device.syncTOTP = false
       await prismaClient.encryptedSecret.createMany({
         data: testData
       })
-
       const res = await deviceQuery.encryptedSecretsToSync(fakeCtx)
+
       expect(res).toHaveLength(0)
 
       fakeCtx.device.syncTOTP = true
-
-      testData.length = 0
     })
 
     it("should show 'TOTP limit exceeded, remove TOTP secrets'", async () => {
@@ -324,9 +334,9 @@ describe('Device', () => {
       const numOverLimit = 5
       //TODO: Make function for generating random secrets, revise this code and remove duplicate lines
 
-      for (let i = 0; i < user.TOTPlimit + numOverLimit; i++) {
+      for (let i = 0; i < numOverLimit; i++) {
         testData.push({
-          encrypted: faker.datatype.string(25),
+          encrypted: faker.string.sample(25),
           kind: EncryptedSecretTypeGQL.TOTP,
           userId: userId,
           version: 1

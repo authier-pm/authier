@@ -140,7 +140,7 @@ export class RootResolver {
       where: { id: jwtPayload.deviceId },
       include: getPrismaRelationsFromGQLInfo({
         info,
-        rootModel: dmmf.modelMap.Device
+        rootModel: dmmf.models.Device
       })
     })
   }

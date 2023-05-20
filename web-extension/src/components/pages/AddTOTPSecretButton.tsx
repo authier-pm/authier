@@ -27,10 +27,7 @@ export const AddTOTPSecretButton = () => {
     const TOTPCount =
       device.state?.secrets.filter((s) => s.kind === EncryptedSecretType.TOTP)
         .length ?? 0
-    const TOTPLimit =
-      device.state?.secrets.filter(
-        (s) => s.kind === EncryptedSecretType.LOGIN_CREDENTIALS
-      ).length ?? 0
+    const TOTPLimit = data?.me.TOTPlimit ?? 0
 
     if (TOTPCount >= TOTPLimit) {
       toast({

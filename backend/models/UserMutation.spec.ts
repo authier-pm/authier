@@ -9,7 +9,7 @@ import { UserMutation } from './UserMutation'
 describe('UserMutation', () => {
   describe('updateEmail', () => {
     it('should update email', async () => {
-      const masterDeviceId = faker.datatype.uuid()
+      const masterDeviceId = faker.string.uuid()
 
       let userRaw = await prismaClient.user.create({
         data: {
@@ -17,9 +17,9 @@ describe('UserMutation', () => {
           loginCredentialsLimit: 3,
           TOTPlimit: 3,
           deviceRecoveryCooldownMinutes: 960,
-          addDeviceSecret: faker.datatype.string(5),
-          addDeviceSecretEncrypted: faker.datatype.string(5),
-          encryptionSalt: faker.datatype.string(5)
+          addDeviceSecret: faker.string.sample(5),
+          addDeviceSecretEncrypted: faker.string.sample(5),
+          encryptionSalt: faker.string.sample(5)
         }
       })
 
@@ -31,8 +31,8 @@ describe('UserMutation', () => {
               id: userRaw.id
             }
           },
-          name: faker.random.word(),
-          firebaseToken: faker.datatype.string(5),
+          name: faker.lorem.word(),
+          firebaseToken: faker.string.sample(5),
           firstIpAddress: faker.internet.ip(),
           lastIpAddress: faker.internet.ip(),
           platform: 'ios'
@@ -76,7 +76,7 @@ describe('UserMutation', () => {
 
   describe('updateSettings', () => {
     it('Should update settings', async () => {
-      const masterDeviceId = faker.datatype.uuid()
+      const masterDeviceId = faker.string.uuid()
 
       const userRaw = await prismaClient.user.create({
         data: {
@@ -84,9 +84,9 @@ describe('UserMutation', () => {
           loginCredentialsLimit: 3,
           TOTPlimit: 3,
           deviceRecoveryCooldownMinutes: 960,
-          addDeviceSecret: faker.datatype.string(5),
-          addDeviceSecretEncrypted: faker.datatype.string(5),
-          encryptionSalt: faker.datatype.string(5)
+          addDeviceSecret: faker.string.sample(5),
+          addDeviceSecretEncrypted: faker.string.sample(5),
+          encryptionSalt: faker.string.sample(5)
         }
       })
 
@@ -98,8 +98,8 @@ describe('UserMutation', () => {
               id: userRaw.id
             }
           },
-          name: faker.random.word(),
-          firebaseToken: faker.datatype.string(5),
+          name: faker.lorem.word(),
+          firebaseToken: faker.string.sample(5),
           firstIpAddress: faker.internet.ip(),
           lastIpAddress: faker.internet.ip(),
           platform: 'ios'
