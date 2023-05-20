@@ -1,6 +1,6 @@
+import { constructURL } from '@src/utils/urlUtils'
 import { Avatar, Icon } from 'native-base'
 import React from 'react'
-import { URL } from 'react-native-url-polyfill'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 export function SecretItemIcon(props: {
@@ -43,7 +43,7 @@ function getHostnameFromUrl(props: {
   url: string
 }): string {
   try {
-    const hostname = new URL(props.url).hostname
+    const hostname = constructURL(props.url).hostname
     return hostname
   } catch (err) {
     return props.url

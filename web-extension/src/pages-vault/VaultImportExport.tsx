@@ -25,6 +25,7 @@ import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
+import { constructURL } from '@shared/urlUtils'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 // const csvHeaderNames = {
@@ -113,7 +114,7 @@ export const onCSVFileAccepted: any = (
 
           let hostname: string
           try {
-            hostname = new URL(creds.url).hostname
+            hostname = constructURL(creds.url).hostname
           } catch (error) {
             skipped++
             break

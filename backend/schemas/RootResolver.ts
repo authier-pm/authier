@@ -16,6 +16,7 @@ import { LoginResponse } from '../models/models'
 import { verify } from 'jsonwebtoken'
 import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
+import { constructURL } from '../../shared/urlUtils'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
@@ -28,7 +29,7 @@ import { Device, User, WebInput } from '.prisma/client'
 import { WebInputGQL } from '../models/generated/WebInputGQL'
 
 import { GraphQLResolveInfo } from 'graphql'
-import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
 import {
@@ -112,10 +113,10 @@ export class RootResolver {
     @Info() info: GraphQLResolveInfo
   ) {
     const { jwtPayload } = ctx
-    //? Ask @Capajj how it works.
-    const include = getPrismaRelationsFromInfo({
+
+    const include = getPrismaRelationsFromGQLInfo({
       info,
-      rootModel: dmmf.modelMap.User
+      rootModel: dmmf.models.User
     })
 
     const tmp = await ctx.prisma.user.findUnique({
@@ -137,7 +138,7 @@ export class RootResolver {
 
     return ctx.prisma.device.findUnique({
       where: { id: jwtPayload.deviceId },
-      include: getPrismaRelationsFromInfo({
+      include: getPrismaRelationsFromGQLInfo({
         info,
         rootModel: dmmf.modelMap.Device
       })
@@ -444,7 +445,7 @@ export class RootResolver {
     for (const webInput of webInputs) {
       const forUpsert = {
         url: webInput.url,
-        host: new URL(webInput.url).host,
+        host: constructURL(webInput.url).host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId

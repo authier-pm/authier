@@ -11,7 +11,7 @@ import { UserGQL } from './generated/UserGQL'
 import { DeviceGQL } from './generated/DeviceGQL'
 import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLInt, GraphQLResolveInfo } from 'graphql'
-import { getPrismaRelationsFromInfo } from '../utils/getPrismaRelationsFromInfo'
+import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
 import { GraphQLEmailAddress, GraphQLNonNegativeInt } from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
@@ -90,7 +90,7 @@ export class UserMutation extends UserBase {
   ) {
     return ctx.prisma.encryptedSecret.findUnique({
       where: { id },
-      include: getPrismaRelationsFromInfo({
+      include: getPrismaRelationsFromGQLInfo({
         info,
         rootModel: dmmf.modelMap.EncryptedSecret
       })
