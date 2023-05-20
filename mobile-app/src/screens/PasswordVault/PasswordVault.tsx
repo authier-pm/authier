@@ -54,7 +54,8 @@ export const PasswordVault = ({
 
       <FlashList
         ListEmptyComponent={EmptyList}
-        estimatedItemSize={104}
+        //FIX: Dont like empty space on fast scroll
+        estimatedItemSize={90}
         data={device.loginCredentials.filter(
           ({ loginCredentials: { url, label } }) => {
             return label.includes(filterBy) || url?.includes(filterBy)
