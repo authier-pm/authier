@@ -142,7 +142,6 @@ export class DeviceQuery extends DeviceGQL {
           ]
         }
       })
-
       return res
     }
   }
