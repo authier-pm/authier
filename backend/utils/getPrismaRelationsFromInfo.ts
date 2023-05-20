@@ -8,7 +8,7 @@ import { dmmf } from '../prisma/prismaClient'
 /**
  * @returns prisma object relation mapping that can be passed into prisma query "include" field
  */
-export const getPrismaRelationsFromInfo = ({
+export const getPrismaRelationsFromGQLInfo = ({
   info,
   rootModel
 }: {
@@ -42,7 +42,7 @@ export const getPrismaRelationsFromInfo = ({
       if (field?.kind !== 'object') {
         break
       }
-      lastRelationModel = dmmf.modelMap[field.type as string]
+      lastRelationModel = dmmf.models[field.type as string]
       path.push(singleRelation)
       if (lastRelationModel) {
         set(prismaInclude, path.join('.include.'), true)
