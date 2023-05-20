@@ -87,7 +87,7 @@ export class DeviceQuery extends DeviceGQL {
     if (userData) {
       const pswLimit = userData?.loginCredentialsLimit
       const totpLimit = userData?.TOTPlimit
-
+      console.log('pswLimit', pswLimit)
       const pswCount = await ctx.prisma.encryptedSecret.count({
         where: {
           userId: ctx.jwtPayload.userId,
@@ -142,6 +142,7 @@ export class DeviceQuery extends DeviceGQL {
           ]
         }
       })
+
       return res
     }
   }
@@ -215,14 +216,6 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
-    //FIX: This is not right
-    // await ctx.prisma.decryptionChallenge.deleteMany({
-    //   where: {
-    //     deviceId: this.id,
-    //     approvedAt: null
-    //   }
-    // })
-
     if (this.id === ctx.masterDeviceId) {
       await ctx.prisma.decryptionChallenge.create({
         data: {

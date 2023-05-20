@@ -25,11 +25,11 @@ describe('RootResolver', () => {
     it('should return current user', async () => {
       const user = await prismaClient.user.create({
         data: {
-          id: faker.datatype.uuid(),
+          id: faker.string.uuid(),
           email: faker.internet.email(),
-          addDeviceSecret: faker.datatype.string(5),
-          addDeviceSecretEncrypted: faker.datatype.string(5),
-          encryptionSalt: faker.datatype.string(5),
+          addDeviceSecret: faker.string.sample(5),
+          addDeviceSecretEncrypted: faker.string.sample(5),
+          encryptionSalt: faker.string.sample(5),
           ...userSecurityProps
         }
       })
@@ -48,7 +48,7 @@ describe('RootResolver', () => {
   })
 
   describe('registerNewUser', () => {
-    const userId = faker.datatype.uuid()
+    const userId = faker.string.uuid()
 
     it('should add new user', async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
@@ -81,7 +81,7 @@ describe('RootResolver', () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
-          id: faker.datatype.uuid(),
+          id: faker.string.uuid(),
           //Same email
           email: input.email,
           addDeviceSecret: input.addDeviceSecret,
@@ -98,7 +98,7 @@ describe('RootResolver', () => {
     })
 
     it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
-      const userId = faker.datatype.uuid()
+      const userId = faker.string.uuid()
 
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
@@ -116,7 +116,7 @@ describe('RootResolver', () => {
               platform: 'iOS',
               firstIpAddress: faker.internet.ip(),
               lastIpAddress: faker.internet.ip(),
-              firebaseToken: faker.datatype.uuid(),
+              firebaseToken: faker.string.uuid(),
               name: input.deviceName
             }
           }
@@ -127,18 +127,18 @@ describe('RootResolver', () => {
         async () =>
           await resolver.registerNewUser(
             input,
-            faker.datatype.uuid(),
+            faker.string.uuid(),
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        '"Device 7421c53a-131c-4215-81c2-3ea98de9451b already exists. You cannot use a device with multiple accounts."'
+        '"Device f025212b-8007-4ffd-a507-21582ec854f5 already exists. You cannot use a device with multiple accounts."'
       )
     })
   })
 
   describe('deviceDecryptionChallenge', () => {
     it('should return a DecryptionChallengeForApproval', async () => {
-      const userId = faker.datatype.uuid()
+      const userId = faker.string.uuid()
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
         data: {
@@ -155,7 +155,7 @@ describe('RootResolver', () => {
       const data = (await resolver.deviceDecryptionChallenge(
         fakeData.email,
         {
-          id: faker.datatype.uuid(),
+          id: faker.string.uuid(),
           name: 'chrome ',
           platform: 'macOS'
         },
@@ -166,7 +166,7 @@ describe('RootResolver', () => {
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
-      const userId = faker.datatype.uuid()
+      const userId = faker.string.uuid()
 
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
       await prismaClient.user.create({
@@ -185,7 +185,7 @@ describe('RootResolver', () => {
         userId: userId,
         ipAddress: faker.internet.ip(),
         masterPasswordVerifiedAt: null,
-        deviceId: faker.datatype.uuid(),
+        deviceId: faker.string.uuid(),
         deviceName: 'chrome'
       }))
 
@@ -197,7 +197,7 @@ describe('RootResolver', () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           {
-            id: faker.datatype.uuid(),
+            id: faker.string.uuid(),
             name: 'chrome ',
             platform: 'macOS'
           },
@@ -207,7 +207,7 @@ describe('RootResolver', () => {
     })
 
     it('should block creation of a challenge from an IP which was blocked previously', async () => {
-      const userId = faker.datatype.uuid()
+      const userId = faker.string.uuid()
       const blockedIp = faker.internet.ip()
       const fakeCtx = {
         reply: { setCookie: () => {} },
@@ -235,7 +235,7 @@ describe('RootResolver', () => {
           userId: userId,
           ipAddress: blockedIp,
           masterPasswordVerifiedAt: null,
-          deviceId: faker.datatype.uuid(),
+          deviceId: faker.string.uuid(),
           deviceName: 'chrome',
           blockIp: true
         }
@@ -245,7 +245,7 @@ describe('RootResolver', () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           {
-            id: faker.datatype.uuid(),
+            id: faker.string.uuid(),
             name: 'chrome ',
             platform: 'macOS'
           },

@@ -29,9 +29,9 @@ describe('DecryptionChallenge', () => {
 
   const challenge: DecryptionChallengeApproved =
     new DecryptionChallengeApproved()
-  challenge.deviceId = faker.datatype.uuid()
-  challenge.deviceName = faker.random.word()
-  const userId = faker.datatype.uuid()
+  challenge.deviceId = faker.string.uuid()
+  challenge.deviceName = faker.lorem.word()
+  const userId = faker.string.uuid()
   const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
   beforeAll(async () => {
@@ -85,7 +85,7 @@ describe('DecryptionChallenge', () => {
 
     it("should show 'User not found'", async () => {
       const input: AddNewDeviceInput = makeAddNewDeviceInput()
-      challenge.userId = faker.datatype.uuid()
+      challenge.userId = faker.string.uuid()
       await expect(async () => {
         await challenge.addNewDeviceForUser(
           input,
@@ -97,7 +97,7 @@ describe('DecryptionChallenge', () => {
     })
 
     it("should show 'Wrong master password used'", async () => {
-      const userId = faker.datatype.uuid()
+      const userId = faker.string.uuid()
 
       const input = makeAddNewDeviceInput()
       challenge.userId = userId
@@ -106,9 +106,9 @@ describe('DecryptionChallenge', () => {
         data: {
           id: userId,
           email: input.email,
-          addDeviceSecret: faker.datatype.string(5),
+          addDeviceSecret: faker.string.sample(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: faker.datatype.string(5),
+          encryptionSalt: faker.string.sample(5),
           ...userSecurityProps
         }
       })
@@ -129,9 +129,9 @@ describe('DecryptionChallenge', () => {
       new DecryptionChallengeMutation()
     challengeMutation.id = faker.datatype.number()
     challengeMutation.blockIp = false
-    const slaveDeviceId = faker.datatype.uuid()
-    const masterDeviceId = faker.datatype.uuid()
-    const userId = faker.datatype.uuid()
+    const slaveDeviceId = faker.string.uuid()
+    const masterDeviceId = faker.string.uuid()
+    const userId = faker.string.uuid()
 
     const createUserData = async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
@@ -140,9 +140,9 @@ describe('DecryptionChallenge', () => {
         data: {
           id: userId,
           email: input.email,
-          addDeviceSecret: faker.datatype.string(5),
+          addDeviceSecret: faker.string.sample(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: faker.datatype.string(5),
+          encryptionSalt: faker.string.sample(5),
           ...userSecurityProps
         }
       })
@@ -150,11 +150,11 @@ describe('DecryptionChallenge', () => {
       await prismaClient.device.create({
         data: {
           id: masterDeviceId,
-          name: faker.random.word(),
-          firebaseToken: faker.datatype.string(5),
+          name: faker.lorem.word(),
+          firebaseToken: faker.string.sample(5),
           firstIpAddress: faker.internet.ip(),
           lastIpAddress: faker.internet.ip(),
-          platform: faker.random.word(),
+          platform: faker.lorem.word(),
           userId
         }
       })
@@ -171,7 +171,7 @@ describe('DecryptionChallenge', () => {
           id: challengeMutation.id,
           userId,
           deviceId: slaveDeviceId,
-          deviceName: faker.random.word(),
+          deviceName: faker.lorem.word(),
           ipAddress: faker.internet.ip()
         }
       })
@@ -214,7 +214,7 @@ describe('DecryptionChallenge', () => {
         jwtPayload: { userId: userId },
         getIpAddress: () => faker.internet.ip(),
         //NOTE: Change ID to be different from masterDeviceId
-        device: { id: faker.datatype.uuid() }
+        device: { id: faker.string.uuid() }
       } as any
 
       await createUserData()
