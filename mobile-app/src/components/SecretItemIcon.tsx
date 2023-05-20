@@ -1,6 +1,6 @@
 import { Icon, Image, useColorModeValue } from 'native-base'
+import { constructURL } from '@src/utils/urlUtils'
 import React from 'react'
-import { URL } from 'react-native-url-polyfill'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 //TODO: Icons are flickering during fast scrolling
@@ -33,7 +33,7 @@ export function SecretItemIcon(props: {
 
   if (props.url) {
     try {
-      hostname = new URL(props.url).hostname
+      hostname = constructURL(props.url).hostname
 
       return (
         <Image
