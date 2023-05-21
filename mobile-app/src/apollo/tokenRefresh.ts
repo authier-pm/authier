@@ -3,7 +3,6 @@ import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
 import { API_URL, API_URL_RELEASE } from '@env'
 
-import mitt from 'mitt'
 import { device } from '@src/utils/Device'
 
 const ENDPOINT = __DEV__ ? API_URL : API_URL_RELEASE

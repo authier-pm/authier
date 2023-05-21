@@ -9,9 +9,7 @@ import {
   View,
   Pressable,
   HStack,
-  Spinner,
-  Icon,
-  Center
+  Icon
 } from 'native-base'
 import React, {
   Dispatch,

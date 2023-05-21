@@ -8,7 +8,6 @@ import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
-import { ILoginSecret } from '@src/utils/Device'
 
 const EmptyList = () => {
   return (
@@ -62,9 +61,7 @@ export const PasswordVault = ({
           }
         )}
         keyExtractor={(i) => i.id}
-        renderItem={({ item }) => (
-          <LoginCredential loginSecret={item as ILoginSecret} />
-        )}
+        renderItem={({ item }) => <LoginCredential loginSecret={item} />}
         onRefresh={() => onRefresh()}
         refreshing={refreshing}
       />
