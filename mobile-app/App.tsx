@@ -72,6 +72,5 @@ const RnApp = () => {
     </React.Fragment>
   )
 }
-//export default CodePush(CodePushOptions)(App)
-// export default Sentry.wrap(App)
+
 export default Sentry.wrap(CodePush(CodePushOptions)(RnApp))

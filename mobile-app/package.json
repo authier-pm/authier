@@ -101,6 +101,7 @@
     "text-decoding": "^1.0.0",
     "vision-camera-code-scanner": "^0.2.0",
     "zod": "^3.21.4",
+    "zustand": "^4.3.8",
     "zxcvbn-typescript": "^5.0.1"
   },
   "devDependencies": {
