@@ -19,16 +19,6 @@ const EmptyList = () => {
   )
 }
 
-const EmptyList = () => {
-  return (
-    <Box p={4}>
-      <Text>
-        <Trans>Start by adding a login secret or a TOTP code</Trans>
-      </Text>
-    </Box>
-  )
-}
-
 export const PasswordVault = ({
   navigation
 }: PasswordStackScreenProps<'PasswordsVault'>) => {
