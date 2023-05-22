@@ -11,7 +11,6 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { Loading } from '@src/components/Loading'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 

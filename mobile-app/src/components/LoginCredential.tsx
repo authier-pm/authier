@@ -59,7 +59,6 @@ const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
         return (
           <View
             borderBottomWidth={0.5}
-            borderBottomRadius={25}
             borderBottomColor="#a7a7a7"
             p="5"
             style={{
@@ -73,7 +72,7 @@ const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
             <HStack space={5}>
               <SecretItemIcon
                 iconUrl={loginCredentials.iconUrl}
-                url={loginCredentials.url!!}
+                url={loginCredentials.url}
               />
 
               <HStack flexGrow={1} justifyContent={'space-between'}>

@@ -79,7 +79,7 @@ export const TOTPVault = ({
 
       <FlashList
         ListEmptyComponent={EmptyList}
-        estimatedItemSize={104}
+        estimatedItemSize={90}
         data={device.TOTPSecrets.filter(({ totp }) => {
           return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
         })}

@@ -1,5 +1,6 @@
 {
   "name": "authier-web-extension",
+  "displayName": "Authier",
   "version": "1.0.20",
   "description": "Authier web Extension for all our supported browsers",
   "license": "AGPL-3.0-or-later",
@@ -9,6 +10,7 @@
   "scripts": {
     "prodBuild": "AUTHIER_ENV=prod webpack --config webpack.prod.js",
     "devBuild": "AUTHIER_ENV=dev webpack --config webpack.dev.js",
+    "newTag": "npm version patch && npx esno ./scripts/updateManifestVersion.ts && npx esno ./scripts/newTag.ts",
     "clean": "rm -rf dist/js",
     "checkBuildOutput": "node ./check-es6.js",
     "dev": "NODE_ENV=development webpack -w --config webpack.dev.js",
