@@ -56,7 +56,6 @@ export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
         return (
           <View
             borderBottomWidth={0.5}
-            borderBottomRadius={25}
             borderBottomColor="#a7a7a7"
             p={5}
             style={{

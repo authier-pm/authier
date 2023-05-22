@@ -31,44 +31,32 @@ jest.mock('react-native-sensitive-info', () => ({
   getItem: jest.fn().mockResolvedValue(null)
 }))
 
-jest.mock('@apollo/client/link/error', () => ({
-  onError: jest.fn()
-}))
-
-jest.mock('@apollo/client', () => ({
-  ApolloClient: jest.fn(),
-  InMemoryCache: jest.fn(),
-  from: jest.fn(),
-  HttpLink: jest.fn(),
-  ApolloLink: jest.fn(),
-  setContext: jest.fn()
-}))
-
-jest.mock('apollo-link-retry', () => ({
-  RetryLink: jest.fn()
-}))
-
-jest.mock('apollo-link-serialize', () => jest.fn())
-
-jest.mock('apollo-link-queue', () => jest.fn())
+// jest.mock('@apollo/client/link/error', () => ({
+//   onError: jest.fn()
+// }))
+//
+// jest.mock('@apollo/client', () => ({
+//   ApolloClient: jest.fn(),
+//   InMemoryCache: jest.fn(),
+//   from: jest.fn(),
+//   HttpLink: jest.fn(),
+//   ApolloLink: jest.fn(),
+//   setContext: jest.fn()
+// }))
+//
+// jest.mock('apollo-link-retry', () => ({
+//   RetryLink: jest.fn()
+// }))
+//
+// jest.mock('apollo-link-serialize', () => jest.fn())
+//
+// jest.mock('apollo-link-queue', () => jest.fn())
 
 jest.mock('../utils/tokenFromAsyncStorage', () => ({
   accessToken: 'dummy_token'
 }))
 
-jest.mock('../apollo/tokenRefresh.ts', () => jest.fn())
-
-jest.mock('../utils/Device', () => ({
-  device: { clearAndReload: jest.fn() }
-}))
-
-jest.mock('native-base', () => ({
-  Toast: { show: jest.fn() }
-}))
-
-jest.mock('graphql', () => ({
-  print: jest.fn()
-}))
+// jest.mock('../apollo/tokenRefresh.ts', () => jest.fn())
 
 describe('Device', () => {
   let device: Device
