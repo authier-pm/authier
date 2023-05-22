@@ -1,5 +1,4 @@
 import fs from 'fs-extra'
-import { exec } from 'child_process'
 import { resolve } from 'node:path'
 import { getManifest } from '../src/manifest'
 
