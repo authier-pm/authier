@@ -17,7 +17,7 @@ import { en as enPlurals } from 'make-plural/plurals'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
-import { storage } from './storage'
+import { getStorage, initializeStorage } from './storage'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getSensitiveItem, setSensitiveItem } from './utils/secretStorage'
 
@@ -50,9 +50,14 @@ const queryClient = new QueryClient()
 
 export const Providers = () => {
   useEffect(() => {
+    const initStorage = async () => {
+      await initializeStorage()
+    }
+
+    initStorage()
     persistCache({
       cache,
-      storage: new MMKVWrapper(storage)
+      storage: new MMKVWrapper(getStorage())
     })
   }, [])
 
