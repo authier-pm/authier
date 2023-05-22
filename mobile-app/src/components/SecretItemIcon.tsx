@@ -4,6 +4,7 @@ import React from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image'
 
+//TODO: Icons are flickering during fast scrolling
 export function SecretItemIcon(props: {
   iconUrl: string | null | undefined
   url: string

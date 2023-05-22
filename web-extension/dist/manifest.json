@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Authier",
+  "description": "Authier chrome extension",
   "version": "1.0.20",
-  "description": "Authier web Extension for all our supported browsers",
   "action": {
     "default_icon": {
       "16": "icon-16.png",
