@@ -63,7 +63,6 @@ export function Register({ navigation }: NavigationProps) {
   }, [error])
 
   if (!device.fireToken) {
-    console.log('loadng')
     return <Loading />
   }
 

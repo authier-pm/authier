@@ -39,6 +39,7 @@ export function VaultUnlockVerification({
   const toast = useToast()
   const id = 'active-toast'
   let device = useStore((state) => state)
+
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
   const bgColor = useColorModeValue('white', 'black')
@@ -77,6 +78,9 @@ export function VaultUnlockVerification({
     )
 
     const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
+    if (encryptedDataBuff.length < 29) {
+      throw new Error('encryptedDataBuff is too small')
+    }
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
@@ -98,6 +102,7 @@ export function VaultUnlockVerification({
     }
     newState.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
     await device.save(newState)
+    device.changeIsLocked(false)
   }
 
   return (

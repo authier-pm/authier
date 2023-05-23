@@ -23,7 +23,6 @@ import { clearAccessToken } from './tokenFromAsyncStorage'
 
 import { getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
-import { setSensitiveItem } from './secretStorage'
 import messaging from '@react-native-firebase/messaging'
 
 export type SecretSerializedType = Pick<
@@ -126,7 +125,6 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { zustandStorage } from './mmkvZustandStorage'
 
 interface DeviceProps {
-  state: ReturnType<typeof useTestStore> | null
   fireToken: string | null
   lockedState: IBackgroundStateSerializableLocked | null
   id: string | null | number[]
@@ -143,7 +141,6 @@ interface Device extends DeviceProps {
   initialize: () => Promise<ReturnType<typeof useTestStore> | null>
   setDeviceSettings: (config: SettingsInput) => void
   lock: () => Promise<void>
-  clearLocalStorage: () => Promise<void>
   clearAndReload: () => Promise<void>
   logout: () => Promise<void>
   serializeSecrets: (
@@ -165,12 +162,12 @@ interface Device extends DeviceProps {
   }>
   loginCredentials: () => ILoginSecret[]
   TOTPSecrets: () => ITOTPSecret[]
+  changeIsLocked: (newValue: boolean) => void
 }
 
 export const useStore = create<Device>()(
   persist(
     (set, get) => ({
-      state: null,
       fireToken: null,
       lockedState: null,
       id: null,
@@ -184,15 +181,14 @@ export const useStore = create<Device>()(
         //We must clear interval, otherwise we will create a new one every time we save the state
         //because we are creating a new interval every time we we start the app (in syncSettings)
         if (deviceState) {
-          set({ state: deviceState })
-          // this.emitter.emit('stateChange')
+          useTestStore.setState({ ...deviceState })
         }
-        if (!get().state) {
+        console.log('new state', useTestStore.getState())
+        if (!useTestStore.getState()) {
           throw new Error(
             'Device state is not initialized and it was not supplied as an argument'
           )
         }
-        // await this.state.save()
       },
       initialize: async () => {
         set({ id: await getUniqueId() })
@@ -300,8 +296,9 @@ export const useStore = create<Device>()(
       lock: async () => {
         let state = useTestStore.getState()
         get().clearLockInterval()
-
+        console.log('state before lock', state)
         if (!state) {
+          console.error('No state')
           return
         }
 
@@ -340,21 +337,8 @@ export const useStore = create<Device>()(
           }
         })
 
-        //FIX: Not sure what to do
-        // await setSensitiveItem('deviceState', {
-        //   backgroundState: null,
-        //   lockedState: get().lockedState
-        // })
-
         set({ isLocked: true })
-        useTestStore.getState().lockState()
-      },
-      clearLocalStorage: async () => {
-        // this.state = null
-        await setSensitiveItem('deviceState', {
-          backgroundState: null,
-          lockedState: null
-        })
+        useTestStore.setState({})
       },
       clearAndReload: async () => {
         // Your implementation...
@@ -408,6 +392,7 @@ export const useStore = create<Device>()(
       },
       loginCredentials: () => {
         let state = useTestStore.getState()
+        console.log('test', state.decryptedSecrets)
         return (state.decryptedSecrets.filter(({ kind }) => {
           return kind === EncryptedSecretType.LOGIN_CREDENTIALS
         }) ?? []) as ILoginSecret[]
@@ -449,6 +434,9 @@ export const useStore = create<Device>()(
       },
       clearLockInterval: () => {
         set({ lockInterval: clearInterval(get().lockInterval!) })
+      },
+      changeIsLocked: (newValue: boolean) => {
+        set({ isLocked: newValue })
       }
     }),
     { name: 'device', storage: createJSONStorage(() => zustandStorage) }
