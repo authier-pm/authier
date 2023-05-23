@@ -8,7 +8,7 @@ import {
   EncryptedSecretType,
   SettingsInput
 } from '@shared/generated/graphqlBaseTypes'
-import { boolean, string, z, ZodError } from 'zod'
+import { z, ZodError } from 'zod'
 import {
   loginCredentialsSchema,
   totpSchema
@@ -20,10 +20,10 @@ import {
   LogoutMutationVariables
 } from '../providers/UserProvider.codegen'
 import { clearAccessToken } from './tokenFromAsyncStorage'
-import mitt from 'mitt'
-import { getDeviceName, getUniqueId } from 'react-native-device-info'
+
+import { getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
-import { getSensitiveItem, setSensitiveItem } from './secretStorage'
+import { setSensitiveItem } from './secretStorage'
 import messaging from '@react-native-firebase/messaging'
 
 export type SecretSerializedType = Pick<
@@ -120,7 +120,7 @@ export type AddSecretInput = Array<
   }
 >
 
-import { create, createStore } from 'zustand'
+import { create } from 'zustand'
 import { useTestStore } from './deviceStateStore'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { zustandStorage } from './mmkvZustandStorage'

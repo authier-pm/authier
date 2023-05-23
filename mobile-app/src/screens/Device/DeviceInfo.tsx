@@ -16,9 +16,11 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
 import { DevicesStackScreenProps } from '../../navigation/types'
-import { DeviceContext } from '../../providers/DeviceProvider'
+
 import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
+
+import { useStore } from '@src/utils/deviceStore'
 
 const ColumnWrapper = ({
   text,
@@ -41,7 +43,7 @@ export default function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
-  const device = React.useContext(DeviceContext)
+  const device = useStore((state) => state)
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
   const masterDeviceId = route.params.masterDeviceId
   const selectedDeviceId = route.params.device.id

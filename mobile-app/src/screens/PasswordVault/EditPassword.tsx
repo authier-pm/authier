@@ -18,7 +18,6 @@ import { Formik, FormikHelpers } from 'formik'
 
 import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
-import { DeviceContext } from '@providers/DeviceProvider'
 import { ILoginSecret, ITOTPSecret } from '@utils/Device'
 import {
   EncryptedSecretsDocument,
@@ -28,6 +27,8 @@ import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
 import { Loading } from '@src/components/Loading'
 import zxcvbn from 'zxcvbn-typescript'
+import { useStore } from '@src/utils/deviceStore'
+import { useTestStore } from '@src/utils/deviceStateStore'
 
 export const InputHeader = ({ children }) => {
   return (
@@ -68,7 +69,8 @@ const InputField = ({
 const LoginSecret = (secretProps: ILoginSecret) => {
   const { loginCredentials } = secretProps
   const [show, setShow] = useState(false)
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
+  let deviceState = useTestStore((state) => state)
 
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
@@ -88,11 +90,11 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           values: credentialValues,
           { setSubmitting, resetForm }: FormikHelpers<credentialValues>
         ) => {
-          const secret = device.state?.secrets.find(
+          const secret = deviceState.secrets.find(
             ({ id }) => id === secretProps.id
           )
           if (secret && device.state) {
-            secret.encrypted = await device.state.encrypt(
+            secret.encrypted = await deviceState.encrypt(
               JSON.stringify({
                 password: values.password,
                 username: values.username,
@@ -112,7 +114,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               }
             })
 
-            await device.state?.save()
+            await deviceState.save()
 
             resetForm({ values })
             setSubmitting(false)
@@ -232,14 +234,14 @@ export default function EditPassword({
   navigation,
   route
 }: PasswordStackScreenProps<'EditPassword'>) {
-  let device = useContext(DeviceContext)
+  let deviceState = useTestStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
 
   useEffect(() => {
     async function loadSecret() {
-      const secret = await device.state?.getSecretDecryptedById(
+      const secret = await deviceState.getSecretDecryptedById(
         route.params.loginSecret.id
       )
       setSecret(secret)
@@ -257,7 +259,7 @@ export default function EditPassword({
   }, [navigation, secret])
 
   //QUESTION: Why cant I use !device.state || !secret
-  if (!device.state) {
+  if (!deviceState) {
     return <Loading />
   }
 

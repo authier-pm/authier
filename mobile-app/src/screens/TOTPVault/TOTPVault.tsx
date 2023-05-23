@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   View,
@@ -12,12 +12,14 @@ import {
 } from 'native-base'
 
 import { SearchBar } from '../../components/SearchBar'
-import { DeviceContext } from '../../providers/DeviceProvider'
+
 import TOTPSecret from '../../components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { TOTPStackScreenProps } from '../../navigation/types'
+import { useTestStore } from '@src/utils/deviceStateStore'
+import { useStore } from '@src/utils/deviceStore'
 
 const EmptyList = () => {
   return (
@@ -37,7 +39,8 @@ export const TOTPVault = ({
 }: TOTPStackScreenProps<'TOTPVault'>) => {
   const [refreshing, setRefreshing] = useState(false)
   const [remainingSeconds, setRemainingSeconds] = useState<number>(30)
-  let device = useContext(DeviceContext)
+  let deviceState = useTestStore((state) => state)
+  let device = useStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
 
   const timer = () => {
@@ -53,7 +56,7 @@ export const TOTPVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await device.state?.backendSync(toast)
+    await deviceState.backendSync(toast)
     setRefreshing(false)
   }
 
@@ -80,7 +83,7 @@ export const TOTPVault = ({
       <FlashList
         ListEmptyComponent={EmptyList}
         estimatedItemSize={90}
-        data={device.TOTPSecrets.filter(({ totp }) => {
+        data={device.TOTPSecrets().filter(({ totp }) => {
           return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
         })}
         keyExtractor={(i) => i.id}

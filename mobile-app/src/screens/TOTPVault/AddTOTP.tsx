@@ -1,14 +1,14 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import { Formik, FormikHelpers } from 'formik'
 import { Button, Flex, FormControl, Input, ScrollView } from 'native-base'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { DeviceContext } from '../../providers/DeviceProvider'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
 import { TOTPStackScreenProps } from '../../navigation/types'
 import { TotpTypeWithMeta } from '@src/utils/Device'
 import { TOTPSchema } from '@shared/formikSharedTypes'
+import { useTestStore } from '@src/utils/deviceStateStore'
 
 export const InputField = ({
   errors,
@@ -34,7 +34,7 @@ export const InputField = ({
 }
 
 export const AddTOTP = () => {
-  let device = useContext(DeviceContext)
+  let deviceState = useTestStore((state) => state)
   const navigation =
     useNavigation<TOTPStackScreenProps<'AddTOTP'>['navigation']>()
 
@@ -54,11 +54,11 @@ export const AddTOTP = () => {
           values: TotpTypeWithMeta,
           { setSubmitting }: FormikHelpers<TotpTypeWithMeta>
         ) => {
-          await device.state?.addSecrets([
+          await deviceState.addSecrets([
             {
               kind: EncryptedSecretType.TOTP,
               totp: values,
-              encrypted: await device.state.encrypt(JSON.stringify(values)),
+              encrypted: await deviceState.encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
             }
           ])

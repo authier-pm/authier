@@ -13,7 +13,7 @@ import {
   View,
   VStack
 } from 'native-base'
-import { StyleSheet } from 'react-native'
+
 import { ButtonWithAlert } from '../../components/ButtonWithAlert'
 import { device } from '../../utils/Device'
 import { AccountStackScreenProps } from '../../navigation/types'

@@ -1,4 +1,4 @@
-import { create, createStore } from 'zustand'
+import { create } from 'zustand'
 import { apolloClient } from '../apollo/ApolloClient'
 import {
   abToCryptoKey,
@@ -27,7 +27,6 @@ import {
   ILoginSecret,
   ITOTPSecret,
   SecretSerializedType,
-  device,
   AddSecretInput,
   isLoginSecret,
   isTotpSecret,
@@ -105,6 +104,7 @@ interface DeviceStateActions extends DeviceStateProps {
   >
   removeSecrets: (secrets: string) => Promise<void>
   lockState: () => void
+  changeUiLanguage: (language: string) => void
 }
 
 export const useTestStore = create<DeviceStateActions>()(
@@ -397,6 +397,9 @@ export const useTestStore = create<DeviceStateActions>()(
       removeSecrets: async (secretId: string) => {
         set({ secrets: get().secrets.filter((s) => s.id !== secretId) })
         //TODO: this.save()
+      },
+      changeUiLanguage: (language: string) => {
+        set({ uiLanguage: language })
       },
       lockState: () =>
         set((state) => {

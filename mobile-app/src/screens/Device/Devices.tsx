@@ -32,8 +32,9 @@ import {
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
 import { DevicesStackScreenProps } from '@navigation/types'
-import { DeviceContext } from '@providers/DeviceProvider'
+
 import mitt from 'mitt'
+import { useStore } from '@src/utils/deviceStore'
 
 export const icons = {
   Android: 'logo-android',
@@ -49,7 +50,7 @@ const empty = () => {
   return <></>
 }
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
-  const device = React.useContext(DeviceContext)
+  const device = useStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,

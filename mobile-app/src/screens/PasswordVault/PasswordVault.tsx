@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react'
+import React, { useState } from 'react'
 
 import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
 

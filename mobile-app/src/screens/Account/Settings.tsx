@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import {
   Box,
@@ -15,13 +15,16 @@ import {
 } from 'native-base'
 
 import { Trans } from '@lingui/macro'
-import { DeviceContext } from '../../providers/DeviceProvider'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
+import { useTestStore } from '@src/utils/deviceStateStore'
+import { useStore } from '@src/utils/deviceStore'
 
 export default function Settings() {
-  let device = useContext(DeviceContext)
+  let deviceState = useTestStore((state) => state)
+  let device = useStore((state) => state)
+
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
     awaitRefetchQueries: true
@@ -31,11 +34,11 @@ export default function Settings() {
 
   const settings = (): SettingsInput => {
     return {
-      autofillTOTPEnabled: device.state!.autofillTOTPEnabled,
-      autofillCredentialsEnabled: device.state!.autofillCredentialsEnabled,
-      uiLanguage: device.state!.uiLanguage,
-      syncTOTP: device.state!.syncTOTP,
-      vaultLockTimeoutSeconds: device.state!.lockTime
+      autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+      autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
+      uiLanguage: deviceState.uiLanguage,
+      syncTOTP: deviceState.syncTOTP,
+      vaultLockTimeoutSeconds: deviceState.lockTime
     }
   }
 
@@ -61,7 +64,7 @@ export default function Settings() {
                     }
                   })
                 }}
-                defaultValue={device.state!.lockTime.toString()}
+                defaultValue={deviceState.lockTime.toString()}
                 accessibilityLabel="Lock time"
               >
                 <Select.Item label="1 minute" value="20" />
@@ -90,15 +93,14 @@ export default function Settings() {
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
                 onValueChange={(value) => {
-                  device.state!.uiLanguage = value
+                  deviceState.changeUiLanguage(value)
                   updateSettings({
                     variables: {
                       config: settings()
                     }
                   })
-                  device.save()
                 }}
-                defaultValue={device.state!.uiLanguage}
+                defaultValue={deviceState.uiLanguage}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
@@ -117,10 +119,10 @@ export default function Settings() {
               <Select
                 onValueChange={(value) => {
                   toggleColorMode()
-                  device.state!.theme = value
+                  deviceState.theme = value
                   device.save()
                 }}
-                defaultValue={device.state!.theme}
+                defaultValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
                 <Select.Item label="light" value="light" />
@@ -142,9 +144,9 @@ export default function Settings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  defaultIsChecked={device.state!.syncTOTP}
+                  defaultIsChecked={deviceState.syncTOTP}
                   onValueChange={(e) => {
-                    device.state!.syncTOTP = e
+                    deviceState.syncTOTP = e
                     updateSettings({
                       variables: {
                         config: settings()
@@ -159,9 +161,9 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  defaultIsChecked={device.state!.biometricsEnabled}
+                  defaultIsChecked={deviceState.biometricsEnabled}
                   onValueChange={async (e) => {
-                    device.state!.biometricsEnabled = e
+                    deviceState.biometricsEnabled = e
                     device.save()
                   }}
                   size="md"

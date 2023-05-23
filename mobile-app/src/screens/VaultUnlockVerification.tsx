@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import SInfo from 'react-native-sensitive-info'
 import { Formik, FormikHelpers } from 'formik'
 import {
@@ -20,11 +20,12 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { DeviceContext } from '../providers/DeviceProvider'
+
 import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
+import { useStore } from '@src/utils/deviceStore'
 
 interface Values {
   password: string
@@ -37,7 +38,7 @@ export function VaultUnlockVerification({
 }) {
   const toast = useToast()
   const id = 'active-toast'
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
   const bgColor = useColorModeValue('white', 'black')

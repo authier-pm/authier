@@ -21,7 +21,6 @@ import {
   dec,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
@@ -34,6 +33,7 @@ import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
+import { useStore } from '@utils/deviceStore'
 
 const ToastServerErrorDetails = {
   title: 'Something went wrong',
@@ -46,7 +46,7 @@ export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
   const [addNewDevice, { loading, error: newDeviceError }] =
     useAddNewDeviceForUserMutation()
 
@@ -223,7 +223,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   const { formState } = useContext(LoginContext)
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
   const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName

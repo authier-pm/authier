@@ -2,15 +2,16 @@ import { useNavigation } from '@react-navigation/native'
 import { Loading } from '@src/components/Loading'
 import { TOTPStackScreenProps } from '@src/navigation/types'
 import * as React from 'react'
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import queryString from 'query-string'
 import { StyleSheet } from 'react-native'
 import Svg, { Defs, Mask, Rect } from 'react-native-svg'
 import { useCameraDevices } from 'react-native-vision-camera'
 import { Camera } from 'react-native-vision-camera'
 import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
-import { DeviceContext } from '@src/providers/DeviceProvider'
+
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import { useTestStore } from '@src/utils/deviceStateStore'
 
 function CameraFrame() {
   return (
@@ -39,7 +40,7 @@ function CameraFrame() {
 export const QRScan = () => {
   const navigation =
     useNavigation<TOTPStackScreenProps<'QRScan'>['navigation']>()
-  let device = useContext(DeviceContext)
+  let deviceState = useTestStore((state) => state)
   const [hasPermission, setHasPermission] = React.useState(false)
   const devices = useCameraDevices()
   const cameraDevice = devices.back
@@ -68,11 +69,11 @@ export const QRScan = () => {
         }
 
         ;(async () => {
-          await device.state?.addSecrets([
+          await deviceState.addSecrets([
             {
               kind: EncryptedSecretType.TOTP,
               totp: unencryptedData,
-              encrypted: await device.state.encrypt(
+              encrypted: await deviceState.encrypt(
                 JSON.stringify(unencryptedData)
               ),
               createdAt: new Date().toJSON()
