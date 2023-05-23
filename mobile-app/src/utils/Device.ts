@@ -45,7 +45,7 @@ export interface IBackgroundStateSerializableLocked {
   uiLanguage: string
   theme: string
   biometricsEnabled?: boolean
-  lockTimeEnd: number
+  lockTimeEnd: number | null
 }
 
 export interface IBackgroundStateSerializable
@@ -195,9 +195,9 @@ export class Device {
 
   setDeviceSettings(config: SettingsInput) {
     //HACK: this is a hack, we should not create a new interval every time we save the state
-    //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
+    //TODO: Document how this works
     if (!this.state) {
-      console.warn('device not initialized')
+      console.warn('cannot set device settings, device not initialized')
       return
     }
     this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
@@ -205,19 +205,27 @@ export class Device {
     this.state.lockTime = config.vaultLockTimeoutSeconds
     this.state.syncTOTP = config.syncTOTP
 
-    // Sync timer
-    if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
-      this.state.lockTimeEnd =
-        Date.now() + config.vaultLockTimeoutSeconds * 1000
-    }
-
-    if (Date.now() >= device.state!.lockTimeEnd) {
-      device.lock()
-    } else if (device.state?.lockTimeEnd) {
-      if (!this.lockInterval) {
-        console.log('syncSettigs', device.state?.lockTimeEnd)
-        device.startVaultLockTimer()
+    if (config.vaultLockTimeoutSeconds > 0) {
+      // Sync timer
+      if (this.state.lockTime !== config.vaultLockTimeoutSeconds) {
+        this.state.lockTimeEnd =
+          Date.now() + config.vaultLockTimeoutSeconds * 1000
       }
+
+      if (
+        device.state!.lockTimeEnd &&
+        Date.now() >= device.state!.lockTimeEnd
+      ) {
+        device.lock()
+      } else if (device.state?.lockTimeEnd) {
+        if (!this.lockInterval) {
+          console.log('syncSettigs', device.state?.lockTimeEnd)
+          device.startVaultLockTimer()
+        }
+      }
+    } else {
+      this.state.lockTimeEnd = null
+      device.clearLockInterval()
     }
   }
 
@@ -393,7 +401,7 @@ export class Device {
 
   startVaultLockTimer = () => {
     this.lockInterval = setInterval(() => {
-      if (this.state!.lockTimeEnd <= Date.now()) {
+      if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= Date.now()) {
         console.log('Vault locked')
         device.lock()
       }
@@ -401,15 +409,17 @@ export class Device {
   }
 
   setLockTime(lockTime: number) {
-    this.state!.lockTime = lockTime
+    if (!this.state) {
+      console.warn('cannot set device settings, device not initialized')
+      return
+    }
+    this.state.lockTime = lockTime
 
     this.clearLockInterval()
     if (lockTime > 0) {
-      this.state!.lockTimeEnd = Date.now() + this.state!.lockTime * 1000
+      this.state.lockTimeEnd = Date.now() + this.state!.lockTime * 1000
       this.startVaultLockTimer()
     }
-
-    this.save()
   }
 
   clearLockInterval = () => {

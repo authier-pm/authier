@@ -67,7 +67,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   //Timer
   lockTimeStart: number
-  lockTimeEnd: number
+  lockTimeEnd: number | null
   lockTimerRunning = false
 
   async initialize() {
