@@ -3,11 +3,12 @@ import React, { useContext, useState } from 'react'
 import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
-import { DeviceContext } from '@providers/DeviceProvider'
 import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
+import { useStore } from '@src/utils/deviceStore'
+import { useTestStore } from '@src/utils/deviceStateStore'
 
 const EmptyList = () => {
   return (
@@ -23,7 +24,8 @@ export const PasswordVault = ({
   navigation
 }: PasswordStackScreenProps<'PasswordsVault'>) => {
   const toast = useToast()
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
+  let deviceState = useTestStore((state) => state)
   const [refreshing, setRefreshing] = useState(false)
   const [filterBy, setFilterBy] = useState('')
 
@@ -31,7 +33,7 @@ export const PasswordVault = ({
     setRefreshing(true)
 
     try {
-      await device.state?.backendSync(toast)
+      await deviceState.backendSync(toast)
     } catch (error) {
       console.log(error)
     } finally {
@@ -55,11 +57,11 @@ export const PasswordVault = ({
         ListEmptyComponent={EmptyList}
         //FIX: Dont like empty space on fast scroll
         estimatedItemSize={90}
-        data={device.loginCredentials.filter(
-          ({ loginCredentials: { url, label } }) => {
+        data={device
+          .loginCredentials()
+          .filter(({ loginCredentials: { url, label } }) => {
             return label.includes(filterBy) || url?.includes(filterBy)
-          }
-        )}
+          })}
         keyExtractor={(i) => i.id}
         renderItem={({ item }) => <LoginCredential loginSecret={item} />}
         onRefresh={() => onRefresh()}

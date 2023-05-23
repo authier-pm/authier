@@ -9,7 +9,7 @@
 import { MMKV } from 'react-native-mmkv'
 import { getUniqueId } from 'react-native-device-info'
 
-let storage
+export let storage
 
 export async function initializeStorage() {
   const uniqueId = await getUniqueId()

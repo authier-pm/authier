@@ -16,7 +16,6 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { DeviceContext } from '../../providers/DeviceProvider'
 import { IBackgroundStateSerializable } from '@utils/Device'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import SInfo from 'react-native-sensitive-info'
@@ -33,6 +32,7 @@ import {
   cryptoKeyToString,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
+import { useStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
 
@@ -43,7 +43,7 @@ export function Register({ navigation }: NavigationProps) {
   const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
-  let device = useContext(DeviceContext)
+  let device = useStore((state) => state)
   const { formState, setFormState } = useContext(LoginContext)
 
   useEffect(() => {
@@ -63,6 +63,7 @@ export function Register({ navigation }: NavigationProps) {
   }, [error])
 
   if (!device.fireToken) {
+    console.log('loadng')
     return <Loading />
   }
 

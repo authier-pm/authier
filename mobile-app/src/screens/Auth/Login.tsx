@@ -21,11 +21,11 @@ import React, {
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
-import { DeviceContext } from '@providers/DeviceProvider'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { Loading } from '@src/components/Loading'
+import { useStore } from '@src/utils/deviceStore'
 
 export interface ILoginFormValues {
   email: string
@@ -45,7 +45,7 @@ export function Login({ navigation }: NavigationProps) {
   const [show, setShow] = React.useState(false)
   const { formState, setFormState } = useContext(LoginContext)
 
-  let device = useContext(DeviceContext)
+  const device = useStore((state) => state)
 
   useEffect(() => {
     if (!device.fireToken) {
