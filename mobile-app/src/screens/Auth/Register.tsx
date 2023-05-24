@@ -162,8 +162,6 @@ export function Register({ navigation }: NavigationProps) {
           errors,
           isSubmitting
         }) => {
-          setFormState(values)
-
           return (
             <VStack space={3} mt="5">
               <FormControl>
@@ -226,20 +224,31 @@ export function Register({ navigation }: NavigationProps) {
               >
                 Register
               </Button>
+              <HStack mt="2" justifyContent="center" space={1}>
+                <Text fontSize="sm" color="muted.700" fontWeight={400}>
+                  <Trans>Already have an account.</Trans>
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('Login', {
+                      password: values.password,
+                      email: values.email
+                    })
+                  }
+                >
+                  <Text
+                    color={'indigo.500'}
+                    fontWeight={'medium'}
+                    fontSize={'sm'}
+                  >
+                    <Trans>Log in</Trans>
+                  </Text>
+                </Pressable>
+              </HStack>
             </VStack>
           )
         }}
       </Formik>
-      <HStack mt="2" justifyContent="center" space={1}>
-        <Text fontSize="sm" color="muted.700" fontWeight={400}>
-          <Trans>Already have an account.</Trans>
-        </Text>
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Text color={'indigo.500'} fontWeight={'medium'} fontSize={'sm'}>
-            <Trans>Log in</Trans>
-          </Text>
-        </Pressable>
-      </HStack>
     </View>
   )
 }

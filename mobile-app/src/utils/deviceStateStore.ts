@@ -34,12 +34,10 @@ import {
 } from './Device'
 
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
-import { setSensitiveItem } from './secretStorage'
 import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
 import { constructURL } from './urlUtils'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { zustandStorage } from '@utils/mmkvZustandStorage'
-import { useStore } from './deviceStore'
+import { zustandStorage } from '@utils/storage'
 
 interface DeviceStateProps {
   email: string
@@ -64,15 +62,10 @@ interface DeviceStateProps {
 }
 
 interface DeviceStateActions extends DeviceStateProps {
-  setEmail: (email: string) => void
-  setUserId: (userId: string) => void
-  setDeviceName: (deviceName: string) => void
-  setEncryptionSalt: (encryptionSalt: string) => void
   initialize: () => Promise<void>
   setMasterEncryptionKey: (masterPassword: string) => Promise<void>
   encrypt: (stringToEncrypt: string) => Promise<string>
   decrypt: (encrypted: string) => Promise<string>
-  save: () => Promise<void>
   getAllSecretsDecrypted: () => Promise<(ILoginSecret | ITOTPSecret)[]>
   decryptSecret: (
     secret: SecretSerializedType
@@ -102,43 +95,54 @@ interface DeviceStateActions extends DeviceStateProps {
       updatedAt?: any
     }[]
   >
-  removeSecrets: (secrets: string) => Promise<void>
+  removeSecret: (secrets: string) => Promise<void>
   lockState: () => void
   changeUiLanguage: (language: string) => void
+  changeTheme: (theme: string) => void
+  changeSecrets: (secrets: SecretSerializedType[]) => void
+  changeDecryptedSecrets: (secrets: (ILoginSecret | ITOTPSecret)[]) => void
+  changeBiometricsEnabled: (enabled: boolean) => void
+  changeSyncTOTP: (syncTOTP: boolean) => void
+  reset: () => void
+  save: () => void
+}
+
+const initialState: DeviceStateProps = {
+  email: '',
+  userId: '',
+  deviceName: '',
+  encryptionSalt: '',
+  masterEncryptionKey: '',
+  secrets: [],
+  authSecret: '',
+  authSecretEncrypted: '',
+  lockTime: 0,
+  syncTOTP: false,
+  autofillCredentialsEnabled: false,
+  autofillTOTPEnabled: false,
+  uiLanguage: '',
+  theme: '',
+  biometricsEnabled: false,
+  lockTimeStart: 0,
+  lockTimeEnd: 0,
+  lockTimerRunning: false,
+  decryptedSecrets: []
 }
 
 export const useTestStore = create<DeviceStateActions>()(
   persist(
     (set, get) => ({
-      email: '',
-      userId: '',
-      deviceName: '',
-      encryptionSalt: '',
-      masterEncryptionKey: '',
-      secrets: [],
-      authSecret: '',
-      authSecretEncrypted: '',
-      lockTime: 0,
-      syncTOTP: false,
-      autofillCredentialsEnabled: false,
-      autofillTOTPEnabled: false,
-      uiLanguage: '',
-      theme: '',
-      biometricsEnabled: false,
-      lockTimeStart: 0,
-      lockTimeEnd: 0,
-      lockTimerRunning: false,
-      decryptedSecrets: [],
-      setEmail: (email) => set({ email }),
-      setUserId: (userId) => set({ userId }),
-      setDeviceName: (deviceName) => set({ deviceName }),
-      setEncryptionSalt: (encryptionSalt) => set({ encryptionSalt }),
+      ...initialState,
       getAllSecretsDecrypted: async () => {
         return Promise.all(
           get().secrets.map((secret) => {
             return get().decryptSecret(secret)
           })
         )
+      },
+      save: async () => {
+        let all = await get().getAllSecretsDecrypted()
+        set({ decryptedSecrets: all })
       },
       initialize: async () => {
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
@@ -190,16 +194,6 @@ export const useTestStore = create<DeviceStateActions>()(
         )
 
         return dec.decode(decrypted)
-      },
-      save: async () => {
-        // device.lockedState = null
-        useStore.setState({})
-        set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
-
-        await setSensitiveItem('deviceState', {
-          backgroundState: this,
-          lockedState: null
-        })
       },
       decryptSecret: async (secret) => {
         const decrypted = await get().decrypt(secret.encrypted)
@@ -304,9 +298,8 @@ export const useTestStore = create<DeviceStateActions>()(
                 )
             )
 
-            deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
-
-            //TODO: await this.save()
+            set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
+            set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
 
             await apolloClient.mutate<
               MarkAsSyncedMutation,
@@ -324,7 +317,6 @@ export const useTestStore = create<DeviceStateActions>()(
               newAndUpdatedSecrets: newAndUpdatedSecrets.length
             }
             console.log('res:', res)
-
             if (
               (res?.newAndUpdatedSecrets as number) > 0 ||
               (res?.removedSecrets as number) > 0
@@ -391,12 +383,12 @@ export const useTestStore = create<DeviceStateActions>()(
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })
-        //TODO: await this.save()
+        set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
         return secretsAdded
       },
-      removeSecrets: async (secretId: string) => {
+      removeSecret: async (secretId: string) => {
         set({ secrets: get().secrets.filter((s) => s.id !== secretId) })
-        //TODO: this.save()
+        set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
       },
       changeUiLanguage: (language: string) => {
         set({ uiLanguage: language })
@@ -408,313 +400,26 @@ export const useTestStore = create<DeviceStateActions>()(
             newState[key] = null
           })
           return newState
-        })
+        }),
+      reset: () => {
+        set(initialState)
+      },
+      changeSecrets: (secrets) => {
+        set({ secrets })
+      },
+      changeDecryptedSecrets: (decryptedSecrets) => {
+        set({ decryptedSecrets })
+      },
+      changeTheme: (theme) => {
+        set({ theme })
+      },
+      changeBiometricsEnabled: (biometricsEnabled) => {
+        set({ biometricsEnabled })
+      },
+      changeSyncTOTP: (syncTOTP) => {
+        set({ syncTOTP })
+      }
     }),
     { name: 'deviceState', storage: createJSONStorage(() => zustandStorage) }
   )
 )
-// export type DeviceStateStore = ReturnType<typeof createDeviceStateStore>
-//
-// const createDeviceStateStore = (initProps?: Partial<DeviceStateProps>) => {
-//   const DEFAULT_STATE: DeviceStateProps = {
-//     email: '',
-//     userId: '',
-//     deviceName: '',
-//     encryptionSalt: '',
-//     masterEncryptionKey: '',
-//     secrets: [],
-//     authSecret: '',
-//     authSecretEncrypted: '',
-//     lockTime: 0,
-//     syncTOTP: false,
-//     autofillCredentialsEnabled: false,
-//     autofillTOTPEnabled: false,
-//     uiLanguage: '',
-//     theme: '',
-//     biometricsEnabled: false,
-//     lockTimeStart: 0,
-//     lockTimeEnd: 0,
-//     lockTimerRunning: false,
-//     decryptedSecrets: []
-//   }
-//   return createStore<DeviceStateActions>()((set, get) => ({
-//     ...DEFAULT_STATE,
-//     ...initProps,
-//     setEmail: (email) => set({ email }),
-//     setUserId: (userId) => set({ userId }),
-//     setDeviceName: (deviceName) => set({ deviceName }),
-//     setEncryptionSalt: (encryptionSalt) => set({ encryptionSalt }),
-//     getAllSecretsDecrypted: async () => {
-//       return Promise.all(
-//         get().secrets.map((secret) => {
-//           return get().decryptSecret(secret)
-//         })
-//       )
-//     },
-//     initialize: async () => {
-//       set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
-//     },
-//     setMasterEncryptionKey: async (masterPassword: string) => {
-//       const key = await generateEncryptionKey(
-//         masterPassword,
-//         base64ToBuffer(get().encryptionSalt)
-//       )
-//       set({ masterEncryptionKey: await cryptoKeyToString(key) })
-//       // this.save()
-//     },
-//     encrypt: async (stringToEncrypt) => {
-//       const cryptoKey = await abToCryptoKey(
-//         base64ToBuffer(get().masterEncryptionKey)
-//       )
-//       const iv = self.crypto.getRandomValues(new Uint8Array(12))
-//       const salt = base64ToBuffer(get().encryptionSalt)
-//
-//       const encrypted = await self.crypto.subtle.encrypt(
-//         { name: 'AES-GCM', iv },
-//         cryptoKey,
-//         enc.encode(stringToEncrypt)
-//       )
-//
-//       const encryptedContentArr = new Uint8Array(encrypted)
-//       const buff = new Uint8Array(
-//         salt.byteLength + iv.byteLength + encryptedContentArr.byteLength
-//       )
-//       buff.set(salt, 0)
-//       buff.set(iv, salt.byteLength)
-//       buff.set(encryptedContentArr, salt.byteLength + iv.byteLength)
-//       const base64Buff = bufferToBase64(buff)
-//
-//       return base64Buff
-//     },
-//     decrypt: async (encrypted) => {
-//       const cryptoKey = await abToCryptoKey(
-//         base64ToBuffer(get().masterEncryptionKey)
-//       )
-//       const encryptedDataBuff = base64ToBuffer(encrypted)
-//       const iv = encryptedDataBuff.slice(16, 16 + 12)
-//       const data = encryptedDataBuff.slice(16 + 12)
-//
-//       const decrypted = await self.crypto.subtle.decrypt(
-//         { name: 'AES-GCM', iv },
-//         cryptoKey,
-//         data
-//       )
-//
-//       return dec.decode(decrypted)
-//     },
-//     save: async () => {
-//       device.lockedState = null
-//       set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
-//
-//       await setSensitiveItem('deviceState', {
-//         backgroundState: this,
-//         lockedState: null
-//       })
-//     },
-//     decryptSecret: async (secret) => {
-//       const decrypted = await get().decrypt(secret.encrypted)
-//       let secretDecrypted: ILoginSecret | ITOTPSecret
-//
-//       if (secret.kind === EncryptedSecretType.TOTP) {
-//         secretDecrypted = {
-//           ...secret,
-//           totp: JSON.parse(decrypted)
-//         } as ITOTPSecret
-//       } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-//         const parsed: {
-//           iconUrl: null
-//           label: string
-//           password: string
-//           url: string
-//           username: string
-//         } = JSON.parse(decrypted)
-//
-//         try {
-//           loginCredentialsSchema.parse(parsed)
-//           secretDecrypted = {
-//             loginCredentials: parsed,
-//             ...secret
-//           } as ILoginSecret
-//         } catch (err: unknown) {
-//           secretDecrypted = {
-//             ...secret,
-//             loginCredentials: {
-//               username: '',
-//               password: '',
-//               parseError: err as Error,
-//               label: parsed.label,
-//               url: parsed.url
-//             }
-//           } as ILoginSecret
-//         }
-//       } else {
-//         throw new Error('Unknown secret type')
-//       }
-//
-//       return secretDecrypted
-//     },
-//     getSecretDecryptedById: (id: string) => {
-//       const secret = get().decryptedSecrets.find((secret) => secret.id === id)
-//       if (secret) {
-//         return get().decryptSecret(secret)
-//       }
-//       return undefined
-//     },
-//     getSecretsDecryptedByHostname: async (host: string) => {
-//       let secrets = get().decryptedSecrets.filter((secret) => {
-//         return (
-//           host ===
-//           constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
-//         )
-//       })
-//       if (secrets.length === 0) {
-//         secrets = get().decryptedSecrets.filter((secret) =>
-//           host.endsWith(
-//             getDomainNameAndTldFromUrl(
-//               getDecryptedSecretProp(secret, 'url') ?? ''
-//             )
-//           )
-//         )
-//       }
-//       return Promise.all(
-//         secrets.map((secret) => {
-//           return get().decryptSecret(secret)
-//         })
-//       )
-//     },
-//     backendSync: async (toast: IToastService) => {
-//       const { data } = await apolloClient.query<
-//         SyncEncryptedSecretsQuery,
-//         SyncEncryptedSecretsQueryVariables
-//       >({
-//         query: SyncEncryptedSecretsDocument,
-//         fetchPolicy: 'network-only'
-//       })
-//
-//       if (data) {
-//         const deviceState = device.state
-//         if (data && deviceState) {
-//           const backendRemovedSecrets =
-//             data.currentDevice.encryptedSecretsToSync.filter(
-//               ({ deletedAt }) => deletedAt
-//             )
-//           const newAndUpdatedSecrets =
-//             data.currentDevice.encryptedSecretsToSync.filter(
-//               ({ deletedAt }) => !deletedAt
-//             )
-//
-//           const secretsBeforeSync = deviceState.secrets
-//           const unchangedSecrets = secretsBeforeSync.filter(
-//             ({ id }) =>
-//               !backendRemovedSecrets.find(
-//                 (removedSecret) => id === removedSecret.id
-//               ) &&
-//               !newAndUpdatedSecrets.find(
-//                 (updatedSecret) => id === updatedSecret.id
-//               )
-//           )
-//
-//           deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
-//
-//           //TODO: await this.save()
-//
-//           await apolloClient.mutate<
-//             MarkAsSyncedMutation,
-//             MarkAsSyncedMutationVariables
-//           >({ mutation: MarkAsSyncedDocument })
-//
-//           const actuallyRemovedOnThisDevice = backendRemovedSecrets.filter(
-//             ({ id: removedId }) => {
-//               return secretsBeforeSync.find(({ id }) => removedId === id)
-//             }
-//           )
-//
-//           const res = {
-//             removedSecrets: actuallyRemovedOnThisDevice.length,
-//             newAndUpdatedSecrets: newAndUpdatedSecrets.length
-//           }
-//           console.log('res:', res)
-//
-//           if (
-//             (res?.newAndUpdatedSecrets as number) > 0 ||
-//             (res?.removedSecrets as number) > 0
-//           ) {
-//             toast.show({
-//               title: 'Vault synced',
-//               description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
-//             })
-//           } else {
-//             toast.show({
-//               title: 'Vault synced'
-//             })
-//           }
-//
-//           return res
-//         }
-//       }
-//     },
-//     findExistingSecret: async (secret) => {
-//       const existingSecretsOnHostname =
-//         await get().getSecretsDecryptedByHostname(
-//           constructURL(secret.url).hostname
-//         )
-//
-//       return existingSecretsOnHostname.find(
-//         (s) =>
-//           (isLoginSecret(s) &&
-//             s.loginCredentials.username ===
-//               secret.loginCredentials?.username) ||
-//           (isTotpSecret(s) && s.totp === secret.totp)
-//       )
-//     },
-//     addSecrets: async (secrets) => {
-//       const encryptedSecrets = await Promise.all(
-//         secrets.map(async (secret) => {
-//           const stringToEncrypt =
-//             secret.kind === EncryptedSecretType.TOTP
-//               ? JSON.stringify(secret.totp)
-//               : JSON.stringify(secret.loginCredentials)
-//
-//           const encrypted = await get().encrypt(stringToEncrypt)
-//
-//           return {
-//             encrypted,
-//             kind: secret.kind
-//           }
-//         })
-//       )
-//
-//       const { data } = await apolloClient.mutate<
-//         AddEncryptedSecretsMutation,
-//         AddEncryptedSecretsMutationVariables
-//       >({
-//         mutation: AddEncryptedSecretsDocument,
-//         variables: {
-//           secrets: encryptedSecrets
-//         },
-//         refetchQueries: [{ query: SyncEncryptedSecretsDocument }]
-//       })
-//       if (!data) {
-//         throw new Error('failed to save secret')
-//       }
-//       console.log('saved secret to the backend', secrets)
-//       const secretsAdded = data.me.addEncryptedSecrets
-//
-//       get().secrets.push(...secretsAdded)
-//       //TODO: await this.save()
-//       return secretsAdded
-//     },
-//     removeSecrets: async (secretId: string) => {
-//       set({ secrets: get().secrets.filter((s) => s.id !== secretId) })
-//       //TODO: this.save()
-//     },
-//     lockState: () =>
-//       set((state) => {
-//         const newState = {}
-//         Object.keys(state).forEach((key) => {
-//           newState[key] = null
-//         })
-//         return newState
-//       })
-//   }))
-// }

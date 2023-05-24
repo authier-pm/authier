@@ -92,7 +92,7 @@ export class UserMutation extends UserBase {
       where: { id },
       include: getPrismaRelationsFromGQLInfo({
         info,
-        rootModel: dmmf.modelMap.EncryptedSecret
+        rootModel: dmmf.models.EncryptedSecret
       })
     })
   }

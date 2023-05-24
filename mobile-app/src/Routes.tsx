@@ -3,7 +3,7 @@ import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 
 import { VaultUnlockVerification } from './screens/VaultUnlockVerification'
-import { useColorMode } from 'native-base'
+import { useColorMode, useToast } from 'native-base'
 import {
   DarkTheme,
   DefaultTheme,
@@ -12,25 +12,22 @@ import {
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
 
-import { storage } from '@utils/mmkvZustandStorage'
+import { storage } from '@utils/storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 import { routingInstrumentation } from './sentryInit'
 import { useStore } from './utils/deviceStore'
-import { useTestStore } from './utils/deviceStateStore'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
   const device = useStore((state) => state)
-  const deviceState = useTestStore((state) => state)
   const { colorMode } = useColorMode()
+
   const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
 
-  console.log('device', device.isInitialized, device.isLocked)
-  console.log('deviceState', deviceState)
   React.useEffect(() => {
     const restoreState = async () => {
       try {
@@ -56,8 +53,6 @@ export default function Routes() {
       restoreState()
     }
   }, [isReady])
-
-  useEffect(() => {}, [device.lockedState])
 
   if (device.isLocked) {
     return (
@@ -86,7 +81,7 @@ export default function Routes() {
       }
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}
     >
-      {deviceState.authSecret ? <AppNavigation /> : <AuthNavigation />}
+      {device.isLoggedIn ? <AppNavigation /> : <AuthNavigation />}
     </NavigationContainer>
   )
 }

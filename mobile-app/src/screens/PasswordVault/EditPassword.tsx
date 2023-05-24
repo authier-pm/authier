@@ -27,7 +27,6 @@ import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
 import { Loading } from '@src/components/Loading'
 import zxcvbn from 'zxcvbn-typescript'
-import { useStore } from '@src/utils/deviceStore'
 import { useTestStore } from '@src/utils/deviceStateStore'
 
 export const InputHeader = ({ children }) => {
@@ -69,8 +68,7 @@ const InputField = ({
 const LoginSecret = (secretProps: ILoginSecret) => {
   const { loginCredentials } = secretProps
   const [show, setShow] = useState(false)
-  let device = useStore((state) => state)
-  let deviceState = useTestStore((state) => state)
+  const deviceState = useTestStore((state) => state)
 
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
@@ -93,7 +91,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           const secret = deviceState.secrets.find(
             ({ id }) => id === secretProps.id
           )
-          if (secret && device.state) {
+          if (secret && deviceState) {
             secret.encrypted = await deviceState.encrypt(
               JSON.stringify({
                 password: values.password,
@@ -114,7 +112,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               }
             })
 
-            await deviceState.save()
+            deviceState.save()
 
             resetForm({ values })
             setSubmitting(false)
@@ -252,13 +250,13 @@ export default function EditPassword({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
     if (secret) {
+      console.log('secret', secret.id)
       navigation.setOptions({
         headerRight: () => <DeleteSecretAlert id={secret?.id} />
       })
     }
   }, [navigation, secret])
 
-  //QUESTION: Why cant I use !device.state || !secret
   if (!deviceState) {
     return <Loading />
   }

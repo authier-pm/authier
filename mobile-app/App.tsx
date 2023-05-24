@@ -47,10 +47,10 @@ const RnApp = () => {
   }
 
   useEffect(() => {
+    // initializeStorage()
     requestUserPermission()
     device.initialize()
 
-    //? What is this for?
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
         queueLink.open()

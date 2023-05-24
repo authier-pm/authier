@@ -18,7 +18,7 @@ import { QueryClient, QueryClientProvider } from 'react-query'
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getSensitiveItem, setSensitiveItem } from './utils/secretStorage'
-import { storage } from './utils/mmkvZustandStorage'
+import { storage } from './utils/storage'
 
 i18n.loadLocaleData('en', { plurals: enPlurals })
 i18n.load('en', messages)

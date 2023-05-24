@@ -14,6 +14,7 @@ import { InputHeader } from '../PasswordVault/EditPassword'
 import { SyncEncryptedSecretsDocument } from '@shared/graphql/ExtensionDevice.codegen'
 import { Loading } from '@src/components/Loading'
 import { useTestStore } from '@src/utils/deviceStateStore'
+import { useStore } from '@src/utils/deviceStore'
 
 const InputField = ({
   errors,
@@ -79,7 +80,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
               }
             })
 
-            await deviceState.save()
+            deviceState.save()
             resetForm({ values })
             setSubmitting(false)
           }

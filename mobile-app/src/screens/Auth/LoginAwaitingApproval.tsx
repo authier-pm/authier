@@ -35,13 +35,6 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useStore } from '@utils/deviceStore'
 
-const ToastServerErrorDetails = {
-  title: 'Something went wrong',
-  variant: 'subtle',
-  description: 'Please create a support ticket from the support page',
-  status: 'warning'
-}
-
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
@@ -64,18 +57,6 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useEffect(() => {
     if (error || newDeviceError) {
-      if (!toast.isActive(id)) {
-        toast.show({
-          id,
-          render: () => (
-            <ToastAlert
-              {...ToastServerErrorDetails}
-              description={error ? error.message : newDeviceError?.message}
-            />
-          )
-        })
-      }
-
       setFormState({ ...formState, password: '', submitted: false })
     }
   }, [error, newDeviceError])

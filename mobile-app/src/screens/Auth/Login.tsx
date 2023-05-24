@@ -93,7 +93,6 @@ export function Login({ navigation }: NavigationProps) {
           isSubmitting,
           errors
         }) => {
-          setFormState(values)
           return (
             <VStack space={3} mt="5">
               <FormControl>
@@ -161,7 +160,14 @@ export function Login({ navigation }: NavigationProps) {
                 <Text fontSize="sm" color="muted.500" fontWeight={400}>
                   <Trans>I'm a new user.</Trans>
                 </Text>
-                <Pressable onPress={() => navigation.navigate('Register')}>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('Register', {
+                      password: values.password,
+                      email: values.email
+                    })
+                  }
+                >
                   <Text
                     color={'indigo.500'}
                     fontWeight={'medium'}

@@ -39,7 +39,6 @@ export const PasswordVault = ({
     } finally {
       setRefreshing(false)
     }
-
     setRefreshing(false)
   }
 

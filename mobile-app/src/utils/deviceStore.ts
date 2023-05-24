@@ -122,7 +122,7 @@ export type AddSecretInput = Array<
 import { create } from 'zustand'
 import { useTestStore } from './deviceStateStore'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { zustandStorage } from './mmkvZustandStorage'
+import { zustandStorage } from './storage'
 
 interface DeviceProps {
   fireToken: string | null
@@ -134,6 +134,7 @@ interface DeviceProps {
   lockInterval: NodeJS.Timer | void
   isInitialized: boolean
   isLocked: boolean
+  isLoggedIn: boolean
 }
 
 interface Device extends DeviceProps {
@@ -165,23 +166,29 @@ interface Device extends DeviceProps {
   changeIsLocked: (newValue: boolean) => void
 }
 
+const initialState: DeviceProps = {
+  fireToken: null,
+  isLoggedIn: false,
+  lockedState: null,
+  id: null,
+  platform: Platform.OS,
+  name: '',
+  biometricsAvailable: false,
+  lockInterval: undefined,
+  isInitialized: false,
+  isLocked: false
+}
+
 export const useStore = create<Device>()(
   persist(
     (set, get) => ({
-      fireToken: null,
-      lockedState: null,
-      id: null,
-      platform: Platform.OS,
-      name: '',
-      biometricsAvailable: false,
-      lockInterval: undefined,
-      isInitialized: false,
-      isLocked: false,
+      ...initialState,
       save: async (deviceState?: IBackgroundStateSerializable) => {
         //We must clear interval, otherwise we will create a new one every time we save the state
         //because we are creating a new interval every time we we start the app (in syncSettings)
         if (deviceState) {
           useTestStore.setState({ ...deviceState })
+          set({ isLoggedIn: true })
         }
         console.log('new state', useTestStore.getState())
         if (!useTestStore.getState()) {
@@ -192,7 +199,6 @@ export const useStore = create<Device>()(
       },
       initialize: async () => {
         set({ id: await getUniqueId() })
-        set({ platform: Platform.OS })
         set({ biometricsAvailable: await get().checkBiometrics() })
 
         //FIX: Not sure how this works
@@ -225,11 +231,10 @@ export const useStore = create<Device>()(
         //   this.state = null
         // }
 
+        useTestStore.getState().initialize()
         const token = await messaging().getToken()
-        set({ fireToken: token })
-        set({ isInitialized: true })
-        //
-        // this.emitter.emit('stateChange')
+        set({ fireToken: token, isInitialized: true, platform: Platform.OS })
+
         console.log('device initialized')
         return useTestStore.getState()
       },
@@ -341,10 +346,11 @@ export const useStore = create<Device>()(
         useTestStore.setState({})
       },
       clearAndReload: async () => {
-        // Your implementation...
+        //TODO: This could be done better
         get().clearLockInterval()
         await clearAccessToken()
-        // await device.clearLocalStorage()
+        useTestStore.getState().reset()
+        set({ isLoggedIn: false, isInitialized: true })
       },
       logout: async () => {
         try {
@@ -392,7 +398,7 @@ export const useStore = create<Device>()(
       },
       loginCredentials: () => {
         let state = useTestStore.getState()
-        console.log('test', state.decryptedSecrets)
+        console.log('loginCredentials', state.decryptedSecrets)
         return (state.decryptedSecrets.filter(({ kind }) => {
           return kind === EncryptedSecretType.LOGIN_CREDENTIALS
         }) ?? []) as ILoginSecret[]

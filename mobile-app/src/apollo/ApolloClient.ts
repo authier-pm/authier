@@ -67,6 +67,13 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 
+const ToastServerErrorDetails = {
+  title: 'Something went wrong',
+  variant: 'subtle',
+  description: 'Please create a support ticket from the support page',
+  status: 'warning'
+}
+
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (graphQLErrors) {
@@ -78,9 +85,12 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
+      //TODO: style this toast
       Toast.show({
-        title: message,
-        variant: 'danger'
+        ...ToastServerErrorDetails,
+        title: 'Something went wrong',
+        description: message,
+        variant: 'subtle'
       })
     })
   }

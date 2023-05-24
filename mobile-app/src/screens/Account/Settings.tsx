@@ -119,8 +119,7 @@ export default function Settings() {
               <Select
                 onValueChange={(value) => {
                   toggleColorMode()
-                  deviceState.theme = value
-                  device.save()
+                  deviceState.changeTheme(value)
                 }}
                 defaultValue={deviceState.theme}
                 accessibilityLabel="theme"
@@ -146,13 +145,12 @@ export default function Settings() {
                 <Switch
                   defaultIsChecked={deviceState.syncTOTP}
                   onValueChange={(e) => {
-                    deviceState.syncTOTP = e
+                    deviceState.changeSyncTOTP(e)
                     updateSettings({
                       variables: {
                         config: settings()
                       }
                     })
-                    device.save()
                   }}
                   size="md"
                 />
@@ -163,8 +161,7 @@ export default function Settings() {
                 <Switch
                   defaultIsChecked={deviceState.biometricsEnabled}
                   onValueChange={async (e) => {
-                    deviceState.biometricsEnabled = e
-                    device.save()
+                    deviceState.changeBiometricsEnabled(e)
                   }}
                   size="md"
                 />

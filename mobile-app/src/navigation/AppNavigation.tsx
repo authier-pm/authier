@@ -11,11 +11,22 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
+import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
+import { useTestStore } from '@utils/deviceStateStore'
+import { useToast } from 'native-base'
+import { useStore } from '@src/utils/deviceStore'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
+  const { data } = useSyncSettingsQuery({
+    fetchPolicy: 'cache-and-network',
+    nextFetchPolicy: 'cache-first'
+  })
+  const device = useStore((state) => state)
+  const deviceState = useTestStore((state) => state)
   const navigation = useNavigation()
+  const toast = useToast()
 
   React.useEffect(() => {
     // Assume a message-notification contains a "type" property in the data payload of the screen to open
@@ -42,6 +53,20 @@ function AppNavigation() {
           navigation.navigate(remoteMessage.data!.type)
         }
       })
+
+    if (deviceState) {
+      deviceState.backendSync(toast)
+    }
+    if (data && data.currentDevice) {
+      device.setDeviceSettings({
+        autofillTOTPEnabled: data.me.autofillTOTPEnabled,
+        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
+        syncTOTP: data.currentDevice.syncTOTP,
+        vaultLockTimeoutSeconds: data.currentDevice
+          .vaultLockTimeoutSeconds as number,
+        uiLanguage: data.me.uiLanguage
+      })
+    }
   }, [])
 
   return (

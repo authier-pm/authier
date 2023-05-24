@@ -3,14 +3,15 @@ import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { AlertDialog, Button, Text, IconButton, Center } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import { useTestStore } from '@src/utils/deviceStateStore'
 
-import { device } from '@utils/Device'
 import {
   EncryptedSecretsDocument,
   useDeleteEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 
 export const DeleteSecretAlert = ({ id }: { id: string }) => {
+  const deviceState = useTestStore((state) => state)
   const navigation = useNavigation()
   const [isOpen, setIsOpen] = useState(false)
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
@@ -23,7 +24,7 @@ export const DeleteSecretAlert = ({ id }: { id: string }) => {
       refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
     })
 
-    await device.state?.removeSecret(id)
+    await deviceState.removeSecret(id)
     navigation.goBack()
   }
 

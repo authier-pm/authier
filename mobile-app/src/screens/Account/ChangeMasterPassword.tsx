@@ -121,7 +121,7 @@ export function ChangeMasterPassword() {
                 const { addDeviceSecret } =
                   await decryptDeviceSecretWithPassword(
                     form.currentPassword,
-                    device.state as IBackgroundStateSerializable
+                    deviceState as IBackgroundStateSerializable
                   )
 
                 if (addDeviceSecret !== deviceState.authSecret) {
