@@ -61,7 +61,7 @@ interface DeviceStateProps {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
 }
 
-interface DeviceStateActions extends DeviceStateProps {
+export interface DeviceStateActions extends DeviceStateProps {
   initialize: () => Promise<void>
   setMasterEncryptionKey: (masterPassword: string) => Promise<void>
   encrypt: (stringToEncrypt: string) => Promise<string>
