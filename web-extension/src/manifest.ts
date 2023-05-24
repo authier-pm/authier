@@ -1,10 +1,10 @@
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
-import { r } from '../scripts/updateManifestVersion'
+import { dir } from '../scripts/updateManifestVersion'
 
 export async function getManifest() {
-  const pkg = (await fs.readJSON(r('package.json'))) as typeof PkgType
+  const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType
 
   // update this file to update this manifest.json
   // can also be conditional based on your need
