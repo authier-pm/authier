@@ -153,7 +153,7 @@ export const useTestStore = create<DeviceStateActions>()(
           base64ToBuffer(get().encryptionSalt)
         )
         set({ masterEncryptionKey: await cryptoKeyToString(key) })
-        // this.save()
+        get().save()
       },
       encrypt: async (stringToEncrypt) => {
         const cryptoKey = await abToCryptoKey(
