@@ -47,6 +47,7 @@
     "@rnx-kit/metro-resolver-symlinks": "^0.1.28",
     "@sentry/react-native": "5.4.1",
     "@shopify/flash-list": "^1.4.3",
+    "@testing-library/react": "^14.0.0",
     "@ts-react/form": "^1.6.4",
     "apollo-link-http": "^1.5.17",
     "apollo-link-queue": "^3.1.0",
@@ -59,6 +60,7 @@
     "date-fns": "^2.30.0",
     "formik": "^2.2.9",
     "graphql": "^16.6.0",
+    "graphql-tools": "^9.0.0",
     "intl": "^1.2.5",
     "jest-environment-node": "^29.5.0",
     "jsc-android": "^250231.0.0",
@@ -149,7 +151,7 @@
       "node"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!(@react-native|react-native|react-native-vector-icons)/)"
+      "node_modules/(?!((jest-)?react-native|@react-native(-community)?)|expo(nent)?|@expo(nent)?/.*|@expo-google-fonts/.*|react-navigation|@react-navigation/.*|@unimodules/.*|unimodules|sentry-expo|native-base|react-native-svg)"
     ],
     "setupFiles": [
       "./jestSetup.js"

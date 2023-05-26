@@ -1,8 +1,5 @@
 import 'react-native-gesture-handler/jestSetup'
-import mockAsyncStorage from '@react-native-async-storage/async-storage/jest/async-storage-mock'
-
 jest.useFakeTimers()
-jest.mock('@react-native-async-storage/async-storage', () => mockAsyncStorage)
 jest.mock('react-native-safe-area-context', () => {
   const inset = { top: 0, right: 0, bottom: 0, left: 0 }
   return {
@@ -14,50 +11,28 @@ jest.mock('react-native-safe-area-context', () => {
   }
 })
 
-// let apolloClient
-//
-// beforeEach(() => {
-//   jest.mock('@apollo/client', () => {
-//     const actualApolloClient = jest.requireActual('@apollo/client')
-//
-//     return {
-//       ...actualApolloClient,
-//       ApolloClient: jest.fn().mockImplementation(() => ({
-//         mutate: jest.fn().mockImplementation((options) => {
-//           if (options.mutation === MarkAsSyncedDocument) {
-//             return Promise.resolve({
-//               data: {
-//                 currentDevice: {
-//                   markAsSynced: 'test_synced_string'
-//                 }
-//               }
-//             })
-//           }
-//
-//           if (options.mutation === AddEncryptedSecretsDocument) {
-//             // Return whatever your server would return here
-//             return Promise.resolve({
-//               data: {
-//                 me: {
-//                   addEncryptedSecrets: 'test_encrypted_secrets'
-//                 }
-//               }
-//             })
-//           }
-//
-//           throw new Error('Unknown mutation')
-//         })
-//       })),
-//       InMemoryCache: jest.fn(),
-//       from: jest.fn(),
-//       HttpLink: jest.fn(),
-//       ApolloLink: jest.fn()
-//     }
-//   })
-//
-//   // Initialize apolloClient in each test
-//   apolloClient = new ApolloClient()
-// })
+jest.mock('@apollo/client', () => {
+  const actualApolloClient = jest.requireActual('@apollo/client')
+
+  return {
+    ...actualApolloClient,
+    ApolloClient: jest.fn().mockImplementation(() => ({
+      mutate: jest.fn().mockImplementation((options) => {
+        return Promise.resolve({
+          data: {
+            currentDevice: {
+              markAsSynced: 'test_synced_string'
+            }
+          }
+        })
+      })
+    })),
+    InMemoryCache: jest.fn(),
+    from: jest.fn(),
+    HttpLink: jest.fn(),
+    ApolloLink: jest.fn()
+  }
+})
 
 jest.mock('react-native-vector-icons/Ionicons', () => 'MockedIcon')
 
@@ -70,6 +45,20 @@ jest.mock('react-native-reanimated', () => {
   Reanimated.default.call = () => {}
 
   return Reanimated
+})
+
+jest.mock('@react-navigation/native', () => {
+  return {
+    useNavigation: () => ({
+      navigate: jest.fn(),
+      dispatch: jest.fn()
+    }),
+    useRoute: () => ({
+      params: {
+        id: '123'
+      }
+    })
+  }
 })
 
 // Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
