@@ -1,4 +1,5 @@
 import { onError } from '@apollo/client/link/error'
+import fetch from 'cross-fetch'
 import {
   ApolloClient,
   InMemoryCache,
@@ -23,7 +24,8 @@ import { useStore } from '@src/utils/deviceStore'
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
 const httpLink = new HttpLink({
   uri: apiUrl,
-  credentials: 'include'
+  credentials: 'include',
+  fetch: fetch
 })
 
 const timeStartLink = new ApolloLink((operation, forward) => {
