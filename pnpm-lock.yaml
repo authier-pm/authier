@@ -277,7 +277,7 @@ importers:
     dependencies:
       '@apollo/client':
         specifier: ^3.7.14
-        version: 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 3.7.14(graphql@16.6.0)(react@18.2.0)
       '@babel/preset-env':
         specifier: ^7.21.5
         version: 7.21.5(@babel/core@7.21.8)
@@ -361,13 +361,13 @@ importers:
         version: 1.5.17(graphql@16.6.0)
       apollo-link-queue:
         specifier: ^3.1.0
-        version: 3.1.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 3.1.0(graphql@16.6.0)(react@18.2.0)
       apollo-link-retry:
         specifier: ^2.2.16
         version: 2.2.16(graphql@16.6.0)
       apollo-link-serialize:
         specifier: ^4.0.0
-        version: 4.0.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 4.0.0(graphql@16.6.0)(react@18.2.0)
       apollo-link-token-refresh:
         specifier: ^0.4.0
         version: 0.4.0(@apollo/client@3.7.14)(graphql@16.6.0)
@@ -377,9 +377,6 @@ importers:
       babel-plugin-transform-remove-console:
         specifier: ^6.9.4
         version: 6.9.4
-      cross-fetch:
-        specifier: ^3.1.6
-        version: 3.1.6
       date-fns:
         specifier: ^2.30.0
         version: 2.30.0
@@ -407,15 +404,12 @@ importers:
       make-plural:
         specifier: ^7.3.0
         version: 7.3.0
-      mitt:
-        specifier: ^3.0.0
-        version: 3.0.0
       ms:
         specifier: ^2.1.3
         version: 2.1.3
       native-base:
         specifier: ^3.4.28
-        version: 3.4.28(@types/react-native@0.71.6)(@types/react@18.2.6)(react-dom@18.2.0)(react-native-safe-area-context@4.5.2)(react-native-svg@13.9.0)(react-native@0.71.7)(react@18.2.0)
+        version: 3.4.28(@types/react-native@0.71.6)(@types/react@18.2.6)(react-native-safe-area-context@4.5.2)(react-native-svg@13.9.0)(react-native@0.71.7)(react@18.2.0)
       query-string:
         specifier: ^8.1.0
         version: 8.1.0
@@ -505,7 +499,7 @@ importers:
         version: 0.0.25(react-native-webview@11.26.1)(react-native@0.71.7)(react@18.2.0)
       react-query:
         specifier: ^3.39.3
-        version: 3.39.3(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0)
+        version: 3.39.3(react-native@0.71.7)(react@18.2.0)
       styled-system:
         specifier: ^5.1.5
         version: 5.1.5
@@ -527,7 +521,7 @@ importers:
     devDependencies:
       '@apollo/react-testing':
         specifier: ^4.0.0
-        version: 4.0.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+        version: 4.0.0(graphql@16.6.0)(react@18.2.0)
       '@babel/core':
         specifier: ^7.21.8
         version: 7.21.8
@@ -600,9 +594,6 @@ importers:
       metro-react-native-babel-preset:
         specifier: 0.76.3
         version: 0.76.3(@babel/core@7.21.8)
-      mock-apollo-client:
-        specifier: ^1.2.1
-        version: 1.2.1(@apollo/client@3.7.14)
       prettier:
         specifier: ^2.8.8
         version: 2.8.8
@@ -1070,6 +1061,41 @@ packages:
       ts-invariant: 0.10.3
       tslib: 2.5.0
       zen-observable-ts: 1.2.5
+    dev: false
+
+  /@apollo/client@3.7.14(graphql@16.6.0)(react@18.2.0):
+    resolution: {integrity: sha512-BRvdkwq5PAXBkjXjboO12uksDm3nrZEqDi4xF97Fk3Mnaa0zDOEfJa7hoKTY9b9KA1EkeWv9BL3i7hSd4SfGBg==}
+    peerDependencies:
+      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+      graphql-ws: ^5.5.5
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
+    peerDependenciesMeta:
+      graphql-ws:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      subscriptions-transport-ws:
+        optional: true
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.6.0)
+      '@wry/context': 0.7.0
+      '@wry/equality': 0.5.3
+      '@wry/trie': 0.3.2
+      graphql: 16.6.0
+      graphql-tag: 2.12.6(graphql@16.6.0)
+      hoist-non-react-statics: 3.3.2
+      optimism: 0.16.2
+      prop-types: 15.8.1
+      react: 18.2.0
+      response-iterator: 0.2.6
+      symbol-observable: 4.0.0
+      ts-invariant: 0.10.3
+      tslib: 2.5.0
+      zen-observable-ts: 1.2.5
 
   /@apollo/react-hooks@4.0.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-fCu0cbne3gbUl0QbA8X4L33iuuFVQbC5Jo2MIKRK8CyawR6PoxDpFdFA1kc6033ODZuZZ9Eo4RdeJFlFIIYcLA==}
@@ -1083,10 +1109,10 @@ packages:
       - subscriptions-transport-ws
     dev: false
 
-  /@apollo/react-testing@4.0.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0):
+  /@apollo/react-testing@4.0.0(graphql@16.6.0)(react@18.2.0):
     resolution: {integrity: sha512-P7Z/flUHpRRZYc3FkIqxZH9XD3FuP2Sgks1IXqGq2Zb7qI0aaTfVeRsLYmZNUcFOh2pTHxs0NXgPnH1VfYOpig==}
     dependencies:
-      '@apollo/client': 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.7.14(graphql@16.6.0)(react@18.2.0)
     transitivePeerDependencies:
       - graphql
       - graphql-ws
@@ -6472,7 +6498,7 @@ packages:
       cosmiconfig-typescript-loader: 4.3.0(@types/node@18.15.11)(cosmiconfig@8.1.3)(ts-node@10.9.1)(typescript@5.0.4)
       jest-validate: 26.6.2
       lodash.get: 4.4.2
-      ts-node: 10.9.1(@swc/core@1.3.58)(@types/node@18.15.11)(typescript@5.0.4)
+      ts-node: 10.9.1(@types/node@18.15.11)(typescript@5.0.4)
       typescript: 5.0.4
     transitivePeerDependencies:
       - '@types/node'
@@ -6826,7 +6852,7 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@react-aria/combobox@3.6.0(react-dom@18.2.0)(react@18.2.0):
+  /@react-aria/combobox@3.6.0(react@18.2.0):
     resolution: {integrity: sha512-GQqKUlSZy7wciSbLstq0zTTDP2zPPLxwrsqH/SahruRQqFYG8D/5aaqDMooPg17nGWg6wQ693Ho572+dIIgx6A==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
@@ -6836,8 +6862,8 @@ packages:
       '@react-aria/interactions': 3.15.0(react@18.2.0)
       '@react-aria/listbox': 3.9.0(react@18.2.0)
       '@react-aria/live-announcer': 3.3.0
-      '@react-aria/menu': 3.9.0(react-dom@18.2.0)(react@18.2.0)
-      '@react-aria/overlays': 3.14.0(react-dom@18.2.0)(react@18.2.0)
+      '@react-aria/menu': 3.9.0(react@18.2.0)
+      '@react-aria/overlays': 3.14.0(react@18.2.0)
       '@react-aria/selection': 3.14.0(react@18.2.0)
       '@react-aria/textfield': 3.9.1(react@18.2.0)
       '@react-aria/utils': 3.16.0(react@18.2.0)
@@ -6849,7 +6875,6 @@ packages:
       '@react-types/shared': 3.18.0(react@18.2.0)
       '@swc/helpers': 0.4.14
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@react-aria/focus@3.12.0(react@18.2.0):
@@ -6929,7 +6954,7 @@ packages:
       '@swc/helpers': 0.4.14
     dev: false
 
-  /@react-aria/menu@3.9.0(react-dom@18.2.0)(react@18.2.0):
+  /@react-aria/menu@3.9.0(react@18.2.0):
     resolution: {integrity: sha512-lIbfWzFvYE7EPOno3lVogXHlc6fzswymlpJWiMBKaB68wkfCtknIIL1cwWssiwgGU63v08H5YpQOZdxRwux2PQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
@@ -6937,7 +6962,7 @@ packages:
     dependencies:
       '@react-aria/i18n': 3.7.1(react@18.2.0)
       '@react-aria/interactions': 3.15.0(react@18.2.0)
-      '@react-aria/overlays': 3.14.0(react-dom@18.2.0)(react@18.2.0)
+      '@react-aria/overlays': 3.14.0(react@18.2.0)
       '@react-aria/selection': 3.14.0(react@18.2.0)
       '@react-aria/utils': 3.16.0(react@18.2.0)
       '@react-stately/collections': 3.7.0(react@18.2.0)
@@ -6948,10 +6973,9 @@ packages:
       '@react-types/shared': 3.18.0(react@18.2.0)
       '@swc/helpers': 0.4.14
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
-  /@react-aria/overlays@3.14.0(react-dom@18.2.0)(react@18.2.0):
+  /@react-aria/overlays@3.14.0(react@18.2.0):
     resolution: {integrity: sha512-lt4vOj44ho0LpmpaHwQ4VgX7eNfKXig9VD7cvE9u7uyECG51jqt9go19s4+/O+otX7pPrhdYlEB2FxLFJocxfw==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0
@@ -6969,7 +6993,6 @@ packages:
       '@react-types/shared': 3.18.0(react@18.2.0)
       '@swc/helpers': 0.4.14
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
     dev: false
 
   /@react-aria/radio@3.6.0(react@18.2.0):
@@ -7135,15 +7158,15 @@ packages:
       react-native: 0.71.7(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
     dev: false
 
-  /@react-native-aria/combobox@0.2.4-alpha.1(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0):
+  /@react-native-aria/combobox@0.2.4-alpha.1(react-native@0.71.7)(react@18.2.0):
     resolution: {integrity: sha512-MOxKMKVus9MsOL3l+mNRDYHeVr5kj5fYnretLofWh/dHBO2W5H7H70ZfOPDEr9s+vgaBBjHCtbbfOiimKRk6Kg==}
     peerDependencies:
       react: '*'
       react-native: '*'
     dependencies:
-      '@react-aria/combobox': 3.6.0(react-dom@18.2.0)(react@18.2.0)
+      '@react-aria/combobox': 3.6.0(react@18.2.0)
       '@react-aria/live-announcer': 3.3.0
-      '@react-aria/overlays': 3.14.0(react-dom@18.2.0)(react@18.2.0)
+      '@react-aria/overlays': 3.14.0(react@18.2.0)
       '@react-aria/utils': 3.16.0(react@18.2.0)
       '@react-native-aria/utils': 0.2.8(react-native@0.71.7)(react@18.2.0)
       '@react-types/button': 3.7.2(react@18.2.0)
@@ -7196,7 +7219,7 @@ packages:
       react-native: 0.71.7(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
     dev: false
 
-  /@react-native-aria/overlays@0.3.6(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0):
+  /@react-native-aria/overlays@0.3.6(react-native@0.71.7)(react@18.2.0):
     resolution: {integrity: sha512-+mgmScrVezZrOzeEfmxykIy+lHrmbiLou+mv04BtFzM0rfFhOYoQlmxHC7vdLKgsVKw+i6bd5EM9X0rUynLNTA==}
     peerDependencies:
       react: '*'
@@ -7204,13 +7227,12 @@ packages:
       react-native: '*'
     dependencies:
       '@react-aria/interactions': 3.15.0(react@18.2.0)
-      '@react-aria/overlays': 3.14.0(react-dom@18.2.0)(react@18.2.0)
+      '@react-aria/overlays': 3.14.0(react@18.2.0)
       '@react-native-aria/utils': 0.2.8(react-native@0.71.7)(react@18.2.0)
       '@react-stately/overlays': 3.5.1(react@18.2.0)
       '@react-types/overlays': 3.7.1(react@18.2.0)
       dom-helpers: 5.2.1
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
       react-native: 0.71.7(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
     dev: false
 
@@ -10478,10 +10500,10 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /apollo-link-queue@3.1.0(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0):
+  /apollo-link-queue@3.1.0(graphql@16.6.0)(react@18.2.0):
     resolution: {integrity: sha512-9zu6MZHKBN2iChhfnvmqSaqnAnhS5taKVS+fzJDEPfxXF2K1S5P84ykOyWr2LuBLOSm6/eDWkE1kIuClPIeI9A==}
     dependencies:
-      '@apollo/client': 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.7.14(graphql@16.6.0)(react@18.2.0)
     transitivePeerDependencies:
       - graphql
       - graphql-ws
@@ -10513,13 +10535,26 @@ packages:
       - subscriptions-transport-ws
     dev: false
 
+  /apollo-link-serialize@4.0.0(graphql@16.6.0)(react@18.2.0):
+    resolution: {integrity: sha512-GQJkwj1Fm/OQyte5+y64GsWBIL89AaALlJGc4plMzTttfMxMREXIttXdaP4BzU5xvC/PwVP0khKS/5CbEX8pjw==}
+    dependencies:
+      '@apollo/client': 3.7.14(graphql@16.6.0)(react@18.2.0)
+      zen-observable-ts: 0.8.21
+    transitivePeerDependencies:
+      - graphql
+      - graphql-ws
+      - react
+      - react-dom
+      - subscriptions-transport-ws
+    dev: false
+
   /apollo-link-token-refresh@0.4.0(@apollo/client@3.7.14)(graphql@16.6.0):
     resolution: {integrity: sha512-5P5nH//asgoz01r6tUYiBbHIuVwEEsBmA9WJ8LEiNtZcOq8AXdfR8aV4Pw/B86P3lRi1ykd8xyZLCHpLro9v+Q==}
     peerDependencies:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.7.14(graphql@16.6.0)(react@18.2.0)
       graphql: 16.6.0
     dev: false
 
@@ -10552,7 +10587,7 @@ packages:
     peerDependencies:
       '@apollo/client': ^3.2.5
     dependencies:
-      '@apollo/client': 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.7.14(graphql@16.6.0)(react@18.2.0)
     dev: false
 
   /appcenter-cli@2.13.7(webpack@5.83.1):
@@ -12446,7 +12481,7 @@ packages:
     dependencies:
       '@types/node': 18.15.11
       cosmiconfig: 8.1.3
-      ts-node: 10.9.1(@swc/core@1.3.58)(@types/node@18.15.11)(typescript@5.0.4)
+      ts-node: 10.9.1(@types/node@18.15.11)(typescript@5.0.4)
       typescript: 5.0.4
     dev: true
 
@@ -12555,6 +12590,7 @@ packages:
       node-fetch: 2.6.11
     transitivePeerDependencies:
       - encoding
+    dev: true
 
   /cross-spawn@6.0.5:
     resolution: {integrity: sha512-eTVLrBSt7fjbDygz805pMnstIs2VTBNkRm0qxZd+M7A5XDdxVRWO5MxGBXZhjY4cqLYLdtrGqRf8mBPmzwSpWQ==}
@@ -16549,7 +16585,7 @@ packages:
       pretty-format: 29.5.0
       slash: 3.0.0
       strip-json-comments: 3.1.1
-      ts-node: 10.9.1(@swc/core@1.3.58)(@types/node@18.15.11)(typescript@5.0.4)
+      ts-node: 10.9.1(@types/node@18.15.11)(typescript@5.0.4)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -18450,6 +18486,7 @@ packages:
 
   /mitt@3.0.0:
     resolution: {integrity: sha512-7dX2/10ITVyqh4aOSVI9gdape+t9l2/8QxHrFmUXu4EEUpdlxl6RudZUPZoc+zuY2hk1j7XxVroIVIan/pD/SQ==}
+    dev: true
 
   /mixin-deep@1.3.2:
     resolution: {integrity: sha512-WRoDn//mXBiJ1H40rqa3vH0toePwSsGb45iInWlTySa+Uu4k3tYUSxa2v1KqAiLtvlrSzaExqS1gtk96A9zvEA==}
@@ -18494,14 +18531,6 @@ packages:
     dependencies:
       obliterator: 2.0.4
     dev: false
-
-  /mock-apollo-client@1.2.1(@apollo/client@3.7.14):
-    resolution: {integrity: sha512-QYQ6Hxo+t7hard1bcHHbsHxlNQYTQsaMNsm2Psh/NbwLMi2R4tGzplJKt97MUWuARHMq3GHB4PTLj/gxej4Caw==}
-    peerDependencies:
-      '@apollo/client': ^3.0.0
-    dependencies:
-      '@apollo/client': 3.7.14(graphql@16.6.0)(react-dom@18.2.0)(react@18.2.0)
-    dev: true
 
   /mockzilla-webextension@0.15.0(@types/jest@28.1.8)(mockzilla@0.14.0)(webextension-polyfill@0.10.0):
     resolution: {integrity: sha512-gnyHsk41jEsVgmsLomceOXJV9vxMF3e3B9ltQbWVCSvaVjz5o/+5gzHn0c5Y62NkRAnVOz3cRA7tZq0ZhKJ+Qg==}
@@ -18669,7 +18698,7 @@ packages:
     resolution: {integrity: sha512-ONmRUqK7zj7DWX0D9ADe03wbwOBZxNAfF20PlGfCWQcD3+/MakShIHrMqx9YwPTfxDdF1zLeL+RGZiR9kGMLdg==}
     dev: false
 
-  /native-base@3.4.28(@types/react-native@0.71.6)(@types/react@18.2.6)(react-dom@18.2.0)(react-native-safe-area-context@4.5.2)(react-native-svg@13.9.0)(react-native@0.71.7)(react@18.2.0):
+  /native-base@3.4.28(@types/react-native@0.71.6)(@types/react@18.2.6)(react-native-safe-area-context@4.5.2)(react-native-svg@13.9.0)(react-native@0.71.7)(react@18.2.0):
     resolution: {integrity: sha512-EDg9UFDNmfYXPInpRbxce+4oWFEIGaM7aG6ey4hVllcvMC3PkgCvkiXEB+7EemgC7Qr8CuFjgMTx7P0vvnwZeQ==}
     peerDependencies:
       '@types/react': '*'
@@ -18683,11 +18712,11 @@ packages:
       '@react-aria/visually-hidden': 3.8.0(react@18.2.0)
       '@react-native-aria/button': 0.2.4(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/checkbox': 0.2.3(react-native@0.71.7)(react@18.2.0)
-      '@react-native-aria/combobox': 0.2.4-alpha.1(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0)
+      '@react-native-aria/combobox': 0.2.4-alpha.1(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/focus': 0.2.7(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/interactions': 0.2.8(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/listbox': 0.2.4-alpha.3(react-native@0.71.7)(react@18.2.0)
-      '@react-native-aria/overlays': 0.3.6(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0)
+      '@react-native-aria/overlays': 0.3.6(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/radio': 0.2.5(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/slider': 0.2.5-alpha.2(react-native@0.71.7)(react@18.2.0)
       '@react-native-aria/tabs': 0.2.8(react-native@0.71.7)(react@18.2.0)
@@ -18715,7 +18744,6 @@ packages:
       lodash.pick: 4.4.0
       lodash.uniqueid: 4.0.1
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
       react-native: 0.71.7(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
       react-native-safe-area-context: 4.5.2(react-native@0.71.7)(react@18.2.0)
       react-native-svg: 13.9.0(react-native@0.71.7)(react@18.2.0)
@@ -20883,7 +20911,7 @@ packages:
       react: 18.2.0
     dev: false
 
-  /react-query@3.39.3(react-dom@18.2.0)(react-native@0.71.7)(react@18.2.0):
+  /react-query@3.39.3(react-native@0.71.7)(react@18.2.0):
     resolution: {integrity: sha512-nLfLz7GiohKTJDuT4us4X3h/8unOh+00MLb2yJoGTPjxKs2bc1iDhkNx2bd5MKklXnOD3NrVZ+J2UXujA5In4g==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
@@ -20899,7 +20927,6 @@ packages:
       broadcast-channel: 3.7.0
       match-sorter: 6.3.1
       react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
       react-native: 0.71.7(@babel/core@7.21.8)(@babel/preset-env@7.21.5)(react@18.2.0)
     dev: false
 
@@ -22795,7 +22822,7 @@ packages:
       schema-utils: 3.1.2
       serialize-javascript: 6.0.1
       terser: 5.16.9
-      webpack: 5.83.1(webpack-cli@5.1.1)
+      webpack: 5.83.1(webpack-cli@4.9.2)
     dev: true
 
   /terser@5.16.9:
@@ -23159,6 +23186,37 @@ packages:
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@swc/core': 1.3.58
+      '@tsconfig/node10': 1.0.9
+      '@tsconfig/node12': 1.0.11
+      '@tsconfig/node14': 1.0.3
+      '@tsconfig/node16': 1.0.3
+      '@types/node': 18.15.11
+      acorn: 8.8.2
+      acorn-walk: 8.2.0
+      arg: 4.1.3
+      create-require: 1.1.1
+      diff: 4.0.2
+      make-error: 1.3.6
+      typescript: 5.0.4
+      v8-compile-cache-lib: 3.0.1
+      yn: 3.1.1
+    dev: true
+
+  /ts-node@10.9.1(@types/node@18.15.11)(typescript@5.0.4):
+    resolution: {integrity: sha512-NtVysVPkxxrwFGUUxGYhfux8k78pQB3JqYBXlLRZgdGUqTO5wU/UyHop5p70iEbGhB7q5KmiZiU0Y3KlJrScEw==}
+    hasBin: true
+    peerDependencies:
+      '@swc/core': '>=1.2.50'
+      '@swc/wasm': '>=1.2.50'
+      '@types/node': '*'
+      typescript: '>=2.7'
+    peerDependenciesMeta:
+      '@swc/core':
+        optional: true
+      '@swc/wasm':
+        optional: true
+    dependencies:
+      '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.9
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3

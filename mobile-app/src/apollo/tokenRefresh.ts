@@ -2,7 +2,6 @@ import { accessToken, saveAccessToken } from '../utils/tokenFromAsyncStorage'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
 import { API_URL, API_URL_RELEASE } from '@env'
-import { useTestStore } from '@src/utils/deviceStateStore'
 import { useStore } from '@src/utils/deviceStore'
 
 const ENDPOINT = __DEV__ ? API_URL : API_URL_RELEASE
@@ -34,14 +33,13 @@ export const tokenRefresh = new TokenRefreshLink({
       credentials: 'include'
     })
   },
-  handleFetch: async (accessToken) => {
-    saveAccessToken(accessToken)
+  handleFetch: async (newAccessToken) => {
+    saveAccessToken(newAccessToken)
   },
   handleError: async (err) => {
-    // TODO: What should we do here?
-    if (useTestStore.getState()) {
+    //FIX: What should we do here?
+    if (useStore.getState().isLoggedIn) {
       console.warn('Your refresh token is invalid. You must login again', err)
-
       useStore.getState().clearAndReload()
     }
   }

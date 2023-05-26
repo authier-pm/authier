@@ -44,7 +44,7 @@ export function Register({ navigation }: NavigationProps) {
   const toast = useToast()
   const id = 'active-toast'
   let device = useStore((state) => state)
-  const { formState, setFormState } = useContext(LoginContext)
+  const { formState } = useContext(LoginContext)
 
   useEffect(() => {
     if (error) {

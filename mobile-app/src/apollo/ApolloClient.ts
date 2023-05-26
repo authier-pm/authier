@@ -1,5 +1,4 @@
 import { onError } from '@apollo/client/link/error'
-import fetch from 'cross-fetch'
 import {
   ApolloClient,
   InMemoryCache,
@@ -22,10 +21,10 @@ import { useStore } from '@src/utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
+console.log('apiUrl', apiUrl)
 const httpLink = new HttpLink({
   uri: apiUrl,
-  credentials: 'include',
-  fetch: fetch
+  credentials: 'include'
 })
 
 const timeStartLink = new ApolloLink((operation, forward) => {
@@ -58,8 +57,6 @@ export const queueLink = new QueueLink()
 const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
-  //get the authentication token
-
   //return the headers to the context so httpLink can read them
   return {
     headers: {
