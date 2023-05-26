@@ -21,7 +21,7 @@ import {
   dec,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import { IBackgroundStateSerializable } from '@utils/Device'
+import { IBackgroundStateSerializable } from '@utils/deviceStore'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
@@ -33,13 +33,13 @@ import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
-import { useStore } from '@utils/deviceStore'
+import { useDeviceStore } from '@utils/deviceStore'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
-  let device = useStore((state) => state)
+  let device = useDeviceStore((state) => state)
   const [addNewDevice, { loading, error: newDeviceError }] =
     useAddNewDeviceForUserMutation()
 
@@ -204,7 +204,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   const { formState } = useContext(LoginContext)
-  let device = useStore((state) => state)
+  let device = useDeviceStore((state) => state)
   const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName

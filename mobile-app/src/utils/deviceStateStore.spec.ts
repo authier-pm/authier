@@ -1,5 +1,5 @@
 import { act } from '@testing-library/react-native'
-import { useTestStore } from './deviceStateStore'
+import { useDeviceStateStore } from './deviceStateStore'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 // Secrets to be added

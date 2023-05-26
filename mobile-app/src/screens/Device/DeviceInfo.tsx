@@ -20,7 +20,7 @@ import { DevicesStackScreenProps } from '../../navigation/types'
 import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 const ColumnWrapper = ({
   text,
@@ -43,7 +43,7 @@ export default function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
-  const device = useStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
   const masterDeviceId = route.params.masterDeviceId
   const selectedDeviceId = route.params.device.id

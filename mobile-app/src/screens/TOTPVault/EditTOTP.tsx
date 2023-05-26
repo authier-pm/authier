@@ -4,17 +4,16 @@ import { Alert, Input, Button, Flex, FormControl, View } from 'native-base'
 
 import { Formik, FormikHelpers } from 'formik'
 
-import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
+import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
-import { ILoginSecret, ITOTPSecret } from '../../utils/Device'
+import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
-import { TOTPStackScreenProps } from '../../navigation/types'
+import { TOTPStackScreenProps } from '@navigation/types'
 import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { SyncEncryptedSecretsDocument } from '@shared/graphql/ExtensionDevice.codegen'
-import { Loading } from '@src/components/Loading'
-import { useTestStore } from '@src/utils/deviceStateStore'
-import { useStore } from '@src/utils/deviceStore'
+import { Loading } from '@components/Loading'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -40,7 +39,7 @@ const InputField = ({
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const { totp } = data
-  let deviceState = useTestStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: SyncEncryptedSecretsDocument, variables: {} }]
   })
@@ -165,7 +164,7 @@ export function EditTOTP({
   navigation,
   route
 }: TOTPStackScreenProps<'EditTOTP'>) {
-  let deviceState = useTestStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)

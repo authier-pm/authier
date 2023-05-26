@@ -22,8 +22,8 @@ import { ToastType } from '../../ToastTypes'
 
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import zxcvbn from 'zxcvbn-typescript'
-import { useStore } from '@src/utils/deviceStore'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -50,8 +50,8 @@ const InputField = ({
 
 export const AddPassword = () => {
   const [show, setShow] = useState(false)
-  let device = useStore((state) => state)
-  let deviceState = useTestStore((state) => state)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const navigation =
     useNavigation<PasswordStackScreenProps<'AddPassword'>['navigation']>()
 

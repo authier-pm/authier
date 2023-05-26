@@ -34,7 +34,7 @@ import { Trans } from '@lingui/macro'
 import { DevicesStackScreenProps } from '@navigation/types'
 
 import mitt from 'mitt'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export const icons = {
   Android: 'logo-android',
@@ -50,7 +50,7 @@ const empty = () => {
   return <></>
 }
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
-  const device = useStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,

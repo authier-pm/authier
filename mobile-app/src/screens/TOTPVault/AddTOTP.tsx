@@ -6,9 +6,9 @@ import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
 import { TOTPStackScreenProps } from '../../navigation/types'
-import { TotpTypeWithMeta } from '@src/utils/Device'
+import { TotpTypeWithMeta } from '@utils/deviceStore'
 import { TOTPSchema } from '@shared/formikSharedTypes'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 export const InputField = ({
   errors,
@@ -34,7 +34,7 @@ export const InputField = ({
 }
 
 export const AddTOTP = () => {
-  let deviceState = useTestStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const navigation =
     useNavigation<TOTPStackScreenProps<'AddTOTP'>['navigation']>()
 

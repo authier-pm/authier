@@ -25,7 +25,7 @@ import { Loading } from '@src/components/Loading'
 import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 interface Values {
   password: string
@@ -38,7 +38,7 @@ export function VaultUnlockVerification({
 }) {
   const toast = useToast()
   const id = 'active-toast'
-  let device = useStore((state) => state)
+  let device = useDeviceStore((state) => state)
 
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)

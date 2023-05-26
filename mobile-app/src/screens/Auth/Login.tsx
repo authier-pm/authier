@@ -25,7 +25,7 @@ import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { Loading } from '@src/components/Loading'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export interface ILoginFormValues {
   email: string
@@ -45,7 +45,7 @@ export function Login({ navigation }: NavigationProps) {
   const [show, setShow] = React.useState(false)
   const { formState, setFormState } = useContext(LoginContext)
 
-  const device = useStore((state) => state)
+  const device = useDeviceStore((state) => state)
 
   useEffect(() => {
     if (!device.fireToken) {

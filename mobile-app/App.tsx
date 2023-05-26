@@ -18,7 +18,7 @@ import messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
-import { useStore } from './src/utils/deviceStore'
+import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
 
 let CodePushOptions = {
@@ -33,7 +33,7 @@ let CodePushOptions = {
 }
 
 const RnApp = () => {
-  const device = useStore((state) => state)
+  const device = useDeviceStore((state) => state)
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()

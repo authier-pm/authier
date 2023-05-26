@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { AlertDialog, Button, Text, IconButton, Center } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 import {
   EncryptedSecretsDocument,
@@ -11,7 +11,7 @@ import {
 } from '@shared/graphql/EncryptedSecrets.codegen'
 
 export const DeleteSecretAlert = ({ id }: { id: string }) => {
-  const deviceState = useTestStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const navigation = useNavigation()
   const [isOpen, setIsOpen] = useState(false)
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()

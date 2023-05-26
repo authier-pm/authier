@@ -18,12 +18,12 @@ import { Trans } from '@lingui/macro'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
-import { useTestStore } from '@src/utils/deviceStateStore'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export default function Settings() {
-  let deviceState = useTestStore((state) => state)
-  let device = useStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
+  let device = useDeviceStore((state) => state)
 
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],

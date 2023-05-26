@@ -16,12 +16,12 @@ import { storage } from '@utils/storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 import { routingInstrumentation } from './sentryInit'
-import { useStore } from './utils/deviceStore'
+import { useDeviceStore } from './utils/deviceStore'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
-  const device = useStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const { colorMode } = useColorMode()
 
   const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.

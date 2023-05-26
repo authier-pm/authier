@@ -18,8 +18,8 @@ import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { TOTPStackScreenProps } from '../../navigation/types'
-import { useTestStore } from '@src/utils/deviceStateStore'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 const EmptyList = () => {
   return (
@@ -39,8 +39,8 @@ export const TOTPVault = ({
 }: TOTPStackScreenProps<'TOTPVault'>) => {
   const [refreshing, setRefreshing] = useState(false)
   const [remainingSeconds, setRemainingSeconds] = useState<number>(30)
-  let deviceState = useTestStore((state) => state)
-  let device = useStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
+  let device = useDeviceStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
 
   const timer = () => {

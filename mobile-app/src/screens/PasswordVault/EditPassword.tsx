@@ -18,16 +18,16 @@ import { Formik, FormikHelpers } from 'formik'
 
 import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
-import { ILoginSecret, ITOTPSecret } from '@utils/Device'
+import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
 import {
   EncryptedSecretsDocument,
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
-import { Loading } from '@src/components/Loading'
+import { Loading } from '@components/Loading'
 import zxcvbn from 'zxcvbn-typescript'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 export const InputHeader = ({ children }) => {
   return (
@@ -68,7 +68,7 @@ const InputField = ({
 const LoginSecret = (secretProps: ILoginSecret) => {
   const { loginCredentials } = secretProps
   const [show, setShow] = useState(false)
-  const deviceState = useTestStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
 
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
@@ -232,7 +232,7 @@ export default function EditPassword({
   navigation,
   route
 }: PasswordStackScreenProps<'EditPassword'>) {
-  let deviceState = useTestStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)

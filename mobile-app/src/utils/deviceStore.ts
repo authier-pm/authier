@@ -13,7 +13,10 @@ import {
   loginCredentialsSchema,
   totpSchema
 } from '../../../shared/loginCredentialsSchema'
-
+import { create } from 'zustand'
+import { useDeviceStateStore } from './deviceStateStore'
+import { createJSONStorage, persist } from 'zustand/middleware'
+import { zustandStorage } from './storage'
 import {
   LogoutDocument,
   LogoutMutation,
@@ -119,11 +122,6 @@ export type AddSecretInput = Array<
   }
 >
 
-import { create } from 'zustand'
-import { useTestStore } from './deviceStateStore'
-import { createJSONStorage, persist } from 'zustand/middleware'
-import { zustandStorage } from './storage'
-
 interface DeviceProps {
   fireToken: string | null
   lockedState: IBackgroundStateSerializableLocked | null
@@ -139,7 +137,7 @@ interface DeviceProps {
 
 interface Device extends DeviceProps {
   save: (deviceState?: IBackgroundStateSerializable) => Promise<void>
-  initialize: () => Promise<ReturnType<typeof useTestStore> | null>
+  initialize: () => Promise<ReturnType<typeof useDeviceStateStore> | null>
   setDeviceSettings: (config: SettingsInput) => void
   lock: () => Promise<void>
   clearAndReload: () => Promise<void>
@@ -179,7 +177,7 @@ const initialState: DeviceProps = {
   isLocked: false
 }
 
-export const useStore = create<Device>()(
+export const useDeviceStore = create<Device>()(
   persist(
     (set, get) => ({
       ...initialState,
@@ -187,11 +185,11 @@ export const useStore = create<Device>()(
         //We must clear interval, otherwise we will create a new one every time we save the state
         //because we are creating a new interval every time we we start the app (in syncSettings)
         if (deviceState) {
-          useTestStore.setState({ ...deviceState })
+          useDeviceStateStore.setState({ ...deviceState })
           set({ isLoggedIn: true })
         }
-        console.log('new state', useTestStore.getState())
-        if (!useTestStore.getState()) {
+        console.log('new state', useDeviceStateStore.getState())
+        if (!useDeviceStateStore.getState()) {
           throw new Error(
             'Device state is not initialized and it was not supplied as an argument'
           )
@@ -231,27 +229,27 @@ export const useStore = create<Device>()(
         //   this.state = null
         // }
 
-        useTestStore.getState().initialize()
+        useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
         set({ fireToken: token, isInitialized: true, platform: Platform.OS })
 
         console.log('device initialized')
-        return useTestStore.getState()
+        return useDeviceStateStore.getState()
       },
       setDeviceSettings: (config: SettingsInput) => {
         //HACK: this is a hack, we should not create a new interval every time we save the state
         //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
-        let state = useTestStore.getState()
+        let state = useDeviceStateStore.getState()
         if (!state) {
           console.warn('device not initialized')
           return
         }
 
-        useTestStore.setState({ ...state, ...config })
+        useDeviceStateStore.setState({ ...state, ...config })
 
         // Sync timer
         if (state.lockTime !== config.vaultLockTimeoutSeconds) {
-          useTestStore.setState({
+          useDeviceStateStore.setState({
             lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
           })
         }
@@ -299,7 +297,7 @@ export const useStore = create<Device>()(
         }
       },
       lock: async () => {
-        let state = useTestStore.getState()
+        let state = useDeviceStateStore.getState()
         get().clearLockInterval()
         console.log('state before lock', state)
         if (!state) {
@@ -343,13 +341,13 @@ export const useStore = create<Device>()(
         })
 
         set({ isLocked: true })
-        useTestStore.setState({})
+        useDeviceStateStore.setState({})
       },
       clearAndReload: async () => {
         //TODO: This could be done better
         get().clearLockInterval()
         await clearAccessToken()
-        useTestStore.getState().reset()
+        useDeviceStateStore.getState().reset()
         set({ isLoggedIn: false, isInitialized: true })
       },
       logout: async () => {
@@ -375,7 +373,7 @@ export const useStore = create<Device>()(
         secrets: SecretSerializedType[],
         newPsw: string
       ) => {
-        const state = useTestStore.getState()
+        const state = useDeviceStateStore.getState()
         if (!state) {
           throw new Error('device not initialized')
         }
@@ -397,27 +395,27 @@ export const useStore = create<Device>()(
         )
       },
       loginCredentials: () => {
-        let state = useTestStore.getState()
+        let state = useDeviceStateStore.getState()
         console.log('loginCredentials', state.decryptedSecrets)
         return (state.decryptedSecrets.filter(({ kind }) => {
           return kind === EncryptedSecretType.LOGIN_CREDENTIALS
         }) ?? []) as ILoginSecret[]
       },
       TOTPSecrets: () => {
-        let state = useTestStore.getState()
+        let state = useDeviceStateStore.getState()
         return (state.decryptedSecrets.filter(({ kind }) => {
           return kind === EncryptedSecretType.TOTP
         }) ?? []) as ITOTPSecret[]
       },
       saveState: async (deviceState: IBackgroundStateSerializable) => {
-        useTestStore.setState({ ...deviceState })
+        useDeviceStateStore.setState({ ...deviceState })
       },
       checkBiometrics: async () => {
         const hasAnySensors = await SInfo.isSensorAvailable()
         return !!hasAnySensors
       },
       startVaultLockTimer: () => {
-        let state = useTestStore.getState()
+        let state = useDeviceStateStore.getState()
         set({
           lockInterval: setInterval(() => {
             if (state.lockTimeEnd <= Date.now()) {
@@ -428,11 +426,13 @@ export const useStore = create<Device>()(
         })
       },
       setLockTime: (lockTime: number) => {
-        useTestStore.setState({ lockTime })
+        useDeviceStateStore.setState({ lockTime })
 
         get().clearLockInterval()
         if (lockTime > 0) {
-          useTestStore.setState({ lockTimeEnd: Date.now() + lockTime * 1000 })
+          useDeviceStateStore.setState({
+            lockTimeEnd: Date.now() + lockTime * 1000
+          })
           get().startVaultLockTimer()
         }
 

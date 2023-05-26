@@ -11,7 +11,7 @@ import { Camera } from 'react-native-vision-camera'
 import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
 
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 function CameraFrame() {
   return (
@@ -40,7 +40,7 @@ function CameraFrame() {
 export const QRScan = () => {
   const navigation =
     useNavigation<TOTPStackScreenProps<'QRScan'>['navigation']>()
-  let deviceState = useTestStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [hasPermission, setHasPermission] = React.useState(false)
   const devices = useCameraDevices()
   const cameraDevice = devices.back

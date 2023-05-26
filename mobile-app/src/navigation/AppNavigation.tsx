@@ -12,9 +12,9 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { useTestStore } from '@utils/deviceStateStore'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { useToast } from 'native-base'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -23,8 +23,8 @@ function AppNavigation() {
     fetchPolicy: 'cache-and-network',
     nextFetchPolicy: 'cache-first'
   })
-  const device = useStore((state) => state)
-  const deviceState = useTestStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const navigation = useNavigation()
   const toast = useToast()
 

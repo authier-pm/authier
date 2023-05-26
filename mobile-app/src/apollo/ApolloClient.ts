@@ -17,7 +17,7 @@ import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { API_URL, API_URL_RELEASE } from '@env'
 import { Toast } from 'native-base'
-import { useStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
@@ -78,7 +78,7 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (graphQLErrors) {
     if (graphQLErrors[0].message === 'not authenticated') {
       //Here just logout the user
-      useStore.getState().clearAndReload()
+      useDeviceStore.getState().clearAndReload()
     }
     graphQLErrors.map(({ message, locations, path }) => {
       console.error(

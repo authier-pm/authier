@@ -31,7 +31,7 @@ import {
   isLoginSecret,
   isTotpSecret,
   getDecryptedSecretProp
-} from './Device'
+} from './deviceStore'
 
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
@@ -129,7 +129,8 @@ const initialState: DeviceStateProps = {
   decryptedSecrets: []
 }
 
-export const useTestStore = create<DeviceStateActions>()(
+//WARNING: Not sure if this name is ok, because it can get easily confused with the deviceStore
+export const useDeviceStateStore = create<DeviceStateActions>()(
   persist(
     (set, get) => ({
       ...initialState,

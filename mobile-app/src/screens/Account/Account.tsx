@@ -19,8 +19,8 @@ import { ButtonWithAlert } from '../../components/ButtonWithAlert'
 import { AccountStackScreenProps } from '../../navigation/types'
 import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
-import { useStore } from '@src/utils/deviceStore'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const settingsOptions = [
   { name: 'Settings', route: 'Settings' },
@@ -57,8 +57,8 @@ const SettingsItem = ({
 
 function Account({ navigation }: AccountStackScreenProps<'Account'>) {
   const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
-  const device = useStore((state) => state)
-  const deviceState = useTestStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
 
   useEffect(() => {
     codePush.getUpdateMetadata().then((metadata) => {

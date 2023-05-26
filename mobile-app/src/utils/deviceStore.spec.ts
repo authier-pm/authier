@@ -1,6 +1,6 @@
 import { act } from '@testing-library/react-native'
-import { useStore } from './deviceStore'
-import { useTestStore } from './deviceStateStore'
+import { useDeviceStore } from './deviceStore'
+import { useDeviceStateStore } from './deviceStateStore'
 
 describe('Device Store', () => {
   it.todo('Init state')

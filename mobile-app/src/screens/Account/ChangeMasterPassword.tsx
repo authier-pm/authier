@@ -25,13 +25,13 @@ import {
   decryptDeviceSecretWithPassword,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
-import { IBackgroundStateSerializable } from '@src/utils/Device'
-import { useStore } from '@src/utils/deviceStore'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { IBackgroundStateSerializable } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 export function ChangeMasterPassword() {
-  let device = useStore((state) => state)
-  let deviceState = useTestStore((state) => state)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [changePassword] = useChangeMasterPasswordMutation()
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const toast = useToast()

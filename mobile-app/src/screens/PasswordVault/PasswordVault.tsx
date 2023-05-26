@@ -7,8 +7,8 @@ import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
-import { useStore } from '@src/utils/deviceStore'
-import { useTestStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const EmptyList = () => {
   return (
@@ -24,8 +24,8 @@ export const PasswordVault = ({
   navigation
 }: PasswordStackScreenProps<'PasswordsVault'>) => {
   const toast = useToast()
-  let device = useStore((state) => state)
-  let deviceState = useTestStore((state) => state)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [refreshing, setRefreshing] = useState(false)
   const [filterBy, setFilterBy] = useState('')
 
