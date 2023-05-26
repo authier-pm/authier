@@ -4,9 +4,10 @@
 
 // Note: test renderer must be required after react-native.
 import React from 'react'
-import { render, fireEvent, waitFor } from '@testing-library/react-native'
+
 import { it } from '@jest/globals'
 import { ILoginFormValues, Login } from '@src/screens/Auth/Login'
+import { fireEvent, render, waitFor } from '@src/utils/test-utils'
 
 describe('Login Component', () => {
   const navigation = {

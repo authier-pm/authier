@@ -1,4 +1,5 @@
 import { onError } from '@apollo/client/link/error'
+import fetch from 'cross-fetch'
 import {
   ApolloClient,
   InMemoryCache,
@@ -24,7 +25,8 @@ const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
 console.log('apiUrl', apiUrl)
 const httpLink = new HttpLink({
   uri: apiUrl,
-  credentials: 'include'
+  credentials: 'include',
+  fetch
 })
 
 const timeStartLink = new ApolloLink((operation, forward) => {
@@ -75,7 +77,7 @@ const ToastServerErrorDetails = {
 
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
-  if (graphQLErrors) {
+  if (graphQLErrors && graphQLErrors.length > 0) {
     if (graphQLErrors[0].message === 'not authenticated') {
       //Here just logout the user
       useDeviceStore.getState().clearAndReload()
