@@ -2,8 +2,7 @@ name: Release and publish on tag
 on:
   push:
     tags:
-      - '*.*.*'
-      - '!*.*.*-firefox'
+      - '*.*.*-extension'
   workflow_dispatch:
 jobs:
   build-release-publish:
