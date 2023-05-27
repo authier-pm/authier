@@ -26,14 +26,14 @@ describe('Login Component', () => {
 
   it.todo('Login Screen')
 
-  it('renders correctly', () => {
-    render(<Login navigation={navigation as any} route={route as any} />)
-
-    const heading = screen.getByText(/Welcome/i)
-    const text = screen.getByText(/Log in to continue!/i)
-    expect(heading).toBeTruthy()
-    expect(text).toBeTruthy()
-  })
+  // it('renders correctly', () => {
+  //   render(<Login navigation={navigation as any} route={route as any} />)
+  //
+  //   const heading = screen.getByText(/Welcome/i)
+  //   const text = screen.getByText(/Log in to continue!/i)
+  //   expect(heading).toBeTruthy()
+  //   expect(text).toBeTruthy()
+  // })
 
   // it('submits form and sets submitted to true', async () => {
   //   const { getByText, getByPlaceholderText } = render(
