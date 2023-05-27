@@ -189,11 +189,13 @@ export class DeviceState implements IBackgroundStateSerializable {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
-    // log('SAVE DEVICE STATE', this.decryptedSecrets)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
     })
+
+    let icon = browser.runtime.getURL('icon-48.png')
+    chrome.action.setIcon({ path: icon })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
@@ -582,6 +584,9 @@ class ExtensionDevice {
 
     this.clearLockInterval()
 
+    let lockIcon = browser.runtime.getURL('icon-lock-48.png')
+    chrome.action.setIcon({ path: lockIcon })
+
     log('locking device')
 
     const {
@@ -622,7 +627,6 @@ class ExtensionDevice {
 
     this.state = null
   }
-
   async clearAndReload() {
     await removeToken()
     await device.clearLocalStorage()
