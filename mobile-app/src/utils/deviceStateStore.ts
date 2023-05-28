@@ -317,7 +317,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
               removedSecrets: actuallyRemovedOnThisDevice.length,
               newAndUpdatedSecrets: newAndUpdatedSecrets.length
             }
-            console.log('res:', res)
+
             if (
               (res?.newAndUpdatedSecrets as number) > 0 ||
               (res?.removedSecrets as number) > 0
