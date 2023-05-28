@@ -5,7 +5,7 @@
 import React from 'react'
 
 import { it } from '@jest/globals'
-import { ILoginFormValues, Login } from '@src/screens/Auth/Login'
+// import { ILoginFormValues, Login } from '../src/screens/Login'
 
 import { render, screen } from '../src/utils/test-utils'
 
@@ -18,11 +18,11 @@ describe('Login Component', () => {
     params: {} // add any necessary default parameters here
   }
 
-  const initialValues: ILoginFormValues = {
-    email: '',
-    password: '',
-    submitted: false
-  }
+  // const initialValues: ILoginFormValues = {
+  //   email: '',
+  //   password: '',
+  //   submitted: false
+  // }
 
   it.todo('Login Screen')
 

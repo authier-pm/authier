@@ -1,35 +1,34 @@
 import { act } from '@testing-library/react-native'
 import { useDeviceStateStore } from './deviceStateStore'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
-// Secrets to be added
-const secrets = [
-  {
-    id: 'test_id',
-    kind: EncryptedSecretType.TOTP,
-    encrypted: 'test_encrypted',
-    totp: {
-      digits: 6,
-      iconUrl: 'https://example.com',
-      label: 'test_label',
-      period: 30,
-      secret: 'test_secret',
-      url: 'https://example.com'
-    }
-  },
-  {
-    id: 'test_id',
-    encrypted: 'test_encrypted',
-    kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-    loginCredentials: {
-      iconUrl: 'https://example.com',
-      label: 'test_label',
-      url: 'https://example.com',
-      username: 'test_username',
-      password: 'test_password'
-    }
-  }
-]
+// // Secrets to be added
+// const secrets = [
+//   {
+//     id: 'test_id',
+//     kind: EncryptedSecretType.TOTP,
+//     encrypted: 'test_encrypted',
+//     totp: {
+//       digits: 6,
+//       iconUrl: 'https://example.com',
+//       label: 'test_label',
+//       period: 30,
+//       secret: 'test_secret',
+//       url: 'https://example.com'
+//     }
+//   },
+//   {
+//     id: 'test_id',
+//     encrypted: 'test_encrypted',
+//     kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+//     loginCredentials: {
+//       iconUrl: 'https://example.com',
+//       label: 'test_label',
+//       url: 'https://example.com',
+//       username: 'test_username',
+//       password: 'test_password'
+//     }
+//   }
+// ]
 
 describe('useTestStore', () => {
   it.todo('Add secrets')
