@@ -22,7 +22,6 @@
     "debug": "^4.3.4",
     "dotenv": "^16.0.3",
     "fastify": "^4.17.0",
-    "fastify-cookie": "^5.7.0",
     "fastify-helmet": "^7.1.0",
     "fastify-jwt": "^4.2.0",
     "fastify-raw-body": "^4.2.0",
