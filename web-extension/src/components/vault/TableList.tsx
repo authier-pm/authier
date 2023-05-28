@@ -8,7 +8,8 @@ import {
   Flex,
   Checkbox,
   HStack,
-  useColorModeValue
+  useColorModeValue,
+  Center
 } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { FixedSizeList as List } from 'react-window'
@@ -17,6 +18,7 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
+import { Link } from 'react-router-dom'
 
 export function TableList({ filter }: { filter: string }) {
   const debouncedSearchTerm = useDebounce(filter, 400)
@@ -89,7 +91,7 @@ export function TableList({ filter }: { filter: string }) {
             backgroundColor: useColorModeValue('gray.400', 'gray.700')
           }}
         >
-          <HStack w="80%" justifyContent="space-between" alignItems="center">
+          <HStack w="90%" justifyContent="space-between" alignItems="center">
             <Box>
               <Checkbox
                 isChecked={selected.includes(row.id)}
@@ -157,11 +159,16 @@ export function TableList({ filter }: { filter: string }) {
               />
             </Tooltip>
             <Tooltip label="Edit" aria-label="Edit">
-              <IconButton
-                aria-label="Edit"
-                icon={<EditIcon />}
-                onClick={() => handleEdit(row)}
-              />
+              <Link
+                to={{
+                  pathname: `secret/${row.id}`
+                }}
+                state={{
+                  data: row.kind === 'TOTP' ? row.totp : row.loginCredentials
+                }}
+              >
+                <IconButton aria-label="Edit" icon={<EditIcon />} />
+              </Link>
             </Tooltip>
             <Tooltip label="Delete" aria-label="Delete">
               <IconButton
@@ -182,37 +189,38 @@ export function TableList({ filter }: { filter: string }) {
         borderBottom="1px"
         borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       >
-        <HStack
-          mt={2}
-          w="80%"
-          justifyContent="space-evenly"
-          alignItems="center"
-        >
-          <Text w="inherit" textAlign="center" fontWeight="bold">
-            Label
-          </Text>
-          <Text w="inherit" textAlign="center" fontWeight="bold">
-            URL
-          </Text>
-          <HStack>
-            <Text pr={4} w="inherit" textAlign="end" fontWeight="bold">
-              Secret
+        <HStack mt={2} w="100%" justifyContent="space-between">
+          <Flex w="33%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              Label
             </Text>
-            <IconButton
-              size="sm"
-              aria-label={showText}
-              icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
-              onClick={() => setShowAllPasswords(!showAllPasswords)}
-              ml={2}
-            />
-          </HStack>
+          </Flex>
+          <Flex w="33%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              URL
+            </Text>
+          </Flex>
+          <Flex w="33%" justifyContent="center">
+            <HStack>
+              <Text pr={4} w="100%" textAlign="end" fontWeight="bold">
+                Secret
+              </Text>
+              <IconButton
+                size="sm"
+                aria-label={showText}
+                icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={() => setShowAllPasswords(!showAllPasswords)}
+                ml={2}
+              />
+            </HStack>
+          </Flex>
         </HStack>
       </Flex>
       <AutoSizer>
         {({ height, width }) => (
           <List
             itemCount={data.length}
-            itemSize={50}
+            itemSize={60}
             width={width}
             height={height}
           >

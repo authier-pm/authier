@@ -120,6 +120,9 @@ export function VaultListItem({
   )
 }
 
+// Make dfault view as table and be able to switch to list view and when go back to table view it should be same as before
+// Make multi option select and delete in table tableView
+
 export const VaultList = () => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
@@ -154,7 +157,7 @@ export const VaultList = () => {
   }
 
   return (
-    <>
+    <Box overflow="hidden">
       <Center justifyContent={'space-evenly'} w={'100%'} bg={bg} p={3}>
         <Input
           variant={'filled'}
@@ -215,6 +218,6 @@ export const VaultList = () => {
           )}
         </div>
       </VStack>
-    </>
+    </Box>
   )
 }
