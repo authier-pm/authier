@@ -6,7 +6,7 @@ import { QueryClientProvider } from 'react-query'
 import { ApolloProvider } from '@apollo/client'
 
 import { RenderOptions, render } from '@testing-library/react-native'
-// import { makeSsrClient } from '@src/apollo/ApolloClientMock'
+import { makeSsrClient } from '@src/apollo/ApolloClientMock'
 import { ReactElement } from 'react'
 
 const inset = {
@@ -19,11 +19,13 @@ const queryClient = jest.fn()
 const AllTheProviders = ({ children }) => {
   return (
     <NativeBaseProvider initialWindowMetrics={inset} theme={theme as any}>
-      <I18nProvider i18n={i18n} defaultComponent={Text}>
-        <QueryClientProvider client={queryClient as any}>
-          {children}
-        </QueryClientProvider>
-      </I18nProvider>
+      <ApolloProvider client={makeSsrClient as any}>
+        <I18nProvider i18n={i18n} defaultComponent={Text}>
+          <QueryClientProvider client={queryClient as any}>
+            {children}
+          </QueryClientProvider>
+        </I18nProvider>
+      </ApolloProvider>
     </NativeBaseProvider>
   )
 }
@@ -38,5 +40,3 @@ export * from '@testing-library/react'
 
 // override render method
 export { customRender as render }
-
-// <ApolloProvider client={makeSsrClient as any}>
