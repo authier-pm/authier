@@ -239,7 +239,7 @@ const appRouter = tc.router({
       return true
     }),
   setLockInterval: tcProcedure
-    .input(z.object({ time: z.number().nullable() }))
+    .input(z.object({ time: z.number() }))
     .mutation(async ({ input }) => {
       device.setLockTime(
         input.time ? Date.now() + input.time * 1000 : input.time

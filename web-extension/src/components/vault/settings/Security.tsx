@@ -17,9 +17,9 @@ import { t } from '@lingui/macro'
 import { SettingsSubmitButton } from './Account'
 
 const VaultConfigFormSchema = z.object({
-  vaultLockTimeoutSeconds: selectNumberFieldSchema
-    .default(0)
-    .describe(t`Lock time // Choose lock time`),
+  vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
+    t`Lock time // Choose lock time`
+  ),
   uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
   autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
   autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),
@@ -90,7 +90,7 @@ export default function Security() {
             },
             vaultLockTimeoutSeconds: {
               options: [
-                { label: t`1 minute`, value: 20 },
+                { label: t`1 minute`, value: 60 },
                 { label: t`2 minutes`, value: 120 },
                 { label: t`1 hour`, value: 3600 },
                 { label: t`4 hours`, value: 14400 },
