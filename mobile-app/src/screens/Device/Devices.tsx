@@ -218,7 +218,9 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 }
               }}
             >
-              {formatRelative(new Date(item.createdAt), new Date())}
+              {item.deviceName}
+              {formatRelative(new Date(item.createdAt), new Date())} from IP
+              {item.ipAddress}
             </Box>
           </VStack>
 

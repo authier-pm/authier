@@ -48,7 +48,7 @@ interface DeviceStateProps {
   secrets: Array<SecretSerializedType>
   authSecret: string
   authSecretEncrypted: string
-  lockTime: number
+  vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -116,7 +116,7 @@ const initialState: DeviceStateProps = {
   secrets: [],
   authSecret: '',
   authSecretEncrypted: '',
-  lockTime: 0,
+  vaultLockTimeoutSeconds: 0,
   syncTOTP: false,
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,

@@ -102,7 +102,7 @@ export function VaultUnlockVerification({
     }
     newState.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
     await device.save(newState)
-    device.changeIsLocked(false)
+    device.setLockedState(null)
   }
 
   return (
