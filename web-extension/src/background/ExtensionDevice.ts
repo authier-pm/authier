@@ -114,7 +114,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime: number | null
+  lockTime: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -425,7 +425,7 @@ class ExtensionDevice {
   initCallbacks: (() => void)[] = []
   lockInterval: NodeJS.Timer | null
 
-  async startLockInterval(lockTime: number | null) {
+  async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
   }
 
@@ -705,7 +705,7 @@ class ExtensionDevice {
   }
 
   // null is when user disables the vault lock
-  setLockTime(lockTime: number | null) {
+  setLockTime(lockTime: number) {
     if (!this.state) {
       console.warn('cannot set device settings, device not initialized')
       return
@@ -713,7 +713,7 @@ class ExtensionDevice {
     this.state.lockTime = lockTime
 
     this.clearLockInterval()
-    if (lockTime && lockTime > 0) {
+    if (lockTime > 0) {
       this.state.lockTimeEnd = Date.now() + lockTime * 1000
       this.startVaultLockTimer()
     }

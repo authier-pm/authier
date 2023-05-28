@@ -17,9 +17,9 @@ import { t } from '@lingui/macro'
 import { SettingsSubmitButton } from './Account'
 
 const VaultConfigFormSchema = z.object({
-  vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
-    t`Lock time // Choose lock time`
-  ),
+  vaultLockTimeoutSeconds: selectNumberFieldSchema
+    .default(0)
+    .describe(t`Lock time // Choose lock time`),
   uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
   autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
   autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),

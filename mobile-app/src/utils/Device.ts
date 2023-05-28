@@ -213,13 +213,14 @@ export class Device {
       }
 
       if (
-        device.state!.lockTimeEnd &&
+        device.state &&
+        device.state.lockTimeEnd &&
         Date.now() >= device.state!.lockTimeEnd
       ) {
         device.lock()
       } else if (device.state?.lockTimeEnd) {
         if (!this.lockInterval) {
-          console.log('syncSettigs', device.state?.lockTimeEnd)
+          console.log('syncSettings', device.state?.lockTimeEnd)
           device.startVaultLockTimer()
         }
       }
