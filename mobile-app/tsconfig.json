@@ -60,16 +60,20 @@
     // "mapRoot": "./",                       /* Specify the location where debugger should locate map files instead of generated locations. */
     // "inlineSourceMap": true,               /* Emit a single file with source maps instead of having a separate file. */
     // "inlineSources": true,                 /* Emit the source alongside the sourcemaps within a single file; requires '--inlineSourceMap' or '--sourceMap' to be set. */
-    "incremental": true
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "preserveConstEnums": true,
     /* Experimental Options */
-    // "experimentalDecorators": true,        /* Enables experimental support for ES7 decorators. */
-    // "emitDecoratorMetadata": true,         /* Enables experimental support for emitting type metadata for decorators. */
+    "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+    "emitDecoratorMetadata": true /* Enables experimental support for emitting type metadata for decorators. */
   },
 
   "exclude": [
     "node_modules",
     "babel.config.js",
     "metro.config.js",
-    "jest.config.js"
+    "jest.config.js",
+    "**/*.spec.ts",
+    "**/*.spec.tsx"
   ]
 }
