@@ -440,7 +440,6 @@ export class UserMutation extends UserBase {
     const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
     const portalSession = await stripe.billingPortal.sessions.create({
-      email: this.email,
       customer: checkoutSession.customer as string,
       return_url: returnUrl
     })

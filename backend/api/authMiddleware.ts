@@ -2,6 +2,7 @@ import { MiddlewareFn } from 'type-graphql'
 import { verify } from 'jsonwebtoken'
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { IJWTPayload } from '../schemas/RootResolver'
+import '@fastify/cookie'
 
 export const throwIfNotAuthenticated: MiddlewareFn<
   IContextAuthenticated
