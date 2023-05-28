@@ -32,8 +32,8 @@ export class DeviceGQLScalars {
   @Field()
   syncTOTP: boolean
 
-  @Field(() => Int, { nullable: true })
-  vaultLockTimeoutSeconds: number | null
+  @Field(() => Int)
+  vaultLockTimeoutSeconds: number
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date

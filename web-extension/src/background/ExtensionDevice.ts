@@ -98,6 +98,7 @@ export const getDecryptedSecretProp = (
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  lockTimeEnd: number
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     //log('device state created', this)
@@ -422,13 +423,10 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
+  lockInterval: NodeJS.Timer | null
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
-  }
-
-  async clearLockInterval() {
-    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 
   onInitDone(callback: () => void) {
@@ -447,11 +445,10 @@ class ExtensionDevice {
    */
   async initialize() {
     this.id = await this.getDeviceId()
-
     let storedState: IBackgroundStateSerializable | null = null
 
     const storage = await browser.storage.local.get()
-    log('storage', storage)
+
     if (storage.backgroundState) {
       storedState = storage.backgroundState
 
@@ -487,7 +484,7 @@ class ExtensionDevice {
 
     this.fireToken = fireToken
     this.initCallbacks.forEach((cb) => cb())
-    log('Extension device initialized')
+    log('Extension device initialized with id ', this.id)
   }
 
   private listenForUserLogin() {
@@ -676,22 +673,62 @@ class ExtensionDevice {
     )
   }
 
-  syncSettings(config: SettingsInput) {
-    if (this.state) {
-      this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
-      this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
-      this.state.lockTime = config.vaultLockTimeoutSeconds
-      this.state.syncTOTP = config.syncTOTP
-      this.state.uiLanguage = config.uiLanguage
+  setDeviceSettings(config: SettingsInput) {
+    if (!this.state) {
+      console.warn('cannot set device settings, device not initialized')
+      return
     }
+
+    this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
+    this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
+    this.state.syncTOTP = config.syncTOTP
+    this.state.uiLanguage = config.uiLanguage
+
+    device.setLockTime(config.vaultLockTimeoutSeconds)
+
+    this.state.save()
   }
 
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     this.state.save()
   }
+
+  startVaultLockTimer() {
+    this.lockInterval = setInterval(() => {
+      const now = Date.now()
+      if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {
+        console.log(`Vault locked at ${now}`)
+        device.lock()
+      }
+    }, 5000)
+  }
+
+  // null is when user disables the vault lock
+  setLockTime(lockTime: number) {
+    if (!this.state) {
+      console.warn('cannot set device settings, device not initialized')
+      return
+    }
+    this.state.lockTime = lockTime
+
+    this.clearLockInterval()
+    if (lockTime > 0) {
+      this.state.lockTimeEnd = Date.now() + lockTime * 1000
+      this.startVaultLockTimer()
+    }
+  }
+
+  async clearLockInterval() {
+    if (this.lockInterval) {
+      clearInterval(this.lockInterval)
+    }
+    this.lockInterval = null
+
+    await extensionDeviceTrpc.clearLockInterval.mutate()
+  }
 }
-log('Extension device started')
+
 export const device = new ExtensionDevice()
 
 device.initialize()

@@ -90,7 +90,7 @@ export default function Security() {
             },
             vaultLockTimeoutSeconds: {
               options: [
-                { label: t`1 minute`, value: 20 },
+                { label: t`1 minute`, value: 60 },
                 { label: t`2 minutes`, value: 120 },
                 { label: t`1 hour`, value: 3600 },
                 { label: t`4 hours`, value: 14400 },

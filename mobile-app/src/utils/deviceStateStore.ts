@@ -56,7 +56,7 @@ interface DeviceStateProps {
   theme: string
   biometricsEnabled: boolean
   lockTimeStart: number
-  lockTimeEnd: number
+  lockTimeEnd: number | null
   lockTimerRunning: boolean
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
 }

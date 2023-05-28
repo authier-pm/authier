@@ -47,7 +47,7 @@ export interface IBackgroundStateSerializableLocked {
   uiLanguage: string
   theme: string
   biometricsEnabled?: boolean
-  lockTimeEnd: number
+  lockTimeEnd: number | null
 }
 
 export interface IBackgroundStateSerializable
@@ -253,14 +253,25 @@ export const useDeviceStore = create<Device>()(
             lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
           })
         }
-
-        if (Date.now() >= state.lockTimeEnd) {
-          get().lock()
-        } else if (state.lockTimeEnd) {
-          if (!get().lockInterval) {
-            console.log('syncSettigs', state.lockTimeEnd)
-            get().startVaultLockTimer()
+        const device = get()
+        if (config.vaultLockTimeoutSeconds > 0) {
+          // Sync timer
+          if (state.lockTime !== config.vaultLockTimeoutSeconds) {
+            state.lockTimeEnd =
+              Date.now() + config.vaultLockTimeoutSeconds * 1000
           }
+
+          if (state && state.lockTimeEnd && Date.now() >= state.lockTimeEnd) {
+            device.lock()
+          } else if (state.lockTimeEnd) {
+            if (!device.lockInterval) {
+              console.log('syncSettings', state.lockTimeEnd)
+              device.startVaultLockTimer()
+            }
+          }
+        } else {
+          state.lockTimeEnd = null
+          device.clearLockInterval()
         }
       },
       generateBackendSecret: () => {
@@ -418,7 +429,7 @@ export const useDeviceStore = create<Device>()(
         let state = useDeviceStateStore.getState()
         set({
           lockInterval: setInterval(() => {
-            if (state.lockTimeEnd <= Date.now()) {
+            if (state.lockTimeEnd && state.lockTime <= Date.now()) {
               console.log('Vault locked')
               get().lock()
             }
@@ -427,13 +438,13 @@ export const useDeviceStore = create<Device>()(
       },
       setLockTime: (lockTime: number) => {
         useDeviceStateStore.setState({ lockTime })
-
-        get().clearLockInterval()
+        const device = get()
+        device.clearLockInterval()
         if (lockTime > 0) {
           useDeviceStateStore.setState({
             lockTimeEnd: Date.now() + lockTime * 1000
           })
-          get().startVaultLockTimer()
+          device.startVaultLockTimer()
         }
 
         // this.save()
