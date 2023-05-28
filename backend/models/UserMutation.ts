@@ -4,7 +4,11 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput, SettingsInput } from './models'
+import {
+  EncryptedSecretInput,
+  EncryptedSecretPatchInput,
+  SettingsInput
+} from './models'
 
 import { UserGQL } from './generated/UserGQL'
 
@@ -113,6 +117,23 @@ export class UserMutation extends UserBase {
       }
     })
   }
+
+  @Field(() => [EncryptedSecretMutation])
+  async removeEncryptedSecrets(
+    @Arg('secrets', () => [EncryptedSecretInput])
+    secrets: EncryptedSecretPatchInput[],
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.$transaction(
+      secrets.map((secret) =>
+        ctx.prisma.encryptedSecret.update({
+          where: { id: secret.id },
+          data: { deletedAt: new Date() }
+        })
+      )
+    )
+  }
+
   @Field(() => [EncryptedSecretQuery])
   async addEncryptedSecrets(
     @Arg('secrets', () => [EncryptedSecretInput])
@@ -152,12 +173,6 @@ export class UserMutation extends UserBase {
       }
     })
 
-    console.log(
-      pswCount,
-      userData?.loginCredentialsLimit,
-      TOTPCount,
-      userData?.TOTPlimit
-    )
     if (pswCount > pswLimit) {
       console.log('psw exceeded')
       return new GraphqlError(`Password limit exceeded.`)

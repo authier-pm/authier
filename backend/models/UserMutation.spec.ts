@@ -74,6 +74,11 @@ describe('UserMutation', () => {
     it.todo('should throw error when user is not ona master device')
   })
 
+  describe('Secret manipulation', () => {
+    it.todo('should remove secrets', async () => {})
+    it.todo('add secrets', async () => {})
+  })
+
   describe('updateSettings', () => {
     it('Should update settings', async () => {
       const masterDeviceId = faker.string.uuid()

@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import {
   IconButton,
   Tooltip,
@@ -73,25 +73,33 @@ export function TableList({ filter }: { filter: string }) {
     return (
       <Flex
         p={10}
-        pt={1}
+        pb={0}
+        pt={0}
         m={['auto', '3']}
         key={row.id}
         cursor="pointer"
         justify="space-between"
         align="center"
         style={style}
-        onMouseOver={() => setAreIconsVisible(true)}
+        onMouseOver={() =>
+          selected.length == 0 || selected.includes(row.id)
+            ? setAreIconsVisible(true)
+            : null
+        }
         onMouseOut={() => setAreIconsVisible(false)}
+        _hover={{
+          backgroundColor: useColorModeValue('gray.400', 'gray.700')
+        }}
       >
-        <Flex
-          p={1}
-          justifyContent="inherit"
-          w="100%"
-          _hover={{
-            backgroundColor: useColorModeValue('gray.400', 'gray.700')
-          }}
-        >
-          <HStack w="90%" justifyContent="space-between" alignItems="center">
+        <Flex p={1} justifyContent="inherit" w="100%">
+          <HStack
+            onClick={() => handleSelect(row.id)}
+            w="90%"
+            justifyContent="space-between"
+            alignItems="center"
+            p={'1em'}
+            m={'-1em'}
+          >
             <Box>
               <Checkbox
                 isChecked={selected.includes(row.id)}
@@ -139,6 +147,7 @@ export function TableList({ filter }: { filter: string }) {
                   )}
             </Text>
           </HStack>
+
           <HStack
             justifyContent="flex-end"
             display={areIconsVisible ? 'flex' : 'none'}

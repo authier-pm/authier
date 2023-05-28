@@ -400,6 +400,9 @@ type UserMutation {
   createSecretUsageEvent(
     event: SecretUsageEventInput!
   ): SecretUsageEventGQLScalars!
+  removeEncryptedSecrets(
+    secrets: [EncryptedSecretInput!]!
+  ): [EncryptedSecretMutation!]!
   addEncryptedSecrets(
     secrets: [EncryptedSecretInput!]!
   ): [EncryptedSecretQuery!]!

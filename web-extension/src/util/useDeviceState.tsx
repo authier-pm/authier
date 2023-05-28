@@ -77,6 +77,7 @@ export function useDeviceState() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
+  const [tableView, setTableView] = useState<boolean>(false)
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
@@ -180,7 +181,9 @@ export function useDeviceState() {
       return secrets.sort((a, b) =>
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
       )
-    }
+    },
+    setTableView,
+    tableView
   }
 
   window['backgroundState'] = backgroundStateContext

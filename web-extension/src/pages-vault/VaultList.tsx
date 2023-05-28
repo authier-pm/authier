@@ -124,12 +124,15 @@ export function VaultListItem({
 // Make multi option select and delete in table tableView
 
 export const VaultList = () => {
-  const { loginCredentials: LoginCredentials, TOTPSecrets } =
-    useContext(DeviceStateContext)
+  const {
+    loginCredentials: LoginCredentials,
+    TOTPSecrets,
+    tableView,
+    setTableView
+  } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
   const { setSecuritySettings } = useContext(DeviceStateContext)
-  const [tableView, setTableView] = useState<boolean>(false)
   const { data, loading, error } = useSyncSettingsQuery()
 
   const screenHeight =
