@@ -1,4 +1,4 @@
-import { test as base, BrowserContext, chromium } from '@playwright/test'
+import { test as base, BrowserContext, chromium, Page } from '@playwright/test'
 import path from 'path'
 
 export const test = base.extend<{
@@ -29,7 +29,23 @@ export const test = base.extend<{
 
 export const expect = test.expect
 
-test('Login page is visible', async ({ page, extensionId }) => {
-  await page.goto(`chrome-extension://${extensionId}/js/vault.html#`)
-  await page.locator('text=Login').first().isVisible()
+test.describe('Extension load', () => {
+  test('Popup is visible and can open vault', async ({
+    context,
+    page,
+    extensionId
+  }) => {
+    await page.goto(`chrome-extension://${extensionId}/js/popup.html#`)
+    await expect(page.locator('body')).toHaveText(
+      'Open vault to login or sign up'
+    )
+
+    const newPagePromise: Promise<Page> = new Promise((resolve) =>
+      context.once('page', resolve)
+    )
+    await page.getByRole('button').click()
+    const newPage: Page = await newPagePromise
+
+    await expect(newPage.locator('h3')).toContainText('Login')
+  })
 })
