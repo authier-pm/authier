@@ -100,7 +100,8 @@ export function VaultUnlockVerification({
       masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
     }
-    newState.lockTimeEnd = Date.now() + lockedState.lockTime * 1000
+    newState.lockTimeEnd =
+      Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
     await device.save(newState)
     device.setLockedState(null)
   }

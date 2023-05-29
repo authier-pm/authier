@@ -40,7 +40,7 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  lockTime: number
+  vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -340,7 +340,7 @@ export const useDeviceStore = create<Device>()(
           encryptionSalt,
           authSecret: state.authSecret,
           authSecretEncrypted: state.authSecretEncrypted,
-          lockTime,
+          vaultLockTimeoutSeconds: lockTime,
           syncTOTP,
           autofillCredentialsEnabled,
           autofillTOTPEnabled,

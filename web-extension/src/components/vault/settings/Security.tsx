@@ -39,7 +39,7 @@ export default function Security() {
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.lockTime
+        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
       },
       mode: 'onChange'
     })
@@ -66,7 +66,7 @@ export default function Security() {
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.lockTime
+        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
       })
     }, [isSubmitSuccessful])
 
