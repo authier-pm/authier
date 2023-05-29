@@ -18,7 +18,7 @@ import Clipboard from '@react-native-clipboard/clipboard'
 import { generateOTP } from '../utils/otp'
 import { SecretItemIcon } from './SecretItemIcon'
 import { useNavigation } from '@react-navigation/native'
-import { ITOTPSecret } from '../utils/Device'
+import { ITOTPSecret } from '../utils/deviceStore'
 import { TOTPStackScreenProps } from '../navigation/types'
 
 export default function TOTPSecret({ item }: { item: ITOTPSecret }) {

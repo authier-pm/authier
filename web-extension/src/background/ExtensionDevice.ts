@@ -114,7 +114,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime: number
+  vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -476,7 +476,7 @@ class ExtensionDevice {
     }
 
     if (this.state && (isVault || isPopup)) {
-      this.startLockInterval(this.state.lockTime)
+      this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 
     // const fireToken = await generateFireToken()
@@ -586,7 +586,7 @@ class ExtensionDevice {
       userId,
       secrets,
       encryptionSalt,
-      lockTime,
+      vaultLockTimeoutSeconds: lockTime,
       syncTOTP,
       autofillCredentialsEnabled,
       autofillTOTPEnabled,
@@ -604,7 +604,7 @@ class ExtensionDevice {
       encryptionSalt,
       authSecret,
       authSecretEncrypted,
-      lockTime,
+      vaultLockTimeoutSeconds: lockTime,
       syncTOTP,
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
@@ -710,7 +710,7 @@ class ExtensionDevice {
       console.warn('cannot set device settings, device not initialized')
       return
     }
-    this.state.lockTime = lockTime
+    this.state.vaultLockTimeoutSeconds = lockTime
 
     this.clearLockInterval()
     if (lockTime > 0) {

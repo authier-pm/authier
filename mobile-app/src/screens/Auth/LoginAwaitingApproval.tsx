@@ -21,8 +21,7 @@ import {
   dec,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import { DeviceContext } from '../../providers/DeviceProvider'
-import { IBackgroundStateSerializable } from '@utils/Device'
+import { IBackgroundStateSerializable } from '@utils/deviceStore'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
@@ -34,19 +33,13 @@ import { ToastAlert } from '@components/ToastAlert'
 import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
-
-const ToastServerErrorDetails = {
-  title: 'Something went wrong',
-  variant: 'subtle',
-  description: 'Please create a support ticket from the support page',
-  status: 'warning'
-}
+import { useDeviceStore } from '@utils/deviceStore'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
-  let device = useContext(DeviceContext)
+  let device = useDeviceStore((state) => state)
   const [addNewDevice, { loading, error: newDeviceError }] =
     useAddNewDeviceForUserMutation()
 
@@ -64,18 +57,6 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useEffect(() => {
     if (error || newDeviceError) {
-      if (!toast.isActive(id)) {
-        toast.show({
-          id,
-          render: () => (
-            <ToastAlert
-              {...ToastServerErrorDetails}
-              description={error ? error.message : newDeviceError?.message}
-            />
-          )
-        })
-      }
-
       setFormState({ ...formState, password: '', submitted: false })
     }
   }, [error, newDeviceError])
@@ -195,7 +176,7 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
-            lockTime: 28800,
+            vaultLockTimeoutSeconds: 28800,
             autofillCredentialsEnabled: false,
             autofillTOTPEnabled: false,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
@@ -223,7 +204,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   const { formState } = useContext(LoginContext)
-  let device = useContext(DeviceContext)
+  let device = useDeviceStore((state) => state)
   const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName

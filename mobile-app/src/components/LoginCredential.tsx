@@ -16,8 +16,8 @@ import Icon from 'react-native-vector-icons/Ionicons'
 import Clipboard from '@react-native-clipboard/clipboard'
 import { SecretItemIcon } from './SecretItemIcon'
 import { useNavigation } from '@react-navigation/native'
-import { ILoginSecret } from '../utils/Device'
-import { PasswordStackScreenProps } from '../navigation/types'
+import { ILoginSecret } from '@utils/deviceStore'
+import { PasswordStackScreenProps } from '@navigation/types'
 
 const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
   const { loginCredentials } = loginSecret

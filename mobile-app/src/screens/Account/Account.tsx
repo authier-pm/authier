@@ -13,12 +13,14 @@ import {
   View,
   VStack
 } from 'native-base'
-import { StyleSheet } from 'react-native'
+
 import { ButtonWithAlert } from '../../components/ButtonWithAlert'
-import { device } from '../../utils/Device'
+
 import { AccountStackScreenProps } from '../../navigation/types'
 import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const settingsOptions = [
   { name: 'Settings', route: 'Settings' },
@@ -55,6 +57,8 @@ const SettingsItem = ({
 
 function Account({ navigation }: AccountStackScreenProps<'Account'>) {
   const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
 
   useEffect(() => {
     codePush.getUpdateMetadata().then((metadata) => {
@@ -74,7 +78,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           size={'lg'}
           source={{ uri: 'https://www.gravatar.com/avatar' }}
         />
-        <Heading size="lg">{device.state?.email}</Heading>
+        <Heading size="lg">{deviceState.email}</Heading>
       </VStack>
 
       <Divider />

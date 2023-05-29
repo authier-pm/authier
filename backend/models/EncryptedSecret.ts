@@ -29,6 +29,8 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('patch', () => EncryptedSecretInput) patch: EncryptedSecretInput
   ) {
+    console.log('delete', this.id)
+
     return ctx.prisma.encryptedSecret.update({
       where: { id: this.id },
       data: { ...patch, version: this.version + 1 }
@@ -37,6 +39,7 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
 
   @Field(() => EncryptedSecretGQL)
   delete(@Ctx() ctx: IContextAuthenticated) {
+    console.log('delete', this.id)
     return ctx.prisma.encryptedSecret.update({
       where: { id: this.id },
       data: { deletedAt: new Date() }

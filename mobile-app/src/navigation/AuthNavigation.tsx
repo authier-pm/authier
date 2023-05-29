@@ -5,8 +5,14 @@ import { ILoginFormValues, Login, LoginContext } from '../screens/Auth/Login'
 import { Register } from '../screens/Auth/Register'
 
 export type AuthStackParamList = {
-  Login: undefined
-  Register: undefined
+  Login: {
+    email?: string
+    password?: string
+  }
+  Register: {
+    email?: string
+    password?: string
+  }
   QRLogin: undefined
 }
 

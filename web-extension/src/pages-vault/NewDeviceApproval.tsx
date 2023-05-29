@@ -22,6 +22,10 @@ export const NewDevicesApprovalStack = () => {
     <VStack mt={3}>
       {devicesRequests?.me?.decryptionChallengesWaiting.map(
         (challengeToApprove) => {
+          const fromLocationText = challengeToApprove.ipGeoLocation
+            ? `(
+            ${challengeToApprove.ipGeoLocation?.city}, ${challengeToApprove.ipGeoLocation?.country_name})`
+            : ''
           return (
             <Alert
               minW="90%"
@@ -38,9 +42,7 @@ export const NewDevicesApprovalStack = () => {
                   new Date(challengeToApprove.createdAt),
                   new Date()
                 )}
-                : from IP {challengeToApprove.ipAddress} (
-                {challengeToApprove.ipGeoLocation?.city},{' '}
-                {challengeToApprove.ipGeoLocation?.country_name})
+                : from IP {challengeToApprove.ipAddress} ${fromLocationText}
               </Center>
 
               <Grid
