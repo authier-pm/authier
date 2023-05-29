@@ -19,11 +19,17 @@ module.exports = {
     '@typescript-eslint/ban-ts-comment': 'off',
     '@typescript-eslint/no-empty-function': 'off',
     'react/prop-types': 'off',
-    'react/react-in-jsx-scope': 'off'
+    'react/react-in-jsx-scope': 'off',
+    'prefer-const': 'error',
+    'no-var': 'error',
+    'array-callback-return': 'error',
+    'getter-return': 'error',
+    'comma-dangle': 'off'
   },
   settings: {
     react: {
       version: 'detect' // Tells eslint-plugin-react to automatically detect the version of React to use
     }
-  }
+  },
+  ignorePatterns: ['dist', 'node_modules', 'examples', 'scripts']
 }

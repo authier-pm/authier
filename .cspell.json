@@ -55,6 +55,7 @@
     "upsert",
     "uuidv",
     "webextension",
-    "wouter"
+    "wouter",
+    "zustand"
   ]
 }

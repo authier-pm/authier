@@ -180,71 +180,80 @@ const DeviceListItem = ({
                   errors,
                   touched,
                   values
-                }) => (
-                  <form onSubmit={handleSubmit}>
-                    <VStack spacing={4} align="flex-start">
-                      <FormControl
-                        isInvalid={!!errors.lockTime && touched.lockTime}
-                      >
-                        <FormLabel htmlFor="lockTime">
-                          <Trans>Lock time</Trans>
-                        </FormLabel>
-                        <Field as={Select} id="lockTime" name="lockTime">
-                          <option value={60}>1 minute</option>
-                          <option value={120}>2 minutes</option>
-                          <option value={3600}>1 hour</option>
-                          <option value={14400}>4 hour</option>
-                          <option value={28800}>8 hours</option>
-                          <option value={86400}>1 day</option>
-                          <option value={604800}>1 week</option>
-                          <option value={2592000}>1 month</option>
-                          <option value={0}>Never</option>
-                        </Field>
-                        <FormHelperText>
-                          <Trans>
-                            Automatically locks vault after chosen period of
-                            time
-                          </Trans>
-                        </FormHelperText>
-                      </FormControl>
+                }) => {
+                  const lockTimeOptions = [
+                    { label: t`1 minute`, value: 60 },
+                    { label: t`2 minutes`, value: 120 },
+                    { label: t`1 hour`, value: 3600 },
+                    { label: t`4 hours`, value: 14400 },
+                    { label: t`8 hours`, value: 28800 },
+                    { label: t`1 day`, value: 86400 },
+                    { label: t`1 week`, value: 604800 },
+                    { label: t`1 month`, value: 2592000 },
+                    { label: t`Never`, value: 0 }
+                  ]
+                  return (
+                    <form onSubmit={handleSubmit}>
+                      <VStack spacing={4} align="flex-start">
+                        <FormControl
+                          isInvalid={!!errors.lockTime && touched.lockTime}
+                        >
+                          <FormLabel htmlFor="lockTime">
+                            <Trans>Lock time</Trans>
+                          </FormLabel>
+                          <Field as={Select} id="lockTime" name="lockTime">
+                            {lockTimeOptions.map((option) => (
+                              <option key={option.value} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </Field>
+                          <FormHelperText>
+                            <Trans>
+                              Automatically locks vault after chosen period of
+                              time
+                            </Trans>
+                          </FormHelperText>
+                        </FormControl>
 
-                      {/* Not ideal, later refactor */}
-                      <Field name="syncTOTP">
-                        {({ field, form }: FieldProps) => {
-                          const { onChange, ...rest } = field
-                          return (
-                            <FormControl
-                              id="syncTOTP"
-                              isInvalid={
-                                !!form.errors['syncTOTP'] &&
-                                !!form.touched['syncTOTP']
-                              }
-                            >
-                              <Checkbox
-                                {...rest}
+                        {/* Not ideal, later refactor */}
+                        <Field name="syncTOTP">
+                          {({ field, form }: FieldProps) => {
+                            const { onChange, ...rest } = field
+                            return (
+                              <FormControl
                                 id="syncTOTP"
-                                onChange={onChange}
-                                defaultChecked={values.syncTOTP}
+                                isInvalid={
+                                  !!form.errors['syncTOTP'] &&
+                                  !!form.touched['syncTOTP']
+                                }
                               >
-                                2FA
-                              </Checkbox>
-                            </FormControl>
-                          )
-                        }}
-                      </Field>
+                                <Checkbox
+                                  {...rest}
+                                  id="syncTOTP"
+                                  onChange={onChange}
+                                  defaultChecked={values.syncTOTP}
+                                >
+                                  2FA
+                                </Checkbox>
+                              </FormControl>
+                            )
+                          }}
+                        </Field>
 
-                      <Button
-                        mt={4}
-                        colorScheme="teal"
-                        isDisabled={isSubmitting || !dirty}
-                        isLoading={isSubmitting}
-                        type="submit"
-                      >
-                        <Trans>Save</Trans>
-                      </Button>
-                    </VStack>
-                  </form>
-                )}
+                        <Button
+                          mt={4}
+                          colorScheme="teal"
+                          isDisabled={isSubmitting || !dirty}
+                          isLoading={isSubmitting}
+                          type="submit"
+                        >
+                          <Trans>Save</Trans>
+                        </Button>
+                      </VStack>
+                    </form>
+                  )
+                }}
               </Formik>
             </Box>
           ) : (

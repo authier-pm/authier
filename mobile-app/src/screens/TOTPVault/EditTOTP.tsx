@@ -1,18 +1,19 @@
-import React, { useContext, useEffect, useLayoutEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 
 import { Alert, Input, Button, Flex, FormControl, View } from 'native-base'
 
 import { Formik, FormikHelpers } from 'formik'
 
-import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
-import { DeviceContext } from '../../providers/DeviceProvider'
-import { ILoginSecret, ITOTPSecret } from '../../utils/Device'
+import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
+
+import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
-import { TOTPStackScreenProps } from '../../navigation/types'
+import { TOTPStackScreenProps } from '@navigation/types'
 import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { SyncEncryptedSecretsDocument } from '@shared/graphql/ExtensionDevice.codegen'
-import { Loading } from '@src/components/Loading'
+import { Loading } from '@components/Loading'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -38,7 +39,7 @@ const InputField = ({
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const { totp } = data
-  let device = useContext(DeviceContext)
+  let deviceState = useDeviceStateStore((state) => state)
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: SyncEncryptedSecretsDocument, variables: {} }]
   })
@@ -58,10 +59,10 @@ const TOTPSecret = (data: ITOTPSecret) => {
           values: totpValues,
           { setSubmitting, resetForm }: FormikHelpers<totpValues>
         ) => {
-          const secret = device.state?.secrets.find(({ id }) => id === data.id)
+          const secret = deviceState.secrets.find(({ id }) => id === data.id)
 
-          if (secret && device.state) {
-            secret.encrypted = await device.state.encrypt(
+          if (secret && deviceState) {
+            secret.encrypted = await deviceState.encrypt(
               JSON.stringify({
                 ...values,
                 iconUrl: ''
@@ -78,7 +79,7 @@ const TOTPSecret = (data: ITOTPSecret) => {
               }
             })
 
-            await device.state?.save()
+            deviceState.save()
             resetForm({ values })
             setSubmitting(false)
           }
@@ -163,7 +164,7 @@ export function EditTOTP({
   navigation,
   route
 }: TOTPStackScreenProps<'EditTOTP'>) {
-  let device = useContext(DeviceContext)
+  let deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
@@ -171,7 +172,7 @@ export function EditTOTP({
   //TODO: Change to react-query, invalidate cache on update
   useEffect(() => {
     async function loadSecret() {
-      const secret = await device.state?.getSecretDecryptedById(
+      const secret = await deviceState.getSecretDecryptedById(
         route.params.item.id
       )
       setSecret(secret)
@@ -187,7 +188,7 @@ export function EditTOTP({
     }
   }, [navigation, secret])
 
-  if (secret === null || !device.state) {
+  if (secret === null || !deviceState) {
     return <Loading />
   }
 
