@@ -11,7 +11,7 @@ if (!ENDPOINT) {
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
-  isTokenValidOrUndefined: () => {
+  isTokenValidOrUndefined: async () => {
     if (!accessToken) {
       return false
     }

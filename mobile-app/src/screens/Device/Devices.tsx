@@ -178,8 +178,12 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   }: {
     item: DecryptionChallengeForApproval
   }) => {
+    const fromLocationText = item.ipGeoLocation
+      ? `(
+      ${item.ipGeoLocation?.city}, ${item.ipGeoLocation?.country_name})`
+      : ''
     return (
-      <Box h="3xs">
+      <Box minH="290px">
         <Alert
           status="info"
           key={item.id}
@@ -218,9 +222,11 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 }
               }}
             >
-              {item.deviceName}
-              {formatRelative(new Date(item.createdAt), new Date())} from IP
-              {item.ipAddress}
+              <Text color={'orange.500'} fontSize="sm">
+                {item.deviceName}{' '}
+                {formatRelative(new Date(item.createdAt), new Date())} from IP{' '}
+                {item.ipAddress} {fromLocationText}
+              </Text>
             </Box>
           </VStack>
 
