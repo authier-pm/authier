@@ -48,7 +48,7 @@ interface DeviceStateProps {
   secrets: Array<SecretSerializedType>
   authSecret: string
   authSecretEncrypted: string
-  lockTime: number
+  vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -116,7 +116,7 @@ const initialState: DeviceStateProps = {
   secrets: [],
   authSecret: '',
   authSecretEncrypted: '',
-  lockTime: 0,
+  vaultLockTimeoutSeconds: 0,
   syncTOTP: false,
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
@@ -317,7 +317,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
               removedSecrets: actuallyRemovedOnThisDevice.length,
               newAndUpdatedSecrets: newAndUpdatedSecrets.length
             }
-            console.log('res:', res)
+
             if (
               (res?.newAndUpdatedSecrets as number) > 0 ||
               (res?.removedSecrets as number) > 0

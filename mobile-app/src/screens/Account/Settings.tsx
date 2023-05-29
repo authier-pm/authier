@@ -38,7 +38,7 @@ export default function Settings() {
       autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
       uiLanguage: deviceState.uiLanguage,
       syncTOTP: deviceState.syncTOTP,
-      vaultLockTimeoutSeconds: deviceState.lockTime
+      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
     }
   }
 
@@ -64,7 +64,7 @@ export default function Settings() {
                     }
                   })
                 }}
-                defaultValue={deviceState.lockTime.toString()}
+                defaultValue={deviceState.vaultLockTimeoutSeconds.toString()}
                 accessibilityLabel="Lock time"
               >
                 <Select.Item label="1 minute" value="20" />

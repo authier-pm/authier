@@ -176,9 +176,9 @@ export class UserQuery extends UserBase {
 
   @Field(() => [DecryptionChallengeForApproval])
   async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
-    if (ctx.device.id !== ctx.masterDeviceId) {
-      return [] // no point in returning these to other devices than the master
-    }
+    // if (ctx.device.id !== ctx.masterDeviceId) {
+    //   return [] // no point in returning these to other devices than the master
+    // }
 
     return ctx.prisma.decryptionChallenge.findMany({
       where: {

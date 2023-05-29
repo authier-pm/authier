@@ -183,6 +183,7 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
       where: { id: this.id },
       data: {
         approvedAt: new Date(),
+        approvedFromDeviceId: ctx.device.id,
         rejectedAt: null,
         blockIp: this.blockIp ? false : null // if it was previously rejected, we mark it as false
       }

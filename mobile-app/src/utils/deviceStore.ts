@@ -131,7 +131,6 @@ interface DeviceProps {
   biometricsAvailable: boolean
   lockInterval: NodeJS.Timer | void
   isInitialized: boolean
-  isLocked: boolean
   isLoggedIn: boolean
 }
 
@@ -161,7 +160,7 @@ interface Device extends DeviceProps {
   }>
   loginCredentials: () => ILoginSecret[]
   TOTPSecrets: () => ITOTPSecret[]
-  changeIsLocked: (newValue: boolean) => void
+  setLockedState: (newValue: IBackgroundStateSerializableLocked | null) => void
 }
 
 const initialState: DeviceProps = {
@@ -173,8 +172,7 @@ const initialState: DeviceProps = {
   name: '',
   biometricsAvailable: false,
   lockInterval: undefined,
-  isInitialized: false,
-  isLocked: false
+  isInitialized: false
 }
 
 export const useDeviceStore = create<Device>()(
@@ -188,7 +186,7 @@ export const useDeviceStore = create<Device>()(
           useDeviceStateStore.setState({ ...deviceState })
           set({ isLoggedIn: true })
         }
-        console.log('new state', useDeviceStateStore.getState())
+        // console.log('new state', useDeviceStateStore.getState())
         if (!useDeviceStateStore.getState()) {
           throw new Error(
             'Device state is not initialized and it was not supplied as an argument'
@@ -236,7 +234,7 @@ export const useDeviceStore = create<Device>()(
         console.log('device initialized')
         return useDeviceStateStore.getState()
       },
-      setDeviceSettings: (config: SettingsInput) => {
+      setDeviceSettings(config: SettingsInput) {
         //HACK: this is a hack, we should not create a new interval every time we save the state
         //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
         let state = useDeviceStateStore.getState()
@@ -248,17 +246,20 @@ export const useDeviceStore = create<Device>()(
         useDeviceStateStore.setState({ ...state, ...config })
 
         // Sync timer
-        if (state.lockTime !== config.vaultLockTimeoutSeconds) {
-          useDeviceStateStore.setState({
-            lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
-          })
-        }
+
         const device = get()
         if (config.vaultLockTimeoutSeconds > 0) {
           // Sync timer
-          if (state.lockTime !== config.vaultLockTimeoutSeconds) {
-            state.lockTimeEnd =
-              Date.now() + config.vaultLockTimeoutSeconds * 1000
+          if (
+            state.vaultLockTimeoutSeconds !== config.vaultLockTimeoutSeconds
+          ) {
+            console.log(
+              'vaultLockTimeoutSeconds',
+              config.vaultLockTimeoutSeconds
+            )
+            useDeviceStateStore.setState({
+              lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
+            })
           }
 
           if (state && state.lockTimeEnd && Date.now() >= state.lockTimeEnd) {
@@ -309,8 +310,10 @@ export const useDeviceStore = create<Device>()(
       },
       lock: async () => {
         let state = useDeviceStateStore.getState()
-        get().clearLockInterval()
-        console.log('state before lock', state)
+        const device = get()
+        device.clearLockInterval()
+        console.log('state before lock', new Error().stack)
+
         if (!state) {
           console.error('No state')
           return
@@ -321,37 +324,32 @@ export const useDeviceStore = create<Device>()(
           userId,
           secrets,
           encryptionSalt,
-          lockTime,
+          vaultLockTimeoutSeconds: lockTime,
           syncTOTP,
           autofillTOTPEnabled,
           autofillCredentialsEnabled,
           uiLanguage,
           theme,
-          biometricsEnabled,
-          lockTimeEnd
+          biometricsEnabled
         } = state
-
-        set({
-          lockedState: {
-            email,
-            userId,
-            secrets,
-            deviceName: get().name,
-            encryptionSalt,
-            authSecret: state.authSecret,
-            authSecretEncrypted: state.authSecretEncrypted,
-            lockTime,
-            syncTOTP,
-            autofillCredentialsEnabled,
-            autofillTOTPEnabled,
-            uiLanguage,
-            theme,
-            biometricsEnabled,
-            lockTimeEnd
-          }
+        device.setLockedState({
+          email,
+          userId,
+          secrets,
+          deviceName: get().name,
+          encryptionSalt,
+          authSecret: state.authSecret,
+          authSecretEncrypted: state.authSecretEncrypted,
+          lockTime,
+          syncTOTP,
+          autofillCredentialsEnabled,
+          autofillTOTPEnabled,
+          uiLanguage,
+          theme,
+          biometricsEnabled,
+          lockTimeEnd: null // when locking the device, we must clear the lockTimeEnd
         })
 
-        set({ isLocked: true })
         useDeviceStateStore.setState({})
       },
       clearAndReload: async () => {
@@ -407,7 +405,7 @@ export const useDeviceStore = create<Device>()(
       },
       loginCredentials: () => {
         let state = useDeviceStateStore.getState()
-        console.log('loginCredentials', state.decryptedSecrets)
+
         return (state.decryptedSecrets.filter(({ kind }) => {
           return kind === EncryptedSecretType.LOGIN_CREDENTIALS
         }) ?? []) as ILoginSecret[]
@@ -425,19 +423,19 @@ export const useDeviceStore = create<Device>()(
         const hasAnySensors = await SInfo.isSensorAvailable()
         return !!hasAnySensors
       },
-      startVaultLockTimer: () => {
+      startVaultLockTimer() {
         let state = useDeviceStateStore.getState()
         set({
           lockInterval: setInterval(() => {
-            if (state.lockTimeEnd && state.lockTime <= Date.now()) {
-              console.log('Vault locked')
+            if (state.lockTimeEnd && state.lockTimeEnd <= Date.now()) {
+              console.log('Vault locking', state.lockTimeEnd)
               get().lock()
             }
           }, 5000)
         })
       },
       setLockTime: (lockTime: number) => {
-        useDeviceStateStore.setState({ lockTime })
+        useDeviceStateStore.setState({ vaultLockTimeoutSeconds: lockTime })
         const device = get()
         device.clearLockInterval()
         if (lockTime > 0) {
@@ -452,8 +450,8 @@ export const useDeviceStore = create<Device>()(
       clearLockInterval: () => {
         set({ lockInterval: clearInterval(get().lockInterval!) })
       },
-      changeIsLocked: (newValue: boolean) => {
-        set({ isLocked: newValue })
+      setLockedState: (lockedState) => {
+        set({ lockedState })
       }
     }),
     { name: 'device', storage: createJSONStorage(() => zustandStorage) }

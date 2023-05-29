@@ -124,7 +124,7 @@ type DeviceGQL {
   ipAddressLock: Boolean!
   logoutAt: DateTime
   syncTOTP: Boolean!
-  vaultLockTimeoutSeconds: Int
+  vaultLockTimeoutSeconds: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -260,7 +260,7 @@ type DeviceQuery {
   ipAddressLock: Boolean!
   logoutAt: DateTime
   syncTOTP: Boolean!
-  vaultLockTimeoutSeconds: Int
+  vaultLockTimeoutSeconds: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -425,7 +425,7 @@ type DeviceMutation {
   ipAddressLock: Boolean!
   logoutAt: DateTime
   syncTOTP: Boolean!
-  vaultLockTimeoutSeconds: Int
+  vaultLockTimeoutSeconds: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime

@@ -54,7 +54,7 @@ export default function Routes() {
     }
   }, [isReady])
 
-  if (device.isLocked) {
+  if (device.lockedState) {
     return (
       <VaultUnlockVerification
         onUnlocked={() => {
