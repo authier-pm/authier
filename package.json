@@ -19,6 +19,7 @@
     "@chakra-ui/react": "2.5.5",
     "@emotion/react": "^11.10.6",
     "@emotion/styled": "^11.10.6",
+    "@graphql-codegen/cli": "^4.0.0",
     "@graphql-codegen/fragment-matcher": "^4.0.1",
     "@graphql-codegen/introspection": "^3.0.1",
     "@graphql-codegen/near-operation-file-preset": "^2.5.0",

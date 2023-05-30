@@ -13,7 +13,11 @@ import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLInt, GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLEmailAddress, GraphQLNonNegativeInt } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLNonNegativeInt,
+  GraphQLUUID
+} from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -113,6 +117,23 @@ export class UserMutation extends UserBase {
       }
     })
   }
+
+  @Field(() => [EncryptedSecretMutation])
+  async removeEncryptedSecrets(
+    @Arg('secrets', () => [GraphQLUUID])
+    secrets: string[],
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.$transaction(
+      secrets.map((id) =>
+        ctx.prisma.encryptedSecret.update({
+          where: { id: id },
+          data: { deletedAt: new Date() }
+        })
+      )
+    )
+  }
+
   @Field(() => [EncryptedSecretQuery])
   async addEncryptedSecrets(
     @Arg('secrets', () => [EncryptedSecretInput])
@@ -152,12 +173,6 @@ export class UserMutation extends UserBase {
       }
     })
 
-    console.log(
-      pswCount,
-      userData?.loginCredentialsLimit,
-      TOTPCount,
-      userData?.TOTPlimit
-    )
     if (pswCount > pswLimit) {
       console.log('psw exceeded')
       return new GraphqlError(`Password limit exceeded.`)
