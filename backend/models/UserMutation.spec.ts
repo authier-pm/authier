@@ -1,44 +1,59 @@
+import { User } from '.prisma/client'
 import { faker } from '@faker-js/faker'
 import { plainToClass } from 'class-transformer'
 import prismaClient from 'prisma/prismaClient'
 import { makeFakeCtx } from 'tests/makeFakeCtx'
-// import { sentEmails } from 'utils/email'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { UserMutation } from './UserMutation'
+import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { EncryptedSecretInput } from './models'
 
 describe('UserMutation', () => {
+  const masterDeviceId = faker.string.uuid()
+  const masterDeviceName = faker.lorem.word()
+  let userRaw: User
+  beforeAll(async () => {
+    userRaw = await prismaClient.user.create({
+      data: {
+        email: faker.internet.email(),
+        loginCredentialsLimit: 3,
+        TOTPlimit: 3,
+        deviceRecoveryCooldownMinutes: 960,
+        addDeviceSecret: faker.string.sample(5),
+        addDeviceSecretEncrypted: faker.string.sample(5),
+        encryptionSalt: faker.string.sample(5)
+      }
+    })
+
+    await prismaClient.device.create({
+      data: {
+        id: masterDeviceId,
+        User: {
+          connect: {
+            id: userRaw.id
+          }
+        },
+        name: masterDeviceName,
+        firebaseToken: faker.string.sample(5),
+        firstIpAddress: faker.internet.ip(),
+        lastIpAddress: faker.internet.ip(),
+        platform: 'ios'
+      }
+    })
+  })
+
+  afterAll(async () => {
+    const deleteSecrets = prismaClient.encryptedSecret.deleteMany()
+    const deleteDevices = prismaClient.device.deleteMany()
+    const deleteUser = prismaClient.user.deleteMany()
+
+    await prismaClient.$transaction([deleteSecrets, deleteDevices, deleteUser])
+
+    await prismaClient.$disconnect()
+  })
+
   describe('updateEmail', () => {
     it('should update email', async () => {
-      const masterDeviceId = faker.string.uuid()
-
-      let userRaw = await prismaClient.user.create({
-        data: {
-          email: faker.internet.email(),
-          loginCredentialsLimit: 3,
-          TOTPlimit: 3,
-          deviceRecoveryCooldownMinutes: 960,
-          addDeviceSecret: faker.string.sample(5),
-          addDeviceSecretEncrypted: faker.string.sample(5),
-          encryptionSalt: faker.string.sample(5)
-        }
-      })
-
-      const masterDevice = await prismaClient.device.create({
-        data: {
-          id: masterDeviceId,
-          User: {
-            connect: {
-              id: userRaw.id
-            }
-          },
-          name: faker.lorem.word(),
-          firebaseToken: faker.string.sample(5),
-          firstIpAddress: faker.internet.ip(),
-          lastIpAddress: faker.internet.ip(),
-          platform: 'ios'
-        }
-      })
-
       userRaw = await prismaClient.user.update({
         data: {
           masterDeviceId
@@ -56,7 +71,7 @@ describe('UserMutation', () => {
         makeFakeCtx({
           userId: user.id,
           device: {
-            id: masterDevice.id
+            id: masterDeviceId
           } as any
         })
       )
@@ -74,43 +89,75 @@ describe('UserMutation', () => {
     it.todo('should throw error when user is not ona master device')
   })
 
-  describe('Secret manipulation', () => {
-    it.todo('should remove secrets', async () => {})
-    it.todo('add secrets', async () => {})
-  })
+  describe('Secret manipulation', async () => {
+    const testData: EncryptedSecretInput[] = []
 
+    it('should add secrets', async () => {
+      const user = plainToClass(UserMutation, userRaw)
+      for (let i = 0; i < user.loginCredentialsLimit; i++) {
+        testData.push({
+          encrypted: faker.string.sample(25),
+          kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS
+        })
+      }
+
+      const data = await user.addEncryptedSecrets(
+        testData,
+        makeFakeCtx({ userId: userRaw.id })
+      )
+
+      expect(Array.isArray(data)).toBe(true)
+      expect(data).toHaveLength(user.loginCredentialsLimit)
+      testData.forEach((testSecret, i) => {
+        expect(data[i]).toEqual(
+          expect.objectContaining({
+            encrypted: testSecret.encrypted,
+            kind: testSecret.kind,
+            version: 1,
+            id: expect.any(String),
+            createdAt: expect.any(Date),
+            updatedAt: expect.any(Date),
+            deletedAt: null,
+            userId: userRaw.id
+          })
+        )
+      })
+    })
+
+    it('should remove secrets', async () => {
+      const user = plainToClass(UserMutation, userRaw)
+      const dataInDB = await prismaClient.encryptedSecret.findMany({
+        where: {
+          userId: userRaw.id
+        }
+      })
+
+      const input = dataInDB.map((secret) => ({
+        id: secret.id,
+        kind: secret.kind as EncryptedSecretTypeGQL,
+        encrypted: secret.encrypted
+      }))
+
+      const removedData = await user.removeEncryptedSecrets(
+        input,
+        makeFakeCtx({ userId: userRaw.id })
+      )
+
+      expect(removedData).toHaveLength(dataInDB.length)
+
+      const dataInDBAfter = await prismaClient.encryptedSecret.findMany({
+        where: {
+          userId: userRaw.id
+        }
+      })
+
+      dataInDBAfter.forEach((secret) => {
+        expect(secret.deletedAt).toBeInstanceOf(Date)
+      })
+    })
+  })
   describe('updateSettings', () => {
     it('Should update settings', async () => {
-      const masterDeviceId = faker.string.uuid()
-
-      const userRaw = await prismaClient.user.create({
-        data: {
-          email: faker.internet.email(),
-          loginCredentialsLimit: 3,
-          TOTPlimit: 3,
-          deviceRecoveryCooldownMinutes: 960,
-          addDeviceSecret: faker.string.sample(5),
-          addDeviceSecretEncrypted: faker.string.sample(5),
-          encryptionSalt: faker.string.sample(5)
-        }
-      })
-
-      const masterDevice = await prismaClient.device.create({
-        data: {
-          id: masterDeviceId,
-          User: {
-            connect: {
-              id: userRaw.id
-            }
-          },
-          name: faker.lorem.word(),
-          firebaseToken: faker.string.sample(5),
-          firstIpAddress: faker.internet.ip(),
-          lastIpAddress: faker.internet.ip(),
-          platform: 'ios'
-        }
-      })
-
       const user = plainToClass(UserMutation, userRaw)
 
       const newSettings = {
@@ -126,14 +173,14 @@ describe('UserMutation', () => {
         makeFakeCtx({
           userId: user.id,
           device: {
-            id: masterDevice.id
+            id: masterDeviceId
           } as any
         })
       )
 
       const deviceData = await prismaClient.device.findFirst({
         where: {
-          id: masterDevice.id
+          id: masterDeviceId
         }
       })
       //TODO: Eventually add all settings
