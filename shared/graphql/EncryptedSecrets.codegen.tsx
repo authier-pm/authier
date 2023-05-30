@@ -16,7 +16,7 @@ export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
 export type DeleteEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', encryptedSecret: { __typename?: 'EncryptedSecretMutation', id: string, delete: { __typename?: 'EncryptedSecretGQL', id: string } } } };
 
 export type RemoveEncryptedSecretsMutationVariables = Types.Exact<{
-  secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
+  secrets: Array<Types.Scalars['UUID']> | Types.Scalars['UUID'];
 }>;
 
 
@@ -109,7 +109,7 @@ export type DeleteEncryptedSecretMutationHookResult = ReturnType<typeof useDelet
 export type DeleteEncryptedSecretMutationResult = Apollo.MutationResult<DeleteEncryptedSecretMutation>;
 export type DeleteEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
 export const RemoveEncryptedSecretsDocument = gql`
-    mutation removeEncryptedSecrets($secrets: [EncryptedSecretPatchInput!]!) {
+    mutation removeEncryptedSecrets($secrets: [UUID!]!) {
   me {
     removeEncryptedSecrets(secrets: $secrets) {
       id

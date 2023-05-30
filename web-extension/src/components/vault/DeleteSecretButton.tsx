@@ -40,18 +40,14 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
           console.log('delete secret', secrets)
           if (secrets.length > 1) {
             console.log('delete multiple secrets')
-            const input = secrets.map(({ id, encrypted, kind }) => ({
-              id,
-              encrypted,
-              kind
-            }))
+            const input = secrets.map(({ id }) => id)
             removeEncryptedSecrets({
               variables: {
                 secrets: input
               }
             })
 
-            await device.state?.removeSecrets(secrets.map((s) => s.id))
+            await device.state?.removeSecrets(input)
             setSelectedItems([])
           } else {
             await deleteEncryptedSecretMutation({

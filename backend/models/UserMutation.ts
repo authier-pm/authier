@@ -124,7 +124,6 @@ export class UserMutation extends UserBase {
     secrets: string[],
     @Ctx() ctx: IContextAuthenticated
   ) {
-    console.log('removeEncryptedSecrets', secrets)
     return ctx.prisma.$transaction(
       secrets.map((id) =>
         ctx.prisma.encryptedSecret.update({

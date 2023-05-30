@@ -592,7 +592,7 @@ export type UserMutationEncryptedSecretArgs = {
 
 
 export type UserMutationRemoveEncryptedSecretsArgs = {
-  secrets: Array<EncryptedSecretPatchInput>;
+  secrets: Array<Scalars['UUID']>;
 };
 
 
