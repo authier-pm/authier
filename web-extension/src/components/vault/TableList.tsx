@@ -2,7 +2,6 @@ import { useContext, useState } from 'react'
 import {
   IconButton,
   Tooltip,
-  useToast,
   Box,
   Text,
   Flex,
@@ -17,41 +16,21 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
+import { Link } from 'react-router-dom'
+import { DeleteSecretButton } from './DeleteSecretButton'
 
 export function TableList({ filter }: { filter: string }) {
+  const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets: search } = useContext(DeviceStateContext)
   const data = search(debouncedSearchTerm)
 
-  const [selected, setSelected] = useState<string[]>([])
-  const toast = useToast()
-
-  const handleSelect = (id: string) => {
-    if (selected.includes(id)) {
-      setSelected(selected.filter((s) => s !== id))
+  const handleSelect = (secret: ILoginSecret | ITOTPSecret) => {
+    if (selectedItems.includes(secret)) {
+      setSelectedItems(selectedItems.filter((s) => s !== secret))
     } else {
-      setSelected([...selected, id])
+      setSelectedItems([...selectedItems, secret])
     }
-  }
-
-  const handleEdit = (row: ILoginSecret | ITOTPSecret) => {
-    // Your edit logic here
-    toast({
-      title: `Editing row ${row.id}`,
-      status: 'info',
-      duration: 3000,
-      isClosable: true
-    })
-  }
-
-  const handleRemove = (row: ILoginSecret | ITOTPSecret) => {
-    // Your remove logic here
-    toast({
-      title: `Removing row ${row.id}`,
-      status: 'warning',
-      duration: 3000,
-      isClosable: true
-    })
   }
 
   const [showAllPasswords, setShowAllPasswords] = useState(false)
@@ -71,29 +50,37 @@ export function TableList({ filter }: { filter: string }) {
     return (
       <Flex
         p={10}
-        pt={1}
+        pb={0}
+        pt={0}
         m={['auto', '3']}
         key={row.id}
         cursor="pointer"
         justify="space-between"
         align="center"
         style={style}
-        onMouseOver={() => setAreIconsVisible(true)}
+        onMouseOver={() =>
+          selectedItems.length == 0 || selectedItems.includes(row)
+            ? setAreIconsVisible(true)
+            : null
+        }
         onMouseOut={() => setAreIconsVisible(false)}
+        _hover={{
+          backgroundColor: useColorModeValue('gray.400', 'gray.700')
+        }}
       >
-        <Flex
-          p={1}
-          justifyContent="inherit"
-          w="100%"
-          _hover={{
-            backgroundColor: useColorModeValue('gray.400', 'gray.700')
-          }}
-        >
-          <HStack w="80%" justifyContent="space-between" alignItems="center">
+        <Flex p={1} justifyContent="inherit" w="100%">
+          <HStack
+            onClick={() => handleSelect(row)}
+            w="90%"
+            justifyContent="space-between"
+            alignItems="center"
+            p={'1em'}
+            m={'-1em'}
+          >
             <Box>
               <Checkbox
-                isChecked={selected.includes(row.id)}
-                onChange={() => handleSelect(row.id)}
+                isChecked={selectedItems.includes(row)}
+                onChange={() => handleSelect(row)}
                 mr={2}
               />
             </Box>
@@ -137,6 +124,7 @@ export function TableList({ filter }: { filter: string }) {
                   )}
             </Text>
           </HStack>
+
           <HStack
             justifyContent="flex-end"
             display={areIconsVisible ? 'flex' : 'none'}
@@ -157,19 +145,26 @@ export function TableList({ filter }: { filter: string }) {
               />
             </Tooltip>
             <Tooltip label="Edit" aria-label="Edit">
-              <IconButton
-                aria-label="Edit"
-                icon={<EditIcon />}
-                onClick={() => handleEdit(row)}
-              />
+              <Link
+                to={{
+                  pathname: `secret/${row.id}`
+                }}
+                state={{
+                  data: row.kind === 'TOTP' ? row.totp : row.loginCredentials
+                }}
+              >
+                <IconButton aria-label="Edit" icon={<EditIcon />} />
+              </Link>
             </Tooltip>
-            <Tooltip label="Delete" aria-label="Delete">
+            <DeleteSecretButton
+              secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
+            >
               <IconButton
+                colorScheme="red"
                 aria-label="Delete"
                 icon={<DeleteIcon />}
-                onClick={() => handleRemove(row)}
               />
-            </Tooltip>
+            </DeleteSecretButton>
           </HStack>
         </Flex>
       </Flex>
@@ -182,37 +177,38 @@ export function TableList({ filter }: { filter: string }) {
         borderBottom="1px"
         borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       >
-        <HStack
-          mt={2}
-          w="80%"
-          justifyContent="space-evenly"
-          alignItems="center"
-        >
-          <Text w="inherit" textAlign="center" fontWeight="bold">
-            Label
-          </Text>
-          <Text w="inherit" textAlign="center" fontWeight="bold">
-            URL
-          </Text>
-          <HStack>
-            <Text pr={4} w="inherit" textAlign="end" fontWeight="bold">
-              Secret
+        <HStack mt={2} w="100%" justifyContent="space-between">
+          <Flex w="33%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              Label
             </Text>
-            <IconButton
-              size="sm"
-              aria-label={showText}
-              icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
-              onClick={() => setShowAllPasswords(!showAllPasswords)}
-              ml={2}
-            />
-          </HStack>
+          </Flex>
+          <Flex w="33%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              URL
+            </Text>
+          </Flex>
+          <Flex w="33%" justifyContent="center">
+            <HStack>
+              <Text pr={4} w="100%" textAlign="end" fontWeight="bold">
+                Secret
+              </Text>
+              <IconButton
+                size="sm"
+                aria-label={showText}
+                icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
+                onClick={() => setShowAllPasswords(!showAllPasswords)}
+                ml={2}
+              />
+            </HStack>
+          </Flex>
         </HStack>
       </Flex>
       <AutoSizer>
         {({ height, width }) => (
           <List
             itemCount={data.length}
-            itemSize={50}
+            itemSize={60}
             width={width}
             height={height}
           >

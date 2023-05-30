@@ -2,7 +2,7 @@ import { useContext, useEffect } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 
 import { Route, Routes, useNavigate } from 'react-router-dom'
-import { VaultItemSettings } from '@src/components/vault/ItemSettings'
+import { VaultItemSettings } from '@src/components/vault/VaultItemSettings'
 import { VaultSettings } from './VaultSettings'
 
 import { Center } from '@chakra-ui/react'
