@@ -94,6 +94,7 @@ jobs:
       - name: Build Android App Bundle
         working-directory: ./mobile-app
         run: |
+          cd android && ./gradlew clean --no-daemon
           cd android && ./gradlew bundleRelease --no-daemon
 
       - name: Sign App Bundle
