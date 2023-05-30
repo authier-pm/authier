@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -126,7 +126,6 @@
     "@types/react-native": "^0.72.2",
     "@types/react-native-vector-icons": "^6.4.13",
     "@types/react-test-renderer": "^18.0.0",
-    "add": "^2.0.6",
     "appcenter-cli": "^2.13.8",
     "babel-jest": "^29.5.0",
     "babel-plugin-macros": "^3.1.0",
