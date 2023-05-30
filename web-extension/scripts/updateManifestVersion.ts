@@ -10,7 +10,7 @@ export async function writeManifest() {
   await fs.writeJSON(dir('dist/manifest.json'), manifest, {
     spaces: 2
   })
-  console.log(`write manifest.json for version ${manifest.version}`)
+  console.log(`written manifest.json for version ${manifest.version}`)
 
   child_process.execSync(`git add dist/manifest.json`)
   child_process.execSync(
