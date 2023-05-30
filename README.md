@@ -9,8 +9,7 @@ Please follow these commands:
 
 ```bash
 curl -fsSL https://get.pnpm.io/install.sh | sh -
-pnpm i zx -g #needed for a postinstall script in mobile-app
-pnpm install
+pnpm install --frozen-lockfile --prefer-offline
 cd web-extension
 cp .env.example .env
 pnpm prodBuild
