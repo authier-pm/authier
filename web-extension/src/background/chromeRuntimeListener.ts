@@ -1,4 +1,3 @@
-import browser from 'webextension-polyfill'
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {

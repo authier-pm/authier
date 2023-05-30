@@ -65,7 +65,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 const browserInfo = bowser.getParser(navigator.userAgent)
-export const isRunningInBgServiceWorker = typeof window === 'undefined'
+export const isRunningInBgPage = location.href.includes('backgroundPage.html')
 
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
