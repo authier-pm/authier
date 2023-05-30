@@ -1,13 +1,13 @@
 name: Android Build ## name of the workflow
 
 on:
-  workflow_dispatch: # To trigger manual build
   push:
     tags:
       - 'v*.*.*-android'
-
+  workflow_dispatch: # To trigger manual build
 jobs:
   android-build:
+    if: github.ref_type == 'tag'
     name: Android Build
     runs-on: ubuntu-latest # using ubuntu latest version / or you can use a specific version
 
