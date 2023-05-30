@@ -3,7 +3,8 @@ name: Android Build ## name of the workflow
 on:
   workflow_dispatch: # To trigger manual build
   push:
-    tags: ['v*.*.*']
+    tags:
+      - 'v*.*.*-android'
 
 jobs:
   android-build:
@@ -29,6 +30,17 @@ jobs:
         run: |
           pnpm i ts-node zx -g
           pnpm i --frozen-lockfile --prefer-offline
+
+      - name: Create .env file
+        env:
+          API_URL: ${{ secrets.API_URL_RELEASE }}
+          PAGE_URL: ${{ secrets.SENTRY_DSN }}
+        shell: bash
+        working-directory: ./mobile-app
+        run: |
+          touch .env
+          echo $API_URL_RELEASE >> .env
+          echo $SENTRY_DSN >> .env
 
       ## configure cash for gradle : will help to reduce build time
       - name: Cache Gradle Wrapper
