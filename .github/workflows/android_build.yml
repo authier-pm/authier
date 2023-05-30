@@ -100,7 +100,7 @@ jobs:
         id: sign_app_bundle
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: mobile-app/android/app/build/outputs/apk/release
+          releaseDirectory: mobile-app/android/app/build/outputs/bundle/release
           signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
           alias: ${{ secrets.ANDROID_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
