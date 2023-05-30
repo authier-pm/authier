@@ -3,7 +3,7 @@ import { authenticator } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementInViewport, isHidden } from './isElementInViewport'
-import { Coords, domRecorder, IInitStateRes } from './contentScript'
+import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
 import { Notyf } from 'notyf'
@@ -574,11 +574,12 @@ export const autofill = (initState: IInitStateRes) => {
 
     bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
   }
-  setTimeout(initAutofill, 150) // let's wait a bit for the page to load
+  const initTimeout = setTimeout(initAutofill, 150) // let's wait a bit for the page to load
 
   return () => {
-    autofillEnabled = false
     bodyInputChangeEmitter.off('inputAdded', initAutofill)
+    clearTimeout(initTimeout)
+    ranForThisPage = false
   }
 }
 
