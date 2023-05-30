@@ -32,8 +32,9 @@ import {
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
 import { DevicesStackScreenProps } from '@navigation/types'
-import { DeviceContext } from '@providers/DeviceProvider'
+
 import mitt from 'mitt'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export const icons = {
   Android: 'logo-android',
@@ -49,7 +50,7 @@ const empty = () => {
   return <></>
 }
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
-  const device = React.useContext(DeviceContext)
+  const device = useDeviceStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,
@@ -177,8 +178,12 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   }: {
     item: DecryptionChallengeForApproval
   }) => {
+    const fromLocationText = item.ipGeoLocation
+      ? `(
+      ${item.ipGeoLocation?.city}, ${item.ipGeoLocation?.country_name})`
+      : ''
     return (
-      <Box h="3xs">
+      <Box minH="290px">
         <Alert
           status="info"
           key={item.id}
@@ -217,7 +222,11 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 }
               }}
             >
-              {formatRelative(new Date(item.createdAt), new Date())}
+              <Text color={'orange.500'} fontSize="sm">
+                {item.deviceName}{' '}
+                {formatRelative(new Date(item.createdAt), new Date())} from IP{' '}
+                {item.ipAddress} {fromLocationText}
+              </Text>
             </Box>
           </VStack>
 

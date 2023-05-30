@@ -109,7 +109,7 @@ export default function Register() {
               encryptionSalt: bufferToBase64(encryptionSalt),
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
-              lockTime: 28800,
+              vaultLockTimeoutSeconds: 28800,
               autofillTOTPEnabled: true,
               autofillCredentialsEnabled: true,
               uiLanguage: 'en',

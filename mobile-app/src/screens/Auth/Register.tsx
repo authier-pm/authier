@@ -16,8 +16,7 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { DeviceContext } from '../../providers/DeviceProvider'
-import { IBackgroundStateSerializable } from '@utils/Device'
+import { IBackgroundStateSerializable } from '@utils/deviceStore'
 import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
@@ -33,6 +32,7 @@ import {
   cryptoKeyToString,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
+import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
 
@@ -43,8 +43,8 @@ export function Register({ navigation }: NavigationProps) {
   const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
-  let device = useContext(DeviceContext)
-  const { formState, setFormState } = useContext(LoginContext)
+  let device = useDeviceStore((state) => state)
+  const { formState } = useContext(LoginContext)
 
   useEffect(() => {
     if (error) {
@@ -128,7 +128,7 @@ export function Register({ navigation }: NavigationProps) {
         encryptionSalt: bufferToBase64(encryptionSalt),
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
-        lockTime: 28800,
+        vaultLockTimeoutSeconds: 28800,
         autofillTOTPEnabled: false,
         autofillCredentialsEnabled: false,
         uiLanguage: 'en',
@@ -162,8 +162,6 @@ export function Register({ navigation }: NavigationProps) {
           errors,
           isSubmitting
         }) => {
-          setFormState(values)
-
           return (
             <VStack space={3} mt="5">
               <FormControl>
@@ -226,20 +224,31 @@ export function Register({ navigation }: NavigationProps) {
               >
                 Register
               </Button>
+              <HStack mt="2" justifyContent="center" space={1}>
+                <Text fontSize="sm" color="muted.700" fontWeight={400}>
+                  <Trans>Already have an account.</Trans>
+                </Text>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('Login', {
+                      password: values.password,
+                      email: values.email
+                    })
+                  }
+                >
+                  <Text
+                    color={'indigo.500'}
+                    fontWeight={'medium'}
+                    fontSize={'sm'}
+                  >
+                    <Trans>Log in</Trans>
+                  </Text>
+                </Pressable>
+              </HStack>
             </VStack>
           )
         }}
       </Formik>
-      <HStack mt="2" justifyContent="center" space={1}>
-        <Text fontSize="sm" color="muted.700" fontWeight={400}>
-          <Trans>Already have an account.</Trans>
-        </Text>
-        <Pressable onPress={() => navigation.navigate('Login')}>
-          <Text color={'indigo.500'} fontWeight={'medium'} fontSize={'sm'}>
-            <Trans>Log in</Trans>
-          </Text>
-        </Pressable>
-      </HStack>
     </View>
   )
 }

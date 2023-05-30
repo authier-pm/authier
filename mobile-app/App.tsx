@@ -18,6 +18,7 @@ import messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
+import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
 
 let CodePushOptions = {
@@ -32,6 +33,8 @@ let CodePushOptions = {
 }
 
 const RnApp = () => {
+  const device = useDeviceStore((state) => state)
+
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
     const enabled =
@@ -44,9 +47,10 @@ const RnApp = () => {
   }
 
   useEffect(() => {
+    // initializeStorage()
     requestUserPermission()
+    device.initialize()
 
-    //? What is this for?
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
         queueLink.open()
@@ -72,6 +76,5 @@ const RnApp = () => {
     </React.Fragment>
   )
 }
-//export default CodePush(CodePushOptions)(App)
-// export default Sentry.wrap(App)
+
 export default Sentry.wrap(CodePush(CodePushOptions)(RnApp))

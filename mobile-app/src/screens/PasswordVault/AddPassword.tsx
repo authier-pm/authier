@@ -13,7 +13,6 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
 import { useNavigation } from '@react-navigation/native'
-import { DeviceContext } from '../../providers/DeviceProvider'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import { InputHeader } from './EditPassword'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
@@ -23,6 +22,8 @@ import { ToastType } from '../../ToastTypes'
 
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import zxcvbn from 'zxcvbn-typescript'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -49,7 +50,8 @@ const InputField = ({
 
 export const AddPassword = () => {
   const [show, setShow] = useState(false)
-  let device = useContext(DeviceContext)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const navigation =
     useNavigation<PasswordStackScreenProps<'AddPassword'>['navigation']>()
 
@@ -80,11 +82,11 @@ export const AddPassword = () => {
         loginCredentialsSchema.parse(unencryptedData)
 
         try {
-          await device.state?.addSecrets([
+          await deviceState.addSecrets([
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: unencryptedData,
-              encrypted: await device.state.encrypt(
+              encrypted: await deviceState.encrypt(
                 JSON.stringify(unencryptedData)
               ),
               createdAt: new Date().toJSON()

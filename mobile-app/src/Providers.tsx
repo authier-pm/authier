@@ -9,7 +9,6 @@ import {
 } from 'native-base'
 import { theme } from './Theme'
 import Routes from './Routes'
-import { DeviceProvider } from './providers/DeviceProvider'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 import { messages } from './locales/en/messages'
@@ -17,9 +16,9 @@ import { en as enPlurals } from 'make-plural/plurals'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
-import { storage } from './storage'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getSensitiveItem, setSensitiveItem } from './utils/secretStorage'
+import { storage } from './utils/storage'
 
 i18n.loadLocaleData('en', { plurals: enPlurals })
 i18n.load('en', messages)
@@ -62,9 +61,7 @@ export const Providers = () => {
         <SafeAreaProvider>
           <I18nProvider i18n={i18n} defaultComponent={Text}>
             <QueryClientProvider client={queryClient}>
-              <DeviceProvider>
-                <Routes />
-              </DeviceProvider>
+              <Routes />
             </QueryClientProvider>
           </I18nProvider>
         </SafeAreaProvider>

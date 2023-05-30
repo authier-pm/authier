@@ -1,4 +1,5 @@
 import { onError } from '@apollo/client/link/error'
+import fetch from 'cross-fetch'
 import {
   ApolloClient,
   InMemoryCache,
@@ -15,15 +16,17 @@ import QueueLink from 'apollo-link-queue'
 import { setContext } from '@apollo/client/link/context'
 import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
-import { device } from '../utils/Device'
 import { API_URL, API_URL_RELEASE } from '@env'
 import { Toast } from 'native-base'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
+console.log('apiUrl', apiUrl)
 const httpLink = new HttpLink({
   uri: apiUrl,
-  credentials: 'include'
+  credentials: 'include',
+  fetch
 })
 
 const timeStartLink = new ApolloLink((operation, forward) => {
@@ -56,8 +59,6 @@ export const queueLink = new QueueLink()
 const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
-  //get the authentication token
-
   //return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -67,20 +68,30 @@ const authLink = setContext(async (_, { headers }) => {
   }
 })
 
+const ToastServerErrorDetails = {
+  title: 'Something went wrong',
+  variant: 'subtle',
+  description: 'Please create a support ticket from the support page',
+  status: 'warning'
+}
+
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
-  if (graphQLErrors) {
+  if (graphQLErrors && graphQLErrors.length > 0) {
     if (graphQLErrors[0].message === 'not authenticated') {
       //Here just logout the user
-      device.clearAndReload()
+      useDeviceStore.getState().clearAndReload()
     }
     graphQLErrors.map(({ message, locations, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
+      //TODO: style this toast
       Toast.show({
-        title: message,
-        variant: 'danger'
+        ...ToastServerErrorDetails,
+        title: 'Something went wrong',
+        description: message,
+        variant: 'subtle'
       })
     })
   }
