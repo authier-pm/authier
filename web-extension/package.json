@@ -10,7 +10,7 @@
   "scripts": {
     "prodBuild": "AUTHIER_ENV=prod webpack --config webpack.prod.js",
     "devBuild": "AUTHIER_ENV=dev webpack --config webpack.dev.js",
-    "newTag": "npm version patch && npx tsx ./scripts/updateManifestVersion.ts && npx tsx ./scripts/newTag.ts",
+    "newTag": "npm version patch && git add package.json && npx tsx ./scripts/updateManifestVersion.ts && npx tsx ./scripts/newTag.ts",
     "clean": "rm -rf dist/js",
     "checkBuildOutput": "node ./check-es6.js",
     "dev": "NODE_ENV=development webpack -w --config webpack.dev.js",
@@ -45,7 +45,6 @@
     "@types/chrome": "^0.0.237",
     "@types/crypto-js": "^4.1.1",
     "@types/debug": "^4.1.8",
-    "@types/mz": "^2.7.4",
     "@types/papaparse": "^5.3.7",
     "@types/react": "^18.2.7",
     "@types/react-dom": "^18.2.4",
