@@ -71,17 +71,14 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
             <a
               key={el.id}
               onClick={async () => {
-                autofill(
-                  {
-                    secretsForHost: { loginCredentials: [el], totpSecrets: [] },
-                    autofillEnabled: true,
-                    extensionDeviceReady: true,
-                    passwordCount: 0,
-                    saveLoginModalsState: undefined,
-                    webInputs: webInputs
-                  },
-                  false
-                )
+                autofill({
+                  secretsForHost: { loginCredentials: [el], totpSecrets: [] },
+                  autofillEnabled: true,
+                  extensionDeviceReady: true,
+                  passwordCount: 0,
+                  saveLoginModalsState: undefined,
+                  webInputs: webInputs
+                })
                 if (promptOption) {
                   promptOption.remove()
                 }

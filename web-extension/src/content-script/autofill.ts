@@ -135,22 +135,22 @@ export const getElementCoordinates = (el: HTMLElement) => {
   }
 }
 
-export let autofillEnabled = false
-let onInputAddedHandler
+export let ranForThisPage = false
+let onInputAddedHandler = (inputEl: any) => {}
 
 const filledElements: Array<HTMLInputElement | null> = []
 
-export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
+export const autofill = (initState: IInitStateRes) => {
   const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
-  if (autofillEnabled === true) {
-    log('enabled is true, returning')
+  if (ranForThisPage === true) {
+    log('autofill already ran, returning')
     return () => {}
   }
   log('init autofill', initState)
 
-  autofillEnabled = true
+  ranForThisPage = true
   const firstLoginCred = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
@@ -207,7 +207,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
     }
     //Fill known inputs
     for (const webInputGql of matchingWebInputs) {
-      let inputEl = document.body.querySelector(
+      const inputEl = document.body.querySelector(
         webInputGql.domPath
       ) as HTMLInputElement | null
 
@@ -287,7 +287,7 @@ export const autofill = (initState: IInitStateRes, autofillEnabled = false) => {
           return // we have already filled 2 inputs on this page, we don't need to fill any more
         }
         log('onInputAddedHandler', inputEl)
-        let newPassword: string | null = null
+        const newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
