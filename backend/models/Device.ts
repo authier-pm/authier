@@ -17,6 +17,7 @@ import ms from 'ms'
 import { GraphqlError } from '../api/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
+// TODO memoize this function into redis so that we don't hit the API limit
 export async function getGeoIpLocation(ipAddress: string) {
   if (ipAddress === '127.0.0.1') {
     return {
@@ -36,6 +37,10 @@ export async function getGeoIpLocation(ipAddress: string) {
   const res = await fetch(
     `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
   )
+
+  if (res.status > 201) {
+    console.warn('Failed to get geo location for ip', ipAddress)
+  }
   const json: any = await res.json()
 
   return json
@@ -58,7 +63,9 @@ export class DeviceQuery extends DeviceGQL {
   @mem({ maxAge: ms('2 days') })
   async getIpGeoLocation(ipAddress: string) {
     const json = await getGeoIpLocation(ipAddress)
-
+    if (!json.data) {
+      return null
+    }
     return {
       city: json.data.location.city.name,
       country_name: json.data.location.country.name
@@ -142,6 +149,9 @@ export class DeviceQuery extends DeviceGQL {
   @Field(() => String)
   async lastGeoLocation() {
     const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
+    if (!geoIp) {
+      return 'Unknown location'
+    }
     return geoIp.city + ', ' + geoIp.country_name
   }
 

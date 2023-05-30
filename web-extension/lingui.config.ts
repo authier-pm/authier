@@ -19,8 +19,5 @@ export default {
     pseudo: 'en-gb'
   },
   format: 'po',
-  formatOptions: { origins: true, lineNumbers: false },
-  extractBabelOptions: {
-    presets: ['@babel/preset-react', '@babel/preset-typescript']
-  }
+  formatOptions: { origins: true, lineNumbers: false }
 }

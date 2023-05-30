@@ -11,8 +11,6 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
 import { Providers } from './src/Providers'
-import { device } from './src/utils/Device'
-import { useForceUpdate } from './useForceUpdate'
 import { Alert } from 'react-native'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
@@ -33,9 +31,7 @@ let CodePushOptions = {
   }
 }
 
-const App = () => {
-  const forceUpdate = useForceUpdate()
-
+const RnApp = () => {
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
     const enabled =
@@ -48,8 +44,6 @@ const App = () => {
   }
 
   useEffect(() => {
-    device.emitter.on('stateChange', forceUpdate)
-
     requestUserPermission()
 
     //? What is this for?
@@ -68,17 +62,16 @@ const App = () => {
     return () => {
       unsubscribe()
       unsubscribeNet()
-      device.emitter.off('stateChange', forceUpdate)
     }
   }, [])
 
   return (
     <React.Fragment>
       <PolyfillCrypto />
-      <Providers key={JSON.stringify(device.state)} />
+      <Providers />
     </React.Fragment>
   )
 }
-export default CodePush(CodePushOptions)(App)
+//export default CodePush(CodePushOptions)(App)
 // export default Sentry.wrap(App)
-//export default Sentry.wrap(CodePush(CodePushOptions)(App))
+export default Sentry.wrap(CodePush(CodePushOptions)(RnApp))

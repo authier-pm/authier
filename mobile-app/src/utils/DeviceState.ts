@@ -136,6 +136,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       backgroundState: this,
       lockedState: null
     })
+
+    device.emitter.emit('stateChange')
   }
 
   getSecretDecryptedById(id: string) {
@@ -223,12 +225,13 @@ export class DeviceState implements IBackgroundStateSerializable {
    * fetches newly added/deleted/updated secrets from the backend and updates the device state
    */
   async backendSync(toast: IToastService) {
+    console.log('backendSync:')
     const { data } = await apolloClient.query<
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
     >({
       query: SyncEncryptedSecretsDocument,
-      fetchPolicy: 'no-cache'
+      fetchPolicy: 'network-only'
     })
 
     if (data) {
@@ -273,6 +276,7 @@ export class DeviceState implements IBackgroundStateSerializable {
           removedSecrets: actuallyRemovedOnThisDevice.length,
           newAndUpdatedSecrets: newAndUpdatedSecrets.length
         }
+        console.log('res:', res)
 
         if (
           (res?.newAndUpdatedSecrets as number) > 0 ||
@@ -281,6 +285,10 @@ export class DeviceState implements IBackgroundStateSerializable {
           toast.show({
             title: 'Vault synced',
             description: `Sync successful, added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`
+          })
+        } else {
+          toast.show({
+            title: 'Vault synced'
           })
         }
 

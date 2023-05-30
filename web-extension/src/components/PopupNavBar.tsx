@@ -67,7 +67,7 @@ export const PopupNavBar: FunctionComponent = () => {
         borderBottomColor="gray.300"
         width="100%"
       >
-        <Box>
+        <Box mr={2}>
           {isUserMenuOpen ? (
             <IconButton
               size="md"

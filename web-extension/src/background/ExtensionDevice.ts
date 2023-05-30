@@ -287,7 +287,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       SyncEncryptedSecretsQueryVariables
     >({
       query: SyncEncryptedSecretsDocument,
-      fetchPolicy: 'no-cache'
+      fetchPolicy: 'network-only'
     })
     if (data) {
       const deviceState = device.state
