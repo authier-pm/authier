@@ -10,6 +10,7 @@ export const getDomainNameAndTldFromUrl = (url: string) => {
   return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
 }
 
+//TODO: This does not work in firefox
 /**
  * Constructs a URL object from a string, adding https:// if needed so that users can omit the protocol when saving a secret
  * @param url
@@ -17,7 +18,11 @@ export const getDomainNameAndTldFromUrl = (url: string) => {
  */
 export const constructURL = (url: string) => {
   if (!url.startsWith('http')) {
-    return new URL(`https://${url}`)
+    try {
+      return new URL(`https://${url}`)
+    } catch (error) {
+      console.error(error)
+    }
   }
   return new URL(url)
 }
