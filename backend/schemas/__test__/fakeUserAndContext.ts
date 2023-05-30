@@ -4,7 +4,7 @@ import { RegisterNewAccountInput } from '../../models/AuthInputs'
 import { makeRegisterAccountInput } from './makeRegisterAccountInput'
 
 export const fakeUserAndContext = async () => {
-  const userId = faker.datatype.uuid()
+  const userId = faker.string.uuid()
 
   const fakeCtx = {
     reply: { setCookie: () => {} },

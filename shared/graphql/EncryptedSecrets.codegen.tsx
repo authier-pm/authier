@@ -15,6 +15,13 @@ export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
 
 export type DeleteEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', encryptedSecret: { __typename?: 'EncryptedSecretMutation', id: string, delete: { __typename?: 'EncryptedSecretGQL', id: string } } } };
 
+export type RemoveEncryptedSecretsMutationVariables = Types.Exact<{
+  secrets: Array<Types.Scalars['UUID']> | Types.Scalars['UUID'];
+}>;
+
+
+export type RemoveEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', removeEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretMutation', id: string }> } };
+
 export type UpdateEncryptedSecretMutationVariables = Types.Exact<{
   id: Types.Scalars['ID'];
   patch: Types.EncryptedSecretInput;
@@ -101,6 +108,41 @@ export function useDeleteEncryptedSecretMutation(baseOptions?: Apollo.MutationHo
 export type DeleteEncryptedSecretMutationHookResult = ReturnType<typeof useDeleteEncryptedSecretMutation>;
 export type DeleteEncryptedSecretMutationResult = Apollo.MutationResult<DeleteEncryptedSecretMutation>;
 export type DeleteEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
+export const RemoveEncryptedSecretsDocument = gql`
+    mutation removeEncryptedSecrets($secrets: [UUID!]!) {
+  me {
+    removeEncryptedSecrets(secrets: $secrets) {
+      id
+    }
+  }
+}
+    `;
+export type RemoveEncryptedSecretsMutationFn = Apollo.MutationFunction<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>;
+
+/**
+ * __useRemoveEncryptedSecretsMutation__
+ *
+ * To run a mutation, you first call `useRemoveEncryptedSecretsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRemoveEncryptedSecretsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [removeEncryptedSecretsMutation, { data, loading, error }] = useRemoveEncryptedSecretsMutation({
+ *   variables: {
+ *      secrets: // value for 'secrets'
+ *   },
+ * });
+ */
+export function useRemoveEncryptedSecretsMutation(baseOptions?: Apollo.MutationHookOptions<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>(RemoveEncryptedSecretsDocument, options);
+      }
+export type RemoveEncryptedSecretsMutationHookResult = ReturnType<typeof useRemoveEncryptedSecretsMutation>;
+export type RemoveEncryptedSecretsMutationResult = Apollo.MutationResult<RemoveEncryptedSecretsMutation>;
+export type RemoveEncryptedSecretsMutationOptions = Apollo.BaseMutationOptions<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>;
 export const UpdateEncryptedSecretDocument = gql`
     mutation updateEncryptedSecret($id: ID!, $patch: EncryptedSecretInput!) {
   me {

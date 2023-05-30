@@ -2,20 +2,28 @@
   "manifest_version": 2,
   "name": "Authier",
   "description": "Authier chrome extension",
-  "version": "1.0.19",
-  "browser_action": {
-    "default_icon": "icon-16.png",
+  "version": "1.0.20",
+  "action": {
+    "default_icon": {
+      "16": "icon-16.png",
+      "48": "icon-48.png",
+      "128": "icon-128.png"
+    },
     "default_popup": "js/popup.html"
   },
   "background": {
-    "page": "js/backgroundPage.html",
-    "persistent": true
+    "service_worker": "js/backgroundPage.js"
   },
   "content_scripts": [
     {
-      "matches": ["*://*/*"],
-      "js": ["js/browser-polyfill.js", "js/contentScript.js"],
-      "all_frames": true
+      "matches": [
+        "<all_urls>"
+      ],
+      "all_frames": true,
+      "js": [
+        "js/browser-polyfill.js",
+        "js/contentScript.js"
+      ]
     }
   ],
   "icons": {
@@ -23,14 +31,22 @@
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "permissions": [
-    "tabs",
-    "activeTab",
-    "storage",
-    "http://*/",
-    "https://*/",
+  "host_permissions": [
     "<all_urls>"
   ],
-  "web_accessible_resources": ["icon-16.png"],
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
+  "permissions": [
+    "activeTab",
+    "storage",
+    "tabs"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "*.png"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
 }

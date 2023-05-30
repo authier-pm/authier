@@ -188,7 +188,7 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newDeviceSecretsPair.addDeviceSecret,
             authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
-            lockTime: 28800,
+            vaultLockTimeoutSeconds: 28800,
             autofillTOTPEnabled: true,
             autofillCredentialsEnabled: true,
             uiLanguage: 'en',

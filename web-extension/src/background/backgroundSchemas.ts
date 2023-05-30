@@ -76,7 +76,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
   deviceName: z.string(),
   authSecretEncrypted: z.string(),
   authSecret: z.string(),
-  lockTime: z.number(),
+  vaultLockTimeoutSeconds: z.number(),
   autofillCredentialsEnabled: z.boolean(),
   autofillTOTPEnabled: z.boolean(),
   uiLanguage: z.string(),

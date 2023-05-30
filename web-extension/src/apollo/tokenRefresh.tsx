@@ -11,7 +11,7 @@ import { device } from '@src/background/ExtensionDevice'
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
-  isTokenValidOrUndefined: () => {
+  isTokenValidOrUndefined: async () => {
     //Get token from local storage
 
     if (!accessToken) {

@@ -60,14 +60,14 @@ export default function Login(): ReactElement {
   })
 
   const {
-    formState: { isSubmitting, isSubmitSuccessful }
+    formState: { isSubmitting }
   } = form
 
   if (!device.id) {
     return <Spinner />
   }
 
-  if (isSubmitSuccessful) {
+  if (formStateContext.isSubmitted) {
     return (
       <LoginContext.Provider
         value={{

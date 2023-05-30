@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   View,
@@ -12,19 +12,35 @@ import {
 } from 'native-base'
 
 import { SearchBar } from '../../components/SearchBar'
-import { DeviceContext } from '../../providers/DeviceProvider'
+
 import TOTPSecret from '../../components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { TOTPStackScreenProps } from '../../navigation/types'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+
+const EmptyList = () => {
+  return (
+    <Box p={4}>
+      <Text>
+        <Trans>
+          Start by adding a secret by logging onto any website or by adding a
+          TOTP code
+        </Trans>
+      </Text>
+    </Box>
+  )
+}
 
 export const TOTPVault = ({
   navigation
 }: TOTPStackScreenProps<'TOTPVault'>) => {
   const [refreshing, setRefreshing] = useState(false)
   const [remainingSeconds, setRemainingSeconds] = useState<number>(30)
-  let device = useContext(DeviceContext)
+  let deviceState = useDeviceStateStore((state) => state)
+  let device = useDeviceStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
 
   const timer = () => {
@@ -37,11 +53,10 @@ export const TOTPVault = ({
   useEffect(() => {
     setInterval(timer, 1000)
   }, [])
-  const hasNoSecrets = device.state?.secrets.length === 0
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await device.state?.backendSync(toast)
+    await deviceState.backendSync(toast)
     setRefreshing(false)
   }
 
@@ -65,27 +80,17 @@ export const TOTPVault = ({
         />
       </Flex>
 
-      {hasNoSecrets ? ( // TODO login form illustration
-        <Box p={4}>
-          <Text>
-            <Trans>
-              Start by adding a secret by logging onto any website or by adding
-              a TOTP code
-            </Trans>
-          </Text>
-        </Box>
-      ) : (
-        <FlashList
-          estimatedItemSize={104}
-          data={device.TOTPSecrets.filter(({ totp }) => {
-            return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
-          })}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => <TOTPSecret item={item} />}
-          onRefresh={() => onRefresh()}
-          refreshing={refreshing}
-        />
-      )}
+      <FlashList
+        ListEmptyComponent={EmptyList}
+        estimatedItemSize={90}
+        data={device.TOTPSecrets().filter(({ totp }) => {
+          return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
+        })}
+        keyExtractor={(i) => i.id}
+        renderItem={({ item }) => <TOTPSecret item={item} />}
+        onRefresh={() => onRefresh()}
+        refreshing={refreshing}
+      />
 
       <Fab
         onPress={() => navigation.navigate('AddTOTP')}

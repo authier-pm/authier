@@ -14,7 +14,7 @@ export type Scalars = {
   BigInt: any;
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: string;
-  /** A field whose value conforms to the standard internet email address format as specified in RFC822: https://www.w3.org/Protocols/rfc822/. */
+  /** A field whose value conforms to the standard internet email address format as specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address. */
   EmailAddress: any;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
   JSON: any;
@@ -76,10 +76,11 @@ export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval';
   createdAt: Scalars['DateTime'];
   deviceId: Scalars['ID'];
+  deviceLocationFromIp?: Maybe<DeviceLocation>;
   deviceName: Scalars['String'];
   id: Scalars['Int'];
   ipAddress: Scalars['String'];
-  ipGeoLocation: Scalars['JSON'];
+  ipGeoLocation?: Maybe<Scalars['JSON']>;
   rejectedAt?: Maybe<Scalars['DateTime']>;
 };
 
@@ -146,13 +147,19 @@ export type DeviceGql = {
   syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
+  vaultLockTimeoutSeconds: Scalars['Int'];
 };
 
 export type DeviceInput = {
   id: Scalars['String'];
   name: Scalars['String'];
   platform: Scalars['String'];
+};
+
+export type DeviceLocation = {
+  __typename?: 'DeviceLocation';
+  city: Scalars['String'];
+  countryName: Scalars['String'];
 };
 
 export type DeviceMutation = {
@@ -181,7 +188,7 @@ export type DeviceMutation = {
   syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
+  vaultLockTimeoutSeconds: Scalars['Int'];
 };
 
 
@@ -223,7 +230,7 @@ export type DeviceQuery = {
   syncTOTP: Scalars['Boolean'];
   updatedAt?: Maybe<Scalars['DateTime']>;
   userId: Scalars['String'];
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']>;
+  vaultLockTimeoutSeconds: Scalars['Int'];
 };
 
 export type EmailVerificationGqlScalars = {
@@ -525,6 +532,7 @@ export type UserMutation = {
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
+  removeEncryptedSecrets: Array<EncryptedSecretMutation>;
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt'];
   setMasterDevice: MasterDeviceChangeGql;
@@ -580,6 +588,11 @@ export type UserMutationDeviceArgs = {
 
 export type UserMutationEncryptedSecretArgs = {
   id: Scalars['ID'];
+};
+
+
+export type UserMutationRemoveEncryptedSecretsArgs = {
+  secrets: Array<Scalars['UUID']>;
 };
 
 

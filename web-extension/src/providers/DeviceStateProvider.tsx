@@ -1,5 +1,5 @@
 import { useDeviceState } from '@src/util/useDeviceState'
-import React, { createContext } from 'react'
+import { createContext } from 'react'
 
 export const DeviceStateContext = createContext<
   ReturnType<typeof useDeviceState>

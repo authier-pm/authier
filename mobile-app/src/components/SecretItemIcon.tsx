@@ -1,42 +1,58 @@
-import { Avatar, Icon } from 'native-base'
+import { Icon, useColorModeValue } from 'native-base'
+import { constructURL } from '@src/utils/urlUtils'
 import React from 'react'
-import { URL } from 'react-native-url-polyfill'
 import Ionicons from 'react-native-vector-icons/Ionicons'
+import FastImage from 'react-native-fast-image'
 
+//TODO: Icons are flickering during fast scrolling
 export function SecretItemIcon(props: {
   iconUrl: string | null | undefined
   url: string
 }) {
-  let hostname
+  const color = useColorModeValue('black', 'white')
+  const FallbackElement = (
+    <Icon
+      as={<Ionicons color={'white'} name={'lock-closed-outline'} />}
+      size={10}
+      alignSelf="center"
+      color={color}
+    />
+  )
 
-  if (props.url) {
-    hostname = getHostnameFromUrl(props)
-  } else {
-    hostname = ''
+  let hostname
+  if (props.iconUrl) {
+    return (
+      <FastImage
+        style={{ width: 50, height: 50, borderRadius: 10 }}
+        source={{
+          uri: props.iconUrl as string,
+          priority: FastImage.priority.normal
+        }}
+        resizeMode={FastImage.resizeMode.contain}
+      />
+    )
   }
 
-  return (
-    <>
-      {hostname.search('android') !== -1 ? (
-        <Icon
-          as={<Ionicons name={'lock-closed-outline'} />}
-          size={5}
-          mr="2"
-          color="muted.400"
-        />
-      ) : (
-        <Avatar
-          background={'white'}
+  if (props.url) {
+    try {
+      hostname = constructURL(props.url).hostname
+
+      return (
+        <FastImage
+          style={{ width: 50, height: 50, borderRadius: 10 }}
           source={{
-            uri: props.iconUrl
-              ? props.iconUrl
-              : `https://icons.duckduckgo.com/ip3/${hostname}.ico` // https://stackoverflow.com/a/10796141}
+            uri: `https://icons.duckduckgo.com/ip3/${hostname}.ico`,
+            priority: FastImage.priority.normal
           }}
-          size="lg"
+          resizeMode={FastImage.resizeMode.contain}
         />
-      )}
-    </>
-  )
+      )
+    } catch (err) {
+      return FallbackElement
+    }
+  } else {
+    return FallbackElement
+  }
 }
 function getHostnameFromUrl(props: {
   iconUrl: string | null | undefined

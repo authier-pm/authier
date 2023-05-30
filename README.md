@@ -8,12 +8,9 @@ To build the browser extension make sure you run on node.js 18.15.0.
 Please follow these commands:
 
 ```bash
-# global system cli executables
 curl -fsSL https://get.pnpm.io/install.sh | sh -
 pnpm i zx -g #needed for a postinstall script in mobile-app
-
-# project dependencies
-pnpm install --frozen-lockfile --prefer-offline
+pnpm install
 cd web-extension
 cp .env.example .env
 pnpm prodBuild

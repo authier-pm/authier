@@ -93,7 +93,7 @@ export default function SidebarWithHeader({
       </Drawer>
       {/* mobilenav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box ml={{ base: 0, md: 60 }} paddingBottom={0}>
+      <Box overflow="hidden" ml={{ base: 0, md: 60 }} paddingBottom={0}>
         {children}
       </Box>
     </Box>

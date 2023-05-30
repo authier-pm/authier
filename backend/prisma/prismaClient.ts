@@ -6,7 +6,6 @@ import { getDbCount } from '../scripts/getDbCount'
 
 import { DMMFClass } from '.prisma/client/runtime'
 import { PrismaClient } from '.prisma/client'
-console.log(__dirname)
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
@@ -53,4 +52,6 @@ if (debugLogs) {
 }
 
 export default prismaClient
-export const dmmf = (prismaClient as any)._baseDmmf as DMMFClass
+//TODO: We should type this
+// @ts-expect-error
+export const dmmf = prismaClient._runtimeDataModel as any

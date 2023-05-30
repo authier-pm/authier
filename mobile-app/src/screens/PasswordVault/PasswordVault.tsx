@@ -1,36 +1,44 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useState } from 'react'
 
 import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
-import { DeviceContext } from '@providers/DeviceProvider'
 import LoginCredential from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
-import { ILoginSecret } from '@src/utils/Device'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+
+const EmptyList = () => {
+  return (
+    <Box p={4}>
+      <Text>
+        <Trans>Start by adding a login secret or a TOTP code</Trans>
+      </Text>
+    </Box>
+  )
+}
 
 export const PasswordVault = ({
   navigation
 }: PasswordStackScreenProps<'PasswordsVault'>) => {
   const toast = useToast()
-  let device = useContext(DeviceContext)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [refreshing, setRefreshing] = useState(false)
   const [filterBy, setFilterBy] = useState('')
-
-  const hasNoSecrets = device.state?.secrets.length === 0
 
   const onRefresh = async () => {
     setRefreshing(true)
 
     try {
-      await device.state?.backendSync(toast)
+      await deviceState.backendSync(toast)
     } catch (error) {
       console.log(error)
     } finally {
       setRefreshing(false)
     }
-
     setRefreshing(false)
   }
 
@@ -44,30 +52,20 @@ export const PasswordVault = ({
         <SearchBar setFilterBy={setFilterBy} />
       </Flex>
 
-      {hasNoSecrets ? ( // TODO login form illustration
-        <Box p={4}>
-          <Text>
-            <Trans>Start by adding a login secret or a TOTP code</Trans>
-          </Text>
-        </Box>
-      ) : (
-        //Maybe we should do infinite scrolling pagination??
-        <FlashList
-          estimatedItemSize={104}
-          data={device.loginCredentials.filter(
-            ({ loginCredentials: { url, label } }) => {
-              return label.includes(filterBy) || url?.includes(filterBy)
-            }
-          )}
-          keyExtractor={(i) => i.id}
-          renderItem={({ item }) => (
-            <LoginCredential loginSecret={item as ILoginSecret} />
-          )}
-          onRefresh={() => onRefresh()}
-          refreshing={refreshing}
-        />
-      )}
-
+      <FlashList
+        ListEmptyComponent={EmptyList}
+        //FIX: Dont like empty space on fast scroll
+        estimatedItemSize={90}
+        data={device
+          .loginCredentials()
+          .filter(({ loginCredentials: { url, label } }) => {
+            return label.includes(filterBy) || url?.includes(filterBy)
+          })}
+        keyExtractor={(i) => i.id}
+        renderItem={({ item }) => <LoginCredential loginSecret={item} />}
+        onRefresh={() => onRefresh()}
+        refreshing={refreshing}
+      />
       <Fab
         onPress={() => navigation.navigate('AddPassword')}
         m={2}

@@ -48,7 +48,7 @@ import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
-import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
+import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const log = debug('au:Device')
@@ -65,7 +65,7 @@ function getRandomInt(min: number, max: number) {
 }
 
 const browserInfo = bowser.getParser(navigator.userAgent)
-export const isRunningInBgPage = location.href.includes('backgroundPage.html')
+export const isRunningInBgServiceWorker = typeof window === 'undefined'
 
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
@@ -98,6 +98,7 @@ export const getDecryptedSecretProp = (
 
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  lockTimeEnd: number
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     //log('device state created', this)
@@ -113,7 +114,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   encryptionSalt: string
   masterEncryptionKey: string
   secrets: Array<SecretSerializedType>
-  lockTime: number
+  vaultLockTimeoutSeconds: number
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
@@ -189,11 +190,13 @@ export class DeviceState implements IBackgroundStateSerializable {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
-    // log('SAVE DEVICE STATE', this.decryptedSecrets)
     await browser.storage.local.set({
       backgroundState: this,
       lockedState: null
     })
+
+    const icon = browser.runtime.getURL('icon-48.png')
+    chrome.action.setIcon({ path: icon })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
@@ -208,7 +211,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   async getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter((secret) => {
       return (
-        host === new URL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
+        host ===
+        constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
       )
     })
     if (secrets.length === 0) {
@@ -340,7 +344,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   //TODO: type this
   async findExistingSecret(secret) {
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      new URL(secret.url).hostname
+      constructURL(secret.url).hostname
     )
 
     return existingSecretsOnHostname.find(
@@ -409,6 +413,17 @@ export class DeviceState implements IBackgroundStateSerializable {
     this.save()
   }
 
+  async removeSecrets(secretIds: string[]) {
+    browser.storage.local.set({
+      backgroundState: {
+        ...device.state,
+        secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
+      }
+    })
+    this.secrets = this.secrets.filter((s) => !secretIds.includes(s.id))
+    this.save()
+  }
+
   destroy() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
   }
@@ -421,13 +436,10 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
+  lockInterval: NodeJS.Timer | null
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
-  }
-
-  async clearLockInterval() {
-    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 
   onInitDone(callback: () => void) {
@@ -446,11 +458,10 @@ class ExtensionDevice {
    */
   async initialize() {
     this.id = await this.getDeviceId()
-
     let storedState: IBackgroundStateSerializable | null = null
 
     const storage = await browser.storage.local.get()
-    log('storage', storage)
+
     if (storage.backgroundState) {
       storedState = storage.backgroundState
 
@@ -478,7 +489,7 @@ class ExtensionDevice {
     }
 
     if (this.state && (isVault || isPopup)) {
-      this.startLockInterval(this.state.lockTime)
+      this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 
     // const fireToken = await generateFireToken()
@@ -486,7 +497,7 @@ class ExtensionDevice {
 
     this.fireToken = fireToken
     this.initCallbacks.forEach((cb) => cb())
-    log('Extension device initialized')
+    log('Extension device initialized with id ', this.id)
   }
 
   private listenForUserLogin() {
@@ -581,6 +592,9 @@ class ExtensionDevice {
 
     this.clearLockInterval()
 
+    const lockIcon = browser.runtime.getURL('icon-lock-48.png')
+    chrome.action.setIcon({ path: lockIcon })
+
     log('locking device')
 
     const {
@@ -588,7 +602,7 @@ class ExtensionDevice {
       userId,
       secrets,
       encryptionSalt,
-      lockTime,
+      vaultLockTimeoutSeconds: lockTime,
       syncTOTP,
       autofillCredentialsEnabled,
       autofillTOTPEnabled,
@@ -606,7 +620,7 @@ class ExtensionDevice {
       encryptionSalt,
       authSecret,
       authSecretEncrypted,
-      lockTime,
+      vaultLockTimeoutSeconds: lockTime,
       syncTOTP,
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
@@ -621,7 +635,6 @@ class ExtensionDevice {
 
     this.state = null
   }
-
   async clearAndReload() {
     await removeToken()
     await device.clearLocalStorage()
@@ -675,22 +688,62 @@ class ExtensionDevice {
     )
   }
 
-  syncSettings(config: SettingsInput) {
-    if (this.state) {
-      this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
-      this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
-      this.state.lockTime = config.vaultLockTimeoutSeconds
-      this.state.syncTOTP = config.syncTOTP
-      this.state.uiLanguage = config.uiLanguage
+  setDeviceSettings(config: SettingsInput) {
+    if (!this.state) {
+      console.warn('cannot set device settings, device not initialized')
+      return
     }
+
+    this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
+    this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
+    this.state.syncTOTP = config.syncTOTP
+    this.state.uiLanguage = config.uiLanguage
+
+    device.setLockTime(config.vaultLockTimeoutSeconds)
+
+    this.state.save()
   }
 
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     this.state.save()
   }
+
+  startVaultLockTimer() {
+    this.lockInterval = setInterval(() => {
+      const now = Date.now()
+      if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {
+        console.log(`Vault locked at ${now}`)
+        device.lock()
+      }
+    }, 5000)
+  }
+
+  // null is when user disables the vault lock
+  setLockTime(lockTime: number) {
+    if (!this.state) {
+      console.warn('cannot set device settings, device not initialized')
+      return
+    }
+    this.state.vaultLockTimeoutSeconds = lockTime
+
+    this.clearLockInterval()
+    if (lockTime > 0) {
+      this.state.lockTimeEnd = Date.now() + lockTime * 1000
+      this.startVaultLockTimer()
+    }
+  }
+
+  async clearLockInterval() {
+    if (this.lockInterval) {
+      clearInterval(this.lockInterval)
+    }
+    this.lockInterval = null
+
+    await extensionDeviceTrpc.clearLockInterval.mutate()
+  }
 }
-log('Extension device started')
+
 export const device = new ExtensionDevice()
 
 device.initialize()

@@ -32,7 +32,9 @@ import {
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
 import { DevicesStackScreenProps } from '@navigation/types'
-import { DeviceContext } from '@providers/DeviceProvider'
+
+import mitt from 'mitt'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export const icons = {
   Android: 'logo-android',
@@ -43,14 +45,20 @@ export const icons = {
   Firefox: 'logo-firefox',
   ChromeOS: 'logo-chrome'
 }
-
+export let emitter = mitt()
+const empty = () => {
+  return <></>
+}
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
-  const device = React.useContext(DeviceContext)
+  const device = useDeviceStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,
     loading: devicesLoading,
-    refetch: devicesRefetch
+    refetch: devicesRefetch,
+    startPolling: devicesStartPolling,
+    stopPolling: devicesStopPolling,
+    previousData
   } = useMyDevicesQuery()
   const {
     data: dataRequests,
@@ -67,6 +75,15 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   useEffect(() => {
     devicesRefetch()
     requestsRefetch()
+    if (previousData !== devicesData) {
+      devicesStopPolling()
+    }
+    emitter.on('refresh', () => {
+      devicesRefetch()
+    })
+    return () => {
+      emitter.off('refresh')
+    }
   }, [])
 
   const renderDevice = ({
@@ -80,7 +97,10 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
       <Pressable
         key={item.id}
         onPress={() =>
-          navigation.navigate('DeviceInfo', { device: item, masterDeviceId })
+          navigation.navigate('DeviceInfo', {
+            device: item,
+            masterDeviceId
+          })
         }
         borderWidth={1}
         borderColor={'gray.600'}
@@ -158,88 +178,100 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   }: {
     item: DecryptionChallengeForApproval
   }) => {
+    const fromLocationText = item.ipGeoLocation
+      ? `(
+      ${item.ipGeoLocation?.city}, ${item.ipGeoLocation?.country_name})`
+      : ''
     return (
-      <Alert
-        status="info"
-        key={item.id}
-        mx={3}
-        borderWidth={1}
-        borderColor={'gray.400'}
-        m={2}
-        rounded={'lg'}
-        p={3}
-      >
-        <VStack flexShrink={1} w="100%">
-          <HStack
-            flexShrink={1}
-            space={1}
-            alignItems="center"
-            justifyContent="space-between"
-          >
-            <HStack space={2} flexShrink={1} alignItems="center">
-              <Alert.Icon />
-              <Text
-                fontSize="md"
-                fontWeight="medium"
-                _dark={{
-                  color: 'coolGray.800'
-                }}
-              >
-                <Trans>New Device is trying to login!</Trans>
-              </Text>
+      <Box minH="290px">
+        <Alert
+          status="info"
+          key={item.id}
+          mx={3}
+          borderWidth={1}
+          borderColor={'gray.400'}
+          m={2}
+          rounded={'lg'}
+          p={3}
+        >
+          <VStack flexShrink={1} w="100%">
+            <HStack
+              flexShrink={1}
+              space={1}
+              alignItems="center"
+              justifyContent="space-between"
+            >
+              <HStack space={2} flexShrink={1} alignItems="center">
+                <Alert.Icon />
+                <Text
+                  fontSize="md"
+                  fontWeight="medium"
+                  _dark={{
+                    color: 'coolGray.800'
+                  }}
+                >
+                  <Trans>New Device is trying to login!</Trans>
+                </Text>
+              </HStack>
             </HStack>
-          </HStack>
-          <Box
-            pl="6"
-            _dark={{
-              _text: {
-                color: 'coolGray.600'
-              }
-            }}
-          >
-            {formatRelative(new Date(item.createdAt), new Date())}
-          </Box>
-        </VStack>
+            <Box
+              pl="6"
+              _dark={{
+                _text: {
+                  color: 'coolGray.600'
+                }
+              }}
+            >
+              <Text color={'orange.500'} fontSize="sm">
+                {item.deviceName}{' '}
+                {formatRelative(new Date(item.createdAt), new Date())} from IP{' '}
+                {item.ipAddress} {fromLocationText}
+              </Text>
+            </Box>
+          </VStack>
 
-        <HStack space={6} mt={3}>
-          <Button
-            w={'30%'}
-            size={'lg'}
-            rounded={'xl'}
-            colorScheme="green"
-            variant="solid"
-            onPress={async () => {
-              await approve({
-                variables: {
-                  id: item.id
-                }
-              })
-              requestsRefetch()
-            }}
-          >
-            <Text fontWeight="bold" color="white">
-              <Trans>Approve</Trans>
-            </Text>
-          </Button>
-          <Button
-            w={'30%'}
-            rounded={'xl'}
-            colorScheme="red"
-            onPress={async () => {
-              await reject({
-                variables: {
-                  id: item.id
-                }
-              })
-              requestsRefetch()
-            }}
-          >
-            <Text fontWeight="bold" color="white">
-              <Trans>Reject</Trans>
-            </Text>
-          </Button>
-        </HStack>
-      </Alert>
+          <HStack space={6} mt={3}>
+            <Button
+              w={'30%'}
+              size={'lg'}
+              rounded={'xl'}
+              colorScheme="green"
+              variant="solid"
+              onPress={async () => {
+                await approve({
+                  variables: {
+                    id: item.id
+                  }
+                })
+                requestsRefetch()
+                devicesStartPolling(5000)
+                //TODO: Add here some kind of animations, like a spinner to show that the device is being added
+              }}
+            >
+              <Text fontWeight="bold" color="white">
+                <Trans>Approve</Trans>
+              </Text>
+            </Button>
+            <Button
+              w={'30%'}
+              rounded={'xl'}
+              colorScheme="red"
+              onPress={async () => {
+                await reject({
+                  variables: {
+                    id: item.id
+                  }
+                })
+                requestsRefetch()
+              }}
+            >
+              <Text fontWeight="bold" color="white">
+                <Trans>Reject</Trans>
+              </Text>
+            </Button>
+          </HStack>
+        </Alert>
+      </Box>
     )
   }
 
@@ -250,6 +282,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
       {/* List of requests*/}
       <FlatList
         flexGrow={0}
+        ListEmptyComponent={empty}
         data={dataRequests?.me?.decryptionChallengesWaiting}
         keyExtractor={(item) => {
           return item.id.toString()

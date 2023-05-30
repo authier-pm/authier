@@ -27,6 +27,7 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
+import { constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -55,12 +56,9 @@ export const saveLoginModalsStates = new Map<
   { password: string; username: string }
 >()
 
-export let noHandsLogin = false
+export const noHandsLogin = false
 let capturedInputEvents: ICapturedInput[] = []
 let inputsUrl: string
-let lockTimeEnd: number | null
-let lockTimeStart: number | null
-let lockInterval: any
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
@@ -80,7 +78,7 @@ const appRouter = tc.router({
       }
       let urlParsed: URL
       try {
-        urlParsed = new URL(url)
+        urlParsed = constructURL(url)
       } catch (err) {
         return false
       }
@@ -233,22 +231,8 @@ const appRouter = tc.router({
       const deviceState = device.state
       log('securitySettings', input, device.state)
       if (deviceState) {
-        deviceState.lockTime = input.vaultLockTimeoutSeconds
-        deviceState.syncTOTP = input.syncTOTP
-        deviceState.uiLanguage = input.uiLanguage
-        deviceState.autofillTOTPEnabled = input.autofillTOTPEnabled
-        deviceState.autofillCredentialsEnabled =
-          input.autofillCredentialsEnabled
-        //TODO: Split this into TOTP and credentials
-        noHandsLogin = input.autofillCredentialsEnabled
+        device.setDeviceSettings(input)
 
-        //Refresh the lock interval
-        lockInterval = clearInterval(lockInterval)
-        lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + deviceState.lockTime * 1000
-
-        createInterval(lockTimeEnd)
-        deviceState.save()
         log('device.state', device.state)
       }
 
@@ -257,15 +241,13 @@ const appRouter = tc.router({
   setLockInterval: tcProcedure
     .input(z.object({ time: z.number() }))
     .mutation(async ({ input }) => {
-      if (!lockInterval) {
-        lockTimeStart = Date.now()
-        lockTimeEnd = lockTimeStart + input.time * 1000
-      }
-      createInterval(lockTimeEnd)
+      device.setLockTime(
+        input.time ? Date.now() + input.time * 1000 : input.time
+      )
       return true
     }),
   clearLockInterval: tcProcedure.mutation(async () => {
-    resetInterval()
+    device.clearLockInterval()
     return true
   }),
   setDeviceState: tcProcedure
@@ -290,22 +272,3 @@ createChromeHandler({
 })
 
 console.log('background page loaded')
-
-const createInterval = (time: number | null) => {
-  if (!lockInterval && lockTimeStart !== lockTimeEnd) {
-    lockInterval = setInterval(() => {
-      if (time && time <= Date.now()) {
-        log('lock', Date.now(), device)
-
-        resetInterval()
-        device.lock()
-      }
-    }, 5000)
-  }
-}
-
-const resetInterval = () => {
-  lockTimeEnd = null
-  lockTimeStart = null
-  lockInterval = clearInterval(lockInterval)
-}

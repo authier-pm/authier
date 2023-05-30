@@ -9,9 +9,7 @@ import {
   View,
   Pressable,
   HStack,
-  Spinner,
-  Icon,
-  Center
+  Icon
 } from 'native-base'
 import React, {
   Dispatch,
@@ -23,11 +21,11 @@ import React, {
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
-import { DeviceContext } from '@providers/DeviceProvider'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { Loading } from '@src/components/Loading'
+import { useDeviceStore } from '@src/utils/deviceStore'
 
 export interface ILoginFormValues {
   email: string
@@ -47,7 +45,7 @@ export function Login({ navigation }: NavigationProps) {
   const [show, setShow] = React.useState(false)
   const { formState, setFormState } = useContext(LoginContext)
 
-  let device = useContext(DeviceContext)
+  const device = useDeviceStore((state) => state)
 
   useEffect(() => {
     if (!device.fireToken) {
@@ -95,7 +93,6 @@ export function Login({ navigation }: NavigationProps) {
           isSubmitting,
           errors
         }) => {
-          setFormState(values)
           return (
             <VStack space={3} mt="5">
               <FormControl>
@@ -163,7 +160,14 @@ export function Login({ navigation }: NavigationProps) {
                 <Text fontSize="sm" color="muted.500" fontWeight={400}>
                   <Trans>I'm a new user.</Trans>
                 </Text>
-                <Pressable onPress={() => navigation.navigate('Register')}>
+                <Pressable
+                  onPress={() =>
+                    navigation.navigate('Register', {
+                      password: values.password,
+                      email: values.email
+                    })
+                  }
+                >
                   <Text
                     color={'indigo.500'}
                     fontWeight={'medium'}

@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React from 'react'
 
 import {
   Box,
@@ -16,7 +16,7 @@ import {
 } from 'native-base'
 
 import { t, Trans } from '@lingui/macro'
-import { DeviceContext } from '../../providers/DeviceProvider'
+
 import { useChangeMasterPasswordMutation } from './ChangeMasterPassword.codegen'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import {
@@ -25,10 +25,13 @@ import {
   decryptDeviceSecretWithPassword,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
-import { IBackgroundStateSerializable } from '@src/utils/Device'
+import { IBackgroundStateSerializable } from '@src/utils/deviceStore'
+import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 export function ChangeMasterPassword() {
-  let device = useContext(DeviceContext)
+  let device = useDeviceStore((state) => state)
+  let deviceState = useDeviceStateStore((state) => state)
   const [changePassword] = useChangeMasterPasswordMutation()
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const toast = useToast()
@@ -82,7 +85,7 @@ export function ChangeMasterPassword() {
                 onChangeText={(value) => {
                   setForm({ ...form, newPassword: value })
                 }}
-              ></Input>
+              />
             </Box>
           </VStack>
 
@@ -98,7 +101,7 @@ export function ChangeMasterPassword() {
                 onChangeText={(value) => {
                   setForm({ ...form, newPasswordConfirmation: value })
                 }}
-              ></Input>
+              />
             </Box>
           </VStack>
           <Button
@@ -118,15 +121,15 @@ export function ChangeMasterPassword() {
                 const { addDeviceSecret } =
                   await decryptDeviceSecretWithPassword(
                     form.currentPassword,
-                    device.state as IBackgroundStateSerializable
+                    deviceState as IBackgroundStateSerializable
                   )
 
-                if (addDeviceSecret !== device.state?.authSecret) {
+                if (addDeviceSecret !== deviceState.authSecret) {
                   toast.show({ title: t`Wrong password`, variant: 'error' })
                   return
                 }
 
-                const { state } = device
+                let state = deviceState
 
                 if (
                   state &&
@@ -144,7 +147,7 @@ export function ChangeMasterPassword() {
                         name: device.name,
                         platform: device.platform
                       },
-                      email: device.state?.email
+                      email: state.email
                     }
                   })
 
@@ -170,7 +173,7 @@ export function ChangeMasterPassword() {
                     }
                   })
 
-                  const deviceState: IBackgroundStateSerializable = {
+                  const newDeviceState: IBackgroundStateSerializable = {
                     ...state,
                     authSecret: newDeviceSecretsPair.addDeviceSecret,
                     authSecretEncrypted:
@@ -179,7 +182,7 @@ export function ChangeMasterPassword() {
                       newEncryptionKey
                     )
                   }
-                  await device.save(deviceState)
+                  await device.save(newDeviceState)
 
                   toast.show({
                     title: t`Password changed, all your devices will be logged out and you will need to log in again`,

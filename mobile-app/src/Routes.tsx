@@ -1,9 +1,9 @@
-import React, { useContext, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
-import { DeviceContext } from './providers/DeviceProvider'
+
 import { VaultUnlockVerification } from './screens/VaultUnlockVerification'
-import { useColorMode } from 'native-base'
+import { useColorMode, useToast } from 'native-base'
 import {
   DarkTheme,
   DefaultTheme,
@@ -12,16 +12,18 @@ import {
 } from '@react-navigation/native'
 import { Linking, Platform } from 'react-native'
 
-import { storage } from './storage'
+import { storage } from '@utils/storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 import { routingInstrumentation } from './sentryInit'
+import { useDeviceStore } from './utils/deviceStore'
 
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
-  const device = useContext(DeviceContext)
+  const device = useDeviceStore((state) => state)
   const { colorMode } = useColorMode()
+
   const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
@@ -52,8 +54,6 @@ export default function Routes() {
     }
   }, [isReady])
 
-  useEffect(() => {}, [device.lockedState])
-
   if (device.lockedState) {
     return (
       <VaultUnlockVerification
@@ -81,7 +81,7 @@ export default function Routes() {
       }
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}
     >
-      {device.state ? <AppNavigation /> : <AuthNavigation />}
+      {device.isLoggedIn ? <AppNavigation /> : <AuthNavigation />}
     </NavigationContainer>
   )
 }

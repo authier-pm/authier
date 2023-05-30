@@ -18,16 +18,16 @@ import { Formik, FormikHelpers } from 'formik'
 
 import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
 
-import { DeviceContext } from '@providers/DeviceProvider'
-import { ILoginSecret, ITOTPSecret } from '@utils/Device'
+import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
 import {
   EncryptedSecretsDocument,
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
-import { Loading } from '@src/components/Loading'
+import { Loading } from '@components/Loading'
 import zxcvbn from 'zxcvbn-typescript'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 export const InputHeader = ({ children }) => {
   return (
@@ -68,7 +68,7 @@ const InputField = ({
 const LoginSecret = (secretProps: ILoginSecret) => {
   const { loginCredentials } = secretProps
   const [show, setShow] = useState(false)
-  let device = useContext(DeviceContext)
+  const deviceState = useDeviceStateStore((state) => state)
 
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: EncryptedSecretsDocument, variables: {} }]
@@ -88,11 +88,11 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           values: credentialValues,
           { setSubmitting, resetForm }: FormikHelpers<credentialValues>
         ) => {
-          const secret = device.state?.secrets.find(
+          const secret = deviceState.secrets.find(
             ({ id }) => id === secretProps.id
           )
-          if (secret && device.state) {
-            secret.encrypted = await device.state.encrypt(
+          if (secret && deviceState) {
+            secret.encrypted = await deviceState.encrypt(
               JSON.stringify({
                 password: values.password,
                 username: values.username,
@@ -112,7 +112,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
               }
             })
 
-            await device.state?.save()
+            deviceState.save()
 
             resetForm({ values })
             setSubmitting(false)
@@ -232,14 +232,14 @@ export default function EditPassword({
   navigation,
   route
 }: PasswordStackScreenProps<'EditPassword'>) {
-  let device = useContext(DeviceContext)
+  let deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
 
   useEffect(() => {
     async function loadSecret() {
-      const secret = await device.state?.getSecretDecryptedById(
+      const secret = await deviceState.getSecretDecryptedById(
         route.params.loginSecret.id
       )
       setSecret(secret)
@@ -250,14 +250,14 @@ export default function EditPassword({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
     if (secret) {
+      console.log('secret', secret.id)
       navigation.setOptions({
         headerRight: () => <DeleteSecretAlert id={secret?.id} />
       })
     }
   }, [navigation, secret])
 
-  //QUESTION: Why cant I use !device.state || !secret
-  if (!device.state) {
+  if (!deviceState) {
     return <Loading />
   }
 

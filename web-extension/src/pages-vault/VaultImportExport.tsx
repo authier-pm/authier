@@ -6,7 +6,9 @@ import {
   Flex,
   Heading,
   Link,
-  Text
+  ListItem,
+  Text,
+  UnorderedList
 } from '@chakra-ui/react'
 import { Trans } from '@lingui/macro'
 import {
@@ -25,6 +27,7 @@ import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
+import { constructURL } from '@shared/urlUtils'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 // const csvHeaderNames = {
@@ -113,7 +116,7 @@ export const onCSVFileAccepted: any = (
 
           let hostname: string
           try {
-            hostname = new URL(creds.url).hostname
+            hostname = constructURL(creds.url).hostname
           } catch (error) {
             skipped++
             break
@@ -205,26 +208,24 @@ export const VaultImportExport = () => {
                   }
                 }}
               />
-              <Text fontSize={16} mt={8} mb={6}>
+              <UnorderedList fontSize={16} mt={8} mb={6}>
                 <Trans>
                   We support importing from <code>csv</code> and{' '}
                   <code>json</code> files.
-                  <ul>
-                    <li>
-                      Lastpass/Bitwarden will work fine, file exported from
-                      other password managers might work as well, but it's not
-                      guaranteed. Please send as a request for a supported
-                      format <a href="https://twitter.com/authierpm">here</a>.
-                    </li>
-                    <li>
-                      For JSON, it must be a file exported from{' '}
-                      <Link href="https://www.npmjs.com/package/authy-desktop-export">
-                        authy-desktop-export
-                      </Link>
-                    </li>
-                  </ul>
                 </Trans>
-              </Text>
+                <ListItem>
+                  Lastpass/Bitwarden will work fine, file exported from other
+                  password managers might work as well, but it's not guaranteed.
+                  Please send as a request for a supported format{' '}
+                  <a href="https://twitter.com/authierpm">here</a>.
+                </ListItem>
+                <ListItem>
+                  For JSON, it must be a file exported from
+                  <Link href="https://www.npmjs.com/package/authy-desktop-export">
+                    authy-desktop-export
+                  </Link>
+                </ListItem>
+              </UnorderedList>
             </>
           ) : (
             <>

@@ -5,6 +5,8 @@
       "mode": "auto"
     }
   ],
-  "cSpell.words": ["trpc"],
+  "cSpell.words": [
+    "trpc"
+  ],
   "typescript.enablePromptUseWorkspaceTsdk": true
 }

@@ -69,13 +69,12 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
               ...lockedState
             })
 
-            device.startLockInterval(lockedState.lockTime)
+            device.startLockInterval(lockedState.vaultLockTimeoutSeconds)
 
             onUnlocked()
 
             setSubmitting(false)
           } catch (err: any) {
-            console.log('TEST', err)
             if (
               err.message ===
               'DOMException: The operation failed for an operation-specific reason'
