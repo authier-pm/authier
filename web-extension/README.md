@@ -24,6 +24,12 @@ and follow the instructions just instead `pnpm prodBuild` run `pnpm dev`
 - `pnpm test -u` - runs Jest + updates test snapshots
 - `pnpm lint` - runs EsLint
 
+## Publishing a new version to stores
+
+We have all of the stores automated on CI except firefox. Firefox is handled manually from a separate branch.
+
+To publish a new version, simply invoke: `pnpm newTag` inside the `web-extension` folder
+
 <details>
   <summary>Loading the extension in Google Chrome</summary>
 
