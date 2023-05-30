@@ -4,11 +4,7 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import {
-  EncryptedSecretInput,
-  EncryptedSecretPatchInput,
-  SettingsInput
-} from './models'
+import { EncryptedSecretInput, SettingsInput } from './models'
 
 import { UserGQL } from './generated/UserGQL'
 
@@ -17,7 +13,11 @@ import { UserBase, UserQuery } from './UserQuery'
 import { GraphQLInt, GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
-import { GraphQLEmailAddress, GraphQLNonNegativeInt } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLNonNegativeInt,
+  GraphQLUUID
+} from 'graphql-scalars'
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -120,15 +120,15 @@ export class UserMutation extends UserBase {
 
   @Field(() => [EncryptedSecretMutation])
   async removeEncryptedSecrets(
-    @Arg('secrets', () => [EncryptedSecretPatchInput])
-    secrets: EncryptedSecretPatchInput[],
+    @Arg('secrets', () => [GraphQLUUID])
+    secrets: string[],
     @Ctx() ctx: IContextAuthenticated
   ) {
     console.log('removeEncryptedSecrets', secrets)
     return ctx.prisma.$transaction(
-      secrets.map((secret) =>
+      secrets.map((id) =>
         ctx.prisma.encryptedSecret.update({
-          where: { id: secret.id },
+          where: { id: id },
           data: { deletedAt: new Date() }
         })
       )

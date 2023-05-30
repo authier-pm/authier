@@ -132,11 +132,7 @@ describe('UserMutation', () => {
         }
       })
 
-      const input = dataInDB.map((secret) => ({
-        id: secret.id,
-        kind: secret.kind as EncryptedSecretTypeGQL,
-        encrypted: secret.encrypted
-      }))
+      const input = dataInDB.map((secret) => secret.id)
 
       const removedData = await user.removeEncryptedSecrets(
         input,

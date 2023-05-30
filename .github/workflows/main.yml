@@ -101,9 +101,8 @@ jobs:
         working-directory: ./web-extension
         run: |
           npx playwright install --with-deps
-          (cd ../backend && pnpm dev) &
-          sleep 10
-          (cd ../web-extension)
+          cd ../backend && pnpm dev
+          cd ../web-extension
           xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
