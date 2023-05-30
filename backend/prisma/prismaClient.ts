@@ -52,5 +52,6 @@ if (debugLogs) {
 }
 
 export default prismaClient
+//TODO: We should type this
 // @ts-expect-error
 export const dmmf = prismaClient._runtimeDataModel as any
