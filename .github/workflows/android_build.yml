@@ -95,7 +95,7 @@ jobs:
         working-directory: ./mobile-app
         run: |
           cd android && ./gradlew clean --no-daemon
-          cd android && ./gradlew bundleRelease --no-daemon
+          ./gradlew bundleRelease --no-daemon
 
       - name: Sign App Bundle
         id: sign_app_bundle
