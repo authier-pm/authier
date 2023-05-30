@@ -78,6 +78,9 @@ export function useDeviceState() {
     device.state
   )
   const [tableView, setTableView] = useState<boolean>(false)
+  const [selectedItems, setSelectedItems] = useState<
+    (ILoginSecret | ITOTPSecret)[]
+  >([])
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
@@ -183,7 +186,9 @@ export function useDeviceState() {
       )
     },
     setTableView,
-    tableView
+    tableView,
+    selectedItems,
+    setSelectedItems
   }
 
   window['backgroundState'] = backgroundStateContext

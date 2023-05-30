@@ -401,7 +401,7 @@ type UserMutation {
     event: SecretUsageEventInput!
   ): SecretUsageEventGQLScalars!
   removeEncryptedSecrets(
-    secrets: [EncryptedSecretInput!]!
+    secrets: [EncryptedSecretPatchInput!]!
   ): [EncryptedSecretMutation!]!
   addEncryptedSecrets(
     secrets: [EncryptedSecretInput!]!
@@ -502,6 +502,12 @@ input SecretUsageEventInput {
   url: String
 }
 
+input EncryptedSecretPatchInput {
+  kind: EncryptedSecretType!
+  encrypted: String!
+  id: UUID!
+}
+
 input SettingsInput {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
@@ -520,12 +526,6 @@ input ChangeMasterPasswordInput {
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
   decryptionChallengeId: PositiveInt!
-}
-
-input EncryptedSecretPatchInput {
-  kind: EncryptedSecretType!
-  encrypted: String!
-  id: UUID!
 }
 
 """

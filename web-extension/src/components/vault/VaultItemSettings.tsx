@@ -1,5 +1,4 @@
 import {
-  Stack,
   useColorModeValue,
   Button,
   Flex,
@@ -18,9 +17,9 @@ import {
   Box
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import { ChevronDownIcon, ChevronUpIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
@@ -34,7 +33,7 @@ import {
   credentialValues
 } from '@shared/formikSharedTypes'
 import { EditFormButtons } from './EditFormButtons'
-import { DeleteSecretButton } from '@src/pages-vault/DeleteSecretButton'
+import { DeleteSecretButton } from './DeleteSecretButton'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -55,7 +54,19 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         display: 'contents'
       }}
     >
-      <DeleteSecretButton secret={secretProps} />
+      <DeleteSecretButton secrets={[secretProps]}>
+        <DeleteIcon
+          cursor={'pointer'}
+          boxSize={26}
+          padding={1.5}
+          alignSelf="end"
+          overflow={'visible'}
+          backgroundColor={'red.400'}
+          _hover={{ backgroundColor: 'red.500' }}
+          right="0"
+          top="inherit"
+        />
+      </DeleteSecretButton>
       <Flex
         width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
@@ -203,7 +214,19 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         alignItems={'center'}
         bg={useColorModeValue('white', 'gray.800')}
       >
-        <DeleteSecretButton secret={secretProps} />
+        <DeleteSecretButton secrets={[secretProps]}>
+          <DeleteIcon
+            cursor={'pointer'}
+            boxSize={26}
+            padding={1.5}
+            alignSelf="end"
+            overflow={'visible'}
+            backgroundColor={'red.400'}
+            _hover={{ backgroundColor: 'red.500' }}
+            right="0"
+            top="inherit"
+          />
+        </DeleteSecretButton>
 
         <Formik
           enableReinitialize

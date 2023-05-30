@@ -1,15 +1,13 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useState } from 'react'
 import {
   IconButton,
   Tooltip,
-  useToast,
   Box,
   Text,
   Flex,
   Checkbox,
   HStack,
-  useColorModeValue,
-  Center
+  useColorModeValue
 } from '@chakra-ui/react'
 import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { FixedSizeList as List } from 'react-window'
@@ -19,41 +17,20 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
 import { Link } from 'react-router-dom'
+import { DeleteSecretButton } from './DeleteSecretButton'
 
 export function TableList({ filter }: { filter: string }) {
+  const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets: search } = useContext(DeviceStateContext)
   const data = search(debouncedSearchTerm)
 
-  const [selected, setSelected] = useState<string[]>([])
-  const toast = useToast()
-
-  const handleSelect = (id: string) => {
-    if (selected.includes(id)) {
-      setSelected(selected.filter((s) => s !== id))
+  const handleSelect = (secret: ILoginSecret | ITOTPSecret) => {
+    if (selectedItems.includes(secret)) {
+      setSelectedItems(selectedItems.filter((s) => s !== secret))
     } else {
-      setSelected([...selected, id])
+      setSelectedItems([...selectedItems, secret])
     }
-  }
-
-  const handleEdit = (row: ILoginSecret | ITOTPSecret) => {
-    // Your edit logic here
-    toast({
-      title: `Editing row ${row.id}`,
-      status: 'info',
-      duration: 3000,
-      isClosable: true
-    })
-  }
-
-  const handleRemove = (row: ILoginSecret | ITOTPSecret) => {
-    // Your remove logic here
-    toast({
-      title: `Removing row ${row.id}`,
-      status: 'warning',
-      duration: 3000,
-      isClosable: true
-    })
   }
 
   const [showAllPasswords, setShowAllPasswords] = useState(false)
@@ -82,7 +59,7 @@ export function TableList({ filter }: { filter: string }) {
         align="center"
         style={style}
         onMouseOver={() =>
-          selected.length == 0 || selected.includes(row.id)
+          selectedItems.length == 0 || selectedItems.includes(row)
             ? setAreIconsVisible(true)
             : null
         }
@@ -93,7 +70,7 @@ export function TableList({ filter }: { filter: string }) {
       >
         <Flex p={1} justifyContent="inherit" w="100%">
           <HStack
-            onClick={() => handleSelect(row.id)}
+            onClick={() => handleSelect(row)}
             w="90%"
             justifyContent="space-between"
             alignItems="center"
@@ -102,8 +79,8 @@ export function TableList({ filter }: { filter: string }) {
           >
             <Box>
               <Checkbox
-                isChecked={selected.includes(row.id)}
-                onChange={() => handleSelect(row.id)}
+                isChecked={selectedItems.includes(row)}
+                onChange={() => handleSelect(row)}
                 mr={2}
               />
             </Box>
@@ -179,13 +156,15 @@ export function TableList({ filter }: { filter: string }) {
                 <IconButton aria-label="Edit" icon={<EditIcon />} />
               </Link>
             </Tooltip>
-            <Tooltip label="Delete" aria-label="Delete">
+            <DeleteSecretButton
+              secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
+            >
               <IconButton
+                colorScheme="red"
                 aria-label="Delete"
                 icon={<DeleteIcon />}
-                onClick={() => handleRemove(row)}
               />
-            </Tooltip>
+            </DeleteSecretButton>
           </HStack>
         </Flex>
       </Flex>

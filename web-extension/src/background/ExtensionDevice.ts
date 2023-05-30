@@ -413,6 +413,17 @@ export class DeviceState implements IBackgroundStateSerializable {
     this.save()
   }
 
+  async removeSecrets(secretIds: string[]) {
+    browser.storage.local.set({
+      backgroundState: {
+        ...device.state,
+        secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
+      }
+    })
+    this.secrets = this.secrets.filter((s) => !secretIds.includes(s.id))
+    this.save()
+  }
+
   destroy() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
   }
@@ -581,7 +592,7 @@ class ExtensionDevice {
 
     this.clearLockInterval()
 
-    let lockIcon = browser.runtime.getURL('icon-lock-48.png')
+    const lockIcon = browser.runtime.getURL('icon-lock-48.png')
     chrome.action.setIcon({ path: lockIcon })
 
     log('locking device')

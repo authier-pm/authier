@@ -120,10 +120,11 @@ export class UserMutation extends UserBase {
 
   @Field(() => [EncryptedSecretMutation])
   async removeEncryptedSecrets(
-    @Arg('secrets', () => [EncryptedSecretInput])
+    @Arg('secrets', () => [EncryptedSecretPatchInput])
     secrets: EncryptedSecretPatchInput[],
     @Ctx() ctx: IContextAuthenticated
   ) {
+    console.log('removeEncryptedSecrets', secrets)
     return ctx.prisma.$transaction(
       secrets.map((secret) =>
         ctx.prisma.encryptedSecret.update({
