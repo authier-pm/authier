@@ -101,7 +101,7 @@ jobs:
         working-directory: ./web-extension
         run: |
           npx playwright install --with-deps
-          cd ../backend && pnpm dev
+          (cd ../backend && pnpm dev) &
           cd ../web-extension
           xvfb-run --auto-servernum -- pnpm playwright:run
 
