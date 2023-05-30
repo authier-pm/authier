@@ -195,8 +195,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       lockedState: null
     })
 
-    const icon = browser.runtime.getURL('icon-48.png')
-    chrome.action.setIcon({ path: icon })
+    //const icon = browser.runtime.getURL('icon-48.png')
+    //chrome.action.setIcon({ path: icon })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
