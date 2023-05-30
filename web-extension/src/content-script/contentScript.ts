@@ -19,7 +19,6 @@ import {
   autofill,
   autofillEventsDispatched,
   debouncedAutofill,
-  getElementCoordinates,
   IDecryptedSecrets
 } from './autofill'
 import { authenticator } from 'otplib'
