@@ -65,43 +65,42 @@ jobs:
         working-directory: ./mobile-app
         run: cd android && chmod +x ./gradlew
 
-      - name: Generate App APK
-        working-directory: ./mobile-app
-        run: |
-          cd android && ./gradlew assembleRelease --no-daemon
+      # - name: Generate App APK
+      #   working-directory: ./mobile-app
+      #   run: |
+      #     cd android && ./gradlew assembleRelease --no-daemon
 
-      ## sign generated apk
-      - name: Sign APK
-        id: sign_app
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: mobile-app/android/app/build/outputs/apk/release
-          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
-          alias: ${{ secrets.ANDROID_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
+      # ## sign generated apk
+      # - name: Sign APK
+      #   id: sign_app
+      #   uses: r0adkll/sign-android-release@v1
+      #   with:
+      #     releaseDirectory: mobile-app/android/app/build/outputs/apk/release
+      #     signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
+      #     alias: ${{ secrets.ANDROID_ALIAS }}
+      #     keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+      #     keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
 
-      ## Distribute app to Firebase App Distribution for testing / use google play internal track if you have a google play account
-      - name: upload artifact to Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.ANDROID_FIREBASE_APP_ID}}
-          serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
-          groups: testers
-          file: ${{steps.sign_app.outputs.signedReleaseFile}}
+      # ## Distribute app to Firebase App Distribution for testing / use google play internal track if you have a google play account
+      # - name: upload artifact to Firebase App Distribution
+      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
+      #   with:
+      #     appId: ${{secrets.ANDROID_FIREBASE_APP_ID}}
+      #     serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
+      #     groups: testers
+      #     file: ${{steps.sign_app.outputs.signedReleaseFile}}
 
       # Building and signing App
       - name: Build Android App Bundle
         working-directory: ./mobile-app
         run: |
-          cd android && ./gradlew clean --no-daemon
-          ./gradlew bundleRelease --no-daemon
+          cd android && ./gradlew bundleRelease --no-daemon
 
       - name: Sign App Bundle
         id: sign_app_bundle
         uses: r0adkll/sign-android-release@v1
         with:
-          releaseDirectory: android/app/build/outputs/apk/release
+          releaseDirectory: mobile-app/android/app/build/outputs/apk/release
           signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
           alias: ${{ secrets.ANDROID_ALIAS }}
           keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
@@ -112,8 +111,8 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
-          packageName: com.test.test
-          releaseFiles: android/app/build/outputs/bundle/release/*.aab
-          track: alpha
+          packageName: com.authier
+          releaseFiles: mobile-app/android/app/build/outputs/bundle/release/*.aab
+          track: internal
           status: completed
           inAppUpdatePriority: 2
