@@ -19,7 +19,6 @@
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
-    "np": "np --no-publish --no-cleanup --any-branch",
     "postversion": "react-native-version"
   },
   "dependencies": {
@@ -134,7 +133,6 @@
     "babel-plugin-module-resolver": "^5.0.0",
     "eslint": "^8.41.0",
     "jest": "^29.5.0",
-    "np": "^7.7.0",
     "metro-react-native-babel-preset": "0.76.5",
     "prettier": "^2.8.8",
     "pretty-quick": "^3.1.3",
