@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -18,7 +18,8 @@
     "postinstall": "./scripts/copyNodeModulesHack.mjs",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
-    "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory"
+    "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
+    "postversion": "react-native-version"
   },
   "dependencies": {
     "@apollo/client": "^3.7.14",
@@ -132,6 +133,7 @@
     "pretty-quick": "^3.1.3",
     "react-native-codegen": "^0.72.0",
     "react-native-dotenv": "^3.4.8",
+    "react-native-version": "^4.0.0",
     "react-test-renderer": "18.2.0",
     "typescript": "^5.0.4"
   },

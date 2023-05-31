@@ -4,11 +4,14 @@ react-native mobile app
 
 ## Development
 
-Install dependencies with `yarn`
+Install dependencies with `pnpm`
 Make sure you have your own `.env` file with API key and secrets: `cp env.sample .env`
 
 ## Release build
 
+We use Github CI/CD for publishing releases. When you push a tag, it will build and publish the app to the play store.
+
+### Deprecated
 in order to build you need `mobile-app/android/local.properties`
 
 Add `local.properties` to `android/` folder with the following content:
@@ -27,7 +30,7 @@ if you have this, make sure the storeFile path is correct. Then run `buildReleas
 ### How to run locally in android emulator
 
 1. run metro bundler
-   `yarn start`
+   `pnpm start`
 
 2. run android studio and inside
 
