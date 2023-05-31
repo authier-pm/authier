@@ -19,6 +19,7 @@ export class AwsCdkAuthierStack extends Stack {
       architecture: Architecture.ARM_64,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../dist')),
+      tracing: lambda.Tracing.DISABLED, // Xray tracing, useless and costs a lot of money per usage
       environment: {
         NODE_ENV: 'production',
         FRONTEND_URL: 'https://www.authier.pm',
