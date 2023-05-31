@@ -231,7 +231,6 @@ export const useDeviceStore = create<Device>()(
         const token = await messaging().getToken()
         set({ fireToken: token, isInitialized: true, platform: Platform.OS })
 
-        console.log('device initialized')
         return useDeviceStateStore.getState()
       },
       setDeviceSettings(config: SettingsInput) {

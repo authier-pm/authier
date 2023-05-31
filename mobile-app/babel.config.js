@@ -4,6 +4,9 @@ module.exports = {
   env: {
     production: {
       plugins: ['transform-remove-console']
+    },
+    test: {
+      plugins: [['module:react-native-dotenv', { path: './.env' }]]
     }
   },
   plugins: [

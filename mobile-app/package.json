@@ -8,7 +8,7 @@
     "start2": "react-native start --port 8088",
     "start": "react-native start",
     "start:nocache": "react-native start --reset-cache",
-    "test": "jest",
+    "test": "jest --watch",
     "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "adb:reverse": "adb reverse tcp:8088 tcp:8088",
     "gen": "graphql-codegen",

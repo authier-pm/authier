@@ -1,62 +1,51 @@
 import { act } from '@testing-library/react-native'
 import { useDeviceStateStore } from './deviceStateStore'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import { AddSecretInput } from './deviceStore'
 
 // Secrets to be added
-const secrets = [
+const secrets: AddSecretInput[] = [
   {
-    id: 'test_id',
-    kind: EncryptedSecretType.TOTP,
-    encrypted: 'test_encrypted',
-    totp: {
-      digits: 6,
-      iconUrl: 'https://example.com',
-      label: 'test_label',
-      period: 30,
-      secret: 'test_secret',
-      url: 'https://example.com'
-    }
-  },
-  {
-    id: 'test_id',
-    encrypted: 'test_encrypted',
     kind: EncryptedSecretType.LOGIN_CREDENTIALS,
     loginCredentials: {
-      iconUrl: 'https://example.com',
-      label: 'test_label',
-      url: 'https://example.com',
-      username: 'test_username',
-      password: 'test_password'
-    }
+      password: 'test',
+      username: 'test',
+      url: 'test',
+      label: 'test',
+      iconUrl: null
+    },
+    encrypted: 'test',
+    createdAt: new Date().toJSON()
   }
 ]
 
 describe('useTestStore', () => {
-  it.todo('Add secrets')
+  it.todo('test')
   // it('adds and encrypts secrets, then stores them in state', async () => {
-  //   // Use `act` when updating state to ensure all updates are applied
-  //   // before the assertions are run.
+  //   //Use `act` when updating state to ensure all updates are applied
+  //   //before the assertions are run.
+  //   console.log('test')
   //   await act(async () => {
-  //     //@ts-ignore
-  //     await useTestStore.getState().addSecrets(secrets)
+  //     //@ts-expect-error
+  //     await useDeviceStateStore.getState().addSecrets(secrets)
   //   })
-  //
-  //   // Check if the secrets were added and encrypted correctly
+
+  //   //Check if the secrets were added and encrypted correctly
   //   for (let secret of secrets) {
-  //     expect(useTestStore.getState().secrets).toContainEqual(
+  //     expect(useDeviceStateStore.getState().secrets).toContainEqual(
   //       expect.objectContaining({
   //         kind: secret.kind,
-  //         encrypted: expect.any(String) // We just check that it's a string, adjust if necessary
+  //         encrypted: expect.any(String) //We just check that it's a string, adjust if necessary
   //       })
   //     )
   //   }
-  //
-  //   // Check if the secrets were decrypted and added to decryptedSecrets correctly
+
+  //   //Check if the secrets were decrypted and added to decryptedSecrets correctly
   //   for (let secret of secrets) {
-  //     expect(useTestStore.getState().decryptedSecrets).toContainEqual(
+  //     expect(useDeviceStateStore.getState().decryptedSecrets).toContainEqual(
   //       expect.objectContaining({
   //         kind: secret.kind
-  //         // Add any extra properties you expect here
+  //         //Add any extra properties you expect here
   //       })
   //     )
   //   }
