@@ -35,6 +35,7 @@ import {
 import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
@@ -83,6 +84,16 @@ export function Register({ navigation }: NavigationProps) {
         showModal: true,
         kSecAccessControl: 'kSecAccessControlBiometryAny'
       })
+      useDeviceStateStore.setState({ biometricsEnabled: true })
+    } else {
+      await SInfo.setItem('psw', values.password, {
+        sharedPreferencesName: 'authierShared',
+        keychainService: 'authierKCH'
+        // touchID: false,
+        // showModal: true,
+        // kSecAccessControl: 'kSecAccessControlDevicePasscode'
+      })
+      useDeviceStateStore.setState({ biometricsEnabled: false })
     }
 
     const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))

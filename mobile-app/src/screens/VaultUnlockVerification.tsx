@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import SInfo from 'react-native-sensitive-info'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Button,
@@ -26,6 +25,7 @@ import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import SInfo from 'react-native-sensitive-info'
 
 interface Values {
   password: string
@@ -48,6 +48,7 @@ export function VaultUnlockVerification({
     RNBootSplash.hide({ fade: true })
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
+        console.log('biometrics enabled retrieving')
         const psw = await SInfo.getItem('psw', {
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH',
@@ -60,8 +61,7 @@ export function VaultUnlockVerification({
           kSecUseOperationPrompt:
             'We need your permission to retrieve encrypted data'
         })
-
-        await unlockVault(psw)
+        unlockVault(psw)
       }
     }
     loadBiometrics()

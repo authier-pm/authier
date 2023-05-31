@@ -403,7 +403,14 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        set(initialState)
+        //TODO: Should we reset completely everything or can we keep basic stuff
+        set({
+          ...initialState,
+          theme: get().theme,
+          biometricsEnabled: get().biometricsEnabled,
+          syncTOTP: get().syncTOTP,
+          uiLanguage: get().uiLanguage
+        })
       },
       changeSecrets: (secrets) => {
         set({ secrets })

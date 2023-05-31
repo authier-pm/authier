@@ -311,7 +311,7 @@ export const useDeviceStore = create<Device>()(
         let state = useDeviceStateStore.getState()
         const device = get()
         device.clearLockInterval()
-        console.log('state before lock', new Error().stack)
+        console.log('state before lock')
 
         if (!state) {
           console.error('No state')
@@ -323,23 +323,24 @@ export const useDeviceStore = create<Device>()(
           userId,
           secrets,
           encryptionSalt,
-          vaultLockTimeoutSeconds: lockTime,
+          vaultLockTimeoutSeconds,
           syncTOTP,
           autofillTOTPEnabled,
           autofillCredentialsEnabled,
           uiLanguage,
           theme,
-          biometricsEnabled
+          biometricsEnabled,
+          deviceName
         } = state
         device.setLockedState({
           email,
           userId,
           secrets,
-          deviceName: get().name,
+          deviceName,
           encryptionSalt,
           authSecret: state.authSecret,
           authSecretEncrypted: state.authSecretEncrypted,
-          vaultLockTimeoutSeconds: lockTime,
+          vaultLockTimeoutSeconds,
           syncTOTP,
           autofillCredentialsEnabled,
           autofillTOTPEnabled,
@@ -355,6 +356,11 @@ export const useDeviceStore = create<Device>()(
         //TODO: This could be done better
         get().clearLockInterval()
         await clearAccessToken()
+        SInfo.deleteItem('psw', {
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH'
+        })
+
         useDeviceStateStore.getState().reset()
         set({ isLoggedIn: false, isInitialized: true })
       },

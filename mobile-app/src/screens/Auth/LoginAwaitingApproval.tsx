@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react'
-
+import SInfo from 'react-native-sensitive-info'
 import {
   Box,
   Center,
@@ -34,12 +33,14 @@ import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [addNewDevice, { loading, error: newDeviceError }] =
     useAddNewDeviceForUserMutation()
 
@@ -155,7 +156,6 @@ export const useLogin = (props: { deviceName: string }) => {
             currentAddDeviceSecret
           }
         })
-
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
           'DecryptionChallengeApproved'
@@ -163,11 +163,32 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
+          //TODO: Password and Username to secure storage
           saveAccessToken(addNewDeviceForUser?.accessToken)
+          if (device.biometricsAvailable && deviceState.biometricsEnabled) {
+            console.log('Bio saving')
+            await SInfo.setItem('psw', formState.password, {
+              sharedPreferencesName: 'authierShared',
+              keychainService: 'authierKCH',
+              touchID: true,
+              showModal: true,
+              kSecAccessControl: 'kSecAccessControlBiometryAny'
+            })
+            useDeviceStateStore.setState({ biometricsEnabled: true })
+          } else {
+            await SInfo.setItem('psw', formState.password, {
+              sharedPreferencesName: 'authierShared',
+              keychainService: 'authierKCH'
+              // touchID: false,
+              // showModal: true,
+              // kSecAccessControl: 'kSecAccessControlDevicePasscode'
+            })
+            useDeviceStateStore.setState({ biometricsEnabled: false })
+          }
 
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
-          const deviceState: IBackgroundStateSerializable = {
+          const newDeviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
@@ -186,7 +207,7 @@ export const useLogin = (props: { deviceName: string }) => {
             theme: addNewDeviceForUser.user.defaultDeviceTheme
           }
 
-          device.save(deviceState)
+          device.save(newDeviceState)
         } else {
           toast.show({
             id,

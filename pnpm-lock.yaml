@@ -461,6 +461,9 @@ importers:
       react-native-gradle-plugin:
         specifier: ^0.72.1
         version: 0.72.1
+      react-native-keychain:
+        specifier: ^8.1.1
+        version: 8.1.1
       react-native-mmkv:
         specifier: ^2.8.0
         version: 2.8.0(react-native@0.71.8)(react@18.2.0)
@@ -21604,6 +21607,10 @@ packages:
 
   /react-native-gradle-plugin@0.72.1:
     resolution: {integrity: sha512-mgFiUa9J/f7pKWxKWuPBdjrqahN1QxljWWYQefM45BEq21nbNGAk+vRI5WyjIQBu34JRCTuWy/pLSMDWwTfb5w==}
+    dev: false
+
+  /react-native-keychain@8.1.1:
+    resolution: {integrity: sha512-8fxgeHKwGcL657eAYpdBTkDIxNhbIHI+kyyO0Yac2dgVAN184JoIwQcW2z6snahwDaCObQOu0biLFHnsH+4KSg==}
     dev: false
 
   /react-native-mmkv@2.8.0(react-native@0.71.8)(react@18.2.0):
