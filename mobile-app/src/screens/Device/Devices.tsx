@@ -277,8 +277,9 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
 
   return (
     <View>
-      <SearchBar setFilterBy={setFilterBy} />
-
+      <HStack flexDirection="row" alignItems="center" space={4} m={4}>
+        <SearchBar setFilterBy={setFilterBy} />
+      </HStack>
       {/* List of requests*/}
       <FlatList
         flexGrow={0}

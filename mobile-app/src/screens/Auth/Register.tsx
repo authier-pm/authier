@@ -89,9 +89,6 @@ export function Register({ navigation }: NavigationProps) {
       await SInfo.setItem('psw', values.password, {
         sharedPreferencesName: 'authierShared',
         keychainService: 'authierKCH'
-        // touchID: false,
-        // showModal: true,
-        // kSecAccessControl: 'kSecAccessControlDevicePasscode'
       })
       useDeviceStateStore.setState({ biometricsEnabled: false })
     }

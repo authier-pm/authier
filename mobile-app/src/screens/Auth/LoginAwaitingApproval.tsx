@@ -179,9 +179,6 @@ export const useLogin = (props: { deviceName: string }) => {
             await SInfo.setItem('psw', formState.password, {
               sharedPreferencesName: 'authierShared',
               keychainService: 'authierKCH'
-              // touchID: false,
-              // showModal: true,
-              // kSecAccessControl: 'kSecAccessControlDevicePasscode'
             })
             useDeviceStateStore.setState({ biometricsEnabled: false })
           }
