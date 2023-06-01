@@ -8,6 +8,7 @@ import { ApolloProvider } from '@apollo/client'
 import { RenderOptions, render } from '@testing-library/react-native'
 import { makeSsrClient } from '@src/apollo/ApolloClientMock'
 import { ReactElement } from 'react'
+import { jest } from '@jest/globals'
 
 const inset = {
   frame: { x: 0, y: 0, width: 0, height: 0 },
@@ -20,6 +21,7 @@ const AllTheProviders = ({ children }) => {
   return (
     <NativeBaseProvider initialWindowMetrics={inset} theme={theme as any}>
       <ApolloProvider client={makeSsrClient as any}>
+        {/* @ts-expect-error */}
         <I18nProvider i18n={i18n} defaultComponent={Text}>
           <QueryClientProvider client={queryClient as any}>
             {children}

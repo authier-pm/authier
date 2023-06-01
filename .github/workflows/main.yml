@@ -49,7 +49,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -71,13 +71,18 @@ jobs:
               - 'mobile-app/**'
               - '.github/**'
 
+      - name: schema gen
+        working-directory: ./backend
+        if: steps.changes.outputs.backend == 'true' || steps.changes.outputs.mobileApp == 'true'
+        run: |
+          pnpm gen
+
       - name: backend install deps, check TS and run jest
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         env:
           DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
         run: |
-          pnpm gen
           pnpm tsc
           cp .env.sample .env
           pnpm test:prepare

@@ -27,7 +27,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -64,31 +64,6 @@ jobs:
       - name: Make Gradlew Executable
         working-directory: ./mobile-app
         run: cd android && chmod +x ./gradlew
-
-      # - name: Generate App APK
-      #   working-directory: ./mobile-app
-      #   run: |
-      #     cd android && ./gradlew assembleRelease --no-daemon
-
-      # ## sign generated apk
-      # - name: Sign APK
-      #   id: sign_app
-      #   uses: r0adkll/sign-android-release@v1
-      #   with:
-      #     releaseDirectory: mobile-app/android/app/build/outputs/apk/release
-      #     signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
-      #     alias: ${{ secrets.ANDROID_ALIAS }}
-      #     keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
-      #     keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
-      # ## Distribute app to Firebase App Distribution for testing / use google play internal track if you have a google play account
-      # - name: upload artifact to Firebase App Distribution
-      #   uses: wzieba/Firebase-Distribution-Github-Action@v1
-      #   with:
-      #     appId: ${{secrets.ANDROID_FIREBASE_APP_ID}}
-      #     serviceCredentialsFileContent: ${{secrets.CREDENTIAL_FILE_CONTENT}}
-      #     groups: testers
-      #     file: ${{steps.sign_app.outputs.signedReleaseFile}}
 
       # Building and signing App
       - name: Build Android App Bundle
