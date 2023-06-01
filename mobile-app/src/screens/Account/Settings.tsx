@@ -160,36 +160,8 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  isDisabled={!device.biometricsAvailable}
-                  defaultIsChecked={deviceState.biometricsEnabled}
-                  onValueChange={async (e) => {
-                    deviceState.changeBiometricsEnabled(e)
-                    if (!deviceState.biometricsEnabled) {
-                      const psw = await SInfo.getItem('psw', {
-                        sharedPreferencesName: 'authierShared',
-                        keychainService: 'authierKCH'
-                      })
-                      await SInfo.setItem('psw', psw, {
-                        sharedPreferencesName: 'authierShared',
-                        keychainService: 'authierKCH',
-                        touchID: true,
-                        showModal: true,
-                        kSecAccessControl: 'kSecAccessControlBiometryAny'
-                      })
-                    } else {
-                      const psw = await SInfo.getItem('psw', {
-                        sharedPreferencesName: 'authierShared',
-                        keychainService: 'authierKCH',
-                        touchID: true,
-                        showModal: true,
-                        kSecAccessControl: 'kSecAccessControlBiometryAny'
-                      })
-                      await SInfo.setItem('psw', psw, {
-                        sharedPreferencesName: 'authierShared',
-                        keychainService: 'authierKCH'
-                      })
-                    }
-                  }}
+                  isDisabled={true}
+                  isChecked={device.biometricsAvailable}
                   size="md"
                 />
               </HStack>

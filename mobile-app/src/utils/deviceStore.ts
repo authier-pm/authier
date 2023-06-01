@@ -230,7 +230,12 @@ export const useDeviceStore = create<Device>()(
         useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
         set({ fireToken: token, isInitialized: true, platform: Platform.OS })
-
+        console.log('device initialized', get().biometricsAvailable)
+        let test = await SInfo.getAllItems({
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH'
+        })
+        console.log('SINFO', test)
         return useDeviceStateStore.getState()
       },
       setDeviceSettings(config: SettingsInput) {
@@ -426,7 +431,9 @@ export const useDeviceStore = create<Device>()(
       },
       checkBiometrics: async () => {
         const hasAnySensors = await SInfo.isSensorAvailable()
-        return !!hasAnySensors
+        //TODO: This is just for android
+        const hasAnyFingerprintsEnrolled = await SInfo.hasEnrolledFingerprints()
+        return hasAnySensors && hasAnyFingerprintsEnrolled
       },
       startVaultLockTimer() {
         let state = useDeviceStateStore.getState()

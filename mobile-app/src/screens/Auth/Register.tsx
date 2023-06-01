@@ -36,6 +36,7 @@ import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { setSensitiveItem } from '@src/utils/secretStorage'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
@@ -77,19 +78,22 @@ export function Register({ navigation }: NavigationProps) {
     const deviceName = await getDeviceName()
 
     if (device.biometricsAvailable) {
-      await SInfo.setItem('psw', values.password, {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH',
-        touchID: true,
-        showModal: true,
-        kSecAccessControl: 'kSecAccessControlBiometryAny'
-      })
-      useDeviceStateStore.setState({ biometricsEnabled: true })
+      try {
+        await SInfo.setItem('psw', values.password, {
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH',
+          touchID: true,
+          showModal: true,
+          kSecAccessControl: 'kSecAccessControlBiometryAny'
+        })
+        useDeviceStateStore.setState({ biometricsEnabled: true })
+      } catch (error) {
+        console.log(error)
+        //TODO:
+        return
+      }
     } else {
-      await SInfo.setItem('psw', values.password, {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH'
-      })
+      console.log('biometrics not available')
       useDeviceStateStore.setState({ biometricsEnabled: false })
     }
 

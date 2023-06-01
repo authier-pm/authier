@@ -34,6 +34,7 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { setSensitiveItem } from '@utils/secretStorage'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
@@ -163,23 +164,24 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          //TODO: Password and Username to secure storage
           saveAccessToken(addNewDeviceForUser?.accessToken)
-          if (device.biometricsAvailable && deviceState.biometricsEnabled) {
-            console.log('Bio saving')
-            await SInfo.setItem('psw', formState.password, {
-              sharedPreferencesName: 'authierShared',
-              keychainService: 'authierKCH',
-              touchID: true,
-              showModal: true,
-              kSecAccessControl: 'kSecAccessControlBiometryAny'
-            })
-            useDeviceStateStore.setState({ biometricsEnabled: true })
+          //TODO
+          if (device.biometricsAvailable) {
+            try {
+              await SInfo.setItem('psw', formState.password, {
+                sharedPreferencesName: 'authierShared',
+                keychainService: 'authierKCH',
+                touchID: true,
+                showModal: true,
+                kSecAccessControl: 'kSecAccessControlBiometryAny'
+              })
+              useDeviceStateStore.setState({ biometricsEnabled: true })
+            } catch (error) {
+              console.log(error)
+              return
+            }
           } else {
-            await SInfo.setItem('psw', formState.password, {
-              sharedPreferencesName: 'authierShared',
-              keychainService: 'authierKCH'
-            })
+            console.log('biometrics not available')
             useDeviceStateStore.setState({ biometricsEnabled: false })
           }
 
