@@ -36,7 +36,6 @@ import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { setSensitiveItem } from '@src/utils/secretStorage'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
@@ -45,7 +44,8 @@ export function Register({ navigation }: NavigationProps) {
   const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const { formState } = useContext(LoginContext)
 
   useEffect(() => {
@@ -77,7 +77,7 @@ export function Register({ navigation }: NavigationProps) {
     const deviceId = await getUniqueId()
     const deviceName = await getDeviceName()
 
-    if (device.biometricsAvailable) {
+    if (device.biometricsAvailable && deviceState.biometricsEnabled) {
       try {
         await SInfo.setItem('psw', values.password, {
           sharedPreferencesName: 'authierShared',

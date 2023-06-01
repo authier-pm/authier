@@ -230,7 +230,11 @@ export const useDeviceStore = create<Device>()(
         useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
         set({ fireToken: token, isInitialized: true, platform: Platform.OS })
-        console.log('device initialized', get().biometricsAvailable)
+        console.log(
+          'device initialized',
+          get().biometricsAvailable,
+          useDeviceStateStore.getState().biometricsEnabled
+        )
         let test = await SInfo.getAllItems({
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH'

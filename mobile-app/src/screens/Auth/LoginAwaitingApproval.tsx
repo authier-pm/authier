@@ -34,7 +34,6 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { setSensitiveItem } from '@utils/secretStorage'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
@@ -165,8 +164,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         if (addNewDeviceForUser?.accessToken) {
           saveAccessToken(addNewDeviceForUser?.accessToken)
-          //TODO
-          if (device.biometricsAvailable) {
+          if (device.biometricsAvailable && deviceState.biometricsEnabled) {
             try {
               await SInfo.setItem('psw', formState.password, {
                 sharedPreferencesName: 'authierShared',
