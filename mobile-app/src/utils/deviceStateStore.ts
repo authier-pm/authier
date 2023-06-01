@@ -350,7 +350,6 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       addSecrets: async (secrets) => {
-        console.log('test')
         const encryptedSecrets = await Promise.all(
           secrets.map(async (secret) => {
             const stringToEncrypt =
@@ -403,7 +402,6 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        //TODO: Should we reset completely everything or can we keep basic stuff
         set({
           ...initialState,
           theme: get().theme,

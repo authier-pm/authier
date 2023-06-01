@@ -89,7 +89,11 @@ export function Register({ navigation }: NavigationProps) {
         useDeviceStateStore.setState({ biometricsEnabled: true })
       } catch (error) {
         console.log(error)
-        //TODO:
+        toast.show({
+          title: 'Login failed',
+          description:
+            'Cannot create account without biometrics, please try again.'
+        })
         return
       }
     } else {
