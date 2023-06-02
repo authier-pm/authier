@@ -8,7 +8,8 @@ import {
   useToast,
   Fab,
   Box,
-  useColorModeValue
+  useColorModeValue,
+  HStack
 } from 'native-base'
 
 import { SearchBar } from '../../components/SearchBar'
@@ -62,12 +63,7 @@ export const TOTPVault = ({
 
   return (
     <View>
-      <Flex
-        flexDirection="row"
-        justifyContent="space-between"
-        mr={8}
-        alignItems="center"
-      >
+      <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
         <CircularProgress
           value={remainingSeconds}
@@ -78,7 +74,7 @@ export const TOTPVault = ({
           activeStrokeWidth={9}
           inActiveStrokeWidth={7}
         />
-      </Flex>
+      </HStack>
 
       <FlashList
         ListEmptyComponent={EmptyList}

@@ -13,6 +13,7 @@ import {
   Divider,
   useColorMode
 } from 'native-base'
+import SInfo from 'react-native-sensitive-info'
 
 import { Trans } from '@lingui/macro'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
@@ -20,10 +21,12 @@ import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import PasswordReEnter from '@src/components/PasswordReEnter'
 
 export default function Settings() {
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
+  const [modalVisible, setModalVisible] = React.useState(false)
 
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
@@ -159,13 +162,26 @@ export default function Settings() {
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
-                  defaultIsChecked={deviceState.biometricsEnabled}
-                  onValueChange={async (e) => {
-                    deviceState.changeBiometricsEnabled(e)
-                  }}
+                  isDisabled={!device.biometricsAvailable}
+                  isChecked={deviceState.biometricsEnabled}
                   size="md"
+                  onToggle={async (e) => {
+                    if (deviceState.biometricsEnabled) {
+                      await SInfo.deleteItem('psw', {
+                        sharedPreferencesName: 'authierShared',
+                        keychainService: 'authierKCH'
+                      })
+                      deviceState.changeBiometricsEnabled(false)
+                    } else {
+                      setModalVisible(true)
+                    }
+                  }}
                 />
               </HStack>
+              <PasswordReEnter
+                modalVisible={modalVisible}
+                setModalVisible={setModalVisible}
+              />
             </Box>
           </VStack>
         </VStack>

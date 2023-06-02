@@ -129,7 +129,6 @@ const initialState: DeviceStateProps = {
   decryptedSecrets: []
 }
 
-//WARNING: Not sure if this name is ok, because it can get easily confused with the deviceStore
 export const useDeviceStateStore = create<DeviceStateActions>()(
   persist(
     (set, get) => ({
@@ -366,7 +365,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
           })
         )
-
+        console.log('saved secret to the backend', secrets)
         const { data } = await apolloClient.mutate<
           AddEncryptedSecretsMutation,
           AddEncryptedSecretsMutationVariables
@@ -403,7 +402,13 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        set(initialState)
+        set({
+          ...initialState,
+          theme: get().theme,
+          biometricsEnabled: get().biometricsEnabled,
+          syncTOTP: get().syncTOTP,
+          uiLanguage: get().uiLanguage
+        })
       },
       changeSecrets: (secrets) => {
         set({ secrets })

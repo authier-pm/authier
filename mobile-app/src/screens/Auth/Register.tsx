@@ -35,6 +35,7 @@ import {
 import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
@@ -43,7 +44,8 @@ export function Register({ navigation }: NavigationProps) {
   const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const { formState } = useContext(LoginContext)
 
   useEffect(() => {
@@ -75,14 +77,28 @@ export function Register({ navigation }: NavigationProps) {
     const deviceId = await getUniqueId()
     const deviceName = await getDeviceName()
 
-    if (device.biometricsAvailable) {
-      await SInfo.setItem('psw', values.password, {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH',
-        touchID: true,
-        showModal: true,
-        kSecAccessControl: 'kSecAccessControlBiometryAny'
-      })
+    if (device.biometricsAvailable && deviceState.biometricsEnabled) {
+      try {
+        await SInfo.setItem('psw', values.password, {
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH',
+          touchID: true,
+          showModal: true,
+          kSecAccessControl: 'kSecAccessControlBiometryAny'
+        })
+        useDeviceStateStore.setState({ biometricsEnabled: true })
+      } catch (error) {
+        console.log(error)
+        toast.show({
+          title: 'Login failed',
+          description:
+            'Cannot create account without biometrics, please try again.'
+        })
+        return
+      }
+    } else {
+      console.log('biometrics not available')
+      useDeviceStateStore.setState({ biometricsEnabled: false })
     }
 
     const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))

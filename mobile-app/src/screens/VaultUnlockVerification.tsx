@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import SInfo from 'react-native-sensitive-info'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Button,
@@ -26,6 +25,7 @@ import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import SInfo from 'react-native-sensitive-info'
 
 interface Values {
   password: string
@@ -39,7 +39,7 @@ export function VaultUnlockVerification({
   const toast = useToast()
   const id = 'active-toast'
   let device = useDeviceStore((state) => state)
-
+  const [loading, setLoading] = useState(false)
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
   const bgColor = useColorModeValue('white', 'black')
@@ -48,26 +48,32 @@ export function VaultUnlockVerification({
     RNBootSplash.hide({ fade: true })
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
-        const psw = await SInfo.getItem('psw', {
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH',
-          touchID: true,
-          showModal: true,
-          strings: {
-            header: 'Unlock your vault',
-            description: 'decrypt your vault with your fingerprint'
-          },
-          kSecUseOperationPrompt:
-            'We need your permission to retrieve encrypted data'
-        })
-
-        await unlockVault(psw)
+        setLoading(true)
+        console.log('biometrics enabled retrieving')
+        try {
+          const psw = await SInfo.getItem('psw', {
+            sharedPreferencesName: 'authierShared',
+            keychainService: 'authierKCH',
+            touchID: true,
+            showModal: true,
+            strings: {
+              header: 'Unlock your vault',
+              description: 'decrypt your vault with your fingerprint'
+            },
+            kSecUseOperationPrompt:
+              'We need your permission to retrieve encrypted data'
+          })
+          unlockVault(psw)
+        } catch (error) {
+          console.log(error)
+          setLoading(false)
+        }
       }
     }
     loadBiometrics()
   }, [])
 
-  if (!lockedState) {
+  if (!lockedState || loading) {
     return <Loading />
   }
 
@@ -104,6 +110,7 @@ export function VaultUnlockVerification({
       Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
     await device.save(newState)
     device.setLockedState(null)
+    setLoading(false)
   }
 
   return (

@@ -1,6 +1,16 @@
 import React, { useState } from 'react'
 
-import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
+import {
+  View,
+  Text,
+  AddIcon,
+  Flex,
+  useToast,
+  Fab,
+  Box,
+  IconButton,
+  HStack
+} from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
 import LoginCredential from '@components/LoginCredential'
@@ -44,13 +54,16 @@ export const PasswordVault = ({
 
   return (
     <View>
-      <Flex
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
+      <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
-      </Flex>
+        <IconButton
+          colorScheme="primary"
+          rounded="lg"
+          variant="solid"
+          icon={<AddIcon color="white" size={6} />}
+          onPress={() => navigation.navigate('AddPassword')}
+        />
+      </HStack>
 
       <FlashList
         ListEmptyComponent={EmptyList}
@@ -65,15 +78,6 @@ export const PasswordVault = ({
         renderItem={({ item }) => <LoginCredential loginSecret={item} />}
         onRefresh={() => onRefresh()}
         refreshing={refreshing}
-      />
-      <Fab
-        onPress={() => navigation.navigate('AddPassword')}
-        m={2}
-        borderRadius={60}
-        renderInPortal={false}
-        shadow={2}
-        size="sm"
-        icon={<AddIcon color="white" size={6} />}
       />
     </View>
   )

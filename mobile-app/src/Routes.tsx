@@ -1,9 +1,9 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
 import AppNavigation from './navigation/AppNavigation'
 
 import { VaultUnlockVerification } from './screens/VaultUnlockVerification'
-import { useColorMode, useToast } from 'native-base'
+import { useColorMode } from 'native-base'
 import {
   DarkTheme,
   DefaultTheme,
