@@ -53,8 +53,9 @@ import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const log = debug('au:Device')
 
-const port = chrome.runtime.connect()
+const port = browser.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
+  // @ts-expect-error types in chromeLink are not correct, this is fine
   links: [chromeLink({ port })]
 })
 
@@ -196,7 +197,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     })
 
     const icon = browser.runtime.getURL('icon-48.png')
-    chrome.action.setIcon({ path: icon })
+    browser.action.setIcon({ path: icon })
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
@@ -593,7 +594,7 @@ class ExtensionDevice {
     this.clearLockInterval()
 
     const lockIcon = browser.runtime.getURL('icon-lock-48.png')
-    chrome.action.setIcon({ path: lockIcon })
+    browser.action.setIcon({ path: lockIcon })
 
     log('locking device')
 
