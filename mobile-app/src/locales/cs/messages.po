@@ -1,11 +1,11 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2023-06-03 22:55+0200\n"
+"POT-Creation-Date: 2023-06-03 22:52+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: @lingui/cli\n"
-"Language: en\n"
+"Language: cs\n"
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "PO-Revision-Date: \n"
@@ -15,165 +15,165 @@ msgstr ""
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
-msgstr "Add TOTP"
+msgstr "Přidat TOTP"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "After you approve it, your vault will open automatically in this tab."
-msgstr "After you approve it, your vault will open automatically in this tab."
+msgstr "Po schválení se na této kartě automaticky otevře váš trezor."
 
 #: src/screens/Auth/Register.tsx
 msgid "Already have an account."
-msgstr "Already have an account."
+msgstr "Již máte účet."
 
 #: src/screens/Device/Devices.tsx
 msgid "Approve"
-msgstr "Approve"
+msgstr "Schválit"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
-msgstr "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
+msgstr "Schvalte toto zařízení ve správě zařízení v trezoru na hlavním zařízení, abyste mohli pokračovat v přidávání nového zařízení."
 
 #: src/screens/Account/Settings.tsx
 msgid "Automatically locks vault after chosen period of time"
-msgstr "Automatically locks vault after chosen period of time"
+msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
 
 #: src/navigation/AccountNavigation.tsx
 msgid "Change master password"
-msgstr "Change master password"
+msgstr "Změna hlavního hesla"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Change password"
-msgstr "Change password"
+msgstr "Změnit heslo"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
-#~ msgstr "Current Passwor2d"
+#~ msgstr "Aktuální heslo"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Current Password"
-msgstr "Current Password"
+msgstr "Aktuální heslo"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
-msgstr "Device:"
+msgstr "Zařízení:"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
-msgstr "Edit TOTP"
+msgstr "Upravit TOTP"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Geolocation"
-msgstr "Geolocation"
+msgstr "Geolokace"
 
 #: src/screens/Auth/Login.tsx
 msgid "I'm a new user."
-msgstr "I'm a new user."
+msgstr "Jsem nový uživatel."
 
 #: src/screens/Account/Settings.tsx
 msgid "Language"
-msgstr "Language"
+msgstr "Jazyk"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Last IP Address"
-msgstr "Last IP Address"
+msgstr "Poslední IP adresa"
 
 #: src/screens/Account/Settings.tsx
 msgid "Lock time"
-msgstr "Lock time"
+msgstr "Doba uzamčení"
 
 #: src/screens/Auth/Register.tsx
 msgid "Log in"
-msgstr "Log in"
+msgstr "Přihlášení"
 
 #: src/screens/Auth/Login.tsx
 msgid "Log in to continue!"
-msgstr "Log in to continue!"
+msgstr "Přihlaste se pro pokračování!"
 
 #: src/components/LogoutDeviceAlert.tsx
 msgid "Log out"
-msgstr "Log out"
+msgstr "Odhlásit se"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Logout at"
-msgstr "Logout at"
+msgstr "Odhlášení v"
 
 #: src/screens/Device/Devices.tsx
 msgid "New Device is trying to login!"
-msgstr "New Device is trying to login!"
+msgstr "Nové zařízení se snaží přihlásit!"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "New password"
-msgstr "New password"
+msgstr "Nové heslo"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "New password confirmation"
-msgstr "New password confirmation"
+msgstr "Potvrzení nového hesla"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Password changed, all your devices will be logged out and you will need to log in again"
-msgstr "Password changed, all your devices will be logged out and you will need to log in again"
+msgstr "Heslo bylo změněno, všechna vaše zařízení budou odhlášena a budete se muset znovu přihlásit"
 
 #: src/navigation/PasswordsStackNavigation.tsx
 msgid "Passwords"
-msgstr "Passwords"
+msgstr "Hesla"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Passwords do not match"
-msgstr "Passwords do not match"
+msgstr "Hesla se neshodují"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Platform"
-msgstr "Platform"
+msgstr "Platforma"
 
 #: src/screens/Device/Devices.tsx
 msgid "Reject"
-msgstr "Reject"
+msgstr "Odmítnout"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Scan QR"
-msgstr "Scan QR"
+msgstr "Naskenujte QR"
 
 #: src/screens/Account/Settings.tsx
 msgid "Security"
-msgstr "Security"
+msgstr "Zabezpečení"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Set on master device"
-msgstr "Set on master device"
+msgstr "Nastaveno na hlavním zařízení"
 
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
-msgstr "Sign Up"
+msgstr "Registrace"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
 msgid "Start by adding a login secret or a TOTP code"
-msgstr "Start by adding a login secret or a TOTP code"
+msgstr "Začněte přidáním přihlašovacího klíče nebo TOTP kódu"
 
 #: src/screens/TOTPVault/TOTPVault.tsx
 msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
-msgstr "Start by adding a secret by logging onto any website or by adding a TOTP code"
+msgstr "Začněte přidáním klíče přihlášení přihlášením na libovolné webové stránky nebo přidáním TOTP kódu"
 
 #: src/screens/Auth/Login.tsx
 msgid "Submit"
-msgstr "Submit"
+msgstr "Odeslat"
 
 #: src/screens/Account/Settings.tsx
 msgid "Theme"
-msgstr "Theme"
+msgstr "Téma"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
-msgstr "TOTPs"
+msgstr "TOTP"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
-msgstr "Username: {0}"
+msgstr "Uživatelské jméno: {0}"
 
 #: src/screens/Auth/Login.tsx
 msgid "Welcome"
-msgstr "Welcome"
+msgstr "Vítejte"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Wrong password"
-msgstr "Wrong password"
+msgstr "Nesprávné heslo"

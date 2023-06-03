@@ -1,5 +1,6 @@
 export default {
-  locales: ['en'],
+  locales: ['en', 'cs'],
+  sourceLocale: 'en',
   catalogs: [
     {
       path: 'src/locales/{locale}/messages',

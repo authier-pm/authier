@@ -11,8 +11,8 @@ import { theme } from './Theme'
 import Routes from './Routes'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
-import { messages } from './locales/en/messages'
-import { en as enPlurals } from 'make-plural/plurals'
+import { messages as enMessages } from './locales/en/messages'
+import { messages as csMessages } from './locales/cs/messages'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
 import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
@@ -20,8 +20,10 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { getSensitiveItem, setSensitiveItem } from './utils/secretStorage'
 import { storage } from './utils/storage'
 
-i18n.loadLocaleData('en', { plurals: enPlurals })
-i18n.load('en', messages)
+i18n.load({
+  en: enMessages,
+  cs: csMessages
+})
 i18n.activate('en')
 
 const colorModeManager: StorageManager = {

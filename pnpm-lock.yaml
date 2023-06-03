@@ -1,8 +1,4 @@
-lockfileVersion: '6.1'
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
+lockfileVersion: '6.0'
 
 importers:
 
@@ -508,11 +504,11 @@ importers:
         specifier: ^2.15.4
         version: 2.15.4(react-native@0.71.8)(react@18.2.0)
       react-native-webview:
-        specifier: ^12.2.0
-        version: 12.2.0(react-native@0.71.8)(react@18.2.0)
+        specifier: 12.1.0
+        version: 12.1.0(react-native@0.71.8)(react@18.2.0)
       react-native-webview-crypto:
         specifier: ^0.0.25
-        version: 0.0.25(react-native-webview@12.2.0)(react-native@0.71.8)(react@18.2.0)
+        version: 0.0.25(react-native-webview@12.1.0)(react-native@0.71.8)(react@18.2.0)
       react-query:
         specifier: ^3.39.3
         version: 3.39.3(react-dom@18.2.0)(react-native@0.71.8)(react@18.2.0)
@@ -21664,7 +21660,7 @@ packages:
       react-native: 0.71.8(@babel/core@7.22.1)(@babel/preset-env@7.22.2)(react@18.2.0)
     dev: false
 
-  /react-native-webview-crypto@0.0.25(react-native-webview@12.2.0)(react-native@0.71.8)(react@18.2.0):
+  /react-native-webview-crypto@0.0.25(react-native-webview@12.1.0)(react-native@0.71.8)(react@18.2.0):
     resolution: {integrity: sha512-H1kn5FFk0tBq5JDpkopyonAQTFEDAGoVJG+9Ip84jx4QmHmh5hxaJ5PkOXsMeNb2wHnwuvsg5p3krCOYNf20+A==}
     peerDependencies:
       react: '>=16.4'
@@ -21675,12 +21671,12 @@ packages:
       fast-base64-encode: 1.0.0
       react: 18.2.0
       react-native: 0.71.8(@babel/core@7.22.1)(@babel/preset-env@7.22.2)(react@18.2.0)
-      react-native-webview: 12.2.0(react-native@0.71.8)(react@18.2.0)
+      react-native-webview: 12.1.0(react-native@0.71.8)(react@18.2.0)
       webview-crypto: 0.1.13
     dev: false
 
-  /react-native-webview@12.2.0(react-native@0.71.8)(react@18.2.0):
-    resolution: {integrity: sha512-F+g1vWz7wpr7FBohejw6J6J1aWjPqs9WwYSdptT0YYvACWuT5spLvRPJg38RBGU7RG64wui/F7eMvuIZq/7G5Q==}
+  /react-native-webview@12.1.0(react-native@0.71.8)(react@18.2.0):
+    resolution: {integrity: sha512-fuMyF4PBSIHHxv/3GgWO0LQbd7hRkLLDvZZIZw7gplSvH1YTahzw2wxnAt2K4Ua9UmsZ3w2MKgDamQCrdk4tdw==}
     peerDependencies:
       react: '*'
       react-native: '*'

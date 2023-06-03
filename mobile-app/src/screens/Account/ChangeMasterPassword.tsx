@@ -51,7 +51,7 @@ export function ChangeMasterPassword() {
             <FormControl isRequired>
               <Stack mx="4">
                 <FormControl.Label>
-                  <Trans>Current Passwor2d</Trans>
+                  <Trans>Current Password</Trans>
                 </FormControl.Label>
                 <Input
                   type="password"
