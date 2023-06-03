@@ -22,10 +22,9 @@ import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import PasswordReEnter from '@src/components/PasswordReEnter'
-import { useLingui } from '@lingui/react'
+import { i18n } from '@lingui/core'
 
 export default function Settings() {
-  const { i18n } = useLingui()
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -45,13 +44,6 @@ export default function Settings() {
       syncTOTP: deviceState.syncTOTP,
       vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
     }
-  }
-
-  const loadAndActivateLocale = (locale: string) => {
-    const newActiveLanguage = locale
-    const catalog = require(`./locales/${locale}/messages.js`)
-    i18n.load(newActiveLanguage, catalog.messages)
-    i18n.activate(newActiveLanguage)
   }
 
   return (
@@ -111,7 +103,7 @@ export default function Settings() {
                       config: settings()
                     }
                   })
-                  loadAndActivateLocale(value)
+                  i18n.activate(value)
                 }}
                 defaultValue={deviceState.uiLanguage}
                 accessibilityLabel="language"

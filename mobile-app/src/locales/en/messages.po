@@ -13,6 +13,14 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/screens/Account/Account.tsx
+msgid "{name}"
+msgstr "{name}"
+
+#: src/navigation/AccountNavigation.tsx
+msgid "Account"
+msgstr "Account"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
 msgstr "Add TOTP"
@@ -38,12 +46,17 @@ msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatically locks vault after chosen period of time"
 
 #: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/Account.tsx
 msgid "Change master password"
 msgstr "Change master password"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Change password"
 msgstr "Change password"
+
+#: src/screens/Account/Account.tsx
+msgid "Codepush version"
+msgstr "Codepush version"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
@@ -57,6 +70,14 @@ msgstr "Current Password"
 msgid "Device:"
 msgstr "Device:"
 
+#: src/screens/Account/Account.tsx
+msgid "Do you want to lock device?"
+msgstr "Do you want to lock device?"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to logout?"
+msgstr "Do you want to logout?"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
 msgstr "Edit TOTP"
@@ -69,6 +90,10 @@ msgstr "Geolocation"
 msgid "I'm a new user."
 msgstr "I'm a new user."
 
+#: src/screens/Account/Account.tsx
+msgid "Import passwords"
+msgstr "Import passwords"
+
 #: src/screens/Account/Settings.tsx
 msgid "Language"
 msgstr "Language"
@@ -76,6 +101,10 @@ msgstr "Language"
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Last IP Address"
 msgstr "Last IP Address"
+
+#: src/screens/Account/Account.tsx
+msgid "Lock"
+msgstr "Lock"
 
 #: src/screens/Account/Settings.tsx
 msgid "Lock time"
@@ -92,6 +121,10 @@ msgstr "Log in to continue!"
 #: src/components/LogoutDeviceAlert.tsx
 msgid "Log out"
 msgstr "Log out"
+
+#: src/screens/Account/Account.tsx
+msgid "Logout"
+msgstr "Logout"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Logout at"
@@ -141,6 +174,10 @@ msgstr "Security"
 msgid "Set on master device"
 msgstr "Set on master device"
 
+#: src/screens/Account/Account.tsx
+msgid "Settings"
+msgstr "Settings"
+
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
 msgstr "Sign Up"
@@ -168,6 +205,10 @@ msgstr "TOTPs"
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
 msgstr "Username: {0}"
+
+#: src/screens/Account/Account.tsx
+msgid "Version"
+msgstr "Version"
 
 #: src/screens/Auth/Login.tsx
 msgid "Welcome"

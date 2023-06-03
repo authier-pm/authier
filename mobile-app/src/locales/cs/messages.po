@@ -13,6 +13,14 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/screens/Account/Account.tsx
+msgid "{name}"
+msgstr "{name}"
+
+#: src/navigation/AccountNavigation.tsx
+msgid "Account"
+msgstr "Účet"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
 msgstr "Přidat TOTP"
@@ -38,12 +46,17 @@ msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
 
 #: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/Account.tsx
 msgid "Change master password"
 msgstr "Změna hlavního hesla"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Change password"
 msgstr "Změnit heslo"
+
+#: src/screens/Account/Account.tsx
+msgid "Codepush version"
+msgstr "Verze Codepush"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
@@ -57,6 +70,14 @@ msgstr "Aktuální heslo"
 msgid "Device:"
 msgstr "Zařízení:"
 
+#: src/screens/Account/Account.tsx
+msgid "Do you want to lock device?"
+msgstr "Chcete zařízení uzamknout?"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to logout?"
+msgstr "Chcete se odhlásit?"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
 msgstr "Upravit TOTP"
@@ -69,6 +90,10 @@ msgstr "Geolokace"
 msgid "I'm a new user."
 msgstr "Jsem nový uživatel."
 
+#: src/screens/Account/Account.tsx
+msgid "Import passwords"
+msgstr "Importovat hesla"
+
 #: src/screens/Account/Settings.tsx
 msgid "Language"
 msgstr "Jazyk"
@@ -76,6 +101,10 @@ msgstr "Jazyk"
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Last IP Address"
 msgstr "Poslední IP adresa"
+
+#: src/screens/Account/Account.tsx
+msgid "Lock"
+msgstr "Uzamknout"
 
 #: src/screens/Account/Settings.tsx
 msgid "Lock time"
@@ -91,6 +120,10 @@ msgstr "Přihlaste se pro pokračování!"
 
 #: src/components/LogoutDeviceAlert.tsx
 msgid "Log out"
+msgstr "Odhlásit se"
+
+#: src/screens/Account/Account.tsx
+msgid "Logout"
 msgstr "Odhlásit se"
 
 #: src/screens/Device/DeviceInfo.tsx
@@ -141,6 +174,10 @@ msgstr "Zabezpečení"
 msgid "Set on master device"
 msgstr "Nastaveno na hlavním zařízení"
 
+#: src/screens/Account/Account.tsx
+msgid "Settings"
+msgstr "Nastavení"
+
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
 msgstr "Registrace"
@@ -168,6 +205,10 @@ msgstr "TOTP"
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
 msgstr "Uživatelské jméno: {0}"
+
+#: src/screens/Account/Account.tsx
+msgid "Version"
+msgstr "Verze"
 
 #: src/screens/Auth/Login.tsx
 msgid "Welcome"

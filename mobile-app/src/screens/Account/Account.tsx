@@ -21,11 +21,12 @@ import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { t, Trans } from '@lingui/macro'
 
 const settingsOptions = [
-  { name: 'Settings', route: 'Settings' },
-  { name: 'Import passwords', route: 'ImportPasswords' },
-  { name: 'Change master password', route: 'ChangeMasterPassword' }
+  { name: t`Settings`, route: 'Settings' },
+  { name: t`Import passwords`, route: 'ImportPasswords' },
+  { name: t`Change master password`, route: 'ChangeMasterPassword' }
 ]
 
 const SettingsItem = ({
@@ -50,7 +51,9 @@ const SettingsItem = ({
       borderWidth={1}
       borderColor={useColorModeValue('#cfcfcf', 'rgb(47, 47, 47)')}
     >
-      <Text>{name}</Text>
+      <Text>
+        <Trans>{name}</Trans>
+      </Text>
     </Button>
   )
 }
@@ -98,16 +101,16 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
         <ButtonWithAlert
           btnColor="orange"
           icon="lock-closed-outline"
-          text={'Do you want to lock device?'}
+          text={t`Do you want to lock device?`}
           onPress={() => device.lock()}
-          btnText="Lock"
+          btnText={t`Lock`}
         />
 
         <ButtonWithAlert
-          btnText="Logout"
+          btnText={t`Logout`}
           btnColor="danger"
           icon="log-out-outline"
-          text={'Do you want to logout?'}
+          text={t`Do you want to logout?`}
           onPress={() => device.logout()}
         />
       </VStack>
@@ -119,11 +122,15 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           justifyContent="space-between"
         >
           <Box>
-            <Text>Version</Text>
+            <Text>
+              <Trans>Version</Trans>
+            </Text>
             <Text>{DeviceInfo.getVersion()}</Text>
           </Box>
           <Box>
-            <Text>Codepush version</Text>
+            <Text>
+              <Trans>Codepush version</Trans>
+            </Text>
             <Text>{appMetadata?.label || 'Native'}</Text>
           </Box>
         </Flex>

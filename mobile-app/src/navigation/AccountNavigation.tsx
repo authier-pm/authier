@@ -16,7 +16,7 @@ export default function AccountNavigation() {
         options={{
           headerShadowVisible: false
         }}
-        name="Account"
+        name={t`Account` as 'Account'}
         component={Account}
       />
       <DeviceStack.Screen name="Settings" component={Settings} />
