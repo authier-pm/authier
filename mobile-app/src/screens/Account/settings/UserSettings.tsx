@@ -3,16 +3,16 @@ import React from 'react'
 import {
   Box,
   Center,
+  Divider,
+  HStack,
   Select,
+  Switch,
   Text,
   useColorModeValue,
   View,
-  VStack,
-  Switch,
-  HStack,
-  Divider,
-  useColorMode
+  VStack
 } from 'native-base'
+
 import SInfo from 'react-native-sensitive-info'
 
 import { Trans } from '@lingui/macro'
@@ -22,7 +22,6 @@ import { SyncSettingsDocument } from '@shared/graphql/Settings.codegen'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import PasswordReEnter from '@src/components/PasswordReEnter'
-import { i18n } from '@lingui/core'
 
 function UserSettings() {
   let deviceState = useDeviceStateStore((state) => state)
@@ -33,7 +32,6 @@ function UserSettings() {
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
     awaitRefetchQueries: true
   })
-  const { toggleColorMode } = useColorMode()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
   const settings = (): SettingsInput => {
@@ -50,8 +48,6 @@ function UserSettings() {
     <View>
       <Center mt={5}>
         <VStack width="90%" space={4}>
-          {/*  */}
-
           <VStack space={2}>
             <Text>
               <Trans>Lock time</Trans>
@@ -87,54 +83,6 @@ function UserSettings() {
             </Box>
           </VStack>
 
-          {/*  */}
-
-          <VStack space={2}>
-            <Text>
-              <Trans>Language</Trans>
-            </Text>
-
-            <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                onValueChange={(value) => {
-                  deviceState.changeUiLanguage(value)
-                  updateSettings({
-                    variables: {
-                      config: settings()
-                    }
-                  })
-                  i18n.activate(value)
-                }}
-                defaultValue={deviceState.uiLanguage}
-                accessibilityLabel="language"
-              >
-                <Select.Item label="English" value="en" />
-                <Select.Item label="Čeština" value="cs" />
-              </Select>
-            </Box>
-          </VStack>
-
-          {/*  */}
-          <VStack space={2}>
-            <Text>
-              <Trans>Theme</Trans>
-            </Text>
-
-            <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                onValueChange={(value) => {
-                  toggleColorMode()
-                  deviceState.changeTheme(value)
-                }}
-                defaultValue={deviceState.theme}
-                accessibilityLabel="theme"
-              >
-                <Select.Item label="light" value="light" />
-                <Select.Item label="dark" value="dark" />
-              </Select>
-            </Box>
-          </VStack>
-
           {/* // TODO: Rewrite switches to one component and then re-use  */}
           <VStack space={2}>
             <Text>
@@ -161,13 +109,14 @@ function UserSettings() {
                 />
               </HStack>
               <Divider />
+              {/* //TODO: Dont change switch value right after click, not sure if native base even support this, maybe use checkbox instead */}
               <HStack justifyContent="space-between" p={2}>
                 <Text>Biometrics</Text>
                 <Switch
                   isDisabled={!device.biometricsAvailable}
                   isChecked={deviceState.biometricsEnabled}
                   size="md"
-                  onToggle={async (e) => {
+                  onToggle={async () => {
                     if (deviceState.biometricsEnabled) {
                       await SInfo.deleteItem('psw', {
                         sharedPreferencesName: 'authierShared',

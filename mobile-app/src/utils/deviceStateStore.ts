@@ -121,7 +121,7 @@ const initialState: DeviceStateProps = {
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
   uiLanguage: '',
-  theme: '',
+  theme: 'dark',
   biometricsEnabled: false,
   lockTimeStart: 0,
   lockTimeEnd: 0,
