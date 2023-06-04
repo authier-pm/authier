@@ -24,7 +24,7 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import PasswordReEnter from '@src/components/PasswordReEnter'
 import { i18n } from '@lingui/core'
 
-export default function Settings() {
+function UserSettings() {
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
   const [modalVisible, setModalVisible] = React.useState(false)
@@ -191,3 +191,5 @@ export default function Settings() {
     </View>
   )
 }
+
+export default UserSettings

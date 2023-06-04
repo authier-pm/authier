@@ -6,6 +6,8 @@ import type { StackScreenProps } from '@react-navigation/stack'
 import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { DeviceQuery, UserQuery } from '@shared/generated/graphqlBaseTypes'
+import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
+import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs'
 
 declare global {
   namespace ReactNavigation {
@@ -22,7 +24,7 @@ export type RootStackParamList = {
 }
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
-  StackScreenProps<RootStackParamList, T>
+  BottomTabScreenProps<RootStackParamList, T>
 
 //PASSWORDS VAULT
 export type PasswordStackScreenProps<T extends keyof PasswordsStackParamList> =
@@ -59,7 +61,7 @@ export type DevicesStackScreenProps<T extends keyof DeviceStackParamList> =
   >
 
 export type DeviceStackParamList = {
-  DeviceList: undefined
+  DeviceList?: undefined
   DeviceInfo: {
     device: Partial<DeviceQuery>
     masterDeviceId: UserQuery['masterDeviceId']
@@ -69,13 +71,24 @@ export type DeviceStackParamList = {
 //ACCOUNT
 export type AccountStackScreenProps<T extends keyof AccountStackParamList> =
   CompositeScreenProps<
-    NativeStackScreenProps<AccountStackParamList, T>,
+    StackScreenProps<AccountStackParamList, T>,
     RootStackScreenProps<keyof RootStackParamList>
   >
 
 export type AccountStackParamList = {
   Account: undefined
-  Settings: undefined
-  ImportPasswords: undefined
+  Settings: NavigatorScreenParams<SettingsTabParamList>
   ChangeMasterPassword: undefined
+}
+
+//SETTINGS
+export type SettingsTabScreenProps<T extends keyof SettingsTabParamList> =
+  CompositeScreenProps<
+    MaterialTopTabScreenProps<SettingsTabParamList, T>,
+    RootStackScreenProps<keyof RootStackParamList>
+  >
+
+export type SettingsTabParamList = {
+  User: undefined
+  Device: undefined
 }

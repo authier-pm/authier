@@ -24,7 +24,7 @@ i18n.load({
   en: enMessages,
   cs: csMessages
 })
-i18n.activate('cs')
+i18n.activate('en')
 
 const colorModeManager: StorageManager = {
   get: async () => {

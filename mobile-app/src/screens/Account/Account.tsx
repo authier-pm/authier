@@ -25,7 +25,6 @@ import { t, Trans } from '@lingui/macro'
 
 const settingsOptions = [
   { name: t`Settings`, route: 'Settings' },
-  { name: t`Import passwords`, route: 'ImportPasswords' },
   { name: t`Change master password`, route: 'ChangeMasterPassword' }
 ]
 
