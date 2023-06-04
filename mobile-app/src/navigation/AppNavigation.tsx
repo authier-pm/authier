@@ -91,7 +91,7 @@ function AppNavigation() {
           // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: '#00a8ff',
+        tabBarActiveTintColor: '#4CE0D2',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
         tabBarHideOnKeyboard: true

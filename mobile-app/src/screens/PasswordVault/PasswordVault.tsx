@@ -4,12 +4,12 @@ import {
   View,
   Text,
   AddIcon,
-  Flex,
   useToast,
-  Fab,
   Box,
   IconButton,
-  HStack
+  HStack,
+  Image,
+  Center
 } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
@@ -20,13 +20,18 @@ import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
-const EmptyList = () => {
+export const EmptyList = (text: string) => {
   return (
-    <Box p={4}>
+    <Center p={4}>
       <Text>
-        <Trans>Start by adding a login secret or a TOTP code</Trans>
+        <Trans>{text}</Trans>
       </Text>
-    </Box>
+      <Image
+        boxSize="md"
+        source={require('../../../assets/empty.png')}
+        alt="Empty list"
+      />
+    </Center>
   )
 }
 
@@ -66,7 +71,7 @@ export const PasswordVault = ({
       </HStack>
 
       <FlashList
-        ListEmptyComponent={EmptyList}
+        ListEmptyComponent={EmptyList('Start by adding a login secret')}
         //FIX: Dont like empty space on fast scroll
         estimatedItemSize={90}
         data={device

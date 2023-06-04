@@ -20,7 +20,8 @@ module.exports = {
           '@utils': './src/utils/',
           '@components': './src/components/',
           '@navigation': './src/navigation/',
-          '@providers': './src/providers/'
+          '@providers': './src/providers/',
+          '@assets': './src/assets/'
         },
         extensions: ['.js', '.jsx', '.tsx', '.ts']
       }

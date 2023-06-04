@@ -2,38 +2,22 @@ import React, { useEffect, useState } from 'react'
 
 import {
   View,
-  Text,
   AddIcon,
-  Flex,
   useToast,
   Fab,
-  Box,
   useColorModeValue,
   HStack
 } from 'native-base'
 
-import { SearchBar } from '../../components/SearchBar'
+import { SearchBar } from '@components/SearchBar'
 
-import TOTPSecret from '../../components/TOTPSecret'
+import TOTPSecret from '@components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
-import { Trans } from '@lingui/macro'
 import CircularProgress from 'react-native-circular-progress-indicator'
-import { TOTPStackScreenProps } from '../../navigation/types'
+import { TOTPStackScreenProps } from '@navigation/types'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
-
-const EmptyList = () => {
-  return (
-    <Box p={4}>
-      <Text>
-        <Trans>
-          Start by adding a secret by logging onto any website or by adding a
-          TOTP code
-        </Trans>
-      </Text>
-    </Box>
-  )
-}
+import { EmptyList } from '../PasswordVault/PasswordVault'
 
 export const TOTPVault = ({
   navigation
@@ -77,7 +61,9 @@ export const TOTPVault = ({
       </HStack>
 
       <FlashList
-        ListEmptyComponent={EmptyList}
+        ListEmptyComponent={EmptyList(
+          'Start by adding a secret by logging onto any website or by adding a TOTP code'
+        )}
         estimatedItemSize={90}
         data={device.TOTPSecrets().filter(({ totp }) => {
           return totp.label.includes(filterBy) || totp.url?.includes(filterBy)

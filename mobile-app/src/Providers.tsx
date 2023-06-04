@@ -1,12 +1,7 @@
 import React, { useEffect } from 'react'
 import { ApolloProvider } from '@apollo/client'
 import { apolloClient, cache } from './apollo/ApolloClient'
-import {
-  ColorMode,
-  NativeBaseProvider,
-  StorageManager,
-  Text
-} from 'native-base'
+import { NativeBaseProvider, StorageManager, Text } from 'native-base'
 import { theme } from './Theme'
 import Routes from './Routes'
 import { I18nProvider } from '@lingui/react'
