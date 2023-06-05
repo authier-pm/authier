@@ -15,7 +15,6 @@
 		756309A7DE75D82B28E44B1E /* Pods_authier_authierTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 48BFA45AD70625D5CE59C79B /* Pods_authier_authierTests.framework */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 		DF0AC6A829ABE66B008CFB2C /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = DF0AC6A729ABE66A008CFB2C /* GoogleService-Info.plist */; };
-		DF5FA6692A2E259B000D06AA /* main.jsbundle in Resources */ = {isa = PBXBuildFile; fileRef = DF5FA6682A2E259B000D06AA /* main.jsbundle */; };
 		DFCBF06A28FF0E82009A4E5D /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = DFCBF06928FF0E82009A4E5D /* BootSplash.storyboard */; };
 /* End PBXBuildFile section */
 
@@ -48,7 +47,6 @@
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = authier/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AEC55A491E774BCF321DF3A3 /* Pods-authier-authierTests.staging.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-authier-authierTests.staging.xcconfig"; path = "Target Support Files/Pods-authier-authierTests/Pods-authier-authierTests.staging.xcconfig"; sourceTree = "<group>"; };
 		DF0AC6A729ABE66A008CFB2C /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		DF5FA6682A2E259B000D06AA /* main.jsbundle */ = {isa = PBXFileReference; lastKnownFileType = text; path = main.jsbundle; sourceTree = "<group>"; };
 		DFAC5EF529AD5B9900BA797B /* authier.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = authier.entitlements; path = authier/authier.entitlements; sourceTree = "<group>"; };
 		DFCBF06928FF0E82009A4E5D /* BootSplash.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = BootSplash.storyboard; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -127,7 +125,6 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
-				DF5FA6682A2E259B000D06AA /* main.jsbundle */,
 				DF0AC6A729ABE66A008CFB2C /* GoogleService-Info.plist */,
 				13B07FAE1A68108700A75B9A /* authier */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
@@ -258,7 +255,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				DF5FA6692A2E259B000D06AA /* main.jsbundle in Resources */,
 				DF0AC6A829ABE66B008CFB2C /* GoogleService-Info.plist in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,

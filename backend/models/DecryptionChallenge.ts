@@ -1,3 +1,4 @@
+import 'reflect-metadata'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallengeGQL'
@@ -10,7 +11,7 @@ import ms from 'ms'
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
-import { decorator as mem } from 'mem'
+import { memDecorator as mem } from 'mem'
 import { getGeoIpLocation } from './Device'
 
 @ObjectType()
