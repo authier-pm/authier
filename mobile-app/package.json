@@ -16,6 +16,8 @@
     "compile": "lingui compile",
     "killPort": "lsof -ti tcp:8088 | xargs kill",
     "postinstall": "./scripts/copyNodeModulesHack.mjs",
+    "pod:install": "cd ios && pod install",
+    "cleanDerivedData": "rm -rf ~/Library/Developer/Xcode/DerivedData",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",

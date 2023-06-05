@@ -26,6 +26,11 @@ target 'authier' do
           Pod::BuildType.static_library
         end
       end
+      if pod.name.eql?('RNPermissions') || pod.name.start_with?('Permission-')
+        def pod.build_type;
+          Pod::BuildType.static_library
+        end
+      end
     end
   end
 
@@ -45,6 +50,8 @@ target 'authier' do
     # An absolute path to your application root.
     :app_path => "#{Pod::Config.instance.installation_root}/.."
   )
+
+  permissions_path = '../node_modules/react-native-permissions/ios'
 
   post_install do |installer|
     # Build Active Architecture Only "NO" (react-native-maps)
