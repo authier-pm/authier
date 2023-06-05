@@ -47,7 +47,6 @@ const RnApp = () => {
   }
 
   useEffect(() => {
-    // initializeStorage()
     requestUserPermission()
     device.initialize()
 
