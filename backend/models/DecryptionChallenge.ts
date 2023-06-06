@@ -6,12 +6,10 @@ import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
 import { GraphQLJSON, GraphQLNonEmptyString } from 'graphql-scalars'
 import { GraphqlError } from '../api/GraphqlError'
-import ms from 'ms'
 
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
-import { memDecorator as mem } from 'mem'
 import { getGeoIpLocation } from './Device'
 
 @ObjectType()
@@ -25,7 +23,6 @@ class DeviceLocation {
 
 @ObjectType()
 export class DecryptionChallengeForApproval {
-  @mem({ maxAge: ms('2 days') })
   @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
     // TODO remove in favor of deviceLocationFromIp
@@ -39,7 +36,6 @@ export class DecryptionChallengeForApproval {
     }
   }
 
-  @mem({ maxAge: ms('2 days') })
   @Field(() => DeviceLocation, { nullable: true })
   async deviceLocationFromIp() {
     const json: any = await getGeoIpLocation(this.ipAddress)
