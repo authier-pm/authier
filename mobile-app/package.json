@@ -23,6 +23,11 @@
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
     "postversion": "react-native-version"
   },
+  "reactNativePermissionsIOS": [
+    "Camera",
+    "FaceID",
+    "Notifications"
+  ],
   "dependencies": {
     "@apollo/client": "^3.7.15",
     "@babel/preset-env": "^7.22.2",

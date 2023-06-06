@@ -8,4 +8,5 @@ if (jscAndroidExists) {
 }
 await $`cp -R ../node_modules/react-native/ ./node_modules/react-native`
 await $`cp -R ../node_modules/react-native-code-push/ ./node_modules/react-native-code-push`
+await $`mkdir -p ./node_modules/.bin`
 await $`cp -R ../node_modules/.bin/react-native ./node_modules/.bin/react-native`

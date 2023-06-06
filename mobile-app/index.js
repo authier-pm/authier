@@ -2,8 +2,8 @@
  * @format
  */
 
-import 'react-native-reanimated'
 import 'react-native-gesture-handler'
+import 'react-native-reanimated'
 import 'intl'
 import 'intl/locale-data/jsonp/en' // or any other locale you need
 import 'react-native-get-random-values'

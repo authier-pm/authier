@@ -19,6 +19,7 @@ import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
 import { useDeviceStore } from './src/utils/deviceStore'
+import { API_URL, API_URL_RELEASE } from '@env'
 import './src/sentryInit'
 
 let CodePushOptions = {
@@ -47,9 +48,9 @@ const RnApp = () => {
   }
 
   useEffect(() => {
-    // initializeStorage()
     requestUserPermission()
     device.initialize()
+    console.log('API_URL', __DEV__ ? API_URL : API_URL_RELEASE)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {

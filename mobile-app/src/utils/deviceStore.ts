@@ -1,5 +1,4 @@
 import { Platform } from 'react-native'
-
 import { apolloClient } from '../apollo/ApolloClient'
 import SInfo from 'react-native-sensitive-info'
 import {
@@ -12,7 +11,7 @@ import { z, ZodError } from 'zod'
 import {
   loginCredentialsSchema,
   totpSchema
-} from '../../../shared/loginCredentialsSchema'
+} from '@shared/loginCredentialsSchema'
 import { create } from 'zustand'
 import { useDeviceStateStore } from './deviceStateStore'
 import { createJSONStorage, persist } from 'zustand/middleware'
@@ -436,8 +435,8 @@ export const useDeviceStore = create<Device>()(
       checkBiometrics: async () => {
         const hasAnySensors = await SInfo.isSensorAvailable()
         //TODO: This is just for android
-        const hasAnyFingerprintsEnrolled = await SInfo.hasEnrolledFingerprints()
-        return hasAnySensors && hasAnyFingerprintsEnrolled
+        //const hasAnyFingerprintsEnrolled = await SInfo.hasEnrolledFingerprints()
+        return !!hasAnySensors
       },
       startVaultLockTimer() {
         let state = useDeviceStateStore.getState()
