@@ -12,8 +12,7 @@ import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/DeviceGQL'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { fetch } from 'undici'
-import { memDecorator as mem } from 'mem'
-import ms from 'ms'
+
 import { GraphqlError } from '../api/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
@@ -60,7 +59,6 @@ export class DeviceInput {
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
-  @mem({ maxAge: ms('2 days') })
   async getIpGeoLocation(ipAddress: string) {
     const json = await getGeoIpLocation(ipAddress)
     if (!json.data) {
