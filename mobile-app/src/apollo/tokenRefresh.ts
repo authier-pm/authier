@@ -1,11 +1,10 @@
 import { accessToken, saveAccessToken } from '../utils/tokenFromAsyncStorage'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
-import { API_URL, API_URL_RELEASE } from '@env'
+import { API_URL } from '@env'
 import { useDeviceStore } from '@src/utils/deviceStore'
 
-const ENDPOINT = __DEV__ ? API_URL : API_URL_RELEASE
-if (!ENDPOINT) {
+if (!API_URL) {
   throw new Error('API_URL is not defined')
 }
 
@@ -28,7 +27,7 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    return await fetch(`${ENDPOINT.replace('/graphql', '')}/refresh_token`, {
+    return await fetch(`${API_URL.replace('/graphql', '')}/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })

@@ -37,7 +37,7 @@ jobs:
 
       - name: Create .env file
         env:
-          API_URL: ${{ secrets.API_URL_RELEASE }}
+          API_URL: ${{ secrets.API_URL }}
           PAGE_URL: ${{ secrets.SENTRY_DSN }}
         shell: bash
         working-directory: ./mobile-app

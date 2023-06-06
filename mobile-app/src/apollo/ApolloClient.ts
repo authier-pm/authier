@@ -16,15 +16,15 @@ import QueueLink from 'apollo-link-queue'
 import { setContext } from '@apollo/client/link/context'
 import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
-import { API_URL, API_URL_RELEASE } from '@env'
+import { API_URL } from '@env'
 import { Toast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
-const apiUrl = __DEV__ ? API_URL : API_URL_RELEASE
-console.log('apiUrl', apiUrl)
+
+console.log('API_URL', API_URL)
 const httpLink = new HttpLink({
-  uri: apiUrl,
+  uri: API_URL,
   credentials: 'include',
   fetch
 })
