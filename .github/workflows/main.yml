@@ -64,12 +64,15 @@ jobs:
             backend:
               - 'backend/**' 
               - '.github/**'
+              - 'pnpm-lock.yaml'
             webExtension:
               - 'web-extension/**'
               - '.github/**'
+              - 'pnpm-lock.yaml'
             mobileApp:
               - 'mobile-app/**'
               - '.github/**'
+              - 'pnpm-lock.yaml'
 
       - name: schema gen
         working-directory: ./backend
