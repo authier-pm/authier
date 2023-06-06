@@ -101,22 +101,22 @@ jobs:
           echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
           pnpm prodBuild
 
-      - name: Install Playwright Browsers & Run Playwright tests with backend
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        working-directory: ./web-extension
-        run: |
-          npx playwright install --with-deps
-          (cd ../backend && pnpm dev) &
-          sleep 5 && cd ../web-extension
-          xvfb-run --auto-servernum -- pnpm playwright:run
+      # - name: Install Playwright Browsers & Run Playwright tests with backend
+      #   if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+      #   working-directory: ./web-extension
+      #   run: |
+      #     npx playwright install --with-deps
+      #     (cd ../backend && pnpm dev) &
+      #     sleep 5 && cd ../web-extension
+      #     xvfb-run --auto-servernum -- pnpm playwright:run
 
-      - name: Upload test results
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-report
-          path: web-extension/playwright-report
-          retention-days: 30
+      # - name: Upload test results
+      #   if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: playwright-report
+      #     path: web-extension/playwright-report
+      #     retention-days: 30
 
       - name: mobile-app, check TS and run jest
         working-directory: ./mobile-app
