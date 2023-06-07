@@ -22,7 +22,10 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 
-console.log('API_URL', API_URL)
+if (!API_URL) {
+  throw new Error('API_URL is not defined')
+}
+
 const httpLink = new HttpLink({
   uri: API_URL,
   credentials: 'include',

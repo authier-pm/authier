@@ -21,7 +21,9 @@
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
-    "postversion": "react-native-version"
+    "postversion": "react-native-version",
+    "start:development": "NODE_ENV=development npx react-native start",
+    "start:production": "NODE_ENV=production npx react-native start"
   },
   "reactNativePermissionsIOS": [
     "Camera",
@@ -44,6 +46,7 @@
     "@react-native-firebase/app": "^17.5.0",
     "@react-native-firebase/messaging": "^17.5.0",
     "@react-native-masked-view/masked-view": "^0.2.9",
+    "@react-native/metro-config": "^0.72.6",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/drawer": "^6.6.2",
     "@react-navigation/material-top-tabs": "^6.6.2",

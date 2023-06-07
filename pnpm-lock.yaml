@@ -326,6 +326,9 @@ importers:
       '@react-native-masked-view/masked-view':
         specifier: ^0.2.9
         version: 0.2.9(react-native@0.71.8)(react@18.2.0)
+      '@react-native/metro-config':
+        specifier: ^0.72.6
+        version: 0.72.6(@babel/core@7.22.1)
       '@react-navigation/bottom-tabs':
         specifier: ^6.5.7
         version: 6.5.7(@react-navigation/native@6.1.6)(react-native-safe-area-context@4.5.3)(react-native-screens@3.20.0)(react-native@0.71.8)(react@18.2.0)
@@ -352,7 +355,7 @@ importers:
         version: 0.16.9(@react-native-community/cli@11.3.1)(metro-config@0.76.5)(metro-core@0.76.5)(metro-react-native-babel-transformer@0.76.5)(metro-resolver@0.76.5)(metro-runtime@0.76.5)(metro@0.76.5)(react-native@0.71.8)
       '@rnx-kit/metro-config':
         specifier: ^1.3.6
-        version: 1.3.6(@babel/core@7.22.1)(metro-config@0.76.5)(metro-react-native-babel-preset@0.76.5)(react-native@0.71.8)(react@18.2.0)
+        version: 1.3.6(@babel/core@7.22.1)(@react-native/metro-config@0.72.6)(metro-config@0.76.5)(metro-react-native-babel-preset@0.76.5)(react-native@0.71.8)(react@18.2.0)
       '@rnx-kit/metro-resolver-symlinks':
         specifier: ^0.1.28
         version: 0.1.28
@@ -8071,6 +8074,25 @@ packages:
   /@react-native/assets@1.0.0:
     resolution: {integrity: sha512-KrwSpS1tKI70wuKl68DwJZYEvXktDHdZMG0k2AXD/rJVSlB23/X2CB2cutVR0HwNMJIal9HOUOBB2rVfa6UGtQ==}
 
+  /@react-native/js-polyfills@0.72.1:
+    resolution: {integrity: sha512-cRPZh2rBswFnGt5X5EUEPs0r+pAsXxYsifv/fgy9ZLQokuT52bPH+9xjDR+7TafRua5CttGW83wP4TntRcWNDA==}
+    dev: false
+
+  /@react-native/metro-config@0.72.6(@babel/core@7.22.1):
+    resolution: {integrity: sha512-hkV0okTi/N/ui1PF4ZgxPV9zajHkxuu+arpQwk8rY+QPZgGM8SIAN5tf68DWJTbPCfAiZLFoW1TgMNbvKrSY1A==}
+    dependencies:
+      '@react-native/js-polyfills': 0.72.1
+      metro-config: 0.76.5
+      metro-react-native-babel-transformer: 0.76.5(@babel/core@7.22.1)
+      metro-runtime: 0.76.5
+    transitivePeerDependencies:
+      - '@babel/core'
+      - bufferutil
+      - encoding
+      - supports-color
+      - utf-8-validate
+    dev: false
+
   /@react-native/normalize-color@2.1.0:
     resolution: {integrity: sha512-Z1jQI2NpdFJCVgpY+8Dq/Bt3d+YUi1928Q+/CZm/oh66fzM0RUl54vvuXlPJKybH4pdCZey1eDTPaLHkMPNgWA==}
 
@@ -8800,7 +8822,7 @@ packages:
       chalk: 4.1.2
     dev: false
 
-  /@rnx-kit/metro-config@1.3.6(@babel/core@7.22.1)(metro-config@0.76.5)(metro-react-native-babel-preset@0.76.5)(react-native@0.71.8)(react@18.2.0):
+  /@rnx-kit/metro-config@1.3.6(@babel/core@7.22.1)(@react-native/metro-config@0.72.6)(metro-config@0.76.5)(metro-react-native-babel-preset@0.76.5)(react-native@0.71.8)(react@18.2.0):
     resolution: {integrity: sha512-gvcEwFkhviioaWfDKNtABc+qRvZbMxcM5RGvFn6riOx7auKVypD5J3j+mvPjXNLJpdKnerpGfIxzjm8ROoaiqg==}
     peerDependencies:
       '@react-native/metro-config': '*'
@@ -8812,6 +8834,7 @@ packages:
       '@react-native/metro-config':
         optional: true
     dependencies:
+      '@react-native/metro-config': 0.72.6(@babel/core@7.22.1)
       '@rnx-kit/babel-preset-metro-react-native': 1.1.4(@babel/core@7.22.1)(metro-react-native-babel-preset@0.76.5)
       '@rnx-kit/console': 1.0.11
       '@rnx-kit/tools-node': 2.0.0
