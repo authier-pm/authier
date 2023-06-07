@@ -115,9 +115,16 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v3
         with:
-          name: playwright-report
-          path: web-extension/playwright-report
+          name: test-results
+          path: web-extension/test-results
           retention-days: 30
+
+      - name: mobile-app, check TS and run tests
+        working-directory: ./mobile-app
+        if: steps.changes.outputs.mobileApp == 'true'
+        run: |
+          pnpm tsc
+          pnpm test
 
       - name: Remove test accounts
         working-directory: ./backend
@@ -126,13 +133,6 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
         run: |
           pnpm removeTestAccounts
-
-      - name: mobile-app, check TS and run tests
-        working-directory: ./mobile-app
-        if: steps.changes.outputs.mobileApp == 'true'
-        run: |
-          pnpm tsc
-          pnpm test
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1

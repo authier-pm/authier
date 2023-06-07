@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -44,6 +44,7 @@
     "@react-native-firebase/app": "^17.5.0",
     "@react-native-firebase/messaging": "^17.5.0",
     "@react-native-masked-view/masked-view": "^0.2.9",
+    "@react-native/metro-config": "^0.72.6",
     "@react-navigation/bottom-tabs": "^6.5.7",
     "@react-navigation/drawer": "^6.6.2",
     "@react-navigation/material-top-tabs": "^6.6.2",
