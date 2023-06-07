@@ -1,6 +1,5 @@
-import { ILoginSecret } from '../util/useDeviceState'
-
 import { h, render } from 'preact'
+import { ILoginSecret } from '../util/useDeviceState'
 import { PromptPasswordOption } from './components/PromptPasswordOption'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 
