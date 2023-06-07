@@ -108,11 +108,12 @@ jobs:
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         working-directory: ./web-extension
         run: |
+          cd dist/ && ls
           npx playwright install --with-deps
           xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+        if: always()
         uses: actions/upload-artifact@v3
         with:
           name: playwright-report
