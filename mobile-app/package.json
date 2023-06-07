@@ -21,9 +21,7 @@
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
-    "postversion": "react-native-version",
-    "start:development": "NODE_ENV=development npx react-native start",
-    "start:production": "NODE_ENV=production npx react-native start"
+    "postversion": "react-native-version"
   },
   "reactNativePermissionsIOS": [
     "Camera",
