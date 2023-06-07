@@ -109,8 +109,6 @@ jobs:
         working-directory: ./web-extension
         run: |
           npx playwright install --with-deps
-          (cd ../backend && pnpm dev) &
-          sleep 5 && cd ../web-extension
           xvfb-run --auto-servernum -- pnpm playwright:run
 
       - name: Upload test results
@@ -120,6 +118,14 @@ jobs:
           name: playwright-report
           path: web-extension/playwright-report
           retention-days: 30
+
+      - name: Remove test accounts
+        working-directory: ./backend
+        if: steps.changes.outputs.backend == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          pnpm removeTestAccounts
 
       - name: mobile-app, check TS and run tests
         working-directory: ./mobile-app
