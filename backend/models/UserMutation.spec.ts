@@ -187,4 +187,8 @@ describe('UserMutation', () => {
       expect(deviceData?.syncTOTP).toBe(newSettings.syncTOTP)
     })
   })
+
+  describe('delete', () => {
+    it.todo('should delete user', async () => {})
+  })
 })
