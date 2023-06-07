@@ -2,7 +2,9 @@ import { faker } from '@faker-js/faker'
 import { test } from './extensionLoad'
 
 test.describe('Authenticating', () => {
-  const email = faker.internet.email()
+  const email = faker.internet.email({
+    firstName: 'authier_test_'
+  })
   const password = faker.internet.password()
 
   test.beforeEach(async ({ page, extensionId }) => {
@@ -29,7 +31,7 @@ test.describe('Authenticating', () => {
     await page.getByLabel('Email').fill(email)
     await page.getByPlaceholder('*******').fill(password)
 
-    await page.getByText('Login').click()
+    await page.getByText('Submit').click()
     await page.getByRole('paragraph', { name: 'Authier' }).isVisible()
   })
 })

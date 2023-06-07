@@ -109,16 +109,14 @@ jobs:
       #   working-directory: ./web-extension
       #   run: |
       #     npx playwright install --with-deps
-      #     (cd ../backend && pnpm dev) &
-      #     sleep 5 && cd ../web-extension
       #     xvfb-run --auto-servernum -- pnpm playwright:run
 
       # - name: Upload test results
-      #   if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+      #   if: always()
       #   uses: actions/upload-artifact@v3
       #   with:
-      #     name: playwright-report
-      #     path: web-extension/playwright-report
+      #     name: test-results
+      #     path: web-extension/test-results
       #     retention-days: 30
 
       - name: mobile-app, check TS and run tests
@@ -127,6 +125,14 @@ jobs:
         run: |
           pnpm tsc
           pnpm test
+
+      - name: Remove test accounts
+        working-directory: ./backend
+        if: steps.changes.outputs.backend == 'true'
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: |
+          pnpm removeTestAccounts
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1

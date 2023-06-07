@@ -43,7 +43,7 @@ jobs:
         working-directory: ./mobile-app
         run: |
           touch .env
-          echo $API_URL_RELEASE >> .env
+          echo $API_URL >> .env
           echo $SENTRY_DSN >> .env
 
       ## configure cash for gradle : will help to reduce build time

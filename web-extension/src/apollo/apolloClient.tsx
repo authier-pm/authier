@@ -6,15 +6,12 @@ import {
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { getTokenFromLocalStorage } from '../util/accessTokenExtension'
-import { errorLink } from '../../../shared/errorLink'
+import { errorLink } from '@shared/errorLink'
 import { tokenRefresh } from './tokenRefresh'
 import SerializingLink from 'apollo-link-serialize'
 
 export const API_URL = process.env.API_URL as string
-
 console.log('API_URL', API_URL)
-console.log('PAGE_URL', process.env.PAGE_URL)
-
 const httpLink = createHttpLink({
   uri: API_URL,
   credentials: 'include'
