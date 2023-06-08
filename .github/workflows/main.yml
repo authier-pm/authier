@@ -104,20 +104,20 @@ jobs:
           echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
           pnpm prodBuild
 
-      # - name: Install Playwright Browsers & Run Playwright tests with backend
-      #   if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-      #   working-directory: ./web-extension
-      #   run: |
-      #     npx playwright install --with-deps
-      #     xvfb-run --auto-servernum -- pnpm playwright:run
+      - name: Install Playwright Browsers & Run Playwright tests with backend
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+        working-directory: ./web-extension
+        run: |
+          npx playwright install --with-deps
+          xvfb-run --auto-servernum -- pnpm playwright:run
 
-      # - name: Upload test results
-      #   if: always()
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: test-results
-      #     path: web-extension/test-results
-      #     retention-days: 30
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-results
+          path: web-extension/test-results
+          retention-days: 30
 
       - name: mobile-app, check TS and run tests
         working-directory: ./mobile-app
