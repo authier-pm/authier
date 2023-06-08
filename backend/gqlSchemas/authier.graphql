@@ -414,6 +414,7 @@ type UserMutation {
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!
+  delete: UserGQL!
 }
 
 type DeviceMutation {

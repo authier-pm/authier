@@ -9,10 +9,6 @@ import browser from 'webextension-polyfill'
 import { API_URL } from './apolloClient'
 import { device } from '@src/background/ExtensionDevice'
 
-if (!API_URL) {
-  throw new Error('API_URL is not defined')
-}
-
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
