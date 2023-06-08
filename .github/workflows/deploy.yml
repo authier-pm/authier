@@ -45,3 +45,13 @@ jobs:
           pnpm gen
           pnpm migrate
           pnpm cdkDeploy
+
+      - name: Create backend Sentry release
+        if: steps.changes.outputs.backend == 'true'
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: authier-ml
+          SENTRY_PROJECT: authier-7k
+        with:
+          environment: production

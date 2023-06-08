@@ -128,13 +128,13 @@ jobs:
           pnpm tsc
           pnpm test
 
-      - name: Remove test accounts
-        working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          pnpm removeTestAccounts
+      # - name: Remove test accounts
+      #   working-directory: ./backend
+      #   if: steps.changes.outputs.backend == 'true'
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: |
+      #     pnpm removeTestAccounts
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -149,16 +149,6 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
+          #pnpm migrateDeploy
         run: |
-          pnpm migrateDeploy
           pnpm cdkDeploy
-
-      - name: Create backend Sentry release
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        uses: getsentry/action-release@v1
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: authier-ml
-          SENTRY_PROJECT: authier-7k
-        with:
-          environment: production
