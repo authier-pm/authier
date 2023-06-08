@@ -236,7 +236,7 @@ const DeleteAccountButton = () => {
 
   return (
     <>
-      <Button colorScheme={'red'} onClick={async () => {}}>
+      <Button colorScheme={'red'} onClick={async () => onOpen()}>
         <Trans>Delete your account</Trans>
       </Button>
       <AlertDialog
