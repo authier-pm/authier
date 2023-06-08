@@ -40,7 +40,7 @@ import {
 import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import admin from 'firebase-admin'
-
+import isTorExit from 'istorexit'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -237,7 +237,6 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
-    // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true
   })
@@ -248,6 +247,12 @@ export class RootResolver {
     @Ctx() ctx: IContext
   ) {
     const ipAddress = ctx.getIpAddress()
+
+    if (await isTorExit(ipAddress)) {
+      throw new GraphqlError(
+        'Tor exit nodes are prohibited from login/adding new devices.'
+      )
+    }
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
