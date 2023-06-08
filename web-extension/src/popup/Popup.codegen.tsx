@@ -4,7 +4,7 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
-  firebaseToken: Types.Scalars['String'];
+  firebaseToken: Types.Scalars['String']['input'];
 }>;
 
 

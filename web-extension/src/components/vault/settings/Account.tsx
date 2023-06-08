@@ -5,7 +5,14 @@ import {
   Button,
   Heading,
   VStack,
-  useColorModeValue
+  useColorModeValue,
+  useDisclosure,
+  AlertDialog,
+  AlertDialogBody,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay
 } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
@@ -17,7 +24,7 @@ import {
   base64ToBuffer,
   cryptoKeyToString
 } from '@src/util/generateEncryptionKey'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import {
@@ -25,7 +32,10 @@ import {
   inputEmailFieldSchema,
   inputPswFieldSchema
 } from '../../util/tsForm'
-import { useChangeMasterPasswordMutation } from './Account.codegen'
+import {
+  useChangeMasterPasswordMutation,
+  useDeleteAccountMutation
+} from './Account.codegen'
 
 const AccountFormSchema = z.object({
   email: inputEmailFieldSchema.describe('Email'),
@@ -212,10 +222,58 @@ export default function Account() {
         <Heading as="h3" size="lg" color={'red'} mb={5}>
           <Trans>Danger zone</Trans>
         </Heading>
-        <Button colorScheme={'red'}>
-          <Trans>Delete your account</Trans>
-        </Button>
+        <DeleteAccountButton />
       </Box>
     </VStack>
+  )
+}
+
+const DeleteAccountButton = () => {
+  const { isOpen, onOpen, onClose } = useDisclosure()
+  const cancelRef = useRef<any>()
+
+  const [deleteAccount] = useDeleteAccountMutation()
+
+  return (
+    <>
+      <Button colorScheme={'red'} onClick={async () => {}}>
+        <Trans>Delete your account</Trans>
+      </Button>
+      <AlertDialog
+        isOpen={isOpen}
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+      >
+        <AlertDialogOverlay>
+          <AlertDialogContent>
+            <AlertDialogHeader fontSize="lg" fontWeight="bold">
+              Delete Customer
+            </AlertDialogHeader>
+
+            <AlertDialogBody>
+              Are you sure? You cannot undo this action afterwards. Make sure to
+              backup data that you want to keep.
+            </AlertDialogBody>
+
+            <AlertDialogFooter>
+              <Button ref={cancelRef} onClick={onClose}>
+                Cancel
+              </Button>
+              <Button
+                colorScheme="red"
+                onClick={async () => {
+                  await deleteAccount()
+                  onClose()
+                  await device.clearAndReload()
+                }}
+                ml={3}
+              >
+                Delete
+              </Button>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialogOverlay>
+      </AlertDialog>
+    </>
   )
 }
