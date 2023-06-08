@@ -11,7 +11,11 @@ import 'notyf/notyf.min.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
 import { getSelectorForElement } from './DOMEventsRecorder'
-import { ILoginSecret, ITOTPSecret } from '../util/useDeviceState'
+import {
+  ILoginSecret,
+  ITOTPSecret,
+  LoginCredentialsTypeWithMeta
+} from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import { getTRPCCached } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
@@ -40,6 +44,38 @@ export const autofillEventsDispatched = new Set()
 const notyf = new Notyf({
   duration: 5000
 })
+
+/**
+ * triggered when page contains 2 or more useful inputs
+ * @param usefulInputs
+ */
+function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
+  for (let index = 0; index < usefulInputs.length - 1; index++) {
+    const input = usefulInputs[index]
+    if (
+      input.type === 'password' &&
+      usefulInputs[index + 1].type === 'password'
+    ) {
+      const newPassword = generatePasswordBasedOnUserConfig()
+      autofillValueIntoInput(usefulInputs[index], newPassword)
+      autofillValueIntoInput(usefulInputs[index + 1], newPassword)
+
+      renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
+      return true
+    } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
+      renderPasswordGenerator({ input: input })
+      const password = generate({
+        length: 10,
+        numbers: true,
+        uppercase: true,
+        symbols: true,
+        strict: true
+      })
+      autofillValueIntoInput(input, password)
+      return true
+    }
+  }
+}
 
 function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
   if (el) {
@@ -96,6 +132,24 @@ export const autofillValueIntoInput = (
   return element
 }
 
+export const fillPasswordIntoInput = (
+  inputEl: HTMLInputElement,
+  loginCredential: LoginCredentialsTypeWithMeta
+) => {
+  passwordFilledForThisPage = true
+
+  const el = autofillValueIntoInput(inputEl, loginCredential.password)
+
+  el &&
+    notyf.success(
+      `Autofilled password for ${
+        loginCredential.username
+      } into element ${generateQuerySelectorForOrphanedElement(el)}`
+    )
+
+  return el
+}
+
 const uselessInputTypes = [
   'hidden',
   'submit',
@@ -111,7 +165,9 @@ const uselessInputTypes = [
   'search',
   'time'
 ]
-
+/**
+ * @returns elements on the page which are visible and of type text, email, password, tel
+ */
 const filterUselessInputs = (documentBody: HTMLElement) => {
   const inputEls = documentBody.querySelectorAll('input')
   const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
@@ -135,31 +191,37 @@ export const getElementCoordinates = (el: HTMLElement) => {
   }
 }
 
-export let ranForThisPage = false
+export let passwordFilledForThisPage = false
 let onInputAddedHandler = (inputEl: any) => {}
 
 const filledElements: Array<HTMLInputElement | null> = []
+
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const autofill = (initState: IInitStateRes) => {
   const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
-  if (ranForThisPage === true) {
+  if (passwordFilledForThisPage === true) {
     log('autofill already ran, returning')
     return () => {}
   }
   log('init autofill', initState)
 
-  ranForThisPage = true
   const firstLoginCred = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
 
   //NOTE: scan all inputs
-  const scanKnownWebInputsAndFillWhenFound = async (body: HTMLBodyElement) => {
+  /**
+   *
+   * @returns array of all useful inputs on the page
+   */
+  const scanKnownWebInputsAndFillWhenFound = async () => {
+    const { body } = document
     /**
      * filter text, email, password, tel
      */
-    const usefulInputs = filterUselessInputs(document.body)
+    let usefulInputs = filterUselessInputs(body)
 
     //Distinguish between register and login from by the number of inputs
     //Then Distinguish between phased and not phased
@@ -168,33 +230,16 @@ export const autofill = (initState: IInitStateRes) => {
     //After certain condition is met, we can assume this is register page
     log('usefulInputs', usefulInputs)
 
-    if (usefulInputs.length >= 2) {
-      for (let index = 0; index < usefulInputs.length - 1; index++) {
-        const input = usefulInputs[index]
-        if (
-          input.type === 'password' &&
-          usefulInputs[index + 1].type === 'password'
-        ) {
-          const newPassword = generatePasswordBasedOnUserConfig()
-          autofillValueIntoInput(usefulInputs[index], newPassword)
-          autofillValueIntoInput(usefulInputs[index + 1], newPassword)
+    if (usefulInputs.length === 0) {
+      await wait(400)
 
-          renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
-          break
-        } else if (
-          input.getAttribute('autocomplete')?.includes('new-password')
-        ) {
-          renderPasswordGenerator({ input: input })
-          const password = generate({
-            length: 10,
-            numbers: true,
-            uppercase: true,
-            symbols: true,
-            strict: true
-          })
-          autofillValueIntoInput(input, password)
-          break
-        }
+      usefulInputs = filterUselessInputs(body)
+    }
+
+    if (usefulInputs.length >= 2) {
+      const isNewPassword = handleNewPasswordCase(usefulInputs)
+      if (isNewPassword) {
+        return
       }
     }
     let matchingWebInputs = webInputs.filter(({ url }) => {
@@ -206,27 +251,25 @@ export const autofill = (initState: IInitStateRes) => {
       matchingWebInputs = webInputs
     }
     //Fill known inputs
+    let foundInputsCount = 0
     for (const webInputGql of matchingWebInputs) {
-      const inputEl = document.body.querySelector(
+      const inputEl = body.querySelector(
         webInputGql.domPath
       ) as HTMLInputElement | null
 
       // log('inputEl', inputEl)
       //NOTE: We found element by DOM path
       if (inputEl) {
+        foundInputsCount++
         log(`autofilled by domPath ${webInputGql.domPath}`)
         if (
           webInputGql.kind === WebInputType.PASSWORD &&
           firstLoginCred &&
           inputEl.type === 'password' // we don't want to autofill password to any other type of input
         ) {
-          const el = autofillValueIntoInput(
+          const el = fillPasswordIntoInput(
             inputEl,
-            firstLoginCred.loginCredentials.password
-          )
-
-          notyf.success(
-            `Autofilled password for ${firstLoginCred.loginCredentials.username} into element ${webInputGql.domPath}`
+            firstLoginCred.loginCredentials
           )
 
           filledElements.push(el)
@@ -256,16 +299,18 @@ export const autofill = (initState: IInitStateRes) => {
           break
         }
         //NOTE: We did not find element by DOM path
+      } else {
+        // TODO we must let API know the element was not found. API will increase notFoundCount for this element and if it reaches a certain threshold, we should delete the element from the DB
       }
     }
 
     //NOTE: Guess web inputs, if we have credentials without DOM PATHS
     if (
-      webInputs.length === 0 &&
+      foundInputsCount === 0 &&
       secretsForHost.loginCredentials.length > 0
       // filledElements.length === 0
     ) {
-      const autofillResult = await searchInputsAndAutofill(document.body)
+      const autofillResult = await searchInputsAndAutofill(body)
       if (autofillResult) {
         await trpc.saveCapturedInputEvents.mutate({
           inputEvents: domRecorder.toJSON(),
@@ -291,19 +336,7 @@ export const autofill = (initState: IInitStateRes) => {
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
-            const autofillReturn = autofillValueIntoInput(
-              inputEl,
-              firstLoginCred.loginCredentials.username
-            )
-            if (autofillReturn) {
-              notyf.success(
-                `Autofilled password for ${
-                  firstLoginCred.loginCredentials.username
-                } into element ${generateQuerySelectorForOrphanedElement(
-                  inputEl
-                )}`
-              )
-            }
+            fillPasswordIntoInput(inputEl, firstLoginCred.loginCredentials)
           } else {
             // todo show prompt to user to select which credential to use
           }
@@ -418,19 +451,10 @@ export const autofill = (initState: IInitStateRes) => {
           }
 
           if (matchingLogin) {
-            const autofilledElPassword = autofillValueIntoInput(
+            const autofilledElPassword = fillPasswordIntoInput(
               inputElsArray[0],
-              matchingLogin.loginCredentials.password
+              matchingLogin.loginCredentials
             )
-
-            autofilledElPassword &&
-              notyf.success(
-                `Autofilled password for ${
-                  matchingLogin.loginCredentials.username
-                } into element ${generateQuerySelectorForOrphanedElement(
-                  autofilledElPassword
-                )}`
-              )
 
             // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
             return autofilledElPassword
@@ -568,7 +592,7 @@ export const autofill = (initState: IInitStateRes) => {
   }
 
   const initAutofill = () => {
-    scanKnownWebInputsAndFillWhenFound(document.body as HTMLBodyElement)
+    scanKnownWebInputsAndFillWhenFound()
 
     //If input shows on loaded page
 
@@ -579,7 +603,7 @@ export const autofill = (initState: IInitStateRes) => {
   return () => {
     bodyInputChangeEmitter.off('inputAdded', initAutofill)
     clearTimeout(initTimeout)
-    ranForThisPage = false
+    passwordFilledForThisPage = false
   }
 }
 
