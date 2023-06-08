@@ -128,13 +128,13 @@ jobs:
           pnpm tsc
           pnpm test
 
-      - name: Remove test accounts
-        working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          pnpm removeTestAccounts
+      # - name: Remove test accounts
+      #   working-directory: ./backend
+      #   if: steps.changes.outputs.backend == 'true'
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: |
+      #     pnpm removeTestAccounts
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
