@@ -91,3 +91,12 @@ jobs:
           track: internal
           status: completed
           inAppUpdatePriority: 2
+
+      - name: Create mobile Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: authier-ml
+          SENTRY_PROJECT: mobile-app
+        with:
+          environment: production

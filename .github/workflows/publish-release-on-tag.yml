@@ -76,3 +76,12 @@ jobs:
           workflow: publish-on-edge-add-ons
           token: ${{ secrets.WORKFLOWS_TOKEN }}
           wait-for-completion: false
+
+      - name: Create Web extension Sentry release
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: authier-ml
+          SENTRY_PROJECT: web-extension
+        with:
+          environment: production
