@@ -16,14 +16,33 @@ import { autofill } from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
-  log('GOT in option prompt', { webInputs, loginCredentials })
   if (webInputs.length === 0) {
     log('No web inputs in PromptPasswordOption')
     return null
   }
 
-  const el = document.querySelector(webInputs[0].domPath)
-  const [pos, setPos] = useState(el?.getBoundingClientRect())
+  let inputEl: HTMLInputElement | null = null
+
+  for (const webInput of webInputs) {
+    inputEl = document.querySelector(webInput.domPath)
+    if (inputEl) {
+      const bounds = inputEl.getBoundingClientRect()
+      if (bounds.width > 0 && bounds.height > 0) {
+        break // found a visible input element
+      }
+    }
+  }
+
+  if (!inputEl) {
+    log('No el in PromptPasswordOption')
+    return null
+  }
+  const [pos, setPos] = useState(inputEl.getBoundingClientRect())
+  log('GOT in option prompt', {
+    inputEl,
+    loginCredentials,
+    pos: JSON.stringify(pos)
+  })
 
   let resizeTimer: string | number | NodeJS.Timeout | undefined
   window.onresize = function () {
@@ -31,8 +50,10 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       promptOption.remove()
       clearTimeout(resizeTimer)
       resizeTimer = setTimeout(function () {
-        setPos(el?.getBoundingClientRect())
-        document.body.appendChild(promptOption!)
+        if (promptOption && inputEl) {
+          setPos(inputEl.getBoundingClientRect())
+          document.body.appendChild(promptOption)
+        }
       }, 100)
     }
   }
@@ -50,8 +71,8 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         alignItems: 'baseline',
         fontFamily: 'sans-serif !important',
         position: 'fixed',
-        top: (pos.top as number) + 'px',
-        left: pos.left + pos.width + 35 + 'px', // 35 because 25 is width of icon and 10 is extra padding
+        top: pos.top + (pos.height / 2 - 12.5) + 'px',
+        left: pos.left + pos.width + 2 + 'px', // 2px is extra padding
         right: pos.right + 'px',
         bottom: pos.bottom + 'px'
       }}
