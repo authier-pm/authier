@@ -31,6 +31,8 @@ jobs:
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
       ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
       REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
       COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
@@ -126,13 +128,13 @@ jobs:
           pnpm tsc
           pnpm test
 
-      - name: Remove test accounts
-        working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-        run: |
-          pnpm removeTestAccounts
+      # - name: Remove test accounts
+      #   working-directory: ./backend
+      #   if: steps.changes.outputs.backend == 'true'
+      #   env:
+      #     DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      #   run: |
+      #     pnpm removeTestAccounts
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
@@ -147,6 +149,6 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
+          #pnpm migrateDeploy
         run: |
-          pnpm migrateDeploy
           pnpm cdkDeploy

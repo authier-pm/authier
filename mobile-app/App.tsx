@@ -19,8 +19,8 @@ import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
 import { useDeviceStore } from './src/utils/deviceStore'
-import { API_URL } from '@env'
 import './src/sentryInit'
+import { API_URL } from '@env'
 
 let CodePushOptions = {
   checkFrequency: __DEV__
