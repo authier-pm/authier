@@ -20,6 +20,7 @@ import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
 import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
+import { API_URL } from '@env'
 
 let CodePushOptions = {
   checkFrequency: __DEV__
@@ -49,6 +50,7 @@ const RnApp = () => {
   useEffect(() => {
     requestUserPermission()
     device.initialize()
+    console.log('API_URL', API_URL)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
