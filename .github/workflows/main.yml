@@ -149,8 +149,8 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
+          #pnpm migrateDeploy
         run: |
-          pnpm migrateDeploy
           pnpm cdkDeploy
 
       - name: Create backend Sentry release
