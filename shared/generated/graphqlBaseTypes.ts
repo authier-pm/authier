@@ -1,246 +1,260 @@
-export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
-export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
+export type Maybe<T> = T | null
+export type InputMaybe<T> = Maybe<T>
+export type Exact<T extends { [key: string]: unknown }> = {
+  [K in keyof T]: T[K]
+}
+export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]?: Maybe<T[SubKey]>
+}
+export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
+  [SubKey in K]: Maybe<T[SubKey]>
+}
+export type MakeEmpty<
+  T extends { [key: string]: unknown },
+  K extends keyof T
+> = { [_ in K]?: never }
+export type Incremental<T> =
+  | T
+  | {
+      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never
+    }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: string;
-  String: string;
-  Boolean: boolean;
-  Int: number;
-  Float: number;
+  ID: { input: string | number; output: string }
+  String: { input: string; output: string }
+  Boolean: { input: boolean; output: boolean }
+  Int: { input: number; output: number }
+  Float: { input: number; output: number }
   /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
-  BigInt: any;
+  BigInt: { input: any; output: any }
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
-  DateTime: string;
+  DateTime: { input: string; output: string }
   /** A field whose value conforms to the standard internet email address format as specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address. */
-  EmailAddress: any;
+  EmailAddress: { input: any; output: any }
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSON: any;
+  JSON: { input: any; output: any }
   /** A string that cannot be passed as an empty value */
-  NonEmptyString: any;
+  NonEmptyString: { input: any; output: any }
   /** Integers that will have a value of 0 or more. */
-  NonNegativeInt: number;
+  NonNegativeInt: { input: number; output: number }
   /** Integers that will have a value greater than 0. */
-  PositiveInt: number;
+  PositiveInt: { input: number; output: number }
   /** A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier. */
-  UUID: any;
-};
+  UUID: { input: any; output: any }
+}
 
 export type AddNewDeviceInput = {
-  addDeviceSecret: Scalars['NonEmptyString'];
-  addDeviceSecretEncrypted: Scalars['NonEmptyString'];
-  devicePlatform: Scalars['String'];
-  encryptionSalt: Scalars['NonEmptyString'];
-  firebaseToken: Scalars['String'];
-};
+  addDeviceSecret: Scalars['NonEmptyString']['input']
+  addDeviceSecretEncrypted: Scalars['NonEmptyString']['input']
+  devicePlatform: Scalars['String']['input']
+  encryptionSalt: Scalars['NonEmptyString']['input']
+  firebaseToken: Scalars['String']['input']
+}
 
 export type ChangeMasterPasswordInput = {
-  addDeviceSecret: Scalars['NonEmptyString'];
-  addDeviceSecretEncrypted: Scalars['NonEmptyString'];
-  decryptionChallengeId: Scalars['PositiveInt'];
-  secrets: Array<EncryptedSecretPatchInput>;
-};
+  addDeviceSecret: Scalars['NonEmptyString']['input']
+  addDeviceSecretEncrypted: Scalars['NonEmptyString']['input']
+  decryptionChallengeId: Scalars['PositiveInt']['input']
+  secrets: Array<EncryptedSecretPatchInput>
+}
 
-export type DecryptionChallenge = DecryptionChallengeApproved | DecryptionChallengeForApproval;
+export type DecryptionChallenge =
+  | DecryptionChallengeApproved
+  | DecryptionChallengeForApproval
 
 export type DecryptionChallengeApproved = {
-  __typename?: 'DecryptionChallengeApproved';
-  User: Array<UserGql>;
-  addDeviceSecretEncrypted: Scalars['String'];
-  addNewDeviceForUser: LoginResponse;
-  approvedAt?: Maybe<Scalars['DateTime']>;
-  approvedByRecovery: Scalars['Boolean'];
-  approvedFromDevice?: Maybe<DeviceGql>;
-  approvedFromDeviceId?: Maybe<Scalars['String']>;
-  blockIp?: Maybe<Scalars['Boolean']>;
-  createdAt: Scalars['DateTime'];
-  deviceId: Scalars['String'];
-  deviceName: Scalars['String'];
-  encryptionSalt: Scalars['String'];
-  id: Scalars['Int'];
-  ipAddress: Scalars['String'];
-  rejectedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-};
-
+  __typename?: 'DecryptionChallengeApproved'
+  User: Array<UserGql>
+  addDeviceSecretEncrypted: Scalars['String']['output']
+  addNewDeviceForUser: LoginResponse
+  approvedAt?: Maybe<Scalars['DateTime']['output']>
+  approvedByRecovery: Scalars['Boolean']['output']
+  approvedFromDevice?: Maybe<DeviceGql>
+  approvedFromDeviceId?: Maybe<Scalars['String']['output']>
+  blockIp?: Maybe<Scalars['Boolean']['output']>
+  createdAt: Scalars['DateTime']['output']
+  deviceId: Scalars['String']['output']
+  deviceName: Scalars['String']['output']
+  encryptionSalt: Scalars['String']['output']
+  id: Scalars['Int']['output']
+  ipAddress: Scalars['String']['output']
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
-  currentAddDeviceSecret: Scalars['NonEmptyString'];
-  input: AddNewDeviceInput;
-};
+  currentAddDeviceSecret: Scalars['NonEmptyString']['input']
+  input: AddNewDeviceInput
+}
 
 export type DecryptionChallengeForApproval = {
-  __typename?: 'DecryptionChallengeForApproval';
-  createdAt: Scalars['DateTime'];
-  deviceId: Scalars['ID'];
-  deviceLocationFromIp?: Maybe<DeviceLocation>;
-  deviceName: Scalars['String'];
-  id: Scalars['Int'];
-  ipAddress: Scalars['String'];
-  ipGeoLocation?: Maybe<Scalars['JSON']>;
-  rejectedAt?: Maybe<Scalars['DateTime']>;
-};
+  __typename?: 'DecryptionChallengeForApproval'
+  createdAt: Scalars['DateTime']['output']
+  deviceId: Scalars['ID']['output']
+  deviceLocationFromIp?: Maybe<DeviceLocation>
+  deviceName: Scalars['String']['output']
+  id: Scalars['Int']['output']
+  ipAddress: Scalars['String']['output']
+  ipGeoLocation?: Maybe<Scalars['JSON']['output']>
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>
+}
 
 export type DecryptionChallengeGql = {
-  __typename?: 'DecryptionChallengeGQL';
-  User: Array<UserGql>;
-  approvedAt?: Maybe<Scalars['DateTime']>;
-  approvedByRecovery: Scalars['Boolean'];
-  approvedFromDevice?: Maybe<DeviceGql>;
-  approvedFromDeviceId?: Maybe<Scalars['String']>;
-  blockIp?: Maybe<Scalars['Boolean']>;
-  createdAt: Scalars['DateTime'];
-  deviceId: Scalars['String'];
-  deviceName: Scalars['String'];
-  id: Scalars['Int'];
-  ipAddress: Scalars['String'];
-  rejectedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-};
+  __typename?: 'DecryptionChallengeGQL'
+  User: Array<UserGql>
+  approvedAt?: Maybe<Scalars['DateTime']['output']>
+  approvedByRecovery: Scalars['Boolean']['output']
+  approvedFromDevice?: Maybe<DeviceGql>
+  approvedFromDeviceId?: Maybe<Scalars['String']['output']>
+  blockIp?: Maybe<Scalars['Boolean']['output']>
+  createdAt: Scalars['DateTime']['output']
+  deviceId: Scalars['String']['output']
+  deviceName: Scalars['String']['output']
+  id: Scalars['Int']['output']
+  ipAddress: Scalars['String']['output']
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type DecryptionChallengeMutation = {
-  __typename?: 'DecryptionChallengeMutation';
-  User: Array<UserGql>;
-  approve: DecryptionChallengeGql;
-  approvedAt?: Maybe<Scalars['DateTime']>;
-  approvedByRecovery: Scalars['Boolean'];
-  approvedFromDevice?: Maybe<DeviceGql>;
-  approvedFromDeviceId?: Maybe<Scalars['String']>;
-  blockIp?: Maybe<Scalars['Boolean']>;
-  createdAt: Scalars['DateTime'];
-  deviceId: Scalars['String'];
-  deviceName: Scalars['String'];
-  id: Scalars['Int'];
-  ipAddress: Scalars['String'];
-  recoverAccount: DecryptionChallengeGql;
-  reject: DecryptionChallengeGql;
-  rejectedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-};
+  __typename?: 'DecryptionChallengeMutation'
+  User: Array<UserGql>
+  approve: DecryptionChallengeGql
+  approvedAt?: Maybe<Scalars['DateTime']['output']>
+  approvedByRecovery: Scalars['Boolean']['output']
+  approvedFromDevice?: Maybe<DeviceGql>
+  approvedFromDeviceId?: Maybe<Scalars['String']['output']>
+  blockIp?: Maybe<Scalars['Boolean']['output']>
+  createdAt: Scalars['DateTime']['output']
+  deviceId: Scalars['String']['output']
+  deviceName: Scalars['String']['output']
+  id: Scalars['Int']['output']
+  ipAddress: Scalars['String']['output']
+  recoverAccount: DecryptionChallengeGql
+  reject: DecryptionChallengeGql
+  rejectedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type DeviceGql = {
-  __typename?: 'DeviceGQL';
-  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>;
-  SecretUsageEvents: Array<SecretUsageEventGql>;
-  User: UserGql;
-  UserMaster?: Maybe<UserGql>;
-  createdAt: Scalars['DateTime'];
-  deletedAt?: Maybe<Scalars['DateTime']>;
-  firebaseToken: Scalars['String'];
-  firstIpAddress: Scalars['String'];
-  id: Scalars['ID'];
-  ipAddressLock: Scalars['Boolean'];
-  lastIpAddress: Scalars['String'];
-  lastLockAt?: Maybe<Scalars['DateTime']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']>;
-  logoutAt?: Maybe<Scalars['DateTime']>;
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>;
-  name: Scalars['String'];
-  platform: Scalars['String'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
-  syncTOTP: Scalars['Boolean'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  userId: Scalars['String'];
-  vaultLockTimeoutSeconds: Scalars['Int'];
-};
+  __typename?: 'DeviceGQL'
+  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
+  SecretUsageEvents: Array<SecretUsageEventGql>
+  User: UserGql
+  UserMaster?: Maybe<UserGql>
+  createdAt: Scalars['DateTime']['output']
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
+  firebaseToken: Scalars['String']['output']
+  firstIpAddress: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  ipAddressLock: Scalars['Boolean']['output']
+  lastIpAddress: Scalars['String']['output']
+  lastLockAt?: Maybe<Scalars['DateTime']['output']>
+  lastSyncAt?: Maybe<Scalars['DateTime']['output']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>
+  logoutAt?: Maybe<Scalars['DateTime']['output']>
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
+  name: Scalars['String']['output']
+  platform: Scalars['String']['output']
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
+  syncTOTP: Scalars['Boolean']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  userId: Scalars['String']['output']
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
+}
 
 export type DeviceInput = {
-  id: Scalars['String'];
-  name: Scalars['String'];
-  platform: Scalars['String'];
-};
+  id: Scalars['String']['input']
+  name: Scalars['String']['input']
+  platform: Scalars['String']['input']
+}
 
 export type DeviceLocation = {
-  __typename?: 'DeviceLocation';
-  city: Scalars['String'];
-  countryName: Scalars['String'];
-};
+  __typename?: 'DeviceLocation'
+  city: Scalars['String']['output']
+  countryName: Scalars['String']['output']
+}
 
 export type DeviceMutation = {
-  __typename?: 'DeviceMutation';
-  createdAt: Scalars['DateTime'];
-  deletedAt?: Maybe<Scalars['DateTime']>;
-  firebaseToken: Scalars['String'];
-  firstIpAddress: Scalars['String'];
-  id: Scalars['ID'];
-  ipAddressLock: Scalars['Boolean'];
-  lastIpAddress: Scalars['String'];
-  lastLockAt?: Maybe<Scalars['DateTime']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']>;
-  logout: DeviceGql;
-  logoutAt?: Maybe<Scalars['DateTime']>;
-  markAsSynced: Scalars['DateTime'];
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>;
-  name: Scalars['String'];
-  platform: Scalars['String'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
+  __typename?: 'DeviceMutation'
+  createdAt: Scalars['DateTime']['output']
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
+  firebaseToken: Scalars['String']['output']
+  firstIpAddress: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  ipAddressLock: Scalars['Boolean']['output']
+  lastIpAddress: Scalars['String']['output']
+  lastLockAt?: Maybe<Scalars['DateTime']['output']>
+  lastSyncAt?: Maybe<Scalars['DateTime']['output']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>
+  logout: DeviceGql
+  logoutAt?: Maybe<Scalars['DateTime']['output']>
+  markAsSynced: Scalars['DateTime']['output']
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
+  name: Scalars['String']['output']
+  platform: Scalars['String']['output']
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
   /** user has to approve it when they log in again on that device */
-  removeDevice: Scalars['Boolean'];
-  rename: DeviceGql;
-  reportSecretUsageEvent: SecretUsageEventGqlScalars;
-  syncTOTP: Scalars['Boolean'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  userId: Scalars['String'];
-  vaultLockTimeoutSeconds: Scalars['Int'];
-};
-
+  removeDevice: Scalars['Boolean']['output']
+  rename: DeviceGql
+  reportSecretUsageEvent: SecretUsageEventGqlScalars
+  syncTOTP: Scalars['Boolean']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  userId: Scalars['String']['output']
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
+}
 
 export type DeviceMutationRenameArgs = {
-  name: Scalars['String'];
-};
-
+  name: Scalars['String']['input']
+}
 
 export type DeviceMutationReportSecretUsageEventArgs = {
-  kind: Scalars['String'];
-  secretId: Scalars['UUID'];
-  webInputId: Scalars['PositiveInt'];
-};
+  kind: Scalars['String']['input']
+  secretId: Scalars['UUID']['input']
+  webInputId: Scalars['PositiveInt']['input']
+}
 
 export type DeviceQuery = {
-  __typename?: 'DeviceQuery';
-  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>;
-  SecretUsageEvents: Array<SecretUsageEventGql>;
-  User: UserGql;
-  UserMaster?: Maybe<UserGql>;
-  createdAt: Scalars['DateTime'];
-  deletedAt?: Maybe<Scalars['DateTime']>;
+  __typename?: 'DeviceQuery'
+  DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>
+  SecretUsageEvents: Array<SecretUsageEventGql>
+  User: UserGql
+  UserMaster?: Maybe<UserGql>
+  createdAt: Scalars['DateTime']['output']
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
   /** Get all secrets that were change since last device sync */
-  encryptedSecretsToSync: Array<EncryptedSecretQuery>;
-  firebaseToken: Scalars['String'];
-  firstIpAddress: Scalars['String'];
-  id: Scalars['ID'];
-  ipAddressLock: Scalars['Boolean'];
-  lastGeoLocation: Scalars['String'];
-  lastIpAddress: Scalars['String'];
-  lastLockAt?: Maybe<Scalars['DateTime']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']>;
-  logoutAt?: Maybe<Scalars['DateTime']>;
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']>;
-  name: Scalars['String'];
-  platform: Scalars['String'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']>;
-  syncTOTP: Scalars['Boolean'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  userId: Scalars['String'];
-  vaultLockTimeoutSeconds: Scalars['Int'];
-};
+  encryptedSecretsToSync: Array<EncryptedSecretQuery>
+  firebaseToken: Scalars['String']['output']
+  firstIpAddress: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  ipAddressLock: Scalars['Boolean']['output']
+  lastGeoLocation: Scalars['String']['output']
+  lastIpAddress: Scalars['String']['output']
+  lastLockAt?: Maybe<Scalars['DateTime']['output']>
+  lastSyncAt?: Maybe<Scalars['DateTime']['output']>
+  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>
+  logoutAt?: Maybe<Scalars['DateTime']['output']>
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>
+  name: Scalars['String']['output']
+  platform: Scalars['String']['output']
+  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
+  syncTOTP: Scalars['Boolean']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  userId: Scalars['String']['output']
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
+}
 
 export type EmailVerificationGqlScalars = {
-  __typename?: 'EmailVerificationGQLScalars';
-  address: Scalars['ID'];
-  createdAt: Scalars['DateTime'];
-  kind: EmailVerificationType;
-  userId: Scalars['String'];
-  verifiedAt?: Maybe<Scalars['DateTime']>;
-};
+  __typename?: 'EmailVerificationGQLScalars'
+  address: Scalars['ID']['output']
+  createdAt: Scalars['DateTime']['output']
+  kind: EmailVerificationType
+  userId: Scalars['String']['output']
+  verifiedAt?: Maybe<Scalars['DateTime']['output']>
+}
 
 export enum EmailVerificationType {
   CONTACT = 'CONTACT',
@@ -248,66 +262,65 @@ export enum EmailVerificationType {
 }
 
 export type EncryptedSecretGql = {
-  __typename?: 'EncryptedSecretGQL';
-  SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime'];
-  deletedAt?: Maybe<Scalars['DateTime']>;
-  encrypted: Scalars['String'];
-  id: Scalars['ID'];
-  kind: EncryptedSecretType;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-  version: Scalars['Int'];
-};
+  __typename?: 'EncryptedSecretGQL'
+  SecretUsageEvent: Array<SecretUsageEventGql>
+  createdAt: Scalars['DateTime']['output']
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
+  encrypted: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  kind: EncryptedSecretType
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+  version: Scalars['Int']['output']
+}
 
 export type EncryptedSecretInput = {
-  encrypted: Scalars['String'];
-  kind: EncryptedSecretType;
-};
+  encrypted: Scalars['String']['input']
+  kind: EncryptedSecretType
+}
 
 export type EncryptedSecretMutation = {
-  __typename?: 'EncryptedSecretMutation';
-  SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime'];
-  delete: EncryptedSecretGql;
-  deletedAt?: Maybe<Scalars['DateTime']>;
-  encrypted: Scalars['String'];
-  id: Scalars['ID'];
-  kind: EncryptedSecretType;
-  lastUsedAt?: Maybe<Scalars['DateTime']>;
-  update: EncryptedSecretGql;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-  version: Scalars['Int'];
-};
-
+  __typename?: 'EncryptedSecretMutation'
+  SecretUsageEvent: Array<SecretUsageEventGql>
+  createdAt: Scalars['DateTime']['output']
+  delete: EncryptedSecretGql
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
+  encrypted: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  kind: EncryptedSecretType
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>
+  update: EncryptedSecretGql
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+  version: Scalars['Int']['output']
+}
 
 export type EncryptedSecretMutationUpdateArgs = {
-  patch: EncryptedSecretInput;
-};
+  patch: EncryptedSecretInput
+}
 
 export type EncryptedSecretPatchInput = {
-  encrypted: Scalars['String'];
-  id: Scalars['UUID'];
-  kind: EncryptedSecretType;
-};
+  encrypted: Scalars['String']['input']
+  id: Scalars['UUID']['input']
+  kind: EncryptedSecretType
+}
 
 export type EncryptedSecretQuery = {
-  __typename?: 'EncryptedSecretQuery';
-  SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime'];
-  deletedAt?: Maybe<Scalars['DateTime']>;
-  encrypted: Scalars['String'];
-  id: Scalars['ID'];
-  kind: EncryptedSecretType;
-  lastUsedAt?: Maybe<Scalars['DateTime']>;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-  version: Scalars['Int'];
-};
+  __typename?: 'EncryptedSecretQuery'
+  SecretUsageEvent: Array<SecretUsageEventGql>
+  createdAt: Scalars['DateTime']['output']
+  deletedAt?: Maybe<Scalars['DateTime']['output']>
+  encrypted: Scalars['String']['output']
+  id: Scalars['ID']['output']
+  kind: EncryptedSecretType
+  lastUsedAt?: Maybe<Scalars['DateTime']['output']>
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+  version: Scalars['Int']['output']
+}
 
 export enum EncryptedSecretType {
   LOGIN_CREDENTIALS = 'LOGIN_CREDENTIALS',
@@ -315,150 +328,145 @@ export enum EncryptedSecretType {
 }
 
 export type LoginResponse = {
-  __typename?: 'LoginResponse';
-  accessToken: Scalars['String'];
-  encryptionSalt: Scalars['String'];
-  user: UserMutation;
-};
+  __typename?: 'LoginResponse'
+  accessToken: Scalars['String']['output']
+  encryptionSalt: Scalars['String']['output']
+  user: UserMutation
+}
 
 export type MasterDeviceChangeGql = {
-  __typename?: 'MasterDeviceChangeGQL';
-  createdAt: Scalars['DateTime'];
-  id: Scalars['ID'];
-  newDeviceId: Scalars['String'];
-  oldDeviceId: Scalars['String'];
-  processAt: Scalars['DateTime'];
-  user: UserGql;
-  userId: Scalars['String'];
-};
+  __typename?: 'MasterDeviceChangeGQL'
+  createdAt: Scalars['DateTime']['output']
+  id: Scalars['ID']['output']
+  newDeviceId: Scalars['String']['output']
+  oldDeviceId: Scalars['String']['output']
+  processAt: Scalars['DateTime']['output']
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type Mutation = {
-  __typename?: 'Mutation';
-  addWebInputs: Array<WebInputGql>;
-  currentDevice: DeviceMutation;
+  __typename?: 'Mutation'
+  addWebInputs: Array<WebInputGql>
+  currentDevice: DeviceMutation
   /** returns a decryption challenge */
-  deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
+  deviceDecryptionChallenge?: Maybe<DecryptionChallenge>
   /**
    * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
    * @deprecated prefer device methods
    */
-  logout?: Maybe<Scalars['Int']>;
+  logout?: Maybe<Scalars['Int']['output']>
   /** you need to be authenticated to call this resolver */
-  me: UserMutation;
-  registerNewUser: LoginResponse;
-};
-
+  me: UserMutation
+  registerNewUser: LoginResponse
+}
 
 export type MutationAddWebInputsArgs = {
-  webInputs: Array<WebInputElement>;
-};
-
+  webInputs: Array<WebInputElement>
+}
 
 export type MutationDeviceDecryptionChallengeArgs = {
-  deviceInput: DeviceInput;
-  email: Scalars['EmailAddress'];
-};
-
+  deviceInput: DeviceInput
+  email: Scalars['EmailAddress']['input']
+}
 
 export type MutationLogoutArgs = {
-  removeDevice?: InputMaybe<Scalars['Boolean']>;
-};
-
+  removeDevice?: InputMaybe<Scalars['Boolean']['input']>
+}
 
 export type MutationRegisterNewUserArgs = {
-  input: RegisterNewAccountInput;
-  userId: Scalars['UUID'];
-};
+  input: RegisterNewAccountInput
+  userId: Scalars['UUID']['input']
+}
 
 export type Query = {
-  __typename?: 'Query';
+  __typename?: 'Query'
   /** you need to be authenticated to call this resolver */
-  authenticated: Scalars['Boolean'];
-  currentDevice: DeviceQuery;
-  me: UserQuery;
-  osTime: Scalars['String'];
-  webInputs: Array<WebInputGql>;
-};
-
+  authenticated: Scalars['Boolean']['output']
+  currentDevice: DeviceQuery
+  me: UserQuery
+  osTime: Scalars['String']['output']
+  webInputs: Array<WebInputGql>
+}
 
 export type QueryWebInputsArgs = {
-  host: Scalars['String'];
-};
+  host: Scalars['String']['input']
+}
 
 export type RegisterNewAccountInput = {
-  addDeviceSecret: Scalars['NonEmptyString'];
-  addDeviceSecretEncrypted: Scalars['NonEmptyString'];
-  deviceId: Scalars['ID'];
-  deviceName: Scalars['String'];
-  devicePlatform: Scalars['String'];
-  email: Scalars['EmailAddress'];
-  encryptionSalt: Scalars['NonEmptyString'];
-  firebaseToken: Scalars['String'];
-};
+  addDeviceSecret: Scalars['NonEmptyString']['input']
+  addDeviceSecretEncrypted: Scalars['NonEmptyString']['input']
+  deviceId: Scalars['ID']['input']
+  deviceName: Scalars['String']['input']
+  devicePlatform: Scalars['String']['input']
+  email: Scalars['EmailAddress']['input']
+  encryptionSalt: Scalars['NonEmptyString']['input']
+  firebaseToken: Scalars['String']['input']
+}
 
 export type SecretUsageEventGql = {
-  __typename?: 'SecretUsageEventGQL';
-  Device: DeviceGql;
-  Secret: EncryptedSecretGql;
-  User: UserGql;
-  WebOTPInput?: Maybe<WebInputGql>;
-  deviceId: Scalars['String'];
-  id: Scalars['BigInt'];
-  kind: Scalars['String'];
-  secretId: Scalars['String'];
-  timestamp: Scalars['DateTime'];
-  url?: Maybe<Scalars['String']>;
-  userId: Scalars['String'];
-  webInputId?: Maybe<Scalars['Int']>;
-};
+  __typename?: 'SecretUsageEventGQL'
+  Device: DeviceGql
+  Secret: EncryptedSecretGql
+  User: UserGql
+  WebOTPInput?: Maybe<WebInputGql>
+  deviceId: Scalars['String']['output']
+  id: Scalars['BigInt']['output']
+  kind: Scalars['String']['output']
+  secretId: Scalars['String']['output']
+  timestamp: Scalars['DateTime']['output']
+  url?: Maybe<Scalars['String']['output']>
+  userId: Scalars['String']['output']
+  webInputId?: Maybe<Scalars['Int']['output']>
+}
 
 export type SecretUsageEventGqlScalars = {
-  __typename?: 'SecretUsageEventGQLScalars';
-  deviceId: Scalars['String'];
-  id: Scalars['BigInt'];
-  kind: Scalars['String'];
-  secretId: Scalars['String'];
-  timestamp: Scalars['DateTime'];
-  url?: Maybe<Scalars['String']>;
-  userId: Scalars['String'];
-  webInputId?: Maybe<Scalars['Int']>;
-};
+  __typename?: 'SecretUsageEventGQLScalars'
+  deviceId: Scalars['String']['output']
+  id: Scalars['BigInt']['output']
+  kind: Scalars['String']['output']
+  secretId: Scalars['String']['output']
+  timestamp: Scalars['DateTime']['output']
+  url?: Maybe<Scalars['String']['output']>
+  userId: Scalars['String']['output']
+  webInputId?: Maybe<Scalars['Int']['output']>
+}
 
 export type SecretUsageEventInput = {
-  kind: Scalars['String'];
-  secretId: Scalars['String'];
-  url?: InputMaybe<Scalars['String']>;
-};
+  kind: Scalars['String']['input']
+  secretId: Scalars['String']['input']
+  url?: InputMaybe<Scalars['String']['input']>
+}
 
 export type SettingsInput = {
-  autofillCredentialsEnabled: Scalars['Boolean'];
-  autofillTOTPEnabled: Scalars['Boolean'];
-  syncTOTP: Scalars['Boolean'];
-  uiLanguage: Scalars['String'];
-  vaultLockTimeoutSeconds: Scalars['Int'];
-};
+  autofillCredentialsEnabled: Scalars['Boolean']['input']
+  autofillTOTPEnabled: Scalars['Boolean']['input']
+  syncTOTP: Scalars['Boolean']['input']
+  uiLanguage: Scalars['String']['input']
+  vaultLockTimeoutSeconds: Scalars['Int']['input']
+}
 
 export type TagGql = {
-  __typename?: 'TagGQL';
-  createdAt: Scalars['DateTime'];
-  id: Scalars['Int'];
-  name: Scalars['String'];
-  user: UserGql;
-  userId: Scalars['String'];
-};
+  __typename?: 'TagGQL'
+  createdAt: Scalars['DateTime']['output']
+  id: Scalars['Int']['output']
+  name: Scalars['String']['output']
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type TokenGql = {
-  __typename?: 'TokenGQL';
-  createdAt: Scalars['DateTime'];
-  emailToken?: Maybe<Scalars['String']>;
-  expiration: Scalars['DateTime'];
-  id: Scalars['Int'];
-  type: TokenType;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-  valid: Scalars['Boolean'];
-};
+  __typename?: 'TokenGQL'
+  createdAt: Scalars['DateTime']['output']
+  emailToken?: Maybe<Scalars['String']['output']>
+  expiration: Scalars['DateTime']['output']
+  id: Scalars['Int']['output']
+  type: TokenType
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+  valid: Scalars['Boolean']['output']
+}
 
 export enum TokenType {
   API = 'API',
@@ -466,242 +474,227 @@ export enum TokenType {
 }
 
 export type UserGql = {
-  __typename?: 'UserGQL';
-  DecryptionChallenges: Array<DecryptionChallengeGql>;
-  Devices: Array<DeviceGql>;
-  EncryptedSecrets: Array<EncryptedSecretGql>;
-  MasterDeviceChange: Array<MasterDeviceChangeGql>;
-  TOTPlimit: Scalars['Int'];
-  Tags: Array<TagGql>;
-  Token: Array<TokenGql>;
-  UsageEvents: Array<SecretUsageEventGql>;
-  UserPaidProducts: Array<UserPaidProductsGql>;
-  WebInputsAdded: Array<WebInputGql>;
-  addDeviceSecretEncrypted: Scalars['String'];
-  autofillCredentialsEnabled: Scalars['Boolean'];
-  autofillTOTPEnabled: Scalars['Boolean'];
-  createdAt: Scalars['DateTime'];
-  defaultDeviceSyncTOTP: Scalars['Boolean'];
-  defaultDeviceTheme: Scalars['String'];
-  deviceRecoveryCooldownMinutes: Scalars['Int'];
-  email?: Maybe<Scalars['String']>;
-  id: Scalars['ID'];
-  loginCredentialsLimit: Scalars['Int'];
-  masterDevice?: Maybe<DeviceGql>;
-  masterDeviceId?: Maybe<Scalars['String']>;
-  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
-  tokenVersion: Scalars['Int'];
-  uiLanguage: Scalars['String'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  username?: Maybe<Scalars['String']>;
-};
+  __typename?: 'UserGQL'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
+  Devices: Array<DeviceGql>
+  EncryptedSecrets: Array<EncryptedSecretGql>
+  MasterDeviceChange: Array<MasterDeviceChangeGql>
+  TOTPlimit: Scalars['Int']['output']
+  Tags: Array<TagGql>
+  Token: Array<TokenGql>
+  UsageEvents: Array<SecretUsageEventGql>
+  UserPaidProducts: Array<UserPaidProductsGql>
+  WebInputsAdded: Array<WebInputGql>
+  addDeviceSecretEncrypted: Scalars['String']['output']
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
+  createdAt: Scalars['DateTime']['output']
+  defaultDeviceSyncTOTP: Scalars['Boolean']['output']
+  defaultDeviceTheme: Scalars['String']['output']
+  deviceRecoveryCooldownMinutes: Scalars['Int']['output']
+  email?: Maybe<Scalars['String']['output']>
+  id: Scalars['ID']['output']
+  loginCredentialsLimit: Scalars['Int']['output']
+  masterDevice?: Maybe<DeviceGql>
+  masterDeviceId?: Maybe<Scalars['String']['output']>
+  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
+  tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  username?: Maybe<Scalars['String']['output']>
+}
 
 export type UserMutation = {
-  __typename?: 'UserMutation';
-  DecryptionChallenges: Array<DecryptionChallengeGql>;
-  Devices: Array<DeviceGql>;
-  EncryptedSecrets: Array<EncryptedSecretGql>;
-  MasterDeviceChange: Array<MasterDeviceChangeGql>;
-  TOTPlimit: Scalars['Int'];
-  Tags: Array<TagGql>;
-  Token: Array<TokenGql>;
-  UsageEvents: Array<SecretUsageEventGql>;
-  UserPaidProducts: Array<UserPaidProductsGql>;
-  WebInputsAdded: Array<WebInputGql>;
-  addCookie: Scalars['String'];
-  addDevice: DeviceGql;
-  addDeviceSecretEncrypted: Scalars['String'];
-  addEncryptedSecrets: Array<EncryptedSecretQuery>;
-  autofillCredentialsEnabled: Scalars['Boolean'];
-  autofillTOTPEnabled: Scalars['Boolean'];
-  changeEmail: UserQuery;
-  changeMasterPassword: Scalars['Int'];
-  createCheckoutSession: Scalars['String'];
-  createPortalSession: Scalars['String'];
-  createSecretUsageEvent: SecretUsageEventGqlScalars;
-  createdAt: Scalars['DateTime'];
-  decryptionChallenge: DecryptionChallengeMutation;
-  defaultDeviceSyncTOTP: Scalars['Boolean'];
-  defaultDeviceTheme: Scalars['String'];
-  device: DeviceMutation;
-  deviceRecoveryCooldownMinutes: Scalars['Int'];
-  email?: Maybe<Scalars['EmailAddress']>;
-  encryptedSecret: EncryptedSecretMutation;
-  id: Scalars['ID'];
-  loginCredentialsLimit: Scalars['Int'];
-  masterDevice?: Maybe<DeviceGql>;
-  masterDeviceId?: Maybe<Scalars['String']>;
-  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
-  removeEncryptedSecrets: Array<EncryptedSecretMutation>;
-  revokeRefreshTokensForUser: UserGql;
-  sendEmailVerification: Scalars['NonNegativeInt'];
-  setMasterDevice: MasterDeviceChangeGql;
-  tokenVersion: Scalars['Int'];
-  uiLanguage: Scalars['String'];
-  updateFireToken: DeviceGql;
-  updateSettings: UserGql;
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  username?: Maybe<Scalars['String']>;
-};
-
+  __typename?: 'UserMutation'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
+  Devices: Array<DeviceGql>
+  EncryptedSecrets: Array<EncryptedSecretGql>
+  MasterDeviceChange: Array<MasterDeviceChangeGql>
+  TOTPlimit: Scalars['Int']['output']
+  Tags: Array<TagGql>
+  Token: Array<TokenGql>
+  UsageEvents: Array<SecretUsageEventGql>
+  UserPaidProducts: Array<UserPaidProductsGql>
+  WebInputsAdded: Array<WebInputGql>
+  addCookie: Scalars['String']['output']
+  addDevice: DeviceGql
+  addDeviceSecretEncrypted: Scalars['String']['output']
+  addEncryptedSecrets: Array<EncryptedSecretQuery>
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
+  changeEmail: UserQuery
+  changeMasterPassword: Scalars['Int']['output']
+  createCheckoutSession: Scalars['String']['output']
+  createPortalSession: Scalars['String']['output']
+  createSecretUsageEvent: SecretUsageEventGqlScalars
+  createdAt: Scalars['DateTime']['output']
+  decryptionChallenge: DecryptionChallengeMutation
+  defaultDeviceSyncTOTP: Scalars['Boolean']['output']
+  defaultDeviceTheme: Scalars['String']['output']
+  delete: UserGql
+  device: DeviceMutation
+  deviceRecoveryCooldownMinutes: Scalars['Int']['output']
+  email?: Maybe<Scalars['EmailAddress']['output']>
+  encryptedSecret: EncryptedSecretMutation
+  id: Scalars['ID']['output']
+  loginCredentialsLimit: Scalars['Int']['output']
+  masterDevice?: Maybe<DeviceGql>
+  masterDeviceId?: Maybe<Scalars['String']['output']>
+  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
+  removeEncryptedSecrets: Array<EncryptedSecretMutation>
+  revokeRefreshTokensForUser: UserGql
+  sendEmailVerification: Scalars['NonNegativeInt']['output']
+  setMasterDevice: MasterDeviceChangeGql
+  tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
+  updateFireToken: DeviceGql
+  updateSettings: UserGql
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  username?: Maybe<Scalars['String']['output']>
+}
 
 export type UserMutationAddDeviceArgs = {
-  device: DeviceInput;
-  firebaseToken: Scalars['String'];
-};
-
+  device: DeviceInput
+  firebaseToken: Scalars['String']['input']
+}
 
 export type UserMutationAddEncryptedSecretsArgs = {
-  secrets: Array<EncryptedSecretInput>;
-};
-
+  secrets: Array<EncryptedSecretInput>
+}
 
 export type UserMutationChangeEmailArgs = {
-  email: Scalars['EmailAddress'];
-};
-
+  email: Scalars['EmailAddress']['input']
+}
 
 export type UserMutationChangeMasterPasswordArgs = {
-  input: ChangeMasterPasswordInput;
-};
-
+  input: ChangeMasterPasswordInput
+}
 
 export type UserMutationCreateCheckoutSessionArgs = {
-  product: Scalars['String'];
-};
-
+  product: Scalars['String']['input']
+}
 
 export type UserMutationCreateSecretUsageEventArgs = {
-  event: SecretUsageEventInput;
-};
-
+  event: SecretUsageEventInput
+}
 
 export type UserMutationDecryptionChallengeArgs = {
-  id: Scalars['Int'];
-};
-
+  id: Scalars['Int']['input']
+}
 
 export type UserMutationDeviceArgs = {
-  id: Scalars['String'];
-};
-
+  id: Scalars['String']['input']
+}
 
 export type UserMutationEncryptedSecretArgs = {
-  id: Scalars['ID'];
-};
-
+  id: Scalars['ID']['input']
+}
 
 export type UserMutationRemoveEncryptedSecretsArgs = {
-  secrets: Array<Scalars['UUID']>;
-};
-
+  secrets: Array<Scalars['UUID']['input']>
+}
 
 export type UserMutationSendEmailVerificationArgs = {
-  isMobile?: InputMaybe<Scalars['Boolean']>;
-};
-
+  isMobile?: InputMaybe<Scalars['Boolean']['input']>
+}
 
 export type UserMutationSetMasterDeviceArgs = {
-  newMasterDeviceId: Scalars['String'];
-};
-
+  newMasterDeviceId: Scalars['String']['input']
+}
 
 export type UserMutationUpdateFireTokenArgs = {
-  firebaseToken: Scalars['String'];
-};
-
+  firebaseToken: Scalars['String']['input']
+}
 
 export type UserMutationUpdateSettingsArgs = {
-  config: SettingsInput;
-};
+  config: SettingsInput
+}
 
 export type UserPaidProductsGql = {
-  __typename?: 'UserPaidProductsGQL';
-  checkoutSessionId: Scalars['String'];
-  createdAt: Scalars['DateTime'];
-  expiresAt?: Maybe<Scalars['DateTime']>;
-  id: Scalars['Int'];
-  productId: Scalars['String'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  user: UserGql;
-  userId: Scalars['String'];
-};
+  __typename?: 'UserPaidProductsGQL'
+  checkoutSessionId: Scalars['String']['output']
+  createdAt: Scalars['DateTime']['output']
+  expiresAt?: Maybe<Scalars['DateTime']['output']>
+  id: Scalars['Int']['output']
+  productId: Scalars['String']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  user: UserGql
+  userId: Scalars['String']['output']
+}
 
 export type UserQuery = {
-  __typename?: 'UserQuery';
-  DecryptionChallenges: Array<DecryptionChallengeGql>;
-  Devices: Array<DeviceGql>;
-  EncryptedSecrets: Array<EncryptedSecretGql>;
-  MasterDeviceChange: Array<MasterDeviceChangeGql>;
-  TOTPlimit: Scalars['Int'];
-  Tags: Array<TagGql>;
-  Token: Array<TokenGql>;
-  UsageEvents: Array<SecretUsageEventGql>;
-  UserPaidProducts: Array<UserPaidProductsGql>;
-  WebInputsAdded: Array<WebInputGql>;
-  addDeviceSecretEncrypted: Scalars['String'];
-  autofillCredentialsEnabled: Scalars['Boolean'];
-  autofillTOTPEnabled: Scalars['Boolean'];
-  createdAt: Scalars['DateTime'];
-  decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
-  defaultDeviceSyncTOTP: Scalars['Boolean'];
-  defaultDeviceTheme: Scalars['String'];
-  device: DeviceQuery;
-  deviceRecoveryCooldownMinutes: Scalars['Int'];
-  devices: Array<DeviceQuery>;
-  devicesCount: Scalars['Int'];
-  email?: Maybe<Scalars['EmailAddress']>;
-  emailVerifications: Array<EmailVerificationGqlScalars>;
-  encryptedSecrets: Array<EncryptedSecretQuery>;
-  id: Scalars['ID'];
-  lastChangeInSecrets?: Maybe<Scalars['DateTime']>;
-  loginCredentialsLimit: Scalars['Int'];
-  masterDevice?: Maybe<DeviceGql>;
-  masterDeviceId?: Maybe<Scalars['String']>;
-  primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
-  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
-  sendAuthMessage: Scalars['Boolean'];
-  tokenVersion: Scalars['Int'];
-  uiLanguage: Scalars['String'];
-  updatedAt?: Maybe<Scalars['DateTime']>;
-  username?: Maybe<Scalars['String']>;
-};
-
+  __typename?: 'UserQuery'
+  DecryptionChallenges: Array<DecryptionChallengeGql>
+  Devices: Array<DeviceGql>
+  EncryptedSecrets: Array<EncryptedSecretGql>
+  MasterDeviceChange: Array<MasterDeviceChangeGql>
+  TOTPlimit: Scalars['Int']['output']
+  Tags: Array<TagGql>
+  Token: Array<TokenGql>
+  UsageEvents: Array<SecretUsageEventGql>
+  UserPaidProducts: Array<UserPaidProductsGql>
+  WebInputsAdded: Array<WebInputGql>
+  addDeviceSecretEncrypted: Scalars['String']['output']
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
+  createdAt: Scalars['DateTime']['output']
+  decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>
+  defaultDeviceSyncTOTP: Scalars['Boolean']['output']
+  defaultDeviceTheme: Scalars['String']['output']
+  device: DeviceQuery
+  deviceRecoveryCooldownMinutes: Scalars['Int']['output']
+  devices: Array<DeviceQuery>
+  devicesCount: Scalars['Int']['output']
+  email?: Maybe<Scalars['EmailAddress']['output']>
+  emailVerifications: Array<EmailVerificationGqlScalars>
+  encryptedSecrets: Array<EncryptedSecretQuery>
+  id: Scalars['ID']['output']
+  lastChangeInSecrets?: Maybe<Scalars['DateTime']['output']>
+  loginCredentialsLimit: Scalars['Int']['output']
+  masterDevice?: Maybe<DeviceGql>
+  masterDeviceId?: Maybe<Scalars['String']['output']>
+  primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>
+  recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
+  sendAuthMessage: Scalars['Boolean']['output']
+  tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
+  updatedAt?: Maybe<Scalars['DateTime']['output']>
+  username?: Maybe<Scalars['String']['output']>
+}
 
 export type UserQueryDeviceArgs = {
-  id: Scalars['UUID'];
-};
-
+  id: Scalars['UUID']['input']
+}
 
 export type UserQuerySendAuthMessageArgs = {
-  device: Scalars['String'];
-  location: Scalars['String'];
-  pageName: Scalars['String'];
-  time: Scalars['DateTime'];
-};
+  device: Scalars['String']['input']
+  location: Scalars['String']['input']
+  pageName: Scalars['String']['input']
+  time: Scalars['DateTime']['input']
+}
 
 export type WebInputElement = {
   /** The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day. */
-  domOrdinal: Scalars['NonNegativeInt'];
-  domPath: Scalars['String'];
-  kind: WebInputType;
-  url: Scalars['String'];
-};
+  domOrdinal: Scalars['NonNegativeInt']['input']
+  domPath: Scalars['String']['input']
+  kind: WebInputType
+  url: Scalars['String']['input']
+}
 
 export type WebInputGql = {
-  __typename?: 'WebInputGQL';
-  UsageEvents: Array<SecretUsageEventGql>;
-  addedByUser?: Maybe<UserGql>;
-  addedByUserId?: Maybe<Scalars['String']>;
-  createdAt: Scalars['DateTime'];
-  domOrdinal: Scalars['Int'];
-  domPath: Scalars['String'];
-  host: Scalars['String'];
-  id: Scalars['Int'];
-  kind: WebInputType;
-  layoutType?: Maybe<Scalars['String']>;
-  url: Scalars['String'];
-};
+  __typename?: 'WebInputGQL'
+  UsageEvents: Array<SecretUsageEventGql>
+  addedByUser?: Maybe<UserGql>
+  addedByUserId?: Maybe<Scalars['String']['output']>
+  createdAt: Scalars['DateTime']['output']
+  domOrdinal: Scalars['Int']['output']
+  domPath: Scalars['String']['output']
+  host: Scalars['String']['output']
+  id: Scalars['Int']['output']
+  kind: WebInputType
+  layoutType?: Maybe<Scalars['String']['output']>
+  url: Scalars['String']['output']
+}
 
 export enum WebInputType {
   CUSTOM = 'CUSTOM',
