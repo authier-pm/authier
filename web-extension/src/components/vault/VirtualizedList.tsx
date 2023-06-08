@@ -12,6 +12,7 @@ import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { DeleteSecretButton } from './DeleteSecretButton'
+import { Txt } from '../util/Txt'
 
 export function VaultListItem({
   secret
@@ -22,6 +23,7 @@ export function VaultListItem({
 
   const { deviceState } = useContext(DeviceStateContext)
 
+  const username = getDecryptedSecretProp(secret, 'username')
   const secretUrl = getDecryptedSecretProp(secret, 'url')
   const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
   const label = getDecryptedSecretProp(secret, 'label')
@@ -37,16 +39,30 @@ export function VaultListItem({
         w="250px"
         h="195px"
         bg={bg}
+        transition={'transform .2s ease-in-out'}
         boxShadow={'2xl'}
         rounded={'md'}
         overflow={'hidden'}
+        _hover={{ transform: 'scale(1.05)' }}
         onMouseOver={() => setIsVisible(true)}
         onMouseOut={() => setIsVisible(false)}
       >
         <Box bg={'gray.100'} h="70%" pos={'relative'}>
-          <Center h={130}>
-            <SecretItemIcon url={secretUrl} iconUrl={iconUrl} />
-          </Center>
+          <Box>
+            <Center h={130}>
+              <SecretItemIcon url={secretUrl} iconUrl={iconUrl} />
+            </Center>
+
+            <Txt
+              color={'blue.800'}
+              position="relative"
+              bottom={'15px'}
+              left="15px"
+            >
+              {username}
+            </Txt>
+          </Box>
+
           <Flex
             display={isVisible ? 'flex' : 'none'}
             alignItems="center"
