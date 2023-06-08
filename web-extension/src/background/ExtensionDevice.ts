@@ -195,9 +195,10 @@ export class DeviceState implements IBackgroundStateSerializable {
       backgroundState: this,
       lockedState: null
     })
-
-    const icon = browser.runtime.getURL('icon-48.png')
-    browser.action.setIcon({ path: icon })
+    if (isRunningInBgServiceWorker) {
+      const icon = browser.runtime.getURL('icon-48.png')
+      browser.action.setIcon({ path: icon })
+    }
 
     browser.storage.onChanged.addListener(this.onStorageChange)
   }
@@ -593,8 +594,10 @@ class ExtensionDevice {
 
     this.clearLockInterval()
 
-    const lockIcon = browser.runtime.getURL('icon-lock-48.png')
-    browser.action.setIcon({ path: lockIcon })
+    if (isRunningInBgServiceWorker) {
+      const lockIcon = browser.runtime.getURL('icon-lock-48.png')
+      browser.action.setIcon({ path: lockIcon })
+    }
 
     log('locking device')
 
