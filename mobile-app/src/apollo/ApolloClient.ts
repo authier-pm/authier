@@ -25,6 +25,9 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 if (!API_URL) {
   throw new Error('API_URL is not defined')
 }
+if (__DEV__) {
+  console.log('API_URL', API_URL)
+}
 
 const httpLink = new HttpLink({
   uri: API_URL,
