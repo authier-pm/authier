@@ -9,14 +9,14 @@ export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 export type MyDevicesQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string }> } };
 
 export type RejectChallengeMutationVariables = Types.Exact<{
-  id: Types.Scalars['Int'];
+  id: Types.Scalars['Int']['input'];
 }>;
 
 
 export type RejectChallengeMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', decryptionChallenge: { __typename?: 'DecryptionChallengeMutation', reject: { __typename?: 'DecryptionChallengeGQL', id: number } } } };
 
 export type ApproveChallengeMutationVariables = Types.Exact<{
-  id: Types.Scalars['Int'];
+  id: Types.Scalars['Int']['input'];
 }>;
 
 
@@ -28,21 +28,21 @@ export type DevicesRequestsQueryVariables = Types.Exact<{ [key: string]: never; 
 export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, ipGeoLocation?: any | null }> } };
 
 export type LogoutDeviceMutationVariables = Types.Exact<{
-  id: Types.Scalars['String'];
+  id: Types.Scalars['String']['input'];
 }>;
 
 
 export type LogoutDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', id: string } } } };
 
 export type RemoveDeviceMutationVariables = Types.Exact<{
-  id: Types.Scalars['String'];
+  id: Types.Scalars['String']['input'];
 }>;
 
 
 export type RemoveDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', removeDevice: boolean } } };
 
 export type ChangeMasterDeviceMutationVariables = Types.Exact<{
-  newMasterDeviceId: Types.Scalars['String'];
+  newMasterDeviceId: Types.Scalars['String']['input'];
 }>;
 
 

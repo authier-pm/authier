@@ -5,9 +5,9 @@ import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type ChangeMasterPasswordMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
-  addDeviceSecret: Types.Scalars['NonEmptyString'];
-  addDeviceSecretEncrypted: Types.Scalars['NonEmptyString'];
-  decryptionChallengeId: Types.Scalars['PositiveInt'];
+  addDeviceSecret: Types.Scalars['NonEmptyString']['input'];
+  addDeviceSecretEncrypted: Types.Scalars['NonEmptyString']['input'];
+  decryptionChallengeId: Types.Scalars['PositiveInt']['input'];
 }>;
 
 

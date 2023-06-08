@@ -9,21 +9,21 @@ export type EncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never;
 export type EncryptedSecretsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, encryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string }> } };
 
 export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
-  id: Types.Scalars['ID'];
+  id: Types.Scalars['ID']['input'];
 }>;
 
 
 export type DeleteEncryptedSecretMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', encryptedSecret: { __typename?: 'EncryptedSecretMutation', id: string, delete: { __typename?: 'EncryptedSecretGQL', id: string } } } };
 
 export type RemoveEncryptedSecretsMutationVariables = Types.Exact<{
-  secrets: Array<Types.Scalars['UUID']> | Types.Scalars['UUID'];
+  secrets: Array<Types.Scalars['UUID']['input']> | Types.Scalars['UUID']['input'];
 }>;
 
 
 export type RemoveEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', removeEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretMutation', id: string }> } };
 
 export type UpdateEncryptedSecretMutationVariables = Types.Exact<{
-  id: Types.Scalars['ID'];
+  id: Types.Scalars['ID']['input'];
   patch: Types.EncryptedSecretInput;
 }>;
 

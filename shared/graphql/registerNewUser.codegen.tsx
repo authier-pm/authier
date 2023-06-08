@@ -5,7 +5,7 @@ import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type RegisterNewUserMutationVariables = Types.Exact<{
   input: Types.RegisterNewAccountInput;
-  userId: Types.Scalars['UUID'];
+  userId: Types.Scalars['UUID']['input'];
 }>;
 
 

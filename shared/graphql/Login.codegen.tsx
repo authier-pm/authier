@@ -4,9 +4,9 @@ import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type AddNewDeviceForUserMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress'];
+  email: Types.Scalars['EmailAddress']['input'];
   deviceInput: Types.DeviceInput;
-  currentAddDeviceSecret: Types.Scalars['NonEmptyString'];
+  currentAddDeviceSecret: Types.Scalars['NonEmptyString']['input'];
   input: Types.AddNewDeviceInput;
 }>;
 
@@ -14,7 +14,7 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', defaultDeviceTheme: string, uiLanguage: string, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
-  email: Types.Scalars['EmailAddress'];
+  email: Types.Scalars['EmailAddress']['input'];
   deviceInput: Types.DeviceInput;
 }>;
 
