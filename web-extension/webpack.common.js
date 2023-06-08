@@ -13,7 +13,8 @@ const entries = {
   vault: path.join(__dirname, 'src/vault-index.tsx'),
   contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
 }
-
+require('dotenv/config')
+console.log('API_URL:', process.env.API_URL)
 module.exports = {
   entry: entries,
   output: {
@@ -69,7 +70,9 @@ module.exports = {
     }),
 
     // new ExtensionReloader(),
-    new Dotenv()
+    new Dotenv({
+      silent: false
+    })
     //new BundleAnalyzerPlugin()
   ],
   module: {
