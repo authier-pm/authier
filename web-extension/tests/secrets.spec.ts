@@ -8,7 +8,11 @@ const email = faker.internet.email({
 })
 const password = faker.internet.password()
 
-test.describe.serial('Account management process', () => {
+const secretLabel = faker.internet.domainName()
+const secretUsername = faker.internet.userName()
+const secretPassword = faker.internet.password()
+
+test.describe.serial('Secrets management', () => {
   let page: Page
   let extensionId: string
   let context: BrowserContext
@@ -31,14 +35,7 @@ test.describe.serial('Account management process', () => {
     await logoutPage.goto(`https://www.google.com/`)
     await logoutPage.goto(`chrome-extension://${extensionId}/js/vault.html#`)
     await logoutPage.waitForLoadState('domcontentloaded')
-    await expect(
-      logoutPage.getByRole('heading', { name: 'Login' })
-    ).toBeVisible()
 
-    await logoutPage.getByLabel('Email').fill(email)
-    await logoutPage.getByPlaceholder('*******').fill(password)
-
-    await logoutPage.getByText('Submit').click()
     await expect(logoutPage.getByText('Authier', { exact: true })).toBeVisible()
 
     await logoutPage.getByRole('link').filter({ hasText: 'Settings' }).click()
@@ -68,36 +65,37 @@ test.describe.serial('Account management process', () => {
 
     await expect(page.getByText('Authier', { exact: true })).toBeVisible()
     await expect(page.getByText('0 secrets')).toBeVisible()
-
-    await page.getByRole('button', { name: email }).click()
-    await expect(
-      page.getByRole('menuitem', { name: 'Lock device' })
-    ).toBeVisible()
-    await page.click('text=Logout')
   })
 
-  test('Relogin account', async () => {
-    //We need to create page from the one context
-    const reloginPage = await context.newPage()
-    await reloginPage.goto(`https://www.google.com/`)
-    await reloginPage.goto(`chrome-extension://${extensionId}/js/vault.html#`)
-    await reloginPage.waitForLoadState('domcontentloaded')
-    await expect(
-      reloginPage.getByRole('heading', { name: 'Login' })
-    ).toBeVisible()
+  test('Save secret', async () => {
+    await expect(page.getByText('0 secrets')).toBeVisible()
+    await page.getByRole('button', { name: 'Add item' }).click()
+    await expect(page.getByRole('button', { name: 'Generate' })).toBeVisible()
 
-    await reloginPage.getByLabel('Email').fill(email)
-    await reloginPage.getByPlaceholder('*******').fill(password)
+    //Create secret
+    await page
+      .getByPlaceholder('google.com')
+      .fill('https://websecurity.dev/password-managers/login/')
+    await page.getByPlaceholder('Work email').fill(secretLabel)
+    await page.getByLabel('Username:').fill(secretUsername)
+    await page.getByLabel('Password:').fill(secretPassword)
 
-    await reloginPage.getByText('Submit').click()
-    await expect(
-      reloginPage.getByText('Authier', { exact: true })
-    ).toBeVisible()
+    await page.getByText('Save').click()
 
-    await reloginPage.getByRole('button', { name: email }).click()
+    //Check secret
+    await expect(page.getByText('1 secrets')).toBeVisible()
+    await expect(page.getByText(secretLabel)).toBeVisible()
+
+    // Start waiting for new page before clicking. Note no await.
+    const pagePromise = context.waitForEvent('page')
+    await page.getByRole('grid', { name: 'grid' }).getByRole('img').hover()
+    await page.getByRole('button', { name: 'open item' }).click()
+    const newPage = await pagePromise
+    await newPage.waitForLoadState()
+
+    // await newPage.waitForEvent('console')
     await expect(
-      reloginPage.getByRole('menuitem', { name: 'Lock device' })
+      newPage.getByRole('heading', { name: 'Please save the password' })
     ).toBeVisible()
-    await reloginPage.click('text=Logout')
   })
 })
