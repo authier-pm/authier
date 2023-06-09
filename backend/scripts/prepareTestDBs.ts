@@ -2,11 +2,12 @@ import 'dotenv/config'
 
 import { execFile } from 'child_process'
 
-import { prismaClient } from '../prisma/prismaClient'
 import { getDbCount } from './getDbCount'
+import { readFileSync, writeFileSync } from 'fs'
 
 export const testDbsPrefix = 'authier_test'
 const dbCount = getDbCount() // each jest worker uses one CPU and one DB, so we need that many DBs
+const prismaSchema = readFileSync('./prisma/schema.prisma', 'utf-8')
 
 const dbUrl = process.env.DATABASE_URL?.split(/(\d+)(?!.*\d)/)[0]
 const migrateOneDb = async (dbName: string) => {
@@ -14,7 +15,16 @@ const migrateOneDb = async (dbName: string) => {
   // Currently we don't have any direct method to invoke prisma migration programmatically.
   // As a workaround, we spawn migration script as a child process and wait for its completion.
   // Please also refer to the following GitHub issue: https://github.com/prisma/prisma/issues/4703
+
+  // comment out prisma schema shadowDatabaseUrl and directUrl
+  const prismaSchemaWithoutShadowDatabaseUrl = prismaSchema
+    .replace('shadowDatabaseUrl', '// shadowDatabaseUrl')
+    .replace('directUrl', '// directUrl')
+  writeFileSync('./prisma/schema.prisma', prismaSchemaWithoutShadowDatabaseUrl)
+
   try {
+    const { prismaClient } = await import('../prisma/prismaClient')
+
     await prismaClient.$executeRawUnsafe(`DROP DATABASE IF EXISTS ${dbName};`)
     await prismaClient.$executeRawUnsafe(`CREATE DATABASE ${dbName}`)
 
@@ -46,6 +56,9 @@ const migrateOneDb = async (dbName: string) => {
     console.error(e)
     throw e
   }
+
+  // write back as it was
+  writeFileSync('./prisma/schema.prisma', prismaSchema)
 }
 
 ;(async () => {
