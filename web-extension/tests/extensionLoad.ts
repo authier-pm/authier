@@ -15,7 +15,7 @@ export const test = base.extend<{
       ]
     })
     await use(context)
-    //TODO: We need to use the same context for all tests
+
     // await context.close()
   },
   extensionId: async ({ context }, use) => {
