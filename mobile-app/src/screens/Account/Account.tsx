@@ -122,7 +122,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
               backup data that you want to keep.`}
           onPress={async () => {
             await deleteAccount()
-            await device.clearAndReload()
+            device.clearAndReload()
           }}
         />
       </VStack>
