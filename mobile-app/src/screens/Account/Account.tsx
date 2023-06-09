@@ -14,14 +14,15 @@ import {
   VStack
 } from 'native-base'
 
-import { ButtonWithAlert } from '../../components/ButtonWithAlert'
+import { ButtonWithAlert } from '@components/ButtonWithAlert'
 
-import { AccountStackScreenProps } from '../../navigation/types'
+import { AccountStackScreenProps } from '@navigation/types'
 import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { t, Trans } from '@lingui/macro'
+import { useDeleteAccountMutation } from './Account.codegen'
 
 const settingsOptions = [
   { name: t`Settings`, route: 'Settings' },
@@ -61,6 +62,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
   const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
+  const [deleteAccount] = useDeleteAccountMutation()
 
   useEffect(() => {
     codePush.getUpdateMetadata().then((metadata) => {
@@ -98,7 +100,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
         })}
 
         <ButtonWithAlert
-          btnColor="orange"
+          btnColor="primary"
           icon="lock-closed-outline"
           text={t`Do you want to lock device?`}
           onPress={() => device.lock()}
@@ -107,10 +109,21 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
 
         <ButtonWithAlert
           btnText={t`Logout`}
-          btnColor="danger"
+          btnColor="orange"
           icon="log-out-outline"
           text={t`Do you want to logout?`}
           onPress={() => device.logout()}
+        />
+        <ButtonWithAlert
+          btnText={t`Delete your account`}
+          btnColor="danger"
+          icon="log-out-outline"
+          text={t`You cannot undo this action afterwards. Make sure to
+              backup data that you want to keep.`}
+          onPress={async () => {
+            await deleteAccount()
+            device.clearAndReload()
+          }}
         />
       </VStack>
       <Center>

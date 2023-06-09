@@ -107,9 +107,9 @@ export default function DeviceInfo({
           </HStack>
 
           <VStack>
-            <Text fontWeight={600} color={'gray.500'} fontSize={'md'} m={3}>
-              About
-            </Text>
+            <Heading fontWeight={'bold'} color={'gray.500'} size="md" m={3}>
+              <Trans>About</Trans>
+            </Heading>
             <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
               <ColumnWrapper text={t`Last IP Address`}>
                 <Text fontSize={'xl'}>
@@ -135,7 +135,7 @@ export default function DeviceInfo({
 
               <HStack alignItems={'center'} justifyContent="space-between">
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                  Created
+                  <Trans>Created</Trans>
                 </Text>
                 <Text fontSize={'xl'}>
                   {intlFormat(new Date(route.params.device.createdAt ?? ''), {
@@ -152,9 +152,9 @@ export default function DeviceInfo({
       </VStack>
 
       <VStack>
-        <Text fontWeight={600} color={'gray.500'} fontSize={'md'} m={3}>
-          Settings
-        </Text>
+        <Heading fontWeight={'bold'} color={'gray.500'} size="md" m={3}>
+          <Trans>Settings</Trans>
+        </Heading>
       </VStack>
     </View>
   )
