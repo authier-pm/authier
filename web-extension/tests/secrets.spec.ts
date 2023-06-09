@@ -67,12 +67,11 @@ test.describe.serial('Secrets management', () => {
     await expect(page.getByText('0 secrets')).toBeVisible()
   })
 
-  test('Save secret', async () => {
+  test('Create secret', async () => {
     await expect(page.getByText('0 secrets')).toBeVisible()
     await page.getByRole('button', { name: 'Add item' }).click()
     await expect(page.getByRole('button', { name: 'Generate' })).toBeVisible()
 
-    //Create secret
     await page
       .getByPlaceholder('google.com')
       .fill('https://websecurity.dev/password-managers/login/')
@@ -82,8 +81,10 @@ test.describe.serial('Secrets management', () => {
 
     await page.getByText('Save').click()
 
-    //Check secret
     await expect(page.getByText('1 secrets')).toBeVisible()
+  })
+
+  test('Autofill secret', async () => {
     await expect(page.getByText(secretLabel)).toBeVisible()
 
     // Start waiting for new page before clicking. Note no await.
@@ -93,9 +94,28 @@ test.describe.serial('Secrets management', () => {
     const newPage = await pagePromise
     await newPage.waitForLoadState()
 
-    // await newPage.waitForEvent('console')
     await expect(
       newPage.getByRole('heading', { name: 'Please save the password' })
     ).toBeVisible()
+    await newPage.close()
+  })
+
+  test('Delete secret', async () => {
+    await expect(page.getByText('1 secrets')).toBeVisible()
+
+    await page
+      .getByRole('grid', { name: 'grid' })
+      .getByRole('img')
+      .nth(1)
+      .click()
+    page.on('popup', async (popup) => {
+      await popup.waitForLoadState()
+    })
+    await expect(page.getByText('Delete confirmation')).toBeVisible()
+    await page.getByRole('button', { name: 'Yes' }).click()
+
+    await expect(page.getByText('0 secrets')).toBeVisible()
+    await page.getByRole('button', { name: 'menu' }).first().click()
+    await expect(page.getByText('0 secrets')).toBeVisible()
   })
 })
