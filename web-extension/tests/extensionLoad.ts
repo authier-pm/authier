@@ -15,7 +15,8 @@ export const test = base.extend<{
       ]
     })
     await use(context)
-    await context.close()
+    //TODO: We need to use the same context for all tests
+    // await context.close()
   },
   extensionId: async ({ context }, use) => {
     // for manifest v3:
