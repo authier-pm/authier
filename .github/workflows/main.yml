@@ -141,6 +141,6 @@ jobs:
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
-          #pnpm migrateDeploy
         run: |
+          pnpm prisma:deploy
           pnpm cdkDeploy
