@@ -157,9 +157,6 @@ importers:
       ip:
         specifier: ^1.1.8
         version: 1.1.8
-      istorexit:
-        specifier: ^0.10.1
-        version: 0.10.1
       jsonwebtoken:
         specifier: ^9.0.0
         version: 9.0.0
@@ -16517,11 +16514,6 @@ packages:
       html-escaper: 2.0.2
       istanbul-lib-report: 3.0.0
     dev: true
-
-  /istorexit@0.10.1:
-    resolution: {integrity: sha512-8R126f2ks97U1XOtlFY77jugF8aOL9V2Duqu/s0MToDBhx9Ie9k/uCtEMvWuc7B0kUfHh9CvN5neaMBCkfHlvQ==}
-    hasBin: true
-    dev: false
 
   /iterall@1.3.0:
     resolution: {integrity: sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==}
