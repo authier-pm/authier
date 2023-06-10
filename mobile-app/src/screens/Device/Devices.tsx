@@ -32,6 +32,7 @@ import {
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
 import { DevicesStackScreenProps } from '@navigation/types'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 import mitt from 'mitt'
 import { useDeviceStore } from '@src/utils/deviceStore'
@@ -51,6 +52,7 @@ const empty = () => {
 }
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,
@@ -179,8 +181,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
     item: DecryptionChallengeForApproval
   }) => {
     const fromLocationText = item.ipGeoLocation
-      ? `(
-      ${item.ipGeoLocation?.city}, ${item.ipGeoLocation?.country_name})`
+      ? `(${item.ipGeoLocation?.city}, ${item.ipGeoLocation?.country_name})`
       : ''
     return (
       <Box minH="290px">
@@ -222,7 +223,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 }
               }}
             >
-              <Text color={'orange.500'} fontSize="sm">
+              <Text w="100%" color={'orange.600'} fontSize="sm">
                 {item.deviceName}{' '}
                 {formatRelative(new Date(item.createdAt), new Date())} from IP{' '}
                 {item.ipAddress} {fromLocationText}
@@ -245,6 +246,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 })
                 requestsRefetch()
                 devicesStartPolling(5000)
+                deviceState.setNotifications(deviceState.notifications - 1)
                 //TODO: Add here some kind of animations, like a spinner to show that the device is being added
               }}
             >

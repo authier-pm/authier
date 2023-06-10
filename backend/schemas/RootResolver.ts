@@ -299,6 +299,8 @@ export class RootResolver {
       where: { id: deviceInput.id }
     })
 
+    console.log('device', device)
+
     let challenge = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
         deviceId: deviceInput.id,
@@ -340,19 +342,17 @@ export class RootResolver {
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10
       ) {
-        await admin
-          .messaging()
-          .sendToDevice(user.masterDevice?.firebaseToken as string, {
-            notification: {
-              title: 'New device login!',
-              body: 'New device is trying to log in.'
-            },
-            data: {
-              type: 'Devices'
-            }
-          })
+        console.log('sending notification to')
+        await admin.messaging().sendToDevice(user.masterDevice.firebaseToken, {
+          notification: {
+            title: 'New device login!',
+            body: 'New device is trying to log in.'
+          },
+          data: {
+            type: 'Devices'
+          }
+        })
       }
-
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: deviceInput.id,

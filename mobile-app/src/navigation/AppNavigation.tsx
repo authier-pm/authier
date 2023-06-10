@@ -12,9 +12,10 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { Platform } from 'react-native'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -54,6 +55,11 @@ function AppNavigation() {
         }
       })
 
+    // Foreground notification
+    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
+      deviceState.setNotifications(deviceState.notifications + 1)
+    })
+
     if (deviceState) {
       deviceState.backendSync(toast)
     }
@@ -67,6 +73,7 @@ function AppNavigation() {
         uiLanguage: data.me.uiLanguage
       })
     }
+    return unsubscribe
   }, [])
 
   return (
@@ -99,7 +106,25 @@ function AppNavigation() {
     >
       <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
       <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
-      <RootStack.Screen name="Devices" component={DeviceStackNavigation} />
+      <RootStack.Screen
+        options={
+          deviceState.notifications > 0
+            ? {
+                tabBarBadge: deviceState.notifications,
+                tabBarBadgeStyle: {
+                  top: Platform.OS === 'ios' ? 0 : 9,
+                  minWidth: 14,
+                  maxHeight: 14,
+                  borderRadius: 7,
+                  fontSize: 10,
+                  lineHeight: 13
+                }
+              }
+            : {}
+        }
+        name="Devices"
+        component={DeviceStackNavigation}
+      />
       <RootStack.Screen name="User" component={AccountNavigation} />
     </RootStack.Navigator>
   )

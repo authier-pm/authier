@@ -147,6 +147,7 @@ export function Register({ navigation }: NavigationProps) {
         vaultLockTimeoutSeconds: 28800,
         autofillTOTPEnabled: false,
         autofillCredentialsEnabled: false,
+        //TODO: From DB
         uiLanguage: 'en',
         lockTimeEnd: Date.now() + 28800000,
         syncTOTP: false,

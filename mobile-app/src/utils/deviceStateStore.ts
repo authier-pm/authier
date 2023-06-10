@@ -59,6 +59,7 @@ interface DeviceStateProps {
   lockTimeEnd: number | null
   lockTimerRunning: boolean
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  notifications: number
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -105,6 +106,7 @@ export interface DeviceStateActions extends DeviceStateProps {
   changeSyncTOTP: (syncTOTP: boolean) => void
   reset: () => void
   save: () => void
+  setNotifications: (newValue: number) => void
 }
 
 const initialState: DeviceStateProps = {
@@ -126,7 +128,8 @@ const initialState: DeviceStateProps = {
   lockTimeStart: 0,
   lockTimeEnd: 0,
   lockTimerRunning: false,
-  decryptedSecrets: []
+  decryptedSecrets: [],
+  notifications: 0
 }
 
 export const useDeviceStateStore = create<DeviceStateActions>()(
@@ -424,6 +427,9 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
       },
       changeSyncTOTP: (syncTOTP) => {
         set({ syncTOTP })
+      },
+      setNotifications: (newValue) => {
+        set({ notifications: newValue })
       }
     }),
     { name: 'deviceState', storage: createJSONStorage(() => zustandStorage) }

@@ -11,7 +11,6 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
 import { Providers } from './src/Providers'
-import { Alert } from 'react-native'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
@@ -59,13 +58,7 @@ const RnApp = () => {
         queueLink.close()
       }
     })
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      if (__DEV__) {
-        Alert.alert('FCM message arrived:', JSON.stringify(remoteMessage))
-      }
-    })
     return () => {
-      unsubscribe()
       unsubscribeNet()
     }
   }, [])

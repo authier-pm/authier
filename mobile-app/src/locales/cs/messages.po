@@ -17,6 +17,14 @@ msgstr ""
 msgid "{name}"
 msgstr "{name}"
 
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "{text}"
+msgstr "{text}"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "About"
+msgstr "O zařízení"
+
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
 msgstr "Účet"
@@ -41,7 +49,7 @@ msgstr "Schválit"
 msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 msgstr "Schvalte toto zařízení ve správě zařízení v trezoru na hlavním zařízení, abyste mohli pokračovat v přidávání nového zařízení."
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
 
@@ -58,6 +66,10 @@ msgstr "Změnit heslo"
 msgid "Codepush version"
 msgstr "Verze Codepush"
 
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Created"
+msgstr "Vytvořeno"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
 #~ msgstr "Aktuální heslo"
@@ -65,6 +77,10 @@ msgstr "Verze Codepush"
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Current Password"
 msgstr "Aktuální heslo"
+
+#: src/screens/Account/Account.tsx
+msgid "Delete your account"
+msgstr "Smazat účet"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
@@ -91,10 +107,10 @@ msgid "I'm a new user."
 msgstr "Jsem nový uživatel."
 
 #: src/screens/Account/Account.tsx
-msgid "Import passwords"
-msgstr "Importovat hesla"
+#~ msgid "Import passwords"
+#~ msgstr "Importovat hesla"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Language"
 msgstr "Jazyk"
 
@@ -106,7 +122,7 @@ msgstr "Poslední IP adresa"
 msgid "Lock"
 msgstr "Uzamknout"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Lock time"
 msgstr "Doba uzamčení"
 
@@ -166,7 +182,7 @@ msgstr "Odmítnout"
 msgid "Scan QR"
 msgstr "Naskenujte QR"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Security"
 msgstr "Zabezpečení"
 
@@ -175,6 +191,7 @@ msgid "Set on master device"
 msgstr "Nastaveno na hlavním zařízení"
 
 #: src/screens/Account/Account.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Settings"
 msgstr "Nastavení"
 
@@ -183,24 +200,28 @@ msgid "Sign Up"
 msgstr "Registrace"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
-msgid "Start by adding a login secret or a TOTP code"
-msgstr "Začněte přidáním přihlašovacího klíče nebo TOTP kódu"
+#~ msgid "Start by adding a login secret or a TOTP code"
+#~ msgstr "Začněte přidáním přihlašovacího klíče nebo TOTP kódu"
 
 #: src/screens/TOTPVault/TOTPVault.tsx
-msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
-msgstr "Začněte přidáním klíče přihlášení přihlášením na libovolné webové stránky nebo přidáním TOTP kódu"
+#~ msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
+#~ msgstr "Začněte přidáním klíče přihlášení přihlášením na libovolné webové stránky nebo přidáním TOTP kódu"
 
 #: src/screens/Auth/Login.tsx
 msgid "Submit"
 msgstr "Odeslat"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Theme"
 msgstr "Téma"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
 msgstr "TOTP"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "User"
+msgstr "Uživatel"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
@@ -218,3 +239,9 @@ msgstr "Vítejte"
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Wrong password"
 msgstr "Nesprávné heslo"
+
+#: src/screens/Account/Account.tsx
+msgid ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."
+msgstr "Tuto akci nemůžete později vrátit zpět. Ujistěte se, že zálohujete data, která chcete zachovat."

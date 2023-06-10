@@ -23,7 +23,7 @@ import {
 } from '../providers/UserProvider.codegen'
 import { clearAccessToken } from './tokenFromAsyncStorage'
 
-import { getUniqueId } from 'react-native-device-info'
+import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
 import messaging from '@react-native-firebase/messaging'
 
@@ -195,36 +195,7 @@ export const useDeviceStore = create<Device>()(
       initialize: async () => {
         set({ id: await getUniqueId() })
         set({ biometricsAvailable: await get().checkBiometrics() })
-
-        //FIX: Not sure how this works
-        // let storedState: null | IBackgroundStateSerializable = null
-        //
-        // const storedDeviceState = await getSensitiveItem('deviceState')
-        //
-        // let storage: {
-        //   backgroundState: IBackgroundStateSerializable
-        //   lockedState: null | IBackgroundStateSerializableLocked
-        // } | null = null
-        //
-        // if (storedDeviceState) {
-        //   storage = JSON.parse(storedDeviceState)
-        // }
-        //
-        // if (storage?.backgroundState) {
-        //   storedState = storage.backgroundState
-        //   console.log('device state init from storage')
-        // } else if (storage?.lockedState) {
-        //   set({ lockedState: storage.lockedState })
-        //   console.log('device state locked')
-        // }
-
-        // if (storedState) {
-        //   this.state = new DeviceState(storedState)
-        //   set({name: storedState.deviceName})
-        // } else {
-        //   set({name: await getDeviceName()})
-        //   this.state = null
-        // }
+        set({ name: await getDeviceName() })
 
         useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
