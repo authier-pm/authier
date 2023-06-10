@@ -145,7 +145,6 @@ export const useLogin = (props: { deviceName: string }) => {
               name: props.deviceName,
               platform: Platform.OS
             },
-
             input: {
               addDeviceSecret: newParams.addDeviceSecret,
               addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
@@ -230,7 +229,7 @@ export const LoginAwaitingApproval = () => {
 
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
-  if (!deviceDecryptionChallenge) {
+  if (!deviceDecryptionChallenge || !device.fireToken) {
     return <Loading />
   }
 

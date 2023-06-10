@@ -118,7 +118,7 @@ type DeviceGQL {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!
@@ -254,7 +254,7 @@ type DeviceQuery {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!
@@ -421,7 +421,7 @@ type DeviceMutation {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!

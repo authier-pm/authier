@@ -46,7 +46,7 @@ model Device {
   id                      String    @id
   firstIpAddress          String    @db.Inet
   lastIpAddress           String    @db.Inet
-  firebaseToken           String
+  firebaseToken           String?
   name                    String
   platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
   ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes

@@ -12,9 +12,9 @@ export const OfflineBanner = () => {
       flexDir="row"
       w="100%"
       justifyContent="center"
-      p={8}
+      p={1}
       alignItems="center"
-      bgColor="red.300"
+      bgColor="red.400"
     >
       <WarningIcon size={18} color="#fff" />
       <Text color="white" ml={8} fontSize={14} lineHeight={22} fontWeight={500}>

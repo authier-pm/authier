@@ -234,7 +234,7 @@ export class DeviceMutation extends DeviceGQLScalars {
       where: {
         id: this.id
       },
-      data: { logoutAt: new Date() }
+      data: { logoutAt: new Date(), firebaseToken: null }
     })
   }
 

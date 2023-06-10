@@ -15,7 +15,7 @@ import React, { ReactElement } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
-import { DevicesStackScreenProps } from '../../navigation/types'
+import { DevicesStackScreenProps } from '@navigation/types'
 
 import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
@@ -49,7 +49,6 @@ export default function DeviceInfo({
   const selectedDeviceId = route.params.device.id
   const currentDeviceId = device.id
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
-
   return (
     <View p={5}>
       <VStack space={8}>
@@ -75,7 +74,10 @@ export default function DeviceInfo({
           </HStack>
 
           <HStack justifyContent={'flex-start'} space={5}>
-            <LogoutDeviceAlert id={route.params.device.id ?? ''} />
+            <LogoutDeviceAlert
+              selectedDeviceId={selectedDeviceId ?? ''}
+              masterDeviceId={masterDeviceId ?? ''}
+            />
             {masterDeviceId !== selectedDeviceId &&
             currentDeviceId === masterDeviceId ? (
               <Button

@@ -75,8 +75,6 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
   useEffect(() => {
-    devicesRefetch()
-    requestsRefetch()
     if (previousData !== devicesData) {
       devicesStopPolling()
     }
@@ -86,7 +84,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
     return () => {
       emitter.off('refresh')
     }
-  }, [])
+  }, [devicesData, previousData])
 
   const renderDevice = ({
     item,

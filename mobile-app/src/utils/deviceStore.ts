@@ -203,7 +203,8 @@ export const useDeviceStore = create<Device>()(
         console.log(
           'device initialized',
           get().biometricsAvailable,
-          useDeviceStateStore.getState().biometricsEnabled
+          useDeviceStateStore.getState().biometricsEnabled,
+          token
         )
         let test = await SInfo.getAllItems({
           sharedPreferencesName: 'authierShared',
@@ -333,15 +334,16 @@ export const useDeviceStore = create<Device>()(
       },
       clearAndReload: async () => {
         //TODO: This could be done better
+        await messaging().deleteToken()
         get().clearLockInterval()
         await clearAccessToken()
         SInfo.deleteItem('psw', {
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH'
         })
-
         useDeviceStateStore.getState().reset()
-        set({ isLoggedIn: false, isInitialized: true })
+        const newToken = await messaging().getToken()
+        set({ isLoggedIn: false, isInitialized: true, fireToken: newToken })
       },
       logout: async () => {
         try {
