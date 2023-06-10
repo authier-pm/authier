@@ -3,7 +3,10 @@ import * as React from 'react'
 import messaging from '@react-native-firebase/messaging'
 import DeviceStackNavigation from './DeviceStackNavigation'
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import {
+  BottomTabBar,
+  createBottomTabNavigator
+} from '@react-navigation/bottom-tabs'
 import PasswordsStackNavigation from './PasswordsStackNavigation'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import AccountNavigation from './AccountNavigation'
@@ -16,6 +19,7 @@ import { useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
+import { OfflineBanner } from '@src/components/OfflineBanner'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -103,6 +107,12 @@ function AppNavigation() {
         headerShown: false,
         tabBarHideOnKeyboard: true
       })}
+      tabBar={(props) => (
+        <>
+          <OfflineBanner />
+          <BottomTabBar {...props} />
+        </>
+      )}
     >
       <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
       <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />

@@ -53,7 +53,7 @@ export default function DeviceInfo({
   return (
     <View p={5}>
       <VStack space={8}>
-        <VStack space={8}>
+        <VStack space={4}>
           <HStack justifyContent="space-between">
             <Heading fontSize={'2xl'}>{route.params.device.name}</Heading>
             {Object.keys(icons).map((i, el) => {
@@ -95,7 +95,7 @@ export default function DeviceInfo({
                     as={Ionicons}
                     name="star"
                     size={'md'}
-                    color="black"
+                    color="yellow.400"
                   />
                 }
               >

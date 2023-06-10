@@ -17,10 +17,13 @@ export const ButtonWithAlert = ({
 }) => {
   const [isOpen, setIsOpen] = useState(false)
 
+  const onClose = () => setIsOpen(false)
   const cancelRef = React.useRef(null)
+
   return (
     <Box alignItems="center">
       <Button
+        rounded={8}
         w="90%"
         leftIcon={<Icon as={Ionicons} name={icon} size={5} />}
         colorScheme={btnColor}
@@ -28,7 +31,11 @@ export const ButtonWithAlert = ({
       >
         {btnText}
       </Button>
-      <AlertDialog leastDestructiveRef={cancelRef} isOpen={isOpen}>
+      <AlertDialog
+        leastDestructiveRef={cancelRef}
+        onClose={onClose}
+        isOpen={isOpen}
+      >
         <AlertDialog.Content>
           <AlertDialog.CloseButton />
           <AlertDialog.Header>Are you sure?</AlertDialog.Header>

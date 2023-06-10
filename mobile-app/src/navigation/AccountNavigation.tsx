@@ -14,7 +14,7 @@ const DeviceStack = createStackNavigator<AccountStackParamList>()
 
 export default function AccountNavigation() {
   return (
-    <DeviceStack.Navigator>
+    <DeviceStack.Navigator initialRouteName="Account">
       <DeviceStack.Screen
         options={{
           headerShadowVisible: false

@@ -195,12 +195,12 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds: 28800,
-            autofillCredentialsEnabled: false,
-            autofillTOTPEnabled: false,
+            autofillCredentialsEnabled:
+              addNewDeviceForUser.user.autofillCredentialsEnabled,
+            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
-            //TODO: Take this from DB
-            syncTOTP: false,
+            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
             theme: addNewDeviceForUser.user.defaultDeviceTheme
           }
 

@@ -22,14 +22,10 @@ import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { t, Trans } from '@lingui/macro'
-import { useDeleteAccountMutation } from './Account.codegen'
 
-const settingsOptions = [
-  { name: t`Settings`, route: 'Settings' },
-  { name: t`Change master password`, route: 'ChangeMasterPassword' }
-]
+const settingsOptions = [{ name: t`Settings`, route: 'Settings' }]
 
-const SettingsItem = ({
+export const SettingsItem = ({
   name,
   onPress
 }: {
@@ -62,7 +58,6 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
   const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
-  const [deleteAccount] = useDeleteAccountMutation()
 
   useEffect(() => {
     codePush.getUpdateMetadata().then((metadata) => {
@@ -109,21 +104,10 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
 
         <ButtonWithAlert
           btnText={t`Logout`}
-          btnColor="orange"
+          btnColor="danger"
           icon="log-out-outline"
           text={t`Do you want to logout?`}
           onPress={() => device.logout()}
-        />
-        <ButtonWithAlert
-          btnText={t`Delete your account`}
-          btnColor="danger"
-          icon="log-out-outline"
-          text={t`You cannot undo this action afterwards. Make sure to
-              backup data that you want to keep.`}
-          onPress={async () => {
-            await deleteAccount()
-            device.clearAndReload()
-          }}
         />
       </VStack>
       <Center>
