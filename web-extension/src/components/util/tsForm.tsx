@@ -6,6 +6,7 @@ import { TextField } from '../form/TextFiled'
 import FormComponent from '../form/FormComponent'
 import SelectNumberField from '../form/SelectNumberField'
 import { PasswordTextField } from '../form/PasswordTextField'
+import { NumberField } from '../form/NumberField'
 
 export const selectTextFieldSchema = createUniqueFieldSchema(
   z.string(),
@@ -34,6 +35,7 @@ export const inputPswFieldSchema = createUniqueFieldSchema(
 const mapping = [
   [inputFieldSchema, TextField],
   [inputEmailFieldSchema, TextField],
+  [z.number(), NumberField],
   [z.boolean(), CheckBoxField],
   [inputPswFieldSchema, PasswordTextField],
   [selectTextFieldSchema, SelectTextField] as const,

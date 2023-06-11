@@ -93,6 +93,23 @@ jobs:
           pnpm test:prepare
           pnpm test
 
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: 'eu-central-1'
+
+      - name: backend build and deploy
+        working-directory: ./backend
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+        env:
+          NODE_ENV: production
+        run: |
+          pnpm prisma:deploy
+          pnpm cdkDeploy
+
       - name: web-extension, check TS and run tests
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
@@ -127,20 +144,3 @@ jobs:
         run: |
           pnpm tsc
           pnpm test
-
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: 'eu-central-1'
-
-      - name: backend build and deploy
-        working-directory: ./backend
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        env:
-          NODE_ENV: production
-        run: |
-          pnpm prisma:deploy
-          pnpm cdkDeploy

@@ -39,6 +39,7 @@ export default function Security() {
   })
 
   if (deviceState) {
+    console.log(deviceState.notificationOnWrongPasswordAttempts)
     const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
       defaultValues: {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
