@@ -188,6 +188,7 @@ export type DeviceMutation = {
   rename: DeviceGql;
   reportSecretUsageEvent: SecretUsageEventGqlScalars;
   syncTOTP: Scalars['Boolean']['output'];
+  updateDeviceSettings: DeviceGql;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
@@ -203,6 +204,11 @@ export type DeviceMutationReportSecretUsageEventArgs = {
   kind: Scalars['String']['input'];
   secretId: Scalars['UUID']['input'];
   webInputId: Scalars['PositiveInt']['input'];
+};
+
+
+export type DeviceMutationUpdateDeviceSettingsArgs = {
+  config: SettingsInput;
 };
 
 export type DeviceQuery = {
@@ -671,6 +677,7 @@ export type UserQuery = {
   notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
+  /** Sends a message to the master device */
   sendAuthMessage: Scalars['Boolean']['output'];
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];

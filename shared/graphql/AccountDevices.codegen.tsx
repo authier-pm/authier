@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string }> } };
+export type MyDevicesQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number }> } };
 
 export type RejectChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int']['input'];
@@ -65,6 +65,8 @@ export const MyDevicesDocument = gql`
       lastSyncAt
       platform
       createdAt
+      syncTOTP
+      vaultLockTimeoutSeconds
     }
   }
 }

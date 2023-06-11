@@ -11,12 +11,13 @@ export type SendAuthMessageQueryVariables = Types.Exact<{
 }>;
 
 
-export type SendAuthMessageQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', sendAuthMessage: boolean } };
+export type SendAuthMessageQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, sendAuthMessage: boolean } };
 
 
 export const SendAuthMessageDocument = gql`
     query sendAuthMessage($type: String!, $body: String!, $title: String!, $deviceId: String!) {
   me {
+    id
     sendAuthMessage(type: $type, body: $body, title: $title, deviceId: $deviceId)
   }
 }

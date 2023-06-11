@@ -453,6 +453,7 @@ type DeviceMutation {
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
+  updateDeviceSettings(config: SettingsInput!): DeviceGQL!
   rename(name: String!): DeviceGQL!
   logout: DeviceGQL!
 
@@ -477,6 +478,16 @@ type SecretUsageEventGQLScalars {
 Integers that will have a value greater than 0.
 """
 scalar PositiveInt
+
+input SettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
+}
 
 input DeviceInput {
   id: String!
@@ -509,16 +520,6 @@ input SecretUsageEventInput {
   kind: String!
   secretId: String!
   url: String
-}
-
-input SettingsInput {
-  syncTOTP: Boolean!
-  vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  notificationOnVaultUnlock: Boolean!
-  notificationOnWrongPasswordAttempts: Int!
 }
 
 """

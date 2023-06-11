@@ -15,6 +15,7 @@ import { fetch } from 'undici'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { SettingsInput } from './models'
 
 // TODO memoize this function into redis so that we don't hit the API limit
 export async function getGeoIpLocation(ipAddress: string) {
@@ -197,6 +198,22 @@ export class DeviceMutation extends DeviceGQLScalars {
       }
     })
     return res
+  }
+
+  @Field(() => DeviceGQL)
+  async updateDeviceSettings(
+    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Ctx() ctx: IContext
+  ) {
+    return await ctx.prisma.device.update({
+      where: {
+        id: this.id
+      },
+      data: {
+        syncTOTP: config.syncTOTP,
+        vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+      }
+    })
   }
 
   @Field(() => DeviceGQL)

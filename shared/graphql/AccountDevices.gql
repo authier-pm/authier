@@ -13,6 +13,8 @@ query myDevices {
       lastSyncAt
       platform
       createdAt
+      syncTOTP
+      vaultLockTimeoutSeconds
     }
   }
 }
