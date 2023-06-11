@@ -5,7 +5,6 @@ import {
   EncryptedSecretQuery
 } from './EncryptedSecret'
 import { EncryptedSecretInput, SettingsInput } from './models'
-
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
@@ -225,6 +224,10 @@ export class UserMutation extends UserBase {
       },
       data: {
         autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+        autofillTOTPEnabled: config.autofillTOTPEnabled,
+        notificationOnVaultUnlock: config.notificationOnVaultUnlock,
+        notificationOnWrongPasswordAttempts:
+          config.notificationOnWrongPasswordAttempts,
         uiLanguage: config.uiLanguage,
         Devices: {
           update: {

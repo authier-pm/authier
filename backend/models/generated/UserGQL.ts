@@ -58,6 +58,12 @@ export class UserGQLScalars {
 
   @Field()
   defaultDeviceSyncTOTP: boolean
+
+  @Field()
+  notificationOnVaultUnlock: boolean
+
+  @Field(() => Int)
+  notificationOnWrongPasswordAttempts: number
 }
 
 @ObjectType()

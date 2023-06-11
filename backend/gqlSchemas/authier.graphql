@@ -27,6 +27,8 @@ type UserQuery {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -45,12 +47,7 @@ type UserQuery {
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
-  sendAuthMessage(
-    pageName: String!
-    device: String!
-    time: DateTime!
-    location: String!
-  ): Boolean!
+  sendAuthMessage(type: String!, body: String!, title: String!): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
 
@@ -101,6 +98,8 @@ type UserGQL {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -382,6 +381,8 @@ type UserMutation {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -507,6 +508,8 @@ input SettingsInput {
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
 }
 
 """

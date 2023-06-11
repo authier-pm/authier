@@ -1,5 +1,4 @@
-import React from 'react'
-
+import React, { useEffect, useRef } from 'react'
 import {
   Box,
   Center,
@@ -44,9 +43,24 @@ function DeviceSettings() {
       autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
       uiLanguage: deviceState.uiLanguage,
       syncTOTP: deviceState.syncTOTP,
-      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
+      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+      notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
+      notificationOnWrongPasswordAttempts:
+        deviceState.notificationOnWrongPasswordAttempts
     }
   }
+
+  //WARNING: IS this correct way?
+  //I dont think this is the correct way how to handle settings update. on web you have save button but on mobile you dont have so I save on every state update, which can be dangerous
+  //@Capajj please check
+  React.useEffect(() => {
+    console.log('CALLED update settings')
+    updateSettings({
+      variables: {
+        config: settings()
+      }
+    })
+  }, [deviceState])
 
   return (
     <ScrollView>
@@ -68,11 +82,6 @@ function DeviceSettings() {
                     variant="rounded"
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
-                      updateSettings({
-                        variables: {
-                          config: settings()
-                        }
-                      })
                     }}
                     defaultValue={deviceState.vaultLockTimeoutSeconds.toString()}
                     accessibilityLabel="Lock time"
@@ -100,14 +109,9 @@ function DeviceSettings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  defaultIsChecked={deviceState.syncTOTP}
-                  onValueChange={(e) => {
+                  value={deviceState.syncTOTP}
+                  onToggle={async (e) => {
                     deviceState.changeSyncTOTP(e)
-                    updateSettings({
-                      variables: {
-                        config: settings()
-                      }
-                    })
                   }}
                   size="md"
                 />
@@ -150,11 +154,6 @@ function DeviceSettings() {
               <Select
                 onValueChange={(value) => {
                   deviceState.changeUiLanguage(value)
-                  updateSettings({
-                    variables: {
-                      config: settings()
-                    }
-                  })
                   i18n.activate(value)
                 }}
                 defaultValue={deviceState.uiLanguage}
@@ -176,7 +175,6 @@ function DeviceSettings() {
                 onValueChange={(value) => {
                   toggleColorMode()
                   deviceState.changeTheme(value)
-                  console.log(value)
                 }}
                 defaultValue={deviceState.theme}
                 accessibilityLabel="theme"

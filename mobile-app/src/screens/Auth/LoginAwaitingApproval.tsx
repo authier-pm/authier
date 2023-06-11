@@ -200,7 +200,11 @@ export const useLogin = (props: { deviceName: string }) => {
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
             syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme
+            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            notificationOnVaultUnlock:
+              addNewDeviceForUser.user.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts
           }
 
           device.save(newDeviceState)

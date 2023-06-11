@@ -435,6 +435,8 @@ export type SecretUsageEventInput = {
 export type SettingsInput = {
   autofillCredentialsEnabled: Scalars['Boolean']['input'];
   autofillTOTPEnabled: Scalars['Boolean']['input'];
+  notificationOnVaultUnlock: Scalars['Boolean']['input'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['input'];
   syncTOTP: Scalars['Boolean']['input'];
   uiLanguage: Scalars['String']['input'];
   vaultLockTimeoutSeconds: Scalars['Int']['input'];
@@ -491,6 +493,8 @@ export type UserGql = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
@@ -534,6 +538,8 @@ export type UserMutation = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   removeEncryptedSecrets: Array<EncryptedSecretMutation>;
   revokeRefreshTokensForUser: UserGql;
@@ -661,6 +667,8 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   sendAuthMessage: Scalars['Boolean']['output'];
@@ -677,10 +685,9 @@ export type UserQueryDeviceArgs = {
 
 
 export type UserQuerySendAuthMessageArgs = {
-  device: Scalars['String']['input'];
-  location: Scalars['String']['input'];
-  pageName: Scalars['String']['input'];
-  time: Scalars['DateTime']['input'];
+  body: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: Scalars['String']['input'];
 };
 
 export type WebInputElement = {

@@ -5,7 +5,8 @@ import {
   Field,
   Int,
   ObjectType,
-  GraphQLISODateTime
+  GraphQLISODateTime,
+  UseMiddleware
 } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 
@@ -20,6 +21,7 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
+import { throwIfNotAuthenticated } from '../api/authMiddleware'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -130,10 +132,9 @@ export class UserQuery extends UserBase {
 
   @Field(() => Boolean)
   async sendAuthMessage(
-    @Arg('location', () => String) location: string,
-    @Arg('time', () => GraphQLISODateTime) time: string,
-    @Arg('device', () => String) device: string,
-    @Arg('pageName', () => String) pageName: string
+    @Arg('title', () => String) title: string,
+    @Arg('body', () => String) body: string,
+    @Arg('type', () => String) type: string
   ) {
     const user = await prismaClient.user.findUnique({
       where: {
@@ -144,32 +145,27 @@ export class UserQuery extends UserBase {
       }
     })
 
-    if (user) {
-      try {
-        await admin.messaging().sendToDevice(
-          user.Devices[0].firebaseToken, // ['token_1', 'token_2', ...]
-          {
-            data: {
-              userId: this.id,
-              location: location,
-              time: time,
-              device: device,
-              pageName: pageName
-            }
-          },
-          {
-            // Required for background/quit data-only messages on iOS
-            contentAvailable: true,
-            // Required for background/quit data-only messages on Android
-            priority: 'high'
-          }
-        )
-        return true
-      } catch (err) {
-        console.log(err)
-        return false
+    const masterDevice = await prismaClient.device.findFirst({
+      where: {
+        id: user?.masterDeviceId as string
       }
-    } else {
+    })
+
+    try {
+      await admin
+        .messaging()
+        .sendToDevice(masterDevice?.firebaseToken as string, {
+          notification: {
+            title: 'New device login!',
+            body: 'New device is trying to log in.'
+          },
+          data: {
+            type: type
+          }
+        })
+      return true
+    } catch (err) {
+      console.log(err)
       return false
     }
   }

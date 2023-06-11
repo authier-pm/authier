@@ -27,6 +27,8 @@ mutation addNewDeviceForUser(
           defaultDeviceSyncTOTP
           autofillCredentialsEnabled
           autofillTOTPEnabled
+          notificationOnVaultUnlock
+          notificationOnWrongPasswordAttempts
         }
       }
     }

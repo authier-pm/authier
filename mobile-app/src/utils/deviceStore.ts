@@ -47,6 +47,8 @@ export interface IBackgroundStateSerializableLocked {
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number | null
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 }
 
 export interface IBackgroundStateSerializable
@@ -215,7 +217,6 @@ export const useDeviceStore = create<Device>()(
       },
       setDeviceSettings(config: SettingsInput) {
         //HACK: this is a hack, we should not create a new interval every time we save the state
-        //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
         let state = useDeviceStateStore.getState()
         if (!state) {
           console.warn('device not initialized')
@@ -310,7 +311,10 @@ export const useDeviceStore = create<Device>()(
           uiLanguage,
           theme,
           biometricsEnabled,
-          deviceName
+          deviceName,
+          notificationOnWrongPasswordAttempts,
+          notificationOnVaultUnlock,
+          notifications
         } = state
         device.setLockedState({
           email,
@@ -327,7 +331,9 @@ export const useDeviceStore = create<Device>()(
           uiLanguage,
           theme,
           biometricsEnabled,
-          lockTimeEnd: null // when locking the device, we must clear the lockTimeEnd
+          lockTimeEnd: null, // when locking the device, we must clear the lockTimeEnd
+          notificationOnVaultUnlock,
+          notificationOnWrongPasswordAttempts
         })
 
         useDeviceStateStore.setState({})

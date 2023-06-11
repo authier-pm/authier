@@ -131,7 +131,7 @@ export function Register({ navigation }: NavigationProps) {
     const registerResult = res.data?.registerNewUser
 
     //FIX: Maybe we should check if is the access token valid?
-    if (registerResult?.accessToken) {
+    if (registerResult?.accessToken && res.data?.registerNewUser.user) {
       await saveAccessToken(registerResult.accessToken)
       const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
@@ -145,13 +145,16 @@ export function Register({ navigation }: NavigationProps) {
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
         vaultLockTimeoutSeconds: 28800,
-        autofillTOTPEnabled: false,
-        autofillCredentialsEnabled: false,
-        //TODO: From DB
-        uiLanguage: 'en',
+        autofillTOTPEnabled: registerResult.user.autofillTOTPEnabled,
+        autofillCredentialsEnabled:
+          registerResult.user.autofillCredentialsEnabled,
+        uiLanguage: registerResult.user.uiLanguage,
         lockTimeEnd: Date.now() + 28800000,
-        syncTOTP: false,
-        theme: 'dark'
+        syncTOTP: registerResult.user.defaultDeviceSyncTOTP,
+        theme: registerResult.user.defaultDeviceTheme,
+        notificationOnWrongPasswordAttempts:
+          registerResult.user.notificationOnWrongPasswordAttempts,
+        notificationOnVaultUnlock: registerResult.user.notificationOnVaultUnlock
       }
 
       device.save(newDeviceState)

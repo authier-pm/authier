@@ -190,6 +190,8 @@ model User {
   uiLanguage                    String  @default("en")
   defaultDeviceTheme            String  @default("dark")
   defaultDeviceSyncTOTP         Boolean @default(true)
+  notificationOnVaultUnlock     Boolean @default(false)
+  notificationOnWrongPasswordAttempts Int @default(3)
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]
