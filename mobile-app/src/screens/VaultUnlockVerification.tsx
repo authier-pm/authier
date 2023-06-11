@@ -41,7 +41,9 @@ export function VaultUnlockVerification({
   const toast = useToast()
   const id = 'active-toast'
   const device = useDeviceStore((state) => state)
-
+  const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
+    state.notificationOnVaultUnlock
+  ])
   const [sendAuthMesssage] = useSendAuthMessageLazyQuery()
   const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
     state.notificationOnWrongPasswordAttempts
@@ -92,7 +94,7 @@ export function VaultUnlockVerification({
     console.log('send notification')
     sendAuthMesssage({
       variables: {
-        body: 'Someone is trying to unlock your vault',
+        body: ' is trying to unlock your vault',
         title: 'Wrong password entered',
         type: 'wrongPassword',
         deviceId: device.id as string
@@ -155,13 +157,17 @@ export function VaultUnlockVerification({
             await unlockVault(values.password)
             onUnlocked()
             setSubmitting(false)
+            await sendAuthMesssage({
+              variables: {
+                body: ' unlocked your vault',
+                title: 'Vault unlocked',
+                type: 'vaultUnlocked',
+                deviceId: device.id as string
+              }
+            })
           } catch (err: any) {
             console.log(err)
             setTries(tries + 1)
-            // toast.show({
-            //   title: 'Login failed',
-            //   description: err.message
-            // })
             if (!toast.isActive(id)) {
               toast.show({
                 id,

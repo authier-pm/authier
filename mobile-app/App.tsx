@@ -33,7 +33,7 @@ let CodePushOptions = {
 }
 
 const RnApp = () => {
-  const device = useDeviceStore((state) => state)
+  const [initialize] = useDeviceStore((state) => [state.initialize])
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
@@ -48,7 +48,7 @@ const RnApp = () => {
 
   useEffect(() => {
     requestUserPermission()
-    device.initialize()
+    initialize()
     console.log('API_URL', API_URL)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {

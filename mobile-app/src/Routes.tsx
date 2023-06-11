@@ -21,9 +21,12 @@ import { useDeviceStore } from './utils/deviceStore'
 const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
 
 export default function Routes() {
-  const device = useDeviceStore((state) => state)
+  const [lockedState, isInitialized, isLoggedIn] = useDeviceStore((state) => [
+    state.lockedState,
+    state.isInitialized,
+    state.isLoggedIn
+  ])
   const { colorMode } = useColorMode()
-
   const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.
   const [initialState, setInitialState] = React.useState()
   const navigation = useNavigationContainerRef()
@@ -54,7 +57,7 @@ export default function Routes() {
     }
   }, [isReady])
 
-  if (device.lockedState) {
+  if (lockedState) {
     return (
       <VaultUnlockVerification
         onUnlocked={() => {
@@ -64,7 +67,7 @@ export default function Routes() {
     )
   }
 
-  if (!isReady || device.isInitialized === false) {
+  if (!isReady || isInitialized === false) {
     return <Loading />
   }
 
@@ -81,7 +84,7 @@ export default function Routes() {
       }
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}
     >
-      {device.isLoggedIn ? <AppNavigation /> : <AuthNavigation />}
+      {isLoggedIn ? <AppNavigation /> : <AuthNavigation />}
     </NavigationContainer>
   )
 }

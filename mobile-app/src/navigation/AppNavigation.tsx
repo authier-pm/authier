@@ -25,9 +25,13 @@ import { Loading } from '@src/components/Loading'
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
-  const { data, loading, error } = useSyncSettingsQuery()
-  const device = useDeviceStore((state) => state)
-  const deviceState = useDeviceStateStore((state) => state)
+  const { data, loading } = useSyncSettingsQuery()
+  const [setDeviceSettings] = useDeviceStore((state) => [
+    state.setDeviceSettings
+  ])
+  const [notifications, backendSync, setNotifications] = useDeviceStateStore(
+    (state) => [state.notifications, state.backendSync, state.setNotifications]
+  )
   const navigation = useNavigation()
   const toast = useToast()
 
@@ -58,19 +62,19 @@ function AppNavigation() {
       })
 
     // Foreground notification
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      deviceState.setNotifications(deviceState.notifications + 1)
+    const unsubscribe = messaging().onMessage(async (remoteMessage: any) => {
+      if (remoteMessage.data.type === 'Devices') {
+        setNotifications(notifications + 1)
+      }
     })
 
-    if (deviceState) {
-      deviceState.backendSync(toast)
-    }
+    backendSync(toast)
     return unsubscribe
   }, [])
 
   React.useEffect(() => {
     if (data && data.currentDevice) {
-      device.setDeviceSettings({
+      setDeviceSettings({
         autofillTOTPEnabled: data.me.autofillTOTPEnabled,
         autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
         syncTOTP: data.currentDevice.syncTOTP,
@@ -126,9 +130,9 @@ function AppNavigation() {
       <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
       <RootStack.Screen
         options={
-          deviceState.notifications > 0
+          notifications > 0
             ? {
-                tabBarBadge: deviceState.notifications,
+                tabBarBadge: notifications,
                 tabBarBadgeStyle: {
                   top: Platform.OS === 'ios' ? 0 : 9,
                   minWidth: 14,
