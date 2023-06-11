@@ -6,7 +6,7 @@ import { makeFakeCtx } from 'tests/makeFakeCtx'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { UserMutation } from './UserMutation'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
-import { EncryptedSecretInput } from './models'
+import { EncryptedSecretInput, SettingsInput } from './models'
 
 describe('UserMutation', () => {
   const masterDeviceId = faker.string.uuid()
@@ -156,12 +156,14 @@ describe('UserMutation', () => {
     it('Should update settings', async () => {
       const user = plainToClass(UserMutation, userRaw)
 
-      const newSettings = {
+      const newSettings: SettingsInput = {
         syncTOTP: true,
         vaultLockTimeoutSeconds: 3600,
         uiLanguage: 'cs',
         autofillCredentialsEnabled: false,
-        autofillTOTPEnabled: false
+        autofillTOTPEnabled: false,
+        notificationOnVaultUnlock: false,
+        notificationOnWrongPasswordAttempts: 3
       }
 
       const res = await user.updateSettings(
