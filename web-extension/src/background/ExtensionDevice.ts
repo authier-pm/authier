@@ -709,6 +709,9 @@ class ExtensionDevice {
     this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.syncTOTP = config.syncTOTP
     this.state.uiLanguage = config.uiLanguage
+    this.state.notificationOnWrongPasswordAttempts =
+      config.notificationOnWrongPasswordAttempts
+    this.state.notificationOnVaultUnlock = config.notificationOnVaultUnlock
 
     device.setLockTime(config.vaultLockTimeoutSeconds)
 

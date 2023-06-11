@@ -8,7 +8,6 @@ import {
   InputGroup,
   InputRightElement
 } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
 import { Trans } from '@lingui/react'
 import { useTsController, useDescription } from '@ts-react/form'
 import { useState } from 'react'

@@ -30,7 +30,7 @@ export const VaultList = () => {
   } = useContext(DeviceStateContext)
   const [filterBy, setFilterBy] = useState('')
   const navigate = useNavigate()
-  const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
+  const { setSecuritySettings } = useContext(DeviceStateContext)
   const { data, loading, error } = useSyncSettingsQuery()
 
   const screenHeight =
@@ -42,7 +42,6 @@ export const VaultList = () => {
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
     if (data) {
-      console.log(data)
       setSecuritySettings({
         autofillCredentialsEnabled: data.me?.autofillCredentialsEnabled,
         autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
@@ -54,7 +53,6 @@ export const VaultList = () => {
           data.me.notificationOnWrongPasswordAttempts,
         notificationOnVaultUnlock: data.me.notificationOnVaultUnlock
       })
-      console.log('test', deviceState?.notificationOnWrongPasswordAttempts)
     }
   }, [data, loading])
 

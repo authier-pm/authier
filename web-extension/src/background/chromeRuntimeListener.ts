@@ -229,11 +229,11 @@ const appRouter = tc.router({
     .input(settingsSchema)
     .mutation(async ({ input }) => {
       const deviceState = device.state
-      log('securitySettings', input, device.state)
+      // console.log('securitySettings', input, device.state)
       if (deviceState) {
         device.setDeviceSettings(input)
 
-        log('device.state', device.state)
+        // console.log('device.state', device.state)
       }
 
       return true

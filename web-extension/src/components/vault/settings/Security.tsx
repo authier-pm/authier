@@ -39,7 +39,6 @@ export default function Security() {
   })
 
   if (deviceState) {
-    console.log(deviceState.notificationOnWrongPasswordAttempts)
     const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
       defaultValues: {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
@@ -76,7 +75,10 @@ export default function Security() {
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
+        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+        notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
+        notificationOnWrongPasswordAttempts:
+          deviceState.notificationOnWrongPasswordAttempts
       })
     }, [isSubmitSuccessful])
 

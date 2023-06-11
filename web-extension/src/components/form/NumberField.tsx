@@ -25,7 +25,7 @@ export function NumberField() {
       <NumberInput
         min={0}
         max={50}
-        defaultValue={value}
+        defaultValue={value ? value : 0}
         onChange={(valueString, valueNumber) => onChange(valueNumber)}
       >
         <NumberInputField />
