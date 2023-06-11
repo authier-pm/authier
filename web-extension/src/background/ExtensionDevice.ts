@@ -123,6 +123,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   theme: string
   authSecret: string
   authSecretEncrypted: string
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -614,11 +616,15 @@ class ExtensionDevice {
       uiLanguage,
       theme,
       authSecret,
-      authSecretEncrypted
+      authSecretEncrypted,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock
     } = this.state
 
     this.lockedState = {
       email,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock,
       userId,
       secrets,
       deviceName: this.name,

@@ -23,7 +23,13 @@ const VaultConfigFormSchema = z.object({
   uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
   autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
   autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),
-  syncTOTP: z.boolean().describe(t`2FA sync`)
+  syncTOTP: z.boolean().describe(t`2FA sync`),
+  notificationOnWrongPasswordAttempts: z
+    .number()
+    .describe('Number of wrong password attempts for notification'),
+  notificationOnVaultUnlock: z
+    .boolean()
+    .describe('Notification on vault unlock')
 })
 
 export default function Security() {
@@ -39,7 +45,10 @@ export default function Security() {
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
         uiLanguage: deviceState.uiLanguage,
         syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
+        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+        notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
+        notificationOnWrongPasswordAttempts:
+          deviceState.notificationOnWrongPasswordAttempts
       },
       mode: 'onChange'
     })
