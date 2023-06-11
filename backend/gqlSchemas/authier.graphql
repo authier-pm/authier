@@ -47,7 +47,12 @@ type UserQuery {
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
-  sendAuthMessage(type: String!, body: String!, title: String!): Boolean!
+  sendAuthMessage(
+    type: String!
+    body: String!
+    title: String!
+    deviceId: String!
+  ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
 

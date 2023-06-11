@@ -686,6 +686,7 @@ export type UserQueryDeviceArgs = {
 
 export type UserQuerySendAuthMessageArgs = {
   body: Scalars['String']['input'];
+  deviceId: Scalars['String']['input'];
   title: Scalars['String']['input'];
   type: Scalars['String']['input'];
 };

@@ -132,37 +132,36 @@ export class UserQuery extends UserBase {
 
   @Field(() => Boolean)
   async sendAuthMessage(
+    @Arg('deviceId', () => String) deviceId: string,
     @Arg('title', () => String) title: string,
     @Arg('body', () => String) body: string,
-    @Arg('type', () => String) type: string
+    @Arg('type', () => String) type: string,
+    @Ctx() ctx: IContextAuthenticated
   ) {
-    const user = await prismaClient.user.findUnique({
+    if (deviceId === ctx.masterDeviceId) {
+      return false // no point in sending messages to the master device
+    }
+    const device = await prismaClient.device.findUnique({
       where: {
-        id: this.id
-      },
-      include: {
-        Devices: true
+        id: deviceId
       }
     })
 
-    const masterDevice = await prismaClient.device.findFirst({
-      where: {
-        id: user?.masterDeviceId as string
-      }
-    })
+    if (!device) {
+      console.log(`Device with ID ${deviceId} not found`)
+      return false
+    }
 
     try {
-      await admin
-        .messaging()
-        .sendToDevice(masterDevice?.firebaseToken as string, {
-          notification: {
-            title: 'New device login!',
-            body: 'New device is trying to log in.'
-          },
-          data: {
-            type: type
-          }
-        })
+      await admin.messaging().sendToDevice(device.firebaseToken as string, {
+        notification: {
+          title: title,
+          body: body
+        },
+        data: {
+          type: type
+        }
+      })
       return true
     } catch (err) {
       console.log(err)

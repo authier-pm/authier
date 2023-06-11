@@ -25,7 +25,7 @@ import { Loading } from '@src/components/Loading'
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
-  // const { data, loading, error } = useSyncSettingsQuery()
+  const { data, loading, error } = useSyncSettingsQuery()
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
   const navigation = useNavigation()
@@ -68,26 +68,25 @@ function AppNavigation() {
     return unsubscribe
   }, [])
 
-  // React.useEffect(() => {
-  //   console.log('data', data)
-  //   if (data && data.currentDevice) {
-  //     device.setDeviceSettings({
-  //       autofillTOTPEnabled: data.me.autofillTOTPEnabled,
-  //       autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
-  //       syncTOTP: data.currentDevice.syncTOTP,
-  //       vaultLockTimeoutSeconds: data.currentDevice
-  //         .vaultLockTimeoutSeconds as number,
-  //       uiLanguage: data.me.uiLanguage,
-  //       notificationOnVaultUnlock: data.me.notificationOnVaultUnlock,
-  //       notificationOnWrongPasswordAttempts:
-  //         data.me.notificationOnWrongPasswordAttempts
-  //     })
-  //   }
-  // }, [data, loading])
-  //
-  // if (loading && !data) {
-  //   return <Loading />
-  // }
+  React.useEffect(() => {
+    if (data && data.currentDevice) {
+      device.setDeviceSettings({
+        autofillTOTPEnabled: data.me.autofillTOTPEnabled,
+        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
+        syncTOTP: data.currentDevice.syncTOTP,
+        vaultLockTimeoutSeconds: data.currentDevice
+          .vaultLockTimeoutSeconds as number,
+        uiLanguage: data.me.uiLanguage,
+        notificationOnVaultUnlock: data.me.notificationOnVaultUnlock,
+        notificationOnWrongPasswordAttempts:
+          data.me.notificationOnWrongPasswordAttempts
+      })
+    }
+  }, [data, loading])
+
+  if (loading && !data) {
+    return <Loading />
+  }
 
   return (
     <RootStack.Navigator

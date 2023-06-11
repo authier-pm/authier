@@ -32,8 +32,8 @@ function DeviceSettings() {
   const [modalVisible, setModalVisible] = React.useState(false)
 
   const [updateSettings] = useUpdateSettingsMutation({
-    refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
-    awaitRefetchQueries: true
+    // refetchQueries: [{ query: SyncSettingsDocument, variables: {} }],
+    // awaitRefetchQueries: true
   })
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
