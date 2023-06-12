@@ -189,11 +189,16 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newDeviceSecretsPair.addDeviceSecret,
             authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds: 28800,
-            autofillTOTPEnabled: true,
-            autofillCredentialsEnabled: true,
-            uiLanguage: 'en',
-            syncTOTP: false,
-            theme: 'dark'
+            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
+            autofillCredentialsEnabled:
+              addNewDeviceForUser.user.autofillCredentialsEnabled,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
+            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
+            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            notificationOnWrongPasswordAttempts:
+              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
+            notificationOnVaultUnlock:
+              addNewDeviceForUser.user.notificationOnVaultUnlock
           }
 
           setUserId(decodedToken.userId)

@@ -38,7 +38,10 @@ export const tokenRefresh = new TokenRefreshLink({
   handleError: async (err) => {
     //FIX: What should we do here?
     if (useDeviceStore.getState().isLoggedIn) {
-      console.warn('Your refresh token is invalid. You must login again', err)
+      console.warn(
+        'Your refresh token is invalid. You must login again',
+        err.message
+      )
       useDeviceStore.getState().clearAndReload()
     }
   }

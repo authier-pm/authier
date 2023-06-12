@@ -10,7 +10,14 @@ const Tab = createMaterialTopTabNavigator<SettingsTabParamList>()
 
 function SettingsNavigation() {
   return (
-    <Tab.Navigator initialRouteName="User">
+    <Tab.Navigator
+      screenOptions={{
+        tabBarIndicatorStyle: {
+          backgroundColor: '#2cb9b0'
+        }
+      }}
+      initialRouteName="User"
+    >
       <Tab.Screen
         name="User"
         options={{
@@ -19,7 +26,7 @@ function SettingsNavigation() {
         component={UserSettings}
       />
       <Tab.Screen
-        options={{ title: `Device` }}
+        options={{ title: t`Device` }}
         name="Device"
         component={DeviceSettings}
       />

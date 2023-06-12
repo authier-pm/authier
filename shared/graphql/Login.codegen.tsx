@@ -11,7 +11,7 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', defaultDeviceTheme: string, uiLanguage: string, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, defaultDeviceTheme: string, uiLanguage: string, defaultDeviceSyncTOTP: boolean, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress']['input'];
@@ -33,6 +33,7 @@ export const AddNewDeviceForUserDocument = gql`
       ) {
         accessToken
         user {
+          id
           EncryptedSecrets {
             id
             encrypted
@@ -43,6 +44,11 @@ export const AddNewDeviceForUserDocument = gql`
           }
           defaultDeviceTheme
           uiLanguage
+          defaultDeviceSyncTOTP
+          autofillCredentialsEnabled
+          autofillTOTPEnabled
+          notificationOnVaultUnlock
+          notificationOnWrongPasswordAttempts
         }
       }
     }

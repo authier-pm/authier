@@ -5,7 +5,8 @@ import {
   Ctx,
   ObjectType,
   Arg,
-  InputType
+  InputType,
+  Int
 } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
@@ -15,6 +16,7 @@ import { fetch } from 'undici'
 
 import { GraphqlError } from '../api/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { SettingsInput } from './models'
 
 // TODO memoize this function into redis so that we don't hit the API limit
 export async function getGeoIpLocation(ipAddress: string) {
@@ -200,6 +202,23 @@ export class DeviceMutation extends DeviceGQLScalars {
   }
 
   @Field(() => DeviceGQL)
+  async updateDeviceSettings(
+    @Arg('syncTOTP', () => Boolean) syncTOTP: boolean,
+    @Arg('vaultLockTimeoutSeconds', () => Int) vaultLockTimeoutSeconds: number,
+    @Ctx() ctx: IContext
+  ) {
+    return await ctx.prisma.device.update({
+      where: {
+        id: this.id
+      },
+      data: {
+        syncTOTP: syncTOTP,
+        vaultLockTimeoutSeconds: vaultLockTimeoutSeconds
+      }
+    })
+  }
+
+  @Field(() => DeviceGQL)
   async rename(@Ctx() ctx: IContextAuthenticated, @Arg('name') name: string) {
     return ctx.prisma.device.update({
       data: {
@@ -234,7 +253,7 @@ export class DeviceMutation extends DeviceGQLScalars {
       where: {
         id: this.id
       },
-      data: { logoutAt: new Date() }
+      data: { logoutAt: new Date(), firebaseToken: null }
     })
   }
 

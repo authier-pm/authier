@@ -1,0 +1,20 @@
+query deviceInfo($id: String!) {
+  me {
+    id
+    masterDeviceId
+    device(id: $id) {
+      id
+      name
+      firstIpAddress
+      lastIpAddress
+      logoutAt
+      lastGeoLocation
+      createdAt
+      lastSyncAt
+      platform
+      createdAt
+      syncTOTP
+      vaultLockTimeoutSeconds
+    }
+  }
+}

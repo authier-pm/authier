@@ -2,25 +2,33 @@ import { t, Trans } from '@lingui/macro'
 
 import { intlFormat } from 'date-fns'
 import {
+  Box,
   Button,
+  Divider,
   Heading,
   HStack,
   Icon,
+  ScrollView,
+  Select,
+  Switch,
   Text,
   useColorModeValue,
-  View,
   VStack
 } from 'native-base'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
-import { DevicesStackScreenProps } from '../../navigation/types'
-
-import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
+import { DevicesStackScreenProps } from '@navigation/types'
+import {
+  useChangeDeviceSettingsMutation,
+  useChangeMasterDeviceMutation
+} from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { Loading } from '@src/components/Loading'
+import { useDeviceInfoQuery } from './DeviceInfo.codegen'
 
 const ColumnWrapper = ({
   text,
@@ -43,24 +51,33 @@ export default function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
-  const device = useDeviceStore((state) => state)
+  const { deviceId: selectedDeviceId, masterDeviceId } = route.params
+  const [id] = useDeviceStore((state) => [state.id])
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
-  const masterDeviceId = route.params.masterDeviceId
-  const selectedDeviceId = route.params.device.id
-  const currentDeviceId = device.id
+  const [chagengeDeviceSettings] = useChangeDeviceSettingsMutation({})
+  const { data, loading, error } = useDeviceInfoQuery({
+    variables: {
+      id: selectedDeviceId
+    },
+    fetchPolicy: 'cache-and-network'
+  })
+  const currentDeviceId = id
+  const selectedDeviceData = data?.me.device
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
+  if (loading && !error) return <Loading />
+
   return (
-    <View p={5}>
+    <ScrollView p={5}>
       <VStack space={8}>
-        <VStack space={8}>
+        <VStack space={4}>
           <HStack justifyContent="space-between">
-            <Heading fontSize={'2xl'}>{route.params.device.name}</Heading>
+            <Heading fontSize={'2xl'}>{selectedDeviceData?.name}</Heading>
             {Object.keys(icons).map((i, el) => {
               if (
                 i
                   .toLowerCase()
-                  .includes(route.params.device.platform?.toLowerCase() ?? '')
+                  .includes(selectedDeviceData?.platform?.toLowerCase() ?? '')
               ) {
                 return (
                   <Icon
@@ -75,7 +92,10 @@ export default function DeviceInfo({
           </HStack>
 
           <HStack justifyContent={'flex-start'} space={5}>
-            <LogoutDeviceAlert id={route.params.device.id ?? ''} />
+            <LogoutDeviceAlert
+              selectedDeviceId={selectedDeviceId ?? ''}
+              masterDeviceId={masterDeviceId ?? ''}
+            />
             {masterDeviceId !== selectedDeviceId &&
             currentDeviceId === masterDeviceId ? (
               <Button
@@ -95,7 +115,7 @@ export default function DeviceInfo({
                     as={Ionicons}
                     name="star"
                     size={'md'}
-                    color="black"
+                    color="yellow.400"
                   />
                 }
               >
@@ -113,23 +133,23 @@ export default function DeviceInfo({
             <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
               <ColumnWrapper text={t`Last IP Address`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.firstIpAddress}
+                  {selectedDeviceData?.firstIpAddress}
                 </Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Geolocation`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.lastGeoLocation}
+                  {selectedDeviceData?.lastGeoLocation}
                 </Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Platform`}>
-                <Text fontSize={'xl'}>{route.params.device.platform}</Text>
+                <Text fontSize={'xl'}>{selectedDeviceData?.platform}</Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Logout at`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.logoutAt ?? 'Logged in'}
+                  {selectedDeviceData?.logoutAt ?? 'Logged in'}
                 </Text>
               </ColumnWrapper>
 
@@ -138,7 +158,7 @@ export default function DeviceInfo({
                   <Trans>Created</Trans>
                 </Text>
                 <Text fontSize={'xl'}>
-                  {intlFormat(new Date(route.params.device.createdAt ?? ''), {
+                  {intlFormat(new Date(selectedDeviceData?.createdAt ?? ''), {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -151,11 +171,66 @@ export default function DeviceInfo({
         </VStack>
       </VStack>
 
-      <VStack>
-        <Heading fontWeight={'bold'} color={'gray.500'} size="md" m={3}>
-          <Trans>Settings</Trans>
-        </Heading>
-      </VStack>
-    </View>
+      {selectedDeviceId !== masterDeviceId ? (
+        <VStack mb={10}>
+          <Heading fontWeight={'bold'} color={'gray.500'} size="md" m={3}>
+            <Trans>Settings</Trans>
+          </Heading>
+          <VStack backgroundColor={itemBg} p={3} rounded={10} space={2}>
+            <Text>
+              <Trans>Lock time</Trans>
+            </Text>
+
+            <Box p={2}>
+              <Select
+                variant="rounded"
+                onValueChange={(value) => {
+                  chagengeDeviceSettings({
+                    variables: {
+                      id: selectedDeviceId as string,
+                      vaultLockTimeoutSeconds: parseInt(value),
+                      syncTOTP: selectedDeviceData?.syncTOTP as boolean
+                    }
+                  })
+                }}
+                defaultValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
+                accessibilityLabel="Lock time"
+              >
+                <Select.Item label="1 minute" value="20" />
+                <Select.Item label="2 minutes" value="120" />
+                <Select.Item label="1 hour" value="3600" />
+                <Select.Item label="4 hours" value="14400" />
+                <Select.Item label="8 hours" value="28800" />
+                <Select.Item label="never" value="0" />
+              </Select>
+
+              <Text>
+                <Trans>
+                  Automatically locks vault after chosen period of time
+                </Trans>
+              </Text>
+            </Box>
+            <Divider />
+            <HStack justifyContent="space-between" alignContent="center" p={2}>
+              <Text>2FA</Text>
+              <Switch
+                value={selectedDeviceData?.syncTOTP}
+                onToggle={async (e) => {
+                  chagengeDeviceSettings({
+                    variables: {
+                      id: selectedDeviceId as string,
+                      vaultLockTimeoutSeconds:
+                        selectedDeviceData?.vaultLockTimeoutSeconds as number,
+                      syncTOTP: e
+                    }
+                  })
+                }}
+                size="md"
+              />
+            </HStack>
+          </VStack>
+        </VStack>
+      ) : null}
+    </ScrollView>
   )
 }

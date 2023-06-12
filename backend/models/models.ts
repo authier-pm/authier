@@ -82,6 +82,12 @@ export class SettingsInput {
 
   @Field(() => String)
   uiLanguage: string
+
+  @Field(() => Boolean)
+  notificationOnVaultUnlock: boolean
+
+  @Field(() => Int)
+  notificationOnWrongPasswordAttempts: number
 }
 
 @InputType()

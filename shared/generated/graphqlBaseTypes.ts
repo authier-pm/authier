@@ -133,7 +133,7 @@ export type DeviceGql = {
   UserMaster?: Maybe<UserGql>;
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
-  firebaseToken: Scalars['String']['output'];
+  firebaseToken?: Maybe<Scalars['String']['output']>;
   firstIpAddress: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   ipAddressLock: Scalars['Boolean']['output'];
@@ -168,7 +168,7 @@ export type DeviceMutation = {
   __typename?: 'DeviceMutation';
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
-  firebaseToken: Scalars['String']['output'];
+  firebaseToken?: Maybe<Scalars['String']['output']>;
   firstIpAddress: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   ipAddressLock: Scalars['Boolean']['output'];
@@ -188,6 +188,7 @@ export type DeviceMutation = {
   rename: DeviceGql;
   reportSecretUsageEvent: SecretUsageEventGqlScalars;
   syncTOTP: Scalars['Boolean']['output'];
+  updateDeviceSettings: DeviceGql;
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
@@ -205,6 +206,12 @@ export type DeviceMutationReportSecretUsageEventArgs = {
   webInputId: Scalars['PositiveInt']['input'];
 };
 
+
+export type DeviceMutationUpdateDeviceSettingsArgs = {
+  syncTOTP: Scalars['Boolean']['input'];
+  vaultLockTimeoutSeconds: Scalars['Int']['input'];
+};
+
 export type DeviceQuery = {
   __typename?: 'DeviceQuery';
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>;
@@ -215,7 +222,7 @@ export type DeviceQuery = {
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   /** Get all secrets that were change since last device sync */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>;
-  firebaseToken: Scalars['String']['output'];
+  firebaseToken?: Maybe<Scalars['String']['output']>;
   firstIpAddress: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   ipAddressLock: Scalars['Boolean']['output'];
@@ -435,6 +442,8 @@ export type SecretUsageEventInput = {
 export type SettingsInput = {
   autofillCredentialsEnabled: Scalars['Boolean']['input'];
   autofillTOTPEnabled: Scalars['Boolean']['input'];
+  notificationOnVaultUnlock: Scalars['Boolean']['input'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['input'];
   syncTOTP: Scalars['Boolean']['input'];
   uiLanguage: Scalars['String']['input'];
   vaultLockTimeoutSeconds: Scalars['Int']['input'];
@@ -491,6 +500,8 @@ export type UserGql = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
@@ -534,6 +545,8 @@ export type UserMutation = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   removeEncryptedSecrets: Array<EncryptedSecretMutation>;
   revokeRefreshTokensForUser: UserGql;
@@ -661,8 +674,11 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  notificationOnVaultUnlock: Scalars['Boolean']['output'];
+  notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
+  /** Sends a message to the master device */
   sendAuthMessage: Scalars['Boolean']['output'];
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
@@ -672,15 +688,15 @@ export type UserQuery = {
 
 
 export type UserQueryDeviceArgs = {
-  id: Scalars['UUID']['input'];
+  id: Scalars['String']['input'];
 };
 
 
 export type UserQuerySendAuthMessageArgs = {
-  device: Scalars['String']['input'];
-  location: Scalars['String']['input'];
-  pageName: Scalars['String']['input'];
-  time: Scalars['DateTime']['input'];
+  body: Scalars['String']['input'];
+  deviceId: Scalars['String']['input'];
+  title: Scalars['String']['input'];
+  type: Scalars['String']['input'];
 };
 
 export type WebInputElement = {

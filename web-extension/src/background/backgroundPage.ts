@@ -36,6 +36,8 @@ export interface IBackgroundStateSerializableLocked {
   autofillTOTPEnabled: boolean
   uiLanguage: string
   theme: string
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 }
 
 export interface IBackgroundStateSerializable

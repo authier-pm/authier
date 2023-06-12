@@ -123,6 +123,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   theme: string
   authSecret: string
   authSecretEncrypted: string
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -614,11 +616,15 @@ class ExtensionDevice {
       uiLanguage,
       theme,
       authSecret,
-      authSecretEncrypted
+      authSecretEncrypted,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock
     } = this.state
 
     this.lockedState = {
       email,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock,
       userId,
       secrets,
       deviceName: this.name,
@@ -703,6 +709,9 @@ class ExtensionDevice {
     this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.syncTOTP = config.syncTOTP
     this.state.uiLanguage = config.uiLanguage
+    this.state.notificationOnWrongPasswordAttempts =
+      config.notificationOnWrongPasswordAttempts
+    this.state.notificationOnVaultUnlock = config.notificationOnVaultUnlock
 
     device.setLockTime(config.vaultLockTimeoutSeconds)
 

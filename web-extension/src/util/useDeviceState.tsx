@@ -136,7 +136,7 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      log('setSecuritySettings', config)
+      // console.log('setSecuritySettings', config)
       await trpc.securitySettings.mutate(config)
     },
 

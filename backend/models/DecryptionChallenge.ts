@@ -135,7 +135,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       }
 
       device = await ctx.prisma.device.update({
-        data: { logoutAt: null },
+        data: { logoutAt: null, firebaseToken },
         where: { id: device.id }
       })
     } else {

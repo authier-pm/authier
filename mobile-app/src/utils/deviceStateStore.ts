@@ -9,7 +9,10 @@ import {
   enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  SettingsInput
+} from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
@@ -59,6 +62,9 @@ interface DeviceStateProps {
   lockTimeEnd: number | null
   lockTimerRunning: boolean
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  notifications: number
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -102,9 +108,12 @@ export interface DeviceStateActions extends DeviceStateProps {
   changeSecrets: (secrets: SecretSerializedType[]) => void
   changeDecryptedSecrets: (secrets: (ILoginSecret | ITOTPSecret)[]) => void
   changeBiometricsEnabled: (enabled: boolean) => void
-  changeSyncTOTP: (syncTOTP: boolean) => void
+  changeSyncTOTP: (syncTOTP: DeviceStateProps['syncTOTP']) => void
+  changeNotificationOnVaultUnlock: (value: boolean) => void
+  changeNotificationOnWrongPasswordAttempts: (value: number) => void
   reset: () => void
   save: () => void
+  setNotifications: (newValue: number) => void
 }
 
 const initialState: DeviceStateProps = {
@@ -121,12 +130,15 @@ const initialState: DeviceStateProps = {
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
   uiLanguage: '',
+  notificationOnVaultUnlock: false,
+  notificationOnWrongPasswordAttempts: 3,
   theme: 'dark',
   biometricsEnabled: false,
   lockTimeStart: 0,
   lockTimeEnd: 0,
   lockTimerRunning: false,
-  decryptedSecrets: []
+  decryptedSecrets: [],
+  notifications: 0
 }
 
 export const useDeviceStateStore = create<DeviceStateActions>()(
@@ -424,6 +436,15 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
       },
       changeSyncTOTP: (syncTOTP) => {
         set({ syncTOTP })
+      },
+      setNotifications: (newValue) => {
+        set({ notifications: newValue })
+      },
+      changeNotificationOnVaultUnlock: (notificationOnVaultUnlock) => {
+        set({ notificationOnVaultUnlock })
+      },
+      changeNotificationOnWrongPasswordAttempts: (value) => {
+        set({ notificationOnWrongPasswordAttempts: value })
       }
     }),
     { name: 'deviceState', storage: createJSONStorage(() => zustandStorage) }

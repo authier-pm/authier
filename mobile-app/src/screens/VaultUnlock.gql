@@ -1,0 +1,16 @@
+query sendAuthMessage(
+  $type: String!
+  $body: String!
+  $title: String!
+  $deviceId: String!
+) {
+  me {
+    id
+    sendAuthMessage(
+      type: $type
+      body: $body
+      title: $title
+      deviceId: $deviceId
+    )
+  }
+}

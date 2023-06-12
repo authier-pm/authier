@@ -80,7 +80,7 @@ msgstr "Aktuální heslo"
 
 #: src/screens/Account/Account.tsx
 msgid "Delete your account"
-msgstr ""
+msgstr "Smazat účet"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
@@ -225,7 +225,7 @@ msgstr "TOTP"
 
 #: src/navigation/SettingsNavigation.tsx
 msgid "User"
-msgstr ""
+msgstr "Uživatel"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
@@ -248,4 +248,4 @@ msgstr "Nesprávné heslo"
 msgid ""
 "You cannot undo this action afterwards. Make sure to\n"
 "backup data that you want to keep."
-msgstr ""
+msgstr "Tuto akci nemůžete později vrátit zpět. Ujistěte se, že zálohujete data, která chcete zachovat."

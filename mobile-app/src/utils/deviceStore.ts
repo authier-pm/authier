@@ -23,7 +23,7 @@ import {
 } from '../providers/UserProvider.codegen'
 import { clearAccessToken } from './tokenFromAsyncStorage'
 
-import { getUniqueId } from 'react-native-device-info'
+import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
 import messaging from '@react-native-firebase/messaging'
 
@@ -47,6 +47,8 @@ export interface IBackgroundStateSerializableLocked {
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number | null
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 }
 
 export interface IBackgroundStateSerializable
@@ -195,44 +197,20 @@ export const useDeviceStore = create<Device>()(
       initialize: async () => {
         set({ id: await getUniqueId() })
         set({ biometricsAvailable: await get().checkBiometrics() })
-
-        //FIX: Not sure how this works
-        // let storedState: null | IBackgroundStateSerializable = null
-        //
-        // const storedDeviceState = await getSensitiveItem('deviceState')
-        //
-        // let storage: {
-        //   backgroundState: IBackgroundStateSerializable
-        //   lockedState: null | IBackgroundStateSerializableLocked
-        // } | null = null
-        //
-        // if (storedDeviceState) {
-        //   storage = JSON.parse(storedDeviceState)
-        // }
-        //
-        // if (storage?.backgroundState) {
-        //   storedState = storage.backgroundState
-        //   console.log('device state init from storage')
-        // } else if (storage?.lockedState) {
-        //   set({ lockedState: storage.lockedState })
-        //   console.log('device state locked')
-        // }
-
-        // if (storedState) {
-        //   this.state = new DeviceState(storedState)
-        //   set({name: storedState.deviceName})
-        // } else {
-        //   set({name: await getDeviceName()})
-        //   this.state = null
-        // }
+        set({ name: await getDeviceName() })
 
         useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
-        set({ fireToken: token, isInitialized: true, platform: Platform.OS })
+        set({
+          fireToken: token,
+          isInitialized: true,
+          platform: Platform.OS
+        })
         console.log(
           'device initialized',
           get().biometricsAvailable,
-          useDeviceStateStore.getState().biometricsEnabled
+          useDeviceStateStore.getState().biometricsEnabled,
+          token
         )
         let test = await SInfo.getAllItems({
           sharedPreferencesName: 'authierShared',
@@ -243,7 +221,6 @@ export const useDeviceStore = create<Device>()(
       },
       setDeviceSettings(config: SettingsInput) {
         //HACK: this is a hack, we should not create a new interval every time we save the state
-        //NOTE: Document how this works. I am looking on this code and I have no idea what is going on :D
         let state = useDeviceStateStore.getState()
         if (!state) {
           console.warn('device not initialized')
@@ -338,7 +315,9 @@ export const useDeviceStore = create<Device>()(
           uiLanguage,
           theme,
           biometricsEnabled,
-          deviceName
+          deviceName,
+          notificationOnWrongPasswordAttempts,
+          notificationOnVaultUnlock
         } = state
         device.setLockedState({
           email,
@@ -355,22 +334,25 @@ export const useDeviceStore = create<Device>()(
           uiLanguage,
           theme,
           biometricsEnabled,
-          lockTimeEnd: null // when locking the device, we must clear the lockTimeEnd
+          lockTimeEnd: null, // when locking the device, we must clear the lockTimeEnd
+          notificationOnVaultUnlock,
+          notificationOnWrongPasswordAttempts
         })
 
         useDeviceStateStore.setState({})
       },
       clearAndReload: async () => {
         //TODO: This could be done better
+        await messaging().deleteToken()
         get().clearLockInterval()
         await clearAccessToken()
         SInfo.deleteItem('psw', {
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH'
         })
-
         useDeviceStateStore.getState().reset()
-        set({ isLoggedIn: false, isInitialized: true })
+        const newToken = await messaging().getToken()
+        set({ isLoggedIn: false, isInitialized: true, fireToken: newToken })
       },
       logout: async () => {
         try {

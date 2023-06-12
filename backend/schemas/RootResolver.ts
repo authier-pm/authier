@@ -299,6 +299,8 @@ export class RootResolver {
       where: { id: deviceInput.id }
     })
 
+    console.log('device', device)
+
     let challenge = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
         deviceId: deviceInput.id,
@@ -314,6 +316,7 @@ export class RootResolver {
             userId: user.id
           }
         })
+        //FIX: This is not working, we need to check if the device is already approved
         if (deviceCount === 1) {
           // user has only one device
           challenge = await ctx.prisma.decryptionChallenge.create({
@@ -340,19 +343,17 @@ export class RootResolver {
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10
       ) {
-        await admin
-          .messaging()
-          .sendToDevice(user.masterDevice?.firebaseToken as string, {
-            notification: {
-              title: 'New device login!',
-              body: 'New device is trying to log in.'
-            },
-            data: {
-              type: 'Devices'
-            }
-          })
+        console.log('sending notification to')
+        await admin.messaging().sendToDevice(user.masterDevice.firebaseToken, {
+          notification: {
+            title: 'New device login!',
+            body: 'New device is trying to log in.'
+          },
+          data: {
+            type: 'Devices'
+          }
+        })
       }
-
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: deviceInput.id,
@@ -374,7 +375,6 @@ export class RootResolver {
     // user has approved this device in the past, we can return the challenge including salt and encrypted secret
     return plainToClass(DecryptionChallengeApproved, {
       ...challenge,
-
       addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
       encryptionSalt: user.encryptionSalt
     })

@@ -14,8 +14,8 @@ export class DeviceGQLScalars {
   @Field()
   lastIpAddress: string
 
-  @Field()
-  firebaseToken: string
+  @Field(() => String, { nullable: true })
+  firebaseToken: string | null
 
   @Field()
   name: string

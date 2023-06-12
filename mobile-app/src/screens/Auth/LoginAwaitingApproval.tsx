@@ -145,7 +145,6 @@ export const useLogin = (props: { deviceName: string }) => {
               name: props.deviceName,
               platform: Platform.OS
             },
-
             input: {
               addDeviceSecret: newParams.addDeviceSecret,
               addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
@@ -195,13 +194,17 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds: 28800,
-            autofillCredentialsEnabled: false,
-            autofillTOTPEnabled: false,
+            autofillCredentialsEnabled:
+              addNewDeviceForUser.user.autofillCredentialsEnabled,
+            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
-            //TODO: Take this from DB
-            syncTOTP: false,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme
+            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
+            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            notificationOnVaultUnlock:
+              addNewDeviceForUser.user.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts
           }
 
           device.save(newDeviceState)
@@ -230,7 +233,7 @@ export const LoginAwaitingApproval = () => {
 
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
-  if (!deviceDecryptionChallenge) {
+  if (!deviceDecryptionChallenge || !device.fireToken) {
     return <Loading />
   }
 

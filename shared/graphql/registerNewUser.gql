@@ -8,6 +8,13 @@ mutation registerNewUser($input: RegisterNewAccountInput!, $userId: UUID!) {
         id
         name
       }
+      defaultDeviceTheme
+      uiLanguage
+      defaultDeviceSyncTOTP
+      autofillCredentialsEnabled
+      autofillTOTPEnabled
+      notificationOnVaultUnlock
+      notificationOnWrongPasswordAttempts
     }
   }
 }

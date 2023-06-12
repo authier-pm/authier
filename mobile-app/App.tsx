@@ -11,7 +11,6 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
 import { Providers } from './src/Providers'
-import { Alert } from 'react-native'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
@@ -34,7 +33,7 @@ let CodePushOptions = {
 }
 
 const RnApp = () => {
-  const device = useDeviceStore((state) => state)
+  const [initialize] = useDeviceStore((state) => [state.initialize])
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
@@ -49,7 +48,7 @@ const RnApp = () => {
 
   useEffect(() => {
     requestUserPermission()
-    device.initialize()
+    initialize()
     console.log('API_URL', API_URL)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {
@@ -59,13 +58,7 @@ const RnApp = () => {
         queueLink.close()
       }
     })
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      if (__DEV__) {
-        Alert.alert('FCM message arrived:', JSON.stringify(remoteMessage))
-      }
-    })
     return () => {
-      unsubscribe()
       unsubscribeNet()
     }
   }, [])
