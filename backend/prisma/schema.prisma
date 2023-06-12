@@ -1,8 +1,8 @@
 datasource db {
   provider          = "postgresql"
   url               = env("DATABASE_URL")
-  // directUrl         = env("DIRECT_URL")
-  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -183,15 +183,15 @@ model User {
   recoveryDecryptionChallengeId Int? // when set user is in process of adding a new master device waiting for the cooldown to
   recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
 
-  deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
+  deviceRecoveryCooldownMinutes       Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofillCredentialsEnabled    Boolean @default(true)
-  autofillTOTPEnabled           Boolean @default(true)
-  uiLanguage                    String  @default("en")
-  defaultDeviceTheme            String  @default("dark")
-  defaultDeviceSyncTOTP         Boolean @default(true)
-  notificationOnVaultUnlock     Boolean @default(false)
-  notificationOnWrongPasswordAttempts Int @default(3)
+  autofillCredentialsEnabled          Boolean @default(true)
+  autofillTOTPEnabled                 Boolean @default(true)
+  uiLanguage                          String  @default("en")
+  defaultDeviceTheme                  String  @default("dark")
+  defaultDeviceSyncTOTP               Boolean @default(true)
+  notificationOnVaultUnlock           Boolean @default(false)
+  notificationOnWrongPasswordAttempts Int     @default(3)
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]

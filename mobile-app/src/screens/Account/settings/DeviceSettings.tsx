@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react'
+import React from 'react'
 import {
   Box,
   Center,
@@ -27,13 +27,11 @@ function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
   const { toggleColorMode } = useColorMode()
-
   const [modalVisible, setModalVisible] = React.useState(false)
-
   const [updateSettings] = useUpdateSettingsMutation({})
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
-  const settings = (): SettingsInput => {
+  const currentSettings = (): SettingsInput => {
     return {
       autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
       autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
@@ -45,17 +43,28 @@ function DeviceSettings() {
         deviceState.notificationOnWrongPasswordAttempts
     }
   }
+  const [previousSettings, setPreviousSettings] = React.useState<SettingsInput>(
+    currentSettings()
+  )
 
-  //WARNING: IS this correct way?
-  //I dont think this is the correct way how to handle settings update. on web you have save button but on mobile you dont have so I save on every state update, which can be dangerous
-  //@Capajj please check
   React.useEffect(() => {
-    console.log('CALLED update settings')
-    updateSettings({
-      variables: {
-        config: settings()
-      }
-    })
+    if (!previousSettings) {
+      setPreviousSettings(currentSettings)
+      return
+    }
+
+    const settingsChanged =
+      JSON.stringify(previousSettings) !== JSON.stringify(currentSettings())
+
+    if (settingsChanged) {
+      updateSettings({
+        variables: {
+          config: currentSettings()
+        }
+      })
+    }
+
+    setPreviousSettings(currentSettings)
   }, [deviceState])
 
   return (

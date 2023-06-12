@@ -89,7 +89,10 @@ export function VaultUnlockVerification({
     return <Loading />
   }
 
-  if (tries >= notificationOnWrongPasswordAttempts) {
+  if (
+    notificationOnWrongPasswordAttempts != 0 &&
+    tries >= notificationOnWrongPasswordAttempts
+  ) {
     //Send notification
     console.log('send notification')
     sendAuthMesssage({
