@@ -63,7 +63,7 @@ export type DevicesStackScreenProps<T extends keyof DeviceStackParamList> =
 export type DeviceStackParamList = {
   DeviceList: undefined
   DeviceInfo: {
-    device: Partial<DeviceQuery>
+    deviceId: DeviceQuery['id']
     masterDeviceId: UserQuery['masterDeviceId']
   }
 }

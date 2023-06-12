@@ -201,7 +201,11 @@ export const useDeviceStore = create<Device>()(
 
         useDeviceStateStore.getState().initialize()
         const token = await messaging().getToken()
-        set({ fireToken: token, isInitialized: true, platform: Platform.OS })
+        set({
+          fireToken: token,
+          isInitialized: true,
+          platform: Platform.OS
+        })
         console.log(
           'device initialized',
           get().biometricsAvailable,
@@ -313,8 +317,7 @@ export const useDeviceStore = create<Device>()(
           biometricsEnabled,
           deviceName,
           notificationOnWrongPasswordAttempts,
-          notificationOnVaultUnlock,
-          notifications
+          notificationOnVaultUnlock
         } = state
         device.setLockedState({
           email,

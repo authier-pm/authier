@@ -13,19 +13,22 @@ import {
   Switch,
   Text,
   useColorModeValue,
-  View,
   VStack
 } from 'native-base'
-import React, { ReactElement } from 'react'
+import React, { ReactElement, useEffect } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
 import { DevicesStackScreenProps } from '@navigation/types'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
-import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
+import {
+  useChangeDeviceSettingsMutation,
+  useChangeMasterDeviceMutation,
+  useDeviceInfoQuery
+} from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { Loading } from '@src/components/Loading'
 
 const ColumnWrapper = ({
   text,
@@ -48,28 +51,33 @@ export default function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
-  const [id, setLockTime] = useDeviceStore((state) => [
-    state.id,
-    state.setLockTime
-  ])
+  const { deviceId: selectedDeviceId, masterDeviceId } = route.params
+  const [id] = useDeviceStore((state) => [state.id])
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
-  const masterDeviceId = route.params.masterDeviceId
-  const selectedDeviceId = route.params.device.id
+  const [chagengeDeviceSettings] = useChangeDeviceSettingsMutation({})
+  const { data, loading, error } = useDeviceInfoQuery({
+    variables: {
+      id: selectedDeviceId
+    },
+    fetchPolicy: 'cache-and-network'
+  })
   const currentDeviceId = id
-  const currentDevice = route.params.device
+  const selectedDeviceData = data?.me.device
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
-  console.log(route.params.device)
+
+  if (loading && !error) return <Loading />
+
   return (
     <ScrollView p={5}>
       <VStack space={8}>
         <VStack space={4}>
           <HStack justifyContent="space-between">
-            <Heading fontSize={'2xl'}>{route.params.device.name}</Heading>
+            <Heading fontSize={'2xl'}>{selectedDeviceData?.name}</Heading>
             {Object.keys(icons).map((i, el) => {
               if (
                 i
                   .toLowerCase()
-                  .includes(route.params.device.platform?.toLowerCase() ?? '')
+                  .includes(selectedDeviceData?.platform?.toLowerCase() ?? '')
               ) {
                 return (
                   <Icon
@@ -125,23 +133,23 @@ export default function DeviceInfo({
             <VStack backgroundColor={itemBg} p={3} rounded={10} space={4}>
               <ColumnWrapper text={t`Last IP Address`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.firstIpAddress}
+                  {selectedDeviceData?.firstIpAddress}
                 </Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Geolocation`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.lastGeoLocation}
+                  {selectedDeviceData?.lastGeoLocation}
                 </Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Platform`}>
-                <Text fontSize={'xl'}>{route.params.device.platform}</Text>
+                <Text fontSize={'xl'}>{selectedDeviceData?.platform}</Text>
               </ColumnWrapper>
 
               <ColumnWrapper text={t`Logout at`}>
                 <Text fontSize={'xl'}>
-                  {route.params.device.logoutAt ?? 'Logged in'}
+                  {selectedDeviceData?.logoutAt ?? 'Logged in'}
                 </Text>
               </ColumnWrapper>
 
@@ -150,7 +158,7 @@ export default function DeviceInfo({
                   <Trans>Created</Trans>
                 </Text>
                 <Text fontSize={'xl'}>
-                  {intlFormat(new Date(route.params.device.createdAt ?? ''), {
+                  {intlFormat(new Date(selectedDeviceData?.createdAt ?? ''), {
                     weekday: 'long',
                     year: 'numeric',
                     month: 'long',
@@ -177,9 +185,15 @@ export default function DeviceInfo({
               <Select
                 variant="rounded"
                 onValueChange={(value) => {
-                  console.log('update value on backend')
+                  chagengeDeviceSettings({
+                    variables: {
+                      id: selectedDeviceId as string,
+                      vaultLockTimeoutSeconds: parseInt(value),
+                      syncTOTP: selectedDeviceData?.syncTOTP as boolean
+                    }
+                  })
                 }}
-                defaultValue={currentDevice.vaultLockTimeoutSeconds?.toString()}
+                defaultValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
                 accessibilityLabel="Lock time"
               >
                 <Select.Item label="1 minute" value="20" />
@@ -200,9 +214,16 @@ export default function DeviceInfo({
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>2FA</Text>
               <Switch
-                value={currentDevice.syncTOTP}
+                value={selectedDeviceData?.syncTOTP}
                 onToggle={async (e) => {
-                  console.log('Update on backend')
+                  chagengeDeviceSettings({
+                    variables: {
+                      id: selectedDeviceId as string,
+                      vaultLockTimeoutSeconds:
+                        selectedDeviceData?.vaultLockTimeoutSeconds as number,
+                      syncTOTP: e
+                    }
+                  })
                 }}
                 size="md"
               />

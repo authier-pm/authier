@@ -41,7 +41,7 @@ type UserQuery {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
-  device(id: UUID!): DeviceQuery!
+  device(id: String!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
@@ -304,11 +304,6 @@ type EncryptedSecretQuery {
   lastUsedAt: DateTime
 }
 
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
-
 type EmailVerificationGQLScalars {
   address: ID!
   createdAt: DateTime!
@@ -453,7 +448,10 @@ type DeviceMutation {
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
-  updateDeviceSettings(config: SettingsInput!): DeviceGQL!
+  updateDeviceSettings(
+    vaultLockTimeoutSeconds: Int!
+    syncTOTP: Boolean!
+  ): DeviceGQL!
   rename(name: String!): DeviceGQL!
   logout: DeviceGQL!
 
@@ -479,15 +477,10 @@ Integers that will have a value greater than 0.
 """
 scalar PositiveInt
 
-input SettingsInput {
-  syncTOTP: Boolean!
-  vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  notificationOnVaultUnlock: Boolean!
-  notificationOnWrongPasswordAttempts: Int!
-}
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 input DeviceInput {
   id: String!
@@ -520,6 +513,16 @@ input SecretUsageEventInput {
   kind: String!
   secretId: String!
   url: String
+}
+
+input SettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
 }
 
 """

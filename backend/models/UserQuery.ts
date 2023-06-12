@@ -21,7 +21,6 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
-import { throwIfNotAuthenticated } from '../api/authMiddleware'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -66,7 +65,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => DeviceQuery)
-  async device(@Ctx() ctx: IContext, @Arg('id', () => GraphQLUUID) id: string) {
+  async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
     return ctx.prisma.device.findFirst({
       where: {
         userId: this.id,

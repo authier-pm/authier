@@ -208,7 +208,8 @@ export type DeviceMutationReportSecretUsageEventArgs = {
 
 
 export type DeviceMutationUpdateDeviceSettingsArgs = {
-  config: SettingsInput;
+  syncTOTP: Scalars['Boolean']['input'];
+  vaultLockTimeoutSeconds: Scalars['Int']['input'];
 };
 
 export type DeviceQuery = {
@@ -687,7 +688,7 @@ export type UserQuery = {
 
 
 export type UserQueryDeviceArgs = {
-  id: Scalars['UUID']['input'];
+  id: Scalars['String']['input'];
 };
 
 

@@ -20,8 +20,8 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '@components/SearchBar'
 import {
   useApproveChallengeMutation,
+  useDevicesListQuery,
   useDevicesRequestsQuery,
-  useMyDevicesQuery,
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import {
@@ -51,8 +51,11 @@ const empty = () => {
   return <></>
 }
 function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
-  const device = useDeviceStore((state) => state)
-  const deviceState = useDeviceStateStore((state) => state)
+  const [id] = useDeviceStore((state) => [state.id])
+  const [notifications, setNotifications] = useDeviceStateStore((state) => [
+    state.notifications,
+    state.setNotifications
+  ])
   const [filterBy, setFilterBy] = useState('')
   const {
     data: devicesData,
@@ -61,21 +64,20 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
     startPolling: devicesStartPolling,
     stopPolling: devicesStopPolling,
     previousData
-  } = useMyDevicesQuery()
+  } = useDevicesListQuery()
   const {
     data: dataRequests,
     refetch: requestsRefetch,
     loading: loadingRequests
-  } = useDevicesRequestsQuery({
-    fetchPolicy: 'cache-first'
-  })
+  } = useDevicesRequestsQuery({})
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
 
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
   useEffect(() => {
-    if (previousData !== devicesData) {
+    //FIX: this is calling on every rerender
+    if (previousData !== null && previousData !== devicesData) {
       devicesStopPolling()
     }
     emitter.on('refresh', () => {
@@ -87,21 +89,21 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
   }, [devicesData, previousData])
 
   const renderDevice = ({
-    item,
+    device,
     masterDeviceId
   }: {
-    item: Partial<DeviceQuery>
+    device: Partial<DeviceQuery>
     masterDeviceId: UserQuery['masterDeviceId']
   }) => {
     return (
       <Pressable
-        key={item.id}
-        onPress={() =>
+        key={device.id}
+        onPress={() => {
           navigation.navigate('DeviceInfo', {
-            device: item,
+            deviceId: device.id as string,
             masterDeviceId
           })
-        }
+        }}
         borderWidth={1}
         borderColor={'gray.600'}
         m={2}
@@ -123,7 +125,9 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
               <HStack space={5} alignItems="center">
                 {Object.keys(icons).map((i, el) => {
                   if (
-                    i.toLowerCase().includes(item.platform?.toLowerCase() ?? '')
+                    i
+                      .toLowerCase()
+                      .includes(device.platform?.toLowerCase() ?? '')
                   ) {
                     return (
                       <Icon
@@ -139,29 +143,29 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
 
                 <VStack space={3}>
                   <HStack space={3}>
-                    {item.logoutAt ? (
+                    {device.logoutAt ? (
                       <Badge colorScheme="red">LOGGED OUT</Badge>
                     ) : (
                       <Badge colorScheme="success">LOGGED IN</Badge>
                     )}
-                    {item.id === masterDeviceId ? (
+                    {device.id === masterDeviceId ? (
                       <Badge colorScheme="yellow">MASTER</Badge>
                     ) : null}
-                    {item.id === device.id ? (
+                    {device.id === id ? (
                       <Badge colorScheme="orange">CURRENT</Badge>
                     ) : null}
                   </HStack>
 
                   <VStack space={1}>
-                    <Heading size={'md'}>{item.name}</Heading>
-                    <Text>{item.lastIpAddress}</Text>
+                    <Heading size={'md'}>{device.name}</Heading>
+                    <Text>{device.lastIpAddress}</Text>
                     <HStack alignItems="center" space={2}>
                       <Ionicons
                         name="location-outline"
                         color={'#00a8ff'}
                         size={20}
                       />
-                      <Text>{item.lastGeoLocation}</Text>
+                      <Text>{device.lastGeoLocation}</Text>
                     </HStack>
                   </VStack>
                 </VStack>
@@ -244,7 +248,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
                 })
                 requestsRefetch()
                 devicesStartPolling(5000)
-                deviceState.setNotifications(deviceState.notifications - 1)
+                setNotifications(notifications - 1)
                 //TODO: Add here some kind of animations, like a spinner to show that the device is being added
               }}
             >
@@ -274,7 +278,6 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
       </Box>
     )
   }
-
   return (
     <View>
       <HStack flexDirection="row" alignItems="center" space={4} m={4}>
@@ -306,7 +309,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
         keyExtractor={(i) => i.id}
         renderItem={({ item }) =>
           renderDevice({
-            item: item,
+            device: item,
             masterDeviceId: devicesData?.me?.masterDeviceId
           })
         }

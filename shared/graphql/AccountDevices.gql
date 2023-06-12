@@ -1,8 +1,22 @@
-query myDevices {
+query devicesList {
   me {
     id
     masterDeviceId
     devices {
+      id
+      name
+      lastIpAddress
+      logoutAt
+      platform
+      lastGeoLocation
+    }
+  }
+}
+
+query deviceInfo($id: String!) {
+  me {
+    id
+    device(id: $id) {
       id
       name
       firstIpAddress
@@ -76,6 +90,23 @@ mutation ChangeMasterDevice($newMasterDeviceId: String!) {
   me {
     setMasterDevice(newMasterDeviceId: $newMasterDeviceId) {
       id
+    }
+  }
+}
+
+mutation changeDeviceSettings(
+  $id: String!
+  $syncTOTP: Boolean!
+  $vaultLockTimeoutSeconds: Int!
+) {
+  me {
+    device(id: $id) {
+      updateDeviceSettings(
+        syncTOTP: $syncTOTP
+        vaultLockTimeoutSeconds: $vaultLockTimeoutSeconds
+      ) {
+        id
+      }
     }
   }
 }

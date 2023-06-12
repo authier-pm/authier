@@ -5,7 +5,8 @@ import {
   Ctx,
   ObjectType,
   Arg,
-  InputType
+  InputType,
+  Int
 } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
@@ -202,7 +203,8 @@ export class DeviceMutation extends DeviceGQLScalars {
 
   @Field(() => DeviceGQL)
   async updateDeviceSettings(
-    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Arg('syncTOTP', () => Boolean) syncTOTP: boolean,
+    @Arg('vaultLockTimeoutSeconds', () => Int) vaultLockTimeoutSeconds: number,
     @Ctx() ctx: IContext
   ) {
     return await ctx.prisma.device.update({
@@ -210,8 +212,8 @@ export class DeviceMutation extends DeviceGQLScalars {
         id: this.id
       },
       data: {
-        syncTOTP: config.syncTOTP,
-        vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+        syncTOTP: syncTOTP,
+        vaultLockTimeoutSeconds: vaultLockTimeoutSeconds
       }
     })
   }

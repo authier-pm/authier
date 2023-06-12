@@ -3,10 +3,17 @@ import * as Types from '../generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type MyDevicesQueryVariables = Types.Exact<{ [key: string]: never; }>;
+export type DevicesListQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MyDevicesQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number }> } };
+export type DevicesListQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, lastIpAddress: string, logoutAt?: string | null, platform: string, lastGeoLocation: string }> } };
+
+export type DeviceInfoQueryVariables = Types.Exact<{
+  id: Types.Scalars['String']['input'];
+}>;
+
+
+export type DeviceInfoQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, device: { __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
 
 export type RejectChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int']['input'];
@@ -48,13 +55,64 @@ export type ChangeMasterDeviceMutationVariables = Types.Exact<{
 
 export type ChangeMasterDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', setMasterDevice: { __typename?: 'MasterDeviceChangeGQL', id: string } } };
 
+export type ChangeDeviceSettingsMutationVariables = Types.Exact<{
+  id: Types.Scalars['String']['input'];
+  syncTOTP: Types.Scalars['Boolean']['input'];
+  vaultLockTimeoutSeconds: Types.Scalars['Int']['input'];
+}>;
 
-export const MyDevicesDocument = gql`
-    query myDevices {
+
+export type ChangeDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', updateDeviceSettings: { __typename?: 'DeviceGQL', id: string } } } };
+
+
+export const DevicesListDocument = gql`
+    query devicesList {
   me {
     id
     masterDeviceId
     devices {
+      id
+      name
+      lastIpAddress
+      logoutAt
+      platform
+      lastGeoLocation
+    }
+  }
+}
+    `;
+
+/**
+ * __useDevicesListQuery__
+ *
+ * To run a query within a React component, call `useDevicesListQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDevicesListQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useDevicesListQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useDevicesListQuery(baseOptions?: Apollo.QueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+      }
+export function useDevicesListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+        }
+export type DevicesListQueryHookResult = ReturnType<typeof useDevicesListQuery>;
+export type DevicesListLazyQueryHookResult = ReturnType<typeof useDevicesListLazyQuery>;
+export type DevicesListQueryResult = Apollo.QueryResult<DevicesListQuery, DevicesListQueryVariables>;
+export const DeviceInfoDocument = gql`
+    query deviceInfo($id: String!) {
+  me {
+    id
+    device(id: $id) {
       id
       name
       firstIpAddress
@@ -73,31 +131,32 @@ export const MyDevicesDocument = gql`
     `;
 
 /**
- * __useMyDevicesQuery__
+ * __useDeviceInfoQuery__
  *
- * To run a query within a React component, call `useMyDevicesQuery` and pass it any options that fit your needs.
- * When your component renders, `useMyDevicesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useDeviceInfoQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDeviceInfoQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useMyDevicesQuery({
+ * const { data, loading, error } = useDeviceInfoQuery({
  *   variables: {
+ *      id: // value for 'id'
  *   },
  * });
  */
-export function useMyDevicesQuery(baseOptions?: Apollo.QueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
+export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MyDevicesQuery, MyDevicesQueryVariables>(MyDevicesDocument, options);
+        return Apollo.useQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
       }
-export function useMyDevicesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyDevicesQuery, MyDevicesQueryVariables>) {
+export function useDeviceInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MyDevicesQuery, MyDevicesQueryVariables>(MyDevicesDocument, options);
+          return Apollo.useLazyQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
-export type MyDevicesQueryHookResult = ReturnType<typeof useMyDevicesQuery>;
-export type MyDevicesLazyQueryHookResult = ReturnType<typeof useMyDevicesLazyQuery>;
-export type MyDevicesQueryResult = Apollo.QueryResult<MyDevicesQuery, MyDevicesQueryVariables>;
+export type DeviceInfoQueryHookResult = ReturnType<typeof useDeviceInfoQuery>;
+export type DeviceInfoLazyQueryHookResult = ReturnType<typeof useDeviceInfoLazyQuery>;
+export type DeviceInfoQueryResult = Apollo.QueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;
 export const RejectChallengeDocument = gql`
     mutation RejectChallenge($id: Int!) {
   me {
@@ -322,3 +381,45 @@ export function useChangeMasterDeviceMutation(baseOptions?: Apollo.MutationHookO
 export type ChangeMasterDeviceMutationHookResult = ReturnType<typeof useChangeMasterDeviceMutation>;
 export type ChangeMasterDeviceMutationResult = Apollo.MutationResult<ChangeMasterDeviceMutation>;
 export type ChangeMasterDeviceMutationOptions = Apollo.BaseMutationOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>;
+export const ChangeDeviceSettingsDocument = gql`
+    mutation changeDeviceSettings($id: String!, $syncTOTP: Boolean!, $vaultLockTimeoutSeconds: Int!) {
+  me {
+    device(id: $id) {
+      updateDeviceSettings(
+        syncTOTP: $syncTOTP
+        vaultLockTimeoutSeconds: $vaultLockTimeoutSeconds
+      ) {
+        id
+      }
+    }
+  }
+}
+    `;
+export type ChangeDeviceSettingsMutationFn = Apollo.MutationFunction<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>;
+
+/**
+ * __useChangeDeviceSettingsMutation__
+ *
+ * To run a mutation, you first call `useChangeDeviceSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useChangeDeviceSettingsMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [changeDeviceSettingsMutation, { data, loading, error }] = useChangeDeviceSettingsMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      syncTOTP: // value for 'syncTOTP'
+ *      vaultLockTimeoutSeconds: // value for 'vaultLockTimeoutSeconds'
+ *   },
+ * });
+ */
+export function useChangeDeviceSettingsMutation(baseOptions?: Apollo.MutationHookOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>(ChangeDeviceSettingsDocument, options);
+      }
+export type ChangeDeviceSettingsMutationHookResult = ReturnType<typeof useChangeDeviceSettingsMutation>;
+export type ChangeDeviceSettingsMutationResult = Apollo.MutationResult<ChangeDeviceSettingsMutation>;
+export type ChangeDeviceSettingsMutationOptions = Apollo.BaseMutationOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>;
