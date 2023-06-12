@@ -61,6 +61,8 @@ const DeviceListItem = ({
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
 
+  const isMasterDevice = deviceInfo.id === masterDeviceId
+  const currentDevice = deviceInfo.id === device.id
   return (
     <>
       <Flex py={6} m={5}>
@@ -100,8 +102,7 @@ const DeviceListItem = ({
               )}
             </HStack>
 
-            {(deviceInfo.id !== masterDeviceId ||
-              deviceInfo.id === device.id) && (
+            {(!isMasterDevice || currentDevice) && (
               <Menu>
                 <MenuButton
                   as={IconButton}
@@ -112,7 +113,7 @@ const DeviceListItem = ({
                   icon={<SettingsIcon color={'white'} />}
                 />
                 <MenuList>
-                  {masterDeviceId !== deviceInfo.id ? (
+                  {!currentDevice && isMasterDevice ? (
                     <MenuItem
                       onClick={() =>
                         changeMasterDeviceMutation({
@@ -124,7 +125,7 @@ const DeviceListItem = ({
                     >
                       <FiStar />
                       <NbSp />
-                      <Trans>Set on master device</Trans>
+                      <Trans>Set as master device</Trans>
                     </MenuItem>
                   ) : null}
 

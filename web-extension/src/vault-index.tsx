@@ -30,9 +30,11 @@ export const renderVault = () => {
 }
 
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-  vaultRoot = ReactDOM.createRoot(
-    document.getElementById('vault') as HTMLElement
-  )
+  const div = document.getElementById('vault') as HTMLElement
+  vaultRoot = ReactDOM.createRoot(div)
+
+  div.style.overflow = 'hidden' // needed to prevent extra scrollbar on the right
+  div.style.height = '100vh'
 
   renderVault()
 })

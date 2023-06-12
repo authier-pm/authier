@@ -189,7 +189,7 @@ msgstr ""
 msgid "Failed to create decryption challenge"
 msgstr ""
 
-#: src/components/vault/ItemSettings.tsx
+#: src/components/vault/VaultItemSettings.tsx
 msgid "Failed to parse this secret:"
 msgstr ""
 
@@ -323,6 +323,10 @@ msgstr ""
 msgid "secrets"
 msgstr ""
 
+#: src/pages-vault/Devices.tsx
+msgid "Set as master device"
+msgstr ""
+
 #: src/components/vault/settings/Account.tsx
 #~ msgid "Set master password"
 #~ msgstr ""
@@ -336,8 +340,8 @@ msgid "Set new master password // New master password"
 msgstr ""
 
 #: src/pages-vault/Devices.tsx
-msgid "Set on master device"
-msgstr ""
+#~ msgid "Set on master device"
+#~ msgstr ""
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Settings"
