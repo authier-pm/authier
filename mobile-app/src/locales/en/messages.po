@@ -17,6 +17,14 @@ msgstr ""
 msgid "{name}"
 msgstr "{name}"
 
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "{text}"
+msgstr "{text}"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "About"
+msgstr "About"
+
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
 msgstr "Account"
@@ -41,7 +49,7 @@ msgstr "Approve"
 msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 msgstr "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatically locks vault after chosen period of time"
 
@@ -58,6 +66,10 @@ msgstr "Change password"
 msgid "Codepush version"
 msgstr "Codepush version"
 
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Created"
+msgstr "Created"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
 #~ msgstr "Current Passwor2d"
@@ -65,6 +77,10 @@ msgstr "Codepush version"
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Current Password"
 msgstr "Current Password"
+
+#: src/screens/Account/Account.tsx
+msgid "Delete your account"
+msgstr "Delete your account"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
@@ -91,10 +107,10 @@ msgid "I'm a new user."
 msgstr "I'm a new user."
 
 #: src/screens/Account/Account.tsx
-msgid "Import passwords"
-msgstr "Import passwords"
+#~ msgid "Import passwords"
+#~ msgstr "Import passwords"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Language"
 msgstr "Language"
 
@@ -106,7 +122,7 @@ msgstr "Last IP Address"
 msgid "Lock"
 msgstr "Lock"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Lock time"
 msgstr "Lock time"
 
@@ -166,15 +182,20 @@ msgstr "Reject"
 msgid "Scan QR"
 msgstr "Scan QR"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Security"
 msgstr "Security"
 
 #: src/screens/Device/DeviceInfo.tsx
-msgid "Set on master device"
-msgstr "Set on master device"
+msgid "Set as master device"
+msgstr "Set as master device"
+
+#: src/screens/Device/DeviceInfo.tsx
+#~ msgid "Set on master device"
+#~ msgstr "Set on master device"
 
 #: src/screens/Account/Account.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Settings"
 msgstr "Settings"
 
@@ -183,24 +204,28 @@ msgid "Sign Up"
 msgstr "Sign Up"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
-msgid "Start by adding a login secret or a TOTP code"
-msgstr "Start by adding a login secret or a TOTP code"
+#~ msgid "Start by adding a login secret or a TOTP code"
+#~ msgstr "Start by adding a login secret or a TOTP code"
 
 #: src/screens/TOTPVault/TOTPVault.tsx
-msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
-msgstr "Start by adding a secret by logging onto any website or by adding a TOTP code"
+#~ msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
+#~ msgstr "Start by adding a secret by logging onto any website or by adding a TOTP code"
 
 #: src/screens/Auth/Login.tsx
 msgid "Submit"
 msgstr "Submit"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Theme"
 msgstr "Theme"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
 msgstr "TOTPs"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "User"
+msgstr "User"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
@@ -218,3 +243,11 @@ msgstr "Welcome"
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Wrong password"
 msgstr "Wrong password"
+
+#: src/screens/Account/Account.tsx
+msgid ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."
+msgstr ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."

@@ -100,7 +100,7 @@ export default function DeviceInfo({
                 }
               >
                 <Text color="white" fontWeight={'bold'}>
-                  <Trans>Set on master device</Trans>
+                  <Trans>Set as master device</Trans>
                 </Text>
               </Button>
             ) : null}

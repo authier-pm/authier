@@ -205,16 +205,20 @@ export function TableList({ filter }: { filter: string }) {
         </HStack>
       </Flex>
       <AutoSizer>
-        {({ height, width }) => (
-          <List
-            itemCount={data.length}
-            itemSize={60}
-            width={width}
-            height={height}
-          >
-            {Row}
-          </List>
-        )}
+        {({ height, width }) => {
+          console.log('height2:', height)
+
+          return (
+            <List
+              itemCount={data.length}
+              itemSize={60}
+              width={width}
+              height={height - 62} // for some reason autosizer does not take into account the height of the header
+            >
+              {Row}
+            </List>
+          )
+        }}
       </AutoSizer>
     </>
   )

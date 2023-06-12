@@ -141,7 +141,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   const filteredItems = search(debouncedSearchTerm)
 
   const ITEMS_COUNT = filteredItems.length
-  const ITEM_SIZE = 270
+  const ITEM_SIZE = 250
 
   return (
     <AutoSizer>
@@ -152,7 +152,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
         return (
           <List
             width={width}
-            height={height}
+            height={height - 23} //for some reason the height is 23px too much
             rowCount={rowCount}
             rowHeight={ITEM_SIZE}
             rowRenderer={({ index, key, style }) => {
