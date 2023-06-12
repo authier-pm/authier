@@ -1,0 +1,20 @@
+query devicesListWithData {
+  me {
+    id
+    masterDeviceId
+    devices {
+      id
+      name
+      firstIpAddress
+      lastIpAddress
+      logoutAt
+      lastGeoLocation
+      createdAt
+      lastSyncAt
+      platform
+      createdAt
+      syncTOTP
+      vaultLockTimeoutSeconds
+    }
+  }
+}

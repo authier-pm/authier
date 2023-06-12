@@ -12,13 +12,13 @@ import {
   AlertDialogCloseButton
 } from '@chakra-ui/react'
 import { QuestionOutlineIcon } from '@chakra-ui/icons'
-import React, { useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import { HStack } from '@chakra-ui/react'
 import {
   useRemoveDeviceMutation,
-  useLogoutDeviceMutation,
-  useMyDevicesQuery
+  useLogoutDeviceMutation
 } from '@shared/graphql/AccountDevices.codegen'
+import { useDevicesListWithDataQuery } from '@src/pages-vault/Devices.codegen'
 
 export function DeviceDeleteAlert({
   isOpen,
@@ -29,7 +29,7 @@ export function DeviceDeleteAlert({
   isOpen: boolean
   id: string
 }) {
-  const { refetch: devicesRefetch } = useMyDevicesQuery()
+  const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
   const cancelRef = useRef()
   const [remove, setRemove] = useState(false)
   const [logoutDevice] = useLogoutDeviceMutation({

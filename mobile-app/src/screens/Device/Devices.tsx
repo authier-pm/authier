@@ -20,7 +20,6 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { SearchBar } from '@components/SearchBar'
 import {
   useApproveChallengeMutation,
-  useDevicesListQuery,
   useDevicesRequestsQuery,
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
@@ -36,6 +35,7 @@ import { useDeviceStateStore } from '@utils/deviceStateStore'
 
 import mitt from 'mitt'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDevicesListQuery } from './Devices.codegen'
 
 export const icons = {
   Android: 'logo-android',

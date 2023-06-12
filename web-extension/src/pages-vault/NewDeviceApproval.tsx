@@ -4,14 +4,14 @@ import { Trans } from '@lingui/macro'
 import {
   useApproveChallengeMutation,
   useDevicesRequestsQuery,
-  useMyDevicesQuery,
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { formatRelative } from 'date-fns'
 import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from './LoginAwaitingApproval'
+import { useDevicesListWithDataQuery } from './Devices.codegen'
 
 export const NewDevicesApprovalStack = () => {
-  const { refetch: devicesRefetch } = useMyDevicesQuery()
+  const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
 
   const { data: devicesRequests, refetch } = useDevicesRequestsQuery()
 

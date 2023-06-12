@@ -1,38 +1,3 @@
-query devicesList {
-  me {
-    id
-    masterDeviceId
-    devices {
-      id
-      name
-      lastIpAddress
-      logoutAt
-      platform
-      lastGeoLocation
-    }
-  }
-}
-
-query deviceInfo($id: String!) {
-  me {
-    id
-    device(id: $id) {
-      id
-      name
-      firstIpAddress
-      lastIpAddress
-      logoutAt
-      lastGeoLocation
-      createdAt
-      lastSyncAt
-      platform
-      createdAt
-      syncTOTP
-      vaultLockTimeoutSeconds
-    }
-  }
-}
-
 mutation RejectChallenge($id: Int!) {
   me {
     decryptionChallenge(id: $id) {

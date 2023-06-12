@@ -11,10 +11,10 @@ import {
 import { DeleteIcon, StarIcon } from '@chakra-ui/icons'
 
 import { IoIosPhonePortrait } from 'react-icons/io'
-import { useMyDevicesQuery } from '@shared/graphql/AccountDevices.codegen'
+import { useDevicesListWithDataQuery } from '@src/pages-vault/Devices.codegen'
 
 export default function Devices() {
-  const { data, loading, error } = useMyDevicesQuery()
+  const { data, loading, error } = useDevicesListWithDataQuery()
 
   return (
     <Box>

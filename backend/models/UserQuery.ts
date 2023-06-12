@@ -138,6 +138,7 @@ export class UserQuery extends UserBase {
     @Arg('body', () => String) body: string,
     @Arg('type', () => String) type: string
   ) {
+    console.log('NOTIFICATION')
     const user = await prismaClient.user.findUnique({
       where: {
         id: this.id
@@ -152,19 +153,33 @@ export class UserQuery extends UserBase {
     })
 
     if (!user || deviceId === user.masterDeviceId) {
+      console.log('no user or master device or firebase token')
       return false // no point in sending messages to the master device
     }
 
+    const masterDevice = await prismaClient.device.findUnique({
+      where: {
+        id: user?.masterDeviceId as string
+      }
+    })
+
+    if (!masterDevice?.firebaseToken || masterDevice.firebaseToken.length < 8) {
+      console.log('no firebase token')
+      return false // no point in sending messages to the master deviceId
+    }
+
     try {
-      await admin.messaging().sendToDevice(user?.masterDeviceId as string, {
-        notification: {
-          title: title,
-          body: user.Devices.find(({ id }) => id === deviceId)?.name + body
-        },
-        data: {
-          type: type
-        }
-      })
+      await admin
+        .messaging()
+        .sendToDevice(masterDevice?.firebaseToken as string, {
+          notification: {
+            title: title,
+            body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+          },
+          data: {
+            type: type
+          }
+        })
       return true
     } catch (err) {
       console.log(err)

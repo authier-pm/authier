@@ -32,10 +32,7 @@ import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { useState } from 'react'
 import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
-import {
-  useChangeMasterDeviceMutation,
-  useMyDevicesQuery
-} from '@shared/graphql/AccountDevices.codegen'
+import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
 import { formatDistance, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
@@ -43,6 +40,7 @@ import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
 import { DeviceQuery } from '@shared/generated/graphqlBaseTypes'
 import { NewDevicesApprovalStack } from './NewDeviceApproval'
+import { useDevicesListWithDataQuery } from './Devices.codegen'
 
 interface SettingsValues {
   lockTime: number
@@ -304,7 +302,7 @@ const DeviceListItem = ({
 }
 
 export default function Devices() {
-  const { data, loading } = useMyDevicesQuery()
+  const { data, loading } = useDevicesListWithDataQuery()
 
   const [filterBy, setFilterBy] = useState('')
 

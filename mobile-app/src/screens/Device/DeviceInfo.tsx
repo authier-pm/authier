@@ -22,13 +22,13 @@ import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 import { DevicesStackScreenProps } from '@navigation/types'
 import {
   useChangeDeviceSettingsMutation,
-  useChangeMasterDeviceMutation,
-  useDeviceInfoQuery
+  useChangeMasterDeviceMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
+import { useDeviceInfoQuery } from './DeviceInfo.codegen'
 
 const ColumnWrapper = ({
   text,
