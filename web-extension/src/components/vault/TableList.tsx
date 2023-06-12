@@ -206,8 +206,6 @@ export function TableList({ filter }: { filter: string }) {
       </Flex>
       <AutoSizer>
         {({ height, width }) => {
-          console.log('height2:', height)
-
           return (
             <List
               itemCount={data.length}
