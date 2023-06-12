@@ -187,8 +187,12 @@ msgid "Security"
 msgstr "Security"
 
 #: src/screens/Device/DeviceInfo.tsx
-msgid "Set on master device"
-msgstr "Set on master device"
+msgid "Set as master device"
+msgstr "Set as master device"
+
+#: src/screens/Device/DeviceInfo.tsx
+#~ msgid "Set on master device"
+#~ msgstr "Set on master device"
 
 #: src/screens/Account/Account.tsx
 #: src/screens/Device/DeviceInfo.tsx

@@ -19,11 +19,11 @@ msgstr "{name}"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
 msgid "{text}"
-msgstr "{text}"
+msgstr ""
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "About"
-msgstr "O zařízení"
+msgstr ""
 
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
@@ -68,7 +68,7 @@ msgstr "Verze Codepush"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Created"
-msgstr "Vytvořeno"
+msgstr ""
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
@@ -187,8 +187,12 @@ msgid "Security"
 msgstr "Zabezpečení"
 
 #: src/screens/Device/DeviceInfo.tsx
-msgid "Set on master device"
-msgstr "Nastaveno na hlavním zařízení"
+msgid "Set as master device"
+msgstr ""
+
+#: src/screens/Device/DeviceInfo.tsx
+#~ msgid "Set on master device"
+#~ msgstr "Nastaveno na hlavním zařízení"
 
 #: src/screens/Account/Account.tsx
 #: src/screens/Device/DeviceInfo.tsx
