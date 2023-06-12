@@ -100,57 +100,60 @@ const DeviceListItem = ({
               )}
             </HStack>
 
-            <Menu>
-              <MenuButton
-                as={IconButton}
-                size="xs"
-                variant="unstyled"
-                aria-label="Favourite"
-                fontSize="15px"
-                icon={<SettingsIcon color={'white'} />}
-              />
-              <MenuList>
-                {masterDeviceId !== deviceInfo.id ? (
-                  <MenuItem
-                    onClick={() =>
-                      changeMasterDeviceMutation({
-                        variables: {
-                          newMasterDeviceId: deviceInfo.id as string
-                        }
-                      })
-                    }
-                  >
-                    <FiStar />
-                    <NbSp />
-                    <Trans>Set on master device</Trans>
-                  </MenuItem>
-                ) : null}
-
-                <MenuItem onClick={() => onOpen()}>
-                  <FiLogOut></FiLogOut>
-                  <NbSp />
-                  <Trans>Logout</Trans>
-                </MenuItem>
-                <DeviceDeleteAlert
-                  id={deviceInfo.id as string}
-                  isOpen={isOpen}
-                  onClose={onClose}
+            {(deviceInfo.id !== masterDeviceId ||
+              deviceInfo.id === device.id) && (
+              <Menu>
+                <MenuButton
+                  as={IconButton}
+                  size="xs"
+                  variant="unstyled"
+                  aria-label="Device actions"
+                  fontSize="15px"
+                  icon={<SettingsIcon color={'white'} />}
                 />
-                <MenuItem
-                  onClick={() => {
-                    if (deviceInfo.id === device.id) {
-                      navigate('/settings/security')
-                    } else {
-                      setIsConfigOpen(!isConfigOpen)
-                    }
-                  }}
-                >
-                  <FiSettings />
-                  <NbSp />
-                  <Trans>Config</Trans>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+                <MenuList>
+                  {masterDeviceId !== deviceInfo.id ? (
+                    <MenuItem
+                      onClick={() =>
+                        changeMasterDeviceMutation({
+                          variables: {
+                            newMasterDeviceId: deviceInfo.id as string
+                          }
+                        })
+                      }
+                    >
+                      <FiStar />
+                      <NbSp />
+                      <Trans>Set on master device</Trans>
+                    </MenuItem>
+                  ) : null}
+
+                  <MenuItem onClick={() => onOpen()}>
+                    <FiLogOut></FiLogOut>
+                    <NbSp />
+                    <Trans>Logout</Trans>
+                  </MenuItem>
+                  <DeviceDeleteAlert
+                    id={deviceInfo.id as string}
+                    isOpen={isOpen}
+                    onClose={onClose}
+                  />
+                  <MenuItem
+                    onClick={() => {
+                      if (deviceInfo.id === device.id) {
+                        navigate('/settings/security')
+                      } else {
+                        setIsConfigOpen(!isConfigOpen)
+                      }
+                    }}
+                  >
+                    <FiSettings />
+                    <NbSp />
+                    <Trans>Config</Trans>
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            )}
           </Stack>
 
           <Heading fontSize={'xl'} fontFamily={'body'}>
