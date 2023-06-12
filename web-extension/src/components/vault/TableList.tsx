@@ -84,6 +84,7 @@ export function TableList({ filter }: { filter: string }) {
                 mr={2}
               />
             </Box>
+
             <Box w={'inherit'}>
               <Text
                 textAlign="left"
@@ -97,6 +98,7 @@ export function TableList({ filter }: { filter: string }) {
                   : row.loginCredentials.label}
               </Text>
             </Box>
+
             <Text
               textOverflow="ellipsis"
               w="100%"
@@ -106,6 +108,18 @@ export function TableList({ filter }: { filter: string }) {
             >
               {row.kind === 'TOTP' ? row.totp.url : row.loginCredentials.url}
             </Text>
+
+            <Box w={'inherit'}>
+              <Text
+                textAlign="left"
+                textOverflow="ellipsis"
+                overflow="hidden"
+                whiteSpace="nowrap"
+                fontWeight="bold"
+              >
+                {row.kind === 'TOTP' ? '' : row.loginCredentials.username}
+              </Text>
+            </Box>
             <Text
               w="inherit"
               textAlign="end"
@@ -178,17 +192,23 @@ export function TableList({ filter }: { filter: string }) {
         borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       >
         <HStack mt={2} w="100%" justifyContent="space-between">
-          <Flex w="33%" justifyContent="center">
+          <Flex w="20%" justifyContent="center">
             <Text w="100%" textAlign="center" fontWeight="bold">
               Label
             </Text>
           </Flex>
-          <Flex w="33%" justifyContent="center">
+
+          <Flex w="20%" justifyContent="center">
             <Text w="100%" textAlign="center" fontWeight="bold">
               URL
             </Text>
           </Flex>
-          <Flex w="33%" justifyContent="center">
+          <Flex w="20%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              Username
+            </Text>
+          </Flex>
+          <Flex w="20%" justifyContent="center">
             <HStack>
               <Text pr={4} w="100%" textAlign="end" fontWeight="bold">
                 Secret
