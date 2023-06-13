@@ -5,15 +5,14 @@ import {
   Field,
   Int,
   ObjectType,
-  GraphQLISODateTime,
-  UseMiddleware
+  GraphQLISODateTime
 } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import { GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
