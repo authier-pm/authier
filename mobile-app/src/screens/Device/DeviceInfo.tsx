@@ -15,7 +15,7 @@ import {
   useColorModeValue,
   VStack
 } from 'native-base'
-import React, { ReactElement, useEffect } from 'react'
+import React, { ReactElement } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
 
@@ -28,7 +28,7 @@ import { icons } from './Devices'
 
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
-import { useDeviceInfoQuery } from './DeviceInfo.codegen'
+import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
 
 const ColumnWrapper = ({
   text,
@@ -54,7 +54,13 @@ export default function DeviceInfo({
   const { deviceId: selectedDeviceId, masterDeviceId } = route.params
   const [id] = useDeviceStore((state) => [state.id])
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
-  const [chagengeDeviceSettings] = useChangeDeviceSettingsMutation({})
+  const [chagengeDeviceSettings, { loading: changeSettingsloading }] =
+    useChangeDeviceSettingsMutation({
+      refetchQueries: [
+        { query: DeviceInfoDocument, variables: { id: selectedDeviceId } }
+      ],
+      awaitRefetchQueries: true
+    })
   const { data, loading, error } = useDeviceInfoQuery({
     variables: {
       id: selectedDeviceId
@@ -171,7 +177,7 @@ export default function DeviceInfo({
         </VStack>
       </VStack>
 
-      {selectedDeviceId !== masterDeviceId ? (
+      {selectedDeviceId !== id ? (
         <VStack mb={10}>
           <Heading fontWeight={'bold'} color={'gray.500'} size="md" m={3}>
             <Trans>Settings</Trans>
@@ -193,7 +199,7 @@ export default function DeviceInfo({
                     }
                   })
                 }}
-                defaultValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
+                selectedValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
                 accessibilityLabel="Lock time"
               >
                 <Select.Item label="1 minute" value="20" />
@@ -201,6 +207,8 @@ export default function DeviceInfo({
                 <Select.Item label="1 hour" value="3600" />
                 <Select.Item label="4 hours" value="14400" />
                 <Select.Item label="8 hours" value="28800" />
+                <Select.Item label="1 week" value="604800" />
+                <Select.Item label="1 month" value="2592000" />
                 <Select.Item label="never" value="0" />
               </Select>
 
@@ -214,7 +222,12 @@ export default function DeviceInfo({
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>2FA</Text>
               <Switch
-                value={selectedDeviceData?.syncTOTP}
+                //FIX: Flickers after change of Lock time
+                value={
+                  changeSettingsloading
+                    ? !selectedDeviceData?.syncTOTP
+                    : selectedDeviceData?.syncTOTP
+                }
                 onToggle={async (e) => {
                   chagengeDeviceSettings({
                     variables: {

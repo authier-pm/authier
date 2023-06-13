@@ -32,7 +32,10 @@ import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { useState } from 'react'
 import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
-import { useChangeMasterDeviceMutation } from '@shared/graphql/AccountDevices.codegen'
+import {
+  useChangeDeviceSettingsMutation,
+  useChangeMasterDeviceMutation
+} from '@shared/graphql/AccountDevices.codegen'
 import { formatDistance, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
 import { device } from '@src/background/ExtensionDevice'
@@ -40,7 +43,10 @@ import { RefreshDeviceButton } from '@src/components/vault/RefreshDeviceButton'
 import { useNavigate } from 'react-router-dom'
 import { DeviceQuery } from '@shared/generated/graphqlBaseTypes'
 import { NewDevicesApprovalStack } from './NewDeviceApproval'
-import { useDevicesListWithDataQuery } from './Devices.codegen'
+import {
+  useDevicesListWithDataQuery,
+  DevicesListWithDataDocument
+} from './Devices.codegen'
 
 interface SettingsValues {
   lockTime: number
@@ -55,6 +61,7 @@ const DeviceListItem = ({
   masterDeviceId: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
+  const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
@@ -169,9 +176,22 @@ const DeviceListItem = ({
                   values: SettingsValues,
                   { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
-                  //TODO: What property can user update?
-                  console.log(values)
-
+                  console.log('Values', values)
+                  changedDeviceSettings({
+                    variables: {
+                      id: deviceInfo.id as string,
+                      syncTOTP: values.syncTOTP,
+                      vaultLockTimeoutSeconds: parseInt(
+                        values.lockTime.toString()
+                      )
+                    },
+                    refetchQueries: [
+                      {
+                        query: DevicesListWithDataDocument,
+                        variables: { id: deviceInfo.id as string }
+                      }
+                    ]
+                  })
                   setSubmitting(false)
                 }}
               >

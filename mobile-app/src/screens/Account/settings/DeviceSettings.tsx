@@ -22,12 +22,14 @@ import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { i18n } from '@lingui/core'
+import { RefreshControl } from 'react-native'
 
 function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
   const { toggleColorMode } = useColorMode()
   const [modalVisible, setModalVisible] = React.useState(false)
+  const [refreshing, setRefreshing] = React.useState(false)
   const [updateSettings] = useUpdateSettingsMutation({})
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
@@ -56,6 +58,7 @@ function DeviceSettings() {
     const settingsChanged =
       JSON.stringify(previousSettings) !== JSON.stringify(currentSettings())
 
+    //FIX: This is called  after onRefresh, which should not happen
     if (settingsChanged) {
       updateSettings({
         variables: {
@@ -65,10 +68,19 @@ function DeviceSettings() {
     }
 
     setPreviousSettings(currentSettings)
-  }, [deviceState])
+  }, [deviceState, refreshing])
 
+  const onRefresh = () => {
+    setRefreshing(true)
+    device.updateDeviceSettings()
+    setRefreshing(false)
+  }
   return (
-    <ScrollView>
+    <ScrollView
+      refreshControl={
+        <RefreshControl onRefresh={onRefresh} refreshing={refreshing} />
+      }
+    >
       <Center mt={5} mb={5}>
         <VStack width="90%" space={4}>
           {/*  */}
@@ -88,7 +100,7 @@ function DeviceSettings() {
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
                     }}
-                    defaultValue={deviceState.vaultLockTimeoutSeconds.toString()}
+                    selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
                     accessibilityLabel="Lock time"
                   >
                     <Select.Item label="1 minute" value="20" />
@@ -96,6 +108,8 @@ function DeviceSettings() {
                     <Select.Item label="1 hour" value="3600" />
                     <Select.Item label="4 hours" value="14400" />
                     <Select.Item label="8 hours" value="28800" />
+                    <Select.Item label="1 week" value="604800" />
+                    <Select.Item label="1 month" value="2592000" />
                     <Select.Item label="never" value="0" />
                   </Select>
 

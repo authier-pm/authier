@@ -19,11 +19,11 @@ msgstr "{name}"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
 msgid "{text}"
-msgstr ""
+msgstr "{text}"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "About"
-msgstr ""
+msgstr "O aplikaci"
 
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
@@ -50,11 +50,16 @@ msgid "Approve this device in your device management in the vault on your master
 msgstr "Schvalte toto zařízení ve správě zařízení v trezoru na hlavním zařízení, abyste mohli pokračovat v přidávání nového zařízení."
 
 #: src/screens/Account/settings/UserSettings.tsx
+msgid "Attempts before notification:"
+msgstr "Počet pokusů před oznámením:"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
 
 #: src/navigation/AccountNavigation.tsx
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Change master password"
 msgstr "Změna hlavního hesla"
 
@@ -68,7 +73,7 @@ msgstr "Verze Codepush"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Created"
-msgstr ""
+msgstr "Vytvořeno"
 
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
@@ -78,9 +83,17 @@ msgstr ""
 msgid "Current Password"
 msgstr "Aktuální heslo"
 
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Danger zone"
+msgstr "Nebezpečná zóna"
+
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Delete your account"
 msgstr "Smazat účet"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "Device"
+msgstr "Zařízení"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
@@ -122,7 +135,8 @@ msgstr "Poslední IP adresa"
 msgid "Lock"
 msgstr "Uzamknout"
 
-#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Lock time"
 msgstr "Doba uzamčení"
 
@@ -158,6 +172,14 @@ msgstr "Nové heslo"
 msgid "New password confirmation"
 msgstr "Potvrzení nového hesla"
 
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notifications"
+msgstr "Oznámení"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notify after password attempts"
+msgstr "Upozornit po pokusu o heslo"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Password changed, all your devices will be logged out and you will need to log in again"
 msgstr "Heslo bylo změněno, všechna vaše zařízení budou odhlášena a budete se muset znovu přihlásit"
@@ -182,13 +204,13 @@ msgstr "Odmítnout"
 msgid "Scan QR"
 msgstr "Naskenujte QR"
 
-#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Security"
 msgstr "Zabezpečení"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Set as master device"
-msgstr ""
+msgstr "Nastavit jako hlavní zařízení"
 
 #: src/screens/Device/DeviceInfo.tsx
 #~ msgid "Set on master device"
@@ -244,8 +266,12 @@ msgstr "Vítejte"
 msgid "Wrong password"
 msgstr "Nesprávné heslo"
 
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid ""
 "You cannot undo this action afterwards. Make sure to\n"
 "backup data that you want to keep."
 msgstr "Tuto akci nemůžete později vrátit zpět. Ujistěte se, že zálohujete data, která chcete zachovat."
+
+#: src/components/OfflineBanner.tsx
+msgid "Your device is offline"
+msgstr "Vaše zařízení je offline"

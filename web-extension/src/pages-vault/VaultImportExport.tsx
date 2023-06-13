@@ -25,7 +25,11 @@ import {
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
-import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
+import {
+  ILoginSecret,
+  ITOTPSecret,
+  LoginCredentialsTypeWithMeta
+} from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { constructURL } from '@shared/urlUtils'
 
@@ -51,6 +55,7 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     return x === 'url' || x === 'login_uri'
   })
 
+  console.log(indexUsername, indexLabel, indexPassword, indexUrl)
   if (
     indexUsername === -1 ||
     indexLabel === -1 ||
@@ -95,6 +100,7 @@ export const onCSVFileAccepted: any = (
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
+        console.log(mapped)
 
         const state = device.state as DeviceState
 
@@ -119,10 +125,10 @@ export const onCSVFileAccepted: any = (
             hostname = constructURL(creds.url).hostname
           } catch (error) {
             skipped++
-            break
+            continue
           }
 
-          const input = {
+          const input /* : ILoginSecret | ITOTPSecret */ = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
             url: creds.url,

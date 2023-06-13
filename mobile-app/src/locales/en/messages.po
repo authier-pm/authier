@@ -50,11 +50,16 @@ msgid "Approve this device in your device management in the vault on your master
 msgstr "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 
 #: src/screens/Account/settings/UserSettings.tsx
+msgid "Attempts before notification:"
+msgstr "Attempts before notification:"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatically locks vault after chosen period of time"
 
 #: src/navigation/AccountNavigation.tsx
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Change master password"
 msgstr "Change master password"
 
@@ -78,9 +83,17 @@ msgstr "Created"
 msgid "Current Password"
 msgstr "Current Password"
 
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Danger zone"
+msgstr "Danger zone"
+
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Delete your account"
 msgstr "Delete your account"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "Device"
+msgstr "Device"
 
 #: src/screens/Auth/LoginAwaitingApproval.tsx
 msgid "Device:"
@@ -122,7 +135,8 @@ msgstr "Last IP Address"
 msgid "Lock"
 msgstr "Lock"
 
-#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Lock time"
 msgstr "Lock time"
 
@@ -158,6 +172,14 @@ msgstr "New password"
 msgid "New password confirmation"
 msgstr "New password confirmation"
 
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notify after password attempts"
+msgstr "Notify after password attempts"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Password changed, all your devices will be logged out and you will need to log in again"
 msgstr "Password changed, all your devices will be logged out and you will need to log in again"
@@ -182,7 +204,7 @@ msgstr "Reject"
 msgid "Scan QR"
 msgstr "Scan QR"
 
-#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Security"
 msgstr "Security"
 
@@ -244,10 +266,14 @@ msgstr "Welcome"
 msgid "Wrong password"
 msgstr "Wrong password"
 
-#: src/screens/Account/Account.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 msgid ""
 "You cannot undo this action afterwards. Make sure to\n"
 "backup data that you want to keep."
 msgstr ""
 "You cannot undo this action afterwards. Make sure to\n"
 "backup data that you want to keep."
+
+#: src/components/OfflineBanner.tsx
+msgid "Your device is offline"
+msgstr "Your device is offline"

@@ -26,6 +26,11 @@ import { clearAccessToken } from './tokenFromAsyncStorage'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
 import messaging from '@react-native-firebase/messaging'
+import {
+  SyncSettingsDocument,
+  SyncSettingsQuery,
+  SyncSettingsQueryVariables
+} from '@shared/graphql/Settings.codegen'
 
 export type SecretSerializedType = Pick<
   EncryptedSecretGql,
@@ -138,7 +143,7 @@ interface DeviceProps {
 interface Device extends DeviceProps {
   save: (deviceState?: IBackgroundStateSerializable) => Promise<void>
   initialize: () => Promise<ReturnType<typeof useDeviceStateStore> | null>
-  setDeviceSettings: (config: SettingsInput) => void
+  updateDeviceSettings: () => void
   lock: () => Promise<void>
   clearAndReload: () => Promise<void>
   logout: () => Promise<void>
@@ -195,68 +200,91 @@ export const useDeviceStore = create<Device>()(
         }
       },
       initialize: async () => {
-        set({ id: await getUniqueId() })
-        set({ biometricsAvailable: await get().checkBiometrics() })
-        set({ name: await getDeviceName() })
+        const start = performance.now()
+        const [id, biometricsAvailable, name, token] = await Promise.all([
+          getUniqueId(),
+          get().checkBiometrics(),
+          getDeviceName(),
+          messaging().getToken()
+          // useDeviceStateStore.getState().initialize()
+        ])
 
-        useDeviceStateStore.getState().initialize()
-        const token = await messaging().getToken()
         set({
           fireToken: token,
           isInitialized: true,
-          platform: Platform.OS
+          platform: Platform.OS,
+          name,
+          biometricsAvailable,
+          id
         })
-        console.log(
-          'device initialized',
-          get().biometricsAvailable,
-          useDeviceStateStore.getState().biometricsEnabled,
-          token
-        )
-        let test = await SInfo.getAllItems({
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH'
-        })
-        console.log('SINFO', test)
+        const end = performance.now()
+        console.log(`Initialize Execution time: ${end - start} ms`)
         return useDeviceStateStore.getState()
       },
-      setDeviceSettings(config: SettingsInput) {
-        //HACK: this is a hack, we should not create a new interval every time we save the state
-        let state = useDeviceStateStore.getState()
-        if (!state) {
-          console.warn('device not initialized')
-          return
-        }
+      async updateDeviceSettings() {
+        try {
+          const query = await apolloClient.query<
+            SyncSettingsQuery,
+            SyncSettingsQueryVariables
+          >({
+            query: SyncSettingsDocument,
+            variables: {},
+            fetchPolicy: 'network-only'
+          })
 
-        useDeviceStateStore.setState({ ...state, ...config })
+          const config = {
+            autofillTOTPEnabled: query.data.me.autofillTOTPEnabled,
+            autofillCredentialsEnabled:
+              query.data.me.autofillCredentialsEnabled,
+            syncTOTP: query.data.currentDevice.syncTOTP,
+            vaultLockTimeoutSeconds: query.data.currentDevice
+              .vaultLockTimeoutSeconds as number,
+            uiLanguage: query.data.me.uiLanguage,
+            notificationOnVaultUnlock: query.data.me.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              query.data.me.notificationOnWrongPasswordAttempts
+          }
 
-        // Sync timer
+          //HACK: this is a hack, we should not create a new interval every time we save the state
+          let state = useDeviceStateStore.getState()
+          if (!state) {
+            console.warn('device not initialized')
+            return
+          }
 
-        const device = get()
-        if (config.vaultLockTimeoutSeconds > 0) {
+          useDeviceStateStore.setState({ ...state, ...config })
+
           // Sync timer
-          if (
-            state.vaultLockTimeoutSeconds !== config.vaultLockTimeoutSeconds
-          ) {
-            console.log(
-              'vaultLockTimeoutSeconds',
-              config.vaultLockTimeoutSeconds
-            )
-            useDeviceStateStore.setState({
-              lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
-            })
-          }
 
-          if (state && state.lockTimeEnd && Date.now() >= state.lockTimeEnd) {
-            device.lock()
-          } else if (state.lockTimeEnd) {
-            if (!device.lockInterval) {
-              console.log('syncSettings', state.lockTimeEnd)
-              device.startVaultLockTimer()
+          const device = get()
+          if (config.vaultLockTimeoutSeconds > 0) {
+            // Sync timer
+            if (
+              state.vaultLockTimeoutSeconds !== config.vaultLockTimeoutSeconds
+            ) {
+              console.log(
+                'vaultLockTimeoutSeconds',
+                config.vaultLockTimeoutSeconds
+              )
+              useDeviceStateStore.setState({
+                lockTimeEnd: Date.now() + config.vaultLockTimeoutSeconds * 1000
+              })
             }
+
+            if (state && state.lockTimeEnd && Date.now() >= state.lockTimeEnd) {
+              device.lock()
+            } else if (state.lockTimeEnd) {
+              if (!device.lockInterval) {
+                console.log('syncSettings', state.lockTimeEnd)
+                device.startVaultLockTimer()
+              }
+            }
+          } else {
+            state.lockTimeEnd = null
+            device.clearLockInterval()
           }
-        } else {
-          state.lockTimeEnd = null
-          device.clearLockInterval()
+        } catch (error) {
+          console.error(error)
         }
       },
       generateBackendSecret: () => {
@@ -343,22 +371,27 @@ export const useDeviceStore = create<Device>()(
       },
       clearAndReload: async () => {
         //TODO: This could be done better
-        await messaging().deleteToken()
+        Promise.all([
+          messaging().deleteToken(),
+          clearAccessToken(),
+          apolloClient.clearStore()
+        ])
+
         get().clearLockInterval()
-        await clearAccessToken()
         SInfo.deleteItem('psw', {
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH'
         })
         useDeviceStateStore.getState().reset()
         const newToken = await messaging().getToken()
-        set({ isLoggedIn: false, isInitialized: true, fireToken: newToken })
+        set({ isInitialized: true, fireToken: newToken })
       },
       logout: async () => {
         try {
           await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
             mutation: LogoutDocument
           })
+          set({ isLoggedIn: false })
         } catch (err: any) {
           console.error(
             `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,

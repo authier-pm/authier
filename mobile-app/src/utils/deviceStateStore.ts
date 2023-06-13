@@ -157,7 +157,10 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
+        const start = performance.now()
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+        const end = performance.now()
+        console.log(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
       },
       setMasterEncryptionKey: async (masterPassword: string) => {
         const key = await generateEncryptionKey(
@@ -279,6 +282,8 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       backendSync: async (toast: IToastService) => {
+        const time = performance.now()
+
         const { data } = await apolloClient.query<
           SyncEncryptedSecretsQuery,
           SyncEncryptedSecretsQueryVariables
@@ -311,7 +316,26 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             )
 
             set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
+
             set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+            // const unchangedDecryptedSecrets = get().decryptedSecrets.filter(
+            //   ({ id }) => {
+            //     return unchangedSecrets.find((secret) => secret.id === id)
+            //   }
+            // )
+            //
+            // const newAndUpdatedDecryptedSecrets = await Promise.all(
+            //   newAndUpdatedSecrets.map((secret) => {
+            //     return get().decryptSecret(secret)
+            //   })
+            // )
+            //
+            // set({
+            //   decryptedSecrets: [
+            //     ...unchangedDecryptedSecrets,
+            //     ...newAndUpdatedDecryptedSecrets
+            //   ]
+            // })
 
             await apolloClient.mutate<
               MarkAsSyncedMutation,
@@ -343,6 +367,8 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
               })
             }
 
+            const end = performance.now()
+            console.log('backendSync', end - time)
             return res
           }
         }
