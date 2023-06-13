@@ -371,22 +371,27 @@ export const useDeviceStore = create<Device>()(
       },
       clearAndReload: async () => {
         //TODO: This could be done better
-        await messaging().deleteToken()
+        Promise.all([
+          messaging().deleteToken(),
+          clearAccessToken(),
+          apolloClient.clearStore()
+        ])
+
         get().clearLockInterval()
-        await clearAccessToken()
         SInfo.deleteItem('psw', {
           sharedPreferencesName: 'authierShared',
           keychainService: 'authierKCH'
         })
         useDeviceStateStore.getState().reset()
         const newToken = await messaging().getToken()
-        set({ isLoggedIn: false, isInitialized: true, fireToken: newToken })
+        set({ isInitialized: true, fireToken: newToken })
       },
       logout: async () => {
         try {
           await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
             mutation: LogoutDocument
           })
+          set({ isLoggedIn: false })
         } catch (err: any) {
           console.error(
             `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,

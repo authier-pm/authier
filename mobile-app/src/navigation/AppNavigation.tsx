@@ -66,7 +66,7 @@ function AppNavigation() {
     })
 
     backendSync(toast)
-    // updateDeviceSettings()
+    updateDeviceSettings()
     return unsubscribe
   }, [])
 
