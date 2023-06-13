@@ -30,8 +30,8 @@ const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
   }
 
   const makeShorter = (str: string) => {
-    if (str.length > 20) {
-      return str.substring(0, 20) + '...'
+    if (str.length > 17) {
+      return str.substring(0, 17) + '...'
     }
     return str
   }
