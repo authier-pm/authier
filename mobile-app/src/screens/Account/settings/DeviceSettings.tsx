@@ -108,6 +108,8 @@ function DeviceSettings() {
                     <Select.Item label="1 hour" value="3600" />
                     <Select.Item label="4 hours" value="14400" />
                     <Select.Item label="8 hours" value="28800" />
+                    <Select.Item label="1 week" value="604800" />
+                    <Select.Item label="1 month" value="2592000" />
                     <Select.Item label="never" value="0" />
                   </Select>
 

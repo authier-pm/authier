@@ -45,7 +45,6 @@ import { DeviceQuery } from '@shared/generated/graphqlBaseTypes'
 import { NewDevicesApprovalStack } from './NewDeviceApproval'
 import {
   useDevicesListWithDataQuery,
-  DevicesListWithDataQuery,
   DevicesListWithDataDocument
 } from './Devices.codegen'
 
