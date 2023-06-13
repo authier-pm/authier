@@ -14,20 +14,17 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
 import { useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
-import { Loading } from '@src/components/Loading'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
-  const { data, loading } = useSyncSettingsQuery()
-  const [setDeviceSettings] = useDeviceStore((state) => [
-    state.setDeviceSettings
+  const [updateDeviceSettings] = useDeviceStore((state) => [
+    state.updateDeviceSettings
   ])
   const [notifications, backendSync, setNotifications] = useDeviceStateStore(
     (state) => [state.notifications, state.backendSync, state.setNotifications]
@@ -73,24 +70,8 @@ function AppNavigation() {
   }, [])
 
   React.useEffect(() => {
-    if (data && data.currentDevice) {
-      setDeviceSettings({
-        autofillTOTPEnabled: data.me.autofillTOTPEnabled,
-        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
-        syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number,
-        uiLanguage: data.me.uiLanguage,
-        notificationOnVaultUnlock: data.me.notificationOnVaultUnlock,
-        notificationOnWrongPasswordAttempts:
-          data.me.notificationOnWrongPasswordAttempts
-      })
-    }
-  }, [data, loading])
-
-  if (loading && !data) {
-    return <Loading />
-  }
+    updateDeviceSettings()
+  }, [])
 
   return (
     <RootStack.Navigator
