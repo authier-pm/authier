@@ -5,7 +5,6 @@ import {
   Text,
   AddIcon,
   useToast,
-  Box,
   IconButton,
   HStack,
   Image,

@@ -157,7 +157,10 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
+        const start = performance.now()
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+        const end = performance.now()
+        console.log(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
       },
       setMasterEncryptionKey: async (masterPassword: string) => {
         const key = await generateEncryptionKey(
@@ -311,6 +314,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             )
 
             set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
+            //FIX: We should comapre what changed and decrypt only those
             set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
 
             await apolloClient.mutate<

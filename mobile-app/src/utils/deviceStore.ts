@@ -200,28 +200,25 @@ export const useDeviceStore = create<Device>()(
         }
       },
       initialize: async () => {
-        set({ id: await getUniqueId() })
-        set({ biometricsAvailable: await get().checkBiometrics() })
-        set({ name: await getDeviceName() })
+        const start = performance.now()
+        const [id, biometricsAvailable, name, token] = await Promise.all([
+          getUniqueId(),
+          get().checkBiometrics(),
+          getDeviceName(),
+          messaging().getToken()
+          // useDeviceStateStore.getState().initialize()
+        ])
 
-        useDeviceStateStore.getState().initialize()
-        const token = await messaging().getToken()
         set({
           fireToken: token,
           isInitialized: true,
-          platform: Platform.OS
+          platform: Platform.OS,
+          name,
+          biometricsAvailable,
+          id
         })
-        console.log(
-          'device initialized',
-          get().biometricsAvailable,
-          useDeviceStateStore.getState().biometricsEnabled,
-          token
-        )
-        let test = await SInfo.getAllItems({
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH'
-        })
-        console.log('SINFO', test)
+        const end = performance.now()
+        console.log(`Initialize Execution time: ${end - start} ms`)
         return useDeviceStateStore.getState()
       },
       async updateDeviceSettings() {
@@ -231,6 +228,7 @@ export const useDeviceStore = create<Device>()(
             SyncSettingsQueryVariables
           >({
             query: SyncSettingsDocument, //WARNING: Why cant I use cache-and-network here?
+            variables: {},
             fetchPolicy: 'network-only'
           })
 

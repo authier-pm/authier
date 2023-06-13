@@ -66,11 +66,8 @@ function AppNavigation() {
     })
 
     backendSync(toast)
+    // updateDeviceSettings()
     return unsubscribe
-  }, [])
-
-  React.useEffect(() => {
-    updateDeviceSettings()
   }, [])
 
   return (
