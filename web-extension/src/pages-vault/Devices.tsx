@@ -61,7 +61,7 @@ const DeviceListItem = ({
   masterDeviceId: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
-  const [chagengeDeviceSettings] = useChangeDeviceSettingsMutation()
+  const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
@@ -177,7 +177,7 @@ const DeviceListItem = ({
                   { setSubmitting }: FormikHelpers<SettingsValues>
                 ) => {
                   console.log('Values', values)
-                  chagengeDeviceSettings({
+                  changedDeviceSettings({
                     variables: {
                       id: deviceInfo.id as string,
                       syncTOTP: values.syncTOTP,

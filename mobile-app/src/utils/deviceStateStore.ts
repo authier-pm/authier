@@ -317,24 +317,25 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
 
             set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
 
-            const unchangedDecryptedSecrets = get().decryptedSecrets.filter(
-              ({ id }) => {
-                return unchangedSecrets.find((secret) => secret.id === id)
-              }
-            )
-
-            const newAndUpdatedDecryptedSecrets = await Promise.all(
-              newAndUpdatedSecrets.map((secret) => {
-                return get().decryptSecret(secret)
-              })
-            )
-
-            set({
-              decryptedSecrets: [
-                ...unchangedDecryptedSecrets,
-                ...newAndUpdatedDecryptedSecrets
-              ]
-            })
+            set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+            // const unchangedDecryptedSecrets = get().decryptedSecrets.filter(
+            //   ({ id }) => {
+            //     return unchangedSecrets.find((secret) => secret.id === id)
+            //   }
+            // )
+            //
+            // const newAndUpdatedDecryptedSecrets = await Promise.all(
+            //   newAndUpdatedSecrets.map((secret) => {
+            //     return get().decryptSecret(secret)
+            //   })
+            // )
+            //
+            // set({
+            //   decryptedSecrets: [
+            //     ...unchangedDecryptedSecrets,
+            //     ...newAndUpdatedDecryptedSecrets
+            //   ]
+            // })
 
             await apolloClient.mutate<
               MarkAsSyncedMutation,

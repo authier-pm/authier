@@ -227,7 +227,7 @@ export const useDeviceStore = create<Device>()(
             SyncSettingsQuery,
             SyncSettingsQueryVariables
           >({
-            query: SyncSettingsDocument, //WARNING: Why cant I use cache-and-network here?
+            query: SyncSettingsDocument,
             variables: {},
             fetchPolicy: 'network-only'
           })
