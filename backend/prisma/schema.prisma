@@ -161,35 +161,44 @@ model WebInput {
   @@index([kind])
 }
 
+model DefaultDeviceConfig {
+  user_id                 String  @id @unique @db.Uuid
+  deviceTheme             String // light, dark
+  syncTOTP                Boolean
+  vaultLockTimeoutSeconds Int
+  user                    User    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
 model User {
-  id                            String               @id @default(uuid()) @db.Uuid
-  email                         String?              @unique @db.Citext
-  tokenVersion                  Int                  @default(0)
-  username                      String?              @unique
+  id                       String    @id @default(uuid()) @db.Uuid
+  email                    String?   @unique @db.Citext
+  tokenVersion             Int       @default(0)
+  username                 String?   @unique
   // @skip
-  addDeviceSecret               String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted      String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
+  addDeviceSecret          String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt                String //WARNING: in pure string
-  Token                         Token[]
-  createdAt                     DateTime             @default(now())
-  updatedAt                     DateTime?            @updatedAt
-  masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
-  masterDeviceId                String?              @unique
-  // Limits for the number of stored secrets
-  TOTPlimit                     Int // this is just override for the 
-  loginCredentialsLimit         Int // 
+  encryptionSalt           String //WARNING: in pure string
+  Token                    Token[]
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime? @updatedAt
+  masterDevice             Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
+  masterDeviceId           String?   @unique
+
+  // Limits for the number of stored secrets. Get's increased when user pays for a subscription
+  TOTPlimit             Int
+  loginCredentialsLimit Int
+
   // @skip
   recoveryDecryptionChallengeId Int? // when set user is in process of adding a new master device waiting for the cooldown to
   recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
 
-  deviceRecoveryCooldownMinutes       Int // in case if user cannot access any existing device, they can trigger this failsafe
+  deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofillCredentialsEnabled          Boolean @default(true)
-  autofillTOTPEnabled                 Boolean @default(true)
-  uiLanguage                          String  @default("en")
-  defaultDeviceTheme                  String  @default("dark")
-  defaultDeviceSyncTOTP               Boolean @default(true)
+  autofillCredentialsEnabled    Boolean @default(true)
+  autofillTOTPEnabled           Boolean @default(true)
+  uiLanguage                    String  @default("en")
+
   notificationOnVaultUnlock           Boolean @default(false)
   notificationOnWrongPasswordAttempts Int     @default(3)
 
@@ -203,6 +212,7 @@ model User {
   // @skip
   EmailVerification    EmailVerification[]
   MasterDeviceChange   MasterDeviceChange[]
+  DefaultDeviceConfig  DefaultDeviceConfig?
 }
 
 model Token {
