@@ -71,7 +71,7 @@ export function useDeviceState() {
   const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
-  const [isFilling, setIsFilling] = useState<boolean>(false)
+
   const [lockedState, setLockedState] =
     useState<IBackgroundStateSerializableLocked | null>(device.lockedState)
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
@@ -146,7 +146,6 @@ export function useDeviceState() {
     },
     lockedState,
     device,
-    isFilling,
     registered: storageOnchangeListenerRegistered,
     /*
      * searches for secrets in the vault, tries to include all fields which can be searched, returns sorted by lastUsedAt
