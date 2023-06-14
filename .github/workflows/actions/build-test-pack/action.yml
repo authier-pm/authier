@@ -37,18 +37,18 @@ runs:
         pnpm prodBuild
 
     - name: Install Playwright Browsers & Run Playwright tests with backend
-        working-directory: ./web-extension
-        run: |
-          npx playwright install --with-deps
-          xvfb-run --auto-servernum -- pnpm playwright:run
-      #
-      - name: Upload test results
-        if: always()
-        uses: actions/upload-artifact@v3
-        with:
-          name: test-results
-          path: web-extension/test-results
-          retention-days: 30
+      working-directory: ./web-extension
+      run: |
+        npx playwright install --with-deps
+        xvfb-run --auto-servernum -- pnpm playwright:run
+
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: test-results
+        path: web-extension/test-results
+        retention-days: 30
 
     - name: Validate manifest.json of the extension
       uses: cardinalby/schema-validator-action@v1
