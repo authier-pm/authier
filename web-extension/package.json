@@ -1,7 +1,7 @@
 {
   "name": "authier-web-extension",
   "displayName": "Authier",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "Authier web Extension for all our supported browsers",
   "license": "AGPL-3.0-or-later",
   "webExt": {
