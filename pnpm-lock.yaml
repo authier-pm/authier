@@ -182,8 +182,8 @@ importers:
         specifier: ^4.15.0
         version: 4.15.0
       prisma-generator-checker:
-        specifier: ^0.1.0
-        version: 0.1.0(prisma@4.15.0)
+        specifier: ^1.0.1
+        version: 1.0.1(prisma@4.15.0)
       raw-body:
         specifier: ^2.5.2
         version: 2.5.2
@@ -20723,8 +20723,8 @@ packages:
       dotenv: 16.1.4
     dev: true
 
-  /prisma-generator-checker@0.1.0(prisma@4.15.0):
-    resolution: {integrity: sha512-8AcQ0kir88vfRFjWAbr0KgnmaAErqUTfkpsx3kpZGhNQa2UTjAa5y6VuSVgf+mbREkMnSFJbqPqU4U19PojgQw==}
+  /prisma-generator-checker@1.0.1(prisma@4.15.0):
+    resolution: {integrity: sha512-7V15yeOrsYrrBNnrV2NL5zZ2txHqP1UGpRCm7siOB80kI34VMHQHUblwf5B/ou2ujG8BQCOMvnXVnChuYv3Yjw==}
     engines: {node: '>=14.0'}
     hasBin: true
     dependencies:
