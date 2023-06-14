@@ -37,6 +37,7 @@ runs:
         pnpm prodBuild
 
     - name: Install Playwright Browsers & Run Playwright tests with backend
+      shell: bash
       working-directory: ./web-extension
       run: |
         npx playwright install --with-deps
