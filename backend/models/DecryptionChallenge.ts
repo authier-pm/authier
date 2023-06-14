@@ -85,8 +85,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   ) {
     const { id, deviceId, userId } = this
 
-    // TODO use findUnique when prisma bug gets fixed
-    const user = await ctx.prisma.user.findFirst({
+    const user = await ctx.prisma.user.findUnique({
       where: { id: userId },
       include: {
         EncryptedSecrets: true
