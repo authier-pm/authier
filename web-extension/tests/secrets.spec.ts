@@ -103,11 +103,7 @@ test.describe.serial('Secrets management', () => {
   test('Delete secret', async () => {
     await expect(page.getByText('1 secrets')).toBeVisible()
 
-    await page
-      .getByRole('grid', { name: 'grid' })
-      .getByRole('img')
-      .nth(1)
-      .hover()
+    await page.getByRole('grid', { name: 'grid' }).locator('img').hover()
     await page
       .getByRole('grid', { name: 'grid' })
       .getByRole('img')

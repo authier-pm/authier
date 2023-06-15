@@ -421,6 +421,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })
+        //FIX: PERFORMANCE ISSUE, DECRYPT ALL SECRETS
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
         return secretsAdded
       },
