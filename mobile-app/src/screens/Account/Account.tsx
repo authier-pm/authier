@@ -23,8 +23,6 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { t, Trans } from '@lingui/macro'
 
-const settingsOptions = [{ name: t`Settings`, route: 'Settings' }]
-
 export const SettingsItem = ({
   name,
   onPress
@@ -83,16 +81,11 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
       <Divider />
 
       <VStack flex={1} space={5} mt={5}>
-        {settingsOptions.map((i) => {
-          return (
-            <SettingsItem
-              name={i.name}
-              //@ts-expect-error
-              onPress={() => navigation.navigate(i.route)}
-              key={i.name}
-            />
-          )
-        })}
+        <SettingsItem
+          name={t`Settings`}
+          onPress={() => navigation.navigate('Settings', { screen: 'User' })}
+          key={'Settings'}
+        />
 
         <ButtonWithAlert
           btnColor="primary"
