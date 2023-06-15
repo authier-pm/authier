@@ -1,4 +1,4 @@
-import { throwIfNotAuthenticated } from '../api/authMiddleware'
+import { throwIfNotAuthenticated } from '../lib/authMiddleware'
 import {
   Query,
   Resolver,
@@ -18,7 +18,7 @@ import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 import { constructURL } from '../../shared/urlUtils'
 
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'

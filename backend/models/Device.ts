@@ -14,7 +14,7 @@ import { DeviceGQL, DeviceGQLScalars } from './generated/DeviceGQL'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { fetch } from 'undici'
 
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { SettingsInput } from './models'
 

@@ -5,7 +5,7 @@ import { DecryptionChallengeGQL } from './generated/DecryptionChallengeGQL'
 import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
 import { GraphQLJSON, GraphQLNonEmptyString } from 'graphql-scalars'
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'

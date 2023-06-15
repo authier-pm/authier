@@ -15,7 +15,7 @@ import {
 import { verify } from 'jsonwebtoken'
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
-import { GraphqlError } from './api/GraphqlError'
+import { GraphqlError } from './lib/GraphqlError'
 import * as admin from 'firebase-admin'
 import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
 import debug from 'debug'
