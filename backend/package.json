@@ -29,6 +29,7 @@
     "graphql-fields": "^2.0.3",
     "graphql-list-fields": "^2.0.2",
     "graphql-scalars": "^1.22.2",
+    "ioredis": "^5.3.2",
     "ip": "^1.1.8",
     "jsonwebtoken": "^9.0.0",
     "lodash.set": "^4.3.2",
