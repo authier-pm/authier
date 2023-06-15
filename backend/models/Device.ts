@@ -12,40 +12,11 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/DeviceGQL'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
-import { fetch } from 'undici'
 
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
-import { SettingsInput } from './models'
 
-// TODO memoize this function into redis so that we don't hit the API limit
-export async function getGeoIpLocation(ipAddress: string) {
-  if (ipAddress === '127.0.0.1') {
-    return {
-      // Mock data from https://ipbase.com/
-      data: {
-        location: {
-          city: {
-            name: 'Brno'
-          },
-          country: {
-            name: 'Czech Republic'
-          }
-        }
-      }
-    }
-  }
-  const res = await fetch(
-    `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
-  )
-
-  if (res.status > 201) {
-    console.warn('Failed to get geo location for ip', ipAddress)
-  }
-  const json: any = await res.json()
-
-  return json
-}
+import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 
 @InputType()
 export class DeviceInput {
@@ -61,17 +32,6 @@ export class DeviceInput {
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
-  async getIpGeoLocation(ipAddress: string) {
-    const json = await getGeoIpLocation(ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      country_name: json.data.location.country.name
-    }
-  }
-
   @Field(() => [EncryptedSecretQuery], {
     description: 'Get all secrets that were change since last device sync'
   })
@@ -148,7 +108,7 @@ export class DeviceQuery extends DeviceGQL {
 
   @Field(() => String)
   async lastGeoLocation() {
-    const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
+    const geoIp = await getGeoIpLocation.memoized(this.lastIpAddress)
     if (!geoIp) {
       return 'Unknown location'
     }

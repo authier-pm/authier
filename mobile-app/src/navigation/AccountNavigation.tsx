@@ -17,9 +17,10 @@ export default function AccountNavigation() {
     <DeviceStack.Navigator initialRouteName="Account">
       <DeviceStack.Screen
         options={{
-          headerShadowVisible: false
+          headerShadowVisible: false,
+          headerTitle: t`Account`
         }}
-        name={t`Account` as 'Account'}
+        name={'Account'}
         component={Account}
       />
       <DeviceStack.Screen

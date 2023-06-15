@@ -25,6 +25,16 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           --user root
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       APPNAME: authier-api
       AWS_REGION: eu-central-1
@@ -42,6 +52,7 @@ jobs:
       MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE }}
       STRIPE_ENDPOINT: ${{ secrets.STRIPE_ENDPOINT }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      IP_API_IO_API_KEY: ${{ secrets.IP_API_IO_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -87,6 +98,7 @@ jobs:
         if: steps.changes.outputs.backend == 'true'
         env:
           DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
+          REDIS_URL: redis://localhost:6379
         run: |
           pnpm tsc
           cp .env.sample .env

@@ -3,6 +3,7 @@ import { Stack, StackProps } from 'aws-cdk-lib'
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import * as path from 'path'
 import * as cdk from 'aws-cdk-lib'
+
 import dotenv from 'dotenv'
 import { Architecture } from 'aws-cdk-lib/aws-lambda'
 import { Topic } from 'aws-cdk-lib/aws-sns'

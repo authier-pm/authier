@@ -17,9 +17,9 @@ import {
   Box
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import { ChevronDownIcon, ChevronUpIcon, DeleteIcon } from '@chakra-ui/icons'
+import { ChevronDownIcon, ChevronUpIcon, CloseIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
@@ -33,10 +33,10 @@ import {
   credentialValues
 } from '@shared/formikSharedTypes'
 import { EditFormButtons } from './EditFormButtons'
-import { DeleteSecretButton } from './DeleteSecretButton'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
+  const navigate = useNavigate()
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
@@ -54,19 +54,26 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         display: 'contents'
       }}
     >
-      <DeleteSecretButton secrets={[secretProps]}>
-        <DeleteIcon
-          cursor={'pointer'}
-          boxSize={26}
-          padding={1.5}
-          alignSelf="end"
-          overflow={'visible'}
-          backgroundColor={'red.400'}
-          _hover={{ backgroundColor: 'red.500' }}
-          right="0"
-          top="inherit"
-        />
-      </DeleteSecretButton>
+      <CloseIcon
+        cursor={'pointer'}
+        boxSize={26}
+        padding={1.5}
+        alignSelf="end"
+        overflow={'visible'}
+        backgroundColor={'red.400'}
+        _hover={{ backgroundColor: 'red.500' }}
+        right="0"
+        top="inherit"
+        onClick={() => {
+          const canGoBack = window.history.length > 1
+          if (canGoBack) {
+            return navigate(-1)
+          } else {
+            return navigate('/')
+          }
+        }}
+      />
+
       <Flex
         width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
@@ -81,7 +88,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         <Formik
           initialValues={{
             secret: totp.secret,
-            url: totp.url!!,
+            url: totp.url!,
             label: totp.label,
             digits: totp.digits,
             period: totp.period
@@ -172,7 +179,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
                     <FormErrorMessage>{errors.period}</FormErrorMessage>
                   </FormControl>
 
-                  <EditFormButtons />
+                  <EditFormButtons secret={secretProps} />
                 </Flex>
               </form>
             </Box>
@@ -185,6 +192,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
 
 const LoginSecret = (secretProps: ILoginSecret) => {
   const [show, setShow] = useState(false)
+  const navigate = useNavigate()
 
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
@@ -214,19 +222,24 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         alignItems={'center'}
         bg={useColorModeValue('white', 'gray.800')}
       >
-        <DeleteSecretButton secrets={[secretProps]}>
-          <DeleteIcon
-            cursor={'pointer'}
-            boxSize={26}
-            padding={1.5}
-            alignSelf="end"
-            overflow={'visible'}
-            backgroundColor={'red.400'}
-            _hover={{ backgroundColor: 'red.500' }}
-            right="0"
-            top="inherit"
-          />
-        </DeleteSecretButton>
+        <CloseIcon
+          cursor={'pointer'}
+          boxSize={26}
+          padding={1.5}
+          alignSelf="end"
+          overflow={'visible'}
+          _hover={{ backgroundColor: 'yellow.500' }}
+          right="0"
+          top="inherit"
+          onClick={() => {
+            const canGoBack = window.history.length > 1
+            if (canGoBack) {
+              return navigate(-1)
+            } else {
+              return navigate('/')
+            }
+          }}
+        />
 
         <Formik
           enableReinitialize
@@ -350,7 +363,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       isOpen={isOpen}
                       onGenerate={setInitPassword}
                     />
-                    <EditFormButtons />
+                    <EditFormButtons secret={secretProps} />
                   </Flex>
                 </form>
               </Box>
