@@ -1,7 +1,15 @@
-import Redis from 'ioredis'
+import { Redis } from '@upstash/redis'
 
-console.log('process.env.REDIS_URL :', process.env.REDIS_URL)
+console.log(
+  'process.env.UPSTASH_REDIS_REST_URL :',
+  process.env.UPSTASH_REDIS_REST_URL
+)
 
-export const redisClient = new Redis(process.env.REDIS_URL as string, {
-  enableAutoPipelining: true
+const env = process.env
+
+export const redisClient = new Redis({
+  url: env.UPSTASH_REDIS_REST_URL,
+  token: env.UPSTASH_REDIS_REST_TOKEN
 })
+
+redisClient.ping().then((res) => console.log('redis', res))

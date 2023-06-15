@@ -37,6 +37,9 @@ export class AwsCdkAuthierStack extends Stack {
         STRIPE_ENDPOINT: process.env.STRIPE_ENDPOINT as string,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
         REDIS_URL: process.env.REDIS_URL as string,
+        UPSTASH_REDIS_REST_URL: process.env.UPSTASH_REDIS_REST_URL as string,
+        UPSTASH_REDIS_REST_TOKEN: process.env
+          .UPSTASH_REDIS_REST_TOKEN as string,
         FREE_GEOIP_API_KEY: process.env.FREE_GEOIP_API_KEY as string,
         IP_API_IO_API_KEY: process.env.IP_API_IO_API_KEY as string
       }
