@@ -10,7 +10,7 @@ import { GraphqlError } from '../lib/GraphqlError'
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
-import { getGeoIpLocation } from './Device'
+import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 
 @ObjectType()
 class DeviceLocation {
@@ -26,26 +26,16 @@ export class DecryptionChallengeForApproval {
   @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
     // TODO remove in favor of deviceLocationFromIp
-    const json = await getGeoIpLocation(this.ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      country_name: json.data.location.country.name
-    }
+    const json = await getGeoIpLocation.memoized(this.ipAddress)
+
+    return json
   }
 
   @Field(() => DeviceLocation, { nullable: true })
   async deviceLocationFromIp() {
-    const json = await getGeoIpLocation(this.ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      countryName: json.data.location.country.name
-    }
+    const json = await getGeoIpLocation.memoized(this.ipAddress)
+
+    return json
   }
 
   @Field(() => Int)

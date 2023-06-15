@@ -3,7 +3,7 @@ import mimicFn from 'mimic-fn'
 import { redisClient } from './redisClient'
 import debug from 'debug'
 
-const log = debug('ofd:memRedis')
+const log = debug('au:memRedis')
 // in many cases this is better than simple in memory memoization because it memoizes across multiple API instances
 export const memRedis = <T>(
   fn: T,
