@@ -4,8 +4,7 @@ import SInfo from 'react-native-sensitive-info'
 import {
   EncryptedSecretGql,
   EncryptedSecretPatchInput,
-  EncryptedSecretType,
-  SettingsInput
+  EncryptedSecretType
 } from '@shared/generated/graphqlBaseTypes'
 import { z, ZodError } from 'zod'
 import {
@@ -20,8 +19,7 @@ import {
   LogoutDocument,
   LogoutMutation,
   LogoutMutationVariables
-} from '../providers/UserProvider.codegen'
-import { clearAccessToken } from './tokenFromAsyncStorage'
+} from './deviceStore.codegen'
 
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
@@ -54,6 +52,7 @@ export interface IBackgroundStateSerializableLocked {
   lockTimeEnd: number | null
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
+  accessToken: string | null
 }
 
 export interface IBackgroundStateSerializable
@@ -137,7 +136,6 @@ interface DeviceProps {
   biometricsAvailable: boolean
   lockInterval: NodeJS.Timer | void
   isInitialized: boolean
-  isLoggedIn: boolean
 }
 
 interface Device extends DeviceProps {
@@ -171,7 +169,6 @@ interface Device extends DeviceProps {
 
 const initialState: DeviceProps = {
   fireToken: null,
-  isLoggedIn: false,
   lockedState: null,
   id: null,
   platform: Platform.OS,
@@ -190,9 +187,8 @@ export const useDeviceStore = create<Device>()(
         //because we are creating a new interval every time we we start the app (in syncSettings)
         if (deviceState) {
           useDeviceStateStore.setState({ ...deviceState })
-          set({ isLoggedIn: true })
         }
-        // console.log('new state', useDeviceStateStore.getState())
+
         if (!useDeviceStateStore.getState()) {
           throw new Error(
             'Device state is not initialized and it was not supplied as an argument'
@@ -345,7 +341,8 @@ export const useDeviceStore = create<Device>()(
           biometricsEnabled,
           deviceName,
           notificationOnWrongPasswordAttempts,
-          notificationOnVaultUnlock
+          notificationOnVaultUnlock,
+          accessToken
         } = state
         device.setLockedState({
           email,
@@ -364,19 +361,16 @@ export const useDeviceStore = create<Device>()(
           biometricsEnabled,
           lockTimeEnd: null, // when locking the device, we must clear the lockTimeEnd
           notificationOnVaultUnlock,
-          notificationOnWrongPasswordAttempts
+          notificationOnWrongPasswordAttempts,
+          accessToken
         })
 
         useDeviceStateStore.setState({})
       },
       clearAndReload: async () => {
-        set({ isLoggedIn: false })
+        useDeviceStateStore.setState({ accessToken: null })
         //TODO: This could be done better
-        Promise.all([
-          messaging().deleteToken(),
-          clearAccessToken(),
-          apolloClient.clearStore()
-        ])
+        Promise.all([messaging().deleteToken(), apolloClient.clearStore()])
 
         get().clearLockInterval()
         SInfo.deleteItem('psw', {

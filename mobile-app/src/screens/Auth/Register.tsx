@@ -17,7 +17,7 @@ import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.code
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
+
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
 import { Loading } from '@components/Loading'
@@ -132,7 +132,6 @@ export function Register({ navigation }: NavigationProps) {
 
     //FIX: Maybe we should check if is the access token valid?
     if (registerResult?.accessToken && res.data?.registerNewUser.user) {
-      await saveAccessToken(registerResult.accessToken)
       const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
       const newDeviceState: IBackgroundStateSerializable = {
@@ -154,7 +153,9 @@ export function Register({ navigation }: NavigationProps) {
         theme: registerResult.user.defaultDeviceTheme,
         notificationOnWrongPasswordAttempts:
           registerResult.user.notificationOnWrongPasswordAttempts,
-        notificationOnVaultUnlock: registerResult.user.notificationOnVaultUnlock
+        notificationOnVaultUnlock:
+          registerResult.user.notificationOnVaultUnlock,
+        accessToken: registerResult.accessToken
       }
 
       device.save(newDeviceState)

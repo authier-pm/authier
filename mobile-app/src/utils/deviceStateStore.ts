@@ -65,6 +65,7 @@ interface DeviceStateProps {
   notifications: number
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
+  accessToken: string | null
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -138,7 +139,8 @@ const initialState: DeviceStateProps = {
   lockTimeEnd: 0,
   lockTimerRunning: false,
   decryptedSecrets: [],
-  notifications: 0
+  notifications: 0,
+  accessToken: null
 }
 
 export const useDeviceStateStore = create<DeviceStateActions>()(
@@ -317,6 +319,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
 
             set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
 
+            //FIX: Optimize this
             set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
             // const unchangedDecryptedSecrets = get().decryptedSecrets.filter(
             //   ({ id }) => {

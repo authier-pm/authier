@@ -21,7 +21,6 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
@@ -162,7 +161,6 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          saveAccessToken(addNewDeviceForUser?.accessToken)
           if (device.biometricsAvailable && deviceState.biometricsEnabled) {
             try {
               await SInfo.setItem('psw', formState.password, {
@@ -204,7 +202,8 @@ export const useLogin = (props: { deviceName: string }) => {
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
-              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts
+              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
+            accessToken: addNewDeviceForUser?.accessToken
           }
 
           device.save(newDeviceState)

@@ -98,7 +98,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           btnColor="primary"
           icon="lock-closed-outline"
           text={t`Do you want to lock device?`}
-          onPress={() => device.lock()}
+          onPress={async () => await device.lock()}
           btnText={t`Lock`}
         />
 
