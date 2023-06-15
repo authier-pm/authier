@@ -81,6 +81,7 @@ export function VaultListItem({
           >
             <DeleteSecretButton secrets={[secret]}>
               <DeleteIcon
+                aria-label="delete_item"
                 cursor={'pointer'}
                 boxSize={26}
                 padding={1.5}
@@ -95,7 +96,7 @@ export function VaultListItem({
 
             {secretUrl ? (
               <IconButton
-                aria-label="open item"
+                aria-label="open_item"
                 colorScheme="blackAlpha"
                 icon={<UnlockIcon />}
                 onClick={() => browser.tabs.create({ url: secretUrl })}

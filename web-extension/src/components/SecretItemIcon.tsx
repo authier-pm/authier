@@ -10,7 +10,12 @@ export function SecretItemIcon(props: {
   let hostname
   if (props.iconUrl) {
     return (
-      <Image src={props.iconUrl as string} maxW="30px" boxSize="30px"></Image>
+      <Image
+        alt="item_icon"
+        src={props.iconUrl as string}
+        maxW="30px"
+        boxSize="30px"
+      ></Image>
     )
   }
   if (props.url) {
@@ -19,6 +24,7 @@ export function SecretItemIcon(props: {
 
       return (
         <Image
+          alt="item_icon"
           src={
             `https://icons.duckduckgo.com/ip3/${hostname}.ico` // https://stackoverflow.com/a/10796141
           }
