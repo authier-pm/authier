@@ -31,13 +31,14 @@ export class AwsCdkAuthierStack extends Stack {
         DATABASE_URL: process.env.DATABASE_URL as string,
         SHADOW_DATABASE_URL: process.env.SHADOW_DATABASE_URL as string,
         DIRECT_URL: process.env.DIRECT_URL as string,
-        FREE_GEOIP_API_KEY: process.env.FREE_GEOIP_API_KEY as string,
         SENTRY_DSN: process.env.SENTRY_DSN as string,
         MJ_APIKEY_PUBLIC: process.env.MJ_APIKEY_PUBLIC as string,
         MJ_APIKEY_PRIVATE: process.env.MJ_APIKEY_PRIVATE as string,
         STRIPE_ENDPOINT: process.env.STRIPE_ENDPOINT as string,
         STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY as string,
-        REDIS_URL: process.env.REDIS_URL as string
+        REDIS_URL: process.env.REDIS_URL as string,
+        FREE_GEOIP_API_KEY: process.env.FREE_GEOIP_API_KEY as string,
+        IP_API_IO_API_KEY: process.env.IP_API_IO_API_KEY as string
       }
     })
 
