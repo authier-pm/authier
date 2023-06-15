@@ -64,9 +64,6 @@ export function Register({ navigation }: NavigationProps) {
     }
   }, [error])
 
-  // if (!device.fireToken) {
-  //   return <Loading />
-  // }
 
   const onSubmit = async (
     values: ILoginFormValues,
