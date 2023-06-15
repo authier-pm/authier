@@ -370,6 +370,7 @@ export const useDeviceStore = create<Device>()(
         useDeviceStateStore.setState({})
       },
       clearAndReload: async () => {
+        set({ isLoggedIn: false })
         //TODO: This could be done better
         Promise.all([
           messaging().deleteToken(),
@@ -391,7 +392,6 @@ export const useDeviceStore = create<Device>()(
           await apolloClient.mutate<LogoutMutation, LogoutMutationVariables>({
             mutation: LogoutDocument
           })
-          set({ isLoggedIn: false })
         } catch (err: any) {
           console.error(
             `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,

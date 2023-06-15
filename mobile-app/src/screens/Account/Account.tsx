@@ -107,7 +107,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           btnColor="danger"
           icon="log-out-outline"
           text={t`Do you want to logout?`}
-          onPress={() => device.logout()}
+          onPress={async () => await device.logout()}
         />
       </VStack>
       <Center>
