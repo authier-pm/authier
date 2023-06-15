@@ -71,7 +71,7 @@ export const isRunningInBgServiceWorker = typeof window === 'undefined'
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
-type SecretTypeUnion = ILoginSecret | ITOTPSecret
+export type SecretTypeUnion = ILoginSecret | ITOTPSecret
 
 const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
   'loginCredentials' in secret

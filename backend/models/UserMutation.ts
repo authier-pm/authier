@@ -29,7 +29,7 @@ import { stripe } from '../stripe'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
 const log = debug('au:userMutation')

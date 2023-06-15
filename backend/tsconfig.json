@@ -27,7 +27,6 @@
     "allowUnreachableCode": false,
     "allowJs": true,
     "downlevelIteration": true,
-    "jsx": "preserve",
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "isolatedModules": true,
