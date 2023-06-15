@@ -26,7 +26,7 @@ export class DecryptionChallengeForApproval {
   @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
     // TODO remove in favor of deviceLocationFromIp
-    const json: any = await getGeoIpLocation(this.ipAddress)
+    const json = await getGeoIpLocation(this.ipAddress)
     if (!json.data) {
       return null
     }
@@ -38,7 +38,7 @@ export class DecryptionChallengeForApproval {
 
   @Field(() => DeviceLocation, { nullable: true })
   async deviceLocationFromIp() {
-    const json: any = await getGeoIpLocation(this.ipAddress)
+    const json = await getGeoIpLocation(this.ipAddress)
     if (!json.data) {
       return null
     }

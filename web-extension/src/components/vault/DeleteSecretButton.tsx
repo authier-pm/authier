@@ -3,15 +3,15 @@ import {
   useDeleteEncryptedSecretMutation,
   useRemoveEncryptedSecretsMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
-import { device } from '@src/background/ExtensionDevice'
+import { SecretTypeUnion, device } from '@src/background/ExtensionDevice'
 import { DeleteAlert } from '@src/components/vault/DeleteAlert'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+
 import React, { useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
 interface DeleteSecretButtonProps {
-  secrets: (ILoginSecret | ITOTPSecret)[]
+  secrets: SecretTypeUnion[]
   children: React.ReactElement
 }
 
@@ -41,13 +41,13 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
           if (secrets.length > 1) {
             console.log('delete multiple secrets')
             const input = secrets.map(({ id }) => id)
-            removeEncryptedSecrets({
+            await removeEncryptedSecrets({
               variables: {
                 secrets: input
               }
             })
 
-            await device.state?.removeSecrets(input)
+            device.state?.removeSecrets(input)
             setSelectedItems([])
           } else {
             await deleteEncryptedSecretMutation({
