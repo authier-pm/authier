@@ -3,6 +3,7 @@ import { verify } from 'jsonwebtoken'
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { IJWTPayload } from '../schemas/RootResolver'
 import '@fastify/cookie'
+import { GraphqlErrorUnauthorized } from './GraphqlError'
 
 export const throwIfNotAuthenticated: MiddlewareFn<
   IContextAuthenticated
@@ -18,7 +19,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
 
   if (!token) {
     context.reply.clearCookie('access-token')
-    throw new Error('not authenticated')
+    throw new GraphqlErrorUnauthorized('not authenticated')
   }
   let jwtPayload: IJWTPayload
   try {
@@ -28,7 +29,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
   } catch (err) {
     context.reply.clearCookie('access-token')
 
-    throw new Error('not authenticated')
+    throw new GraphqlErrorUnauthorized('not authenticated')
   }
 
   const currentDevice = await context.prisma.device.findUnique({
@@ -39,13 +40,13 @@ export const throwIfNotAuthenticated: MiddlewareFn<
 
   if (!currentDevice) {
     context.reply.clearCookie('access-token')
-    throw new Error('not authenticated')
+    throw new GraphqlErrorUnauthorized('not authenticated')
   }
 
   if (currentDevice?.logoutAt) {
     context.reply.clearCookie('access-token')
 
-    throw new Error('not authenticated')
+    throw new GraphqlErrorUnauthorized('not authenticated')
   }
   context.device = currentDevice
 
