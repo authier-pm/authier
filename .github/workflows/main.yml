@@ -52,6 +52,7 @@ jobs:
       MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE }}
       STRIPE_ENDPOINT: ${{ secrets.STRIPE_ENDPOINT }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
       IP_API_IO_API_KEY: ${{ secrets.IP_API_IO_API_KEY }}
 
     steps:
