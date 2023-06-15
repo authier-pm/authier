@@ -8,8 +8,8 @@ console.log(
 const env = process.env
 
 export const redisClient = new Redis({
-  url: env.UPSTASH_REDIS_REST_URL,
-  token: env.UPSTASH_REDIS_REST_TOKEN
+  url: env.UPSTASH_REDIS_REST_URL as string,
+  token: env.UPSTASH_REDIS_REST_TOKEN as string
 })
 
 redisClient.ping().then((res) => console.log('redis', res))

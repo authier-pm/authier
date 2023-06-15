@@ -29,11 +29,11 @@ export const memRedis = <T>(
       cacheKey ? cacheKey(arguments_) : objectHash(arguments_)
     ].join('_')
 
-    const cacheItem = await redisClient.get(key)
+    const cacheItem = await redisClient.get<any>(key)
 
     if (cacheItem) {
       log('cache hit', key)
-      return JSON.parse(cacheItem).data
+      return cacheItem.data
     }
 
     log('cache miss', key)
@@ -66,6 +66,7 @@ export const memRedis = <T>(
       if (keys.length === 0) {
         return 0
       }
+      // @ts-expect-error
       return redisClient.del(keys)
     },
     clearKey: async (...args: any[]) => {
