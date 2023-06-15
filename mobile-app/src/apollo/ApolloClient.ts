@@ -14,11 +14,11 @@ import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
 
 import { setContext } from '@apollo/client/link/context'
-import { accessToken } from '../utils/tokenFromAsyncStorage'
 import { tokenRefresh } from './tokenRefresh'
 import { API_URL } from '@env'
 import { Toast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
 
@@ -62,6 +62,7 @@ export const queueLink = new QueueLink()
 const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
+  let accessToken = useDeviceStateStore.getState().accessToken
   //return the headers to the context so httpLink can read them
   return {
     headers: {

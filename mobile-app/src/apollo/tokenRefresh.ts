@@ -1,8 +1,8 @@
-import { accessToken, saveAccessToken } from '../utils/tokenFromAsyncStorage'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
 import { API_URL } from '@env'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 if (!API_URL) {
   throw new Error('API_URL is not defined')
@@ -11,6 +11,7 @@ if (!API_URL) {
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
+    let accessToken = useDeviceStateStore.getState().accessToken
     if (!accessToken) {
       return false
     }
@@ -33,11 +34,10 @@ export const tokenRefresh = new TokenRefreshLink({
     })
   },
   handleFetch: async (newAccessToken) => {
-    saveAccessToken(newAccessToken)
+    useDeviceStateStore.setState({ accessToken: newAccessToken })
   },
   handleError: async (err) => {
-    //FIX: What should we do here?
-    if (useDeviceStore.getState().isLoggedIn) {
+    if (err.message.includes('not authenticated')) {
       console.warn(
         'Your refresh token is invalid. You must login again',
         err.message

@@ -87,14 +87,14 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
         <SettingsItem
           name={t`Settings`}
           onPress={() => navigation.navigate('Settings', { screen: 'User' })}
-          key={'settings'}
+          key={'Settings'}
         />
 
         <ButtonWithAlert
           btnColor="primary"
           icon="lock-closed-outline"
           text={t`Do you want to lock device?`}
-          onPress={() => device.lock()}
+          onPress={async () => await device.lock()}
           btnText={t`Lock`}
         />
 
@@ -103,7 +103,7 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           btnColor="danger"
           icon="log-out-outline"
           text={t`Do you want to logout?`}
-          onPress={() => device.logout()}
+          onPress={async () => await device.logout()}
         />
       </VStack>
       <Center>

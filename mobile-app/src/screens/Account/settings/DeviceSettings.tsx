@@ -96,6 +96,8 @@ function DeviceSettings() {
 
                 <Box p={2}>
                   <Select
+                    //@ts-expect-error https://github.com/GeekyAnts/NativeBase/issues/5687
+                    optimized={false}
                     variant="rounded"
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
@@ -171,6 +173,8 @@ function DeviceSettings() {
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
+                //@ts-expect-error
+                optimized={false}
                 onValueChange={(value) => {
                   deviceState.changeUiLanguage(value)
                   i18n.activate(value)
@@ -191,6 +195,8 @@ function DeviceSettings() {
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
               <Select
+                //@ts-expect-error
+                optimized={false}
                 onValueChange={(value) => {
                   toggleColorMode()
                   deviceState.changeTheme(value)

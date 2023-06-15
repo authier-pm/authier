@@ -33,8 +33,6 @@ export default function PasswordReEnter({
 }) {
   const [showPassword, setShowPassword] = useState(false)
   let deviceState = useDeviceStateStore((state) => state)
-  const toast = useToast()
-  const id = 'reeenter-toast'
 
   return (
     <>
