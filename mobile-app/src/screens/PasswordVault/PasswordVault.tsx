@@ -1,6 +1,15 @@
 import React, { useState } from 'react'
 
-import { View, Text, AddIcon, Flex, useToast, Fab, Box } from 'native-base'
+import {
+  View,
+  Text,
+  AddIcon,
+  useToast,
+  IconButton,
+  HStack,
+  Image,
+  Center
+} from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
 import LoginCredential from '@components/LoginCredential'
@@ -10,13 +19,18 @@ import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
-const EmptyList = () => {
+export const EmptyList = (text: string) => {
   return (
-    <Box p={4}>
+    <Center p={4}>
       <Text>
-        <Trans>Start by adding a login secret or a TOTP code</Trans>
+        <Trans>{text}</Trans>
       </Text>
-    </Box>
+      <Image
+        boxSize="md"
+        source={require('../../../assets/empty.png')}
+        alt="Empty list"
+      />
+    </Center>
   )
 }
 
@@ -44,16 +58,19 @@ export const PasswordVault = ({
 
   return (
     <View>
-      <Flex
-        flexDirection="row"
-        justifyContent="space-between"
-        alignItems="center"
-      >
+      <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
-      </Flex>
+        <IconButton
+          colorScheme="primary"
+          rounded="lg"
+          variant="solid"
+          icon={<AddIcon color="white" size={6} />}
+          onPress={() => navigation.navigate('AddPassword')}
+        />
+      </HStack>
 
       <FlashList
-        ListEmptyComponent={EmptyList}
+        ListEmptyComponent={EmptyList('Start by adding a login secret')}
         //FIX: Dont like empty space on fast scroll
         estimatedItemSize={90}
         data={device
@@ -65,15 +82,6 @@ export const PasswordVault = ({
         renderItem={({ item }) => <LoginCredential loginSecret={item} />}
         onRefresh={() => onRefresh()}
         refreshing={refreshing}
-      />
-      <Fab
-        onPress={() => navigation.navigate('AddPassword')}
-        m={2}
-        borderRadius={60}
-        renderInPortal={false}
-        shadow={2}
-        size="sm"
-        icon={<AddIcon color="white" size={6} />}
       />
     </View>
   )

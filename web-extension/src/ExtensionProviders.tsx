@@ -22,13 +22,13 @@ export const chakraCustomTheme = extendTheme(chakraRawTheme)
 export function ExtensionProviders({ children }) {
   return (
     <>
-      <ChakraProvider theme={chakraCustomTheme}>
-        <DeviceStateProvider>
-          <UserProvider>
-            <I18nProvider i18n={i18n}>{children}</I18nProvider>
-          </UserProvider>
-        </DeviceStateProvider>
-      </ChakraProvider>
+      <I18nProvider i18n={i18n}>
+        <ChakraProvider theme={chakraCustomTheme}>
+          <DeviceStateProvider>
+            <UserProvider>{children}</UserProvider>
+          </DeviceStateProvider>
+        </ChakraProvider>
+      </I18nProvider>
     </>
   )
 }

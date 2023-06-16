@@ -55,7 +55,9 @@ export const settingsSchema = z.object({
   autofillTOTPEnabled: z.boolean(),
   uiLanguage: z.string(),
   syncTOTP: z.boolean(),
-  vaultLockTimeoutSeconds: z.number()
+  vaultLockTimeoutSeconds: z.number(),
+  notificationOnVaultUnlock: z.boolean(),
+  notificationOnWrongPasswordAttempts: z.number()
 })
 
 export const backgroundStateSerializableLockedSchema = z.object({
@@ -82,7 +84,9 @@ export const backgroundStateSerializableLockedSchema = z.object({
   uiLanguage: z.string(),
   syncTOTP: z.boolean(),
   theme: z.string(),
-  masterEncryptionKey: z.string()
+  masterEncryptionKey: z.string(),
+  notificationOnVaultUnlock: z.boolean(),
+  notificationOnWrongPasswordAttempts: z.number()
 })
 
 export const payloadSchema = z.union([

@@ -19,7 +19,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '16'
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -45,3 +45,13 @@ jobs:
           pnpm gen
           pnpm migrate
           pnpm cdkDeploy
+
+      - name: Create backend Sentry release
+        if: steps.changes.outputs.backend == 'true'
+        uses: getsentry/action-release@v1
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: authier-ml
+          SENTRY_PROJECT: authier-7k
+        with:
+          environment: production

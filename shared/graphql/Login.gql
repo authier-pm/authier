@@ -13,6 +13,7 @@ mutation addNewDeviceForUser(
       ) {
         accessToken
         user {
+          id
           EncryptedSecrets {
             id
             encrypted
@@ -23,6 +24,11 @@ mutation addNewDeviceForUser(
           }
           defaultDeviceTheme
           uiLanguage
+          defaultDeviceSyncTOTP
+          autofillCredentialsEnabled
+          autofillTOTPEnabled
+          notificationOnVaultUnlock
+          notificationOnWrongPasswordAttempts
         }
       }
     }

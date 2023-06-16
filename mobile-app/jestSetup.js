@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler/jestSetup'
+
 jest.useFakeTimers()
 jest.mock('react-native-safe-area-context', () => {
   const inset = { top: 0, right: 0, bottom: 0, left: 0 }
@@ -11,30 +12,17 @@ jest.mock('react-native-safe-area-context', () => {
   }
 })
 
-jest.mock('@apollo/client', () => {
-  const actualApolloClient = jest.requireActual('@apollo/client')
-
-  return {
-    ...actualApolloClient,
-    ApolloClient: jest.fn().mockImplementation(() => ({
-      mutate: jest.fn().mockImplementation((options) => {
-        return Promise.resolve({
-          data: {
-            currentDevice: {
-              markAsSynced: 'test_synced_string'
-            }
-          }
-        })
-      })
-    })),
-    InMemoryCache: jest.fn(),
-    from: jest.fn(),
-    HttpLink: jest.fn(),
-    ApolloLink: jest.fn()
-  }
-})
-
 jest.mock('react-native-vector-icons/Ionicons', () => 'MockedIcon')
+
+jest.mock('@react-native-firebase/messaging', () => {
+  return () => ({
+    hasPermission: jest.fn(() => Promise.resolve(true)),
+    subscribeToTopic: jest.fn(),
+    unsubscribeFromTopic: jest.fn(),
+    requestPermission: jest.fn(() => Promise.resolve(true)),
+    getToken: jest.fn(() => Promise.resolve('myMockToken'))
+  })
+})
 
 // include this section and the NativeAnimatedHelper section for mocking react-native-reanimated
 jest.mock('react-native-reanimated', () => {
@@ -85,27 +73,33 @@ global.self = {
   crypto: subtleMock
 }
 
-jest.mock('apollo-link-retry', () => {
-  return { RetryLink: jest.fn() }
-})
-jest.mock('apollo-link-serialize', () => {
-  return jest.fn()
-})
-jest.mock('apollo-link-queue', () => {
-  return jest.fn()
-})
-jest.mock('@apollo/client/link/context', () => {
-  return { setContext: jest.fn() }
-})
+// jest.mock('apollo-link-retry', () => {
+//   return { RetryLink: jest.fn() }
+// })
+// jest.mock('apollo-link-serialize', () => {
+//   return jest.fn()
+// })
+// jest.mock('apollo-link-queue', () => {
+//   return jest.fn()
+// })
+// jest.mock('@apollo/client/link/context', () => {
+//   return {
+//     setContext: jest.fn().mockRejectedValue({
+//       headers: {
+//         authorization: 'test'
+//       }
+//     })
+//   }
+// })
 
-jest.mock('@react-native-firebase/messaging', () => {
-  return {
-    __esModule: true,
-    default: () => ({
-      getToken: jest.fn(() => Promise.resolve('test_token'))
-    })
-  }
-})
+// jest.mock('@react-native-firebase/messaging', () => {
+//   return {
+//     __esModule: true,
+//     default: () => ({
+//       getToken: jest.fn(() => Promise.resolve('test_token'))
+//     })
+//   }
+// })
 
 jest.mock('react-native-url-polyfill', () => ({
   URL: jest.fn().mockImplementation((url) => ({ toString: () => url }))
@@ -120,7 +114,8 @@ jest.mock('react-native-sensitive-info', () => {
   return {
     isSensorAvailable: jest.fn(),
     setItem: jest.fn().mockResolvedValue(true),
-    getItem: jest.fn().mockResolvedValue(null)
+    getItem: jest.fn().mockResolvedValue(null),
+    deleteItem: jest.fn()
   }
 })
 
@@ -130,11 +125,6 @@ jest.mock('react-native-device-info', () => {
     getDeviceName: jest.fn(() => Promise.resolve('test_device_name'))
   }
 })
-
-jest.mock('./src/utils/secretStorage', () => ({
-  getSensitiveItem: jest.fn(),
-  setSensitiveItem: jest.fn()
-}))
 
 jest.mock('native-base', () => ({
   Toast: {

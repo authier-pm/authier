@@ -5,7 +5,6 @@ import {
   EncryptedSecretQuery
 } from './EncryptedSecret'
 import { EncryptedSecretInput, SettingsInput } from './models'
-
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
@@ -23,14 +22,14 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
-import { dmmf } from '../prisma/prismaClient'
+import prismaClient, { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
 import { stripe } from '../stripe'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
 const log = debug('au:userMutation')
@@ -225,6 +224,10 @@ export class UserMutation extends UserBase {
       },
       data: {
         autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+        autofillTOTPEnabled: config.autofillTOTPEnabled,
+        notificationOnVaultUnlock: config.notificationOnVaultUnlock,
+        notificationOnWrongPasswordAttempts:
+          config.notificationOnWrongPasswordAttempts,
         uiLanguage: config.uiLanguage,
         Devices: {
           update: {
@@ -517,5 +520,18 @@ export class UserMutation extends UserBase {
 
       return session.id
     }
+  }
+
+  @Field(() => UserGQL)
+  async delete(@Ctx() ctx: IContextAuthenticated) {
+    const res = await prismaClient.user.delete({
+      where: {
+        id: this.id
+      }
+    })
+    log('deleted user', res.email)
+    ctx.reply.clearCookie('refresh-token')
+    ctx.reply.clearCookie('access-token')
+    return res
   }
 }

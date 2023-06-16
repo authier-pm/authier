@@ -53,8 +53,9 @@ import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 export const log = debug('au:Device')
 
-const port = chrome.runtime.connect()
+const port = browser.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
+  // @ts-expect-error types in chromeLink are not correct, this is fine
   links: [chromeLink({ port })]
 })
 
@@ -70,7 +71,7 @@ export const isRunningInBgPage = location.href.includes('backgroundPage.html')
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
-type SecretTypeUnion = ILoginSecret | ITOTPSecret
+export type SecretTypeUnion = ILoginSecret | ITOTPSecret
 
 const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
   'loginCredentials' in secret
@@ -122,6 +123,8 @@ export class DeviceState implements IBackgroundStateSerializable {
   theme: string
   authSecret: string
   authSecretEncrypted: string
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -496,6 +499,7 @@ class ExtensionDevice {
     const fireToken = 'aaaa' // TODO remove this
 
     this.fireToken = fireToken
+    console.log('deviceId', this.id)
     this.initCallbacks.forEach((cb) => cb())
     log('Extension device initialized with id ', this.id)
   }
@@ -592,8 +596,10 @@ class ExtensionDevice {
 
     this.clearLockInterval()
 
-    const lockIcon = browser.runtime.getURL('icon-lock-48.png')
-    chrome.action.setIcon({ path: lockIcon })
+    // if (isRunningInBgServiceWorker) {
+    //   const lockIcon = browser.runtime.getURL('icon-lock-48.png')
+    //   browser.action.setIcon({ path: lockIcon })
+    // }
 
     log('locking device')
 
@@ -609,11 +615,15 @@ class ExtensionDevice {
       uiLanguage,
       theme,
       authSecret,
-      authSecretEncrypted
+      authSecretEncrypted,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock
     } = this.state
 
     this.lockedState = {
       email,
+      notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock,
       userId,
       secrets,
       deviceName: this.name,
@@ -698,6 +708,9 @@ class ExtensionDevice {
     this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
     this.state.syncTOTP = config.syncTOTP
     this.state.uiLanguage = config.uiLanguage
+    this.state.notificationOnWrongPasswordAttempts =
+      config.notificationOnWrongPasswordAttempts
+    this.state.notificationOnVaultUnlock = config.notificationOnVaultUnlock
 
     device.setLockTime(config.vaultLockTimeoutSeconds)
 

@@ -32,3 +32,11 @@ mutation resendEmailVerification {
     sendEmailVerification
   }
 }
+
+mutation deleteAccount {
+  me {
+    delete {
+      id
+    }
+  }
+}

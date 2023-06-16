@@ -1,17 +1,17 @@
-import { accessToken, saveAccessToken } from '../utils/tokenFromAsyncStorage'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import jwtDecode, { JwtPayload } from 'jwt-decode'
-import { API_URL, API_URL_RELEASE } from '@env'
+import { API_URL } from '@env'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
-const ENDPOINT = __DEV__ ? API_URL : API_URL_RELEASE
-if (!ENDPOINT) {
+if (!API_URL) {
   throw new Error('API_URL is not defined')
 }
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
+    let accessToken = useDeviceStateStore.getState().accessToken
     if (!accessToken) {
       return false
     }
@@ -28,18 +28,20 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    return await fetch(`${ENDPOINT.replace('/graphql', '')}/refresh_token`, {
+    return await fetch(`${API_URL.replace('/graphql', '')}/refresh_token`, {
       method: 'POST',
       credentials: 'include'
     })
   },
   handleFetch: async (newAccessToken) => {
-    saveAccessToken(newAccessToken)
+    useDeviceStateStore.setState({ accessToken: newAccessToken })
   },
   handleError: async (err) => {
-    //FIX: What should we do here?
-    if (useDeviceStore.getState().isLoggedIn) {
-      console.warn('Your refresh token is invalid. You must login again', err)
+    if (err.message.includes('not authenticated')) {
+      console.warn(
+        'Your refresh token is invalid. You must login again',
+        err.message
+      )
       useDeviceStore.getState().clearAndReload()
     }
   }

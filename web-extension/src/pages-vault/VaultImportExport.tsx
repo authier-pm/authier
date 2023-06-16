@@ -7,7 +7,6 @@ import {
   Heading,
   Link,
   ListItem,
-  Text,
   UnorderedList
 } from '@chakra-ui/react'
 import { Trans } from '@lingui/macro'
@@ -16,18 +15,21 @@ import {
   ExportTOTPToCsvButton
 } from '@src/components/vault/ExportCsvButtons'
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import papaparse from 'papaparse'
 import {
   AddSecretInput,
   device,
-  DeviceState
+  DeviceState,
+  SecretTypeUnion
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { constructURL } from '@shared/urlUtils'
+import { Txt } from '@src/components/util/Txt'
+import { useRemoveEncryptedSecretsMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 // const csvHeaderNames = {
@@ -51,6 +53,7 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     return x === 'url' || x === 'login_uri'
   })
 
+  console.log(indexUsername, indexLabel, indexPassword, indexUrl)
   if (
     indexUsername === -1 ||
     indexLabel === -1 ||
@@ -95,6 +98,7 @@ export const onCSVFileAccepted: any = (
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
+        console.log(mapped)
 
         const state = device.state as DeviceState
 
@@ -119,10 +123,10 @@ export const onCSVFileAccepted: any = (
             hostname = constructURL(creds.url).hostname
           } catch (error) {
             skipped++
-            break
+            continue
           }
 
-          const input = {
+          const input /* : ILoginSecret | ITOTPSecret */ = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: creds,
             url: creds.url,
@@ -186,9 +190,51 @@ export const onJsonFileAccepted = async (file: File) => {
 }
 
 export const VaultImportExport = () => {
-  const [importedStat, setImportedStat] = React.useState<IImportedStat | null>(
-    null
-  )
+  const [importedStat, setImportedStat] = useState<IImportedStat | null>(null)
+  const [duplicates, setDuplicates] = useState<SecretTypeUnion[]>([])
+  const [removeEncryptedSecrets] = useRemoveEncryptedSecretsMutation()
+
+  useEffect(() => {
+    if (!device.state?.decryptedSecrets) {
+      return
+    }
+    const foundDuplicates: SecretTypeUnion[] = []
+    const allSecrets = [...device.state.decryptedSecrets]
+
+    device.state.decryptedSecrets.forEach((secret) => {
+      if (
+        allSecrets.find((s) => {
+          if (
+            s.kind === EncryptedSecretType.LOGIN_CREDENTIALS &&
+            secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+          ) {
+            return (
+              s.loginCredentials.url === secret.loginCredentials.url &&
+              s.id !== secret.id &&
+              s.loginCredentials.username ===
+                secret.loginCredentials.username &&
+              s.loginCredentials.password === secret.loginCredentials.password
+            )
+          } else if (
+            s.kind === EncryptedSecretType.TOTP &&
+            secret.kind === EncryptedSecretType.TOTP
+          ) {
+            return (
+              s.totp.url === secret.totp.url &&
+              s.id !== secret.id &&
+              s.totp.secret === secret.totp.secret
+            )
+          }
+          return false
+        })
+      ) {
+        foundDuplicates.push(secret)
+        allSecrets.splice(allSecrets.indexOf(secret), 1)
+      }
+    })
+
+    setDuplicates(foundDuplicates)
+  }, [device.state?.decryptedSecrets])
   const { data } = useMeExtensionQuery()
   return (
     <Center p={5}>
@@ -216,12 +262,15 @@ export const VaultImportExport = () => {
                 <ListItem>
                   Lastpass/Bitwarden will work fine, file exported from other
                   password managers might work as well, but it's not guaranteed.
-                  Please send as a request for a supported format{' '}
+                  Please send as a request for a new type of export{' '}
                   <a href="https://twitter.com/authierpm">here</a>.
                 </ListItem>
                 <ListItem>
-                  For JSON, it must be a file exported from
-                  <Link href="https://www.npmjs.com/package/authy-desktop-export">
+                  For JSON, it must be a file exported from{' '}
+                  <Link
+                    textDecor={'underline'}
+                    href="https://www.npmjs.com/package/authy-desktop-export"
+                  >
                     authy-desktop-export
                   </Link>
                 </ListItem>
@@ -255,6 +304,34 @@ export const VaultImportExport = () => {
           <br />
 
           <ExportTOTPToCsvButton />
+        </Box>
+
+        <Box>
+          <Heading size="sm">Merge duplicates</Heading>
+          {duplicates.length ? (
+            <Flex m={8} align={'center'}>
+              <Txt mr={6}>
+                found {duplicates.length} duplicates in your secrets
+              </Txt>
+              <Button
+                onClick={async () => {
+                  const duplicateIds = duplicates.map(({ id }) => id)
+                  await removeEncryptedSecrets({
+                    variables: {
+                      secrets: duplicateIds
+                    }
+                  })
+
+                  await device.state?.removeSecrets(duplicateIds)
+                  setDuplicates([])
+                }}
+              >
+                Merge now
+              </Button>
+            </Flex>
+          ) : (
+            <Trans>You have no duplicates in your secrets</Trans>
+          )}
         </Box>
       </Flex>
     </Center>

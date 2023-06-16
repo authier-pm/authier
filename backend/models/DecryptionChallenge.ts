@@ -1,17 +1,16 @@
+import 'reflect-metadata'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallengeGQL'
 import { GraphQLResolveInfo } from 'graphql'
 import { createUnionType } from 'type-graphql'
 import { GraphQLJSON, GraphQLNonEmptyString } from 'graphql-scalars'
-import { GraphqlError } from '../api/GraphqlError'
-import ms from 'ms'
+import { GraphqlError } from '../lib/GraphqlError'
 
 import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
-import { decorator as mem } from 'mem'
-import { getGeoIpLocation } from './Device'
+import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 
 @ObjectType()
 class DeviceLocation {
@@ -24,31 +23,19 @@ class DeviceLocation {
 
 @ObjectType()
 export class DecryptionChallengeForApproval {
-  @mem({ maxAge: ms('2 days') })
   @Field(() => GraphQLJSON, { nullable: true })
   async ipGeoLocation() {
     // TODO remove in favor of deviceLocationFromIp
-    const json: any = await getGeoIpLocation(this.ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      country_name: json.data.location.country.name
-    }
+    const json = await getGeoIpLocation.memoized(this.ipAddress)
+
+    return json
   }
 
-  @mem({ maxAge: ms('2 days') })
   @Field(() => DeviceLocation, { nullable: true })
   async deviceLocationFromIp() {
-    const json: any = await getGeoIpLocation(this.ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      countryName: json.data.location.country.name
-    }
+    const json = await getGeoIpLocation.memoized(this.ipAddress)
+
+    return json
   }
 
   @Field(() => Int)
@@ -88,8 +75,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   ) {
     const { id, deviceId, userId } = this
 
-    // TODO use findUnique when prisma bug gets fixed
-    const user = await ctx.prisma.user.findFirst({
+    const user = await ctx.prisma.user.findUnique({
       where: { id: userId },
       include: {
         EncryptedSecrets: true
@@ -138,7 +124,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       }
 
       device = await ctx.prisma.device.update({
-        data: { logoutAt: null },
+        data: { logoutAt: null, firebaseToken },
         where: { id: device.id }
       })
     } else {

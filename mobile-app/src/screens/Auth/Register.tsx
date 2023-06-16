@@ -17,7 +17,7 @@ import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.code
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
+
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
 import { Loading } from '@components/Loading'
@@ -35,6 +35,7 @@ import {
 import { useDeviceStore } from '@utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
@@ -43,7 +44,8 @@ export function Register({ navigation }: NavigationProps) {
   const [show, setShow] = useState(false)
   const toast = useToast()
   const id = 'active-toast'
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const { formState } = useContext(LoginContext)
 
   useEffect(() => {
@@ -62,9 +64,6 @@ export function Register({ navigation }: NavigationProps) {
     }
   }, [error])
 
-  if (!device.fireToken) {
-    return <Loading />
-  }
 
   const onSubmit = async (
     values: ILoginFormValues,
@@ -75,14 +74,28 @@ export function Register({ navigation }: NavigationProps) {
     const deviceId = await getUniqueId()
     const deviceName = await getDeviceName()
 
-    if (device.biometricsAvailable) {
-      await SInfo.setItem('psw', values.password, {
-        sharedPreferencesName: 'authierShared',
-        keychainService: 'authierKCH',
-        touchID: true,
-        showModal: true,
-        kSecAccessControl: 'kSecAccessControlBiometryAny'
-      })
+    if (device.biometricsAvailable && deviceState.biometricsEnabled) {
+      try {
+        await SInfo.setItem('psw', values.password, {
+          sharedPreferencesName: 'authierShared',
+          keychainService: 'authierKCH',
+          touchID: true,
+          showModal: true,
+          kSecAccessControl: 'kSecAccessControlBiometryAny'
+        })
+        useDeviceStateStore.setState({ biometricsEnabled: true })
+      } catch (error) {
+        console.log(error)
+        toast.show({
+          title: 'Login failed',
+          description:
+            'Cannot create account without biometrics, please try again.'
+        })
+        return
+      }
+    } else {
+      console.log('biometrics not available')
+      useDeviceStateStore.setState({ biometricsEnabled: false })
     }
 
     const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
@@ -115,8 +128,7 @@ export function Register({ navigation }: NavigationProps) {
     const registerResult = res.data?.registerNewUser
 
     //FIX: Maybe we should check if is the access token valid?
-    if (registerResult?.accessToken) {
-      await saveAccessToken(registerResult.accessToken)
+    if (registerResult?.accessToken && res.data?.registerNewUser.user) {
       const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
       const newDeviceState: IBackgroundStateSerializable = {
@@ -129,12 +141,18 @@ export function Register({ navigation }: NavigationProps) {
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
         vaultLockTimeoutSeconds: 28800,
-        autofillTOTPEnabled: false,
-        autofillCredentialsEnabled: false,
-        uiLanguage: 'en',
+        autofillTOTPEnabled: registerResult.user.autofillTOTPEnabled,
+        autofillCredentialsEnabled:
+          registerResult.user.autofillCredentialsEnabled,
+        uiLanguage: registerResult.user.uiLanguage,
         lockTimeEnd: Date.now() + 28800000,
-        syncTOTP: false,
-        theme: 'dark'
+        syncTOTP: registerResult.user.defaultDeviceSyncTOTP,
+        theme: registerResult.user.defaultDeviceTheme,
+        notificationOnWrongPasswordAttempts:
+          registerResult.user.notificationOnWrongPasswordAttempts,
+        notificationOnVaultUnlock:
+          registerResult.user.notificationOnVaultUnlock,
+        accessToken: registerResult.accessToken
       }
 
       device.save(newDeviceState)

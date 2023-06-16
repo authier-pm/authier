@@ -11,6 +11,7 @@ const modulesToCopy = [
   'get-intrinsic',
   'object-inspect',
   'has',
+  'has-proto', // needed by stripe
   'has-symbols'
 ]
 

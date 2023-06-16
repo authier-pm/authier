@@ -1,6 +1,8 @@
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -18,6 +20,10 @@ generator PrismaTypeGraphQLTypesGenerator {
   splitScalarAndObjectTypeFields = true
   exportedNameSuffix             = "GQL"
   useDotPrismaImport             = true
+}
+
+generator prisma_checker {
+  provider = "npx prisma-generator-checker"
 }
 
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
@@ -44,7 +50,7 @@ model Device {
   id                      String    @id
   firstIpAddress          String    @db.Inet
   lastIpAddress           String    @db.Inet
-  firebaseToken           String
+  firebaseToken           String?
   name                    String
   platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
   ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
@@ -181,13 +187,15 @@ model User {
   recoveryDecryptionChallengeId Int? // when set user is in process of adding a new master device waiting for the cooldown to
   recoveryDecryptionChallenge   DecryptionChallenge? @relation("recoveryDecryptionChallenge", fields: [recoveryDecryptionChallengeId], references: [id])
 
-  deviceRecoveryCooldownMinutes Int // in case if user cannot access any existing device, they can trigger this failsafe
+  deviceRecoveryCooldownMinutes       Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofillCredentialsEnabled    Boolean @default(true)
-  autofillTOTPEnabled           Boolean @default(true)
-  uiLanguage                    String  @default("en")
-  defaultDeviceTheme            String  @default("dark")
-  defaultDeviceSyncTOTP         Boolean @default(true)
+  autofillCredentialsEnabled          Boolean @default(true)
+  autofillTOTPEnabled                 Boolean @default(true)
+  uiLanguage                          String  @default("en")
+  defaultDeviceTheme                  String  @default("dark")
+  defaultDeviceSyncTOTP               Boolean @default(true)
+  notificationOnVaultUnlock           Boolean @default(false)
+  notificationOnWrongPasswordAttempts Int     @default(3)
 
   UsageEvents          SecretUsageEvent[]
   EncryptedSecrets     EncryptedSecret[]

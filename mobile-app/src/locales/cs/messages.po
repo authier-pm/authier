@@ -1,0 +1,277 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2023-06-03 22:52+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: cs\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/screens/Account/Account.tsx
+msgid "{name}"
+msgstr "{name}"
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "{text}"
+msgstr "{text}"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "About"
+msgstr "O aplikaci"
+
+#: src/navigation/AccountNavigation.tsx
+msgid "Account"
+msgstr "Účet"
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Add TOTP"
+msgstr "Přidat TOTP"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "After you approve it, your vault will open automatically in this tab."
+msgstr "Po schválení se na této kartě automaticky otevře váš trezor."
+
+#: src/screens/Auth/Register.tsx
+msgid "Already have an account."
+msgstr "Již máte účet."
+
+#: src/screens/Device/Devices.tsx
+msgid "Approve"
+msgstr "Schválit"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
+msgstr "Schvalte toto zařízení ve správě zařízení v trezoru na hlavním zařízení, abyste mohli pokračovat v přidávání nového zařízení."
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Attempts before notification:"
+msgstr "Počet pokusů před oznámením:"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Automatically locks vault after chosen period of time"
+msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
+
+#: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Change master password"
+msgstr "Změna hlavního hesla"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Change password"
+msgstr "Změnit heslo"
+
+#: src/screens/Account/Account.tsx
+msgid "Codepush version"
+msgstr "Verze Codepush"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Created"
+msgstr "Vytvořeno"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+#~ msgid "Current Passwor2d"
+#~ msgstr "Aktuální heslo"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Current Password"
+msgstr "Aktuální heslo"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Danger zone"
+msgstr "Nebezpečná zóna"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Delete your account"
+msgstr "Smazat účet"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "Device"
+msgstr "Zařízení"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Device:"
+msgstr "Zařízení:"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to lock device?"
+msgstr "Chcete zařízení uzamknout?"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to logout?"
+msgstr "Chcete se odhlásit?"
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Edit TOTP"
+msgstr "Upravit TOTP"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Geolocation"
+msgstr "Geolokace"
+
+#: src/screens/Auth/Login.tsx
+msgid "I'm a new user."
+msgstr "Jsem nový uživatel."
+
+#: src/screens/Account/Account.tsx
+#~ msgid "Import passwords"
+#~ msgstr "Importovat hesla"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+msgid "Language"
+msgstr "Jazyk"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Last IP Address"
+msgstr "Poslední IP adresa"
+
+#: src/screens/Account/Account.tsx
+msgid "Lock"
+msgstr "Uzamknout"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Lock time"
+msgstr "Doba uzamčení"
+
+#: src/screens/Auth/Register.tsx
+msgid "Log in"
+msgstr "Přihlášení"
+
+#: src/screens/Auth/Login.tsx
+msgid "Log in to continue!"
+msgstr "Přihlaste se pro pokračování!"
+
+#: src/components/LogoutDeviceAlert.tsx
+msgid "Log out"
+msgstr "Odhlásit se"
+
+#: src/screens/Account/Account.tsx
+msgid "Logout"
+msgstr "Odhlásit se"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Logout at"
+msgstr "Odhlášení v"
+
+#: src/screens/Device/Devices.tsx
+msgid "New Device is trying to login!"
+msgstr "Nové zařízení se snaží přihlásit!"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "New password"
+msgstr "Nové heslo"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "New password confirmation"
+msgstr "Potvrzení nového hesla"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notifications"
+msgstr "Oznámení"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notify after password attempts"
+msgstr "Upozornit po pokusu o heslo"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Password changed, all your devices will be logged out and you will need to log in again"
+msgstr "Heslo bylo změněno, všechna vaše zařízení budou odhlášena a budete se muset znovu přihlásit"
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Passwords"
+msgstr "Hesla"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Passwords do not match"
+msgstr "Hesla se neshodují"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Platform"
+msgstr "Platforma"
+
+#: src/screens/Device/Devices.tsx
+msgid "Reject"
+msgstr "Odmítnout"
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Scan QR"
+msgstr "Naskenujte QR"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+msgid "Security"
+msgstr "Zabezpečení"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Set as master device"
+msgstr "Nastavit jako hlavní zařízení"
+
+#: src/screens/Device/DeviceInfo.tsx
+#~ msgid "Set on master device"
+#~ msgstr "Nastaveno na hlavním zařízení"
+
+#: src/screens/Account/Account.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Settings"
+msgstr "Nastavení"
+
+#: src/screens/Auth/Login.tsx
+msgid "Sign Up"
+msgstr "Registrace"
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+#~ msgid "Start by adding a login secret or a TOTP code"
+#~ msgstr "Začněte přidáním přihlašovacího klíče nebo TOTP kódu"
+
+#: src/screens/TOTPVault/TOTPVault.tsx
+#~ msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
+#~ msgstr "Začněte přidáním klíče přihlášení přihlášením na libovolné webové stránky nebo přidáním TOTP kódu"
+
+#: src/screens/Auth/Login.tsx
+msgid "Submit"
+msgstr "Odeslat"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+msgid "Theme"
+msgstr "Téma"
+
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "TOTPs"
+msgstr "TOTP"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "User"
+msgstr "Uživatel"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Username: {0}"
+msgstr "Uživatelské jméno: {0}"
+
+#: src/screens/Account/Account.tsx
+msgid "Version"
+msgstr "Verze"
+
+#: src/screens/Auth/Login.tsx
+msgid "Welcome"
+msgstr "Vítejte"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Wrong password"
+msgstr "Nesprávné heslo"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."
+msgstr "Tuto akci nemůžete později vrátit zpět. Ujistěte se, že zálohujete data, která chcete zachovat."
+
+#: src/components/OfflineBanner.tsx
+msgid "Your device is offline"
+msgstr "Vaše zařízení je offline"

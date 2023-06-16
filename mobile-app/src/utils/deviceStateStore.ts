@@ -9,7 +9,10 @@ import {
   enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  SettingsInput
+} from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
@@ -59,6 +62,10 @@ interface DeviceStateProps {
   lockTimeEnd: number | null
   lockTimerRunning: boolean
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  notifications: number
+  notificationOnVaultUnlock: boolean
+  notificationOnWrongPasswordAttempts: number
+  accessToken: string | null
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -102,9 +109,12 @@ export interface DeviceStateActions extends DeviceStateProps {
   changeSecrets: (secrets: SecretSerializedType[]) => void
   changeDecryptedSecrets: (secrets: (ILoginSecret | ITOTPSecret)[]) => void
   changeBiometricsEnabled: (enabled: boolean) => void
-  changeSyncTOTP: (syncTOTP: boolean) => void
+  changeSyncTOTP: (syncTOTP: DeviceStateProps['syncTOTP']) => void
+  changeNotificationOnVaultUnlock: (value: boolean) => void
+  changeNotificationOnWrongPasswordAttempts: (value: number) => void
   reset: () => void
   save: () => void
+  setNotifications: (newValue: number) => void
 }
 
 const initialState: DeviceStateProps = {
@@ -121,15 +131,18 @@ const initialState: DeviceStateProps = {
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
   uiLanguage: '',
-  theme: '',
+  notificationOnVaultUnlock: false,
+  notificationOnWrongPasswordAttempts: 3,
+  theme: 'dark',
   biometricsEnabled: false,
   lockTimeStart: 0,
   lockTimeEnd: 0,
   lockTimerRunning: false,
-  decryptedSecrets: []
+  decryptedSecrets: [],
+  notifications: 0,
+  accessToken: null
 }
 
-//WARNING: Not sure if this name is ok, because it can get easily confused with the deviceStore
 export const useDeviceStateStore = create<DeviceStateActions>()(
   persist(
     (set, get) => ({
@@ -146,7 +159,10 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
+        const start = performance.now()
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+        const end = performance.now()
+        console.log(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
       },
       setMasterEncryptionKey: async (masterPassword: string) => {
         const key = await generateEncryptionKey(
@@ -268,6 +284,8 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       backendSync: async (toast: IToastService) => {
+        const time = performance.now()
+
         const { data } = await apolloClient.query<
           SyncEncryptedSecretsQuery,
           SyncEncryptedSecretsQueryVariables
@@ -300,7 +318,27 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             )
 
             set({ secrets: [...unchangedSecrets, ...newAndUpdatedSecrets] })
+
+            //FIX: Optimize this
             set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
+            // const unchangedDecryptedSecrets = get().decryptedSecrets.filter(
+            //   ({ id }) => {
+            //     return unchangedSecrets.find((secret) => secret.id === id)
+            //   }
+            // )
+            //
+            // const newAndUpdatedDecryptedSecrets = await Promise.all(
+            //   newAndUpdatedSecrets.map((secret) => {
+            //     return get().decryptSecret(secret)
+            //   })
+            // )
+            //
+            // set({
+            //   decryptedSecrets: [
+            //     ...unchangedDecryptedSecrets,
+            //     ...newAndUpdatedDecryptedSecrets
+            //   ]
+            // })
 
             await apolloClient.mutate<
               MarkAsSyncedMutation,
@@ -332,6 +370,8 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
               })
             }
 
+            const end = performance.now()
+            console.log('backendSync', end - time)
             return res
           }
         }
@@ -366,7 +406,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
           })
         )
-
+        console.log('saved secret to the backend', secrets)
         const { data } = await apolloClient.mutate<
           AddEncryptedSecretsMutation,
           AddEncryptedSecretsMutationVariables
@@ -384,6 +424,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })
+        //FIX: PERFORMANCE ISSUE, DECRYPT ALL SECRETS
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
         return secretsAdded
       },
@@ -403,7 +444,13 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        set(initialState)
+        set({
+          ...initialState,
+          theme: get().theme,
+          biometricsEnabled: get().biometricsEnabled,
+          syncTOTP: get().syncTOTP,
+          uiLanguage: get().uiLanguage
+        })
       },
       changeSecrets: (secrets) => {
         set({ secrets })
@@ -419,6 +466,15 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
       },
       changeSyncTOTP: (syncTOTP) => {
         set({ syncTOTP })
+      },
+      setNotifications: (newValue) => {
+        set({ notifications: newValue })
+      },
+      changeNotificationOnVaultUnlock: (notificationOnVaultUnlock) => {
+        set({ notificationOnVaultUnlock })
+      },
+      changeNotificationOnWrongPasswordAttempts: (value) => {
+        set({ notificationOnWrongPasswordAttempts: value })
       }
     }),
     { name: 'deviceState', storage: createJSONStorage(() => zustandStorage) }

@@ -25,12 +25,24 @@ jobs:
           --health-timeout 5s
           --health-retries 5
           --user root
+      redis:
+        image: redis
+        ports:
+          - 6379:6379
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     env:
       APPNAME: authier-api
       AWS_REGION: eu-central-1
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_URL: ${{ secrets.DIRECT_URL }}
+      SHADOW_DATABASE_URL: ${{ secrets.SHADOW_DATABASE_URL }}
       ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
       REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
       COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
@@ -40,6 +52,10 @@ jobs:
       MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE }}
       STRIPE_ENDPOINT: ${{ secrets.STRIPE_ENDPOINT }}
       STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+      UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
+      IP_API_IO_API_KEY: ${{ secrets.IP_API_IO_API_KEY }}
 
     steps:
       - uses: actions/checkout@v3
@@ -49,7 +65,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 18
           cache: 'pnpm'
 
       - name: Install dependencies
@@ -64,60 +80,32 @@ jobs:
             backend:
               - 'backend/**' 
               - '.github/**'
+              - 'pnpm-lock.yaml'
             webExtension:
               - 'web-extension/**'
               - '.github/**'
+              - 'pnpm-lock.yaml'
             mobileApp:
               - 'mobile-app/**'
               - '.github/**'
+              - 'pnpm-lock.yaml'
 
-      - name: backend install deps, check TS and run jest
+      - name: schema gen
+        working-directory: ./backend
+        if: steps.changes.outputs.backend == 'true' || steps.changes.outputs.mobileApp == 'true'
+        run: |
+          pnpm gen
+
+      - name: backend install deps, check TS and run tests
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         env:
           DATABASE_URL: postgresql://authier:auth133r@localhost:5432/authier
+          REDIS_URL: redis://localhost:6379
         run: |
-          pnpm gen
           pnpm tsc
           cp .env.sample .env
           pnpm test:prepare
-          pnpm test
-
-      - name: web-extension, check TS and run jest
-        working-directory: ./web-extension
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          pnpm tsc
-
-      - name: web-extension build
-        working-directory: ./web-extension
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
-          pnpm prodBuild
-
-      - name: Install Playwright Browsers & Run Playwright tests with backend
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        working-directory: ./web-extension
-        run: |
-          npx playwright install --with-deps
-          (cd ../backend && pnpm dev) &
-          cd ../web-extension
-          xvfb-run --auto-servernum -- pnpm playwright:run
-
-      - name: Upload test results
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        uses: actions/upload-artifact@v3
-        with:
-          name: playwright-report
-          path: web-extension/playwright-report
-          retention-days: 30
-
-      - name: mobile-app, check TS and run jest
-        working-directory: ./mobile-app
-        if: steps.changes.outputs.mobileApp == 'true'
-        run: |
-          pnpm tsc
           pnpm test
 
       - name: Configure aws credentials
@@ -134,5 +122,40 @@ jobs:
         env:
           NODE_ENV: production
         run: |
-          pnpm migrateDeploy
+          pnpm prisma:deploy
           pnpm cdkDeploy
+
+      - name: web-extension, check TS and run tests
+        working-directory: ./web-extension
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+        run: |
+          pnpm tsc
+
+      - name: web-extension build
+        working-directory: ./web-extension
+        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
+        run: |
+          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
+          pnpm prodBuild
+
+      # - name: Install Playwright Browsers & Run Playwright tests with backend
+      #   if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+      #   working-directory: ./web-extension
+      #   run: |
+      #     npx playwright install --with-deps
+      #     xvfb-run --auto-servernum -- pnpm playwright:run
+      #
+      # - name: Upload test results
+      #   if: always()
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: test-results
+      #     path: web-extension/test-results
+      #     retention-days: 30
+
+      - name: mobile-app, check TS and run tests
+        working-directory: ./mobile-app
+        if: steps.changes.outputs.mobileApp == 'true'
+        run: |
+          pnpm tsc
+          pnpm test

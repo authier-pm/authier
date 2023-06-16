@@ -11,16 +11,24 @@ import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
 import { emitter } from '@src/screens/Device/Devices'
 
-export const LogoutDeviceAlert = ({ id }: { id: string }) => {
+export const LogoutDeviceAlert = ({
+  selectedDeviceId,
+  masterDeviceId
+}: {
+  selectedDeviceId: string
+  masterDeviceId: string
+}) => {
   const navigation = useNavigation()
   const [isOpen, setIsOpen] = useState(false)
   const [remove, setRemove] = useState(false)
   const [logoutDevice] = useLogoutDeviceMutation({
     variables: {
-      id: id
+      id: selectedDeviceId
     }
   })
-  const [removeDevice] = useRemoveDeviceMutation({ variables: { id: id } })
+  const [removeDevice] = useRemoveDeviceMutation({
+    variables: { id: selectedDeviceId }
+  })
 
   const onClose = async (goBack: boolean) => {
     if (remove) {
@@ -65,14 +73,16 @@ export const LogoutDeviceAlert = ({ id }: { id: string }) => {
           <AlertDialog.Body>
             <Text fontSize={16}>This will logout this device.</Text>
 
-            <Checkbox
-              onChange={() => setRemove(!remove)}
-              value="one"
-              my={2}
-              colorScheme="blue"
-            >
-              remove from list device
-            </Checkbox>
+            {masterDeviceId !== selectedDeviceId ? (
+              <Checkbox
+                onChange={() => setRemove(!remove)}
+                value="one"
+                my={2}
+                colorScheme="blue"
+              >
+                remove from list device
+              </Checkbox>
+            ) : null}
           </AlertDialog.Body>
 
           <AlertDialog.Footer>

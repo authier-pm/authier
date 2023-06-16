@@ -1,6 +1,8 @@
 # authier
 
-monorepo for authier FE and BE.
+monorepo for authier password manager web extension, mobile app and backend.
+
+If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
 
 ## Running the extension build on Ubuntu
 

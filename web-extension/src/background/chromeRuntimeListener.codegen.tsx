@@ -11,7 +11,7 @@ export type AddWebInputsMutationVariables = Types.Exact<{
 export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number }> };
 
 export type WebInputsForHostQueryVariables = Types.Exact<{
-  host: Types.Scalars['String'];
+  host: Types.Scalars['String']['input'];
 }>;
 
 

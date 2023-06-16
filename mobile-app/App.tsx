@@ -11,7 +11,6 @@
 import 'react-native-gesture-handler'
 import React, { useEffect } from 'react'
 import { Providers } from './src/Providers'
-import { Alert } from 'react-native'
 import { queueLink } from './src/apollo/ApolloClient'
 import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
@@ -20,6 +19,7 @@ import PolyfillCrypto from 'react-native-webview-crypto'
 import CodePush from 'react-native-code-push'
 import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
+import { API_URL } from '@env'
 
 let CodePushOptions = {
   checkFrequency: __DEV__
@@ -33,7 +33,7 @@ let CodePushOptions = {
 }
 
 const RnApp = () => {
-  const device = useDeviceStore((state) => state)
+  const [initialize] = useDeviceStore((state) => [state.initialize])
 
   async function requestUserPermission() {
     const authStatus = await messaging().requestPermission()
@@ -47,9 +47,9 @@ const RnApp = () => {
   }
 
   useEffect(() => {
-    // initializeStorage()
     requestUserPermission()
-    device.initialize()
+    initialize()
+    console.log('API_URL', API_URL)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {
@@ -58,13 +58,7 @@ const RnApp = () => {
         queueLink.close()
       }
     })
-    const unsubscribe = messaging().onMessage(async (remoteMessage) => {
-      if (__DEV__) {
-        Alert.alert('FCM message arrived:', JSON.stringify(remoteMessage))
-      }
-    })
     return () => {
-      unsubscribe()
       unsubscribeNet()
     }
   }, [])

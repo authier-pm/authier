@@ -14,21 +14,19 @@ import {
   VStack
 } from 'native-base'
 
-import { ButtonWithAlert } from '../../components/ButtonWithAlert'
+import { ButtonWithAlert } from '@components/ButtonWithAlert'
 
-import { AccountStackScreenProps } from '../../navigation/types'
+import {
+  AccountStackScreenProps,
+  SettingsTabScreenProps
+} from '@navigation/types'
 import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { t, Trans } from '@lingui/macro'
 
-const settingsOptions = [
-  { name: 'Settings', route: 'Settings' },
-  { name: 'Import passwords', route: 'ImportPasswords' },
-  { name: 'Change master password', route: 'ChangeMasterPassword' }
-]
-
-const SettingsItem = ({
+export const SettingsItem = ({
   name,
   onPress
 }: {
@@ -50,7 +48,9 @@ const SettingsItem = ({
       borderWidth={1}
       borderColor={useColorModeValue('#cfcfcf', 'rgb(47, 47, 47)')}
     >
-      <Text>{name}</Text>
+      <Text>
+        <Trans>{name}</Trans>
+      </Text>
     </Button>
   )
 }
@@ -84,31 +84,26 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
       <Divider />
 
       <VStack flex={1} space={5} mt={5}>
-        {settingsOptions.map((i) => {
-          return (
-            <SettingsItem
-              name={i.name}
-              //@ts-expect-error
-              onPress={() => navigation.navigate(i.route)}
-              key={i.name}
-            />
-          )
-        })}
-
-        <ButtonWithAlert
-          btnColor="orange"
-          icon="lock-closed-outline"
-          text={'Do you want to lock device?'}
-          onPress={() => device.lock()}
-          btnText="Lock"
+        <SettingsItem
+          name={t`Settings`}
+          onPress={() => navigation.navigate('Settings', { screen: 'User' })}
+          key={'Settings'}
         />
 
         <ButtonWithAlert
-          btnText="Logout"
+          btnColor="primary"
+          icon="lock-closed-outline"
+          text={t`Do you want to lock device?`}
+          onPress={async () => await device.lock()}
+          btnText={t`Lock`}
+        />
+
+        <ButtonWithAlert
+          btnText={t`Logout`}
           btnColor="danger"
           icon="log-out-outline"
-          text={'Do you want to logout?'}
-          onPress={() => device.logout()}
+          text={t`Do you want to logout?`}
+          onPress={async () => await device.logout()}
         />
       </VStack>
       <Center>
@@ -119,11 +114,15 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           justifyContent="space-between"
         >
           <Box>
-            <Text>Version</Text>
+            <Text>
+              <Trans>Version</Trans>
+            </Text>
             <Text>{DeviceInfo.getVersion()}</Text>
           </Box>
           <Box>
-            <Text>Codepush version</Text>
+            <Text>
+              <Trans>Codepush version</Trans>
+            </Text>
             <Text>{appMetadata?.label || 'Native'}</Text>
           </Box>
         </Flex>

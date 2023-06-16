@@ -12,7 +12,7 @@ import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import * as admin from 'firebase-admin'
 
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import { GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
 
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
@@ -64,7 +64,7 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => DeviceQuery)
-  async device(@Ctx() ctx: IContext, @Arg('id', () => GraphQLUUID) id: string) {
+  async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
     return ctx.prisma.device.findFirst({
       where: {
         userId: this.id,
@@ -128,48 +128,60 @@ export class UserQuery extends UserBase {
     })
   }
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, {
+    description: 'Sends a message to the master device'
+  })
   async sendAuthMessage(
-    @Arg('location', () => String) location: string,
-    @Arg('time', () => GraphQLISODateTime) time: string,
-    @Arg('device', () => String) device: string,
-    @Arg('pageName', () => String) pageName: string
+    @Arg('deviceId', () => String) deviceId: string,
+    @Arg('title', () => String) title: string,
+    @Arg('body', () => String) body: string,
+    @Arg('type', () => String) type: string
   ) {
+    console.log('NOTIFICATION')
     const user = await prismaClient.user.findUnique({
       where: {
         id: this.id
       },
       include: {
-        Devices: true
+        Devices: {
+          where: {
+            id: deviceId
+          }
+        }
       }
     })
 
-    if (user) {
-      try {
-        await admin.messaging().sendToDevice(
-          user.Devices[0].firebaseToken, // ['token_1', 'token_2', ...]
-          {
-            data: {
-              userId: this.id,
-              location: location,
-              time: time,
-              device: device,
-              pageName: pageName
-            }
-          },
-          {
-            // Required for background/quit data-only messages on iOS
-            contentAvailable: true,
-            // Required for background/quit data-only messages on Android
-            priority: 'high'
-          }
-        )
-        return true
-      } catch (err) {
-        console.log(err)
-        return false
+    if (!user || deviceId === user.masterDeviceId) {
+      console.log('no user or master device or firebase token')
+      return false // no point in sending messages to the master device
+    }
+
+    const masterDevice = await prismaClient.device.findUnique({
+      where: {
+        id: user?.masterDeviceId as string
       }
-    } else {
+    })
+
+    if (!masterDevice?.firebaseToken || masterDevice.firebaseToken.length < 8) {
+      console.log('no firebase token')
+      return false // no point in sending messages to the master deviceId
+    }
+
+    try {
+      await admin
+        .messaging()
+        .sendToDevice(masterDevice?.firebaseToken as string, {
+          notification: {
+            title: title,
+            body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+          },
+          data: {
+            type: type
+          }
+        })
+      return true
+    } catch (err) {
+      console.log(err)
       return false
     }
   }

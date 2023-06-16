@@ -5,11 +5,11 @@ import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
 export type RegisterNewUserMutationVariables = Types.Exact<{
   input: Types.RegisterNewAccountInput;
-  userId: Types.Scalars['UUID'];
+  userId: Types.Scalars['UUID']['input'];
 }>;
 
 
-export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, sendEmailVerification: number, Devices: Array<{ __typename?: 'DeviceGQL', id: string, name: string }> } } };
+export type RegisterNewUserMutation = { __typename?: 'Mutation', registerNewUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, sendEmailVerification: number, defaultDeviceTheme: string, uiLanguage: string, defaultDeviceSyncTOTP: boolean, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, Devices: Array<{ __typename?: 'DeviceGQL', id: string, name: string }> } } };
 
 
 export const RegisterNewUserDocument = gql`
@@ -23,6 +23,13 @@ export const RegisterNewUserDocument = gql`
         id
         name
       }
+      defaultDeviceTheme
+      uiLanguage
+      defaultDeviceSyncTOTP
+      autofillCredentialsEnabled
+      autofillTOTPEnabled
+      notificationOnVaultUnlock
+      notificationOnWrongPasswordAttempts
     }
   }
 }

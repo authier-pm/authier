@@ -1,6 +1,5 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useEffect, useState } from 'react'
-
+import SInfo from 'react-native-sensitive-info'
 import {
   Box,
   Center,
@@ -22,7 +21,6 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import { saveAccessToken } from '@utils/tokenFromAsyncStorage'
 import useInterval from '@src/utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
@@ -34,12 +32,14 @@ import { Loading } from '@components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
   const { formState, setFormState } = useContext(LoginContext)
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [addNewDevice, { loading, error: newDeviceError }] =
     useAddNewDeviceForUserMutation()
 
@@ -144,7 +144,6 @@ export const useLogin = (props: { deviceName: string }) => {
               name: props.deviceName,
               platform: Platform.OS
             },
-
             input: {
               addDeviceSecret: newParams.addDeviceSecret,
               addDeviceSecretEncrypted: newParams.addDeviceSecretEncrypted,
@@ -155,7 +154,6 @@ export const useLogin = (props: { deviceName: string }) => {
             currentAddDeviceSecret
           }
         })
-
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
           'DecryptionChallengeApproved'
@@ -163,11 +161,28 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          saveAccessToken(addNewDeviceForUser?.accessToken)
+          if (device.biometricsAvailable && deviceState.biometricsEnabled) {
+            try {
+              await SInfo.setItem('psw', formState.password, {
+                sharedPreferencesName: 'authierShared',
+                keychainService: 'authierKCH',
+                touchID: true,
+                showModal: true,
+                kSecAccessControl: 'kSecAccessControlBiometryAny'
+              })
+              useDeviceStateStore.setState({ biometricsEnabled: true })
+            } catch (error) {
+              console.log(error)
+              return
+            }
+          } else {
+            console.log('biometrics not available')
+            useDeviceStateStore.setState({ biometricsEnabled: false })
+          }
 
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 
-          const deviceState: IBackgroundStateSerializable = {
+          const newDeviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
             userId: userId,
             secrets: EncryptedSecrets,
@@ -177,16 +192,21 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds: 28800,
-            autofillCredentialsEnabled: false,
-            autofillTOTPEnabled: false,
+            autofillCredentialsEnabled:
+              addNewDeviceForUser.user.autofillCredentialsEnabled,
+            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             lockTimeEnd: Date.now() + 28800000,
-            //TODO: Take this from DB
-            syncTOTP: false,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme
+            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
+            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            notificationOnVaultUnlock:
+              addNewDeviceForUser.user.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
+            accessToken: addNewDeviceForUser?.accessToken
           }
 
-          device.save(deviceState)
+          device.save(newDeviceState)
         } else {
           toast.show({
             id,
@@ -212,7 +232,7 @@ export const LoginAwaitingApproval = () => {
 
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
-  if (!deviceDecryptionChallenge) {
+  if (!deviceDecryptionChallenge || !device.fireToken) {
     return <Loading />
   }
 

@@ -3,7 +3,10 @@ import * as React from 'react'
 import messaging from '@react-native-firebase/messaging'
 import DeviceStackNavigation from './DeviceStackNavigation'
 
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs'
+import {
+  BottomTabBar,
+  createBottomTabNavigator
+} from '@react-navigation/bottom-tabs'
 import PasswordsStackNavigation from './PasswordsStackNavigation'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import AccountNavigation from './AccountNavigation'
@@ -11,20 +14,21 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { Platform } from 'react-native'
+import { OfflineBanner } from '@src/components/OfflineBanner'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
 function AppNavigation() {
-  const { data } = useSyncSettingsQuery({
-    fetchPolicy: 'cache-and-network',
-    nextFetchPolicy: 'cache-first'
-  })
-  const device = useDeviceStore((state) => state)
-  const deviceState = useDeviceStateStore((state) => state)
+  const [updateDeviceSettings] = useDeviceStore((state) => [
+    state.updateDeviceSettings
+  ])
+  const [notifications, backendSync, setNotifications] = useDeviceStateStore(
+    (state) => [state.notifications, state.backendSync, state.setNotifications]
+  )
   const navigation = useNavigation()
   const toast = useToast()
 
@@ -54,19 +58,16 @@ function AppNavigation() {
         }
       })
 
-    if (deviceState) {
-      deviceState.backendSync(toast)
-    }
-    if (data && data.currentDevice) {
-      device.setDeviceSettings({
-        autofillTOTPEnabled: data.me.autofillTOTPEnabled,
-        autofillCredentialsEnabled: data.me.autofillCredentialsEnabled,
-        syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number,
-        uiLanguage: data.me.uiLanguage
-      })
-    }
+    // Foreground notification
+    const unsubscribe = messaging().onMessage(async (remoteMessage: any) => {
+      if (remoteMessage.data.type === 'Devices') {
+        setNotifications(notifications + 1)
+      }
+    })
+
+    backendSync(toast)
+    updateDeviceSettings()
+    return unsubscribe
   }, [])
 
   return (
@@ -91,15 +92,39 @@ function AppNavigation() {
           // You can return any component that you like here!
           return <Ionicons name={iconName} size={size} color={color} />
         },
-        tabBarActiveTintColor: '#00a8ff',
+        tabBarActiveTintColor: '#4CE0D2',
         tabBarInactiveTintColor: 'gray',
         headerShown: false,
         tabBarHideOnKeyboard: true
       })}
+      tabBar={(props) => (
+        <>
+          <OfflineBanner />
+          <BottomTabBar {...props} />
+        </>
+      )}
     >
       <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
       <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
-      <RootStack.Screen name="Devices" component={DeviceStackNavigation} />
+      <RootStack.Screen
+        options={
+          notifications > 0
+            ? {
+                tabBarBadge: notifications,
+                tabBarBadgeStyle: {
+                  top: Platform.OS === 'ios' ? 0 : 9,
+                  minWidth: 14,
+                  maxHeight: 14,
+                  borderRadius: 7,
+                  fontSize: 10,
+                  lineHeight: 13
+                }
+              }
+            : {}
+        }
+        name="Devices"
+        component={DeviceStackNavigation}
+      />
       <RootStack.Screen name="User" component={AccountNavigation} />
     </RootStack.Navigator>
   )

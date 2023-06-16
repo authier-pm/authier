@@ -5,46 +5,18 @@ import {
   Ctx,
   ObjectType,
   Arg,
-  InputType
+  InputType,
+  Int
 } from 'type-graphql'
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/DeviceGQL'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
-import { fetch } from 'undici'
-import { decorator as mem } from 'mem'
-import ms from 'ms'
-import { GraphqlError } from '../api/GraphqlError'
+
+import { GraphqlError } from '../lib/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
-// TODO memoize this function into redis so that we don't hit the API limit
-export async function getGeoIpLocation(ipAddress: string) {
-  if (ipAddress === '127.0.0.1') {
-    return {
-      // Mock data from https://ipbase.com/
-      data: {
-        location: {
-          city: {
-            name: 'Brno'
-          },
-          country: {
-            name: 'Czech Republic'
-          }
-        }
-      }
-    }
-  }
-  const res = await fetch(
-    `https://api.ipbase.com/v2/info?ip=${ipAddress}&apikey=${process.env.FREE_GEOIP_API_KEY}`
-  )
-
-  if (res.status > 201) {
-    console.warn('Failed to get geo location for ip', ipAddress)
-  }
-  const json: any = await res.json()
-
-  return json
-}
+import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 
 @InputType()
 export class DeviceInput {
@@ -60,18 +32,6 @@ export class DeviceInput {
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
-  @mem({ maxAge: ms('2 days') })
-  async getIpGeoLocation(ipAddress: string) {
-    const json = await getGeoIpLocation(ipAddress)
-    if (!json.data) {
-      return null
-    }
-    return {
-      city: json.data.location.city.name,
-      country_name: json.data.location.country.name
-    }
-  }
-
   @Field(() => [EncryptedSecretQuery], {
     description: 'Get all secrets that were change since last device sync'
   })
@@ -148,7 +108,7 @@ export class DeviceQuery extends DeviceGQL {
 
   @Field(() => String)
   async lastGeoLocation() {
-    const geoIp = await this.getIpGeoLocation(this.lastIpAddress)
+    const geoIp = await getGeoIpLocation.memoized(this.lastIpAddress)
     if (!geoIp) {
       return 'Unknown location'
     }
@@ -202,6 +162,23 @@ export class DeviceMutation extends DeviceGQLScalars {
   }
 
   @Field(() => DeviceGQL)
+  async updateDeviceSettings(
+    @Arg('syncTOTP', () => Boolean) syncTOTP: boolean,
+    @Arg('vaultLockTimeoutSeconds', () => Int) vaultLockTimeoutSeconds: number,
+    @Ctx() ctx: IContext
+  ) {
+    return await ctx.prisma.device.update({
+      where: {
+        id: this.id
+      },
+      data: {
+        syncTOTP: syncTOTP,
+        vaultLockTimeoutSeconds: vaultLockTimeoutSeconds
+      }
+    })
+  }
+
+  @Field(() => DeviceGQL)
   async rename(@Ctx() ctx: IContextAuthenticated, @Arg('name') name: string) {
     return ctx.prisma.device.update({
       data: {
@@ -236,7 +213,7 @@ export class DeviceMutation extends DeviceGQLScalars {
       where: {
         id: this.id
       },
-      data: { logoutAt: new Date() }
+      data: { logoutAt: new Date(), firebaseToken: null }
     })
   }
 

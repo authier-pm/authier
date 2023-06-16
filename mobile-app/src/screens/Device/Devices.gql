@@ -1,0 +1,14 @@
+query devicesList {
+  me {
+    id
+    masterDeviceId
+    devices {
+      id
+      name
+      lastIpAddress
+      logoutAt
+      platform
+      lastGeoLocation
+    }
+  }
+}

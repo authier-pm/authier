@@ -1,4 +1,4 @@
-import { throwIfNotAuthenticated } from '../api/authMiddleware'
+import { throwIfNotAuthenticated } from '../lib/authMiddleware'
 import {
   Query,
   Resolver,
@@ -18,7 +18,7 @@ import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 import { constructURL } from '../../shared/urlUtils'
 
-import { GraphqlError } from '../api/GraphqlError'
+import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
@@ -40,7 +40,7 @@ import {
 import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 import admin from 'firebase-admin'
-
+import { isTorExit } from './isTorExit'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -237,7 +237,6 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
-    // TODO return a union instead
     description: 'returns a decryption challenge',
     nullable: true
   })
@@ -248,6 +247,12 @@ export class RootResolver {
     @Ctx() ctx: IContext
   ) {
     const ipAddress = ctx.getIpAddress()
+
+    if (await isTorExit(ipAddress)) {
+      throw new GraphqlError(
+        'Tor exit nodes are prohibited from login/adding new devices.'
+      )
+    }
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
@@ -294,6 +299,8 @@ export class RootResolver {
       where: { id: deviceInput.id }
     })
 
+    console.log('device', device)
+
     let challenge = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
         deviceId: deviceInput.id,
@@ -309,6 +316,7 @@ export class RootResolver {
             userId: user.id
           }
         })
+        //FIX: This is not working, we need to check if the device is already approved
         if (deviceCount === 1) {
           // user has only one device
           challenge = await ctx.prisma.decryptionChallenge.create({
@@ -335,19 +343,17 @@ export class RootResolver {
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10
       ) {
-        await admin
-          .messaging()
-          .sendToDevice(user.masterDevice?.firebaseToken as string, {
-            notification: {
-              title: 'New device login!',
-              body: 'New device is trying to log in.'
-            },
-            data: {
-              type: 'Devices'
-            }
-          })
+        console.log('sending notification to')
+        await admin.messaging().sendToDevice(user.masterDevice.firebaseToken, {
+          notification: {
+            title: 'New device login!',
+            body: 'New device is trying to log in.'
+          },
+          data: {
+            type: 'Devices'
+          }
+        })
       }
-
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
           deviceId: deviceInput.id,
@@ -369,7 +375,6 @@ export class RootResolver {
     // user has approved this device in the past, we can return the challenge including salt and encrypted secret
     return plainToClass(DecryptionChallengeApproved, {
       ...challenge,
-
       addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
       encryptionSalt: user.encryptionSalt
     })

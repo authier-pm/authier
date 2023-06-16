@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react'
-import SInfo from 'react-native-sensitive-info'
 import { Formik, FormikHelpers } from 'formik'
 import {
   Button,
@@ -26,6 +25,9 @@ import { ToastAlert } from '@src/components/ToastAlert'
 import { ToastType } from '@src/ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
 import { useDeviceStore } from '@src/utils/deviceStore'
+import SInfo from 'react-native-sensitive-info'
+import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useSendAuthMessageLazyQuery } from './VaultUnlock.codegen'
 
 interface Values {
   password: string
@@ -38,37 +40,69 @@ export function VaultUnlockVerification({
 }) {
   const toast = useToast()
   const id = 'active-toast'
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
+    state.notificationOnVaultUnlock
+  ])
+  const [sendAuthMesssage, { loading: messageLoading, error, data }] =
+    useSendAuthMessageLazyQuery({ fetchPolicy: 'network-only' })
+  const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
+    state.notificationOnWrongPasswordAttempts
+  ])
 
+  const [loading, setLoading] = useState(false)
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
+  const [tries, setTries] = useState(0)
   const bgColor = useColorModeValue('white', 'black')
 
   useEffect(() => {
     RNBootSplash.hide({ fade: true })
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
-        const psw = await SInfo.getItem('psw', {
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH',
-          touchID: true,
-          showModal: true,
-          strings: {
-            header: 'Unlock your vault',
-            description: 'decrypt your vault with your fingerprint'
-          },
-          kSecUseOperationPrompt:
-            'We need your permission to retrieve encrypted data'
-        })
-
-        await unlockVault(psw)
+        setLoading(true)
+        console.log('biometrics enabled retrieving')
+        try {
+          const psw = await SInfo.getItem('psw', {
+            sharedPreferencesName: 'authierShared',
+            keychainService: 'authierKCH',
+            touchID: true,
+            showModal: true,
+            strings: {
+              header: 'Unlock your vault',
+              description: 'decrypt your vault with your fingerprint'
+            },
+            kSecUseOperationPrompt:
+              'We need your permission to retrieve encrypted data'
+          })
+          unlockVault(psw)
+        } catch (error) {
+          console.log(error)
+          setTries(tries + 1)
+          setLoading(false)
+        }
       }
     }
     loadBiometrics()
   }, [])
 
-  if (!lockedState) {
+  if (!lockedState || loading) {
     return <Loading />
+  }
+
+  if (
+    notificationOnWrongPasswordAttempts != 0 &&
+    tries >= notificationOnWrongPasswordAttempts
+  ) {
+    sendAuthMesssage({
+      variables: {
+        body: ' is trying to unlock your vault',
+        title: 'Wrong password entered',
+        type: 'wrongPassword',
+        deviceId: device.id as string
+      }
+    })
+    setTries(0)
   }
 
   const unlockVault = async (psw: string) => {
@@ -79,6 +113,7 @@ export function VaultUnlockVerification({
 
     const encryptedDataBuff = base64ToBuffer(lockedState.authSecretEncrypted)
     if (encryptedDataBuff.length < 29) {
+      setTries(tries + 1)
       throw new Error('encryptedDataBuff is too small')
     }
     const iv = encryptedDataBuff.slice(16, 16 + 12)
@@ -93,6 +128,7 @@ export function VaultUnlockVerification({
     let currentAddDeviceSecret = dec.decode(decryptedContent)
 
     if (currentAddDeviceSecret !== lockedState.authSecret) {
+      setTries(tries + 1)
       throw new Error(`Incorrect password`)
     }
 
@@ -104,6 +140,7 @@ export function VaultUnlockVerification({
       Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
     await device.save(newState)
     device.setLockedState(null)
+    setLoading(false)
   }
 
   return (
@@ -121,14 +158,22 @@ export function VaultUnlockVerification({
           try {
             await unlockVault(values.password)
             onUnlocked()
+            if (notificationOnVaultUnlock) {
+              console.log('send notification', device.id)
+
+              await sendAuthMesssage({
+                variables: {
+                  body: ' unlocked your vault',
+                  title: 'Vault unlocked',
+                  type: 'vaultUnlocked',
+                  deviceId: device.id as string
+                }
+              })
+            }
             setSubmitting(false)
           } catch (err: any) {
             console.log(err)
-
-            toast.show({
-              title: 'Login failed',
-              description: err.message
-            })
+            setTries(tries + 1)
             if (!toast.isActive(id)) {
               toast.show({
                 id,

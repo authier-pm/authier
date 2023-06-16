@@ -1,22 +1,3 @@
-query myDevices {
-  me {
-    id
-    masterDeviceId
-    devices {
-      id
-      name
-      firstIpAddress
-      lastIpAddress
-      logoutAt
-      lastGeoLocation
-      createdAt
-      lastSyncAt
-      platform
-      createdAt
-    }
-  }
-}
-
 mutation RejectChallenge($id: Int!) {
   me {
     decryptionChallenge(id: $id) {
@@ -74,6 +55,23 @@ mutation ChangeMasterDevice($newMasterDeviceId: String!) {
   me {
     setMasterDevice(newMasterDeviceId: $newMasterDeviceId) {
       id
+    }
+  }
+}
+
+mutation changeDeviceSettings(
+  $id: String!
+  $syncTOTP: Boolean!
+  $vaultLockTimeoutSeconds: Int!
+) {
+  me {
+    device(id: $id) {
+      updateDeviceSettings(
+        syncTOTP: $syncTOTP
+        vaultLockTimeoutSeconds: $vaultLockTimeoutSeconds
+      ) {
+        id
+      }
     }
   }
 }

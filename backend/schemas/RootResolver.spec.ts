@@ -8,7 +8,7 @@ import { describe, expect, it } from 'vitest'
 import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
 import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
-import { WebInputTypeGQL } from 'models/types/WebInputType'
+import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 

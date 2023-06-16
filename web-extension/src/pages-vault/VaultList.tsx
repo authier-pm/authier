@@ -48,7 +48,10 @@ export const VaultList = () => {
         uiLanguage: data.me?.uiLanguage,
         syncTOTP: data.currentDevice.syncTOTP,
         vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number
+          .vaultLockTimeoutSeconds as number,
+        notificationOnWrongPasswordAttempts:
+          data.me.notificationOnWrongPasswordAttempts,
+        notificationOnVaultUnlock: data.me.notificationOnVaultUnlock
       })
     }
   }, [data, loading])

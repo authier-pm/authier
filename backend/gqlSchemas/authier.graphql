@@ -27,6 +27,8 @@ type UserQuery {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -39,17 +41,21 @@ type UserQuery {
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   devices: [DeviceQuery!]!
-  device(id: UUID!): DeviceQuery!
+  device(id: String!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
+
+  """
+  Sends a message to the master device
+  """
   sendAuthMessage(
-    pageName: String!
-    device: String!
-    time: DateTime!
-    location: String!
+    type: String!
+    body: String!
+    title: String!
+    deviceId: String!
   ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
@@ -101,6 +107,8 @@ type UserGQL {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -118,7 +126,7 @@ type DeviceGQL {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!
@@ -254,7 +262,7 @@ type DeviceQuery {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!
@@ -295,11 +303,6 @@ type EncryptedSecretQuery {
   SecretUsageEvent: [SecretUsageEventGQL!]!
   lastUsedAt: DateTime
 }
-
-"""
-A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
-"""
-scalar UUID
 
 type EmailVerificationGQLScalars {
   address: ID!
@@ -382,6 +385,8 @@ type UserMutation {
   uiLanguage: String!
   defaultDeviceTheme: String!
   defaultDeviceSyncTOTP: Boolean!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -414,13 +419,14 @@ type UserMutation {
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!
+  delete: UserGQL!
 }
 
 type DeviceMutation {
   id: ID!
   firstIpAddress: String!
   lastIpAddress: String!
-  firebaseToken: String!
+  firebaseToken: String
   name: String!
   platform: String!
   ipAddressLock: Boolean!
@@ -442,6 +448,10 @@ type DeviceMutation {
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
+  updateDeviceSettings(
+    vaultLockTimeoutSeconds: Int!
+    syncTOTP: Boolean!
+  ): DeviceGQL!
   rename(name: String!): DeviceGQL!
   logout: DeviceGQL!
 
@@ -466,6 +476,11 @@ type SecretUsageEventGQLScalars {
 Integers that will have a value greater than 0.
 """
 scalar PositiveInt
+
+"""
+A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
+"""
+scalar UUID
 
 input DeviceInput {
   id: String!
@@ -506,6 +521,8 @@ input SettingsInput {
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
+  notificationOnVaultUnlock: Boolean!
+  notificationOnWrongPasswordAttempts: Int!
 }
 
 """

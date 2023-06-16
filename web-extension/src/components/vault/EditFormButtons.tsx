@@ -1,11 +1,16 @@
-import { Button, Flex } from '@chakra-ui/react'
+import { Button, Flex, IconButton } from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useFormikContext } from 'formik'
 
-export const EditFormButtons = () => {
+import { DeleteSecretButton } from './DeleteSecretButton'
+import { DeleteIcon } from '@chakra-ui/icons'
+import { SecretTypeUnion } from '@src/background/ExtensionDevice'
+
+export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
   const navigate = useNavigate()
 
   const { isSubmitting, dirty } = useFormikContext()
+
   return (
     <Flex
       direction={'row'}
@@ -13,6 +18,15 @@ export const EditFormButtons = () => {
       my={5}
       alignItems={'baseline'}
     >
+      {secret && (
+        <DeleteSecretButton secrets={[secret]}>
+          <IconButton
+            colorScheme="red"
+            aria-label="Delete"
+            icon={<DeleteIcon />}
+          />
+        </DeleteSecretButton>
+      )}
       <Button
         _focus={{
           bg: 'gray.200'
@@ -28,6 +42,7 @@ export const EditFormButtons = () => {
       >
         Go back
       </Button>
+
       <Button
         isDisabled={isSubmitting || !dirty}
         isLoading={isSubmitting}

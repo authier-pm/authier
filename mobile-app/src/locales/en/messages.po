@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2022-06-21 23:12+0200\n"
+"POT-Creation-Date: 2023-06-03 22:55+0200\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,95 +13,267 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#: src/screens/Account/Account.tsx
+msgid "{name}"
+msgstr "{name}"
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "{text}"
+msgstr "{text}"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "About"
+msgstr "About"
+
+#: src/navigation/AccountNavigation.tsx
+msgid "Account"
+msgstr "Account"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
-msgstr ""
+msgstr "Add TOTP"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "After you approve it, your vault will open automatically in this tab."
+msgstr "After you approve it, your vault will open automatically in this tab."
 
 #: src/screens/Auth/Register.tsx
 msgid "Already have an account."
-msgstr ""
+msgstr "Already have an account."
 
 #: src/screens/Device/Devices.tsx
 msgid "Approve"
-msgstr ""
+msgstr "Approve"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
+msgstr "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Attempts before notification:"
+msgstr "Attempts before notification:"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Automatically locks vault after chosen period of time"
-msgstr ""
+msgstr "Automatically locks vault after chosen period of time"
+
+#: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Change master password"
+msgstr "Change master password"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Change password"
+msgstr "Change password"
+
+#: src/screens/Account/Account.tsx
+msgid "Codepush version"
+msgstr "Codepush version"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Created"
+msgstr "Created"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+#~ msgid "Current Passwor2d"
+#~ msgstr "Current Passwor2d"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Current Password"
+msgstr "Current Password"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Danger zone"
+msgstr "Danger zone"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Delete your account"
+msgstr "Delete your account"
+
+#: src/navigation/SettingsNavigation.tsx
+msgid "Device"
+msgstr "Device"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Device:"
+msgstr "Device:"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to lock device?"
+msgstr "Do you want to lock device?"
+
+#: src/screens/Account/Account.tsx
+msgid "Do you want to logout?"
+msgstr "Do you want to logout?"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
-msgstr ""
+msgstr "Edit TOTP"
 
-#: src/screens/Login.tsx
-#~ msgid "Forget Password?"
-#~ msgstr ""
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Geolocation"
+msgstr "Geolocation"
 
 #: src/screens/Auth/Login.tsx
 msgid "I'm a new user."
-msgstr ""
+msgstr "I'm a new user."
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Account/Account.tsx
+#~ msgid "Import passwords"
+#~ msgstr "Import passwords"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Language"
-msgstr ""
+msgstr "Language"
 
-#: src/screens/Account/Settings.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Last IP Address"
+msgstr "Last IP Address"
+
+#: src/screens/Account/Account.tsx
+msgid "Lock"
+msgstr "Lock"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Device/DeviceInfo.tsx
 msgid "Lock time"
-msgstr ""
+msgstr "Lock time"
 
 #: src/screens/Auth/Register.tsx
 msgid "Log in"
-msgstr ""
+msgstr "Log in"
 
 #: src/screens/Auth/Login.tsx
 msgid "Log in to continue!"
-msgstr ""
+msgstr "Log in to continue!"
 
 #: src/components/LogoutDeviceAlert.tsx
 msgid "Log out"
-msgstr ""
+msgstr "Log out"
+
+#: src/screens/Account/Account.tsx
+msgid "Logout"
+msgstr "Logout"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Logout at"
+msgstr "Logout at"
 
 #: src/screens/Device/Devices.tsx
 msgid "New Device is trying to login!"
-msgstr ""
+msgstr "New Device is trying to login!"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "New password"
+msgstr "New password"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "New password confirmation"
+msgstr "New password confirmation"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notifications"
+msgstr "Notifications"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "Notify after password attempts"
+msgstr "Notify after password attempts"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Password changed, all your devices will be logged out and you will need to log in again"
+msgstr "Password changed, all your devices will be logged out and you will need to log in again"
 
 #: src/navigation/PasswordsStackNavigation.tsx
 msgid "Passwords"
-msgstr ""
+msgstr "Passwords"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Passwords do not match"
+msgstr "Passwords do not match"
+
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Platform"
+msgstr "Platform"
 
 #: src/screens/Device/Devices.tsx
 msgid "Reject"
-msgstr ""
+msgstr "Reject"
 
-#: src/screens/Account/Settings.tsx
+#: src/navigation/TOTPStackNavigation.tsx
+msgid "Scan QR"
+msgstr "Scan QR"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Security"
-msgstr ""
+msgstr "Security"
 
 #: src/screens/Device/DeviceInfo.tsx
-msgid "Set on master device"
-msgstr ""
+msgid "Set as master device"
+msgstr "Set as master device"
+
+#: src/screens/Device/DeviceInfo.tsx
+#~ msgid "Set on master device"
+#~ msgstr "Set on master device"
+
+#: src/screens/Account/Account.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "Settings"
+msgstr "Settings"
 
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
-msgstr ""
+msgstr "Sign Up"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
+#~ msgid "Start by adding a login secret or a TOTP code"
+#~ msgstr "Start by adding a login secret or a TOTP code"
+
 #: src/screens/TOTPVault/TOTPVault.tsx
-msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
-msgstr ""
+#~ msgid "Start by adding a secret by logging onto any website or by adding a TOTP code"
+#~ msgstr "Start by adding a secret by logging onto any website or by adding a TOTP code"
 
 #: src/screens/Auth/Login.tsx
 msgid "Submit"
-msgstr ""
+msgstr "Submit"
+
+#: src/screens/Account/settings/DeviceSettings.tsx
+msgid "Theme"
+msgstr "Theme"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
-msgstr ""
+msgstr "TOTPs"
 
-#: src/screens/Account/Settings.tsx
-msgid "Theme"
-msgstr ""
+#: src/navigation/SettingsNavigation.tsx
+msgid "User"
+msgstr "User"
+
+#: src/screens/Auth/LoginAwaitingApproval.tsx
+msgid "Username: {0}"
+msgstr "Username: {0}"
+
+#: src/screens/Account/Account.tsx
+msgid "Version"
+msgstr "Version"
 
 #: src/screens/Auth/Login.tsx
 msgid "Welcome"
+msgstr "Welcome"
+
+#: src/screens/Account/ChangeMasterPassword.tsx
+#: src/screens/Account/ChangeMasterPassword.tsx
+msgid "Wrong password"
+msgstr "Wrong password"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."
 msgstr ""
+"You cannot undo this action afterwards. Make sure to\n"
+"backup data that you want to keep."
+
+#: src/components/OfflineBanner.tsx
+msgid "Your device is offline"
+msgstr "Your device is offline"

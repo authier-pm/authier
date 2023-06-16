@@ -1,5 +1,5 @@
-import { PromptPassword } from './components/PromptPassword'
 import { h, render } from 'preact'
+import { PromptPassword } from './components/PromptPassword'
 import { getTRPCCached } from './connectTRPC'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars

@@ -1,12 +1,14 @@
 import path from 'node:path/posix'
 import swc from 'unplugin-swc'
+import tsconfigPaths from 'vite-tsconfig-paths'
 
 import { defineConfig } from 'vitest/config'
 
 export default defineConfig({
   plugins: [
     // Vite plugin
-    swc.vite()
+    swc.vite(),
+    tsconfigPaths()
   ],
 
   test: {
@@ -16,10 +18,17 @@ export default defineConfig({
     }
   },
   resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.json'], // by default vite also resolves mjs files, but we run in CJS mode so we don't want to load ESM modules
+    extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.cjs'], // by default vite also resolves mjs files, but we run in CJS mode so we don't want to load ESM modules
 
     alias: {
-      '.prisma/client': path.resolve(__dirname, './node_modules/.prisma/client')
+      '.prisma/client': path.resolve(
+        __dirname,
+        './node_modules/.prisma/client'
+      ),
+      stripe: path.resolve(
+        __dirname,
+        '../node_modules/stripe/cjs/stripe.cjs.node.js'
+      )
     }
   }
 })

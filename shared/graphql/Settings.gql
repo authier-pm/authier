@@ -6,6 +6,8 @@ query SyncSettings {
     autofillCredentialsEnabled
     autofillTOTPEnabled
     uiLanguage
+    notificationOnVaultUnlock
+    notificationOnWrongPasswordAttempts
   }
   currentDevice {
     id

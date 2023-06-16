@@ -1,4 +1,4 @@
-import { test as base, BrowserContext, chromium, Page } from '@playwright/test'
+import { test as base, BrowserContext, chromium } from '@playwright/test'
 import path from 'path'
 
 export const test = base.extend<{
@@ -15,7 +15,8 @@ export const test = base.extend<{
       ]
     })
     await use(context)
-    await context.close()
+
+    // await context.close()
   },
   extensionId: async ({ context }, use) => {
     // for manifest v3:

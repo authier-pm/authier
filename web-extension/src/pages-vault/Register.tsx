@@ -110,11 +110,16 @@ export default function Register() {
               authSecret: params.addDeviceSecret,
               authSecretEncrypted: params.addDeviceSecretEncrypted,
               vaultLockTimeoutSeconds: 28800,
-              autofillTOTPEnabled: true,
-              autofillCredentialsEnabled: true,
-              uiLanguage: 'en',
-              syncTOTP: false,
-              theme: 'dark'
+              autofillTOTPEnabled: registerResult.user.autofillTOTPEnabled,
+              autofillCredentialsEnabled:
+                registerResult.user.autofillCredentialsEnabled,
+              uiLanguage: registerResult.user.uiLanguage,
+              syncTOTP: registerResult.user.defaultDeviceSyncTOTP,
+              theme: registerResult.user.defaultDeviceTheme,
+              notificationOnVaultUnlock:
+                registerResult.user.notificationOnVaultUnlock,
+              notificationOnWrongPasswordAttempts:
+                registerResult.user.notificationOnWrongPasswordAttempts
             }
 
             device.save(deviceState)
