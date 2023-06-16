@@ -326,7 +326,7 @@ export const VaultImportExport = () => {
                   setDuplicates([])
                 }}
               >
-                Merge now
+                Delete duplicates now
               </Button>
             </Flex>
           ) : (

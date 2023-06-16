@@ -44,6 +44,9 @@ model DecryptionChallenge {
   approvedFromDeviceId     String? // when non null it means user unlocked by using another device
   approvedFromDevice       Device?   @relation("approvedFromDevice", fields: [approvedFromDeviceId], references: [id])
   User                     User[]    @relation("recoveryDecryptionChallenge")
+
+  @@index([userId])
+  @@index([deviceId])
 }
 
 model Device {
@@ -96,6 +99,8 @@ model EncryptedSecret {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   SecretUsageEvent SecretUsageEvent[]
+
+  @@index([userId])
 }
 
 // recorded whenever secret gets used.
@@ -120,6 +125,8 @@ model SecretUsageEvent {
   deviceId    String
   webInputId  Int? // this will be null when it was inputted manually
   WebOTPInput WebInput?       @relation(fields: [webInputId], references: [id])
+
+  @@index([secretId])
 }
 
 model MasterDeviceChange {
@@ -221,6 +228,8 @@ model Token {
   // Relation fields
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
+
+  @@index([userId])
 }
 
 model UserPaidProducts {
@@ -232,6 +241,8 @@ model UserPaidProducts {
   userId            String    @db.Uuid
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   checkoutSessionId String
+
+  @@index([userId])
 }
 
 enum TokenType {
@@ -262,6 +273,8 @@ model Tag {
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String   @db.Uuid
+
+  @@unique([userId, name])
 }
 
 enum EmailVerificationType {
@@ -278,4 +291,6 @@ model EmailVerification {
   // @skip
   token      String                @unique @db.Uuid
   kind       EmailVerificationType
+
+  @@index([userId])
 }
