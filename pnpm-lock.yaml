@@ -476,9 +476,6 @@ importers:
       react-native-get-random-values:
         specifier: ^1.9.0
         version: 1.9.0(react-native@0.71.8)
-      react-native-gradle-plugin:
-        specifier: ^0.72.1
-        version: 0.72.1
       react-native-mmkv:
         specifier: ^2.8.0
         version: 2.8.0(react-native@0.71.8)(react@18.2.0)
@@ -23823,10 +23820,6 @@ packages:
 
   /react-native-gradle-plugin@0.71.18:
     resolution: {integrity: sha512-7F6bD7B8Xsn3JllxcwHhFcsl9aHIig47+3eN4IHFNqfLhZr++3ElDrcqfMzugM+niWbaMi7bJ0kAkAL8eCpdWg==}
-
-  /react-native-gradle-plugin@0.72.1:
-    resolution: {integrity: sha512-mgFiUa9J/f7pKWxKWuPBdjrqahN1QxljWWYQefM45BEq21nbNGAk+vRI5WyjIQBu34JRCTuWy/pLSMDWwTfb5w==}
-    dev: false
 
   /react-native-mmkv@2.8.0(react-native@0.71.8)(react@18.2.0):
     resolution: {integrity: sha512-sfI2uzr5UCz7jS6QxIWnC7AbIuoIw9T7hDtsw0ohSlIdCABPoORPu8xpOSZN2bMkK7Z7sMQwLeP73uBXu0A3jw==}
