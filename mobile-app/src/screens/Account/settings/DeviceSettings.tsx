@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Center,
@@ -28,8 +28,8 @@ function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
   let device = useDeviceStore((state) => state)
   const { toggleColorMode } = useColorMode()
-  const [modalVisible, setModalVisible] = React.useState(false)
-  const [refreshing, setRefreshing] = React.useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [updateSettings] = useUpdateSettingsMutation({})
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
@@ -45,11 +45,11 @@ function DeviceSettings() {
         deviceState.notificationOnWrongPasswordAttempts
     }
   }
-  const [previousSettings, setPreviousSettings] = React.useState<SettingsInput>(
+  const [previousSettings, setPreviousSettings] = useState<SettingsInput>(
     currentSettings()
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!previousSettings) {
       setPreviousSettings(currentSettings)
       return

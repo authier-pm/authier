@@ -54,7 +54,7 @@ export default function DeviceInfo({
   const { deviceId: selectedDeviceId, masterDeviceId } = route.params
   const [id] = useDeviceStore((state) => [state.id])
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
-  const [chagengeDeviceSettings, { loading: changeSettingsloading }] =
+  const [changeDeviceSettings, { loading: changeSettingsLoading }] =
     useChangeDeviceSettingsMutation({
       refetchQueries: [
         { query: DeviceInfoDocument, variables: { id: selectedDeviceId } }
@@ -191,7 +191,7 @@ export default function DeviceInfo({
               <Select
                 variant="rounded"
                 onValueChange={(value) => {
-                  chagengeDeviceSettings({
+                  changeDeviceSettings({
                     variables: {
                       id: selectedDeviceId as string,
                       vaultLockTimeoutSeconds: parseInt(value),
@@ -224,12 +224,12 @@ export default function DeviceInfo({
               <Switch
                 //FIX: Flickers after change of Lock time
                 value={
-                  changeSettingsloading
+                  changeSettingsLoading
                     ? !selectedDeviceData?.syncTOTP
                     : selectedDeviceData?.syncTOTP
                 }
                 onToggle={async (e) => {
-                  chagengeDeviceSettings({
+                  changeDeviceSettings({
                     variables: {
                       id: selectedDeviceId as string,
                       vaultLockTimeoutSeconds:
