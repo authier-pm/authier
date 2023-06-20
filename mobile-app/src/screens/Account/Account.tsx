@@ -16,10 +16,7 @@ import {
 
 import { ButtonWithAlert } from '@components/ButtonWithAlert'
 
-import {
-  AccountStackScreenProps,
-  SettingsTabScreenProps
-} from '@navigation/types'
+import { AccountStackScreenProps } from '@navigation/types'
 import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
@@ -88,6 +85,12 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
           name={t`Settings`}
           onPress={() => navigation.navigate('Settings', { screen: 'User' })}
           key={'Settings'}
+        />
+
+        <SettingsItem
+          name={t`Limits`}
+          onPress={() => navigation.navigate('Limits')}
+          key={'Limits'}
         />
 
         <ButtonWithAlert

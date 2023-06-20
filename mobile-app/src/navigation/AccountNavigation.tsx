@@ -9,6 +9,7 @@ import {
   TransitionPresets
 } from '@react-navigation/stack'
 import SettingsNavigation from './SettingsNavigation'
+import Limits from '@src/screens/Account/Limits'
 
 const DeviceStack = createStackNavigator<AccountStackParamList>()
 
@@ -36,6 +37,13 @@ export default function AccountNavigation() {
           headerTitle: t`Change master password`
         }}
         component={ChangeMasterPassword}
+      />
+      <DeviceStack.Screen
+        name="Limits"
+        options={{
+          headerTitle: t`Limits`
+        }}
+        component={Limits}
       />
     </DeviceStack.Navigator>
   )

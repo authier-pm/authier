@@ -2,6 +2,7 @@ import { FastifyRequest } from 'fastify'
 import { prismaClient } from './prisma/prismaClient'
 import { stripe } from './stripe'
 import { app, endpointSecret } from './app'
+import { GraphQLError } from 'graphql'
 
 const CREDS_SUBSCRIPTION_ID = 'prod_LquWXgjk6kl5sM'
 const TOTP_SUBSCRIPTION_ID = 'prod_LquVrkwfsXjTAL'
@@ -116,62 +117,68 @@ export const stripeWebhook = (fastify, opts, done) => {
       case 'checkout.session.completed':
         const session = event.data.object
         console.log('Session completed:', session.metadata)
+        console.log('Session completed:', session)
         const productId = session.metadata.productId
 
-        await prismaClient.$transaction(async () => {
-          await prismaClient.user.update({
-            where: {
-              email: session.customer_details.email
-            },
-            data: {
-              UserPaidProducts: {
-                create: {
-                  checkoutSessionId: session.id,
-                  productId,
-                  expiresAt: new Date(session.expires_at)
+        try {
+          await prismaClient.$transaction(async () => {
+            await prismaClient.user.update({
+              where: {
+                email: session.customer_details.email
+              },
+              data: {
+                UserPaidProducts: {
+                  create: {
+                    checkoutSessionId: session.id,
+                    productId,
+                    expiresAt: new Date(session.expires_at)
+                  }
                 }
               }
+            })
+
+            if (productId === TOTP_SUBSCRIPTION_ID) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
+                },
+                data: {
+                  TOTPlimit: {
+                    increment: TOTP_SUBSCRIPTION
+                  }
+                }
+              })
+            } else if (productId === CREDS_SUBSCRIPTION_ID) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
+                },
+                data: {
+                  loginCredentialsLimit: {
+                    increment: CREDS_SUBSCRIPTION
+                  }
+                }
+              })
+            } else if (productId === TOTP_AND_CREDS_SUBSCRIPTION_ID) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
+                },
+                data: {
+                  TOTPlimit: {
+                    increment: TOTP_SUBSCRIPTION
+                  },
+                  loginCredentialsLimit: {
+                    increment: CREDS_SUBSCRIPTION
+                  }
+                }
+              })
             }
           })
-
-          if (productId === TOTP_SUBSCRIPTION_ID) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  increment: TOTP_SUBSCRIPTION
-                }
-              }
-            })
-          } else if (productId === CREDS_SUBSCRIPTION_ID) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                loginCredentialsLimit: {
-                  increment: CREDS_SUBSCRIPTION
-                }
-              }
-            })
-          } else if (productId === TOTP_AND_CREDS_SUBSCRIPTION_ID) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  increment: TOTP_SUBSCRIPTION
-                },
-                loginCredentialsLimit: {
-                  increment: CREDS_SUBSCRIPTION
-                }
-              }
-            })
-          }
-        })
+        } catch (error) {
+          console.error(error)
+          throw new GraphQLError('Error completing checkout session')
+        }
 
         break
       default:
