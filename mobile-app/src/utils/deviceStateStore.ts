@@ -262,20 +262,17 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         return undefined
       },
       getSecretsDecryptedByHostname: async (host: string) => {
-        let secrets = get().decryptedSecrets.filter((secret) => {
-          return (
-            host ===
-            constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
-          )
+        const self = get()
+        let secrets = self.decryptedSecrets.filter((secret) => {
+          const secretUrl: string = getDecryptedSecretProp(secret, 'url')
+          return secretUrl && host === constructURL(secretUrl ?? '').hostname
         })
         if (secrets.length === 0) {
-          secrets = get().decryptedSecrets.filter((secret) =>
-            host.endsWith(
-              getDomainNameAndTldFromUrl(
-                getDecryptedSecretProp(secret, 'url') ?? ''
-              )
-            )
-          )
+          secrets = self.decryptedSecrets.filter((secret) => {
+            const url = getDecryptedSecretProp(secret, 'url')
+
+            return url && host.endsWith(getDomainNameAndTldFromUrl(url ?? ''))
+          })
         }
         return Promise.all(
           secrets.map((secret) => {

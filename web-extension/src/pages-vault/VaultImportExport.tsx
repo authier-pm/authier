@@ -25,7 +25,10 @@ import {
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { useMeExtensionQuery } from './AccountLimits.codegen'
-import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
+import {
+  ILoginSecret,
+  LoginCredentialsTypeWithMeta
+} from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { constructURL } from '@shared/urlUtils'
 import { Txt } from '@src/components/util/Txt'
@@ -83,7 +86,7 @@ export interface IImportedStat {
 /**
  * should support lastpass and bitwarden for now, TODO write e2e specs
  */
-export const onCSVFileAccepted: any = (
+export const onCSVFileAccepted = (
   file: File,
   pswCount: number
 ): Promise<IImportedStat> => {
@@ -126,17 +129,17 @@ export const onCSVFileAccepted: any = (
             continue
           }
 
-          const input /* : ILoginSecret | ITOTPSecret */ = {
+          const input: Omit<ILoginSecret, 'id'> = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-            loginCredentials: creds,
-            url: creds.url,
+            loginCredentials: {
+              ...creds,
+              url: hostname
+            },
             encrypted: await state?.encrypt(JSON.stringify(creds)),
-            createdAt: new Date().toJSON(),
-            iconUrl: null,
-            label: creds.label ?? `${creds.username}@${hostname}`
+            createdAt: new Date().toJSON()
           }
 
-          if (await state.findExistingSecret(input)) {
+          if (await state.findExistingSecret(creds)) {
             skipped++
             continue
           }
@@ -246,8 +249,9 @@ export const VaultImportExport = () => {
               <ImportFromFile
                 onFileAccepted={async (f) => {
                   if (f.type === 'text/csv') {
+                    const loginCredentialsLimit = data?.me.loginCredentialsLimit
                     setImportedStat(
-                      await onCSVFileAccepted(f, data?.me.loginCredentialsLimit)
+                      await onCSVFileAccepted(f, loginCredentialsLimit ?? 50)
                     )
                   } else if (f.type === 'application/json') {
                     setImportedStat(await onJsonFileAccepted(f))
