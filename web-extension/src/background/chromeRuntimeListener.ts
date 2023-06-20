@@ -27,7 +27,7 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
-import { constructURL } from '@shared/urlUtils'
+import { ConstructURLReturnType, constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -76,7 +76,8 @@ const appRouter = tc.router({
       if (!url || !deviceState) {
         return false // we can't do anything without a valid url
       }
-      let urlParsed: URL
+      let urlParsed: ConstructURLReturnType
+
       try {
         urlParsed = constructURL(url)
       } catch (err) {

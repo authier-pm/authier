@@ -7,10 +7,10 @@ import {
   WebInputsForHostQuery,
   WebInputsForHostQueryVariables
 } from './chromeRuntimeListener.codegen'
-import { device } from './ExtensionDevice'
+import { SecretTypeUnion, device } from './ExtensionDevice'
 import mem from 'mem'
 import ms from 'ms'
-import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
@@ -23,17 +23,23 @@ export const getContentScriptInitialState = async (
   log('tabUrl', tabUrl)
   const hostname = constructURL(tabUrl).hostname
 
-  const decrypted =
-    (await device.state?.getSecretsDecryptedByHostname(hostname)) ??
-    ([] as ISecret[])
+  let decrypted: SecretTypeUnion[]
+  if (hostname) {
+    if (device.state) {
+      decrypted = await device.state.getSecretsDecryptedByHostname(hostname)
+    } else {
+      decrypted = []
+    }
+  } else {
+    decrypted = []
+  }
 
-  const res = await getWebInputs(hostname)
-
+  const res = hostname ? await getWebInputs(hostname) : null
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
     autofillEnabled: !!device.state?.autofillCredentialsEnabled,
-    webInputs: res.data.webInputs,
+    webInputs: res?.data.webInputs ?? [],
     passwordCount:
       device.state?.secrets.filter(
         (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
