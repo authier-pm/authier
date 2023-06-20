@@ -7,24 +7,31 @@ import {
   Avatar,
   Heading,
   useColorModeValue,
-  View,
-  Button
+  Button,
+  ScrollView
 } from 'native-base'
 import React from 'react'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useLimitsQuery } from '../../../../shared/graphql/AccountLimits.codegen'
-import { Linking } from 'react-native'
+import { Linking, RefreshControl } from 'react-native'
 import { PAGE_URL } from '@env'
 
 export default function Limits() {
-  const [token] = useDeviceStateStore((state) => [state.accessToken])
-  const { data } = useLimitsQuery({
+  const [token, email] = useDeviceStateStore((state) => [
+    state.accessToken,
+    state.email
+  ])
+  const { data, refetch, loading } = useLimitsQuery({
     fetchPolicy: 'network-only'
   })
 
-  const [email] = useDeviceStateStore((state) => [state.email])
   return (
-    <View>
+    <ScrollView
+      flex={1}
+      refreshControl={
+        <RefreshControl onRefresh={refetch} refreshing={loading} />
+      }
+    >
       <VStack
         alignItems="center"
         space={5}
@@ -76,11 +83,11 @@ export default function Limits() {
         mx={5}
         colorScheme="primary"
         onPress={() => {
-          Linking.openURL(`${PAGE_URL}/pricing&acToken=${token}`)
+          Linking.openURL(`${PAGE_URL}/pricing?acToken=${token}`)
         }}
       >
         Pricing page
       </Button>
-    </View>
+    </ScrollView>
   )
 }
