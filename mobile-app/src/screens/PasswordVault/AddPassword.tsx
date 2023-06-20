@@ -211,6 +211,25 @@ export const AddPassword = () => {
             >
               Save
             </Button>
+            <Button
+              mt={5}
+              onPress={() =>
+                navigation.navigate('User', { screen: 'PasswordGenerator' })
+              }
+              size={'md'}
+              fontSize={'sm'}
+              bg={'blue.400'}
+              color={'white'}
+              _hover={{
+                bg: 'blue.500'
+              }}
+              _focus={{
+                bg: 'blue.500'
+              }}
+              aria-label="Save"
+            >
+              Password Generator
+            </Button>
           </Flex>
         )
       }}

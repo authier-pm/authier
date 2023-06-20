@@ -88,6 +88,12 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
         />
 
         <SettingsItem
+          name={t`Password generator`}
+          onPress={() => navigation.navigate('PasswordGenerator')}
+          key={'Generator'}
+        />
+
+        <SettingsItem
           name={t`Limits`}
           onPress={() => navigation.navigate('Limits')}
           key={'Limits'}

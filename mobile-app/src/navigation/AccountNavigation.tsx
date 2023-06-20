@@ -10,6 +10,7 @@ import {
 } from '@react-navigation/stack'
 import SettingsNavigation from './SettingsNavigation'
 import Limits from '@src/screens/Account/Limits'
+import Generator from '@src/screens/Account/Generator'
 
 const DeviceStack = createStackNavigator<AccountStackParamList>()
 
@@ -44,6 +45,13 @@ export default function AccountNavigation() {
           headerTitle: t`Limits`
         }}
         component={Limits}
+      />
+      <DeviceStack.Screen
+        name="PasswordGenerator"
+        options={{
+          headerTitle: t`Password generator`
+        }}
+        component={Generator}
       />
     </DeviceStack.Navigator>
   )

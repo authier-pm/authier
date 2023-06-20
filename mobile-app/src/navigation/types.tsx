@@ -80,6 +80,7 @@ export type AccountStackParamList = {
   Limits: undefined
   Settings: NavigatorScreenParams<SettingsTabParamList>
   ChangeMasterPassword: undefined
+  PasswordGenerator: undefined
 }
 
 //SETTINGS
