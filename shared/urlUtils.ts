@@ -28,6 +28,7 @@ export const constructURL = (url: string) => {
       // this is not a valid URL object, but that's ok for our needs,
       hostname: null,
       href: null,
+      host: null,
       origin: null,
       pathname: null,
       port: null
