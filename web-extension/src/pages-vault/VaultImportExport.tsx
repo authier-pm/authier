@@ -24,12 +24,12 @@ import {
   SecretTypeUnion
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { constructURL } from '@shared/urlUtils'
 import { Txt } from '@src/components/util/Txt'
 import { useRemoveEncryptedSecretsMutation } from '@shared/graphql/EncryptedSecrets.codegen'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 // const csvHeaderNames = {
@@ -235,7 +235,7 @@ export const VaultImportExport = () => {
 
     setDuplicates(foundDuplicates)
   }, [device.state?.decryptedSecrets])
-  const { data } = useMeExtensionQuery()
+  const { data } = useLimitsQuery()
   return (
     <Center p={5}>
       <Flex maxW={'1200px'} flexDir={'column'}>

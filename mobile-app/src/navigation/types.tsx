@@ -77,6 +77,7 @@ export type AccountStackScreenProps<T extends keyof AccountStackParamList> =
 
 export type AccountStackParamList = {
   Account: undefined
+  Limits: undefined
   Settings: NavigatorScreenParams<SettingsTabParamList>
   ChangeMasterPassword: undefined
 }

@@ -501,8 +501,15 @@ export class UserMutation extends UserBase {
 
       return session.id
     } else {
+      const newCustomer = await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx.jwtPayload.userId
+        }
+      })
+
       const session = await stripe.checkout.sessions.create({
         billing_address_collection: 'auto',
+        customer_email: newCustomer?.email as string,
         line_items: [
           {
             price: productItem['default_price'] as string,

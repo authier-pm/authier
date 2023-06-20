@@ -13,19 +13,19 @@ import { motion } from 'framer-motion'
 
 import { AddLogin } from '@src/components/vault/addItem/AddLogin'
 import { AddTOTP } from '@src/components/vault/addItem/AddTOTP'
-import { useMeExtensionQuery } from './AccountLimits.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Txt } from '@src/components/util/Txt'
 import { Trans } from '@lingui/macro'
 import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 export const AddItem = () => {
   type secretType = 'login' | 'totp'
   const [type, setType] = useState<secretType>('login')
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
-  const { data, loading } = useMeExtensionQuery()
+  const { data, loading } = useLimitsQuery()
 
   const bg = useColorModeValue('white', 'gray.800')
 

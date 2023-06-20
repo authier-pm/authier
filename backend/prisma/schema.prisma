@@ -237,7 +237,7 @@ model UserPaidProducts {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime? @updatedAt
   expiresAt         DateTime?
-  productId         String    @unique
+  productId         String 
   userId            String    @db.Uuid
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   checkoutSessionId String

@@ -14,12 +14,12 @@ import { device } from '@src/background/ExtensionDevice'
 import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 import { ITOTPSecret } from '@src/util/useDeviceState'
-import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
 import { toast } from '@src/ExtensionProviders'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
-  const { data } = useMeExtensionQuery()
+  const { data } = useLimitsQuery()
 
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
