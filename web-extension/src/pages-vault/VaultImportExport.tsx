@@ -121,11 +121,17 @@ export const onCSVFileAccepted = (
             break
           }
 
-          let hostname: string
-          try {
-            hostname = constructURL(creds.url).hostname
-          } catch (error) {
+          const hostname = constructURL(creds.url).hostname
+          if (!hostname) {
             skipped++
+            toast({
+              title: `skipping secret because url ${creds.url} could not be parsed`,
+              status: 'warning',
+              isClosable: true
+            })
+            console.warn(
+              `skipping secret because url ${creds.url} could not be parsed`
+            )
             continue
           }
 

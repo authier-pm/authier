@@ -13,11 +13,22 @@ export const getDomainNameAndTldFromUrl = (url: string) => {
   return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
 }
 
+export type ConstructURLReturnType =
+  | URL
+  | {
+      hostname: null
+      href: null
+      host: null
+      origin: null
+      pathname: null
+      port: null
+    }
+
 /**
  * Constructs a URL object from a string, adding https:// if needed so that users can omit the protocol when saving a secret
  * @returns URL object
  */
-export const constructURL = (url: string) => {
+export const constructURL = (url: string): ConstructURLReturnType => {
   try {
     if (!url.startsWith('http')) {
       return new URL(`https://${url}`)

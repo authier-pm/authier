@@ -221,7 +221,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       secrets = this.decryptedSecrets.filter((secret) => {
         const url = getDecryptedSecretProp(secret, 'url')
 
-        return url && host.endsWith(getDomainNameAndTldFromUrl(url ?? ''))
+        const domainAndTLD = getDomainNameAndTldFromUrl(url)
+        return domainAndTLD && host.endsWith(domainAndTLD)
       })
     }
     return Promise.all(
@@ -343,8 +344,12 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async findExistingSecret(secret: LoginCredentialsTypeWithMeta) {
+    const hostname = constructURL(secret.url).hostname
+    if (!hostname) {
+      return undefined
+    }
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      constructURL(secret.url).hostname
+      hostname
     )
 
     return existingSecretsOnHostname.find(

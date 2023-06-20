@@ -270,8 +270,9 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         if (secrets.length === 0) {
           secrets = self.decryptedSecrets.filter((secret) => {
             const url = getDecryptedSecretProp(secret, 'url')
+            const domainAndTLD = getDomainNameAndTldFromUrl(url)
 
-            return url && host.endsWith(getDomainNameAndTldFromUrl(url ?? ''))
+            return domainAndTLD && host.endsWith(domainAndTLD)
           })
         }
         return Promise.all(
@@ -374,10 +375,13 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         }
       },
       findExistingSecret: async (secret) => {
+        const hostname = constructURL(secret.url).hostname
+
+        if (!hostname) {
+          return undefined
+        }
         const existingSecretsOnHostname =
-          await get().getSecretsDecryptedByHostname(
-            constructURL(secret.url).hostname
-          )
+          await get().getSecretsDecryptedByHostname(hostname)
 
         return existingSecretsOnHostname.find(
           (s) =>
