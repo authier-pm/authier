@@ -8,7 +8,8 @@ import {
   Heading,
   useColorModeValue,
   Button,
-  ScrollView
+  ScrollView,
+  Flex
 } from 'native-base'
 import React from 'react'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
@@ -54,27 +55,27 @@ export default function Limits() {
             <Text>Current count</Text>
             <Text>Your limit</Text>
           </HStack>
-          <HStack justifyContent="space-around">
-            <Text>Credentials</Text>
-            <Text>
+          <Flex mx={4} justifyContent="space-between" flexDir="row">
+            <Text flex={3}>Credentials</Text>
+            <Text flex={2}>
               {
                 data?.me.encryptedSecrets.filter(
                   (i) => i.kind === 'LOGIN_CREDENTIALS'
                 ).length
               }
             </Text>
-            <Text>{data?.me.loginCredentialsLimit}</Text>
-          </HStack>
-          <HStack justifyContent="space-around">
-            <Text>TOTP</Text>
-            <Text>
+            <Text flex={1}>{data?.me.loginCredentialsLimit}</Text>
+          </Flex>
+          <Flex mx={4} justifyContent="space-between" flexDir="row">
+            <Text flex={3}>TOTP</Text>
+            <Text flex={2}>
               {
                 data?.me.encryptedSecrets.filter((i) => i.kind === 'TOTP')
                   .length
               }
             </Text>
-            <Text>{data?.me.TOTPlimit}</Text>
-          </HStack>
+            <Text flex={1}>{data?.me.TOTPlimit}</Text>
+          </Flex>
         </VStack>
       </Center>
 
