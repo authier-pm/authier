@@ -2,7 +2,7 @@ import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 import { z } from 'zod'
 import SelectTextField from '../form/SelectField'
 import CheckBoxField from '../form/CheckBoxField'
-import { TextField } from '../form/TextField'
+import { EmailField, TextField } from '../form/TextField'
 import FormComponent from '../form/FormComponent'
 import SelectNumberField from '../form/SelectNumberField'
 import { PasswordTextField } from '../form/PasswordTextField'
@@ -34,7 +34,7 @@ export const inputPswFieldSchema = createUniqueFieldSchema(
 // create the mapping
 const mapping = [
   [inputFieldSchema, TextField],
-  [inputEmailFieldSchema, TextField],
+  [inputEmailFieldSchema, EmailField],
   [z.number(), NumberField],
   [z.boolean(), CheckBoxField],
   [inputPswFieldSchema, PasswordTextField],

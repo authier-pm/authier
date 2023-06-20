@@ -448,9 +448,13 @@ export class RootResolver {
   ) {
     const returnedInputs: WebInput[] = []
     for (const webInput of webInputs) {
+      const host = constructURL(webInput.url).host
+      if (!host) {
+        continue
+      }
       const forUpsert = {
         url: webInput.url,
-        host: constructURL(webInput.url).host,
+        host: host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
