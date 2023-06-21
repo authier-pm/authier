@@ -4,11 +4,23 @@ import { stripe } from './stripe'
 import { app, endpointSecret } from './app'
 import { GraphQLError } from 'graphql'
 
-const CREDS_SUBSCRIPTION_ID = 'prod_LquWXgjk6kl5sM'
-const TOTP_SUBSCRIPTION_ID = 'prod_LquVrkwfsXjTAL'
-const TOTP_AND_CREDS_SUBSCRIPTION_ID = 'prod_Lp3NU9UcNWduBm'
-const CREDS_SUBSCRIPTION = 60
-const TOTP_SUBSCRIPTION = 20
+const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
+
+const stripeProducts = {
+  test: {
+    Credentials: 'prod_LquWXgjk6kl5sM',
+    TOTP: 'prod_LquVrkwfsXjTAL',
+    TOTPCredentials: 'prod_Lp3NU9UcNWduBm'
+  },
+  live: {
+    Credentials: 'prod_O70NGKoIusmxwE',
+    TOTP: 'prod_O70Pl3a3CW9XNz',
+    TOTPCredentials: 'prod_O7KTrrFYqhOrJR'
+  }
+}
+
+const CREDS_SUBSCRIPTION_INCREASE = 250
+const TOTP_SUBSCRIPTION_INCREASE = 100
 
 export const stripeWebhook = (fastify, opts, done) => {
   fastify.addContentTypeParser(
@@ -73,39 +85,39 @@ export const stripeWebhook = (fastify, opts, done) => {
             })
           })
 
-          if (productId === TOTP_SUBSCRIPTION_ID) {
+          if (productId === stripeProducts[STRIPE_ENV].TOTP) {
             await prismaClient.user.update({
               where: {
                 email: session.customer_details.email
               },
               data: {
                 TOTPlimit: {
-                  decrement: 20
+                  decrement: TOTP_SUBSCRIPTION_INCREASE
                 }
               }
             })
-          } else if (productId === CREDS_SUBSCRIPTION_ID) {
+          } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
             await prismaClient.user.update({
               where: {
                 email: session.customer_details.email
               },
               data: {
                 loginCredentialsLimit: {
-                  decrement: 60
+                  decrement: CREDS_SUBSCRIPTION_INCREASE
                 }
               }
             })
-          } else if (productId === TOTP_AND_CREDS_SUBSCRIPTION_ID) {
+          } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
             await prismaClient.user.update({
               where: {
                 email: session.customer_details.email
               },
               data: {
                 TOTPlimit: {
-                  decrement: 20
+                  decrement: TOTP_SUBSCRIPTION_INCREASE
                 },
                 loginCredentialsLimit: {
-                  decrement: 60
+                  decrement: CREDS_SUBSCRIPTION_INCREASE
                 }
               }
             })
@@ -137,39 +149,41 @@ export const stripeWebhook = (fastify, opts, done) => {
               }
             })
 
-            if (productId === TOTP_SUBSCRIPTION_ID) {
+            if (productId === stripeProducts[STRIPE_ENV].TOTP) {
               await prismaClient.user.update({
                 where: {
                   email: session.customer_details.email
                 },
                 data: {
                   TOTPlimit: {
-                    increment: TOTP_SUBSCRIPTION
+                    increment: TOTP_SUBSCRIPTION_INCREASE
                   }
                 }
               })
-            } else if (productId === CREDS_SUBSCRIPTION_ID) {
+            } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
               await prismaClient.user.update({
                 where: {
                   email: session.customer_details.email
                 },
                 data: {
                   loginCredentialsLimit: {
-                    increment: CREDS_SUBSCRIPTION
+                    increment: CREDS_SUBSCRIPTION_INCREASE
                   }
                 }
               })
-            } else if (productId === TOTP_AND_CREDS_SUBSCRIPTION_ID) {
+            } else if (
+              productId === stripeProducts[STRIPE_ENV].TOTPCredentials
+            ) {
               await prismaClient.user.update({
                 where: {
                   email: session.customer_details.email
                 },
                 data: {
                   TOTPlimit: {
-                    increment: TOTP_SUBSCRIPTION
+                    increment: TOTP_SUBSCRIPTION_INCREASE
                   },
                   loginCredentialsLimit: {
-                    increment: CREDS_SUBSCRIPTION
+                    increment: CREDS_SUBSCRIPTION_INCREASE
                   }
                 }
               })
