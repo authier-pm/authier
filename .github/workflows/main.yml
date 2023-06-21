@@ -125,6 +125,17 @@ jobs:
           pnpm prisma:deploy
           pnpm cdkDeploy
 
+      - name: Create a Sentry.io release
+        uses: tclindner/sentry-releases-action@v1.2.0
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+        env:
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: authier-ml
+          SENTRY_PROJECT: authier-backend
+        with:
+          tagName: ${{ github.sha }}
+          environment: production
+
       - name: web-extension, check TS and run tests
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
