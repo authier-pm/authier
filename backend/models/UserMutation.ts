@@ -25,7 +25,7 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import prismaClient, { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
-import { stripe } from '../stripe'
+import { stripeClient } from '../stripeClient'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
@@ -449,7 +449,7 @@ export class UserMutation extends UserBase {
       throw new GraphqlError("You don't have a paid subscription")
     }
 
-    const checkoutSession = await stripe.checkout.sessions.retrieve(
+    const checkoutSession = await stripeClient.checkout.sessions.retrieve(
       product?.checkoutSessionId as string
     )
 
@@ -457,7 +457,7 @@ export class UserMutation extends UserBase {
     // managing their billing with the portal.
     const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
-    const portalSession = await stripe.billingPortal.sessions.create({
+    const portalSession = await stripeClient.billingPortal.sessions.create({
       customer: checkoutSession.customer as string,
       return_url: returnUrl
     })
@@ -474,14 +474,14 @@ export class UserMutation extends UserBase {
       where: { userId: ctx.jwtPayload.userId }
     })
 
-    const productItem = await stripe.products.retrieve(product)
+    const productItem = await stripeClient.products.retrieve(product)
 
     if (user) {
-      const checkoutSession = await stripe.checkout.sessions.retrieve(
+      const checkoutSession = await stripeClient.checkout.sessions.retrieve(
         user?.checkoutSessionId as string
       )
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await stripeClient.checkout.sessions.create({
         billing_address_collection: 'auto',
         line_items: [
           {
@@ -507,7 +507,7 @@ export class UserMutation extends UserBase {
         }
       })
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await stripeClient.checkout.sessions.create({
         billing_address_collection: 'auto',
         customer_email: newCustomer?.email as string,
         line_items: [

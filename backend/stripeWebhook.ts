@@ -1,8 +1,10 @@
 import { FastifyRequest } from 'fastify'
-import { prismaClient } from './prisma/prismaClient'
-import { stripe } from './stripe'
-import { app, endpointSecret } from './app'
+import { prismaClient, prismaTransaction } from './prisma/prismaClient'
+import { stripeClient } from './stripeClient'
+
+import { endpointSecret } from './app'
 import { GraphQLError } from 'graphql'
+import Stripe from 'stripe'
 
 const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
 
@@ -42,10 +44,10 @@ export const stripeWebhook = (fastify, opts, done) => {
   fastify.post('/webhook', async (req: FastifyRequest, reply) => {
     const sig = req.headers['stripe-signature']
 
-    let event: { type: any; data: { object: any } }
+    let event: Stripe.Event
 
     try {
-      event = stripe.webhooks.constructEvent(
+      event = stripeClient.webhooks.constructEvent(
         //@ts-expect-error TODO @capaj
         req.body.raw,
         sig as string | string[] | Buffer,
@@ -63,13 +65,13 @@ export const stripeWebhook = (fastify, opts, done) => {
     switch (event.type) {
       case 'customer.subscription.deleted':
         // Then define and call a method to handle the subscription deleted.
-        subscription = event.data.object
+        subscription = event.data.object as any // TODO type properly
         status = subscription.status
         if (status === 'canceled') {
-          const session = event.data.object
-          const productId = session.metadata.productId
+          const session = event.data.object as any //
+          const productId = session.metadata?.productId
 
-          await prismaClient.$transaction(async () => {
+          await prismaTransaction(async () => {
             await prismaClient.user.update({
               where: {
                 email: session.customer_details.email
@@ -83,57 +85,59 @@ export const stripeWebhook = (fastify, opts, done) => {
                 }
               }
             })
-          })
 
-          if (productId === stripeProducts[STRIPE_ENV].TOTP) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  decrement: TOTP_SUBSCRIPTION_INCREASE
-                }
-              }
-            })
-          } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                loginCredentialsLimit: {
-                  decrement: CREDS_SUBSCRIPTION_INCREASE
-                }
-              }
-            })
-          } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
-            await prismaClient.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  decrement: TOTP_SUBSCRIPTION_INCREASE
+            if (productId === stripeProducts[STRIPE_ENV].TOTP) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
                 },
-                loginCredentialsLimit: {
-                  decrement: CREDS_SUBSCRIPTION_INCREASE
+                data: {
+                  TOTPlimit: {
+                    decrement: TOTP_SUBSCRIPTION_INCREASE
+                  }
                 }
-              }
-            })
-          }
+              })
+            } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
+                },
+                data: {
+                  loginCredentialsLimit: {
+                    decrement: CREDS_SUBSCRIPTION_INCREASE
+                  }
+                }
+              })
+            } else if (
+              productId === stripeProducts[STRIPE_ENV].TOTPCredentials
+            ) {
+              await prismaClient.user.update({
+                where: {
+                  email: session.customer_details.email
+                },
+                data: {
+                  TOTPlimit: {
+                    decrement: TOTP_SUBSCRIPTION_INCREASE
+                  },
+                  loginCredentialsLimit: {
+                    decrement: CREDS_SUBSCRIPTION_INCREASE
+                  }
+                }
+              })
+            }
+          })
         }
         console.log(`Subscription status is ${status}.`)
         break
 
       case 'checkout.session.completed':
-        const session = event.data.object
-        console.log('Session completed:', session.metadata)
+        const session = event.data.object as any
+
         console.log('Session completed:', session)
         const productId = session.metadata.productId
 
         try {
-          await prismaClient.$transaction(async () => {
+          await prismaTransaction(async () => {
             await prismaClient.user.update({
               where: {
                 email: session.customer_details.email
