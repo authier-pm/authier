@@ -110,7 +110,7 @@ jobs:
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+        if: steps.changes.outputs.backend == 'true'
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -118,23 +118,24 @@ jobs:
 
       - name: backend build and deploy
         working-directory: ./backend
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+        if: steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
         run: |
           pnpm prisma:deploy
           pnpm cdkDeploy
 
-      - name: Create a Sentry.io release
-        uses: tclindner/sentry-releases-action@v1.2.0
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: authier-ml
-          SENTRY_PROJECT: authier-backend
-        with:
-          tagName: ${{ github.sha }}
-          environment: production
+      ## TODO fix sentry release action
+      # - name: Create a Sentry.io release
+      #   uses: tclindner/sentry-releases-action@v1.2.0
+      #   if: steps.changes.outputs.backend == 'true'
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: authier-ml
+      #     SENTRY_PROJECT: authier-backend
+      #   with:
+      #     tagName: ${{ github.sha }}
+      #     environment: production
 
       - name: web-extension, check TS and run tests
         working-directory: ./web-extension
@@ -150,7 +151,7 @@ jobs:
           pnpm prodBuild
 
       # - name: Install Playwright Browsers & Run Playwright tests with backend
-      #   if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+      #   if: steps.changes.outputs.backend == 'true'
       #   working-directory: ./web-extension
       #   run: |
       #     npx playwright install --with-deps
