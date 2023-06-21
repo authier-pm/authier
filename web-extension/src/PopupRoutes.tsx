@@ -5,10 +5,12 @@ import { DeviceStateContext } from './providers/DeviceStateProvider'
 import { UnlockDeviceForm } from './pages/UnlockDeviceForm'
 import debug from 'debug'
 import { useLocation } from 'wouter'
+import { Spinner } from '@chakra-ui/react'
 const log = debug('au:popupRoutes')
 
 export default function PopupRoutes(): ReactElement {
-  const { deviceState, lockedState } = useContext(DeviceStateContext)
+  const { deviceState, lockedState, isInitialized } =
+    useContext(DeviceStateContext)
 
   const [, setLocation] = useLocation()
 
@@ -25,7 +27,11 @@ export default function PopupRoutes(): ReactElement {
     )
   }
 
-  if (lockedState || deviceState === null) {
+  if (isInitialized === false) {
+    return <Spinner />
+  }
+
+  if (deviceState === null) {
     return <AuthLinkPage />
   }
 

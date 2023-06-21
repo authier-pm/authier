@@ -6,7 +6,7 @@ import { t, Trans } from '@lingui/macro'
 import { IoMdArchive } from 'react-icons/io'
 import browser from 'webextension-polyfill'
 
-export function openVaultTab(afterHash: string = '') {
+export function openVaultTab(afterHash = '') {
   //WARNING: In firefox, the path does not need js/ but in chrome it does
   const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1
 
