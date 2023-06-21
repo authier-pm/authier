@@ -23,6 +23,7 @@ import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { i18n } from '@lingui/core'
 import { RefreshControl } from 'react-native'
+import AuthierSelect from '@src/components/AuthierSelect'
 
 function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
@@ -95,9 +96,7 @@ function DeviceSettings() {
                 </Text>
 
                 <Box p={2}>
-                  <Select
-                    //@ts-expect-error https://github.com/GeekyAnts/NativeBase/issues/5687
-                    optimized={false}
+                  <AuthierSelect
                     variant="rounded"
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
@@ -113,7 +112,7 @@ function DeviceSettings() {
                     <Select.Item label="1 week" value="604800" />
                     <Select.Item label="1 month" value="2592000" />
                     <Select.Item label="never" value="0" />
-                  </Select>
+                  </AuthierSelect>
 
                   <Text>
                     <Trans>
@@ -172,9 +171,7 @@ function DeviceSettings() {
             </Heading>
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
+              <AuthierSelect
                 onValueChange={(value) => {
                   deviceState.changeUiLanguage(value)
                   i18n.activate(value)
@@ -184,7 +181,7 @@ function DeviceSettings() {
               >
                 <Select.Item label="English" value="en" />
                 <Select.Item label="Čeština" value="cs" />
-              </Select>
+              </AuthierSelect>
             </Box>
           </VStack>
           {/*  */}
@@ -194,9 +191,7 @@ function DeviceSettings() {
             </Heading>
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
+              <AuthierSelect
                 onValueChange={(value) => {
                   toggleColorMode()
                   deviceState.changeTheme(value)
@@ -206,7 +201,7 @@ function DeviceSettings() {
               >
                 <Select.Item label="light" value="light" />
                 <Select.Item label="dark" value="dark" />
-              </Select>
+              </AuthierSelect>
             </Box>
           </VStack>
         </VStack>

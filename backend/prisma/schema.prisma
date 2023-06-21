@@ -218,11 +218,12 @@ model DefaultSettings {
   id                            Int      @id @default(autoincrement())
   createdAt                     DateTime @default(now())
   updatedAt                     DateTime? @updatedAt
-  credentialsEnabled     Boolean  @default(true)
+  autofillCredentialsEnabled     Boolean  @default(true)
   autofillTOTPEnabled    Boolean  @default(true)
   uiLanguage             String   @default("en")
   deviceTheme            String   @default("dark")
   deviceSyncTOTP         Boolean  @default(true)
+  vaultLockTimeoutSeconds Int       @default(28800) // 8 hours
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @db.Uuid
