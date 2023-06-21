@@ -20,7 +20,6 @@ import { IBackgroundStateSerializable } from '@utils/deviceStore'
 
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
-import { Loading } from '@components/Loading'
 import { Trans } from '@lingui/macro'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../navigation/AuthNavigation'
@@ -63,7 +62,6 @@ export function Register({ navigation }: NavigationProps) {
       }
     }
   }, [error])
-
 
   const onSubmit = async (
     values: ILoginFormValues,
@@ -140,14 +138,13 @@ export function Register({ navigation }: NavigationProps) {
         encryptionSalt: bufferToBase64(encryptionSalt),
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
-        vaultLockTimeoutSeconds: 28800,
-        autofillTOTPEnabled: registerResult.user.autofillTOTPEnabled,
-        autofillCredentialsEnabled:
-          registerResult.user.autofillCredentialsEnabled,
-        uiLanguage: registerResult.user.uiLanguage,
-        lockTimeEnd: Date.now() + 28800000,
-        syncTOTP: registerResult.user.defaultDeviceSyncTOTP,
-        theme: registerResult.user.defaultDeviceTheme,
+        // vaultLockTimeoutSeconds: 28800,
+        // autofillTOTPEnabled: false,
+        // autofillCredentialsEnabled: false,
+        // uiLanguage: 'en',
+        lockTimeEnd: null,
+        // syncTOTP: false,
+        theme: 'dark',
         notificationOnWrongPasswordAttempts:
           registerResult.user.notificationOnWrongPasswordAttempts,
         notificationOnVaultUnlock:

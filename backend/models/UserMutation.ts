@@ -223,12 +223,9 @@ export class UserMutation extends UserBase {
         id: this.id
       },
       data: {
-        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
-        autofillTOTPEnabled: config.autofillTOTPEnabled,
         notificationOnVaultUnlock: config.notificationOnVaultUnlock,
         notificationOnWrongPasswordAttempts:
           config.notificationOnWrongPasswordAttempts,
-        uiLanguage: config.uiLanguage,
         Devices: {
           update: {
             where: {
@@ -236,10 +233,32 @@ export class UserMutation extends UserBase {
             },
             data: {
               syncTOTP: config.syncTOTP,
-              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+              uiLanguage: config.uiLanguage,
+              autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+              autofillTOTPEnabled: config.autofillTOTPEnabled
             }
           }
         }
+      }
+    })
+  }
+
+  @Field(() => UserGQL)
+  async updateDefaultSettings(
+    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return await ctx.prisma.defaultSettings.update({
+      where: {
+        userId: this.id
+      },
+      data: {
+        autofillTOTPEnabled: config.autofillTOTPEnabled,
+        uiLanguage: config.uiLanguage,
+        deviceSyncTOTP: config.syncTOTP,
+        vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+        autofillCredentialsEnabled: config.autofillCredentialsEnabled
       }
     })
   }

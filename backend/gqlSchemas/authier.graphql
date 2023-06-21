@@ -22,11 +22,6 @@ type UserQuery {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -40,6 +35,7 @@ type UserQuery {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultSettings: [DefaultSettingsGQL!]!
   devices: [DeviceQuery!]!
   device(id: String!): DeviceQuery!
   lastChangeInSecrets: DateTime
@@ -102,11 +98,6 @@ type UserGQL {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -120,6 +111,7 @@ type UserGQL {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultSettings: [DefaultSettingsGQL!]!
 }
 
 type DeviceGQL {
@@ -133,6 +125,9 @@ type DeviceGQL {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  uiLanguage: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -258,6 +253,20 @@ type MasterDeviceChangeGQL {
   user: UserGQL!
 }
 
+type DefaultSettingsGQL {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  deviceTheme: String!
+  deviceSyncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
+  user: UserGQL!
+}
+
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -269,6 +278,9 @@ type DeviceQuery {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  uiLanguage: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -380,11 +392,6 @@ type UserMutation {
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -398,6 +405,7 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultSettings: [DefaultSettingsGQL!]!
   addCookie: String!
   device(id: String!): DeviceMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
@@ -411,6 +419,7 @@ type UserMutation {
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(config: SettingsInput!): UserGQL!
+  updateDefaultSettings(config: SettingsInput!): UserGQL!
   sendEmailVerification(isMobile: Boolean): NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): Int!
@@ -433,6 +442,9 @@ type DeviceMutation {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  uiLanguage: String!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime

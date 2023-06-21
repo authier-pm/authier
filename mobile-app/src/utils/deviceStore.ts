@@ -42,11 +42,11 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  // vaultLockTimeoutSeconds: number
+  // syncTOTP: boolean
+  // autofillCredentialsEnabled: boolean
+  // autofillTOTPEnabled: boolean
+  // uiLanguage: string
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number | null
@@ -229,13 +229,12 @@ export const useDeviceStore = create<Device>()(
           })
 
           const config = {
-            autofillTOTPEnabled: query.data.me.autofillTOTPEnabled,
-            autofillCredentialsEnabled:
-              query.data.me.autofillCredentialsEnabled,
-            syncTOTP: query.data.currentDevice.syncTOTP,
+            // autofillTOTPEnabled: false,
+            // autofillCredentialsEnabled: false,
+            // syncTOTP: false,
             vaultLockTimeoutSeconds: query.data.currentDevice
               .vaultLockTimeoutSeconds as number,
-            uiLanguage: query.data.me.uiLanguage,
+            // uiLanguage: 'en',
             notificationOnVaultUnlock: query.data.me.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
               query.data.me.notificationOnWrongPasswordAttempts
@@ -352,11 +351,11 @@ export const useDeviceStore = create<Device>()(
           encryptionSalt,
           authSecret: state.authSecret,
           authSecretEncrypted: state.authSecretEncrypted,
-          vaultLockTimeoutSeconds,
-          syncTOTP,
-          autofillCredentialsEnabled,
-          autofillTOTPEnabled,
-          uiLanguage,
+          // vaultLockTimeoutSeconds,
+          // syncTOTP,
+          // autofillCredentialsEnabled,
+          // autofillTOTPEnabled,
+          // uiLanguage,
           theme,
           biometricsEnabled,
           lockTimeEnd: null, // when locking the device, we must clear the lockTimeEnd

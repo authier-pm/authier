@@ -22,11 +22,11 @@ mutation addNewDeviceForUser(
             updatedAt
             version
           }
-          defaultDeviceTheme
-          uiLanguage
-          defaultDeviceSyncTOTP
-          autofillCredentialsEnabled
-          autofillTOTPEnabled
+          # defaultDeviceTheme
+          # uiLanguage
+          # defaultDeviceSyncTOTP
+          # autofillCredentialsEnabled
+          # autofillTOTPEnabled
           notificationOnVaultUnlock
           notificationOnWrongPasswordAttempts
         }

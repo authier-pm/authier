@@ -8,6 +8,7 @@ import { WebInputGQL } from './WebInputGQL'
 import { TagGQL } from './TagGQL'
 import { UserPaidProductsGQL } from './UserPaidProductsGQL'
 import { MasterDeviceChangeGQL } from './MasterDeviceChangeGQL'
+import { DefaultSettingsGQL } from './DefaultSettingsGQL'
 
 @ObjectType()
 export class UserGQLScalars {
@@ -43,21 +44,6 @@ export class UserGQLScalars {
 
   @Field(() => Int)
   deviceRecoveryCooldownMinutes: number
-
-  @Field()
-  autofillCredentialsEnabled: boolean
-
-  @Field()
-  autofillTOTPEnabled: boolean
-
-  @Field()
-  uiLanguage: string
-
-  @Field()
-  defaultDeviceTheme: string
-
-  @Field()
-  defaultDeviceSyncTOTP: boolean
 
   @Field()
   notificationOnVaultUnlock: boolean
@@ -100,6 +86,9 @@ export class UserGQL extends UserGQLScalars {
 
   @Field(() => [MasterDeviceChangeGQL])
   MasterDeviceChange: MasterDeviceChangeGQL[]
+
+  @Field(() => [DefaultSettingsGQL])
+  DefaultSettings: DefaultSettingsGQL[]
 
   // skip overwrite 👇
 }

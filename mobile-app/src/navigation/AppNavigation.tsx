@@ -14,11 +14,12 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { useToast } from 'native-base'
+import { Text, useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
+import DefaultSettings from '@src/screens/DefaultSettings'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -26,9 +27,14 @@ function AppNavigation() {
   const [updateDeviceSettings] = useDeviceStore((state) => [
     state.updateDeviceSettings
   ])
-  const [notifications, backendSync, setNotifications] = useDeviceStateStore(
-    (state) => [state.notifications, state.backendSync, state.setNotifications]
-  )
+  const [notifications, backendSync, setNotifications, firstTimeUser] =
+    useDeviceStateStore((state) => [
+      state.notifications,
+      state.backendSync,
+      state.setNotifications,
+      state.firstTimeUser
+    ])
+
   const navigation = useNavigation()
   const toast = useToast()
 
@@ -69,6 +75,10 @@ function AppNavigation() {
     updateDeviceSettings()
     return unsubscribe
   }, [])
+
+  if (firstTimeUser) {
+    return <DefaultSettings />
+  }
 
   return (
     <RootStack.Navigator

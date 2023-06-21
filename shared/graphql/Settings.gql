@@ -3,9 +3,9 @@ query SyncSettings {
     loginCredentialsLimit
     TOTPlimit
     id
-    autofillCredentialsEnabled
-    autofillTOTPEnabled
-    uiLanguage
+    # autofillCredentialsEnabled
+    # autofillTOTPEnabled
+    # uiLanguage
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
   }

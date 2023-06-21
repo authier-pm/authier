@@ -9,10 +9,7 @@ import {
   enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import {
-  EncryptedSecretType,
-  SettingsInput
-} from '@shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
@@ -66,6 +63,7 @@ interface DeviceStateProps {
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
   accessToken: string | null
+  firstTimeUser: boolean
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -126,11 +124,11 @@ const initialState: DeviceStateProps = {
   secrets: [],
   authSecret: '',
   authSecretEncrypted: '',
-  vaultLockTimeoutSeconds: 0,
+  vaultLockTimeoutSeconds: 28800,
   syncTOTP: false,
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
-  uiLanguage: '',
+  uiLanguage: 'en',
   notificationOnVaultUnlock: false,
   notificationOnWrongPasswordAttempts: 3,
   theme: 'dark',
@@ -140,7 +138,8 @@ const initialState: DeviceStateProps = {
   lockTimerRunning: false,
   decryptedSecrets: [],
   notifications: 0,
-  accessToken: null
+  accessToken: null,
+  firstTimeUser: true
 }
 
 export const useDeviceStateStore = create<DeviceStateActions>()(

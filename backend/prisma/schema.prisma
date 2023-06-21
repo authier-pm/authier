@@ -50,20 +50,20 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                      String    @id
-  firstIpAddress          String    @db.Inet
-  lastIpAddress           String    @db.Inet
-  firebaseToken           String?
-  name                    String
-  platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
-  ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  logoutAt                DateTime?
+  id                         String    @id
+  firstIpAddress             String    @db.Inet
+  lastIpAddress              String    @db.Inet
+  firebaseToken              String?
+  name                       String
+  platform                   String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
+  ipAddressLock              Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  logoutAt                   DateTime?
   // Device settings
-  syncTOTP                Boolean   @default(false) // sync2FA
-  vaultLockTimeoutSeconds Int       @default(28800) // 8 hours
-  uiLanguage                          String  @default("en")
-  autofillCredentialsEnabled          Boolean @default(true)
-  autofillTOTPEnabled                 Boolean @default(true)
+  syncTOTP                   Boolean   @default(false) // sync2FA
+  vaultLockTimeoutSeconds    Int       @default(28800) // 8 hours
+  uiLanguage                 String    @default("en")
+  autofillCredentialsEnabled Boolean   @default(true)
+  autofillTOTPEnabled        Boolean   @default(true)
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -212,21 +212,22 @@ model User {
   // @skip
   EmailVerification    EmailVerification[]
   MasterDeviceChange   MasterDeviceChange[]
+  DefaultSettings      DefaultSettings[]
 }
 
 model DefaultSettings {
-  id                            Int      @id @default(autoincrement())
-  createdAt                     DateTime @default(now())
-  updatedAt                     DateTime? @updatedAt
-  autofillCredentialsEnabled     Boolean  @default(true)
-  autofillTOTPEnabled    Boolean  @default(true)
-  uiLanguage             String   @default("en")
-  deviceTheme            String   @default("dark")
-  deviceSyncTOTP         Boolean  @default(true)
-  vaultLockTimeoutSeconds Int       @default(28800) // 8 hours
+  id                         Int       @id @default(autoincrement())
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime? @updatedAt
+  autofillCredentialsEnabled Boolean   @default(true)
+  autofillTOTPEnabled        Boolean   @default(true)
+  uiLanguage                 String    @default("en")
+  deviceTheme                String    @default("dark")
+  deviceSyncTOTP             Boolean   @default(true)
+  vaultLockTimeoutSeconds    Int       @default(28800) // 8 hours
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String @db.Uuid
+  userId String @unique @db.Uuid
 }
 
 model Token {
@@ -250,7 +251,7 @@ model UserPaidProducts {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime? @updatedAt
   expiresAt         DateTime?
-  productId         String 
+  productId         String
   userId            String    @db.Uuid
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   checkoutSessionId String

@@ -33,11 +33,7 @@ interface Values {
   password: string
 }
 
-export function VaultUnlockVerification({
-  onUnlocked
-}: {
-  onUnlocked: () => any
-}) {
+export function VaultUnlockVerification() {
   const toast = useToast()
   const id = 'active-toast'
   const device = useDeviceStore((state) => state)
@@ -157,7 +153,7 @@ export function VaultUnlockVerification({
         ) => {
           try {
             await unlockVault(values.password)
-            onUnlocked()
+
             if (notificationOnVaultUnlock) {
               console.log('send notification', device.id)
 
