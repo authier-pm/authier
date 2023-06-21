@@ -101,6 +101,12 @@ function UserSettings() {
             />
           </HStack>
         </VStack>
+        {/** **/}
+        <Heading size="md">
+          <Trans>New device default settings</Trans>
+        </Heading>
+        <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}></VStack>
+        {/** **/}
         <Heading size="md">
           <Trans>Danger zone</Trans>
         </Heading>
