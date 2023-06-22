@@ -41,14 +41,15 @@ export const VaultList = () => {
 
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
+    console.log('data', data)
     if (data) {
       setSecuritySettings({
-        autofillCredentialsEnabled: data.me?.autofillCredentialsEnabled,
-        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
-        uiLanguage: data.me?.uiLanguage,
+        autofillCredentialsEnabled:
+          data.currentDevice.autofillCredentialsEnabled,
+        autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
+        uiLanguage: data.currentDevice.uiLanguage,
         syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number,
+        vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
         notificationOnWrongPasswordAttempts:
           data.me.notificationOnWrongPasswordAttempts,
         notificationOnVaultUnlock: data.me.notificationOnVaultUnlock

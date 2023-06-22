@@ -17,6 +17,7 @@ import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
+import DefaultSettings from './DefaultSettings'
 
 const log = debug('au:VaultRouter')
 
@@ -24,6 +25,7 @@ export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
 
+  console.log('test', deviceState)
   useEffect(() => {
     if (lockedState) {
       navigate('verify')
@@ -52,6 +54,10 @@ export function VaultRouter() {
     )
   }
 
+  if (deviceState.firstTimeUser) {
+    return <DefaultSettings />
+  }
+
   return (
     <SidebarWithHeader>
       <Routes>
@@ -62,7 +68,6 @@ export function VaultRouter() {
         <Route path="/devices" element={<Devices />}></Route>
         <Route path="/import-export" element={<VaultImportExport />}></Route>
         <Route path="/addItem" element={<AddItem />}></Route>
-        <Route path="/devices" element={<Devices />}></Route>
       </Routes>
     </SidebarWithHeader>
   )

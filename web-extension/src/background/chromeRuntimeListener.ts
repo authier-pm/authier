@@ -256,6 +256,14 @@ const appRouter = tc.router({
     .mutation(async ({ input }) => {
       device.save(input)
       return true
+    }),
+  setFirstTimeUser: tcProcedure
+    .input(z.object({ value: z.boolean() }))
+    .mutation(() => {
+      if (device.state) {
+        device.save({ ...device.state, firstTimeUser: false })
+      }
+      return true
     })
 })
 

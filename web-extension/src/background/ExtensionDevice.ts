@@ -125,6 +125,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   authSecretEncrypted: string
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
+  firstTimeUser: boolean
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -460,10 +461,12 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
-    this.id = await this.getDeviceId()
+    const [id, storage] = await Promise.all([
+      this.getDeviceId(),
+      browser.storage.local.get()
+    ])
+    this.id = id
     let storedState: IBackgroundStateSerializable | null = null
-
-    const storage = await browser.storage.local.get()
 
     if (storage.backgroundState) {
       storedState = storage.backgroundState
@@ -491,7 +494,11 @@ class ExtensionDevice {
       }
     }
 
-    if (this.state && (isVault || isPopup)) {
+    if (
+      this.state &&
+      (isVault || isPopup) &&
+      this.state.vaultLockTimeoutSeconds
+    ) {
       this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 
@@ -617,7 +624,8 @@ class ExtensionDevice {
       authSecret,
       authSecretEncrypted,
       notificationOnWrongPasswordAttempts,
-      notificationOnVaultUnlock
+      notificationOnVaultUnlock,
+      firstTimeUser
     } = this.state
 
     this.lockedState = {
@@ -635,7 +643,8 @@ class ExtensionDevice {
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
       uiLanguage,
-      theme
+      theme,
+      firstTimeUser
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,

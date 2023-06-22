@@ -29,20 +29,20 @@ export class DeviceGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   logoutAt: Date | null
 
-  @Field()
-  syncTOTP: boolean
+  @Field(() => Boolean, { nullable: true })
+  syncTOTP: boolean | null
 
-  @Field(() => Int)
-  vaultLockTimeoutSeconds: number
+  @Field(() => Int, { nullable: true })
+  vaultLockTimeoutSeconds: number | null
 
-  @Field()
-  uiLanguage: string
+  @Field(() => String, { nullable: true })
+  uiLanguage: string | null
 
-  @Field()
-  autofillCredentialsEnabled: boolean
+  @Field(() => Boolean, { nullable: true })
+  autofillCredentialsEnabled: boolean | null
 
-  @Field()
-  autofillTOTPEnabled: boolean
+  @Field(() => Boolean, { nullable: true })
+  autofillTOTPEnabled: boolean | null
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date

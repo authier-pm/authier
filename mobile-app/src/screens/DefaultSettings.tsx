@@ -20,15 +20,17 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import React from 'react'
 import { useUpdateDefaultSettingsMutation } from '../../../shared/graphql/DefaultSettings.codegen'
 import { i18n } from '@lingui/core'
+import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 
 export default function DefaultSettings() {
   // const device = useDeviceStore((state) => state)
-  // const deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const bgColor = useColorModeValue('white', 'rgb(1, 1, 1)')
   const { toggleColorMode } = useColorMode()
   const [updateDefaultSettings, { loading }] =
     useUpdateDefaultSettingsMutation()
+  const [updateSettings] = useUpdateSettingsMutation()
 
   const [form, setForm] = React.useState({
     vaultLockTimeoutSeconds: '28800',
@@ -159,19 +161,31 @@ export default function DefaultSettings() {
       </VStack>
       <Button
         isLoading={loading}
-        onPress={() => {
+        onPress={async () => {
           const formData = {
             uiLanguage: form.uiLanguage,
             autofillCredentialsEnabled: form.autofillCredentialsEnabled,
             syncTOTP: form.syncTOTP,
             autofillTOTPEnabled: form.autofillTOTPEnabled,
-            vaultLockTimeoutSeconds: parseInt(form.vaultLockTimeoutSeconds, 10),
-            theme: form.theme
+            vaultLockTimeoutSeconds: parseInt(form.vaultLockTimeoutSeconds, 10)
           }
-          updateDefaultSettings({
+
+          await updateSettings({
             variables: {
               config: {
-                ...formData
+                ...formData,
+                notificationOnWrongPasswordAttempts:
+                  deviceState.notificationOnWrongPasswordAttempts,
+                notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock
+              }
+            }
+          })
+
+          await updateDefaultSettings({
+            variables: {
+              config: {
+                ...formData,
+                theme: form.theme
               }
             }
           })

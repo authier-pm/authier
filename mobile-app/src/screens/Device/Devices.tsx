@@ -77,6 +77,7 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
 
   useEffect(() => {
     //FIX: this is calling on every rerender
+    //What if device is not added, it will pool infinitely
     if (previousData !== null && previousData !== devicesData) {
       devicesStopPolling()
     }

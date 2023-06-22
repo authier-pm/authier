@@ -136,13 +136,14 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      // console.log('setSecuritySettings', config)
       await trpc.securitySettings.mutate(config)
     },
-
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
       await trpc.setDeviceState.mutate(state)
+    },
+    setFirstTimeUser: async (firstTimeUser: boolean) => {
+      await trpc.setFirstTimeUser.mutate({ value: firstTimeUser })
     },
     lockedState,
     device,

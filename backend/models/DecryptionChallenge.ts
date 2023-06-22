@@ -78,7 +78,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     const user = await ctx.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        EncryptedSecrets: true
+        EncryptedSecrets: true,
+        DefaultSettings: true
       }
     })
 
@@ -118,6 +119,9 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       where: { id: deviceId }
     })
 
+    //Why is this array??
+    const defaultSettings = user.DefaultSettings[0]
+
     if (device) {
       if (device.userId !== user.id) {
         throw new GraphqlError('Device is already registered for another user') // prevents users from circumventing our limits by using multiple accounts
@@ -136,7 +140,13 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           firebaseToken: firebaseToken,
           name: this.deviceName,
           userId: user.id,
-          platform: input.devicePlatform
+          platform: input.devicePlatform,
+          syncTOTP: defaultSettings.deviceSyncTOTP,
+          uiLanguage: defaultSettings.uiLanguage,
+          autofillCredentialsEnabled:
+            defaultSettings.autofillCredentialsEnabled,
+          autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
+          vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
         }
       })
     }

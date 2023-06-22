@@ -184,7 +184,6 @@ export const useLogin = (props: { deviceName: string }) => {
           }
 
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
-          const defaultSettings = addNewDeviceForUser.user.defaultSettings
 
           const newDeviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
@@ -196,22 +195,16 @@ export const useLogin = (props: { deviceName: string }) => {
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds:
-              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds ??
-              defaultSettings.vaultLockTimeoutSeconds,
-            autofillCredentialsEnabled:
-              addNewDeviceForUser.user.device.autofillCredentialsEnabled ??
-              defaultSettings.autofillCredentialsEnabled,
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
             autofillTOTPEnabled:
-              addNewDeviceForUser.user.device.autofillTOTPEnabled ??
-              defaultSettings.autofillTOTPEnabled,
-            uiLanguage:
-              addNewDeviceForUser.user.device.uiLanguage ??
-              defaultSettings.uiLanguage,
-            lockTimeEnd: addNewDeviceForUser.user.device.vaultLockTimeoutSeconds
-              ? Date.now() +
-                addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000
-              : Date.now() + defaultSettings.vaultLockTimeoutSeconds * 1000,
+              addNewDeviceForUser.user.device.autofillTOTPEnabled,
+            autofillCredentialsEnabled:
+              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
+            uiLanguage: addNewDeviceForUser.user.device.uiLanguage,
             syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
+            lockTimeEnd:
+              Date.now() +
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000,
             theme: (await colorModeManager.get()) as string,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,

@@ -1,0 +1,11 @@
+-- AlterTable
+ALTER TABLE "Device" ALTER COLUMN "vaultLockTimeoutSeconds" DROP NOT NULL,
+ALTER COLUMN "vaultLockTimeoutSeconds" DROP DEFAULT,
+ALTER COLUMN "syncTOTP" DROP NOT NULL,
+ALTER COLUMN "syncTOTP" DROP DEFAULT,
+ALTER COLUMN "autofillCredentialsEnabled" DROP NOT NULL,
+ALTER COLUMN "autofillCredentialsEnabled" DROP DEFAULT,
+ALTER COLUMN "autofillTOTPEnabled" DROP NOT NULL,
+ALTER COLUMN "autofillTOTPEnabled" DROP DEFAULT,
+ALTER COLUMN "uiLanguage" DROP NOT NULL,
+ALTER COLUMN "uiLanguage" DROP DEFAULT;

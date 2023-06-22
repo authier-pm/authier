@@ -176,7 +176,6 @@ export class RootResolver {
           TOTPlimit: 3,
           Devices: {
             create: {
-              syncTOTP: true,
               platform: input.devicePlatform,
               id: deviceId,
               firstIpAddress: ipAddress,

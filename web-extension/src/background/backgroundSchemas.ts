@@ -78,15 +78,16 @@ export const backgroundStateSerializableLockedSchema = z.object({
   deviceName: z.string(),
   authSecretEncrypted: z.string(),
   authSecret: z.string(),
-  vaultLockTimeoutSeconds: z.number(),
-  autofillCredentialsEnabled: z.boolean(),
-  autofillTOTPEnabled: z.boolean(),
-  uiLanguage: z.string(),
-  syncTOTP: z.boolean(),
+  vaultLockTimeoutSeconds: z.number().nullable(),
+  autofillCredentialsEnabled: z.boolean().nullable(),
+  autofillTOTPEnabled: z.boolean().nullable(),
+  uiLanguage: z.string().nullable(),
+  syncTOTP: z.boolean().nullable(),
   theme: z.string(),
   masterEncryptionKey: z.string(),
   notificationOnVaultUnlock: z.boolean(),
-  notificationOnWrongPasswordAttempts: z.number()
+  notificationOnWrongPasswordAttempts: z.number(),
+  firstTimeUser: z.boolean()
 })
 
 export const payloadSchema = z.union([
