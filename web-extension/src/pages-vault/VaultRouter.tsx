@@ -25,7 +25,6 @@ export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
 
-  console.log('test', deviceState)
   useEffect(() => {
     if (lockedState) {
       navigate('verify')

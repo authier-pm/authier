@@ -52,6 +52,7 @@ export default function DefaultSettings() {
     useContext(DeviceStateContext)
   const [updateDefaultSettings] = useUpdateDefaultSettingsMutation({})
   const [updateSettings] = useUpdateSettingsMutation({})
+  const bgColor = useColorModeValue('white', 'gray.800')
 
   if (deviceState) {
     const form = useForm<z.infer<typeof DefaultsFormSchema>>({
@@ -125,7 +126,7 @@ export default function DefaultSettings() {
           rounded={'lg'}
           boxShadow={'lg'}
           p={30}
-          bg={useColorModeValue('white', 'gray.800')}
+          bg={bgColor}
         >
           <Form
             form={form}
