@@ -33,6 +33,7 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { colorModeManager } from '@src/Providers'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
@@ -139,6 +140,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const response = await addNewDevice({
           variables: {
             email: formState.email,
+            deviceId: device.id as string,
             deviceInput: {
               id: device.id as string,
               name: props.deviceName,
@@ -161,6 +163,7 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
+          useDeviceStateStore.setState({ firstTimeUser: false })
           if (device.biometricsAvailable && deviceState.biometricsEnabled) {
             try {
               await SInfo.setItem('psw', formState.password, {
@@ -181,6 +184,7 @@ export const useLogin = (props: { deviceName: string }) => {
           }
 
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
+          const defaultSettings = addNewDeviceForUser.user.defaultSettings
 
           const newDeviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
@@ -191,14 +195,24 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
-            vaultLockTimeoutSeconds: 28800,
+            vaultLockTimeoutSeconds:
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds ??
+              defaultSettings.vaultLockTimeoutSeconds,
             autofillCredentialsEnabled:
-              addNewDeviceForUser.user.autofillCredentialsEnabled,
-            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
-            uiLanguage: addNewDeviceForUser.user.uiLanguage,
-            lockTimeEnd: Date.now() + 28800000,
-            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+              addNewDeviceForUser.user.device.autofillCredentialsEnabled ??
+              defaultSettings.autofillCredentialsEnabled,
+            autofillTOTPEnabled:
+              addNewDeviceForUser.user.device.autofillTOTPEnabled ??
+              defaultSettings.autofillTOTPEnabled,
+            uiLanguage:
+              addNewDeviceForUser.user.device.uiLanguage ??
+              defaultSettings.uiLanguage,
+            lockTimeEnd: addNewDeviceForUser.user.device.vaultLockTimeoutSeconds
+              ? Date.now() +
+                addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000
+              : Date.now() + defaultSettings.vaultLockTimeoutSeconds * 1000,
+            syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
+            theme: (await colorModeManager.get()) as string,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:

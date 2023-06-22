@@ -8,10 +8,11 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
   deviceInput: Types.DeviceInput;
   currentAddDeviceSecret: Types.Scalars['NonEmptyString']['input'];
   input: Types.AddNewDeviceInput;
+  deviceId: Types.Scalars['String']['input'];
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }> } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean, uiLanguage: string }, defaultSettings: { __typename?: 'DefaultSettingsGQL', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number } } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress']['input'];
@@ -23,7 +24,7 @@ export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', devic
 
 
 export const AddNewDeviceForUserDocument = gql`
-    mutation addNewDeviceForUser($email: EmailAddress!, $deviceInput: DeviceInput!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!) {
+    mutation addNewDeviceForUser($email: EmailAddress!, $deviceInput: DeviceInput!, $currentAddDeviceSecret: NonEmptyString!, $input: AddNewDeviceInput!, $deviceId: String!) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
       id
@@ -44,6 +45,23 @@ export const AddNewDeviceForUserDocument = gql`
           }
           notificationOnVaultUnlock
           notificationOnWrongPasswordAttempts
+          device(id: $deviceId) {
+            id
+            syncTOTP
+            vaultLockTimeoutSeconds
+            autofillCredentialsEnabled
+            autofillTOTPEnabled
+            uiLanguage
+          }
+          defaultSettings {
+            id
+            autofillTOTPEnabled
+            autofillCredentialsEnabled
+            uiLanguage
+            deviceTheme
+            deviceSyncTOTP
+            vaultLockTimeoutSeconds
+          }
         }
       }
     }
@@ -69,6 +87,7 @@ export type AddNewDeviceForUserMutationFn = Apollo.MutationFunction<AddNewDevice
  *      deviceInput: // value for 'deviceInput'
  *      currentAddDeviceSecret: // value for 'currentAddDeviceSecret'
  *      input: // value for 'input'
+ *      deviceId: // value for 'deviceId'
  *   },
  * });
  */

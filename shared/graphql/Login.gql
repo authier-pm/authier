@@ -3,6 +3,7 @@ mutation addNewDeviceForUser(
   $deviceInput: DeviceInput!
   $currentAddDeviceSecret: NonEmptyString!
   $input: AddNewDeviceInput!
+  $deviceId: String!
 ) {
   deviceDecryptionChallenge(email: $email, deviceInput: $deviceInput) {
     ... on DecryptionChallengeApproved {
@@ -22,13 +23,25 @@ mutation addNewDeviceForUser(
             updatedAt
             version
           }
-          # defaultDeviceTheme
-          # uiLanguage
-          # defaultDeviceSyncTOTP
-          # autofillCredentialsEnabled
-          # autofillTOTPEnabled
           notificationOnVaultUnlock
           notificationOnWrongPasswordAttempts
+          device(id: $deviceId) {
+            id
+            syncTOTP
+            vaultLockTimeoutSeconds
+            autofillCredentialsEnabled
+            autofillTOTPEnabled
+            uiLanguage
+          }
+          defaultSettings {
+            id
+            autofillTOTPEnabled
+            autofillCredentialsEnabled
+            uiLanguage
+            deviceTheme
+            deviceSyncTOTP
+            vaultLockTimeoutSeconds
+          }
         }
       }
     }

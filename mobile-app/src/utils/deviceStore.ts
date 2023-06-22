@@ -42,11 +42,11 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  // vaultLockTimeoutSeconds: number
-  // syncTOTP: boolean
-  // autofillCredentialsEnabled: boolean
-  // autofillTOTPEnabled: boolean
-  // uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number | null
@@ -354,11 +354,11 @@ export const useDeviceStore = create<Device>()(
           encryptionSalt,
           authSecret: state.authSecret,
           authSecretEncrypted: state.authSecretEncrypted,
-          // vaultLockTimeoutSeconds,
-          // syncTOTP,
-          // autofillCredentialsEnabled,
-          // autofillTOTPEnabled,
-          // uiLanguage,
+          vaultLockTimeoutSeconds,
+          syncTOTP,
+          autofillCredentialsEnabled,
+          autofillTOTPEnabled,
+          uiLanguage,
           theme,
           biometricsEnabled,
           lockTimeEnd: null, // when locking the device, we must clear the lockTimeEnd

@@ -408,6 +408,7 @@ type UserMutation {
   DefaultSettings: [DefaultSettingsGQL!]!
   addCookie: String!
   device(id: String!): DeviceMutation!
+  defaultSettings: DefaultSettingsGQL!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   createSecretUsageEvent(

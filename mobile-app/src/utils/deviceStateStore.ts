@@ -48,11 +48,11 @@ interface DeviceStateProps {
   secrets: Array<SecretSerializedType>
   authSecret: string
   authSecretEncrypted: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   biometricsEnabled: boolean
   lockTimeStart: number

@@ -138,6 +138,11 @@ export function Register({ navigation }: NavigationProps) {
         encryptionSalt: bufferToBase64(encryptionSalt),
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
+        vaultLockTimeoutSeconds: null,
+        syncTOTP: null,
+        uiLanguage: null,
+        autofillTOTPEnabled: null,
+        autofillCredentialsEnabled: null,
         lockTimeEnd: null,
         theme: 'dark',
         notificationOnWrongPasswordAttempts:

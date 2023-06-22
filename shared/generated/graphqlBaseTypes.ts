@@ -562,6 +562,7 @@ export type UserMutation = {
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime']['output'];
   decryptionChallenge: DecryptionChallengeMutation;
+  defaultSettings: DefaultSettingsGql;
   delete: UserGql;
   device: DeviceMutation;
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];

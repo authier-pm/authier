@@ -21,7 +21,7 @@ i18n.load({
 })
 i18n.activate('en')
 
-const colorModeManager: StorageManager = {
+export const colorModeManager: StorageManager = {
   get: async () => {
     try {
       let val = useDeviceStateStore.getState().theme

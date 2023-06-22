@@ -36,11 +36,12 @@ function DeviceSettings() {
 
   const currentSettings = (): SettingsInput => {
     return {
-      autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-      autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
-      uiLanguage: deviceState.uiLanguage,
-      syncTOTP: deviceState.syncTOTP,
-      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+      autofillTOTPEnabled: deviceState.autofillTOTPEnabled as boolean,
+      autofillCredentialsEnabled:
+        deviceState.autofillCredentialsEnabled as boolean,
+      uiLanguage: deviceState.uiLanguage as string,
+      syncTOTP: deviceState.syncTOTP as boolean,
+      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds as number,
       notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
       notificationOnWrongPasswordAttempts:
         deviceState.notificationOnWrongPasswordAttempts
@@ -101,7 +102,9 @@ function DeviceSettings() {
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
                     }}
-                    selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
+                    selectedValue={
+                      deviceState.vaultLockTimeoutSeconds?.toString() ?? '0'
+                    }
                     accessibilityLabel="Lock time"
                   >
                     <Select.Item label="1 minute" value="20" />
@@ -129,7 +132,7 @@ function DeviceSettings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  value={deviceState.syncTOTP}
+                  value={deviceState.syncTOTP ?? false}
                   onToggle={async (e) => {
                     deviceState.changeSyncTOTP(e)
                   }}
@@ -176,7 +179,7 @@ function DeviceSettings() {
                   deviceState.changeUiLanguage(value)
                   i18n.activate(value)
                 }}
-                selectedValue={deviceState.uiLanguage}
+                selectedValue={deviceState.uiLanguage ?? 'en'}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />

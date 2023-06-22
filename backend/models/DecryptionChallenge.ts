@@ -131,7 +131,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       device = await ctx.prisma.device.create({
         data: {
           id: deviceId,
-          syncTOTP: user.defaultDeviceSyncTOTP,
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,

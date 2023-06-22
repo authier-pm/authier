@@ -36,6 +36,7 @@ import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
+import { DefaultSettingsGQL } from './generated/DefaultSettingsGQL'
 const log = debug('au:userMutation')
 
 @ObjectType()
@@ -63,6 +64,15 @@ export class UserMutation extends UserBase {
       where: {
         userId: this.id,
         id
+      }
+    })
+  }
+
+  @Field(() => DefaultSettingsGQL)
+  async defaultSettings(@Ctx() ctx: IContext) {
+    return ctx.prisma.defaultSettings.findFirst({
+      where: {
+        userId: this.id
       }
     })
   }
