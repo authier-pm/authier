@@ -14,7 +14,7 @@ import { SettingsSubmitButton } from '@src/components/vault/settings/Account'
 import { useUpdateDefaultSettingsMutation } from '@shared/graphql/DefaultSettings.codegen'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 
-const VaultConfigFormSchema = z.object({
+export const DefaultsFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
     t`Lock time // Choose lock time`
   ),
@@ -25,6 +25,28 @@ const VaultConfigFormSchema = z.object({
   theme: selectTextFieldSchema.describe(t`Theme // Choose theme`)
 })
 
+export const defaultsFormProps = {
+  uiLanguage: {
+    options: ['cs', 'en']
+  },
+  vaultLockTimeoutSeconds: {
+    options: [
+      { label: t`1 minute`, value: 60 },
+      { label: t`2 minutes`, value: 120 },
+      { label: t`1 hour`, value: 3600 },
+      { label: t`4 hours`, value: 14400 },
+      { label: t`8 hours`, value: 28800 },
+      { label: t`1 day`, value: 86400 },
+      { label: t`1 week`, value: 604800 },
+      { label: t`1 month`, value: 2592000 },
+      { label: t`Never`, value: 0 }
+    ]
+  },
+  theme: {
+    options: [t`Light`, t`Dark`]
+  }
+}
+
 export default function DefaultSettings() {
   const { setSecuritySettings, deviceState, setFirstTimeUser } =
     useContext(DeviceStateContext)
@@ -32,7 +54,7 @@ export default function DefaultSettings() {
   const [updateSettings] = useUpdateSettingsMutation({})
 
   if (deviceState) {
-    const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
+    const form = useForm<z.infer<typeof DefaultsFormSchema>>({
       defaultValues: {
         autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
         autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
@@ -48,7 +70,7 @@ export default function DefaultSettings() {
       reset
     } = form
 
-    async function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
+    async function onSubmit(data: z.infer<typeof DefaultsFormSchema>) {
       await updateSettings({
         variables: {
           config: {
@@ -107,28 +129,8 @@ export default function DefaultSettings() {
         >
           <Form
             form={form}
-            props={{
-              uiLanguage: {
-                options: ['cs', 'en']
-              },
-              vaultLockTimeoutSeconds: {
-                options: [
-                  { label: t`1 minute`, value: 60 },
-                  { label: t`2 minutes`, value: 120 },
-                  { label: t`1 hour`, value: 3600 },
-                  { label: t`4 hours`, value: 14400 },
-                  { label: t`8 hours`, value: 28800 },
-                  { label: t`1 day`, value: 86400 },
-                  { label: t`1 week`, value: 604800 },
-                  { label: t`1 month`, value: 2592000 },
-                  { label: t`Never`, value: 0 }
-                ]
-              },
-              theme: {
-                options: [t`Light`, t`Dark`]
-              }
-            }}
-            schema={VaultConfigFormSchema}
+            props={defaultsFormProps}
+            schema={DefaultsFormSchema}
             onSubmit={onSubmit}
             formProps={{
               submitButton: (
