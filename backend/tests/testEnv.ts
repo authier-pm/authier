@@ -11,7 +11,7 @@ beforeAll(() => {
   const fakeMailjetPost = {
     request: vi.fn()
   }
-  console.log('mocked mailjet post')
+  log('mocked mailjet post')
   // we don't want to send anything from tests.
   vi.mock('node-mailjet', () => ({
     default: {

@@ -110,7 +110,7 @@ jobs:
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@v1
-        if: steps.changes.outputs.backend == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
@@ -118,7 +118,7 @@ jobs:
 
       - name: backend build and deploy
         working-directory: ./backend
-        if: steps.changes.outputs.backend == 'true'
+        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
         run: |
@@ -142,13 +142,6 @@ jobs:
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           pnpm tsc
-
-      - name: web-extension build
-        working-directory: ./web-extension
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
-          pnpm prodBuild
 
       # - name: Install Playwright Browsers & Run Playwright tests with backend
       #   if: steps.changes.outputs.backend == 'true'
