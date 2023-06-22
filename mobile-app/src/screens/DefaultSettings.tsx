@@ -4,33 +4,41 @@ import {
   Select,
   useColorModeValue,
   VStack,
-  useColorMode,
   HStack,
   Switch,
   Divider,
   Heading,
-  ScrollView,
   Text,
-  Button
+  Button,
+  useColorMode
 } from 'native-base'
 
-import { Trans } from '@lingui/macro'
-import { i18n } from '@lingui/core'
+import { Trans, t } from '@lingui/macro'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import React from 'react'
+import { useUpdateDefaultSettingsMutation } from '../../../shared/graphql/DefaultSettings.codegen'
+import { i18n } from '@lingui/core'
 
 export default function DefaultSettings() {
-  const device = useDeviceStore((state) => state)
-  const deviceState = useDeviceStateStore((state) => state)
+  // const device = useDeviceStore((state) => state)
+  // const deviceState = useDeviceStateStore((state) => state)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const bgColor = useColorModeValue('white', 'rgb(1, 1, 1)')
-  const { toggleColorMode, colorMode } = useColorMode()
+  const { toggleColorMode } = useColorMode()
+  const [updateDefaultSettings, { loading }] =
+    useUpdateDefaultSettingsMutation()
 
-  const [form, setForm] = React.useState({})
+  const [form, setForm] = React.useState({
+    vaultLockTimeoutSeconds: '28800',
+    uiLanguage: 'en',
+    theme: 'dark',
+    syncTOTP: true,
+    autofillCredentialsEnabled: true,
+    autofillTOTPEnabled: true
+  })
 
-  console.log('deviceState', colorMode)
   return (
     <Center h={'100%'} bg={bgColor}>
       <Heading size="md" mb={5}>
@@ -51,9 +59,10 @@ export default function DefaultSettings() {
                 <AuthierSelect
                   variant="rounded"
                   onValueChange={(value) => {
-                    device.setLockTime(parseInt(value, 10))
+                    // device.setLockTime(parseInt(value, 10))
+                    setForm({ ...form, vaultLockTimeoutSeconds: value })
                   }}
-                  selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
+                  selectedValue={form.vaultLockTimeoutSeconds}
                   accessibilityLabel="Lock time"
                 >
                   <Select.Item label="1 minute" value="20" />
@@ -77,9 +86,9 @@ export default function DefaultSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>2FA</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form.syncTOTP}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({ ...form, syncTOTP: e })
                 }}
                 size="md"
               />
@@ -87,9 +96,9 @@ export default function DefaultSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>Credentials autofill</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form.autofillCredentialsEnabled}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({ ...form, autofillCredentialsEnabled: e })
                 }}
                 size="md"
               />
@@ -97,9 +106,9 @@ export default function DefaultSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>TOTP autofill</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form.autofillTOTPEnabled}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({ ...form, autofillTOTPEnabled: e })
                 }}
                 size="md"
               />
@@ -116,10 +125,10 @@ export default function DefaultSettings() {
           <Box p={2} rounded="xl">
             <AuthierSelect
               onValueChange={(value) => {
-                deviceState.changeUiLanguage(value)
+                setForm({ ...form, uiLanguage: value })
                 i18n.activate(value)
               }}
-              defaultValue={deviceState.uiLanguage}
+              defaultValue={form.uiLanguage}
               accessibilityLabel="language"
             >
               <Select.Item label="English" value="en" />
@@ -137,24 +146,46 @@ export default function DefaultSettings() {
             <AuthierSelect
               onValueChange={(value) => {
                 toggleColorMode()
-                deviceState.changeTheme(value)
+                setForm({ ...form, theme: value })
               }}
-              defaultValue={deviceState.theme}
+              defaultValue={form.theme}
               accessibilityLabel="theme"
             >
-              <Select.Item label="light" value="light" />
-              <Select.Item label="dark" value="dark" />
+              <Select.Item label={t`light`} value="light" />
+              <Select.Item label={t`dark`} value="dark" />
             </AuthierSelect>
           </Box>
         </VStack>
       </VStack>
       <Button
+        isLoading={loading}
         onPress={() => {
-          console.log('test')
+          const formData = {
+            uiLanguage: form.uiLanguage,
+            autofillCredentialsEnabled: form.autofillCredentialsEnabled,
+            syncTOTP: form.syncTOTP,
+            autofillTOTPEnabled: form.autofillTOTPEnabled,
+            vaultLockTimeoutSeconds: parseInt(form.vaultLockTimeoutSeconds, 10),
+            theme: form.theme
+          }
+          updateDefaultSettings({
+            variables: {
+              config: {
+                ...formData
+              }
+            }
+          })
+
+          useDeviceStateStore.setState({
+            ...formData,
+            firstTimeUser: false,
+            lockTimeEnd:
+              Date.now() + parseInt(form.vaultLockTimeoutSeconds, 10) * 1000
+          })
         }}
         mt={3}
       >
-        Save default settings
+        <Trans>Save default settings</Trans>
       </Button>
     </Center>
   )

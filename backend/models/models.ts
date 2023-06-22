@@ -91,6 +91,27 @@ export class SettingsInput {
 }
 
 @InputType()
+export class DefaultSettingsInput {
+  @Field(() => Boolean)
+  syncTOTP: boolean
+
+  @Field(() => Int)
+  vaultLockTimeoutSeconds: number
+
+  @Field(() => Boolean)
+  autofillCredentialsEnabled: boolean
+
+  @Field(() => Boolean)
+  autofillTOTPEnabled: boolean
+
+  @Field(() => String)
+  uiLanguage: string
+
+  @Field(() => String)
+  theme: string
+}
+
+@InputType()
 export class EncryptedSecretPatchInput extends EncryptedSecretInput {
   @Field(() => GraphQLUUID)
   id: string

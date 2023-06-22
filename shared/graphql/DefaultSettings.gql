@@ -1,0 +1,21 @@
+mutation updateDefaultSettings($config: DefaultSettingsInput!) {
+  me {
+    updateDefaultSettings(config: $config) {
+      id
+    }
+  }
+}
+
+query syncDefaultSettings {
+  me {
+    id
+    DefaultSettings {
+      autofillTOTPEnabled
+      autofillCredentialsEnabled
+      uiLanguage
+      deviceTheme
+      deviceSyncTOTP
+      vaultLockTimeoutSeconds
+    }
+  }
+}

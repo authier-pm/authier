@@ -3,9 +3,6 @@ query SyncSettings {
     loginCredentialsLimit
     TOTPlimit
     id
-    # autofillCredentialsEnabled
-    # autofillTOTPEnabled
-    # uiLanguage
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
   }
@@ -13,6 +10,9 @@ query SyncSettings {
     id
     syncTOTP
     vaultLockTimeoutSeconds
+    autofillCredentialsEnabled
+    autofillTOTPEnabled
+    uiLanguage
   }
 }
 

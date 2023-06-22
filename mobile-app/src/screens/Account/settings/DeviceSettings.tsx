@@ -176,7 +176,7 @@ function DeviceSettings() {
                   deviceState.changeUiLanguage(value)
                   i18n.activate(value)
                 }}
-                defaultValue={deviceState.uiLanguage}
+                selectedValue={deviceState.uiLanguage}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
@@ -196,7 +196,7 @@ function DeviceSettings() {
                   toggleColorMode()
                   deviceState.changeTheme(value)
                 }}
-                defaultValue={deviceState.theme}
+                selectedValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
                 <Select.Item label="light" value="light" />

@@ -228,16 +228,19 @@ export const useDeviceStore = create<Device>()(
             fetchPolicy: 'network-only'
           })
 
+          const queryData = query.data
+
           const config = {
-            // autofillTOTPEnabled: false,
-            // autofillCredentialsEnabled: false,
-            // syncTOTP: false,
-            vaultLockTimeoutSeconds: query.data.currentDevice
-              .vaultLockTimeoutSeconds as number,
-            // uiLanguage: 'en',
-            notificationOnVaultUnlock: query.data.me.notificationOnVaultUnlock,
+            autofillTOTPEnabled: queryData.currentDevice.autofillTOTPEnabled,
+            autofillCredentialsEnabled:
+              queryData.currentDevice.autofillCredentialsEnabled,
+            syncTOTP: queryData.currentDevice.syncTOTP,
+            vaultLockTimeoutSeconds:
+              queryData.currentDevice.vaultLockTimeoutSeconds,
+            uiLanguage: queryData.currentDevice.uiLanguage,
+            notificationOnVaultUnlock: queryData.me.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
-              query.data.me.notificationOnWrongPasswordAttempts
+              queryData.me.notificationOnWrongPasswordAttempts
           }
 
           //HACK: this is a hack, we should not create a new interval every time we save the state

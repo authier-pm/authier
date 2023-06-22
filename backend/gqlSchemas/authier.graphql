@@ -419,7 +419,7 @@ type UserMutation {
   ): [EncryptedSecretQuery!]!
   updateFireToken(firebaseToken: String!): DeviceGQL!
   updateSettings(config: SettingsInput!): UserGQL!
-  updateDefaultSettings(config: SettingsInput!): UserGQL!
+  updateDefaultSettings(config: DefaultSettingsInput!): UserGQL!
   sendEmailVerification(isMobile: Boolean): NonNegativeInt!
   revokeRefreshTokensForUser: UserGQL!
   changeMasterPassword(input: ChangeMasterPasswordInput!): Int!
@@ -535,6 +535,15 @@ input SettingsInput {
   uiLanguage: String!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
+}
+
+input DefaultSettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  theme: String!
 }
 
 """

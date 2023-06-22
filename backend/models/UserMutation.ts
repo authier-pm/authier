@@ -4,7 +4,11 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput, SettingsInput } from './models'
+import {
+  DefaultSettingsInput,
+  EncryptedSecretInput,
+  SettingsInput
+} from './models'
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
@@ -246,19 +250,28 @@ export class UserMutation extends UserBase {
 
   @Field(() => UserGQL)
   async updateDefaultSettings(
-    @Arg('config', () => SettingsInput) config: SettingsInput,
+    @Arg('config', () => DefaultSettingsInput) config: DefaultSettingsInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
-    return await ctx.prisma.defaultSettings.update({
+    const data = {
+      autofillTOTPEnabled: config.autofillTOTPEnabled,
+      uiLanguage: config.uiLanguage,
+      deviceSyncTOTP: config.syncTOTP,
+      vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+      autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+      deviceTheme: config.theme
+    }
+
+    return await ctx.prisma.defaultSettings.upsert({
       where: {
         userId: this.id
       },
-      data: {
-        autofillTOTPEnabled: config.autofillTOTPEnabled,
-        uiLanguage: config.uiLanguage,
-        deviceSyncTOTP: config.syncTOTP,
-        vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-        autofillCredentialsEnabled: config.autofillCredentialsEnabled
+      create: {
+        ...data,
+        userId: this.id
+      },
+      update: {
+        ...data
       }
     })
   }

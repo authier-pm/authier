@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string | number; output: string; }
+  ID: { input: string; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -138,6 +138,15 @@ export type DefaultSettingsGql = {
   user: UserGql;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
+export type DefaultSettingsInput = {
+  autofillCredentialsEnabled: Scalars['Boolean']['input'];
+  autofillTOTPEnabled: Scalars['Boolean']['input'];
+  syncTOTP: Scalars['Boolean']['input'];
+  theme: Scalars['String']['input'];
+  uiLanguage: Scalars['String']['input'];
+  vaultLockTimeoutSeconds: Scalars['Int']['input'];
 };
 
 export type DeviceGql = {
@@ -640,7 +649,7 @@ export type UserMutationSetMasterDeviceArgs = {
 
 
 export type UserMutationUpdateDefaultSettingsArgs = {
-  config: SettingsInput;
+  config: DefaultSettingsInput;
 };
 
 

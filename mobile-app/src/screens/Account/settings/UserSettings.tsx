@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import {
   Center,
@@ -25,20 +25,75 @@ import { useNavigation } from '@react-navigation/native'
 import { AccountStackScreenProps } from '@src/navigation/types'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import AuthierSelect from '@src/components/AuthierSelect'
-import { i18n } from '@lingui/core'
+import {
+  useSyncDefaultSettingsQuery,
+  useUpdateDefaultSettingsMutation
+} from '@shared/graphql/DefaultSettings.codegen'
+import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
+import { Loading } from '@src/components/Loading'
 
 function UserSettings() {
-  let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
-  const [deleteAccount] = useDeleteAccountMutation()
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
-  const [isOpen, setIsOpen] = React.useState(
+  let deviceState = useDeviceStateStore((state) => state)
+  let device = useDeviceStore((state) => state)
+
+  const [deleteAccount] = useDeleteAccountMutation()
+  const { data, loading } = useSyncDefaultSettingsQuery({
+    fetchPolicy: 'network-only'
+  })
+  const [updateDefaultSettings] = useUpdateDefaultSettingsMutation()
+  const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
-  const { toggleColorMode } = useColorMode()
-
+  //WARNING: Why does it return an array?
+  const [form, setForm] = useState<DefaultSettingsInput | null>(null)
+  const [previousSettings, setPreviousSettings] =
+    useState<DefaultSettingsInput | null>(null)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+
+  React.useEffect(() => {
+    if (data && !form) {
+      const defaultData = data?.me.DefaultSettings[0]
+      setForm({
+        vaultLockTimeoutSeconds: defaultData?.vaultLockTimeoutSeconds,
+        uiLanguage: defaultData?.uiLanguage,
+        theme: defaultData?.deviceTheme,
+        syncTOTP: defaultData?.deviceSyncTOTP,
+        autofillCredentialsEnabled: defaultData?.autofillCredentialsEnabled,
+        autofillTOTPEnabled: defaultData?.autofillTOTPEnabled
+      })
+    }
+
+    if (!previousSettings && data) {
+      setPreviousSettings(form)
+      return
+    }
+
+    const settingsChanged =
+      JSON.stringify(previousSettings) !== JSON.stringify(form)
+
+    if (settingsChanged && form) {
+      updateDefaultSettings({
+        variables: {
+          config: {
+            uiLanguage: form?.uiLanguage,
+            theme: form.theme,
+            vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
+            autofillTOTPEnabled: form.autofillTOTPEnabled,
+            autofillCredentialsEnabled: form.autofillCredentialsEnabled,
+            syncTOTP: form.syncTOTP
+          }
+        }
+      })
+    }
+
+    setPreviousSettings(form)
+  }, [deviceState, data, loading, form])
+
+  if (loading) {
+    return <Loading />
+  }
 
   return (
     <ScrollView mt={5}>
@@ -118,9 +173,12 @@ function UserSettings() {
             <AuthierSelect
               variant="rounded"
               onValueChange={(value) => {
-                device.setLockTime(parseInt(value, 10))
+                setForm({
+                  ...(form as DefaultSettingsInput),
+                  vaultLockTimeoutSeconds: parseInt(value)
+                })
               }}
-              selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
+              selectedValue={form?.vaultLockTimeoutSeconds.toString()}
               accessibilityLabel="Lock time"
             >
               <Select.Item label="1 minute" value="20" />
@@ -142,9 +200,9 @@ function UserSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>2FA</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form?.syncTOTP}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({ ...(form as DefaultSettingsInput), syncTOTP: e })
                 }}
                 size="md"
               />
@@ -152,9 +210,12 @@ function UserSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>Credentials autofill</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form?.autofillCredentialsEnabled}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({
+                    ...(form as DefaultSettingsInput),
+                    autofillCredentialsEnabled: e
+                  })
                 }}
                 size="md"
               />
@@ -162,30 +223,37 @@ function UserSettings() {
             <HStack justifyContent="space-between" alignContent="center" p={2}>
               <Text>TOTP autofill</Text>
               <Switch
-                value={deviceState.syncTOTP}
+                value={form?.autofillTOTPEnabled}
                 onToggle={async (e) => {
-                  deviceState.changeSyncTOTP(e)
+                  setForm({
+                    ...(form as DefaultSettingsInput),
+                    autofillTOTPEnabled: e
+                  })
                 }}
                 size="md"
               />
             </HStack>
             <AuthierSelect
-              onValueChange={(value) => {
-                deviceState.changeUiLanguage(value)
-                i18n.activate(value)
+              onValueChange={(uiLanguage) => {
+                setForm({
+                  ...(form as DefaultSettingsInput),
+                  uiLanguage
+                })
               }}
-              defaultValue={deviceState.uiLanguage}
+              selectedValue={form?.uiLanguage}
               accessibilityLabel="language"
             >
               <Select.Item label="English" value="en" />
               <Select.Item label="Čeština" value="cs" />
             </AuthierSelect>
             <AuthierSelect
-              onValueChange={(value) => {
-                toggleColorMode()
-                deviceState.changeTheme(value)
+              onValueChange={(theme) => {
+                setForm({
+                  ...(form as DefaultSettingsInput),
+                  theme
+                })
               }}
-              defaultValue={deviceState.theme}
+              selectedValue={form?.theme}
               accessibilityLabel="theme"
             >
               <Select.Item label="light" value="light" />

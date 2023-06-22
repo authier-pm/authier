@@ -25,6 +25,7 @@ const colorModeManager: StorageManager = {
   get: async () => {
     try {
       let val = useDeviceStateStore.getState().theme
+      console.log('colorModeManager get', val)
       if (val === null) {
         return 'dark'
       }
@@ -53,7 +54,7 @@ export const Providers = () => {
   }, [])
 
   return (
-    <NativeBaseProvider theme={theme}>
+    <NativeBaseProvider colorModeManager={colorModeManager} theme={theme}>
       <ApolloProvider client={apolloClient}>
         <SafeAreaProvider>
           <I18nProvider i18n={i18n} defaultComponent={Text}>
