@@ -11,7 +11,6 @@ import { QRCode } from '@src/pages/QRcode'
 
 import Devices from '@src/pages/Devices'
 
-import { AboutPage } from '@src/pages/AboutPage'
 import debug from 'debug'
 const log = debug('au:Popup')
 
@@ -35,7 +34,6 @@ export const Popup: FunctionComponent = () => {
         <Route path="/popup.html" component={Home} />
         <Route path="/qr-code" component={QRCode} />
         <Route path="/devices" component={Devices} />
-        <Route path="/about" component={AboutPage} />
       </Switch>
     </>
   )

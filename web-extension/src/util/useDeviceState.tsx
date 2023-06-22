@@ -77,6 +77,7 @@ export function useDeviceState() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
+  const [isInitialized, setIsInitialized] = useState<boolean>(false)
   const [tableView, setTableView] = useState<boolean>(false)
   const [selectedItems, setSelectedItems] = useState<
     (ILoginSecret | ITOTPSecret)[]
@@ -111,6 +112,7 @@ export function useDeviceState() {
       if (device.lockedState) {
         setLockedState(device.lockedState)
       }
+      setIsInitialized(true)
     })
     if (storageOnchangeListenerRegistered) {
       return
@@ -188,7 +190,8 @@ export function useDeviceState() {
     setTableView,
     tableView,
     selectedItems,
-    setSelectedItems
+    setSelectedItems,
+    isInitialized
   }
 
   window['backgroundState'] = backgroundStateContext

@@ -16,6 +16,7 @@ import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTyp
 import { ITOTPSecret } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
+import { TbPhoto } from 'react-icons/tb'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
@@ -67,6 +68,7 @@ export const AddTOTPSecretButton = () => {
 
   return (
     <Button
+      leftIcon={<TbPhoto></TbPhoto>}
       className="btn btn-block btn-outline-dark"
       onClick={async () => {
         const src = await browser.tabs.captureVisibleTab()
@@ -82,7 +84,7 @@ export const AddTOTPSecretButton = () => {
         }
       }}
     >
-      <Trans>Add QR TOTP</Trans>
+      <Trans>Add QR TOTP from current page</Trans>
     </Button>
   )
 }
@@ -97,8 +99,11 @@ export async function getTokenSecretFromQrCode(
     console.error('QR code does not have any secret', qr.data)
     throw new Error('QR code does not have any secret')
   }
+  if (!device.state) {
+    throw new Error('device not initialized')
+  }
 
-  const encrypted = await device.state!.encrypt(secret)
+  const encrypted = await device.state.encrypt(secret)
 
   return {
     id: uuidv4(),

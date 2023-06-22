@@ -17,6 +17,7 @@ import { AnimatePresence } from 'framer-motion'
 import Security from '@src/components/vault/settings/Security'
 import Account from '@src/components/vault/settings/Account'
 import Defaults from '@src/components/vault/settings/Defaults'
+import { AboutPage } from './AboutPage'
 
 interface LinkItemProps {
   name: string
@@ -97,6 +98,7 @@ export const VaultSettings = () => {
           <Route path={'/account'} element={<Account />}></Route>
           <Route path={'/security'} element={<Security />}></Route>
           <Route path={'/defaults'} element={<Defaults />}></Route>
+          <Route path={'/about'} element={<AboutPage />}></Route>
         </Routes>
       </AnimatePresence>
     </Flex>
