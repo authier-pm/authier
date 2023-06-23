@@ -1,15 +1,24 @@
-mutation updateDefaultSettings($config: DefaultSettingsInput!) {
+mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
   me {
-    updateDefaultSettings(config: $config) {
+    defaultDeviceSettings {
       id
+      update(config: $config) {
+        id
+        autofillTOTPEnabled
+        autofillCredentialsEnabled
+        uiLanguage
+        deviceTheme
+        deviceSyncTOTP
+        vaultLockTimeoutSeconds
+      }
     }
   }
 }
 
-query syncDefaultSettings {
+query defaultSettings {
   me {
     id
-    DefaultSettings {
+    defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
       uiLanguage

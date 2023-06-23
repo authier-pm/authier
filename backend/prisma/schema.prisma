@@ -1,8 +1,8 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl         = env("DIRECT_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -59,11 +59,10 @@ model Device {
   ipAddressLock              Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   logoutAt                   DateTime?
   // Device settings
-  syncTOTP                   Boolean? // sync2FA
-  vaultLockTimeoutSeconds    Int? // 8 hours
-  uiLanguage                 String?
-  autofillCredentialsEnabled Boolean?
-  autofillTOTPEnabled        Boolean?
+  syncTOTP                   Boolean // sync2FA
+  vaultLockTimeoutSeconds    Int // 8 hours
+  autofillCredentialsEnabled Boolean
+  autofillTOTPEnabled        Boolean
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -176,20 +175,22 @@ model WebInput {
 }
 
 model User {
-  id                            String               @id @default(uuid()) @db.Uuid
-  email                         String?              @unique @db.Citext
-  tokenVersion                  Int                  @default(0)
-  username                      String?              @unique
+  id                       String    @id @default(uuid()) @db.Uuid
+  email                    String?   @unique @db.Citext
+  tokenVersion             Int       @default(0)
+  username                 String?   @unique
   // @skip
-  addDeviceSecret               String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted      String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
+  addDeviceSecret          String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt                String //WARNING: in pure string
-  Token                         Token[]
-  createdAt                     DateTime             @default(now())
-  updatedAt                     DateTime?            @updatedAt
-  masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
-  masterDeviceId                String?              @unique
+  encryptionSalt           String //WARNING: in pure string
+  Token                    Token[]
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime? @updatedAt
+  masterDevice             Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
+  masterDeviceId           String?   @unique
+  uiLanguage               String    @default("en")
+
   // Limits for the number of stored secrets
   TOTPlimit                     Int // this is just override for the 
   loginCredentialsLimit         Int // 
@@ -202,32 +203,33 @@ model User {
   notificationOnVaultUnlock           Boolean @default(false)
   notificationOnWrongPasswordAttempts Int     @default(3)
 
-  UsageEvents          SecretUsageEvent[]
-  EncryptedSecrets     EncryptedSecret[]
-  Devices              Device[]              @relation("devices")
-  WebInputsAdded       WebInput[]
-  Tags                 Tag[]
-  UserPaidProducts     UserPaidProducts[]
-  DecryptionChallenges DecryptionChallenge[]
+  UsageEvents           SecretUsageEvent[]
+  EncryptedSecrets      EncryptedSecret[]
+  Devices               Device[]               @relation("devices")
+  WebInputsAdded        WebInput[]
+  Tags                  Tag[]
+  UserPaidProducts      UserPaidProducts[]
+  DecryptionChallenges  DecryptionChallenge[]
   // @skip
-  EmailVerification    EmailVerification[]
-  MasterDeviceChange   MasterDeviceChange[]
-  DefaultSettings      DefaultSettings[]
+  EmailVerification     EmailVerification[]
+  MasterDeviceChange    MasterDeviceChange[]
+  DefaultDeviceSettings DefaultDeviceSettings?
 }
 
-model DefaultSettings {
+model DefaultDeviceSettings {
   id                         Int       @id @default(autoincrement())
   createdAt                  DateTime  @default(now())
   updatedAt                  DateTime? @updatedAt
   autofillCredentialsEnabled Boolean   @default(true)
   autofillTOTPEnabled        Boolean   @default(true)
-  uiLanguage                 String    @default("en")
-  deviceTheme                String    @default("dark")
-  deviceSyncTOTP             Boolean   @default(true)
+  theme                      String    @default("dark")
+  syncTOTP                   Boolean   @default(true)
   vaultLockTimeoutSeconds    Int       @default(28800) // 8 hours
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique @db.Uuid
+
+  @@map("DefaultSettings")
 }
 
 model Token {

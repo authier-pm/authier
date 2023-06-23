@@ -261,7 +261,7 @@ const appRouter = tc.router({
     .input(z.object({ value: z.boolean() }))
     .mutation(() => {
       if (device.state) {
-        device.save({ ...device.state, firstTimeUser: false })
+        device.save({ ...device.state })
       }
       return true
     })

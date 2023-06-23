@@ -11,8 +11,9 @@ import {
   selectTextFieldSchema
 } from '@src/components/util/tsForm'
 import { SettingsSubmitButton } from '@src/components/vault/settings/Account'
-import { useUpdateDefaultSettingsMutation } from '@shared/graphql/DefaultSettings.codegen'
+import { useUpdateDefaultDeviceSettingsMutation } from '@shared/graphql/DefaultSettings.codegen'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 export const DefaultsFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
@@ -30,17 +31,7 @@ export const defaultsFormProps = {
     options: ['cs', 'en']
   },
   vaultLockTimeoutSeconds: {
-    options: [
-      { label: t`1 minute`, value: 60 },
-      { label: t`2 minutes`, value: 120 },
-      { label: t`1 hour`, value: 3600 },
-      { label: t`4 hours`, value: 14400 },
-      { label: t`8 hours`, value: 28800 },
-      { label: t`1 day`, value: 86400 },
-      { label: t`1 week`, value: 604800 },
-      { label: t`1 month`, value: 2592000 },
-      { label: t`Never`, value: 0 }
-    ]
+    options: vaultLockTimeoutOptions
   },
   theme: {
     options: [t`Light`, t`Dark`]
@@ -50,8 +41,8 @@ export const defaultsFormProps = {
 export default function DefaultSettings() {
   const { setSecuritySettings, deviceState, setFirstTimeUser } =
     useContext(DeviceStateContext)
-  const [updateDefaultSettings] = useUpdateDefaultSettingsMutation({})
-  const [updateSettings] = useUpdateSettingsMutation({})
+  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
+  const [updateSettings] = useUpdateSettingsMutation()
   const bgColor = useColorModeValue('white', 'gray.800')
 
   if (deviceState) {
@@ -72,19 +63,21 @@ export default function DefaultSettings() {
     } = form
 
     async function onSubmit(data: z.infer<typeof DefaultsFormSchema>) {
+      const config = {
+        syncTOTP: data.syncTOTP,
+        uiLanguage: data.uiLanguage,
+        vaultLockTimeoutSeconds: data.vaultLockTimeoutSeconds,
+        autofillCredentialsEnabled: data.autofillCredentialsEnabled,
+        autofillTOTPEnabled: data.autofillTOTPEnabled,
+        notificationOnWrongPasswordAttempts:
+          deviceState?.notificationOnWrongPasswordAttempts as number,
+        notificationOnVaultUnlock:
+          deviceState?.notificationOnVaultUnlock as boolean
+      }
+      console.log({ config })
       await updateSettings({
         variables: {
-          config: {
-            syncTOTP: data.syncTOTP,
-            uiLanguage: data.uiLanguage,
-            vaultLockTimeoutSeconds: data.vaultLockTimeoutSeconds,
-            autofillCredentialsEnabled: data.autofillCredentialsEnabled,
-            autofillTOTPEnabled: data.autofillTOTPEnabled,
-            notificationOnWrongPasswordAttempts:
-              deviceState?.notificationOnWrongPasswordAttempts as number,
-            notificationOnVaultUnlock:
-              deviceState?.notificationOnVaultUnlock as boolean
-          }
+          config: config
         }
       })
       await updateDefaultSettings({

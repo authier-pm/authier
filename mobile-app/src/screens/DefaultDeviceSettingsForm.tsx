@@ -17,23 +17,27 @@ import { Trans, t } from '@lingui/macro'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
-import React from 'react'
-import { useUpdateDefaultSettingsMutation } from '../../../shared/graphql/DefaultSettings.codegen'
+import React, { useState } from 'react'
+import {
+  useDefaultSettingsQuery,
+  useUpdateDefaultDeviceSettingsMutation
+} from '../../../shared/graphql/DefaultSettings.codegen'
 import { i18n } from '@lingui/core'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
-export default function DefaultSettings() {
-  // const device = useDeviceStore((state) => state)
+export function DefaultDeviceSettingsForm() {
   const deviceState = useDeviceStateStore((state) => state)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const bgColor = useColorModeValue('white', 'rgb(1, 1, 1)')
   const { toggleColorMode } = useColorMode()
   const [updateDefaultSettings, { loading }] =
-    useUpdateDefaultSettingsMutation()
+    useUpdateDefaultDeviceSettingsMutation()
   const [updateSettings] = useUpdateSettingsMutation()
+  const { data } = useDefaultSettingsQuery()
 
-  const [form, setForm] = React.useState({
-    vaultLockTimeoutSeconds: '28800',
+  const [form, setForm] = useState({
+    vaultLockTimeoutSeconds: 28800,
     uiLanguage: 'en',
     theme: 'dark',
     syncTOTP: true,
@@ -62,19 +66,18 @@ export default function DefaultSettings() {
                   variant="rounded"
                   onValueChange={(value) => {
                     // device.setLockTime(parseInt(value, 10))
-                    setForm({ ...form, vaultLockTimeoutSeconds: value })
+                    setForm({ ...form, vaultLockTimeoutSeconds: Number(value) })
                   }}
-                  selectedValue={form.vaultLockTimeoutSeconds}
+                  selectedValue={form.vaultLockTimeoutSeconds.toString()}
                   accessibilityLabel="Lock time"
                 >
-                  <Select.Item label="1 minute" value="20" />
-                  <Select.Item label="2 minutes" value="120" />
-                  <Select.Item label="1 hour" value="3600" />
-                  <Select.Item label="4 hours" value="14400" />
-                  <Select.Item label="8 hours" value="28800" />
-                  <Select.Item label="1 week" value="604800" />
-                  <Select.Item label="1 month" value="2592000" />
-                  <Select.Item label="never" value="0" />
+                  {vaultLockTimeoutOptions.map((option, index) => (
+                    <Select.Item
+                      label={option.label}
+                      value={option.value.toString()}
+                      key={index}
+                    />
+                  ))}
                 </AuthierSelect>
 
                 <Text>
@@ -167,17 +170,21 @@ export default function DefaultSettings() {
             autofillCredentialsEnabled: form.autofillCredentialsEnabled,
             syncTOTP: form.syncTOTP,
             autofillTOTPEnabled: form.autofillTOTPEnabled,
-            vaultLockTimeoutSeconds: parseInt(form.vaultLockTimeoutSeconds, 10)
+            vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds
           }
 
+          const config = {
+            ...(data?.me.defaultDeviceSettings ?? {}),
+            ...formData,
+            notificationOnWrongPasswordAttempts:
+              deviceState.notificationOnWrongPasswordAttempts,
+            notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock
+          }
+
+          console.log({ config })
           await updateSettings({
             variables: {
-              config: {
-                ...formData,
-                notificationOnWrongPasswordAttempts:
-                  deviceState.notificationOnWrongPasswordAttempts,
-                notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock
-              }
+              config
             }
           })
 
@@ -192,9 +199,7 @@ export default function DefaultSettings() {
 
           useDeviceStateStore.setState({
             ...formData,
-            firstTimeUser: false,
-            lockTimeEnd:
-              Date.now() + parseInt(form.vaultLockTimeoutSeconds, 10) * 1000
+            lockTimeEnd: Date.now() + form.vaultLockTimeoutSeconds * 1000
           })
         }}
         mt={3}

@@ -163,7 +163,6 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          useDeviceStateStore.setState({ firstTimeUser: false })
           if (device.biometricsAvailable && deviceState.biometricsEnabled) {
             try {
               await SInfo.setItem('psw', formState.password, {

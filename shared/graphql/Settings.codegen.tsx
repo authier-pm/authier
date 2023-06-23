@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', loginCredentialsLimit: number, TOTPlimit: number, id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean, uiLanguage: string } };
+export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', loginCredentialsLimit: number, TOTPlimit: number, id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP?: boolean | null, vaultLockTimeoutSeconds?: number | null, autofillCredentialsEnabled?: boolean | null, autofillTOTPEnabled?: boolean | null, uiLanguage?: string | null } };
 
 export type UpdateSettingsMutationVariables = Types.Exact<{
   config: Types.SettingsInput;

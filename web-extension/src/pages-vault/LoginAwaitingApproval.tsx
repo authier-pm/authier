@@ -180,7 +180,6 @@ export const useLogin = (props: { deviceName: string }) => {
 
           const deviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
-            firstTimeUser: false,
             userId: userId,
             secrets: EncryptedSecrets,
             email: formStateContext.email,

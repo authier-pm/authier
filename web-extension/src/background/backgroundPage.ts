@@ -38,7 +38,6 @@ export interface IBackgroundStateSerializableLocked {
   theme: string
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
-  firstTimeUser: boolean
 }
 
 export interface IBackgroundStateSerializable

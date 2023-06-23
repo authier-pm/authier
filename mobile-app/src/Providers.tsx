@@ -25,7 +25,7 @@ export const colorModeManager: StorageManager = {
   get: async () => {
     try {
       let val = useDeviceStateStore.getState().theme
-      console.log('colorModeManager get', val)
+
       if (val === null) {
         return 'dark'
       }

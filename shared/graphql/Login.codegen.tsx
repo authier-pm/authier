@@ -12,7 +12,7 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean, uiLanguage: string }, defaultSettings: { __typename?: 'DefaultSettingsGQL', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number } } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
+export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?: { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP?: boolean | null, vaultLockTimeoutSeconds?: number | null, autofillCredentialsEnabled?: boolean | null, autofillTOTPEnabled?: boolean | null, uiLanguage?: string | null }, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number } } } } | { __typename?: 'DecryptionChallengeForApproval' } | null };
 
 export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
   email: Types.Scalars['EmailAddress']['input'];
@@ -53,7 +53,7 @@ export const AddNewDeviceForUserDocument = gql`
             autofillTOTPEnabled
             uiLanguage
           }
-          defaultSettings {
+          defaultDeviceSettings {
             id
             autofillTOTPEnabled
             autofillCredentialsEnabled

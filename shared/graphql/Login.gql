@@ -33,7 +33,7 @@ mutation addNewDeviceForUser(
             autofillTOTPEnabled
             uiLanguage
           }
-          defaultSettings {
+          defaultDeviceSettings {
             id
             autofillTOTPEnabled
             autofillCredentialsEnabled

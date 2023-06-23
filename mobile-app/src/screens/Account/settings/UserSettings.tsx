@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Center,
@@ -26,11 +26,12 @@ import { AccountStackScreenProps } from '@src/navigation/types'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import AuthierSelect from '@src/components/AuthierSelect'
 import {
-  useSyncDefaultSettingsQuery,
-  useUpdateDefaultSettingsMutation
+  useDefaultSettingsQuery,
+  useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { Loading } from '@src/components/Loading'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 function UserSettings() {
   const navigation =
@@ -39,10 +40,8 @@ function UserSettings() {
   let device = useDeviceStore((state) => state)
 
   const [deleteAccount] = useDeleteAccountMutation()
-  const { data, loading } = useSyncDefaultSettingsQuery({
-    fetchPolicy: 'network-only'
-  })
-  const [updateDefaultSettings] = useUpdateDefaultSettingsMutation()
+  const { data, loading } = useDefaultSettingsQuery()
+  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
@@ -52,9 +51,9 @@ function UserSettings() {
     useState<DefaultSettingsInput | null>(null)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (data && !form) {
-      const defaultData = data?.me.DefaultSettings[0]
+      const defaultData = data?.me.defaultDeviceSettings
       setForm({
         vaultLockTimeoutSeconds: defaultData?.vaultLockTimeoutSeconds,
         uiLanguage: defaultData?.uiLanguage,
@@ -74,22 +73,24 @@ function UserSettings() {
       JSON.stringify(previousSettings) !== JSON.stringify(form)
 
     if (settingsChanged && form) {
+      const config = {
+        uiLanguage: form?.uiLanguage,
+        theme: form.theme,
+        vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
+        autofillTOTPEnabled: form.autofillTOTPEnabled,
+        autofillCredentialsEnabled: form.autofillCredentialsEnabled,
+        syncTOTP: form.syncTOTP
+      }
+      console.log('config:', config)
       updateDefaultSettings({
         variables: {
-          config: {
-            uiLanguage: form?.uiLanguage,
-            theme: form.theme,
-            vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
-            autofillTOTPEnabled: form.autofillTOTPEnabled,
-            autofillCredentialsEnabled: form.autofillCredentialsEnabled,
-            syncTOTP: form.syncTOTP
-          }
+          config
         }
       })
     }
 
     setPreviousSettings(form)
-  }, [deviceState, data, loading, form])
+  }, [data, loading, form])
 
   if (loading) {
     return <Loading />
@@ -178,17 +179,18 @@ function UserSettings() {
                   vaultLockTimeoutSeconds: parseInt(value)
                 })
               }}
-              selectedValue={form?.vaultLockTimeoutSeconds.toString()}
+              selectedValue={(
+                form?.vaultLockTimeoutSeconds ?? 28800
+              ).toString()}
               accessibilityLabel="Lock time"
             >
-              <Select.Item label="1 minute" value="20" />
-              <Select.Item label="2 minutes" value="120" />
-              <Select.Item label="1 hour" value="3600" />
-              <Select.Item label="4 hours" value="14400" />
-              <Select.Item label="8 hours" value="28800" />
-              <Select.Item label="1 week" value="604800" />
-              <Select.Item label="1 month" value="2592000" />
-              <Select.Item label="never" value="0" />
+              {vaultLockTimeoutOptions.map((option, index) => (
+                <Select.Item
+                  label={option.label}
+                  value={option.value.toString()}
+                  key={index}
+                />
+              ))}
             </AuthierSelect>
             <Text>
               <Trans>

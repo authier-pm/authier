@@ -8,7 +8,7 @@ export type DeviceInfoQueryVariables = Types.Exact<{
 }>;
 
 
-export type DeviceInfoQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, device: { __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+export type DeviceInfoQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, device: { __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP?: boolean | null, vaultLockTimeoutSeconds?: number | null } } };
 
 
 export const DeviceInfoDocument = gql`

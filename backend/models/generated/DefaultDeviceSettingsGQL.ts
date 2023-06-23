@@ -2,7 +2,7 @@ import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
 import { UserGQL } from './UserGQL'
 
 @ObjectType()
-export class DefaultSettingsGQLScalars {
+export class DefaultDeviceSettingsGQLScalars {
   @Field(() => Int)
   id: number
 
@@ -19,13 +19,10 @@ export class DefaultSettingsGQLScalars {
   autofillTOTPEnabled: boolean
 
   @Field()
-  uiLanguage: string
+  theme: string
 
   @Field()
-  deviceTheme: string
-
-  @Field()
-  deviceSyncTOTP: boolean
+  syncTOTP: boolean
 
   @Field(() => Int)
   vaultLockTimeoutSeconds: number
@@ -35,7 +32,7 @@ export class DefaultSettingsGQLScalars {
 }
 
 @ObjectType()
-export class DefaultSettingsGQL extends DefaultSettingsGQLScalars {
+export class DefaultDeviceSettingsGQL extends DefaultDeviceSettingsGQLScalars {
   @Field(() => UserGQL)
   user: UserGQL
 

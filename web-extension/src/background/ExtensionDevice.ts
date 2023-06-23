@@ -125,7 +125,6 @@ export class DeviceState implements IBackgroundStateSerializable {
   authSecretEncrypted: string
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
-  firstTimeUser: boolean
 
   onStorageChange(
     changes: Record<string, browser.Storage.StorageChange>,
@@ -624,8 +623,7 @@ class ExtensionDevice {
       authSecret,
       authSecretEncrypted,
       notificationOnWrongPasswordAttempts,
-      notificationOnVaultUnlock,
-      firstTimeUser
+      notificationOnVaultUnlock
     } = this.state
 
     this.lockedState = {
@@ -643,8 +641,7 @@ class ExtensionDevice {
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
       uiLanguage,
-      theme,
-      firstTimeUser
+      theme
     }
     await browser.storage.local.set({
       lockedState: this.lockedState,

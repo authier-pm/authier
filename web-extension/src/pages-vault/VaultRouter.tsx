@@ -17,7 +17,6 @@ import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
-import DefaultSettings from './DefaultSettings'
 
 const log = debug('au:VaultRouter')
 
@@ -51,10 +50,6 @@ export function VaultRouter() {
         </Routes>
       </Center>
     )
-  }
-
-  if (deviceState.firstTimeUser) {
-    return <DefaultSettings />
   }
 
   return (
