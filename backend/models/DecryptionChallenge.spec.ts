@@ -17,6 +17,7 @@ import {
 } from './DecryptionChallenge'
 import { User } from '.prisma/client'
 import { beforeAll, describe, expect, it } from 'vitest'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -155,7 +156,8 @@ describe('DecryptionChallenge', () => {
           firstIpAddress: faker.internet.ip(),
           lastIpAddress: faker.internet.ip(),
           platform: faker.lorem.word(),
-          userId
+          userId,
+          ...defaultDeviceSettingSystemValues
         }
       })
 

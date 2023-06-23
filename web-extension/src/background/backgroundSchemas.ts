@@ -86,8 +86,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
   theme: z.string(),
   masterEncryptionKey: z.string(),
   notificationOnVaultUnlock: z.boolean(),
-  notificationOnWrongPasswordAttempts: z.number(),
-  firstTimeUser: z.boolean()
+  notificationOnWrongPasswordAttempts: z.number()
 })
 
 export const payloadSchema = z.union([

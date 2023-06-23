@@ -237,7 +237,7 @@ export const useDeviceStore = create<Device>()(
             syncTOTP: queryData.currentDevice.syncTOTP,
             vaultLockTimeoutSeconds:
               queryData.currentDevice.vaultLockTimeoutSeconds,
-            uiLanguage: queryData.currentDevice.uiLanguage,
+            uiLanguage: queryData.me.uiLanguage,
             notificationOnVaultUnlock: queryData.me.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
               queryData.me.notificationOnWrongPasswordAttempts

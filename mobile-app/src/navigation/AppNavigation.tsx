@@ -1,4 +1,4 @@
-import * as React from 'react'
+import { useEffect, useState } from 'react'
 
 import messaging from '@react-native-firebase/messaging'
 import DeviceStackNavigation from './DeviceStackNavigation'
@@ -14,12 +14,12 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { Text, useToast } from 'native-base'
+import { FormControl, Modal, Text, useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
-import DefaultSettings from '@src/screens/DefaultSettings'
+import { DefaultDeviceSettingsModal } from '@src/screens/DefaultDeviceSettingsModal'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
@@ -27,18 +27,13 @@ function AppNavigation() {
   const [updateDeviceSettings] = useDeviceStore((state) => [
     state.updateDeviceSettings
   ])
-  const [notifications, backendSync, setNotifications, firstTimeUser] =
-    useDeviceStateStore((state) => [
-      state.notifications,
-      state.backendSync,
-      state.setNotifications,
-      state.firstTimeUser
-    ])
-
+  const [notifications, backendSync, setNotifications] = useDeviceStateStore(
+    (state) => [state.notifications, state.backendSync, state.setNotifications]
+  )
   const navigation = useNavigation()
   const toast = useToast()
 
-  React.useEffect(() => {
+  useEffect(() => {
     // Assume a message-notification contains a "type" property in the data payload of the screen to open
     messaging().onNotificationOpenedApp((remoteMessage) => {
       console.log(
@@ -76,67 +71,68 @@ function AppNavigation() {
     return unsubscribe
   }, [])
 
-  if (firstTimeUser) {
-    return <DefaultSettings />
-  }
-
   return (
-    <RootStack.Navigator
-      initialRouteName={'Passwords'}
-      screenOptions={({ route }) => ({
-        // eslint-disable-next-line react/no-unstable-nested-components
-        tabBarIcon: ({ focused, color, size }) => {
-          // Make this questionMark or something
-          let iconName = 'key'
+    <>
+      <RootStack.Navigator
+        initialRouteName={'Passwords'}
+        screenOptions={({ route }) => ({
+          // eslint-disable-next-line react/no-unstable-nested-components
+          tabBarIcon: ({ focused, color, size }) => {
+            // Make this questionMark or something
+            let iconName = 'key'
 
-          if (route.name === 'Passwords') {
-            iconName = focused ? 'key' : 'key-outline'
-          } else if (route.name === 'Devices') {
-            iconName = focused ? 'phone-portrait' : 'phone-portrait-outline'
-          } else if (route.name === 'TOTP') {
-            iconName = focused ? 'reader' : 'reader-outline'
-          } else if (route.name === 'User') {
-            iconName = focused ? 'person' : 'person-outline'
-          }
+            if (route.name === 'Passwords') {
+              iconName = focused ? 'key' : 'key-outline'
+            } else if (route.name === 'Devices') {
+              iconName = focused ? 'phone-portrait' : 'phone-portrait-outline'
+            } else if (route.name === 'TOTP') {
+              iconName = focused ? 'reader' : 'reader-outline'
+            } else if (route.name === 'User') {
+              iconName = focused ? 'person' : 'person-outline'
+            }
 
-          // You can return any component that you like here!
-          return <Ionicons name={iconName} size={size} color={color} />
-        },
-        tabBarActiveTintColor: '#4CE0D2',
-        tabBarInactiveTintColor: 'gray',
-        headerShown: false,
-        tabBarHideOnKeyboard: true
-      })}
-      tabBar={(props) => (
-        <>
-          <OfflineBanner />
-          <BottomTabBar {...props} />
-        </>
-      )}
-    >
-      <RootStack.Screen name="Passwords" component={PasswordsStackNavigation} />
-      <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
-      <RootStack.Screen
-        options={
-          notifications > 0
-            ? {
-                tabBarBadge: notifications,
-                tabBarBadgeStyle: {
-                  top: Platform.OS === 'ios' ? 0 : 9,
-                  minWidth: 14,
-                  maxHeight: 14,
-                  borderRadius: 7,
-                  fontSize: 10,
-                  lineHeight: 13
+            // You can return any component that you like here!
+            return <Ionicons name={iconName} size={size} color={color} />
+          },
+          tabBarActiveTintColor: '#4CE0D2',
+          tabBarInactiveTintColor: 'gray',
+          headerShown: false,
+          tabBarHideOnKeyboard: true
+        })}
+        tabBar={(props) => (
+          <>
+            <OfflineBanner />
+            <BottomTabBar {...props} />
+          </>
+        )}
+      >
+        <RootStack.Screen
+          name="Passwords"
+          component={PasswordsStackNavigation}
+        />
+        <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
+        <RootStack.Screen
+          options={
+            notifications > 0
+              ? {
+                  tabBarBadge: notifications,
+                  tabBarBadgeStyle: {
+                    top: Platform.OS === 'ios' ? 0 : 9,
+                    minWidth: 14,
+                    maxHeight: 14,
+                    borderRadius: 7,
+                    fontSize: 10,
+                    lineHeight: 13
+                  }
                 }
-              }
-            : {}
-        }
-        name="Devices"
-        component={DeviceStackNavigation}
-      />
-      <RootStack.Screen name="User" component={AccountNavigation} />
-    </RootStack.Navigator>
+              : {}
+          }
+          name="Devices"
+          component={DeviceStackNavigation}
+        />
+        <RootStack.Screen name="User" component={AccountNavigation} />
+      </RootStack.Navigator>
+    </>
   )
 }
 export default AppNavigation

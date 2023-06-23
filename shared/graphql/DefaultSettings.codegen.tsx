@@ -3,64 +3,72 @@ import * as Types from '../generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
 const defaultOptions = {} as const;
-export type UpdateDefaultSettingsMutationVariables = Types.Exact<{
+export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
   config: Types.DefaultSettingsInput;
 }>;
 
 
-export type UpdateDefaultSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', updateDefaultSettings: { __typename?: 'UserGQL', id: string } } };
+export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id?: number | null, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id?: number | null, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
-export type SyncDefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
-
-
-export type SyncDefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, DefaultSettings: Array<{ __typename?: 'DefaultSettingsGQL', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number }> } };
+export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export const UpdateDefaultSettingsDocument = gql`
-    mutation updateDefaultSettings($config: DefaultSettingsInput!) {
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+
+
+export const UpdateDefaultDeviceSettingsDocument = gql`
+    mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
   me {
-    updateDefaultSettings(config: $config) {
+    defaultDeviceSettings {
       id
+      update(config: $config) {
+        id
+        autofillTOTPEnabled
+        autofillCredentialsEnabled
+        theme
+        syncTOTP
+        vaultLockTimeoutSeconds
+      }
     }
   }
 }
     `;
-export type UpdateDefaultSettingsMutationFn = Apollo.MutationFunction<UpdateDefaultSettingsMutation, UpdateDefaultSettingsMutationVariables>;
+export type UpdateDefaultDeviceSettingsMutationFn = Apollo.MutationFunction<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>;
 
 /**
- * __useUpdateDefaultSettingsMutation__
+ * __useUpdateDefaultDeviceSettingsMutation__
  *
- * To run a mutation, you first call `useUpdateDefaultSettingsMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUpdateDefaultSettingsMutation` returns a tuple that includes:
+ * To run a mutation, you first call `useUpdateDefaultDeviceSettingsMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUpdateDefaultDeviceSettingsMutation` returns a tuple that includes:
  * - A mutate function that you can call at any time to execute the mutation
  * - An object with fields that represent the current status of the mutation's execution
  *
  * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
  *
  * @example
- * const [updateDefaultSettingsMutation, { data, loading, error }] = useUpdateDefaultSettingsMutation({
+ * const [updateDefaultDeviceSettingsMutation, { data, loading, error }] = useUpdateDefaultDeviceSettingsMutation({
  *   variables: {
  *      config: // value for 'config'
  *   },
  * });
  */
-export function useUpdateDefaultSettingsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDefaultSettingsMutation, UpdateDefaultSettingsMutationVariables>) {
+export function useUpdateDefaultDeviceSettingsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateDefaultSettingsMutation, UpdateDefaultSettingsMutationVariables>(UpdateDefaultSettingsDocument, options);
+        return Apollo.useMutation<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>(UpdateDefaultDeviceSettingsDocument, options);
       }
-export type UpdateDefaultSettingsMutationHookResult = ReturnType<typeof useUpdateDefaultSettingsMutation>;
-export type UpdateDefaultSettingsMutationResult = Apollo.MutationResult<UpdateDefaultSettingsMutation>;
-export type UpdateDefaultSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateDefaultSettingsMutation, UpdateDefaultSettingsMutationVariables>;
-export const SyncDefaultSettingsDocument = gql`
-    query syncDefaultSettings {
+export type UpdateDefaultDeviceSettingsMutationHookResult = ReturnType<typeof useUpdateDefaultDeviceSettingsMutation>;
+export type UpdateDefaultDeviceSettingsMutationResult = Apollo.MutationResult<UpdateDefaultDeviceSettingsMutation>;
+export type UpdateDefaultDeviceSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>;
+export const DefaultSettingsDocument = gql`
+    query defaultSettings {
   me {
     id
-    DefaultSettings {
+    uiLanguage
+    defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
-      uiLanguage
-      deviceTheme
-      deviceSyncTOTP
+      theme
+      syncTOTP
       vaultLockTimeoutSeconds
     }
   }
@@ -68,28 +76,28 @@ export const SyncDefaultSettingsDocument = gql`
     `;
 
 /**
- * __useSyncDefaultSettingsQuery__
+ * __useDefaultSettingsQuery__
  *
- * To run a query within a React component, call `useSyncDefaultSettingsQuery` and pass it any options that fit your needs.
- * When your component renders, `useSyncDefaultSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useDefaultSettingsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useDefaultSettingsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useSyncDefaultSettingsQuery({
+ * const { data, loading, error } = useDefaultSettingsQuery({
  *   variables: {
  *   },
  * });
  */
-export function useSyncDefaultSettingsQuery(baseOptions?: Apollo.QueryHookOptions<SyncDefaultSettingsQuery, SyncDefaultSettingsQueryVariables>) {
+export function useDefaultSettingsQuery(baseOptions?: Apollo.QueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SyncDefaultSettingsQuery, SyncDefaultSettingsQueryVariables>(SyncDefaultSettingsDocument, options);
+        return Apollo.useQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
       }
-export function useSyncDefaultSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SyncDefaultSettingsQuery, SyncDefaultSettingsQueryVariables>) {
+export function useDefaultSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SyncDefaultSettingsQuery, SyncDefaultSettingsQueryVariables>(SyncDefaultSettingsDocument, options);
+          return Apollo.useLazyQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
         }
-export type SyncDefaultSettingsQueryHookResult = ReturnType<typeof useSyncDefaultSettingsQuery>;
-export type SyncDefaultSettingsLazyQueryHookResult = ReturnType<typeof useSyncDefaultSettingsLazyQuery>;
-export type SyncDefaultSettingsQueryResult = Apollo.QueryResult<SyncDefaultSettingsQuery, SyncDefaultSettingsQueryVariables>;
+export type DefaultSettingsQueryHookResult = ReturnType<typeof useDefaultSettingsQuery>;
+export type DefaultSettingsLazyQueryHookResult = ReturnType<typeof useDefaultSettingsLazyQuery>;
+export type DefaultSettingsQueryResult = Apollo.QueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;

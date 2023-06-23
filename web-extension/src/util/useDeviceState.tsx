@@ -144,9 +144,6 @@ export function useDeviceState() {
       device.save(state)
       await trpc.setDeviceState.mutate(state)
     },
-    setFirstTimeUser: async (firstTimeUser: boolean) => {
-      await trpc.setFirstTimeUser.mutate({ value: firstTimeUser })
-    },
     lockedState,
     device,
     registered: storageOnchangeListenerRegistered,

@@ -24,6 +24,7 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import { i18n } from '@lingui/core'
 import { RefreshControl } from 'react-native'
 import AuthierSelect from '@src/components/AuthierSelect'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
@@ -107,14 +108,13 @@ function DeviceSettings() {
                     }
                     accessibilityLabel="Lock time"
                   >
-                    <Select.Item label="1 minute" value="20" />
-                    <Select.Item label="2 minutes" value="120" />
-                    <Select.Item label="1 hour" value="3600" />
-                    <Select.Item label="4 hours" value="14400" />
-                    <Select.Item label="8 hours" value="28800" />
-                    <Select.Item label="1 week" value="604800" />
-                    <Select.Item label="1 month" value="2592000" />
-                    <Select.Item label="never" value="0" />
+                    {vaultLockTimeoutOptions.map((option, index) => (
+                      <Select.Item
+                        label={option.label}
+                        value={option.value.toString()}
+                        key={index}
+                      />
+                    ))}
                   </AuthierSelect>
 
                   <Text>

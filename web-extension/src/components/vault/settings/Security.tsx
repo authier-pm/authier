@@ -15,6 +15,7 @@ import { useColorModeValue } from '@chakra-ui/color-mode'
 import { VStack } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
 import { SettingsSubmitButton } from './Account'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 const VaultConfigFormSchema = z.object({
   vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
@@ -101,17 +102,7 @@ export default function Security() {
               options: ['cs', 'en']
             },
             vaultLockTimeoutSeconds: {
-              options: [
-                { label: t`1 minute`, value: 60 },
-                { label: t`2 minutes`, value: 120 },
-                { label: t`1 hour`, value: 3600 },
-                { label: t`4 hours`, value: 14400 },
-                { label: t`8 hours`, value: 28800 },
-                { label: t`1 day`, value: 86400 },
-                { label: t`1 week`, value: 604800 },
-                { label: t`1 month`, value: 2592000 },
-                { label: t`Never`, value: 0 }
-              ]
+              options: vaultLockTimeoutOptions
             }
           }}
           schema={VaultConfigFormSchema}

@@ -163,7 +163,6 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          useDeviceStateStore.setState({ firstTimeUser: false })
           if (device.biometricsAvailable && deviceState.biometricsEnabled) {
             try {
               await SInfo.setItem('psw', formState.password, {
@@ -200,7 +199,7 @@ export const useLogin = (props: { deviceName: string }) => {
               addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
               addNewDeviceForUser.user.device.autofillCredentialsEnabled,
-            uiLanguage: addNewDeviceForUser.user.device.uiLanguage,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
             syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
             lockTimeEnd:
               Date.now() +

@@ -118,8 +118,7 @@ export default function Register() {
               notificationOnVaultUnlock:
                 registerResult.user.notificationOnVaultUnlock,
               notificationOnWrongPasswordAttempts:
-                registerResult.user.notificationOnWrongPasswordAttempts,
-              firstTimeUser: true
+                registerResult.user.notificationOnWrongPasswordAttempts
             }
 
             device.save(deviceState)

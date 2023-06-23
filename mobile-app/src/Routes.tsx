@@ -22,10 +22,7 @@ export default function Routes() {
     state.lockedState,
     state.isInitialized
   ])
-  const [accessToken] = useDeviceStateStore((state) => [
-    state.accessToken,
-    state.firstTimeUser
-  ])
+  const [accessToken] = useDeviceStateStore((state) => [state.accessToken])
   const { colorMode } = useColorMode()
 
   const navigation = useNavigationContainerRef()

@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 import {
   Center,
@@ -26,11 +26,11 @@ import { AccountStackScreenProps } from '@src/navigation/types'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import AuthierSelect from '@src/components/AuthierSelect'
 import {
-  useSyncDefaultSettingsQuery,
-  useUpdateDefaultSettingsMutation
+  useDefaultSettingsQuery,
+  useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
-import { Loading } from '@src/components/Loading'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 function UserSettings() {
   const navigation =
@@ -39,30 +39,32 @@ function UserSettings() {
   let device = useDeviceStore((state) => state)
 
   const [deleteAccount] = useDeleteAccountMutation()
-  const { data, loading } = useSyncDefaultSettingsQuery({
-    fetchPolicy: 'network-only'
-  })
-  const [updateDefaultSettings] = useUpdateDefaultSettingsMutation()
+  const { data, refetch } = useDefaultSettingsQuery()
+
+  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
-  //WARNING: Why does it return an array?
-  const [form, setForm] = useState<DefaultSettingsInput | null>(null)
-  const [previousSettings, setPreviousSettings] =
-    useState<DefaultSettingsInput | null>(null)
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  type SettingsFormType = Omit<DefaultSettingsInput, 'uiLanguage'>
+  const [uiLanguage, setUiLanguage] = useState(data?.me.uiLanguage ?? 'en')
 
-  React.useEffect(() => {
-    if (data && !form) {
-      const defaultData = data?.me.DefaultSettings[0]
-      setForm({
-        vaultLockTimeoutSeconds: defaultData?.vaultLockTimeoutSeconds,
-        uiLanguage: defaultData?.uiLanguage,
-        theme: defaultData?.deviceTheme,
-        syncTOTP: defaultData?.deviceSyncTOTP,
-        autofillCredentialsEnabled: defaultData?.autofillCredentialsEnabled,
-        autofillTOTPEnabled: defaultData?.autofillTOTPEnabled
-      })
+  const [form, setForm] = useState<SettingsFormType | null>(null)
+  const [previousSettings, setPreviousSettings] =
+    useState<SettingsFormType | null>(null)
+  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const defaultData = data?.me.defaultDeviceSettings
+
+  useEffect(() => {
+    if (defaultData && !form) {
+      const formData = {
+        vaultLockTimeoutSeconds: defaultData.vaultLockTimeoutSeconds,
+        theme: defaultData.theme,
+        syncTOTP: defaultData.syncTOTP,
+        autofillCredentialsEnabled: defaultData.autofillCredentialsEnabled,
+        autofillTOTPEnabled: defaultData.autofillTOTPEnabled
+      }
+
+      setForm(formData)
     }
 
     if (!previousSettings && data) {
@@ -74,26 +76,27 @@ function UserSettings() {
       JSON.stringify(previousSettings) !== JSON.stringify(form)
 
     if (settingsChanged && form) {
-      updateDefaultSettings({
-        variables: {
-          config: {
-            uiLanguage: form?.uiLanguage,
-            theme: form.theme,
-            vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
-            autofillTOTPEnabled: form.autofillTOTPEnabled,
-            autofillCredentialsEnabled: form.autofillCredentialsEnabled,
-            syncTOTP: form.syncTOTP
-          }
+      ;(async () => {
+        const config = {
+          theme: form.theme,
+          vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
+          autofillTOTPEnabled: form.autofillTOTPEnabled,
+          autofillCredentialsEnabled: form.autofillCredentialsEnabled,
+          syncTOTP: form.syncTOTP,
+          uiLanguage
         }
-      })
+
+        await updateDefaultSettings({
+          variables: {
+            config
+          }
+        })
+        refetch()
+      })()
     }
 
     setPreviousSettings(form)
-  }, [deviceState, data, loading, form])
-
-  if (loading) {
-    return <Loading />
-  }
+  }, [defaultData, form])
 
   return (
     <ScrollView mt={5}>
@@ -163,6 +166,17 @@ function UserSettings() {
                 size="md"
               />
             </HStack>
+
+            <AuthierSelect
+              onValueChange={(uiLanguage) => {
+                setUiLanguage(uiLanguage)
+              }}
+              selectedValue={uiLanguage}
+              accessibilityLabel="language"
+            >
+              <Select.Item label="English" value="en" />
+              <Select.Item label="Čeština" value="cs" />
+            </AuthierSelect>
           </VStack>
           {/** **/}
           <Heading size="md">
@@ -178,17 +192,18 @@ function UserSettings() {
                   vaultLockTimeoutSeconds: parseInt(value)
                 })
               }}
-              selectedValue={form?.vaultLockTimeoutSeconds.toString()}
+              selectedValue={(
+                form?.vaultLockTimeoutSeconds ?? 28800
+              ).toString()}
               accessibilityLabel="Lock time"
             >
-              <Select.Item label="1 minute" value="20" />
-              <Select.Item label="2 minutes" value="120" />
-              <Select.Item label="1 hour" value="3600" />
-              <Select.Item label="4 hours" value="14400" />
-              <Select.Item label="8 hours" value="28800" />
-              <Select.Item label="1 week" value="604800" />
-              <Select.Item label="1 month" value="2592000" />
-              <Select.Item label="never" value="0" />
+              {vaultLockTimeoutOptions.map((option, index) => (
+                <Select.Item
+                  label={option.label}
+                  value={option.value.toString()}
+                  key={index}
+                />
+              ))}
             </AuthierSelect>
             <Text>
               <Trans>
@@ -233,19 +248,7 @@ function UserSettings() {
                 size="md"
               />
             </HStack>
-            <AuthierSelect
-              onValueChange={(uiLanguage) => {
-                setForm({
-                  ...(form as DefaultSettingsInput),
-                  uiLanguage
-                })
-              }}
-              selectedValue={form?.uiLanguage}
-              accessibilityLabel="language"
-            >
-              <Select.Item label="English" value="en" />
-              <Select.Item label="Čeština" value="cs" />
-            </AuthierSelect>
+
             <AuthierSelect
               onValueChange={(theme) => {
                 setForm({
@@ -256,8 +259,8 @@ function UserSettings() {
               selectedValue={form?.theme}
               accessibilityLabel="theme"
             >
-              <Select.Item label="light" value="Light" />
-              <Select.Item label="dark" value="Dark" />
+              <Select.Item value="light" label={t`Light`} />
+              <Select.Item value="dark" label={t`Dark`} />
             </AuthierSelect>
           </VStack>
           {/** **/}

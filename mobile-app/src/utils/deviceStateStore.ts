@@ -63,7 +63,6 @@ interface DeviceStateProps {
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number
   accessToken: string | null
-  firstTimeUser: boolean
 }
 
 export interface DeviceStateActions extends DeviceStateProps {
@@ -138,8 +137,7 @@ const initialState: DeviceStateProps = {
   lockTimerRunning: false,
   decryptedSecrets: [],
   notifications: 0,
-  accessToken: null,
-  firstTimeUser: true
+  accessToken: null
 }
 
 export const useDeviceStateStore = create<DeviceStateActions>()(
@@ -444,6 +442,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
+        console.log('resetting device state')
         set({
           ...initialState,
           theme: get().theme,

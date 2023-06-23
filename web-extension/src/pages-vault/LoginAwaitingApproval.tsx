@@ -180,7 +180,6 @@ export const useLogin = (props: { deviceName: string }) => {
 
           const deviceState: IBackgroundStateSerializable = {
             masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
-            firstTimeUser: false,
             userId: userId,
             secrets: EncryptedSecrets,
             email: formStateContext.email,
@@ -194,7 +193,7 @@ export const useLogin = (props: { deviceName: string }) => {
               addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
               addNewDeviceForUser.user.device.autofillCredentialsEnabled,
-            uiLanguage: addNewDeviceForUser.user.device.uiLanguage,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
             syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
             notificationOnWrongPasswordAttempts:
               addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,

@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import Security from '@src/components/vault/settings/Security'
 import Account from '@src/components/vault/settings/Account'
-import Defaults from '@src/components/vault/settings/Defaults'
+import { DeviceDefaultsForm } from '@src/components/vault/settings/DeviceDefaultsForm'
 import { AboutPage } from './AboutPage'
 
 interface LinkItemProps {
@@ -97,7 +97,7 @@ export const VaultSettings = () => {
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
           <Route path={'/security'} element={<Security />}></Route>
-          <Route path={'/defaults'} element={<Defaults />}></Route>
+          <Route path={'/defaults'} element={<DeviceDefaultsForm />}></Route>
           <Route path={'/about'} element={<AboutPage />}></Route>
         </Routes>
       </AnimatePresence>

@@ -11,6 +11,7 @@ import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 @ObjectType()
 class DeviceLocation {
@@ -79,7 +80,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       where: { id: userId },
       include: {
         EncryptedSecrets: true,
-        DefaultSettings: true
+        DefaultDeviceSettings: true
       }
     })
 
@@ -119,8 +120,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       where: { id: deviceId }
     })
 
-    //Why is this array??
-    const defaultSettings = user.DefaultSettings[0]
+    const defaultSettings =
+      user.DefaultDeviceSettings ?? defaultDeviceSettingSystemValues
 
     if (device) {
       if (device.userId !== user.id) {
@@ -141,8 +142,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           name: this.deviceName,
           userId: user.id,
           platform: input.devicePlatform,
-          syncTOTP: defaultSettings.deviceSyncTOTP,
-          uiLanguage: defaultSettings.uiLanguage,
+          syncTOTP: defaultSettings.syncTOTP,
           autofillCredentialsEnabled:
             defaultSettings.autofillCredentialsEnabled,
           autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,

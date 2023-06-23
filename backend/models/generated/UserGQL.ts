@@ -8,7 +8,7 @@ import { WebInputGQL } from './WebInputGQL'
 import { TagGQL } from './TagGQL'
 import { UserPaidProductsGQL } from './UserPaidProductsGQL'
 import { MasterDeviceChangeGQL } from './MasterDeviceChangeGQL'
-import { DefaultSettingsGQL } from './DefaultSettingsGQL'
+import { DefaultDeviceSettingsGQL } from './DefaultDeviceSettingsGQL'
 
 @ObjectType()
 export class UserGQLScalars {
@@ -35,6 +35,9 @@ export class UserGQLScalars {
 
   @Field(() => String, { nullable: true })
   masterDeviceId: string | null
+
+  @Field()
+  uiLanguage: string
 
   @Field(() => Int)
   TOTPlimit: number
@@ -87,8 +90,8 @@ export class UserGQL extends UserGQLScalars {
   @Field(() => [MasterDeviceChangeGQL])
   MasterDeviceChange: MasterDeviceChangeGQL[]
 
-  @Field(() => [DefaultSettingsGQL])
-  DefaultSettings: DefaultSettingsGQL[]
+  @Field(() => DefaultDeviceSettingsGQL, { nullable: true })
+  DefaultDeviceSettings: DefaultDeviceSettingsGQL | null
 
   // skip overwrite 👇
 }

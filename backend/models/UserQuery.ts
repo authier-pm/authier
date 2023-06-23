@@ -20,6 +20,8 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
+import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettingsGQL'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -50,6 +52,17 @@ export class UserBase extends UserGQL {
       }
     }
   }
+
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    const deviceDefaultSettings =
+      await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })
+
+    return deviceDefaultSettings ?? defaultDeviceSettingSystemValues
+  }
 }
 
 @ObjectType()
@@ -61,6 +74,11 @@ export class UserQuery extends UserBase {
         userId: this.id
       }
     })
+  }
+
+  @Field(() => DefaultDeviceSettingsGQLScalars)
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceQuery)

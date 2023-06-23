@@ -36,7 +36,9 @@ import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
-import { DefaultSettingsGQL } from './generated/DefaultSettingsGQL'
+import { DefaultDeviceSettingsMutation } from './DefaultSettings'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+
 const log = debug('au:userMutation')
 
 @ObjectType()
@@ -68,13 +70,9 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => DefaultSettingsGQL)
-  async defaultSettings(@Ctx() ctx: IContext) {
-    return ctx.prisma.defaultSettings.findFirst({
-      where: {
-        userId: this.id
-      }
-    })
+  @Field(() => DefaultDeviceSettingsMutation)
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceGQL)
@@ -85,6 +83,13 @@ export class UserMutation extends UserBase {
   ) {
     const ipAddress: string = ctx.getIpAddress()
 
+    const deviceDefaultSettings =
+      (await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })) ?? defaultDeviceSettingSystemValues
+
     return await ctx.prisma.device.create({
       data: {
         platform: device.platform,
@@ -94,7 +99,11 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
+        autofillCredentialsEnabled:
+          deviceDefaultSettings.autofillCredentialsEnabled,
+        autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+        syncTOTP: deviceDefaultSettings.syncTOTP
       }
     })
   }
@@ -238,6 +247,7 @@ export class UserMutation extends UserBase {
       },
       data: {
         notificationOnVaultUnlock: config.notificationOnVaultUnlock,
+        uiLanguage: config.uiLanguage,
         notificationOnWrongPasswordAttempts:
           config.notificationOnWrongPasswordAttempts,
         Devices: {
@@ -248,40 +258,11 @@ export class UserMutation extends UserBase {
             data: {
               syncTOTP: config.syncTOTP,
               vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-              uiLanguage: config.uiLanguage,
               autofillCredentialsEnabled: config.autofillCredentialsEnabled,
               autofillTOTPEnabled: config.autofillTOTPEnabled
             }
           }
         }
-      }
-    })
-  }
-
-  @Field(() => UserGQL)
-  async updateDefaultSettings(
-    @Arg('config', () => DefaultSettingsInput) config: DefaultSettingsInput,
-    @Ctx() ctx: IContextAuthenticated
-  ) {
-    const data = {
-      autofillTOTPEnabled: config.autofillTOTPEnabled,
-      uiLanguage: config.uiLanguage,
-      deviceSyncTOTP: config.syncTOTP,
-      vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-      autofillCredentialsEnabled: config.autofillCredentialsEnabled,
-      deviceTheme: config.theme
-    }
-
-    return await ctx.prisma.defaultSettings.upsert({
-      where: {
-        userId: this.id
-      },
-      create: {
-        ...data,
-        userId: this.id
-      },
-      update: {
-        ...data
       }
     })
   }

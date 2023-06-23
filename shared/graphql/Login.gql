@@ -15,6 +15,7 @@ mutation addNewDeviceForUser(
         accessToken
         user {
           id
+          uiLanguage
           EncryptedSecrets {
             id
             encrypted
@@ -31,15 +32,14 @@ mutation addNewDeviceForUser(
             vaultLockTimeoutSeconds
             autofillCredentialsEnabled
             autofillTOTPEnabled
-            uiLanguage
           }
-          defaultSettings {
+          defaultDeviceSettings {
             id
             autofillTOTPEnabled
             autofillCredentialsEnabled
-            uiLanguage
-            deviceTheme
-            deviceSyncTOTP
+
+            theme
+            syncTOTP
             vaultLockTimeoutSeconds
           }
         }

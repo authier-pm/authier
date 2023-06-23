@@ -92,22 +92,22 @@ export class SettingsInput {
 
 @InputType()
 export class DefaultSettingsInput {
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: false })
   syncTOTP: boolean
 
-  @Field(() => Int)
+  @Field(() => Int, { nullable: false })
   vaultLockTimeoutSeconds: number
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: false })
   autofillCredentialsEnabled: boolean
 
-  @Field(() => Boolean)
+  @Field(() => Boolean, { nullable: false })
   autofillTOTPEnabled: boolean
 
-  @Field(() => String)
+  @Field(() => String, { nullable: false })
   uiLanguage: string
 
-  @Field(() => String)
+  @Field(() => String, { nullable: false })
   theme: string
 }
 
