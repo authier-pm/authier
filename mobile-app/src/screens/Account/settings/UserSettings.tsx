@@ -30,7 +30,6 @@ import {
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
-import { Loading } from '@src/components/Loading'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { useUiLanguageQuery } from './UserSettings.codegen'
 
@@ -41,7 +40,9 @@ function UserSettings() {
   let device = useDeviceStore((state) => state)
 
   const [deleteAccount] = useDeleteAccountMutation()
-  const { data, loading } = useDefaultSettingsQuery()
+  const { data, refetch } = useDefaultSettingsQuery({
+    fetchPolicy: 'cache-and-network'
+  })
   const langQuery = useUiLanguageQuery()
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
@@ -51,22 +52,24 @@ function UserSettings() {
   const [uiLanguage, setUiLanguage] = useState(
     langQuery.data?.me.uiLanguage ?? 'en'
   )
-  //WARNING: Why does it return an array?
+
   const [form, setForm] = useState<SettingsFormType | null>(null)
   const [previousSettings, setPreviousSettings] =
     useState<SettingsFormType | null>(null)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const defaultData = data?.me.defaultDeviceSettings
 
   useEffect(() => {
-    if (data && !form) {
-      const defaultData = data?.me.defaultDeviceSettings
-      setForm({
-        vaultLockTimeoutSeconds: defaultData?.vaultLockTimeoutSeconds,
-        theme: defaultData?.theme,
-        syncTOTP: defaultData?.syncTOTP,
-        autofillCredentialsEnabled: defaultData?.autofillCredentialsEnabled,
-        autofillTOTPEnabled: defaultData?.autofillTOTPEnabled
-      })
+    if (defaultData && !form) {
+      const formData = {
+        vaultLockTimeoutSeconds: defaultData.vaultLockTimeoutSeconds,
+        theme: defaultData.theme,
+        syncTOTP: defaultData.syncTOTP,
+        autofillCredentialsEnabled: defaultData.autofillCredentialsEnabled,
+        autofillTOTPEnabled: defaultData.autofillTOTPEnabled
+      }
+      console.log('defaultData:', defaultData)
+      setForm(formData)
     }
 
     if (!previousSettings && data) {
@@ -78,28 +81,27 @@ function UserSettings() {
       JSON.stringify(previousSettings) !== JSON.stringify(form)
 
     if (settingsChanged && form) {
-      const config = {
-        theme: form.theme,
-        vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
-        autofillTOTPEnabled: form.autofillTOTPEnabled,
-        autofillCredentialsEnabled: form.autofillCredentialsEnabled,
-        syncTOTP: form.syncTOTP,
-        uiLanguage
-      }
-      console.log('config:', config)
-      updateDefaultSettings({
-        variables: {
-          config
+      ;(async () => {
+        const config = {
+          theme: form.theme,
+          vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
+          autofillTOTPEnabled: form.autofillTOTPEnabled,
+          autofillCredentialsEnabled: form.autofillCredentialsEnabled,
+          syncTOTP: form.syncTOTP,
+          uiLanguage
         }
-      })
+        console.log('config:', config)
+        await updateDefaultSettings({
+          variables: {
+            config
+          }
+        })
+        refetch()
+      })()
     }
 
     setPreviousSettings(form)
-  }, [data, loading, form])
-
-  if (loading) {
-    return <Loading />
-  }
+  }, [defaultData, form])
 
   return (
     <ScrollView mt={5}>
@@ -262,8 +264,8 @@ function UserSettings() {
               selectedValue={form?.theme}
               accessibilityLabel="theme"
             >
-              <Select.Item label="light" value="Light" />
-              <Select.Item label="dark" value="Dark" />
+              <Select.Item value="light" label={t`Light`} />
+              <Select.Item value="dark" label={t`Dark`} />
             </AuthierSelect>
           </VStack>
           {/** **/}

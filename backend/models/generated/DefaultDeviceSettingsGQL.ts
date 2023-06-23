@@ -3,7 +3,7 @@ import { UserGQL } from './UserGQL'
 
 @ObjectType()
 export class DefaultDeviceSettingsGQLScalars {
-  @Field(() => Int)
+  @Field(() => Int, { nullable: true })
   id: number
 
   @Field(() => GraphQLISODateTime)

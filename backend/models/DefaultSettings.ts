@@ -12,20 +12,32 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
     @Ctx() ctx: IContextAuthenticated
   ) {
     const data = {
-      autofillTOTPEnabled: config.autofillTOTPEnabled ?? true,
-      uiLanguage: config.uiLanguage ?? 'en',
-      deviceSyncTOTP: config.syncTOTP ?? true,
-      vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds ?? 28800,
-      autofillCredentialsEnabled: config.autofillCredentialsEnabled ?? true,
-      deviceTheme: config.theme ?? 'dark'
+      autofillTOTPEnabled: config.autofillTOTPEnabled,
+      syncTOTP: config.syncTOTP,
+      vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+      autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+      theme: config.theme
     }
 
-    return await ctx.prisma.defaultDeviceSettings.update({
-      where: {
-        id: this.id
-      },
+    if (this.id) {
+      return await ctx.prisma.defaultDeviceSettings.update({
+        where: {
+          id: this.id
+        },
 
-      data
+        data
+      })
+    }
+
+    return await ctx.prisma.defaultDeviceSettings.create({
+      data: {
+        ...data,
+        user: {
+          connect: {
+            id: ctx.jwtPayload.userId
+          }
+        }
+      }
     })
   }
 }
