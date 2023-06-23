@@ -1,0 +1,6 @@
+query uiLanguage {
+  me {
+    id
+    uiLanguage
+  }
+}

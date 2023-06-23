@@ -22,13 +22,12 @@ export function DeviceDefaultsForm() {
 
   const form = useForm<z.infer<typeof DefaultsFormSchema>>({
     defaultValues: {
-      autofillTOTPEnabled: data?.me.DefaultSettings[0]?.autofillTOTPEnabled,
+      autofillTOTPEnabled: data?.me.defaultDeviceSettings.autofillTOTPEnabled,
       autofillCredentialsEnabled:
-        data?.me.DefaultSettings[0]?.autofillCredentialsEnabled,
-      uiLanguage: data?.me.DefaultSettings[0]?.uiLanguage,
-      syncTOTP: data?.me.DefaultSettings[0]?.deviceSyncTOTP,
+        data?.me.defaultDeviceSettings.autofillCredentialsEnabled,
+      syncTOTP: data?.me.defaultDeviceSettings.syncTOTP,
       vaultLockTimeoutSeconds:
-        data?.me.DefaultSettings[0]?.vaultLockTimeoutSeconds
+        data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds
     },
     mode: 'onChange'
   })
@@ -40,12 +39,11 @@ export function DeviceDefaultsForm() {
   } = form
 
   useEffect(() => {
-    const defaultsData = data?.me.DefaultSettings[0]
+    const defaultsData = data?.me.defaultDeviceSettings
     reset({
       autofillTOTPEnabled: defaultsData?.autofillTOTPEnabled,
       autofillCredentialsEnabled: defaultsData?.autofillCredentialsEnabled,
-      uiLanguage: defaultsData?.uiLanguage,
-      syncTOTP: defaultsData?.deviceSyncTOTP,
+      syncTOTP: defaultsData?.syncTOTP,
       vaultLockTimeoutSeconds: defaultsData?.vaultLockTimeoutSeconds
     })
   }, [isSubmitSuccessful, data])

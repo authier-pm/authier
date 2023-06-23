@@ -6,9 +6,8 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
         id
         autofillTOTPEnabled
         autofillCredentialsEnabled
-        uiLanguage
-        deviceTheme
-        deviceSyncTOTP
+        theme
+        syncTOTP
         vaultLockTimeoutSeconds
       }
     }
@@ -21,9 +20,8 @@ query defaultSettings {
     defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
-      uiLanguage
-      deviceTheme
-      deviceSyncTOTP
+      theme
+      syncTOTP
       vaultLockTimeoutSeconds
     }
   }

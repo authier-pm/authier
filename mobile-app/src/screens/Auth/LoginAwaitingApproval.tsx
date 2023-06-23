@@ -199,7 +199,7 @@ export const useLogin = (props: { deviceName: string }) => {
               addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
               addNewDeviceForUser.user.device.autofillCredentialsEnabled,
-            uiLanguage: addNewDeviceForUser.user.device.uiLanguage,
+            uiLanguage: addNewDeviceForUser.user.uiLanguage,
             syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
             lockTimeEnd:
               Date.now() +

@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', loginCredentialsLimit: number, TOTPlimit: number, id: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP?: boolean | null, vaultLockTimeoutSeconds?: number | null, autofillCredentialsEnabled?: boolean | null, autofillTOTPEnabled?: boolean | null, uiLanguage?: string | null } };
+export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, loginCredentialsLimit: number, TOTPlimit: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, uiLanguage: string }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean } };
 
 export type UpdateSettingsMutationVariables = Types.Exact<{
   config: Types.SettingsInput;
@@ -19,11 +19,12 @@ export type UpdateSettingsMutation = { __typename?: 'Mutation', me: { __typename
 export const SyncSettingsDocument = gql`
     query SyncSettings {
   me {
+    id
     loginCredentialsLimit
     TOTPlimit
-    id
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
+    uiLanguage
   }
   currentDevice {
     id
@@ -31,7 +32,6 @@ export const SyncSettingsDocument = gql`
     vaultLockTimeoutSeconds
     autofillCredentialsEnabled
     autofillTOTPEnabled
-    uiLanguage
   }
 }
     `;

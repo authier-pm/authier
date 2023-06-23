@@ -8,12 +8,12 @@ export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
 }>;
 
 
-export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
 export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, uiLanguage: string, deviceTheme: string, deviceSyncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`
@@ -25,9 +25,8 @@ export const UpdateDefaultDeviceSettingsDocument = gql`
         id
         autofillTOTPEnabled
         autofillCredentialsEnabled
-        uiLanguage
-        deviceTheme
-        deviceSyncTOTP
+        theme
+        syncTOTP
         vaultLockTimeoutSeconds
       }
     }
@@ -67,9 +66,8 @@ export const DefaultSettingsDocument = gql`
     defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
-      uiLanguage
-      deviceTheme
-      deviceSyncTOTP
+      theme
+      syncTOTP
       vaultLockTimeoutSeconds
     }
   }

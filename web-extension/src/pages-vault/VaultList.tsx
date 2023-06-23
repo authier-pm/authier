@@ -47,7 +47,7 @@ export const VaultList = () => {
         autofillCredentialsEnabled:
           data.currentDevice.autofillCredentialsEnabled,
         autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
-        uiLanguage: data.currentDevice.uiLanguage,
+        uiLanguage: data.me.uiLanguage,
         syncTOTP: data.currentDevice.syncTOTP,
         vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
         notificationOnWrongPasswordAttempts:

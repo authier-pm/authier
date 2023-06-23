@@ -144,10 +144,9 @@ export type DefaultDeviceSettingsGql = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  deviceSyncTOTP: Scalars['Boolean']['output']
-  deviceTheme: Scalars['String']['output']
   id: Scalars['Int']['output']
-  uiLanguage: Scalars['String']['output']
+  syncTOTP: Scalars['Boolean']['output']
+  theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   user: UserGql
   userId: Scalars['String']['output']
@@ -159,10 +158,9 @@ export type DefaultDeviceSettingsGqlScalars = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  deviceSyncTOTP: Scalars['Boolean']['output']
-  deviceTheme: Scalars['String']['output']
   id: Scalars['Int']['output']
-  uiLanguage: Scalars['String']['output']
+  syncTOTP: Scalars['Boolean']['output']
+  theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   userId: Scalars['String']['output']
   vaultLockTimeoutSeconds: Scalars['Int']['output']
@@ -173,10 +171,9 @@ export type DefaultDeviceSettingsMutation = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  deviceSyncTOTP: Scalars['Boolean']['output']
-  deviceTheme: Scalars['String']['output']
   id: Scalars['Int']['output']
-  uiLanguage: Scalars['String']['output']
+  syncTOTP: Scalars['Boolean']['output']
+  theme: Scalars['String']['output']
   update: DefaultDeviceSettingsGqlScalars
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   userId: Scalars['String']['output']
@@ -188,12 +185,12 @@ export type DefaultDeviceSettingsMutationUpdateArgs = {
 }
 
 export type DefaultSettingsInput = {
-  autofillCredentialsEnabled?: InputMaybe<Scalars['Boolean']['input']>
-  autofillTOTPEnabled?: InputMaybe<Scalars['Boolean']['input']>
-  syncTOTP?: InputMaybe<Scalars['Boolean']['input']>
-  theme?: InputMaybe<Scalars['String']['input']>
-  uiLanguage?: InputMaybe<Scalars['String']['input']>
-  vaultLockTimeoutSeconds?: InputMaybe<Scalars['Int']['input']>
+  autofillCredentialsEnabled: Scalars['Boolean']['input']
+  autofillTOTPEnabled: Scalars['Boolean']['input']
+  syncTOTP: Scalars['Boolean']['input']
+  theme: Scalars['String']['input']
+  uiLanguage: Scalars['String']['input']
+  vaultLockTimeoutSeconds: Scalars['Int']['input']
 }
 
 export type DeviceGql = {
@@ -202,8 +199,8 @@ export type DeviceGql = {
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
   UserMaster?: Maybe<UserGql>
-  autofillCredentialsEnabled?: Maybe<Scalars['Boolean']['output']>
-  autofillTOTPEnabled?: Maybe<Scalars['Boolean']['output']>
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
   firebaseToken?: Maybe<Scalars['String']['output']>
@@ -219,11 +216,10 @@ export type DeviceGql = {
   name: Scalars['String']['output']
   platform: Scalars['String']['output']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
-  syncTOTP?: Maybe<Scalars['Boolean']['output']>
-  uiLanguage?: Maybe<Scalars['String']['output']>
+  syncTOTP: Scalars['Boolean']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   userId: Scalars['String']['output']
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']['output']>
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
 }
 
 export type DeviceInput = {
@@ -240,8 +236,8 @@ export type DeviceLocation = {
 
 export type DeviceMutation = {
   __typename?: 'DeviceMutation'
-  autofillCredentialsEnabled?: Maybe<Scalars['Boolean']['output']>
-  autofillTOTPEnabled?: Maybe<Scalars['Boolean']['output']>
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
   firebaseToken?: Maybe<Scalars['String']['output']>
@@ -263,12 +259,11 @@ export type DeviceMutation = {
   removeDevice: Scalars['Boolean']['output']
   rename: DeviceGql
   reportSecretUsageEvent: SecretUsageEventGqlScalars
-  syncTOTP?: Maybe<Scalars['Boolean']['output']>
-  uiLanguage?: Maybe<Scalars['String']['output']>
+  syncTOTP: Scalars['Boolean']['output']
   updateDeviceSettings: DeviceGql
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   userId: Scalars['String']['output']
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']['output']>
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
 }
 
 export type DeviceMutationRenameArgs = {
@@ -292,8 +287,8 @@ export type DeviceQuery = {
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
   UserMaster?: Maybe<UserGql>
-  autofillCredentialsEnabled?: Maybe<Scalars['Boolean']['output']>
-  autofillTOTPEnabled?: Maybe<Scalars['Boolean']['output']>
+  autofillCredentialsEnabled: Scalars['Boolean']['output']
+  autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
   /** Get all secrets that were change since last device sync */
@@ -312,11 +307,10 @@ export type DeviceQuery = {
   name: Scalars['String']['output']
   platform: Scalars['String']['output']
   registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>
-  syncTOTP?: Maybe<Scalars['Boolean']['output']>
-  uiLanguage?: Maybe<Scalars['String']['output']>
+  syncTOTP: Scalars['Boolean']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   userId: Scalars['String']['output']
-  vaultLockTimeoutSeconds?: Maybe<Scalars['Int']['output']>
+  vaultLockTimeoutSeconds: Scalars['Int']['output']
 }
 
 export type EmailVerificationGqlScalars = {
@@ -550,7 +544,7 @@ export enum TokenType {
 export type UserGql = {
   __typename?: 'UserGQL'
   DecryptionChallenges: Array<DecryptionChallengeGql>
-  DefaultDeviceSettings: Array<DefaultDeviceSettingsGql>
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
   MasterDeviceChange: Array<MasterDeviceChangeGql>
@@ -572,6 +566,7 @@ export type UserGql = {
   notificationOnWrongPasswordAttempts: Scalars['Int']['output']
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>
   tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   username?: Maybe<Scalars['String']['output']>
 }
@@ -579,7 +574,7 @@ export type UserGql = {
 export type UserMutation = {
   __typename?: 'UserMutation'
   DecryptionChallenges: Array<DecryptionChallengeGql>
-  DefaultDeviceSettings: Array<DefaultDeviceSettingsGql>
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
   MasterDeviceChange: Array<MasterDeviceChangeGql>
@@ -618,6 +613,7 @@ export type UserMutation = {
   sendEmailVerification: Scalars['NonNegativeInt']['output']
   setMasterDevice: MasterDeviceChangeGql
   tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
   updateFireToken: DeviceGql
   updateSettings: UserGql
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -696,7 +692,7 @@ export type UserPaidProductsGql = {
 export type UserQuery = {
   __typename?: 'UserQuery'
   DecryptionChallenges: Array<DecryptionChallengeGql>
-  DefaultDeviceSettings: Array<DefaultDeviceSettingsGql>
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>
   Devices: Array<DeviceGql>
   EncryptedSecrets: Array<EncryptedSecretGql>
   MasterDeviceChange: Array<MasterDeviceChangeGql>
@@ -729,6 +725,7 @@ export type UserQuery = {
   /** Sends a message to the master device */
   sendAuthMessage: Scalars['Boolean']['output']
   tokenVersion: Scalars['Int']['output']
+  uiLanguage: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
   username?: Maybe<Scalars['String']['output']>
 }

@@ -32,6 +32,7 @@ import {
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { Loading } from '@src/components/Loading'
 import { vaultLockTimeoutOptions } from '@shared/constants'
+import { useUiLanguageQuery } from './UserSettings.codegen'
 
 function UserSettings() {
   const navigation =
@@ -41,14 +42,19 @@ function UserSettings() {
 
   const [deleteAccount] = useDeleteAccountMutation()
   const { data, loading } = useDefaultSettingsQuery()
+  const langQuery = useUiLanguageQuery()
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
+  type SettingsFormType = Omit<DefaultSettingsInput, 'uiLanguage'>
+  const [uiLanguage, setUiLanguage] = useState(
+    langQuery.data?.me.uiLanguage ?? 'en'
+  )
   //WARNING: Why does it return an array?
-  const [form, setForm] = useState<DefaultSettingsInput | null>(null)
+  const [form, setForm] = useState<SettingsFormType | null>(null)
   const [previousSettings, setPreviousSettings] =
-    useState<DefaultSettingsInput | null>(null)
+    useState<SettingsFormType | null>(null)
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
   useEffect(() => {
@@ -56,9 +62,8 @@ function UserSettings() {
       const defaultData = data?.me.defaultDeviceSettings
       setForm({
         vaultLockTimeoutSeconds: defaultData?.vaultLockTimeoutSeconds,
-        uiLanguage: defaultData?.uiLanguage,
-        theme: defaultData?.deviceTheme,
-        syncTOTP: defaultData?.deviceSyncTOTP,
+        theme: defaultData?.theme,
+        syncTOTP: defaultData?.syncTOTP,
         autofillCredentialsEnabled: defaultData?.autofillCredentialsEnabled,
         autofillTOTPEnabled: defaultData?.autofillTOTPEnabled
       })
@@ -74,12 +79,12 @@ function UserSettings() {
 
     if (settingsChanged && form) {
       const config = {
-        uiLanguage: form?.uiLanguage,
         theme: form.theme,
         vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
         autofillTOTPEnabled: form.autofillTOTPEnabled,
         autofillCredentialsEnabled: form.autofillCredentialsEnabled,
-        syncTOTP: form.syncTOTP
+        syncTOTP: form.syncTOTP,
+        uiLanguage
       }
       console.log('config:', config)
       updateDefaultSettings({
@@ -164,6 +169,17 @@ function UserSettings() {
                 size="md"
               />
             </HStack>
+
+            <AuthierSelect
+              onValueChange={(uiLanguage) => {
+                setUiLanguage(uiLanguage)
+              }}
+              selectedValue={uiLanguage}
+              accessibilityLabel="language"
+            >
+              <Select.Item label="English" value="en" />
+              <Select.Item label="Čeština" value="cs" />
+            </AuthierSelect>
           </VStack>
           {/** **/}
           <Heading size="md">
@@ -235,19 +251,7 @@ function UserSettings() {
                 size="md"
               />
             </HStack>
-            <AuthierSelect
-              onValueChange={(uiLanguage) => {
-                setForm({
-                  ...(form as DefaultSettingsInput),
-                  uiLanguage
-                })
-              }}
-              selectedValue={form?.uiLanguage}
-              accessibilityLabel="language"
-            >
-              <Select.Item label="English" value="en" />
-              <Select.Item label="Čeština" value="cs" />
-            </AuthierSelect>
+
             <AuthierSelect
               onValueChange={(theme) => {
                 setForm({
