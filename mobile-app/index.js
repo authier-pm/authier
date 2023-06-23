@@ -2,6 +2,7 @@
  * @format
  */
 
+import 'setimmediate'
 import 'react-native-gesture-handler'
 import 'react-native-reanimated'
 import 'intl'
