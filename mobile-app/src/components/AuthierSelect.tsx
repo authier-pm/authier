@@ -13,6 +13,7 @@ const AuthierSelect: React.FC<IAuthierSelectProps> = ({
     <Select
       //@ts-expect-error https://github.com/GeekyAnts/NativeBase/issues/5687
       optimized={false}
+      minW={150}
       {...props}
     >
       {children}

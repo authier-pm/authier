@@ -144,7 +144,7 @@ export type DefaultDeviceSettingsGql = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  id: Scalars['Int']['output']
+  id?: Maybe<Scalars['Int']['output']>
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -158,7 +158,7 @@ export type DefaultDeviceSettingsGqlScalars = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  id: Scalars['Int']['output']
+  id?: Maybe<Scalars['Int']['output']>
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   updatedAt?: Maybe<Scalars['DateTime']['output']>
@@ -171,7 +171,7 @@ export type DefaultDeviceSettingsMutation = {
   autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
-  id: Scalars['Int']['output']
+  id?: Maybe<Scalars['Int']['output']>
   syncTOTP: Scalars['Boolean']['output']
   theme: Scalars['String']['output']
   update: DefaultDeviceSettingsGqlScalars

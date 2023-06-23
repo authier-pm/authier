@@ -17,6 +17,7 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
 query defaultSettings {
   me {
     id
+    uiLanguage
     defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled

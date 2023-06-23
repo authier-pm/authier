@@ -31,7 +31,6 @@ import {
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { vaultLockTimeoutOptions } from '@shared/constants'
-import { useUiLanguageQuery } from './UserSettings.codegen'
 
 function UserSettings() {
   const navigation =
@@ -40,18 +39,14 @@ function UserSettings() {
   let device = useDeviceStore((state) => state)
 
   const [deleteAccount] = useDeleteAccountMutation()
-  const { data, refetch } = useDefaultSettingsQuery({
-    fetchPolicy: 'cache-and-network'
-  })
-  const langQuery = useUiLanguageQuery()
+  const { data, refetch } = useDefaultSettingsQuery()
+
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
   type SettingsFormType = Omit<DefaultSettingsInput, 'uiLanguage'>
-  const [uiLanguage, setUiLanguage] = useState(
-    langQuery.data?.me.uiLanguage ?? 'en'
-  )
+  const [uiLanguage, setUiLanguage] = useState(data?.me.uiLanguage ?? 'en')
 
   const [form, setForm] = useState<SettingsFormType | null>(null)
   const [previousSettings, setPreviousSettings] =

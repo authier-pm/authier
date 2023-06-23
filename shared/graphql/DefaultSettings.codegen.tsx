@@ -8,12 +8,12 @@ export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
 }>;
 
 
-export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id?: number | null, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id?: number | null, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
 export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`
@@ -63,6 +63,7 @@ export const DefaultSettingsDocument = gql`
     query defaultSettings {
   me {
     id
+    uiLanguage
     defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
