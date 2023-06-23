@@ -39,8 +39,7 @@ export const defaultsFormProps = {
 }
 
 export default function DefaultSettings() {
-  const { setSecuritySettings, deviceState, setFirstTimeUser } =
-    useContext(DeviceStateContext)
+  const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [updateSettings] = useUpdateSettingsMutation()
   const bgColor = useColorModeValue('white', 'gray.800')
@@ -94,8 +93,6 @@ export default function DefaultSettings() {
         notificationOnWrongPasswordAttempts:
           deviceState?.notificationOnWrongPasswordAttempts as number
       })
-
-      setFirstTimeUser(false)
     }
 
     useEffect(() => {
