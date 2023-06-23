@@ -52,6 +52,17 @@ export class UserBase extends UserGQL {
       }
     }
   }
+
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    const deviceDefaultSettings =
+      await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })
+
+    return deviceDefaultSettings ?? defaultDeviceSettingSystemValues
+  }
 }
 
 @ObjectType()
@@ -67,15 +78,7 @@ export class UserQuery extends UserBase {
 
   @Field(() => DefaultDeviceSettingsGQLScalars)
   async defaultDeviceSettings(@Ctx() ctx: IContext) {
-    const deviceDefaultSettings =
-      await ctx.prisma.defaultDeviceSettings.findFirst({
-        where: {
-          userId: this.id
-        }
-      })
-    console.log('deviceDefaultSettings:', deviceDefaultSettings)
-
-    return deviceDefaultSettings ?? defaultDeviceSettingSystemValues
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceQuery)

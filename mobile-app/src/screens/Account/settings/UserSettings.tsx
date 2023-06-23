@@ -68,7 +68,7 @@ function UserSettings() {
         autofillCredentialsEnabled: defaultData.autofillCredentialsEnabled,
         autofillTOTPEnabled: defaultData.autofillTOTPEnabled
       }
-      console.log('defaultData:', defaultData)
+
       setForm(formData)
     }
 
@@ -90,7 +90,7 @@ function UserSettings() {
           syncTOTP: form.syncTOTP,
           uiLanguage
         }
-        console.log('config:', config)
+
         await updateDefaultSettings({
           variables: {
             config

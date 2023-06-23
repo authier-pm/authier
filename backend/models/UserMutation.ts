@@ -72,14 +72,7 @@ export class UserMutation extends UserBase {
 
   @Field(() => DefaultDeviceSettingsMutation)
   async defaultDeviceSettings(@Ctx() ctx: IContext) {
-    const deviceDefaultSettings =
-      await ctx.prisma.defaultDeviceSettings.findFirst({
-        where: {
-          userId: this.id
-        }
-      })
-    console.log('deviceDefaultSettings23:', deviceDefaultSettings)
-    return deviceDefaultSettings ?? defaultDeviceSettingSystemValues
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceGQL)
