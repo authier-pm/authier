@@ -57,11 +57,7 @@ describe('Device', () => {
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
         platform: faker.lorem.word(),
-        User: {
-          connect: {
-            id: userId
-          }
-        },
+        userId: userId,
         ...defaultDeviceSettingSystemValues
       }
     })
@@ -75,11 +71,7 @@ describe('Device', () => {
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
         platform: faker.lorem.word(),
-        User: {
-          connect: {
-            id: userId
-          }
-        },
+        userId: userId,
         ...defaultDeviceSettingSystemValues
       }
     })
