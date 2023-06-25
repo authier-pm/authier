@@ -20,7 +20,6 @@ import { IBackgroundStateSerializable } from '@utils/deviceStore'
 
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
-import { Loading } from '@components/Loading'
 import { Trans } from '@lingui/macro'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../navigation/AuthNavigation'
@@ -63,7 +62,6 @@ export function Register({ navigation }: NavigationProps) {
       }
     }
   }, [error])
-
 
   const onSubmit = async (
     values: ILoginFormValues,
@@ -140,14 +138,13 @@ export function Register({ navigation }: NavigationProps) {
         encryptionSalt: bufferToBase64(encryptionSalt),
         authSecret: params.addDeviceSecret,
         authSecretEncrypted: params.addDeviceSecretEncrypted,
-        vaultLockTimeoutSeconds: 28800,
-        autofillTOTPEnabled: registerResult.user.autofillTOTPEnabled,
-        autofillCredentialsEnabled:
-          registerResult.user.autofillCredentialsEnabled,
-        uiLanguage: registerResult.user.uiLanguage,
-        lockTimeEnd: Date.now() + 28800000,
-        syncTOTP: registerResult.user.defaultDeviceSyncTOTP,
-        theme: registerResult.user.defaultDeviceTheme,
+        vaultLockTimeoutSeconds: null,
+        syncTOTP: null,
+        uiLanguage: null,
+        autofillTOTPEnabled: null,
+        autofillCredentialsEnabled: null,
+        lockTimeEnd: null,
+        theme: 'dark',
         notificationOnWrongPasswordAttempts:
           registerResult.user.notificationOnWrongPasswordAttempts,
         notificationOnVaultUnlock:
@@ -166,9 +163,9 @@ export function Register({ navigation }: NavigationProps) {
         Welcome
       </Heading>
       <Heading mt="1" fontWeight="medium" size="xs">
-        Beware that authier is in beta, so we advise not to use it for important
-        passwords just yet. We will assess the security of the app before we
-        recommend it for important passwords.
+        Beware that authier is in public preview, so we advise not to use it for
+        important passwords just yet. We will assess the security of the app
+        before we recommend it for all your passwords, including important ones.
       </Heading>
 
       <Formik initialValues={formState} enableReinitialize onSubmit={onSubmit}>

@@ -1,8 +1,8 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  // directUrl         = env("DIRECT_URL")
+  // shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
 }
 
 generator client {
@@ -50,17 +50,19 @@ model DecryptionChallenge {
 }
 
 model Device {
-  id                      String    @id
-  firstIpAddress          String    @db.Inet
-  lastIpAddress           String    @db.Inet
-  firebaseToken           String?
-  name                    String
-  platform                String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
-  ipAddressLock           Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
-  logoutAt                DateTime?
+  id                         String    @id
+  firstIpAddress             String    @db.Inet
+  lastIpAddress              String    @db.Inet
+  firebaseToken              String?
+  name                       String
+  platform                   String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
+  ipAddressLock              Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
+  logoutAt                   DateTime?
   // Device settings
-  syncTOTP                Boolean   @default(false) // sync2FA
-  vaultLockTimeoutSeconds Int       @default(28800) // 8 hours
+  syncTOTP                   Boolean // sync2FA
+  vaultLockTimeoutSeconds    Int // 8 hours
+  autofillCredentialsEnabled Boolean
+  autofillTOTPEnabled        Boolean
 
   createdAt                DateTime  @default(now())
   updatedAt                DateTime? @updatedAt
@@ -173,20 +175,22 @@ model WebInput {
 }
 
 model User {
-  id                            String               @id @default(uuid()) @db.Uuid
-  email                         String?              @unique @db.Citext
-  tokenVersion                  Int                  @default(0)
-  username                      String?              @unique
+  id                       String    @id @default(uuid()) @db.Uuid
+  email                    String?   @unique @db.Citext
+  tokenVersion             Int       @default(0)
+  username                 String?   @unique
   // @skip
-  addDeviceSecret               String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
-  addDeviceSecretEncrypted      String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
+  addDeviceSecret          String //WARNING: in base64, random string used when user wants to log in on mobile using a QR code displayed in authier extension
+  addDeviceSecretEncrypted String //WARNING: inbase64, client has to decrypt this to prove they have the correct master password
   // @skip
-  encryptionSalt                String //WARNING: in pure string
-  Token                         Token[]
-  createdAt                     DateTime             @default(now())
-  updatedAt                     DateTime?            @updatedAt
-  masterDevice                  Device?              @relation("masterDevice", fields: [masterDeviceId], references: [id])
-  masterDeviceId                String?              @unique
+  encryptionSalt           String //WARNING: in pure string
+  Token                    Token[]
+  createdAt                DateTime  @default(now())
+  updatedAt                DateTime? @updatedAt
+  masterDevice             Device?   @relation("masterDevice", fields: [masterDeviceId], references: [id])
+  masterDeviceId           String?   @unique
+  uiLanguage               String    @default("en")
+
   // Limits for the number of stored secrets
   TOTPlimit                     Int // this is just override for the 
   loginCredentialsLimit         Int // 
@@ -196,24 +200,36 @@ model User {
 
   deviceRecoveryCooldownMinutes       Int // in case if user cannot access any existing device, they can trigger this failsafe
   // User settings
-  autofillCredentialsEnabled          Boolean @default(true)
-  autofillTOTPEnabled                 Boolean @default(true)
-  uiLanguage                          String  @default("en")
-  defaultDeviceTheme                  String  @default("dark")
-  defaultDeviceSyncTOTP               Boolean @default(true)
   notificationOnVaultUnlock           Boolean @default(false)
   notificationOnWrongPasswordAttempts Int     @default(3)
 
-  UsageEvents          SecretUsageEvent[]
-  EncryptedSecrets     EncryptedSecret[]
-  Devices              Device[]              @relation("devices")
-  WebInputsAdded       WebInput[]
-  Tags                 Tag[]
-  UserPaidProducts     UserPaidProducts[]
-  DecryptionChallenges DecryptionChallenge[]
+  UsageEvents           SecretUsageEvent[]
+  EncryptedSecrets      EncryptedSecret[]
+  Devices               Device[]               @relation("devices")
+  WebInputsAdded        WebInput[]
+  Tags                  Tag[]
+  UserPaidProducts      UserPaidProducts[]
+  DecryptionChallenges  DecryptionChallenge[]
   // @skip
-  EmailVerification    EmailVerification[]
-  MasterDeviceChange   MasterDeviceChange[]
+  EmailVerification     EmailVerification[]
+  MasterDeviceChange    MasterDeviceChange[]
+  DefaultDeviceSettings DefaultDeviceSettings?
+}
+
+model DefaultDeviceSettings {
+  id                         Int       @id @default(autoincrement())
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime? @updatedAt
+  autofillCredentialsEnabled Boolean   @default(true)
+  autofillTOTPEnabled        Boolean   @default(true)
+  theme                      String    @default("dark")
+  syncTOTP                   Boolean   @default(true)
+  vaultLockTimeoutSeconds    Int       @default(28800) // 8 hours
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String @unique @db.Uuid
+
+  @@map("DefaultSettings")
 }
 
 model Token {
@@ -237,7 +253,7 @@ model UserPaidProducts {
   createdAt         DateTime  @default(now())
   updatedAt         DateTime? @updatedAt
   expiresAt         DateTime?
-  productId         String 
+  productId         String
   userId            String    @db.Uuid
   user              User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   checkoutSessionId String

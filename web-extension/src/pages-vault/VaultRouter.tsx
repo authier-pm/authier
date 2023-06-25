@@ -62,7 +62,6 @@ export function VaultRouter() {
         <Route path="/devices" element={<Devices />}></Route>
         <Route path="/import-export" element={<VaultImportExport />}></Route>
         <Route path="/addItem" element={<AddItem />}></Route>
-        <Route path="/devices" element={<Devices />}></Route>
       </Routes>
     </SidebarWithHeader>
   )

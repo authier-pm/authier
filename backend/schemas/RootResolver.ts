@@ -176,13 +176,16 @@ export class RootResolver {
           TOTPlimit: 3,
           Devices: {
             create: {
-              syncTOTP: true,
               platform: input.devicePlatform,
               id: deviceId,
               firstIpAddress: ipAddress,
               lastIpAddress: ipAddress,
               firebaseToken: firebaseToken,
-              name: deviceName
+              name: deviceName,
+              autofillCredentialsEnabled: true,
+              vaultLockTimeoutSeconds: 28800, // 8 hours
+              syncTOTP: true,
+              autofillTOTPEnabled: true
             }
           }
         },

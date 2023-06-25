@@ -42,11 +42,11 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   biometricsEnabled?: boolean
   lockTimeEnd: number | null
@@ -228,17 +228,19 @@ export const useDeviceStore = create<Device>()(
             fetchPolicy: 'network-only'
           })
 
+          const queryData = query.data
+
           const config = {
-            autofillTOTPEnabled: query.data.me.autofillTOTPEnabled,
+            autofillTOTPEnabled: queryData.currentDevice.autofillTOTPEnabled,
             autofillCredentialsEnabled:
-              query.data.me.autofillCredentialsEnabled,
-            syncTOTP: query.data.currentDevice.syncTOTP,
-            vaultLockTimeoutSeconds: query.data.currentDevice
-              .vaultLockTimeoutSeconds as number,
-            uiLanguage: query.data.me.uiLanguage,
-            notificationOnVaultUnlock: query.data.me.notificationOnVaultUnlock,
+              queryData.currentDevice.autofillCredentialsEnabled,
+            syncTOTP: queryData.currentDevice.syncTOTP,
+            vaultLockTimeoutSeconds:
+              queryData.currentDevice.vaultLockTimeoutSeconds,
+            uiLanguage: queryData.me.uiLanguage,
+            notificationOnVaultUnlock: queryData.me.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
-              query.data.me.notificationOnWrongPasswordAttempts
+              queryData.me.notificationOnWrongPasswordAttempts
           }
 
           //HACK: this is a hack, we should not create a new interval every time we save the state

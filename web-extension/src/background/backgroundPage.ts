@@ -30,11 +30,11 @@ export interface IBackgroundStateSerializableLocked {
   deviceName: string
   authSecretEncrypted: string
   authSecret: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   notificationOnVaultUnlock: boolean
   notificationOnWrongPasswordAttempts: number

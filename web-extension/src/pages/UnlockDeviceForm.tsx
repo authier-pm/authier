@@ -69,7 +69,9 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
               ...lockedState
             })
 
-            device.startLockInterval(lockedState.vaultLockTimeoutSeconds)
+            if (lockedState.vaultLockTimeoutSeconds) {
+              device.startLockInterval(lockedState.vaultLockTimeoutSeconds)
+            }
 
             onUnlocked()
 

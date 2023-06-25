@@ -9,10 +9,7 @@ import {
   enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import {
-  EncryptedSecretType,
-  SettingsInput
-} from '@shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
@@ -51,11 +48,11 @@ interface DeviceStateProps {
   secrets: Array<SecretSerializedType>
   authSecret: string
   authSecretEncrypted: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   biometricsEnabled: boolean
   lockTimeStart: number
@@ -126,11 +123,11 @@ const initialState: DeviceStateProps = {
   secrets: [],
   authSecret: '',
   authSecretEncrypted: '',
-  vaultLockTimeoutSeconds: 0,
+  vaultLockTimeoutSeconds: 28800,
   syncTOTP: false,
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
-  uiLanguage: '',
+  uiLanguage: 'en',
   notificationOnVaultUnlock: false,
   notificationOnWrongPasswordAttempts: 3,
   theme: 'dark',
@@ -445,6 +442,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
+        console.log('resetting device state')
         set({
           ...initialState,
           theme: get().theme,

@@ -1,0 +1,9 @@
+query DefaultDeviceSettingsModal {
+  me {
+    id
+    defaultDeviceSettings {
+      id
+    }
+    devicesCount
+  }
+}

@@ -16,6 +16,7 @@ import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import Security from '@src/components/vault/settings/Security'
 import Account from '@src/components/vault/settings/Account'
+import { DeviceDefaultsForm } from '@src/components/vault/settings/DeviceDefaultsForm'
 import { AboutPage } from './AboutPage'
 
 interface LinkItemProps {
@@ -31,7 +32,7 @@ interface Props extends LinkItemProps {
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Account', path: '/account' },
   { name: 'Security', path: '/security' },
-  { name: 'About', path: '/about' }
+  { name: 'Defaults', path: '/defaults' }
 ]
 
 const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
@@ -96,6 +97,7 @@ export const VaultSettings = () => {
         <Routes key={location.pathname}>
           <Route path={'/account'} element={<Account />}></Route>
           <Route path={'/security'} element={<Security />}></Route>
+          <Route path={'/defaults'} element={<DeviceDefaultsForm />}></Route>
           <Route path={'/about'} element={<AboutPage />}></Route>
         </Routes>
       </AnimatePresence>

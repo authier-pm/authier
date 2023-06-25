@@ -33,11 +33,7 @@ interface Values {
   password: string
 }
 
-export function VaultUnlockVerification({
-  onUnlocked
-}: {
-  onUnlocked: () => any
-}) {
+export function VaultUnlockVerification() {
   const toast = useToast()
   const id = 'active-toast'
   const device = useDeviceStore((state) => state)
@@ -137,7 +133,7 @@ export function VaultUnlockVerification({
       ...lockedState
     }
     newState.lockTimeEnd =
-      Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
+      Date.now() + lockedState.vaultLockTimeoutSeconds!! * 1000
     await device.save(newState)
     device.setLockedState(null)
     setLoading(false)
@@ -157,7 +153,7 @@ export function VaultUnlockVerification({
         ) => {
           try {
             await unlockVault(values.password)
-            onUnlocked()
+
             if (notificationOnVaultUnlock) {
               console.log('send notification', device.id)
 

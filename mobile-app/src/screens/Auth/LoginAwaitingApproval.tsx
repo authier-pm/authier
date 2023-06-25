@@ -33,6 +33,7 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { colorModeManager } from '@src/Providers'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
@@ -139,6 +140,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const response = await addNewDevice({
           variables: {
             email: formState.email,
+            deviceId: device.id as string,
             deviceInput: {
               id: device.id as string,
               name: props.deviceName,
@@ -191,14 +193,18 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
-            vaultLockTimeoutSeconds: 28800,
+            vaultLockTimeoutSeconds:
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
+            autofillTOTPEnabled:
+              addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
-              addNewDeviceForUser.user.autofillCredentialsEnabled,
-            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
+              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
-            lockTimeEnd: Date.now() + 28800000,
-            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
+            lockTimeEnd:
+              Date.now() +
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000,
+            theme: (await colorModeManager.get()) as string,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:

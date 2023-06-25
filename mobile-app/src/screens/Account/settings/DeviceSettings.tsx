@@ -23,6 +23,8 @@ import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { i18n } from '@lingui/core'
 import { RefreshControl } from 'react-native'
+import AuthierSelect from '@src/components/AuthierSelect'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 function DeviceSettings() {
   let deviceState = useDeviceStateStore((state) => state)
@@ -35,11 +37,12 @@ function DeviceSettings() {
 
   const currentSettings = (): SettingsInput => {
     return {
-      autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-      autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
-      uiLanguage: deviceState.uiLanguage,
-      syncTOTP: deviceState.syncTOTP,
-      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+      autofillTOTPEnabled: deviceState.autofillTOTPEnabled as boolean,
+      autofillCredentialsEnabled:
+        deviceState.autofillCredentialsEnabled as boolean,
+      uiLanguage: deviceState.uiLanguage as string,
+      syncTOTP: deviceState.syncTOTP as boolean,
+      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds as number,
       notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
       notificationOnWrongPasswordAttempts:
         deviceState.notificationOnWrongPasswordAttempts
@@ -95,25 +98,24 @@ function DeviceSettings() {
                 </Text>
 
                 <Box p={2}>
-                  <Select
-                    //@ts-expect-error https://github.com/GeekyAnts/NativeBase/issues/5687
-                    optimized={false}
+                  <AuthierSelect
                     variant="rounded"
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
                     }}
-                    selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
+                    selectedValue={
+                      deviceState.vaultLockTimeoutSeconds?.toString() ?? '0'
+                    }
                     accessibilityLabel="Lock time"
                   >
-                    <Select.Item label="1 minute" value="20" />
-                    <Select.Item label="2 minutes" value="120" />
-                    <Select.Item label="1 hour" value="3600" />
-                    <Select.Item label="4 hours" value="14400" />
-                    <Select.Item label="8 hours" value="28800" />
-                    <Select.Item label="1 week" value="604800" />
-                    <Select.Item label="1 month" value="2592000" />
-                    <Select.Item label="never" value="0" />
-                  </Select>
+                    {vaultLockTimeoutOptions.map((option, index) => (
+                      <Select.Item
+                        label={option.label}
+                        value={option.value.toString()}
+                        key={index}
+                      />
+                    ))}
+                  </AuthierSelect>
 
                   <Text>
                     <Trans>
@@ -130,7 +132,7 @@ function DeviceSettings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  value={deviceState.syncTOTP}
+                  value={deviceState.syncTOTP ?? false}
                   onToggle={async (e) => {
                     deviceState.changeSyncTOTP(e)
                   }}
@@ -172,19 +174,17 @@ function DeviceSettings() {
             </Heading>
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
+              <AuthierSelect
                 onValueChange={(value) => {
                   deviceState.changeUiLanguage(value)
                   i18n.activate(value)
                 }}
-                defaultValue={deviceState.uiLanguage}
+                selectedValue={deviceState.uiLanguage ?? 'en'}
                 accessibilityLabel="language"
               >
                 <Select.Item label="English" value="en" />
                 <Select.Item label="Čeština" value="cs" />
-              </Select>
+              </AuthierSelect>
             </Box>
           </VStack>
           {/*  */}
@@ -194,19 +194,17 @@ function DeviceSettings() {
             </Heading>
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
+              <AuthierSelect
                 onValueChange={(value) => {
                   toggleColorMode()
                   deviceState.changeTheme(value)
                 }}
-                defaultValue={deviceState.theme}
+                selectedValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
                 <Select.Item label="light" value="light" />
                 <Select.Item label="dark" value="dark" />
-              </Select>
+              </AuthierSelect>
             </Box>
           </VStack>
         </VStack>

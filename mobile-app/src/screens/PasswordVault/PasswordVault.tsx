@@ -18,6 +18,7 @@ import { Trans } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { DefaultDeviceSettingsModal } from '../DefaultDeviceSettingsModal'
 
 export const EmptyList = (text: string) => {
   return (
@@ -58,6 +59,8 @@ export const PasswordVault = ({
 
   return (
     <View>
+      <DefaultDeviceSettingsModal />
+
       <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
         <IconButton

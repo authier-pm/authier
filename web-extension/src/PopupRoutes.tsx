@@ -27,9 +27,9 @@ export default function PopupRoutes(): ReactElement {
     )
   }
 
-  if (isInitialized === false) {
-    return <Spinner />
-  }
+  // if (isInitialized === false) { // TODO this is not correct when user is logged out
+  //   return <Spinner />
+  // }
 
   if (deviceState === null) {
     return <AuthLinkPage />

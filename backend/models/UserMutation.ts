@@ -4,7 +4,11 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput, SettingsInput } from './models'
+import {
+  DefaultSettingsInput,
+  EncryptedSecretInput,
+  SettingsInput
+} from './models'
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
@@ -32,6 +36,9 @@ import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
+import { DefaultDeviceSettingsMutation } from './DefaultSettings'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+
 const log = debug('au:userMutation')
 
 @ObjectType()
@@ -63,6 +70,11 @@ export class UserMutation extends UserBase {
     })
   }
 
+  @Field(() => DefaultDeviceSettingsMutation)
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    return super.defaultDeviceSettings(ctx)
+  }
+
   @Field(() => DeviceGQL)
   async addDevice(
     @Arg('device', () => DeviceInput) device: DeviceInput,
@@ -70,6 +82,13 @@ export class UserMutation extends UserBase {
     @Ctx() ctx: IContext
   ) {
     const ipAddress: string = ctx.getIpAddress()
+
+    const deviceDefaultSettings =
+      (await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })) ?? defaultDeviceSettingSystemValues
 
     return await ctx.prisma.device.create({
       data: {
@@ -80,7 +99,11 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
+        autofillCredentialsEnabled:
+          deviceDefaultSettings.autofillCredentialsEnabled,
+        autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+        syncTOTP: deviceDefaultSettings.syncTOTP
       }
     })
   }
@@ -223,12 +246,10 @@ export class UserMutation extends UserBase {
         id: this.id
       },
       data: {
-        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
-        autofillTOTPEnabled: config.autofillTOTPEnabled,
         notificationOnVaultUnlock: config.notificationOnVaultUnlock,
+        uiLanguage: config.uiLanguage,
         notificationOnWrongPasswordAttempts:
           config.notificationOnWrongPasswordAttempts,
-        uiLanguage: config.uiLanguage,
         Devices: {
           update: {
             where: {
@@ -236,7 +257,9 @@ export class UserMutation extends UserBase {
             },
             data: {
               syncTOTP: config.syncTOTP,
-              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+              autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+              autofillTOTPEnabled: config.autofillTOTPEnabled
             }
           }
         }

@@ -47,6 +47,7 @@ import {
   useDevicesListWithDataQuery,
   DevicesListWithDataDocument
 } from './Devices.codegen'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 interface SettingsValues {
   lockTime: number
@@ -203,17 +204,6 @@ const DeviceListItem = ({
                   touched,
                   values
                 }) => {
-                  const lockTimeOptions = [
-                    { label: t`1 minute`, value: 60 },
-                    { label: t`2 minutes`, value: 120 },
-                    { label: t`1 hour`, value: 3600 },
-                    { label: t`4 hours`, value: 14400 },
-                    { label: t`8 hours`, value: 28800 },
-                    { label: t`1 day`, value: 86400 },
-                    { label: t`1 week`, value: 604800 },
-                    { label: t`1 month`, value: 2592000 },
-                    { label: t`Never`, value: 0 }
-                  ]
                   return (
                     <form onSubmit={handleSubmit}>
                       <VStack spacing={4} align="flex-start">
@@ -224,7 +214,7 @@ const DeviceListItem = ({
                             <Trans>Lock time</Trans>
                           </FormLabel>
                           <Field as={Select} id="lockTime" name="lockTime">
-                            {lockTimeOptions.map((option) => (
+                            {vaultLockTimeoutOptions.map((option) => (
                               <option key={option.value} value={option.value}>
                                 {option.label}
                               </option>

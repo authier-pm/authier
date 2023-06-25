@@ -21,6 +21,7 @@ export type RootStackParamList = {
   TOTP: NavigatorScreenParams<TOTPStackParamList>
   Devices: NavigatorScreenParams<DeviceStackParamList>
   User: NavigatorScreenParams<AccountStackParamList>
+  DefaultSettings: undefined
 }
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =

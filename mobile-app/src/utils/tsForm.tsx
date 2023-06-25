@@ -2,6 +2,7 @@ import CheckBoxField from '@src/components/form/CheckBoxField'
 import FormComponent from '@src/components/form/FormComponent'
 import { PasswordTextField } from '@src/components/form/PasswordTextField'
 import SelectTextField from '@src/components/form/SelectField'
+import SelectNumberField from '@src/components/form/SelectNumberField'
 import { TextField } from '@src/components/form/TextFiled'
 import { createTsForm, createUniqueFieldSchema } from '@ts-react/form'
 import { z } from 'zod'
@@ -35,9 +36,9 @@ const mapping = [
   [inputEmailFieldSchema, TextField],
   [z.boolean(), CheckBoxField],
   [inputPswFieldSchema, PasswordTextField],
-  [selectTextFieldSchema, SelectTextField] as const
-  // [selectNumberFieldSchema, SelectNumberField] as const
+  [selectTextFieldSchema, SelectTextField] as const,
+  [selectNumberFieldSchema, SelectNumberField] as const
 ] as const // 👈 `as const` is necessary
 
 // A typesafe React component
-export const Form = createTsForm(mapping, { FormComponent })
+export const MyForm = createTsForm(mapping, { FormComponent })

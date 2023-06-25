@@ -460,10 +460,12 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
-    this.id = await this.getDeviceId()
+    const [id, storage] = await Promise.all([
+      this.getDeviceId(),
+      browser.storage.local.get()
+    ])
+    this.id = id
     let storedState: IBackgroundStateSerializable | null = null
-
-    const storage = await browser.storage.local.get()
 
     if (storage.backgroundState) {
       storedState = storage.backgroundState
@@ -491,7 +493,11 @@ class ExtensionDevice {
       }
     }
 
-    if (this.state && (isVault || isPopup)) {
+    if (
+      this.state &&
+      (isVault || isPopup) &&
+      this.state.vaultLockTimeoutSeconds
+    ) {
       this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 

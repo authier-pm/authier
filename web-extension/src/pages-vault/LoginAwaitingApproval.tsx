@@ -35,10 +35,8 @@ export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formStateContext, setFormStateContext } = useContext(LoginContext)
-
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
-
   const [
     getDeviceDecryptionChallenge,
     { data: decryptionData, error: decryptionChallengeError }
@@ -143,6 +141,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const response = await addNewDevice({
           variables: {
             email: formStateContext.email,
+            deviceId: device.id as string,
             deviceInput: {
               id: device.id as string,
               name: props.deviceName,
@@ -188,17 +187,19 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newDeviceSecretsPair.addDeviceSecret,
             authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
-            vaultLockTimeoutSeconds: 28800,
-            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
+            vaultLockTimeoutSeconds:
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
+            autofillTOTPEnabled:
+              addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
-              addNewDeviceForUser.user.autofillCredentialsEnabled,
+              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
-            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
             notificationOnWrongPasswordAttempts:
               addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
             notificationOnVaultUnlock:
-              addNewDeviceForUser.user.notificationOnVaultUnlock
+              addNewDeviceForUser.user.notificationOnVaultUnlock,
+            theme: 'dark'
           }
 
           setUserId(decodedToken.userId)

@@ -29,6 +29,7 @@ import { icons } from './Devices'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
 import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
+import { vaultLockTimeoutOptions } from '@shared/constants'
 
 const ColumnWrapper = ({
   text,
@@ -202,14 +203,13 @@ export default function DeviceInfo({
                 selectedValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
                 accessibilityLabel="Lock time"
               >
-                <Select.Item label="1 minute" value="20" />
-                <Select.Item label="2 minutes" value="120" />
-                <Select.Item label="1 hour" value="3600" />
-                <Select.Item label="4 hours" value="14400" />
-                <Select.Item label="8 hours" value="28800" />
-                <Select.Item label="1 week" value="604800" />
-                <Select.Item label="1 month" value="2592000" />
-                <Select.Item label="never" value="0" />
+                {vaultLockTimeoutOptions.map((option, index) => (
+                  <Select.Item
+                    label={option.label}
+                    value={option.value.toString()}
+                    key={index}
+                  />
+                ))}
               </Select>
 
               <Text>
