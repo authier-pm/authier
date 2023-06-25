@@ -49,12 +49,14 @@ type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
 
+  console.log('header', header)
+
+  //TODO: Make this regexp for all possible headers
+  //Later we can split it for every app eg. lastpass, bitwarden, etc.
   const indexUsername = header.findIndex((x) => x.match(/username/i))
-  const indexLabel = header.findIndex((x) => x === 'name')
+  const indexLabel = header.findIndex((x) => x.match(/name|title/i))
   const indexPassword = header.findIndex((x) => x.match(/password/i))
-  const indexUrl = header.findIndex((x) => {
-    return x === 'url' || x === 'login_uri'
-  })
+  const indexUrl = header.findIndex((x) => x.match(/url|uri|login_url/i))
 
   console.log(indexUsername, indexLabel, indexPassword, indexUrl)
   if (
@@ -101,7 +103,7 @@ export const onCSVFileAccepted = (
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
-        console.log(mapped)
+        console.log('mapped', mapped)
 
         const state = device.state as DeviceState
 
