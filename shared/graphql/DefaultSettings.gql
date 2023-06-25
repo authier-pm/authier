@@ -21,7 +21,6 @@ query defaultSettings {
     defaultDeviceSettings {
       autofillTOTPEnabled
       autofillCredentialsEnabled
-      theme
       syncTOTP
       vaultLockTimeoutSeconds
     }
