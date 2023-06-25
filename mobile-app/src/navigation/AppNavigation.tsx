@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 import messaging from '@react-native-firebase/messaging'
 import DeviceStackNavigation from './DeviceStackNavigation'
@@ -14,12 +14,11 @@ import TOTPStackNavigation from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
-import { FormControl, Modal, Text, useToast } from 'native-base'
+import { useToast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
-import { DefaultDeviceSettingsModal } from '@src/screens/DefaultDeviceSettingsModal'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 

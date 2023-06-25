@@ -50,7 +50,6 @@ const InputField = ({
 
 export const AddPassword = () => {
   const [show, setShow] = useState(false)
-  let device = useDeviceStore((state) => state)
   let deviceState = useDeviceStateStore((state) => state)
   const navigation =
     useNavigation<PasswordStackScreenProps<'AddPassword'>['navigation']>()

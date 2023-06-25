@@ -37,7 +37,6 @@ mutation addNewDeviceForUser(
             id
             autofillTOTPEnabled
             autofillCredentialsEnabled
-
             theme
             syncTOTP
             vaultLockTimeoutSeconds

@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
   WarningIcon,
+  useColorMode,
   useColorModeValue,
   useToast
 } from 'native-base'
@@ -33,11 +34,11 @@ import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
 import { useDeviceStore } from '@utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { colorModeManager } from '@src/Providers'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
+  const { colorMode, toggleColorMode } = useColorMode()
   const { formState, setFormState } = useContext(LoginContext)
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
@@ -204,12 +205,16 @@ export const useLogin = (props: { deviceName: string }) => {
             lockTimeEnd:
               Date.now() +
               addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000,
-            theme: (await colorModeManager.get()) as string,
+            theme: addNewDeviceForUser.user.defaultDeviceSettings.theme,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
               addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
             accessToken: addNewDeviceForUser?.accessToken
+          }
+
+          if (colorMode !== newDeviceState.theme) {
+            toggleColorMode()
           }
 
           device.save(newDeviceState)

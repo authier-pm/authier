@@ -13,7 +13,7 @@ export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me:
 export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', id?: number | null, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`
@@ -63,12 +63,15 @@ export const DefaultSettingsDocument = gql`
     query defaultSettings {
   me {
     id
+    masterDeviceId
     uiLanguage
     defaultDeviceSettings {
+      id
       autofillTOTPEnabled
       autofillCredentialsEnabled
       syncTOTP
       vaultLockTimeoutSeconds
+      theme
     }
   }
 }

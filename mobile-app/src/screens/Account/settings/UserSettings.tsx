@@ -11,7 +11,6 @@ import {
   Input,
   Select,
   Divider,
-  useColorMode,
   ScrollView
 } from 'native-base'
 
@@ -36,7 +35,10 @@ function UserSettings() {
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
   let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
+  let [clearAndReload, deviceId] = useDeviceStore((state) => [
+    state.clearAndReload,
+    state.id
+  ])
 
   const [deleteAccount] = useDeleteAccountMutation()
   const { data, refetch } = useDefaultSettingsQuery()
@@ -259,19 +261,22 @@ function UserSettings() {
               selectedValue={form?.theme}
               accessibilityLabel="theme"
             >
-              <Select.Item value="light" label={t`Light`} />
-              <Select.Item value="dark" label={t`Dark`} />
+              <Select.Item value="Light" label={t`Light`} />
+              <Select.Item value="Dark" label={t`Dark`} />
             </AuthierSelect>
           </VStack>
           {/** **/}
           <Heading size="md">
             <Trans>Danger zone</Trans>
           </Heading>
-          <SettingsItem
-            name={t`Change master password`}
-            onPress={() => navigation.navigate('ChangeMasterPassword')}
-            key={'ChangeMasterPassword'}
-          />
+
+          {deviceId === data?.me.masterDeviceId ? (
+            <SettingsItem
+              name={t`Change master password`}
+              onPress={() => navigation.navigate('ChangeMasterPassword')}
+              key={'ChangeMasterPassword'}
+            />
+          ) : null}
           <ButtonWithAlert
             btnText={t`Delete your account`}
             btnColor="danger"
@@ -280,7 +285,7 @@ function UserSettings() {
               backup data that you want to keep.`}
             onPress={async () => {
               await deleteAccount()
-              device.clearAndReload()
+              clearAndReload()
             }}
           />
         </VStack>
