@@ -7,7 +7,10 @@ type Query {
   authenticated: Boolean!
   me: UserQuery!
   currentDevice: DeviceQuery!
-  webInputs(host: String!): [WebInputGQL!]!
+  webInputs(
+    hosts: [String!]
+    host: String @deprecated(reason: "use hosts")
+  ): [WebInputGQLScalars!]!
 }
 
 type UserQuery {
@@ -38,7 +41,7 @@ type UserQuery {
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
   DefaultDeviceSettings: DefaultDeviceSettingsGQL
   devices: [DeviceQuery!]!
-  defaultDeviceSettings: DefaultDeviceSettingsGQLScalars!
+  defaultDeviceSettings: DefaultDeviceSettingsQuery!
   device(id: String!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
@@ -256,7 +259,7 @@ type MasterDeviceChangeGQL {
 }
 
 type DefaultDeviceSettingsGQL {
-  id: Int
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!
@@ -316,7 +319,7 @@ type EncryptedSecretQuery {
   lastUsedAt: DateTime
 }
 
-type DefaultDeviceSettingsGQLScalars {
+type DefaultDeviceSettingsQuery {
   id: Int
   createdAt: DateTime!
   updatedAt: DateTime
@@ -363,6 +366,18 @@ scalar JSON
 type DeviceLocation {
   city: String!
   countryName: String!
+}
+
+type WebInputGQLScalars {
+  id: Int!
+  layoutType: String
+  createdAt: DateTime!
+  host: String!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  domOrdinal: Int!
+  addedByUserId: String
 }
 
 type Mutation {
@@ -507,7 +522,7 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 scalar UUID
 
 type DefaultDeviceSettingsMutation {
-  id: Int
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!
@@ -517,6 +532,18 @@ type DefaultDeviceSettingsMutation {
   vaultLockTimeoutSeconds: Int!
   userId: String!
   update(config: DefaultSettingsInput!): DefaultDeviceSettingsGQLScalars!
+}
+
+type DefaultDeviceSettingsGQLScalars {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  theme: String!
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
 }
 
 input DefaultSettingsInput {

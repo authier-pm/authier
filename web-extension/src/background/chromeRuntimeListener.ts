@@ -138,6 +138,11 @@ const appRouter = tc.router({
   saveCapturedInputEvents: tcProcedure
     .input(capturedEventsPayloadSchema)
     .mutation(async ({ input }) => {
+      if (navigator.onLine === false) {
+        console.warn('ignoring saving of inputs because we are offline')
+        return
+      }
+
       capturedInputEvents = input.inputEvents
       inputsUrl = input.url
 
@@ -158,7 +163,8 @@ const appRouter = tc.router({
         mutation: AddWebInputsDocument,
         variables: {
           webInputs: newWebInputs
-        }
+        },
+        errorPolicy: 'ignore'
       })
     }),
   saveLoginCredentialsModalShown: tcProcedure

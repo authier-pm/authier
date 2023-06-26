@@ -274,7 +274,7 @@ export const VaultImportExport = () => {
                 <ListItem>
                   Lastpass/Bitwarden will work fine, file exported from other
                   password managers might work as well, but it's not guaranteed.
-                  Please send as a request for a new type of export{' '}
+                  Please send us a request for a new type of export{' '}
                   <a href="https://twitter.com/authierpm">here</a>.
                 </ListItem>
                 <ListItem>
