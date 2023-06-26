@@ -256,7 +256,7 @@ type MasterDeviceChangeGQL {
 }
 
 type DefaultDeviceSettingsGQL {
-  id: Int
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!
@@ -317,7 +317,7 @@ type EncryptedSecretQuery {
 }
 
 type DefaultDeviceSettingsGQLScalars {
-  id: Int
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!
@@ -507,7 +507,7 @@ A field whose value is a generic Universally Unique Identifier: https://en.wikip
 scalar UUID
 
 type DefaultDeviceSettingsMutation {
-  id: Int
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!

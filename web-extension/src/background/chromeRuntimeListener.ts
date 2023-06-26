@@ -233,8 +233,6 @@ const appRouter = tc.router({
       // console.log('securitySettings', input, device.state)
       if (deviceState) {
         device.setDeviceSettings(input)
-
-        // console.log('device.state', device.state)
       }
 
       return true

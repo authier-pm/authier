@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { Spinner, VStack } from '@chakra-ui/react'
 import { t } from '@lingui/macro'
@@ -27,7 +27,8 @@ export function DeviceDefaultsForm() {
         data?.me.defaultDeviceSettings.autofillCredentialsEnabled,
       syncTOTP: data?.me.defaultDeviceSettings.syncTOTP,
       vaultLockTimeoutSeconds:
-        data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds
+        data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
+      theme: data?.me.defaultDeviceSettings.theme
     },
     mode: 'onChange'
   })
@@ -44,7 +45,8 @@ export function DeviceDefaultsForm() {
       autofillTOTPEnabled: defaultsData?.autofillTOTPEnabled,
       autofillCredentialsEnabled: defaultsData?.autofillCredentialsEnabled,
       syncTOTP: defaultsData?.syncTOTP,
-      vaultLockTimeoutSeconds: defaultsData?.vaultLockTimeoutSeconds
+      vaultLockTimeoutSeconds: defaultsData?.vaultLockTimeoutSeconds,
+      theme: defaultsData?.theme
     })
   }, [isSubmitSuccessful, data])
 

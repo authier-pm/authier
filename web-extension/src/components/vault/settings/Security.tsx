@@ -1,10 +1,3 @@
-import { z } from 'zod'
-import {
-  Form,
-  selectTextFieldSchema,
-  selectNumberFieldSchema
-} from '../../util/tsForm'
-import { useForm } from 'react-hook-form'
 import {
   useUpdateSettingsMutation,
   SyncSettingsDocument
@@ -12,26 +5,34 @@ import {
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useContext, useEffect } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { VStack } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
-import { SettingsSubmitButton } from './Account'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Select,
+  VStack
+} from '@chakra-ui/react'
+import { t, Trans } from '@lingui/macro'
 
-const VaultConfigFormSchema = z.object({
-  vaultLockTimeoutSeconds: selectNumberFieldSchema.describe(
-    t`Lock time // Choose lock time`
-  ),
-  uiLanguage: selectTextFieldSchema.describe(t`Language // Choose language`),
-  autofillCredentialsEnabled: z.boolean().describe(t`Credentials autofill`),
-  autofillTOTPEnabled: z.boolean().describe(t`TOTP autofill`),
-  syncTOTP: z.boolean().describe(t`2FA sync`),
-  notificationOnWrongPasswordAttempts: z
-    .number()
-    .describe('Number of wrong password attempts for notification'),
-  notificationOnVaultUnlock: z
-    .boolean()
-    .describe('Notification on vault unlock')
-})
+import { vaultLockTimeoutOptions } from '@shared/constants'
+import { Field, Formik, FormikHelpers } from 'formik'
+
+interface Values {
+  vaultLockTimeoutSeconds: number
+  uiLanguage: string
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  syncTOTP: boolean
+  notificationOnWrongPasswordAttempts: number
+  notificationOnVaultUnlock: boolean
+}
 
 export default function Security() {
   const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
@@ -40,49 +41,6 @@ export default function Security() {
   })
 
   if (deviceState) {
-    const form = useForm<z.infer<typeof VaultConfigFormSchema>>({
-      defaultValues: {
-        autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-        autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
-        uiLanguage: deviceState.uiLanguage,
-        syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
-        notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
-        notificationOnWrongPasswordAttempts:
-          deviceState.notificationOnWrongPasswordAttempts
-      },
-      mode: 'onChange'
-    })
-
-    const {
-      formState: { isDirty, isSubmitting, isSubmitSuccessful },
-      reset
-    } = form
-
-    async function onSubmit(data: z.infer<typeof VaultConfigFormSchema>) {
-      await updateSettings({
-        variables: {
-          config: {
-            ...data
-          }
-        }
-      })
-      setSecuritySettings({ ...data })
-    }
-
-    useEffect(() => {
-      reset({
-        autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-        autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
-        uiLanguage: deviceState.uiLanguage,
-        syncTOTP: deviceState.syncTOTP,
-        vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
-        notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
-        notificationOnWrongPasswordAttempts:
-          deviceState.notificationOnWrongPasswordAttempts
-      })
-    }, [isSubmitSuccessful])
-
     return (
       <VStack
         width={'70%'}
@@ -95,28 +53,174 @@ export default function Security() {
         p={30}
         bg={useColorModeValue('white', 'gray.800')}
       >
-        <Form
-          form={form}
-          props={{
-            uiLanguage: {
-              options: ['cs', 'en']
-            },
-            vaultLockTimeoutSeconds: {
-              options: vaultLockTimeoutOptions
+        <Formik
+          initialValues={{
+            autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
+            autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
+            uiLanguage: deviceState.uiLanguage,
+            syncTOTP: deviceState.syncTOTP,
+            vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+            notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              deviceState.notificationOnWrongPasswordAttempts
+          }}
+          onSubmit={async (
+            values: Values,
+            { setSubmitting, resetForm }: FormikHelpers<Values>
+          ) => {
+            console.log(values)
+            const config = {
+              ...values,
+              vaultLockTimeoutSeconds: parseInt(
+                values.vaultLockTimeoutSeconds.toString()
+              )
             }
+
+            await updateSettings({
+              variables: {
+                config
+              }
+            })
+            setSecuritySettings(config)
+            resetForm({ values: config })
+            setSubmitting(false)
           }}
-          schema={VaultConfigFormSchema}
-          onSubmit={onSubmit}
-          formProps={{
-            submitButton: (
-              <SettingsSubmitButton
-                isDirty={isDirty}
-                isSubmitting={isSubmitting}
-              />
-            ),
-            formHeading: t`Basic security settings`
-          }}
-        />
+        >
+          {({ isSubmitting, dirty, handleSubmit }) => (
+            <form onSubmit={handleSubmit}>
+              <VStack spacing={4} align="flex-start">
+                <FormControl>
+                  <FormLabel htmlFor="vaultLockTimeoutSeconds">
+                    Lock time
+                  </FormLabel>
+                  <Field
+                    as={Select}
+                    id="vaultLockTimeoutSeconds"
+                    name="vaultLockTimeoutSeconds"
+                  >
+                    {vaultLockTimeoutOptions.map((option, index) => (
+                      <option value={option.value.toString()} key={index}>
+                        {option.label}
+                      </option>
+                    ))}
+                  </Field>
+                </FormControl>
+
+                {/*  */}
+
+                <FormControl>
+                  <FormLabel htmlFor="uiLanguage">Language</FormLabel>
+                  <Field as={Select} id="uiLanguage" name="uiLanguage">
+                    <option value="en">English</option>
+                    <option value="cs">Čeština</option>
+                  </Field>
+                </FormControl>
+
+                {/*  */}
+
+                <Field name="autofillCredentialsEnabled">
+                  {({ field }) => (
+                    <Checkbox
+                      id="autofillCredentialsEnabled"
+                      name="autofillCredentialsEnabled"
+                      isChecked={field.value}
+                      mr={5}
+                      {...field}
+                    >
+                      Credentials autofill
+                    </Checkbox>
+                  )}
+                </Field>
+
+                {/*  */}
+                <Field name="autofillTOTPEnabled">
+                  {({ field }) => (
+                    <Checkbox
+                      id="autofillTOTPEnabled"
+                      name="autofillTOTPEnabled"
+                      isChecked={field.value}
+                      mr={5}
+                      {...field}
+                    >
+                      TOTP autofill
+                    </Checkbox>
+                  )}
+                </Field>
+
+                {/*  */}
+                <Field name="syncTOTP">
+                  {({ field }) => (
+                    <Checkbox
+                      id="syncTOTP"
+                      name="syncTOTP"
+                      isChecked={field.value}
+                      mr={5}
+                      {...field}
+                    >
+                      2FA sync
+                    </Checkbox>
+                  )}
+                </Field>
+                {/*  */}
+                <Field name="notificationOnWrongPasswordAttempts">
+                  {({ field, form }) => (
+                    <NumberInput
+                      id="notificationOnWrongPasswordAttempts"
+                      mr={5}
+                      name="notificationOnWrongPasswordAttempts"
+                      size="md"
+                      value={field.value} // TODO make this configurable per user
+                      min={0}
+                      onChange={(val) => {
+                        form.setFieldValue(field.name, parseInt(val))
+                      }}
+                    >
+                      <NumberInputField />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                  )}
+                </Field>
+                {/*  */}
+                <Field name="notificationOnVaultUnlock">
+                  {({ field }) => (
+                    <Checkbox
+                      id="notificationOnVaultUnlock"
+                      name="notificationOnVaultUnlock"
+                      isChecked={field.value}
+                      mr={5}
+                      {...field}
+                    >
+                      Notification on vault unlock
+                    </Checkbox>
+                  )}
+                </Field>
+
+                <Button
+                  isDisabled={isSubmitting || !dirty}
+                  isLoading={isSubmitting}
+                  type="submit"
+                  bg={'blue.400'}
+                  color={'white'}
+                  boxShadow={
+                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                  }
+                  _hover={{
+                    bg: 'blue.500'
+                  }}
+                  _focus={{
+                    bg: 'blue.500'
+                  }}
+                  aria-label="Save"
+                >
+                  Save
+                </Button>
+              </VStack>
+            </form>
+          )}
+        </Formik>
       </VStack>
     )
   }
