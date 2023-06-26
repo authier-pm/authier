@@ -5,5 +5,5 @@ export const defaultDeviceSettingSystemValues = {
   syncTOTP: true,
   theme: 'Dark',
   //This needs to heve ID @capaj
-  id: 1
+  id: 0
 }

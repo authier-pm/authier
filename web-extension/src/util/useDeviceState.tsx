@@ -138,6 +138,8 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
+      //WARNING: This probably starts second timer???
+      device.setDeviceSettings(config)
       await trpc.securitySettings.mutate(config)
     },
     setDeviceState: async (state: IBackgroundStateSerializable) => {

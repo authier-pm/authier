@@ -19,7 +19,7 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
       theme: config.theme
     }
 
-    if (this.id) {
+    if (this.id && this.id !== 0) {
       return await ctx.prisma.defaultDeviceSettings.update({
         where: {
           id: this.id

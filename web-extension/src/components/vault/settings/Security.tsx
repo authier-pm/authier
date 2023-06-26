@@ -36,11 +36,13 @@ interface Values {
 
 export default function Security() {
   const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
+
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
   })
 
   if (deviceState) {
+    console.log(deviceState.notificationOnVaultUnlock)
     return (
       <VStack
         width={'70%'}
