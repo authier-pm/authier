@@ -47,7 +47,7 @@ export interface IInitStateRes {
   secretsForHost: IDecryptedSecrets
   passwordCount: number
   webInputs: Array<{
-    __typename?: 'WebInputGQL'
+    __typename?: 'WebInputGQLScalars'
     id?: number
     url: string
     host: string

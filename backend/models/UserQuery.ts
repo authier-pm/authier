@@ -22,6 +22,7 @@ import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettingsGQL'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -76,7 +77,7 @@ export class UserQuery extends UserBase {
     })
   }
 
-  @Field(() => DefaultDeviceSettingsGQLScalars)
+  @Field(() => DefaultDeviceSettingsQuery)
   async defaultDeviceSettings(@Ctx() ctx: IContext) {
     return super.defaultDeviceSettings(ctx)
   }

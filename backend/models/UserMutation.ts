@@ -36,7 +36,7 @@ import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
-import { DefaultDeviceSettingsMutation } from './DefaultSettings'
+import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 const log = debug('au:userMutation')
