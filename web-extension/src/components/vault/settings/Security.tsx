@@ -3,13 +3,12 @@ import {
   SyncSettingsDocument
 } from '@shared/graphql/Settings.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { useContext, useEffect } from 'react'
+import { useContext } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import {
   Button,
   Checkbox,
   FormControl,
-  FormErrorMessage,
   FormLabel,
   NumberDecrementStepper,
   NumberIncrementStepper,
@@ -19,7 +18,7 @@ import {
   Select,
   VStack
 } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { Trans } from '@lingui/macro'
 
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { Field, Formik, FormikHelpers } from 'formik'
@@ -42,7 +41,6 @@ export default function Security() {
   })
 
   if (deviceState) {
-    console.log(deviceState.notificationOnVaultUnlock)
     return (
       <VStack
         width={'70%'}
@@ -70,7 +68,6 @@ export default function Security() {
             values: Values,
             { setSubmitting, resetForm }: FormikHelpers<Values>
           ) => {
-            console.log(values)
             const config = {
               ...values,
               vaultLockTimeoutSeconds: parseInt(
@@ -129,7 +126,7 @@ export default function Security() {
                       mr={5}
                       {...field}
                     >
-                      Credentials autofill
+                      <Trans>Credentials autofill</Trans>
                     </Checkbox>
                   )}
                 </Field>
@@ -159,7 +156,7 @@ export default function Security() {
                       mr={5}
                       {...field}
                     >
-                      2FA sync
+                      <Trans>2FA sync</Trans>
                     </Checkbox>
                   )}
                 </Field>
@@ -195,7 +192,7 @@ export default function Security() {
                       mr={5}
                       {...field}
                     >
-                      Notification on vault unlock
+                      <Trans>Notification on vault unlock</Trans>
                     </Checkbox>
                   )}
                 </Field>
@@ -217,7 +214,7 @@ export default function Security() {
                   }}
                   aria-label="Save"
                 >
-                  Save
+                  <Trans>Save</Trans>
                 </Button>
               </VStack>
             </form>

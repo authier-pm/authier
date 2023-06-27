@@ -202,8 +202,8 @@ function DeviceSettings() {
                 selectedValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
-                <Select.Item label="light" value="light" />
-                <Select.Item label="dark" value="dark" />
+                <Select.Item label="Light" value="light" />
+                <Select.Item label="Dark" value="dark" />
               </AuthierSelect>
             </Box>
           </VStack>

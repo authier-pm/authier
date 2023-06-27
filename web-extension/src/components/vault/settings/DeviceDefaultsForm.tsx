@@ -1,30 +1,21 @@
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { useEffect } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import {
   Button,
   Checkbox,
   FormControl,
   FormLabel,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   Select,
   Spinner,
   VStack
 } from '@chakra-ui/react'
 
 import {
+  DefaultSettingsDocument,
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
-import {
-  DefaultsFormSchema,
-  defaultsFormProps
-} from '@src/pages-vault/DefaultSettings'
+import { Trans } from '@lingui/macro'
+
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { Formik, FormikHelpers, Field } from 'formik'
 
@@ -38,8 +29,12 @@ interface Values {
 }
 
 export function DeviceDefaultsForm() {
-  const { data, loading } = useDefaultSettingsQuery()
-  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({})
+  const { data, loading } = useDefaultSettingsQuery({
+    fetchPolicy: 'network-only'
+  })
+  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
+    refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
+  })
   const bgColor = useColorModeValue('white', 'gray.800')
 
   if (loading || !data) return <Spinner />
@@ -72,13 +67,13 @@ export function DeviceDefaultsForm() {
           values: Values,
           { setSubmitting, resetForm }: FormikHelpers<Values>
         ) => {
-          console.log(values)
           const config = {
             ...values,
             vaultLockTimeoutSeconds: parseInt(
               values.vaultLockTimeoutSeconds.toString()
             )
           }
+
           await updateDefaultSettings({
             variables: {
               config
@@ -93,7 +88,7 @@ export function DeviceDefaultsForm() {
             <VStack spacing={4} align="flex-start">
               <FormControl>
                 <FormLabel htmlFor="vaultLockTimeoutSeconds">
-                  Lock time
+                  <Trans>Lock time</Trans>
                 </FormLabel>
                 <Field
                   as={Select}
@@ -111,7 +106,9 @@ export function DeviceDefaultsForm() {
               {/*  */}
 
               <FormControl>
-                <FormLabel htmlFor="uiLanguage">Language</FormLabel>
+                <FormLabel htmlFor="uiLanguage">
+                  <Trans>Language</Trans>
+                </FormLabel>
                 <Field as={Select} id="uiLanguage" name="uiLanguage">
                   <option value="en">English</option>
                   <option value="cs">Čeština</option>
@@ -129,7 +126,7 @@ export function DeviceDefaultsForm() {
                     mr={5}
                     {...field}
                   >
-                    Credentials autofill
+                    <Trans>Credentials autofill</Trans>
                   </Checkbox>
                 )}
               </Field>
@@ -144,7 +141,7 @@ export function DeviceDefaultsForm() {
                     mr={5}
                     {...field}
                   >
-                    TOTP autofill
+                    <Trans>TOTP autofill</Trans>
                   </Checkbox>
                 )}
               </Field>
@@ -159,16 +156,18 @@ export function DeviceDefaultsForm() {
                     mr={5}
                     {...field}
                   >
-                    2FA sync
+                    <Trans>2FA sync</Trans>
                   </Checkbox>
                 )}
               </Field>
               {/*  */}
               <FormControl>
-                <FormLabel htmlFor="theme">Language</FormLabel>
+                <FormLabel htmlFor="theme">
+                  <Trans>Language</Trans>
+                </FormLabel>
                 <Field as={Select} id="theme" name="theme">
-                  <option value="Dark">Dark</option>
-                  <option value="Light">Light</option>
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
                 </Field>
               </FormControl>
 
@@ -189,7 +188,7 @@ export function DeviceDefaultsForm() {
                 }}
                 aria-label="Save"
               >
-                Save
+                <Trans>Save</Trans>
               </Button>
             </VStack>
           </form>

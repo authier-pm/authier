@@ -20,7 +20,6 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
-import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettingsGQL'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
 

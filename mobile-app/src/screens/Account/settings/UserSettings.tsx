@@ -261,8 +261,8 @@ function UserSettings() {
               selectedValue={form?.theme}
               accessibilityLabel="theme"
             >
-              <Select.Item value="Light" label={t`Light`} />
-              <Select.Item value="Dark" label={t`Dark`} />
+              <Select.Item value="light" label={t`Light`} />
+              <Select.Item value="dark" label={t`Dark`} />
             </AuthierSelect>
           </VStack>
           {/** **/}

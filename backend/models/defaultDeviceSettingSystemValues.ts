@@ -3,7 +3,6 @@ export const defaultDeviceSettingSystemValues = {
   autofillTOTPEnabled: true,
   autofillCredentialsEnabled: true,
   syncTOTP: true,
-  theme: 'Dark',
-  //This needs to heve ID @capaj
+  theme: 'dark',
   id: 0
 }

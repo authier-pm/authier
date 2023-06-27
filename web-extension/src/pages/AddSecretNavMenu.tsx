@@ -1,9 +1,9 @@
-import React, { FunctionComponent, useContext } from 'react'
+import { FunctionComponent, useContext } from 'react'
 
 import { Button, ButtonGroup, Stack, useColorModeValue } from '@chakra-ui/react'
 
-import { AddIcon, InfoOutlineIcon } from '@chakra-ui/icons'
-import { Link } from 'wouter'
+import { AddIcon } from '@chakra-ui/icons'
+
 import { AddTOTPSecretButton } from '@src/components/pages/AddTOTPSecretButton'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'

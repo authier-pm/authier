@@ -11,7 +11,8 @@ import {
   Text,
   HStack,
   useToast,
-  Icon
+  Icon,
+  useColorMode
 } from 'native-base'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
@@ -40,7 +41,8 @@ type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 
 export function Register({ navigation }: NavigationProps) {
   const [register, { error }] = useRegisterNewUserMutation()
-  const [show, setShow] = useState(false)
+  const [show, setShow] = useState<boolean>(false)
+  const { colorMode, toggleColorMode } = useColorMode()
   const toast = useToast()
   const id = 'active-toast'
   const device = useDeviceStore((state) => state)
@@ -150,6 +152,10 @@ export function Register({ navigation }: NavigationProps) {
         notificationOnVaultUnlock:
           registerResult.user.notificationOnVaultUnlock,
         accessToken: registerResult.accessToken
+      }
+
+      if (colorMode !== newDeviceState.theme) {
+        toggleColorMode()
       }
 
       device.save(newDeviceState)
