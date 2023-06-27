@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Authier",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "description": "Authier web Extension for all our supported browsers",
   "action": {
     "default_icon": {
@@ -27,10 +27,10 @@
     "128": "icon-128.png"
   },
   "host_permissions": ["<all_urls>"],
-  "permissions": ["activeTab", "storage", "tabs"],
+  "permissions": ["activeTab", "storage", "tabs", "clipboardRead"],
   "web_accessible_resources": [
     {
-      "resources": ["*.png", "*.js.map"],
+      "resources": ["*.png"],
       "matches": ["<all_urls>"]
     }
   ]
