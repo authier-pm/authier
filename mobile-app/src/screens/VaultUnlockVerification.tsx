@@ -40,7 +40,7 @@ export function VaultUnlockVerification() {
   const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
     state.notificationOnVaultUnlock
   ])
-  const [sendAuthMesssage] = useSendAuthMessageLazyQuery({
+  const [sendAuthMessage] = useSendAuthMessageLazyQuery({
     fetchPolicy: 'network-only'
   })
   const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
@@ -91,7 +91,7 @@ export function VaultUnlockVerification() {
     notificationOnWrongPasswordAttempts != 0 &&
     tries >= notificationOnWrongPasswordAttempts
   ) {
-    sendAuthMesssage({
+    sendAuthMessage({
       variables: {
         body: ' is trying to unlock your vault',
         title: 'Wrong password entered',
@@ -160,7 +160,7 @@ export function VaultUnlockVerification() {
             if (notificationOnVaultUnlock) {
               console.log('send notification', device.id)
 
-              await sendAuthMesssage({
+              await sendAuthMessage({
                 variables: {
                   body: ' unlocked your vault',
                   title: 'Vault unlocked',
