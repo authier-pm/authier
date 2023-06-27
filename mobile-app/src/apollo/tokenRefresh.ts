@@ -38,7 +38,7 @@ export const tokenRefresh = new TokenRefreshLink({
   },
   handleError: async (err) => {
     if (err.message.includes('not authenticated')) {
-      console.warn(
+      console.log(
         'Your refresh token is invalid. You must login again',
         err.message
       )

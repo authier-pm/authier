@@ -74,7 +74,7 @@ export function VaultUnlockVerification() {
           })
           unlockVault(psw)
         } catch (error) {
-          console.warn(error)
+          console.log(error)
           setTries(tries + 1)
           setLoading(false)
         }
@@ -158,7 +158,7 @@ export function VaultUnlockVerification() {
             await unlockVault(values.password)
 
             if (notificationOnVaultUnlock) {
-              console.warn('send notification', device.id)
+              console.log('send notification', device.id)
 
               await sendAuthMesssage({
                 variables: {

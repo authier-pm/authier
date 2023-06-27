@@ -159,7 +159,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         const start = performance.now()
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
         const end = performance.now()
-        console.warn(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
+        console.log(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
       },
       setMasterEncryptionKey: async (masterPassword: string) => {
         const key = await generateEncryptionKey(
@@ -442,7 +442,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        console.warn('resetting device state')
+        console.log('resetting device state')
         set({
           ...initialState,
           theme: get().theme,

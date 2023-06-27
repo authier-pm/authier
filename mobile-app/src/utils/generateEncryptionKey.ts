@@ -106,7 +106,7 @@ export async function decryptDeviceSecretWithPassword(
     const addDeviceSecret = dec.decode(decryptedContent)
     return { addDeviceSecret, masterEncryptionKey }
   } catch (error) {
-    console.warn('error:', error)
+    console.log('error:', error)
     return { error: 'Wrong password' }
   }
 }

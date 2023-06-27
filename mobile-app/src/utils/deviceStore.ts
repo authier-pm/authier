@@ -383,7 +383,7 @@ export const useDeviceStore = create<Device>()(
             mutation: LogoutDocument
           })
         } catch (err: any) {
-          console.warn(
+          console.log(
             `There was an error logging out: ${err.message} \n., you will need to deauthorize the device manually in device management.`,
             {
               autoClose: false,
@@ -447,7 +447,7 @@ export const useDeviceStore = create<Device>()(
         set({
           lockInterval: setInterval(() => {
             if (state.lockTimeEnd && state.lockTimeEnd <= Date.now()) {
-              console.warn('Vault locking', state.lockTimeEnd)
+              console.log('Vault locking', state.lockTimeEnd)
               get().lock()
             }
           }, 5000)
