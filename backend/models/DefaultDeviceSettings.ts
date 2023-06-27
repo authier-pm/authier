@@ -1,8 +1,15 @@
-import { Arg, Ctx, Field, ObjectType } from 'type-graphql'
+import { Arg, Ctx, Field, Int, ObjectType } from 'type-graphql'
 import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettingsGQL'
 
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { DefaultSettingsInput } from './models'
+
+@ObjectType()
+export class DefaultDeviceSettingsQuery extends DefaultDeviceSettingsGQLScalars {
+  @Field(() => Int, { nullable: true })
+  // @ts-expect-error This is ok, we need the id to be nullable here
+  id: number | null
+}
 
 @ObjectType()
 export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScalars {

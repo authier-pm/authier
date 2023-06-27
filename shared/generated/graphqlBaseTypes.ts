@@ -171,6 +171,19 @@ export type DefaultDeviceSettingsMutationUpdateArgs = {
   config: DefaultSettingsInput;
 };
 
+export type DefaultDeviceSettingsQuery = {
+  __typename?: 'DefaultDeviceSettingsQuery';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id?: Maybe<Scalars['Int']['output']>;
+  syncTOTP: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userId: Scalars['String']['output'];
+  vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
 export type DefaultSettingsInput = {
   autofillCredentialsEnabled: Scalars['Boolean']['input'];
   autofillTOTPEnabled: Scalars['Boolean']['input'];
@@ -447,12 +460,13 @@ export type Query = {
   currentDevice: DeviceQuery;
   me: UserQuery;
   osTime: Scalars['String']['output'];
-  webInputs: Array<WebInputGql>;
+  webInputs: Array<WebInputGqlScalars>;
 };
 
 
 export type QueryWebInputsArgs = {
-  host: Scalars['String']['input'];
+  host?: InputMaybe<Scalars['String']['input']>;
+  hosts?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type RegisterNewAccountInput = {
@@ -715,7 +729,7 @@ export type UserQuery = {
   addDeviceSecretEncrypted: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
-  defaultDeviceSettings: DefaultDeviceSettingsGqlScalars;
+  defaultDeviceSettings: DefaultDeviceSettingsQuery;
   device: DeviceQuery;
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];
   devices: Array<DeviceQuery>;
@@ -765,6 +779,19 @@ export type WebInputGql = {
   __typename?: 'WebInputGQL';
   UsageEvents: Array<SecretUsageEventGql>;
   addedByUser?: Maybe<UserGql>;
+  addedByUserId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  domOrdinal: Scalars['Int']['output'];
+  domPath: Scalars['String']['output'];
+  host: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  kind: WebInputType;
+  layoutType?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
+};
+
+export type WebInputGqlScalars = {
+  __typename?: 'WebInputGQLScalars';
   addedByUserId?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   domOrdinal: Scalars['Int']['output'];

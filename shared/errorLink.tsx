@@ -25,8 +25,9 @@ export const errorLink = onError(
         isClosable: true
       })
     } else if (networkError) {
-      console.log('pepe')
       console.error(`[Network error]: ${networkError}`)
+      console.error('operation', operation)
+
       toast({
         title: 'There was network error.',
         status: 'error',

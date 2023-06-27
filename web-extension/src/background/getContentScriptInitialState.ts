@@ -1,6 +1,10 @@
 import { apolloClient } from '@src/apollo/apolloClient'
 import { IInitStateRes } from '@src/content-script/contentScript'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import {
+  EncryptedSecretType,
+  WebInputGql,
+  WebInputGqlScalars
+} from '../../../shared/generated/graphqlBaseTypes'
 import { saveLoginModalsStates } from './chromeRuntimeListener'
 import {
   WebInputsForHostDocument,
@@ -34,12 +38,22 @@ export const getContentScriptInitialState = async (
     decrypted = []
   }
 
-  const res = hostname ? await getWebInputs(hostname) : null
+  let webInputs: WebInputGqlScalars[] = []
+
+  if (hostname) {
+    try {
+      const webInputsResponse = await getWebInputs(hostname) // TODO move web inputs into device init. We will make a single call to get all the web inputs for all the hosts that appear in users secrets
+      webInputs = webInputsResponse?.data.webInputs ?? []
+    } catch (err) {
+      log('webInputs error', err)
+      // we don't want to throw here, because it would break autofill in content script which does not even need webInputs in many cases
+    }
+  }
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
     autofillEnabled: !!device.state?.autofillCredentialsEnabled,
-    webInputs: res?.data.webInputs ?? [],
+    webInputs: webInputs,
     passwordCount:
       device.state?.secrets.filter(
         (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
@@ -67,7 +81,7 @@ const getWebInputs = mem(
     >({
       query: WebInputsForHostDocument,
       variables: { host: hostname },
-      fetchPolicy: 'network-only'
+      errorPolicy: 'ignore'
     })
   },
   { maxAge: ms('2 days') }

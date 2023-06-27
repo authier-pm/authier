@@ -15,7 +15,7 @@ export type WebInputsForHostQueryVariables = Types.Exact<{
 }>;
 
 
-export type WebInputsForHostQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQL', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
+export type WebInputsForHostQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
 
 
 export const AddWebInputsDocument = gql`
