@@ -30,18 +30,27 @@ import {
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { vaultLockTimeoutOptions } from '@shared/constants'
+import { useNetInfo } from '@react-native-community/netinfo'
+import { RefreshControl } from 'react-native'
+import { useSyncSettingsLazyQuery } from '@shared/graphql/Settings.codegen'
 
 function UserSettings() {
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
+  const { isConnected } = useNetInfo()
   let deviceState = useDeviceStateStore((state) => state)
-  let [clearAndReload, deviceId] = useDeviceStore((state) => [
-    state.clearAndReload,
-    state.id
-  ])
-
+  let [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
+    (state) => [state.clearAndReload, state.id, state.updateDeviceSettings]
+  )
   const [deleteAccount] = useDeleteAccountMutation()
-  const { data, refetch } = useDefaultSettingsQuery()
+
+  const {
+    data,
+    refetch: refetchDefaultSettings,
+    loading: loadingDefaultSettings
+  } = useDefaultSettingsQuery({
+    fetchPolicy: 'network-only'
+  })
 
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
   const [isOpen, setIsOpen] = useState(
@@ -49,15 +58,15 @@ function UserSettings() {
   )
   type SettingsFormType = Omit<DefaultSettingsInput, 'uiLanguage'>
   const [uiLanguage, setUiLanguage] = useState(data?.me.uiLanguage ?? 'en')
-
   const [form, setForm] = useState<SettingsFormType | null>(null)
   const [previousSettings, setPreviousSettings] =
     useState<SettingsFormType | null>(null)
+
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const defaultData = data?.me.defaultDeviceSettings
 
   useEffect(() => {
-    if (defaultData && !form) {
+    if (defaultData) {
       const formData = {
         vaultLockTimeoutSeconds: defaultData.vaultLockTimeoutSeconds,
         theme: defaultData.theme,
@@ -66,10 +75,13 @@ function UserSettings() {
         autofillTOTPEnabled: defaultData.autofillTOTPEnabled
       }
 
-      setForm(formData)
+      if (!form || JSON.stringify(formData) !== JSON.stringify(form)) {
+        setForm(formData)
+        setPreviousSettings(formData)
+      }
     }
 
-    if (!previousSettings && data) {
+    if (!previousSettings && form) {
       setPreviousSettings(form)
       return
     }
@@ -93,15 +105,27 @@ function UserSettings() {
             config
           }
         })
-        refetch()
-      })()
-    }
 
-    setPreviousSettings(form)
+        refetchDefaultSettings()
+      })()
+
+      setPreviousSettings(form)
+    }
   }, [defaultData, form])
 
   return (
-    <ScrollView mt={5}>
+    <ScrollView
+      mt={5}
+      refreshControl={
+        <RefreshControl
+          refreshing={loadingDefaultSettings}
+          onRefresh={async () => {
+            await refetchDefaultSettings()
+            updateDeviceSettings()
+          }}
+        />
+      }
+    >
       <Center>
         <VStack width="90%" space={4}>
           <Heading size="md">
@@ -159,7 +183,9 @@ function UserSettings() {
               </Animated.View>
             ) : null}
             <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text fontSize="md">On vault unlock</Text>
+              <Text fontSize="md">
+                <Trans>On vault unlock</Trans>
+              </Text>
               <Switch
                 value={deviceState.notificationOnVaultUnlock}
                 onToggle={(e) => {
@@ -181,90 +207,108 @@ function UserSettings() {
             </AuthierSelect>
           </VStack>
           {/** **/}
-          <Heading size="md">
-            <Trans>New device default settings</Trans>
-          </Heading>
+          {isConnected ? (
+            <>
+              <Heading size="md">
+                <Trans>New device default settings</Trans>
+              </Heading>
+              <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}>
+                <AuthierSelect
+                  variant="rounded"
+                  onValueChange={(value) => {
+                    setForm({
+                      ...(form as DefaultSettingsInput),
+                      vaultLockTimeoutSeconds: parseInt(value)
+                    })
+                  }}
+                  selectedValue={(
+                    form?.vaultLockTimeoutSeconds ?? 28800
+                  ).toString()}
+                  accessibilityLabel="Lock time"
+                >
+                  {vaultLockTimeoutOptions.map((option, index) => (
+                    <Select.Item
+                      label={option.label}
+                      value={option.value.toString()}
+                      key={index}
+                    />
+                  ))}
+                </AuthierSelect>
 
-          <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}>
-            <AuthierSelect
-              variant="rounded"
-              onValueChange={(value) => {
-                setForm({
-                  ...(form as DefaultSettingsInput),
-                  vaultLockTimeoutSeconds: parseInt(value)
-                })
-              }}
-              selectedValue={(
-                form?.vaultLockTimeoutSeconds ?? 28800
-              ).toString()}
-              accessibilityLabel="Lock time"
-            >
-              {vaultLockTimeoutOptions.map((option, index) => (
-                <Select.Item
-                  label={option.label}
-                  value={option.value.toString()}
-                  key={index}
-                />
-              ))}
-            </AuthierSelect>
-            <Text>
-              <Trans>
-                Automatically locks vault after chosen period of time
-              </Trans>
-            </Text>
+                <Trans>
+                  Automatically locks vault after chosen period of time
+                </Trans>
 
-            <Divider />
-            <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>2FA</Text>
-              <Switch
-                value={form?.syncTOTP}
-                onToggle={async (e) => {
-                  setForm({ ...(form as DefaultSettingsInput), syncTOTP: e })
-                }}
-                size="md"
-              />
-            </HStack>
-            <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>Credentials autofill</Text>
-              <Switch
-                value={form?.autofillCredentialsEnabled}
-                onToggle={async (e) => {
-                  setForm({
-                    ...(form as DefaultSettingsInput),
-                    autofillCredentialsEnabled: e
-                  })
-                }}
-                size="md"
-              />
-            </HStack>
-            <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>TOTP autofill</Text>
-              <Switch
-                value={form?.autofillTOTPEnabled}
-                onToggle={async (e) => {
-                  setForm({
-                    ...(form as DefaultSettingsInput),
-                    autofillTOTPEnabled: e
-                  })
-                }}
-                size="md"
-              />
-            </HStack>
+                <Divider />
+                <HStack
+                  justifyContent="space-between"
+                  alignContent="center"
+                  p={2}
+                >
+                  <Text>2FA</Text>
+                  <Switch
+                    value={form?.syncTOTP}
+                    onToggle={async (e) => {
+                      setForm({
+                        ...(form as DefaultSettingsInput),
+                        syncTOTP: e
+                      })
+                    }}
+                    size="md"
+                  />
+                </HStack>
+                <HStack
+                  justifyContent="space-between"
+                  alignContent="center"
+                  p={2}
+                >
+                  <Text>Credentials autofill</Text>
+                  <Switch
+                    value={form?.autofillCredentialsEnabled}
+                    onToggle={async (e) => {
+                      setForm({
+                        ...(form as DefaultSettingsInput),
+                        autofillCredentialsEnabled: e
+                      })
+                    }}
+                    size="md"
+                  />
+                </HStack>
+                <HStack
+                  justifyContent="space-between"
+                  alignContent="center"
+                  p={2}
+                >
+                  <Trans>TOTP autofill</Trans>
+                  <Switch
+                    value={form?.autofillTOTPEnabled}
+                    onToggle={async (e) => {
+                      setForm({
+                        ...(form as DefaultSettingsInput),
+                        autofillTOTPEnabled: e
+                      })
+                    }}
+                    size="md"
+                  />
+                </HStack>
 
-            <AuthierSelect
-              onValueChange={(theme) => {
-                setForm({
-                  ...(form as DefaultSettingsInput),
-                  theme
-                })
-              }}
-              selectedValue={form?.theme}
-              accessibilityLabel="theme"
-            >
-              <Select.Item value="light" label={t`Light`} />
-              <Select.Item value="dark" label={t`Dark`} />
-            </AuthierSelect>
-          </VStack>
+                <AuthierSelect
+                  onValueChange={(theme) => {
+                    setForm({
+                      ...(form as DefaultSettingsInput),
+                      theme
+                    })
+                  }}
+                  selectedValue={form?.theme}
+                  accessibilityLabel="theme"
+                >
+                  <Select.Item value="light" label={t`Light`} />
+                  <Select.Item value="dark" label={t`Dark`} />
+                </AuthierSelect>
+              </VStack>
+            </>
+          ) : null}
+
           {/** **/}
           <Heading size="md">
             <Trans>Danger zone</Trans>

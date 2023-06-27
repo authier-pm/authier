@@ -205,6 +205,7 @@ export const useLogin = (props: { deviceName: string }) => {
             lockTimeEnd:
               Date.now() +
               addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000,
+            //TODO: distinguish between "new" and "old" device
             theme: addNewDeviceForUser.user.defaultDeviceSettings.theme,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,

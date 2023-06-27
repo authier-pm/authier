@@ -93,9 +93,7 @@ function DeviceSettings() {
             </Heading>
             <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}>
               <VStack space={2}>
-                <Text>
-                  <Trans>Lock time</Trans>
-                </Text>
+                <Trans>Lock time</Trans>
 
                 <Box p={2}>
                   <AuthierSelect
@@ -117,11 +115,9 @@ function DeviceSettings() {
                     ))}
                   </AuthierSelect>
 
-                  <Text>
-                    <Trans>
-                      Automatically locks vault after chosen period of time
-                    </Trans>
-                  </Text>
+                  <Trans>
+                    Automatically locks vault after chosen period of time
+                  </Trans>
                 </Box>
               </VStack>
               <Divider />
