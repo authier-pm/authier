@@ -193,8 +193,8 @@ export function DefaultDeviceSettingsModal() {
                   selectedValue={form.theme}
                   accessibilityLabel="theme"
                 >
-                  <Select.Item label={t`light`} value="Light" />
-                  <Select.Item label={t`dark`} value="Dark" />
+                  <Select.Item label={t`Light`} value="light" />
+                  <Select.Item label={t`Dark`} value="dark" />
                 </AuthierSelect>
               </Box>
             </VStack>
@@ -212,7 +212,7 @@ export function DefaultDeviceSettingsModal() {
 
                 const defaultDeviceSettings = omit(
                   data?.me.defaultDeviceSettings,
-                  ['__typename', 'theme']
+                  ['__typename', 'theme', 'id']
                 )
                 const config = {
                   ...(defaultDeviceSettings ?? {}),
@@ -222,7 +222,6 @@ export function DefaultDeviceSettingsModal() {
                   notificationOnVaultUnlock: notificationOnVaultUnlock
                 }
 
-                console.log({ config })
                 await updateSettings({
                   variables: {
                     config
