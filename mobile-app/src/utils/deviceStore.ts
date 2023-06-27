@@ -224,7 +224,6 @@ export const useDeviceStore = create<Device>()(
             SyncSettingsQueryVariables
           >({
             query: SyncSettingsDocument,
-            variables: {},
             fetchPolicy: 'network-only'
           })
 

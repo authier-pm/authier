@@ -47,7 +47,7 @@ const page_url = process.env.PAGE_URL as string
 
 export const AccountLimits = () => {
   const { data } = useLimitsQuery({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   })
   const [refreshAccountTooltip, setRefreshAccountTooltip] = useState(false)
   return (

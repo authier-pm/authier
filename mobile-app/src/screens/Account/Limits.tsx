@@ -23,7 +23,7 @@ export default function Limits() {
     state.email
   ])
   const { data, refetch, loading } = useLimitsQuery({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   })
 
   return (

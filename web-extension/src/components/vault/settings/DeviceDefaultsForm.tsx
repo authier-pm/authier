@@ -30,7 +30,7 @@ interface Values {
 
 export function DeviceDefaultsForm() {
   const { data, loading } = useDefaultSettingsQuery({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   })
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
     refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]

@@ -15,7 +15,7 @@ export function RefreshAccountLimits({
   const [isSyncing, setIsSyncing] = useState(false)
   const toast = useToast()
   const { refetch } = useLimitsQuery({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   })
 
   return (

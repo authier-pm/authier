@@ -27,7 +27,6 @@ import RNBootSplash from 'react-native-bootsplash'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import SInfo from 'react-native-sensitive-info'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useSendAuthMessageLazyQuery } from './VaultUnlock.codegen'
 
 interface Values {
   password: string
@@ -40,9 +39,7 @@ export function VaultUnlockVerification() {
   const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
     state.notificationOnVaultUnlock
   ])
-  const [sendAuthMesssage] = useSendAuthMessageLazyQuery({
-    fetchPolicy: 'network-only'
-  })
+
   const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
     state.notificationOnWrongPasswordAttempts
   ])
@@ -91,14 +88,15 @@ export function VaultUnlockVerification() {
     notificationOnWrongPasswordAttempts != 0 &&
     tries >= notificationOnWrongPasswordAttempts
   ) {
-    sendAuthMesssage({
-      variables: {
-        body: ' is trying to unlock your vault',
-        title: 'Wrong password entered',
-        type: 'wrongPassword',
-        deviceId: device.id as string
-      }
-    })
+    // TODO do this on BE
+    // sendAuthMessage({
+    //   variables: {
+    //     body: ' is trying to unlock your vault',
+    //     title: 'Wrong password entered',
+    //     type: 'wrongPassword',
+    //     deviceId: device.id as string
+    //   }
+    // })
     setTries(0)
   }
 
@@ -160,14 +158,15 @@ export function VaultUnlockVerification() {
             if (notificationOnVaultUnlock) {
               console.log('send notification', device.id)
 
-              await sendAuthMesssage({
-                variables: {
-                  body: ' unlocked your vault',
-                  title: 'Vault unlocked',
-                  type: 'vaultUnlocked',
-                  deviceId: device.id as string
-                }
-              })
+              // TODO trigger BE mutation: currentDevice { setUnlocked }
+              // await sendAuthMessage({
+              //   variables: {
+              //     body: ' unlocked your vault',
+              //     title: 'Vault unlocked',
+              //     type: 'vaultUnlocked',
+              //     deviceId: device.id as string
+              //   }
+              // })
             }
             setSubmitting(false)
           } catch (err: any) {
