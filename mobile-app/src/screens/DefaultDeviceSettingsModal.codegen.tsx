@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type DefaultDeviceSettingsModalQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultDeviceSettingsModalQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, devicesCount: number, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsGQLScalars', id?: number | null } } };
+export type DefaultDeviceSettingsModalQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, devicesCount: number, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id?: number | null } } };
 
 
 export const DefaultDeviceSettingsModalDocument = gql`
