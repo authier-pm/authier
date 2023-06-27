@@ -40,15 +40,9 @@ module.exports = {
     'jest/no-disabled-tests': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
-    'no-restricted-imports': [
-      'error',
-      {
-        name: 'react-redux',
-        importNames: ['useSelector', 'useDispatch'],
-        message: 'use hooks in `src/hooks/useSelector` for typing support'
-      }
-    ],
-    'comma-dangle': 'off'
+    'import/no-default-export': 'error',
+    'comma-dangle': 'off',
+    'react-native/no-raw-text': 'off'
   },
   overrides: [
     {
