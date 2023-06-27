@@ -64,12 +64,13 @@ function UserSettings() {
 
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
   const defaultData = data?.me.defaultDeviceSettings
+  const [theme] = useDeviceStateStore((state) => [state.theme])
 
   useEffect(() => {
     if (defaultData) {
       const formData = {
         vaultLockTimeoutSeconds: defaultData.vaultLockTimeoutSeconds,
-        theme: defaultData.theme,
+        theme,
         syncTOTP: defaultData.syncTOTP,
         autofillCredentialsEnabled: defaultData.autofillCredentialsEnabled,
         autofillTOTPEnabled: defaultData.autofillTOTPEnabled
