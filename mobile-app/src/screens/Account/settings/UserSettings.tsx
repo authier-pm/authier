@@ -32,7 +32,6 @@ import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { useNetInfo } from '@react-native-community/netinfo'
 import { RefreshControl } from 'react-native'
-import { useSyncSettingsLazyQuery } from '@shared/graphql/Settings.codegen'
 
 function UserSettings() {
   const navigation =
@@ -49,7 +48,7 @@ function UserSettings() {
     refetch: refetchDefaultSettings,
     loading: loadingDefaultSettings
   } = useDefaultSettingsQuery({
-    fetchPolicy: 'network-only'
+    fetchPolicy: 'cache-and-network'
   })
 
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
