@@ -192,6 +192,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async save() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
+    //TODO: Fix perf
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
     await browser.storage.local.set({
       backgroundState: this,

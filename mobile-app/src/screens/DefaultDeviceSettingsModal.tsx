@@ -59,7 +59,7 @@ export function DefaultDeviceSettingsModal() {
   useEffect(() => {
     if (
       checkQuery.data?.me.devicesCount === 1 &&
-      checkQuery.data?.me.defaultDeviceSettings.id === null // we keep showing this modal until user sets default settings
+      checkQuery.data?.me.defaultDeviceSettings.id === 0 // we keep showing this modal until user sets default settings
     ) {
       setShowModal(true)
     }

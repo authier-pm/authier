@@ -115,6 +115,7 @@ export function useDeviceState() {
       setIsInitialized(true)
     })
     if (storageOnchangeListenerRegistered) {
+      console.log('storage change listener already registered')
       return
     }
     browser.storage.onChanged.addListener(onStorageChange)
@@ -140,11 +141,9 @@ export function useDeviceState() {
     setSecuritySettings: async (config: SettingsInput) => {
       //WARNING: This probably starts second timer???
       device.setDeviceSettings(config)
-      await trpc.securitySettings.mutate(config)
     },
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      await trpc.setDeviceState.mutate(state)
     },
     lockedState,
     device,
