@@ -105,8 +105,6 @@ export default function Security() {
                   </Field>
                 </FormControl>
 
-                {/*  */}
-
                 <FormControl>
                   <FormLabel htmlFor="uiLanguage">Language</FormLabel>
                   <Field as={Select} id="uiLanguage" name="uiLanguage">
@@ -114,8 +112,6 @@ export default function Security() {
                     <option value="cs">Čeština</option>
                   </Field>
                 </FormControl>
-
-                {/*  */}
 
                 <Field name="autofillCredentialsEnabled">
                   {({ field }) => (
@@ -131,7 +127,6 @@ export default function Security() {
                   )}
                 </Field>
 
-                {/*  */}
                 <Field name="autofillTOTPEnabled">
                   {({ field }) => (
                     <Checkbox
@@ -146,7 +141,6 @@ export default function Security() {
                   )}
                 </Field>
 
-                {/*  */}
                 <Field name="syncTOTP">
                   {({ field }) => (
                     <Checkbox
@@ -160,7 +154,7 @@ export default function Security() {
                     </Checkbox>
                   )}
                 </Field>
-                {/*  */}
+
                 <Field name="notificationOnWrongPasswordAttempts">
                   {({ field, form }) => (
                     <NumberInput
@@ -182,7 +176,7 @@ export default function Security() {
                     </NumberInput>
                   )}
                 </Field>
-                {/*  */}
+
                 <Field name="notificationOnVaultUnlock">
                   {({ field }) => (
                     <Checkbox
