@@ -1,4 +1,4 @@
-import React, { useContext, useState, useLayoutEffect, useEffect } from 'react'
+import React, { useState, useLayoutEffect, useEffect } from 'react'
 
 import {
   Alert,
@@ -78,7 +78,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
     <View>
       <Formik
         initialValues={{
-          url: loginCredentials.url!!,
+          url: loginCredentials.url,
           password: loginCredentials.password,
           label: loginCredentials.label,
           username: loginCredentials.username
@@ -232,7 +232,7 @@ export default function EditPassword({
   navigation,
   route
 }: PasswordStackScreenProps<'EditPassword'>) {
-  let deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)
@@ -250,7 +250,6 @@ export default function EditPassword({
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useLayoutEffect(() => {
     if (secret) {
-      console.log('secret', secret.id)
       navigation.setOptions({
         headerRight: () => <DeleteSecretAlert id={secret?.id} />
       })

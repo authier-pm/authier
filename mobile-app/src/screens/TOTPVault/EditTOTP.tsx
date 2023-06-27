@@ -39,7 +39,7 @@ const InputField = ({
 
 const TOTPSecret = (data: ITOTPSecret) => {
   const { totp } = data
-  let deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [updateSecret] = useUpdateEncryptedSecretMutation({
     refetchQueries: [{ query: SyncEncryptedSecretsDocument, variables: {} }]
   })
@@ -164,7 +164,7 @@ export function EditTOTP({
   navigation,
   route
 }: TOTPStackScreenProps<'EditTOTP'>) {
-  let deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [secret, setSecret] = useState<
     ITOTPSecret | ILoginSecret | undefined | null
   >(null)

@@ -26,9 +26,9 @@ import { RefreshControl } from 'react-native'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 
-function DeviceSettings() {
-  let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
+export function DeviceSettings() {
+  const deviceState = useDeviceStateStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const { toggleColorMode } = useColorMode()
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -208,5 +208,3 @@ function DeviceSettings() {
     </ScrollView>
   )
 }
-
-export default DeviceSettings

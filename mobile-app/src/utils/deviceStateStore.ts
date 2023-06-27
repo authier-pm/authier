@@ -152,14 +152,14 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       save: async () => {
-        let all = await get().getAllSecretsDecrypted()
+        const all = await get().getAllSecretsDecrypted()
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
         const start = performance.now()
         set({ decryptedSecrets: await get().getAllSecretsDecrypted() })
         const end = performance.now()
-        console.log(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
+        console.warn(`getAllSecretsDecrypted Execution time: ${end - start} ms`)
       },
       setMasterEncryptionKey: async (masterPassword: string) => {
         const key = await generateEncryptionKey(
@@ -366,7 +366,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
 
             const end = performance.now()
-            console.log('backendSync', end - time)
+            console.warn('backendSync', end - time)
             return res
           }
         }
@@ -404,7 +404,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
           })
         )
-        console.log('saved secret to the backend', secrets)
+
         const { data } = await apolloClient.mutate<
           AddEncryptedSecretsMutation,
           AddEncryptedSecretsMutationVariables
@@ -418,7 +418,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         if (!data) {
           throw new Error('failed to save secret')
         }
-        console.log('saved secret to the backend', secrets)
+
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })
@@ -442,7 +442,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
-        console.log('resetting device state')
+        console.warn('resetting device state')
         set({
           ...initialState,
           theme: get().theme,

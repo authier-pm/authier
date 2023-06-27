@@ -22,7 +22,7 @@ import { ToastType } from '../../ToastTypes'
 
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import zxcvbn from 'zxcvbn-typescript'
-import { useDeviceStore } from '@src/utils/deviceStore'
+
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const InputField = ({
@@ -50,7 +50,10 @@ const InputField = ({
 
 export const AddPassword = () => {
   const [show, setShow] = useState(false)
-  let deviceState = useDeviceStateStore((state) => state)
+  const [addSecrets, encrypt] = useDeviceStateStore((state) => [
+    state.addSecrets,
+    state.encrypt
+  ])
   const navigation =
     useNavigation<PasswordStackScreenProps<'AddPassword'>['navigation']>()
 
@@ -81,13 +84,11 @@ export const AddPassword = () => {
         loginCredentialsSchema.parse(unencryptedData)
 
         try {
-          await deviceState.addSecrets([
+          await addSecrets([
             {
               kind: EncryptedSecretType.LOGIN_CREDENTIALS,
               loginCredentials: unencryptedData,
-              encrypted: await deviceState.encrypt(
-                JSON.stringify(unencryptedData)
-              ),
+              encrypted: await encrypt(JSON.stringify(unencryptedData)),
               createdAt: new Date().toJSON()
             }
           ])

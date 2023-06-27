@@ -24,7 +24,7 @@ i18n.activate('en')
 export const colorModeManager: StorageManager = {
   get: async () => {
     try {
-      let val = useDeviceStateStore.getState().theme
+      const val = useDeviceStateStore.getState().theme
 
       if (val === null) {
         return 'dark'
@@ -38,7 +38,7 @@ export const colorModeManager: StorageManager = {
     try {
       useDeviceStateStore.getState().changeTheme(value)
     } catch (e) {
-      console.log(e)
+      console.warn(e)
     }
   }
 }
