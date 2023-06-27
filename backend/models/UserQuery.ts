@@ -149,14 +149,12 @@ export class UserQuery extends UserBase {
     })
   }
 
-  @Field(() => Boolean, {
-    description: 'Sends a message to the master device'
-  })
+  // TODO use this to send notifications to the master device about unlock and wrong password attempts
   async sendAuthMessage(
-    @Arg('deviceId', () => String) deviceId: string,
-    @Arg('title', () => String) title: string,
-    @Arg('body', () => String) body: string,
-    @Arg('type', () => String) type: string
+    deviceId: string,
+    title: string,
+    body: string,
+    type: string
   ) {
     console.log('NOTIFICATION')
     const user = await prismaClient.user.findUnique({

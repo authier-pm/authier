@@ -48,16 +48,6 @@ type UserQuery {
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
-
-  """
-  Sends a message to the master device
-  """
-  sendAuthMessage(
-    type: String!
-    body: String!
-    title: String!
-    deviceId: String!
-  ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
 
