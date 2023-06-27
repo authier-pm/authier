@@ -8,7 +8,7 @@ async function pushNewTag() {
   const version = pkg.version
 
   exec(
-    `git tag -a v${version} -m "version ${version}" && git push origin v${version}`,
+    `git tag -a v${version}-extension -m "version ${version}" && git push origin v${version}`,
     (error, stdout, stderr) => {
       if (error) {
         console.error(`Failed to create or push git tag: ${error}`)

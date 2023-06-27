@@ -2,8 +2,9 @@ name: Release and publish on tag
 on:
   push:
     tags:
-      - '*.*.*-extension'
+      - 'v*.*.*-extension'
   workflow_dispatch:
+
 jobs:
   build-release-publish:
     if: github.ref_type == 'tag'
