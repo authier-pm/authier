@@ -10,5 +10,6 @@ export const defaultDeviceSettingUserValuesWithId = {
   autofillTOTPEnabled: true,
   autofillCredentialsEnabled: true,
   syncTOTP: true,
+  theme: 'dark',
   id: 0
 }
