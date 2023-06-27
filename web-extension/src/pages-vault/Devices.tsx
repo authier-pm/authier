@@ -175,7 +175,7 @@ const DeviceListItem = ({
                 }}
                 onSubmit={async (
                   values: SettingsValues,
-                  { setSubmitting }: FormikHelpers<SettingsValues>
+                  { setSubmitting, resetForm }: FormikHelpers<SettingsValues>
                 ) => {
                   console.log('Values', values)
                   changedDeviceSettings({
@@ -194,6 +194,7 @@ const DeviceListItem = ({
                     ]
                   })
                   setSubmitting(false)
+                  resetForm({ values })
                 }}
               >
                 {({
