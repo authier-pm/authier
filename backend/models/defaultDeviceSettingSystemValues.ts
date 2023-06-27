@@ -2,8 +2,7 @@ export const defaultDeviceSettingSystemValues = {
   vaultLockTimeoutSeconds: 28800,
   autofillTOTPEnabled: true,
   autofillCredentialsEnabled: true,
-  syncTOTP: true,
-  theme: 'dark'
+  syncTOTP: true
 }
 
 export const defaultDeviceSettingUserValuesWithId = {
@@ -11,6 +10,5 @@ export const defaultDeviceSettingUserValuesWithId = {
   autofillTOTPEnabled: true,
   autofillCredentialsEnabled: true,
   syncTOTP: true,
-  theme: 'dark',
   id: 0
 }
