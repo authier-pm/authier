@@ -109,6 +109,7 @@ export const SyncEncryptedSecretsDocument = gql`
   currentDevice {
     id
     encryptedSecretsToSync {
+      id
       ...secretExtension
     }
   }

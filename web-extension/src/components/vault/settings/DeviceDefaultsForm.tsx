@@ -1,62 +1,41 @@
-import { z } from 'zod'
-import { useForm } from 'react-hook-form'
-import { useEffect, useMemo } from 'react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { Spinner, VStack } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
-import { Form } from '@src/components/util/tsForm'
-import { SettingsSubmitButton } from '@src/components/vault/settings/Account'
 import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormLabel,
+  Select,
+  Spinner,
+  VStack
+} from '@chakra-ui/react'
+
+import {
+  DefaultSettingsDocument,
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
-import {
-  DefaultsFormSchema,
-  defaultsFormProps
-} from '@src/pages-vault/DefaultSettings'
+import { Trans } from '@lingui/macro'
+
+import { vaultLockTimeoutOptions } from '@shared/constants'
+import { Formik, FormikHelpers, Field } from 'formik'
+
+interface Values {
+  vaultLockTimeoutSeconds: number
+  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean
+  syncTOTP: boolean
+  uiLanguage: string
+  theme: string
+}
 
 export function DeviceDefaultsForm() {
-  const { data, loading } = useDefaultSettingsQuery()
-  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({})
-  const bgColor = useColorModeValue('white', 'gray.800')
-
-  const form = useForm<z.infer<typeof DefaultsFormSchema>>({
-    defaultValues: {
-      autofillTOTPEnabled: data?.me.defaultDeviceSettings.autofillTOTPEnabled,
-      autofillCredentialsEnabled:
-        data?.me.defaultDeviceSettings.autofillCredentialsEnabled,
-      syncTOTP: data?.me.defaultDeviceSettings.syncTOTP,
-      vaultLockTimeoutSeconds:
-        data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds
-    },
-    mode: 'onChange'
+  const { data, loading } = useDefaultSettingsQuery({
+    fetchPolicy: 'network-only'
   })
-
-  console.log(data)
-  const {
-    formState: { isDirty, isSubmitting, isSubmitSuccessful },
-    reset
-  } = form
-
-  useEffect(() => {
-    const defaultsData = data?.me.defaultDeviceSettings
-    reset({
-      autofillTOTPEnabled: defaultsData?.autofillTOTPEnabled,
-      autofillCredentialsEnabled: defaultsData?.autofillCredentialsEnabled,
-      syncTOTP: defaultsData?.syncTOTP,
-      vaultLockTimeoutSeconds: defaultsData?.vaultLockTimeoutSeconds
-    })
-  }, [isSubmitSuccessful, data])
-
-  async function onSubmit(data: z.infer<typeof DefaultsFormSchema>) {
-    await updateDefaultSettings({
-      variables: {
-        config: {
-          ...data
-        }
-      }
-    })
-  }
+  const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
+    refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
+  })
+  const bgColor = useColorModeValue('white', 'gray.800')
 
   if (loading || !data) return <Spinner />
 
@@ -72,21 +51,149 @@ export function DeviceDefaultsForm() {
       p={30}
       bg={bgColor}
     >
-      <Form
-        form={form}
-        props={defaultsFormProps}
-        schema={DefaultsFormSchema}
-        onSubmit={onSubmit}
-        formProps={{
-          submitButton: (
-            <SettingsSubmitButton
-              isDirty={isDirty}
-              isSubmitting={isSubmitting}
-            />
-          ),
-          formHeading: t`Set default settings for new device`
+      <Formik
+        initialValues={{
+          autofillTOTPEnabled:
+            data?.me.defaultDeviceSettings.autofillTOTPEnabled,
+          autofillCredentialsEnabled:
+            data?.me.defaultDeviceSettings.autofillCredentialsEnabled,
+          syncTOTP: data?.me.defaultDeviceSettings.syncTOTP,
+          vaultLockTimeoutSeconds:
+            data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
+          theme: data?.me.defaultDeviceSettings.theme,
+          uiLanguage: data?.me.uiLanguage
         }}
-      />
+        onSubmit={async (
+          values: Values,
+          { setSubmitting, resetForm }: FormikHelpers<Values>
+        ) => {
+          const config = {
+            ...values,
+            vaultLockTimeoutSeconds: parseInt(
+              values.vaultLockTimeoutSeconds.toString()
+            )
+          }
+
+          await updateDefaultSettings({
+            variables: {
+              config
+            }
+          })
+          resetForm({ values: config })
+          setSubmitting(false)
+        }}
+      >
+        {({ isSubmitting, dirty, handleSubmit }) => (
+          <form onSubmit={handleSubmit}>
+            <VStack spacing={4} align="flex-start">
+              <FormControl>
+                <FormLabel htmlFor="vaultLockTimeoutSeconds">
+                  <Trans>Lock time</Trans>
+                </FormLabel>
+                <Field
+                  as={Select}
+                  id="vaultLockTimeoutSeconds"
+                  name="vaultLockTimeoutSeconds"
+                >
+                  {vaultLockTimeoutOptions.map((option, index) => (
+                    <option value={option.value.toString()} key={index}>
+                      {option.label}
+                    </option>
+                  ))}
+                </Field>
+              </FormControl>
+
+              {/*  */}
+
+              <FormControl>
+                <FormLabel htmlFor="uiLanguage">
+                  <Trans>Language</Trans>
+                </FormLabel>
+                <Field as={Select} id="uiLanguage" name="uiLanguage">
+                  <option value="en">English</option>
+                  <option value="cs">Čeština</option>
+                </Field>
+              </FormControl>
+
+              {/*  */}
+
+              <Field name="autofillCredentialsEnabled">
+                {({ field }) => (
+                  <Checkbox
+                    id="autofillCredentialsEnabled"
+                    name="autofillCredentialsEnabled"
+                    isChecked={field.value}
+                    mr={5}
+                    {...field}
+                  >
+                    <Trans>Credentials autofill</Trans>
+                  </Checkbox>
+                )}
+              </Field>
+
+              {/*  */}
+              <Field name="autofillTOTPEnabled">
+                {({ field }) => (
+                  <Checkbox
+                    id="autofillTOTPEnabled"
+                    name="autofillTOTPEnabled"
+                    isChecked={field.value}
+                    mr={5}
+                    {...field}
+                  >
+                    <Trans>TOTP autofill</Trans>
+                  </Checkbox>
+                )}
+              </Field>
+
+              {/*  */}
+              <Field name="syncTOTP">
+                {({ field }) => (
+                  <Checkbox
+                    id="syncTOTP"
+                    name="syncTOTP"
+                    isChecked={field.value}
+                    mr={5}
+                    {...field}
+                  >
+                    <Trans>2FA sync</Trans>
+                  </Checkbox>
+                )}
+              </Field>
+              {/*  */}
+              <FormControl>
+                <FormLabel htmlFor="theme">
+                  <Trans>Language</Trans>
+                </FormLabel>
+                <Field as={Select} id="theme" name="theme">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </Field>
+              </FormControl>
+
+              <Button
+                isDisabled={isSubmitting || !dirty}
+                isLoading={isSubmitting}
+                type="submit"
+                bg={'blue.400'}
+                color={'white'}
+                boxShadow={
+                  '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
+                }
+                _hover={{
+                  bg: 'blue.500'
+                }}
+                _focus={{
+                  bg: 'blue.500'
+                }}
+                aria-label="Save"
+              >
+                <Trans>Save</Trans>
+              </Button>
+            </VStack>
+          </form>
+        )}
+      </Formik>
     </VStack>
   )
 }

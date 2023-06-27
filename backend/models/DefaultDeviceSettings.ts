@@ -6,9 +6,11 @@ import { DefaultSettingsInput } from './models'
 
 @ObjectType()
 export class DefaultDeviceSettingsQuery extends DefaultDeviceSettingsGQLScalars {
-  @Field(() => Int, { nullable: true })
-  // @ts-expect-error This is ok, we need the id to be nullable here
-  id: number | null
+  @Field(() => Int, {
+    nullable: false,
+    description: '0 index for system defaults'
+  })
+  declare id: number
 }
 
 @ObjectType()
@@ -26,7 +28,7 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
       theme: config.theme
     }
 
-    if (this.id) {
+    if (this.id && this.id !== 0) {
       return await ctx.prisma.defaultDeviceSettings.update({
         where: {
           id: this.id

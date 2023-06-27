@@ -8,7 +8,7 @@ import {
   createStackNavigator,
   TransitionPresets
 } from '@react-navigation/stack'
-import SettingsNavigation from './SettingsNavigation'
+import { SettingsNavigation } from './SettingsNavigation'
 import Limits from '@src/screens/Account/Limits'
 
 const DeviceStack = createStackNavigator<AccountStackParamList>()

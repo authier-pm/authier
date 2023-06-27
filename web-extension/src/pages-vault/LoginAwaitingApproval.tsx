@@ -16,6 +16,7 @@ import {
   Flex,
   Heading,
   Spinner,
+  useColorMode,
   useInterval
 } from '@chakra-ui/react'
 import { formatRelative } from 'date-fns'
@@ -35,6 +36,7 @@ export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formStateContext, setFormStateContext } = useContext(LoginContext)
+  const { colorMode, toggleColorMode } = useColorMode()
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
   const [
@@ -199,7 +201,13 @@ export const useLogin = (props: { deviceName: string }) => {
               addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
-            theme: 'dark'
+            theme: addNewDeviceForUser.user.defaultDeviceSettings.theme
+          }
+
+          if (
+            colorMode !== addNewDeviceForUser.user.defaultDeviceSettings.theme
+          ) {
+            toggleColorMode()
           }
 
           setUserId(decodedToken.userId)

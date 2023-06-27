@@ -26,9 +26,9 @@ import { RefreshControl } from 'react-native'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 
-function DeviceSettings() {
-  let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
+export function DeviceSettings() {
+  const deviceState = useDeviceStateStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const { toggleColorMode } = useColorMode()
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -93,9 +93,7 @@ function DeviceSettings() {
             </Heading>
             <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}>
               <VStack space={2}>
-                <Text>
-                  <Trans>Lock time</Trans>
-                </Text>
+                <Trans>Lock time</Trans>
 
                 <Box p={2}>
                   <AuthierSelect
@@ -117,11 +115,9 @@ function DeviceSettings() {
                     ))}
                   </AuthierSelect>
 
-                  <Text>
-                    <Trans>
-                      Automatically locks vault after chosen period of time
-                    </Trans>
-                  </Text>
+                  <Trans>
+                    Automatically locks vault after chosen period of time
+                  </Trans>
                 </Box>
               </VStack>
               <Divider />
@@ -202,8 +198,8 @@ function DeviceSettings() {
                 selectedValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
-                <Select.Item label="light" value="light" />
-                <Select.Item label="dark" value="dark" />
+                <Select.Item label="Light" value="light" />
+                <Select.Item label="Dark" value="dark" />
               </AuthierSelect>
             </Box>
           </VStack>
@@ -212,5 +208,3 @@ function DeviceSettings() {
     </ScrollView>
   )
 }
-
-export default DeviceSettings

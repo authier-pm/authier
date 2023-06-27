@@ -6,7 +6,6 @@ import {
   VStack,
   HStack,
   Switch,
-  Divider,
   Heading,
   Text,
   Button,
@@ -14,10 +13,9 @@ import {
   Modal
 } from 'native-base'
 
-import { Trans, t } from '@lingui/macro'
+import { t, Trans } from '@lingui/macro'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useDeviceStore } from '@src/utils/deviceStore'
 import React, { useEffect, useState } from 'react'
 import {
   useDefaultSettingsQuery,
@@ -33,7 +31,11 @@ import { omit } from 'lodash'
  * should only show after signup
  */
 export function DefaultDeviceSettingsModal() {
-  const deviceState = useDeviceStateStore((state) => state)
+  const [notificationOnWrongPasswordAttempts, notificationOnVaultUnlock] =
+    useDeviceStateStore((state) => [
+      state.notificationOnWrongPasswordAttempts,
+      state.notificationOnVaultUnlock
+    ])
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
   const { toggleColorMode } = useColorMode()
@@ -57,7 +59,7 @@ export function DefaultDeviceSettingsModal() {
   useEffect(() => {
     if (
       checkQuery.data?.me.devicesCount === 1 &&
-      checkQuery.data?.me.defaultDeviceSettings.id === null // we keep showing this modal until user sets default settings
+      checkQuery.data?.me.defaultDeviceSettings.id === 0 // we keep showing this modal until user sets default settings
     ) {
       setShowModal(true)
     }
@@ -71,25 +73,19 @@ export function DefaultDeviceSettingsModal() {
       onClose={() => setShowModal(false)}
     >
       <Modal.Content>
-        <Modal.Header>
-          <Trans>Set default settings for new devices</Trans>
-        </Modal.Header>
+        <Modal.Header>Set default settings for new devices</Modal.Header>
         <Modal.Body>
           <Center h={'100%'}>
             {/*  */}
             <VStack space={2}>
               <Text maxW={'100%'}>
-                <Trans>
-                  Before adding any more devices, please take the time to
-                  configure your device settings for all devices added in the
-                  future
-                </Trans>
+                Before adding any more devices, please take the time to
+                configure your device settings for all devices added in the
+                future
               </Text>
               <VStack space={2} rounded="xl" p={3} bg={itemBg}>
                 <VStack space={2}>
-                  <Text>
-                    <Trans>Lock time</Trans>
-                  </Text>
+                  <Text>Lock time </Text>
                   <Box p={2}>
                     <AuthierSelect
                       variant="rounded"
@@ -112,11 +108,9 @@ export function DefaultDeviceSettingsModal() {
                     </AuthierSelect>
 
                     <Text>
-                      <Trans>
-                        Automatically locks vault after chosen period of time,
-                        use lower values for more security, higher for more user
-                        comfort
-                      </Trans>
+                      Automatically locks vault after chosen period of time, use
+                      lower values for more security, higher for more user
+                      comfort
                     </Text>
                   </Box>
                 </VStack>
@@ -170,9 +164,7 @@ export function DefaultDeviceSettingsModal() {
 
             {/*  */}
             <VStack space={2} rounded="xl" p={2} bg={itemBg} mt={2}>
-              <Heading size="md">
-                <Trans>Language</Trans>
-              </Heading>
+              <Heading size="md">Language </Heading>
 
               <Box p={2} rounded="xl" minW="95%">
                 <AuthierSelect
@@ -190,9 +182,7 @@ export function DefaultDeviceSettingsModal() {
             </VStack>
             {/*  */}
             <VStack space={2} rounded="xl" p={2} bg={itemBg} mt={2}>
-              <Heading size="md">
-                <Trans>Theme</Trans>
-              </Heading>
+              <Heading size="md">Theme</Heading>
 
               <Box p={2} rounded="xl" minW={'95%'}>
                 <AuthierSelect
@@ -200,11 +190,11 @@ export function DefaultDeviceSettingsModal() {
                     toggleColorMode()
                     setForm({ ...form, theme: value })
                   }}
-                  defaultValue={form.theme}
+                  selectedValue={form.theme}
                   accessibilityLabel="theme"
                 >
-                  <Select.Item label={t`light`} value="light" />
-                  <Select.Item label={t`dark`} value="dark" />
+                  <Select.Item label={t`Light`} value="light" />
+                  <Select.Item label={t`Dark`} value="dark" />
                 </AuthierSelect>
               </Box>
             </VStack>
@@ -222,18 +212,16 @@ export function DefaultDeviceSettingsModal() {
 
                 const defaultDeviceSettings = omit(
                   data?.me.defaultDeviceSettings,
-                  ['__typename', 'theme']
+                  ['__typename', 'theme', 'id']
                 )
                 const config = {
                   ...(defaultDeviceSettings ?? {}),
                   ...formData,
                   notificationOnWrongPasswordAttempts:
-                    deviceState.notificationOnWrongPasswordAttempts,
-                  notificationOnVaultUnlock:
-                    deviceState.notificationOnVaultUnlock
+                    notificationOnWrongPasswordAttempts,
+                  notificationOnVaultUnlock: notificationOnVaultUnlock
                 }
 
-                console.log({ config })
                 await updateSettings({
                   variables: {
                     config
@@ -260,7 +248,7 @@ export function DefaultDeviceSettingsModal() {
               }}
               mt={3}
             >
-              <Trans>Save default settings</Trans>
+              Save default settings
             </Button>
           </Center>
         </Modal.Body>

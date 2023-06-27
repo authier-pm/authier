@@ -152,7 +152,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       save: async () => {
-        let all = await get().getAllSecretsDecrypted()
+        const all = await get().getAllSecretsDecrypted()
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
@@ -366,7 +366,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
 
             const end = performance.now()
-            console.log('backendSync', end - time)
+            console.warn('backendSync', end - time)
             return res
           }
         }
@@ -404,7 +404,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
           })
         )
-        console.log('saved secret to the backend', secrets)
+
         const { data } = await apolloClient.mutate<
           AddEncryptedSecretsMutation,
           AddEncryptedSecretsMutationVariables
@@ -418,7 +418,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         if (!data) {
           throw new Error('failed to save secret')
         }
-        console.log('saved secret to the backend', secrets)
+
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })

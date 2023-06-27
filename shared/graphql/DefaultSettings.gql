@@ -17,12 +17,15 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
 query defaultSettings {
   me {
     id
+    masterDeviceId
     uiLanguage
     defaultDeviceSettings {
+      id
       autofillTOTPEnabled
       autofillCredentialsEnabled
       syncTOTP
       vaultLockTimeoutSeconds
+      theme
     }
   }
 }

@@ -16,6 +16,7 @@ query SyncEncryptedSecrets {
   currentDevice {
     id
     encryptedSecretsToSync {
+      id
       ...secretExtension
     }
   }

@@ -40,7 +40,7 @@ function CameraFrame() {
 export const QRScan = () => {
   const navigation =
     useNavigation<TOTPStackScreenProps<'QRScan'>['navigation']>()
-  let deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [hasPermission, setHasPermission] = React.useState(false)
   const devices = useCameraDevices()
   const cameraDevice = devices.back
@@ -53,7 +53,7 @@ export const QRScan = () => {
     if (barcodes && barcodes.length > 0) {
       //FIX: we should have here some kind of validation, that the scanned code is a valid TOTP code
       if (barcodes[0].rawValue?.includes('otpauth://totp/')) {
-        let barcode = barcodes[0]
+        const barcode = barcodes[0]
         const parsedQuery = queryString.parseUrl(barcode.rawValue as string)
         const secret = parsedQuery.query.secret as string
 

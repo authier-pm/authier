@@ -41,7 +41,6 @@ export const VaultList = () => {
 
   // Here is bug wut theme change, this is not ideal
   useEffect(() => {
-    console.log('data', data)
     if (data) {
       setSecuritySettings({
         autofillCredentialsEnabled:

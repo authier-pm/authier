@@ -49,8 +49,6 @@ type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
 
-  console.log('header', header)
-
   //TODO: Make this regexp for all possible headers
   //Later we can split it for every app eg. lastpass, bitwarden, etc.
   const indexUsername = header.findIndex((x) => x.match(/username/i))

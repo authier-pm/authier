@@ -320,7 +320,10 @@ type EncryptedSecretQuery {
 }
 
 type DefaultDeviceSettingsQuery {
-  id: Int
+  """
+  0 index for system defaults
+  """
+  id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
   autofillCredentialsEnabled: Boolean!

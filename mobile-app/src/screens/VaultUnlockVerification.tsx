@@ -40,8 +40,9 @@ export function VaultUnlockVerification() {
   const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
     state.notificationOnVaultUnlock
   ])
-  const [sendAuthMesssage, { loading: messageLoading, error, data }] =
-    useSendAuthMessageLazyQuery({ fetchPolicy: 'network-only' })
+  const [sendAuthMesssage] = useSendAuthMessageLazyQuery({
+    fetchPolicy: 'network-only'
+  })
   const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
     state.notificationOnWrongPasswordAttempts
   ])
@@ -57,7 +58,7 @@ export function VaultUnlockVerification() {
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
         setLoading(true)
-        console.log('biometrics enabled retrieving')
+
         try {
           const psw = await SInfo.getItem('psw', {
             sharedPreferencesName: 'authierShared',
@@ -115,13 +116,13 @@ export function VaultUnlockVerification() {
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
-    let decryptedContent = await self.crypto.subtle.decrypt(
+    const decryptedContent = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       data
     )
 
-    let currentAddDeviceSecret = dec.decode(decryptedContent)
+    const currentAddDeviceSecret = dec.decode(decryptedContent)
 
     if (currentAddDeviceSecret !== lockedState.authSecret) {
       setTries(tries + 1)
@@ -132,8 +133,10 @@ export function VaultUnlockVerification() {
       masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
     }
-    newState.lockTimeEnd =
-      Date.now() + lockedState.vaultLockTimeoutSeconds!! * 1000
+    if (lockedState.vaultLockTimeoutSeconds) {
+      newState.lockTimeEnd =
+        Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
+    }
     await device.save(newState)
     device.setLockedState(null)
     setLoading(false)
@@ -168,7 +171,6 @@ export function VaultUnlockVerification() {
             }
             setSubmitting(false)
           } catch (err: any) {
-            console.log(err)
             setTries(tries + 1)
             if (!toast.isActive(id)) {
               toast.show({

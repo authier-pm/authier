@@ -139,7 +139,7 @@ const appRouter = tc.router({
     .input(capturedEventsPayloadSchema)
     .mutation(async ({ input }) => {
       if (navigator.onLine === false) {
-        console.warn('ignoring saving of inputs because we are offline')
+        console.log('ignoring saving of inputs because we are offline')
         return
       }
 
@@ -239,8 +239,6 @@ const appRouter = tc.router({
       // console.log('securitySettings', input, device.state)
       if (deviceState) {
         device.setDeviceSettings(input)
-
-        // console.log('device.state', device.state)
       }
 
       return true
