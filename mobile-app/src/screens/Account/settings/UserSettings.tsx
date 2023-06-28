@@ -13,7 +13,6 @@ import {
   Divider,
   ScrollView
 } from 'native-base'
-
 import { t, Trans } from '@lingui/macro'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
@@ -29,12 +28,10 @@ import {
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
-
 import { useNetInfo } from '@react-native-community/netinfo'
 import { RefreshControl } from 'react-native'
-
 import { i18n } from '@lingui/core'
-import { vaultLockTimeoutOptions } from '@src/screens/DefaultDeviceSettingsModal'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 export function UserSettings() {
   const navigation =
@@ -44,6 +41,7 @@ export function UserSettings() {
   const [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
     (state) => [state.clearAndReload, state.id, state.updateDeviceSettings]
   )
+  const options = useVaultLockTimeoutOptions()
   const [deleteAccount] = useDeleteAccountMutation()
 
   const {
@@ -231,7 +229,7 @@ export function UserSettings() {
                   ).toString()}
                   accessibilityLabel="Lock time"
                 >
-                  {vaultLockTimeoutOptions.map((option, index) => (
+                  {options.map((option, index) => (
                     <Select.Item
                       label={option.label}
                       value={option.value.toString()}

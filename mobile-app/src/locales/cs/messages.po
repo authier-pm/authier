@@ -21,47 +21,47 @@ msgstr "{name}"
 msgid "{text}"
 msgstr "{text}"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "1 day"
 msgstr "1 den"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "1 hour"
 msgstr "1 hodina"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "1 minute"
 msgstr "1 minuta"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "1 week"
 msgstr "1 týden"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "1 year"
 msgstr "1 rok"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "10 minutes"
 msgstr "10 minut"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "12 hours"
 msgstr "12 hodin"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "2 days"
 msgstr "2 dny"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "2 hours"
 msgstr "2 hodiny"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "2 months"
 msgstr "2 měsíce"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "2 weeks"
 msgstr "2 týdny"
 
@@ -70,35 +70,35 @@ msgstr "2 týdny"
 msgid "2FA"
 msgstr "2FA"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "3 days"
 msgstr "3 dny"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "3 months"
 msgstr "3 měsíce"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "30 minutes"
 msgstr "30 minut"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "31 days"
 msgstr "31 dní"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "4 hours"
 msgstr "4 hodiny"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "5 minutes"
 msgstr "5 minut"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "6 months"
 msgstr "6 měsíců"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "8 hours"
 msgstr "8 hodin"
 
@@ -282,7 +282,7 @@ msgstr "Odhlásit se"
 msgid "Logout at"
 msgstr "Odhlášení v"
 
-#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/utils/useVaultLockTimeoutOptions.tsx
 msgid "Never"
 msgstr "Nikdy"
 
