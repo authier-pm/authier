@@ -24,11 +24,12 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 
 import { RefreshControl } from 'react-native'
 import { AuthierSelect } from '@src/components/AuthierSelect'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 export function DeviceSettings() {
   const deviceState = useDeviceStateStore((state) => state)
   const device = useDeviceStore((state) => state)
+  const options = useVaultLockTimeoutOptions()
   const { toggleColorMode } = useColorMode()
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -106,7 +107,7 @@ export function DeviceSettings() {
                     }
                     accessibilityLabel="Lock time"
                   >
-                    {vaultLockTimeoutOptions.map((option, index) => (
+                    {options.map((option, index) => (
                       <Select.Item
                         label={option.label}
                         value={option.value.toString()}

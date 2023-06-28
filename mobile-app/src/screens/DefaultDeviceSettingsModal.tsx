@@ -101,16 +101,13 @@ export function DefaultDeviceSettingsModal() {
                       selectedValue={form.vaultLockTimeoutSeconds.toString()}
                       accessibilityLabel="Lock time"
                     >
-                      {options.map((option, index) => {
-                        console.log(option.label)
-                        return (
-                          <Select.Item
-                            label={option.label}
-                            value={option.value.toString()}
-                            key={index}
-                          />
-                        )
-                      })}
+                      {options.map((option, index) => (
+                        <Select.Item
+                          label={option.label}
+                          value={option.value.toString()}
+                          key={index}
+                        />
+                      ))}
                     </AuthierSelect>
 
                     <Trans>
