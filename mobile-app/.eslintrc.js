@@ -16,7 +16,7 @@ module.exports = {
     'promise'
   ],
   extends: [
-    'plugin:@typescript-eslint/recommended', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
+    '@react-native', // Uses the recommended rules from the @typescript-eslint/eslint-plugin
     'plugin:prettier/recommended'
   ],
   parserOptions: {
@@ -40,8 +40,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
     'import/no-default-export': 'error',
-    'comma-dangle': 'off',
-    'react-native/no-raw-text': 'off'
+    'comma-dangle': 'off'
   },
   overrides: [
     {
