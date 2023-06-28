@@ -27,25 +27,19 @@ import RNBootSplash from 'react-native-bootsplash'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import SInfo from 'react-native-sensitive-info'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useSendAuthMessageLazyQuery } from './VaultUnlock.codegen'
 
 interface Values {
   password: string
 }
 
-export function VaultUnlockVerification({
-  onUnlocked
-}: {
-  onUnlocked: () => any
-}) {
+export function VaultUnlockVerification() {
   const toast = useToast()
   const id = 'active-toast'
   const device = useDeviceStore((state) => state)
   const [notificationOnVaultUnlock] = useDeviceStateStore((state) => [
     state.notificationOnVaultUnlock
   ])
-  const [sendAuthMesssage, { loading: messageLoading, error, data }] =
-    useSendAuthMessageLazyQuery({ fetchPolicy: 'network-only' })
+
   const [notificationOnWrongPasswordAttempts] = useDeviceStateStore((state) => [
     state.notificationOnWrongPasswordAttempts
   ])
@@ -61,7 +55,7 @@ export function VaultUnlockVerification({
     const loadBiometrics = async () => {
       if (device.biometricsAvailable && device.lockedState?.biometricsEnabled) {
         setLoading(true)
-        console.log('biometrics enabled retrieving')
+
         try {
           const psw = await SInfo.getItem('psw', {
             sharedPreferencesName: 'authierShared',
@@ -94,14 +88,15 @@ export function VaultUnlockVerification({
     notificationOnWrongPasswordAttempts != 0 &&
     tries >= notificationOnWrongPasswordAttempts
   ) {
-    sendAuthMesssage({
-      variables: {
-        body: ' is trying to unlock your vault',
-        title: 'Wrong password entered',
-        type: 'wrongPassword',
-        deviceId: device.id as string
-      }
-    })
+    // TODO do this on BE
+    // sendAuthMessage({
+    //   variables: {
+    //     body: ' is trying to unlock your vault',
+    //     title: 'Wrong password entered',
+    //     type: 'wrongPassword',
+    //     deviceId: device.id as string
+    //   }
+    // })
     setTries(0)
   }
 
@@ -119,13 +114,13 @@ export function VaultUnlockVerification({
     const iv = encryptedDataBuff.slice(16, 16 + 12)
     const data = encryptedDataBuff.slice(16 + 12)
 
-    let decryptedContent = await self.crypto.subtle.decrypt(
+    const decryptedContent = await self.crypto.subtle.decrypt(
       { name: 'AES-GCM', iv },
       masterEncryptionKey,
       data
     )
 
-    let currentAddDeviceSecret = dec.decode(decryptedContent)
+    const currentAddDeviceSecret = dec.decode(decryptedContent)
 
     if (currentAddDeviceSecret !== lockedState.authSecret) {
       setTries(tries + 1)
@@ -136,8 +131,10 @@ export function VaultUnlockVerification({
       masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
       ...lockedState
     }
-    newState.lockTimeEnd =
-      Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
+    if (lockedState.vaultLockTimeoutSeconds) {
+      newState.lockTimeEnd =
+        Date.now() + lockedState.vaultLockTimeoutSeconds * 1000
+    }
     await device.save(newState)
     device.setLockedState(null)
     setLoading(false)
@@ -157,22 +154,22 @@ export function VaultUnlockVerification({
         ) => {
           try {
             await unlockVault(values.password)
-            onUnlocked()
+
             if (notificationOnVaultUnlock) {
               console.log('send notification', device.id)
 
-              await sendAuthMesssage({
-                variables: {
-                  body: ' unlocked your vault',
-                  title: 'Vault unlocked',
-                  type: 'vaultUnlocked',
-                  deviceId: device.id as string
-                }
-              })
+              // TODO trigger BE mutation: currentDevice { setUnlocked }
+              // await sendAuthMessage({
+              //   variables: {
+              //     body: ' unlocked your vault',
+              //     title: 'Vault unlocked',
+              //     type: 'vaultUnlocked',
+              //     deviceId: device.id as string
+              //   }
+              // })
             }
             setSubmitting(false)
           } catch (err: any) {
-            console.log(err)
             setTries(tries + 1)
             if (!toast.isActive(id)) {
               toast.show({

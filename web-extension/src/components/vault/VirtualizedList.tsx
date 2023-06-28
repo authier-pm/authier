@@ -4,15 +4,15 @@ import { AutoSizer, List } from 'react-virtualized'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, EditIcon, DeleteIcon } from '@chakra-ui/icons'
-import { Center, Box, Flex, Text } from '@chakra-ui/react'
+import { UnlockIcon, EditIcon, DeleteIcon, CopyIcon } from '@chakra-ui/icons'
+import { Center, Box, Flex, Text, useToast } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { Link } from 'react-router-dom'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import browser from 'webextension-polyfill'
-import { DeleteSecretButton } from './DeleteSecretButton'
 import { Txt } from '../util/Txt'
+import { t } from '@lingui/macro'
 
 export function VaultListItem({
   secret
@@ -22,8 +22,10 @@ export function VaultListItem({
   const [isVisible, setIsVisible] = useState(false)
 
   const { deviceState } = useContext(DeviceStateContext)
+  const toast = useToast()
 
   const username = getDecryptedSecretProp(secret, 'username')
+  const password = getDecryptedSecretProp(secret, 'password')
   const secretUrl = getDecryptedSecretProp(secret, 'url')
   const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
   const label = getDecryptedSecretProp(secret, 'label')
@@ -79,20 +81,27 @@ export function VaultListItem({
               }
             }}
           >
-            <DeleteSecretButton secrets={[secret]}>
-              <DeleteIcon
-                aria-label="delete_item"
-                cursor={'pointer'}
-                boxSize={26}
-                padding={1.5}
-                alignSelf="end"
-                overflow={'visible'}
-                backgroundColor={'red.400'}
-                _hover={{ backgroundColor: 'red.500' }}
-                right="0"
-                top="inherit"
-              />
-            </DeleteSecretButton>
+            <CopyIcon
+              aria-label="copy to clipboard"
+              onClick={() => {
+                navigator.clipboard.writeText(password)
+                toast({
+                  title: t`Copied to clipboard`,
+                  status: 'success'
+                })
+                secret.lastUsedAt = new Date().toISOString()
+                // TODO store SecretUsageEvent
+              }}
+              cursor={'pointer'}
+              boxSize={29}
+              padding={1.5}
+              alignSelf="end"
+              overflow={'visible'}
+              backgroundColor={'blue.400'}
+              _hover={{ backgroundColor: 'orange.500' }}
+              right="0"
+              top="inherit"
+            />
 
             {secretUrl ? (
               <IconButton

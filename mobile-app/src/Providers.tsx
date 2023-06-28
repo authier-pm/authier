@@ -3,7 +3,7 @@ import { ApolloProvider } from '@apollo/client'
 import { apolloClient, cache } from './apollo/ApolloClient'
 import { NativeBaseProvider, StorageManager, Text } from 'native-base'
 import { theme } from './Theme'
-import Routes from './Routes'
+import { Routes } from './Routes'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 import { messages as enMessages } from './locales/en/messages'
@@ -19,26 +19,26 @@ i18n.load({
   en: enMessages,
   cs: csMessages
 })
-i18n.activate('en')
+i18n.activate(useDeviceStateStore.getState().uiLanguage ?? 'en')
 
-const colorModeManager: StorageManager = {
+export const colorModeManager: StorageManager = {
   get: async () => {
     try {
-      let val = useDeviceStateStore.getState().theme
-      console.log('val', val)
+      const val = useDeviceStateStore.getState().theme
+
       if (val === null) {
         return 'dark'
       }
       return val === 'dark' ? 'dark' : 'light'
     } catch (e) {
-      return 'light'
+      return 'dark'
     }
   },
   set: async (value: any) => {
     try {
       useDeviceStateStore.getState().changeTheme(value)
     } catch (e) {
-      console.log(e)
+      console.warn(e)
     }
   }
 }
@@ -54,7 +54,7 @@ export const Providers = () => {
   }, [])
 
   return (
-    <NativeBaseProvider theme={theme} colorModeManager={colorModeManager}>
+    <NativeBaseProvider colorModeManager={colorModeManager} theme={theme}>
       <ApolloProvider client={apolloClient}>
         <SafeAreaProvider>
           <I18nProvider i18n={i18n} defaultComponent={Text}>

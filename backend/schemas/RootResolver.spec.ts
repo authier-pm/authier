@@ -11,6 +11,7 @@ import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
+import { defaultDeviceSettingSystemValues } from 'models/defaultDeviceSettingSystemValues'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -117,7 +118,8 @@ describe('RootResolver', () => {
               firstIpAddress: faker.internet.ip(),
               lastIpAddress: faker.internet.ip(),
               firebaseToken: faker.string.uuid(),
-              name: input.deviceName
+              name: input.deviceName,
+              ...defaultDeviceSettingSystemValues
             }
           }
         }

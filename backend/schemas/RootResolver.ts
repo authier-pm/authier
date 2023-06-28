@@ -26,7 +26,10 @@ import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import { Device, User, WebInput } from '.prisma/client'
 
-import { WebInputGQL } from '../models/generated/WebInputGQL'
+import {
+  WebInputGQL,
+  WebInputGQLScalars
+} from '../models/generated/WebInputGQL'
 
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
@@ -176,13 +179,16 @@ export class RootResolver {
           TOTPlimit: 3,
           Devices: {
             create: {
-              syncTOTP: true,
               platform: input.devicePlatform,
               id: deviceId,
               firstIpAddress: ipAddress,
               lastIpAddress: ipAddress,
               firebaseToken: firebaseToken,
-              name: deviceName
+              name: deviceName,
+              autofillCredentialsEnabled: true,
+              vaultLockTimeoutSeconds: 28800, // 8 hours
+              syncTOTP: true,
+              autofillTOTPEnabled: true
             }
           }
         },
@@ -432,11 +438,29 @@ export class RootResolver {
     return user.tokenVersion
   }
 
-  @Query(() => [WebInputGQL])
+  @Query(() => [WebInputGQLScalars])
   async webInputs(
-    @Arg('host') host: string,
+    @Arg('host', () => String, {
+      deprecationReason: 'use hosts',
+      nullable: true
+    })
+    host: string | null,
+    @Arg('hosts', () => [String], { nullable: true }) hosts: string[] | null,
     @Ctx() ctx: IContextAuthenticated
   ) {
+    if (hosts) {
+      return ctx.prisma.webInput.findMany({
+        where: {
+          host: {
+            in: hosts
+          }
+        }
+      })
+    }
+    if (!host) {
+      return []
+    }
+
     return ctx.prisma.webInput.findMany({ where: { host } })
   }
 
@@ -448,9 +472,13 @@ export class RootResolver {
   ) {
     const returnedInputs: WebInput[] = []
     for (const webInput of webInputs) {
+      const host = constructURL(webInput.url).host
+      if (!host) {
+        continue
+      }
       const forUpsert = {
         url: webInput.url,
-        host: constructURL(webInput.url).host,
+        host: host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId

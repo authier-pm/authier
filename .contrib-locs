@@ -1,8 +1,9 @@
 {
   matchFiles: [
-    '**/*.{yml,yaml,md,ts,tsx,js,sql,gql}',
+    '**/*.{yml,yaml,md,ts,tsx,js,jsx,mjs,cjs,sql,gql}',
     '!**/*.codegen.*',
     '!**/generated/**/*',
-    '!pnpm-lock.yaml'
+    '!pnpm-lock.yaml',
+    '!**/dist/**/*'
   ]
 }

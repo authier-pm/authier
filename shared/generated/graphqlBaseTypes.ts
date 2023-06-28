@@ -7,7 +7,7 @@ export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> =
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
-  ID: { input: string | number; output: string; }
+  ID: { input: string; output: string; }
   String: { input: string; output: string; }
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
@@ -125,12 +125,82 @@ export type DecryptionChallengeMutation = {
   userId: Scalars['String']['output'];
 };
 
+export type DefaultDeviceSettingsGql = {
+  __typename?: 'DefaultDeviceSettingsGQL';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  syncTOTP: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  user: UserGql;
+  userId: Scalars['String']['output'];
+  vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
+export type DefaultDeviceSettingsGqlScalars = {
+  __typename?: 'DefaultDeviceSettingsGQLScalars';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  syncTOTP: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userId: Scalars['String']['output'];
+  vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
+export type DefaultDeviceSettingsMutation = {
+  __typename?: 'DefaultDeviceSettingsMutation';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  syncTOTP: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
+  update: DefaultDeviceSettingsGqlScalars;
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userId: Scalars['String']['output'];
+  vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
+
+export type DefaultDeviceSettingsMutationUpdateArgs = {
+  config: DefaultSettingsInput;
+};
+
+export type DefaultDeviceSettingsQuery = {
+  __typename?: 'DefaultDeviceSettingsQuery';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id?: Maybe<Scalars['Int']['output']>;
+  syncTOTP: Scalars['Boolean']['output'];
+  theme: Scalars['String']['output'];
+  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  userId: Scalars['String']['output'];
+  vaultLockTimeoutSeconds: Scalars['Int']['output'];
+};
+
+export type DefaultSettingsInput = {
+  autofillCredentialsEnabled: Scalars['Boolean']['input'];
+  autofillTOTPEnabled: Scalars['Boolean']['input'];
+  syncTOTP: Scalars['Boolean']['input'];
+  theme: Scalars['String']['input'];
+  uiLanguage: Scalars['String']['input'];
+  vaultLockTimeoutSeconds: Scalars['Int']['input'];
+};
+
 export type DeviceGql = {
   __typename?: 'DeviceGQL';
   DeviceDecryptionChallengesApproved: Array<DecryptionChallengeGql>;
   SecretUsageEvents: Array<SecretUsageEventGql>;
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   firebaseToken?: Maybe<Scalars['String']['output']>;
@@ -166,6 +236,8 @@ export type DeviceLocation = {
 
 export type DeviceMutation = {
   __typename?: 'DeviceMutation';
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   firebaseToken?: Maybe<Scalars['String']['output']>;
@@ -218,6 +290,8 @@ export type DeviceQuery = {
   SecretUsageEvents: Array<SecretUsageEventGql>;
   User: UserGql;
   UserMaster?: Maybe<UserGql>;
+  autofillCredentialsEnabled: Scalars['Boolean']['output'];
+  autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
   deletedAt?: Maybe<Scalars['DateTime']['output']>;
   /** Get all secrets that were change since last device sync */
@@ -386,12 +460,13 @@ export type Query = {
   currentDevice: DeviceQuery;
   me: UserQuery;
   osTime: Scalars['String']['output'];
-  webInputs: Array<WebInputGql>;
+  webInputs: Array<WebInputGqlScalars>;
 };
 
 
 export type QueryWebInputsArgs = {
-  host: Scalars['String']['input'];
+  host?: InputMaybe<Scalars['String']['input']>;
+  hosts?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
 export type RegisterNewAccountInput = {
@@ -479,6 +554,7 @@ export enum TokenType {
 export type UserGql = {
   __typename?: 'UserGQL';
   DecryptionChallenges: Array<DecryptionChallengeGql>;
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
@@ -489,11 +565,7 @@ export type UserGql = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String']['output'];
-  autofillCredentialsEnabled: Scalars['Boolean']['output'];
-  autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
-  defaultDeviceSyncTOTP: Scalars['Boolean']['output'];
-  defaultDeviceTheme: Scalars['String']['output'];
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -512,6 +584,7 @@ export type UserGql = {
 export type UserMutation = {
   __typename?: 'UserMutation';
   DecryptionChallenges: Array<DecryptionChallengeGql>;
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
@@ -525,8 +598,6 @@ export type UserMutation = {
   addDevice: DeviceGql;
   addDeviceSecretEncrypted: Scalars['String']['output'];
   addEncryptedSecrets: Array<EncryptedSecretQuery>;
-  autofillCredentialsEnabled: Scalars['Boolean']['output'];
-  autofillTOTPEnabled: Scalars['Boolean']['output'];
   changeEmail: UserQuery;
   changeMasterPassword: Scalars['Int']['output'];
   createCheckoutSession: Scalars['String']['output'];
@@ -534,8 +605,7 @@ export type UserMutation = {
   createSecretUsageEvent: SecretUsageEventGqlScalars;
   createdAt: Scalars['DateTime']['output'];
   decryptionChallenge: DecryptionChallengeMutation;
-  defaultDeviceSyncTOTP: Scalars['Boolean']['output'];
-  defaultDeviceTheme: Scalars['String']['output'];
+  defaultDeviceSettings: DefaultDeviceSettingsMutation;
   delete: UserGql;
   device: DeviceMutation;
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];
@@ -646,6 +716,7 @@ export type UserPaidProductsGql = {
 export type UserQuery = {
   __typename?: 'UserQuery';
   DecryptionChallenges: Array<DecryptionChallengeGql>;
+  DefaultDeviceSettings?: Maybe<DefaultDeviceSettingsGql>;
   Devices: Array<DeviceGql>;
   EncryptedSecrets: Array<EncryptedSecretGql>;
   MasterDeviceChange: Array<MasterDeviceChangeGql>;
@@ -656,12 +727,9 @@ export type UserQuery = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String']['output'];
-  autofillCredentialsEnabled: Scalars['Boolean']['output'];
-  autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
-  defaultDeviceSyncTOTP: Scalars['Boolean']['output'];
-  defaultDeviceTheme: Scalars['String']['output'];
+  defaultDeviceSettings: DefaultDeviceSettingsQuery;
   device: DeviceQuery;
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];
   devices: Array<DeviceQuery>;
@@ -711,6 +779,19 @@ export type WebInputGql = {
   __typename?: 'WebInputGQL';
   UsageEvents: Array<SecretUsageEventGql>;
   addedByUser?: Maybe<UserGql>;
+  addedByUserId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  domOrdinal: Scalars['Int']['output'];
+  domPath: Scalars['String']['output'];
+  host: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  kind: WebInputType;
+  layoutType?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
+};
+
+export type WebInputGqlScalars = {
+  __typename?: 'WebInputGQLScalars';
   addedByUserId?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   domOrdinal: Scalars['Int']['output'];

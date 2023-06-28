@@ -16,7 +16,14 @@ export const ExportTOTPToCsvButton = () => {
       colorScheme="teal"
       type="submit"
       onClick={() => {
-        const csv = papaparse.unparse(TOTPSecrets)
+        const csv = papaparse.unparse(
+          TOTPSecrets.map(({ id, totp }) => ({
+            id,
+            url: totp.url,
+            label: totp.label,
+            sercret: totp.secret
+          }))
+        )
         downloadAsFile(csv, 'totp')
       }}
     >
@@ -35,7 +42,7 @@ export const ExportLoginCredentialsToCsvButton = () => {
       colorScheme="teal"
       type="submit"
       onClick={() => {
-        // Call here export mutation for export notification
+        //TODO: Call here export mutation for export notification
         const csv = papaparse.unparse(
           LoginCredentials.map(({ id, loginCredentials }) => ({
             id,

@@ -43,12 +43,12 @@ export const VaultList = () => {
   useEffect(() => {
     if (data) {
       setSecuritySettings({
-        autofillCredentialsEnabled: data.me?.autofillCredentialsEnabled,
-        autofillTOTPEnabled: data.me?.autofillTOTPEnabled,
-        uiLanguage: data.me?.uiLanguage,
+        autofillCredentialsEnabled:
+          data.currentDevice.autofillCredentialsEnabled,
+        autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
+        uiLanguage: data.me.uiLanguage,
         syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice
-          .vaultLockTimeoutSeconds as number,
+        vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
         notificationOnWrongPasswordAttempts:
           data.me.notificationOnWrongPasswordAttempts,
         notificationOnVaultUnlock: data.me.notificationOnVaultUnlock

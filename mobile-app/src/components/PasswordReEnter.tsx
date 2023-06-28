@@ -1,14 +1,5 @@
 import React, { useState } from 'react'
-import {
-  Modal,
-  Button,
-  Icon,
-  Input,
-  useToast,
-  FormControl,
-  Heading,
-  VStack
-} from 'native-base'
+import { Modal, Button, Icon, Input, FormControl } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import SInfo from 'react-native-sensitive-info'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
@@ -17,14 +8,13 @@ import {
   dec,
   generateEncryptionKey
 } from '@src/utils/generateEncryptionKey'
-import { ToastAlert } from './ToastAlert'
-import { ToastType } from '@src/ToastTypes'
+
 import { Formik, FormikHelpers } from 'formik'
 
 interface Values {
   password: string
 }
-export default function PasswordReEnter({
+export function PasswordReEnter({
   modalVisible,
   setModalVisible
 }: {
@@ -32,7 +22,7 @@ export default function PasswordReEnter({
   setModalVisible: (visible: boolean) => void
 }) {
   const [showPassword, setShowPassword] = useState(false)
-  let deviceState = useDeviceStateStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
 
   return (
     <>
@@ -65,13 +55,13 @@ export default function PasswordReEnter({
                 const iv = encryptedDataBuff.slice(16, 16 + 12)
                 const data = encryptedDataBuff.slice(16 + 12)
 
-                let decryptedContent = await self.crypto.subtle.decrypt(
+                const decryptedContent = await self.crypto.subtle.decrypt(
                   { name: 'AES-GCM', iv },
                   masterEncryptionKey,
                   data
                 )
 
-                let currentAddDeviceSecret = dec.decode(decryptedContent)
+                const currentAddDeviceSecret = dec.decode(decryptedContent)
 
                 if (currentAddDeviceSecret !== deviceState.authSecret) {
                   throw new Error(`Incorrect password`)

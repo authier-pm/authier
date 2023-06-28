@@ -77,6 +77,7 @@ export function useDeviceState() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
+  const [isInitialized, setIsInitialized] = useState<boolean>(false)
   const [tableView, setTableView] = useState<boolean>(false)
   const [selectedItems, setSelectedItems] = useState<
     (ILoginSecret | ITOTPSecret)[]
@@ -111,8 +112,10 @@ export function useDeviceState() {
       if (device.lockedState) {
         setLockedState(device.lockedState)
       }
+      setIsInitialized(true)
     })
     if (storageOnchangeListenerRegistered) {
+      console.log('storage change listener already registered')
       return
     }
     browser.storage.onChanged.addListener(onStorageChange)
@@ -136,13 +139,10 @@ export function useDeviceState() {
     },
 
     setSecuritySettings: async (config: SettingsInput) => {
-      // console.log('setSecuritySettings', config)
-      await trpc.securitySettings.mutate(config)
+      device.setDeviceSettings(config)
     },
-
     setDeviceState: async (state: IBackgroundStateSerializable) => {
       device.save(state)
-      await trpc.setDeviceState.mutate(state)
     },
     lockedState,
     device,
@@ -187,7 +187,8 @@ export function useDeviceState() {
     setTableView,
     tableView,
     selectedItems,
-    setSelectedItems
+    setSelectedItems,
+    isInitialized
   }
 
   window['backgroundState'] = backgroundStateContext

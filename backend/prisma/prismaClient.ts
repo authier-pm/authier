@@ -4,7 +4,7 @@ import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
-import { PrismaClient } from '.prisma/client'
+import { Prisma, PrismaClient } from '.prisma/client'
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
@@ -54,3 +54,13 @@ export default prismaClient
 //TODO: We should type this
 // @ts-expect-error
 export const dmmf = prismaClient._runtimeDataModel as any
+
+// helper, because the default prisma interactive transaction timeouts are too low
+export const prismaTransaction = <R>(
+  fn: (prisma: Prisma.TransactionClient) => Promise<R>
+) => {
+  return prismaClient.$transaction(fn, {
+    timeout: 55000,
+    maxWait: 55000
+  })
+}

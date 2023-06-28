@@ -26,7 +26,7 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
-import { constructURL } from '@shared/urlUtils'
+import { ConstructURLReturnType, constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -75,7 +75,8 @@ const appRouter = tc.router({
       if (!url || !deviceState) {
         return false // we can't do anything without a valid url
       }
-      let urlParsed: URL
+      let urlParsed: ConstructURLReturnType
+
       try {
         urlParsed = constructURL(url)
       } catch (err) {
@@ -136,6 +137,11 @@ const appRouter = tc.router({
   saveCapturedInputEvents: tcProcedure
     .input(capturedEventsPayloadSchema)
     .mutation(async ({ input }) => {
+      if (navigator.onLine === false) {
+        console.log('ignoring saving of inputs because we are offline')
+        return
+      }
+
       capturedInputEvents = input.inputEvents
       inputsUrl = input.url
 
@@ -156,7 +162,8 @@ const appRouter = tc.router({
         mutation: AddWebInputsDocument,
         variables: {
           webInputs: newWebInputs
-        }
+        },
+        errorPolicy: 'ignore'
       })
     }),
   saveLoginCredentialsModalShown: tcProcedure
@@ -231,8 +238,6 @@ const appRouter = tc.router({
       // console.log('securitySettings', input, device.state)
       if (deviceState) {
         device.setDeviceSettings(input)
-
-        // console.log('device.state', device.state)
       }
 
       return true

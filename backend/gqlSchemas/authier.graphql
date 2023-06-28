@@ -7,7 +7,10 @@ type Query {
   authenticated: Boolean!
   me: UserQuery!
   currentDevice: DeviceQuery!
-  webInputs(host: String!): [WebInputGQL!]!
+  webInputs(
+    hosts: [String!]
+    host: String @deprecated(reason: "use hosts")
+  ): [WebInputGQLScalars!]!
 }
 
 type UserQuery {
@@ -19,14 +22,10 @@ type UserQuery {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: String
+  uiLanguage: String!
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -40,23 +39,15 @@ type UserQuery {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultDeviceSettings: DefaultDeviceSettingsGQL
   devices: [DeviceQuery!]!
+  defaultDeviceSettings: DefaultDeviceSettingsQuery!
   device(id: String!): DeviceQuery!
   lastChangeInSecrets: DateTime
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
   encryptedSecrets: [EncryptedSecretQuery!]!
-
-  """
-  Sends a message to the master device
-  """
-  sendAuthMessage(
-    type: String!
-    body: String!
-    title: String!
-    deviceId: String!
-  ): Boolean!
   decryptionChallengesWaiting: [DecryptionChallengeForApproval!]!
 }
 
@@ -99,14 +90,10 @@ type UserGQL {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: String
+  uiLanguage: String!
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -120,6 +107,7 @@ type UserGQL {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultDeviceSettings: DefaultDeviceSettingsGQL
 }
 
 type DeviceGQL {
@@ -133,6 +121,8 @@ type DeviceGQL {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -258,6 +248,19 @@ type MasterDeviceChangeGQL {
   user: UserGQL!
 }
 
+type DefaultDeviceSettingsGQL {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  theme: String!
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
+  user: UserGQL!
+}
+
 type DeviceQuery {
   id: ID!
   firstIpAddress: String!
@@ -269,6 +272,8 @@ type DeviceQuery {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -302,6 +307,21 @@ type EncryptedSecretQuery {
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
   lastUsedAt: DateTime
+}
+
+type DefaultDeviceSettingsQuery {
+  """
+  0 index for system defaults
+  """
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  theme: String!
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
 }
 
 type EmailVerificationGQLScalars {
@@ -341,6 +361,18 @@ type DeviceLocation {
   countryName: String!
 }
 
+type WebInputGQLScalars {
+  id: Int!
+  layoutType: String
+  createdAt: DateTime!
+  host: String!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  domOrdinal: Int!
+  addedByUserId: String
+}
+
 type Mutation {
   """
   you need to be authenticated to call this resolver
@@ -377,14 +409,10 @@ type UserMutation {
   createdAt: DateTime!
   updatedAt: DateTime
   masterDeviceId: String
+  uiLanguage: String!
   TOTPlimit: Int!
   loginCredentialsLimit: Int!
   deviceRecoveryCooldownMinutes: Int!
-  autofillCredentialsEnabled: Boolean!
-  autofillTOTPEnabled: Boolean!
-  uiLanguage: String!
-  defaultDeviceTheme: String!
-  defaultDeviceSyncTOTP: Boolean!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
   Token: [TokenGQL!]!
@@ -398,8 +426,10 @@ type UserMutation {
   UserPaidProducts: [UserPaidProductsGQL!]!
   DecryptionChallenges: [DecryptionChallengeGQL!]!
   MasterDeviceChange: [MasterDeviceChangeGQL!]!
+  DefaultDeviceSettings: DefaultDeviceSettingsGQL
   addCookie: String!
   device(id: String!): DeviceMutation!
+  defaultDeviceSettings: DefaultDeviceSettingsMutation!
   addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   createSecretUsageEvent(
@@ -433,6 +463,8 @@ type DeviceMutation {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
   deletedAt: DateTime
@@ -481,6 +513,40 @@ scalar PositiveInt
 A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier.
 """
 scalar UUID
+
+type DefaultDeviceSettingsMutation {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  theme: String!
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
+  update(config: DefaultSettingsInput!): DefaultDeviceSettingsGQLScalars!
+}
+
+type DefaultDeviceSettingsGQLScalars {
+  id: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  theme: String!
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  userId: String!
+}
+
+input DefaultSettingsInput {
+  syncTOTP: Boolean!
+  vaultLockTimeoutSeconds: Int!
+  autofillCredentialsEnabled: Boolean!
+  autofillTOTPEnabled: Boolean!
+  uiLanguage: String!
+  theme: String!
+}
 
 input DeviceInput {
   id: String!

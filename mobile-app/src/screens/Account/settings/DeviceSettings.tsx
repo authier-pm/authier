@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   Box,
   Center,
@@ -13,7 +13,7 @@ import {
   Heading,
   ScrollView
 } from 'native-base'
-import PasswordReEnter from '@src/components/PasswordReEnter'
+import { PasswordReEnter } from '@src/components/PasswordReEnter'
 
 import SInfo from 'react-native-sensitive-info'
 import { Trans } from '@lingui/macro'
@@ -21,35 +21,39 @@ import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
-import { i18n } from '@lingui/core'
-import { RefreshControl } from 'react-native'
 
-function DeviceSettings() {
-  let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
+import { RefreshControl } from 'react-native'
+import { AuthierSelect } from '@src/components/AuthierSelect'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
+
+export function DeviceSettings() {
+  const deviceState = useDeviceStateStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const options = useVaultLockTimeoutOptions()
   const { toggleColorMode } = useColorMode()
-  const [modalVisible, setModalVisible] = React.useState(false)
-  const [refreshing, setRefreshing] = React.useState(false)
+  const [modalVisible, setModalVisible] = useState(false)
+  const [refreshing, setRefreshing] = useState(false)
   const [updateSettings] = useUpdateSettingsMutation({})
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
 
   const currentSettings = (): SettingsInput => {
     return {
-      autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-      autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
-      uiLanguage: deviceState.uiLanguage,
-      syncTOTP: deviceState.syncTOTP,
-      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
+      autofillTOTPEnabled: deviceState.autofillTOTPEnabled as boolean,
+      autofillCredentialsEnabled:
+        deviceState.autofillCredentialsEnabled as boolean,
+      uiLanguage: deviceState.uiLanguage as string,
+      syncTOTP: deviceState.syncTOTP as boolean,
+      vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds as number,
       notificationOnVaultUnlock: deviceState.notificationOnVaultUnlock,
       notificationOnWrongPasswordAttempts:
         deviceState.notificationOnWrongPasswordAttempts
     }
   }
-  const [previousSettings, setPreviousSettings] = React.useState<SettingsInput>(
+  const [previousSettings, setPreviousSettings] = useState<SettingsInput>(
     currentSettings()
   )
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!previousSettings) {
       setPreviousSettings(currentSettings)
       return
@@ -90,36 +94,31 @@ function DeviceSettings() {
             </Heading>
             <VStack space={2} backgroundColor={itemBg} rounded="xl" p={3}>
               <VStack space={2}>
-                <Text>
-                  <Trans>Lock time</Trans>
-                </Text>
+                <Trans>Lock time</Trans>
 
                 <Box p={2}>
-                  <Select
-                    //@ts-expect-error https://github.com/GeekyAnts/NativeBase/issues/5687
-                    optimized={false}
+                  <AuthierSelect
                     variant="rounded"
                     onValueChange={(value) => {
                       device.setLockTime(parseInt(value, 10))
                     }}
-                    selectedValue={deviceState.vaultLockTimeoutSeconds.toString()}
+                    selectedValue={
+                      deviceState.vaultLockTimeoutSeconds?.toString() ?? '0'
+                    }
                     accessibilityLabel="Lock time"
                   >
-                    <Select.Item label="1 minute" value="20" />
-                    <Select.Item label="2 minutes" value="120" />
-                    <Select.Item label="1 hour" value="3600" />
-                    <Select.Item label="4 hours" value="14400" />
-                    <Select.Item label="8 hours" value="28800" />
-                    <Select.Item label="1 week" value="604800" />
-                    <Select.Item label="1 month" value="2592000" />
-                    <Select.Item label="never" value="0" />
-                  </Select>
+                    {options.map((option, index) => (
+                      <Select.Item
+                        label={option.label}
+                        value={option.value.toString()}
+                        key={index}
+                      />
+                    ))}
+                  </AuthierSelect>
 
-                  <Text>
-                    <Trans>
-                      Automatically locks vault after chosen period of time
-                    </Trans>
-                  </Text>
+                  <Trans>
+                    Automatically locks vault after chosen period of time
+                  </Trans>
                 </Box>
               </VStack>
               <Divider />
@@ -130,7 +129,7 @@ function DeviceSettings() {
               >
                 <Text>2FA</Text>
                 <Switch
-                  value={deviceState.syncTOTP}
+                  value={deviceState.syncTOTP ?? false}
                   onToggle={async (e) => {
                     deviceState.changeSyncTOTP(e)
                   }}
@@ -168,45 +167,21 @@ function DeviceSettings() {
           {/*  */}
           <VStack space={2}>
             <Heading size="md">
-              <Trans>Language</Trans>
-            </Heading>
-
-            <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
-                onValueChange={(value) => {
-                  deviceState.changeUiLanguage(value)
-                  i18n.activate(value)
-                }}
-                defaultValue={deviceState.uiLanguage}
-                accessibilityLabel="language"
-              >
-                <Select.Item label="English" value="en" />
-                <Select.Item label="Čeština" value="cs" />
-              </Select>
-            </Box>
-          </VStack>
-          {/*  */}
-          <VStack space={2}>
-            <Heading size="md">
               <Trans>Theme</Trans>
             </Heading>
 
             <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <Select
-                //@ts-expect-error
-                optimized={false}
+              <AuthierSelect
                 onValueChange={(value) => {
                   toggleColorMode()
                   deviceState.changeTheme(value)
                 }}
-                defaultValue={deviceState.theme}
+                selectedValue={deviceState.theme}
                 accessibilityLabel="theme"
               >
-                <Select.Item label="light" value="light" />
-                <Select.Item label="dark" value="dark" />
-              </Select>
+                <Select.Item label="Light" value="light" />
+                <Select.Item label="Dark" value="dark" />
+              </AuthierSelect>
             </Box>
           </VStack>
         </VStack>
@@ -214,5 +189,3 @@ function DeviceSettings() {
     </ScrollView>
   )
 }
-
-export default DeviceSettings

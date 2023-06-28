@@ -21,6 +21,87 @@ msgstr "{name}"
 msgid "{text}"
 msgstr "{text}"
 
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "1 day"
+msgstr "1 day"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "1 hour"
+msgstr "1 hour"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "1 minute"
+msgstr "1 minute"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "1 week"
+msgstr "1 week"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "1 year"
+msgstr "1 year"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "10 minutes"
+msgstr "10 minutes"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "12 hours"
+msgstr "12 hours"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "2 days"
+msgstr "2 days"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "2 hours"
+msgstr "2 hours"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "2 months"
+msgstr "2 months"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "2 weeks"
+msgstr "2 weeks"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "2FA"
+msgstr "2FA"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "3 days"
+msgstr "3 days"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "3 months"
+msgstr "3 months"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "30 minutes"
+msgstr "30 minutes"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "31 days"
+msgstr "31 days"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "4 hours"
+msgstr "4 hours"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "5 minutes"
+msgstr "5 minutes"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "6 months"
+msgstr "6 months"
+
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "8 hours"
+msgstr "8 hours"
+
 #: src/screens/Device/DeviceInfo.tsx
 msgid "About"
 msgstr "About"
@@ -28,6 +109,10 @@ msgstr "About"
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
 msgstr "Account"
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Add password"
+msgstr "Add password"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
@@ -54,9 +139,14 @@ msgid "Attempts before notification:"
 msgstr "Attempts before notification:"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatically locks vault after chosen period of time"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Automatically locks vault after chosen period of time, use lower values for more security, higher for more user comfort"
+msgstr "Automatically locks vault after chosen period of time, use lower values for more security, higher for more user comfort"
 
 #: src/navigation/AccountNavigation.tsx
 #: src/screens/Account/settings/UserSettings.tsx
@@ -75,6 +165,11 @@ msgstr "Codepush version"
 msgid "Created"
 msgstr "Created"
 
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Credentials autofill"
+msgstr "Credentials autofill"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
 #~ msgstr "Current Passwor2d"
@@ -88,9 +183,15 @@ msgid "Danger zone"
 msgstr "Danger zone"
 
 #: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Dark"
+msgstr "Dark"
+
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Delete your account"
 msgstr "Delete your account"
 
+#: src/navigation/DeviceStackNavigation.tsx
 #: src/navigation/SettingsNavigation.tsx
 msgid "Device"
 msgstr "Device"
@@ -99,6 +200,12 @@ msgstr "Device"
 msgid "Device:"
 msgstr "Device:"
 
+#: src/navigation/AppNavigation.tsx
+#: src/navigation/AppNavigation.tsx
+#: src/navigation/AppNavigation.tsx
+msgid "Devices"
+msgstr "Devices"
+
 #: src/screens/Account/Account.tsx
 msgid "Do you want to lock device?"
 msgstr "Do you want to lock device?"
@@ -106,6 +213,10 @@ msgstr "Do you want to lock device?"
 #: src/screens/Account/Account.tsx
 msgid "Do you want to logout?"
 msgstr "Do you want to logout?"
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Edit password"
+msgstr "Edit password"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
@@ -124,18 +235,29 @@ msgstr "I'm a new user."
 #~ msgstr "Import passwords"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
-msgid "Language"
-msgstr "Language"
+#~ msgid "Language"
+#~ msgstr "Language"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Last IP Address"
 msgstr "Last IP Address"
+
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Light"
+msgstr "Light"
+
+#: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/Account.tsx
+msgid "Limits"
+msgstr "Limits"
 
 #: src/screens/Account/Account.tsx
 msgid "Lock"
 msgstr "Lock"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Lock time"
 msgstr "Lock time"
@@ -160,6 +282,14 @@ msgstr "Logout"
 msgid "Logout at"
 msgstr "Logout at"
 
+#: src/utils/useVaultLockTimeoutOptions.tsx
+msgid "Never"
+msgstr "Never"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "New device default settings"
+msgstr "New device default settings"
+
 #: src/screens/Device/Devices.tsx
 msgid "New Device is trying to login!"
 msgstr "New Device is trying to login!"
@@ -180,10 +310,15 @@ msgstr "Notifications"
 msgid "Notify after password attempts"
 msgstr "Notify after password attempts"
 
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "On vault unlock"
+msgstr "On vault unlock"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Password changed, all your devices will be logged out and you will need to log in again"
 msgstr "Password changed, all your devices will be logged out and you will need to log in again"
 
+#: src/navigation/AppNavigation.tsx
 #: src/navigation/PasswordsStackNavigation.tsx
 msgid "Passwords"
 msgstr "Passwords"
@@ -200,6 +335,10 @@ msgstr "Platform"
 msgid "Reject"
 msgstr "Reject"
 
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Save default settings"
+msgstr "Save default settings"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Scan QR"
 msgstr "Scan QR"
@@ -211,6 +350,10 @@ msgstr "Security"
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Set as master device"
 msgstr "Set as master device"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Set default settings for new devices"
+msgstr "Set default settings for new devices"
 
 #: src/screens/Device/DeviceInfo.tsx
 #~ msgid "Set on master device"
@@ -224,6 +367,10 @@ msgstr "Settings"
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
 msgstr "Sign Up"
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "Start by adding a login secret"
+msgstr "Start by adding a login secret"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
 #~ msgid "Start by adding a login secret or a TOTP code"
@@ -240,6 +387,11 @@ msgstr "Submit"
 #: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Theme"
 msgstr "Theme"
+
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "TOTP autofill"
+msgstr "TOTP autofill"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
@@ -277,3 +429,7 @@ msgstr ""
 #: src/components/OfflineBanner.tsx
 msgid "Your device is offline"
 msgstr "Your device is offline"
+
+#: src/navigation/DeviceStackNavigation.tsx
+msgid "Your devices"
+msgstr "Your devices"

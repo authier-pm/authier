@@ -4,7 +4,11 @@ import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import { EncryptedSecretInput, SettingsInput } from './models'
+import {
+  DefaultSettingsInput,
+  EncryptedSecretInput,
+  SettingsInput
+} from './models'
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
@@ -25,13 +29,16 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 import prismaClient, { dmmf } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
-import { stripe } from '../stripe'
+import { stripeClient } from '../stripeClient'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
+import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+
 const log = debug('au:userMutation')
 
 @ObjectType()
@@ -63,6 +70,11 @@ export class UserMutation extends UserBase {
     })
   }
 
+  @Field(() => DefaultDeviceSettingsMutation)
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    return super.defaultDeviceSettings(ctx)
+  }
+
   @Field(() => DeviceGQL)
   async addDevice(
     @Arg('device', () => DeviceInput) device: DeviceInput,
@@ -70,6 +82,13 @@ export class UserMutation extends UserBase {
     @Ctx() ctx: IContext
   ) {
     const ipAddress: string = ctx.getIpAddress()
+
+    const deviceDefaultSettings =
+      (await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })) ?? defaultDeviceSettingSystemValues
 
     return await ctx.prisma.device.create({
       data: {
@@ -80,7 +99,11 @@ export class UserMutation extends UserBase {
         firstIpAddress: ipAddress,
         userId: this.id,
         lastIpAddress: ipAddress,
-        vaultLockTimeoutSeconds: 60
+        vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
+        autofillCredentialsEnabled:
+          deviceDefaultSettings.autofillCredentialsEnabled,
+        autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
+        syncTOTP: deviceDefaultSettings.syncTOTP
       }
     })
   }
@@ -223,12 +246,10 @@ export class UserMutation extends UserBase {
         id: this.id
       },
       data: {
-        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
-        autofillTOTPEnabled: config.autofillTOTPEnabled,
         notificationOnVaultUnlock: config.notificationOnVaultUnlock,
+        uiLanguage: config.uiLanguage,
         notificationOnWrongPasswordAttempts:
           config.notificationOnWrongPasswordAttempts,
-        uiLanguage: config.uiLanguage,
         Devices: {
           update: {
             where: {
@@ -236,7 +257,9 @@ export class UserMutation extends UserBase {
             },
             data: {
               syncTOTP: config.syncTOTP,
-              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds
+              vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
+              autofillCredentialsEnabled: config.autofillCredentialsEnabled,
+              autofillTOTPEnabled: config.autofillTOTPEnabled
             }
           }
         }
@@ -449,7 +472,7 @@ export class UserMutation extends UserBase {
       throw new GraphqlError("You don't have a paid subscription")
     }
 
-    const checkoutSession = await stripe.checkout.sessions.retrieve(
+    const checkoutSession = await stripeClient.checkout.sessions.retrieve(
       product?.checkoutSessionId as string
     )
 
@@ -457,7 +480,7 @@ export class UserMutation extends UserBase {
     // managing their billing with the portal.
     const returnUrl = `${process.env.FRONTEND_URL}/pricing`
 
-    const portalSession = await stripe.billingPortal.sessions.create({
+    const portalSession = await stripeClient.billingPortal.sessions.create({
       customer: checkoutSession.customer as string,
       return_url: returnUrl
     })
@@ -474,14 +497,14 @@ export class UserMutation extends UserBase {
       where: { userId: ctx.jwtPayload.userId }
     })
 
-    const productItem = await stripe.products.retrieve(product)
+    const productItem = await stripeClient.products.retrieve(product)
 
     if (user) {
-      const checkoutSession = await stripe.checkout.sessions.retrieve(
+      const checkoutSession = await stripeClient.checkout.sessions.retrieve(
         user?.checkoutSessionId as string
       )
 
-      const session = await stripe.checkout.sessions.create({
+      const session = await stripeClient.checkout.sessions.create({
         billing_address_collection: 'auto',
         line_items: [
           {
@@ -501,8 +524,15 @@ export class UserMutation extends UserBase {
 
       return session.id
     } else {
-      const session = await stripe.checkout.sessions.create({
+      const newCustomer = await ctx.prisma.user.findUnique({
+        where: {
+          id: ctx.jwtPayload.userId
+        }
+      })
+
+      const session = await stripeClient.checkout.sessions.create({
         billing_address_collection: 'auto',
+        customer_email: newCustomer?.email as string,
         line_items: [
           {
             price: productItem['default_price'] as string,

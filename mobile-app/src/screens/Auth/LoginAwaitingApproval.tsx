@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
   WarningIcon,
+  useColorMode,
   useColorModeValue,
   useToast
 } from 'native-base'
@@ -37,6 +38,7 @@ import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()
   const id = 'active-toast'
+  const { colorMode, toggleColorMode } = useColorMode()
   const { formState, setFormState } = useContext(LoginContext)
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
@@ -139,6 +141,7 @@ export const useLogin = (props: { deviceName: string }) => {
         const response = await addNewDevice({
           variables: {
             email: formState.email,
+            deviceId: device.id as string,
             deviceInput: {
               id: device.id as string,
               name: props.deviceName,
@@ -191,19 +194,28 @@ export const useLogin = (props: { deviceName: string }) => {
             deviceName: props.deviceName,
             authSecret: newParams.addDeviceSecret,
             authSecretEncrypted: newParams.addDeviceSecretEncrypted,
-            vaultLockTimeoutSeconds: 28800,
+            vaultLockTimeoutSeconds:
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
+            autofillTOTPEnabled:
+              addNewDeviceForUser.user.device.autofillTOTPEnabled,
             autofillCredentialsEnabled:
-              addNewDeviceForUser.user.autofillCredentialsEnabled,
-            autofillTOTPEnabled: addNewDeviceForUser.user.autofillTOTPEnabled,
+              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
-            lockTimeEnd: Date.now() + 28800000,
-            syncTOTP: addNewDeviceForUser.user.defaultDeviceSyncTOTP,
-            theme: addNewDeviceForUser.user.defaultDeviceTheme,
+            syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
+            lockTimeEnd:
+              Date.now() +
+              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds * 1000,
+            //TODO: distinguish between "new" and "old" device
+            theme: addNewDeviceForUser.user.defaultDeviceSettings.theme,
             notificationOnVaultUnlock:
               addNewDeviceForUser.user.notificationOnVaultUnlock,
             notificationOnWrongPasswordAttempts:
               addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
             accessToken: addNewDeviceForUser?.accessToken
+          }
+
+          if (colorMode !== newDeviceState.theme) {
+            toggleColorMode()
           }
 
           device.save(newDeviceState)
@@ -224,7 +236,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
 export const LoginAwaitingApproval = () => {
   const { formState } = useContext(LoginContext)
-  let device = useDeviceStore((state) => state)
+  const device = useDeviceStore((state) => state)
   const [deviceName] = useState(device.name)
   const { deviceDecryptionChallenge } = useLogin({
     deviceName

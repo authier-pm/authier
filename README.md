@@ -46,6 +46,15 @@ We are using pnpm workspaces so always run pnpm in root folder. That's where the
 
 Refer to readme inside each subproject for all the instructions. Generally you will need to run backend + whatever client you want to develop.
 
+# Contributor financial reward scheme
+
+Authier is a non profit organization. If we ever see any profit from this project, it will be divided at the end each month proportionally according to the latest numbers in `contrib-locs.json`.
+
+If you contribute to authier, your PR gets merged and from next month you will be eligible for a small portion of the profit.
+For now this happens manually. We cannot open source our stripe dashboard, but we will expose publicly our stripe balance if there are more than 4 contributors. ATM it's just 2 contributors.
+
 ## Contrib locs
 
-For now we're running it manually every week or so by `pnpm contrib`. If we ever see a profit from this project, it will be divided each month proportionally according to the latest numbers in `contrib-locs.json`
+For now we're running it manually every week.
+It needs to run in node 16, does not run in node 18, see this issue: https://github.com/nodegit/nodegit/issues/1980
+TODO run contrib-locs with github CRON.

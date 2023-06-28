@@ -52,6 +52,14 @@ export type ChangeDeviceSettingsMutationVariables = Types.Exact<{
 
 export type ChangeDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', updateDeviceSettings: { __typename?: 'DeviceGQL', id: string } } } };
 
+export type RenameDeviceMutationVariables = Types.Exact<{
+  id: Types.Scalars['String']['input'];
+  name: Types.Scalars['String']['input'];
+}>;
+
+
+export type RenameDeviceMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', device: { __typename?: 'DeviceMutation', rename: { __typename?: 'DeviceGQL', id: string } } } };
+
 
 export const RejectChallengeDocument = gql`
     mutation RejectChallenge($id: Int!) {
@@ -319,3 +327,41 @@ export function useChangeDeviceSettingsMutation(baseOptions?: Apollo.MutationHoo
 export type ChangeDeviceSettingsMutationHookResult = ReturnType<typeof useChangeDeviceSettingsMutation>;
 export type ChangeDeviceSettingsMutationResult = Apollo.MutationResult<ChangeDeviceSettingsMutation>;
 export type ChangeDeviceSettingsMutationOptions = Apollo.BaseMutationOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>;
+export const RenameDeviceDocument = gql`
+    mutation renameDevice($id: String!, $name: String!) {
+  me {
+    device(id: $id) {
+      rename(name: $name) {
+        id
+      }
+    }
+  }
+}
+    `;
+export type RenameDeviceMutationFn = Apollo.MutationFunction<RenameDeviceMutation, RenameDeviceMutationVariables>;
+
+/**
+ * __useRenameDeviceMutation__
+ *
+ * To run a mutation, you first call `useRenameDeviceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useRenameDeviceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [renameDeviceMutation, { data, loading, error }] = useRenameDeviceMutation({
+ *   variables: {
+ *      id: // value for 'id'
+ *      name: // value for 'name'
+ *   },
+ * });
+ */
+export function useRenameDeviceMutation(baseOptions?: Apollo.MutationHookOptions<RenameDeviceMutation, RenameDeviceMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<RenameDeviceMutation, RenameDeviceMutationVariables>(RenameDeviceDocument, options);
+      }
+export type RenameDeviceMutationHookResult = ReturnType<typeof useRenameDeviceMutation>;
+export type RenameDeviceMutationResult = Apollo.MutationResult<RenameDeviceMutation>;
+export type RenameDeviceMutationOptions = Apollo.BaseMutationOptions<RenameDeviceMutation, RenameDeviceMutationVariables>;

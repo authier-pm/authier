@@ -29,6 +29,7 @@ import { icons } from './Devices'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
 import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 const ColumnWrapper = ({
   text,
@@ -47,20 +48,21 @@ const ColumnWrapper = ({
   )
 }
 
-export default function DeviceInfo({
+export function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
   const { deviceId: selectedDeviceId, masterDeviceId } = route.params
   const [id] = useDeviceStore((state) => [state.id])
   const [changeMasterDevice] = useChangeMasterDeviceMutation()
-  const [chagengeDeviceSettings, { loading: changeSettingsloading }] =
+  const [changeDeviceSettings, { loading: changeSettingsLoading }] =
     useChangeDeviceSettingsMutation({
       refetchQueries: [
         { query: DeviceInfoDocument, variables: { id: selectedDeviceId } }
       ],
       awaitRefetchQueries: true
     })
+  const options = useVaultLockTimeoutOptions()
   const { data, loading, error } = useDeviceInfoQuery({
     variables: {
       id: selectedDeviceId
@@ -183,15 +185,13 @@ export default function DeviceInfo({
             <Trans>Settings</Trans>
           </Heading>
           <VStack backgroundColor={itemBg} p={3} rounded={10} space={2}>
-            <Text>
-              <Trans>Lock time</Trans>
-            </Text>
+            <Trans>Lock time</Trans>
 
             <Box p={2}>
               <Select
                 variant="rounded"
                 onValueChange={(value) => {
-                  chagengeDeviceSettings({
+                  changeDeviceSettings({
                     variables: {
                       id: selectedDeviceId as string,
                       vaultLockTimeoutSeconds: parseInt(value),
@@ -202,34 +202,31 @@ export default function DeviceInfo({
                 selectedValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
                 accessibilityLabel="Lock time"
               >
-                <Select.Item label="1 minute" value="20" />
-                <Select.Item label="2 minutes" value="120" />
-                <Select.Item label="1 hour" value="3600" />
-                <Select.Item label="4 hours" value="14400" />
-                <Select.Item label="8 hours" value="28800" />
-                <Select.Item label="1 week" value="604800" />
-                <Select.Item label="1 month" value="2592000" />
-                <Select.Item label="never" value="0" />
+                {options.map((option, index) => (
+                  <Select.Item
+                    label={option.label}
+                    value={option.value.toString()}
+                    key={index}
+                  />
+                ))}
               </Select>
 
-              <Text>
-                <Trans>
-                  Automatically locks vault after chosen period of time
-                </Trans>
-              </Text>
+              <Trans>
+                Automatically locks vault after chosen period of time
+              </Trans>
             </Box>
             <Divider />
             <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>2FA</Text>
+              <Trans>2FA</Trans>
               <Switch
                 //FIX: Flickers after change of Lock time
                 value={
-                  changeSettingsloading
+                  changeSettingsLoading
                     ? !selectedDeviceData?.syncTOTP
                     : selectedDeviceData?.syncTOTP
                 }
                 onToggle={async (e) => {
-                  chagengeDeviceSettings({
+                  changeDeviceSettings({
                     variables: {
                       id: selectedDeviceId as string,
                       vaultLockTimeoutSeconds:

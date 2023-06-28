@@ -7,6 +7,7 @@ import { faker } from '@faker-js/faker'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeviceMutation, DeviceQuery } from './Device'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 describe('Device', () => {
   let user: User
@@ -56,7 +57,8 @@ describe('Device', () => {
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
         platform: faker.lorem.word(),
-        userId: userId
+        userId: userId,
+        ...defaultDeviceSettingSystemValues
       }
     })
 
@@ -69,7 +71,8 @@ describe('Device', () => {
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
         platform: faker.lorem.word(),
-        userId: userId
+        userId: userId,
+        ...defaultDeviceSettingSystemValues
       }
     })
 

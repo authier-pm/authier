@@ -62,7 +62,7 @@ export const queueLink = new QueueLink()
 const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
-  let accessToken = useDeviceStateStore.getState().accessToken
+  const accessToken = useDeviceStateStore.getState().accessToken
   //return the headers to the context so httpLink can read them
   return {
     headers: {
@@ -82,6 +82,7 @@ const ToastServerErrorDetails = {
 // Log any GraphQL errors or network error that occurred
 const errorLink = onError(({ graphQLErrors, networkError, response }) => {
   if (graphQLErrors && graphQLErrors.length > 0) {
+    console.log(graphQLErrors[0].message)
     if (graphQLErrors[0].message === 'not authenticated') {
       //Here just logout the user
       useDeviceStore.getState().clearAndReload()

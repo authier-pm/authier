@@ -75,3 +75,13 @@ mutation changeDeviceSettings(
     }
   }
 }
+
+mutation renameDevice($id: String!, $name: String!) {
+  me {
+    device(id: $id) {
+      rename(name: $name) {
+        id
+      }
+    }
+  }
+}

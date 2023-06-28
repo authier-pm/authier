@@ -34,7 +34,10 @@ export const InputField = ({
 }
 
 export const AddTOTP = () => {
-  let deviceState = useDeviceStateStore((state) => state)
+  const [addSecrets, encrypt] = useDeviceStateStore((state) => [
+    state.addSecrets,
+    state.encrypt
+  ])
   const navigation =
     useNavigation<TOTPStackScreenProps<'AddTOTP'>['navigation']>()
 
@@ -54,11 +57,11 @@ export const AddTOTP = () => {
           values: TotpTypeWithMeta,
           { setSubmitting }: FormikHelpers<TotpTypeWithMeta>
         ) => {
-          await deviceState.addSecrets([
+          await addSecrets([
             {
               kind: EncryptedSecretType.TOTP,
               totp: values,
-              encrypted: await deviceState.encrypt(JSON.stringify(values)),
+              encrypted: await encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
             }
           ])

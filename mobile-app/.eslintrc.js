@@ -29,7 +29,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/explicit-module-boundary-types': 'off',
     '@typescript-eslint/no-unused-vars': ['error'],
-    'no-console': ['error', { allow: ['warn'] }],
     'react-native/no-unused-styles': 'error',
     'react-native/split-platform-components': 'warn',
     'react-native/no-inline-styles': 'warn',
@@ -40,15 +39,9 @@ module.exports = {
     'jest/no-disabled-tests': 'warn',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
-    'no-restricted-imports': [
-      'error',
-      {
-        name: 'react-redux',
-        importNames: ['useSelector', 'useDispatch'],
-        message: 'use hooks in `src/hooks/useSelector` for typing support'
-      }
-    ],
-    'comma-dangle': 'off'
+    'import/no-default-export': 'error',
+    'comma-dangle': 'off',
+    'react-native/no-raw-text': 'off'
   },
   overrides: [
     {

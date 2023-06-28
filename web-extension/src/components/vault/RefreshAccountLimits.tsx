@@ -3,7 +3,7 @@ import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
 
 import { t, Trans } from '@lingui/macro'
-import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 export function RefreshAccountLimits({
   refreshAccountTooltip,
@@ -14,8 +14,8 @@ export function RefreshAccountLimits({
 }) {
   const [isSyncing, setIsSyncing] = useState(false)
   const toast = useToast()
-  const { refetch } = useMeExtensionQuery({
-    fetchPolicy: 'network-only'
+  const { refetch } = useLimitsQuery({
+    fetchPolicy: 'cache-and-network'
   })
 
   return (

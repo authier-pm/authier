@@ -1,7 +1,7 @@
 import { Button } from '@chakra-ui/react'
 import { t, Trans } from '@lingui/macro'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
-import { useContext } from 'react'
+import { useContext, useState } from 'react'
 import { QRCode } from 'jsqr'
 
 import { v4 as uuidv4 } from 'uuid'
@@ -14,13 +14,15 @@ import { device } from '@src/background/ExtensionDevice'
 import { getQrCodeFromUrl } from '@src/util/getQrCodeFromUrl'
 import { EncryptedSecretType } from '../../../../shared/generated/graphqlBaseTypes'
 import { ITOTPSecret } from '@src/util/useDeviceState'
-import { useMeExtensionQuery } from '@src/pages-vault/AccountLimits.codegen'
 import { toast } from '@src/ExtensionProviders'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
+import { TbPhoto } from 'react-icons/tb'
+import { constructURL } from '@shared/urlUtils'
 
 export const AddTOTPSecretButton = () => {
   const { deviceState, TOTPSecrets } = useContext(DeviceStateContext)
-  const { data } = useMeExtensionQuery()
-
+  const { data } = useLimitsQuery()
+  const [isLoading, setIsLoading] = useState(false)
   const addToTOTPs = async (qr: QRCode) => {
     const tab = await getCurrentTab()
 
@@ -67,22 +69,31 @@ export const AddTOTPSecretButton = () => {
 
   return (
     <Button
+      isLoading={isLoading}
+      leftIcon={<TbPhoto></TbPhoto>}
       className="btn btn-block btn-outline-dark"
       onClick={async () => {
-        const src = await browser.tabs.captureVisibleTab()
-        const qr = await getQrCodeFromUrl(src)
-        if (qr) {
-          addToTOTPs(qr)
-        } else {
-          toast({
-            title: t`could not find any QR code on this page. Make sure QR code is visible.`,
-            status: 'error',
-            isClosable: true
-          })
+        setIsLoading(true)
+        try {
+          const src = await browser.tabs.captureVisibleTab()
+          const qr = await getQrCodeFromUrl(src)
+          if (qr) {
+            addToTOTPs(qr)
+          } else {
+            toast({
+              title: t`could not find any QR code on this page. Make sure QR code is visible.`,
+              status: 'error',
+              isClosable: true
+            })
+          }
+        } catch (err) {
+          throw err
+        } finally {
+          setIsLoading(false)
         }
       }}
     >
-      <Trans>Add QR TOTP</Trans>
+      <Trans>Add QR TOTP from current page</Trans>
     </Button>
   )
 }
@@ -97,9 +108,13 @@ export async function getTokenSecretFromQrCode(
     console.error('QR code does not have any secret', qr.data)
     throw new Error('QR code does not have any secret')
   }
+  if (!device.state) {
+    throw new Error('device not initialized')
+  }
 
-  const encrypted = await device.state!.encrypt(secret)
+  const encrypted = await device.state.encrypt(secret)
 
+  const hostname = constructURL(tab.url as string).hostname
   return {
     id: uuidv4(),
     kind: EncryptedSecretType.TOTP,
@@ -112,7 +127,7 @@ export async function getTokenSecretFromQrCode(
       label:
         (parsedQuery.query.issuer as string) ??
         decodeURIComponent(parsedQuery.url.replace('otpauth://totp/', '')),
-      url: tab.url as string
+      url: hostname
     },
     createdAt: new Date().toJSON(),
     encrypted

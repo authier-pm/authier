@@ -3,12 +3,12 @@ import * as React from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { t } from '@lingui/macro'
 import { SettingsTabParamList } from './types'
-import UserSettings from '@src/screens/Account/settings/UserSettings'
-import DeviceSettings from '@src/screens/Account/settings/DeviceSettings'
+import { UserSettings } from '@src/screens/Account/settings/UserSettings'
+import { DeviceSettings } from '@src/screens/Account/settings/DeviceSettings'
 
 const Tab = createMaterialTopTabNavigator<SettingsTabParamList>()
 
-function SettingsNavigation() {
+export function SettingsNavigation() {
   return (
     <Tab.Navigator
       screenOptions={{
@@ -33,4 +33,3 @@ function SettingsNavigation() {
     </Tab.Navigator>
   )
 }
-export default SettingsNavigation

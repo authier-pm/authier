@@ -20,7 +20,7 @@ import {
   TableContainer
 } from '@chakra-ui/react'
 import { FaCheckCircle } from 'react-icons/fa'
-import { useMeExtensionQuery } from './AccountLimits.codegen'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 import ProfileCard from '@src/components/vault/ProfileCard'
 import browser from 'webextension-polyfill'
 import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
@@ -45,15 +45,9 @@ function PriceWrapper({ children }: { children: ReactNode }) {
 
 const page_url = process.env.PAGE_URL as string
 
-const pricingPlan = {
-  Credentials: 'prod_LquWXgjk6kl5sM',
-  TOTP: 'prod_LquVrkwfsXjTAL',
-  TOTP_Credentials: 'prod_Lp3NU9UcNWduBm'
-}
-
 export const AccountLimits = () => {
-  const { data } = useMeExtensionQuery({
-    fetchPolicy: 'network-only'
+  const { data } = useLimitsQuery({
+    fetchPolicy: 'cache-and-network'
   })
   const [refreshAccountTooltip, setRefreshAccountTooltip] = useState(false)
   return (
@@ -178,7 +172,7 @@ export const AccountLimits = () => {
               onClick={async () => {
                 const token = await getTokenFromLocalStorage()
                 browser.tabs.create({
-                  url: `${page_url}/pricing?product=${pricingPlan.Credentials}&acToken=${token}`
+                  url: `${page_url}/pricing?acToken=${token}`
                 })
                 setRefreshAccountTooltip(true)
               }}
@@ -222,7 +216,7 @@ export const AccountLimits = () => {
               onClick={async () => {
                 const token = await getTokenFromLocalStorage()
                 browser.tabs.create({
-                  url: `${page_url}/pricing?product=${pricingPlan.TOTP}&acToken=${token}`
+                  url: `${page_url}/pricing?acToken=${token}`
                 })
                 setRefreshAccountTooltip(true)
               }}
@@ -291,7 +285,7 @@ export const AccountLimits = () => {
                 onClick={async () => {
                   const token = await getTokenFromLocalStorage()
                   browser.tabs.create({
-                    url: `${page_url}/pricing?product=${pricingPlan.TOTP_Credentials}&acToken=${token}`
+                    url: `${page_url}/pricing?acToken=${token}`
                   })
                   setRefreshAccountTooltip(true)
                 }}

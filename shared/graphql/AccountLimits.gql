@@ -1,4 +1,4 @@
-query meExtension {
+query Limits {
   me {
     id
     encryptedSecrets {

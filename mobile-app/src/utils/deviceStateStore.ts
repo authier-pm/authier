@@ -9,10 +9,7 @@ import {
   enc,
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
-import {
-  EncryptedSecretType,
-  SettingsInput
-} from '@shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
 import {
@@ -51,11 +48,11 @@ interface DeviceStateProps {
   secrets: Array<SecretSerializedType>
   authSecret: string
   authSecretEncrypted: string
-  vaultLockTimeoutSeconds: number
-  syncTOTP: boolean
-  autofillCredentialsEnabled: boolean
-  autofillTOTPEnabled: boolean
-  uiLanguage: string
+  vaultLockTimeoutSeconds: number | null
+  syncTOTP: boolean | null
+  autofillCredentialsEnabled: boolean | null
+  autofillTOTPEnabled: boolean | null
+  uiLanguage: string | null
   theme: string
   biometricsEnabled: boolean
   lockTimeStart: number
@@ -126,11 +123,11 @@ const initialState: DeviceStateProps = {
   secrets: [],
   authSecret: '',
   authSecretEncrypted: '',
-  vaultLockTimeoutSeconds: 0,
+  vaultLockTimeoutSeconds: 28800,
   syncTOTP: false,
   autofillCredentialsEnabled: false,
   autofillTOTPEnabled: false,
-  uiLanguage: '',
+  uiLanguage: 'en',
   notificationOnVaultUnlock: false,
   notificationOnWrongPasswordAttempts: 3,
   theme: 'dark',
@@ -155,7 +152,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         )
       },
       save: async () => {
-        let all = await get().getAllSecretsDecrypted()
+        const all = await get().getAllSecretsDecrypted()
         set({ decryptedSecrets: all })
       },
       initialize: async () => {
@@ -262,20 +259,18 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         return undefined
       },
       getSecretsDecryptedByHostname: async (host: string) => {
-        let secrets = get().decryptedSecrets.filter((secret) => {
-          return (
-            host ===
-            constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
-          )
+        const self = get()
+        let secrets = self.decryptedSecrets.filter((secret) => {
+          const secretUrl: string = getDecryptedSecretProp(secret, 'url')
+          return secretUrl && host === constructURL(secretUrl ?? '').hostname
         })
         if (secrets.length === 0) {
-          secrets = get().decryptedSecrets.filter((secret) =>
-            host.endsWith(
-              getDomainNameAndTldFromUrl(
-                getDecryptedSecretProp(secret, 'url') ?? ''
-              )
-            )
-          )
+          secrets = self.decryptedSecrets.filter((secret) => {
+            const url = getDecryptedSecretProp(secret, 'url')
+            const domainAndTLD = getDomainNameAndTldFromUrl(url)
+
+            return domainAndTLD && host.endsWith(domainAndTLD)
+          })
         }
         return Promise.all(
           secrets.map((secret) => {
@@ -371,16 +366,19 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
 
             const end = performance.now()
-            console.log('backendSync', end - time)
+            console.warn('backendSync', end - time)
             return res
           }
         }
       },
       findExistingSecret: async (secret) => {
+        const hostname = constructURL(secret.url).hostname
+
+        if (!hostname) {
+          return undefined
+        }
         const existingSecretsOnHostname =
-          await get().getSecretsDecryptedByHostname(
-            constructURL(secret.url).hostname
-          )
+          await get().getSecretsDecryptedByHostname(hostname)
 
         return existingSecretsOnHostname.find(
           (s) =>
@@ -406,7 +404,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
             }
           })
         )
-        console.log('saved secret to the backend', secrets)
+
         const { data } = await apolloClient.mutate<
           AddEncryptedSecretsMutation,
           AddEncryptedSecretsMutationVariables
@@ -420,7 +418,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
         if (!data) {
           throw new Error('failed to save secret')
         }
-        console.log('saved secret to the backend', secrets)
+
         const secretsAdded = data.me.addEncryptedSecrets
 
         set({ secrets: [...get().secrets, ...secretsAdded] })
@@ -444,6 +442,7 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
           return newState
         }),
       reset: () => {
+        console.log('resetting device state')
         set({
           ...initialState,
           theme: get().theme,

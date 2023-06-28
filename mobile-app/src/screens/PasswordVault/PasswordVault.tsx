@@ -12,12 +12,13 @@ import {
 } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
-import LoginCredential from '@components/LoginCredential'
+import { LoginCredential } from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
-import { Trans } from '@lingui/macro'
+import { Trans, t } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { DefaultDeviceSettingsModal } from '../DefaultDeviceSettingsModal'
 
 export const EmptyList = (text: string) => {
   return (
@@ -38,8 +39,8 @@ export const PasswordVault = ({
   navigation
 }: PasswordStackScreenProps<'PasswordsVault'>) => {
   const toast = useToast()
-  let device = useDeviceStore((state) => state)
-  let deviceState = useDeviceStateStore((state) => state)
+  const [loginCredentials] = useDeviceStore((state) => [state.loginCredentials])
+  const deviceState = useDeviceStateStore((state) => state)
   const [refreshing, setRefreshing] = useState(false)
   const [filterBy, setFilterBy] = useState('')
 
@@ -49,7 +50,7 @@ export const PasswordVault = ({
     try {
       await deviceState.backendSync(toast)
     } catch (error) {
-      console.log(error)
+      console.warn(error)
     } finally {
       setRefreshing(false)
     }
@@ -58,6 +59,8 @@ export const PasswordVault = ({
 
   return (
     <View>
+      <DefaultDeviceSettingsModal />
+
       <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
         <IconButton
@@ -70,14 +73,14 @@ export const PasswordVault = ({
       </HStack>
 
       <FlashList
-        ListEmptyComponent={EmptyList('Start by adding a login secret')}
+        ListEmptyComponent={EmptyList(t`Start by adding a login secret`)}
         //FIX: Dont like empty space on fast scroll
         estimatedItemSize={90}
-        data={device
-          .loginCredentials()
-          .filter(({ loginCredentials: { url, label } }) => {
+        data={loginCredentials().filter(
+          ({ loginCredentials: { url, label } }) => {
             return label.includes(filterBy) || url?.includes(filterBy)
-          })}
+          }
+        )}
         keyExtractor={(i) => i.id}
         renderItem={({ item }) => <LoginCredential loginSecret={item} />}
         onRefresh={() => onRefresh()}

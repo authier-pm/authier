@@ -11,7 +11,7 @@ if (!API_URL) {
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
-    let accessToken = useDeviceStateStore.getState().accessToken
+    const accessToken = useDeviceStateStore.getState().accessToken
     if (!accessToken) {
       return false
     }
@@ -38,7 +38,7 @@ export const tokenRefresh = new TokenRefreshLink({
   },
   handleError: async (err) => {
     if (err.message.includes('not authenticated')) {
-      console.warn(
+      console.log(
         'Your refresh token is invalid. You must login again',
         err.message
       )

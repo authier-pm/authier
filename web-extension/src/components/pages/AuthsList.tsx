@@ -120,7 +120,7 @@ const LoginCredentialsListItem = ({
   const { onCopy } = useClipboard(loginCredentials.password)
 
   return (
-    <Box boxShadow="xl" m={2}>
+    <Box boxShadow="xl" m={1}>
       <Flex
         key={loginCredentials.url}
         p="3"

@@ -21,7 +21,7 @@ import { useNavigation } from '@react-navigation/native'
 import { ITOTPSecret } from '../utils/deviceStore'
 import { TOTPStackScreenProps } from '../navigation/types'
 
-export default function TOTPSecret({ item }: { item: ITOTPSecret }) {
+export function TOTPSecret({ item }: { item: ITOTPSecret }) {
   const { totp } = item
   const [showWhole, setShowWhole] = useState<boolean>(false)
   const totpCode = generateOTP(totp.secret)

@@ -1,0 +1,31 @@
+mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
+  me {
+    defaultDeviceSettings {
+      id
+      update(config: $config) {
+        id
+        autofillTOTPEnabled
+        autofillCredentialsEnabled
+        theme
+        syncTOTP
+        vaultLockTimeoutSeconds
+      }
+    }
+  }
+}
+
+query defaultSettings {
+  me {
+    id
+    masterDeviceId
+    uiLanguage
+    defaultDeviceSettings {
+      id
+      autofillTOTPEnabled
+      autofillCredentialsEnabled
+      syncTOTP
+      vaultLockTimeoutSeconds
+      theme
+    }
+  }
+}

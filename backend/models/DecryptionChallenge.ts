@@ -11,6 +11,7 @@ import { AddNewDeviceInput } from './AuthInputs'
 import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 @ObjectType()
 class DeviceLocation {
@@ -78,7 +79,8 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     const user = await ctx.prisma.user.findUnique({
       where: { id: userId },
       include: {
-        EncryptedSecrets: true
+        EncryptedSecrets: true,
+        DefaultDeviceSettings: true
       }
     })
 
@@ -118,6 +120,9 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       where: { id: deviceId }
     })
 
+    const defaultSettings =
+      user.DefaultDeviceSettings ?? defaultDeviceSettingSystemValues
+
     if (device) {
       if (device.userId !== user.id) {
         throw new GraphqlError('Device is already registered for another user') // prevents users from circumventing our limits by using multiple accounts
@@ -131,13 +136,17 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       device = await ctx.prisma.device.create({
         data: {
           id: deviceId,
-          syncTOTP: user.defaultDeviceSyncTOTP,
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
           name: this.deviceName,
           userId: user.id,
-          platform: input.devicePlatform
+          platform: input.devicePlatform,
+          syncTOTP: defaultSettings.syncTOTP,
+          autofillCredentialsEnabled:
+            defaultSettings.autofillCredentialsEnabled,
+          autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
+          vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
         }
       })
     }

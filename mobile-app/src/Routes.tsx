@@ -1,6 +1,6 @@
 import React from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
-import AppNavigation from './navigation/AppNavigation'
+import { AppNavigation } from './navigation/AppNavigation'
 
 import { VaultUnlockVerification } from './screens/VaultUnlockVerification'
 import { useColorMode } from 'native-base'
@@ -10,65 +10,28 @@ import {
   NavigationContainer,
   useNavigationContainerRef
 } from '@react-navigation/native'
-import { Linking, Platform } from 'react-native'
 
-import { storage } from '@utils/storage'
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
 import { routingInstrumentation } from './sentryInit'
 import { useDeviceStore } from './utils/deviceStore'
 import { useDeviceStateStore } from './utils/deviceStateStore'
 
-const PERSISTENCE_KEY = 'NAVIGATION_STATE_V1'
-
-export default function Routes() {
+export function Routes() {
   const [lockedState, isInitialized] = useDeviceStore((state) => [
     state.lockedState,
     state.isInitialized
   ])
   const [accessToken] = useDeviceStateStore((state) => [state.accessToken])
   const { colorMode } = useColorMode()
-  const [isReady, setIsReady] = React.useState(__DEV__ ? true : true) // this can sometimes cause issue with navigation on dev. Set to true to enable when working on navigation. Otherwise keep as true. fast refresh does a good enough job to keep you on the same screen for most cases.
-  const [initialState, setInitialState] = React.useState()
+
   const navigation = useNavigationContainerRef()
 
-  React.useEffect(() => {
-    const restoreState = async () => {
-      try {
-        const initialUrl = await Linking.getInitialURL()
-
-        if (Platform.OS !== 'web' && initialUrl == null) {
-          // Only restore state if there's no deep link and we're not on web
-          const savedStateString = storage.getString(PERSISTENCE_KEY)
-          const state = savedStateString
-            ? JSON.parse(savedStateString)
-            : undefined
-
-          if (state !== undefined) {
-            setInitialState(state)
-          }
-        }
-      } finally {
-        setIsReady(true)
-      }
-    }
-
-    if (!isReady) {
-      restoreState()
-    }
-  }, [isReady])
-
   if (lockedState) {
-    return (
-      <VaultUnlockVerification
-        onUnlocked={() => {
-          setIsReady(true)
-        }}
-      />
-    )
+    return <VaultUnlockVerification />
   }
 
-  if (!isReady || isInitialized === false) {
+  if (isInitialized === false) {
     return <Loading />
   }
 
@@ -79,10 +42,6 @@ export default function Routes() {
         RNBootSplash.hide({ fade: true })
         routingInstrumentation.registerNavigationContainer(navigation)
       }}
-      initialState={initialState}
-      onStateChange={(state) =>
-        storage.set(PERSISTENCE_KEY, JSON.stringify(state))
-      }
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}
     >
       {accessToken ? <AppNavigation /> : <AuthNavigation />}

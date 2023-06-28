@@ -21,6 +21,7 @@ export type RootStackParamList = {
   TOTP: NavigatorScreenParams<TOTPStackParamList>
   Devices: NavigatorScreenParams<DeviceStackParamList>
   User: NavigatorScreenParams<AccountStackParamList>
+  DefaultSettings: undefined
 }
 
 export type RootStackScreenProps<T extends keyof RootStackParamList> =
@@ -77,6 +78,7 @@ export type AccountStackScreenProps<T extends keyof AccountStackParamList> =
 
 export type AccountStackParamList = {
   Account: undefined
+  Limits: undefined
   Settings: NavigatorScreenParams<SettingsTabParamList>
   ChangeMasterPassword: undefined
 }

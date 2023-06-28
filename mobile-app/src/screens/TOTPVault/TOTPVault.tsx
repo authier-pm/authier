@@ -11,7 +11,7 @@ import {
 
 import { SearchBar } from '@components/SearchBar'
 
-import TOTPSecret from '@components/TOTPSecret'
+import { TOTPSecret } from '@components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { TOTPStackScreenProps } from '@navigation/types'
@@ -24,8 +24,8 @@ export const TOTPVault = ({
 }: TOTPStackScreenProps<'TOTPVault'>) => {
   const [refreshing, setRefreshing] = useState(false)
   const [remainingSeconds, setRemainingSeconds] = useState<number>(30)
-  let deviceState = useDeviceStateStore((state) => state)
-  let device = useDeviceStore((state) => state)
+  const [backendSync] = useDeviceStateStore((state) => [state.backendSync])
+  const [TOTPSecrets] = useDeviceStore((state) => [state.TOTPSecrets])
   const [filterBy, setFilterBy] = useState('')
 
   const timer = () => {
@@ -41,7 +41,7 @@ export const TOTPVault = ({
 
   const onRefresh = async () => {
     setRefreshing(true)
-    await deviceState.backendSync(toast)
+    await backendSync(toast)
     setRefreshing(false)
   }
 
@@ -65,7 +65,7 @@ export const TOTPVault = ({
           'Start by adding a secret by logging onto any website or by adding a TOTP code'
         )}
         estimatedItemSize={90}
-        data={device.TOTPSecrets().filter(({ totp }) => {
+        data={TOTPSecrets().filter(({ totp }) => {
           return totp.label.includes(filterBy) || totp.url?.includes(filterBy)
         })}
         keyExtractor={(i) => i.id}

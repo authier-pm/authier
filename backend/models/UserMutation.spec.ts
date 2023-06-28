@@ -7,6 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { UserMutation } from './UserMutation'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { EncryptedSecretInput, SettingsInput } from './models'
+import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 describe('UserMutation', () => {
   const masterDeviceId = faker.string.uuid()
@@ -37,7 +38,8 @@ describe('UserMutation', () => {
         firebaseToken: faker.string.sample(5),
         firstIpAddress: faker.internet.ip(),
         lastIpAddress: faker.internet.ip(),
-        platform: 'ios'
+        platform: 'ios',
+        ...defaultDeviceSettingSystemValues
       }
     })
   })

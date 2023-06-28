@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Authier",
   "description": "Authier chrome extension",
-  "version": "1.0.22",
+  "version": "1.0.23",
   "browser_action": {
     "default_icon": "icon-16.png",
     "default_popup": "js/popup.html"
@@ -28,14 +28,7 @@
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "permissions": [
-    "tabs",
-    "activeTab",
-    "storage",
-    "http://*/",
-    "https://*/",
-    "<all_urls>"
-  ],
+  "permissions": ["activeTab", "storage", "tabs", "clipboardRead"],
   "web_accessible_resources": [
     "icon-16.png"
   ],

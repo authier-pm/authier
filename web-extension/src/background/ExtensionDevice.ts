@@ -192,6 +192,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   async save() {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
+    //TODO: Fix perf
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
     await browser.storage.local.set({
       backgroundState: this,
@@ -213,19 +214,16 @@ export class DeviceState implements IBackgroundStateSerializable {
 
   async getSecretsDecryptedByHostname(host: string) {
     let secrets = this.decryptedSecrets.filter((secret) => {
-      return (
-        host ===
-        constructURL(getDecryptedSecretProp(secret, 'url') ?? '').hostname
-      )
+      const url = getDecryptedSecretProp(secret, 'url')
+      return url && host === constructURL(url ?? '').hostname
     })
     if (secrets.length === 0) {
-      secrets = this.decryptedSecrets.filter((secret) =>
-        host.endsWith(
-          getDomainNameAndTldFromUrl(
-            getDecryptedSecretProp(secret, 'url') ?? ''
-          )
-        )
-      )
+      secrets = this.decryptedSecrets.filter((secret) => {
+        const url = getDecryptedSecretProp(secret, 'url')
+
+        const domainAndTLD = getDomainNameAndTldFromUrl(url)
+        return domainAndTLD && host.endsWith(domainAndTLD)
+      })
     }
     return Promise.all(
       secrets.map((secret) => {
@@ -344,17 +342,19 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     }
   }
-  //TODO: type this
-  async findExistingSecret(secret) {
+
+  async findExistingSecret(secret: LoginCredentialsTypeWithMeta) {
+    const hostname = constructURL(secret.url).hostname
+    if (!hostname) {
+      return undefined
+    }
     const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      constructURL(secret.url).hostname
+      hostname
     )
 
     return existingSecretsOnHostname.find(
-      (s) =>
-        (isLoginSecret(s) &&
-          s.loginCredentials.username === secret.loginCredentials?.username) ||
-        (isTotpSecret(s) && s.totp === secret.totp)
+      (s) => isLoginSecret(s) && s.loginCredentials.username === secret.username
+      // (isTotpSecret(s) && s.totp === secret.) // TODO we need to test this with import of TOTP from bitwarden
     )
   }
 
@@ -460,10 +460,12 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
-    this.id = await this.getDeviceId()
+    const [id, storage] = await Promise.all([
+      this.getDeviceId(),
+      browser.storage.local.get()
+    ])
+    this.id = id
     let storedState: IBackgroundStateSerializable | null = null
-
-    const storage = await browser.storage.local.get()
 
     if (storage.backgroundState) {
       storedState = storage.backgroundState
@@ -491,7 +493,11 @@ class ExtensionDevice {
       }
     }
 
-    if (this.state && (isVault || isPopup)) {
+    if (
+      this.state &&
+      (isVault || isPopup) &&
+      this.state.vaultLockTimeoutSeconds
+    ) {
       this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 

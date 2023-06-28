@@ -20,6 +20,11 @@ import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
+import {
+  defaultDeviceSettingSystemValues,
+  defaultDeviceSettingUserValuesWithId
+} from './defaultDeviceSettingSystemValues'
+import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -50,6 +55,17 @@ export class UserBase extends UserGQL {
       }
     }
   }
+
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    const deviceDefaultSettings =
+      await ctx.prisma.defaultDeviceSettings.findFirst({
+        where: {
+          userId: this.id
+        }
+      })
+
+    return deviceDefaultSettings ?? defaultDeviceSettingUserValuesWithId
+  }
 }
 
 @ObjectType()
@@ -61,6 +77,11 @@ export class UserQuery extends UserBase {
         userId: this.id
       }
     })
+  }
+
+  @Field(() => DefaultDeviceSettingsQuery)
+  async defaultDeviceSettings(@Ctx() ctx: IContext) {
+    return super.defaultDeviceSettings(ctx)
   }
 
   @Field(() => DeviceQuery)
@@ -128,14 +149,12 @@ export class UserQuery extends UserBase {
     })
   }
 
-  @Field(() => Boolean, {
-    description: 'Sends a message to the master device'
-  })
+  // TODO use this to send notifications to the master device about unlock and wrong password attempts
   async sendAuthMessage(
-    @Arg('deviceId', () => String) deviceId: string,
-    @Arg('title', () => String) title: string,
-    @Arg('body', () => String) body: string,
-    @Arg('type', () => String) type: string
+    deviceId: string,
+    title: string,
+    body: string,
+    type: string
   ) {
     console.log('NOTIFICATION')
     const user = await prismaClient.user.findUnique({

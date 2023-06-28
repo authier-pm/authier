@@ -125,21 +125,26 @@ jobs:
           pnpm prisma:deploy
           pnpm cdkDeploy
 
+      ## TODO fix sentry release action
+      # - name: Create a Sentry.io release
+      #   uses: tclindner/sentry-releases-action@v1.2.0
+      #   if: steps.changes.outputs.backend == 'true'
+      #   env:
+      #     SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      #     SENTRY_ORG: authier-ml
+      #     SENTRY_PROJECT: authier-backend
+      #   with:
+      #     tagName: ${{ github.sha }}
+      #     environment: production
+
       - name: web-extension, check TS and run tests
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           pnpm tsc
 
-      - name: web-extension build
-        working-directory: ./web-extension
-        if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          echo "${{ secrets.EXTENSION_ENV_PROD }}" > .env
-          pnpm prodBuild
-
       # - name: Install Playwright Browsers & Run Playwright tests with backend
-      #   if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
+      #   if: steps.changes.outputs.backend == 'true'
       #   working-directory: ./web-extension
       #   run: |
       #     npx playwright install --with-deps

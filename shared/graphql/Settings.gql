@@ -1,18 +1,18 @@
 query SyncSettings {
   me {
+    id
     loginCredentialsLimit
     TOTPlimit
-    id
-    autofillCredentialsEnabled
-    autofillTOTPEnabled
-    uiLanguage
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
+    uiLanguage
   }
   currentDevice {
     id
     syncTOTP
     vaultLockTimeoutSeconds
+    autofillCredentialsEnabled
+    autofillTOTPEnabled
   }
 }
 

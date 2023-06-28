@@ -24,12 +24,15 @@ import {
   SecretTypeUnion
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
-import { useMeExtensionQuery } from './AccountLimits.codegen'
-import { LoginCredentialsTypeWithMeta } from '@src/util/useDeviceState'
+import {
+  ILoginSecret,
+  LoginCredentialsTypeWithMeta
+} from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
 import { constructURL } from '@shared/urlUtils'
 import { Txt } from '@src/components/util/Txt'
 import { useRemoveEncryptedSecretsMutation } from '@shared/graphql/EncryptedSecrets.codegen'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 // const csvHeaderNames = {
@@ -46,12 +49,12 @@ type MappedCSVInput = LoginCredentialsTypeWithMeta[]
 const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
 
+  //TODO: Make this regexp for all possible headers
+  //Later we can split it for every app eg. lastpass, bitwarden, etc.
   const indexUsername = header.findIndex((x) => x.match(/username/i))
-  const indexLabel = header.findIndex((x) => x === 'name')
+  const indexLabel = header.findIndex((x) => x.match(/name|title/i))
   const indexPassword = header.findIndex((x) => x.match(/password/i))
-  const indexUrl = header.findIndex((x) => {
-    return x === 'url' || x === 'login_uri'
-  })
+  const indexUrl = header.findIndex((x) => x.match(/url|uri|login_url/i))
 
   console.log(indexUsername, indexLabel, indexPassword, indexUrl)
   if (
@@ -83,7 +86,7 @@ export interface IImportedStat {
 /**
  * should support lastpass and bitwarden for now, TODO write e2e specs
  */
-export const onCSVFileAccepted: any = (
+export const onCSVFileAccepted = (
   file: File,
   pswCount: number
 ): Promise<IImportedStat> => {
@@ -98,7 +101,7 @@ export const onCSVFileAccepted: any = (
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
-        console.log(mapped)
+        console.log('mapped', mapped)
 
         const state = device.state as DeviceState
 
@@ -118,25 +121,31 @@ export const onCSVFileAccepted: any = (
             break
           }
 
-          let hostname: string
-          try {
-            hostname = constructURL(creds.url).hostname
-          } catch (error) {
+          const hostname = constructURL(creds.url).hostname
+          if (!hostname) {
             skipped++
+            toast({
+              title: `skipping secret because url ${creds.url} could not be parsed`,
+              status: 'warning',
+              isClosable: true
+            })
+            console.warn(
+              `skipping secret because url ${creds.url} could not be parsed`
+            )
             continue
           }
 
-          const input /* : ILoginSecret | ITOTPSecret */ = {
+          const input: Omit<ILoginSecret, 'id'> = {
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-            loginCredentials: creds,
-            url: creds.url,
+            loginCredentials: {
+              ...creds,
+              url: hostname
+            },
             encrypted: await state?.encrypt(JSON.stringify(creds)),
-            createdAt: new Date().toJSON(),
-            iconUrl: null,
-            label: creds.label ?? `${creds.username}@${hostname}`
+            createdAt: new Date().toJSON()
           }
 
-          if (await state.findExistingSecret(input)) {
+          if (await state.findExistingSecret(creds)) {
             skipped++
             continue
           }
@@ -235,7 +244,7 @@ export const VaultImportExport = () => {
 
     setDuplicates(foundDuplicates)
   }, [device.state?.decryptedSecrets])
-  const { data } = useMeExtensionQuery()
+  const { data } = useLimitsQuery()
   return (
     <Center p={5}>
       <Flex maxW={'1200px'} flexDir={'column'}>
@@ -246,8 +255,9 @@ export const VaultImportExport = () => {
               <ImportFromFile
                 onFileAccepted={async (f) => {
                   if (f.type === 'text/csv') {
+                    const loginCredentialsLimit = data?.me.loginCredentialsLimit
                     setImportedStat(
-                      await onCSVFileAccepted(f, data?.me.loginCredentialsLimit)
+                      await onCSVFileAccepted(f, loginCredentialsLimit ?? 50)
                     )
                   } else if (f.type === 'application/json') {
                     setImportedStat(await onJsonFileAccepted(f))
@@ -262,7 +272,7 @@ export const VaultImportExport = () => {
                 <ListItem>
                   Lastpass/Bitwarden will work fine, file exported from other
                   password managers might work as well, but it's not guaranteed.
-                  Please send as a request for a new type of export{' '}
+                  Please send us a request for a new type of export{' '}
                   <a href="https://twitter.com/authierpm">here</a>.
                 </ListItem>
                 <ListItem>
@@ -326,7 +336,7 @@ export const VaultImportExport = () => {
                   setDuplicates([])
                 }}
               >
-                Merge now
+                Delete duplicates now
               </Button>
             </Flex>
           ) : (
