@@ -228,7 +228,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   )
 }
 
-export default function EditPassword({
+export function EditPassword({
   navigation,
   route
 }: PasswordStackScreenProps<'EditPassword'>) {

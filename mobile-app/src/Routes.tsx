@@ -1,6 +1,6 @@
 import React from 'react'
 import { AuthNavigation } from './navigation/AuthNavigation'
-import AppNavigation from './navigation/AppNavigation'
+import { AppNavigation } from './navigation/AppNavigation'
 
 import { VaultUnlockVerification } from './screens/VaultUnlockVerification'
 import { useColorMode } from 'native-base'
@@ -17,7 +17,7 @@ import { routingInstrumentation } from './sentryInit'
 import { useDeviceStore } from './utils/deviceStore'
 import { useDeviceStateStore } from './utils/deviceStateStore'
 
-export default function Routes() {
+export function Routes() {
   const [lockedState, isInitialized] = useDeviceStore((state) => [
     state.lockedState,
     state.isInitialized

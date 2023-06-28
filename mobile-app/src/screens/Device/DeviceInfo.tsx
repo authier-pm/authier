@@ -29,7 +29,7 @@ import { icons } from './Devices'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
 import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 const ColumnWrapper = ({
   text,
@@ -48,7 +48,7 @@ const ColumnWrapper = ({
   )
 }
 
-export default function DeviceInfo({
+export function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
@@ -62,6 +62,7 @@ export default function DeviceInfo({
       ],
       awaitRefetchQueries: true
     })
+  const options = useVaultLockTimeoutOptions()
   const { data, loading, error } = useDeviceInfoQuery({
     variables: {
       id: selectedDeviceId
@@ -184,9 +185,7 @@ export default function DeviceInfo({
             <Trans>Settings</Trans>
           </Heading>
           <VStack backgroundColor={itemBg} p={3} rounded={10} space={2}>
-            <Text>
-              <Trans>Lock time</Trans>
-            </Text>
+            <Trans>Lock time</Trans>
 
             <Box p={2}>
               <Select
@@ -203,7 +202,7 @@ export default function DeviceInfo({
                 selectedValue={selectedDeviceData?.vaultLockTimeoutSeconds?.toString()}
                 accessibilityLabel="Lock time"
               >
-                {vaultLockTimeoutOptions.map((option, index) => (
+                {options.map((option, index) => (
                   <Select.Item
                     label={option.label}
                     value={option.value.toString()}
@@ -212,15 +211,13 @@ export default function DeviceInfo({
                 ))}
               </Select>
 
-              <Text>
-                <Trans>
-                  Automatically locks vault after chosen period of time
-                </Trans>
-              </Text>
+              <Trans>
+                Automatically locks vault after chosen period of time
+              </Trans>
             </Box>
             <Divider />
             <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>2FA</Text>
+              <Trans>2FA</Trans>
               <Switch
                 //FIX: Flickers after change of Lock time
                 value={

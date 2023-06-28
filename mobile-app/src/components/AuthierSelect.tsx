@@ -5,7 +5,7 @@ interface IAuthierSelectProps extends ISelectProps {
   children: React.ReactNode
 }
 
-const AuthierSelect: React.FC<IAuthierSelectProps> = ({
+export const AuthierSelect: React.FC<IAuthierSelectProps> = ({
   children,
   ...props
 }) => {
@@ -20,5 +20,3 @@ const AuthierSelect: React.FC<IAuthierSelectProps> = ({
     </Select>
   )
 }
-
-export default AuthierSelect

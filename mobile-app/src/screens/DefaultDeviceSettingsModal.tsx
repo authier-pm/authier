@@ -13,19 +13,19 @@ import {
   Modal
 } from 'native-base'
 
-import { t, Trans } from '@lingui/macro'
-import AuthierSelect from '@src/components/AuthierSelect'
+import { Trans, t } from '@lingui/macro'
+import { AuthierSelect } from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import React, { useEffect, useState } from 'react'
 import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
-} from '../../../shared/graphql/DefaultSettings.codegen'
-import { i18n } from '@lingui/core'
+} from '@shared/graphql/DefaultSettings.codegen'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
-import { vaultLockTimeoutOptions } from '@shared/constants'
 import { useDefaultDeviceSettingsModalQuery } from './DefaultDeviceSettingsModal.codegen'
 import { omit } from 'lodash'
+import { useLingui } from '@lingui/react'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 /**
  * should only show after signup
@@ -36,8 +36,9 @@ export function DefaultDeviceSettingsModal() {
       state.notificationOnWrongPasswordAttempts,
       state.notificationOnVaultUnlock
     ])
+  const options = useVaultLockTimeoutOptions()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
-
+  const { i18n } = useLingui()
   const { toggleColorMode } = useColorMode()
   const [updateDefaultSettings, { loading }] =
     useUpdateDefaultDeviceSettingsMutation()
@@ -73,7 +74,9 @@ export function DefaultDeviceSettingsModal() {
       onClose={() => setShowModal(false)}
     >
       <Modal.Content>
-        <Modal.Header>Set default settings for new devices</Modal.Header>
+        <Modal.Header>
+          <Trans>Set default settings for new devices</Trans>
+        </Modal.Header>
         <Modal.Body>
           <Center h={'100%'}>
             {/*  */}
@@ -85,7 +88,7 @@ export function DefaultDeviceSettingsModal() {
               </Text>
               <VStack space={2} rounded="xl" p={3} bg={itemBg}>
                 <VStack space={2}>
-                  <Text>Lock time </Text>
+                  <Trans>Lock time </Trans>
                   <Box p={2}>
                     <AuthierSelect
                       variant="rounded"
@@ -98,7 +101,7 @@ export function DefaultDeviceSettingsModal() {
                       selectedValue={form.vaultLockTimeoutSeconds.toString()}
                       accessibilityLabel="Lock time"
                     >
-                      {vaultLockTimeoutOptions.map((option, index) => (
+                      {options.map((option, index) => (
                         <Select.Item
                           label={option.label}
                           value={option.value.toString()}
@@ -107,11 +110,11 @@ export function DefaultDeviceSettingsModal() {
                       ))}
                     </AuthierSelect>
 
-                    <Text>
+                    <Trans>
                       Automatically locks vault after chosen period of time, use
                       lower values for more security, higher for more user
                       comfort
-                    </Text>
+                    </Trans>
                   </Box>
                 </VStack>
               </VStack>
@@ -121,7 +124,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>2FA</Text>
+                  <Trans>2FA</Trans>
                   <Switch
                     value={form.syncTOTP}
                     onToggle={async (e) => {
@@ -135,7 +138,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>Credentials autofill</Text>
+                  <Trans>Credentials autofill</Trans>
                   <Switch
                     value={form.autofillCredentialsEnabled}
                     onToggle={async (e) => {
@@ -149,7 +152,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>TOTP autofill</Text>
+                  <Trans>TOTP autofill</Trans>
                   <Switch
                     value={form.autofillTOTPEnabled}
                     onToggle={async (e) => {
@@ -248,7 +251,7 @@ export function DefaultDeviceSettingsModal() {
               }}
               mt={3}
             >
-              Save default settings
+              <Trans>Save default settings</Trans>
             </Button>
           </Center>
         </Modal.Body>

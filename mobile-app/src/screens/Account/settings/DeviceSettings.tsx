@@ -13,7 +13,7 @@ import {
   Heading,
   ScrollView
 } from 'native-base'
-import PasswordReEnter from '@src/components/PasswordReEnter'
+import { PasswordReEnter } from '@src/components/PasswordReEnter'
 
 import SInfo from 'react-native-sensitive-info'
 import { Trans } from '@lingui/macro'
@@ -21,14 +21,15 @@ import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
-import { i18n } from '@lingui/core'
+
 import { RefreshControl } from 'react-native'
-import AuthierSelect from '@src/components/AuthierSelect'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+import { AuthierSelect } from '@src/components/AuthierSelect'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 export function DeviceSettings() {
   const deviceState = useDeviceStateStore((state) => state)
   const device = useDeviceStore((state) => state)
+  const options = useVaultLockTimeoutOptions()
   const { toggleColorMode } = useColorMode()
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
@@ -106,7 +107,7 @@ export function DeviceSettings() {
                     }
                     accessibilityLabel="Lock time"
                   >
-                    {vaultLockTimeoutOptions.map((option, index) => (
+                    {options.map((option, index) => (
                       <Select.Item
                         label={option.label}
                         value={option.value.toString()}
@@ -163,26 +164,6 @@ export function DeviceSettings() {
             </VStack>
           </VStack>
 
-          {/*  */}
-          <VStack space={2}>
-            <Heading size="md">
-              <Trans>Language</Trans>
-            </Heading>
-
-            <Box backgroundColor={itemBg} p={3} rounded="xl">
-              <AuthierSelect
-                onValueChange={(value) => {
-                  deviceState.changeUiLanguage(value)
-                  i18n.activate(value)
-                }}
-                selectedValue={deviceState.uiLanguage ?? 'en'}
-                accessibilityLabel="language"
-              >
-                <Select.Item label="English" value="en" />
-                <Select.Item label="Čeština" value="cs" />
-              </AuthierSelect>
-            </Box>
-          </VStack>
           {/*  */}
           <VStack space={2}>
             <Heading size="md">

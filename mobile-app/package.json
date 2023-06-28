@@ -1,6 +1,6 @@
 {
   "name": "authier-mobile-app",
-  "version": "1.0.9",
+  "version": "1.1.0",
   "license": "AGPL-3.0-or-later",
   "scripts": {
     "android": "pnpm exec react-native run-android",
@@ -20,6 +20,7 @@
     "cleanDerivedData": "rm -rf ~/Library/Developer/Xcode/DerivedData",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",
     "installBundle": "npx react-native run-android --mode=release",
+    "testRelease": "cd android && ./gradlew clean && npx react-native run-android --mode release",
     "codepush:android": "npx appcenter codepush release-react -a Authier/Authier -d Production --mandatory",
     "postversion": "react-native-version"
   },

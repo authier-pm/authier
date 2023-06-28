@@ -13,7 +13,6 @@ import {
   Divider,
   ScrollView
 } from 'native-base'
-
 import { t, Trans } from '@lingui/macro'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
@@ -23,24 +22,26 @@ import { SettingsItem } from '../Account'
 import { useNavigation } from '@react-navigation/native'
 import { AccountStackScreenProps } from '@src/navigation/types'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
-import AuthierSelect from '@src/components/AuthierSelect'
+import { AuthierSelect } from '@src/components/AuthierSelect'
 import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
-import { vaultLockTimeoutOptions } from '@shared/constants'
 import { useNetInfo } from '@react-native-community/netinfo'
 import { RefreshControl } from 'react-native'
+import { i18n } from '@lingui/core'
+import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
-function UserSettings() {
+export function UserSettings() {
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
   const { isConnected } = useNetInfo()
-  let deviceState = useDeviceStateStore((state) => state)
-  let [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
+  const deviceState = useDeviceStateStore((state) => state)
+  const [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
     (state) => [state.clearAndReload, state.id, state.updateDeviceSettings]
   )
+  const options = useVaultLockTimeoutOptions()
   const [deleteAccount] = useDeleteAccountMutation()
 
   const {
@@ -197,6 +198,8 @@ function UserSettings() {
 
             <AuthierSelect
               onValueChange={(uiLanguage) => {
+                deviceState.changeUiLanguage(uiLanguage)
+                i18n.activate(uiLanguage)
                 setUiLanguage(uiLanguage)
               }}
               selectedValue={uiLanguage}
@@ -226,7 +229,7 @@ function UserSettings() {
                   ).toString()}
                   accessibilityLabel="Lock time"
                 >
-                  {vaultLockTimeoutOptions.map((option, index) => (
+                  {options.map((option, index) => (
                     <Select.Item
                       label={option.label}
                       value={option.value.toString()}
@@ -262,7 +265,7 @@ function UserSettings() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>Credentials autofill</Text>
+                  <Trans>Credentials autofill</Trans>
                   <Switch
                     value={form?.autofillCredentialsEnabled}
                     onToggle={async (e) => {
@@ -337,5 +340,3 @@ function UserSettings() {
     </ScrollView>
   )
 }
-
-export default UserSettings

@@ -98,8 +98,8 @@ android {
         applicationId "com.authier"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 12
-        versionName "1.0.9"
+        versionCode 14
+        versionName "1.1.0"
         missingDimensionStrategy 'react-native-camera', 'general'
         resValue 'string', "CODE_PUSH_APK_BUILD_TIME", String.format("\"%d\"", System.currentTimeMillis())
     }
@@ -119,14 +119,14 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-         // release {
-         //     Properties properties = new Properties()
-         //     properties.load(project.rootProject.file('local.properties').newDataInputStream())
-         //     storeFile file(properties.getProperty('storeFile'))
-         //     keyAlias properties.getProperty('keyAlias')
-         //     storePassword properties.getProperty('storePassword')
-         //     keyPassword properties.getProperty('keyPassword')
-         // }
+        // release {
+        //     Properties properties = new Properties()
+        //     properties.load(project.rootProject.file('local.properties').newDataInputStream())
+        //     storeFile file(properties.getProperty('storeFile'))
+        //     keyAlias properties.getProperty('keyAlias')
+        //     storePassword properties.getProperty('storePassword')
+        //     keyPassword properties.getProperty('keyPassword')
+        // }
     }
     buildTypes {
         debug {
@@ -143,7 +143,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            //WARNING: signingConfig signingConfigs.release
+            // signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
             resValue "string", "CodePushDeploymentKey", '"KXQ5PaN64ljzxMGYU0Okf-ZZ7j1O8_6V_c00N"'

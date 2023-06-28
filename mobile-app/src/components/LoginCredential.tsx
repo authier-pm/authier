@@ -19,7 +19,11 @@ import { useNavigation } from '@react-navigation/native'
 import { ILoginSecret } from '@utils/deviceStore'
 import { PasswordStackScreenProps } from '@navigation/types'
 
-const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
+export const LoginCredential = ({
+  loginSecret
+}: {
+  loginSecret: ILoginSecret
+}) => {
   const { loginCredentials } = loginSecret
   const navigation =
     useNavigation<PasswordStackScreenProps<'PasswordsVault'>['navigation']>()
@@ -114,5 +118,3 @@ const LoginCredential = ({ loginSecret }: { loginSecret: ILoginSecret }) => {
     </Pressable>
   )
 }
-
-export default LoginCredential

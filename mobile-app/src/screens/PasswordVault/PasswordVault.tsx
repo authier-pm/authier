@@ -12,9 +12,9 @@ import {
 } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
-import LoginCredential from '@components/LoginCredential'
+import { LoginCredential } from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
-import { Trans } from '@lingui/macro'
+import { Trans, t } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
@@ -73,7 +73,7 @@ export const PasswordVault = ({
       </HStack>
 
       <FlashList
-        ListEmptyComponent={EmptyList('Start by adding a login secret')}
+        ListEmptyComponent={EmptyList(t`Start by adding a login secret`)}
         //FIX: Dont like empty space on fast scroll
         estimatedItemSize={90}
         data={loginCredentials().filter(

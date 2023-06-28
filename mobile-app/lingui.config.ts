@@ -4,7 +4,8 @@ export default {
   catalogs: [
     {
       path: 'src/locales/{locale}/messages',
-      include: ['src']
+      include: ['src'],
+      exclude: ['**/node_modules/**']
     }
   ],
   format: 'po',

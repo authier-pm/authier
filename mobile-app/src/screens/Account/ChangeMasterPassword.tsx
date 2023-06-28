@@ -30,8 +30,8 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 export function ChangeMasterPassword() {
-  let device = useDeviceStore((state) => state)
-  let deviceState = useDeviceStateStore((state) => state)
+  const device = useDeviceStore((state) => state)
+  const deviceState = useDeviceStateStore((state) => state)
   const [changePassword] = useChangeMasterPasswordMutation()
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const toast = useToast()
@@ -129,7 +129,7 @@ export function ChangeMasterPassword() {
                   return
                 }
 
-                let state = deviceState
+                const state = deviceState
 
                 if (
                   state &&

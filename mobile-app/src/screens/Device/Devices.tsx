@@ -46,11 +46,13 @@ export const icons = {
   Firefox: 'logo-firefox',
   ChromeOS: 'logo-chrome'
 }
-export let emitter = mitt()
+export const emitter = mitt()
 const empty = () => {
   return <></>
 }
-function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
+export function DeviceList({
+  navigation
+}: DevicesStackScreenProps<'DeviceList'>) {
   const [id] = useDeviceStore((state) => [state.id])
   const [notifications, setNotifications] = useDeviceStateStore((state) => [
     state.notifications,
@@ -318,5 +320,3 @@ function DeviceList({ navigation }: DevicesStackScreenProps<'DeviceList'>) {
     </View>
   )
 }
-
-export default DeviceList

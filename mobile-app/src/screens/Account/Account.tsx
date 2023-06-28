@@ -52,7 +52,7 @@ export const SettingsItem = ({
   )
 }
 
-function Account({ navigation }: AccountStackScreenProps<'Account'>) {
+export function Account({ navigation }: AccountStackScreenProps<'Account'>) {
   const [appMetadata, setAppMetadata] = useState<LocalPackage | null>(null)
   const device = useDeviceStore((state) => state)
   const deviceState = useDeviceStateStore((state) => state)
@@ -133,5 +133,3 @@ function Account({ navigation }: AccountStackScreenProps<'Account'>) {
     </View>
   )
 }
-
-export default Account
