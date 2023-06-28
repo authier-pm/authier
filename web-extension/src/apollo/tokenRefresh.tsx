@@ -26,6 +26,7 @@ export const tokenRefresh = new TokenRefreshLink({
         return true
       }
     } catch (error) {
+      console.error(error)
       return false
     }
   },
