@@ -29,16 +29,19 @@ import {
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+
 import { useNetInfo } from '@react-native-community/netinfo'
 import { RefreshControl } from 'react-native'
 
-function UserSettings() {
+import { i18n } from '@lingui/core'
+import { vaultLockTimeoutOptions } from '@src/screens/DefaultDeviceSettingsModal'
+
+export function UserSettings() {
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
   const { isConnected } = useNetInfo()
-  let deviceState = useDeviceStateStore((state) => state)
-  let [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
+  const deviceState = useDeviceStateStore((state) => state)
+  const [clearAndReload, deviceId, updateDeviceSettings] = useDeviceStore(
     (state) => [state.clearAndReload, state.id, state.updateDeviceSettings]
   )
   const [deleteAccount] = useDeleteAccountMutation()
@@ -197,6 +200,8 @@ function UserSettings() {
 
             <AuthierSelect
               onValueChange={(uiLanguage) => {
+                deviceState.changeUiLanguage(uiLanguage)
+                i18n.activate(uiLanguage)
                 setUiLanguage(uiLanguage)
               }}
               selectedValue={uiLanguage}
@@ -262,7 +267,7 @@ function UserSettings() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>Credentials autofill</Text>
+                  <Trans>Credentials autofill</Trans>
                   <Switch
                     value={form?.autofillCredentialsEnabled}
                     onToggle={async (e) => {
@@ -337,5 +342,3 @@ function UserSettings() {
     </ScrollView>
   )
 }
-
-export default UserSettings

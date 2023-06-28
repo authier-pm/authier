@@ -29,7 +29,7 @@ import { icons } from './Devices'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { Loading } from '@src/components/Loading'
 import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+import { vaultLockTimeoutOptions } from '../DefaultDeviceSettingsModal'
 
 const ColumnWrapper = ({
   text,
@@ -48,7 +48,7 @@ const ColumnWrapper = ({
   )
 }
 
-export default function DeviceInfo({
+export function DeviceInfo({
   route,
   navigation
 }: DevicesStackScreenProps<'DeviceInfo'>) {
@@ -184,9 +184,7 @@ export default function DeviceInfo({
             <Trans>Settings</Trans>
           </Heading>
           <VStack backgroundColor={itemBg} p={3} rounded={10} space={2}>
-            <Text>
-              <Trans>Lock time</Trans>
-            </Text>
+            <Trans>Lock time</Trans>
 
             <Box p={2}>
               <Select
@@ -212,15 +210,13 @@ export default function DeviceInfo({
                 ))}
               </Select>
 
-              <Text>
-                <Trans>
-                  Automatically locks vault after chosen period of time
-                </Trans>
-              </Text>
+              <Trans>
+                Automatically locks vault after chosen period of time
+              </Trans>
             </Box>
             <Divider />
             <HStack justifyContent="space-between" alignContent="center" p={2}>
-              <Text>2FA</Text>
+              <Trans>2FA</Trans>
               <Switch
                 //FIX: Flickers after change of Lock time
                 value={

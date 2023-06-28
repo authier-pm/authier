@@ -7,10 +7,10 @@ import {
   BottomTabBar,
   createBottomTabNavigator
 } from '@react-navigation/bottom-tabs'
-import PasswordsStackNavigation from './PasswordsStackNavigation'
+import { PasswordsStackNavigation } from './PasswordsStackNavigation'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import AccountNavigation from './AccountNavigation'
-import TOTPStackNavigation from './TOTPStackNavigation'
+import { AccountNavigation } from './AccountNavigation'
+import { TOTPStackNavigation } from './TOTPStackNavigation'
 
 import { useNavigation } from '@react-navigation/native'
 import { RootStackParamList } from './types'
@@ -19,10 +19,11 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
+import { t } from '@lingui/macro'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 
-function AppNavigation() {
+export function AppNavigation() {
   const [updateDeviceSettings] = useDeviceStore((state) => [
     state.updateDeviceSettings
   ])
@@ -107,6 +108,9 @@ function AppNavigation() {
       >
         <RootStack.Screen
           name="Passwords"
+          options={{
+            title: t`Passwords`
+          }}
           component={PasswordsStackNavigation}
         />
         <RootStack.Screen name="TOTP" component={TOTPStackNavigation} />
@@ -115,6 +119,7 @@ function AppNavigation() {
             notifications > 0
               ? {
                   tabBarBadge: notifications,
+                  title: t`Devices`,
                   tabBarBadgeStyle: {
                     top: Platform.OS === 'ios' ? 0 : 9,
                     minWidth: 14,
@@ -124,14 +129,19 @@ function AppNavigation() {
                     lineHeight: 13
                   }
                 }
-              : {}
+              : { title: t`Devices` }
           }
           name="Devices"
           component={DeviceStackNavigation}
         />
-        <RootStack.Screen name="User" component={AccountNavigation} />
+        <RootStack.Screen
+          name="User"
+          options={{
+            title: t`Devices`
+          }}
+          component={AccountNavigation}
+        />
       </RootStack.Navigator>
     </>
   )
 }
-export default AppNavigation

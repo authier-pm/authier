@@ -10,7 +10,7 @@ import { t } from '@lingui/macro'
 
 const Stack = createNativeStackNavigator<PasswordsStackParamList>()
 
-function PasswordsStackNavigation() {
+export function PasswordsStackNavigation() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -21,16 +21,15 @@ function PasswordsStackNavigation() {
         component={PasswordVault}
       />
       <Stack.Screen
-        options={{ title: `Add password` }}
+        options={{ title: t`Add password` }}
         name="AddPassword"
         component={AddPassword}
       />
       <Stack.Screen
         name="EditPassword"
-        options={{ title: `Edit password` }}
+        options={{ title: t`Edit password` }}
         component={EditPassword}
       />
     </Stack.Navigator>
   )
 }
-export default PasswordsStackNavigation

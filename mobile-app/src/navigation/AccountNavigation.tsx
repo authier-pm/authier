@@ -13,7 +13,7 @@ import Limits from '@src/screens/Account/Limits'
 
 const DeviceStack = createStackNavigator<AccountStackParamList>()
 
-export default function AccountNavigation() {
+export function AccountNavigation() {
   return (
     <DeviceStack.Navigator initialRouteName="Account">
       <DeviceStack.Screen

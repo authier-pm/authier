@@ -11,7 +11,7 @@ import { QRScan } from '@src/screens/TOTPVault/QRScan'
 
 const Stack = createNativeStackNavigator<TOTPStackParamList>()
 
-function TOTPStackNavigation() {
+export function TOTPStackNavigation() {
   return (
     <Stack.Navigator>
       <Stack.Screen
@@ -38,4 +38,3 @@ function TOTPStackNavigation() {
     </Stack.Navigator>
   )
 }
-export default TOTPStackNavigation

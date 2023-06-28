@@ -21,6 +21,87 @@ msgstr "{name}"
 msgid "{text}"
 msgstr "{text}"
 
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "1 day"
+msgstr "1 den"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "1 hour"
+msgstr "1 hodina"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "1 minute"
+msgstr "1 minuta"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "1 week"
+msgstr "1 týden"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "1 year"
+msgstr "1 rok"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "10 minutes"
+msgstr "10 minut"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "12 hours"
+msgstr "12 hodin"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "2 days"
+msgstr "2 dny"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "2 hours"
+msgstr "2 hodiny"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "2 months"
+msgstr "2 měsíce"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "2 weeks"
+msgstr "2 týdny"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+#: src/screens/Device/DeviceInfo.tsx
+msgid "2FA"
+msgstr "2FA"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "3 days"
+msgstr "3 dny"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "3 months"
+msgstr "3 měsíce"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "30 minutes"
+msgstr "30 minut"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "31 days"
+msgstr "31 dní"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "4 hours"
+msgstr "4 hodiny"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "5 minutes"
+msgstr "5 minut"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "6 months"
+msgstr "6 měsíců"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "8 hours"
+msgstr "8 hodin"
+
 #: src/screens/Device/DeviceInfo.tsx
 msgid "About"
 msgstr "O aplikaci"
@@ -28,6 +109,10 @@ msgstr "O aplikaci"
 #: src/navigation/AccountNavigation.tsx
 msgid "Account"
 msgstr "Účet"
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Add password"
+msgstr "Přidat heslo"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Add TOTP"
@@ -54,9 +139,14 @@ msgid "Attempts before notification:"
 msgstr "Počet pokusů před oznámením:"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/Account/settings/UserSettings.tsx
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Automatically locks vault after chosen period of time, use lower values for more security, higher for more user comfort"
+msgstr "Automatické uzamčení trezoru po uplynutí zvolené doby, použijte nižší hodnoty pro větší bezpečnost, vyšší pro větší uživatelský komfort"
 
 #: src/navigation/AccountNavigation.tsx
 #: src/screens/Account/settings/UserSettings.tsx
@@ -75,6 +165,11 @@ msgstr "Verze Codepush"
 msgid "Created"
 msgstr "Vytvořeno"
 
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Credentials autofill"
+msgstr "Doplňování přihlašovacích údajů"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 #~ msgid "Current Passwor2d"
 #~ msgstr "Aktuální heslo"
@@ -88,9 +183,15 @@ msgid "Danger zone"
 msgstr "Nebezpečná zóna"
 
 #: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Dark"
+msgstr "Tmavý"
+
+#: src/screens/Account/settings/UserSettings.tsx
 msgid "Delete your account"
 msgstr "Smazat účet"
 
+#: src/navigation/DeviceStackNavigation.tsx
 #: src/navigation/SettingsNavigation.tsx
 msgid "Device"
 msgstr "Zařízení"
@@ -99,6 +200,12 @@ msgstr "Zařízení"
 msgid "Device:"
 msgstr "Zařízení:"
 
+#: src/navigation/AppNavigation.tsx
+#: src/navigation/AppNavigation.tsx
+#: src/navigation/AppNavigation.tsx
+msgid "Devices"
+msgstr "Zařízení"
+
 #: src/screens/Account/Account.tsx
 msgid "Do you want to lock device?"
 msgstr "Chcete zařízení uzamknout?"
@@ -106,6 +213,10 @@ msgstr "Chcete zařízení uzamknout?"
 #: src/screens/Account/Account.tsx
 msgid "Do you want to logout?"
 msgstr "Chcete se odhlásit?"
+
+#: src/navigation/PasswordsStackNavigation.tsx
+msgid "Edit password"
+msgstr "Uprava hesla"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Edit TOTP"
@@ -124,18 +235,29 @@ msgstr "Jsem nový uživatel."
 #~ msgstr "Importovat hesla"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
-msgid "Language"
-msgstr "Jazyk"
+#~ msgid "Language"
+#~ msgstr "Jazyk"
 
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Last IP Address"
 msgstr "Poslední IP adresa"
+
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Light"
+msgstr "Světlý"
+
+#: src/navigation/AccountNavigation.tsx
+#: src/screens/Account/Account.tsx
+msgid "Limits"
+msgstr "Limity"
 
 #: src/screens/Account/Account.tsx
 msgid "Lock"
 msgstr "Uzamknout"
 
 #: src/screens/Account/settings/DeviceSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Lock time"
 msgstr "Doba uzamčení"
@@ -160,6 +282,14 @@ msgstr "Odhlásit se"
 msgid "Logout at"
 msgstr "Odhlášení v"
 
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Never"
+msgstr "Nikdy"
+
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "New device default settings"
+msgstr "Výchozí nastavení nového zařízení"
+
 #: src/screens/Device/Devices.tsx
 msgid "New Device is trying to login!"
 msgstr "Nové zařízení se snaží přihlásit!"
@@ -180,10 +310,15 @@ msgstr "Oznámení"
 msgid "Notify after password attempts"
 msgstr "Upozornit po pokusu o heslo"
 
+#: src/screens/Account/settings/UserSettings.tsx
+msgid "On vault unlock"
+msgstr "Při odemčení trezoru"
+
 #: src/screens/Account/ChangeMasterPassword.tsx
 msgid "Password changed, all your devices will be logged out and you will need to log in again"
 msgstr "Heslo bylo změněno, všechna vaše zařízení budou odhlášena a budete se muset znovu přihlásit"
 
+#: src/navigation/AppNavigation.tsx
 #: src/navigation/PasswordsStackNavigation.tsx
 msgid "Passwords"
 msgstr "Hesla"
@@ -200,6 +335,10 @@ msgstr "Platforma"
 msgid "Reject"
 msgstr "Odmítnout"
 
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Save default settings"
+msgstr "Uložit výchozí nastavení"
+
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "Scan QR"
 msgstr "Naskenujte QR"
@@ -211,6 +350,10 @@ msgstr "Zabezpečení"
 #: src/screens/Device/DeviceInfo.tsx
 msgid "Set as master device"
 msgstr "Nastavit jako hlavní zařízení"
+
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "Set default settings for new devices"
+msgstr "Nastavit výchozí nastavení pro nová zařízení"
 
 #: src/screens/Device/DeviceInfo.tsx
 #~ msgid "Set on master device"
@@ -224,6 +367,10 @@ msgstr "Nastavení"
 #: src/screens/Auth/Login.tsx
 msgid "Sign Up"
 msgstr "Registrace"
+
+#: src/screens/PasswordVault/PasswordVault.tsx
+msgid "Start by adding a login secret"
+msgstr "Začněte přidáním přihlašovacích údajů"
 
 #: src/screens/PasswordVault/PasswordVault.tsx
 #~ msgid "Start by adding a login secret or a TOTP code"
@@ -240,6 +387,11 @@ msgstr "Odeslat"
 #: src/screens/Account/settings/DeviceSettings.tsx
 msgid "Theme"
 msgstr "Téma"
+
+#: src/screens/Account/settings/UserSettings.tsx
+#: src/screens/DefaultDeviceSettingsModal.tsx
+msgid "TOTP autofill"
+msgstr "Doplňování TOTP"
 
 #: src/navigation/TOTPStackNavigation.tsx
 msgid "TOTPs"
@@ -275,3 +427,7 @@ msgstr "Tuto akci nemůžete později vrátit zpět. Ujistěte se, že zálohuje
 #: src/components/OfflineBanner.tsx
 msgid "Your device is offline"
 msgstr "Vaše zařízení je offline"
+
+#: src/navigation/DeviceStackNavigation.tsx
+msgid "Your devices"
+msgstr "Tvoje zařízení"

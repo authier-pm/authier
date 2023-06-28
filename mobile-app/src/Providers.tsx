@@ -3,7 +3,7 @@ import { ApolloProvider } from '@apollo/client'
 import { apolloClient, cache } from './apollo/ApolloClient'
 import { NativeBaseProvider, StorageManager, Text } from 'native-base'
 import { theme } from './Theme'
-import Routes from './Routes'
+import { Routes } from './Routes'
 import { I18nProvider } from '@lingui/react'
 import { i18n } from '@lingui/core'
 import { messages as enMessages } from './locales/en/messages'
@@ -19,7 +19,7 @@ i18n.load({
   en: enMessages,
   cs: csMessages
 })
-i18n.activate('en')
+i18n.activate(useDeviceStateStore.getState().uiLanguage ?? 'en')
 
 export const colorModeManager: StorageManager = {
   get: async () => {

@@ -1,9 +1,10 @@
 import React from 'react'
 
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
-import DeviceInfo from '../screens/Device/DeviceInfo'
+import { DeviceInfo } from '../screens/Device/DeviceInfo'
 import DeviceList from '../screens/Device/Devices'
 import { DeviceStackParamList } from './types'
+import { t } from '@lingui/macro'
 
 const DeviceStack = createNativeStackNavigator<DeviceStackParamList>()
 
@@ -13,14 +14,14 @@ export default function DeviceStackNavigation() {
       <DeviceStack.Screen
         name="DeviceList"
         options={{
-          title: 'Your devices'
+          title: t`Your devices`
         }}
         component={DeviceList}
       />
       <DeviceStack.Screen
         name="DeviceInfo"
         options={{
-          title: 'Device'
+          title: t`Device`
         }}
         component={DeviceInfo}
       />

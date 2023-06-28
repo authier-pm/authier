@@ -13,7 +13,7 @@ import {
   Modal
 } from 'native-base'
 
-import { t, Trans } from '@lingui/macro'
+import { Trans, t } from '@lingui/macro'
 import AuthierSelect from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import React, { useEffect, useState } from 'react'
@@ -23,9 +23,32 @@ import {
 } from '../../../shared/graphql/DefaultSettings.codegen'
 import { i18n } from '@lingui/core'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
-import { vaultLockTimeoutOptions } from '@shared/constants'
+
 import { useDefaultDeviceSettingsModalQuery } from './DefaultDeviceSettingsModal.codegen'
 import { omit } from 'lodash'
+
+export const vaultLockTimeoutOptions = [
+  { value: 60, label: t`1 minute` },
+  { value: 300, label: t`5 minutes` },
+  { value: 600, label: t`10 minutes` },
+  { value: 1800, label: t`30 minutes` },
+  { value: 3600, label: t`1 hour` },
+  { value: 7200, label: t`2 hours` },
+  { value: 14400, label: t`4 hours` },
+  { value: 28800, label: t`8 hours` },
+  { value: 43200, label: t`12 hours` },
+  { value: 86400, label: t`1 day` },
+  { value: 172800, label: t`2 days` },
+  { value: 259200, label: t`3 days` },
+  { value: 604800, label: t`1 week` },
+  { value: 1209600, label: t`2 weeks` },
+  { value: 2592000, label: t`31 days` },
+  { value: 5184000, label: t`2 months` },
+  { value: 7776000, label: t`3 months` },
+  { value: 15552000, label: t`6 months` },
+  { value: 31536000, label: t`1 year` },
+  { value: 0, label: t`Never` }
+]
 
 /**
  * should only show after signup
@@ -73,7 +96,9 @@ export function DefaultDeviceSettingsModal() {
       onClose={() => setShowModal(false)}
     >
       <Modal.Content>
-        <Modal.Header>Set default settings for new devices</Modal.Header>
+        <Modal.Header>
+          <Trans>Set default settings for new devices</Trans>
+        </Modal.Header>
         <Modal.Body>
           <Center h={'100%'}>
             {/*  */}
@@ -85,7 +110,7 @@ export function DefaultDeviceSettingsModal() {
               </Text>
               <VStack space={2} rounded="xl" p={3} bg={itemBg}>
                 <VStack space={2}>
-                  <Text>Lock time </Text>
+                  <Trans>Lock time </Trans>
                   <Box p={2}>
                     <AuthierSelect
                       variant="rounded"
@@ -107,11 +132,11 @@ export function DefaultDeviceSettingsModal() {
                       ))}
                     </AuthierSelect>
 
-                    <Text>
+                    <Trans>
                       Automatically locks vault after chosen period of time, use
                       lower values for more security, higher for more user
                       comfort
-                    </Text>
+                    </Trans>
                   </Box>
                 </VStack>
               </VStack>
@@ -121,7 +146,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>2FA</Text>
+                  <Trans>2FA</Trans>
                   <Switch
                     value={form.syncTOTP}
                     onToggle={async (e) => {
@@ -135,7 +160,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>Credentials autofill</Text>
+                  <Trans>Credentials autofill</Trans>
                   <Switch
                     value={form.autofillCredentialsEnabled}
                     onToggle={async (e) => {
@@ -149,7 +174,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>TOTP autofill</Text>
+                  <Trans>TOTP autofill</Trans>
                   <Switch
                     value={form.autofillTOTPEnabled}
                     onToggle={async (e) => {
@@ -248,7 +273,7 @@ export function DefaultDeviceSettingsModal() {
               }}
               mt={3}
             >
-              Save default settings
+              <Trans>Save default settings</Trans>
             </Button>
           </Center>
         </Modal.Body>
