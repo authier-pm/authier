@@ -62,7 +62,7 @@ export const queueLink = new QueueLink()
 const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
-  let accessToken = useDeviceStateStore.getState().accessToken
+  const accessToken = useDeviceStateStore.getState().accessToken
   //return the headers to the context so httpLink can read them
   return {
     headers: {

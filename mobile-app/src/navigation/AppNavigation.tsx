@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 
 import messaging from '@react-native-firebase/messaging'
-import DeviceStackNavigation from './DeviceStackNavigation'
+import { DeviceStackNavigation } from './DeviceStackNavigation'
 
 import {
   BottomTabBar,

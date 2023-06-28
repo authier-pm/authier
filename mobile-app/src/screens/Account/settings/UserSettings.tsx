@@ -22,7 +22,7 @@ import { SettingsItem } from '../Account'
 import { useNavigation } from '@react-navigation/native'
 import { AccountStackScreenProps } from '@src/navigation/types'
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
-import AuthierSelect from '@src/components/AuthierSelect'
+import { AuthierSelect } from '@src/components/AuthierSelect'
 import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation

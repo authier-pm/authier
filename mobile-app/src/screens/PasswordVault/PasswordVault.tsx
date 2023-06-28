@@ -12,7 +12,7 @@ import {
 } from 'native-base'
 
 import { SearchBar } from '@components/SearchBar'
-import LoginCredential from '@components/LoginCredential'
+import { LoginCredential } from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
 import { Trans, t } from '@lingui/macro'
 import { PasswordStackScreenProps } from '@navigation/types'

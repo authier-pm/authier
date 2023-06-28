@@ -17,7 +17,7 @@ import { useLimitsQuery } from '../../../../shared/graphql/AccountLimits.codegen
 import { Linking, RefreshControl } from 'react-native'
 import { PAGE_URL } from '@env'
 
-export default function Limits() {
+export function Limits() {
   const [token, email] = useDeviceStateStore((state) => [
     state.accessToken,
     state.email

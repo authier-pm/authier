@@ -14,13 +14,13 @@ import {
 } from 'native-base'
 
 import { Trans, t } from '@lingui/macro'
-import AuthierSelect from '@src/components/AuthierSelect'
+import { AuthierSelect } from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import React, { useEffect, useState } from 'react'
 import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
-} from '../../../shared/graphql/DefaultSettings.codegen'
+} from '@shared/graphql/DefaultSettings.codegen'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { useDefaultDeviceSettingsModalQuery } from './DefaultDeviceSettingsModal.codegen'
 import { omit } from 'lodash'

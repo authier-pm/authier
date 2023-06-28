@@ -3,7 +3,7 @@ import * as React from 'react'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 
 import { PasswordVault } from '../screens/PasswordVault/PasswordVault'
-import EditPassword from '../screens/PasswordVault/EditPassword'
+import { EditPassword } from '../screens/PasswordVault/EditPassword'
 import { AddPassword } from '../screens/PasswordVault/AddPassword'
 import { PasswordsStackParamList } from './types'
 import { t } from '@lingui/macro'

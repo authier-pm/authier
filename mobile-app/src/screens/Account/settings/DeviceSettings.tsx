@@ -13,7 +13,7 @@ import {
   Heading,
   ScrollView
 } from 'native-base'
-import PasswordReEnter from '@src/components/PasswordReEnter'
+import { PasswordReEnter } from '@src/components/PasswordReEnter'
 
 import SInfo from 'react-native-sensitive-info'
 import { Trans } from '@lingui/macro'
@@ -23,7 +23,7 @@ import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 
 import { RefreshControl } from 'react-native'
-import AuthierSelect from '@src/components/AuthierSelect'
+import { AuthierSelect } from '@src/components/AuthierSelect'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 
 export function DeviceSettings() {

@@ -11,7 +11,7 @@ if (!API_URL) {
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
-    let accessToken = useDeviceStateStore.getState().accessToken
+    const accessToken = useDeviceStateStore.getState().accessToken
     if (!accessToken) {
       return false
     }

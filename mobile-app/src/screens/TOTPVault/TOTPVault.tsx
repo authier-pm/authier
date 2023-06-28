@@ -11,7 +11,7 @@ import {
 
 import { SearchBar } from '@components/SearchBar'
 
-import TOTPSecret from '@components/TOTPSecret'
+import { TOTPSecret } from '@components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
 import CircularProgress from 'react-native-circular-progress-indicator'
 import { TOTPStackScreenProps } from '@navigation/types'
