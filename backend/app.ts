@@ -94,7 +94,9 @@ app.post('/refresh_token', async (request, reply) => {
   const refreshToken = request.cookies['refresh-token']
 
   if (!refreshToken) {
-    return reply.send({ ok: false, accessToken: '' })
+    return reply
+      .status(400)
+      .send({ ok: false, error: 'no refresh token cookie' })
   }
 
   let payload: jwtPayloadRefreshToken | null = null
@@ -103,11 +105,12 @@ app.post('/refresh_token', async (request, reply) => {
       refreshToken,
       process.env.REFRESH_TOKEN_SECRET!
     ) as jwtPayloadRefreshToken
-  } catch (err) {
+  } catch (err: any) {
     console.log(err)
     return reply
       .clearCookie('refresh-token')
-      .send({ ok: false, accessToken: '' })
+      .status(401)
+      .send({ ok: false, error: err.message })
   }
 
   //token is valid and we can send back access token
