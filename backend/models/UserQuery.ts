@@ -75,6 +75,10 @@ export class UserQuery extends UserBase {
     return ctx.prisma.device.findMany({
       where: {
         userId: this.id
+      },
+      orderBy: {
+        lastSyncAt: 'desc',
+        createdAt: 'desc'
       }
     })
   }
