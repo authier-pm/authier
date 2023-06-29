@@ -76,10 +76,14 @@ export class UserQuery extends UserBase {
       where: {
         userId: this.id
       },
-      orderBy: {
-        lastSyncAt: 'desc',
-        createdAt: 'desc'
-      }
+      orderBy: [
+        {
+          lastSyncAt: 'desc'
+        },
+        {
+          createdAt: 'desc'
+        }
+      ]
     })
   }
 
