@@ -20,8 +20,8 @@ import {
 } from '@chakra-ui/react'
 import { Trans } from '@lingui/macro'
 
-import { vaultLockTimeoutOptions } from '@shared/constants'
 import { Field, Formik, FormikHelpers } from 'formik'
+import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
 
 interface Values {
   vaultLockTimeoutSeconds: number
@@ -35,6 +35,7 @@ interface Values {
 
 export default function Security() {
   const { setSecuritySettings, deviceState } = useContext(DeviceStateContext)
+  const options = useVaultLockTimeoutOptions()
 
   const [updateSettings] = useUpdateSettingsMutation({
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
@@ -97,7 +98,7 @@ export default function Security() {
                     id="vaultLockTimeoutSeconds"
                     name="vaultLockTimeoutSeconds"
                   >
-                    {vaultLockTimeoutOptions.map((option, index) => (
+                    {options.map((option, index) => (
                       <option value={option.value.toString()} key={index}>
                         {option.label}
                       </option>
