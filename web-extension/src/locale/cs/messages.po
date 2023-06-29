@@ -1,0 +1,513 @@
+msgid ""
+msgstr ""
+"POT-Creation-Date: 2023-06-29 22:36+0200\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: @lingui/cli\n"
+"Language: cs\n"
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: \n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"Plural-Forms: \n"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "1 day"
+msgstr "1 den"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "1 hour"
+msgstr "1 hodina"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "1 minute"
+msgstr "1 minuta"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "1 week"
+msgstr "1 týden"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "1 year"
+msgstr "1 rok"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "10 minutes"
+msgstr "10 minut"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "12 hours"
+msgstr "12 hodin"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "2 days"
+msgstr "2 dny"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "2 hours"
+msgstr "2 hodiny"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "2 months"
+msgstr "2 měsíce"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "2 weeks"
+msgstr "2 týdny"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
+msgid "2FA sync"
+msgstr "Synchronizace 2FA"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "3 days"
+msgstr "3 dny"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "3 months"
+msgstr "3 měsíce"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "30 minutes"
+msgstr "30 minut"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "31 days"
+msgstr "31 dní"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "4 hours"
+msgstr "4 hodiny"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "5 minutes"
+msgstr "5 minut"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "6 months"
+msgstr "6 měsíců"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "8 hours"
+msgstr "8 hodin"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Account Limits"
+msgstr "Limity účtu"
+
+#: src/components/pages/AddTOTPSecretButton.tsx
+msgid "Add QR TOTP from current page"
+msgstr "Přidat QR TOTP z aktuální stránky"
+
+#: src/components/PopupNavBar.tsx
+#: src/components/PopupNavBar.tsx
+msgid "add secret"
+msgstr "přidat tajemství"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "After you approve it, the vault password will be checked and your vault will open automatically in this tab."
+msgstr "Po schválení se zkontroluje heslo trezoru a váš trezor se automaticky otevře na této kartě."
+
+#: src/pages-vault/Register.tsx
+msgid "Already have an account?"
+msgstr "Už máte účet?"
+
+#: src/pages-vault/NewDeviceApproval.tsx
+msgid "Approve"
+msgstr "Schválit"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
+msgstr "Pro pokračování v přidávání nového zařízení schvalte toto zařízení ve správě zařízení v trezoru na hlavním zařízení."
+
+#: src/pages-vault/Devices.tsx
+msgid "Automatically locks vault after chosen period of time"
+msgstr "Automaticky zamyká trezor po zvoleném časovém období"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Change vault password"
+msgstr "Změnit heslo trezoru"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Click to show the whole"
+msgstr "Klikněte pro zobrazení celého"
+
+#: src/components/PopupNavBar.tsx
+#: src/components/PopupNavBar.tsx
+msgid "close menu"
+msgstr "zavřít menu"
+
+#: src/pages-vault/Devices.tsx
+msgid "Config"
+msgstr "Konfigurace"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Confirm new password // Confirm password"
+msgstr "Potvrďte nové heslo // Potvrďte heslo"
+
+#: src/components/vault/VirtualizedList.tsx
+msgid "Copied to clipboard"
+msgstr "Zkopírováno do schránky"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Copy password"
+msgstr "Kopírovat heslo"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Copy TOTP"
+msgstr "Kopírovat TOTP"
+
+#: src/components/pages/AddTOTPSecretButton.tsx
+msgid "could not find any QR code on this page. Make sure QR code is visible."
+msgstr "na této stránce se nenašel žádný QR kód. Ujistěte se, že je QR kód viditelný."
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
+msgid "Credentials autofill"
+msgstr "Automatické vyplňování přihlašovacích údajů"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Current password // Master password"
+msgstr "Aktuální heslo // Hlavní heslo"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Danger zone"
+msgstr "Nebezpečná zóna"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Delete your account"
+msgstr "Smazat váš účet"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Device approved at {0}"
+msgstr "Zařízení schváleno v {0}"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Device:"
+msgstr "Zařízení:"
+
+#: src/pages-vault/Devices.tsx
+msgid "devices"
+msgstr "zařízení"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Devices"
+msgstr "Zařízení"
+
+#: src/pages-vault/Login.tsx
+msgid "Don't have account?"
+msgstr "Nemáte účet?"
+
+#: src/components/vault/ExportCsvButtons.tsx
+msgid "Export Login Credentials to CSV"
+msgstr "Exportovat přihlašovací údaje do CSV"
+
+#: src/components/vault/ExportCsvButtons.tsx
+msgid "Export TOTP to CSV"
+msgstr "Exportovat TOTP do CSV"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Failed to create decryption challenge"
+msgstr "Nepodařilo se vytvořit dešifrovací výzvu"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "Failed to parse this secret:"
+msgstr "Nepodařilo se analyzovat tento tajný kód:"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Import & Export"
+msgstr "Import & Export"
+
+#: src/pages-vault/VaultImportExport.tsx
+msgid "Import another"
+msgstr "Importovat další"
+
+#: src/pages/UnlockDeviceForm.tsx
+msgid "Incorrect password"
+msgstr "Nesprávné heslo"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+msgid "Language"
+msgstr "Jazyk"
+
+#: src/components/vault/SidebarWithHeader.tsx
+#: src/pages/UserNavMenu.tsx
+msgid "Lock device"
+msgstr "Zamknout zařízení"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/pages-vault/Devices.tsx
+msgid "Lock time"
+msgstr "Čas zámku"
+
+#: src/pages-vault/Devices.tsx
+msgid "Logged in"
+msgstr "Přihlášen"
+
+#: src/pages-vault/Devices.tsx
+msgid "Logged out"
+msgstr "Odhlášen"
+
+#: src/pages-vault/Login.tsx
+msgid "Login"
+msgstr "Přihlásit se"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Login failed, check your email or password"
+msgstr "Přihlášení se nezdařilo, zkontrolujte svůj e-mail nebo heslo"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Login failed, check your username or password"
+msgstr "Přihlášení se nezdařilo, zkontrolujte své uživatelské jméno nebo heslo"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Login failed, try removing and adding the extension again"
+msgstr "Přihlášení se nezdařilo, zkuste odstranit a znovu přidat rozšíření"
+
+#: src/pages-vault/Devices.tsx
+#: src/pages/UserNavMenu.tsx
+msgid "Logout"
+msgstr "Odhlásit se"
+
+#: src/util/useVaultLockTimeoutOptions.tsx
+msgid "Never"
+msgstr "Nikdy"
+
+#: src/components/vault/settings/Security.tsx
+msgid "Notification on vault unlock"
+msgstr "Upozornění na odemknutí trezoru"
+
+#: src/AuthLink.tsx
+#~ msgid "Open"
+#~ msgstr "Otevřít"
+
+#: src/AuthLinkPage.tsx
+#: src/AuthLinkPage.tsx
+#: src/components/PopupNavBar.tsx
+#: src/components/PopupNavBar.tsx
+msgid "Open vault"
+msgstr "Otřít trezor"
+
+#: src/AuthLinkPage.tsx
+msgid "Open vault to login or sign up"
+msgstr "Otevřete trezor pro přihlášení nebo registraci"
+
+#: src/components/vault/SidebarWithHeader.tsx
+#~ msgid "Overview"
+#~ msgstr "Přehled"
+
+#: src/pages-vault/Login.tsx
+#~ msgid "password"
+#~ msgstr "heslo"
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Password"
+#~ msgstr "Heslo"
+
+#: src/pages-vault/Login.tsx
+msgid "Password // *******"
+msgstr "Heslo // *******"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Password changed, all your other devices will be logged out and you will need to log in again"
+msgstr "Heslo bylo změněno, všechna vaše další zařízení budou odhlášena a budete se muset znovu přihlásit"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Passwords do not match"
+msgstr "Hesla se neshodují"
+
+#: src/pages-vault/Devices.tsx
+#~ msgid "Permanently remove device"
+#~ msgstr "Trvale odstranit zařízení"
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Please choose a strong password that you haven't used elsewhere"
+#~ msgstr "Zvolte silné heslo, které jste jinde nepoužívali"
+
+#: src/pages-vault/NewDeviceApproval.tsx
+#~ msgid "Please go to your master device and approve this device there."
+#~ msgstr "Přejděte na své hlavní zařízení a tam schvalte toto zařízení."
+
+#: src/pages-vault/NewDeviceApproval.tsx
+#~ msgid "Please save this key to a safe place. You will need it for password recovery."
+#~ msgstr "Uložte tento klíč na bezpečné místo. Budete ho potřebovat pro obnovení hesla."
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Please, save this recovery key to a safe place. It will allow you to reset your password in case you forget it. Do not share this key with anyone, it can be used to access your data."
+#~ msgstr "Uložte, prosím, tento obnovovací klíč na bezpečné místo. Umožní vám resetovat heslo v případě, že ho zapomenete. Nikomu tento klíč nesdílejte, může být použit k přístupu k vašim datům."
+
+#: src/pages-vault/Login.tsx
+#~ msgid "Recover account"
+#~ msgstr "Obnovit účet"
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Recovery Key"
+#~ msgstr "Obnovovací klíč"
+
+#: src/components/vault/RefreshAccountLimits.tsx
+msgid "refresh account limits"
+msgstr "obnovit limity účtu"
+
+#: src/components/vault/RefreshAccountLimits.tsx
+msgid "Refresh account limits!"
+msgstr "Obnovit limity účtu!"
+
+#: src/pages-vault/NewDeviceApproval.tsx
+msgid "Reject"
+msgstr "Zamítnout"
+
+#: src/components/vault/SidebarWithHeader.tsx
+#~ msgid "Reload"
+#~ msgstr "Obnovit"
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Repeat password"
+#~ msgstr "Zopakovat heslo"
+
+#: src/components/pages/AuthsList.tsx
+#~ msgid "Reveal TOTP"
+#~ msgstr "Zobrazit TOTP"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
+#: src/pages-vault/Devices.tsx
+msgid "Save"
+msgstr "Uložit"
+
+#: src/pages-vault/Register.tsx
+#~ msgid "Save Recovery Key"
+#~ msgstr "Uložit obnovovací klíč"
+
+#: src/pages-vault/Devices.tsx
+msgid "Search for device"
+msgstr "Hledat zařízení"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Search vault by url, username, label or password"
+msgstr "Hledat trezor podle url, uživatelského jména, popisku nebo hesla"
+
+#: src/pages-vault/VaultList.tsx
+msgid "secrets"
+msgstr "tajemství"
+
+#: src/pages-vault/Devices.tsx
+#~ msgid "Set"
+#~ msgstr "Nastavit"
+
+#: src/pages-vault/Devices.tsx
+msgid "Set as master device"
+msgstr "Nastavit jako hlavní zařízení"
+
+#: src/components/vault/settings/Account.tsx
+msgid "Set new master password // New master password"
+msgstr "Nastavit nové hlavní heslo // Nové hlavní heslo"
+
+#: src/components/vault/settings/Account.tsx
+#~ msgid "Set up 2FA"
+#~ msgstr "Nastavit 2FA"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Settings"
+msgstr "Nastavení"
+
+#: src/components/pages/AuthsList.tsx
+#~ msgid "Show full OTP secret"
+#~ msgstr "Zobrazit celý OTP tajný kód"
+
+#: src/components/vault/settings/Account.tsx
+#: src/pages-vault/Login.tsx
+msgid "Submit"
+msgstr "Odeslat"
+
+#: src/pages-vault/VaultImportExport.tsx
+msgid "Successfully added {0}, skipped {1}"
+msgstr "Úspěšně přidáno {0}, přeskočeno {1}"
+
+#: src/components/pages/AddTOTPSecretButton.tsx
+msgid "Successfully added TOTP for {0}"
+msgstr "Úspěšně přidáno TOTP pro {0}"
+
+#: src/components/RefreshSecretsButton.tsx
+#: src/components/vault/RefreshAccountLimits.tsx
+#: src/components/vault/RefreshDeviceButton.tsx
+msgid "Sync successful"
+msgstr "Synchronizace úspěšná"
+
+#: src/components/vault/RefreshDeviceButton.tsx
+#: src/components/vault/RefreshDeviceButton.tsx
+msgid "Synchronize devices"
+msgstr "Synchronizovat zařízení"
+
+#: src/components/RefreshSecretsButton.tsx
+#: src/components/RefreshSecretsButton.tsx
+msgid "Synchronize vault"
+msgstr "Synchronizovat trezor"
+
+#: src/components/pages/AddTOTPSecretButton.tsx
+msgid "This TOTP secret is already in your vault"
+msgstr "Tento TOTP tajný kód je již ve vašem trezoru"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+msgid "TOTP autofill"
+msgstr "TOTP automatické vyplňování"
+
+#: src/pages-vault/Devices.tsx
+#~ msgid "Unlock"
+#~ msgstr "Odemknout"
+
+#: src/pages/UnlockDeviceForm.tsx
+msgid "Unlock vault"
+msgstr "Odemknout trezor"
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+msgid "Username: {0}"
+msgstr "Uživatelské jméno: {0}"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Vault"
+msgstr "Trezor"
+
+#: src/pages-vault/Login.tsx
+#~ msgid "Vault password"
+#~ msgstr "Heslo trezoru"
+
+#: src/pages-vault/AboutPage.tsx
+msgid "Version: {0}"
+msgstr "Verze: {0}"
+
+#: src/pages-vault/VaultImportExport.tsx
+msgid "We support importing from <0>csv</0> and <1>json</1> files."
+msgstr "Podporujeme import z <0>csv</0> a <1>json</1> souborů."
+
+#: src/components/vault/settings/Account.tsx
+#: src/components/vault/settings/Account.tsx
+msgid "Wrong password"
+msgstr "Špatné heslo"
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#~ msgid "You can set defaults for any new devices you pair with your vault."
+#~ msgstr "Můžete nastavit výchozí nastavení pro jakékoli nové zařízení, které spárujete s vaším trezorem."
+
+#: src/pages-vault/LoginAwaitingApproval.tsx
+#~ msgid "You can sign out and try logging in again."
+#~ msgstr "Můžete se odhlásit a zkuste se znovu přihlásit."
+
+#: src/pages-vault/VaultImportExport.tsx
+msgid "You have no duplicates in your secrets"
+msgstr "Ve vašich tajemstvích nemáte žádné duplicity"
+
+#: src/pages-vault/AddItem.tsx
+msgid "You have reached your account limit. Go to <0>Account Limits to upgrade your account.</0>"
+msgstr "Dosáhli jste limitu vašeho účtu. Přejděte na <0>Limit účtu</0> pro upgradování vašeho účtu."
+
+#: src/components/pages/AddTOTPSecretButton.tsx
+msgid "You have reached your password limit. Please upgrade your account to add more passwords."
+msgstr "Dosáhli jste limitu vašich hesel. Prosím upgradujte váš účet pro přidání více hesel."
+
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#~ msgid "Your changes will be applied to new devices only."
+#~ msgstr "Vaše změny budou použity pouze pro nová zařízení."

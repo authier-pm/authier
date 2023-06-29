@@ -7,16 +7,11 @@ export default {
     }
   ],
   compileNamespace: 'ts',
-
-  locales: [
-    'en-gb',
-    // 'de-de',
-    'pseudo'
-  ],
-
+  sourceLocale: 'en',
+  locales: ['en', 'cs'],
   pseudoLocale: 'pseudo',
   fallbackLocales: {
-    pseudo: 'en-gb'
+    pseudo: 'en'
   },
   format: 'po',
   formatOptions: { origins: true, lineNumbers: false }

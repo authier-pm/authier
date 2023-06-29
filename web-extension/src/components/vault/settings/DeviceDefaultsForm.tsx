@@ -18,6 +18,7 @@ import { Trans } from '@lingui/macro'
 
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { Formik, FormikHelpers, Field } from 'formik'
+import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
 
 interface Values {
   vaultLockTimeoutSeconds: number
@@ -36,6 +37,7 @@ export function DeviceDefaultsForm() {
     refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
   })
   const bgColor = useColorModeValue('white', 'gray.800')
+  const options = useVaultLockTimeoutOptions()
 
   if (loading || !data) return <Spinner />
 
@@ -95,7 +97,7 @@ export function DeviceDefaultsForm() {
                   id="vaultLockTimeoutSeconds"
                   name="vaultLockTimeoutSeconds"
                 >
-                  {vaultLockTimeoutOptions.map((option, index) => (
+                  {options.map((option, index) => (
                     <option value={option.value.toString()} key={index}>
                       {option.label}
                     </option>
