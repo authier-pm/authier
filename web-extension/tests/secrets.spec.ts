@@ -106,7 +106,8 @@ test.describe.serial('Secrets management', () => {
 
     await page.getByRole('img', { name: 'item_icon' }).hover({ force: true })
 
-    await page.getByRole('img', { name: 'delete_item' }).click()
+    await page.getByRole('button', { name: 'Edit item' }).click()
+    await page.getByRole('button', { name: 'Delete' }).click()
 
     page.on('popup', async (popup) => {
       await popup.waitForLoadState()

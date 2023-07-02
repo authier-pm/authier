@@ -28,7 +28,14 @@
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "permissions": ["activeTab", "storage", "tabs", "clipboardRead"],
+  "permissions": [
+    "tabs",
+    "activeTab",
+    "notifications",
+    "storage",
+    "http://localhost:5051/graphql",
+    "https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql"
+  ],
   "web_accessible_resources": [
     "icon-16.png"
   ],
