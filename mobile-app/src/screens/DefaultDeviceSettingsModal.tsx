@@ -24,7 +24,6 @@ import {
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { useDefaultDeviceSettingsModalQuery } from './DefaultDeviceSettingsModal.codegen'
 import { omit } from 'lodash'
-import { useLingui } from '@lingui/react'
 import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 /**
@@ -38,7 +37,6 @@ export function DefaultDeviceSettingsModal() {
     ])
   const options = useVaultLockTimeoutOptions()
   const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
-  const { i18n } = useLingui()
   const { toggleColorMode } = useColorMode()
   const [updateDefaultSettings, { loading }] =
     useUpdateDefaultDeviceSettingsMutation()
@@ -74,9 +72,7 @@ export function DefaultDeviceSettingsModal() {
       onClose={() => setShowModal(false)}
     >
       <Modal.Content>
-        <Modal.Header>
-          <Trans>Set default settings for new devices</Trans>
-        </Modal.Header>
+        <Modal.Header>Set default settings for new devices</Modal.Header>
         <Modal.Body>
           <Center h={'100%'}>
             {/*  */}
@@ -88,7 +84,7 @@ export function DefaultDeviceSettingsModal() {
               </Text>
               <VStack space={2} rounded="xl" p={3} bg={itemBg}>
                 <VStack space={2}>
-                  <Trans>Lock time </Trans>
+                  <Text>Lock time </Text>
                   <Box p={2}>
                     <AuthierSelect
                       variant="rounded"
@@ -110,11 +106,11 @@ export function DefaultDeviceSettingsModal() {
                       ))}
                     </AuthierSelect>
 
-                    <Trans>
+                    <Text>
                       Automatically locks vault after chosen period of time, use
                       lower values for more security, higher for more user
                       comfort
-                    </Trans>
+                    </Text>
                   </Box>
                 </VStack>
               </VStack>
@@ -124,7 +120,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Trans>2FA</Trans>
+                  <Text> 2FA</Text>
                   <Switch
                     value={form.syncTOTP}
                     onToggle={async (e) => {
@@ -138,7 +134,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Trans>Credentials autofill</Trans>
+                  <Text>Credentials autofill</Text>
                   <Switch
                     value={form.autofillCredentialsEnabled}
                     onToggle={async (e) => {
@@ -152,7 +148,7 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Trans>TOTP autofill</Trans>
+                  <Text>TOTP autofill</Text>
                   <Switch
                     value={form.autofillTOTPEnabled}
                     onToggle={async (e) => {
@@ -173,7 +169,8 @@ export function DefaultDeviceSettingsModal() {
                 <AuthierSelect
                   onValueChange={(value) => {
                     setForm({ ...form, uiLanguage: value })
-                    i18n.activate(value)
+                    //FIX: Cant get i18n into this file
+                    //i18n.activate(value)
                   }}
                   defaultValue={form.uiLanguage}
                   accessibilityLabel="language"
@@ -251,7 +248,7 @@ export function DefaultDeviceSettingsModal() {
               }}
               mt={3}
             >
-              <Trans>Save default settings</Trans>
+              <Text>Save default settings</Text>
             </Button>
           </Center>
         </Modal.Body>

@@ -30,7 +30,7 @@ export const PromptPassword = ({
   password: string
   inputEvents: {
     capturedInputEvents: ICapturedInput[]
-    inputsUrl: any
+    inputsUrl: string
   }
 }) => {
   const trpc = getTRPCCached()
@@ -106,7 +106,7 @@ export const PromptPassword = ({
         onClick={() => {
           const passwordDisplayEl = document.querySelector(
             '#__AUTHIER__pswdDisplay'
-          )!
+          ) as HTMLElement
           if (passwordShown) {
             passwordDisplayEl.innerHTML = password.replaceAll(/./g, '*')
             passwordShown = false

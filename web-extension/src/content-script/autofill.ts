@@ -546,10 +546,7 @@ export const autofill = (initState: IInitStateRes) => {
             }
 
             //Let user choose which credential to use
-            if (
-              webInputs.length === 0 &&
-              secretsForHost.loginCredentials.length > 1
-            ) {
+            if (secretsForHost.loginCredentials.length > 1) {
               log('choose credential', domRecorder.toJSON())
               renderLoginCredOption({
                 loginCredentials: secretsForHost.loginCredentials,

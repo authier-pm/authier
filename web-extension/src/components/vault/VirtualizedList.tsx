@@ -4,7 +4,9 @@ import { AutoSizer, List } from 'react-virtualized'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { UnlockIcon, EditIcon, DeleteIcon, CopyIcon } from '@chakra-ui/icons'
+import { EditIcon, DeleteIcon, CopyIcon } from '@chakra-ui/icons'
+import { Tb2Fa } from 'react-icons/tb'
+import { GrUserAdmin } from 'react-icons/gr'
 import { Center, Box, Flex, Text, useToast } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { Link } from 'react-router-dom'
@@ -13,6 +15,8 @@ import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { Txt } from '../util/Txt'
 import { t } from '@lingui/macro'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import { authierColors } from '@shared/chakraRawTheme'
 
 export function VaultListItem({
   secret
@@ -64,7 +68,17 @@ export function VaultListItem({
               {username}
             </Txt>
           </Box>
-
+          <Box
+            pos="absolute"
+            top={secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? 3 : 1}
+            left={4}
+          >
+            {secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
+              <GrUserAdmin size={13}></GrUserAdmin>
+            ) : (
+              <Tb2Fa color={authierColors.gray[700]} size={25}></Tb2Fa>
+            )}
+          </Box>
           <Flex
             display={isVisible ? 'flex' : 'none'}
             alignItems="center"
@@ -72,7 +86,6 @@ export function VaultListItem({
             zIndex={9}
             position="absolute"
             top={0}
-            bgColor="blackAlpha.600"
             w="100%"
             h="full"
             sx={{
@@ -81,33 +94,32 @@ export function VaultListItem({
               }
             }}
           >
-            <CopyIcon
-              aria-label="copy to clipboard"
-              onClick={() => {
-                navigator.clipboard.writeText(password)
-                toast({
-                  title: t`Copied to clipboard`,
-                  status: 'success'
-                })
-                secret.lastUsedAt = new Date().toISOString()
-                // TODO store SecretUsageEvent
+            <Link
+              to={{
+                pathname: `secret/${secret.id}`
               }}
-              cursor={'pointer'}
-              boxSize={29}
-              padding={1.5}
-              alignSelf="end"
-              overflow={'visible'}
-              backgroundColor={'blue.400'}
-              _hover={{ backgroundColor: 'orange.500' }}
-              right="0"
-              top="inherit"
-            />
+              state={{ data: secret }}
+            >
+              <EditIcon
+                aria-label="Edit item"
+                cursor={'pointer'}
+                boxSize={29}
+                padding={1.5}
+                alignSelf="end"
+                overflow={'visible'}
+                backgroundColor={'blue.400'}
+                _hover={{ backgroundColor: 'orange.500' }}
+                right={0}
+                top={0}
+              />
+            </Link>
 
             {secretUrl ? (
               <IconButton
                 aria-label="open_item"
                 colorScheme="blackAlpha"
-                icon={<UnlockIcon />}
+                h={'50px'}
+                w={'55px'}
                 onClick={() => browser.tabs.create({ url: secretUrl })}
               />
             ) : null}
@@ -123,20 +135,22 @@ export function VaultListItem({
             {label}
           </Text>
 
-          <Link
-            to={{
-              pathname: `secret/${secret.id}`
+          <IconButton
+            size="sm"
+            display={isVisible ? 'block' : 'none'}
+            aria-label="copy to clipboard"
+            colorScheme="gray"
+            onClick={() => {
+              navigator.clipboard.writeText(password)
+              toast({
+                title: t`Copied to clipboard`,
+                status: 'success'
+              })
+              secret.lastUsedAt = new Date().toISOString()
+              // TODO store SecretUsageEvent
             }}
-            state={{ data: secret }}
-          >
-            <IconButton
-              size="sm"
-              display={isVisible ? 'block' : 'none'}
-              aria-label="Edit item"
-              colorScheme="gray"
-              icon={<EditIcon />}
-            />
-          </Link>
+            icon={<CopyIcon />}
+          />
         </Flex>
       </Box>
     </Center>

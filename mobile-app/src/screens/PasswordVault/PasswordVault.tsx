@@ -60,7 +60,6 @@ export const PasswordVault = ({
   return (
     <View>
       <DefaultDeviceSettingsModal />
-
       <HStack flexDirection="row" alignItems="center" space={4} m={4}>
         <SearchBar setFilterBy={setFilterBy} />
         <IconButton

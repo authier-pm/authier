@@ -9,7 +9,7 @@ import { UserProvider } from './providers/UserProvider'
 
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
 import { DeviceStateProvider } from './providers/DeviceStateProvider'
-import { messages } from './locale/en-gb/messages'
+import { messages } from './locale/en/messages'
 
 export const { ToastContainer, toast } = createStandaloneToast({
   theme: chakraRawTheme
@@ -17,6 +17,7 @@ export const { ToastContainer, toast } = createStandaloneToast({
 
 i18n.load('en', messages)
 i18n.activate('en')
+
 export const chakraCustomTheme = extendTheme(chakraRawTheme)
 
 export function ExtensionProviders({ children }) {

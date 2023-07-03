@@ -32,6 +32,8 @@ import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { useState } from 'react'
 import { FiLogOut, FiSettings, FiStar } from 'react-icons/fi'
+import { FaUserCheck } from 'react-icons/fa'
+import { LiaUserAltSlashSolid } from 'react-icons/lia'
 import {
   useChangeDeviceSettingsMutation,
   useChangeMasterDeviceMutation
@@ -99,10 +101,12 @@ const DeviceListItem = ({
               )}
               {deviceInfo.logoutAt ? (
                 <Badge height="min-content" colorScheme="red">
+                  <LiaUserAltSlashSolid />
                   <Trans>Logged out</Trans>
                 </Badge>
               ) : (
                 <Badge height="min-content" colorScheme="green">
+                  <FaUserCheck />
                   <Trans>Logged in</Trans>
                 </Badge>
               )}
