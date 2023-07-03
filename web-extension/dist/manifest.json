@@ -13,13 +13,8 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "*://*/*"
-      ],
-      "js": [
-        "js/browser-polyfill.js",
-        "js/contentScript.js"
-      ],
+      "matches": ["*://*/*"],
+      "js": ["js/browser-polyfill.js", "js/contentScript.js"],
       "all_frames": true
     }
   ],
@@ -33,11 +28,10 @@
     "activeTab",
     "notifications",
     "storage",
-    "http://localhost:5051/graphql",
-    "https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws/graphql"
+    "http://localhost",
+    "https://127.0.0.1",
+    "https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws"
   ],
-  "web_accessible_resources": [
-    "icon-16.png"
-  ],
+  "web_accessible_resources": ["icon-16.png"],
   "content_security_policy": "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
 }
