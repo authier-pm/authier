@@ -4,7 +4,7 @@ import { AutoSizer, List } from 'react-virtualized'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { IconButton } from '@chakra-ui/button'
 import { useColorModeValue } from '@chakra-ui/color-mode'
-import { EditIcon, DeleteIcon, CopyIcon } from '@chakra-ui/icons'
+import { EditIcon, CopyIcon } from '@chakra-ui/icons'
 import { Tb2Fa } from 'react-icons/tb'
 import { GrUserAdmin } from 'react-icons/gr'
 import { Center, Box, Flex, Text, useToast } from '@chakra-ui/react'
@@ -101,7 +101,8 @@ export function VaultListItem({
               state={{ data: secret }}
             >
               <EditIcon
-                aria-label="Edit item"
+                aria-label="edit_item"
+                display={isVisible ? 'block' : 'none'}
                 cursor={'pointer'}
                 boxSize={29}
                 padding={1.5}
