@@ -17,5 +17,5 @@ export const totpSchema = secretUrlsSchema.extend({
   secret: z.string().min(1),
   digits: z.number(),
   period: z.number(),
-  url: z.string().min(1).nullable() // This can be nullish for imported items, should be non-nullish for TOTP items added from web extension
+  url: z.string().min(1).nullish() // This can be nullish for imported items, should be non-nullish for TOTP items added from web extension
 })
