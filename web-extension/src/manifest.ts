@@ -9,10 +9,10 @@ export async function getManifest() {
   // update this file to update this manifest.json
   // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
-    manifest_version: 3,
+    manifest_version: 2,
     name: pkg.displayName,
     version: pkg.version,
-    description: pkg.description,
+    description: 'Authier password manager firefox extension',
     action: {
       default_icon: {
         16: 'icon-16.png',
@@ -37,13 +37,23 @@ export async function getManifest() {
       128: 'icon-128.png'
     },
     host_permissions: ['<all_urls>'],
-    permissions: ['activeTab', 'storage', 'tabs', 'clipboardRead'],
+    permissions: [
+      'activeTab',
+      'storage',
+      'tabs',
+      'clipboardRead',
+      'http://localhost',
+      'https://127.0.0.1',
+      'https://jj46btrl5p42gvqobutebxifr40ogwdt.lambda-url.eu-central-1.on.aws'
+    ],
     web_accessible_resources: [
       {
         resources: ['*.png'],
         matches: ['<all_urls>']
       }
-    ]
+    ],
+    content_security_policy:
+      "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
   }
 
   return manifest
