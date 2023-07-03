@@ -94,27 +94,25 @@ export function VaultListItem({
               }
             }}
           >
-            <CopyIcon
-              aria-label="copy to clipboard"
-              onClick={() => {
-                navigator.clipboard.writeText(password)
-                toast({
-                  title: t`Copied to clipboard`,
-                  status: 'success'
-                })
-                secret.lastUsedAt = new Date().toISOString()
-                // TODO store SecretUsageEvent
+            <Link
+              to={{
+                pathname: `secret/${secret.id}`
               }}
-              cursor={'pointer'}
-              boxSize={29}
-              padding={1.5}
-              alignSelf="end"
-              overflow={'visible'}
-              backgroundColor={'blue.400'}
-              _hover={{ backgroundColor: 'orange.500' }}
-              right="0"
-              top="inherit"
-            />
+              state={{ data: secret }}
+            >
+              <EditIcon
+                aria-label="Edit item"
+                cursor={'pointer'}
+                boxSize={29}
+                padding={1.5}
+                alignSelf="end"
+                overflow={'visible'}
+                backgroundColor={'blue.400'}
+                _hover={{ backgroundColor: 'orange.500' }}
+                right={0}
+                top={0}
+              />
+            </Link>
 
             {secretUrl ? (
               <IconButton
@@ -137,20 +135,22 @@ export function VaultListItem({
             {label}
           </Text>
 
-          <Link
-            to={{
-              pathname: `secret/${secret.id}`
+          <IconButton
+            size="sm"
+            display={isVisible ? 'block' : 'none'}
+            aria-label="copy to clipboard"
+            colorScheme="gray"
+            onClick={() => {
+              navigator.clipboard.writeText(password)
+              toast({
+                title: t`Copied to clipboard`,
+                status: 'success'
+              })
+              secret.lastUsedAt = new Date().toISOString()
+              // TODO store SecretUsageEvent
             }}
-            state={{ data: secret }}
-          >
-            <IconButton
-              size="sm"
-              display={isVisible ? 'block' : 'none'}
-              aria-label="Edit item"
-              colorScheme="gray"
-              icon={<EditIcon />}
-            />
-          </Link>
+            icon={<CopyIcon />}
+          />
         </Flex>
       </Box>
     </Center>

@@ -54,26 +54,6 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         display: 'contents'
       }}
     >
-      <CloseIcon
-        cursor={'pointer'}
-        boxSize={26}
-        padding={1.5}
-        alignSelf="end"
-        overflow={'visible'}
-        backgroundColor={'red.400'}
-        _hover={{ backgroundColor: 'red.500' }}
-        right="0"
-        top="inherit"
-        onClick={() => {
-          const canGoBack = window.history.length > 1
-          if (canGoBack) {
-            return navigate(-1)
-          } else {
-            return navigate('/')
-          }
-        }}
-      />
-
       <Flex
         width={{ base: '90%', sm: '70%', md: '60%' }}
         mt={4}
@@ -85,6 +65,24 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         alignItems={'center'}
         bg={bg}
       >
+        <CloseIcon
+          cursor={'pointer'}
+          boxSize={26}
+          padding={1.5}
+          alignSelf="end"
+          overflow={'visible'}
+          _hover={{ backgroundColor: 'yellow.500' }}
+          right="0"
+          top="inherit"
+          onClick={() => {
+            const canGoBack = window.history.length > 1
+            if (canGoBack) {
+              return navigate(-1)
+            } else {
+              return navigate('/')
+            }
+          }}
+        />
         <Formik
           initialValues={{
             secret: totp.secret,
