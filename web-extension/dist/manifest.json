@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Authier",
   "version": "1.0.23",
-  "description": "Authier web Extension for all our supported browsers",
+  "description": "Authier password manager firefox extension",
   "action": {
     "default_icon": {
       "16": "icon-16.png",

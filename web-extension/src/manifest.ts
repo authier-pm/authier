@@ -12,7 +12,7 @@ export async function getManifest() {
     manifest_version: 2,
     name: pkg.displayName,
     version: pkg.version,
-    description: pkg.description,
+    description: 'Authier password manager firefox extension',
     action: {
       default_icon: {
         16: 'icon-16.png',
