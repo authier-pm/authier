@@ -76,10 +76,10 @@ const appRouter = tc.router({
       if (!url || !deviceState) {
         return false // we can't do anything without a valid url
       }
-      let urlParsed: ConstructURLReturnType
+      let urlParsed: URL
 
       try {
-        urlParsed = constructURL(url)
+        urlParsed = new URL(url)
       } catch (err) {
         return false
       }
@@ -91,7 +91,7 @@ const appRouter = tc.router({
         username: credentials.username,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
-        url: url,
+        url: urlParsed.hostname,
         label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
       }
 
