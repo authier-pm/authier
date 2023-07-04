@@ -24,7 +24,7 @@ import {
   defaultDeviceSettingUserValuesWithId
 } from './defaultDeviceSettingSystemValues'
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
-import { firebaseAdmin } from 'lib/firebaseAdmin'
+import { firebaseAdmin } from '../lib/firebaseAdmin'
 
 @ObjectType()
 export class UserBase extends UserGQL {

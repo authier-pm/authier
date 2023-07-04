@@ -44,7 +44,7 @@ import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 import { isTorExit } from './isTorExit'
-import { firebaseAdmin } from 'lib/firebaseAdmin'
+import { firebaseAdmin } from '../lib/firebaseAdmin'
 const log = debug('au:RootResolver')
 
 export interface IContext {
