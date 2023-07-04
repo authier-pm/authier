@@ -10,7 +10,6 @@ import {
 import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
-import * as admin from 'firebase-admin'
 
 import { GraphQLEmailAddress } from 'graphql-scalars'
 import { UserGQL } from './generated/UserGQL'
@@ -25,6 +24,7 @@ import {
   defaultDeviceSettingUserValuesWithId
 } from './defaultDeviceSettingSystemValues'
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
+import { firebaseAdmin } from 'lib/firebaseAdmin'
 
 @ObjectType()
 export class UserBase extends UserGQL {
@@ -195,7 +195,7 @@ export class UserQuery extends UserBase {
     }
 
     try {
-      await admin
+      await firebaseAdmin
         .messaging()
         .sendToDevice(masterDevice?.firebaseToken as string, {
           notification: {

@@ -42,8 +42,9 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
-import admin from 'firebase-admin'
+
 import { isTorExit } from './isTorExit'
+import { firebaseAdmin } from 'lib/firebaseAdmin'
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -350,15 +351,17 @@ export class RootResolver {
         user.masterDevice.firebaseToken.length > 10
       ) {
         console.log('sending notification to')
-        await admin.messaging().sendToDevice(user.masterDevice.firebaseToken, {
-          notification: {
-            title: 'New device login!',
-            body: 'New device is trying to log in.'
-          },
-          data: {
-            type: 'Devices'
-          }
-        })
+        await firebaseAdmin
+          .messaging()
+          .sendToDevice(user.masterDevice.firebaseToken, {
+            notification: {
+              title: 'New device login!',
+              body: 'New device is trying to log in.'
+            },
+            data: {
+              type: 'Devices'
+            }
+          })
       }
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
