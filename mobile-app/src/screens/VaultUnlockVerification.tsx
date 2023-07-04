@@ -169,7 +169,7 @@ export function VaultUnlockVerification() {
               // })
             }
             setSubmitting(false)
-          } catch (err: any) {
+          } catch (err) {
             setTries(tries + 1)
             if (!toast.isActive(id)) {
               toast.show({
@@ -222,7 +222,7 @@ export function VaultUnlockVerification() {
             <Button
               colorScheme="teal"
               isDisabled={values.password.length < 3}
-              onPress={handleSubmit as (values: any) => void}
+              onPress={handleSubmit as (values) => void}
               isLoading={isSubmitting}
             >
               Unlock vault
