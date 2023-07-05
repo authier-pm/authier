@@ -14,7 +14,7 @@ import {
 import React, { useCallback } from 'react'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useLimitsQuery } from '../../../../shared/graphql/AccountLimits.codegen'
-import { Linking, RefreshControl } from 'react-native'
+import { Alert, Linking, RefreshControl } from 'react-native'
 import { PAGE_URL } from '@env'
 
 type OpenURLButtonProps = {
@@ -25,15 +25,15 @@ type OpenURLButtonProps = {
 const OpenURLButton = ({ url, children }: OpenURLButtonProps) => {
   const handlePress = useCallback(async () => {
     // Checking if the link is supported for links with custom URL scheme.
-    const supported = await Linking.canOpenURL(url)
+    // FIX: does not work on android
+    // const supported = await Linking.canOpenURL(url)
 
-    if (supported) {
-      // Opening the link with some app, if the URL scheme is "http" the web link should be opened
-      // by some browser in the mobile
-      await Linking.openURL(url)
-    } else {
-      console.error(`Don't know how to open this URL: ${url}`)
+    if (!url.startsWith('http') && !url.startsWith('https')) {
+      Alert.alert('Invalid URL', 'URL must start with "http" or "https"')
+      return
     }
+
+    await Linking.openURL(url)
   }, [url])
 
   return (
