@@ -2,9 +2,9 @@ import { FastifyRequest } from 'fastify'
 import { prismaClient, prismaTransaction } from './prisma/prismaClient'
 import { stripeClient } from './stripeClient'
 
-import { endpointSecret } from './app'
 import { GraphQLError } from 'graphql'
 import Stripe from 'stripe'
+import debug from 'debug'
 
 const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
 
@@ -20,6 +20,10 @@ const stripeProducts = {
     TOTPCredentials: 'prod_O7KTrrFYqhOrJR'
   }
 }
+const log = debug('au:stripeWebhook')
+export const endpointSecret = process.env.STRIPE_ENDPOINT as string
+
+log('endpointSecret', endpointSecret)
 
 const CREDS_SUBSCRIPTION_INCREASE = 250
 const TOTP_SUBSCRIPTION_INCREASE = 100

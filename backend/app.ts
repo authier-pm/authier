@@ -34,9 +34,7 @@ sentryInit({
   release: `<project-name>@${pkg.version}`
 })
 
-export const endpointSecret = env.STRIPE_ENDPOINT as string
 const isLambda = !!env.LAMBDA_TASK_ROOT
-log('endpointSecret', endpointSecret)
 
 let logger
 let pino
@@ -156,7 +154,7 @@ app.register(mercurius, {
   errorFormatter: (res, ctx) => {
     // console.error(ctx)
     if (res.errors) {
-      res.errors.map((err) => {
+      res.errors.forEach((err) => {
         if (err instanceof GraphqlError === false) {
           captureException(err)
         }
