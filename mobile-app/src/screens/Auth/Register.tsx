@@ -196,6 +196,7 @@ export function Register({ navigation }: NavigationProps) {
                 </FormControl.Label>
 
                 <Input
+                  autoCapitalize="none"
                   onBlur={handleBlur('email')}
                   onChangeText={handleChange('email')}
                   value={values.email}

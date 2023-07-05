@@ -105,6 +105,7 @@ export function Login({ navigation }: NavigationProps) {
                   Email
                 </FormControl.Label>
                 <Input
+                  autoCapitalize="none"
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
                   value={values.email}
