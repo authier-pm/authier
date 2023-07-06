@@ -19,7 +19,7 @@ import {
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
-import { getTRPCCached } from '@src/content-script/connectTRPC'
+import { trpcCS } from '@src/content-script/connectTRPC'
 import {
   totpSchema,
   loginCredentialsSchema
@@ -68,7 +68,6 @@ export interface ISecuritySettingsInBg {
 let storageOnchangeListenerRegistered = false // we need to only register once
 
 export function useDeviceState() {
-  const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
 

@@ -1,13 +1,12 @@
 import { h } from 'preact'
 import { useState } from 'preact/hooks'
-import { getTRPCCached } from '../connectTRPC'
+import { trpcCS } from '../connectTRPC'
 import { popupDiv } from '../renderItemPopup'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
 export const PromptItemPopup = ({ inputEvents }: { inputEvents: any }) => {
-  const trpc = getTRPCCached()
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
 
@@ -30,7 +29,7 @@ export const PromptItemPopup = ({ inputEvents }: { inputEvents: any }) => {
       }
     })
 
-    return await trpc.addLoginCredentials.mutate(loginCredentials)
+    return await trpcCS.addLoginCredentials.mutate(loginCredentials)
   }
 
   const onInput = (e) => {

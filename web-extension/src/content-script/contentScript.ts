@@ -27,7 +27,7 @@ import {
   contentScriptRender,
   showSavePromptIfAppropriate
 } from './contentScriptRender'
-import { getTRPCCached } from './connectTRPC'
+import { connectTRPC } from './connectTRPC'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -79,8 +79,15 @@ export const domRecorder = new DOMEventsRecorder()
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 export let stateInitRes: IInitStateRes | null = null
 
+let trpc
+try {
+  trpc = connectTRPC()
+} catch (err) {
+  console.error('eeeeeee3124')
+  throw err
+}
+
 export async function initInputWatch() {
-  const trpc = getTRPCCached()
   stateInitRes = await trpc.getContentScriptInitialState.query()
 
   log('~ stateInitRes', stateInitRes)
@@ -177,7 +184,7 @@ export async function initInputWatch() {
                 domPath: elementSelector.css,
                 domOrdinal: elementSelector.domOrdinal,
                 kind: WebInputType.TOTP,
-                url: location.href
+                url: location.href.split('?')[0] // remove query params as they often include sensitive data
               }
               await trpc.addTOTPInput.mutate(webInput)
               log(`TOTP WebInput added for selector "${elementSelector}"`)

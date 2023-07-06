@@ -12,7 +12,6 @@ const logQueries = debug('au:prisma')
 const nodeEnv = process.env.NODE_ENV || 'test'
 
 let dbUrl = process.env.DATABASE_URL
-console.log('~ dbUrl', dbUrl)
 
 const workerId = process.env.VITEST_WORKER_ID
 if (workerId) {
@@ -23,6 +22,7 @@ if (workerId) {
 } else {
   log('DATABASE_URL', dbUrl)
 }
+console.log('~ dbUrl', dbUrl)
 
 export const prismaClient = new PrismaClient({
   log:

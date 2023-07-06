@@ -5,6 +5,7 @@ import browser from 'webextension-polyfill'
 
 // just utility function to get to the return type of the router, prefer to use getTRPCCached() everywhere
 export const connectTRPC = () => {
+  console.warn('runtime connect')
   const port = browser.runtime.connect()
 
   const trpc = createTRPCProxyClient<AppRouter>({
@@ -14,11 +15,4 @@ export const connectTRPC = () => {
   return trpc
 }
 
-let trpcCached: ReturnType<typeof connectTRPC>
-
-export const getTRPCCached = () => {
-  if (!trpcCached) {
-    trpcCached = connectTRPC()
-  }
-  return trpcCached
-}
+export const trpcCS = connectTRPC()

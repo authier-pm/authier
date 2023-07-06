@@ -10,7 +10,7 @@ import debug from 'debug'
 import { IDecryptedSecrets } from './autofill'
 import { renderItemPopup } from './renderItemPopup'
 import { recordDiv, renderToast } from './renderToast'
-import { getTRPCCached } from './connectTRPC'
+import { trpcCS } from './connectTRPC'
 
 const log = debug('au:contentScript:renderer')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -25,7 +25,6 @@ const hideToast = () => {
     x?.remove()
   }, 5000)
 }
-const trpc = getTRPCCached()
 
 export function recordInputs(e?: KeyboardEvent) {
   if (
@@ -71,7 +70,7 @@ async function clicked(e: MouseEvent) {
   }
 
   if (clickCount === 2) {
-    await trpc.saveCapturedInputEvents.mutate({
+    await trpcCS.saveCapturedInputEvents.mutate({
       inputEvents: domRecorder.toJSON(),
       url: document.documentURI
     })
@@ -128,7 +127,7 @@ export const showSavePromptIfAppropriate = async (
     return
   }
 
-  await trpc.saveCapturedInputEvents.mutate({
+  await trpcCS.saveCapturedInputEvents.mutate({
     inputEvents: domRecorder.toJSON(),
     url: document.documentURI
   })
@@ -147,7 +146,7 @@ export const showSavePromptIfAppropriate = async (
     } else {
       // @ts-expect-error
       const fallbackUsernames: string[] =
-        await trpc.getFallbackUsernames.query()
+        await trpcCS.getFallbackUsernames.query()
       log('fallbackUsernames', fallbackUsernames)
       renderSaveCredentialsForm(fallbackUsernames[0], password)
     }

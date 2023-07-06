@@ -115,7 +115,7 @@ const appRouter = tc.router({
         return {
           domPath: captured.cssSelector,
           kind: captured.kind,
-          url: inputsUrl,
+          url: inputsUrl.split('?')[0],
           domOrdinal: captured.domOrdinal
         }
       })
@@ -144,7 +144,7 @@ const appRouter = tc.router({
       }
 
       capturedInputEvents = input.inputEvents
-      inputsUrl = input.url
+      inputsUrl = input.url.split('?')[0] // remove query params from url
 
       const newWebInputs = capturedInputEvents.map((captured) => {
         return {
