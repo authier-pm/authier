@@ -68,7 +68,6 @@ export interface ISecuritySettingsInBg {
 let storageOnchangeListenerRegistered = false // we need to only register once
 
 export function useDeviceState() {
-  const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
 

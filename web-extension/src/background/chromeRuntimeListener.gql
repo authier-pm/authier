@@ -4,8 +4,8 @@ mutation addWebInputs($webInputs: [WebInputElement!]!) {
   }
 }
 
-query webInputsForHost($host: String!) {
-  webInputs(host: $host) {
+query webInputsForHosts($hosts: [String!]) {
+  webInputs(hosts: $hosts) {
     id
     host
     url

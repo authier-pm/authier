@@ -50,6 +50,12 @@ import { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from 'trpc-chrome/link'
 import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
+import {
+  WebInputsForHostsDocument,
+  WebInputsForHostsQuery,
+  WebInputsForHostsQueryVariables
+} from './chromeRuntimeListener.codegen'
+import { WebInputForAutofill } from './getContentScriptInitialState'
 
 export const log = debug('au:Device')
 
@@ -100,6 +106,7 @@ export const getDecryptedSecretProp = (
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   lockTimeEnd: number
+  webInputs: WebInputForAutofill[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     //log('device state created', this)
@@ -322,6 +329,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
         await this.save()
 
+        this.webInputs = await this.getWebInputs()
         await apolloClient.mutate<
           MarkAsSyncedMutation,
           MarkAsSyncedMutationVariables
@@ -332,10 +340,7 @@ export class DeviceState implements IBackgroundStateSerializable {
             return secretsBeforeSync.find(({ id }) => removedId === id)
           }
         )
-        console.log(
-          '~ actuallyRemovedOnThisDevice',
-          actuallyRemovedOnThisDevice
-        )
+        log('actuallyRemovedOnThisDevice', actuallyRemovedOnThisDevice)
         return {
           removedSecrets: actuallyRemovedOnThisDevice.length,
           newAndUpdatedSecrets: newAndUpdatedSecrets.length
@@ -404,6 +409,29 @@ export class DeviceState implements IBackgroundStateSerializable {
     await this.save()
 
     return secretsAdded
+  }
+
+  async getWebInputs() {
+    // TODO use this for getting web inputs on each sync
+    const hostnames = this.decryptedSecrets
+      .map((s) =>
+        s.kind === EncryptedSecretType.TOTP
+          ? s.totp.url
+          : s.loginCredentials.url
+      )
+      .filter((h) => !!h)
+      .map((h) => constructURL(h as string).hostname) as string[]
+    const { data } = await apolloClient.query<
+      WebInputsForHostsQuery,
+      WebInputsForHostsQueryVariables
+    >({
+      query: WebInputsForHostsDocument,
+      variables: {
+        hosts: hostnames
+      }
+    })
+
+    return data.webInputs ?? []
   }
 
   async removeSecret(secretId: string) {
