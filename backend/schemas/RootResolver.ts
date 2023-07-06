@@ -480,7 +480,7 @@ export class RootResolver {
         continue
       }
       const forUpsert = {
-        url: webInput.url,
+        url: webInput.url.split('?')[0], // query can often have sensitive data, so we omit it here and on FE too
         host: host,
         domPath: webInput.domPath,
         kind: webInput.kind,
