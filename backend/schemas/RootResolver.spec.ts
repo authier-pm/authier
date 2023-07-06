@@ -258,13 +258,13 @@ describe('RootResolver', () => {
   })
 
   describe('addWebInputs', () => {
-    it('should add to the DB', async () => {
+    it('should add to the DB and omit any url query when storing the url', async () => {
       const { fakeCtx } = await fakeUserAndContext()
 
       const inputs = await resolver.addWebInputs(
         [
           {
-            url: 'https://google.com',
+            url: 'https://google.com?query=123',
             kind: WebInputTypeGQL.PASSWORD,
             domOrdinal: 1,
             domPath: 'body'
@@ -274,6 +274,7 @@ describe('RootResolver', () => {
       )
 
       expect(inputs).toHaveLength(1)
+
       // @ts-expect-error
       delete inputs[0].createdAt
       // @ts-expect-error
