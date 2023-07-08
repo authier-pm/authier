@@ -19,7 +19,6 @@ import {
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
-import { getTRPCCached } from '@src/content-script/connectTRPC'
 import {
   totpSchema,
   loginCredentialsSchema
@@ -77,7 +76,6 @@ export function useDeviceState() {
     device.state
   )
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
-  const [tableView, setTableView] = useState<boolean>(false)
   const [selectedItems, setSelectedItems] = useState<
     (ILoginSecret | ITOTPSecret)[]
   >([])
@@ -183,8 +181,6 @@ export function useDeviceState() {
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
       )
     },
-    setTableView,
-    tableView,
     selectedItems,
     setSelectedItems,
     isInitialized
