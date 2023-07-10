@@ -42,7 +42,7 @@ export const getContentScriptInitialState = async (
 
   let webInputs: WebInputForAutofill[] = []
 
-  if (hostname) {
+  if (hostname && device.state?.webInputs) {
     webInputs = device.state?.webInputs.filter((i) => i.url === tabUrl) ?? []
   }
   return {

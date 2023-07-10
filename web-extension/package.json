@@ -8,7 +8,7 @@
     "sourceDir": "dist/"
   },
   "scripts": {
-    "prodBuild": "webpack --config webpack.prod.js",
+    "prodBuild": "NODE_ENV=production webpack --config webpack.prod.js",
     "devBuild": "webpack --config webpack.dev.js",
     "newTag": "npm version patch && git add package.json && npx tsx ./scripts/updateManifestVersion.ts && npx tsx ./scripts/newTag.ts",
     "clean": "rm -rf dist/js",

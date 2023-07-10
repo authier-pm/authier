@@ -89,14 +89,14 @@ test.describe.serial('Secrets management', () => {
 
     // Start waiting for new page before clicking. Note no await.
     const pagePromise = context.waitForEvent('page')
-    await page.getByRole('grid', { name: 'grid' }).getByRole('img').hover()
+    await page.getByRole('img', { name: 'item_icon' }).hover({ force: true })
     await page.getByRole('button', { name: 'open_item' }).click()
     const newPage = await pagePromise
     await newPage.waitForLoadState()
 
-    await expect(
-      newPage.getByRole('heading', { name: 'Please save the password' })
-    ).toBeVisible()
+    await expect(newPage.locator('#username')).toHaveValue(secretUsername)
+    await expect(newPage.getByLabel('Password')).toHaveValue(secretPassword)
+
     await newPage.close()
   })
 
@@ -106,7 +106,7 @@ test.describe.serial('Secrets management', () => {
 
     await page.getByRole('img', { name: 'item_icon' }).hover({ force: true })
 
-    await page.getByRole('button', { name: 'Edit item' }).click()
+    await page.getByRole('link', { name: 'edit_item' }).click()
     await page.getByRole('button', { name: 'Delete' }).click()
 
     page.on('popup', async (popup) => {
