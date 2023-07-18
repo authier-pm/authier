@@ -27,7 +27,6 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
-import { ConstructURLReturnType, constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -43,17 +42,10 @@ export interface ICapturedInput {
   inputted?: string | undefined
 }
 
-interface ILoginCredentialsFromContentScript {
-  username: string
-  password: string
-  capturedInputEvents: ICapturedInput[]
-  openInVault: boolean
-}
-
 //NOTE: temporary storage for not yet saved credentials. (during page rerender)
 export const saveLoginModalsStates = new Map<
   number,
-  { password: string; username: string }
+  { password: string; username: string | null }
 >()
 
 export const noHandsLogin = false

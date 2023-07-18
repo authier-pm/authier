@@ -372,7 +372,7 @@ export const autofill = (initState: IInitStateRes) => {
         }
 
         if (newPassword) {
-          renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
+          renderSaveCredentialsForm(null, newPassword)
         }
       },
       500,
