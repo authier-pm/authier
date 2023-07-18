@@ -42,11 +42,13 @@ export interface ICapturedInput {
   inputted?: string | undefined
 }
 
+export interface ISaveLoginModalState {
+  password: string
+  username: string | null
+}
+
 //NOTE: temporary storage for not yet saved credentials. (during page rerender)
-export const saveLoginModalsStates = new Map<
-  number,
-  { password: string; username: string | null }
->()
+export const saveLoginModalsStates = new Map<number, ISaveLoginModalState>()
 
 export const noHandsLogin = false
 let capturedInputEvents: ICapturedInput[] = []
