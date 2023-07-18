@@ -220,19 +220,17 @@ export class DeviceState implements IBackgroundStateSerializable {
     }
   }
 
-  async getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.decryptedSecrets.filter((secret) => {
+  /**
+   * here we want to get all secrets that are decrypted and match the hostname TLD. This is used for autofill in content script
+   * we only match by TLD because many services use many subdomains. For example account with mail.google.com is usable for account.google.com etc
+   */
+  async getSecretsDecryptedByTLD(host: string) {
+    const secrets = this.decryptedSecrets.filter((secret) => {
       const url = getDecryptedSecretProp(secret, 'url')
-      return url && host === constructURL(url ?? '').hostname
-    })
-    if (secrets.length === 0) {
-      secrets = this.decryptedSecrets.filter((secret) => {
-        const url = getDecryptedSecretProp(secret, 'url')
 
-        const domainAndTLD = getDomainNameAndTldFromUrl(url)
-        return domainAndTLD && host.endsWith(domainAndTLD)
-      })
-    }
+      const domainAndTLD = getDomainNameAndTldFromUrl(url)
+      return domainAndTLD && host.endsWith(domainAndTLD)
+    })
     return Promise.all(
       secrets.map((secret) => {
         return this.decryptSecret(secret)
@@ -354,7 +352,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (!hostname) {
       return undefined
     }
-    const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
+    const existingSecretsOnHostname = await this.getSecretsDecryptedByTLD(
       hostname
     )
 

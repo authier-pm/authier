@@ -32,7 +32,7 @@ export const getContentScriptInitialState = async (
   let decrypted: SecretTypeUnion[]
   if (hostname) {
     if (device.state) {
-      decrypted = await device.state.getSecretsDecryptedByHostname(hostname)
+      decrypted = await device.state.getSecretsDecryptedByTLD(hostname)
     } else {
       decrypted = []
     }
