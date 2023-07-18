@@ -26,7 +26,7 @@ export const PromptPassword = ({
   password,
   inputEvents
 }: {
-  username: string
+  username: string | null
   password: string
   inputEvents: {
     capturedInputEvents: ICapturedInput[]

@@ -27,7 +27,6 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
-import { ConstructURLReturnType, constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -43,18 +42,13 @@ export interface ICapturedInput {
   inputted?: string | undefined
 }
 
-interface ILoginCredentialsFromContentScript {
-  username: string
+export interface ISaveLoginModalState {
   password: string
-  capturedInputEvents: ICapturedInput[]
-  openInVault: boolean
+  username: string | null
 }
 
 //NOTE: temporary storage for not yet saved credentials. (during page rerender)
-export const saveLoginModalsStates = new Map<
-  number,
-  { password: string; username: string }
->()
+export const saveLoginModalsStates = new Map<number, ISaveLoginModalState>()
 
 export const noHandsLogin = false
 let capturedInputEvents: ICapturedInput[] = []
@@ -84,11 +78,11 @@ const appRouter = tc.router({
         return false
       }
 
-      const credentials: ILoginCredentialsFromContentScript = input
+      const credentials = input
       log('addLoginCredentials', credentials)
 
       const encryptedData = {
-        username: credentials.username,
+        username: credentials.username ?? deviceState.email,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
         url: urlParsed.hostname,
@@ -251,10 +245,6 @@ const appRouter = tc.router({
       )
       return true
     }),
-  clearLockInterval: tcProcedure.mutation(async () => {
-    device.clearLockInterval()
-    return true
-  }),
   setDeviceState: tcProcedure
     .input(backgroundStateSerializableLockedSchema)
     .mutation(async ({ input }) => {

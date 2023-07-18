@@ -28,6 +28,7 @@ import {
   showSavePromptIfAppropriate
 } from './contentScriptRender'
 import { getTRPCCached } from './connectTRPC'
+import type { ISaveLoginModalState } from '../background/chromeRuntimeListener'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -54,13 +55,7 @@ export interface IInitStateRes {
     kind: WebInputType
     createdAt: string
   }>
-  saveLoginModalsState?:
-    | {
-        password: string
-        username: string
-      }
-    | null
-    | undefined
+  saveLoginModalsState?: ISaveLoginModalState | null | undefined
 }
 
 // TODO spec
