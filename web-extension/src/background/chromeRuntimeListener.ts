@@ -84,11 +84,11 @@ const appRouter = tc.router({
         return false
       }
 
-      const credentials: ILoginCredentialsFromContentScript = input
+      const credentials = input
       log('addLoginCredentials', credentials)
 
       const encryptedData = {
-        username: credentials.username,
+        username: credentials.username ?? deviceState.email,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
         url: urlParsed.hostname,
@@ -251,10 +251,6 @@ const appRouter = tc.router({
       )
       return true
     }),
-  clearLockInterval: tcProcedure.mutation(async () => {
-    device.clearLockInterval()
-    return true
-  }),
   setDeviceState: tcProcedure
     .input(backgroundStateSerializableLockedSchema)
     .mutation(async ({ input }) => {

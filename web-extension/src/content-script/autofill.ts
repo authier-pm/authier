@@ -20,7 +20,7 @@ import { renderPasswordGenerator } from './renderPasswordGenerator'
 import { getTRPCCached } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
-import { device } from '../background/ExtensionDevice'
+
 import browser from 'webextension-polyfill'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
@@ -60,7 +60,7 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
       autofillValueIntoInput(usefulInputs[index], newPassword)
       autofillValueIntoInput(usefulInputs[index + 1], newPassword)
 
-      renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
+      renderSaveCredentialsForm(null, newPassword)
       return true
     } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
       renderPasswordGenerator({ input: input })

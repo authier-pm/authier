@@ -787,11 +787,14 @@ class ExtensionDevice {
       clearInterval(this.lockInterval)
     }
     this.lockInterval = null
-
-    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 }
+if (location.href.startsWith('chrome-extension://') === false) {
+  console.warn('location.href', location.href)
 
+  throw new Error(
+    'This file should only be imported in vault/popup/service worker' // importing in content script adds unnecessary performance overhead to each page user visits
+  )
+}
 export const device = new ExtensionDevice()
-
 device.initialize()

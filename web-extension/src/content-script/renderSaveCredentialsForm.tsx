@@ -8,7 +8,7 @@ const nano = h
 export let loginPrompt: HTMLDivElement | null
 
 export async function renderSaveCredentialsForm(
-  username: string,
+  username: string | null,
   password: string
 ) {
   const trpc = getTRPCCached()
