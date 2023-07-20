@@ -56,6 +56,14 @@ interface SettingsValues {
   syncTOTP: boolean
 }
 
+export const BadgeWithIcon = (props) => {
+  return (
+    <Badge display={'flex'} alignItems={'center'} {...props}>
+      {props.children}
+    </Badge>
+  )
+}
+
 const DeviceListItem = ({
   deviceInfo,
   masterDeviceId
@@ -90,25 +98,25 @@ const DeviceListItem = ({
           >
             <HStack mb={2} spacing={3}>
               {deviceInfo.id === device.id && (
-                <Badge height="min-content" colorScheme="yellow">
+                <BadgeWithIcon height="min-content" colorScheme="yellow">
                   Current
-                </Badge>
+                </BadgeWithIcon>
               )}
               {deviceInfo.id === masterDeviceId && (
-                <Badge height="min-content" colorScheme="purple">
+                <BadgeWithIcon height="min-content" colorScheme="purple">
                   Master
-                </Badge>
+                </BadgeWithIcon>
               )}
               {deviceInfo.logoutAt ? (
-                <Badge height="min-content" colorScheme="red">
+                <BadgeWithIcon height="min-content" colorScheme="red">
                   <LiaUserAltSlashSolid />
                   <Trans>Logged out</Trans>
-                </Badge>
+                </BadgeWithIcon>
               ) : (
-                <Badge height="min-content" colorScheme="green">
+                <BadgeWithIcon height="min-content" colorScheme="green">
                   <FaUserCheck />
                   <Trans>Logged in</Trans>
-                </Badge>
+                </BadgeWithIcon>
               )}
             </HStack>
 
