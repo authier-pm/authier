@@ -2,7 +2,7 @@ import getFieldNames from 'graphql-list-fields'
 import { GraphQLResolveInfo } from 'graphql'
 import set from 'lodash.set'
 
-import { DMMF } from '@prisma/client/runtime'
+import { DMMF } from '.prisma/client/runtime/index'
 import { dmmf } from '../prisma/prismaClient'
 
 /**
@@ -26,6 +26,7 @@ export const getPrismaRelationsFromGQLInfo = ({
         relationsChain.pop() // last one is always scalar field
         return relationsChain
       }
+      return null
     }) // anything that has a dot in it and capital first letter should be a prisma relation we need to load
 
   if (relationsChains.length === 0) return null

@@ -30,6 +30,7 @@ import {
   WebInputGQL,
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
+import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
@@ -41,7 +42,6 @@ import {
   DecryptionChallengeUnion
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
 
 import { isTorExit } from './isTorExit'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
