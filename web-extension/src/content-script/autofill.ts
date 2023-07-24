@@ -116,6 +116,12 @@ async function imitateKeyInput(el: HTMLInputElement, input: string) {
       dispatchAutofillEvent(change)
       // await sleep(2) // this is to make it a bit more realistic
     }
+
+    const inputEvent = new Event('input', { bubbles: true })
+    dispatchAutofillEvent(inputEvent)
+
+    const blurEvent = new Event('blur', { bubbles: true }) // this is needed, because some websites actually trigger form validation on blur. for example coinmate.io
+    dispatchAutofillEvent(blurEvent)
   } else {
     console.error('el is null')
   }
