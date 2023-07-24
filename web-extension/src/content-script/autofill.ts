@@ -77,33 +77,44 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   }
 }
 
-function imitateKeyInput(el: HTMLInputElement, input: string) {
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+
+async function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
+    const dispatchAutofillEvent = (ev) => {
+      autofillEventsDispatched.add(ev)
+      el.dispatchEvent(ev)
+    }
+    // dispatch focus event
+
     for (let i = 0; i < input.length; i++) {
       const key = input[i]
       const keyboardEventInit = {
         bubbles: false,
         cancelable: false,
         composed: false,
+
         key: key,
         keyCode: key.charCodeAt(0),
         location: 0
       }
       const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
-      autofillEventsDispatched.add(keyDown)
-      el.dispatchEvent(keyDown)
+
+      dispatchAutofillEvent(keyDown)
 
       const keyPress = new KeyboardEvent('keypress', keyboardEventInit)
-      autofillEventsDispatched.add(keyPress)
-      el.dispatchEvent(keyPress)
+
+      dispatchAutofillEvent(keyPress)
 
       const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
-      autofillEventsDispatched.add(keyUp)
-      el.dispatchEvent(keyUp)
+
+      dispatchAutofillEvent(keyUp)
+      el.value += key
 
       const change = new Event('change', { bubbles: true })
-      autofillEventsDispatched.add(change)
-      el.dispatchEvent(change)
+
+      dispatchAutofillEvent(change)
+      // await sleep(2) // this is to make it a bit more realistic
     }
   } else {
     console.error('el is null')
