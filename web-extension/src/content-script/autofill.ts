@@ -77,29 +77,34 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   }
 }
 
-function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
+function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
-    const keyboardEventInit = {
-      bubbles: false,
-      cancelable: false,
-      composed: false,
-      key: '',
-      code: '',
-      location: 0
+    for (let i = 0; i < input.length; i++) {
+      const key = input[i]
+      const keyboardEventInit = {
+        bubbles: false,
+        cancelable: false,
+        composed: false,
+        key: key,
+        keyCode: key.charCodeAt(0),
+        location: 0
+      }
+      const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
+      autofillEventsDispatched.add(keyDown)
+      el.dispatchEvent(keyDown)
+
+      const keyPress = new KeyboardEvent('keypress', keyboardEventInit)
+      autofillEventsDispatched.add(keyPress)
+      el.dispatchEvent(keyPress)
+
+      const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
+      autofillEventsDispatched.add(keyUp)
+      el.dispatchEvent(keyUp)
+
+      const change = new Event('change', { bubbles: true })
+      autofillEventsDispatched.add(change)
+      el.dispatchEvent(change)
     }
-    const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
-    autofillEventsDispatched.add(keyDown)
-    el.dispatchEvent(keyDown)
-
-    el.value = keyChar
-
-    const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
-    autofillEventsDispatched.add(keyUp)
-    el.dispatchEvent(keyUp)
-
-    const change = new Event('change', { bubbles: true })
-    autofillEventsDispatched.add(change)
-    el.dispatchEvent(change)
   } else {
     console.error('el is null')
   }
