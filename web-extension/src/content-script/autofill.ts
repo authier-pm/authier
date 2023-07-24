@@ -77,9 +77,7 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   }
 }
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
-
-async function imitateKeyInput(el: HTMLInputElement, input: string) {
+function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
     const dispatchAutofillEvent = (ev) => {
       autofillEventsDispatched.add(ev)
