@@ -77,29 +77,49 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   }
 }
 
-function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
+function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
-    const keyboardEventInit = {
-      bubbles: false,
-      cancelable: false,
-      composed: false,
-      key: '',
-      code: '',
-      location: 0
+    const dispatchAutofillEvent = (ev) => {
+      autofillEventsDispatched.add(ev)
+      el.dispatchEvent(ev)
     }
-    const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
-    autofillEventsDispatched.add(keyDown)
-    el.dispatchEvent(keyDown)
+    // dispatch focus event
 
-    el.value = keyChar
+    for (let i = 0; i < input.length; i++) {
+      const key = input[i]
+      const keyboardEventInit = {
+        bubbles: false,
+        cancelable: false,
+        composed: false,
 
-    const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
-    autofillEventsDispatched.add(keyUp)
-    el.dispatchEvent(keyUp)
+        key: key,
+        keyCode: key.charCodeAt(0),
+        location: 0
+      }
+      const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
 
-    const change = new Event('change', { bubbles: true })
-    autofillEventsDispatched.add(change)
-    el.dispatchEvent(change)
+      dispatchAutofillEvent(keyDown)
+
+      const keyPress = new KeyboardEvent('keypress', keyboardEventInit)
+
+      dispatchAutofillEvent(keyPress)
+
+      const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
+
+      dispatchAutofillEvent(keyUp)
+      el.value += key
+
+      const change = new Event('change', { bubbles: true })
+
+      dispatchAutofillEvent(change)
+      // await sleep(2) // this is to make it a bit more realistic
+    }
+
+    const inputEvent = new Event('input', { bubbles: true })
+    dispatchAutofillEvent(inputEvent)
+
+    const blurEvent = new Event('blur', { bubbles: true }) // this is needed, because some websites actually trigger form validation on blur. for example coinmate.io
+    dispatchAutofillEvent(blurEvent)
   } else {
     console.error('el is null')
   }
