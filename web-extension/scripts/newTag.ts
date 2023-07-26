@@ -5,10 +5,11 @@ import { dir } from '../scripts/updateManifestVersion'
 
 async function pushNewTag() {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType
-  const version = pkg.version
+  const { version } = pkg
 
+  const tagName = `v${version}-extension`
   exec(
-    `git tag -a v${version}-extension -m "version ${version}" && git push origin v${version}`,
+    `git tag -a ${tagName} -m "version ${version}" && git push origin ${tagName}`,
     (error, stdout, stderr) => {
       if (error) {
         console.error(`Failed to create or push git tag: ${error}`)
@@ -18,7 +19,7 @@ async function pushNewTag() {
         console.error(`stderr: ${stderr}`)
         return
       }
-      console.log(`Git tag created: v${version}`)
+      console.log(stdout)
     }
   )
 }
