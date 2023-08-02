@@ -1,13 +1,24 @@
-import { Button, Flex, IconButton } from '@chakra-ui/react'
+import {
+  Button,
+  Flex,
+  HStack,
+  IconButton,
+  Tooltip,
+  useToast
+} from '@chakra-ui/react'
 import { useNavigate } from 'react-router-dom'
 import { useFormikContext } from 'formik'
 
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { DeleteIcon } from '@chakra-ui/icons'
 import { SecretTypeUnion } from '@src/background/ExtensionDevice'
+import { IoDuplicate } from 'react-icons/io5'
+import { t } from '@lingui/macro'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 
 export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
   const navigate = useNavigate()
+  const toast = useToast()
 
   const { isSubmitting, dirty } = useFormikContext()
 
@@ -18,15 +29,6 @@ export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
       my={5}
       alignItems={'baseline'}
     >
-      {secret && (
-        <DeleteSecretButton secrets={[secret]}>
-          <IconButton
-            colorScheme="red"
-            aria-label="Delete"
-            icon={<DeleteIcon />}
-          />
-        </DeleteSecretButton>
-      )}
       <Button
         _focus={{
           bg: 'gray.200'
@@ -42,6 +44,39 @@ export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
       >
         Go back
       </Button>
+      {secret && (
+        <HStack spacing={10}>
+          <DeleteSecretButton secrets={[secret]}>
+            <Tooltip label={t`delete secret`}>
+              <IconButton
+                colorScheme="red"
+                aria-label="Delete"
+                icon={<DeleteIcon />}
+              />
+            </Tooltip>
+          </DeleteSecretButton>
+          <Tooltip label={t`copy whole secret`}>
+            <IconButton
+              onClick={() => {
+                let stringified
+                if (secret.kind === EncryptedSecretType.TOTP) {
+                  stringified = JSON.stringify(secret.totp)
+                } else {
+                  stringified = `url: ${secret.loginCredentials.url}\nlabel: ${secret.loginCredentials.label}\nusername: ${secret.loginCredentials.username}\npassword: ${secret.loginCredentials.password}`
+                }
+
+                navigator.clipboard.writeText(stringified)
+                toast({
+                  title: t`Copied to clipboard`,
+                  status: 'success'
+                })
+              }}
+              aria-label={t`copy whole secret`}
+              icon={<IoDuplicate></IoDuplicate>}
+            ></IconButton>
+          </Tooltip>
+        </HStack>
+      )}
 
       <Button
         isDisabled={isSubmitting || !dirty}
