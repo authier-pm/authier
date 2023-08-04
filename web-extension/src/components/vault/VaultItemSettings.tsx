@@ -14,7 +14,8 @@ import {
   FormErrorMessage,
   FormLabel,
   Tooltip,
-  Box
+  Box,
+  useToast
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
@@ -25,7 +26,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { Field, Formik, FormikHelpers } from 'formik'
-import { Trans } from '@lingui/macro'
+import { Trans, t } from '@lingui/macro'
 import { motion } from 'framer-motion'
 import {
   TOTPSchema,
@@ -33,6 +34,7 @@ import {
   credentialValues
 } from '@shared/formikSharedTypes'
 import { EditFormButtons } from './EditFormButtons'
+import { IoDuplicateOutline } from 'react-icons/io5'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -191,6 +193,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
 const LoginSecret = (secretProps: ILoginSecret) => {
   const [show, setShow] = useState(false)
   const navigate = useNavigate()
+  const toast = useToast()
 
   const { isOpen, onToggle } = useDisclosure()
   const handleClick = () => setShow(!show)
@@ -313,21 +316,37 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       isInvalid={!!errors.password && touched.password}
                     >
                       <FormLabel htmlFor="password">Password:</FormLabel>
+                      <Flex>
+                        <InputGroup size="md">
+                          <Field
+                            as={Input}
+                            id="password"
+                            name="password"
+                            pr="4.5rem"
+                            type={show ? 'text' : 'password'}
+                          />
+                          <InputRightElement width="4.5rem">
+                            <Button h="1.75rem" size="sm" onClick={handleClick}>
+                              {show ? 'Hide' : 'Show'}
+                            </Button>
+                          </InputRightElement>
+                        </InputGroup>
+                        <Tooltip label={t`copy password`}>
+                          <IconButton
+                            ml={2}
+                            icon={<IoDuplicateOutline />}
+                            aria-label={`copy password`}
+                            onClick={() => {
+                              navigator.clipboard.writeText(values.password)
+                              toast({
+                                title: t`Copied to clipboard`,
+                                status: 'success'
+                              })
+                            }}
+                          ></IconButton>
+                        </Tooltip>
+                      </Flex>
 
-                      <InputGroup size="md">
-                        <Field
-                          as={Input}
-                          id="password"
-                          name="password"
-                          pr="4.5rem"
-                          type={show ? 'text' : 'password'}
-                        />
-                        <InputRightElement width="4.5rem">
-                          <Button h="1.75rem" size="sm" onClick={handleClick}>
-                            {show ? 'Hide' : 'Show'}
-                          </Button>
-                        </InputRightElement>
-                      </InputGroup>
                       <Progress
                         value={levelOfPsw.id}
                         size="xs"
