@@ -116,7 +116,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     const ipAddress = ctx.getIpAddress()
 
     let device = await ctx.prisma.device.findUnique({
-      // TODO change this to upsert
       where: { id: deviceId }
     })
 
@@ -125,7 +124,12 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 
     if (device) {
       if (device.userId !== user.id) {
-        throw new GraphqlError('Device is already registered for another user') // prevents users from circumventing our limits by using multiple accounts
+        const deviceOwner = await ctx.prisma.user.findUniqueOrThrow({
+          where: { id: device.userId }
+        })
+        throw new GraphqlError(
+          `Device is already registered with user ${deviceOwner.email}`
+        ) // prevents users from circumventing our limits by using multiple accounts
       }
 
       device = await ctx.prisma.device.update({
