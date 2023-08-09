@@ -71,8 +71,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     @Arg('input', () => AddNewDeviceInput) input: AddNewDeviceInput,
     @Arg('currentAddDeviceSecret', () => GraphQLNonEmptyString)
     currentAddDeviceSecret: string,
-    @Ctx() ctx: IContext,
-    @Info() info: GraphQLResolveInfo
+    @Ctx() ctx: IContext
   ) {
     const { id, deviceId, userId } = this
 
