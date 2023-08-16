@@ -30,7 +30,7 @@
     "Notifications"
   ],
   "dependencies": {
-    "@apollo/client": "^3.7.17",
+    "@apollo/client": "^3.8.1",
     "@babel/preset-env": "^7.22.2",
     "@babel/preset-react": "^7.22.3",
     "@hookform/resolvers": "^2.9.11",
