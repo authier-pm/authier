@@ -23,6 +23,7 @@ import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
+import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
 import { Device, User, WebInput } from '.prisma/client'
 
@@ -30,7 +31,6 @@ import {
   WebInputGQL,
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
-import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
 import { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
@@ -486,18 +486,25 @@ export class RootResolver {
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
       }
-      const input = await ctx.prisma.webInput.upsert({
-        create: forUpsert,
-        update: forUpsert,
-        where: {
-          webInputIdentifier: {
+
+      try {
+        // prisma is weird because it is throwing unique constraint conflict errors here. upsert should never throw that.
+        const input = await ctx.prisma.webInput.upsert({
+          create: forUpsert,
+          update: forUpsert,
+          where: {
+            domPath: webInput.domPath,
             url: webInput.url,
-            domPath: webInput.domPath
+            webInputIdentifier: {
+              url: webInput.url,
+              domPath: webInput.domPath
+            }
           }
-        }
-      })
-      // @ts-ignore TODO figure out why this errors only on local, but not on CI
-      returnedInputs.push(input)
+        })
+        returnedInputs.push(input)
+      } catch (err: any) {
+        console.warn('error adding web input', err)
+      }
     }
     return returnedInputs
   }

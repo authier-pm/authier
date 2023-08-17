@@ -381,6 +381,9 @@ importers:
       '@ts-react/form':
         specifier: ^1.6.4
         version: 1.8.2(@hookform/resolvers@2.9.11)(react-hook-form@7.45.2)(react@18.2.0)(zod@3.21.4)
+      '@tsconfig/react-native':
+        specifier: ^3.0.2
+        version: 3.0.2
       apollo-link-http:
         specifier: ^1.5.17
         version: 1.5.17(graphql@16.7.1)
@@ -10877,6 +10880,10 @@ packages:
   /@tsconfig/node16@1.0.4:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
     dev: true
+
+  /@tsconfig/react-native@3.0.2:
+    resolution: {integrity: sha512-F7IoHEqf741lut4Z2K+IkWQRvXAhBiZMeY5L7BysG7Z2Z3MlIyFR+AagD8jQ/CqC1vowGnRwfLjeuwIpaeoJxA==}
+    dev: false
 
   /@types/aria-query@5.0.1:
     resolution: {integrity: sha512-XTIieEY+gvJ39ChLcB4If5zHtPxt3Syj5rgZR+e1ctpmK8NjPf0zFqsz4JpLJT0xla9GFDKjy8Cpu331nrmE1Q==}

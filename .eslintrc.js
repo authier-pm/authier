@@ -24,7 +24,9 @@ module.exports = {
     'no-var': 'error',
     'array-callback-return': 'error',
     'getter-return': 'error',
-    'comma-dangle': 'off'
+    'comma-dangle': 'off',
+    'no-unused-vars': 'off',
+    '@typescript-eslint/no-unused-vars': 'off' // this does not work correctly for type imports
   },
   settings: {
     react: {
