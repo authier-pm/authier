@@ -60,6 +60,7 @@
     "@shopify/flash-list": "^1.4.3",
     "@testing-library/react": "^14.0.0",
     "@ts-react/form": "^1.6.4",
+    "@tsconfig/react-native": "^3.0.2",
     "apollo-link-http": "^1.5.17",
     "apollo-link-queue": "^3.1.0",
     "apollo-link-retry": "^2.2.16",

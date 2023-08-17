@@ -134,7 +134,7 @@ interface DeviceProps {
   platform: 'android' | 'ios' | 'web' | 'windows' | 'macos' | 'linux'
   name: string
   biometricsAvailable: boolean
-  lockInterval: NodeJS.Timer | null
+  lockInterval: number | null
   isInitialized: boolean
 }
 
@@ -449,7 +449,7 @@ export const useDeviceStore = create<Device>()(
               console.log('Vault locking', state.lockTimeEnd)
               get().lock()
             }
-          }, 5000)
+          }, 5000) as any as number // TODO figure out why typescript thinks it's running in node. We only have node types in the parent folder
         })
       },
       setLockTime: (lockTime: number) => {
