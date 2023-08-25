@@ -549,9 +549,6 @@ importers:
       vision-camera-code-scanner:
         specifier: ^0.2.0
         version: 0.2.0(react-native-vision-camera@2.15.4)(react-native@0.71.11)(react@18.2.0)
-      zod:
-        specifier: ^3.21.4
-        version: 3.21.4
       zustand:
         specifier: ^4.3.8
         version: 4.3.9(react@18.2.0)
@@ -1016,9 +1013,6 @@ importers:
       webpack-merge:
         specifier: ^5.9.0
         version: 5.9.0
-      zod:
-        specifier: 3.22.2
-        version: 3.22.2
 
 packages:
 
