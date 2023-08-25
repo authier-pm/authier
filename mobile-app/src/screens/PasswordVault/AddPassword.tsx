@@ -22,7 +22,10 @@ import { ToastType } from '../../ToastTypes'
 
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import zxcvbn from 'zxcvbn-typescript'
-
+import {
+  defaultPasswordGeneratorConfig,
+  generate
+} from '@shared/passwordGenerator'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 
 const InputField = ({
@@ -64,7 +67,7 @@ export const AddPassword = () => {
     <Formik
       initialValues={{
         url: '',
-        password: '',
+        password: generate(defaultPasswordGeneratorConfig),
         label: '',
         username: ''
       }}
