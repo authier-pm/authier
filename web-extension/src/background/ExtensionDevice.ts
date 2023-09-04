@@ -466,7 +466,7 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
-  lockInterval: NodeJS.Timer | null
+  lockInterval: number | null
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
@@ -756,6 +756,7 @@ class ExtensionDevice {
   }
 
   startVaultLockTimer() {
+    // @ts-expect-error
     this.lockInterval = setInterval(() => {
       const now = Date.now()
       if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {
