@@ -38,7 +38,7 @@
     "framer-motion": "^10",
     "generate-password": "^1.7.0",
     "husky": "^8.0.3",
-    "prettier": "^2.8.8",
+    "prettier": "^3.0.3",
     "pretty-quick": "^3.1.3",
     "typescript": "^5.2.2",
     "vite-tsconfig-paths": "^4.2.0",
