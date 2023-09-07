@@ -94,7 +94,7 @@
     "webpack-merge": "^5.9.0"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.2",
+    "@apollo/client": "^3.8.3",
     "@apollo/react-hooks": "^4.0.0",
     "@chakra-ui/color-mode": "^2.2.0",
     "@chakra-ui/icons": "^2.1.0",
