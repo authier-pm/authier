@@ -14,10 +14,7 @@ import {
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { passwordStrength } from 'check-password-strength'
-import {
-  defaultPasswordGeneratorConfig,
-  PasswordGenerator
-} from '@src/components/vault/PasswordGenerator'
+import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
 import { Field, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
@@ -27,6 +24,7 @@ import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import { EditFormButtons } from '../EditFormButtons'
 import { generate } from 'generate-password'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
+import { defaultPasswordGeneratorConfig } from '@shared/passwordGenerator'
 
 export const AddLogin = () => {
   const navigate = useNavigate()
