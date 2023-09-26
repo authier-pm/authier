@@ -1,7 +1,8 @@
 import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
-import { GraphQLUUID } from 'graphql-scalars'
+
 import { UserMutation } from './UserMutation'
+import { GraphQLUUID } from 'graphql-scalars'
 
 @ObjectType()
 export class DecryptionChallengeResponse {

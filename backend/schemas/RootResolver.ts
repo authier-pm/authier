@@ -21,6 +21,7 @@ import { constructURL } from '../../shared/urlUtils'
 import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
@@ -45,6 +46,7 @@ import { plainToClass } from 'class-transformer'
 
 import { isTorExit } from './isTorExit'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
+
 const log = debug('au:RootResolver')
 
 export interface IContext {

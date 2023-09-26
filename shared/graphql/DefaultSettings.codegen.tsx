@@ -13,7 +13,7 @@ export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me:
 export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id?: number | null, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`

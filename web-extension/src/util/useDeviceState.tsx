@@ -171,8 +171,11 @@ export function useDeviceState() {
         const url = getDecryptedSecretProp(item, 'url')
         return (
           label.includes(filterBy) ||
+          label.toLowerCase().includes(filterBy.toLowerCase()) ||
           url.includes(filterBy) ||
+          url.toLowerCase().includes(filterBy.toLowerCase()) ||
           username.includes(filterBy) ||
+          username.toLowerCase().includes(filterBy.toLowerCase()) ||
           getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
         )
       })
