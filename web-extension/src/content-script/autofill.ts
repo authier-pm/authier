@@ -212,6 +212,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
 }
 
 export let passwordFilledForThisPage = false
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 let onInputAddedHandler = (inputEl: any) => {}
 
 const filledElements: Array<HTMLInputElement | null> = []

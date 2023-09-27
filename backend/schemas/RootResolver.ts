@@ -495,8 +495,6 @@ export class RootResolver {
           create: forUpsert,
           update: forUpsert,
           where: {
-            domPath: webInput.domPath,
-            url: webInput.url,
             webInputIdentifier: {
               url: webInput.url,
               domPath: webInput.domPath
@@ -504,7 +502,7 @@ export class RootResolver {
           }
         })
         returnedInputs.push(input)
-      } catch (err: any) {
+      } catch (err: unknown) {
         console.warn('error adding web input', err)
       }
     }
