@@ -8,6 +8,8 @@ import { ColorModeScript } from '@chakra-ui/react'
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
 import { ExtensionProviders } from './ExtensionProviders'
 import { VaultRouter } from './pages-vault/VaultRouter'
+import { QueryParamProvider } from 'use-query-params'
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6'
 
 Sentry.init({
   dsn: 'https://528d6bfc04eb436faea6046afc419f56@o997539.ingest.sentry.io/5955889'
@@ -17,14 +19,16 @@ let vaultRoot: ReactDOM.Root
 export const renderVault = () => {
   vaultRoot.render(
     <HashRouter basename="/">
-      <ApolloProvider client={apolloClient}>
-        <ColorModeScript
-          initialColorMode={chakraRawTheme.config?.initialColorMode}
-        />
-        <ExtensionProviders>
-          <VaultRouter />
-        </ExtensionProviders>
-      </ApolloProvider>
+      <QueryParamProvider adapter={ReactRouter6Adapter}>
+        <ApolloProvider client={apolloClient}>
+          <ColorModeScript
+            initialColorMode={chakraRawTheme.config?.initialColorMode}
+          />
+          <ExtensionProviders>
+            <VaultRouter />
+          </ExtensionProviders>
+        </ApolloProvider>
+      </QueryParamProvider>
     </HashRouter>
   )
 }

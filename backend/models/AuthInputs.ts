@@ -1,10 +1,10 @@
+import { Field, ID, InputType } from 'type-graphql'
+import { EncryptedSecretPatchInput } from './models'
 import {
   GraphQLEmailAddress,
   GraphQLNonEmptyString,
   GraphQLPositiveInt
 } from 'graphql-scalars'
-import { Field, ID, InputType } from 'type-graphql'
-import { EncryptedSecretPatchInput } from './models'
 
 @InputType()
 export class AddNewDeviceInput {
