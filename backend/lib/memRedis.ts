@@ -1,9 +1,8 @@
 import objectHash from 'object-hash'
-import mimicFn from 'mimic-fn'
 import { redisClient } from './redisClient'
 import debug from 'debug'
 
-const log = debug('au:memRedis')
+const log = debug('dh:memRedis')
 // in many cases this is better than simple in memory memoization because it memoizes across multiple API instances
 export const memRedis = <T>(
   fn: T,
@@ -29,11 +28,15 @@ export const memRedis = <T>(
       cacheKey ? cacheKey(arguments_) : objectHash(arguments_)
     ].join('_')
 
-    const cacheItem = await redisClient.get<any>(key)
+    const cacheItem = await redisClient.get(key)
 
     if (cacheItem) {
       log('cache hit', key)
-      return cacheItem.data
+
+      if (typeof cacheItem === 'string') {
+        return JSON.parse(cacheItem)
+      }
+      // we ignore the cache
     }
 
     log('cache miss', key)
@@ -44,16 +47,14 @@ export const memRedis = <T>(
       await redisClient.setex(
         key,
         typeof maxAge === 'number' ? maxAge : maxAge(arguments_),
-        JSON.stringify({ data: result })
+        JSON.stringify(result)
       )
     } else {
-      await redisClient.set(key, JSON.stringify({ data: result }))
+      await redisClient.set(key, JSON.stringify(result))
     }
 
     return result
   }
-  // @ts-expect-error
-  mimicFn(memoized, fn)
 
   return {
     // @ts-expect-error
