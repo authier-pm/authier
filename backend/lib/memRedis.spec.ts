@@ -4,7 +4,7 @@ import { memRedis } from './memRedis'
 import { redisClient } from './redisClient'
 
 describe('memRedis', () => {
-  let sampleFn: { memoized: any; clear: () => Promise<number> }
+  let sampleFn: { memoized: any; clear: () => Promise<number[]> }
 
   let evalCount = 0
   //  function to be memoized
