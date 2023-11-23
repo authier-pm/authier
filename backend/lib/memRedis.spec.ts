@@ -1,10 +1,10 @@
-import { describe, it, expect, beforeEach, afterEach, afterAll } from 'vitest'
+import { describe, it, expect, afterEach, beforeAll } from 'vitest'
 
 import { memRedis } from './memRedis'
 import { redisClient } from './redisClient'
 
 describe('memRedis', () => {
-  let sampleFn: { memoized: any; clear?: () => Promise<number> }
+  let sampleFn: { memoized: any; clear: () => Promise<number> }
 
   let evalCount = 0
   //  function to be memoized
@@ -12,7 +12,7 @@ describe('memRedis', () => {
     evalCount++
     return arg * 2
   }
-  beforeEach(async () => {
+  beforeAll(async () => {
     sampleFn = memRedis(sampleFunction, {
       cacheKey: (args) => `test-key-${args[0]}`,
       maxAge: 60,
@@ -20,7 +20,7 @@ describe('memRedis', () => {
     })
   })
 
-  afterAll(async () => {
+  beforeAll(async () => {
     await redisClient.flushall()
   })
 
@@ -32,8 +32,10 @@ describe('memRedis', () => {
     const result = await sampleFn.memoized(1)
     expect(result).toBe(2)
     // Check Redis to confirm the value is cached
-    const cachedValue = await redisClient.get('test-prefix_test-key-1')
-    expect(JSON.parse(cachedValue as string)).toBe(2)
+    const cachedValue = (await redisClient.get('test-prefix_test-key-1')) as {
+      data: number
+    }
+    expect(cachedValue?.data).toBe(2)
   })
 
   it('should return cached value on subsequent calls (cache hit)', async () => {
@@ -42,7 +44,7 @@ describe('memRedis', () => {
     expect(res).toBe(4)
     // Second call should hit the cache
     const result = await sampleFn.memoized(2)
-    console.log('result:', result)
+
     expect(evalCount).toBe(1)
 
     expect(result).toBe(4)
@@ -51,11 +53,8 @@ describe('memRedis', () => {
   it('should clear the cache correctly', async () => {
     await sampleFn.memoized(3)
     // Clear the cache
-    const { clear } = memRedis(sampleFunction, {
-      maxAge: 60,
-      cachePrefix: 'test-prefix'
-    })
-    await clear()
+
+    await sampleFn.clear()
     // Cache should be empty now
     const cachedValue = await redisClient.get('test-prefix_test-key-3')
     expect(cachedValue).toBeNull()
