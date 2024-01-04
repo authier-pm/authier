@@ -15,9 +15,9 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@apollo/client": "^3.8.4",
-    "@chakra-ui/react": "2.8.1",
-    "@emotion/react": "^11.11.1",
+    "@apollo/client": "^3.8.8",
+    "@chakra-ui/react": "2.8.2",
+    "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
     "@graphql-codegen/cli": "^5.0.0",
     "@graphql-codegen/fragment-matcher": "^5.0.0",
@@ -25,39 +25,35 @@
     "@graphql-codegen/near-operation-file-preset": "^3.0.0",
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
-    "@graphql-codegen/typescript-react-apollo": "^4.0.0",
-    "@types/jest": "^29.5.5",
-    "@types/node": "^20.7.0",
-    "@typescript-eslint/eslint-plugin": "^6.7.3",
-    "@typescript-eslint/parser": "^6.7.3",
-    "eslint": "^8.50.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-plugin-jest": "^27.4.0",
-    "eslint-plugin-prettier": "^5.0.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.1.0",
+    "@types/jest": "^29.5.11",
+    "@types/node": "^20.10.6",
+    "@typescript-eslint/eslint-plugin": "^6.17.0",
+    "@typescript-eslint/parser": "^6.17.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-jest": "^27.6.1",
+    "eslint-plugin-prettier": "^5.1.2",
     "eslint-plugin-react": "^7.33.2",
     "framer-motion": "^10",
-    "generate-password": "^1.7.0",
+    "generate-password": "^1.7.1",
     "husky": "^8.0.3",
-    "lint-staged": "^14.0.1",
-    "prettier": "^3.0.3",
-    "typescript": "^5.2.2",
-    "vite-tsconfig-paths": "^4.2.1",
-    "zod": "^3.22.2",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.1.1",
+    "typescript": "^5.3.3",
+    "vite-tsconfig-paths": "^4.2.3",
+    "zod": "^3.22.4",
     "zx": "^7.2.3"
   },
   "scripts": {
     "devBE": "cd backend && pnpm run dev",
     "devEX": "cd web-extension && pnpm run dev",
     "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd mobile-app && tsc",
+    "bumpDeps": "ncu -u && cd backend && ncu -u && cd .. && cd web-extension && ncu -u",
     "test": "cd backend && pnpm test && cd .. && cd web-extension && pnpm test",
     "gfs": "graphql-codegen --config codegen.yml",
     "gbs": "cd backend && pnpm gbs",
     "schemas": "pnpm gbs && pnpm gfs",
     "preinstall": "npx only-allow pnpm"
-  },
-  "pnpm": {
-    "patchedDependencies": {
-      "graphql-scalars@1.22.2": "patches/graphql-scalars@1.22.2.patch"
-    }
   }
 }
