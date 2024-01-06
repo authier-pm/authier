@@ -7,7 +7,9 @@
     "graphql": "^16.7.1"
   },
   "lint-staged": {
-    "*": "prettier --write"
+    "*.{js,jsx,ts,tsx,md,json,yaml,yml}": [
+      "prettier --write"
+    ]
   },
   "dependencies": {
     "@fastify/aws-lambda": "3.5.0",

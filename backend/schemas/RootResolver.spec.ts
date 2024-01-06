@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { prismaClient } from '../prisma/prismaClient'
-import { IContextAuthenticated, RootResolver } from './RootResolver'
+import { IContext, IContextAuthenticated, RootResolver } from './RootResolver'
 import { faker } from '@faker-js/faker'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
@@ -12,6 +12,7 @@ import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 import { defaultDeviceSettingSystemValues } from 'models/defaultDeviceSettingSystemValues'
+import { GraphQLResolveInfo } from 'graphql'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -19,7 +20,7 @@ const userSecurityProps = {
   TOTPlimit: 4
 }
 
-describe('RootResolver', () => {
+describe.only('RootResolver', () => {
   const resolver = new RootResolver()
 
   describe('me', () => {
@@ -42,7 +43,7 @@ describe('RootResolver', () => {
             prisma: prismaClient,
             jwtPayload: { userId: user.id }
           } as IContextAuthenticated,
-          {} as any
+          {} as GraphQLResolveInfo
         )
       ).toMatchObject(user)
     })
@@ -133,7 +134,7 @@ describe('RootResolver', () => {
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        '"Device f025212b-8007-4ffd-a507-21582ec854f5 already exists. You cannot use a device with multiple accounts."'
+        `[Error: Device f025212b-8007-4ffd-a507-21582ec854f5 already exists. You cannot use a device with multiple accounts.]`
       )
     })
   })
@@ -257,7 +258,7 @@ describe('RootResolver', () => {
     })
   })
 
-  describe('addWebInputs', () => {
+  describe.only('addWebInputs', () => {
     it('should add to the DB and omit any url query when storing the url', async () => {
       const { fakeCtx } = await fakeUserAndContext()
 
