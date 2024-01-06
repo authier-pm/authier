@@ -20,7 +20,7 @@ const userSecurityProps = {
   TOTPlimit: 4
 }
 
-describe.only('RootResolver', () => {
+describe('RootResolver', () => {
   const resolver = new RootResolver()
 
   describe('me', () => {
@@ -258,7 +258,7 @@ describe.only('RootResolver', () => {
     })
   })
 
-  describe.only('addWebInputs', () => {
+  describe('addWebInputs', () => {
     it('should add to the DB and omit any url query when storing the url', async () => {
       const { fakeCtx } = await fakeUserAndContext()
 
