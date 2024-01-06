@@ -16,7 +16,7 @@ import path from 'path'
     outfile: 'dist/lambda.js',
     external: ['@prisma/client', 'stripe'],
     platform: 'node',
-    target: 'node18',
+    target: 'node20',
     plugins: [
       esbuildDecorators({
         tsconfig: 'tsconfig.json',

@@ -37,7 +37,7 @@ jobs:
                 max = parseInt(env.maxAttempts);
               assert(attempt && max && max >= attempt);
               return attempt < max ? attempt + 1 : '';
-            }            
+            }
 
       - uses: actions/checkout@v2
 
@@ -71,7 +71,7 @@ jobs:
           extensionId: ${{ secrets.G_EXTENSION_ID }}
           apiAccessToken: ${{ steps.fetchAccessToken.outputs.accessToken }}
           waitForUploadCheckCount: 10
-          waitForUploadCheckIntervalMs: 180000    # 3 minutes
+          waitForUploadCheckIntervalMs: 180000 # 3 minutes
 
       # Schedule a next attempt if store refused to accept new version because it
       # still has a previous one in review
@@ -120,4 +120,3 @@ jobs:
         with:
           name: ${{ env.WEBSTORE_CRX_FILE_NAME }}
           path: ${{ env.WEBSTORE_CRX_FILE_PATH }}
-

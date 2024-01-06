@@ -16,7 +16,7 @@ export class AwsCdkAuthierStack extends Stack {
     const backendApi = new lambda.Function(this, 'backend-api', {
       memorySize: 512,
       timeout: cdk.Duration.seconds(40),
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       architecture: Architecture.ARM_64,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../dist')),
