@@ -16,6 +16,7 @@ console.log('~ dbUrl', dbUrl)
 
 const workerId = process.env.VITEST_WORKER_ID
 if (workerId) {
+  dbUrl = dbUrl?.includes('?') ? dbUrl?.split('?')[0] : dbUrl
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
   dbUrl = `${dbUrl}_test_${
     vitestWorkerId + 1
