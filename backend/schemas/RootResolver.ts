@@ -246,7 +246,7 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
-    description: 'returns a decryption challenge',
+    description: 'returns a decryption challenge, used when logging in',
     nullable: true
   })
   async deviceDecryptionChallenge(
@@ -257,11 +257,11 @@ export class RootResolver {
   ) {
     const ipAddress = ctx.getIpAddress()
 
-    if (await isTorExit(ipAddress)) {
-      throw new GraphqlError(
-        'Tor exit nodes are prohibited from login/adding new devices.'
-      )
-    }
+    // if (await isTorExit(ipAddress)) { // this is broken ATM, TODO figure out another way to check for tor exit nodes
+    //   throw new GraphqlError(
+    //     'Tor exit nodes are prohibited from login/adding new devices.'
+    //   )
+    // }
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
