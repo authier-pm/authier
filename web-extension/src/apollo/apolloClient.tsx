@@ -10,6 +10,8 @@ import { errorLink } from '@shared/errorLink'
 import { tokenRefresh } from './tokenRefresh'
 import SerializingLink from 'apollo-link-serialize'
 
+export const apolloCache = new InMemoryCache()
+
 export const API_URL = process.env.API_URL as string
 console.log('API_URL', API_URL)
 const httpLink = createHttpLink({
@@ -41,6 +43,6 @@ export const apolloClient = new ApolloClient({
     authLink,
     httpLink
   ]),
-  cache: new InMemoryCache(),
+  cache: apolloCache,
   queryDeduplication: true
 })

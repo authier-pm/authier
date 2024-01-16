@@ -718,6 +718,9 @@ importers:
       apollo-link-token-refresh:
         specifier: ^0.6.1
         version: 0.6.1(@apollo/client@3.8.9)(@types/node@20.10.6)(graphql@16.8.1)(typescript@5.3.3)
+      apollo3-cache-persist:
+        specifier: ^0.14.1
+        version: 0.14.1(@apollo/client@3.8.9)
       babel-plugin-macros:
         specifier: ^3.1.0
         version: 3.1.0
@@ -12285,6 +12288,14 @@ packages:
       '@apollo/client': ^3.2.5
     dependencies:
       '@apollo/client': 3.8.8(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+    dev: false
+
+  /apollo3-cache-persist@0.14.1(@apollo/client@3.8.9):
+    resolution: {integrity: sha512-p/jNzN/MmSd0TmY7/ts0B3qi0SdQ3w9yNLQdKqB3GGb9xATUlAum2v4hSrTeWd/DZKK2Z7Xg5kFXTH6nNVnKSQ==}
+    peerDependencies:
+      '@apollo/client': ^3.2.5
+    dependencies:
+      '@apollo/client': 3.8.9(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /appcenter-cli@2.14.0(webpack@5.89.0):
