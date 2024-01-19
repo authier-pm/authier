@@ -385,7 +385,7 @@ type Mutation {
   ): LoginResponse!
 
   """
-  returns a decryption challenge
+  returns a decryption challenge, used when logging in
   """
   deviceDecryptionChallenge(
     deviceInput: DeviceInput!
