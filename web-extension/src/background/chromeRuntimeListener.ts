@@ -10,7 +10,7 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
-import { createChromeHandler } from 'trpc-chrome/adapter'
+import { createChromeHandler } from '@capaj/trpc-browser/adapter'
 import { device, isRunningInBgServiceWorker } from './ExtensionDevice'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
 
