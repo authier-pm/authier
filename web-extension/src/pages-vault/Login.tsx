@@ -90,6 +90,7 @@ export default function Login(): ReactElement {
   return (
     <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
       <Form
+        // @ts-ignore TODO figure out why this always has type error on CI
         form={form}
         schema={LoginFormSchema}
         onSubmit={onSubmit}

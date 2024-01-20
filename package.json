@@ -15,7 +15,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@apollo/client": "^3.8.8",
+    "@apollo/client": "^3.8.10",
     "@chakra-ui/react": "2.8.2",
     "@emotion/react": "^11.11.3",
     "@emotion/styled": "^11.11.0",
