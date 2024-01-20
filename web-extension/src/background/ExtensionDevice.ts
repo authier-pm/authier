@@ -47,7 +47,7 @@ import {
 import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
-import { chromeLink } from 'trpc-chrome/link'
+import { chromeLink } from '@capaj/trpc-browser/link'
 import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import {
@@ -352,9 +352,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (!hostname) {
       return undefined
     }
-    const existingSecretsOnHostname = await this.getSecretsDecryptedByTLD(
-      hostname
-    )
+    const existingSecretsOnHostname =
+      await this.getSecretsDecryptedByTLD(hostname)
 
     return existingSecretsOnHostname.find(
       (s) => isLoginSecret(s) && s.loginCredentials.username === secret.username

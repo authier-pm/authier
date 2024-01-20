@@ -74,6 +74,23 @@ export const chakraRawTheme: ThemeOverride = {
   colors: authierColors,
   config: {
     initialColorMode: 'dark'
+  },
+  styles: {
+    global: {
+      '*': {
+        minWidth: 0,
+        boxSizing: 'border-box'
+      }
+    }
+  },
+  components: {
+    Button: {
+      baseStyle: {
+        whiteSpace: 'nowrap',
+        textOverflow: 'ellipsis',
+        overflow: 'hidden'
+      }
+    }
   }
 }
 

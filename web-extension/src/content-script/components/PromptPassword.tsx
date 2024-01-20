@@ -4,8 +4,8 @@ import { loginPrompt } from '../renderSaveCredentialsForm'
 
 import { ICapturedInput } from '../../background/backgroundPage'
 import debug from 'debug'
+import { trpc } from '../connectTRPC'
 
-import { getTRPCCached } from '../connectTRPC'
 const log = debug('au:PromptPassword')
 
 //import { css } from '@emotion/css'
@@ -33,8 +33,6 @@ export const PromptPassword = ({
     inputsUrl: string
   }
 }) => {
-  const trpc = getTRPCCached()
-
   const h3Style = {
     margin: 0,
     fontFamily: 'sans-serif !important',

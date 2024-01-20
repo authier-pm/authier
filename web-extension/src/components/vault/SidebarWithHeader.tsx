@@ -122,7 +122,12 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
       alignItems="center"
       {...rest}
     >
-      <Flex justifyContent={'flex-end'} flexDirection="column" height="inherit">
+      <Flex
+        justifyContent={'flex-end'}
+        flexDirection="column"
+        height="inherit"
+        w={{ base: 'full', md: 60 }}
+      >
         <Flex
           h={'72px'}
           alignItems="center"
@@ -243,7 +248,7 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
         {icon && (
           <Icon
             mr="4"
-            fontSize="16"
+            fontSize="32"
             _groupHover={{
               color: 'gray.400'
             }}

@@ -17,7 +17,7 @@ import {
   LoginCredentialsTypeWithMeta
 } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
-import { getTRPCCached } from './connectTRPC'
+import { trpc } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 
@@ -220,7 +220,6 @@ const filledElements: Array<HTMLInputElement | null> = []
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const autofill = (initState: IInitStateRes) => {
-  const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
   if (passwordFilledForThisPage === true) {

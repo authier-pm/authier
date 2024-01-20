@@ -95,7 +95,18 @@ export const VaultList = ({ tableView }) => {
         </Flex>
         <HStack spacing={4}>
           <Center>
-            <Stat px={3} ml="auto" whiteSpace={'nowrap'}>
+            <Stat
+              px={3}
+              ml="auto"
+              w={'100%'}
+              sx={{
+                dl: {
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap'
+                }
+              }}
+            >
               {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
             </Stat>
             <RefreshSecretsButton />
