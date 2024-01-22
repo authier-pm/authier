@@ -77,7 +77,7 @@ export function TableList({ filter }: { filter: string }) {
             p={'1em'}
             m={'-1em'}
           >
-            <Box>
+            <Box minW={'16px'}>
               <Checkbox
                 isChecked={selectedItems.includes(row)}
                 onChange={() => handleSelect(row)}
