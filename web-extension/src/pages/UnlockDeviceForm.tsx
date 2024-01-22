@@ -42,7 +42,7 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
     return null
   }
   return (
-    <Flex flexDirection="column" width="315px" p={4}>
+    <Flex flexDirection="column" minWidth="315px" p={4}>
       <Center>
         <LockIcon boxSize="50px" mx={20} my={3}></LockIcon>
       </Center>
