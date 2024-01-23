@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`RootResolver > addWebInputs > should add to the DB 1`] = `
+exports[`RootResolver > addWebInputs > should add to the DB and omit any url query when storing the url 1`] = `
 {
   "addedByUserId": "9f65bca8-eea5-4336-ae80-ff0816dff0c8",
   "domOrdinal": 0,

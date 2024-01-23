@@ -9,8 +9,8 @@ import {
   EncryptedSecretType,
   WebInputType
 } from '@shared/generated/graphqlBaseTypes'
-import { createChromeHandler } from 'trpc-chrome/adapter'
 import { device, isRunningInBgPage } from './ExtensionDevice'
+import { createChromeHandler } from '@capaj/trpc-browser/adapter'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
 
 import {
@@ -26,7 +26,6 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
-import { ConstructURLReturnType, constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -42,18 +41,13 @@ export interface ICapturedInput {
   inputted?: string | undefined
 }
 
-interface ILoginCredentialsFromContentScript {
-  username: string
+export interface ISaveLoginModalState {
   password: string
-  capturedInputEvents: ICapturedInput[]
-  openInVault: boolean
+  username: string | null
 }
 
 //NOTE: temporary storage for not yet saved credentials. (during page rerender)
-export const saveLoginModalsStates = new Map<
-  number,
-  { password: string; username: string }
->()
+export const saveLoginModalsStates = new Map<number, ISaveLoginModalState>()
 
 export const noHandsLogin = false
 let capturedInputEvents: ICapturedInput[] = []
@@ -83,11 +77,11 @@ const appRouter = tc.router({
         return false
       }
 
-      const credentials: ILoginCredentialsFromContentScript = input
+      const credentials = input
       log('addLoginCredentials', credentials)
 
       const encryptedData = {
-        username: credentials.username,
+        username: credentials.username ?? deviceState.email,
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
         url: urlParsed.hostname,
@@ -120,15 +114,19 @@ const appRouter = tc.router({
       })
 
       // TODO handle scenario where user has reached the limit of secrets, and the secret is not added. We should show a message to the user and remove the secret from local device
-      await apolloClient.mutate<
-        AddWebInputsMutationResult,
-        AddWebInputsMutationVariables
-      >({
-        mutation: AddWebInputsDocument,
-        variables: {
-          webInputs
-        }
-      })
+      try {
+        await apolloClient.mutate<
+          AddWebInputsMutationResult,
+          AddWebInputsMutationVariables
+        >({
+          mutation: AddWebInputsDocument,
+          variables: {
+            webInputs
+          }
+        })
+      } catch (err) {
+        console.warn('error adding web inputs', err)
+      }
 
       if (input.openInVault) {
         openVaultTab(`/secret/${secret.id}`)
@@ -250,10 +248,6 @@ const appRouter = tc.router({
       )
       return true
     }),
-  clearLockInterval: tcProcedure.mutation(async () => {
-    device.clearLockInterval()
-    return true
-  }),
   setDeviceState: tcProcedure
     .input(backgroundStateSerializableLockedSchema)
     .mutation(async ({ input }) => {

@@ -24,9 +24,9 @@ export function getCssSelectorForInput(
   if (input.name) {
     proposedSelector += `[name=${input.name}]`
   } else if (input.className) {
-    proposedSelector += `[class=${input.name}]`
+    proposedSelector += `[class=${input.className}]`
   } else if (input.autocomplete) {
-    proposedSelector += `[autocomplete=${input.name}]`
+    proposedSelector += `[autocomplete=${input.autocomplete}]`
   }
 
   const inputsForProposedSelector = document.querySelectorAll(proposedSelector)

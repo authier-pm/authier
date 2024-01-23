@@ -176,7 +176,8 @@ export type DefaultDeviceSettingsQuery = {
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
   createdAt: Scalars['DateTime']['output'];
-  id?: Maybe<Scalars['Int']['output']>;
+  /** 0 index for system defaults */
+  id: Scalars['Int']['output'];
   syncTOTP: Scalars['Boolean']['output'];
   theme: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -746,8 +747,6 @@ export type UserQuery = {
   notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
-  /** Sends a message to the master device */
-  sendAuthMessage: Scalars['Boolean']['output'];
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
   updatedAt?: Maybe<Scalars['DateTime']['output']>;
@@ -757,14 +756,6 @@ export type UserQuery = {
 
 export type UserQueryDeviceArgs = {
   id: Scalars['String']['input'];
-};
-
-
-export type UserQuerySendAuthMessageArgs = {
-  body: Scalars['String']['input'];
-  deviceId: Scalars['String']['input'];
-  title: Scalars['String']['input'];
-  type: Scalars['String']['input'];
 };
 
 export type WebInputElement = {

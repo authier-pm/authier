@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Button,
   Checkbox,
@@ -11,24 +11,14 @@ import {
   NumberInputField,
   NumberInputStepper
 } from '@chakra-ui/react'
-import { generate } from 'generate-password'
+
 import { Formik, Field, FormikHelpers } from 'formik'
+import {
+  IPasswordGeneratorConfig,
+  defaultPasswordGeneratorConfig,
+  generate
+} from '@shared/passwordGenerator'
 
-interface Values {
-  numbers: boolean
-  symbols: boolean
-  uppercase: boolean
-  lowercase: boolean
-  length: number
-}
-
-export const defaultPasswordGeneratorConfig = {
-  numbers: true,
-  symbols: true,
-  uppercase: true,
-  lowercase: true,
-  length: 14
-}
 export const PasswordGenerator = ({
   isOpen,
   onGenerate: setInitPassword
@@ -53,8 +43,8 @@ export const PasswordGenerator = ({
         <Formik
           initialValues={defaultPasswordGeneratorConfig}
           onSubmit={(
-            values: Values,
-            { setSubmitting }: FormikHelpers<Values>
+            values: IPasswordGeneratorConfig,
+            { setSubmitting }: FormikHelpers<IPasswordGeneratorConfig>
           ) => {
             setInitPassword(generate({ ...values }))
             setSubmitting(false)

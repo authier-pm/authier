@@ -4,7 +4,7 @@ import {
   setAccessToken
 } from '../util/accessTokenExtension'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
-import jwtDecode, { JwtPayload } from 'jwt-decode'
+import { JwtPayload, jwtDecode } from 'jwt-decode'
 import browser from 'webextension-polyfill'
 import { API_URL } from './apolloClient'
 import { device } from '@src/background/ExtensionDevice'

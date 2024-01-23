@@ -1,6 +1,6 @@
 import { h, render } from 'preact'
 import { PromptPassword } from './components/PromptPassword'
-import { getTRPCCached } from './connectTRPC'
+import { trpc } from './connectTRPC'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -8,10 +8,9 @@ const nano = h
 export let loginPrompt: HTMLDivElement | null
 
 export async function renderSaveCredentialsForm(
-  username: string,
+  username: string | null,
   password: string
 ) {
-  const trpc = getTRPCCached()
   const inputEvents = await trpc.getCapturedInputEvents.query()
 
   loginPrompt = document.createElement('div')

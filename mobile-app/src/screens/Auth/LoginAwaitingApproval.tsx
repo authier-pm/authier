@@ -22,7 +22,7 @@ import {
   generateEncryptionKey
 } from '@utils/generateEncryptionKey'
 import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import useInterval from '@src/utils/useInterval'
+import { useInterval } from '@src/utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation

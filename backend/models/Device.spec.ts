@@ -353,7 +353,7 @@ describe('Device', () => {
       await expect(
         async () => await deviceQuery.encryptedSecretsToSync(fakeCtx)
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        '"TOTP limit exceeded, remove 5 TOTP secrets"'
+        `[Error: TOTP limit exceeded, remove 5 TOTP secrets]`
       )
     })
   })

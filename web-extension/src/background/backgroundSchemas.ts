@@ -22,13 +22,13 @@ export const contentScriptContextSchema = z.object({
 })
 
 export const loginCredentialSchema = z.object({
-  username: z.string(),
+  username: z.string().nullable(),
   password: z.string()
 })
 
 export const loginCredentialsFromContentScriptSchema =
   contentScriptContextSchema.extend({
-    username: z.string(),
+    username: z.string().nullable(),
     password: z.string()
   })
 

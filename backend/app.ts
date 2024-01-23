@@ -16,8 +16,7 @@ import { verify } from 'jsonwebtoken'
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './lib/GraphqlError'
-import * as admin from 'firebase-admin'
-import serviceAccount from './authier-bc184-firebase-adminsdk-8nuxf-4d2cc873ea.json'
+
 import debug from 'debug'
 
 import pkg from '../package.json'
@@ -35,9 +34,7 @@ sentryInit({
   release: `<project-name>@${pkg.version}`
 })
 
-export const endpointSecret = env.STRIPE_ENDPOINT as string
 const isLambda = !!env.LAMBDA_TASK_ROOT
-log('endpointSecret', endpointSecret)
 
 let logger
 let pino
@@ -157,7 +154,7 @@ app.register(mercurius, {
   errorFormatter: (res, ctx) => {
     // console.error(ctx)
     if (res.errors) {
-      res.errors.map((err) => {
+      res.errors.forEach((err) => {
         if (err instanceof GraphqlError === false) {
           captureException(err)
         }
@@ -169,8 +166,4 @@ app.register(mercurius, {
     errResponse.statusCode = 200 // mercurius returns 500 by default, but we want to use 200 as that aligns better with apollo-server
     return errResponse
   }
-})
-admin.initializeApp({
-  //@ts-expect-error TODO: fix this
-  credential: admin.credential.cert(serviceAccount)
 })

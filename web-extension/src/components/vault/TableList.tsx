@@ -9,7 +9,7 @@ import {
   HStack,
   useColorModeValue
 } from '@chakra-ui/react'
-import { DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { CopyIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
 import { FixedSizeList as List } from 'react-window'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
@@ -18,6 +18,7 @@ import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
 import { Link } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
+import { authenticator } from 'otplib'
 
 export function TableList({ filter }: { filter: string }) {
   const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
@@ -46,6 +47,7 @@ export function TableList({ filter }: { filter: string }) {
     const [areIconsVisible, setAreIconsVisible] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const row = data[index]
+    const isTotp = row.kind === 'TOTP'
 
     return (
       <Flex
@@ -77,7 +79,7 @@ export function TableList({ filter }: { filter: string }) {
             p={'1em'}
             m={'-1em'}
           >
-            <Box>
+            <Box minW={'16px'}>
               <Checkbox
                 isChecked={selectedItems.includes(row)}
                 onChange={() => handleSelect(row)}
@@ -93,9 +95,7 @@ export function TableList({ filter }: { filter: string }) {
                 whiteSpace="nowrap"
                 fontWeight="bold"
               >
-                {row.kind === 'TOTP'
-                  ? row.totp.label
-                  : row.loginCredentials.label}
+                {isTotp ? row.totp.label : row.loginCredentials.label}
               </Text>
             </Box>
 
@@ -106,7 +106,7 @@ export function TableList({ filter }: { filter: string }) {
               overflow="hidden"
               whiteSpace="nowrap"
             >
-              {row.kind === 'TOTP' ? row.totp.url : row.loginCredentials.url}
+              {isTotp ? row.totp.url : row.loginCredentials.url}
             </Text>
 
             <Box w={'inherit'}>
@@ -117,7 +117,7 @@ export function TableList({ filter }: { filter: string }) {
                 whiteSpace="nowrap"
                 fontWeight="bold"
               >
-                {row.kind === 'TOTP' ? '' : row.loginCredentials.username}
+                {isTotp ? '' : row.loginCredentials.username}
               </Text>
             </Box>
             <Text
@@ -128,11 +128,11 @@ export function TableList({ filter }: { filter: string }) {
               whiteSpace="nowrap"
             >
               {showPassword || showAllPasswords
-                ? row.kind === 'TOTP'
+                ? isTotp
                   ? row.totp.secret
                   : row.loginCredentials.password
                 : '*'.repeat(
-                    row.kind === 'TOTP'
+                    isTotp
                       ? row.totp.secret.length
                       : row.loginCredentials.password.length
                   )}
@@ -144,6 +144,19 @@ export function TableList({ filter }: { filter: string }) {
             display={areIconsVisible ? 'flex' : 'none'}
             spacing={2}
           >
+            <Tooltip label={isTotp ? 'Copy token' : 'Copy'} aria-label="Copy">
+              <IconButton
+                icon={<CopyIcon />}
+                aria-label="Copy"
+                onClick={() => {
+                  navigator.clipboard.writeText(
+                    isTotp
+                      ? authenticator.generate(row.totp.secret)
+                      : row.loginCredentials.password
+                  )
+                }}
+              />
+            </Tooltip>
             <Tooltip label={showText} aria-label={showText}>
               <IconButton
                 display={areIconsVisible ? 'block' : 'none'}
@@ -164,7 +177,7 @@ export function TableList({ filter }: { filter: string }) {
                   pathname: `secret/${row.id}`
                 }}
                 state={{
-                  data: row.kind === 'TOTP' ? row.totp : row.loginCredentials
+                  data: isTotp ? row.totp : row.loginCredentials
                 }}
               >
                 <IconButton aria-label="Edit" icon={<EditIcon />} />

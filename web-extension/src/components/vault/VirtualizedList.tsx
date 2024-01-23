@@ -95,6 +95,12 @@ export function VaultListItem({
             }}
           >
             <Link
+              //HACK: https://playwright.dev/docs/actionability#visible
+              style={{
+                width: '1px',
+                height: '1px'
+              }}
+              aria-label="edit_item"
               to={{
                 pathname: `secret/${secret.id}`
               }}

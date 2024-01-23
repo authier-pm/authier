@@ -3,13 +3,14 @@ datasource db {
   url               = env("DATABASE_URL")
   directUrl         = env("DIRECT_URL")
   shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
+  extensions        = [citext(schema: "pg_catalog")]
 }
 
 generator client {
   provider        = "prisma-client-js"
   output          = "../node_modules/.prisma/client"
-  binaryTargets   = ["native", "linux-arm64-openssl-1.0.x"]
-  previewFeatures = ["extendedWhereUnique", "jsonProtocol"]
+  binaryTargets   = ["native", "linux-arm64-openssl-1.0.x", "linux-arm64-openssl-3.0.x"]
+  previewFeatures = ["postgresqlExtensions", "nativeDistinct", "relationJoins"]
 }
 
 generator PrismaTypeGraphQLTypesGenerator {

@@ -21,8 +21,10 @@ import { constructURL } from '../../shared/urlUtils'
 import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
 import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
+import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
 import { Device, User, WebInput } from '.prisma/client'
 
@@ -41,9 +43,10 @@ import {
   DecryptionChallengeUnion
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime'
-import admin from 'firebase-admin'
+
 import { isTorExit } from './isTorExit'
+import { firebaseAdmin } from '../lib/firebaseAdmin'
+
 const log = debug('au:RootResolver')
 
 export interface IContext {
@@ -243,7 +246,7 @@ export class RootResolver {
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
-    description: 'returns a decryption challenge',
+    description: 'returns a decryption challenge, used when logging in',
     nullable: true
   })
   async deviceDecryptionChallenge(
@@ -254,11 +257,11 @@ export class RootResolver {
   ) {
     const ipAddress = ctx.getIpAddress()
 
-    if (await isTorExit(ipAddress)) {
-      throw new GraphqlError(
-        'Tor exit nodes are prohibited from login/adding new devices.'
-      )
-    }
+    // if (await isTorExit(ipAddress)) { // this is broken ATM, TODO figure out another way to check for tor exit nodes
+    //   throw new GraphqlError(
+    //     'Tor exit nodes are prohibited from login/adding new devices.'
+    //   )
+    // }
 
     const user = await ctx.prisma.user.findUnique({
       where: { email },
@@ -350,15 +353,17 @@ export class RootResolver {
         user.masterDevice.firebaseToken.length > 10
       ) {
         console.log('sending notification to')
-        await admin.messaging().sendToDevice(user.masterDevice.firebaseToken, {
-          notification: {
-            title: 'New device login!',
-            body: 'New device is trying to log in.'
-          },
-          data: {
-            type: 'Devices'
-          }
-        })
+        await firebaseAdmin
+          .messaging()
+          .sendToDevice(user.masterDevice.firebaseToken, {
+            notification: {
+              title: 'New device login!',
+              body: 'New device is trying to log in.'
+            },
+            data: {
+              type: 'Devices'
+            }
+          })
       }
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
@@ -477,24 +482,29 @@ export class RootResolver {
         continue
       }
       const forUpsert = {
-        url: webInput.url,
+        url: webInput.url.split('?')[0], // query can often have sensitive data, so we omit it here and on FE too
         host: host,
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
       }
-      const input = await ctx.prisma.webInput.upsert({
-        create: forUpsert,
-        update: forUpsert,
-        where: {
-          webInputIdentifier: {
-            url: webInput.url,
-            domPath: webInput.domPath
+
+      try {
+        // prisma is weird because it is throwing unique constraint conflict errors here. upsert should never throw that.
+        const input = await ctx.prisma.webInput.upsert({
+          create: forUpsert,
+          update: forUpsert,
+          where: {
+            webInputIdentifier: {
+              url: webInput.url,
+              domPath: webInput.domPath
+            }
           }
-        }
-      })
-      // @ts-ignore TODO figure out why this errors only on local, but not on CI
-      returnedInputs.push(input)
+        })
+        returnedInputs.push(input)
+      } catch (err: unknown) {
+        console.warn('error adding web input', err)
+      }
     }
     return returnedInputs
   }

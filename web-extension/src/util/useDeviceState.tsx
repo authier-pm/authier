@@ -19,7 +19,6 @@ import {
 import { z, ZodError } from 'zod'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
-import { getTRPCCached } from '@src/content-script/connectTRPC'
 import {
   totpSchema,
   loginCredentialsSchema
@@ -68,7 +67,6 @@ export interface ISecuritySettingsInBg {
 let storageOnchangeListenerRegistered = false // we need to only register once
 
 export function useDeviceState() {
-  const trpc = getTRPCCached()
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
 
@@ -78,7 +76,6 @@ export function useDeviceState() {
     device.state
   )
   const [isInitialized, setIsInitialized] = useState<boolean>(false)
-  const [tableView, setTableView] = useState<boolean>(false)
   const [selectedItems, setSelectedItems] = useState<
     (ILoginSecret | ITOTPSecret)[]
   >([])
@@ -174,8 +171,11 @@ export function useDeviceState() {
         const url = getDecryptedSecretProp(item, 'url')
         return (
           label.includes(filterBy) ||
+          label.toLowerCase().includes(filterBy.toLowerCase()) ||
           url.includes(filterBy) ||
+          url.toLowerCase().includes(filterBy.toLowerCase()) ||
           username.includes(filterBy) ||
+          username.toLowerCase().includes(filterBy.toLowerCase()) ||
           getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
         )
       })
@@ -184,8 +184,6 @@ export function useDeviceState() {
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
       )
     },
-    setTableView,
-    tableView,
     selectedItems,
     setSelectedItems,
     isInitialized

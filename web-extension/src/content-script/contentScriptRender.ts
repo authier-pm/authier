@@ -10,7 +10,7 @@ import debug from 'debug'
 import { IDecryptedSecrets } from './autofill'
 import { renderItemPopup } from './renderItemPopup'
 import { recordDiv, renderToast } from './renderToast'
-import { getTRPCCached } from './connectTRPC'
+import { trpc } from './connectTRPC'
 
 const log = debug('au:contentScript:renderer')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -25,7 +25,6 @@ const hideToast = () => {
     x?.remove()
   }, 5000)
 }
-const trpc = getTRPCCached()
 
 export function recordInputs(e?: KeyboardEvent) {
   if (

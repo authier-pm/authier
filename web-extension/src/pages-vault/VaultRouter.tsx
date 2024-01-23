@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 
 import { Route, Routes, useNavigate } from 'react-router-dom'
@@ -17,12 +17,14 @@ import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
+import browser from 'webextension-polyfill'
 
 const log = debug('au:VaultRouter')
 
 export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
+  const [vaultTableView, setVaultTableView] = useState(false)
 
   useEffect(() => {
     if (lockedState) {
@@ -30,6 +32,18 @@ export function VaultRouter() {
     }
     log('VaultRouter: deviceState', deviceState, lockedState)
   }, [lockedState])
+
+  useEffect(() => {
+    browser.storage.sync.get('vaultTableView').then((res) => {
+      setVaultTableView(res.vaultTableView)
+    })
+
+    browser.storage.sync.onChanged.addListener((changes) => {
+      if (changes.vaultTableView) {
+        setVaultTableView(changes.vaultTableView.newValue)
+      }
+    })
+  }, [])
 
   if (deviceState === null) {
     return (
@@ -55,7 +69,10 @@ export function VaultRouter() {
   return (
     <SidebarWithHeader>
       <Routes>
-        <Route path="/" element={<VaultList />}></Route>
+        <Route
+          path="/"
+          element={<VaultList tableView={vaultTableView} />}
+        ></Route>
         <Route path="/secret/:secretId" element={<VaultItemSettings />} />
         <Route path="/account-limits" element={<AccountLimits />}></Route>
         <Route path="/settings/*" element={<VaultSettings />}></Route>

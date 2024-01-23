@@ -1,10 +1,13 @@
 import objectHash from 'object-hash'
-import mimicFn from 'mimic-fn'
 import { redisClient } from './redisClient'
 import debug from 'debug'
 
 const log = debug('au:memRedis')
 // in many cases this is better than simple in memory memoization because it memoizes across multiple API instances
+
+/**
+ * this only works with @upstash/redis do not use with ioredis
+ */
 export const memRedis = <T>(
   fn: T,
   {
@@ -14,14 +17,14 @@ export const memRedis = <T>(
   }: {
     cacheKey?: (args: any) => string
     /**
-     * maxAge in seconds
+     * maxAge in milliseconds
      */
     maxAge: number | ((args: any) => number)
     cachePrefix: string // grep cachePrefix when adding a new cache to see if your name is unique
   }
 ): {
   memoized: T
-  clear: () => Promise<number>
+  clear: () => Promise<number[]>
 } => {
   const memoized = async function (...arguments_: any[]) {
     const key = [
@@ -29,7 +32,7 @@ export const memRedis = <T>(
       cacheKey ? cacheKey(arguments_) : objectHash(arguments_)
     ].join('_')
 
-    const cacheItem = await redisClient.get<any>(key)
+    const cacheItem = (await redisClient.get(key)) as { data: T }
 
     if (cacheItem) {
       log('cache hit', key)
@@ -52,8 +55,6 @@ export const memRedis = <T>(
 
     return result
   }
-  // @ts-expect-error
-  mimicFn(memoized, fn)
 
   return {
     // @ts-expect-error
@@ -63,11 +64,11 @@ export const memRedis = <T>(
      */
     clear: async () => {
       const keys = await redisClient.keys(prefix + '*')
+
       if (keys.length === 0) {
-        return 0
+        return [0]
       }
-      // @ts-expect-error
-      return redisClient.del(keys)
+      return await Promise.all(keys.map((key) => redisClient.del(key)))
     },
     clearKey: async (...args: any[]) => {
       const key = [prefix, cacheKey ? cacheKey(args) : objectHash(args)].join(

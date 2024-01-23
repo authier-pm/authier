@@ -16,7 +16,7 @@ export class AwsCdkAuthierStack extends Stack {
     const backendApi = new lambda.Function(this, 'backend-api', {
       memorySize: 512,
       timeout: cdk.Duration.seconds(40),
-      runtime: lambda.Runtime.NODEJS_18_X,
+      runtime: lambda.Runtime.NODEJS_20_X,
       architecture: Architecture.ARM_64,
       handler: 'lambda.handler',
       code: lambda.Code.fromAsset(path.join(__dirname, '../dist')),
@@ -41,7 +41,10 @@ export class AwsCdkAuthierStack extends Stack {
         UPSTASH_REDIS_REST_TOKEN: process.env
           .UPSTASH_REDIS_REST_TOKEN as string,
         FREE_GEOIP_API_KEY: process.env.FREE_GEOIP_API_KEY as string,
-        IP_API_IO_API_KEY: process.env.IP_API_IO_API_KEY as string
+        IP_API_IO_API_KEY: process.env.IP_API_IO_API_KEY as string,
+        FIREBASE_PROJECT_ID: process.env.FIREBASE_PROJECT_ID as string,
+        FIREBASE_PRIVATE_KEY: process.env.FIREBASE_PRIVATE_KEY as string,
+        FIREBASE_CLIENT_EMAIL: process.env.FIREBASE_CLIENT_EMAIL as string
       }
     })
 

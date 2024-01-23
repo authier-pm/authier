@@ -21,7 +21,7 @@ import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
 import { API_URL } from '@env'
 
-let CodePushOptions = {
+const CodePushOptions = {
   checkFrequency: __DEV__
     ? CodePush.CheckFrequency.MANUAL
     : CodePush.CheckFrequency.ON_APP_RESUME,

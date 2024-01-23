@@ -1,4 +1,4 @@
-import jwtDecode from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode'
 import browser from 'webextension-polyfill'
 
 export let accessToken: string | null = null

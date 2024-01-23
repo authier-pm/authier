@@ -17,10 +17,10 @@ import {
   LoginCredentialsTypeWithMeta
 } from '../util/useDeviceState'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
-import { getTRPCCached } from './connectTRPC'
+import { trpc } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
-import { device } from '../background/ExtensionDevice'
+
 import browser from 'webextension-polyfill'
 import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
 
@@ -60,7 +60,7 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
       autofillValueIntoInput(usefulInputs[index], newPassword)
       autofillValueIntoInput(usefulInputs[index + 1], newPassword)
 
-      renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
+      renderSaveCredentialsForm(null, newPassword)
       return true
     } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
       renderPasswordGenerator({ input: input })
@@ -77,29 +77,49 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   }
 }
 
-function imitateKeyInput(el: HTMLInputElement, keyChar: string) {
+function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
-    const keyboardEventInit = {
-      bubbles: false,
-      cancelable: false,
-      composed: false,
-      key: '',
-      code: '',
-      location: 0
+    const dispatchAutofillEvent = (ev) => {
+      autofillEventsDispatched.add(ev)
+      el.dispatchEvent(ev)
     }
-    const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
-    autofillEventsDispatched.add(keyDown)
-    el.dispatchEvent(keyDown)
+    // dispatch focus event
 
-    el.value = keyChar
+    for (let i = 0; i < input.length; i++) {
+      const key = input[i]
+      const keyboardEventInit = {
+        bubbles: false,
+        cancelable: false,
+        composed: false,
 
-    const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
-    autofillEventsDispatched.add(keyUp)
-    el.dispatchEvent(keyUp)
+        key: key,
+        keyCode: key.charCodeAt(0),
+        location: 0
+      }
+      const keyDown = new KeyboardEvent('keydown', keyboardEventInit)
 
-    const change = new Event('change', { bubbles: true })
-    autofillEventsDispatched.add(change)
-    el.dispatchEvent(change)
+      dispatchAutofillEvent(keyDown)
+
+      const keyPress = new KeyboardEvent('keypress', keyboardEventInit)
+
+      dispatchAutofillEvent(keyPress)
+
+      const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
+
+      dispatchAutofillEvent(keyUp)
+      el.value += key
+
+      const change = new Event('change', { bubbles: true })
+
+      dispatchAutofillEvent(change)
+      // await sleep(2) // this is to make it a bit more realistic
+    }
+
+    const inputEvent = new Event('input', { bubbles: true })
+    dispatchAutofillEvent(inputEvent)
+
+    const blurEvent = new Event('blur', { bubbles: true }) // this is needed, because some websites actually trigger form validation on blur. for example coinmate.io
+    dispatchAutofillEvent(blurEvent)
   } else {
     console.error('el is null')
   }
@@ -192,6 +212,7 @@ export const getElementCoordinates = (el: HTMLElement) => {
 }
 
 export let passwordFilledForThisPage = false
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 let onInputAddedHandler = (inputEl: any) => {}
 
 const filledElements: Array<HTMLInputElement | null> = []
@@ -199,7 +220,6 @@ const filledElements: Array<HTMLInputElement | null> = []
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export const autofill = (initState: IInitStateRes) => {
-  const trpc = getTRPCCached()
   const { secretsForHost, webInputs } = initState
 
   if (passwordFilledForThisPage === true) {
@@ -372,7 +392,7 @@ export const autofill = (initState: IInitStateRes) => {
         }
 
         if (newPassword) {
-          renderSaveCredentialsForm(device.state?.email ?? '', newPassword)
+          renderSaveCredentialsForm(null, newPassword)
         }
       },
       500,

@@ -10,10 +10,9 @@ const logQueries = debug('mm:prisma')
 
 export const enablePrismaDebug = (prismaClient: PrismaClient) => {
   //@ts-expect-error Prisma wrong types
-  prismaClient.$on('query', (event) => {
+  prismaClient.$on('query', (event: any) => {
     queryCount++
 
-    //@ts-expect-error Prisma wrong types
     const { params, query } = event
     const paramsAsArray = params.substring(1, params.length - 1).split(',')
 
@@ -33,12 +32,14 @@ export const enablePrismaDebug = (prismaClient: PrismaClient) => {
     const after = Date.now()
     if (Array.isArray(result) && params.action !== 'findUnique') {
       logQueries(
-        `${params.model}.${params.action} results: ${result.length} ${after - before
+        `${params.model}.${params.action} results: ${result.length} ${
+          after - before
         }ms`
       )
     } else {
       logQueries(
-        `${params.model}.${params.action} returned ${result?.id ?? result?.[0]?.id ?? null
+        `${params.model}.${params.action} returned ${
+          result?.id ?? result?.[0]?.id ?? null
         } ${after - before}ms`
       )
     }

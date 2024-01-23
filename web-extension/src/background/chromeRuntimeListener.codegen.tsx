@@ -10,12 +10,12 @@ export type AddWebInputsMutationVariables = Types.Exact<{
 
 export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number }> };
 
-export type WebInputsForHostQueryVariables = Types.Exact<{
-  host: Types.Scalars['String']['input'];
+export type WebInputsForHostsQueryVariables = Types.Exact<{
+  hosts?: Types.InputMaybe<Array<Types.Scalars['String']['input']> | Types.Scalars['String']['input']>;
 }>;
 
 
-export type WebInputsForHostQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
+export type WebInputsForHostsQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
 
 
 export const AddWebInputsDocument = gql`
@@ -51,9 +51,9 @@ export function useAddWebInputsMutation(baseOptions?: Apollo.MutationHookOptions
 export type AddWebInputsMutationHookResult = ReturnType<typeof useAddWebInputsMutation>;
 export type AddWebInputsMutationResult = Apollo.MutationResult<AddWebInputsMutation>;
 export type AddWebInputsMutationOptions = Apollo.BaseMutationOptions<AddWebInputsMutation, AddWebInputsMutationVariables>;
-export const WebInputsForHostDocument = gql`
-    query webInputsForHost($host: String!) {
-  webInputs(host: $host) {
+export const WebInputsForHostsDocument = gql`
+    query webInputsForHosts($hosts: [String!]) {
+  webInputs(hosts: $hosts) {
     id
     host
     url
@@ -66,29 +66,29 @@ export const WebInputsForHostDocument = gql`
     `;
 
 /**
- * __useWebInputsForHostQuery__
+ * __useWebInputsForHostsQuery__
  *
- * To run a query within a React component, call `useWebInputsForHostQuery` and pass it any options that fit your needs.
- * When your component renders, `useWebInputsForHostQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * To run a query within a React component, call `useWebInputsForHostsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useWebInputsForHostsQuery` returns an object from Apollo Client that contains loading, error, and data properties
  * you can use to render your UI.
  *
  * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
  *
  * @example
- * const { data, loading, error } = useWebInputsForHostQuery({
+ * const { data, loading, error } = useWebInputsForHostsQuery({
  *   variables: {
- *      host: // value for 'host'
+ *      hosts: // value for 'hosts'
  *   },
  * });
  */
-export function useWebInputsForHostQuery(baseOptions: Apollo.QueryHookOptions<WebInputsForHostQuery, WebInputsForHostQueryVariables>) {
+export function useWebInputsForHostsQuery(baseOptions?: Apollo.QueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<WebInputsForHostQuery, WebInputsForHostQueryVariables>(WebInputsForHostDocument, options);
+        return Apollo.useQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
       }
-export function useWebInputsForHostLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebInputsForHostQuery, WebInputsForHostQueryVariables>) {
+export function useWebInputsForHostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<WebInputsForHostQuery, WebInputsForHostQueryVariables>(WebInputsForHostDocument, options);
+          return Apollo.useLazyQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
         }
-export type WebInputsForHostQueryHookResult = ReturnType<typeof useWebInputsForHostQuery>;
-export type WebInputsForHostLazyQueryHookResult = ReturnType<typeof useWebInputsForHostLazyQuery>;
-export type WebInputsForHostQueryResult = Apollo.QueryResult<WebInputsForHostQuery, WebInputsForHostQueryVariables>;
+export type WebInputsForHostsQueryHookResult = ReturnType<typeof useWebInputsForHostsQuery>;
+export type WebInputsForHostsLazyQueryHookResult = ReturnType<typeof useWebInputsForHostsLazyQuery>;
+export type WebInputsForHostsQueryResult = Apollo.QueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;

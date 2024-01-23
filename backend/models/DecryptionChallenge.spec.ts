@@ -66,8 +66,7 @@ describe('DecryptionChallenge', () => {
           ...input
         },
         input.addDeviceSecret,
-        fakeCtx,
-        {} as GraphQLResolveInfo
+        fakeCtx
       )
 
       const accessToken = sign(
@@ -91,8 +90,7 @@ describe('DecryptionChallenge', () => {
         await challenge.addNewDeviceForUser(
           input,
           input.addDeviceSecret,
-          fakeCtx,
-          {} as GraphQLResolveInfo
+          fakeCtx
         )
       }).rejects.toThrow('User not found')
     })
@@ -118,8 +116,7 @@ describe('DecryptionChallenge', () => {
         await challenge.addNewDeviceForUser(
           input,
           input.addDeviceSecret,
-          fakeCtx,
-          {} as GraphQLResolveInfo
+          fakeCtx
         )
       }).rejects.toThrow('Wrong master password used')
     })

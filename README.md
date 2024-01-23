@@ -56,5 +56,5 @@ For now this happens manually. We cannot open source our stripe dashboard, but w
 ## Contrib locs
 
 For now we're running it manually every week.
-It needs to run in node 16, does not run in node 18, see this issue: https://github.com/nodegit/nodegit/issues/1980
+It needs to run in node 16, does not run in other node versions, see this issue: https://github.com/nodegit/nodegit/issues/1980
 TODO run contrib-locs with github CRON.

@@ -47,9 +47,15 @@ import {
 import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import { AppRouter } from './chromeRuntimeListener'
-import { chromeLink } from 'trpc-chrome/link'
+import { chromeLink } from '@capaj/trpc-browser/link'
 import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
+import {
+  WebInputsForHostsDocument,
+  WebInputsForHostsQuery,
+  WebInputsForHostsQueryVariables
+} from './chromeRuntimeListener.codegen'
+import { WebInputForAutofill } from './getContentScriptInitialState'
 
 export const log = debug('au:Device')
 
@@ -100,6 +106,7 @@ export const getDecryptedSecretProp = (
 export class DeviceState implements IBackgroundStateSerializable {
   decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
   lockTimeEnd: number
+  webInputs: WebInputForAutofill[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
     //log('device state created', this)
@@ -212,19 +219,17 @@ export class DeviceState implements IBackgroundStateSerializable {
     }
   }
 
-  async getSecretsDecryptedByHostname(host: string) {
-    let secrets = this.decryptedSecrets.filter((secret) => {
+  /**
+   * here we want to get all secrets that are decrypted and match the hostname TLD. This is used for autofill in content script
+   * we only match by TLD because many services use many subdomains. For example account with mail.google.com is usable for account.google.com etc
+   */
+  async getSecretsDecryptedByTLD(host: string) {
+    const secrets = this.decryptedSecrets.filter((secret) => {
       const url = getDecryptedSecretProp(secret, 'url')
-      return url && host === constructURL(url ?? '').hostname
-    })
-    if (secrets.length === 0) {
-      secrets = this.decryptedSecrets.filter((secret) => {
-        const url = getDecryptedSecretProp(secret, 'url')
 
-        const domainAndTLD = getDomainNameAndTldFromUrl(url)
-        return domainAndTLD && host.endsWith(domainAndTLD)
-      })
-    }
+      const domainAndTLD = getDomainNameAndTldFromUrl(url)
+      return domainAndTLD && host.endsWith(domainAndTLD)
+    })
     return Promise.all(
       secrets.map((secret) => {
         return this.decryptSecret(secret)
@@ -321,6 +326,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
         await this.save()
 
+        this.webInputs = await this.getWebInputs()
         await apolloClient.mutate<
           MarkAsSyncedMutation,
           MarkAsSyncedMutationVariables
@@ -331,10 +337,7 @@ export class DeviceState implements IBackgroundStateSerializable {
             return secretsBeforeSync.find(({ id }) => removedId === id)
           }
         )
-        console.log(
-          '~ actuallyRemovedOnThisDevice',
-          actuallyRemovedOnThisDevice
-        )
+        log('actuallyRemovedOnThisDevice', actuallyRemovedOnThisDevice)
         return {
           removedSecrets: actuallyRemovedOnThisDevice.length,
           newAndUpdatedSecrets: newAndUpdatedSecrets.length
@@ -348,9 +351,8 @@ export class DeviceState implements IBackgroundStateSerializable {
     if (!hostname) {
       return undefined
     }
-    const existingSecretsOnHostname = await this.getSecretsDecryptedByHostname(
-      hostname
-    )
+    const existingSecretsOnHostname =
+      await this.getSecretsDecryptedByTLD(hostname)
 
     return existingSecretsOnHostname.find(
       (s) => isLoginSecret(s) && s.loginCredentials.username === secret.username
@@ -405,6 +407,29 @@ export class DeviceState implements IBackgroundStateSerializable {
     return secretsAdded
   }
 
+  async getWebInputs() {
+    // TODO use this for getting web inputs on each sync
+    const hostnames = this.decryptedSecrets
+      .map((s) =>
+        s.kind === EncryptedSecretType.TOTP
+          ? s.totp.url
+          : s.loginCredentials.url
+      )
+      .filter((h) => !!h)
+      .map((h) => constructURL(h as string).hostname) as string[]
+    const { data } = await apolloClient.query<
+      WebInputsForHostsQuery,
+      WebInputsForHostsQueryVariables
+    >({
+      query: WebInputsForHostsDocument,
+      variables: {
+        hosts: hostnames
+      }
+    })
+
+    return data.webInputs ?? []
+  }
+
   async removeSecret(secretId: string) {
     browser.storage.local.set({
       backgroundState: {
@@ -439,7 +464,7 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
-  lockInterval: NodeJS.Timer | null
+  lockInterval: number | null
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })
@@ -729,6 +754,7 @@ class ExtensionDevice {
   }
 
   startVaultLockTimer() {
+    // @ts-expect-error
     this.lockInterval = setInterval(() => {
       const now = Date.now()
       if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {
@@ -758,11 +784,14 @@ class ExtensionDevice {
       clearInterval(this.lockInterval)
     }
     this.lockInterval = null
-
-    await extensionDeviceTrpc.clearLockInterval.mutate()
   }
 }
+if (location.href.startsWith('chrome-extension://') === false) {
+  console.warn('location.href', location.href)
 
+  throw new Error(
+    'This file should only be imported in vault/popup/service worker' // importing in content script adds unnecessary performance overhead to each page user visits
+  )
+}
 export const device = new ExtensionDevice()
-
 device.initialize()

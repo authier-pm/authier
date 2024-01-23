@@ -147,7 +147,9 @@ export default function Register() {
                   isInvalid={form.errors.password && form.touched.password}
                   isRequired
                 >
-                  <FormLabel htmlFor="password">Password</FormLabel>
+                  <FormLabel mt={3} htmlFor="password">
+                    Password
+                  </FormLabel>
                   <InputGroup>
                     <Input
                       {...field}

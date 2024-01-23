@@ -11,11 +11,37 @@ import {
   ScrollView,
   Flex
 } from 'native-base'
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useLimitsQuery } from '../../../../shared/graphql/AccountLimits.codegen'
-import { Linking, RefreshControl } from 'react-native'
+import { Alert, Linking, RefreshControl } from 'react-native'
 import { PAGE_URL } from '@env'
+
+type OpenURLButtonProps = {
+  url: string
+  children: string
+}
+
+const OpenURLButton = ({ url, children }: OpenURLButtonProps) => {
+  const handlePress = useCallback(async () => {
+    // Checking if the link is supported for links with custom URL scheme.
+    // FIX: does not work on android
+    // const supported = await Linking.canOpenURL(url)
+
+    if (!url.startsWith('http') && !url.startsWith('https')) {
+      Alert.alert('Invalid URL', 'URL must start with "http" or "https"')
+      return
+    }
+
+    await Linking.openURL(url)
+  }, [url])
+
+  return (
+    <Button mt={10} mx={5} onPress={handlePress} colorScheme="primary">
+      {children}
+    </Button>
+  )
+}
 
 export function Limits() {
   const [token, email] = useDeviceStateStore((state) => [
@@ -79,16 +105,9 @@ export function Limits() {
         </VStack>
       </Center>
 
-      <Button
-        mt={10}
-        mx={5}
-        colorScheme="primary"
-        onPress={() => {
-          Linking.openURL(`${PAGE_URL}/pricing?acToken=${token}`)
-        }}
-      >
+      <OpenURLButton url={`${PAGE_URL}/pricing?acToken=${token}`}>
         Pricing page
-      </Button>
+      </OpenURLButton>
     </ScrollView>
   )
 }

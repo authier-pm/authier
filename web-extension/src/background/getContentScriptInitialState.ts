@@ -1,24 +1,26 @@
-import { apolloClient } from '@src/apollo/apolloClient'
 import { IInitStateRes } from '@src/content-script/contentScript'
 import {
   EncryptedSecretType,
-  WebInputGql,
-  WebInputGqlScalars
+  WebInputType
 } from '../../../shared/generated/graphqlBaseTypes'
 import { saveLoginModalsStates } from './chromeRuntimeListener'
-import {
-  WebInputsForHostDocument,
-  WebInputsForHostQuery,
-  WebInputsForHostQueryVariables
-} from './chromeRuntimeListener.codegen'
 import { SecretTypeUnion, device } from './ExtensionDevice'
-import mem from 'mem'
-import ms from 'ms'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
 const log = debug('au:getContentScriptInitialState')
+
+export type WebInputForAutofill = {
+  __typename?: 'WebInputGQLScalars'
+  id: number
+  host: string
+  url: string
+  domPath: string
+  domOrdinal: number
+  kind: WebInputType
+  createdAt: string
+}
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
@@ -30,7 +32,7 @@ export const getContentScriptInitialState = async (
   let decrypted: SecretTypeUnion[]
   if (hostname) {
     if (device.state) {
-      decrypted = await device.state.getSecretsDecryptedByHostname(hostname)
+      decrypted = await device.state.getSecretsDecryptedByTLD(hostname)
     } else {
       decrypted = []
     }
@@ -38,16 +40,10 @@ export const getContentScriptInitialState = async (
     decrypted = []
   }
 
-  let webInputs: WebInputGqlScalars[] = []
+  let webInputs: WebInputForAutofill[] = []
 
-  if (hostname) {
-    try {
-      const webInputsResponse = await getWebInputs(hostname) // TODO move web inputs into device init. We will make a single call to get all the web inputs for all the hosts that appear in users secrets
-      webInputs = webInputsResponse?.data.webInputs ?? []
-    } catch (err) {
-      log('webInputs error', err)
-      // we don't want to throw here, because it would break autofill in content script which does not even need webInputs in many cases
-    }
+  if (hostname && device.state?.webInputs) {
+    webInputs = device.state?.webInputs.filter((i) => i.url === tabUrl) ?? []
   }
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
@@ -71,18 +67,3 @@ export const getContentScriptInitialState = async (
       : null
   }
 }
-
-// TODO stop using mem for this, we should be able to use the apollo cache
-const getWebInputs = mem(
-  (hostname: string) => {
-    return apolloClient.query<
-      WebInputsForHostQuery,
-      WebInputsForHostQueryVariables
-    >({
-      query: WebInputsForHostDocument,
-      variables: { host: hostname },
-      errorPolicy: 'ignore'
-    })
-  },
-  { maxAge: ms('2 days') }
-)
