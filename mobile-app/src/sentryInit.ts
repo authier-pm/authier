@@ -12,7 +12,6 @@ if (!__DEV__) {
     // We recommend adjusting this value in production.
     tracesSampleRate: 1.0,
     integrations: [
-      // @ts-expect-error TODO: fix type incompatibility
       new Sentry.ReactNativeTracing({
         // Pass instrumentation to be used as `routingInstrumentation`
         routingInstrumentation
