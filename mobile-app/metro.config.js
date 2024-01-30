@@ -19,6 +19,11 @@ const config = makeMetroConfig({
       /web-extension\/dist\/.*/,
       /backend\/dist\/.*/
     ]),
+    extraNodeModules: {
+      // Polyfills for node libraries
+      crypto: require.resolve('crypto-browserify'),
+      stream: require.resolve('stream-browserify')
+    },
     sourceExts: ['js', 'jsx', 'ts', 'tsx', 'cjs', 'json', 'mjs']
   },
   watchFolders: [`${__dirname}/..`]

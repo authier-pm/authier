@@ -45,7 +45,7 @@
     "@react-native-firebase/app": "^17.5.0",
     "@react-native-firebase/messaging": "^17.5.0",
     "@react-native-masked-view/masked-view": "^0.3.1",
-    "@react-native/metro-config": "^0.74.0",
+    "@react-native/metro-config": "0.73.1",
     "@react-navigation/bottom-tabs": "^6.5.11",
     "@react-navigation/drawer": "^6.6.6",
     "@react-navigation/material-top-tabs": "^6.6.5",
@@ -151,6 +151,9 @@
     "react-native-version": "^4.0.0",
     "react-test-renderer": "18.2.0",
     "typescript": "^5.3.3"
+  },
+  "resolutions": {
+    "metro": "^0.79.1"
   },
   "jest": {
     "testEnvironmentOptions": {},
