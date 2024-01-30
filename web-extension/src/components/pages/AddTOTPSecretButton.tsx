@@ -78,7 +78,7 @@ export const AddTOTPSecretButton = () => {
           const src = await browser.tabs.captureVisibleTab()
           const qr = await getQrCodeFromUrl(src)
           if (qr) {
-            addToTOTPs(qr)
+            await addToTOTPs(qr)
           } else {
             toast({
               title: t`could not find any QR code on this page. Make sure QR code is visible.`,
