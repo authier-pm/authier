@@ -298,8 +298,8 @@ importers:
   mobile-app:
     dependencies:
       '@apollo/client':
-        specifier: ^3.8.10
-        version: 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+        specifier: ^3.9.5
+        version: 3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       '@babel/preset-env':
         specifier: ^7.23.7
         version: 7.23.7(@babel/core@7.23.7)
@@ -395,19 +395,19 @@ importers:
         version: 1.5.17(graphql@16.8.1)
       apollo-link-queue:
         specifier: ^3.1.0
-        version: 3.1.0(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 3.1.0(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       apollo-link-retry:
         specifier: ^2.2.16
         version: 2.2.16(graphql@16.8.1)
       apollo-link-serialize:
         specifier: ^4.0.0
-        version: 4.0.0(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+        version: 4.0.0(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       apollo-link-token-refresh:
         specifier: ^0.6.1
-        version: 0.6.1(@apollo/client@3.8.10)(@types/node@20.11.20)(graphql@16.8.1)(typescript@5.3.3)
+        version: 0.6.1(@apollo/client@3.9.5)(@types/node@20.11.20)(graphql@16.8.1)(typescript@5.3.3)
       apollo3-cache-persist:
         specifier: ^0.14.1
-        version: 0.14.1(@apollo/client@3.8.10)
+        version: 0.14.1(@apollo/client@3.9.5)
       babel-plugin-transform-remove-console:
         specifier: ^6.9.4
         version: 6.9.4
@@ -1074,41 +1074,6 @@ packages:
     dev: false
     optional: true
 
-  /@apollo/client@3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-p/22RZ8ehHyvySnC20EHPPe0gdu8Xp6ZCiXOfdEe1ZORw5cUteD/TLc66tfKv8qu8NLIfbiWoa+6s70XnKvxqg==}
-    peerDependencies:
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-      graphql-ws: ^5.5.5
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
-    peerDependenciesMeta:
-      graphql-ws:
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      subscriptions-transport-ws:
-        optional: true
-    dependencies:
-      '@graphql-typed-document-node/core': 3.2.0(graphql@16.8.1)
-      '@wry/equality': 0.5.6
-      '@wry/trie': 0.5.0
-      graphql: 16.8.1
-      graphql-tag: 2.12.6(graphql@16.8.1)
-      hoist-non-react-statics: 3.3.2
-      optimism: 0.18.0
-      prop-types: 15.8.1
-      react: 18.2.0
-      react-dom: 18.2.0(react@18.2.0)
-      response-iterator: 0.2.6
-      symbol-observable: 4.0.0
-      ts-invariant: 0.10.3
-      tslib: 2.6.2
-      zen-observable-ts: 1.2.5
-    dev: false
-
   /@apollo/client@3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-7y+c8MTPU+hhTwvcGVtMMGIgWduzrvG1mz5yJMRyqYbheBkkky3Lki6ADWVSBXG1lZoOtPYvB2zDgVfKb2HSsw==}
     peerDependencies:
@@ -1146,7 +1111,6 @@ packages:
       zen-observable-ts: 1.2.5
     transitivePeerDependencies:
       - '@types/react'
-    dev: true
 
   /@apollo/client@3.9.5(@types/react@18.2.58)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-7y+c8MTPU+hhTwvcGVtMMGIgWduzrvG1mz5yJMRyqYbheBkkky3Lki6ADWVSBXG1lZoOtPYvB2zDgVfKb2HSsw==}
@@ -14046,11 +14010,12 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /apollo-link-queue@3.1.0(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
+  /apollo-link-queue@3.1.0(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-9zu6MZHKBN2iChhfnvmqSaqnAnhS5taKVS+fzJDEPfxXF2K1S5P84ykOyWr2LuBLOSm6/eDWkE1kIuClPIeI9A==}
     dependencies:
-      '@apollo/client': 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
     transitivePeerDependencies:
+      - '@types/react'
       - graphql
       - graphql-ws
       - react
@@ -14068,6 +14033,20 @@ packages:
       - graphql
     dev: false
 
+  /apollo-link-serialize@4.0.0(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
+    resolution: {integrity: sha512-GQJkwj1Fm/OQyte5+y64GsWBIL89AaALlJGc4plMzTttfMxMREXIttXdaP4BzU5xvC/PwVP0khKS/5CbEX8pjw==}
+    dependencies:
+      '@apollo/client': 3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+      zen-observable-ts: 0.8.21
+    transitivePeerDependencies:
+      - '@types/react'
+      - graphql
+      - graphql-ws
+      - react
+      - react-dom
+      - subscriptions-transport-ws
+    dev: false
+
   /apollo-link-serialize@4.0.0(@types/react@18.2.58)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
     resolution: {integrity: sha512-GQJkwj1Fm/OQyte5+y64GsWBIL89AaALlJGc4plMzTttfMxMREXIttXdaP4BzU5xvC/PwVP0khKS/5CbEX8pjw==}
     dependencies:
@@ -14082,42 +14061,13 @@ packages:
       - subscriptions-transport-ws
     dev: false
 
-  /apollo-link-serialize@4.0.0(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0):
-    resolution: {integrity: sha512-GQJkwj1Fm/OQyte5+y64GsWBIL89AaALlJGc4plMzTttfMxMREXIttXdaP4BzU5xvC/PwVP0khKS/5CbEX8pjw==}
-    dependencies:
-      '@apollo/client': 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
-      zen-observable-ts: 0.8.21
-    transitivePeerDependencies:
-      - graphql
-      - graphql-ws
-      - react
-      - react-dom
-      - subscriptions-transport-ws
-    dev: false
-
-  /apollo-link-token-refresh@0.6.1(@apollo/client@3.8.10)(@types/node@20.11.20)(graphql@16.8.1)(typescript@5.3.3):
-    resolution: {integrity: sha512-1loepJ228nVU0Y9fx01GPbWeCHUdGXdctzn2BzduWDZ2XvIvcP4znDmZ4jR7lC5l7BmlkFKfQge4JJv6YI+p3Q==}
-    peerDependencies:
-      '@apollo/client': ^3.0.0
-      graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
-    dependencies:
-      '@apollo/client': 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
-      graphql: 16.8.1
-      ts-node: 10.9.2(@swc/core@1.3.107)(@types/node@20.11.20)(typescript@5.3.3)
-    transitivePeerDependencies:
-      - '@swc/core'
-      - '@swc/wasm'
-      - '@types/node'
-      - typescript
-    dev: false
-
   /apollo-link-token-refresh@0.6.1(@apollo/client@3.9.5)(@types/node@20.11.20)(graphql@16.8.1)(typescript@5.3.3):
     resolution: {integrity: sha512-1loepJ228nVU0Y9fx01GPbWeCHUdGXdctzn2BzduWDZ2XvIvcP4znDmZ4jR7lC5l7BmlkFKfQge4JJv6YI+p3Q==}
     peerDependencies:
       '@apollo/client': ^3.0.0
       graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
     dependencies:
-      '@apollo/client': 3.9.5(@types/react@18.2.58)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
       graphql: 16.8.1
       ts-node: 10.9.2(@swc/core@1.3.107)(@types/node@20.11.20)(typescript@5.3.3)
     transitivePeerDependencies:
@@ -14151,20 +14101,12 @@ packages:
       tslib: 1.14.1
     dev: false
 
-  /apollo3-cache-persist@0.14.1(@apollo/client@3.8.10):
-    resolution: {integrity: sha512-p/jNzN/MmSd0TmY7/ts0B3qi0SdQ3w9yNLQdKqB3GGb9xATUlAum2v4hSrTeWd/DZKK2Z7Xg5kFXTH6nNVnKSQ==}
-    peerDependencies:
-      '@apollo/client': ^3.2.5
-    dependencies:
-      '@apollo/client': 3.8.10(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
-    dev: false
-
   /apollo3-cache-persist@0.14.1(@apollo/client@3.9.5):
     resolution: {integrity: sha512-p/jNzN/MmSd0TmY7/ts0B3qi0SdQ3w9yNLQdKqB3GGb9xATUlAum2v4hSrTeWd/DZKK2Z7Xg5kFXTH6nNVnKSQ==}
     peerDependencies:
       '@apollo/client': ^3.2.5
     dependencies:
-      '@apollo/client': 3.9.5(@types/react@18.2.58)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
+      '@apollo/client': 3.9.5(@types/react@18.2.46)(graphql@16.8.1)(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /appcenter-cli@2.14.0(webpack@5.90.3):
@@ -26680,7 +26622,6 @@ packages:
     dependencies:
       '@types/react': 18.2.46
       react: 18.2.0
-    dev: true
 
   /rehackt@0.0.5(@types/react@18.2.58)(react@18.2.0):
     resolution: {integrity: sha512-BI1rV+miEkaHj8zd2n+gaMgzu/fKz7BGlb4zZ6HAiY9adDmJMkaDcmuXlJFv0eyKUob+oszs3/2gdnXUrzx2Tg==}
