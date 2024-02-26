@@ -1,6 +1,5 @@
-import React, {
+import {
   FunctionComponent,
-  useContext,
   useEffect,
   useState
 } from 'react'
@@ -13,16 +12,15 @@ import {
   Tooltip,
   useColorModeValue
 } from '@chakra-ui/react'
-import { HamburgerIcon, CloseIcon, LockIcon, AddIcon } from '@chakra-ui/icons'
+import { CloseIcon, LockIcon, AddIcon } from '@chakra-ui/icons'
 
-import { Link, useRoute, useLocation, LinkProps, LocationHook } from 'wouter'
+import { useLocation } from 'wouter'
 
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdArchive } from 'react-icons/io'
 import { t } from '@lingui/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
 import { openVaultTab } from '@src/AuthLinkPage'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AddSecretNavMenu } from '@src/pages/AddSecretNavMenu'
 
 export const PopupNavBar: FunctionComponent = () => {
