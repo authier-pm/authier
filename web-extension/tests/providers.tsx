@@ -6,9 +6,10 @@ import { Router } from 'wouter'
 
 // import { gqlSchema } from '../../backend/schemas/gqlSchema'
 const gqlSchemas = require('../../backend/schemas/gqlSchema').gqlSchema // we need to require it because when we use regular import typescript starts to compile whole BE codebase with extensions config
-
+import { memoryLocation } from 'wouter/memory-location'
 import { i18n } from '@lingui/core'
-import staticLocationHook from 'wouter/static-location'
+
+const locationHook = memoryLocation({ path: '/', static: true, record: true })
 
 export const makeSsrClient = (ctx: any) => {
   return new ApolloClient({
@@ -31,7 +32,7 @@ export const wrapInFEProviders = (
   return (
     <ApolloProvider client={client}>
       <I18nProvider i18n={i18n}>
-        <Router hook={staticLocationHook('/')}>{jsx}</Router>
+        <Router hook={locationHook.hook}>{jsx}</Router>
       </I18nProvider>
     </ApolloProvider>
   )
