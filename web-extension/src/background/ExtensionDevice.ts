@@ -55,7 +55,7 @@ import {
   WebInputsForHostsQuery,
   WebInputsForHostsQueryVariables
 } from './chromeRuntimeListener.codegen'
-import { WebInputForAutofill } from './getContentScriptInitialState'
+import { WebInputForAutofill } from './WebInputForAutofill'
 
 export const log = debug('au:Device')
 

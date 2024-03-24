@@ -9,7 +9,7 @@ import { authierColors } from '../../../shared/chakraRawTheme'
 import 'notyf/notyf.min.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
-import { getSelectorForElement } from './DOMEventsRecorder'
+
 import {
   ILoginSecret,
   ITOTPSecret,
@@ -21,7 +21,10 @@ import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBo
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 
 import browser from 'webextension-polyfill'
-import { generateQuerySelectorForOrphanedElement } from './cssSelectorGenerators'
+import {
+  generateQuerySelectorForOrphanedElement,
+  getSelectorForElement
+} from './cssSelectorGenerators'
 import { notyf } from './notyf'
 
 const log = debug('au:autofill')

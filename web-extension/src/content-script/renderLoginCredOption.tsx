@@ -1,7 +1,7 @@
 import { h, render } from 'preact'
 import { ILoginSecret } from '../util/useDeviceState'
 import { PromptPasswordOption } from './components/PromptPasswordOption'
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
+import { WebInputForAutofill } from '../background/WebInputForAutofill'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -10,15 +10,7 @@ export let promptOption: HTMLDivElement | null
 
 export type PromptPasswordOptionProps = {
   loginCredentials: ILoginSecret[]
-  webInputs: Array<{
-    __typename?: 'WebInputGQL'
-    id?: number
-    url: string
-    host: string
-    domPath: string
-    kind: WebInputType
-    createdAt: string
-  }>
+  webInputs: Array<WebInputForAutofill>
 }
 
 export function renderLoginCredOption(props: PromptPasswordOptionProps) {

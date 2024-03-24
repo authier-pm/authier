@@ -1,10 +1,6 @@
 import { debounce } from 'lodash'
 
-import {
-  DOMEventsRecorder,
-  getSelectorForElement,
-  IInputRecord
-} from './DOMEventsRecorder'
+import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import {
   WebInputElement,
@@ -34,6 +30,8 @@ import { trpc } from './connectTRPC'
 import { notyf } from './notyf'
 import browser from 'webextension-polyfill'
 import { PopupActionsEnum } from '../components/pages/PopupActionsEnum'
+import { getSelectorForElement } from './cssSelectorGenerators'
+import { WebInputForAutofill } from '../background/WebInputForAutofill'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -47,20 +45,13 @@ export interface Coords {
   x: number
   y: number
 }
+
 export interface IInitStateRes {
   extensionDeviceReady: boolean
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   passwordCount: number
-  webInputs: Array<{
-    id?: number
-    url: string
-    host: string
-    domPath: string
-    domOrdinal: number
-    kind: WebInputType
-    createdAt: string
-  }>
+  webInputs: Array<WebInputForAutofill>
   saveLoginModalsState?: ISaveLoginModalState | null | undefined
 }
 
