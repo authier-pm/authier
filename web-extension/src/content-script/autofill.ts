@@ -26,20 +26,13 @@ import {
   getSelectorForElement
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
+import { WebInputForAutofill } from '../background/WebInputForAutofill'
 
 const log = debug('au:autofill')
 
 export type IDecryptedSecrets = {
   loginCredentials: ILoginSecret[]
   totpSecrets: ITOTPSecret[]
-}
-
-type webInput = {
-  url: string
-  host: string
-  domPath: string
-  kind: WebInputType
-  createdAt: string
 }
 
 export const autofillEventsDispatched = new Set()
@@ -446,7 +439,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const newWebInputs: webInput[] = []
+      const newWebInputs: WebInputForAutofill[] = []
       const inputElsArray = filterUselessInputs(documentBody)
       log('inputElsArray', inputElsArray)
 
@@ -496,9 +489,11 @@ export const autofill = (initState: IInitStateRes) => {
               webInputs.length === 0 &&
               secretsForHost.loginCredentials.length > 1
             ) {
+              const selector = getSelectorForElement(input)
               newWebInputs.push({
                 createdAt: new Date().toString(),
-                domPath: getSelectorForElement(input).css,
+                domPath: selector.css,
+                domOrdinal: selector.domOrdinal,
                 host: location.host,
                 url: location.href,
                 kind: WebInputType.PASSWORD
@@ -522,9 +517,11 @@ export const autofill = (initState: IInitStateRes) => {
                   webInputs.length === 0 &&
                   secretsForHost.loginCredentials.length > 1
                 ) {
+                  const selector = getSelectorForElement(inputElsArray[j])
                   newWebInputs.push({
                     createdAt: new Date().toString(),
-                    domPath: getSelectorForElement(inputElsArray[j]).css,
+                    domPath: selector.css,
+                    domOrdinal: selector.domOrdinal,
                     host: location.host,
                     url: location.href,
                     kind: WebInputType.USERNAME
