@@ -82,9 +82,6 @@ export type SecretTypeUnion = ILoginSecret | ITOTPSecret
 const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
   'loginCredentials' in secret
 
-const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
-  'totp' in secret
-
 export type AddSecretInput = Array<
   Omit<SecretSerializedType, 'id'> & {
     totp?: TotpTypeWithMeta
@@ -325,9 +322,11 @@ export class DeviceState implements IBackgroundStateSerializable {
 
         deviceState.secrets = [...unchangedSecrets, ...newAndUpdatedSecrets]
 
+        const webInputs = await this.getWebInputs()
+
+        this.webInputs = webInputs
         await this.save()
 
-        this.webInputs = await this.getWebInputs()
         await apolloClient.mutate<
           MarkAsSyncedMutation,
           MarkAsSyncedMutationVariables
@@ -425,9 +424,9 @@ export class DeviceState implements IBackgroundStateSerializable {
       query: WebInputsForHostsDocument,
       variables: {
         hosts: hostnames
-      }
+      },
+      fetchPolicy: 'network-only'
     })
-
     return data.webInputs ?? []
   }
 

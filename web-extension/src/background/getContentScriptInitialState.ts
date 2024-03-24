@@ -45,6 +45,7 @@ export const getContentScriptInitialState = async (
   if (hostname && device.state?.webInputs) {
     webInputs = device.state?.webInputs.filter((i) => i.url === tabUrl) ?? []
   }
+
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
