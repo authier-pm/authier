@@ -1,4 +1,4 @@
-import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
+import { generateQuerySelectorForOrphanedElement } from './cssSelectorGenerators'
 
 describe('generateQuerySelectorForOrphanedElement', () => {
   it('should generate selector based on type and autocomplete attributes', () => {

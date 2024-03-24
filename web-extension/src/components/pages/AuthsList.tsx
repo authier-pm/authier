@@ -28,6 +28,8 @@ import { SecretItemIcon } from '../SecretItemIcon'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import { PopupActionsEnum } from './PopupActionsEnum'
+import { SquareMousePointer } from './SquareMousePointerIcon'
 
 const log = debug('au:AuthsList')
 
@@ -84,25 +86,37 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               {showWhole ? (
                 otpCode
               ) : (
-                <Tooltip label={t`Click to show the whole`}>
-                  {otpCode.substr(0, 3) + '***'}
+                <Tooltip label={t`Click to show & copy`}>
+                  <div
+                    onClick={() => {
+                      onCopy()
+                    }}
+                  >
+                    {otpCode.substr(0, 3) + '***'}
+                    <CopyIcon></CopyIcon>
+                  </div>
                 </Tooltip>
               )}
             </StatNumber>
           </Box>
-          <Tooltip label={t`Copy TOTP`}>
+          <Tooltip label={t`Fill TOTP into input on screen by point&click`}>
             <Button
               size="md"
               ml={2}
               variant="solid"
               colorScheme={'cyan'}
               onClick={() => {
-                onCopy()
-
                 // TODO log usage of this token to backend
+                browser.runtime.sendMessage({
+                  kind: PopupActionsEnum.TOTP_COPIED,
+                  event: {
+                    otpCode,
+                    secretId: totpSecret.id
+                  }
+                })
               }}
             >
-              <CopyIcon></CopyIcon>
+              <SquareMousePointer></SquareMousePointer>
             </Button>
           </Tooltip>
         </Flex>

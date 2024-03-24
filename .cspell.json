@@ -1,5 +1,8 @@
 {
-  "ignorePaths": ["*/node_modules/**", "*/dist/**"],
+  "ignorePaths": [
+    "*/node_modules/**",
+    "*/dist/**"
+  ],
   "words": [
     "APIKEY",
     "appspot",
@@ -28,6 +31,7 @@
     "Formik",
     "GEOIP",
     "graphiql",
+    "ICSS",
     "IJWT",
     "Ionicons",
     "ITOTP",

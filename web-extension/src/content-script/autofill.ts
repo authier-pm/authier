@@ -6,11 +6,10 @@ import { isElementInViewport, isHidden } from './isElementInViewport'
 import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
-import { Notyf } from 'notyf'
 import 'notyf/notyf.min.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
-import { getSelectorForElement } from './DOMEventsRecorder'
+
 import {
   ILoginSecret,
   ITOTPSecret,
@@ -22,7 +21,12 @@ import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBo
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
 
 import browser from 'webextension-polyfill'
-import { generateQuerySelectorForOrphanedElement } from './generateQuerySelectorForOrphanedElement'
+import {
+  generateQuerySelectorForOrphanedElement,
+  getSelectorForElement
+} from './cssSelectorGenerators'
+import { notyf } from './notyf'
+import { WebInputForAutofill } from '../background/WebInputForAutofill'
 
 const log = debug('au:autofill')
 
@@ -31,19 +35,7 @@ export type IDecryptedSecrets = {
   totpSecrets: ITOTPSecret[]
 }
 
-type webInput = {
-  url: string
-  host: string
-  domPath: string
-  kind: WebInputType
-  createdAt: string
-}
-
 export const autofillEventsDispatched = new Set()
-
-const notyf = new Notyf({
-  duration: 5000
-})
 
 /**
  * triggered when page contains 2 or more useful inputs
@@ -131,10 +123,14 @@ export const autofillValueIntoInput = (
 ) => {
   log('autofillValueIntoInput:', value, element)
 
+  if (alreadyFilledElements.has(element)) {
+    return null
+  }
   if (element.childNodes.length > 0) {
-    //we should again loop through the children of the element and find th right input
+    //we should again loop through the children of the element and find the right input
     //@ts-ignore
     imitateKeyInput(element.childNodes[0], value)
+    alreadyFilledElements.add(element)
   }
 
   if (isElementInViewport(element) === false || isHidden(element)) {
@@ -148,6 +144,7 @@ export const autofillValueIntoInput = (
     lastAutofilledValue: value
   })
   imitateKeyInput(element, value)
+  alreadyFilledElements.add(element)
 
   return element
 }
@@ -219,6 +216,8 @@ const filledElements: Array<HTMLInputElement | null> = []
 
 const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
+const alreadyFilledElements = new Set()
+
 export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
 
@@ -262,24 +261,26 @@ export const autofill = (initState: IInitStateRes) => {
         return
       }
     }
-    let matchingWebInputs = webInputs.filter(({ url }) => {
+    const matchingWebInputs = webInputs.filter(({ url }) => {
       const matches = url.startsWith(location.href)
 
       return matches
     })
-    if (matchingWebInputs.length < 2) {
-      matchingWebInputs = webInputs
-    }
-    //Fill known inputs
+    log('matchingWebInputs:', matchingWebInputs)
+
+    // Fill known inputs
     let foundInputsCount = 0
     for (const webInputGql of matchingWebInputs) {
-      const inputEl = body.querySelector(
+      const inputElList = body.querySelectorAll(
         webInputGql.domPath
-      ) as HTMLInputElement | null
+      ) as NodeListOf<HTMLInputElement>
 
-      // log('inputEl', inputEl)
+      const inputEl = inputElList[webInputGql.domOrdinal]
+
       //NOTE: We found element by DOM path
       if (inputEl) {
+        // log('webInputGql was found')
+
         foundInputsCount++
         log(`autofilled by domPath ${webInputGql.domPath}`)
         if (
@@ -309,7 +310,6 @@ export const autofill = (initState: IInitStateRes) => {
         } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
           const el = autofillValueIntoInput(
             inputEl,
-            //@sleaper TODO: fix this
             authenticator.generate(totpSecret.totp.secret)
           )
           filledElements.push(el)
@@ -439,7 +439,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const newWebInputs: webInput[] = []
+      const newWebInputs: WebInputForAutofill[] = []
       const inputElsArray = filterUselessInputs(documentBody)
       log('inputElsArray', inputElsArray)
 
@@ -489,9 +489,11 @@ export const autofill = (initState: IInitStateRes) => {
               webInputs.length === 0 &&
               secretsForHost.loginCredentials.length > 1
             ) {
+              const selector = getSelectorForElement(input)
               newWebInputs.push({
                 createdAt: new Date().toString(),
-                domPath: getSelectorForElement(input).css,
+                domPath: selector.css,
+                domOrdinal: selector.domOrdinal,
                 host: location.host,
                 url: location.href,
                 kind: WebInputType.PASSWORD
@@ -515,9 +517,11 @@ export const autofill = (initState: IInitStateRes) => {
                   webInputs.length === 0 &&
                   secretsForHost.loginCredentials.length > 1
                 ) {
+                  const selector = getSelectorForElement(inputElsArray[j])
                   newWebInputs.push({
                     createdAt: new Date().toString(),
-                    domPath: getSelectorForElement(inputElsArray[j]).css,
+                    domPath: selector.css,
+                    domOrdinal: selector.domOrdinal,
                     host: location.host,
                     url: location.href,
                     kind: WebInputType.USERNAME
