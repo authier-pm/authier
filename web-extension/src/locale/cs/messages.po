@@ -132,8 +132,12 @@ msgid "Change vault password"
 msgstr "Změnit heslo trezoru"
 
 #: src/components/pages/AuthsList.tsx
-msgid "Click to show the whole"
-msgstr "Klikněte pro zobrazení celého"
+msgid "Click to show & copy"
+msgstr ""
+
+#: src/components/pages/AuthsList.tsx
+#~ msgid "Click to show the whole"
+#~ msgstr "Klikněte pro zobrazení celého"
 
 #: src/components/PopupNavBar.tsx
 #: src/components/PopupNavBar.tsx
@@ -148,17 +152,28 @@ msgstr "Konfigurace"
 msgid "Confirm new password // Confirm password"
 msgstr "Potvrďte nové heslo // Potvrďte heslo"
 
+#: src/components/vault/EditFormButtons.tsx
+#: src/components/vault/VaultItemSettings.tsx
 #: src/components/vault/VirtualizedList.tsx
 msgid "Copied to clipboard"
 msgstr "Zkopírováno do schránky"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "copy password"
+msgstr ""
 
 #: src/components/pages/AuthsList.tsx
 msgid "Copy password"
 msgstr "Kopírovat heslo"
 
 #: src/components/pages/AuthsList.tsx
-msgid "Copy TOTP"
-msgstr "Kopírovat TOTP"
+#~ msgid "Copy TOTP"
+#~ msgstr "Kopírovat TOTP"
+
+#: src/components/vault/EditFormButtons.tsx
+#: src/components/vault/EditFormButtons.tsx
+msgid "copy whole secret"
+msgstr ""
 
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "could not find any QR code on this page. Make sure QR code is visible."
@@ -176,6 +191,10 @@ msgstr "Aktuální heslo // Hlavní heslo"
 #: src/components/vault/settings/Account.tsx
 msgid "Danger zone"
 msgstr "Nebezpečná zóna"
+
+#: src/components/vault/EditFormButtons.tsx
+msgid "delete secret"
+msgstr ""
 
 #: src/components/vault/settings/Account.tsx
 msgid "Delete your account"
@@ -216,6 +235,10 @@ msgstr "Nepodařilo se vytvořit dešifrovací výzvu"
 #: src/components/vault/VaultItemSettings.tsx
 msgid "Failed to parse this secret:"
 msgstr "Nepodařilo se analyzovat tento tajný kód:"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Fill TOTP into input on screen by point&click"
+msgstr ""
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Import & Export"
