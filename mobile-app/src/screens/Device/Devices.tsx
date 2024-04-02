@@ -72,8 +72,8 @@ export function DeviceList({
     refetch: requestsRefetch,
     loading: loadingRequests
   } = useDevicesRequestsQuery({})
-  const [reject] = useRejectChallengeMutation()
-  const [approve] = useApproveChallengeMutation()
+  const [reject, { loading: rejectLoading }] = useRejectChallengeMutation()
+  const [approve, { loading: approveLoading }] = useApproveChallengeMutation()
 
   const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
 
@@ -239,10 +239,29 @@ export function DeviceList({
           <HStack space={6} mt={3}>
             <Button
               w={'30%'}
+              rounded={'xl'}
+              colorScheme="red"
+              isLoading={rejectLoading}
+              onPress={async () => {
+                await reject({
+                  variables: {
+                    id: item.id
+                  }
+                })
+                requestsRefetch()
+              }}
+            >
+              <Text fontWeight="bold" color="white">
+                <Trans>Reject</Trans>
+              </Text>
+            </Button>
+            <Button
+              w={'30%'}
               size={'lg'}
               rounded={'xl'}
               colorScheme="green"
               variant="solid"
+              isLoading={approveLoading}
               onPress={async () => {
                 await approve({
                   variables: {
@@ -257,23 +276,6 @@ export function DeviceList({
             >
               <Text fontWeight="bold" color="white">
                 <Trans>Approve</Trans>
-              </Text>
-            </Button>
-            <Button
-              w={'30%'}
-              rounded={'xl'}
-              colorScheme="red"
-              onPress={async () => {
-                await reject({
-                  variables: {
-                    id: item.id
-                  }
-                })
-                requestsRefetch()
-              }}
-            >
-              <Text fontWeight="bold" color="white">
-                <Trans>Reject</Trans>
               </Text>
             </Button>
           </HStack>
