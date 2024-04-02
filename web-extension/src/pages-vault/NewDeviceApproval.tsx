@@ -13,7 +13,9 @@ import { useDevicesListWithDataQuery } from './Devices.codegen'
 export const NewDevicesApprovalStack = () => {
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
 
-  const { data: devicesRequests, refetch } = useDevicesRequestsQuery()
+  const { data: devicesRequests, refetch } = useDevicesRequestsQuery({
+    fetchPolicy: 'cache-and-network'
+  })
 
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
