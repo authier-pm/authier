@@ -1,4 +1,4 @@
-import { Button } from '@chakra-ui/button'
+import { Button } from '@chakra-ui/react'
 import {
   AlertDialog,
   AlertDialogOverlay,

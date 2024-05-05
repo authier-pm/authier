@@ -262,7 +262,12 @@ browser.runtime.onMessage.addListener((message) => {
         url: location.href
       }
       await trpc.addTOTPInput.mutate(webInput)
-      autofillValueIntoInput(selectedElement, message.otpCode)
+      const messageEvent = message.event as {
+        otpCode: string
+        secretId: string
+      }
+
+      autofillValueIntoInput(selectedElement, messageEvent.otpCode)
       notyf.success(`TOTP WebInput added for selector "${elementSelector.css}"`)
     }
 

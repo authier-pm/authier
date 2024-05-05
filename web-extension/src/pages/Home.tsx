@@ -32,8 +32,8 @@ export const Home: FunctionComponent = () => {
   const filterByTLD = !currentURL
     ? true
     : filterByTLDManual === null
-    ? currentURL.startsWith('http')
-    : filterByTLDManual
+      ? currentURL.startsWith('http')
+      : filterByTLDManual
   return (
     <>
       <Flex position="sticky" align="center" pl={4} pr={4} mt={'10px'}>
@@ -54,6 +54,7 @@ export const Home: FunctionComponent = () => {
 
             <Input
               ml={5}
+              mr={3}
               size="sm"
               placeholder="Search"
               onChange={(e) => {

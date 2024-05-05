@@ -1,4 +1,4 @@
-import { IconButton } from '@chakra-ui/button'
+import { IconButton } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
 import {

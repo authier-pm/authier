@@ -71,6 +71,13 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
 
 function imitateKeyInput(el: HTMLInputElement, input: string) {
   if (el) {
+    if (el.value === input) {
+      return
+    }
+
+    if (el.value !== '') {
+      el.value = '' // reset if there is already some value
+    }
     const dispatchAutofillEvent = (ev) => {
       autofillEventsDispatched.add(ev)
       el.dispatchEvent(ev)
