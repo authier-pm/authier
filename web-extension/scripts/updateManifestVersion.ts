@@ -4,7 +4,7 @@ import { getManifest } from '../src/manifest'
 import child_process from 'child_process'
 
 export const dir = (...args: string[]) => resolve(__dirname, '..', ...args)
-export async function writeManifest() {
+export async function updateManifestVersion() {
   const manifest = await getManifest()
 
   await fs.writeJSON(dir('dist/manifest.json'), manifest, {
@@ -12,10 +12,10 @@ export async function writeManifest() {
   })
   console.log(`written manifest.json for version ${manifest.version}`)
 
-  child_process.execSync(`git add dist/manifest.json`)
+  child_process.execSync(`git add *`)
   child_process.execSync(
     `git commit -m "bump web extension to ${manifest.version}"`
   )
 }
 
-writeManifest()
+updateManifestVersion()
