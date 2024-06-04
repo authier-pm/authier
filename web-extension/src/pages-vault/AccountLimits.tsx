@@ -36,7 +36,7 @@ function PriceWrapper({ children }: { children: ReactNode }) {
       borderRadius={'xl'}
       rounded={'xl'}
       boxShadow={'lg'}
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={useColorModeValue('cyan.800', 'gray.900')}
     >
       {children}
     </Box>
@@ -239,7 +239,7 @@ export const AccountLimits = () => {
                 bg={useColorModeValue('red.300', 'red.700')}
                 px={3}
                 py={1}
-                color={useColorModeValue('white', 'gray.100')}
+                color={useColorModeValue('cyan.800', 'gray.100')}
                 fontSize="sm"
                 fontWeight="600"
                 rounded="xl"

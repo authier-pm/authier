@@ -69,7 +69,7 @@ export function Account({ navigation }: AccountStackScreenProps<'Account'>) {
         alignItems="center"
         space={5}
         pb={3}
-        backgroundColor={useColorModeValue('white', 'rgb(18, 18, 18)')}
+        backgroundColor={useColorModeValue('cyan.800', 'rgb(18, 18, 18)')}
       >
         <Avatar
           size={'lg'}

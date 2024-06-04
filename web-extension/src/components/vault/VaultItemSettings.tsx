@@ -43,7 +43,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
 
-  const bg = useColorModeValue('white', 'gray.800')
+  const bg = useColorModeValue('cyan.800', 'gray.800')
 
   return (
     <motion.div
@@ -221,7 +221,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         overflow={'hidden'}
         m="auto"
         alignItems={'center'}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={useColorModeValue('cyan.800', 'gray.800')}
       >
         <CloseIcon
           cursor={'pointer'}

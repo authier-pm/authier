@@ -242,7 +242,7 @@ export const LoginAwaitingApproval = () => {
     deviceName
   })
 
-  const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
+  const bgColor = useColorModeValue('cyan.800', 'rgb(18, 18, 18)')
 
   if (!deviceDecryptionChallenge || !device.fireToken) {
     return <Loading />

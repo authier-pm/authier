@@ -75,7 +75,7 @@ export function DeviceList({
   const [reject, { loading: rejectLoading }] = useRejectChallengeMutation()
   const [approve, { loading: approveLoading }] = useApproveChallengeMutation()
 
-  const bgColor = useColorModeValue('white', 'rgb(18, 18, 18)')
+  const bgColor = useColorModeValue('cyan.800', 'rgb(18, 18, 18)')
 
   useEffect(() => {
     //FIX: this is calling on every rerender
@@ -117,6 +117,7 @@ export function DeviceList({
         {({ isPressed }) => {
           return (
             <HStack
+              justifyContent={'center'}
               style={{
                 transform: [
                   {

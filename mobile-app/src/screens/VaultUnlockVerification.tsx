@@ -48,7 +48,7 @@ export function VaultUnlockVerification() {
   const { lockedState } = device
   const [showPassword, setShowPassword] = useState(false)
   const [tries, setTries] = useState(0)
-  const bgColor = useColorModeValue('white', 'black')
+  const bgColor = useColorModeValue('cyan.800', 'black')
 
   useEffect(() => {
     RNBootSplash.hide({ fade: true })

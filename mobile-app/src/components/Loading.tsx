@@ -2,7 +2,7 @@ import React from 'react'
 import { HStack, Spinner, Heading, View, useColorModeValue } from 'native-base'
 
 export const Loading = () => {
-  const bgColor = useColorModeValue('white', 'black')
+  const bgColor = useColorModeValue('cyan.800', 'black')
 
   return (
     <View background={bgColor} alignItems={'center'} justifyContent="center">

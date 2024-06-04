@@ -84,7 +84,7 @@ const DeviceListItem = ({
       <Flex py={6} m={5}>
         <Box
           w="350px"
-          bg={useColorModeValue('white', 'gray.800')}
+          bg={useColorModeValue('cyan.800', 'gray.800')}
           boxShadow={'2xl'}
           rounded={'lg'}
           p={6}
@@ -285,37 +285,63 @@ const DeviceListItem = ({
             <Stack mt={6} spacing={4}>
               <Box>
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                  Last IP Address
+                  <Trans>Last IP Address</Trans>
                 </Text>
                 <Text fontSize={'xl'}>{deviceInfo.lastIpAddress}</Text>
               </Box>
               <Box>
                 <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                  Geolocation
+                  <Trans>Geolocation</Trans>
                 </Text>
-                <Text fontSize={'xl'}>{deviceInfo.lastGeoLocation}</Text>
+                <Text fontSize={'md'}>{deviceInfo.lastGeoLocation}</Text>
               </Box>
-              <Box>
-                <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                  Added
-                </Text>
-                <Tooltip
-                  label={intlFormat(new Date(deviceInfo.createdAt ?? ''), {
-                    weekday: 'long',
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric'
-                  })}
-                >
-                  <Text fontSize={'xl'}>
-                    {formatDistance(
-                      new Date(deviceInfo.createdAt ?? ''),
-                      new Date()
-                    )}{' '}
-                    ago
+              <HStack>
+                <Box w="50%">
+                  <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                    <Trans>Added</Trans>
                   </Text>
-                </Tooltip>
-              </Box>
+                  <Tooltip
+                    label={intlFormat(new Date(deviceInfo.createdAt ?? ''), {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  >
+                    <Text fontSize={'sm'}>
+                      {formatDistance(
+                        new Date(deviceInfo.createdAt ?? ''),
+                        new Date()
+                      )}{' '}
+                      ago
+                    </Text>
+                  </Tooltip>
+                </Box>
+
+                <Box w="50%">
+                  <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                    <Trans>Last sync</Trans>
+                  </Text>
+                  {deviceInfo.lastSyncAt && (
+                    <Tooltip
+                      label={intlFormat(new Date(deviceInfo.lastSyncAt ?? ''), {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    >
+                      <Text fontSize={'sm'}>
+                        {formatDistance(
+                          new Date(deviceInfo.lastSyncAt ?? ''),
+                          new Date()
+                        )}{' '}
+                        ago
+                      </Text>
+                    </Tooltip>
+                  )}
+                </Box>
+              </HStack>
             </Stack>
           )}
         </Box>
@@ -357,7 +383,7 @@ export default function Devices() {
       <NewDevicesApprovalStack></NewDevicesApprovalStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
         <Flex flexDirection="column">
-          <Flex flexDirection="row" flexWrap="wrap" m="auto">
+          <Flex flexDirection="row" flexWrap="wrap" justify={'center'}>
             {loading ? (
               <Center pt={5}>
                 <Spinner size="lg" />

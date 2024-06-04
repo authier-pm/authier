@@ -34,7 +34,7 @@ export function VaultListItem({
   const secretUrl = getDecryptedSecretProp(secret, 'url')
   const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
   const label = getDecryptedSecretProp(secret, 'label')
-  const bg = useColorModeValue('white', 'gray.800')
+  const bg = useColorModeValue('cyan.800', 'gray.800')
 
   if (!deviceState) {
     return null

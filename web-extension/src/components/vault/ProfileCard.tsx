@@ -29,7 +29,7 @@ export default function ProfileCard({
       <Box
         maxW={'320px'}
         w={'full'}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={useColorModeValue('cyan.800', 'gray.800')}
         boxShadow={'2xl'}
         rounded={'lg'}
         p={6}
