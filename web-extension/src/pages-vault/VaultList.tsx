@@ -1,6 +1,8 @@
 import { IconButton } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
+
+import { PiSquaresFourDuotone } from 'react-icons/pi'
 import {
   Center,
   Box,
@@ -124,7 +126,13 @@ export const VaultList = ({ tableView }) => {
             size="md"
             ml="2"
             aria-label="menu"
-            icon={<IoList />}
+            icon={
+              !tableView ? (
+                <IoList />
+              ) : (
+                <PiSquaresFourDuotone color="green.500" />
+              )
+            }
             onClick={async () => {
               browser.storage.sync.set({ vaultTableView: !tableView })
             }}
