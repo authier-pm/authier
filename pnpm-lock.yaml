@@ -111,11 +111,11 @@ importers:
         specifier: ^9.0.1
         version: 9.0.1
       '@prisma/client':
-        specifier: ^5.14.0
-        version: 5.14.0(prisma@5.14.0)
+        specifier: ^5.15.0
+        version: 5.15.0(prisma@5.15.0)
       '@react-native-firebase/app':
-        specifier: ^20.0.0
-        version: 20.0.0(react-native@0.71.11(@babel/core@7.24.6)(react@18.3.1))(react@18.3.1)
+        specifier: ^20.1.0
+        version: 20.1.0(react-native@0.71.11(@babel/core@7.24.6)(react@18.3.1))(react@18.3.1)
       '@sentry/node':
         specifier: ^8.7.0
         version: 8.7.0
@@ -195,11 +195,11 @@ importers:
         specifier: 11.1.0
         version: 11.1.0
       prisma:
-        specifier: ^5.14.0
-        version: 5.14.0
+        specifier: ^5.15.0
+        version: 5.15.0
       prisma-generator-checker:
         specifier: ^2.0.1
-        version: 2.0.1(prisma@5.14.0)
+        version: 2.0.1(prisma@5.15.0)
       raw-body:
         specifier: ^2.5.2
         version: 2.5.2
@@ -278,7 +278,7 @@ importers:
         version: 3.1.3
       prisma-erd-generator:
         specifier: ^1.11.2
-        version: 1.11.2(@prisma/client@5.14.0(prisma@5.14.0))(typescript@5.4.5)
+        version: 1.11.2(@prisma/client@5.15.0(prisma@5.15.0))(typescript@5.4.5)
       sql-formatter:
         specifier: ^15.3.1
         version: 15.3.1
@@ -5276,8 +5276,8 @@ packages:
       prisma:
         optional: true
 
-  '@prisma/client@5.14.0':
-    resolution: {integrity: sha512-akMSuyvLKeoU4LeyBAUdThP/uhVP3GuLygFE3MlYzaCb3/J8SfsYBE5PkaFuLuVpLyA6sFoW+16z/aPhNAESqg==}
+  '@prisma/client@5.15.0':
+    resolution: {integrity: sha512-wPTeTjbd2Q0abOeffN7zCDCbkp9C9cF+e9HPiI64lmpehyq2TepgXE+sY7FXr7Rhbb21prLMnhXX27/E11V09w==}
     engines: {node: '>=16.13'}
     peerDependencies:
       prisma: '*'
@@ -5300,8 +5300,8 @@ packages:
   '@prisma/debug@4.8.1':
     resolution: {integrity: sha512-BcShw74uZWWuuDPRpvIj8lqF6ywfcaeTqJF6VTiMd3VXxiB+c0F/mCshnYqoURoEaDmwwrBubWjBgmoWBHoPLQ==}
 
-  '@prisma/debug@5.14.0':
-    resolution: {integrity: sha512-iq56qBZuFfX3fCxoxT8gBX33lQzomBU0qIUaEj1RebsKVz1ob/BVH1XSBwwwvRVtZEV1b7Fxx2eVu34Ge/mg3w==}
+  '@prisma/debug@5.15.0':
+    resolution: {integrity: sha512-QpEAOjieLPc/4sMny/WrWqtpIAmBYsgqwWlWwIctqZO0AbhQ9QcT6x2Ut3ojbDo/pFRCCA1Z1+xm2MUy7fAkZA==}
 
   '@prisma/engine-core@3.15.2':
     resolution: {integrity: sha512-E5uMBX7CPT46ydRqpduIVmjBSiDwOLx9ONPtzaNH8pNeKQoBORrf1I9k+dTa40JgdfFunYxyjIYaifTw63KpbQ==}
@@ -5309,20 +5309,20 @@ packages:
   '@prisma/engines-version@4.15.0-28.8fbc245156db7124f997f4cecdd8d1219e360944':
     resolution: {integrity: sha512-sVOig4tjGxxlYaFcXgE71f/rtFhzyYrfyfNFUsxCIEJyVKU9rdOWIlIwQ2NQ7PntvGnn+x0XuFo4OC1jvPJKzg==}
 
-  '@prisma/engines-version@5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48':
-    resolution: {integrity: sha512-ip6pNkRo1UxWv+6toxNcYvItNYaqQjXdFNGJ+Nuk2eYtRoEdoF13wxo7/jsClJFFenMPVNVqXQDV0oveXnR1cA==}
+  '@prisma/engines-version@5.15.0-29.12e25d8d06f6ea5a0252864dd9a03b1bb51f3022':
+    resolution: {integrity: sha512-3BEgZ41Qb4oWHz9kZNofToRvNeS4LZYaT9pienR1gWkjhky6t6K1NyeWNBkqSj2llgraUNbgMOCQPY4f7Qp5wA==}
 
   '@prisma/engines@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e':
     resolution: {integrity: sha512-NHlojO1DFTsSi3FtEleL9QWXeSF/UjhCW0fgpi7bumnNZ4wj/eQ+BJJ5n2pgoOliTOGv9nX2qXvmHap7rJMNmg==}
 
-  '@prisma/engines@5.14.0':
-    resolution: {integrity: sha512-lgxkKZ6IEygVcw6IZZUlPIfLQ9hjSYAtHjZ5r64sCLDgVzsPFCi2XBBJgzPMkOQ5RHzUD4E/dVdpn9+ez8tk1A==}
+  '@prisma/engines@5.15.0':
+    resolution: {integrity: sha512-hXL5Sn9hh/ZpRKWiyPA5GbvF3laqBHKt6Vo70hYqqOhh5e0ZXDzHcdmxNvOefEFeqxra2DMz2hNbFoPvqrVe1w==}
 
   '@prisma/fetch-engine@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e':
     resolution: {integrity: sha512-/Xi9sTBjTm3RexDO8lm/XSO67OUqHRemf74cwOcyLCwLGydrkmZF2IT1whppHG7+xqwrQn7cNzWSf/+7FB3fcA==}
 
-  '@prisma/fetch-engine@5.14.0':
-    resolution: {integrity: sha512-VrheA9y9DMURK5vu8OJoOgQpxOhas3qF0IBHJ8G/0X44k82kc8E0w98HCn2nhnbOOMwbWsJWXfLC2/F8n5u0gQ==}
+  '@prisma/fetch-engine@5.15.0':
+    resolution: {integrity: sha512-z6AY5yyXxc20Klj7wwnfGP0iIUkVKzybqapT02zLYR/nf9ynaeN8bq73WRmi1TkLYn+DJ5Qy+JGu7hBf1pE78A==}
 
   '@prisma/generator-helper@3.15.2':
     resolution: {integrity: sha512-G6oKBowE+IwBdQUL5pOHuDrOgVQZVcsA3w1E52P5MeUqWhOtvtrewNBlqvsgyX9IiE35bzHQWIwxGfc0gzPUng==}
@@ -5339,8 +5339,8 @@ packages:
   '@prisma/get-platform@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e':
     resolution: {integrity: sha512-z306ogr/IvpnboY2R/Ry+Qqgi9XIJ6WXV5h4Isd8l/fQNHB83VQydkCSspRkbCeCIddYSRZNTIlPW7+ICy4NbQ==}
 
-  '@prisma/get-platform@5.14.0':
-    resolution: {integrity: sha512-/yAyBvcEjRv41ynZrhdrPtHgk47xLRRq/o5eWGcUpBJ1YrUZTYB8EoPiopnP7iQrMATK8stXQdPOoVlrzuTQZw==}
+  '@prisma/get-platform@5.15.0':
+    resolution: {integrity: sha512-1GULDkW4+/VQb73vihxCBSc4Chc2x88MA+O40tcZFjmBzG4/fF44PaXFxUqKSFltxU9L9GIMLhh0Gfkk/pUbtg==}
 
   '@prisma/instrumentation@5.14.0':
     resolution: {integrity: sha512-DeybWvIZzu/mUsOYP9MVd6AyBj+MP7xIMrcuIn25MX8FiQX39QBnET5KhszTAip/ToctUuDwSJ46QkIoyo3RFA==}
@@ -5681,8 +5681,8 @@ packages:
       expo:
         optional: true
 
-  '@react-native-firebase/app@20.0.0':
-    resolution: {integrity: sha512-h9Xgmj0Z0ga1ponhDnQ63yqkX288LOW+ZvstDWHDo2rgPu58nbAmdzs73MTmPjYdgm5Elm71puG1NRJX5n7wRw==}
+  '@react-native-firebase/app@20.1.0':
+    resolution: {integrity: sha512-FCcTtmfz/Bk2laOEKOiUrQUkAnzerkRml7d3kZzJSxaBWLFxpWJQnnXqGZmD8hNWio2QEauB8llUD71KiDk+sw==}
     peerDependencies:
       expo: '>=47.0.0'
       react: '*'
@@ -13725,8 +13725,8 @@ packages:
     engines: {node: '>=16'}
     hasBin: true
 
-  prisma@5.14.0:
-    resolution: {integrity: sha512-gCNZco7y5XtjrnQYeDJTiVZmT/ncqCr5RY1/Cf8X2wgLRmyh9ayPAGBNziI4qEE4S6SxCH5omQLVo9lmURaJ/Q==}
+  prisma@5.15.0:
+    resolution: {integrity: sha512-JA81ACQSCi3a7NUOgonOIkdx8PAVkO+HbUOxmd00Yb8DgIIEpr2V9+Qe/j6MLxIgWtE/OtVQ54rVjfYRbZsCfw==}
     engines: {node: '>=16.13'}
     hasBin: true
 
@@ -22760,15 +22760,15 @@ snapshots:
 
   '@popperjs/core@2.11.8': {}
 
-  '@prisma/client@4.15.0(prisma@5.14.0)':
+  '@prisma/client@4.15.0(prisma@5.15.0)':
     dependencies:
       '@prisma/engines-version': 4.15.0-28.8fbc245156db7124f997f4cecdd8d1219e360944
     optionalDependencies:
-      prisma: 5.14.0
+      prisma: 5.15.0
 
-  '@prisma/client@5.14.0(prisma@5.14.0)':
+  '@prisma/client@5.15.0(prisma@5.15.0)':
     optionalDependencies:
-      prisma: 5.14.0
+      prisma: 5.15.0
 
   '@prisma/debug@3.14.0':
     dependencies:
@@ -22808,7 +22808,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@prisma/debug@5.14.0': {}
+  '@prisma/debug@5.15.0': {}
 
   '@prisma/engine-core@3.15.2':
     dependencies:
@@ -22829,16 +22829,16 @@ snapshots:
 
   '@prisma/engines-version@4.15.0-28.8fbc245156db7124f997f4cecdd8d1219e360944': {}
 
-  '@prisma/engines-version@5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48': {}
+  '@prisma/engines-version@5.15.0-29.12e25d8d06f6ea5a0252864dd9a03b1bb51f3022': {}
 
   '@prisma/engines@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e': {}
 
-  '@prisma/engines@5.14.0':
+  '@prisma/engines@5.15.0':
     dependencies:
-      '@prisma/debug': 5.14.0
-      '@prisma/engines-version': 5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
-      '@prisma/fetch-engine': 5.14.0
-      '@prisma/get-platform': 5.14.0
+      '@prisma/debug': 5.15.0
+      '@prisma/engines-version': 5.15.0-29.12e25d8d06f6ea5a0252864dd9a03b1bb51f3022
+      '@prisma/fetch-engine': 5.15.0
+      '@prisma/get-platform': 5.15.0
 
   '@prisma/fetch-engine@3.15.1-1.461d6a05159055555eb7dfb337c9fb271cbd4d7e':
     dependencies:
@@ -22863,11 +22863,11 @@ snapshots:
       - encoding
       - supports-color
 
-  '@prisma/fetch-engine@5.14.0':
+  '@prisma/fetch-engine@5.15.0':
     dependencies:
-      '@prisma/debug': 5.14.0
-      '@prisma/engines-version': 5.14.0-25.e9771e62de70f79a5e1c604a2d7c8e2a0a874b48
-      '@prisma/get-platform': 5.14.0
+      '@prisma/debug': 5.15.0
+      '@prisma/engines-version': 5.15.0-29.12e25d8d06f6ea5a0252864dd9a03b1bb51f3022
+      '@prisma/get-platform': 5.15.0
 
   '@prisma/generator-helper@3.15.2':
     dependencies:
@@ -22909,9 +22909,9 @@ snapshots:
     dependencies:
       '@prisma/debug': 3.14.0
 
-  '@prisma/get-platform@5.14.0':
+  '@prisma/get-platform@5.15.0':
     dependencies:
-      '@prisma/debug': 5.14.0
+      '@prisma/debug': 5.15.0
 
   '@prisma/instrumentation@5.14.0':
     dependencies:
@@ -23785,7 +23785,7 @@ snapshots:
       react-native: 0.71.11(@babel/core@7.23.7)(@babel/preset-env@7.23.7(@babel/core@7.23.7))(react@18.2.0)
       superstruct: 0.6.2
 
-  '@react-native-firebase/app@20.0.0(react-native@0.71.11(@babel/core@7.24.6)(react@18.3.1))(react@18.3.1)':
+  '@react-native-firebase/app@20.1.0(react-native@0.71.11(@babel/core@7.24.6)(react@18.3.1))(react@18.3.1)':
     dependencies:
       opencollective-postinstall: 2.0.3
       react: 18.3.1
@@ -31830,7 +31830,7 @@ snapshots:
       chalk: 4.1.2
       flow-parser: 0.206.0
       graceful-fs: 4.2.11
-      micromatch: 4.0.6
+      micromatch: 4.0.7
       neo-async: 2.6.2
       node-dir: 0.1.17
       recast: 0.21.5
@@ -32615,7 +32615,7 @@ snapshots:
       jest-serializer: 27.5.1
       jest-util: 27.5.1
       jest-worker: 27.5.1
-      micromatch: 4.0.6
+      micromatch: 4.0.7
       nullthrows: 1.1.1
       walker: 1.0.8
     optionalDependencies:
@@ -34636,10 +34636,10 @@ snapshots:
 
   prettysize@2.0.0: {}
 
-  prisma-erd-generator@1.11.2(@prisma/client@5.14.0(prisma@5.14.0))(typescript@5.4.5):
+  prisma-erd-generator@1.11.2(@prisma/client@5.15.0(prisma@5.15.0))(typescript@5.4.5):
     dependencies:
       '@mermaid-js/mermaid-cli': 10.9.1(typescript@5.4.5)
-      '@prisma/client': 5.14.0(prisma@5.14.0)
+      '@prisma/client': 5.15.0(prisma@5.15.0)
       '@prisma/generator-helper': 4.16.2
       dotenv: 16.4.5
     transitivePeerDependencies:
@@ -34649,9 +34649,9 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  prisma-generator-checker@2.0.1(prisma@5.14.0):
+  prisma-generator-checker@2.0.1(prisma@5.15.0):
     dependencies:
-      '@prisma/client': 4.15.0(prisma@5.14.0)
+      '@prisma/client': 4.15.0(prisma@5.15.0)
       '@prisma/generator-helper': 4.15.0
       '@prisma/sdk': 3.15.2
       prettier: 2.8.8
@@ -34660,9 +34660,9 @@ snapshots:
       - prisma
       - supports-color
 
-  prisma@5.14.0:
+  prisma@5.15.0:
     dependencies:
-      '@prisma/engines': 5.14.0
+      '@prisma/engines': 5.15.0
 
   private@0.1.8: {}
 
