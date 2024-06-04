@@ -3,7 +3,6 @@ import cpy from '@cjsa/cpy'
 const relativePath = './node_modules'
 
 const modulesToCopy = [
-  'stripe',
   'qs',
   'side-channel',
   'call-bind',
@@ -12,10 +11,7 @@ const modulesToCopy = [
   'object-inspect',
   'has',
   'has-symbols',
-  'farmhash',
-  // needed by stripe
-  'has-proto',
-  'es-errors'
+  'farmhash'
 ]
 
 // copies all node_modules needed for lambda as prisma generated files are not bundled
