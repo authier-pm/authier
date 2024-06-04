@@ -11,9 +11,11 @@ const modulesToCopy = [
   'get-intrinsic',
   'object-inspect',
   'has',
-  'has-proto', // needed by stripe
   'has-symbols',
-  'farmhash'
+  'farmhash',
+  // needed by stripe
+  'has-proto',
+  'es-errors'
 ]
 
 // copies all node_modules needed for lambda as prisma generated files are not bundled
