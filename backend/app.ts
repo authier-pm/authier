@@ -81,6 +81,13 @@ app.register(cookie, {
 
 app.route({
   method: 'GET',
+  url: '/health',
+  handler: (_request, reply) => {
+    reply.send({ ok: true })
+  }
+})
+app.route({
+  method: 'GET',
   url: '/health/report',
   handler: healthReportHandler
 })
