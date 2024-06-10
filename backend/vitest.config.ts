@@ -7,7 +7,9 @@ import { defineConfig } from 'vitest/config'
 export default defineConfig({
   plugins: [
     // Vite plugin
+    // @ts-expect-error
     swc.vite(),
+    // @ts-expect-error
     tsconfigPaths()
   ],
 

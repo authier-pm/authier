@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "AGPL-3.0-or-later",
   "overrides": {
-    "graphql": "^16.7.1"
+    "graphql": "^16.8.1"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,md,json,yaml,yml}": [
@@ -50,7 +50,7 @@
     "source-map-support": "^0.5.21",
     "stripe": "^15.9.0",
     "type-graphql": "npm:@capaj/type-graphql@2.0.0-alpha.1",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.1-rc",
     "uuid": "^9.0.1"
   },
   "devDependencies": {

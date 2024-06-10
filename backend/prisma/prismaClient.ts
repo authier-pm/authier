@@ -18,9 +18,8 @@ const workerId = process.env.VITEST_WORKER_ID
 if (workerId) {
   dbUrl = dbUrl?.includes('?') ? dbUrl?.split('?')[0] : dbUrl
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
-  dbUrl = `${dbUrl}_test_${
-    vitestWorkerId + 1
-  }?connection_limit=500&pool_timeout=0&connect_timeout=0` // this allows us to run tests in parallel against multiple dbs without conflicts
+  dbUrl = `${dbUrl}_test_${vitestWorkerId + 1
+    }?connection_limit=500&pool_timeout=0&connect_timeout=0` // this allows us to run tests in parallel against multiple dbs without conflicts
 } else {
   log('DATABASE_URL', dbUrl)
 }
@@ -30,13 +29,13 @@ export const prismaClient = new PrismaClient({
     nodeEnv === 'production'
       ? ['info', 'warn']
       : [
-          {
-            emit: 'event',
-            level: 'query'
-          },
-          'info',
-          'warn'
-        ],
+        {
+          emit: 'event',
+          level: 'query'
+        },
+        'info',
+        'warn'
+      ],
   errorFormat: workerId ? 'pretty' : undefined,
   datasources: {
     db: {

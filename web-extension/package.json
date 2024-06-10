@@ -85,7 +85,7 @@
     "ts-loader": "^9.5.1",
     "ts-node-dev": "^2.0.0",
     "type-graphql": "^1.1.1",
-    "typescript": "^5.4.5",
+    "typescript": "^5.5.1-rc",
     "vitest": "^1.6.0",
     "web-ext": "^8.0.0",
     "webpack": "^5.91.0",

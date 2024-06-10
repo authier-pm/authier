@@ -213,7 +213,7 @@ describe('RootResolver', () => {
       const userId = faker.string.uuid()
       const blockedIp = faker.internet.ip()
       const fakeCtx = {
-        reply: { setCookie: () => {} },
+        reply: { setCookie: () => { } },
         request: { headers: {} },
         prisma: prismaClient,
         jwtPayload: { userId: userId },
