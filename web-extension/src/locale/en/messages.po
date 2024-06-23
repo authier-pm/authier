@@ -132,8 +132,12 @@ msgid "Change vault password"
 msgstr "Change vault password"
 
 #: src/components/pages/AuthsList.tsx
-msgid "Click to show the whole"
-msgstr "Click to show the whole"
+msgid "Click to show & copy"
+msgstr "Click to show & copy"
+
+#: src/components/pages/AuthsList.tsx
+#~ msgid "Click to show the whole"
+#~ msgstr "Click to show the whole"
 
 #: src/components/PopupNavBar.tsx
 #: src/components/PopupNavBar.tsx
@@ -148,17 +152,28 @@ msgstr "Config"
 msgid "Confirm new password // Confirm password"
 msgstr "Confirm new password // Confirm password"
 
+#: src/components/vault/EditFormButtons.tsx
+#: src/components/vault/VaultItemSettings.tsx
 #: src/components/vault/VirtualizedList.tsx
 msgid "Copied to clipboard"
 msgstr "Copied to clipboard"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "copy password"
+msgstr "copy password"
 
 #: src/components/pages/AuthsList.tsx
 msgid "Copy password"
 msgstr "Copy password"
 
 #: src/components/pages/AuthsList.tsx
-msgid "Copy TOTP"
-msgstr "Copy TOTP"
+#~ msgid "Copy TOTP"
+#~ msgstr "Copy TOTP"
+
+#: src/components/vault/EditFormButtons.tsx
+#: src/components/vault/EditFormButtons.tsx
+msgid "copy whole secret"
+msgstr "copy whole secret"
 
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "could not find any QR code on this page. Make sure QR code is visible."
@@ -176,6 +191,10 @@ msgstr "Current password // Master password"
 #: src/components/vault/settings/Account.tsx
 msgid "Danger zone"
 msgstr "Danger zone"
+
+#: src/components/vault/EditFormButtons.tsx
+msgid "delete secret"
+msgstr "delete secret"
 
 #: src/components/vault/settings/Account.tsx
 msgid "Delete your account"
@@ -216,6 +235,10 @@ msgstr "Failed to create decryption challenge"
 #: src/components/vault/VaultItemSettings.tsx
 msgid "Failed to parse this secret:"
 msgstr "Failed to parse this secret:"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Fill TOTP into input on screen by point&click"
+msgstr "Fill TOTP into input on screen by point&click"
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Import & Export"

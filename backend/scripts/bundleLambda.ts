@@ -14,7 +14,7 @@ import path from 'path'
     bundle: true,
     tsconfig: 'tsconfig.json',
     outfile: 'dist/lambda.js',
-    external: ['@prisma/client', 'stripe'],
+    external: ['@prisma/client', 'farmhash'],
     platform: 'node',
     target: 'node20',
     plugins: [

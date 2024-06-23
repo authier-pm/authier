@@ -91,7 +91,7 @@ export default function SidebarWithHeader({
           <SidebarContent onClose={onClose} />
         </DrawerContent>
       </Drawer>
-      {/* mobilenav */}
+      {/* mobile nav */}
       <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
       <Box overflow="hidden" ml={{ base: 0, md: 60 }} paddingBottom={0}>
         {children}
@@ -112,7 +112,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   return (
     <Flex
       transition="1s ease"
-      bg={useColorModeValue('white', 'gray.800')}
+      bg={useColorModeValue('cyan.800', 'gray.800')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
       w={{ base: 'full', md: 60 }}
@@ -135,7 +135,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           justifyContent="space-between"
         >
           <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-            Authier
+            Authier2
           </Text>
           <CloseButton
             display={{ base: 'flex', md: 'none' }}
@@ -180,7 +180,7 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
                 </Flex>
               </MenuButton>
               <MenuList
-                bg={useColorModeValue('white', 'gray.900')}
+                bg={useColorModeValue('cyan.800', 'gray.900')}
                 borderColor={useColorModeValue('gray.200', 'gray.700')}
               >
                 <MenuItem
@@ -273,7 +273,7 @@ const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
       px={{ base: 4, md: 4 }}
       height="20"
       alignItems="center"
-      bg={useColorModeValue('white', 'gray.900')}
+      bg={useColorModeValue('cyan.800', 'gray.900')}
       borderBottomWidth="1px"
       borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
       justifyContent={{ base: 'space-between', md: 'flex-end' }}

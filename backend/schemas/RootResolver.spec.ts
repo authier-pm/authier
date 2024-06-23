@@ -134,7 +134,7 @@ describe('RootResolver', () => {
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Device f025212b-8007-4ffd-a507-21582ec854f5 already exists. You cannot use a device with multiple accounts.]`
+        `[Error: Device cf6fe83e-0ae6-4472-8908-7ece569f0252 already exists. You cannot use a device with multiple accounts.]`
       )
     })
   })
@@ -274,7 +274,7 @@ describe('RootResolver', () => {
         fakeCtx
       )
 
-      expect(inputs).toHaveLength(1)
+      expect(inputs).toHaveLength(1) // TODO: flaky here, fix
 
       // @ts-expect-error
       delete inputs[0].createdAt

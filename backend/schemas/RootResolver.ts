@@ -454,6 +454,7 @@ export class RootResolver {
     @Ctx() ctx: IContextAuthenticated
   ) {
     if (hosts) {
+      // TODO only return new web inputs created after last sync
       return ctx.prisma.webInput.findMany({
         where: {
           host: {
@@ -487,6 +488,25 @@ export class RootResolver {
         domPath: webInput.domPath,
         kind: webInput.kind,
         addedByUserId: ctx.jwtPayload.userId
+      }
+
+      const existing = await ctx.prisma.webInput.findFirst({
+        where: {
+          url: forUpsert.url,
+          kind: forUpsert.kind
+        },
+        select: {
+          id: true
+        }
+      })
+
+      if (existing) {
+        // it can happen that website changes the input field, so we delete the old one and add the new one
+        await ctx.prisma.webInput.delete({
+          where: {
+            id: existing.id
+          }
+        })
       }
 
       try {

@@ -71,7 +71,7 @@ export function DeviceInfo({
   })
   const currentDeviceId = id
   const selectedDeviceData = data?.me.device
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
 
   if (loading && !error) return <Loading />
 

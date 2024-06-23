@@ -1,6 +1,11 @@
 # authier
 
-monorepo for authier password manager web extension, mobile app and backend.
+monorepo for authier password manager
+Includes:
+
+- web extension
+- mobile app
+- backend
 
 If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
 

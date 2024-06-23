@@ -1,6 +1,8 @@
-import { IconButton } from '@chakra-ui/button'
+import { IconButton } from '@chakra-ui/react'
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
+
+import { PiSquaresFourDuotone } from 'react-icons/pi'
 import {
   Center,
   Box,
@@ -38,7 +40,7 @@ export const VaultList = ({ tableView }) => {
     window.innerHeight ||
     document.documentElement.clientHeight ||
     document.body.clientHeight
-  const bg = useColorModeValue('white', 'gray.800')
+  const bg = useColorModeValue('cyan.800', 'gray.800')
 
   const [filterBy, setFilterBy] = useQueryParam(
     'filterBy',
@@ -68,13 +70,22 @@ export const VaultList = ({ tableView }) => {
 
   return (
     <Box overflow="hidden">
-      <Center justifyContent={'space-evenly'} w={'100%'} bg={bg} p={3}>
+      <Center
+        justifyContent={'space-evenly'}
+        w={'100%'}
+        bg={bg}
+        p={3}
+        // color="cyan.500"
+      >
         <Flex m="auto">
           <InputGroup>
             <Input
               variant={'filled'}
-              color="grey.300"
               w={['300px', '350px', '400px', '500px']}
+              color={
+                useColorModeValue('gray.100', 'gray.100') // This is not ideal
+              }
+              bg={'gray.800'}
               placeholder={t`Search vault by url, username, label or password`}
               value={filterBy}
               onChange={(ev) => {
@@ -115,7 +126,13 @@ export const VaultList = ({ tableView }) => {
             size="md"
             ml="2"
             aria-label="menu"
-            icon={<IoList />}
+            icon={
+              !tableView ? (
+                <IoList />
+              ) : (
+                <PiSquaresFourDuotone color="green.500" />
+              )
+            }
             onClick={async () => {
               browser.storage.sync.set({ vaultTableView: !tableView })
             }}

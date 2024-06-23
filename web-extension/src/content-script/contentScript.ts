@@ -1,10 +1,6 @@
 import { debounce } from 'lodash'
 
-import {
-  DOMEventsRecorder,
-  getSelectorForElement,
-  IInputRecord
-} from './DOMEventsRecorder'
+import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
 import debug from 'debug'
 import {
   WebInputElement,
@@ -18,6 +14,7 @@ import {
 import {
   autofill,
   autofillEventsDispatched,
+  autofillValueIntoInput,
   debouncedAutofill,
   IDecryptedSecrets
 } from './autofill'
@@ -30,6 +27,11 @@ import {
 
 import type { ISaveLoginModalState } from '../background/chromeRuntimeListener'
 import { trpc } from './connectTRPC'
+import { notyf } from './notyf'
+import browser from 'webextension-polyfill'
+import { PopupActionsEnum } from '../components/pages/PopupActionsEnum'
+import { getSelectorForElement } from './cssSelectorGenerators'
+import { WebInputForAutofill } from '../background/WebInputForAutofill'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -43,30 +45,23 @@ export interface Coords {
   x: number
   y: number
 }
+
 export interface IInitStateRes {
   extensionDeviceReady: boolean
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   passwordCount: number
-  webInputs: Array<{
-    id?: number
-    url: string
-    host: string
-    domPath: string
-    kind: WebInputType
-    createdAt: string
-  }>
+  webInputs: Array<WebInputForAutofill>
   saveLoginModalsState?: ISaveLoginModalState | null | undefined
 }
 
 // TODO spec
-export function getWebInputKind(
-  targetElement: HTMLInputElement
-): WebInputType | null {
+export function getWebInputKind(targetElement: HTMLInputElement): WebInputType {
   return (
     (targetElement.type === 'password'
       ? WebInputType.PASSWORD
-      : inputKindMap[targetElement.autocomplete]) ?? 'USERNAME_OR_EMAIL'
+      : inputKindMap[targetElement.autocomplete]) ??
+    WebInputType.USERNAME_OR_EMAIL
   )
 }
 
@@ -159,27 +154,6 @@ export async function initInputWatch() {
         }
         domRecorder.addInputEvent(inputRecord)
 
-        // TOTP Recognition
-        if (inputted.length === 6 && secretsForHost.totpSecrets.length > 0) {
-          // TODO if this is a number check existing TOTP and add TOTP web input if it matches the OTP input
-
-          secretsForHost.totpSecrets.forEach(async (totpSecret) => {
-            if (authenticator.generate(totpSecret.totp.secret) === inputted) {
-              const elementSelector = getSelectorForElement(
-                targetElement as HTMLInputElement
-              )
-              const webInput: WebInputElement = {
-                domPath: elementSelector.css,
-                domOrdinal: elementSelector.domOrdinal,
-                kind: WebInputType.TOTP,
-                url: location.href
-              }
-              await trpc.addTOTPInput.mutate(webInput)
-              log(`TOTP WebInput added for selector "${elementSelector}"`)
-            }
-          })
-        }
-
         if (targetElement.type === 'password') {
           log('password inputted', inputted)
 
@@ -238,6 +212,7 @@ export async function initInputWatch() {
       debouncedInputEventListener,
       true
     )
+
     stopAutofillListener()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
     bodyInputChangeEmitter.off('inputAdded', onInputAdded)
@@ -264,3 +239,38 @@ new MutationObserver(() => {
     initInputWatch()
   }
 }).observe(document, { subtree: true, childList: true })
+
+browser.runtime.onMessage.addListener((message) => {
+  if (message.kind === PopupActionsEnum.TOTP_COPIED) {
+    async function elementSelected(event) {
+      event.preventDefault()
+      event.stopPropagation() // Stop the event from propagating further
+
+      document.removeEventListener('click', elementSelected, true) // Remove the event listener
+
+      const selectedElement = event.target // Correctly gets the clicked element
+      if (selectedElement.tagName !== 'INPUT') {
+        notyf.error('You must select an input element')
+      }
+      selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
+
+      const elementSelector = getSelectorForElement(selectedElement)
+      const webInput: WebInputElement = {
+        domPath: elementSelector.css,
+        domOrdinal: elementSelector.domOrdinal,
+        kind: WebInputType.TOTP,
+        url: location.href
+      }
+      await trpc.addTOTPInput.mutate(webInput)
+      const messageEvent = message.event as {
+        otpCode: string
+        secretId: string
+      }
+
+      autofillValueIntoInput(selectedElement, messageEvent.otpCode)
+      notyf.success(`TOTP WebInput added for selector "${elementSelector.css}"`)
+    }
+
+    document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
+  }
+})

@@ -202,7 +202,7 @@ export default function Account() {
       rounded={'lg'}
       boxShadow={'lg'}
       p={30}
-      bg={useColorModeValue('white', 'gray.800')}
+      bg={useColorModeValue('cyan.800', 'gray.800')}
     >
       <Form
         // @ts-ignore TODO figure out why this always has type error on CI

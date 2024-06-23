@@ -2,12 +2,12 @@ import { useContext, useState } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AutoSizer, List } from 'react-virtualized'
 import { useDebounce } from '@src/pages-vault/useDebounce'
-import { IconButton } from '@chakra-ui/button'
+
 import { useColorModeValue } from '@chakra-ui/color-mode'
 import { EditIcon, CopyIcon } from '@chakra-ui/icons'
-import { Tb2Fa } from 'react-icons/tb'
+
 import { GrUserAdmin } from 'react-icons/gr'
-import { Center, Box, Flex, Text, useToast } from '@chakra-ui/react'
+import { Center, Box, Flex, Text, useToast, IconButton } from '@chakra-ui/react'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { Link } from 'react-router-dom'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
@@ -17,6 +17,7 @@ import { Txt } from '../util/Txt'
 import { t } from '@lingui/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { authierColors } from '@shared/chakraRawTheme'
+import { TbAuth2Fa } from 'react-icons/tb'
 
 export function VaultListItem({
   secret
@@ -33,7 +34,7 @@ export function VaultListItem({
   const secretUrl = getDecryptedSecretProp(secret, 'url')
   const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
   const label = getDecryptedSecretProp(secret, 'label')
-  const bg = useColorModeValue('white', 'gray.800')
+  const bg = useColorModeValue('cyan.800', 'gray.800')
 
   if (!deviceState) {
     return null
@@ -76,7 +77,7 @@ export function VaultListItem({
             {secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
               <GrUserAdmin size={13}></GrUserAdmin>
             ) : (
-              <Tb2Fa color={authierColors.gray[700]} size={25}></Tb2Fa>
+              <TbAuth2Fa color={authierColors.gray[700]} size={25}></TbAuth2Fa>
             )}
           </Box>
           <Flex

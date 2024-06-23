@@ -36,7 +36,7 @@ export function ChangeMasterPassword() {
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const toast = useToast()
 
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
   const [form, setForm] = React.useState({
     currentPassword: '',
     newPassword: '',
@@ -178,9 +178,8 @@ export function ChangeMasterPassword() {
                     authSecret: newDeviceSecretsPair.addDeviceSecret,
                     authSecretEncrypted:
                       newDeviceSecretsPair.addDeviceSecretEncrypted,
-                    masterEncryptionKey: await cryptoKeyToString(
-                      newEncryptionKey
-                    )
+                    masterEncryptionKey:
+                      await cryptoKeyToString(newEncryptionKey)
                   }
                   await device.save(newDeviceState)
 

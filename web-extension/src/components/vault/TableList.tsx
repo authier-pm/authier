@@ -19,6 +19,7 @@ import { AutoSizer } from 'react-virtualized'
 import { Link } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { authenticator } from 'otplib'
+import { Trans } from '@lingui/macro'
 
 export function TableList({ filter }: { filter: string }) {
   const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
@@ -122,7 +123,8 @@ export function TableList({ filter }: { filter: string }) {
             </Box>
             <Text
               w="inherit"
-              textAlign="end"
+              // textAlign="end"
+              textAlign={'center'}
               textOverflow="ellipsis"
               overflow="hidden"
               whiteSpace="nowrap"
@@ -140,7 +142,7 @@ export function TableList({ filter }: { filter: string }) {
           </HStack>
 
           <HStack
-            justifyContent="flex-end"
+            justifyContent="flex-center"
             display={areIconsVisible ? 'flex' : 'none'}
             spacing={2}
           >
@@ -207,24 +209,24 @@ export function TableList({ filter }: { filter: string }) {
         <HStack mt={2} w="100%" justifyContent="space-between">
           <Flex w="20%" justifyContent="center">
             <Text w="100%" textAlign="center" fontWeight="bold">
-              Label
+              <Trans>Label</Trans>
             </Text>
           </Flex>
 
           <Flex w="20%" justifyContent="center">
             <Text w="100%" textAlign="center" fontWeight="bold">
-              URL
+              <Trans>URL</Trans>
             </Text>
           </Flex>
           <Flex w="20%" justifyContent="center">
             <Text w="100%" textAlign="center" fontWeight="bold">
-              Username
+              <Trans>Username</Trans>
             </Text>
           </Flex>
           <Flex w="20%" justifyContent="center">
             <HStack>
               <Text pr={4} w="100%" textAlign="end" fontWeight="bold">
-                Secret
+                <Trans>Secret</Trans>
               </Text>
               <IconButton
                 size="sm"
@@ -232,8 +234,14 @@ export function TableList({ filter }: { filter: string }) {
                 icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
                 onClick={() => setShowAllPasswords(!showAllPasswords)}
                 ml={2}
+                mb={2}
               />
             </HStack>
+          </Flex>
+          <Flex w="10%" justifyContent="center">
+            <Text w="100%" textAlign="center" fontWeight="bold">
+              <Trans>Actions</Trans>
+            </Text>
           </Flex>
         </HStack>
       </Flex>

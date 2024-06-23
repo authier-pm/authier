@@ -34,7 +34,7 @@ export function DeviceSettings() {
   const [modalVisible, setModalVisible] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [updateSettings] = useUpdateSettingsMutation({})
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
 
   const currentSettings = (): SettingsInput => {
     return {
@@ -49,9 +49,8 @@ export function DeviceSettings() {
         deviceState.notificationOnWrongPasswordAttempts
     }
   }
-  const [previousSettings, setPreviousSettings] = useState<SettingsInput>(
-    currentSettings()
-  )
+  const [previousSettings, setPreviousSettings] =
+    useState<SettingsInput>(currentSettings())
 
   useEffect(() => {
     if (!previousSettings) {

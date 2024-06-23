@@ -12,6 +12,7 @@ import {
 import { device, isRunningInBgPage } from './ExtensionDevice'
 import { createChromeHandler } from '@capaj/trpc-browser/adapter'
 import { getContentScriptInitialState } from './getContentScriptInitialState'
+import browser from 'webextension-polyfill'
 
 import {
   backgroundStateSerializableLockedSchema,
@@ -211,7 +212,7 @@ const appRouter = tc.router({
     log('GEtting initial state from BG', tab?.url, tab?.pendingUrl)
     if (!tabUrl || !deviceState || !currentTabId) {
       log(
-        '~ chromeRuntimeListener We dont have tabURL or deviceState or tabId',
+        '~ chromeRuntimeListener We do not have tabURL or deviceState or tabId',
         {
           tabUrl,
           deviceState,
@@ -220,7 +221,7 @@ const appRouter = tc.router({
       )
       return null
     } else {
-      //We will have to get webInputs for current URL from DB and send it to content script for reseting after new DOM path save
+      //We will have to get webInputs for current URL from DB and send it to content script for resetting after new DOM path save
       return getContentScriptInitialState(tabUrl, currentTabId)
     }
   }),
@@ -270,3 +271,14 @@ createChromeHandler({
 })
 
 console.log('background page loaded')
+
+browser.runtime.onMessage.addListener((request) => {
+  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+    const firstTabId = tabs[0].id
+
+    if (!firstTabId) {
+      return
+    }
+    chrome.tabs.sendMessage(firstTabId, request)
+  })
+})

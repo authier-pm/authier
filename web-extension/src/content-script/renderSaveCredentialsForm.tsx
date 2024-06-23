@@ -12,8 +12,13 @@ export async function renderSaveCredentialsForm(
   password: string
 ) {
   const inputEvents = await trpc.getCapturedInputEvents.query()
+  if (loginPrompt) {
+    loginPrompt.remove() // remove if already in the page
+  }
 
-  loginPrompt = document.createElement('div')
+  const newDiv = document.createElement('div')
+  newDiv.id = 'authier-save-prompt'
+  loginPrompt = newDiv
   render(
     <PromptPassword
       username={username}

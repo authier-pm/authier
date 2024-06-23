@@ -1,26 +1,13 @@
 import { IInitStateRes } from '@src/content-script/contentScript'
-import {
-  EncryptedSecretType,
-  WebInputType
-} from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 import { saveLoginModalsStates } from './chromeRuntimeListener'
 import { SecretTypeUnion, device } from './ExtensionDevice'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
+import { WebInputForAutofill } from './WebInputForAutofill'
 const log = debug('au:getContentScriptInitialState')
-
-export type WebInputForAutofill = {
-  __typename?: 'WebInputGQLScalars'
-  id: number
-  host: string
-  url: string
-  domPath: string
-  domOrdinal: number
-  kind: WebInputType
-  createdAt: string
-}
 
 export const getContentScriptInitialState = async (
   tabUrl: string,
@@ -45,6 +32,7 @@ export const getContentScriptInitialState = async (
   if (hostname && device.state?.webInputs) {
     webInputs = device.state?.webInputs.filter((i) => i.url === tabUrl) ?? []
   }
+
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP

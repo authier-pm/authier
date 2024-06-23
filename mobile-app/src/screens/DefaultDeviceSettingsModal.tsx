@@ -36,7 +36,7 @@ export function DefaultDeviceSettingsModal() {
       state.notificationOnVaultUnlock
     ])
   const options = useVaultLockTimeoutOptions()
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
   const { toggleColorMode } = useColorMode()
   const [updateDefaultSettings, { loading }] =
     useUpdateDefaultDeviceSettingsMutation()

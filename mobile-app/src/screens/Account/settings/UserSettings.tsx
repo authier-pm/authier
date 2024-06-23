@@ -62,7 +62,7 @@ export function UserSettings() {
   const [previousSettings, setPreviousSettings] =
     useState<SettingsFormType | null>(null)
 
-  const itemBg = useColorModeValue('white', 'rgb(28, 28, 28)')
+  const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
   const defaultData = data?.me.defaultDeviceSettings
   const [theme] = useDeviceStateStore((state) => [state.theme])
 

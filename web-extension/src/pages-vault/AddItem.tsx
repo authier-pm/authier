@@ -27,7 +27,7 @@ export const AddItem = () => {
     useContext(DeviceStateContext)
   const { data, loading } = useLimitsQuery()
 
-  const bg = useColorModeValue('white', 'gray.800')
+  const bg = useColorModeValue('cyan.800', 'gray.800')
 
   if (loading) {
     return <Spinner />

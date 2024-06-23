@@ -50,9 +50,10 @@ export default function Security() {
         mt={8}
         spacing={20}
         rounded={'lg'}
+        className="Security"
         boxShadow={'lg'}
         p={30}
-        bg={useColorModeValue('white', 'gray.800')}
+        bg={useColorModeValue('cyan.800', 'gray.800')}
       >
         <Formik
           initialValues={{
@@ -91,7 +92,7 @@ export default function Security() {
               <VStack spacing={4} align="flex-start">
                 <FormControl>
                   <FormLabel htmlFor="vaultLockTimeoutSeconds">
-                    Lock time
+                    <Trans>Lock time</Trans>
                   </FormLabel>
                   <Field
                     as={Select}

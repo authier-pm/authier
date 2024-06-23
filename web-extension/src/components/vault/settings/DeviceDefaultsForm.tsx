@@ -36,7 +36,7 @@ export function DeviceDefaultsForm() {
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
     refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
   })
-  const bgColor = useColorModeValue('white', 'gray.800')
+  const bgColor = useColorModeValue('cyan.800', 'gray.800')
   const options = useVaultLockTimeoutOptions()
 
   if (loading || !data) return <Spinner />

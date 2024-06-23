@@ -652,7 +652,7 @@ input RegisterNewAccountInput {
 }
 
 union DecryptionChallenge =
-    DecryptionChallengeApproved
+  | DecryptionChallengeApproved
   | DecryptionChallengeForApproval
 
 type DecryptionChallengeApproved {
