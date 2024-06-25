@@ -41,6 +41,11 @@ export async function getManifest() {
       'https://*/',
       '<all_urls>'
     ],
+    browser_specific_settings: { // from https://blog.mozilla.org/addons/2023/10/05/changes-to-android-extension-signing/
+      "gecko_android": {
+        "strict_min_version": "90.0"
+      }
+    },
     web_accessible_resources: ['icon-16.png'],
     content_security_policy:
       "script-src 'self' 'unsafe-eval'; https://www.googleapis.com https://js.stripe.com/v3 https://*.firebaseio.com; object-src 'self'"
