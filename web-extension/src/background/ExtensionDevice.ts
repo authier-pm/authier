@@ -786,7 +786,9 @@ class ExtensionDevice {
     this.lockInterval = null
   }
 }
-if (location.href.startsWith('chrome-extension://') === false) {
+if (location.href.startsWith('chrome-extension://') === false && 
+    location.href.startsWith('moz-extension://') === false
+) {
   console.warn('location.href', location.href)
 
   throw new Error(
