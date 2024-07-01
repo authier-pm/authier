@@ -35,7 +35,7 @@ const authLink = setContext(async (_, { headers }) => {
 })
 export const apolloClient = new ApolloClient({
   link: ApolloLink.from([
-    tokenRefresh as any, // token refresh link types are bad. ts-expect-error breaks the build in 1 out of 2 CI runs
+    tokenRefresh,
     errorLink,
     serializingLink,
     authLink,
