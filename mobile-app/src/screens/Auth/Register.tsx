@@ -199,6 +199,7 @@ export function Register({ navigation }: NavigationProps) {
                   autoCapitalize="none"
                   onBlur={handleBlur('email')}
                   onChangeText={handleChange('email')}
+                  autoComplete='email'
                   value={values.email}
                 />
                 <FormControl.ErrorMessage>

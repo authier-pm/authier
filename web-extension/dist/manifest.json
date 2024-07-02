@@ -32,7 +32,12 @@
     "<all_urls>"
   ],
   "browser_specific_settings": {
+    "gecko": {
+      "id": "addon@authier.pm",
+      "strict_min_version": "90.0"
+    },
     "gecko_android": {
+      "id": "addon@authier.pm",
       "strict_min_version": "90.0"
     }
   },

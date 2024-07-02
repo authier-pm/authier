@@ -1,8 +1,8 @@
 import * as Sentry from '@sentry/browser'
 import ReactDOM from 'react-dom/client'
 import browser from 'webextension-polyfill'
-import { ApolloProvider } from '@apollo/client'
-import { apolloCache, apolloClient } from './apollo/apolloClient'
+
+import { apolloCache } from './apollo/apolloClient'
 import { HashRouter } from 'react-router-dom'
 import { ColorModeScript } from '@chakra-ui/react'
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
@@ -21,14 +21,12 @@ export const renderVault = () => {
   vaultRoot.render(
     <HashRouter basename="/">
       <QueryParamProvider adapter={ReactRouter6Adapter}>
-        <ApolloProvider client={apolloClient}>
           <ColorModeScript
             initialColorMode={chakraRawTheme.config?.initialColorMode}
           />
           <ExtensionProviders>
             <VaultRouter />
           </ExtensionProviders>
-        </ApolloProvider>
       </QueryParamProvider>
     </HashRouter>
   )
