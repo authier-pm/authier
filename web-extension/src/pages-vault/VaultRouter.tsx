@@ -18,6 +18,8 @@ import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
 import browser from 'webextension-polyfill'
+import { ApolloProvider } from '@apollo/client'
+import { apolloClient, apolloClientWithoutTokenRefresh } from '@src/apollo/apolloClient'
 
 const log = debug('au:VaultRouter')
 
@@ -47,39 +49,44 @@ export function VaultRouter() {
 
   if (deviceState === null) {
     return (
-      <Center marginX="50%" h="100vh">
-        <Routes>
-          <Route path="/" element={<Login />}></Route>
-          <Route path="/signup" element={<Register />}></Route>
-          <Route
-            path="/verify"
-            element={
-              <UnlockDeviceForm
-                onUnlocked={() => {
-                  navigate('/')
-                }}
-              />
-            }
-          ></Route>
-        </Routes>
-      </Center>
+      <ApolloProvider client={apolloClientWithoutTokenRefresh} >
+        <Center marginX="50%" h="100vh">
+          <Routes>
+            <Route path="/" element={<Login />}></Route>
+            <Route path="/signup" element={<Register />}></Route>
+            <Route
+              path="/verify"
+              element={
+                <UnlockDeviceForm
+                  onUnlocked={() => {
+                    navigate('/')
+                  }}
+                />
+              }
+            ></Route>
+          </Routes>
+        </Center>
+      </ApolloProvider>
     )
   }
 
   return (
-    <SidebarWithHeader>
-      <Routes>
-        <Route
-          path="/"
-          element={<VaultList tableView={vaultTableView} />}
-        ></Route>
-        <Route path="/secret/:secretId" element={<VaultItemSettings />} />
-        <Route path="/account-limits" element={<AccountLimits />}></Route>
-        <Route path="/settings/*" element={<VaultSettings />}></Route>
-        <Route path="/devices" element={<Devices />}></Route>
-        <Route path="/import-export" element={<VaultImportExport />}></Route>
-        <Route path="/addItem" element={<AddItem />}></Route>
-      </Routes>
-    </SidebarWithHeader>
+    <ApolloProvider client={apolloClient}>
+      <SidebarWithHeader>
+        <Routes>
+          <Route
+            path="/"
+            element={<VaultList tableView={vaultTableView} />}
+          ></Route>
+          <Route path="/secret/:secretId" element={<VaultItemSettings />} />
+          <Route path="/account-limits" element={<AccountLimits />}></Route>
+          <Route path="/settings/*" element={<VaultSettings />}></Route>
+          <Route path="/devices" element={<Devices />}></Route>
+          <Route path="/import-export" element={<VaultImportExport />}></Route>
+          <Route path="/addItem" element={<AddItem />}></Route>
+        </Routes>
+      </SidebarWithHeader>
+    </ApolloProvider>
+
   )
 }

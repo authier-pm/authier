@@ -6,8 +6,9 @@ import {
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import { JwtPayload, jwtDecode } from 'jwt-decode'
 import browser from 'webextension-polyfill'
-import { API_URL } from './apolloClient'
+import { API_URL } from './API_URL'
 import { device } from '@src/background/ExtensionDevice'
+const tokenRefreshBaseUrl = API_URL?.replace('/graphql', '')
 
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
@@ -31,7 +32,7 @@ export const tokenRefresh = new TokenRefreshLink({
     }
   },
   fetchAccessToken: async () => {
-    const url = `${API_URL?.replace('/graphql', '')}/refresh_token`
+    const url = `${tokenRefreshBaseUrl}/refresh_token`
 
     return await fetch(url, {
       method: 'POST',

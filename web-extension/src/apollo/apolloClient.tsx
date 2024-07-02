@@ -9,11 +9,10 @@ import { getTokenFromLocalStorage } from '../util/accessTokenExtension'
 import { errorLink } from '@shared/errorLink'
 import { tokenRefresh } from './tokenRefresh'
 import SerializingLink from 'apollo-link-serialize'
+import { API_URL } from './API_URL'
 
 export const apolloCache = new InMemoryCache()
 
-export const API_URL = process.env.API_URL as string
-console.log('API_URL', API_URL)
 const httpLink = createHttpLink({
   uri: API_URL,
   credentials: 'include'
@@ -39,6 +38,16 @@ export const apolloClient = new ApolloClient({
     errorLink,
     serializingLink,
     authLink,
+    httpLink
+  ]),
+  cache: apolloCache,
+  queryDeduplication: true
+})
+
+export const apolloClientWithoutTokenRefresh = new ApolloClient({
+  link: ApolloLink.from([
+    errorLink,
+    serializingLink,
     httpLink
   ]),
   cache: apolloCache,

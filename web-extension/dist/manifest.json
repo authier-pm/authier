@@ -16,14 +16,9 @@
   },
   "content_scripts": [
     {
-      "matches": [
-        "<all_urls>"
-      ],
+      "matches": ["<all_urls>"],
       "all_frames": true,
-      "js": [
-        "js/browser-polyfill.js",
-        "js/contentScript.js"
-      ]
+      "js": ["js/browser-polyfill.js", "js/contentScript.js"]
     }
   ],
   "icons": {
@@ -31,23 +26,12 @@
     "48": "icon-48.png",
     "128": "icon-128.png"
   },
-  "host_permissions": [
-    "<all_urls>"
-  ],
-  "permissions": [
-    "activeTab",
-    "storage",
-    "tabs",
-    "clipboardRead"
-  ],
+  "host_permissions": ["<all_urls>"],
+  "permissions": ["activeTab", "storage", "tabs", "clipboardRead"],
   "web_accessible_resources": [
     {
-      "resources": [
-        "*.png"
-      ],
-      "matches": [
-        "<all_urls>"
-      ]
+      "resources": ["*.png"],
+      "matches": ["<all_urls>"]
     }
   ]
 }
