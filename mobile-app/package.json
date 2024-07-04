@@ -150,7 +150,7 @@
     "react-native-dotenv": "^3.4.9",
     "react-native-version": "^4.0.0",
     "react-test-renderer": "18.2.0",
-    "typescript": "^5.4.5"
+    "typescript": "^5.5.3"
   },
   "jest": {
     "testEnvironmentOptions": {},
