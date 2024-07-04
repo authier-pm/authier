@@ -6,6 +6,7 @@ const TerserPlugin = require('terser-webpack-plugin')
 module.exports = merge(common, {
   mode: 'production',
   optimization: {
+    usedExports: true,
     chunkIds: 'deterministic',
     moduleIds: 'deterministic',
     minimizer: [new TerserPlugin()],
@@ -14,7 +15,7 @@ module.exports = merge(common, {
       chunks(chunk) {
         return chunk.name !== 'contentScript' && chunk.name !== 'backgroundPage'
       },
-      minChunks: 3,
+      minChunks: 2,
       maxSize: 3500000
     }
   }

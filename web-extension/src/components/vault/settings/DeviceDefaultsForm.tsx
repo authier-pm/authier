@@ -165,7 +165,7 @@ export function DeviceDefaultsForm() {
               {/*  */}
               <FormControl>
                 <FormLabel htmlFor="theme">
-                  <Trans>Language</Trans>
+                  <Trans>Theme</Trans>
                 </FormLabel>
                 <Field as={Select} id="theme" name="theme">
                   <option value="dark">Dark</option>

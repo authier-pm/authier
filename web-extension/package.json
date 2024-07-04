@@ -107,7 +107,7 @@
     "@hookform/resolvers": "^3.7.0",
     "@lingui/cli": "^4.11.2",
     "@lingui/macro": "^4.11.2",
-    "@sentry/browser": "^8.13.0",
+    "@sentry/browser": "^8.14.0",
     "@sentry/tracing": "^7.114.0",
     "@trpc/client": "^10.45.2",
     "@trpc/server": "^10.45.2",
