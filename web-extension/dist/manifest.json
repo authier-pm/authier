@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Authier",
-  "version": "1.1.0",
+  "version": "1.1.4",
   "description": "Authier password manager firefox extension",
   "browser_action": {
     "default_icon": "icon-16.png",
@@ -33,11 +33,11 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "addon@authier.pm",
+      "id": "{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}",
       "strict_min_version": "90.0"
     },
     "gecko_android": {
-      "id": "addon@authier.pm",
+      "id": "{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}",
       "strict_min_version": "90.0"
     }
   },

@@ -41,9 +41,16 @@ export async function getManifest() {
       'https://*/',
       '<all_urls>'
     ],
-    browser_specific_settings: { // from https://blog.mozilla.org/addons/2023/10/05/changes-to-android-extension-signing/
-      "gecko_android": {
-        "strict_min_version": "90.0"
+    browser_specific_settings: {
+      // from https://blog.mozilla.org/addons/2023/10/05/changes-to-android-extension-signing/
+      gecko: {
+        id: '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}',
+        strict_min_version: '90.0'
+      },
+      gecko_android: {
+        // @ts-expect-error
+        id: '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}',
+        strict_min_version: '90.0'
       }
     },
     web_accessible_resources: ['icon-16.png'],
