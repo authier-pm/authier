@@ -15,7 +15,7 @@ jobs:
       - name: Check out Git repository # clone the repo to local ci workspace
         uses: actions/checkout@v3
 
-      - uses: pnpm/action-setup@v3
+      - uses: pnpm/action-setup@v4
         with:
           version: 9
 
