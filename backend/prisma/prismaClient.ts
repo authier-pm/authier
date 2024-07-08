@@ -4,8 +4,17 @@ import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
-import { PrismaClient } from '.prisma/client'
-import { Prisma } from '@prisma/client'
+import { Prisma, PrismaClient } from '../node_modules/.prisma/client'
+
+import { Pool, neonConfig } from '@neondatabase/serverless'
+import { PrismaNeon } from '@prisma/adapter-neon'
+import ws from 'ws'
+
+neonConfig.webSocketConstructor = ws
+const connectionString = `${process.env.DATABASE_URL}`
+
+const pool = new Pool({ connectionString })
+const adapter = new PrismaNeon(pool)
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
@@ -27,6 +36,7 @@ if (workerId) {
 }
 
 export const prismaClient = new PrismaClient({
+  adapter,
   log:
     nodeEnv === 'production'
       ? ['info', 'warn']

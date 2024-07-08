@@ -21,6 +21,17 @@ const escapeHtml = (unsafe: string) => {
     .replaceAll("'", '&#039;')
 }
 
+const removeSavePromptDiv = () => {
+  if (loginPrompt) {
+    loginPrompt.remove()
+  }
+  // sometimes loginPrompt is not set for some strange reason
+  const promptDiv = document.getElementById('authier-save-prompt')
+  if (promptDiv) {
+    promptDiv.remove()
+  }
+}
+
 export const PromptPassword = ({
   username,
   password,
@@ -72,7 +83,7 @@ export const PromptPassword = ({
   }
 
   const removeCredential = async () => {
-    loginPrompt?.remove()
+    removeSavePromptDiv()
     await trpc.hideLoginCredentialsModal.mutate()
   }
 
@@ -121,7 +132,7 @@ export const PromptPassword = ({
           style={buttonStyle('#57c7e9')}
           onClick={async () => {
             await addCredential()
-            loginPrompt?.remove()
+            removeSavePromptDiv()
           }}
         >
           save
@@ -130,7 +141,7 @@ export const PromptPassword = ({
           style={buttonStyle('#1EAE9B')}
           onClick={async () => {
             await addCredential(true)
-            loginPrompt?.remove()
+            removeSavePromptDiv()
           }}
         >
           save & edit

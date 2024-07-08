@@ -15,6 +15,8 @@
     "@fastify/aws-lambda": "4.1.0",
     "@fastify/cookie": "9.3.1",
     "@fastify/cors": "^9.0.1",
+    "@neondatabase/serverless": "^0.9.4",
+    "@prisma/adapter-neon": "^5.16.1",
     "@prisma/client": "^5.16.1",
     "@react-native-firebase/app": "^20.1.0",
     "@sentry/node": "^8.15.0",
@@ -51,7 +53,8 @@
     "stripe": "^16.2.0",
     "type-graphql": "npm:@capaj/type-graphql@2.0.0-alpha.1",
     "typescript": "^5.5.3",
-    "uuid": "^10.0.0"
+    "uuid": "^10.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "@anatine/esbuild-decorators": "^0.2.19",
