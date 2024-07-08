@@ -14,13 +14,13 @@ const connectionString = `${process.env.DATABASE_URL}`
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
 
-const nodeEnv = process.env.NODE_ENV || 'test'
+const NODE_ENV = process.env.NODE_ENV || 'test'
 
 let dbUrl = process.env.DATABASE_URL
 
 const workerId = process.env.VITEST_WORKER_ID
 let adapter: PrismaNeon | null = null // CI and local uses regular prisma client. Neon adapter is only used from lambda
-if (workerId || nodeEnv === 'test') {
+if (workerId) {
   dbUrl = dbUrl?.includes('?') ? dbUrl?.split('?')[0] : dbUrl
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
   dbUrl = `${dbUrl}_test_${
@@ -37,7 +37,7 @@ if (workerId || nodeEnv === 'test') {
 export const prismaClient = new PrismaClient({
   adapter,
   log:
-    nodeEnv === 'production'
+    NODE_ENV === 'production'
       ? ['info', 'warn']
       : [
           {
