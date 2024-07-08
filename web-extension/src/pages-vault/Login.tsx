@@ -66,7 +66,6 @@ export default function Login(): ReactElement {
   if (!device.id) {
     return <Spinner />
   }
-  console.log('formStateContext:', formStateContext)
 
   if (formStateContext.isSubmitted) {
     return (

@@ -55,8 +55,6 @@ export const useLogin = (props: { deviceName: string }) => {
 
   useEffect(() => {
     if (error || decryptionChallengeError) {
-      console.log('decryptionChallengeError:', decryptionChallengeError)
-      console.log('error3:', error)
       setFormStateContext({
         ...formStateContext,
         isSubmitted: false
@@ -72,12 +70,12 @@ export const useLogin = (props: { deviceName: string }) => {
   useEffect(() => {
     const { fireToken } = device
 
-    console.log('~ decryptionData', decryptionData, fireToken)
+    console.log('~ decryptionData', decryptionData)
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ;(async () => {
+      ; (async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -171,7 +169,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-          'DecryptionChallengeApproved'
+            'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
