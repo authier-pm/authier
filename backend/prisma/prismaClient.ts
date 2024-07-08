@@ -4,17 +4,12 @@ import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
-import { Prisma, PrismaClient } from '../node_modules/.prisma/client'
-
+import { PrismaClient, Prisma } from '.prisma/client'
 import { Pool, neonConfig } from '@neondatabase/serverless'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import ws from 'ws'
 
-neonConfig.webSocketConstructor = ws
 const connectionString = `${process.env.DATABASE_URL}`
-
-const pool = new Pool({ connectionString })
-const adapter = new PrismaNeon(pool)
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
@@ -22,9 +17,9 @@ const logQueries = debug('au:prisma')
 const nodeEnv = process.env.NODE_ENV || 'test'
 
 let dbUrl = process.env.DATABASE_URL
-console.log('~ dbUrl', dbUrl)
 
 const workerId = process.env.VITEST_WORKER_ID
+let adapter: PrismaNeon | null = null // CI and local uses regular prisma client. Neon adapter is only used from lambda
 if (workerId) {
   dbUrl = dbUrl?.includes('?') ? dbUrl?.split('?')[0] : dbUrl
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
@@ -33,6 +28,10 @@ if (workerId) {
   }?connection_limit=500&pool_timeout=0&connect_timeout=0` // this allows us to run tests in parallel against multiple dbs without conflicts
 } else {
   log('DATABASE_URL', dbUrl)
+  neonConfig.webSocketConstructor = ws
+
+  const pool = new Pool({ connectionString })
+  adapter = new PrismaNeon(pool)
 }
 
 export const prismaClient = new PrismaClient({
