@@ -1,4 +1,4 @@
-name: publish-on-firefox-add-ons
+name: TODO-publish-on-firefox-add-ons #broken-we never got it to work
 on:
   workflow_dispatch:
 jobs:
