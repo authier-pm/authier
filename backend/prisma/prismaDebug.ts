@@ -1,7 +1,7 @@
 import { format } from 'sql-formatter'
 import { highlight } from 'sql-highlight'
 import debug from 'debug'
-import type { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '.prisma/client'
 
 export let queryCount = 0
 
@@ -9,6 +9,7 @@ const log = debug('prisma:sql')
 const logQueries = debug('mm:prisma')
 
 export const enablePrismaDebug = (prismaClient: PrismaClient) => {
+  // @ts-expect-error
   prismaClient.$on('query', (event: any) => {
     queryCount++
 

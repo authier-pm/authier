@@ -4,8 +4,7 @@ import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
-import { PrismaClient } from '.prisma/client'
-import { Prisma } from '@prisma/client'
+import { PrismaClient, Prisma } from '.prisma/client'
 
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
