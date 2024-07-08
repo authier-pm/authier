@@ -10,7 +10,7 @@ import { Prisma } from '@prisma/client'
 const log = debug('prisma:sql')
 const logQueries = debug('au:prisma')
 
-const nodeEnv = process.env.NODE_ENV || 'test'
+const NODE_ENV = process.env.NODE_ENV || 'test'
 
 let dbUrl = process.env.DATABASE_URL
 console.log('~ dbUrl', dbUrl)
@@ -28,7 +28,7 @@ if (workerId) {
 
 export const prismaClient = new PrismaClient({
   log:
-    nodeEnv === 'production'
+    NODE_ENV === 'production'
       ? ['info', 'warn']
       : [
           {
