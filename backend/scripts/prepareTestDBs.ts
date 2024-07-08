@@ -4,7 +4,7 @@ import { execFile } from 'child_process'
 
 import { getDbCount } from './getDbCount'
 import { readFileSync, writeFileSync } from 'fs'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '../node_modules/.prisma/client'
 
 export const testDbsPrefix = 'authier_test'
 const dbCount = getDbCount() // each jest worker uses one CPU and one DB, so we need that many DBs
