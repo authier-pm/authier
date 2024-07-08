@@ -20,7 +20,7 @@ let dbUrl = process.env.DATABASE_URL
 
 const workerId = process.env.VITEST_WORKER_ID
 let adapter: PrismaNeon | null = null // CI and local uses regular prisma client. Neon adapter is only used from lambda
-if (workerId) {
+if (workerId || nodeEnv === 'test') {
   dbUrl = dbUrl?.includes('?') ? dbUrl?.split('?')[0] : dbUrl
   const vitestWorkerId = Number(process.env.VITEST_WORKER_ID) % getDbCount()
   dbUrl = `${dbUrl}_test_${
