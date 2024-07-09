@@ -15,14 +15,10 @@ runs:
         version: 9
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 20
         cache: 'pnpm'
-
-    - name: Install dependencies
-      run: |
-        pnpm i --frozen-lockfile --prefer-offline
 
     # Add additional build and test steps here
     - name: create .env & web-extension build
@@ -32,7 +28,7 @@ runs:
         touch .env
         echo $API_URL >> .env
         echo $PAGE_URL >> .env
-        tsx ./scripts/updateManifestVersion.ts 
+        pnpm run generateManifest
         pnpm prodBuild
 
     # - name: Install Playwright Browsers & Run Playwright tests with backend
