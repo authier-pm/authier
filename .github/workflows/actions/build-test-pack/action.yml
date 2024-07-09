@@ -21,9 +21,7 @@ runs:
         cache: 'pnpm'
 
     - name: Install dependencies
-      shell: bash
       run: |
-        pnpm i ts-node zx -g
         pnpm i --frozen-lockfile --prefer-offline
 
     # Add additional build and test steps here
@@ -34,6 +32,7 @@ runs:
         touch .env
         echo $API_URL >> .env
         echo $PAGE_URL >> .env
+        tsx ./scripts/updateManifestVersion.ts 
         pnpm prodBuild
 
     # - name: Install Playwright Browsers & Run Playwright tests with backend

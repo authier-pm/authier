@@ -82,7 +82,7 @@
     "style-loader": "^4.0.0",
     "terser-webpack-plugin": "^5.3.10",
     "ts-loader": "^9.5.1",
-    "ts-node-dev": "^2.0.0",
+    "tsx": "^4.16.2",
     "type-graphql": "^1.1.1",
     "typescript": "^5.5.3",
     "vitest": "^2.0.1",
