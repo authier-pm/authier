@@ -71,7 +71,7 @@ const DeviceListItem = ({
 }: {
   deviceInfo: Partial<DeviceQuery>
   masterDeviceId: string
-  TOTPCode: string
+  TOTPCode?: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
   const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
