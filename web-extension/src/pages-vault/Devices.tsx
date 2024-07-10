@@ -355,48 +355,6 @@ const DeviceListItem = ({
                   </Button>
                 )}
               </HStack>
-                  <Tooltip
-                    label={intlFormat(new Date(deviceInfo.createdAt ?? ''), {
-                      weekday: 'long',
-                      year: 'numeric',
-                      month: 'long',
-                      day: 'numeric'
-                    })}
-                  >
-                    <Text fontSize={'sm'}>
-                      {formatDistance(
-                        new Date(deviceInfo.createdAt ?? ''),
-                        new Date()
-                      )}{' '}
-                      ago
-                    </Text>
-                  </Tooltip>
-                </Box>
-
-                <Box w="50%">
-                  <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
-                    <Trans>Last sync</Trans>
-                  </Text>
-                  {deviceInfo.lastSyncAt && (
-                    <Tooltip
-                      label={intlFormat(new Date(deviceInfo.lastSyncAt ?? ''), {
-                        weekday: 'long',
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                      })}
-                    >
-                      <Text fontSize={'sm'}>
-                        {formatDistance(
-                          new Date(deviceInfo.lastSyncAt ?? ''),
-                          new Date()
-                        )}{' '}
-                        ago
-                      </Text>
-                    </Tooltip>
-                  )}
-                </Box>
-              </HStack>
             </Stack>
           )}
         </Box>
@@ -455,6 +413,7 @@ export default function Devices() {
                       key={i}
                       masterDeviceId={data.me.masterDeviceId as string}
                       TOTPCode={el.TOTPCode}
+                    />
                   )
                 })
             )}
