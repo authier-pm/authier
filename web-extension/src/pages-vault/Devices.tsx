@@ -66,16 +66,23 @@ export const BadgeWithIcon = (props) => {
 
 const DeviceListItem = ({
   deviceInfo,
-  masterDeviceId
+  masterDeviceId,
+  TOTPCode
 }: {
   deviceInfo: Partial<DeviceQuery>
   masterDeviceId: string
+  TOTPCode: string
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
   const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
+  const [TOTPCode, setTOTPCode] = useState(deviceInfo.TOTPCode || '')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
+
+  const handleCopyTOTP = () => {
+    navigator.clipboard.writeText(TOTPCode)
+  }
 
   const isMasterDevice = deviceInfo.id === masterDeviceId
   const currentDevice = deviceInfo.id === device.id
@@ -317,6 +324,54 @@ const DeviceListItem = ({
                     </Text>
                   </Tooltip>
                 </Box>
+                <Box w="50%">
+                  <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
+                    <Trans>Last sync</Trans>
+                  </Text>
+                  {deviceInfo.lastSyncAt && (
+                    <Tooltip
+                      label={intlFormat(new Date(deviceInfo.lastSyncAt ?? ''), {
+                        weekday: 'long',
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                      })}
+                    >
+                      <Text fontSize={'sm'}>
+                        {formatDistance(
+                          new Date(deviceInfo.lastSyncAt ?? ''),
+                          new Date()
+                        )}{' '}
+                        ago
+                      </Text>
+                    </Tooltip>
+                  )}
+                </Box>
+              </HStack>
+              <HStack>
+                {TOTPCode && (
+                  <Button onClick={handleCopyTOTP} size="sm" colorScheme="teal">
+                    <Trans>Copy TOTP</Trans>
+                  </Button>
+                )}
+              </HStack>
+                  <Tooltip
+                    label={intlFormat(new Date(deviceInfo.createdAt ?? ''), {
+                      weekday: 'long',
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  >
+                    <Text fontSize={'sm'}>
+                      {formatDistance(
+                        new Date(deviceInfo.createdAt ?? ''),
+                        new Date()
+                      )}{' '}
+                      ago
+                    </Text>
+                  </Tooltip>
+                </Box>
 
                 <Box w="50%">
                   <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
@@ -399,7 +454,7 @@ export default function Devices() {
                       deviceInfo={el}
                       key={i}
                       masterDeviceId={data.me.masterDeviceId as string}
-                    />
+                      TOTPCode={el.TOTPCode}
                   )
                 })
             )}
