@@ -147,12 +147,18 @@ export function VaultListItem({
             aria-label="copy to clipboard"
             colorScheme="gray"
             onClick={() => {
-              navigator.clipboard.writeText(password)
-              toast({
-                title: t`Copied to clipboard`,
-                status: 'success'
-              })
-              secret.lastUsedAt = new Date().toISOString()
+              if (secret.kind === EncryptedSecretType.TOTP) {
+                // TODO implement this see issue #493
+              } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
+
+                navigator.clipboard.writeText(password)
+                toast({
+                  title: t`Copied to clipboard`,
+                  status: 'success'
+                })
+                secret.lastUsedAt = new Date().toISOString()
+              }
+
               // TODO store SecretUsageEvent
             }}
             icon={<CopyIcon />}
