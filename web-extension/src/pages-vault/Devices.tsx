@@ -76,12 +76,14 @@ const DeviceListItem = ({
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
   const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
-  const [TOTPCode, setTOTPCode] = useState(deviceInfo.TOTPCode || '')
+  const [TOTPCode, setTOTPCode] = useState(deviceInfo.TOTPCode ?? '')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
 
   const handleCopyTOTP = () => {
-    navigator.clipboard.writeText(TOTPCode)
+    if (TOTPCode) {
+      navigator.clipboard.writeText(TOTPCode)
+    }
   }
 
   const isMasterDevice = deviceInfo.id === masterDeviceId
@@ -412,7 +414,7 @@ export default function Devices() {
                       deviceInfo={el}
                       key={i}
                       masterDeviceId={data.me.masterDeviceId as string}
-                      TOTPCode={el.TOTPCode}
+                      TOTPCode={el.TOTPCode ?? ''}
                     />
                   )
                 })

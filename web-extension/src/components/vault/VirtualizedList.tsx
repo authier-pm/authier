@@ -25,7 +25,9 @@ export function VaultListItem({
   secret: ILoginSecret | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
-  const [TOTPCode, setTOTPCode] = useState(secret.TOTPCode || '')
+  const [TOTPCode, setTOTPCode] = useState(
+    secret.kind === EncryptedSecretType.TOTP_SECRET ? (secret as ITOTPSecret).TOTPCode || '' : ''
+  )
 
   const { deviceState } = useContext(DeviceStateContext)
   const toast = useToast()
@@ -150,7 +152,7 @@ export function VaultListItem({
             {label}
           </Text>
 
-          {secret.kind === EncryptedSecretType.TOTP_SECRET && TOTPCode && (
+          {secret.kind === EncryptedSecretType.TOTP && TOTPCode && (
             <IconButton
               size="sm"
               aria-label="copy TOTP to clipboard"
