@@ -25,9 +25,18 @@ export function VaultListItem({
   secret: ILoginSecret | ITOTPSecret
 }) {
   const [isVisible, setIsVisible] = useState(false)
+  const [TOTPCode, setTOTPCode] = useState(secret.TOTPCode || '')
 
   const { deviceState } = useContext(DeviceStateContext)
   const toast = useToast()
+
+  const handleCopyTOTP = () => {
+    navigator.clipboard.writeText(TOTPCode)
+    toast({
+      title: t`Copied to clipboard`,
+      status: 'success'
+    })
+  }
 
   const username = getDecryptedSecretProp(secret, 'username')
   const password = getDecryptedSecretProp(secret, 'password')
@@ -140,6 +149,16 @@ export function VaultListItem({
           <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
             {label}
           </Text>
+
+          {secret.kind === EncryptedSecretType.TOTP_SECRET && TOTPCode && (
+            <IconButton
+              size="sm"
+              aria-label="copy TOTP to clipboard"
+              colorScheme="teal"
+              onClick={handleCopyTOTP}
+              icon={<CopyIcon />}
+            />
+          )}
 
           <IconButton
             size="sm"
