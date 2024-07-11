@@ -18,6 +18,7 @@ import { t } from '@lingui/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { authierColors } from '@shared/chakraRawTheme'
 import { TbAuth2Fa } from 'react-icons/tb'
+import { authenticator } from 'otplib'
 
 export function VaultListItem({
   secret
@@ -148,16 +149,18 @@ export function VaultListItem({
             colorScheme="gray"
             onClick={() => {
               if (secret.kind === EncryptedSecretType.TOTP) {
-                // TODO implement this see issue #493
+                const otpCode = authenticator.generate(secret.totp.secret)
+                navigator.clipboard.writeText(otpCode)
               } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
-
                 navigator.clipboard.writeText(password)
-                toast({
-                  title: t`Copied to clipboard`,
-                  status: 'success'
-                })
-                secret.lastUsedAt = new Date().toISOString()
+
               }
+              secret.lastUsedAt = new Date().toISOString()
+
+              toast({
+                title: t`Copied to clipboard`,
+                status: 'success'
+              })
 
               // TODO store SecretUsageEvent
             }}
