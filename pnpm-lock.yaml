@@ -4,6 +4,11 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+patchedDependencies:
+  prisma-extension-kysely@2.1.0:
+    hash: 7annk24dwkro5e5y6mjrfbkgcm
+    path: patches/prisma-extension-kysely@2.1.0.patch
+
 importers:
 
   .:
@@ -202,7 +207,7 @@ importers:
         version: 5.17.0
       prisma-extension-kysely:
         specifier: ^2.1.0
-        version: 2.1.0(@prisma/client@5.17.0(prisma@5.17.0))
+        version: 2.1.0(patch_hash=7annk24dwkro5e5y6mjrfbkgcm)(@prisma/client@5.17.0(prisma@5.17.0))
       prisma-generator-checker:
         specifier: ^2.0.1
         version: 2.0.1(prisma@5.17.0)
@@ -1051,6 +1056,24 @@ packages:
 
   '@apollo/client@3.11.0':
     resolution: {integrity: sha512-gX+sfALW6m/EfydJAE3ogLci1SFIBJKlyyWcakcNgTMLm7PfKMJ2MysagIdKgCSapQjBUL8qxZVI62TLKqe2Ng==}
+    peerDependencies:
+      graphql: ^15.0.0 || ^16.0.0
+      graphql-ws: ^5.5.5
+      react: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0
+      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0 || >=19.0.0-rc <19.0.0
+      subscriptions-transport-ws: ^0.9.0 || ^0.11.0
+    peerDependenciesMeta:
+      graphql-ws:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+      subscriptions-transport-ws:
+        optional: true
+
+  '@apollo/client@3.11.1':
+    resolution: {integrity: sha512-fVuAi7ufRt2apIEYV18upvykw5JD+CwHAThxZkclby4phWCXtO4LD39Z0sk0+4i+j7oZ+jOofEkO1XGDDomZvQ==}
     peerDependencies:
       graphql: ^15.0.0 || ^16.0.0
       graphql-ws: ^5.5.5
@@ -16974,6 +16997,54 @@ snapshots:
     transitivePeerDependencies:
       - '@types/react'
 
+  '@apollo/client@3.11.1(@types/react@18.2.46)(graphql-ws@5.14.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.8.1)
+      '@wry/caches': 1.0.1
+      '@wry/equality': 0.5.6
+      '@wry/trie': 0.5.0
+      graphql: 16.8.1
+      graphql-tag: 2.12.6(graphql@16.8.1)
+      hoist-non-react-statics: 3.3.2
+      optimism: 0.18.0
+      prop-types: 15.8.1
+      rehackt: 0.1.0(@types/react@18.2.46)(react@18.2.0)
+      response-iterator: 0.2.6
+      symbol-observable: 4.0.0
+      ts-invariant: 0.10.3
+      tslib: 2.6.2
+      zen-observable-ts: 1.2.5
+    optionalDependencies:
+      graphql-ws: 5.14.0(graphql@16.8.1)
+      react: 18.2.0
+      react-dom: 18.3.1(react@18.2.0)
+    transitivePeerDependencies:
+      - '@types/react'
+
+  '@apollo/client@3.11.1(@types/react@18.3.3)(graphql-ws@5.14.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
+    dependencies:
+      '@graphql-typed-document-node/core': 3.2.0(graphql@16.9.0)
+      '@wry/caches': 1.0.1
+      '@wry/equality': 0.5.6
+      '@wry/trie': 0.5.0
+      graphql: 16.9.0
+      graphql-tag: 2.12.6(graphql@16.9.0)
+      hoist-non-react-statics: 3.3.2
+      optimism: 0.18.0
+      prop-types: 15.8.1
+      rehackt: 0.1.0(@types/react@18.3.3)(react@18.3.1)
+      response-iterator: 0.2.6
+      symbol-observable: 4.0.0
+      ts-invariant: 0.10.3
+      tslib: 2.6.2
+      zen-observable-ts: 1.2.5
+    optionalDependencies:
+      graphql-ws: 5.14.0(graphql@16.9.0)
+      react: 18.3.1
+      react-dom: 18.3.1(react@18.3.1)
+    transitivePeerDependencies:
+      - '@types/react'
+
   '@apollo/client@3.7.17(graphql-ws@5.14.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)':
     dependencies:
       '@graphql-typed-document-node/core': 3.2.0(graphql@16.8.1)
@@ -16998,7 +17069,7 @@ snapshots:
 
   '@apollo/react-hooks@4.0.0(@types/react@18.3.3)(graphql-ws@5.14.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)':
     dependencies:
-      '@apollo/client': 3.11.0(@types/react@18.3.3)(graphql-ws@5.14.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      '@apollo/client': 3.11.1(@types/react@18.3.3)(graphql-ws@5.14.0(graphql@16.9.0))(graphql@16.9.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     transitivePeerDependencies:
       - '@types/react'
       - graphql
@@ -17009,7 +17080,7 @@ snapshots:
 
   '@apollo/react-testing@4.0.0(@types/react@18.2.46)(graphql-ws@5.14.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@apollo/client': 3.11.0(@types/react@18.2.46)(graphql-ws@5.14.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
+      '@apollo/client': 3.11.1(@types/react@18.2.46)(graphql-ws@5.14.0(graphql@16.8.1))(graphql@16.8.1)(react-dom@18.3.1(react@18.2.0))(react@18.2.0)
     transitivePeerDependencies:
       - '@types/react'
       - graphql
@@ -35439,7 +35510,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  prisma-extension-kysely@2.1.0(@prisma/client@5.17.0(prisma@5.17.0)):
+  prisma-extension-kysely@2.1.0(patch_hash=7annk24dwkro5e5y6mjrfbkgcm)(@prisma/client@5.17.0(prisma@5.17.0)):
     dependencies:
       '@prisma/client': 5.17.0(prisma@5.17.0)
 
