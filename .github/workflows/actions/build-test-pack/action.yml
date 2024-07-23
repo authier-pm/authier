@@ -20,6 +20,10 @@ runs:
         node-version: 20
         cache: 'pnpm'
 
+    - name: Install dependencies
+      run: |
+        pnpm i --frozen-lockfile --prefer-offline
+
     # Add additional build and test steps here
     - name: create .env & web-extension build
       shell: bash
