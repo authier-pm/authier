@@ -1,5 +1,5 @@
 import { FastifyRequest } from 'fastify'
-import { prismaClient, prismaTransaction } from './prisma/prismaClient'
+import { prismaClient } from './prisma/prismaClient'
 import { stripeClient } from './stripeClient'
 
 import { GraphQLError } from 'graphql'
@@ -49,8 +49,8 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
   let status: string
 
   async function incrementAccountLimits(session: any, productId: any) {
-    await prismaTransaction(async () => {
-      await prismaClient.user.update({
+    await prismaClient.$transaction(async (trx) => {
+      await trx.user.update({
         where: {
           email: session.customer_details.email
         },
@@ -66,7 +66,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
       })
 
       if (productId === stripeProducts[STRIPE_ENV].TOTP) {
-        await prismaClient.user.update({
+        await trx.user.update({
           where: {
             email: session.customer_details.email
           },
@@ -77,7 +77,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
           }
         })
       } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
-        await prismaClient.user.update({
+        await trx.user.update({
           where: {
             email: session.customer_details.email
           },
@@ -88,7 +88,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
           }
         })
       } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
-        await prismaClient.user.update({
+        await trx.user.update({
           where: {
             email: session.customer_details.email
           },
@@ -116,8 +116,8 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
       subscription = event.data.object as any // TODO type properly
       status = subscription.status
       if (status === 'canceled') {
-        await prismaTransaction(async () => {
-          await prismaClient.user.update({
+        await prismaClient.$transaction(async (trx) => {
+          await trx.user.update({
             where: {
               email: session.customer_details.email
             },
@@ -132,7 +132,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
           })
 
           if (productId === stripeProducts[STRIPE_ENV].TOTP) {
-            await prismaClient.user.update({
+            await trx.user.update({
               where: {
                 email: session.customer_details.email
               },
@@ -143,7 +143,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
               }
             })
           } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
-            await prismaClient.user.update({
+            await trx.user.update({
               where: {
                 email: session.customer_details.email
               },
@@ -154,7 +154,7 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
               }
             })
           } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
-            await prismaClient.user.update({
+            await trx.user.update({
               where: {
                 email: session.customer_details.email
               },

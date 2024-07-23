@@ -35,6 +35,10 @@ if (workerId) {
 }
 
 export const prismaClient = new PrismaClient({
+  transactionOptions: {
+    timeout: 55_000,
+    maxWait: 55_000
+  },
   log:
     NODE_ENV === 'production'
       ? ['info', 'warn']
@@ -76,13 +80,3 @@ if (debugLogs) {
 
 // @ts-expect-error
 export const dmmf = prismaClient._runtimeDataModel as any
-
-// helper, because the default prisma interactive transaction timeouts are too low
-export const prismaTransaction = <R>(
-  fn: (prisma: Prisma.TransactionClient) => Promise<R>
-) => {
-  return prismaClient.$transaction(fn, {
-    timeout: 55000,
-    maxWait: 55000
-  })
-}
