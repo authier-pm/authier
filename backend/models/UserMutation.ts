@@ -26,7 +26,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 import { EmailVerificationType } from '.prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
-import prismaClient, { dmmf } from '../prisma/prismaClient'
+import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
 import { stripeClient } from '../stripeClient'

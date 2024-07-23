@@ -23,6 +23,10 @@ generator PrismaTypeGraphQLTypesGenerator {
   useDotPrismaImport             = true
 }
 
+generator kysely {
+  provider = "prisma-kysely"
+}
+
 generator prisma_checker {
   provider = "npx prisma-generator-checker"
 }

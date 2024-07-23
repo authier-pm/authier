@@ -445,29 +445,28 @@ export class RootResolver {
 
   @Query(() => [WebInputGQLScalars])
   async webInputs(
-    @Arg('host', () => String, {
-      deprecationReason: 'use hosts',
-      nullable: true
+    @Arg('hosts', () => [String], {
+      nullable: true,
+      description: 'accepts strings like example.com and similar'
     })
-    host: string | null,
-    @Arg('hosts', () => [String], { nullable: true }) hosts: string[] | null,
+    hosts: string[] | null,
     @Ctx() ctx: IContextAuthenticated
   ) {
     if (hosts) {
-      // TODO only return new web inputs created after last sync
-      return ctx.prisma.webInput.findMany({
-        where: {
-          host: {
-            in: hosts
-          }
-        }
+      const formattedDomains = hosts.map((url) => {
+        const strippedUrl = url.replace('www.', '')
+        return `%${strippedUrl}`
       })
-    }
-    if (!host) {
-      return []
-    }
 
-    return ctx.prisma.webInput.findMany({ where: { host } })
+      // TODO only return new web inputs created after last sync
+      return ctx.prisma.$kysely
+        .selectFrom('WebInput')
+        .selectAll()
+        .where((eb) =>
+          eb.or(formattedDomains.map((domain) => eb('host', 'like', domain)))
+        )
+        .execute()
+    }
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

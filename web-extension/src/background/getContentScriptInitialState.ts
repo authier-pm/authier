@@ -7,6 +7,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
 import { WebInputForAutofill } from './WebInputForAutofill'
+import { getWebInputsForUrl } from './getWebInputsForUrl'
 const log = debug('au:getContentScriptInitialState')
 
 export const getContentScriptInitialState = async (
@@ -27,11 +28,7 @@ export const getContentScriptInitialState = async (
     decrypted = []
   }
 
-  let webInputs: WebInputForAutofill[] = []
-
-  if (hostname && device.state?.webInputs) {
-    webInputs = device.state?.webInputs.filter((i) => i.url === tabUrl) ?? []
-  }
+  let webInputs = getWebInputsForUrl(tabUrl)
 
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
