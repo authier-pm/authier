@@ -20,6 +20,10 @@ const modulesToCopy = [
     [`${relativePath}/@prisma/client/**`],
     'dist/node_modules/@prisma/client'
   )
+  await cpy(
+    [`../node_modules//@prisma/client/**`],
+    'dist/node_modules/@prisma/client'
+  )
 
   await cpy([`${relativePath}/pg-*/**`], `dist/node_modules`) // needed for knex
   await cpy([`${relativePath}/postgres-*/**`], `dist/node_modules`) // needed for knex
