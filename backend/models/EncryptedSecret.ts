@@ -2,6 +2,7 @@ import { Arg, Ctx, Field, ObjectType } from 'type-graphql'
 import { IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
+import { WebInputGQLScalars } from './generated/WebInputGQL'
 
 @ObjectType()
 export class EncryptedSecretQuery extends EncryptedSecretGQL {

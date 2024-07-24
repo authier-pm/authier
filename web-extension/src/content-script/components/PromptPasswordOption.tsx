@@ -12,7 +12,7 @@ const nano = h
 import './Option.css'
 import debug from 'debug'
 const log = debug('au:PromptPasswordOption')
-import { autofill } from '../autofill'
+import { autofill, filledElements, resetAutofillStateForThisPage } from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
@@ -87,25 +87,23 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       ></span>
 
       <div className="dropdown-content">
-        {loginCredentials.map((el) => {
+        {loginCredentials.map((loginCredential) => {
           return (
             <a
-              key={el.id}
+              key={loginCredential.id}
               onClick={async () => {
+                resetAutofillStateForThisPage()
                 autofill({
-                  secretsForHost: { loginCredentials: [el], totpSecrets: [] },
+                  secretsForHost: { loginCredentials: [loginCredential], totpSecrets: [] },
                   autofillEnabled: true,
                   extensionDeviceReady: true,
                   passwordCount: 0,
                   saveLoginModalsState: undefined,
                   webInputs: webInputs
                 })
-                if (promptOption) {
-                  promptOption.remove()
-                }
               }}
             >
-              {el.loginCredentials.username}
+              {loginCredential.loginCredentials.username}
             </a>
           )
         })}

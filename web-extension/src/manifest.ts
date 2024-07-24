@@ -1,7 +1,7 @@
 import fs from 'fs-extra'
 import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
-import { dir } from '../scripts/updateManifestVersion'
+import { dir } from '../scripts/generateExtensionManifest'
 
 export async function getManifest() {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType

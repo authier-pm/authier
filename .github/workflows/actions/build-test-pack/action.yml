@@ -9,13 +9,13 @@ inputs:
 runs:
   using: 'composite'
   steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - uses: pnpm/action-setup@v4
       with:
         version: 9
 
     - name: Set up Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: 20
         cache: 'pnpm'
@@ -23,17 +23,18 @@ runs:
     - name: Install dependencies
       shell: bash
       run: |
-        pnpm i ts-node zx -g
         pnpm i --frozen-lockfile --prefer-offline
 
     # Add additional build and test steps here
-    - name: create .env & web-extension build
+    - name: web-extension production build
       shell: bash
       working-directory: ./web-extension
       run: |
         touch .env
         echo $API_URL >> .env
         echo $PAGE_URL >> .env
+        pnpm run generateManifest
+        pnpm run lingui
         pnpm prodBuild
 
     # - name: Install Playwright Browsers & Run Playwright tests with backend

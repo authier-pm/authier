@@ -8,8 +8,7 @@ datasource db {
 
 generator client {
   provider        = "prisma-client-js"
-  output          = "../node_modules/.prisma/client"
-  binaryTargets   = ["native", "linux-arm64-openssl-1.0.x", "linux-arm64-openssl-3.0.x"]
+  binaryTargets   = ["native", "linux-arm64-openssl-3.0.x"]
   previewFeatures = ["postgresqlExtensions", "nativeDistinct", "relationJoins"]
 }
 
@@ -21,6 +20,10 @@ generator PrismaTypeGraphQLTypesGenerator {
   splitScalarAndObjectTypeFields = true
   exportedNameSuffix             = "GQL"
   useDotPrismaImport             = true
+}
+
+generator kysely {
+  provider = "prisma-kysely"
 }
 
 generator prisma_checker {

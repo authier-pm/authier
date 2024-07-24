@@ -49,7 +49,7 @@ We are using pnpm workspaces so always run pnpm in root folder. That's where the
 
 ## How to run locally
 
-Refer to readme inside each subproject for all the instructions. Generally you will need to run backend + whatever client you want to develop.
+Refer to readme inside each sub project for all the instructions. Generally you will need to run backend + whatever client you want to develop.
 
 # Contributor financial reward scheme
 

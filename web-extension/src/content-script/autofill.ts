@@ -27,6 +27,7 @@ import {
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
 import { WebInputForAutofill } from '../background/WebInputForAutofill'
+import { wait } from './wait'
 
 const log = debug('au:autofill')
 
@@ -130,14 +131,14 @@ export const autofillValueIntoInput = (
 ) => {
   log('autofillValueIntoInput:', value, element)
 
-  if (alreadyFilledElements.has(element)) {
+  if (filledElements.has(element)) {
     return null
   }
   if (element.childNodes.length > 0) {
     //we should again loop through the children of the element and find the right input
     //@ts-ignore
     imitateKeyInput(element.childNodes[0], value)
-    alreadyFilledElements.add(element)
+    filledElements.add(element)
   }
 
   if (isElementInViewport(element) === false || isHidden(element)) {
@@ -151,16 +152,27 @@ export const autofillValueIntoInput = (
     lastAutofilledValue: value
   })
   imitateKeyInput(element, value)
-  alreadyFilledElements.add(element)
+  filledElements.add(element)
 
   return element
 }
 
-export const fillPasswordIntoInput = (
-  inputEl: HTMLInputElement,
+export const fillStringIntoInput = ({
+  inputEl,
+  loginCredential,
+  inputType
+}: {
+  inputEl: HTMLInputElement
   loginCredential: LoginCredentialsTypeWithMeta
-) => {
-  passwordFilledForThisPage = true
+
+  inputType: WebInputType
+}) => {
+  if (inputTypesFilledForThisPage.has(inputType)) {
+    log(`inputType ${inputType} already filled for this page`)
+    return
+  }
+
+  inputTypesFilledForThisPage.add(inputType)
 
   const el = autofillValueIntoInput(inputEl, loginCredential.password)
 
@@ -215,23 +227,29 @@ export const getElementCoordinates = (el: HTMLElement) => {
   }
 }
 
-export let passwordFilledForThisPage = false
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, @typescript-eslint/no-explicit-any
 let onInputAddedHandler = (inputEl: any) => {}
 
-const filledElements: Array<HTMLInputElement | null> = []
+/**
+ * tracks which input types have been autofilled for this page, so we don't autofill them again
+ */
+export let inputTypesFilledForThisPage = new Set<WebInputType>()
 
-const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
+/**
+ * tracks autofilled elements, so we don't autofill them again. We clear this set when user decides to autofill again with different credentials
+ */
+export const filledElements = new Set<HTMLInputElement>()
 
-const alreadyFilledElements = new Set()
+export const resetAutofillStateForThisPage = () => {
+  for (const el of filledElements) {
+    el.value = ''
+  }
+  inputTypesFilledForThisPage.clear()
+  filledElements.clear()
+}
 
 export const autofill = (initState: IInitStateRes) => {
   const { secretsForHost, webInputs } = initState
 
-  if (passwordFilledForThisPage === true) {
-    log('autofill already ran, returning')
-    return () => {}
-  }
   log('init autofill', initState)
 
   const firstLoginCred = secretsForHost.loginCredentials[0]
@@ -268,16 +286,10 @@ export const autofill = (initState: IInitStateRes) => {
         return
       }
     }
-    const matchingWebInputs = webInputs.filter(({ url }) => {
-      const matches = url.startsWith(location.href)
-
-      return matches
-    })
-    log('matchingWebInputs:', matchingWebInputs)
 
     // Fill known inputs
     let foundInputsCount = 0
-    for (const webInputGql of matchingWebInputs) {
+    for (const webInputGql of webInputs) {
       const inputElList = body.querySelectorAll(
         webInputGql.domPath
       ) as NodeListOf<HTMLInputElement>
@@ -295,12 +307,13 @@ export const autofill = (initState: IInitStateRes) => {
           firstLoginCred &&
           inputEl.type === 'password' // we don't want to autofill password to any other type of input
         ) {
-          const el = fillPasswordIntoInput(
+          const el = fillStringIntoInput({
             inputEl,
-            firstLoginCred.loginCredentials
-          )
+            loginCredential: firstLoginCred.loginCredentials,
+            inputType: webInputGql.kind
+          })
 
-          filledElements.push(el)
+          el && filledElements.add(el)
         } else if (
           [
             WebInputType.EMAIL,
@@ -313,16 +326,16 @@ export const autofill = (initState: IInitStateRes) => {
             inputEl,
             firstLoginCred.loginCredentials.username
           )
-          filledElements.push(el)
+          el && filledElements.add(el)
         } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
           const el = autofillValueIntoInput(
             inputEl,
             authenticator.generate(totpSecret.totp.secret)
           )
-          filledElements.push(el)
+          el && filledElements.add(el)
         }
 
-        if (filledElements.length >= 2) {
+        if (filledElements.size >= 2) {
           break
         }
         //NOTE: We did not find element by DOM path
@@ -351,11 +364,11 @@ export const autofill = (initState: IInitStateRes) => {
       bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
     }
 
-    //TODO: this does not work right
-    //Catch new inputs
+    //TODO: write a test for this
+    // Catch new inputs
     onInputAddedHandler = debounce(
       (inputEl) => {
-        if (filledElements.length >= 2) {
+        if (filledElements.size >= 2) {
           return // we have already filled 2 inputs on this page, we don't need to fill any more
         }
         log('onInputAddedHandler', inputEl)
@@ -363,7 +376,11 @@ export const autofill = (initState: IInitStateRes) => {
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
-            fillPasswordIntoInput(inputEl, firstLoginCred.loginCredentials)
+            fillStringIntoInput({
+              inputEl,
+              loginCredential: firstLoginCred.loginCredentials,
+              inputType: WebInputType.USERNAME
+            })
           } else {
             // todo show prompt to user to select which credential to use
           }
@@ -414,7 +431,7 @@ export const autofill = (initState: IInitStateRes) => {
       return () => {}
     }
 
-    if (filledElements.length === 2) {
+    if (filledElements.size === 2) {
       const form = filledElements[0]?.form
       if (form) {
         // TODO try to submit the form
@@ -430,14 +447,19 @@ export const autofill = (initState: IInitStateRes) => {
           cancelable: true
         })
         if (form.submit instanceof HTMLElement) {
-          // @ts-expect-error TODO
           form.submit.dispatchEvent(clickEvent)
         }
 
-        const notAPasswordInput = filledElements.find(
-          (el) => el?.type !== 'password'
-        )
-        if (notAPasswordInput?.[0]) {
+        let notAPasswordInput: HTMLInputElement | null = null
+
+        for (const el of filledElements) {
+          if (el?.type !== 'password') {
+            notAPasswordInput = el
+            break
+          }
+        }
+
+        if (notAPasswordInput) {
           notyf.success(
             `Submitted autofilled form for user "${notAPasswordInput[0].value}}"`
           )
@@ -478,10 +500,11 @@ export const autofill = (initState: IInitStateRes) => {
           }
 
           if (matchingLogin) {
-            const autofilledElPassword = fillPasswordIntoInput(
-              inputElsArray[0],
-              matchingLogin.loginCredentials
-            )
+            const autofilledElPassword = fillStringIntoInput({
+              inputEl: inputElsArray[0],
+              loginCredential: matchingLogin.loginCredentials,
+              inputType: WebInputType.PASSWORD
+            })
 
             // TODO we should show a notification to let user know which login was used for autofill to prevent confusion when multiple logins are available and maybe some of them are wrong
             return autofilledElPassword
@@ -631,7 +654,7 @@ export const autofill = (initState: IInitStateRes) => {
   return () => {
     bodyInputChangeEmitter.off('inputAdded', initAutofill)
     clearTimeout(initTimeout)
-    passwordFilledForThisPage = false
+    inputTypesFilledForThisPage.clear()
   }
 }
 

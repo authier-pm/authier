@@ -50,7 +50,7 @@ import {
   DevicesListWithDataDocument
 } from './Devices.codegen'
 import { vaultLockTimeoutOptions } from '@shared/constants'
-
+import { useWindowSize } from 'usehooks-ts'
 interface SettingsValues {
   lockTime: number
   syncTOTP: boolean
@@ -354,7 +354,7 @@ export default function Devices() {
   const { data, loading } = useDevicesListWithDataQuery()
 
   const [filterBy, setFilterBy] = useState('')
-
+  const { height } = useWindowSize()
   return (
     <Flex flexDirection="column">
       <Center
@@ -382,7 +382,7 @@ export default function Devices() {
 
       <NewDevicesApprovalStack></NewDevicesApprovalStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection="column">
+        <Flex flexDirection="column" maxH={`${height - 70}px`} overflow={'auto'}>
           <Flex flexDirection="row" flexWrap="wrap" justify={'center'}>
             {loading ? (
               <Center pt={5}>

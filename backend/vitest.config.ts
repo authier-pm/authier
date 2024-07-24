@@ -1,4 +1,4 @@
-import path from 'node:path/posix'
+import path from 'node:path'
 import swc from 'unplugin-swc'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
@@ -21,10 +21,6 @@ export default defineConfig({
     extensions: ['.js', '.ts', '.jsx', '.tsx', '.json', '.cjs'], // by default vite also resolves mjs files, but we run in CJS mode so we don't want to load ESM modules
 
     alias: {
-      '.prisma/client': path.resolve(
-        __dirname,
-        './node_modules/.prisma/client'
-      ),
       stripe: path.resolve(
         __dirname,
         '../node_modules/stripe/cjs/stripe.cjs.node.js'

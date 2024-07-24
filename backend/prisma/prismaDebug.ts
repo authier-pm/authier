@@ -1,16 +1,16 @@
 import { format } from 'sql-formatter'
 import { highlight } from 'sql-highlight'
 import debug from 'debug'
-import { PrismaClient } from '.prisma/client'
+import { prismaClient } from './prismaClient'
 
 export let queryCount = 0
 
 const log = debug('prisma:sql')
 const logQueries = debug('mm:prisma')
 
-export const enablePrismaDebug = (prismaClient: PrismaClient) => {
-  //@ts-expect-error Prisma wrong types
-  prismaClient.$on('query', (event: any) => {
+export const enablePrismaDebug = (client: typeof prismaClient) => {
+  // @ts-expect-error
+  client.$on('query', (event: any) => {
     queryCount++
 
     const { params, query } = event
@@ -23,8 +23,8 @@ export const enablePrismaDebug = (prismaClient: PrismaClient) => {
 
     log(highlight(format(queryWithVarsReplaced)))
   })
-
-  prismaClient.$use(async (params, next) => {
+  // @ts-expect-error
+  client.$use(async (params, next) => {
     const before = Date.now()
     // log(params) // use for debugging mysteriously failing prisma queries
     const result = await next(params)

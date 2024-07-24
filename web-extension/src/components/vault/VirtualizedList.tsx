@@ -18,6 +18,7 @@ import { t } from '@lingui/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { authierColors } from '@shared/chakraRawTheme'
 import { TbAuth2Fa } from 'react-icons/tb'
+import { authenticator } from 'otplib'
 
 export function VaultListItem({
   secret
@@ -149,12 +150,20 @@ export function VaultListItem({
             aria-label="copy to clipboard"
             colorScheme="gray"
             onClick={() => {
-              navigator.clipboard.writeText(password)
+              if (secret.kind === EncryptedSecretType.TOTP) {
+                const otpCode = authenticator.generate(secret.totp.secret)
+                navigator.clipboard.writeText(otpCode)
+              } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
+                navigator.clipboard.writeText(password)
+
+              }
+              secret.lastUsedAt = new Date().toISOString()
+
               toast({
                 title: t`Copied to clipboard`,
                 status: 'success'
               })
-              secret.lastUsedAt = new Date().toISOString()
+
               // TODO store SecretUsageEvent
             }}
             icon={<CopyIcon />}

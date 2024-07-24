@@ -15,7 +15,7 @@ import {
   DecryptionChallengeApproved,
   DecryptionChallengeMutation
 } from './DecryptionChallenge'
-import { User } from '.prisma/client'
+import { User } from '@prisma/client'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 

@@ -12,3 +12,4 @@ yarn-error.log
 /playwright/.cache/
 
 playwright/.auth/user.json
+dist/manifest.json

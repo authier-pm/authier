@@ -8,8 +8,10 @@ type Query {
   me: UserQuery!
   currentDevice: DeviceQuery!
   webInputs(
+    """
+    accepts strings like example.com and similar
+    """
     hosts: [String!]
-    host: String @deprecated(reason: "use hosts")
   ): [WebInputGQLScalars!]!
 }
 

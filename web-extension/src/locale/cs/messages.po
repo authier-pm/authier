@@ -98,6 +98,10 @@ msgstr "8 hodin"
 msgid "Account Limits"
 msgstr "Limity účtu"
 
+#: src/components/vault/TableList.tsx
+msgid "Actions"
+msgstr ""
+
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "Add QR TOTP from current page"
 msgstr "Přidat QR TOTP z aktuální stránky"
@@ -106,6 +110,10 @@ msgstr "Přidat QR TOTP z aktuální stránky"
 #: src/components/PopupNavBar.tsx
 msgid "add secret"
 msgstr "přidat tajemství"
+
+#: src/pages-vault/Devices.tsx
+msgid "Added"
+msgstr ""
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
 msgid "After you approve it, the vault password will be checked and your vault will open automatically in this tab."
@@ -240,6 +248,10 @@ msgstr "Nepodařilo se analyzovat tento tajný kód:"
 msgid "Fill TOTP into input on screen by point&click"
 msgstr ""
 
+#: src/pages-vault/Devices.tsx
+msgid "Geolocation"
+msgstr ""
+
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Import & Export"
 msgstr "Import & Export"
@@ -252,10 +264,21 @@ msgstr "Importovat další"
 msgid "Incorrect password"
 msgstr "Nesprávné heslo"
 
-#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/TableList.tsx
+msgid "Label"
+msgstr ""
+
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
 msgid "Language"
 msgstr "Jazyk"
+
+#: src/pages-vault/Devices.tsx
+msgid "Last IP Address"
+msgstr ""
+
+#: src/pages-vault/Devices.tsx
+msgid "Last sync"
+msgstr ""
 
 #: src/components/vault/SidebarWithHeader.tsx
 #: src/pages/UserNavMenu.tsx
@@ -263,6 +286,7 @@ msgid "Lock device"
 msgstr "Zamknout zařízení"
 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
 #: src/pages-vault/Devices.tsx
 msgid "Lock time"
 msgstr "Čas zámku"
@@ -296,9 +320,17 @@ msgstr "Přihlášení se nezdařilo, zkuste odstranit a znovu přidat rozšíř
 msgid "Logout"
 msgstr "Odhlásit se"
 
+#: src/components/vault/VaultItemSettings.tsx
+msgid "Matching Web inputs"
+msgstr ""
+
 #: src/util/useVaultLockTimeoutOptions.tsx
 msgid "Never"
 msgstr "Nikdy"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "No matching web inputs found"
+msgstr ""
 
 #: src/components/vault/settings/Security.tsx
 msgid "Notification on vault unlock"
@@ -413,6 +445,10 @@ msgstr "Hledat zařízení"
 msgid "Search vault by url, username, label or password"
 msgstr "Hledat trezor podle url, uživatelského jména, popisku nebo hesla"
 
+#: src/components/vault/TableList.tsx
+msgid "Secret"
+msgstr ""
+
 #: src/pages-vault/VaultList.tsx
 msgid "secrets"
 msgstr "tajemství"
@@ -470,6 +506,10 @@ msgstr "Synchronizovat zařízení"
 msgid "Synchronize vault"
 msgstr "Synchronizovat trezor"
 
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+msgid "Theme"
+msgstr ""
+
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "This TOTP secret is already in your vault"
 msgstr "Tento TOTP tajný kód je již ve vašem trezoru"
@@ -485,6 +525,14 @@ msgstr "TOTP automatické vyplňování"
 #: src/pages/UnlockDeviceForm.tsx
 msgid "Unlock vault"
 msgstr "Odemknout trezor"
+
+#: src/components/vault/TableList.tsx
+msgid "URL"
+msgstr ""
+
+#: src/components/vault/TableList.tsx
+msgid "Username"
+msgstr ""
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
