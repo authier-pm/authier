@@ -327,7 +327,11 @@ export const autofill = (initState: IInitStateRes) => {
             firstLoginCred.loginCredentials.username
           )
           el && filledElements.add(el)
-        } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
+        } else if (webInputGql.kind === WebInputType.TOTP) {
+          if (!totpSecret) {
+            log('no totp secret')
+            return
+          }
           const el = autofillValueIntoInput(
             inputEl,
             authenticator.generate(totpSecret.totp.secret)
