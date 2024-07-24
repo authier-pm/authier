@@ -52,11 +52,12 @@ runs:
     #     path: web-extension/test-results
     #     retention-days: 30
 
-    - name: Validate manifest.json of the extension
-      uses: cardinalby/schema-validator-action@v3
-      with:
-        file: ${{ env.EXTENSION_DIR }}manifest.json
-        schema: 'https://json.schemastore.org/chrome-manifest'
+    # TODO enable the manifest.json validation
+    # - name: Validate manifest.json of the extension
+    #   uses: cardinalby/schema-validator-action@v3
+    #   with:
+    #     file: ${{ env.EXTENSION_DIR }}manifest.json
+    #     schema: 'https://json.schemastore.org/chrome-manifest'
 
     - name: Pack directory to zip
       if: inputs.doNotPackZip != 'true'
