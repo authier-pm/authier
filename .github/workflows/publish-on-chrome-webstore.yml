@@ -116,7 +116,7 @@ jobs:
 
       - name: Upload webstore crx file artifact to workflow
         if: '!needs.publish-on-webstore.outputs.releaseUploadUrl'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WEBSTORE_CRX_FILE_NAME }}
           path: ${{ env.WEBSTORE_CRX_FILE_PATH }}
