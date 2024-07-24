@@ -7,7 +7,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cardinalby/export-env-action@v1
+      - uses: cardinalby/export-env-action@v2
         with:
           envFile: './.github/workflows/constants.env'
           expand: true
@@ -20,7 +20,7 @@ jobs:
           pageURL: ${{ secrets.PAGE_URL }}
 
       - name: Deploy to Edge Addons
-        uses: wdzeng/edge-addon@v1.0.3
+        uses: wdzeng/edge-addon@v1.2.4
         with:
           product-id: ${{ secrets.EDGE_PRODUCT_ID }}
           zip-path: ${{ env.ZIP_FILE_PATH }}

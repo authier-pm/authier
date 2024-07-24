@@ -53,7 +53,7 @@ runs:
     #     retention-days: 30
 
     - name: Validate manifest.json of the extension
-      uses: cardinalby/schema-validator-action@v1
+      uses: cardinalby/schema-validator-action@v3
       with:
         file: ${{ env.EXTENSION_DIR }}manifest.json
         schema: 'https://json.schemastore.org/chrome-manifest'
