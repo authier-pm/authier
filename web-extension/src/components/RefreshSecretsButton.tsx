@@ -17,7 +17,8 @@ export function RefreshSecretsButton() {
         size="md"
         aria-label="menu"
         icon={<IoMdRefreshCircle />}
-        disabled={isSyncing}
+        isDisabled={isSyncing}
+        isLoading={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
           let res

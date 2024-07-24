@@ -98,6 +98,10 @@ msgstr "8 hours"
 msgid "Account Limits"
 msgstr "Account Limits"
 
+#: src/components/vault/TableList.tsx
+msgid "Actions"
+msgstr "Actions"
+
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "Add QR TOTP from current page"
 msgstr "Add QR TOTP from current page"
@@ -106,6 +110,10 @@ msgstr "Add QR TOTP from current page"
 #: src/components/PopupNavBar.tsx
 msgid "add secret"
 msgstr "add secret"
+
+#: src/pages-vault/Devices.tsx
+msgid "Added"
+msgstr "Added"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
 msgid "After you approve it, the vault password will be checked and your vault will open automatically in this tab."
@@ -240,6 +248,10 @@ msgstr "Failed to parse this secret:"
 msgid "Fill TOTP into input on screen by point&click"
 msgstr "Fill TOTP into input on screen by point&click"
 
+#: src/pages-vault/Devices.tsx
+msgid "Geolocation"
+msgstr "Geolocation"
+
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Import & Export"
 msgstr "Import & Export"
@@ -252,10 +264,21 @@ msgstr "Import another"
 msgid "Incorrect password"
 msgstr "Incorrect password"
 
-#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/TableList.tsx
+msgid "Label"
+msgstr "Label"
+
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
 msgid "Language"
 msgstr "Language"
+
+#: src/pages-vault/Devices.tsx
+msgid "Last IP Address"
+msgstr "Last IP Address"
+
+#: src/pages-vault/Devices.tsx
+msgid "Last sync"
+msgstr "Last sync"
 
 #: src/components/vault/SidebarWithHeader.tsx
 #: src/pages/UserNavMenu.tsx
@@ -263,6 +286,7 @@ msgid "Lock device"
 msgstr "Lock device"
 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
 #: src/pages-vault/Devices.tsx
 msgid "Lock time"
 msgstr "Lock time"
@@ -296,9 +320,17 @@ msgstr "Login failed, try removing and adding the extension again"
 msgid "Logout"
 msgstr "Logout"
 
+#: src/components/vault/VaultItemSettings.tsx
+msgid "Matching Web inputs"
+msgstr "Matching Web inputs"
+
 #: src/util/useVaultLockTimeoutOptions.tsx
 msgid "Never"
 msgstr "Never"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "No matching web inputs found"
+msgstr "No matching web inputs found"
 
 #: src/components/vault/settings/Security.tsx
 msgid "Notification on vault unlock"
@@ -353,6 +385,10 @@ msgstr "Search for device"
 msgid "Search vault by url, username, label or password"
 msgstr "Search vault by url, username, label or password"
 
+#: src/components/vault/TableList.tsx
+msgid "Secret"
+msgstr "Secret"
+
 #: src/pages-vault/VaultList.tsx
 msgid "secrets"
 msgstr "secrets"
@@ -398,6 +434,10 @@ msgstr "Synchronize devices"
 msgid "Synchronize vault"
 msgstr "Synchronize vault"
 
+#: src/components/vault/settings/DeviceDefaultsForm.tsx
+msgid "Theme"
+msgstr "Theme"
+
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "This TOTP secret is already in your vault"
 msgstr "This TOTP secret is already in your vault"
@@ -409,6 +449,14 @@ msgstr "TOTP autofill"
 #: src/pages/UnlockDeviceForm.tsx
 msgid "Unlock vault"
 msgstr "Unlock vault"
+
+#: src/components/vault/TableList.tsx
+msgid "URL"
+msgstr "URL"
+
+#: src/components/vault/TableList.tsx
+msgid "Username"
+msgstr "Username"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
 msgid "Username: {0}"

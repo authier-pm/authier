@@ -22,7 +22,7 @@ export function RefreshDeviceButton() {
         ml="2"
         aria-label="menu"
         icon={<IoMdRefreshCircle />}
-        disabled={isSyncing}
+        isLoading={isSyncing}
         onClick={async () => {
           setIsSyncing(true)
           devicesRefetch()
