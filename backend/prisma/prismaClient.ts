@@ -4,7 +4,7 @@ import debug from 'debug'
 import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
-import { PrismaClient, Prisma } from '.prisma/client'
+import { PrismaClient, Prisma } from '@prisma/client'
 import kyselyExtension from 'prisma-extension-kysely'
 import type { DB } from './generated/types'
 

@@ -17,7 +17,7 @@ import { UserGQL } from './generated/UserGQL'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
-import { EmailVerificationType } from '.prisma/client'
+import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import {
   defaultDeviceSettingSystemValues,

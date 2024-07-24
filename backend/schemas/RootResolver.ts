@@ -26,7 +26,7 @@ import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
-import { Device, User, WebInput } from '.prisma/client'
+import { Device, User, WebInput } from '@prisma/client'
 
 import {
   WebInputGQL,

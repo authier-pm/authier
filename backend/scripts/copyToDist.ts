@@ -38,15 +38,15 @@ const modulesToCopy = [
 
   await cpy(
     [
-      `${relativePath}/.prisma/**`,
+      `${relativePath}/@prisma/**`,
       `!**/libquery_engine-debian-*`,
       `!**/libquery_engine-rhel-*`
       // there should be only libquery_engine-linux-arm64-openssl-1.0.x.so left
     ],
-    'dist/node_modules/.prisma'
+    'dist/node_modules/@prisma'
   )
 
-  await cpy(['./prisma/schema.prisma'], './dist/node_modules/.prisma/client')
+  await cpy(['./prisma/schema.prisma'], './dist/node_modules/@prisma/client')
 
   console.log(`Prisma files copied!`)
 })()

@@ -1,4 +1,4 @@
-import { User } from '.prisma/client'
+import { User } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import { plainToClass } from 'class-transformer'
 import { prismaClient } from '../prisma/prismaClient'
