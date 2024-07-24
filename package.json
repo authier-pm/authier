@@ -60,8 +60,6 @@
     "release": "cd web-extension && pnpm run newTag"
   },
   "pnpm": {
-    "patchedDependencies": {
-      "prisma-extension-kysely@2.1.0": "patches/prisma-extension-kysely@2.1.0.patch"
-    }
+    "patchedDependencies": {}
   }
 }
