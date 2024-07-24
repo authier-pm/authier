@@ -17,16 +17,17 @@ const modulesToCopy = [
 // copies all node_modules needed for lambda as prisma generated files are not bundled
 ;(async () => {
   await cpy(
-    [`${relativePath}/@prisma/client/**`],
-    'dist/node_modules/@prisma/client'
+    [
+      `../node_modules/.prisma/client/**`,
+      `!**/libquery_engine-debian-*`,
+      `!**/libquery_engine-rhel-*`
+    ],
+    'dist/node_modules/.prisma/client'
   )
   await cpy(
-    [`../node_modules//@prisma/client/**`],
+    [`../node_modules/@prisma/client/**`],
     'dist/node_modules/@prisma/client'
   )
-
-  await cpy([`${relativePath}/pg-*/**`], `dist/node_modules`) // needed for knex
-  await cpy([`${relativePath}/postgres-*/**`], `dist/node_modules`) // needed for knex
 
   for (const mod of modulesToCopy) {
     const res = await cpy(
@@ -46,7 +47,8 @@ const modulesToCopy = [
     'dist/node_modules/@prisma'
   )
 
+  await cpy(['./prisma/schema.prisma'], './dist/node_modules/.prisma/client')
   await cpy(['./prisma/schema.prisma'], './dist/node_modules/@prisma/client')
 
-  console.log(`Prisma files copied!`)
+  console.log(`Prisma client files copied!`)
 })()
