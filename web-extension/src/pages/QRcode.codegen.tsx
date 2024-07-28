@@ -40,6 +40,11 @@ export function useDeviceCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
         }
+export function useDeviceCountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
+        }
 export type DeviceCountQueryHookResult = ReturnType<typeof useDeviceCountQuery>;
 export type DeviceCountLazyQueryHookResult = ReturnType<typeof useDeviceCountLazyQuery>;
+export type DeviceCountSuspenseQueryHookResult = ReturnType<typeof useDeviceCountSuspenseQuery>;
 export type DeviceCountQueryResult = Apollo.QueryResult<DeviceCountQuery, DeviceCountQueryVariables>;

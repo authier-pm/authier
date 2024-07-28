@@ -67,8 +67,13 @@ export function useEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryHookO
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
         }
+export function useEncryptedSecretsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+        }
 export type EncryptedSecretsQueryHookResult = ReturnType<typeof useEncryptedSecretsQuery>;
 export type EncryptedSecretsLazyQueryHookResult = ReturnType<typeof useEncryptedSecretsLazyQuery>;
+export type EncryptedSecretsSuspenseQueryHookResult = ReturnType<typeof useEncryptedSecretsSuspenseQuery>;
 export type EncryptedSecretsQueryResult = Apollo.QueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
 export const DeleteEncryptedSecretDocument = gql`
     mutation deleteEncryptedSecret($id: ID!) {

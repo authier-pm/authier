@@ -45,6 +45,11 @@ export function useLimitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Lim
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
         }
+export function useLimitsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
+        }
 export type LimitsQueryHookResult = ReturnType<typeof useLimitsQuery>;
 export type LimitsLazyQueryHookResult = ReturnType<typeof useLimitsLazyQuery>;
+export type LimitsSuspenseQueryHookResult = ReturnType<typeof useLimitsSuspenseQuery>;
 export type LimitsQueryResult = Apollo.QueryResult<LimitsQuery, LimitsQueryVariables>;

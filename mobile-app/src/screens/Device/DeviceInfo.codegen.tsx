@@ -8,7 +8,7 @@ export type DeviceInfoQueryVariables = Types.Exact<{
 }>;
 
 
-export type DeviceInfoQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, device: { __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: string | null, lastGeoLocation: string, createdAt: string, lastSyncAt?: string | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
+export type DeviceInfoQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, device: { __typename?: 'DeviceQuery', id: string, name: string, firstIpAddress: string, lastIpAddress: string, logoutAt?: any | null, lastGeoLocation: string, createdAt: any, lastSyncAt?: any | null, platform: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } };
 
 
 export const DeviceInfoDocument = gql`
@@ -50,7 +50,7 @@ export const DeviceInfoDocument = gql`
  *   },
  * });
  */
-export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables> & ({ variables: DeviceInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
       }
@@ -58,6 +58,11 @@ export function useDeviceInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
+export function useDeviceInfoSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
+        }
 export type DeviceInfoQueryHookResult = ReturnType<typeof useDeviceInfoQuery>;
 export type DeviceInfoLazyQueryHookResult = ReturnType<typeof useDeviceInfoLazyQuery>;
+export type DeviceInfoSuspenseQueryHookResult = ReturnType<typeof useDeviceInfoSuspenseQuery>;
 export type DeviceInfoQueryResult = Apollo.QueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;

@@ -6,26 +6,26 @@ const defaultOptions = {} as const;
 export type LogoutMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type LogoutMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', logoutAt?: string | null } } };
+export type LogoutMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', logout: { __typename?: 'DeviceGQL', logoutAt?: any | null } } };
 
 export type MarkAsSyncedMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type MarkAsSyncedMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', markAsSynced: string } };
+export type MarkAsSyncedMutation = { __typename?: 'Mutation', currentDevice: { __typename?: 'DeviceMutation', markAsSynced: any } };
 
 export type SyncEncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number }> } };
+export type SyncEncryptedSecretsQuery = { __typename?: 'Query', currentDevice: { __typename?: 'DeviceQuery', id: string, encryptedSecretsToSync: Array<{ __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: any, updatedAt?: any | null, deletedAt?: any | null, version: number }> } };
 
-export type SecretExtensionFragment = { __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, deletedAt?: string | null, version: number };
+export type SecretExtensionFragment = { __typename?: 'EncryptedSecretQuery', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: any, updatedAt?: any | null, deletedAt?: any | null, version: number };
 
 export type AddEncryptedSecretsMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
 }>;
 
 
-export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, version: number, createdAt: string, updatedAt?: string | null }> } };
+export type AddEncryptedSecretsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', addEncryptedSecrets: Array<{ __typename?: 'EncryptedSecretQuery', id: string, kind: Types.EncryptedSecretType, encrypted: string, version: number, createdAt: any, updatedAt?: any | null }> } };
 
 export const SecretExtensionFragmentDoc = gql`
     fragment secretExtension on EncryptedSecretQuery {
@@ -139,8 +139,13 @@ export function useSyncEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
         }
+export function useSyncEncryptedSecretsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
+        }
 export type SyncEncryptedSecretsQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsQuery>;
 export type SyncEncryptedSecretsLazyQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsLazyQuery>;
+export type SyncEncryptedSecretsSuspenseQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsSuspenseQuery>;
 export type SyncEncryptedSecretsQueryResult = Apollo.QueryResult<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>;
 export const AddEncryptedSecretsDocument = gql`
     mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {

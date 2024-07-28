@@ -15,7 +15,7 @@ export type WebInputsForHostsQueryVariables = Types.Exact<{
 }>;
 
 
-export type WebInputsForHostsQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
+export type WebInputsForHostsQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: any }> };
 
 
 export const AddWebInputsDocument = gql`
@@ -89,6 +89,11 @@ export function useWebInputsForHostsLazyQuery(baseOptions?: Apollo.LazyQueryHook
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
         }
+export function useWebInputsForHostsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
+        }
 export type WebInputsForHostsQueryHookResult = ReturnType<typeof useWebInputsForHostsQuery>;
 export type WebInputsForHostsLazyQueryHookResult = ReturnType<typeof useWebInputsForHostsLazyQuery>;
+export type WebInputsForHostsSuspenseQueryHookResult = ReturnType<typeof useWebInputsForHostsSuspenseQuery>;
 export type WebInputsForHostsQueryResult = Apollo.QueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;

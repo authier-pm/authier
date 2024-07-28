@@ -135,8 +135,8 @@ importers:
         specifier: ^0.5.1
         version: 0.5.1
       class-validator:
-        specifier: 0.13.2
-        version: 0.13.2
+        specifier: 0.14.1
+        version: 0.14.1
       cpy:
         specifier: ^9.0.1
         version: 9.0.1
@@ -219,8 +219,8 @@ importers:
         specifier: ^16.5.0
         version: 16.5.0
       type-graphql:
-        specifier: npm:@capaj/type-graphql@2.0.0-alpha.1
-        version: '@capaj/type-graphql@2.0.0-alpha.1(class-validator@0.13.2)(graphql@16.9.0)'
+        specifier: 2.0.0-rc.2
+        version: 2.0.0-rc.2(class-validator@0.14.1)(graphql-scalars@1.23.0(graphql@16.9.0))(graphql@16.9.0)
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -1000,7 +1000,7 @@ importers:
         version: 4.16.2
       type-graphql:
         specifier: ^1.1.1
-        version: 1.1.1(class-validator@0.13.2)(graphql@16.9.0)
+        version: 1.1.1(class-validator@0.14.1)(graphql@16.9.0)
       typescript:
         specifier: ^5.5.4
         version: 5.5.4
@@ -2890,13 +2890,6 @@ packages:
     peerDependencies:
       '@trpc/client': ^10
       '@trpc/server': ^10
-
-  '@capaj/type-graphql@2.0.0-alpha.1':
-    resolution: {integrity: sha512-AIMVUwa8ReBv6qOx0GDcAJaJFkHEA2LbaEZ8uBC7p4Y5Ewi5fv3xoGQM0/j35Mp64xoEE+C5BMNQYbg+mRU30g==}
-    engines: {node: '>= 14'}
-    peerDependencies:
-      class-validator: '>=0.13.0'
-      graphql: ^16
 
   '@chakra-ui/accordion@2.3.1':
     resolution: {integrity: sha512-FSXRm8iClFyU+gVaXisOSEw0/4Q+qZbFRiuhIAkVU6Boj0FxAMrlo9a8AV5TuF77rgaHytCdHk0Ng+cyUijrag==}
@@ -4853,6 +4846,14 @@ packages:
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
     peerDependencies:
       graphql: ^0.8.0 || ^0.9.0 || ^0.10.0 || ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0 || ^16.0.0 || ^17.0.0
+
+  '@graphql-yoga/subscription@5.0.1':
+    resolution: {integrity: sha512-1wCB1DfAnaLzS+IdoOzELGGnx1ODEg9nzQXFh4u2j02vAnne6d+v4A7HIH9EqzVdPLoAaMKXCZUUdKs+j3z1fg==}
+    engines: {node: '>=18.0.0'}
+
+  '@graphql-yoga/typed-event-target@3.0.0':
+    resolution: {integrity: sha512-w+liuBySifrstuHbFrHoHAEyVnDFVib+073q8AeAJ/qqJfvFvAwUPLLtNohR/WDVRgSasfXtl3dcNuVJWN+rjg==}
+    engines: {node: '>=18.0.0'}
 
   '@grpc/grpc-js@1.10.8':
     resolution: {integrity: sha512-vYVqYzHicDqyKB+NQhAc54I1QWCBLCrYG6unqOIcBTHx+7x8C9lcoLj3KVJXs2VB4lUbpWY+Kk9NipcbXYWmvg==}
@@ -7112,6 +7113,9 @@ packages:
   '@types/semver@7.5.0':
     resolution: {integrity: sha512-G8hZ6XJiHnuhQKR7ZmysCeJWE08o8T0AXtk5darsCaTVsYZhhgUrq53jizaR2FvsoeCwJhlmwTjkXBY5Pn/ZHw==}
 
+  '@types/semver@7.5.8':
+    resolution: {integrity: sha512-I8EUhyrgfLrcTkzV3TSsGyl1tSuPrEDzr0yd5m90UgNxQkyDXULk3b6MlQqTCpZpNtWe1K0hzclnZkTcLBe2UQ==}
+
   '@types/send@0.17.1':
     resolution: {integrity: sha512-Cwo8LE/0rnvX7kIIa3QHCkcuF21c05Ayb0ZfxPiv0W8VRiZiNW/WuRupHKpqqGVGf7SUA44QSOUKaEd9lIrd/Q==}
 
@@ -7138,6 +7142,9 @@ packages:
 
   '@types/uuid@10.0.0':
     resolution: {integrity: sha512-7gqG38EyHgyP1S+7+xomFtL+ZNHcKv6DwNaCZmJmo1vgMugyF3TCnXVg4t1uk89mLNwnLtnY3TpOpCOyp1/xHQ==}
+
+  '@types/validator@13.12.0':
+    resolution: {integrity: sha512-nH45Lk7oPIJ1RVOF6JgFI6Dy0QpHEzq4QecZhvguxYPDwT8c93prCMqAtiIttm39voZ+DDR+qkNnMpJmMBRqag==}
 
   '@types/webextension-polyfill@0.10.7':
     resolution: {integrity: sha512-10ql7A0qzBmFB+F+qAke/nP1PIonS0TXZAOMVOxEUsm+lGSW6uwVcISFNa0I4Oyj0884TZVWGGMIWeXOVSNFHw==}
@@ -8575,8 +8582,8 @@ packages:
     resolution: {integrity: sha512-qOhPa/Fj7s6TY8H8esGu5QNpMMQxz79h+urzrNYN6mn+9BnxlDGf5QZ+XeCDsxSjPqsSR56XOZOJmpeurnLMeg==}
     engines: {node: '>=0.10.0'}
 
-  class-validator@0.13.2:
-    resolution: {integrity: sha512-yBUcQy07FPlGzUjoLuUfIOXzgynnQPPruyK1Ge2B74k9ROwnle1E+NxLWnUv5OLU8hA/qL5leAE9XnXq3byaBw==}
+  class-validator@0.14.1:
+    resolution: {integrity: sha512-2VEG9JICxIqTpoK1eMzZqaV+u/EiwEJkMGzTrZf6sU/fwsnOITVgYJ8yojSy6CaXtO9V0Cc6ZQZ8h8m4UBuLwQ==}
 
   clean-css@5.3.2:
     resolution: {integrity: sha512-JVJbM+f3d3Q704rF4bqQ5UUyTtuJ0JRKNbTKVEeujCCBoMdkEi+V+e8oktO9qGQNSvHrFTM6JZRXrUvGR1czww==}
@@ -10791,8 +10798,8 @@ packages:
   graphql-list-fields@2.0.4:
     resolution: {integrity: sha512-q3prnhAL/dBsD+vaGr83B8DzkBijg+Yh+lbt7qp2dW1fpuO+q/upzDXvFJstVsSAA8m11MHGkSxxyxXeLou4MA==}
 
-  graphql-query-complexity@0.11.0:
-    resolution: {integrity: sha512-1Ns64a41XYLehYFxZwoEn7i7myUQPd/fLRZPZ73ULjln4VBWMwptzB8LiPWNaRHsTjLMkecZPeqmuKYNXrFIGA==}
+  graphql-query-complexity@0.12.0:
+    resolution: {integrity: sha512-fWEyuSL6g/+nSiIRgIipfI6UXTI7bAxrpPlCY1c0+V3pAEUo1ybaKmSBgNr1ed2r+agm1plJww8Loig9y6s2dw==}
     peerDependencies:
       graphql: ^14.6.0 || ^15.0.0 || ^16.0.0
 
@@ -10816,11 +10823,6 @@ packages:
     resolution: {integrity: sha512-95yD/tKi24q8xYa7Q9rhQN16AYj5wPbrb8tmHGM3WRc9EBmWrG/0kkMl+tQG8wcEuE9ibR4zyOM31p5Sdr2v4g==}
     peerDependencies:
       graphql: ^0.10.5 || ^0.11.3 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-
-  graphql-subscriptions@2.0.0:
-    resolution: {integrity: sha512-s6k2b8mmt9gF9pEfkxsaO1lTxaySfKoEJzEfmwguBbQ//Oq23hIXCfR1hm4kdh5hnR20RdwB+s3BCb+0duHSZA==}
-    peerDependencies:
-      graphql: ^15.7.2 || ^16.0.0
 
   graphql-tag@2.12.6:
     resolution: {integrity: sha512-FdSNcu2QQcWnM2VNvSCCDCVS5PpPqpzgFT8+GXzqJuoDd0CBncxCY278u4mhRO7tMgo2JjgJA5aZ+nWSQ/Z+xg==}
@@ -12135,8 +12137,8 @@ packages:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
 
-  libphonenumber-js@1.10.37:
-    resolution: {integrity: sha512-Z10PCaOCiAxbUxLyR31DNeeNugSVP6iv/m7UrSKS5JHziEMApJtgku4e9Q69pzzSC9LnQiM09sqsGf2ticZnMw==}
+  libphonenumber-js@1.11.5:
+    resolution: {integrity: sha512-TwHR5BZxGRODtAfz03szucAkjT5OArXr+94SMtAM2pYXIlQNVMrxvb6uSCbnaJJV6QXEyICk7+l6QPgn72WHhg==}
 
   lie@3.1.1:
     resolution: {integrity: sha512-RiNhHysUjhrDQntfYSfY4MU24coXXdEOgw9WGcKHNeEwffDYbF//u87M1EWaMGzuFoSbqW0C9C6lEEhDOAswfw==}
@@ -16038,6 +16040,17 @@ packages:
       class-validator: '>=0.12.0'
       graphql: ^15.3.0
 
+  type-graphql@2.0.0-rc.2:
+    resolution: {integrity: sha512-DJ8erG1cmjteMrOhFIkBHOqRM+L+wCJxvNjbbj1Y+q2r4HZkB1qOSS4ZD4AaoAfRPAp1yU23gMtmzf0jen/FFA==}
+    engines: {node: '>= 18.12.0'}
+    peerDependencies:
+      class-validator: '>=0.14.0'
+      graphql: ^16.8.1
+      graphql-scalars: ^1.23.0
+    peerDependenciesMeta:
+      class-validator:
+        optional: true
+
   type@1.2.0:
     resolution: {integrity: sha512-+5nt5AAniqsCnu2cEQQdpzCAh33kVx8n0VoFidKpB1dVVLAN/F+bgVOqOJqOnEnrhp222clB5p3vUlD+1QAnfg==}
 
@@ -19893,19 +19906,6 @@ snapshots:
       '@trpc/client': 10.45.2(@trpc/server@10.45.2)
       '@trpc/server': 10.45.2
 
-  '@capaj/type-graphql@2.0.0-alpha.1(class-validator@0.13.2)(graphql@16.9.0)':
-    dependencies:
-      '@types/glob': 7.2.0
-      '@types/node': 20.7.0
-      '@types/semver': 7.5.0
-      class-validator: 0.13.2
-      glob: 7.2.3
-      graphql: 16.9.0
-      graphql-query-complexity: 0.11.0(graphql@16.9.0)
-      graphql-subscriptions: 2.0.0(graphql@16.9.0)
-      semver: 7.5.4
-      tslib: 2.6.1
-
   '@chakra-ui/accordion@2.3.1(@chakra-ui/system@2.6.2(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@emotion/styled@11.13.0(@emotion/react@11.13.0(@types/react@18.3.3)(react@18.3.1))(@types/react@18.3.3)(react@18.3.1))(react@18.3.1))(framer-motion@11.0.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)':
     dependencies:
       '@chakra-ui/descendant': 3.1.0(react@18.3.1)
@@ -22525,6 +22525,18 @@ snapshots:
   '@graphql-typed-document-node/core@3.2.0(graphql@16.9.0)':
     dependencies:
       graphql: 16.9.0
+
+  '@graphql-yoga/subscription@5.0.1':
+    dependencies:
+      '@graphql-yoga/typed-event-target': 3.0.0
+      '@repeaterjs/repeater': 3.0.4
+      '@whatwg-node/events': 0.1.1
+      tslib: 2.6.2
+
+  '@graphql-yoga/typed-event-target@3.0.0':
+    dependencies:
+      '@repeaterjs/repeater': 3.0.4
+      tslib: 2.6.2
 
   '@grpc/grpc-js@1.10.8':
     dependencies:
@@ -26136,6 +26148,8 @@ snapshots:
 
   '@types/semver@7.5.0': {}
 
+  '@types/semver@7.5.8': {}
+
   '@types/send@0.17.1':
     dependencies:
       '@types/mime': 1.3.2
@@ -26163,6 +26177,8 @@ snapshots:
   '@types/unist@2.0.10': {}
 
   '@types/uuid@10.0.0': {}
+
+  '@types/validator@13.12.0': {}
 
   '@types/webextension-polyfill@0.10.7': {}
 
@@ -28329,9 +28345,10 @@ snapshots:
       isobject: 3.0.1
       static-extend: 0.1.2
 
-  class-validator@0.13.2:
+  class-validator@0.14.1:
     dependencies:
-      libphonenumber-js: 1.10.37
+      '@types/validator': 13.12.0
+      libphonenumber-js: 1.11.5
       validator: 13.9.0
 
   clean-css@5.3.2:
@@ -31283,7 +31300,7 @@ snapshots:
 
   graphql-list-fields@2.0.4: {}
 
-  graphql-query-complexity@0.11.0(graphql@16.9.0):
+  graphql-query-complexity@0.12.0(graphql@16.9.0):
     dependencies:
       graphql: 16.9.0
       lodash.get: 4.4.2
@@ -31307,11 +31324,6 @@ snapshots:
       tslib: 2.6.2
 
   graphql-subscriptions@1.2.1(graphql@16.9.0):
-    dependencies:
-      graphql: 16.9.0
-      iterall: 1.3.0
-
-  graphql-subscriptions@2.0.0(graphql@16.9.0):
     dependencies:
       graphql: 16.9.0
       iterall: 1.3.0
@@ -33037,7 +33049,7 @@ snapshots:
       prelude-ls: 1.2.1
       type-check: 0.4.0
 
-  libphonenumber-js@1.10.37: {}
+  libphonenumber-js@1.11.5: {}
 
   lie@3.1.1:
     dependencies:
@@ -38085,18 +38097,31 @@ snapshots:
 
   type-fest@3.13.1: {}
 
-  type-graphql@1.1.1(class-validator@0.13.2)(graphql@16.9.0):
+  type-graphql@1.1.1(class-validator@0.14.1)(graphql@16.9.0):
     dependencies:
       '@types/glob': 7.2.0
       '@types/node': 20.4.4
       '@types/semver': 7.5.0
-      class-validator: 0.13.2
+      class-validator: 0.14.1
       glob: 7.2.3
       graphql: 16.9.0
       graphql-query-complexity: 0.7.2(graphql@16.9.0)
       graphql-subscriptions: 1.2.1(graphql@16.9.0)
       semver: 7.5.4
       tslib: 2.6.1
+
+  type-graphql@2.0.0-rc.2(class-validator@0.14.1)(graphql-scalars@1.23.0(graphql@16.9.0))(graphql@16.9.0):
+    dependencies:
+      '@graphql-yoga/subscription': 5.0.1
+      '@types/node': 20.14.12
+      '@types/semver': 7.5.8
+      graphql: 16.9.0
+      graphql-query-complexity: 0.12.0(graphql@16.9.0)
+      graphql-scalars: 1.23.0(graphql@16.9.0)
+      semver: 7.6.2
+      tslib: 2.6.2
+    optionalDependencies:
+      class-validator: 0.14.1
 
   type@1.2.0: {}
 

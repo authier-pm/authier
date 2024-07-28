@@ -100,6 +100,11 @@ export function useDefaultSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
         }
+export function useDefaultSettingsSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
+        }
 export type DefaultSettingsQueryHookResult = ReturnType<typeof useDefaultSettingsQuery>;
 export type DefaultSettingsLazyQueryHookResult = ReturnType<typeof useDefaultSettingsLazyQuery>;
+export type DefaultSettingsSuspenseQueryHookResult = ReturnType<typeof useDefaultSettingsSuspenseQuery>;
 export type DefaultSettingsQueryResult = Apollo.QueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;

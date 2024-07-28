@@ -6,7 +6,7 @@ const defaultOptions = {} as const;
 export type DevicesListQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesListQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, lastIpAddress: string, logoutAt?: string | null, platform: string, lastGeoLocation: string }> } };
+export type DevicesListQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, devices: Array<{ __typename?: 'DeviceQuery', id: string, name: string, lastIpAddress: string, logoutAt?: any | null, platform: string, lastGeoLocation: string }> } };
 
 
 export const DevicesListDocument = gql`
@@ -49,6 +49,11 @@ export function useDevicesListLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
         }
+export function useDevicesListSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+        }
 export type DevicesListQueryHookResult = ReturnType<typeof useDevicesListQuery>;
 export type DevicesListLazyQueryHookResult = ReturnType<typeof useDevicesListLazyQuery>;
+export type DevicesListSuspenseQueryHookResult = ReturnType<typeof useDevicesListSuspenseQuery>;
 export type DevicesListQueryResult = Apollo.QueryResult<DevicesListQuery, DevicesListQueryVariables>;

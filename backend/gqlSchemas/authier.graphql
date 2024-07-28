@@ -21,8 +21,8 @@ type UserQuery {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   masterDeviceId: String
   uiLanguage: String!
   TOTPlimit: Int!
@@ -45,7 +45,7 @@ type UserQuery {
   devices: [DeviceQuery!]!
   defaultDeviceSettings: DefaultDeviceSettingsQuery!
   device(id: String!): DeviceQuery!
-  lastChangeInSecrets: DateTime
+  lastChangeInSecrets: DateTimeISO
   devicesCount: Int!
   primaryEmailVerification: EmailVerificationGQLScalars
   emailVerifications: [EmailVerificationGQLScalars!]!
@@ -62,18 +62,18 @@ scalar EmailAddress
   )
 
 """
-The javascript `Date` as string. Type represents date and time as the ISO Date string.
+A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
 """
-scalar DateTime
+scalar DateTimeISO
 
 type TokenGQL {
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   type: TokenType!
   emailToken: String
   valid: Boolean!
-  expiration: DateTime!
+  expiration: DateTimeISO!
   userId: String!
   user: UserGQL!
 }
@@ -89,8 +89,8 @@ type UserGQL {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   masterDeviceId: String
   uiLanguage: String!
   TOTPlimit: Int!
@@ -120,19 +120,19 @@ type DeviceGQL {
   name: String!
   platform: String!
   ipAddressLock: Boolean!
-  logoutAt: DateTime
+  logoutAt: DateTimeISO
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
-  registeredWithMasterAt: DateTime
-  lastSyncAt: DateTime
-  lastUnlockAt: DateTime
-  lastLockAt: DateTime
-  masterPasswordOutdatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
+  registeredWithMasterAt: DateTimeISO
+  lastSyncAt: DateTimeISO
+  lastUnlockAt: DateTimeISO
+  lastLockAt: DateTimeISO
+  masterPasswordOutdatedAt: DateTimeISO
   userId: String!
   User: UserGQL!
   UserMaster: UserGQL
@@ -143,7 +143,7 @@ type DeviceGQL {
 type SecretUsageEventGQL {
   id: BigInt!
   kind: String!
-  timestamp: DateTime!
+  timestamp: DateTimeISO!
   secretId: String!
   url: String
   userId: String!
@@ -165,9 +165,9 @@ type EncryptedSecretGQL {
   encrypted: String!
   version: Int!
   kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
@@ -181,7 +181,7 @@ enum EncryptedSecretType {
 type WebInputGQL {
   id: Int!
   layoutType: String
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   host: String!
   url: String!
   kind: WebInputType!
@@ -207,13 +207,13 @@ enum WebInputType {
 type DecryptionChallengeGQL {
   id: Int!
   ipAddress: String!
-  approvedAt: DateTime
-  rejectedAt: DateTime
+  approvedAt: DateTimeISO
+  rejectedAt: DateTimeISO
   blockIp: Boolean
   deviceName: String!
   deviceId: String!
   userId: String!
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -224,16 +224,16 @@ type DecryptionChallengeGQL {
 type TagGQL {
   id: Int!
   name: String!
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   userId: String!
   user: UserGQL!
 }
 
 type UserPaidProductsGQL {
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  expiresAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  expiresAt: DateTimeISO
   productId: String!
   userId: String!
   checkoutSessionId: String!
@@ -242,8 +242,8 @@ type UserPaidProductsGQL {
 
 type MasterDeviceChangeGQL {
   id: ID!
-  createdAt: DateTime!
-  processAt: DateTime!
+  createdAt: DateTimeISO!
+  processAt: DateTimeISO!
   oldDeviceId: String!
   newDeviceId: String!
   userId: String!
@@ -252,8 +252,8 @@ type MasterDeviceChangeGQL {
 
 type DefaultDeviceSettingsGQL {
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
@@ -271,19 +271,19 @@ type DeviceQuery {
   name: String!
   platform: String!
   ipAddressLock: Boolean!
-  logoutAt: DateTime
+  logoutAt: DateTimeISO
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
-  registeredWithMasterAt: DateTime
-  lastSyncAt: DateTime
-  lastUnlockAt: DateTime
-  lastLockAt: DateTime
-  masterPasswordOutdatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
+  registeredWithMasterAt: DateTimeISO
+  lastSyncAt: DateTimeISO
+  lastUnlockAt: DateTimeISO
+  lastLockAt: DateTimeISO
+  masterPasswordOutdatedAt: DateTimeISO
   userId: String!
   User: UserGQL!
   UserMaster: UserGQL
@@ -302,13 +302,13 @@ type EncryptedSecretQuery {
   encrypted: String!
   version: Int!
   kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
-  lastUsedAt: DateTime
+  lastUsedAt: DateTimeISO
 }
 
 type DefaultDeviceSettingsQuery {
@@ -316,8 +316,8 @@ type DefaultDeviceSettingsQuery {
   0 index for system defaults
   """
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
@@ -328,8 +328,8 @@ type DefaultDeviceSettingsQuery {
 
 type EmailVerificationGQLScalars {
   address: ID!
-  createdAt: DateTime!
-  verifiedAt: DateTime
+  createdAt: DateTimeISO!
+  verifiedAt: DateTimeISO
   userId: String!
   kind: EmailVerificationType!
 }
@@ -344,8 +344,8 @@ type DecryptionChallengeForApproval {
   deviceLocationFromIp: DeviceLocation
   id: Int!
   ipAddress: String!
-  rejectedAt: DateTime
-  createdAt: DateTime!
+  rejectedAt: DateTimeISO
+  createdAt: DateTimeISO!
   deviceName: String!
   deviceId: ID!
 }
@@ -366,7 +366,7 @@ type DeviceLocation {
 type WebInputGQLScalars {
   id: Int!
   layoutType: String
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   host: String!
   url: String!
   kind: WebInputType!
@@ -408,8 +408,8 @@ type UserMutation {
   tokenVersion: Int!
   username: String
   addDeviceSecretEncrypted: String!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   masterDeviceId: String
   uiLanguage: String!
   TOTPlimit: Int!
@@ -462,21 +462,21 @@ type DeviceMutation {
   name: String!
   platform: String!
   ipAddressLock: Boolean!
-  logoutAt: DateTime
+  logoutAt: DateTimeISO
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
-  registeredWithMasterAt: DateTime
-  lastSyncAt: DateTime
-  lastUnlockAt: DateTime
-  lastLockAt: DateTime
-  masterPasswordOutdatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
+  registeredWithMasterAt: DateTimeISO
+  lastSyncAt: DateTimeISO
+  lastUnlockAt: DateTimeISO
+  lastLockAt: DateTimeISO
+  masterPasswordOutdatedAt: DateTimeISO
   userId: String!
-  markAsSynced: DateTime!
+  markAsSynced: DateTimeISO!
   reportSecretUsageEvent(
     webInputId: PositiveInt!
     secretId: UUID!
@@ -498,7 +498,7 @@ type DeviceMutation {
 type SecretUsageEventGQLScalars {
   id: BigInt!
   kind: String!
-  timestamp: DateTime!
+  timestamp: DateTimeISO!
   secretId: String!
   url: String
   userId: String!
@@ -518,8 +518,8 @@ scalar UUID
 
 type DefaultDeviceSettingsMutation {
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
@@ -531,8 +531,8 @@ type DefaultDeviceSettingsMutation {
 
 type DefaultDeviceSettingsGQLScalars {
   id: Int!
-  createdAt: DateTime!
-  updatedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
   autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
@@ -561,13 +561,13 @@ type EncryptedSecretMutation {
   encrypted: String!
   version: Int!
   kind: EncryptedSecretType!
-  createdAt: DateTime!
-  updatedAt: DateTime
-  deletedAt: DateTime
+  createdAt: DateTimeISO!
+  updatedAt: DateTimeISO
+  deletedAt: DateTimeISO
   userId: String!
   user: UserGQL!
   SecretUsageEvent: [SecretUsageEventGQL!]!
-  lastUsedAt: DateTime
+  lastUsedAt: DateTimeISO
   update(patch: EncryptedSecretInput!): EncryptedSecretGQL!
   delete: EncryptedSecretGQL!
 }
@@ -619,13 +619,13 @@ scalar NonEmptyString
 type DecryptionChallengeMutation {
   id: Int!
   ipAddress: String!
-  approvedAt: DateTime
-  rejectedAt: DateTime
+  approvedAt: DateTimeISO
+  rejectedAt: DateTimeISO
   blockIp: Boolean
   deviceName: String!
   deviceId: String!
   userId: String!
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!
@@ -660,13 +660,13 @@ union DecryptionChallenge =
 type DecryptionChallengeApproved {
   id: Int!
   ipAddress: String!
-  approvedAt: DateTime
-  rejectedAt: DateTime
+  approvedAt: DateTimeISO
+  rejectedAt: DateTimeISO
   blockIp: Boolean
   deviceName: String!
   deviceId: String!
   userId: String!
-  createdAt: DateTime!
+  createdAt: DateTimeISO!
   approvedByRecovery: Boolean!
   approvedFromDeviceId: String
   user: UserGQL!

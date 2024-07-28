@@ -44,6 +44,11 @@ export function useDefaultDeviceSettingsModalLazyQuery(baseOptions?: Apollo.Lazy
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
         }
+export function useDefaultDeviceSettingsModalSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
+        }
 export type DefaultDeviceSettingsModalQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalQuery>;
 export type DefaultDeviceSettingsModalLazyQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalLazyQuery>;
+export type DefaultDeviceSettingsModalSuspenseQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalSuspenseQuery>;
 export type DefaultDeviceSettingsModalQueryResult = Apollo.QueryResult<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>;

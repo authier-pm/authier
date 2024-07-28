@@ -14,8 +14,8 @@ export type Scalars = {
   Float: { input: number; output: number; }
   /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
   BigInt: { input: any; output: any; }
-  /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
-  DateTime: { input: string; output: string; }
+  /** A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format. */
+  DateTimeISO: { input: any; output: any; }
   /** A field whose value conforms to the standard internet email address format as specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address. */
   EmailAddress: { input: any; output: any; }
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -52,18 +52,18 @@ export type DecryptionChallengeApproved = {
   User: Array<UserGql>;
   addDeviceSecretEncrypted: Scalars['String']['output'];
   addNewDeviceForUser: LoginResponse;
-  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  approvedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   approvedByRecovery: Scalars['Boolean']['output'];
   approvedFromDevice?: Maybe<DeviceGql>;
   approvedFromDeviceId?: Maybe<Scalars['String']['output']>;
   blockIp?: Maybe<Scalars['Boolean']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   deviceId: Scalars['String']['output'];
   deviceName: Scalars['String']['output'];
   encryptionSalt: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
-  rejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  rejectedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
 };
@@ -76,30 +76,30 @@ export type DecryptionChallengeApprovedAddNewDeviceForUserArgs = {
 
 export type DecryptionChallengeForApproval = {
   __typename?: 'DecryptionChallengeForApproval';
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   deviceId: Scalars['ID']['output'];
   deviceLocationFromIp?: Maybe<DeviceLocation>;
   deviceName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
   ipGeoLocation?: Maybe<Scalars['JSON']['output']>;
-  rejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  rejectedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
 export type DecryptionChallengeGql = {
   __typename?: 'DecryptionChallengeGQL';
   User: Array<UserGql>;
-  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  approvedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   approvedByRecovery: Scalars['Boolean']['output'];
   approvedFromDevice?: Maybe<DeviceGql>;
   approvedFromDeviceId?: Maybe<Scalars['String']['output']>;
   blockIp?: Maybe<Scalars['Boolean']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   deviceId: Scalars['String']['output'];
   deviceName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
-  rejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  rejectedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
 };
@@ -108,19 +108,19 @@ export type DecryptionChallengeMutation = {
   __typename?: 'DecryptionChallengeMutation';
   User: Array<UserGql>;
   approve: DecryptionChallengeGql;
-  approvedAt?: Maybe<Scalars['DateTime']['output']>;
+  approvedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   approvedByRecovery: Scalars['Boolean']['output'];
   approvedFromDevice?: Maybe<DeviceGql>;
   approvedFromDeviceId?: Maybe<Scalars['String']['output']>;
   blockIp?: Maybe<Scalars['Boolean']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   deviceId: Scalars['String']['output'];
   deviceName: Scalars['String']['output'];
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
   recoverAccount: DecryptionChallengeGql;
   reject: DecryptionChallengeGql;
-  rejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  rejectedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
 };
@@ -129,11 +129,11 @@ export type DefaultDeviceSettingsGql = {
   __typename?: 'DefaultDeviceSettingsGQL';
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['Int']['output'];
   syncTOTP: Scalars['Boolean']['output'];
   theme: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
@@ -143,11 +143,11 @@ export type DefaultDeviceSettingsGqlScalars = {
   __typename?: 'DefaultDeviceSettingsGQLScalars';
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['Int']['output'];
   syncTOTP: Scalars['Boolean']['output'];
   theme: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -156,12 +156,12 @@ export type DefaultDeviceSettingsMutation = {
   __typename?: 'DefaultDeviceSettingsMutation';
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['Int']['output'];
   syncTOTP: Scalars['Boolean']['output'];
   theme: Scalars['String']['output'];
   update: DefaultDeviceSettingsGqlScalars;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -175,12 +175,12 @@ export type DefaultDeviceSettingsQuery = {
   __typename?: 'DefaultDeviceSettingsQuery';
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   /** 0 index for system defaults */
   id: Scalars['Int']['output'];
   syncTOTP: Scalars['Boolean']['output'];
   theme: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -202,23 +202,23 @@ export type DeviceGql = {
   UserMaster?: Maybe<UserGql>;
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   firebaseToken?: Maybe<Scalars['String']['output']>;
   firstIpAddress: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   ipAddressLock: Scalars['Boolean']['output'];
   lastIpAddress: Scalars['String']['output'];
-  lastLockAt?: Maybe<Scalars['DateTime']['output']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']['output']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>;
-  logoutAt?: Maybe<Scalars['DateTime']['output']>;
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>;
+  lastLockAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastSyncAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastUnlockAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  logoutAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   name: Scalars['String']['output'];
   platform: Scalars['String']['output'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>;
+  registeredWithMasterAt?: Maybe<Scalars['DateTimeISO']['output']>;
   syncTOTP: Scalars['Boolean']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -239,30 +239,30 @@ export type DeviceMutation = {
   __typename?: 'DeviceMutation';
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   firebaseToken?: Maybe<Scalars['String']['output']>;
   firstIpAddress: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   ipAddressLock: Scalars['Boolean']['output'];
   lastIpAddress: Scalars['String']['output'];
-  lastLockAt?: Maybe<Scalars['DateTime']['output']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']['output']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>;
+  lastLockAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastSyncAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastUnlockAt?: Maybe<Scalars['DateTimeISO']['output']>;
   logout: DeviceGql;
-  logoutAt?: Maybe<Scalars['DateTime']['output']>;
-  markAsSynced: Scalars['DateTime']['output'];
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>;
+  logoutAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  markAsSynced: Scalars['DateTimeISO']['output'];
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   name: Scalars['String']['output'];
   platform: Scalars['String']['output'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>;
+  registeredWithMasterAt?: Maybe<Scalars['DateTimeISO']['output']>;
   /** user has to approve it when they log in again on that device */
   removeDevice: Scalars['Boolean']['output'];
   rename: DeviceGql;
   reportSecretUsageEvent: SecretUsageEventGqlScalars;
   syncTOTP: Scalars['Boolean']['output'];
   updateDeviceSettings: DeviceGql;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -293,8 +293,8 @@ export type DeviceQuery = {
   UserMaster?: Maybe<UserGql>;
   autofillCredentialsEnabled: Scalars['Boolean']['output'];
   autofillTOTPEnabled: Scalars['Boolean']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   /** Get all secrets that were change since last device sync */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>;
   firebaseToken?: Maybe<Scalars['String']['output']>;
@@ -303,16 +303,16 @@ export type DeviceQuery = {
   ipAddressLock: Scalars['Boolean']['output'];
   lastGeoLocation: Scalars['String']['output'];
   lastIpAddress: Scalars['String']['output'];
-  lastLockAt?: Maybe<Scalars['DateTime']['output']>;
-  lastSyncAt?: Maybe<Scalars['DateTime']['output']>;
-  lastUnlockAt?: Maybe<Scalars['DateTime']['output']>;
-  logoutAt?: Maybe<Scalars['DateTime']['output']>;
-  masterPasswordOutdatedAt?: Maybe<Scalars['DateTime']['output']>;
+  lastLockAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastSyncAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  lastUnlockAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  logoutAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  masterPasswordOutdatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   name: Scalars['String']['output'];
   platform: Scalars['String']['output'];
-  registeredWithMasterAt?: Maybe<Scalars['DateTime']['output']>;
+  registeredWithMasterAt?: Maybe<Scalars['DateTimeISO']['output']>;
   syncTOTP: Scalars['Boolean']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   userId: Scalars['String']['output'];
   vaultLockTimeoutSeconds: Scalars['Int']['output'];
 };
@@ -320,10 +320,10 @@ export type DeviceQuery = {
 export type EmailVerificationGqlScalars = {
   __typename?: 'EmailVerificationGQLScalars';
   address: Scalars['ID']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   kind: EmailVerificationType;
   userId: Scalars['String']['output'];
-  verifiedAt?: Maybe<Scalars['DateTime']['output']>;
+  verifiedAt?: Maybe<Scalars['DateTimeISO']['output']>;
 };
 
 export enum EmailVerificationType {
@@ -334,12 +334,12 @@ export enum EmailVerificationType {
 export type EncryptedSecretGql = {
   __typename?: 'EncryptedSecretGQL';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime']['output'];
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   encrypted: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   kind: EncryptedSecretType;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
   version: Scalars['Int']['output'];
@@ -353,15 +353,15 @@ export type EncryptedSecretInput = {
 export type EncryptedSecretMutation = {
   __typename?: 'EncryptedSecretMutation';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   delete: EncryptedSecretGql;
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   encrypted: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   kind: EncryptedSecretType;
-  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
+  lastUsedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   update: EncryptedSecretGql;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
   version: Scalars['Int']['output'];
@@ -381,13 +381,13 @@ export type EncryptedSecretPatchInput = {
 export type EncryptedSecretQuery = {
   __typename?: 'EncryptedSecretQuery';
   SecretUsageEvent: Array<SecretUsageEventGql>;
-  createdAt: Scalars['DateTime']['output'];
-  deletedAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  deletedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   encrypted: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   kind: EncryptedSecretType;
-  lastUsedAt?: Maybe<Scalars['DateTime']['output']>;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  lastUsedAt?: Maybe<Scalars['DateTimeISO']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
   version: Scalars['Int']['output'];
@@ -407,11 +407,11 @@ export type LoginResponse = {
 
 export type MasterDeviceChangeGql = {
   __typename?: 'MasterDeviceChangeGQL';
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['ID']['output'];
   newDeviceId: Scalars['String']['output'];
   oldDeviceId: Scalars['String']['output'];
-  processAt: Scalars['DateTime']['output'];
+  processAt: Scalars['DateTimeISO']['output'];
   user: UserGql;
   userId: Scalars['String']['output'];
 };
@@ -420,7 +420,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
   currentDevice: DeviceMutation;
-  /** returns a decryption challenge */
+  /** returns a decryption challenge, used when logging in */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
   /**
    * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
@@ -466,7 +466,6 @@ export type Query = {
 
 
 export type QueryWebInputsArgs = {
-  host?: InputMaybe<Scalars['String']['input']>;
   hosts?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -491,7 +490,7 @@ export type SecretUsageEventGql = {
   id: Scalars['BigInt']['output'];
   kind: Scalars['String']['output'];
   secretId: Scalars['String']['output'];
-  timestamp: Scalars['DateTime']['output'];
+  timestamp: Scalars['DateTimeISO']['output'];
   url?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
   webInputId?: Maybe<Scalars['Int']['output']>;
@@ -503,7 +502,7 @@ export type SecretUsageEventGqlScalars = {
   id: Scalars['BigInt']['output'];
   kind: Scalars['String']['output'];
   secretId: Scalars['String']['output'];
-  timestamp: Scalars['DateTime']['output'];
+  timestamp: Scalars['DateTimeISO']['output'];
   url?: Maybe<Scalars['String']['output']>;
   userId: Scalars['String']['output'];
   webInputId?: Maybe<Scalars['Int']['output']>;
@@ -527,7 +526,7 @@ export type SettingsInput = {
 
 export type TagGql = {
   __typename?: 'TagGQL';
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   user: UserGql;
@@ -536,12 +535,12 @@ export type TagGql = {
 
 export type TokenGql = {
   __typename?: 'TokenGQL';
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   emailToken?: Maybe<Scalars['String']['output']>;
-  expiration: Scalars['DateTime']['output'];
+  expiration: Scalars['DateTimeISO']['output'];
   id: Scalars['Int']['output'];
   type: TokenType;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
   valid: Scalars['Boolean']['output'];
@@ -566,7 +565,7 @@ export type UserGql = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   deviceRecoveryCooldownMinutes: Scalars['Int']['output'];
   email?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
@@ -578,7 +577,7 @@ export type UserGql = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -604,7 +603,7 @@ export type UserMutation = {
   createCheckoutSession: Scalars['String']['output'];
   createPortalSession: Scalars['String']['output'];
   createSecretUsageEvent: SecretUsageEventGqlScalars;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   decryptionChallenge: DecryptionChallengeMutation;
   defaultDeviceSettings: DefaultDeviceSettingsMutation;
   delete: UserGql;
@@ -627,7 +626,7 @@ export type UserMutation = {
   uiLanguage: Scalars['String']['output'];
   updateFireToken: DeviceGql;
   updateSettings: UserGql;
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -705,11 +704,11 @@ export type UserMutationUpdateSettingsArgs = {
 export type UserPaidProductsGql = {
   __typename?: 'UserPaidProductsGQL';
   checkoutSessionId: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
-  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  createdAt: Scalars['DateTimeISO']['output'];
+  expiresAt?: Maybe<Scalars['DateTimeISO']['output']>;
   id: Scalars['Int']['output'];
   productId: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   user: UserGql;
   userId: Scalars['String']['output'];
 };
@@ -728,7 +727,7 @@ export type UserQuery = {
   UserPaidProducts: Array<UserPaidProductsGql>;
   WebInputsAdded: Array<WebInputGql>;
   addDeviceSecretEncrypted: Scalars['String']['output'];
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>;
   defaultDeviceSettings: DefaultDeviceSettingsQuery;
   device: DeviceQuery;
@@ -739,7 +738,7 @@ export type UserQuery = {
   emailVerifications: Array<EmailVerificationGqlScalars>;
   encryptedSecrets: Array<EncryptedSecretQuery>;
   id: Scalars['ID']['output'];
-  lastChangeInSecrets?: Maybe<Scalars['DateTime']['output']>;
+  lastChangeInSecrets?: Maybe<Scalars['DateTimeISO']['output']>;
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
@@ -749,7 +748,7 @@ export type UserQuery = {
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
-  updatedAt?: Maybe<Scalars['DateTime']['output']>;
+  updatedAt?: Maybe<Scalars['DateTimeISO']['output']>;
   username?: Maybe<Scalars['String']['output']>;
 };
 
@@ -771,7 +770,7 @@ export type WebInputGql = {
   UsageEvents: Array<SecretUsageEventGql>;
   addedByUser?: Maybe<UserGql>;
   addedByUserId?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   domOrdinal: Scalars['Int']['output'];
   domPath: Scalars['String']['output'];
   host: Scalars['String']['output'];
@@ -784,7 +783,7 @@ export type WebInputGql = {
 export type WebInputGqlScalars = {
   __typename?: 'WebInputGQLScalars';
   addedByUserId?: Maybe<Scalars['String']['output']>;
-  createdAt: Scalars['DateTime']['output'];
+  createdAt: Scalars['DateTimeISO']['output'];
   domOrdinal: Scalars['Int']['output'];
   domPath: Scalars['String']['output'];
   host: Scalars['String']['output'];

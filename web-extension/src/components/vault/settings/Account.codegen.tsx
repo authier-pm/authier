@@ -16,7 +16,7 @@ export type ChangeMasterPasswordMutation = { __typename?: 'Mutation', me: { __ty
 export type AccountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type AccountQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: string, verifiedAt?: string | null } | null } };
+export type AccountQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, deviceRecoveryCooldownMinutes: number, primaryEmailVerification?: { __typename?: 'EmailVerificationGQLScalars', createdAt: any, verifiedAt?: any | null } | null } };
 
 export type ResendEmailVerificationMutationVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -103,8 +103,13 @@ export function useAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ac
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
         }
+export function useAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+        }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
+export type AccountSuspenseQueryHookResult = ReturnType<typeof useAccountSuspenseQuery>;
 export type AccountQueryResult = Apollo.QueryResult<AccountQuery, AccountQueryVariables>;
 export const ResendEmailVerificationDocument = gql`
     mutation resendEmailVerification {
