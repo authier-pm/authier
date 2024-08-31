@@ -45,6 +45,7 @@ import {
 import { plainToClass } from 'class-transformer'
 
 import { firebaseAdmin } from '../lib/firebaseAdmin'
+import { WebInputMutation } from '../models/WebInput'
 
 const log = debug('au:RootResolver')
 
@@ -469,7 +470,7 @@ export class RootResolver {
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
-  @Mutation(() => WebInputGQL, {
+  @Mutation(() => WebInputMutation, {
     nullable: true
   })
   @Query(() => WebInputGQL, {

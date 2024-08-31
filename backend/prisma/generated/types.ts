@@ -91,7 +91,7 @@ export type EmailVerification = {
   kind: EmailVerificationType
 }
 export type EncryptedSecret = {
-  id: string
+  id: Generated<string>
   encrypted: string
   version: number
   kind: EncryptedSecretType
@@ -136,7 +136,7 @@ export type Token = {
   userId: string
 }
 export type User = {
-  id: string
+  id: Generated<string>
   email: string | null
   tokenVersion: Generated<number>
   username: string | null

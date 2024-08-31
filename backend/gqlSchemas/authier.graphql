@@ -191,7 +191,6 @@ type WebInputGQL {
   addedByUserId: String
   addedByUser: UserGQL
   UsageEvents: [SecretUsageEventGQL!]!
-  delete: Int!
 }
 
 enum WebInputType {
@@ -401,7 +400,7 @@ type Mutation {
   """
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
-  webInput(id: Int!): WebInputGQL
+  webInput(id: Int!): WebInputMutation
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 
@@ -689,6 +688,21 @@ input AddNewDeviceInput {
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!
   devicePlatform: String!
+}
+
+type WebInputMutation {
+  id: Int!
+  layoutType: String
+  createdAt: DateTime!
+  host: String!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  domOrdinal: Int!
+  addedByUserId: String
+  addedByUser: UserGQL
+  UsageEvents: [SecretUsageEventGQL!]!
+  delete: Int!
 }
 
 input WebInputElement {

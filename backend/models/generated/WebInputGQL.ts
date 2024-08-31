@@ -1,11 +1,8 @@
-import { Field, ObjectType, Int, GraphQLISODateTime, Ctx } from 'type-graphql'
+import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
 import { WebInputTypeGQL } from '../types/WebInputType'
 import { UserGQL } from './UserGQL'
 import { SecretUsageEventGQL } from './SecretUsageEventGQL'
-import type { IContextAuthenticated } from 'schemas/RootResolver'
-import debug from 'debug'
 
-const log = debug('au:WebInput')
 @ObjectType()
 export class WebInputGQLScalars {
   @Field(() => Int)
@@ -45,14 +42,4 @@ export class WebInputGQL extends WebInputGQLScalars {
   UsageEvents: SecretUsageEventGQL[]
 
   // skip overwrite 👇
-
-  @Field(() => Int)
-  async delete(@Ctx() ctx: IContextAuthenticated) {
-    log('delete of WebInput id: ', this.id)
-    // TODO rate limit this to like 1 per hour
-
-    return ctx.prisma.webInput.delete({
-      where: { id: this.id }
-    })
-  }
 }
