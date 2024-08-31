@@ -37,12 +37,12 @@ export function VaultRouter() {
 
   useEffect(() => {
     browser.storage.sync.get('vaultTableView').then((res) => {
-      setVaultTableView(res.vaultTableView)
+      setVaultTableView(res.vaultTableView as boolean)
     })
 
     browser.storage.sync.onChanged.addListener((changes) => {
       if (changes.vaultTableView) {
-        setVaultTableView(changes.vaultTableView.newValue)
+        setVaultTableView(changes.vaultTableView.newValue as boolean)
       }
     })
   }, [])

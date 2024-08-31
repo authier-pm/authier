@@ -33,7 +33,7 @@ import {
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
 
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
@@ -44,7 +44,6 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
-import { isTorExit } from './isTorExit'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
 
 const log = debug('au:RootResolver')
@@ -467,6 +466,24 @@ export class RootResolver {
         )
         .execute()
     }
+  }
+
+  @UseMiddleware(throwIfNotAuthenticated)
+  @Mutation(() => WebInputGQL, {
+    nullable: true
+  })
+  @Query(() => WebInputGQL, {
+    nullable: true
+  })
+  async webInput(
+    @Arg('id', () => Int) id: number,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.webInput.findUnique({
+      where: {
+        id
+      }
+    })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

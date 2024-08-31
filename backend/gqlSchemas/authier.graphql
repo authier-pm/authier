@@ -13,6 +13,7 @@ type Query {
     """
     hosts: [String!]
   ): [WebInputGQLScalars!]!
+  webInput(id: Int!): WebInputGQL
 }
 
 type UserQuery {
@@ -188,6 +189,7 @@ type WebInputGQL {
   domPath: String!
   domOrdinal: Int!
   addedByUserId: String
+  delete: Int!
   addedByUser: UserGQL
   UsageEvents: [SecretUsageEventGQL!]!
 }
@@ -373,6 +375,7 @@ type WebInputGQLScalars {
   domPath: String!
   domOrdinal: Int!
   addedByUserId: String
+  delete: Int!
 }
 
 type Mutation {
@@ -399,6 +402,7 @@ type Mutation {
   """
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
+  webInput(id: Int!): WebInputGQL
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 

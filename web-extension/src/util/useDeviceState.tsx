@@ -87,9 +87,9 @@ export function useDeviceState() {
     log('onStorageChange', areaName, changes)
     //WARNING: Not sure if this condition is correct
     if (areaName === 'local' && changes.backgroundState) {
-      setDeviceState(changes.backgroundState.newValue)
+      setDeviceState(changes.backgroundState.newValue as DeviceState)
       if (changes.lockedState) {
-        setLockedState(changes.lockedState.newValue)
+        setLockedState(changes.lockedState.newValue as DeviceState)
       }
 
       log('states loaded from storage')

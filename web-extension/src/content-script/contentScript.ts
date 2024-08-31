@@ -240,37 +240,44 @@ new MutationObserver(() => {
   }
 }).observe(document, { subtree: true, childList: true })
 
-browser.runtime.onMessage.addListener((message) => {
-  if (message.kind === PopupActionsEnum.TOTP_COPIED) {
-    async function elementSelected(event) {
-      event.preventDefault()
-      event.stopPropagation() // Stop the event from propagating further
+browser.runtime.onMessage.addListener(
+  // @ts-expect-error
+  (message: {
+    kind: PopupActionsEnum
+    event?: { otpCode: string; secretId: string }
+  }) => {
+    if (message.kind === PopupActionsEnum.TOTP_COPIED) {
+      async function elementSelected(event) {
+        event.preventDefault()
+        event.stopPropagation() // Stop the event from propagating further
 
-      document.removeEventListener('click', elementSelected, true) // Remove the event listener
+        document.removeEventListener('click', elementSelected, true) // Remove the event listener
 
-      const selectedElement = event.target // Correctly gets the clicked element
-      if (selectedElement.tagName !== 'INPUT') {
-        notyf.error('You must select an input element')
+        const selectedElement = event.target // Correctly gets the clicked element
+        if (selectedElement.tagName !== 'INPUT') {
+          notyf.error('You must select an input element')
+        }
+        selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
+
+        const elementSelector = getSelectorForElement(selectedElement)
+        const webInput: WebInputElement = {
+          domPath: elementSelector.css,
+          domOrdinal: elementSelector.domOrdinal,
+          kind: WebInputType.TOTP,
+          url: location.href
+        }
+        await trpc.addTOTPInput.mutate(webInput)
+        const messageEvent = message.event
+
+        if (messageEvent?.otpCode) {
+          autofillValueIntoInput(selectedElement, messageEvent?.otpCode)
+          notyf.success(
+            `TOTP WebInput added for selector "${elementSelector.css}"`
+          )
+        }
       }
-      selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
 
-      const elementSelector = getSelectorForElement(selectedElement)
-      const webInput: WebInputElement = {
-        domPath: elementSelector.css,
-        domOrdinal: elementSelector.domOrdinal,
-        kind: WebInputType.TOTP,
-        url: location.href
-      }
-      await trpc.addTOTPInput.mutate(webInput)
-      const messageEvent = message.event as {
-        otpCode: string
-        secretId: string
-      }
-
-      autofillValueIntoInput(selectedElement, messageEvent.otpCode)
-      notyf.success(`TOTP WebInput added for selector "${elementSelector.css}"`)
+      document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
     }
-
-    document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
   }
-})
+)
