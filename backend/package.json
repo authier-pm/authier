@@ -11,7 +11,6 @@
       "prettier --write"
     ]
   },
-  "type": "module",
   "dependencies": {
     "@fastify/aws-lambda": "4.1.0",
     "@fastify/cookie": "9.4.0",
