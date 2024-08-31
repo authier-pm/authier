@@ -34,15 +34,6 @@ export class WebInputGQLScalars {
 
   @Field(() => String, { nullable: true })
   addedByUserId: string | null
-
-  @Field(() => Int)
-  async delete(@Ctx() ctx: IContextAuthenticated) {
-    log('delete of WebInput id: ', this.id)
-
-    return ctx.prisma.webInput.delete({
-      where: { id: this.id }
-    })
-  }
 }
 
 @ObjectType()
@@ -54,4 +45,14 @@ export class WebInputGQL extends WebInputGQLScalars {
   UsageEvents: SecretUsageEventGQL[]
 
   // skip overwrite 👇
+
+  @Field(() => Int)
+  async delete(@Ctx() ctx: IContextAuthenticated) {
+    log('delete of WebInput id: ', this.id)
+    // TODO rate limit this to like 1 per hour
+
+    return ctx.prisma.webInput.delete({
+      where: { id: this.id }
+    })
+  }
 }

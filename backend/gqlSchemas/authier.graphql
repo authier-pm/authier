@@ -189,9 +189,9 @@ type WebInputGQL {
   domPath: String!
   domOrdinal: Int!
   addedByUserId: String
-  delete: Int!
   addedByUser: UserGQL
   UsageEvents: [SecretUsageEventGQL!]!
+  delete: Int!
 }
 
 enum WebInputType {
@@ -375,7 +375,6 @@ type WebInputGQLScalars {
   domPath: String!
   domOrdinal: Int!
   addedByUserId: String
-  delete: Int!
 }
 
 type Mutation {
