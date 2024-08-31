@@ -85,7 +85,7 @@
     "vitest": "^2.0.5"
   },
   "scripts": {
-    "dev": "DEBUG=au:* pnpm nodemon --exec ts-node-transpile-only server.ts",
+    "dev": "DEBUG=au:* pnpm nodemon --exec node --loader ts-node/esm server.ts",
     "killNodemon": "kill $(lsof -t -i:5051)",
     "local": "nodemon server.ts",
     "pgn": "pnpm prisma migrate dev && pnpm prisma db push && prisma generate",

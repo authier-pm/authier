@@ -1,7 +1,7 @@
 import { Arg, Ctx, Field, Int, ObjectType } from 'type-graphql'
 import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettingsGQL'
 
-import { IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContextAuthenticated } from '../schemas/RootResolver'
 import { DefaultSettingsInput } from './models'
 
 @ObjectType()

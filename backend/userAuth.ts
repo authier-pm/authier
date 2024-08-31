@@ -1,8 +1,10 @@
 import { User } from '@prisma/client'
-import { JwtPayload, sign } from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 
 import { isProd } from './envUtils'
 import { IContext } from './schemas/RootResolver'
+
+const { sign } = jsonwebtoken
 
 export const setNewAccessTokenIntoCookie = (
   user: Pick<User, 'id'>,
@@ -26,7 +28,7 @@ export const setNewAccessTokenIntoCookie = (
   return accessToken
 }
 
-export interface jwtPayloadRefreshToken extends JwtPayload {
+export interface jwtPayloadRefreshToken extends jsonwebtoken.JwtPayload {
   userId: string
   deviceId: string
   tokenVersion: number

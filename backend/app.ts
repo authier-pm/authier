@@ -12,21 +12,23 @@ import {
   setNewAccessTokenIntoCookie,
   setNewRefreshToken
 } from './userAuth'
-import { verify } from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 import { IContext } from './schemas/RootResolver'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './lib/GraphqlError'
 
 import debug from 'debug'
 
-import pkg from '../package.json'
 import { healthReportHandler } from './healthReportRoute'
 import fastifyCors from '@fastify/cors'
 import { stripeWebhook } from './stripeWebhook'
+import { readFileSync } from 'fs'
 
 const { env } = process
 const log = debug('au:app')
 
+const { verify } = jsonwebtoken
+const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 const environment = env.NODE_ENV
 sentryInit({
   dsn: env.SENTRY_DSN,

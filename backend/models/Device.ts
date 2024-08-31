@@ -8,7 +8,7 @@ import {
   InputType,
   Int
 } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretQuery } from './EncryptedSecret'
 import { DeviceGQL, DeviceGQLScalars } from './generated/DeviceGQL'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'

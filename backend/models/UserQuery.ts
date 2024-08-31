@@ -7,7 +7,7 @@ import {
   ObjectType,
   GraphQLISODateTime
 } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
 

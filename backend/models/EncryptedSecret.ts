@@ -1,5 +1,5 @@
 import { Arg, Ctx, Field, ObjectType } from 'type-graphql'
-import { IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContextAuthenticated } from '../schemas/RootResolver'
 import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
 import { WebInputGQLScalars } from './generated/WebInputGQL'

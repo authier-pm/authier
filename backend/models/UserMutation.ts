@@ -1,5 +1,5 @@
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContext, IContextAuthenticated } from '../schemas/RootResolver'
 import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
@@ -13,7 +13,7 @@ import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
 import { UserBase, UserQuery } from './UserQuery'
-import { GraphQLInt, GraphQLResolveInfo } from 'graphql'
+import * as graphql from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
 import {
@@ -112,7 +112,7 @@ export class UserMutation extends UserBase {
   async encryptedSecret(
     @Arg('id', () => ID) id: string,
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() info: graphql.GraphQLResolveInfo
   ) {
     return ctx.prisma.encryptedSecret.findUnique({
       where: { id },
@@ -332,7 +332,7 @@ export class UserMutation extends UserBase {
     })
   }
 
-  @Field(() => GraphQLInt)
+  @Field(() => graphql.GraphQLInt)
   async changeMasterPassword(
     @Arg('input', () => ChangeMasterPasswordInput)
     input: ChangeMasterPasswordInput,

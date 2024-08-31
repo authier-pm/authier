@@ -13,7 +13,7 @@ import { dmmf, prismaClient } from '../prisma/prismaClient'
 import { FastifyReply, FastifyRequest } from 'fastify'
 import { LoginResponse } from '../models/models'
 
-import { verify } from 'jsonwebtoken'
+import jsonwebtoken from 'jsonwebtoken'
 import { UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 import { constructURL } from '../../shared/urlUtils'
@@ -33,7 +33,7 @@ import {
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
 
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
@@ -48,6 +48,7 @@ import { isTorExit } from './isTorExit'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
 
 const log = debug('au:RootResolver')
+const { verify } = jsonwebtoken
 
 export interface IContext {
   request: FastifyRequest
@@ -467,6 +468,20 @@ export class RootResolver {
         )
         .execute()
     }
+  }
+
+  @UseMiddleware(throwIfNotAuthenticated)
+  @Mutation(() => WebInputGQL)
+  @Query(() => WebInputGQL)
+  async webInput(
+    @Arg('id', () => Int) id: number,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.webInput.findUnique({
+      where: {
+        id
+      }
+    })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

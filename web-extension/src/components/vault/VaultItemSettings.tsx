@@ -404,7 +404,13 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       {webInputs.map(
                         ({ kind, domPath, url, id }) => (
                           <ListItem key={id}>
-                            {kind} - {domPath} - <Link href={url}>{url}</Link>
+                            {kind} - {domPath} - <Link href={url}>{url}</Link> - <Button onClick={() => {
+                              // TODO remove web input
+                            }}>
+                              <Trans>
+                                Remove
+                              </Trans>
+                            </Button>
                           </ListItem>
                         )
                       )}
