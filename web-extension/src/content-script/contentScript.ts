@@ -18,7 +18,6 @@ import {
   debouncedAutofill,
   IDecryptedSecrets
 } from './autofill'
-import { authenticator } from 'otplib'
 import {
   recordInputs,
   contentScriptRender,
@@ -31,7 +30,7 @@ import { notyf } from './notyf'
 import browser from 'webextension-polyfill'
 import { PopupActionsEnum } from '../components/pages/PopupActionsEnum'
 import { getSelectorForElement } from './cssSelectorGenerators'
-import { WebInputForAutofill } from '../background/WebInputForAutofill'
+import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -51,7 +50,7 @@ export interface IInitStateRes {
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   passwordCount: number
-  webInputs: Array<WebInputForAutofill>
+  webInputs: WebInputsArrayClientSide
   saveLoginModalsState?: ISaveLoginModalState | null | undefined
 }
 

@@ -26,7 +26,10 @@ import {
   getSelectorForElement
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
-import { WebInputForAutofill } from '../background/WebInputForAutofill'
+import {
+  WebInputForAutofill,
+  WebInputsArrayClientSide
+} from '../background/WebInputForAutofill'
 import { wait } from './wait'
 
 const log = debug('au:autofill')
@@ -472,9 +475,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const newWebInputs: Array<
-        Omit<WebInputForAutofill, '__typename' | 'id'>
-      > = []
+      const newWebInputs: WebInputsArrayClientSide = []
       const inputElsArray = filterUselessInputs(documentBody)
       log('inputElsArray', inputElsArray)
 

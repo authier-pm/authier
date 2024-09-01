@@ -10,3 +10,7 @@ export type WebInputForAutofill = {
   kind: WebInputType
   createdAt: string
 }
+
+export type WebInputsArrayClientSide = Array<
+  Omit<WebInputForAutofill, '__typename' | 'id'>
+>
