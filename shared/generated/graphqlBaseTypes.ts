@@ -420,7 +420,7 @@ export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
   currentDevice: DeviceMutation;
-  /** returns a decryption challenge */
+  /** returns a decryption challenge, used when logging in */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
   /**
    * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
@@ -430,6 +430,7 @@ export type Mutation = {
   /** you need to be authenticated to call this resolver */
   me: UserMutation;
   registerNewUser: LoginResponse;
+  webInput?: Maybe<WebInputMutation>;
 };
 
 
@@ -454,6 +455,11 @@ export type MutationRegisterNewUserArgs = {
   userId: Scalars['UUID']['input'];
 };
 
+
+export type MutationWebInputArgs = {
+  id: Scalars['Int']['input'];
+};
+
 export type Query = {
   __typename?: 'Query';
   /** you need to be authenticated to call this resolver */
@@ -461,12 +467,17 @@ export type Query = {
   currentDevice: DeviceQuery;
   me: UserQuery;
   osTime: Scalars['String']['output'];
+  webInput?: Maybe<WebInputGql>;
   webInputs: Array<WebInputGqlScalars>;
 };
 
 
+export type QueryWebInputArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type QueryWebInputsArgs = {
-  host?: InputMaybe<Scalars['String']['input']>;
   hosts?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
@@ -785,6 +796,22 @@ export type WebInputGqlScalars = {
   __typename?: 'WebInputGQLScalars';
   addedByUserId?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
+  domOrdinal: Scalars['Int']['output'];
+  domPath: Scalars['String']['output'];
+  host: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  kind: WebInputType;
+  layoutType?: Maybe<Scalars['String']['output']>;
+  url: Scalars['String']['output'];
+};
+
+export type WebInputMutation = {
+  __typename?: 'WebInputMutation';
+  UsageEvents: Array<SecretUsageEventGql>;
+  addedByUser?: Maybe<UserGql>;
+  addedByUserId?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  delete: Scalars['Int']['output'];
   domOrdinal: Scalars['Int']['output'];
   domPath: Scalars['String']['output'];
   host: Scalars['String']['output'];

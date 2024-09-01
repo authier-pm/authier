@@ -41,6 +41,7 @@ import {
 import { EditFormButtons } from './EditFormButtons'
 import { IoDuplicateOutline } from 'react-icons/io5'
 import { getWebInputsForUrl } from '@src/background/getWebInputsForUrl'
+import { useRemoveWebInputMutation } from './VaultItemSettings.codegen'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -209,7 +210,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const webInputs = getWebInputsForUrl(secretProps.loginCredentials.url)
-
+  const [removeWebInput] = useRemoveWebInputMutation()
 
   return (
     <motion.div
@@ -404,7 +405,20 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       {webInputs.map(
                         ({ kind, domPath, url, id }) => (
                           <ListItem key={id}>
-                            {kind} - {domPath} - <Link href={url}>{url}</Link>
+                            {kind} - {domPath} - <Button onClick={async () => {
+                              await removeWebInput({ variables: { id } })
+                              toast(
+                                {
+                                  title: t`Web input removed`,
+                                  status: 'success'
+                                }
+                              )
+                              // TODO reload all web inputs for this URL
+                            }}>
+                              <Trans>
+                                Remove
+                              </Trans>
+                            </Button>
                           </ListItem>
                         )
                       )}
