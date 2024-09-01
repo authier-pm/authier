@@ -472,7 +472,9 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const newWebInputs: WebInputForAutofill[] = []
+      const newWebInputs: Array<
+        Omit<WebInputForAutofill, '__typename' | 'id'>
+      > = []
       const inputElsArray = filterUselessInputs(documentBody)
       log('inputElsArray', inputElsArray)
 
