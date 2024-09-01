@@ -413,7 +413,12 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                                   status: 'success'
                                 }
                               )
-                              // TODO reload all web inputs for this URL
+
+                              device.setWebInputs(
+                                device.state?.webInputs.filter(
+                                  (input) => input.id !== id
+                                ) ?? []
+                              )
                             }}>
                               <Trans>
                                 Remove
