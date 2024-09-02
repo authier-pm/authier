@@ -8,13 +8,15 @@ export type RemoveWebInputMutationVariables = Types.Exact<{
 }>;
 
 
-export type RemoveWebInputMutation = { __typename?: 'Mutation', webInput?: { __typename?: 'WebInputMutation', delete: number } | null };
+export type RemoveWebInputMutation = { __typename?: 'Mutation', webInput?: { __typename?: 'WebInputMutation', delete?: { __typename?: 'WebInputGQLScalars', id: number } | null } | null };
 
 
 export const RemoveWebInputDocument = gql`
     mutation removeWebInput($id: Int!) {
   webInput(id: $id) {
-    delete
+    delete {
+      id
+    }
   }
 }
     `;

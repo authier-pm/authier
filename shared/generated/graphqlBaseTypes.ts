@@ -811,7 +811,7 @@ export type WebInputMutation = {
   addedByUser?: Maybe<UserGql>;
   addedByUserId?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
-  delete: Scalars['Int']['output'];
+  delete?: Maybe<WebInputGqlScalars>;
   domOrdinal: Scalars['Int']['output'];
   domPath: Scalars['String']['output'];
   host: Scalars['String']['output'];
