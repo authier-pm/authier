@@ -42,7 +42,7 @@ export class RedisBasicRateLimiter {
       .expire(key, this.options.intervalSeconds)
       .exec()
 
-    if (res && res[0] && (res[0][1] as number) > this.options.maxHits) {
+    if (res && res[0] > this.options.maxHits) {
       throw new RateLimitedError(
         `rate limit exceeded, try in ${this.duration}`,
         'RATE_LIMIT_EXCEEDED'

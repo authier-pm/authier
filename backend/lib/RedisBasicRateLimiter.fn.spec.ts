@@ -23,7 +23,7 @@ describe('RedisBasicRateLimiter', () => {
     await expect(
       limiter.increment('127.0.0.1')
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      '"rate limit exceeded, try in 10 seconds"'
+      `[GraphQLError: rate limit exceeded, try in 10 seconds]`
     )
   })
 })
