@@ -134,7 +134,7 @@ describe('RootResolver', () => {
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Device cf6fe83e-0ae6-4472-8908-7ece569f0252 already exists. You cannot use a device with multiple accounts.]`
+        `[Error: Device 2502b05d-bb37-49f3-a34c-7083c409d6b8 already exists. You cannot use a device with multiple accounts.]`
       )
     })
   })
@@ -213,7 +213,7 @@ describe('RootResolver', () => {
       const userId = faker.string.uuid()
       const blockedIp = faker.internet.ip()
       const fakeCtx = {
-        reply: { setCookie: () => { } },
+        reply: { setCookie: () => {} },
         request: { headers: {} },
         prisma: prismaClient,
         jwtPayload: { userId: userId },
