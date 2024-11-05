@@ -134,7 +134,7 @@ describe('RootResolver', () => {
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Device 2502b05d-bb37-49f3-a34c-7083c409d6b8 already exists. You cannot use a device with multiple accounts.]`
+        `[Error: Device 8faf8825-02b0-45db-8b37-9f334c7083c4 already exists. You cannot use a device with multiple accounts.]`
       )
     })
   })
