@@ -26,6 +26,10 @@ import {
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
 
+import debug from 'debug'
+
+const log = debug('app:UserQuery')
+
 @ObjectType()
 export class UserBase extends UserGQL {
   constructor(parameters) {
@@ -164,7 +168,7 @@ export class UserQuery extends UserBase {
     body: string,
     type: string
   ) {
-    console.log('NOTIFICATION')
+    log('sendAuthMessage', deviceId, title, type)
     const user = await prismaClient.user.findUnique({
       where: {
         id: this.id
@@ -179,7 +183,7 @@ export class UserQuery extends UserBase {
     })
 
     if (!user || deviceId === user.masterDeviceId) {
-      console.log('no user or master device or firebase token')
+      log('no user or master device or firebase token')
       return false // no point in sending messages to the master device
     }
 
@@ -189,26 +193,29 @@ export class UserQuery extends UserBase {
       }
     })
 
-    if (!masterDevice?.firebaseToken || masterDevice.firebaseToken.length < 8) {
-      console.log('no firebase token')
+    if (!masterDevice?.firebaseToken) {
       return false // no point in sending messages to the master deviceId
     }
 
+    if (masterDevice.firebaseToken.length < 8) {
+      log('invalid firebase token', masterDevice.firebaseToken)
+      return false
+    }
+
     try {
-      await firebaseAdmin
-        .messaging()
-        .sendToDevice(masterDevice?.firebaseToken as string, {
-          notification: {
-            title: title,
-            body: user.Devices.find(({ id }) => id === deviceId)?.name + body
-          },
-          data: {
-            type: type
-          }
-        })
+      await firebaseAdmin.messaging().send({
+        token: masterDevice.firebaseToken as string,
+        notification: {
+          title: title,
+          body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+        },
+        data: {
+          type: type
+        }
+      })
       return true
     } catch (err) {
-      console.log(err)
+      console.error(err)
       return false
     }
   }
