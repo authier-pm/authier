@@ -195,17 +195,16 @@ export class UserQuery extends UserBase {
     }
 
     try {
-      await firebaseAdmin
-        .messaging()
-        .sendToDevice(masterDevice?.firebaseToken as string, {
-          notification: {
-            title: title,
-            body: user.Devices.find(({ id }) => id === deviceId)?.name + body
-          },
-          data: {
-            type: type
-          }
-        })
+      await firebaseAdmin.messaging().send({
+        token: masterDevice.firebaseToken,
+        notification: {
+          title: title,
+          body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+        },
+        data: {
+          type: type
+        }
+      })
       return true
     } catch (err) {
       console.log(err)

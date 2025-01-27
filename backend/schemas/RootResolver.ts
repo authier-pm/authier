@@ -274,7 +274,9 @@ export class RootResolver {
     })
 
     if (!user) {
-      throw new GraphqlError('Login failed, create a new account.')
+      throw new GraphqlError(
+        'Login failed, check your email and master password'
+      )
     }
     const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
