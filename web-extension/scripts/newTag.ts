@@ -9,7 +9,7 @@ async function pushNewTag() {
 
   const tagName = `v${version}-extension`
   exec(
-    `git tag -a ${tagName} -m "version ${version}" && git push origin ${tagName}`,
+    `git tag -a ${tagName} -m "version ${version}" && git push origin`,
     (error, stdout, stderr) => {
       if (error) {
         console.error(`Failed to create or push git tag: ${error}`)

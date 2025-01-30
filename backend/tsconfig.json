@@ -15,7 +15,7 @@
     "noImplicitAny": false,
     "strict": true,
     "inlineSources": true,
-    "types": ["node"],
+    // "types": ["node"],
     "forceConsistentCasingInFileNames": true,
     "noUnusedLocals": false,
     "resolveJsonModule": true,

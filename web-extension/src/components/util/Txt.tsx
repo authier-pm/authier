@@ -6,3 +6,7 @@ import { Text, TextProps } from '@chakra-ui/react'
 export const Txt = (props: TextProps) => {
   return <Text {...props} />
 }
+
+export const TxtNowrap = (props: TextProps) => {
+  return <Txt {...props} whiteSpace={'nowrap'} />
+}

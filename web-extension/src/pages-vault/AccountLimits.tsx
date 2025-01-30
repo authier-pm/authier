@@ -7,8 +7,6 @@ import {
   List,
   ListIcon,
   ListItem,
-  Stack,
-  Text,
   useColorModeValue,
   VStack,
   Table,
@@ -17,13 +15,15 @@ import {
   Tr,
   Th,
   Td,
-  TableContainer
+  TableContainer,
+  Flex
 } from '@chakra-ui/react'
 import { FaCheckCircle } from 'react-icons/fa'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 import ProfileCard from '@src/components/vault/ProfileCard'
 import browser from 'webextension-polyfill'
 import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
+import { Txt, TxtNowrap } from '@src/components/util/Txt'
 
 function PriceWrapper({ children }: { children: ReactNode }) {
   return (
@@ -51,7 +51,7 @@ export const AccountLimits = () => {
   })
   const [refreshAccountTooltip, setRefreshAccountTooltip] = useState(false)
   return (
-    <Box>
+    <Box m={4}>
       <HStack spacing={10} justifyContent="center" alignItems={'center'}>
         <ProfileCard
           refreshAccountTooltip={refreshAccountTooltip}
@@ -94,28 +94,29 @@ export const AccountLimits = () => {
         </TableContainer>
       </HStack>
 
-      <Stack
+      <Flex
         direction={{ base: 'column', md: 'row' }}
         textAlign="center"
         justify="center"
-        spacing={{ base: 4, lg: 10 }}
+        gap={4}
+        wrap={'wrap'}
         py={10}
       >
         <PriceWrapper>
           <Box px={12}>
-            <Text fontWeight="500" fontSize="2xl">
+            <TxtNowrap fontWeight="500" fontSize="2xl">
               Free tier
-            </Text>
+            </TxtNowrap>
             <HStack justifyContent="center">
-              <Text fontSize="3xl" fontWeight="600">
+              <Txt fontSize="3xl" fontWeight="600">
                 $
-              </Text>
-              <Text fontSize="5xl" fontWeight="900">
+              </Txt>
+              <Txt fontSize="5xl" fontWeight="900">
                 0
-              </Text>
-              <Text fontSize="3xl" color="gray.500">
+              </Txt>
+              <Txt fontSize="3xl" color="gray.500" whiteSpace={'nowrap'}>
                 /month
-              </Text>
+              </Txt>
             </HStack>
           </Box>
           <VStack
@@ -139,19 +140,19 @@ export const AccountLimits = () => {
         </PriceWrapper>
         <PriceWrapper>
           <Box py={4} px={12}>
-            <Text fontWeight="500" fontSize="2xl">
+            <TxtNowrap fontWeight="500" fontSize="2xl">
               Credentials
-            </Text>
+            </TxtNowrap>
             <HStack justifyContent="center">
-              <Text fontSize="3xl" fontWeight="600">
+              <Txt fontSize="3xl" fontWeight="600">
                 $
-              </Text>
-              <Text fontSize="5xl" fontWeight="900">
+              </Txt>
+              <Txt fontSize="5xl" fontWeight="900">
                 1
-              </Text>
-              <Text fontSize="3xl" color="gray.500">
+              </Txt>
+              <Txt fontSize="3xl" color="gray.500" whiteSpace={'nowrap'}>
                 /month
-              </Text>
+              </Txt>
             </HStack>
           </Box>
           <VStack
@@ -183,19 +184,19 @@ export const AccountLimits = () => {
         </PriceWrapper>
         <PriceWrapper>
           <Box py={4} px={12}>
-            <Text fontWeight="500" fontSize="2xl">
+            <TxtNowrap fontWeight="500" fontSize="2xl">
               TOTP
-            </Text>
+            </TxtNowrap>
             <HStack justifyContent="center">
-              <Text fontSize="3xl" fontWeight="600">
+              <Txt fontSize="3xl" fontWeight="600">
                 $
-              </Text>
-              <Text fontSize="5xl" fontWeight="900">
+              </Txt>
+              <Txt fontSize="5xl" fontWeight="900">
                 1
-              </Text>
-              <Text fontSize="3xl" color="gray.500">
+              </Txt>
+              <Txt fontSize="3xl" color="gray.500" whiteSpace={'nowrap'}>
                 /month
-              </Text>
+              </Txt>
             </HStack>
           </Box>
           <VStack
@@ -233,7 +234,7 @@ export const AccountLimits = () => {
               left="50%"
               style={{ transform: 'translate(-50%)' }}
             >
-              <Text
+              <Txt
                 textTransform="uppercase"
                 noOfLines={1}
                 bg={useColorModeValue('red.300', 'red.700')}
@@ -245,22 +246,22 @@ export const AccountLimits = () => {
                 rounded="xl"
               >
                 Most Popular
-              </Text>
+              </Txt>
             </Box>
             <Box py={4} px={12}>
-              <Text fontWeight="500" fontSize="2xl">
+              <TxtNowrap fontWeight="500" fontSize="2xl">
                 TOTP and Credentials
-              </Text>
+              </TxtNowrap>
               <HStack justifyContent="center">
-                <Text fontSize="3xl" fontWeight="600">
+                <Txt fontSize="3xl" fontWeight="600">
                   $
-                </Text>
-                <Text fontSize="5xl" fontWeight="900">
+                </Txt>
+                <Txt fontSize="5xl" fontWeight="900">
                   2
-                </Text>
-                <Text fontSize="3xl" color="gray.500">
+                </Txt>
+                <Txt fontSize="3xl" color="gray.500" whiteSpace={'nowrap'}>
                   /month
-                </Text>
+                </Txt>
               </HStack>
             </Box>
             <VStack
@@ -295,7 +296,7 @@ export const AccountLimits = () => {
             </VStack>
           </Box>
         </PriceWrapper>
-      </Stack>
+      </Flex>
     </Box>
   )
 }

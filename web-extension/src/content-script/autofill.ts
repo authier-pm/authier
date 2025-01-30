@@ -15,7 +15,7 @@ import {
   ITOTPSecret,
   LoginCredentialsTypeWithMeta
 } from '../util/useDeviceState'
-import { renderPasswordGenerator } from './renderPasswordGenerator'
+
 import { trpc } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
@@ -59,15 +59,17 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
       renderSaveCredentialsForm(null, newPassword)
       return true
     } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
-      renderPasswordGenerator({ input: input })
-      const password = generate({
-        length: 10,
-        numbers: true,
-        uppercase: true,
-        symbols: true,
-        strict: true
-      })
-      autofillValueIntoInput(input, password)
+      // TODO it would make sense to render the password generator here, but renderPasswordGenerator is not implemented yet
+      // renderPasswordGenerator({ input: input })
+      // const password = generate({
+      //   length: 10,
+      //   numbers: true,
+      //   uppercase: true,
+      //   symbols: true,
+      //   strict: true
+      // })
+      // autofillValueIntoInput(input, password)
+
       return true
     }
   }
