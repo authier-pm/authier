@@ -46,6 +46,7 @@ export const autofillEventsDispatched = new Set()
  * @param usefulInputs
  */
 function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
+  // TODO only do this after user confirmation as this could cause user to change their password by mistake-for example when they edit something on their profile and it also has the two password inputs
   for (let index = 0; index < usefulInputs.length - 1; index++) {
     const input = usefulInputs[index]
     if (
