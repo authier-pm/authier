@@ -61,7 +61,7 @@
     "gbs": "cd backend && pnpm gbs",
     "schemas": "pnpm gbs && pnpm gfs",
     "preinstall": "npx only-allow pnpm",
-    "release": "cd web-extension && pnpm run newTag"
+    "release": "cd web-extension && pnpm run release"
   },
   "pnpm": {
     "patchedDependencies": {}

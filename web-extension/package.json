@@ -1,7 +1,7 @@
 {
   "name": "authier-web-extension",
   "displayName": "Authier",
-  "version": "1.1.9",
+  "version": "1.1.10",
   "description": "Authier web Extension for all our supported browsers",
   "license": "AGPL-3.0-or-later",
   "webExt": {
@@ -10,7 +10,7 @@
   "scripts": {
     "prodBuild": "NODE_ENV=production webpack --config webpack.prod.js",
     "devBuild": "webpack --config webpack.dev.js",
-    "newTag": "npm version patch && git add package.json && npx tsx ./scripts/generateExtensionManifest.ts && npx tsx ./scripts/newTag.ts",
+    "release": "npm version patch && git add package.json && npx tsx ./scripts/generateExtensionManifest.ts && npx tsx ./scripts/release.ts",
     "generateManifest": "npx tsx ./scripts/generateExtensionManifest.ts",
     "clean": "rm -rf dist/js",
     "checkBuildOutput": "node ./check-es6.js",
