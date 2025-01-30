@@ -96,6 +96,9 @@ jobs:
           envFile: './.github/workflows/constants.env'
           expand: true
 
+      - name: Wait for CRX to be available
+        run: sleep 60 # Wait 1 minute for the CRX to be processed
+
       - name: Download published crx file
         id: gWebStoreDownloadCrx
         uses: cardinalby/webext-buildtools-chrome-webstore-download-crx-action@v1
