@@ -36,7 +36,8 @@ module.exports = {
       ]
     }),
     new webpack.ProvidePlugin({
-      Buffer: ['buffer', 'Buffer']
+      Buffer: ['buffer', 'Buffer'],
+      process: 'process/browser'
     }),
     new HtmlWebpackPlugin({
       scriptLoading: 'blocking',
@@ -98,6 +99,12 @@ module.exports = {
         }
       },
       {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false
+        }
+      },
+      {
         exclude: /node_modules/,
         test: /src\/content-script.*\.tsx?$/,
         use: {
@@ -133,7 +140,9 @@ module.exports = {
     fallback: {
       crypto: require.resolve('crypto-browserify'),
       buffer: require.resolve('buffer'),
-      stream: require.resolve('stream-browserify')
+      stream: require.resolve('stream-browserify'),
+      vm: require.resolve('vm-browserify'),
+      process: require.resolve('process/browser')
     }
   }
 }

@@ -9,7 +9,7 @@ import {
   HStack,
   useColorModeValue
 } from '@chakra-ui/react'
-import { CopyIcon, DeleteIcon, EditIcon } from '@chakra-ui/icons'
+import { CopyIcon, EditIcon } from '@chakra-ui/icons'
 import { FixedSizeList as List } from 'react-window'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
@@ -187,13 +187,7 @@ export function TableList({ filter }: { filter: string }) {
             </Tooltip>
             <DeleteSecretButton
               secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
-            >
-              <IconButton
-                colorScheme="red"
-                aria-label="Delete"
-                icon={<DeleteIcon />}
-              />
-            </DeleteSecretButton>
+            ></DeleteSecretButton>
           </HStack>
         </Flex>
       </Flex>

@@ -10,7 +10,6 @@ import { useNavigate } from 'react-router-dom'
 import { useFormikContext } from 'formik'
 
 import { DeleteSecretButton } from './DeleteSecretButton'
-import { DeleteIcon } from '@chakra-ui/icons'
 import { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { IoDuplicate } from 'react-icons/io5'
 import { t } from '@lingui/macro'
@@ -46,15 +45,8 @@ export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
       </Button>
       {secret && (
         <HStack spacing={10}>
-          <DeleteSecretButton secrets={[secret]}>
-            <Tooltip label={t`delete secret`}>
-              <IconButton
-                colorScheme="red"
-                aria-label="Delete"
-                icon={<DeleteIcon />}
-              />
-            </Tooltip>
-          </DeleteSecretButton>
+          <DeleteSecretButton secrets={[secret]}></DeleteSecretButton>
+
           <Tooltip label={t`copy whole secret`}>
             <IconButton
               onClick={() => {

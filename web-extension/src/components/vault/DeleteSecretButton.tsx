@@ -1,4 +1,6 @@
-import { useDisclosure } from '@chakra-ui/react'
+import { DeleteIcon } from '@chakra-ui/icons'
+import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
+import { t } from '@lingui/core/macro'
 import {
   useDeleteEncryptedSecretMutation,
   useRemoveEncryptedSecretsMutation
@@ -12,12 +14,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 
 interface DeleteSecretButtonProps {
   secrets: SecretTypeUnion[]
-  children: React.ReactElement
 }
 
 export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
-  secrets,
-  children
+  secrets
 }) => {
   const { setSelectedItems } = useContext(DeviceStateContext)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -26,13 +26,16 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
   const [removeEncryptedSecrets] = useRemoveEncryptedSecretsMutation()
 
-  const modifiedChildren = React.cloneElement(children, {
-    onClick: onOpen
-  })
-
   return (
     <>
-      {modifiedChildren}
+      <Tooltip label={t`delete secret`}>
+        <IconButton
+          colorScheme="red"
+          aria-label={t`delete secret`}
+          icon={<DeleteIcon />}
+          onClick={onOpen}
+        />
+      </Tooltip>
       <DeleteAlert
         isOpen={isOpen}
         onClose={onClose}
