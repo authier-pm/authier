@@ -37,9 +37,10 @@ import { NavLink as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
 import { ChevronDownIcon, LockIcon } from '@chakra-ui/icons'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 import { ColorModeButton } from '../ColorModeButton'
 import { TbLogout } from 'react-icons/tb'
+import browser from 'webextension-polyfill'
 
 interface LinkItemProps {
   title: JSX.Element
@@ -85,7 +86,7 @@ export default function SidebarWithHeader({
         onClose={onClose}
         returnFocusOnClose={false}
         onOverlayClick={onClose}
-        size="full"
+        size={'xs'}
       >
         <DrawerContent>
           <SidebarContent onClose={onClose} />
@@ -111,11 +112,11 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
   }
   return (
     <Flex
-      transition="1s ease"
+      transition="0.5s ease"
       bg={useColorModeValue('cyan.800', 'gray.800')}
       borderRight="1px"
       borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: 'full', md: 60 }}
+      w={{ base: '400px', md: 60 }}
       pos="fixed"
       h="full"
       flexDirection="column"
@@ -126,25 +127,36 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
         justifyContent={'flex-end'}
         flexDirection="column"
         height="inherit"
-        w={{ base: 'full', md: 60 }}
+        w={{ base: '400px', md: 60 }}
       >
-        <Flex
-          h={'72px'}
-          alignItems="center"
-          mx="8"
-          justifyContent="space-between"
-        >
-          <Text fontSize="2xl" fontFamily="monospace" fontWeight="bold">
-            Authier2
+        <Flex h={'72px'} alignItems="center" mx="6">
+          <Box
+            className="iconAuthier"
+            boxSize={8}
+            mr={3}
+            style={{
+              backgroundImage: `url('${browser.runtime.getURL('icon-128.png')}')`,
+              backgroundSize: 'cover',
+              borderRadius: '20%'
+            }}
+          ></Box>
+          <Text fontSize="xl" fontWeight="bold">
+            Authier
           </Text>
           <CloseButton
+            ml="auto"
             display={{ base: 'flex', md: 'none' }}
             onClick={onClose}
           />
         </Flex>
         <Flex flexDirection="column" height="100%">
           {LinkItems.map((link, i) => (
-            <NavItem key={i} icon={link.icon} path={link.path}>
+            <NavItem
+              key={i}
+              icon={link.icon}
+              path={link.path}
+              onClick={onClose}
+            >
               {link.title}
             </NavItem>
           ))}

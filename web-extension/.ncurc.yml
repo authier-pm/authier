@@ -1,0 +1,6 @@
+upgrade: true
+reject:
+  - react
+  - react-dom
+  - react-router-dom
+  - react-test-renderer
