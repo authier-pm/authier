@@ -41,9 +41,11 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
       endpointSecret
     )
   } catch (err: any) {
+    console.error(err)
     reply.status(400).send(`Webhook Error: ${err.message}`)
     return
   }
+  log('event', event)
 
   let subscription: { status: string }
   let status: string
