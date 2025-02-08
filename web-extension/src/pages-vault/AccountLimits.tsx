@@ -163,7 +163,7 @@ export const AccountLimits = () => {
             <List spacing={3} textAlign="start" px={12}>
               <ListItem>
                 <ListIcon as={FaCheckCircle} color="green.500" />
-                additional 60 login secrets
+                additional 250 login secrets
               </ListItem>
             </List>
             <Button
@@ -207,7 +207,7 @@ export const AccountLimits = () => {
             <List spacing={3} textAlign="start" px={12}>
               <ListItem>
                 <ListIcon as={FaCheckCircle} color="green.500" />
-                additional 20 TOTP secrets
+                additional 100 TOTP secrets
               </ListItem>
             </List>
             <Button
@@ -272,11 +272,11 @@ export const AccountLimits = () => {
               <List spacing={3} textAlign="start" px={12}>
                 <ListItem>
                   <ListIcon as={FaCheckCircle} color="green.500" />
-                  additional 60 login secrets
+                  additional 250 login secrets
                 </ListItem>
                 <ListItem>
                   <ListIcon as={FaCheckCircle} color="green.500" />
-                  additional 20 TOTP secrets
+                  additional 100 TOTP secrets
                 </ListItem>
               </List>
               <Button
