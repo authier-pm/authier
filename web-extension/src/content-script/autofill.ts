@@ -31,6 +31,7 @@ import {
   WebInputsArrayClientSide
 } from '../background/WebInputForAutofill'
 import { wait } from './wait'
+import { filterUselessInputs } from './getAllInputsIncludingShadowDom'
 
 const log = debug('au:autofill')
 
@@ -192,39 +193,6 @@ export const fillStringIntoInput = ({
   return el
 }
 
-const uselessInputTypes = [
-  'hidden',
-  'submit',
-  'button',
-  'reset',
-  'button',
-  'checkbox',
-  'radio',
-  'file',
-  'color',
-  'image',
-  'range',
-  'search',
-  'time'
-]
-/**
- * @returns elements on the page which are visible and of type text, email, password, tel
- */
-const filterUselessInputs = (documentBody: HTMLElement) => {
-  const inputEls = documentBody.querySelectorAll('input')
-  const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
-    (el) => {
-      return (
-        uselessInputTypes.includes(el.type) === false &&
-        el.offsetWidth > 0 && // filter out hidden elements
-        el.offsetHeight > 0 &&
-        el.value === '' // filter out elements that already have a value
-      )
-    }
-  )
-  return inputElsArray
-}
-
 export const getElementCoordinates = (el: HTMLElement) => {
   const rect = el.getBoundingClientRect()
   return {
@@ -278,13 +246,34 @@ export const autofill = (initState: IInitStateRes) => {
 
     //Register screen
     //After certain condition is met, we can assume this is register page
-    log('usefulInputs', usefulInputs)
 
     if (usefulInputs.length === 0) {
       await wait(400)
 
       usefulInputs = filterUselessInputs(body)
     }
+
+    if (usefulInputs.length === 0) {
+      const filledInputs = (await trpc.executeMainWorldAutofillFunction.mutate(
+        secretsForHost.loginCredentials.map((cred) => ({
+          username: cred.loginCredentials.username,
+          password: cred.loginCredentials.password,
+          lastUsedAt: cred.lastUsedAt ?? null
+        }))
+      )) as Array<{
+        webInputType: WebInputType | null
+        username: string | null
+      }>
+
+      const filled = filledInputs.find(
+        (input) => input.webInputType === WebInputType.PASSWORD
+      )
+      if (filled) {
+        notyf.success(`Autofilled password for ${filled.username}`)
+      }
+    }
+
+    log('usefulInputs', usefulInputs)
 
     if (usefulInputs.length >= 2) {
       const isNewPassword = handleNewPasswordCase(usefulInputs)

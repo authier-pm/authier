@@ -37,7 +37,7 @@ export async function getManifest() {
       128: 'icon-128.png'
     },
     host_permissions: ['<all_urls>'],
-    permissions: ['activeTab', 'storage', 'tabs', 'clipboardRead'],
+    permissions: ['activeTab', 'storage', 'tabs', 'clipboardRead', 'scripting'],
     web_accessible_resources: [
       {
         resources: ['*.png'],

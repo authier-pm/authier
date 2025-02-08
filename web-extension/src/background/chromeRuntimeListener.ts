@@ -27,6 +27,7 @@ import { z } from 'zod'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
+import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludingShadowDom'
 
 const log = debug('au:chListener')
 
@@ -196,6 +197,26 @@ const appRouter = tc.router({
           webInputs: [input]
         }
       })
+    }),
+  executeMainWorldAutofillFunction: tcProcedure
+    .input(
+      z.array(
+        loginCredentialSchema.extend({ lastUsedAt: z.string().nullable() })
+      )
+    )
+    .mutation(async ({ ctx, input }) => {
+      // @ts-expect-error
+      const tab = ctx.sender.tab
+      if (!tab?.id) return []
+
+      const results = await browser.scripting.executeScript({
+        target: { tabId: tab.id },
+        world: 'MAIN',
+        func: mainWorldAutofillFunction,
+        args: [input]
+      })
+
+      return results[0]?.result || []
     }),
   getFallbackUsernames: tcProcedure.query(async () => {
     const deviceState = device.state

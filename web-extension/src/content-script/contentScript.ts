@@ -220,15 +220,6 @@ export async function initInputWatch() {
 
 initInputWatch()
 
-// document.addEventListener('readystatechange', (event) => {
-//   if (
-//     event.target instanceof Document &&
-//     event.target?.readyState === 'complete'
-//   ) {
-//     initInputWatch()
-//   }
-// })
-
 // For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
 let lastUrl = location.href
 new MutationObserver(() => {
