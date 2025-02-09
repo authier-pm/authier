@@ -169,7 +169,7 @@ export function Register({ navigation }: NavigationProps) {
         Welcome
       </Heading>
       <Heading mt="1" fontWeight="medium" size="xs">
-        Beware that authier is in public preview, so we advise not to use it for
+        Beware that Authier is in public preview, so we advise not to use it for
         important passwords just yet. We will assess the security of the app
         before we recommend it for all your passwords, including important ones.
       </Heading>

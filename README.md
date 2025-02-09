@@ -1,6 +1,6 @@
-# authier
+# Authier
 
-monorepo for authier password manager
+monorepo for Authier password manager
 Includes:
 
 - web extension
@@ -51,7 +51,7 @@ Refer to readme inside each sub project for all the instructions. Generally you 
 
 Authier is a non profit organization. If we ever see any profit from this project, it will be divided at the end each month proportionally according to the latest numbers in `contrib-locs.json`.
 
-If you contribute to authier, your PR gets merged and from next month you will be eligible for a small portion of the profit.
+If you contribute to Authier, your PR gets merged and from next month you will be eligible for a small portion of the profit.
 For now this happens manually. We cannot open source our stripe dashboard, but we will expose publicly our stripe balance if there are more than 4 contributors. ATM it's just 2 contributors.
 
 ## Contrib locs

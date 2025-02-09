@@ -460,7 +460,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 }
 
 /**
- * This class is used to manage the state of authier extension. It is used in vault, popup and service worker.
+ * This class is used to manage the state of Authier extension. It is used in vault, popup and service worker.
  * Leverages local storage to store the state of the device and events to keep the state in sync between vault, popup and service worker
  */
 class ExtensionDevice {
