@@ -19,6 +19,26 @@ export async function renderSaveCredentialsForm(
   const newDiv = document.createElement('div')
   newDiv.id = 'authier-save-prompt'
   loginPrompt = newDiv
+
+  // Create shadow root
+  const shadow = newDiv.attachShadow({ mode: 'closed' })
+
+  // Add base styles to shadow DOM
+  const style = document.createElement('style')
+  style.textContent = `
+    :host {
+      all: initial;
+      position: fixed !important;
+      z-index: 2147483647 !important;
+      font-family: system-ui, -apple-system, sans-serif;
+    }
+  `
+  shadow.appendChild(style)
+
+  // Create container for Preact render
+  const container = document.createElement('div')
+  shadow.appendChild(container)
+
   render(
     <PromptPassword
       username={username}
@@ -26,7 +46,7 @@ export async function renderSaveCredentialsForm(
       // @ts-expect-error TODO fix
       inputEvents={inputEvents}
     />,
-    loginPrompt
+    container
   )
 
   document.body.appendChild(loginPrompt)
