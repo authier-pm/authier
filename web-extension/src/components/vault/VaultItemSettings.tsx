@@ -40,8 +40,12 @@ import {
 } from '@shared/formikSharedTypes'
 import { EditFormButtons } from './EditFormButtons'
 import { IoDuplicateOutline } from 'react-icons/io5'
-import { getWebInputsForUrl } from '@src/background/getWebInputsForUrl'
+import {
+  getWebInputsForUrl,
+  getWebInputsForUrlOfKinds
+} from '@src/background/getWebInputsForUrl'
 import { useRemoveWebInputMutation } from './VaultItemSettings.codegen'
+import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -49,7 +53,12 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
   const [show, setShow] = useState(false)
+  const webInputs = secretProps.totp.url
+    ? getWebInputsForUrlOfKinds(secretProps.totp.url, [WebInputType.TOTP])
+    : []
+  const [removeWebInput] = useRemoveWebInputMutation()
 
+  const toast = useToast()
   const bg = useColorModeValue('cyan.800', 'gray.800')
 
   return (
@@ -63,7 +72,7 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
         display: 'contents'
       }}
     >
-      <Center className='wrapper' height={'100vh'}>
+      <Center className="wrapper" height={'100vh'}>
         <Flex
           width={{ base: '90%', sm: '70%', md: '60%' }}
           mt={4}
@@ -193,6 +202,47 @@ const TOTPSecret = (secretProps: ITOTPSecret) => {
               </Box>
             )}
           </Formik>
+
+          <Box>
+            <Heading size="md" mt={5}>
+              {t`Matching Web inputs`}
+            </Heading>
+
+            <List
+              spacing={3}
+              mt={3}
+              mb={6}
+              bgColor={'gray.500'}
+              p={3}
+              rounded={'md'}
+            >
+              {webInputs.map(({ kind, domPath, url, id }) => (
+                <ListItem key={id}>
+                  {kind} - {domPath} -{' '}
+                  <Button
+                    onClick={async () => {
+                      await removeWebInput({ variables: { id } })
+                      toast({
+                        title: t`Web input removed`,
+                        status: 'success'
+                      })
+
+                      device.setWebInputs(
+                        device.state?.webInputs.filter(
+                          (input) => input.id !== id
+                        ) ?? []
+                      )
+                    }}
+                  >
+                    <Trans>Remove</Trans>
+                  </Button>
+                </ListItem>
+              ))}
+              {webInputs.length === 0 && (
+                <ListItem>{t`No matching web inputs found`}</ListItem>
+              )}
+            </List>
+          </Box>
         </Flex>
       </Center>
     </motion.div>
@@ -209,7 +259,18 @@ const LoginSecret = (secretProps: ILoginSecret) => {
   const [initPassword, setInitPassword] = useState('')
 
   const [updateSecret] = useUpdateEncryptedSecretMutation()
-  const webInputs = getWebInputsForUrl(secretProps.loginCredentials.url)
+  const webInputs = getWebInputsForUrlOfKinds(
+    secretProps.loginCredentials.url,
+    [
+      WebInputType.USERNAME_OR_EMAIL,
+      WebInputType.PASSWORD,
+      WebInputType.EMAIL,
+      WebInputType.USERNAME,
+      WebInputType.NEW_PASSWORD,
+      WebInputType.NEW_PASSWORD_CONFIRMATION,
+      WebInputType.SUBMIT_BUTTON
+    ]
+  )
   const [removeWebInput] = useRemoveWebInputMutation()
 
   return (
@@ -223,8 +284,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
         display: 'contents'
       }}
     >
-      <Center className='wrapper' height={'100vh'}>
-
+      <Center className="wrapper" height={'100vh'}>
         <Flex
           width={{ base: '90%', sm: '70%', md: '60%' }}
           mt={4}
@@ -339,7 +399,11 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                               type={show ? 'text' : 'password'}
                             />
                             <InputRightElement width="4.5rem">
-                              <Button h="1.75rem" size="sm" onClick={handleClick}>
+                              <Button
+                                h="1.75rem"
+                                size="sm"
+                                onClick={handleClick}
+                              >
                                 {show ? 'Hide' : 'Show'}
                               </Button>
                             </InputRightElement>
@@ -384,7 +448,9 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         <IconButton
                           w="min-content"
                           aria-label="Open password generator"
-                          icon={isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />}
+                          icon={
+                            isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />
+                          }
                           onClick={onToggle}
                           m={3}
                         />
@@ -401,35 +467,39 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                       {t`Matching Web inputs`}
                     </Heading>
 
-                    <List spacing={3} mt={3} mb={6} bgColor={'gray.500'} p={3} rounded={'md'}>
-                      {webInputs.map(
-                        ({ kind, domPath, url, id }) => (
-                          <ListItem key={id}>
-                            {kind} - {domPath} - <Button onClick={async () => {
+                    <List
+                      spacing={3}
+                      mt={3}
+                      mb={6}
+                      bgColor={'gray.500'}
+                      p={3}
+                      rounded={'md'}
+                    >
+                      {webInputs.map(({ kind, domPath, url, id }) => (
+                        <ListItem key={id}>
+                          {kind} - {domPath} -{' '}
+                          <Button
+                            onClick={async () => {
                               await removeWebInput({ variables: { id } })
-                              toast(
-                                {
-                                  title: t`Web input removed`,
-                                  status: 'success'
-                                }
-                              )
+                              toast({
+                                title: t`Web input removed`,
+                                status: 'success'
+                              })
 
                               device.setWebInputs(
                                 device.state?.webInputs.filter(
                                   (input) => input.id !== id
                                 ) ?? []
                               )
-                            }}>
-                              <Trans>
-                                Remove
-                              </Trans>
-                            </Button>
-                          </ListItem>
-                        )
+                            }}
+                          >
+                            <Trans>Remove</Trans>
+                          </Button>
+                        </ListItem>
+                      ))}
+                      {webInputs.length === 0 && (
+                        <ListItem>{t`No matching web inputs found`}</ListItem>
                       )}
-                      {
-                        webInputs.length === 0 && <ListItem>{t`No matching web inputs found`}</ListItem>
-                      }
                     </List>
                   </Box>
                 </Box>
@@ -438,7 +508,6 @@ const LoginSecret = (secretProps: ILoginSecret) => {
           </Formik>
         </Flex>
       </Center>
-
     </motion.div>
   )
 }

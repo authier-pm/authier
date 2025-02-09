@@ -108,7 +108,7 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               onClick={() => {
                 // TODO log usage of this token to backend
                 browser.runtime.sendMessage({
-                  kind: PopupActionsEnum.TOTP_COPIED,
+                  kind: PopupActionsEnum.TOTP_FILL_ON_CLICK,
                   event: {
                     otpCode,
                     secretId: totpSecret.id

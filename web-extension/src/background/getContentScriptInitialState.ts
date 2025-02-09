@@ -6,7 +6,6 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
-import { WebInputForAutofill } from './WebInputForAutofill'
 import { getWebInputsForUrl } from './getWebInputsForUrl'
 const log = debug('au:getContentScriptInitialState')
 

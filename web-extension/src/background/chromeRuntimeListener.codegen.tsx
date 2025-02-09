@@ -8,7 +8,7 @@ export type AddWebInputsMutationVariables = Types.Exact<{
 }>;
 
 
-export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number }> };
+export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number, createdAt: string }> };
 
 export type WebInputsForHostsQueryVariables = Types.Exact<{
   hosts?: Types.InputMaybe<Array<Types.Scalars['String']['input']> | Types.Scalars['String']['input']>;
@@ -22,6 +22,7 @@ export const AddWebInputsDocument = gql`
     mutation addWebInputs($webInputs: [WebInputElement!]!) {
   addWebInputs(webInputs: $webInputs) {
     id
+    createdAt
   }
 }
     `;
@@ -89,6 +90,11 @@ export function useWebInputsForHostsLazyQuery(baseOptions?: Apollo.LazyQueryHook
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
         }
+export function useWebInputsForHostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
+        }
 export type WebInputsForHostsQueryHookResult = ReturnType<typeof useWebInputsForHostsQuery>;
 export type WebInputsForHostsLazyQueryHookResult = ReturnType<typeof useWebInputsForHostsLazyQuery>;
+export type WebInputsForHostsSuspenseQueryHookResult = ReturnType<typeof useWebInputsForHostsSuspenseQuery>;
 export type WebInputsForHostsQueryResult = Apollo.QueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;

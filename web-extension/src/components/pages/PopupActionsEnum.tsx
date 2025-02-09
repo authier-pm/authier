@@ -1,3 +1,3 @@
 export enum PopupActionsEnum {
-  TOTP_COPIED = 'TOTP_COPIED'
+  TOTP_FILL_ON_CLICK = 'TOTP_FILL_ON_CLICK'
 }

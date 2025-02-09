@@ -28,6 +28,7 @@ import { openVaultTab } from '@src/AuthLinkPage'
 import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
 import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludingShadowDom'
+import { constructURL } from '@shared/urlUtils'
 
 const log = debug('au:chListener')
 
@@ -188,7 +189,9 @@ const appRouter = tc.router({
   addTOTPInput: tcProcedure
     .input(webInputElementSchema)
     .mutation(async ({ input }) => {
-      await apolloClient.mutate<
+      const hostname = constructURL(input.url).hostname
+
+      const res = await apolloClient.mutate<
         AddWebInputsMutationResult,
         AddWebInputsMutationVariables
       >({
@@ -197,6 +200,18 @@ const appRouter = tc.router({
           webInputs: [input]
         }
       })
+      const resData = res.data?.data?.addWebInputs[0]
+      if (!resData || !hostname) {
+        throw new Error('no data returned from addWebInputs')
+      }
+      const forDeviceState = {
+        ...input,
+        id: resData.id,
+        createdAt: resData.createdAt,
+        host: hostname
+      }
+
+      device.state?.webInputs.push(forDeviceState)
     }),
   executeMainWorldAutofillFunction: tcProcedure
     .input(

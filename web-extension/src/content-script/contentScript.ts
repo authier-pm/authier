@@ -236,7 +236,7 @@ browser.runtime.onMessage.addListener(
     kind: PopupActionsEnum
     event?: { otpCode: string; secretId: string }
   }) => {
-    if (message.kind === PopupActionsEnum.TOTP_COPIED) {
+    if (message.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
       async function elementSelected(event) {
         event.preventDefault()
         event.stopPropagation() // Stop the event from propagating further

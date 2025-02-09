@@ -1,5 +1,6 @@
 import { constructURL } from '@shared/urlUtils'
 import { device } from './ExtensionDevice'
+import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 
 export const getWebInputsForUrl = (url: string) => {
   const hostname = constructURL(url).hostname
@@ -36,4 +37,11 @@ export const getWebInputsForUrl = (url: string) => {
   }
 
   return []
+}
+
+export const getWebInputsForUrlOfKinds = (
+  url: string,
+  kinds: WebInputType[]
+) => {
+  return getWebInputsForUrl(url).filter((i) => kinds.includes(i.kind))
 }
