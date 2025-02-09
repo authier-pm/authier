@@ -19,7 +19,7 @@ import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   bufferToBase64,

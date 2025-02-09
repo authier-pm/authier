@@ -23,7 +23,7 @@ import { AutoSizer } from 'react-virtualized'
 import { Link, useLocation } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { authenticator } from 'otplib'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 
 export function TableList({ filter }: { filter: string }) {
   const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)

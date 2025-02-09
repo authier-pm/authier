@@ -14,7 +14,7 @@ import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
 } from '@shared/graphql/DefaultSettings.codegen'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { Formik, FormikHelpers, Field } from 'formik'

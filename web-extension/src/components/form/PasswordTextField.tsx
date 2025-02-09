@@ -8,9 +8,9 @@ import {
   InputGroup,
   InputRightElement
 } from '@chakra-ui/react'
-import { Trans } from '@lingui/react'
+import { Trans } from '@lingui/react/macro'
 import { useTsController, useDescription } from '@ts-react/form'
-import { useState } from 'react'
+import { useState, ReactNode } from 'react'
 
 export function PasswordTextField() {
   const {
@@ -20,6 +20,10 @@ export function PasswordTextField() {
   const { label, placeholder } = useDescription()
   const [showPassword, setShowPassword] = useState(false)
   const isError = error?.errorMessage !== undefined
+
+  if (!label) {
+    return null
+  }
 
   return (
     <FormControl isInvalid={isError}>

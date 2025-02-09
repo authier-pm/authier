@@ -28,7 +28,7 @@ import { TableList } from '@src/components/vault/TableList'
 import browser from 'webextension-polyfill'
 import { StringParam, useQueryParam, withDefault } from 'use-query-params'
 
-export const VaultList = ({ tableView, type }) => {
+export const VaultList = ({ tableView }: { tableView: boolean }) => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
 

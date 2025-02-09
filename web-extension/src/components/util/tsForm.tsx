@@ -42,5 +42,5 @@ const mapping = [
   [selectNumberFieldSchema, SelectNumberField] as const
 ] as const // 👈 `as const` is necessary
 
-// A typesafe React component
+// @ts-expect-error TODO fix
 export const Form = createTsForm(mapping, { FormComponent })
