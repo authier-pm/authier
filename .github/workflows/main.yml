@@ -38,6 +38,7 @@ jobs:
     env:
       APPNAME: authier-api
       AWS_REGION: eu-central-1
+      DEBUG: au:*
       AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
