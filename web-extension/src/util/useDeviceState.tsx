@@ -66,6 +66,12 @@ export interface ISecuritySettingsInBg {
 
 let storageOnchangeListenerRegistered = false // we need to only register once
 
+export const pathNameToTypes = {
+  '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
+  '/totps': [EncryptedSecretType.TOTP],
+  '/': [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+}
+
 export function useDeviceState() {
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')

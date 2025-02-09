@@ -19,7 +19,10 @@ import debug from 'debug'
 import Login from './Login'
 import browser from 'webextension-polyfill'
 import { ApolloProvider } from '@apollo/client'
-import { apolloClient, apolloClientWithoutTokenRefresh } from '@src/apollo/apolloClient'
+import {
+  apolloClient,
+  apolloClientWithoutTokenRefresh
+} from '@src/apollo/apolloClient'
 
 const log = debug('au:VaultRouter')
 
@@ -49,7 +52,7 @@ export function VaultRouter() {
 
   if (deviceState === null) {
     return (
-      <ApolloProvider client={apolloClientWithoutTokenRefresh} >
+      <ApolloProvider client={apolloClientWithoutTokenRefresh}>
         <Center marginX="50%" h="100vh">
           <Routes>
             <Route path="/" element={<Login />}></Route>
@@ -78,6 +81,14 @@ export function VaultRouter() {
             path="/"
             element={<VaultList tableView={vaultTableView} />}
           ></Route>
+          <Route
+            path="/credentials"
+            element={<VaultList tableView={vaultTableView} />}
+          ></Route>
+          <Route
+            path="/totps"
+            element={<VaultList tableView={vaultTableView} />}
+          ></Route>
           <Route path="/secret/:secretId" element={<VaultItemSettings />} />
           <Route path="/account-limits" element={<AccountLimits />}></Route>
           <Route path="/settings/*" element={<VaultSettings />}></Route>
@@ -87,6 +98,5 @@ export function VaultRouter() {
         </Routes>
       </SidebarWithHeader>
     </ApolloProvider>
-
   )
 }

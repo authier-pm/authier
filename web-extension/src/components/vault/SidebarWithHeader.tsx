@@ -30,7 +30,9 @@ import {
   FiMenu,
   FiChevronDown,
   FiHardDrive,
-  FiDisc
+  FiDisc,
+  FiKey,
+  FiLock
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { NavLink as RouterLink } from 'react-router-dom'
@@ -48,7 +50,6 @@ interface LinkItemProps {
   path: string
 }
 const LinkItems: Array<LinkItemProps> = [
-  { title: <Trans>Vault</Trans>, icon: FiHome, path: '/' },
   {
     title: <Trans>Settings</Trans>,
     icon: FiSettings,
@@ -150,6 +151,21 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
           />
         </Flex>
         <Flex flexDirection="column" height="100%">
+          <NavItem icon={FiHome} path="/" onClick={onClose}>
+            <Trans>Vault</Trans>
+          </NavItem>
+          <NavItem
+            level={1}
+            icon={FiLock}
+            path="/credentials"
+            onClick={onClose}
+          >
+            <Trans>Credentials</Trans>
+          </NavItem>
+          <NavItem level={1} icon={FiKey} path="/totps" onClick={onClose}>
+            <Trans>TOTPs</Trans>
+          </NavItem>
+
           {LinkItems.map((link, i) => (
             <NavItem
               key={i}
@@ -233,9 +249,10 @@ const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
 interface NavItemProps extends FlexProps {
   icon: IconType
   path: string
+  level?: number
   children: JSX.Element
 }
-const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
+const NavItem = ({ icon, path, level, children, ...rest }: NavItemProps) => {
   return (
     <Link
       as={RouterLink}
@@ -252,6 +269,7 @@ const NavItem = ({ icon, path, children, ...rest }: NavItemProps) => {
         align="center"
         p="4"
         mx="4"
+        pl={level ? level * 6 : 0}
         borderRadius="lg"
         role="group"
         cursor="pointer"

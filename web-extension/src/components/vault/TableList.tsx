@@ -13,10 +13,14 @@ import { CopyIcon, EditIcon } from '@chakra-ui/icons'
 import { FixedSizeList as List } from 'react-window'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import {
+  ILoginSecret,
+  ITOTPSecret,
+  pathNameToTypes
+} from '@src/util/useDeviceState'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { AutoSizer } from 'react-virtualized'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { authenticator } from 'otplib'
 import { Trans } from '@lingui/macro'
@@ -25,8 +29,10 @@ export function TableList({ filter }: { filter: string }) {
   const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets: search } = useContext(DeviceStateContext)
-  const data = search(debouncedSearchTerm)
 
+  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
+
+  const data = search(debouncedSearchTerm, pathNameToTypes[pathname])
   const handleSelect = (secret: ILoginSecret | ITOTPSecret) => {
     if (selectedItems.includes(secret)) {
       setSelectedItems(selectedItems.filter((s) => s !== secret))

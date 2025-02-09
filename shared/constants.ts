@@ -1,4 +1,7 @@
 import { t } from '@lingui/macro'
+import { i18n } from '@lingui/core'
+
+i18n.activate('en')
 
 export const PBKDF2Iterations = 600000 // 600k same as bitwarden
 
