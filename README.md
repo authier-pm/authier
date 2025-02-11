@@ -1,3 +1,5 @@
+[![Join our Discord](https://dcbadge.vercel.app/api/server/PdGCMeXtFG)](https://discord.gg/PdGCMeXtFG)
+
 # Authier
 
 monorepo for Authier password manager
