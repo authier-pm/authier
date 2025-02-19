@@ -27,7 +27,7 @@ export const inputFieldSchema = createUniqueFieldSchema(
   'inputStringId'
 )
 export const inputPswFieldSchema = createUniqueFieldSchema(
-  z.string().min(process.env.NODE_ENV === 'development' ? 1 : 10),
+  z.string().min(process.env.NODE_ENV === 'development' ? 1 : 8),
   'inputPswId'
 )
 

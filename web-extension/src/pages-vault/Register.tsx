@@ -12,7 +12,8 @@ import {
   InputGroup,
   InputRightElement,
   Spinner,
-  Text
+  Text,
+  useToast
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
@@ -43,6 +44,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
+  const toast = useToast()
 
   const { fireToken } = device
   if (!fireToken) {
@@ -64,6 +66,14 @@ export default function Register() {
           const deviceId = await device.getDeviceId()
 
           const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
+
+          if (values.password.length < 8) {
+            toast({
+              title: 'Password must be at least 8 characters long',
+              status: 'error'
+            })
+            return
+          }
 
           const masterEncryptionKey = await generateEncryptionKey(
             values.password,
