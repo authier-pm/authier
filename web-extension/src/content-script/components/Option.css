@@ -1,4 +1,4 @@
-.dropdown {
+.authier-dropdown {
   position: relative;
   display: inline-block;
 
@@ -6,7 +6,7 @@
   max-height: 100px;
 }
 
-.dropdown-content {
+.authier-dropdown-content {
   display: none;
   position: absolute;
   background-color: #f1f1f1;
@@ -15,22 +15,22 @@
   z-index: 1;
 }
 
-.dropdown-content a {
+.authier-dropdown-content a {
   color: black;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
 }
 
-.dropdown-content a:hover {
+.authier-dropdown-content a:hover {
   background-color: #ddd;
 }
 
-.dropdown:hover .dropdown-content {
+.authier-dropdown:hover .authier-dropdown-content {
   display: block;
 }
 
-.iconAuthier {
+.authier-logo-icon {
   height: 25px;
   width: 25px;
   display: block;
