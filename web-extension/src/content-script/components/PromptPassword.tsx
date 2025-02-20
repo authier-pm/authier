@@ -94,7 +94,8 @@ export const PromptPassword = ({
         position: 'fixed',
         padding: '8px',
         backgroundColor: '#64cabd',
-        top: '0px'
+        top: '0px',
+        left: '0px'
       }}
     >
       <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
