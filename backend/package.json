@@ -53,7 +53,7 @@
     "stripe": "^17.6.0",
     "type-graphql": "npm:@capaj/type-graphql@2.0.0-alpha.1",
     "typescript": "^5.7.3",
-    "uuid": "^11.0.5"
+    "uuid": "^11.1.0"
   },
   "devDependencies": {
     "@anatine/esbuild-decorators": "^0.2.19",
@@ -61,7 +61,7 @@
     "@cjsa/cpy": "^9.0.1",
     "@faker-js/faker": "^9.5.0",
     "@mermaid-js/mermaid-cli": "^11.4.2",
-    "@swc/core": "^1.10.17",
+    "@swc/core": "^1.10.18",
     "@types/graphql-list-fields": "^2.0.7",
     "@types/lodash.set": "^4.3.9",
     "@types/node-mailjet": "^3.3.12",
@@ -80,7 +80,7 @@
     "sql-highlight": "^6.0.0",
     "ts-node": "^10.9.2",
     "unplugin-swc": "^1.5.1",
-    "vite": "^6.1.0",
+    "vite": "^6.1.1",
     "vitest": "^3.0.6"
   },
   "scripts": {
