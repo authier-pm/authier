@@ -233,6 +233,10 @@ export function mainWorldAutofillFunction(
     username: string | null
   }> = []
 
+  if (loginCredentials.length === 0) {
+    return []
+  }
+
   const recentlyUsedLogin = loginCredentials.sort((a, b) => {
     return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
   })[0]

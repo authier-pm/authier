@@ -126,6 +126,9 @@ export async function initInputWatch() {
 
   /**
    * responsible for saving new web inputs
+   *
+   * TODO fix when inputs are wrapped in shadow DOM. In those cases we get the ev.target as shadow root and inside there can be multiple inputs.
+   * this is an issue on github.com for example.
    */
   const debouncedInputEventListener = debounce((ev) => {
     log('Caught action', ev, ev.type)
