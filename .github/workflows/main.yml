@@ -147,7 +147,7 @@ jobs:
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
         run: |
           pnpm tsc
-
+          pnpm test
       # - name: Install Playwright Browsers & Run Playwright tests with backend
       #   if: steps.changes.outputs.backend == 'true'
       #   working-directory: ./web-extension
