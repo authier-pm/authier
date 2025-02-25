@@ -24,14 +24,14 @@ describe('DOMEventsRecorder', () => {
       expect(recorder.toJSON()).toMatchInlineSnapshot(`
         [
           {
-            "cssSelector": "INPUT",
+            "cssSelector": "INPUT[type="text"]",
             "domOrdinal": 0,
             "inputted": undefined,
             "kind": "USERNAME_OR_EMAIL",
             "type": "input",
           },
           {
-            "cssSelector": "INPUT",
+            "cssSelector": "INPUT[type="text"]",
             "domOrdinal": 0,
             "inputted": undefined,
             "kind": "PASSWORD",

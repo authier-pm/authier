@@ -1,0 +1,7 @@
+---
+description: project rule
+globs: 
+alwaysApply: true
+---
+
+- always use pnpm
