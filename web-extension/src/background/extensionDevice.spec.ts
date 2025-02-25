@@ -46,10 +46,7 @@ vi.mock('./ExtensionDevice', async () => {
   }
 })
 
-// Import after mocking
-import { extensionDeviceTrpc } from './ExtensionDevice'
-
-describe.only('ExtensionDevice', () => {
+describe('ExtensionDevice', () => {
   beforeEach(() => {
     location.href = 'chrome-extension://mock-extension-id/'
     vi.clearAllMocks()
