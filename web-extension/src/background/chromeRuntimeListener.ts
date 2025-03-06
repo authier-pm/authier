@@ -308,7 +308,6 @@ createChromeHandler({
 
 console.log('background page loaded')
 
-// @ts-expect-error
 browser.runtime.onMessage.addListener((request) => {
   chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
     const firstTabId = tabs[0].id
