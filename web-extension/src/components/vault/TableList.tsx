@@ -182,7 +182,7 @@ export function TableList({ filter }: { filter: string }) {
             <Tooltip label="Edit" aria-label="Edit">
               <Link
                 to={{
-                  pathname: `secret/${row.id}`
+                  pathname: `/secret/${row.id}`
                 }}
                 state={{
                   data: isTotp ? row.totp : row.loginCredentials

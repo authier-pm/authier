@@ -108,7 +108,7 @@ export function VaultListItem({
               }}
               aria-label="edit_item"
               to={{
-                pathname: `secret/${secret.id}`
+                pathname: `/secret/${secret.id}`
               }}
               state={{ data: secret }}
             >
