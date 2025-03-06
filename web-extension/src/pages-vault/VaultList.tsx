@@ -16,7 +16,7 @@ import {
   InputRightElement,
   Flex
 } from '@chakra-ui/react'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/macro'
 import { useNavigate } from 'react-router-dom'
