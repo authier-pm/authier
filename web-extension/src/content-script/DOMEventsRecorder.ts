@@ -41,27 +41,28 @@ export class DOMEventsRecorder {
   }
 
   toJSON(): ICapturedInput[] {
-    return this.capturedInputEvents.map(
+    const json = this.capturedInputEvents.map(
       ({ element, inputted, eventType: type, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
 
-        if (
-          kind === null && // this can happen when the input for username is just a plain input with no attribute type="username"
-          nextEvent &&
-          nextEvent.kind === WebInputType.PASSWORD
-        ) {
-          kind = WebInputType.USERNAME_OR_EMAIL
+        if (kind === null) {
+          if (nextEvent && nextEvent.kind === WebInputType.PASSWORD) {
+            kind = WebInputType.USERNAME_OR_EMAIL // this can happen when the input for username is just a plain input with no attribute type="username"
+          } else {
+            console.warn('kind is null', element)
+          }
         }
 
         return {
           cssSelector: getSelectorForElement(element).css,
           domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
-          kind: kind as WebInputType,
+          kind: kind,
           inputted
         }
       }
     )
+    return json.filter(({ kind }) => kind !== null)
   }
 
   /**
