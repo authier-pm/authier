@@ -62,7 +62,7 @@ export class DOMEventsRecorder {
         }
       }
     )
-    return json.filter(({ kind }) => kind !== null)
+    return json.filter(({ kind }) => kind !== null) as ICapturedInput[]
   }
 
   /**
