@@ -49,6 +49,11 @@ export function useDevicesListLazyQuery(baseOptions?: Apollo.LazyQueryHookOption
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
         }
+export function useDevicesListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+        }
 export type DevicesListQueryHookResult = ReturnType<typeof useDevicesListQuery>;
 export type DevicesListLazyQueryHookResult = ReturnType<typeof useDevicesListLazyQuery>;
+export type DevicesListSuspenseQueryHookResult = ReturnType<typeof useDevicesListSuspenseQuery>;
 export type DevicesListQueryResult = Apollo.QueryResult<DevicesListQuery, DevicesListQueryVariables>;

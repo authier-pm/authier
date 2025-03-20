@@ -9,7 +9,6 @@ const log = debug('prisma:sql')
 const logQueries = debug('mm:prisma')
 
 export const enablePrismaDebug = (client: typeof prismaClient) => {
-  // @ts-expect-error
   client.$on('query', (event: any) => {
     queryCount++
 
@@ -23,7 +22,7 @@ export const enablePrismaDebug = (client: typeof prismaClient) => {
 
     log(highlight(format(queryWithVarsReplaced)))
   })
-  // @ts-expect-error
+
   client.$use(async (params, next) => {
     const before = Date.now()
     // log(params) // use for debugging mysteriously failing prisma queries

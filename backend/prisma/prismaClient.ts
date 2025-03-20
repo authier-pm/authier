@@ -78,5 +78,4 @@ if (debugLogs) {
   enablePrismaDebug(prismaClient)
 }
 
-// @ts-expect-error
 export const dmmf = prismaClient._runtimeDataModel as any

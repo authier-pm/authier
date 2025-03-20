@@ -68,7 +68,6 @@ export const backgroundStateSerializableLockedSchema = z.object({
       id: z.string(),
       encrypted: z.string(),
       kind: z.nativeEnum(EncryptedSecretType),
-      lastUsedAt: z.string().nullable().optional(),
       createdAt: z.string(),
       deletedAt: z.string().nullable().optional(),
       updatedAt: z.string().nullable().optional()

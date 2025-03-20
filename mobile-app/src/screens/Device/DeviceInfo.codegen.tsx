@@ -50,7 +50,7 @@ export const DeviceInfoDocument = gql`
  *   },
  * });
  */
-export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables> & ({ variables: DeviceInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
         return Apollo.useQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
       }
@@ -58,6 +58,11 @@ export function useDeviceInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
+export function useDeviceInfoSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
+        }
 export type DeviceInfoQueryHookResult = ReturnType<typeof useDeviceInfoQuery>;
 export type DeviceInfoLazyQueryHookResult = ReturnType<typeof useDeviceInfoLazyQuery>;
+export type DeviceInfoSuspenseQueryHookResult = ReturnType<typeof useDeviceInfoSuspenseQuery>;
 export type DeviceInfoQueryResult = Apollo.QueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;
