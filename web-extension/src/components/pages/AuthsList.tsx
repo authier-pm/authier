@@ -16,7 +16,7 @@ import { authenticator } from 'otplib'
 
 import { CopyIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 
 import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'

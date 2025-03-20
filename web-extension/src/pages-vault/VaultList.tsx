@@ -18,7 +18,7 @@ import {
 } from '@chakra-ui/react'
 import { useContext, useEffect } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { useNavigate } from 'react-router-dom'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'

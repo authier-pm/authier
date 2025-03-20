@@ -185,9 +185,9 @@ export function useDeviceState() {
           getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
         )
       })
-
+      console.log('secrets', secrets)
       return secrets.sort((a, b) =>
-        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
+        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? -1 : 1
       )
     },
     selectedItems,
