@@ -77,5 +77,5 @@ const debugLogs = process.env.LOG_PRISMA_SQL
 if (debugLogs) {
   enablePrismaDebug(prismaClient)
 }
-
+// @ts-ignore
 export const dmmf = prismaClient._runtimeDataModel as any

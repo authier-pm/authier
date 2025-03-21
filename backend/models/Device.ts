@@ -145,7 +145,11 @@ export class DeviceMutation extends DeviceGQLScalars {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('kind') kind: string,
     @Arg('secretId', () => GraphQLUUID) secretId: string,
-    @Arg('webInputId', () => GraphQLPositiveInt) webInputId: number
+    @Arg('webInputId', () => GraphQLPositiveInt, {
+      nullable: true,
+      description: 'null when user has copied it using a button'
+    })
+    webInputId: number
   ) {
     const res = await ctx.prisma.secretUsageEvent.create({
       data: {

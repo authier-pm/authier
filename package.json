@@ -15,7 +15,7 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
-    "@apollo/client": "^3.13.4",
+    "@apollo/client": "^3.13.5",
     "@chakra-ui/react": "2.10.4",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
@@ -28,8 +28,8 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@types/jest": "^29.5.14",
     "@types/node": "^22.13.10",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
+    "@typescript-eslint/eslint-plugin": "^8.27.0",
+    "@typescript-eslint/parser": "^8.27.0",
     "concurrently": "^9.1.2",
     "eslint": "^9.22.0",
     "eslint-config-prettier": "^10.1.1",

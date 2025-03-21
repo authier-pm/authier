@@ -480,7 +480,10 @@ type DeviceMutation {
   userId: String!
   markAsSynced: DateTime!
   reportSecretUsageEvent(
-    webInputId: PositiveInt!
+    """
+    null when user has copied it using a button
+    """
+    webInputId: PositiveInt
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
