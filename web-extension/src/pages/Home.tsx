@@ -79,7 +79,7 @@ export const Home: FunctionComponent = () => {
           />
         )}
       </Flex>
-      <Box height={300} width={350} pr={5} pl={5} mb={2} mt={2}>
+      <Box height={300} width={350} pr={1} pl={1} mb={2} mt={2}>
         <Grid gap={3} mb={5}>
           <AuthsList filterByTLD={filterByTLD} search={search} />
         </Grid>
