@@ -38,8 +38,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
   useChangeMasterPasswordMutation,
-  useDeleteAccountMutation,
-  useDeviceQuery
+  useDeleteAccountMutation
 } from './Account.codegen'
 import { useDevicesRequestsQuery } from '@shared/graphql/AccountDevices.codegen'
 
