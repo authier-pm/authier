@@ -20,11 +20,12 @@ import {
   Heading,
   List,
   ListItem,
-  Link
+  Link,
+  HStack,
+  VStack
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { passwordStrength } from 'check-password-strength'
 import { ChevronDownIcon, ChevronUpIcon, CloseIcon } from '@chakra-ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -47,6 +48,8 @@ import {
 import { useRemoveWebInputMutation } from './VaultItemSettings.codegen'
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 import { Trans } from '@lingui/react/macro'
+import { formatRelative } from 'date-fns'
+import { evaluatePasswordStrength } from './evaluatePasswordStrength'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps
@@ -361,7 +364,7 @@ const LoginSecret = (secretProps: ILoginSecret) => {
             }}
           >
             {({ values, handleSubmit, errors, touched }) => {
-              const levelOfPsw = passwordStrength(values.password)
+              const levelOfPsw = evaluatePasswordStrength(values.password)
               return (
                 <Box w={'80%'}>
                   <form onSubmit={handleSubmit}>
@@ -371,13 +374,11 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         <Field as={Input} id="url" name="url" />
                         <FormErrorMessage>{errors.url}</FormErrorMessage>
                       </FormControl>
-
                       <FormControl isInvalid={!!errors.label && touched.label}>
                         <FormLabel htmlFor="label">Label:</FormLabel>
                         <Field as={Input} id="label" name="label" />
                         <FormErrorMessage>{errors.label}</FormErrorMessage>
                       </FormControl>
-
                       <FormControl
                         isInvalid={!!errors.username && touched.username}
                       >
@@ -385,77 +386,83 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                         <Field as={Input} id="username" name="username" />
                         <FormErrorMessage>{errors.username}</FormErrorMessage>
                       </FormControl>
+                      <HStack alignItems={'center'}>
+                        <FormControl
+                          isInvalid={!!errors.password && touched.password}
+                        >
+                          <FormLabel htmlFor="password">Password:</FormLabel>
+                          <Flex gap={2}>
+                            <VStack w="full">
+                              <InputGroup size="md">
+                                <Field
+                                  as={Input}
+                                  id="password"
+                                  name="password"
+                                  pr="4.5rem"
+                                  type={show ? 'text' : 'password'}
+                                />
+                                <InputRightElement width="4.5rem">
+                                  <Button
+                                    h="1.75rem"
+                                    size="sm"
+                                    onClick={handleClick}
+                                  >
+                                    {show ? 'Hide' : 'Show'}
+                                  </Button>
+                                </InputRightElement>
+                              </InputGroup>
+                              <Progress
+                                value={levelOfPsw.id}
+                                size="xs"
+                                w="full"
+                                colorScheme={levelOfPsw.color}
+                                max={3}
+                                min={0}
+                                mb={1}
+                              />
+                            </VStack>
+                            <Tooltip label={t`copy password`}>
+                              <IconButton
+                                icon={<IoDuplicateOutline />}
+                                aria-label={`copy password`}
+                                onClick={() => {
+                                  navigator.clipboard.writeText(values.password)
+                                  toast({
+                                    title: t`Copied to clipboard`,
+                                    status: 'success'
+                                  })
+                                }}
+                              ></IconButton>
+                            </Tooltip>
 
-                      <FormControl
-                        isInvalid={!!errors.password && touched.password}
-                      >
-                        <FormLabel htmlFor="password">Password:</FormLabel>
-                        <Flex>
-                          <InputGroup size="md">
-                            <Field
-                              as={Input}
-                              id="password"
-                              name="password"
-                              pr="4.5rem"
-                              type={show ? 'text' : 'password'}
-                            />
-                            <InputRightElement width="4.5rem">
-                              <Button
-                                h="1.75rem"
-                                size="sm"
-                                onClick={handleClick}
-                              >
-                                {show ? 'Hide' : 'Show'}
-                              </Button>
-                            </InputRightElement>
-                          </InputGroup>
-                          <Tooltip label={t`copy password`}>
-                            <IconButton
-                              ml={2}
-                              icon={<IoDuplicateOutline />}
-                              aria-label={`copy password`}
-                              onClick={() => {
-                                navigator.clipboard.writeText(values.password)
-                                toast({
-                                  title: t`Copied to clipboard`,
-                                  status: 'success'
-                                })
-                              }}
-                            ></IconButton>
-                          </Tooltip>
-                        </Flex>
+                            <Tooltip label="Password generator">
+                              <IconButton
+                                w="min-content"
+                                aria-label="Open password generator"
+                                icon={
+                                  isOpen ? (
+                                    <ChevronUpIcon />
+                                  ) : (
+                                    <ChevronDownIcon />
+                                  )
+                                }
+                                onClick={onToggle}
+                              />
+                            </Tooltip>
+                          </Flex>
 
-                        <Progress
-                          value={levelOfPsw.id}
-                          size="xs"
-                          colorScheme="green"
-                          max={3}
-                          min={0}
-                          mb={1}
-                        />
+                          <FormErrorMessage>{errors.password}</FormErrorMessage>
+                        </FormControl>
+                        {secretProps.loginCredentials.parseError && (
+                          <Alert status="error" mt={4}>
+                            <Trans>Failed to parse this secret:</Trans>
+                            {JSON.stringify(
+                              secretProps.loginCredentials.parseError
+                            )}
+                          </Alert>
+                        )}
+                      </HStack>
 
-                        <FormErrorMessage>{errors.password}</FormErrorMessage>
-                      </FormControl>
-
-                      {secretProps.loginCredentials.parseError && (
-                        <Alert status="error" mt={4}>
-                          <Trans>Failed to parse this secret:</Trans>
-                          {JSON.stringify(
-                            secretProps.loginCredentials.parseError
-                          )}
-                        </Alert>
-                      )}
-                      <Tooltip label="Password generator">
-                        <IconButton
-                          w="min-content"
-                          aria-label="Open password generator"
-                          icon={
-                            isOpen ? <ChevronUpIcon /> : <ChevronDownIcon />
-                          }
-                          onClick={onToggle}
-                          m={3}
-                        />
-                      </Tooltip>
                       <PasswordGenerator
                         isOpen={isOpen}
                         onGenerate={setInitPassword}
@@ -464,7 +471,15 @@ const LoginSecret = (secretProps: ILoginSecret) => {
                     </Flex>
                   </form>
                   <Box>
-                    <Heading size="md" mt={5}>
+                    <span>
+                      <Trans>Created </Trans>
+                      {formatRelative(
+                        new Date(secretProps.createdAt),
+                        new Date()
+                      )}
+                    </span>
+
+                    <Heading size="sm" mt={5}>
                       {t`Matching Web inputs`}
                     </Heading>
 

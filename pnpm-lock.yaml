@@ -751,9 +751,6 @@ importers:
       buffer:
         specifier: ^6.0.3
         version: 6.0.3
-      check-password-strength:
-        specifier: ^3.0.0
-        version: 3.0.0
       crypto-browserify:
         specifier: ^3.12.1
         version: 3.12.1
@@ -8201,9 +8198,6 @@ packages:
   check-error@2.1.1:
     resolution: {integrity: sha512-OAlb+T7V4Op9OwdkjmguYRqncdlx5JiofwOAUkmTF+jNdHwzTaTs4sRAGpzLF3oOz5xAyDGrPgeIDFQmDOTiJw==}
     engines: {node: '>= 16'}
-
-  check-password-strength@3.0.0:
-    resolution: {integrity: sha512-XIBvWpb7/RI2DO05tMixE4WbFFvEC7ls/jr1VSrWgXvlCmdiH2fsdkixG0cNGs1uIXwoSqJ75T3s9H/TlJV6Cw==}
 
   checkpoint-client@1.1.21:
     resolution: {integrity: sha512-bcrcnJncn6uGhj06IIsWvUBPyJWK1ZezDbLCJ//IQEYXkUobhGvOOBlHe9K5x0ZMkAZGinPB4T+lTUmFz/acWQ==}
@@ -28002,10 +27996,6 @@ snapshots:
   chardet@0.7.0: {}
 
   check-error@2.1.1: {}
-
-  check-password-strength@3.0.0:
-    dependencies:
-      escape-string-regexp: 5.0.0
 
   checkpoint-client@1.1.21:
     dependencies:

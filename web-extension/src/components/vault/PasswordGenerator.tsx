@@ -9,7 +9,8 @@ import {
   NumberIncrementStepper,
   NumberInput,
   NumberInputField,
-  NumberInputStepper
+  NumberInputStepper,
+  Flex
 } from '@chakra-ui/react'
 
 import { Formik, Field, FormikHelpers } from 'formik'
@@ -27,127 +28,130 @@ export const PasswordGenerator = ({
   onGenerate: (password: string) => void
 }) => {
   return (
-    <Collapse in={isOpen} animateOpacity>
-      <HStack
-        flexDirection="column"
-        justifyContent="center"
-        alignItems="center"
-        m={2}
-        sx={{
-          label: {
-            marginBottom: '0px',
-            marginTop: '0px'
-          }
-        }}
-      >
-        <Formik
-          initialValues={defaultPasswordGeneratorConfig}
-          onSubmit={(
-            values: IPasswordGeneratorConfig,
-            { setSubmitting }: FormikHelpers<IPasswordGeneratorConfig>
-          ) => {
-            setInitPassword(generate({ ...values }))
-            setSubmitting(false)
+    <>
+      <Collapse in={isOpen} animateOpacity>
+        <HStack
+          flexDirection="column"
+          justifyContent="center"
+          alignItems="center"
+          m={2}
+          sx={{
+            label: {
+              marginBottom: '0px',
+              marginTop: '0px'
+            }
           }}
         >
-          {({ isSubmitting, handleSubmit }) => (
-            <VStack
-              alignItems="center"
-              alignContent="center"
-              justifyContent={'right'}
-            >
-              <Field name="length">
-                {({ field, form }) => (
-                  <NumberInput
-                    id="length"
-                    mr={5}
-                    name="length"
-                    size="md"
-                    value={field.value} // TODO make this configurable per user
-                    min={5}
-                    onChange={(val) => {
-                      form.setFieldValue(field.name, parseInt(val))
+          <Formik
+            initialValues={defaultPasswordGeneratorConfig}
+            onSubmit={(
+              values: IPasswordGeneratorConfig,
+              { setSubmitting }: FormikHelpers<IPasswordGeneratorConfig>
+            ) => {
+              setInitPassword(generate({ ...values }))
+              setSubmitting(false)
+            }}
+          >
+            {({ isSubmitting, handleSubmit }) => {
+              return (
+                <>
+                  <Flex justifyContent={'right'}>
+                    <Field name="length">
+                      {({ field, form }) => (
+                        <NumberInput
+                          id="length"
+                          mr={5}
+                          name="length"
+                          size="md"
+                          value={field.value} // TODO make this configurable per user
+                          min={5}
+                          onChange={(val) => {
+                            form.setFieldValue(field.name, parseInt(val))
+                          }}
+                        >
+                          <NumberInputField />
+                          <NumberInputStepper>
+                            <NumberIncrementStepper />
+                            <NumberDecrementStepper />
+                          </NumberInputStepper>
+                        </NumberInput>
+                      )}
+                    </Field>
+                    <Field name="numbers">
+                      {({ field }) => (
+                        <Checkbox
+                          id="numbers"
+                          mr={5}
+                          mb={2}
+                          name="numbers"
+                          whiteSpace={'nowrap'}
+                          isChecked={field.value}
+                          {...field}
+                        >
+                          numbers
+                        </Checkbox>
+                      )}
+                    </Field>
+                    <Field name="symbols">
+                      {({ field }) => (
+                        <Checkbox
+                          id="symbols"
+                          name="symbols"
+                          isChecked={field.value}
+                          mr={5}
+                          whiteSpace={'nowrap'}
+                          {...field}
+                        >
+                          symbols
+                        </Checkbox>
+                      )}
+                    </Field>
+                    <Field name="uppercase">
+                      {({ field }) => (
+                        <Checkbox
+                          id="uppercase"
+                          name="uppercase"
+                          isChecked={field.value}
+                          mr={5}
+                          whiteSpace={'nowrap'}
+                          {...field}
+                        >
+                          uppercase
+                        </Checkbox>
+                      )}
+                    </Field>
+                    <Field name="lowercase">
+                      {({ field }) => (
+                        <Checkbox
+                          id="lowercase"
+                          name="lowercase"
+                          isChecked={field.value}
+                          mr={5}
+                          whiteSpace={'nowrap'}
+                          {...field}
+                        >
+                          lowercase
+                        </Checkbox>
+                      )}
+                    </Field>
+                  </Flex>
+                  <Button
+                    w={150}
+                    size={'sm'}
+                    colorScheme="teal"
+                    isLoading={isSubmitting}
+                    onClick={() => {
+                      handleSubmit()
                     }}
                   >
-                    <NumberInputField />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                )}
-              </Field>
-              <Field name="numbers">
-                {({ field }) => (
-                  <Checkbox
-                    id="numbers"
-                    mr={5}
-                    mb={2}
-                    name="numbers"
-                    isChecked={field.value}
-                    {...field}
-                  >
-                    numbers
-                  </Checkbox>
-                )}
-              </Field>
-              <Field name="symbols">
-                {({ field }) => (
-                  <Checkbox
-                    id="symbols"
-                    name="symbols"
-                    isChecked={field.value}
-                    mr={5}
-                    {...field}
-                  >
-                    symbols
-                  </Checkbox>
-                )}
-              </Field>
-              <Field name="uppercase">
-                {({ field }) => (
-                  <Checkbox
-                    id="uppercase"
-                    name="uppercase"
-                    isChecked={field.value}
-                    mr={5}
-                    {...field}
-                  >
-                    uppercase
-                  </Checkbox>
-                )}
-              </Field>
-              <Field name="lowercase">
-                {({ field }) => (
-                  <Checkbox
-                    id="lowercase"
-                    name="lowercase"
-                    isChecked={field.value}
-                    mr={5}
-                    {...field}
-                  >
-                    lowercase
-                  </Checkbox>
-                )}
-              </Field>
-
-              <Button
-                w={150}
-                alignSelf="center"
-                justifySelf={'right'}
-                size={'md'}
-                colorScheme="teal"
-                isLoading={isSubmitting}
-                onClick={() => {
-                  handleSubmit()
-                }}
-              >
-                Generate
-              </Button>
-            </VStack>
-          )}
-        </Formik>
-      </HStack>
-    </Collapse>
+                    Generate
+                  </Button>
+                </>
+              )
+            }}
+          </Formik>
+        </HStack>
+      </Collapse>
+    </>
   )
 }
