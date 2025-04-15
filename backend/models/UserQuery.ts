@@ -17,7 +17,7 @@ import { UserGQL } from './generated/UserGQL'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
-import { EmailVerificationType } from '@prisma/client'
+import { Device, EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import {
   defaultDeviceSettingSystemValues,
@@ -38,11 +38,11 @@ export class UserBase extends UserGQL {
   })
   declare email: string
 
-  async setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
+  async setCookiesAndConstructLoginResponse(device: Device, ctx: IContext) {
     const userDevice = await ctx.prisma.device.findFirstOrThrow({
       where: {
         userId: this.id,
-        id: deviceId
+        id: device.id
       }
     })
 

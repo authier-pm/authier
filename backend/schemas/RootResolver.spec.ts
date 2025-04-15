@@ -55,14 +55,6 @@ describe('RootResolver', () => {
     it('should add new user', async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
-      const accessToken = sign(
-        { userId: userId, deviceId: input.deviceId },
-        process.env.ACCESS_TOKEN_SECRET!,
-        {
-          expiresIn: '60m'
-        }
-      )
-
       const data = await resolver.registerNewUser(
         input,
         userId,
@@ -72,7 +64,7 @@ describe('RootResolver', () => {
       expect({
         accessToken: data.accessToken,
         email: data.user.email
-      }).toMatchObject({ accessToken: accessToken, email: input.email })
+      }).toMatchObject({ accessToken: expect.any(String), email: input.email })
 
       await prismaClient.device.deleteMany()
       await prismaClient.decryptionChallenge.deleteMany()

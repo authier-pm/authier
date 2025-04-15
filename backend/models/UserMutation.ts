@@ -52,7 +52,7 @@ export class UserMutation extends UserBase {
     const firstDev = await ctx.prisma.device.findFirst()
     if (firstDev) {
       const { accessToken } = await this.setCookiesAndConstructLoginResponse(
-        firstDev.id,
+        firstDev,
         ctx
       )
       return accessToken

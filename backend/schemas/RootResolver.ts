@@ -239,7 +239,7 @@ export class RootResolver {
     })
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device.id,
+      device,
       ctx
     )
   }
