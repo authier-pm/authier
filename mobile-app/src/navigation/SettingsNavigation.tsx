@@ -1,7 +1,7 @@
 import * as React from 'react'
 
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { SettingsTabParamList } from './types'
 import { UserSettings } from '@src/screens/Account/settings/UserSettings'
 import { DeviceSettings } from '@src/screens/Account/settings/DeviceSettings'

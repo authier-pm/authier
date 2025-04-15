@@ -13,7 +13,7 @@ import {
   Divider,
   ScrollView
 } from 'native-base'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { ButtonWithAlert } from '@src/components/ButtonWithAlert'

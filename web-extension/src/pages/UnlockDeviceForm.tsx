@@ -15,7 +15,7 @@ import {
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import {
   cryptoKeyToString,
   decryptDeviceSecretWithPassword

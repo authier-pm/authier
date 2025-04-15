@@ -1,4 +1,4 @@
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { device } from '@src/background/ExtensionDevice'
 import { UserContext } from '@src/providers/UserProvider'
 import React, { useContext, useEffect, useState } from 'react'
@@ -75,7 +75,7 @@ export const useLogin = (props: { deviceName: string }) => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
       fireToken
     ) {
-      ; (async () => {
+      ;(async () => {
         const addDeviceSecretEncrypted =
           deviceDecryptionChallenge?.addDeviceSecretEncrypted
 
@@ -169,7 +169,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
-            'DecryptionChallengeApproved'
+          'DecryptionChallengeApproved'
             ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 

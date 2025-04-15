@@ -108,7 +108,7 @@ export function Login({ navigation }: NavigationProps) {
                   autoCapitalize="none"
                   onChangeText={handleChange('email')}
                   onBlur={handleBlur('email')}
-                  autoComplete='email'
+                  autoComplete="email"
                   value={values.email}
                 />
 

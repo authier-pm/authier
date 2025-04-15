@@ -1,4 +1,4 @@
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 
 import { intlFormat } from 'date-fns'
 import {

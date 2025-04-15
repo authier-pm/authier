@@ -1,4 +1,4 @@
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { i18n } from '@lingui/core'
 
 i18n.activate('en')

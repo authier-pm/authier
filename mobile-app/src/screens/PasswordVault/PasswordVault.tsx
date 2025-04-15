@@ -14,11 +14,12 @@ import {
 import { SearchBar } from '@components/SearchBar'
 import { LoginCredential } from '@components/LoginCredential'
 import { FlashList } from '@shopify/flash-list'
-import { Trans, t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { PasswordStackScreenProps } from '@navigation/types'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import { DefaultDeviceSettingsModal } from '../DefaultDeviceSettingsModal'
+import { Trans } from '@lingui/macro'
 
 export const EmptyList = (text: string) => {
   return (

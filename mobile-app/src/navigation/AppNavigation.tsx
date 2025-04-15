@@ -19,7 +19,7 @@ import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@utils/deviceStateStore'
 import { Platform } from 'react-native'
 import { OfflineBanner } from '@src/components/OfflineBanner'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 

@@ -1,5 +1,5 @@
 import { Button } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { getCurrentTab } from '@src/util/executeScriptInCurrentTab'
 import { useContext, useState } from 'react'
 import { QRCode } from 'jsqr'

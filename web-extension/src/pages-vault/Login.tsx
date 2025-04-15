@@ -1,6 +1,6 @@
 import React, { Dispatch, ReactElement, SetStateAction, useState } from 'react'
 import { Box, Button, Flex, Spinner, Text } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { device } from '@src/background/ExtensionDevice'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { z } from 'zod'

@@ -31,7 +31,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { Field, Formik, FormikHelpers } from 'formik'
-import { Trans, t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { motion } from 'framer-motion'
 import {
   TOTPSchema,
@@ -46,6 +46,7 @@ import {
 } from '@src/background/getWebInputsForUrl'
 import { useRemoveWebInputMutation } from './VaultItemSettings.codegen'
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
+import { Trans } from '@lingui/react/macro'
 
 const TOTPSecret = (secretProps: ITOTPSecret) => {
   const { totp } = secretProps

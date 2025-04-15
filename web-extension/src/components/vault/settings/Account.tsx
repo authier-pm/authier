@@ -14,7 +14,7 @@ import {
   AlertDialogHeader,
   AlertDialogOverlay
 } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { device } from '@src/background/ExtensionDevice'

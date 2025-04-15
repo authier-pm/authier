@@ -3,7 +3,7 @@ import React from 'react'
 import { Account } from '../screens/Account/Account'
 import { AccountStackParamList } from './types'
 import { ChangeMasterPassword } from '@src/screens/Account/ChangeMasterPassword'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import {
   createStackNavigator,
   TransitionPresets

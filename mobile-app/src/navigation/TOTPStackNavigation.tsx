@@ -6,7 +6,7 @@ import { TOTPVault } from '../screens/TOTPVault/TOTPVault'
 import { AddTOTP } from '../screens/TOTPVault/AddTOTP'
 import { EditTOTP } from '../screens/TOTPVault/EditTOTP'
 import { TOTPStackParamList } from './types'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { QRScan } from '@src/screens/TOTPVault/QRScan'
 
 const Stack = createNativeStackNavigator<TOTPStackParamList>()

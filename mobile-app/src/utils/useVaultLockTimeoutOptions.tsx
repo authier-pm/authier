@@ -1,4 +1,4 @@
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { useLingui } from '@lingui/react'
 import React from 'react'
 

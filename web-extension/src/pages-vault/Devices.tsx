@@ -27,7 +27,7 @@ import {
   FormHelperText,
   HStack
 } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { useState } from 'react'
@@ -382,7 +382,11 @@ export default function Devices() {
 
       <NewDevicesApprovalStack></NewDevicesApprovalStack>
       <Center justifyContent={['flex-end', 'center', 'center']}>
-        <Flex flexDirection="column" maxH={`${height - 70}px`} overflow={'auto'}>
+        <Flex
+          flexDirection="column"
+          maxH={`${height - 70}px`}
+          overflow={'auto'}
+        >
           <Flex flexDirection="row" flexWrap="wrap" justify={'center'}>
             {loading ? (
               <Center pt={5}>

@@ -1,7 +1,6 @@
-
 import { Box, Center, Heading } from '@chakra-ui/react'
 import { Tooltip, IconButton } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 
 import { IoMdArchive } from 'react-icons/io'
 import browser from 'webextension-polyfill'

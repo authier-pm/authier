@@ -21,7 +21,7 @@ import codePush, { LocalPackage } from 'react-native-code-push'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { t, Trans } from '@lingui/macro'
+import { t, Trans } from '@lingui/core/macro'
 
 export const SettingsItem = ({
   name,
