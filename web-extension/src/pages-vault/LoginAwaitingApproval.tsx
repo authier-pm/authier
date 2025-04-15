@@ -1,4 +1,5 @@
-import { t, Trans } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { device } from '@src/background/ExtensionDevice'
 import { UserContext } from '@src/providers/UserProvider'
 import React, { useContext, useEffect, useState } from 'react'

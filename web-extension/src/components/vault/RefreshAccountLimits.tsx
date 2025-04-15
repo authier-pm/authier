@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
 
-import { t, Trans } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 export function RefreshAccountLimits({

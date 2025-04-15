@@ -27,7 +27,8 @@ import {
   FormHelperText,
   HStack
 } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { NbSp } from '@src/components/util/NbSp'
 import { Formik, FormikHelpers, Field, FieldProps } from 'formik'
 import { useState } from 'react'
