@@ -38,10 +38,17 @@ export class UserBase extends UserGQL {
   })
   declare email: string
 
-  setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
-    setNewRefreshToken(this, deviceId, ctx)
+  async setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
+    const userDevice = await ctx.prisma.device.findFirstOrThrow({
+      where: {
+        userId: this.id,
+        id: deviceId
+      }
+    })
 
-    const accessToken = setNewAccessTokenIntoCookie(this, deviceId, ctx)
+    setNewRefreshToken(this, userDevice, ctx)
+
+    const accessToken = setNewAccessTokenIntoCookie(this, userDevice, ctx)
 
     return {
       accessToken,

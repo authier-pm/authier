@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import { Device, User } from '@prisma/client'
 import { JwtPayload, sign } from 'jsonwebtoken'
 
 import { isProd } from './envUtils'
@@ -6,14 +6,14 @@ import { IContext } from './schemas/RootResolver'
 
 export const setNewAccessTokenIntoCookie = (
   user: Pick<User, 'id'>,
-  deviceId: string,
+  device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>,
   ctx: IContext
 ) => {
   const accessToken = sign(
-    { userId: user.id, deviceId: deviceId },
+    { userId: user.id, deviceId: device.id },
     process.env.ACCESS_TOKEN_SECRET!,
     {
-      expiresIn: '60m'
+      expiresIn: `${Math.floor(device.vaultLockTimeoutSeconds / 3)}s`
     }
   )
 
@@ -34,16 +34,16 @@ export interface jwtPayloadRefreshToken extends JwtPayload {
 
 export const setNewRefreshToken = (
   user: Pick<User, 'id' | 'tokenVersion'>,
-  deviceId: string,
+  device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>,
   ctx: IContext
 ) => {
   const payload = {
     userId: user.id,
-    deviceId: deviceId,
+    deviceId: device.id,
     tokenVersion: user.tokenVersion
   }
   const refreshToken = sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
-    expiresIn: '1825d' // 5 years. In 5 years user has to approve the device again as it's refresh token will expire
+    expiresIn: `${device.vaultLockTimeoutSeconds}s`
   })
 
   ctx.reply.setCookie('refresh-token', refreshToken, {

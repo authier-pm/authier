@@ -131,11 +131,17 @@ app.post('/refresh_token', async (request, reply) => {
   if (user.tokenVersion !== payload.tokenVersion) {
     return reply.send({ ok: false, accessToken: '' })
   }
+
+  const device = await prismaClient.device.findFirstOrThrow({
+    where: {
+      id: payload.deviceId
+    }
+  })
   const ctx = { request, reply } as IContext
 
-  setNewRefreshToken(user, payload.deviceId, ctx)
+  setNewRefreshToken(user, device, ctx)
 
-  const accessToken = setNewAccessTokenIntoCookie(user, payload.deviceId, ctx)
+  const accessToken = setNewAccessTokenIntoCookie(user, device, ctx)
 
   return reply.send({
     ok: true,

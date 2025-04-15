@@ -44,7 +44,6 @@ const log = debug('au:userMutation')
 @ObjectType()
 export class UserMutation extends UserBase {
   @Field(() => String)
-  // TODO remove before putting into prod
   async addCookie(@Ctx() ctx: IContext) {
     if (process.env.NODE_ENV !== 'development') {
       throw new Error('This is only for development')
@@ -52,7 +51,7 @@ export class UserMutation extends UserBase {
 
     const firstDev = await ctx.prisma.device.findFirst()
     if (firstDev) {
-      const { accessToken } = this.setCookiesAndConstructLoginResponse(
+      const { accessToken } = await this.setCookiesAndConstructLoginResponse(
         firstDev.id,
         ctx
       )
@@ -374,7 +373,7 @@ export class UserMutation extends UserBase {
       ...secretsUpdates
     ])
 
-    setNewRefreshToken(user, ctx.device.id, ctx) // set new refresh token to force all other devices to re-login
+    setNewRefreshToken(user, ctx.device, ctx) // set new refresh token to force all other devices to re-login
     return secretsUpdates.length
   }
 

@@ -16,7 +16,7 @@ export const setAccessToken = async (s: string) => {
 
 export const removeToken = async () => {
   await browser.storage.local.remove('access-token')
-  accessToken = ''
+  accessToken = null
 }
 
 export const getUserFromToken = async () => {

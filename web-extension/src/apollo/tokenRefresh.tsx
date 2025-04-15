@@ -1,11 +1,6 @@
-import {
-  accessToken,
-  removeToken,
-  setAccessToken
-} from '../util/accessTokenExtension'
+import { accessToken, setAccessToken } from '../util/accessTokenExtension'
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
 import { JwtPayload, jwtDecode } from 'jwt-decode'
-import browser from 'webextension-polyfill'
 import { API_URL } from './API_URL'
 import { device } from '@src/background/ExtensionDevice'
 const tokenRefreshBaseUrl = API_URL?.replace('/graphql', '')
@@ -13,8 +8,6 @@ const tokenRefreshBaseUrl = API_URL?.replace('/graphql', '')
 export const tokenRefresh = new TokenRefreshLink({
   accessTokenField: 'accessToken',
   isTokenValidOrUndefined: async () => {
-    //Get token from local storage
-
     if (!accessToken) {
       return false
     }
@@ -39,13 +32,14 @@ export const tokenRefresh = new TokenRefreshLink({
       credentials: 'include'
     })
   },
-  handleFetch: async (accessToken) => {
-    await browser.storage.local.set({ 'access-token': accessToken })
+  handleFetch: async (accessToken: string) => {
+    // accessToken is the string token extracted by the library
     setAccessToken(accessToken)
   },
-  handleError: async (err) => {
-    console.log('Your refresh token is invalid. You must login again', err)
-    await removeToken()
-    await device.clearLocalStorage()
+  handleError: async (err: any) => {
+    console.error('Error during token refresh:', err)
+    console.log('Your refresh token is likely invalid. Logging out.')
+
+    await device.clearAndReload()
   }
 })
