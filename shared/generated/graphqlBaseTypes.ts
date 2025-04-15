@@ -276,7 +276,7 @@ export type DeviceMutationRenameArgs = {
 export type DeviceMutationReportSecretUsageEventArgs = {
   kind: Scalars['String']['input'];
   secretId: Scalars['UUID']['input'];
-  webInputId: Scalars['PositiveInt']['input'];
+  webInputId?: InputMaybe<Scalars['PositiveInt']['input']>;
 };
 
 

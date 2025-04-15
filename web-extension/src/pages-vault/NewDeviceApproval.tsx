@@ -29,8 +29,8 @@ export const NewDevicesApprovalStack = () => {
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
 
-  // const isMasterDevice = device.id === devicesRequests?.me.masterDeviceId
-  const isMasterDevice = true
+  const isMasterDevice = device.id === devicesRequests?.me.masterDeviceId
+  // const isMasterDevice = true
   return (
     <VStack mt={3}>
       {devicesRequests?.me?.decryptionChallengesWaiting.map(
