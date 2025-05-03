@@ -21,7 +21,7 @@ import {
   InputRightElement
 } from '@chakra-ui/react'
 import { t } from '@lingui/core/macro'
-import { Trans } from '@lingui/react/macro'
+
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
@@ -41,6 +41,7 @@ import {
   useDeleteAccountMutation
 } from './Account.codegen'
 import { useDevicesRequestsQuery } from '@shared/graphql/AccountDevices.codegen'
+import { Trans } from '@lingui/react/macro'
 
 const AccountFormSchema = z.object({
   email: z

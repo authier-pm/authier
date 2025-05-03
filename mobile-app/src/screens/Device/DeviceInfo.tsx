@@ -1,4 +1,5 @@
-import { t, Trans } from '@lingui/core/macro'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 
 import { intlFormat } from 'date-fns'
 import {
