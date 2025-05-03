@@ -305,7 +305,7 @@ importers:
         version: 1.5.2(@swc/core@1.11.22)(rollup@4.40.0)
       vitest:
         specifier: ^3.1.1
-        version: 3.1.2(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+        version: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
 
   mobile-app:
     dependencies:
@@ -724,12 +724,6 @@ importers:
       '@types/offscreencanvas':
         specifier: ^2019.7.3
         version: 2019.7.3
-      apollo-boost:
-        specifier: ^0.4.9
-        version: 0.4.9(graphql@16.10.0)
-      apollo-link-serialize:
-        specifier: ^4.0.0
-        version: 4.0.0(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       apollo-link-token-refresh:
         specifier: ^0.7.0
         version: 0.7.0(@apollo/client@3.13.8(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(@swc/core@1.11.22)(@types/node@22.14.1)(graphql@16.10.0)(typescript@5.8.3)
@@ -907,10 +901,10 @@ importers:
         version: 4.4.1(vite@6.3.3(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0))
       '@vitest/coverage-v8':
         specifier: ^3.1.2
-        version: 3.1.2(vitest@3.1.2)
+        version: 3.1.2(vitest@3.1.1)
       '@vitest/ui':
         specifier: ^3.1.2
-        version: 3.1.2(vitest@3.1.2)
+        version: 3.1.2(vitest@3.1.1)
       acorn:
         specifier: ^8.14.1
         version: 8.14.1
@@ -1014,8 +1008,8 @@ importers:
         specifier: ^5.8.3
         version: 5.8.3
       vitest:
-        specifier: ^3.1.1
-        version: 3.1.2(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+        specifier: 3.1.1
+        version: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
       vm-browserify:
         specifier: ^1.1.2
         version: 1.1.2
@@ -6127,9 +6121,6 @@ packages:
   '@types/zen-observable@0.8.0':
     resolution: {integrity: sha512-te5lMAWii1uEJ4FwLjzdlbw3+n0FZNOvFXHxQDKeT0dilh7HOzdMzV2TrJVUzq8ep7J4Na8OUYPRLSQkJHAlrg==}
 
-  '@types/zen-observable@0.8.3':
-    resolution: {integrity: sha512-fbF6oTd4sGGy0xjHPKAt+eS2CrxJ3+6gQ3FGcBoIJR2TLAyCkCyI8JqZNy+FeON0AhVgNJoUumVoZQjBFUqHkw==}
-
   '@typescript-eslint/eslint-plugin@5.62.0':
     resolution: {integrity: sha512-TiZzBSJja/LbhNPvk6yc0JrX9XqhQ0hdh6M2svYfsHGejaKFIAGd9MQ+ERIMzLGlN/kZoYIgdxFV0PuljTKXag==}
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
@@ -6281,11 +6272,11 @@ packages:
       '@vitest/browser':
         optional: true
 
-  '@vitest/expect@3.1.2':
-    resolution: {integrity: sha512-O8hJgr+zREopCAqWl3uCVaOdqJwZ9qaDwUP7vy3Xigad0phZe9APxKhPcDNqYYi0rX5oMvwJMSCAXY2afqeTSA==}
+  '@vitest/expect@3.1.1':
+    resolution: {integrity: sha512-q/zjrW9lgynctNbwvFtQkGK9+vvHA5UzVi2V8APrp1C6fG6/MuYYkmlx4FubuqLycCeSdHD5aadWfua/Vr0EUA==}
 
-  '@vitest/mocker@3.1.2':
-    resolution: {integrity: sha512-kOtd6K2lc7SQ0mBqYv/wdGedlqPdM/B38paPY+OwJ1XiNi44w3Fpog82UfOibmHaV9Wod18A09I9SCKLyDMqgw==}
+  '@vitest/mocker@3.1.1':
+    resolution: {integrity: sha512-bmpJJm7Y7i9BBELlLuuM1J1Q6EQ6K5Ye4wcyOpOMXMcePYKSIYlpcrCm4l/O6ja4VJA5G2aMJiuZkZdnxlC3SA==}
     peerDependencies:
       msw: ^2.4.9
       vite: ^5.0.0 || ^6.0.0
@@ -6295,22 +6286,28 @@ packages:
       vite:
         optional: true
 
+  '@vitest/pretty-format@3.1.1':
+    resolution: {integrity: sha512-dg0CIzNx+hMMYfNmSqJlLSXEmnNhMswcn3sXO7Tpldr0LiGmg3eXdLLhwkv2ZqgHb/d5xg5F7ezNFRA1fA13yA==}
+
   '@vitest/pretty-format@3.1.2':
     resolution: {integrity: sha512-R0xAiHuWeDjTSB3kQ3OQpT8Rx3yhdOAIm/JM4axXxnG7Q/fS8XUwggv/A4xzbQA+drYRjzkMnpYnOGAc4oeq8w==}
 
-  '@vitest/runner@3.1.2':
-    resolution: {integrity: sha512-bhLib9l4xb4sUMPXnThbnhX2Yi8OutBMA8Yahxa7yavQsFDtwY/jrUZwpKp2XH9DhRFJIeytlyGpXCqZ65nR+g==}
+  '@vitest/runner@3.1.1':
+    resolution: {integrity: sha512-X/d46qzJuEDO8ueyjtKfxffiXraPRfmYasoC4i5+mlLEJ10UvPb0XH5M9C3gWuxd7BAQhpK42cJgJtq53YnWVA==}
 
-  '@vitest/snapshot@3.1.2':
-    resolution: {integrity: sha512-Q1qkpazSF/p4ApZg1vfZSQ5Yw6OCQxVMVrLjslbLFA1hMDrT2uxtqMaw8Tc/jy5DLka1sNs1Y7rBcftMiaSH/Q==}
+  '@vitest/snapshot@3.1.1':
+    resolution: {integrity: sha512-bByMwaVWe/+1WDf9exFxWWgAixelSdiwo2p33tpqIlM14vW7PRV5ppayVXtfycqze4Qhtwag5sVhX400MLBOOw==}
 
-  '@vitest/spy@3.1.2':
-    resolution: {integrity: sha512-OEc5fSXMws6sHVe4kOFyDSj/+4MSwst0ib4un0DlcYgQvRuYQ0+M2HyqGaauUMnjq87tmUaMNDxKQx7wNfVqPA==}
+  '@vitest/spy@3.1.1':
+    resolution: {integrity: sha512-+EmrUOOXbKzLkTDwlsc/xrwOlPDXyVk3Z6P6K4oiCndxz7YLpp/0R0UsWVOKT0IXWjjBJuSMk6D27qipaupcvQ==}
 
   '@vitest/ui@3.1.2':
     resolution: {integrity: sha512-+YPgKiLpFEyBVJNHDkRcSDcLrrnr20lyU4HQoI9Jtq1MdvoX8usql9h38mQw82MBU1Zo5BPC6sw+sXZ6NS18CQ==}
     peerDependencies:
       vitest: 3.1.2
+
+  '@vitest/utils@3.1.1':
+    resolution: {integrity: sha512-1XIjflyaU2k3HMArJ50bwSh3wKWPD6Q47wz/NUSmRV0zNywPc4w79ARjg/i/aNINHwA+mIALhUVqD9/aUvZNgg==}
 
   '@vitest/utils@3.1.2':
     resolution: {integrity: sha512-5GGd0ytZ7BH3H6JTj9Kw7Prn1Nbg0wZVrIvou+UWxm54d+WoXXgAgjFJ8wn3LdagWLFSEfpPeyYrByZaGEZHLg==}
@@ -6465,9 +6462,6 @@ packages:
   '@wry/caches@1.0.1':
     resolution: {integrity: sha512-bXuaUNLVVkD20wcGBWRyo7j9N3TxePEWFZj2Y+r9OoUzfqmavM84+mFykRicNsBqatba5JLay1t48wxaXaWnlA==}
     engines: {node: '>=8'}
-
-  '@wry/context@0.4.4':
-    resolution: {integrity: sha512-LrKVLove/zw6h2Md/KZyWxIkFM6AoyKp71OqpH9Hiip1csjPVoD3tPxlbQUNxEnHENks3UGgNpSBCAfq9KWuag==}
 
   '@wry/context@0.7.3':
     resolution: {integrity: sha512-Nl8WTesHp89RF803Se9X3IiHjdmLBrIvPMaJkl+rKVJAYyPsz1TEUbu89943HpvujtSJgDUx9W4vZw3K1Mr3sA==}
@@ -6706,29 +6700,6 @@ packages:
   anymatch@3.1.3:
     resolution: {integrity: sha512-KMReFUr0B4t+D+OBkjR3KYqvocp2XaSzO55UcB6mgQMd3KbcE+mWTyvVV7D/zsdEbNnV6acZUutkiHQXvTr1Rw==}
     engines: {node: '>= 8'}
-
-  apollo-boost@0.4.9:
-    resolution: {integrity: sha512-05y5BKcDaa8w47f8d81UVwKqrAjn8uKLv6QM9fNdldoNzQ+rnOHgFlnrySUZRz9QIT3vPftQkEz2UEASp1Mi5g==}
-    peerDependencies:
-      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-
-  apollo-cache-inmemory@1.6.6:
-    resolution: {integrity: sha512-L8pToTW/+Xru2FFAhkZ1OA9q4V4nuvfoPecBM34DecAugUZEBhI2Hmpgnzq2hTKZ60LAMrlqiASm0aqAY6F8/A==}
-    peerDependencies:
-      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-
-  apollo-cache@1.3.5:
-    resolution: {integrity: sha512-1XoDy8kJnyWY/i/+gLTEbYLnoiVtS8y7ikBr/IfmML4Qb+CM7dEEbIUOjnY716WqmZ/UpXIxTfJsY7rMcqiCXA==}
-    peerDependencies:
-      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-
-  apollo-client@2.6.10:
-    resolution: {integrity: sha512-jiPlMTN6/5CjZpJOkGeUV0mb4zxx33uXWdj/xQCfAMkuNAC3HN7CvYDyMHHEzmcQ5GV12LszWoQ/VlxET24CtA==}
-    peerDependencies:
-      graphql: ^0.11.0 || ^0.12.0 || ^0.13.0 || ^14.0.0 || ^15.0.0
-
-  apollo-link-error@1.1.13:
-    resolution: {integrity: sha512-jAZOOahJU6bwSqb2ZyskEK1XdgUY9nkmeclCrW7Gddh1uasHVqmoYc4CKdb0/H0Y1J9lvaXKle2Wsw/Zx1AyUg==}
 
   apollo-link-http-common@0.2.16:
     resolution: {integrity: sha512-2tIhOIrnaF4UbQHf7kjeQA/EmSorB7+HyJIIrUjJOKBgnXwuexi8aMecRlqTIDWcyVXCeqLhUnztMa6bOH/jTg==}
@@ -12555,9 +12526,6 @@ packages:
     resolution: {integrity: sha512-ur5UIdyw5Y7yEj9wLzhqXiy6GZ3Mwx0yGI+5sMn2r0N0v3cKJvUmFH5yPP+WXh9e0xfyzyJX95D8l088DNFj7A==}
     hasBin: true
 
-  optimism@0.10.3:
-    resolution: {integrity: sha512-9A5pqGoQk49H6Vhjb9kPgAeeECfUDF6aIICbMDL23kDLStBn1MWk3YvcZ4xWF9CsSf6XEgvRLkXy4xof/56vVw==}
-
   optimism@0.16.2:
     resolution: {integrity: sha512-zWNbgWj+3vLEjZNIh/okkY2EUfX+vB9TJopzIZwT1xxaMqC5hRLLraePod4c5n4He08xuXNH+zhKFFCu390wiQ==}
 
@@ -14938,10 +14906,6 @@ packages:
   swap-case@2.0.2:
     resolution: {integrity: sha512-kc6S2YS/2yXbtkSMunBtKdah4VFETZ8Oh6ONSmSd9bRxhqTrtARUCBUiWXH3xVPpvR7tz2CSnkuXVE42EcGnMw==}
 
-  symbol-observable@1.2.0:
-    resolution: {integrity: sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==}
-    engines: {node: '>=0.10.0'}
-
   symbol-observable@4.0.0:
     resolution: {integrity: sha512-b19dMThMV4HVFynSAM1++gBHAbk2Tc/osgLIBZMKsyqh34jb2e8Os7T6ZW/Bt3pJFdBTd2JwAnAAEQV7rSNvcQ==}
     engines: {node: '>=0.10'}
@@ -15761,8 +15725,8 @@ packages:
       react-native: '*'
       react-native-vision-camera: '>=2.9.4'
 
-  vite-node@3.1.2:
-    resolution: {integrity: sha512-/8iMryv46J3aK13iUXsei5G/A3CUlW4665THCPS+K8xAaqrVWiGB4RfXMQXCLjpK9P2eK//BczrVkn5JLAk6DA==}
+  vite-node@3.1.1:
+    resolution: {integrity: sha512-V+IxPAE2FvXpTCHXyNem0M+gWm6J7eRyWPR6vYoG/Gl+IscNOjXzztUhimQgTxaAoUoj40Qqimaa0NLIOOAH4w==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
 
@@ -15854,16 +15818,16 @@ packages:
       yaml:
         optional: true
 
-  vitest@3.1.2:
-    resolution: {integrity: sha512-WaxpJe092ID1C0mr+LH9MmNrhfzi8I65EX/NRU/Ld016KqQNRgxSOlGNP1hHN+a/F8L15Mh8klwaF77zR3GeDQ==}
+  vitest@3.1.1:
+    resolution: {integrity: sha512-kiZc/IYmKICeBAZr9DQ5rT7/6bD9G7uqQEki4fxazi1jdVl2mWGzedtBs5s6llz59yQhVb7FFY2MbHzHCnT79Q==}
     engines: {node: ^18.0.0 || ^20.0.0 || >=22.0.0}
     hasBin: true
     peerDependencies:
       '@edge-runtime/vm': '*'
       '@types/debug': ^4.1.12
       '@types/node': ^18.0.0 || ^20.0.0 || >=22.0.0
-      '@vitest/browser': 3.1.2
-      '@vitest/ui': 3.1.2
+      '@vitest/browser': 3.1.1
+      '@vitest/ui': 3.1.1
       happy-dom: '*'
       jsdom: '*'
     peerDependenciesMeta:
@@ -23598,8 +23562,6 @@ snapshots:
 
   '@types/zen-observable@0.8.0': {}
 
-  '@types/zen-observable@0.8.3': {}
-
   '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.1)(typescript@5.8.3))(eslint@8.57.1)(typescript@5.8.3)':
     dependencies:
       '@eslint-community/regexpp': 4.6.1
@@ -23815,7 +23777,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/coverage-v8@3.1.2(vitest@3.1.2)':
+  '@vitest/coverage-v8@3.1.2(vitest@3.1.1)':
     dependencies:
       '@ampproject/remapping': 2.3.0
       '@bcoe/v8-coverage': 1.0.2
@@ -23829,45 +23791,49 @@ snapshots:
       std-env: 3.9.0
       test-exclude: 7.0.1
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+      vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - supports-color
 
-  '@vitest/expect@3.1.2':
+  '@vitest/expect@3.1.1':
     dependencies:
-      '@vitest/spy': 3.1.2
-      '@vitest/utils': 3.1.2
+      '@vitest/spy': 3.1.1
+      '@vitest/utils': 3.1.1
       chai: 5.2.0
       tinyrainbow: 2.0.0
 
-  '@vitest/mocker@3.1.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0))':
+  '@vitest/mocker@3.1.1(vite@6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0))':
     dependencies:
-      '@vitest/spy': 3.1.2
+      '@vitest/spy': 3.1.1
       estree-walker: 3.0.3
       magic-string: 0.30.17
     optionalDependencies:
       vite: 6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
 
+  '@vitest/pretty-format@3.1.1':
+    dependencies:
+      tinyrainbow: 2.0.0
+
   '@vitest/pretty-format@3.1.2':
     dependencies:
       tinyrainbow: 2.0.0
 
-  '@vitest/runner@3.1.2':
+  '@vitest/runner@3.1.1':
     dependencies:
-      '@vitest/utils': 3.1.2
+      '@vitest/utils': 3.1.1
       pathe: 2.0.3
 
-  '@vitest/snapshot@3.1.2':
+  '@vitest/snapshot@3.1.1':
     dependencies:
-      '@vitest/pretty-format': 3.1.2
+      '@vitest/pretty-format': 3.1.1
       magic-string: 0.30.17
       pathe: 2.0.3
 
-  '@vitest/spy@3.1.2':
+  '@vitest/spy@3.1.1':
     dependencies:
       tinyspy: 3.0.2
 
-  '@vitest/ui@3.1.2(vitest@3.1.2)':
+  '@vitest/ui@3.1.2(vitest@3.1.1)':
     dependencies:
       '@vitest/utils': 3.1.2
       fflate: 0.8.2
@@ -23876,7 +23842,13 @@ snapshots:
       sirv: 3.0.1
       tinyglobby: 0.2.13
       tinyrainbow: 2.0.0
-      vitest: 3.1.2(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+      vitest: 3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+
+  '@vitest/utils@3.1.1':
+    dependencies:
+      '@vitest/pretty-format': 3.1.1
+      loupe: 3.1.3
+      tinyrainbow: 2.0.0
 
   '@vitest/utils@3.1.2':
     dependencies:
@@ -24082,11 +24054,6 @@ snapshots:
   '@wry/caches@1.0.1':
     dependencies:
       tslib: 2.8.1
-
-  '@wry/context@0.4.4':
-    dependencies:
-      '@types/node': 22.14.1
-      tslib: 1.14.1
 
   '@wry/context@0.7.3':
     dependencies:
@@ -24344,54 +24311,6 @@ snapshots:
       normalize-path: 3.0.0
       picomatch: 2.3.1
 
-  apollo-boost@0.4.9(graphql@16.10.0):
-    dependencies:
-      apollo-cache: 1.3.5(graphql@16.10.0)
-      apollo-cache-inmemory: 1.6.6(graphql@16.10.0)
-      apollo-client: 2.6.10(graphql@16.10.0)
-      apollo-link: 1.2.14(graphql@16.10.0)
-      apollo-link-error: 1.1.13(graphql@16.10.0)
-      apollo-link-http: 1.5.17(graphql@16.10.0)
-      graphql: 16.10.0
-      graphql-tag: 2.12.6(graphql@16.10.0)
-      ts-invariant: 0.4.4
-      tslib: 1.14.1
-
-  apollo-cache-inmemory@1.6.6(graphql@16.10.0):
-    dependencies:
-      apollo-cache: 1.3.5(graphql@16.10.0)
-      apollo-utilities: 1.3.4(graphql@16.10.0)
-      graphql: 16.10.0
-      optimism: 0.10.3
-      ts-invariant: 0.4.4
-      tslib: 1.14.1
-
-  apollo-cache@1.3.5(graphql@16.10.0):
-    dependencies:
-      apollo-utilities: 1.3.4(graphql@16.10.0)
-      graphql: 16.10.0
-      tslib: 1.14.1
-
-  apollo-client@2.6.10(graphql@16.10.0):
-    dependencies:
-      '@types/zen-observable': 0.8.3
-      apollo-cache: 1.3.5(graphql@16.10.0)
-      apollo-link: 1.2.14(graphql@16.10.0)
-      apollo-utilities: 1.3.4(graphql@16.10.0)
-      graphql: 16.10.0
-      symbol-observable: 1.2.0
-      ts-invariant: 0.4.4
-      tslib: 1.14.1
-      zen-observable: 0.8.15
-
-  apollo-link-error@1.1.13(graphql@16.10.0):
-    dependencies:
-      apollo-link: 1.2.14(graphql@16.10.0)
-      apollo-link-http-common: 0.2.16(graphql@16.10.0)
-      tslib: 1.14.1
-    transitivePeerDependencies:
-      - graphql
-
   apollo-link-http-common@0.2.16(graphql@16.10.0):
     dependencies:
       apollo-link: 1.2.14(graphql@16.10.0)
@@ -24424,18 +24343,6 @@ snapshots:
       tslib: 1.14.1
     transitivePeerDependencies:
       - graphql
-
-  apollo-link-serialize@4.0.0(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
-    dependencies:
-      '@apollo/client': 3.13.8(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
-      zen-observable-ts: 0.8.21
-    transitivePeerDependencies:
-      - '@types/react'
-      - graphql
-      - graphql-ws
-      - react
-      - react-dom
-      - subscriptions-transport-ws
 
   apollo-link-serialize@4.0.0(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.10.0))(graphql@16.10.0)(react-dom@19.0.0(react@18.2.0))(react@18.2.0):
     dependencies:
@@ -27633,7 +27540,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
 
   esutils@2.0.3: {}
 
@@ -32206,10 +32113,6 @@ snapshots:
 
   opener@1.5.2: {}
 
-  optimism@0.10.3:
-    dependencies:
-      '@wry/context': 0.4.4
-
   optimism@0.16.2:
     dependencies:
       '@wry/context': 0.7.3
@@ -35173,8 +35076,6 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  symbol-observable@1.2.0: {}
-
   symbol-observable@4.0.0: {}
 
   symbol-tree@3.2.4: {}
@@ -36055,13 +35956,13 @@ snapshots:
       react-native: 0.71.11(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(react@18.2.0)
       react-native-vision-camera: 2.16.6(react-native@0.71.11(@babel/core@7.26.10)(@babel/preset-env@7.26.9(@babel/core@7.26.10))(react@18.2.0))(react@18.2.0)
 
-  vite-node@3.1.2(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0):
+  vite-node@3.1.1(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
       cac: 6.7.14
       debug: 4.4.0(supports-color@5.5.0)
       es-module-lexer: 1.6.0
       pathe: 2.0.3
-      vite: 6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+      vite: 6.3.3(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
     transitivePeerDependencies:
       - '@types/node'
       - jiti
@@ -36116,15 +36017,15 @@ snapshots:
       tsx: 4.19.3
       yaml: 2.7.0
 
-  vitest@3.1.2(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0):
+  vitest@3.1.1(@types/debug@4.1.12)(@types/node@22.14.1)(@vitest/ui@3.1.2)(jiti@2.3.3)(jsdom@26.1.0)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0):
     dependencies:
-      '@vitest/expect': 3.1.2
-      '@vitest/mocker': 3.1.2(vite@6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0))
+      '@vitest/expect': 3.1.1
+      '@vitest/mocker': 3.1.1(vite@6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0))
       '@vitest/pretty-format': 3.1.2
-      '@vitest/runner': 3.1.2
-      '@vitest/snapshot': 3.1.2
-      '@vitest/spy': 3.1.2
-      '@vitest/utils': 3.1.2
+      '@vitest/runner': 3.1.1
+      '@vitest/snapshot': 3.1.1
+      '@vitest/spy': 3.1.1
+      '@vitest/utils': 3.1.1
       chai: 5.2.0
       debug: 4.4.0(supports-color@5.5.0)
       expect-type: 1.2.1
@@ -36133,16 +36034,15 @@ snapshots:
       std-env: 3.9.0
       tinybench: 2.9.0
       tinyexec: 0.3.2
-      tinyglobby: 0.2.13
       tinypool: 1.0.2
       tinyrainbow: 2.0.0
       vite: 6.2.6(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
-      vite-node: 3.1.2(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
+      vite-node: 3.1.1(@types/node@22.14.1)(jiti@2.3.3)(terser@5.37.0)(tsx@4.19.3)(yaml@2.7.0)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/debug': 4.1.12
       '@types/node': 22.14.1
-      '@vitest/ui': 3.1.2(vitest@3.1.2)
+      '@vitest/ui': 3.1.2(vitest@3.1.1)
       jsdom: 26.1.0
     transitivePeerDependencies:
       - jiti

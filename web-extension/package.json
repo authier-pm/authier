@@ -120,8 +120,6 @@
     "@trpc/server": "^10.45.2",
     "@ts-react/form": "^1.8.3",
     "@types/offscreencanvas": "^2019.7.3",
-    "apollo-boost": "^0.4.9",
-    "apollo-link-serialize": "^4.0.0",
     "apollo-link-token-refresh": "^0.7.0",
     "apollo3-cache-persist": "^0.15.0",
     "babel-plugin-macros": "^3.1.0",

@@ -10,7 +10,6 @@ import {
 import { RetryLink } from 'apollo-link-retry'
 import { print } from 'graphql'
 
-import SerializingLink from 'apollo-link-serialize'
 import QueueLink from 'apollo-link-queue'
 
 import { setContext } from '@apollo/client/link/context'
@@ -59,7 +58,6 @@ const logTimeLink = new ApolloLink((operation, forward) => {
 
 const retryLink = new RetryLink()
 export const queueLink = new QueueLink()
-const serializingLink = new SerializingLink()
 
 const authLink = setContext(async (_, { headers }) => {
   const accessToken = useDeviceStateStore.getState().accessToken
@@ -115,7 +113,6 @@ export const apolloClient = new ApolloClient({
     tokenRefresh,
     errorLink,
     queueLink,
-    serializingLink,
     retryLink,
     authLink,
     httpLink as any
