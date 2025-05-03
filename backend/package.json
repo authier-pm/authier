@@ -80,7 +80,8 @@
     "sql-highlight": "^6.0.0",
     "ts-node": "^10.9.2",
     "unplugin-swc": "^1.5.2",
-    "vitest": "^3.1.1"
+    "vitest": "3.1.1",
+    "vite": "6.2.6"
   },
   "scripts": {
     "dev": "DEBUG=au:* pnpm nodemon --exec ts-node-transpile-only server.ts",
