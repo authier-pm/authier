@@ -15,8 +15,8 @@ import {
 
 import { t } from '@lingui/core/macro'
 
-import { AuthierSelect } from '@src/components/AuthierSelect'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { AuthierSelect } from '../components/AuthierSelect'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 import React, { useEffect, useState } from 'react'
 import {
   useDefaultSettingsQuery,
@@ -25,7 +25,7 @@ import {
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { useDefaultDeviceSettingsModalQuery } from './DefaultDeviceSettingsModal.codegen'
 import { omit } from 'lodash'
-import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
+import { useVaultLockTimeoutOptions } from '../utils/useVaultLockTimeoutOptions'
 
 /**
  * should only show after signup

@@ -3,9 +3,12 @@ import type {
   NavigatorScreenParams
 } from '@react-navigation/native'
 import type { StackScreenProps } from '@react-navigation/stack'
-import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
+import { ILoginSecret, ITOTPSecret } from '../utils/deviceStore'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { DeviceQuery, UserQuery } from '@shared/generated/graphqlBaseTypes'
+import {
+  DeviceQuery,
+  UserQuery
+} from '../../../shared/generated/graphqlBaseTypes'
 import { BottomTabScreenProps } from '@react-navigation/bottom-tabs'
 import { MaterialTopTabScreenProps } from '@react-navigation/material-top-tabs'
 

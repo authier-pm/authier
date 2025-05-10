@@ -1,7 +1,9 @@
+nodeLinker: hoisted
 packages:
-  - "backend/**"
+  - 'backend/**'
   - 'mobile-app/**'
   - 'web-extension/**'
+  - 'shared/**'
   # if required, exclude some directories
   - '!backend/dist/**'
   - '!web-extension/dist/**'

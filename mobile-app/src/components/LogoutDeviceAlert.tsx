@@ -9,7 +9,7 @@ import {
 } from '@shared/graphql/AccountDevices.codegen'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Trans } from '@lingui/macro'
-import { emitter } from '@src/screens/Device/Devices'
+import { emitter } from '../screens/Device/Devices'
 
 export const LogoutDeviceAlert = ({
   selectedDeviceId,

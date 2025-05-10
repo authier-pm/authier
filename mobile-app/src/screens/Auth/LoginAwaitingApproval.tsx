@@ -20,20 +20,20 @@ import {
   cryptoKeyToString,
   dec,
   generateEncryptionKey
-} from '@utils/generateEncryptionKey'
-import { IBackgroundStateSerializable } from '@utils/deviceStore'
-import { useInterval } from '@src/utils/useInterval'
+} from '../../utils/generateEncryptionKey'
+import { IBackgroundStateSerializable } from '../../utils/deviceStore'
+import { useInterval } from '../../utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation
 } from '@shared/graphql/Login.codegen'
 import { Platform } from 'react-native'
-import { ToastAlert } from '@components/ToastAlert'
-import { Loading } from '@components/Loading'
+import { ToastAlert } from '../../components/ToastAlert'
+import { Loading } from '../../components/Loading'
 import { ToastType } from '../../ToastTypes'
 import { Trans } from '@lingui/macro'
-import { useDeviceStore } from '@utils/deviceStore'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStore } from '../../utils/deviceStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 export const useLogin = (props: { deviceName: string }) => {
   const toast = useToast()

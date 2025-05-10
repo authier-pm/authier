@@ -6,7 +6,7 @@ import { QueryClientProvider } from 'react-query'
 import { ApolloProvider } from '@apollo/client'
 
 import { RenderOptions, render } from '@testing-library/react-native'
-import { makeSsrClient } from '@src/apollo/ApolloClientMock'
+import { makeSsrClient } from '../apollo/ApolloClientMock'
 import { ReactElement } from 'react'
 import { jest } from '@jest/globals'
 

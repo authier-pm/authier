@@ -24,8 +24,8 @@ import { Trans } from '@lingui/macro'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '@navigation/AuthNavigation'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
-import { Loading } from '@src/components/Loading'
-import { useDeviceStore } from '@src/utils/deviceStore'
+import { Loading } from '../components/Loading'
+import { useDeviceStore } from '../utils/deviceStore'
 
 export interface ILoginFormValues {
   email: string

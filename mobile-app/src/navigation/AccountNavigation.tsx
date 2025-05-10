@@ -2,14 +2,14 @@ import React from 'react'
 
 import { Account } from '../screens/Account/Account'
 import { AccountStackParamList } from './types'
-import { ChangeMasterPassword } from '@src/screens/Account/ChangeMasterPassword'
+import { ChangeMasterPassword } from '../screens/Account/ChangeMasterPassword'
 import { t } from '@lingui/core/macro'
 import {
   createStackNavigator,
   TransitionPresets
 } from '@react-navigation/stack'
 import { SettingsNavigation } from './SettingsNavigation'
-import { Limits } from '@src/screens/Account/Limits'
+import { Limits } from '../screens/Account/Limits'
 
 const DeviceStack = createStackNavigator<AccountStackParamList>()
 

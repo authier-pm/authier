@@ -13,18 +13,19 @@ import {
   Heading,
   ScrollView
 } from 'native-base'
-import { PasswordReEnter } from '@src/components/PasswordReEnter'
 
 import SInfo from 'react-native-sensitive-info'
 import { Trans } from '@lingui/macro'
 import { useUpdateSettingsMutation } from '@shared/graphql/Settings.codegen'
 import { SettingsInput } from '@shared/generated/graphqlBaseTypes'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStateStore } from '../../../utils/deviceStateStore'
+import { useDeviceStore } from '../../../utils/deviceStore'
 
 import { RefreshControl } from 'react-native'
-import { AuthierSelect } from '@src/components/AuthierSelect'
-import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
+
+import { useVaultLockTimeoutOptions } from '../../../utils/useVaultLockTimeoutOptions'
+import { PasswordReEnter } from '@/src/components/PasswordReEnter'
+import { AuthierSelect } from '@/src/components/AuthierSelect'
 
 export function DeviceSettings() {
   const deviceState = useDeviceStateStore((state) => state)

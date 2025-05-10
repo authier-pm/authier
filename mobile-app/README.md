@@ -1,75 +1,50 @@
-# mobile
+# Welcome to your Expo app 👋
 
-react-native mobile app
+This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
 
-## Development
+## Get started
 
-Install dependencies with `pnpm`
-Make sure you have your own `.env` file with API key and secrets: `cp env.sample .env`
+1. Install dependencies
 
-## Release build
+   ```bash
+   npm install
+   ```
 
-We use Github CI/CD for publishing releases. When you push a tag, it will build and publish the app to the play store.
+2. Start the app
 
-### Deprecated
+   ```bash
+   npx expo start
+   ```
 
-in order to build you need `mobile-app/android/local.properties`
+In the output, you'll find options to open the app in a
 
-Add `local.properties` to `android/` folder with the following content:
+- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
+- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
+- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
+- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
 
-```
-# local.properties
-storePassword=XXXXXXXX
-sdk.dir=XXXXXXXX
-keyAlias=XXXXXXXX
-keyPassword=XXXXXXXX
-storeFile=XXXXXXXX
-```
+You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
 
-if you have this, make sure the storeFile path is correct. Then run `buildRelease`
+## Get a fresh project
 
-### How to run locally in android emulator
+When you're ready, run:
 
-1. run metro bundler
-   `pnpm start`
-
-2. hit `a` for android
-
-### How to run for ios
-
-1. install pods with `pnpm pod:install`
-2. run metro `pnpm start` and hit `i` for iOS
-
-## Known problems
-
-make sure to hard refresh by pressing `r` if you edit a formik form. Formik has problems hot reloading.
-
-# Useful commands
-
-### useful to debug js code errors
-
-`adb logcat "*:S" ReactNative:V ReactNativeJS:V`
-
-### useful to debug native errors (when the app won't even start)
-
-`adb logcat "*:E"`
-
-### When you have problem with dependencies
-
-`npx react-native-clean-project`
-
-### Could not connect to server
-
-reverse ports with `adb reverse tcp:**** tcp:****` or use https://stackoverflow.com/a/2235255/671457
-
-### error Failed to install the app
-
-Sometimes you need to copy the react native dependency from root to mobile folder. So run this command from `mobile-app`
-
-```
-cp -r ../node_modules/react-native/ ./node_modules
+```bash
+npm run reset-project
 ```
 
-## TODO
+This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
 
-- https://f-droid.org/en/ publish here
+## Learn more
+
+To learn more about developing your project with Expo, look at the following resources:
+
+- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
+- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+
+## Join the community
+
+Join our community of developers creating universal apps.
+
+- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
+- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.

@@ -2,12 +2,12 @@ import React, { useState } from 'react'
 import { Modal, Button, Icon, Input, FormControl } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import SInfo from 'react-native-sensitive-info'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 import {
   base64ToBuffer,
   dec,
   generateEncryptionKey
-} from '@src/utils/generateEncryptionKey'
+} from '../utils/generateEncryptionKey'
 
 import { Formik, FormikHelpers } from 'formik'
 

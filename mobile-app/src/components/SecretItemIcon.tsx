@@ -1,5 +1,5 @@
 import { Icon, useColorModeValue } from 'native-base'
-import { constructURL } from '@src/utils/urlUtils'
+import { constructURL } from '../utils/urlUtils'
 import React from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import FastImage from 'react-native-fast-image'

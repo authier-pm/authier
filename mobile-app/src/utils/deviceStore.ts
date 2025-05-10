@@ -22,7 +22,7 @@ import {
 } from './deviceStore.codegen'
 
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
+import { enc, encryptedBuf_to_base64 } from './generateEncryptionKey'
 import messaging from '@react-native-firebase/messaging'
 import {
   SyncSettingsDocument,

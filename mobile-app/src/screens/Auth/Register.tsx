@@ -17,25 +17,25 @@ import {
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import uuid from 'react-native-uuid'
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
-import { IBackgroundStateSerializable } from '@utils/deviceStore'
+import { IBackgroundStateSerializable } from '../../utils/deviceStore'
 
 import SInfo from 'react-native-sensitive-info'
 import { Platform } from 'react-native'
 import { Trans } from '@lingui/macro'
 import { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { AuthStackParamList } from '../../navigation/AuthNavigation'
-import { ToastAlert } from '@components/ToastAlert'
+import { ToastAlert } from '../../components/ToastAlert'
 import { ToastType } from '../../ToastTypes'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import {
   bufferToBase64,
   cryptoKeyToString,
   generateEncryptionKey
-} from '@src/utils/generateEncryptionKey'
-import { useDeviceStore } from '@utils/deviceStore'
+} from '../../utils/generateEncryptionKey'
+import { useDeviceStore } from '../../utils/deviceStore'
 
 import { ILoginFormValues, LoginContext } from './Login'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 type NavigationProps = NativeStackScreenProps<AuthStackParamList, 'Register'>
 

@@ -8,7 +8,6 @@ export const makeSsrClient = (ctx: any) => {
     cache: new InMemoryCache(),
     ssrMode: true,
     link: new SchemaLink({
-      // @ts-ignore
       schema: gqlSchema,
       context: ctx
     })

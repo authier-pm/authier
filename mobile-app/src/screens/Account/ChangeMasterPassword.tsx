@@ -24,10 +24,10 @@ import {
   cryptoKeyToString,
   decryptDeviceSecretWithPassword,
   generateEncryptionKey
-} from '@src/utils/generateEncryptionKey'
-import { IBackgroundStateSerializable } from '@src/utils/deviceStore'
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+} from '../utils/generateEncryptionKey'
+import { IBackgroundStateSerializable } from '../utils/deviceStore'
+import { useDeviceStore } from '../utils/deviceStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 
 export function ChangeMasterPassword() {
   const device = useDeviceStore((state) => state)

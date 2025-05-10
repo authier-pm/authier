@@ -8,7 +8,7 @@ import {
   dec,
   enc,
   generateEncryptionKey
-} from '@utils/generateEncryptionKey'
+} from './generateEncryptionKey'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 
@@ -37,7 +37,7 @@ import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { IToastService } from 'native-base/lib/typescript/components/composites/Toast'
 import { constructURL } from './urlUtils'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { zustandStorage } from '@utils/storage'
+import { zustandStorage } from './storage'
 
 interface DeviceStateProps {
   email: string
@@ -87,6 +87,7 @@ export interface DeviceStateActions extends DeviceStateProps {
       }
     | undefined
   >
+  // @ts-expect-error
   findExistingSecret: (secret) => Promise<SecretSerializedType | undefined>
   addSecrets: (secrets: AddSecretInput) => Promise<
     {

@@ -17,16 +17,16 @@ import {
   cryptoKeyToString,
   dec,
   generateEncryptionKey
-} from '@utils/generateEncryptionKey'
+} from '../utils/generateEncryptionKey'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { Loading } from '@src/components/Loading'
-import { ToastAlert } from '@src/components/ToastAlert'
-import { ToastType } from '@src/ToastTypes'
+import { Loading } from '../components/Loading'
+import { ToastAlert } from '../components/ToastAlert'
+import { ToastType } from '../ToastTypes'
 import RNBootSplash from 'react-native-bootsplash'
-import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '../utils/deviceStore'
 import SInfo from 'react-native-sensitive-info'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 
 interface Values {
   password: string

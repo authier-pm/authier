@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import { Loading } from '@src/components/Loading'
-import { TOTPStackScreenProps } from '@src/navigation/types'
+import { Loading } from '../components/Loading'
+import { TOTPStackScreenProps } from '../navigation/types'
 import * as React from 'react'
 import { useEffect } from 'react'
 import queryString from 'query-string'
@@ -11,7 +11,7 @@ import { Camera } from 'react-native-vision-camera'
 import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
 
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 
 function CameraFrame() {
   return (

@@ -16,18 +16,18 @@ import {
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { Formik, FormikHelpers } from 'formik'
 
-import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
+import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 
-import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
+import { ILoginSecret, ITOTPSecret } from '../../utils/deviceStore'
 import {
   EncryptedSecretsDocument,
   useUpdateEncryptedSecretMutation
 } from '@shared/graphql/EncryptedSecrets.codegen'
-import { PasswordStackScreenProps } from '@navigation/types'
+import { PasswordStackScreenProps } from '../../navigation/types'
 import { credentialValues, PasswordSchema } from '@shared/formikSharedTypes'
-import { Loading } from '@components/Loading'
+import { Loading } from '../../components/Loading'
 import zxcvbn from 'zxcvbn-typescript'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 export const InputHeader = ({ children }) => {
   return (

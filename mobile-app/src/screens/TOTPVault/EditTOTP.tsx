@@ -4,16 +4,16 @@ import { Alert, Input, Button, Flex, FormControl, View } from 'native-base'
 
 import { Formik, FormikHelpers } from 'formik'
 
-import { DeleteSecretAlert } from '@components/DeleteSecretAlert'
+import { DeleteSecretAlert } from '../../components/DeleteSecretAlert'
 
-import { ILoginSecret, ITOTPSecret } from '@utils/deviceStore'
+import { ILoginSecret, ITOTPSecret } from '../../utils/deviceStore'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
-import { TOTPStackScreenProps } from '@navigation/types'
+import { TOTPStackScreenProps } from '../../navigation/types'
 import { TOTPSchema, totpValues } from '@shared/formikSharedTypes'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { SyncEncryptedSecretsDocument } from '@shared/graphql/ExtensionDevice.codegen'
-import { Loading } from '@components/Loading'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { Loading } from '../../components/Loading'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -22,6 +22,13 @@ const InputField = ({
   handleBlur,
   handleChange,
   header
+}: {
+  errors: any
+  values: any
+  name: any
+  handleBlur: any
+  handleChange: any
+  header: any
 }) => {
   return (
     <FormControl isInvalid={name in errors}>

@@ -1,26 +1,26 @@
-import { onError } from '@apollo/client/link/error'
-import fetch from 'cross-fetch'
 import {
   ApolloClient,
-  InMemoryCache,
+  ApolloLink,
   from,
   HttpLink,
-  ApolloLink
+  InMemoryCache
 } from '@apollo/client'
+import { onError } from '@apollo/client/link/error'
 import { RetryLink } from 'apollo-link-retry'
+import fetch from 'cross-fetch'
 import { print } from 'graphql'
 
 import QueueLink from 'apollo-link-queue'
 
 import { setContext } from '@apollo/client/link/context'
 import { tokenRefresh } from './tokenRefresh'
-import { API_URL } from '@env'
+
 import { Toast } from 'native-base'
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
+import { useDeviceStore } from '../utils/deviceStore'
 
 //REVERSE PORTS adb reverse tcp:5051 tcp:5051 or use https://stackoverflow.com/a/2235255/671457
-
+const API_URL = process.env.EXPO_PUBLIC_API_URL
 if (!API_URL) {
   throw new Error('API_URL is not defined')
 }

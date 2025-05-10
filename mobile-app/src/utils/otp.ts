@@ -1,13 +1,13 @@
 import jsSHA from 'jssha'
 
-function dec2hex(s) {
+function dec2hex(s: number) {
   return (s < 15.5 ? '0' : '') + Math.round(s).toString(16)
 }
-function hex2dec(s) {
+function hex2dec(s: string) {
   return parseInt(s, 16)
 }
 
-function base32tohex(base32) {
+function base32tohex(base32: string) {
   const base32chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
   let bits = ''
   let hex = ''
@@ -24,7 +24,7 @@ function base32tohex(base32) {
   return hex
 }
 
-function leftpad(str, len, pad) {
+function leftpad(str: string, len: number, pad: string) {
   if (len + 1 >= str.length) {
     str = Array(len + 1 - str.length).join(pad) + str
   }

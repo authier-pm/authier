@@ -15,24 +15,26 @@ import {
 } from 'native-base'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { ButtonWithAlert } from '@src/components/ButtonWithAlert'
+import { useDeviceStateStore } from '../../../utils/deviceStateStore'
+import { useDeviceStore } from '../../../utils/deviceStore'
+import { ButtonWithAlert } from '../../../components/ButtonWithAlert'
 import { useDeleteAccountMutation } from '../Account.codegen'
 import { SettingsItem } from '../Account'
 import { useNavigation } from '@react-navigation/native'
-import { AccountStackScreenProps } from '@src/navigation/types'
+
 import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
-import { AuthierSelect } from '@src/components/AuthierSelect'
+import { AuthierSelect } from '../../../components/AuthierSelect'
 import {
   useDefaultSettingsQuery,
   useUpdateDefaultDeviceSettingsMutation
-} from '@shared/graphql/DefaultSettings.codegen'
-import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
+} from '../../../../../shared/graphql/DefaultSettings.codegen'
+
 import { useNetInfo } from '@react-native-community/netinfo'
 import { RefreshControl } from 'react-native'
 import { i18n } from '@lingui/core'
-import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
+import { useVaultLockTimeoutOptions } from '../../../utils/useVaultLockTimeoutOptions'
+import { AccountStackScreenProps } from '@/src/navigation/types'
+import { DefaultSettingsInput } from '../../../../../shared/generated/graphqlBaseTypes'
 
 export function UserSettings() {
   const navigation =

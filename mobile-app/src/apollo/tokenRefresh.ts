@@ -1,9 +1,9 @@
 import { TokenRefreshLink } from 'apollo-link-token-refresh'
-import jwtDecode, { JwtPayload } from 'jwt-decode'
-import { API_URL } from '@env'
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { JwtPayload, jwtDecode } from 'jwt-decode'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
+import { useDeviceStore } from '../utils/deviceStore'
 
+const API_URL = process.env.EXPO_PUBLIC_API_URL
 if (!API_URL) {
   throw new Error('API_URL is not defined')
 }

@@ -13,7 +13,7 @@ import {
 
 import { Loading } from './components/Loading'
 import RNBootSplash from 'react-native-bootsplash'
-import { routingInstrumentation } from './sentryInit'
+
 import { useDeviceStore } from './utils/deviceStore'
 import { useDeviceStateStore } from './utils/deviceStateStore'
 
@@ -40,7 +40,6 @@ export function Routes() {
       ref={navigation}
       onReady={() => {
         RNBootSplash.hide({ fade: true })
-        routingInstrumentation.registerNavigationContainer(navigation)
       }}
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}
     >

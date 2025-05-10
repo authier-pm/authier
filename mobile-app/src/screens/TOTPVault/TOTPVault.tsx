@@ -9,14 +9,14 @@ import {
   HStack
 } from 'native-base'
 
-import { SearchBar } from '@components/SearchBar'
+import { SearchBar } from '../../components/SearchBar'
 
-import { TOTPSecret } from '@components/TOTPSecret'
+import { TOTPSecret } from '../../components/TOTPSecret'
 import { FlashList } from '@shopify/flash-list'
 import CircularProgress from 'react-native-circular-progress-indicator'
-import { TOTPStackScreenProps } from '@navigation/types'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useDeviceStore } from '@src/utils/deviceStore'
+import { TOTPStackScreenProps } from '../../navigation/types'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
+import { useDeviceStore } from '../../utils/deviceStore'
 import { EmptyList } from '../PasswordVault/PasswordVault'
 
 export const TOTPVault = ({

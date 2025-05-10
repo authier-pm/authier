@@ -1,21 +1,22 @@
 import {
-  Center,
-  HStack,
-  Text,
-  VStack,
-  Divider,
   Avatar,
-  Heading,
-  useColorModeValue,
   Button,
+  Center,
+  Divider,
+  Flex,
+  Heading,
+  HStack,
   ScrollView,
-  Flex
+  Text,
+  useColorModeValue,
+  VStack
 } from 'native-base'
 import React, { useCallback } from 'react'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
-import { useLimitsQuery } from '../../../../shared/graphql/AccountLimits.codegen'
 import { Alert, Linking, RefreshControl } from 'react-native'
-import { PAGE_URL } from '@env'
+import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
+
+const PAGE_URL = process.env.EXPO_PUBLIC_PAGE_URL
 
 type OpenURLButtonProps = {
   url: string

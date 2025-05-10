@@ -7,19 +7,19 @@ import {
   BottomTabBar,
   createBottomTabNavigator
 } from '@react-navigation/bottom-tabs'
-import { PasswordsStackNavigation } from './PasswordsStackNavigation'
 import Ionicons from 'react-native-vector-icons/Ionicons'
 import { AccountNavigation } from './AccountNavigation'
+import { PasswordsStackNavigation } from './PasswordsStackNavigation'
 import { TOTPStackNavigation } from './TOTPStackNavigation'
 
-import { useNavigation } from '@react-navigation/native'
-import { RootStackParamList } from './types'
-import { useToast } from 'native-base'
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
-import { Platform } from 'react-native'
-import { OfflineBanner } from '@src/components/OfflineBanner'
 import { t } from '@lingui/core/macro'
+import { useNavigation } from '@react-navigation/native'
+import { useToast } from 'native-base'
+import { Platform } from 'react-native'
+import { OfflineBanner } from '../components/OfflineBanner'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
+import { useDeviceStore } from '../utils/deviceStore'
+import { RootStackParamList } from './types'
 
 const RootStack = createBottomTabNavigator<RootStackParamList>()
 

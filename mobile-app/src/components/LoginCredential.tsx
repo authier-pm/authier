@@ -1,23 +1,23 @@
+import Clipboard from '@react-native-clipboard/clipboard'
+import { useNavigation } from '@react-navigation/native'
 import {
-  HStack,
-  VStack,
-  IconButton,
-  Text,
-  View,
-  Icon as NativeIcon,
-  Pressable,
-  useToast,
   Box,
   Center,
-  Heading
+  Heading,
+  HStack,
+  IconButton,
+  Icon as NativeIcon,
+  Pressable,
+  Text,
+  useToast,
+  View,
+  VStack
 } from 'native-base'
 import React from 'react'
 import Icon from 'react-native-vector-icons/Ionicons'
-import Clipboard from '@react-native-clipboard/clipboard'
+import { PasswordStackScreenProps } from '../navigation/types'
+import { ILoginSecret } from '../utils/deviceStore'
 import { SecretItemIcon } from './SecretItemIcon'
-import { useNavigation } from '@react-navigation/native'
-import { ILoginSecret } from '@utils/deviceStore'
-import { PasswordStackScreenProps } from '@navigation/types'
 
 export const LoginCredential = ({
   loginSecret

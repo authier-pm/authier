@@ -1,4 +1,5 @@
 import Base64 from './Base64'
+//@ts-expect-error missing types
 import { TextEncoder, TextDecoder } from 'text-decoding'
 import { PBKDF2Iterations } from '../../../shared/constants'
 
@@ -37,7 +38,7 @@ async function getKeyMaterial(password: string): Promise<CryptoKey> {
 
 export async function generateEncryptionKey(
   psw: string,
-  salt: ArrayBuffer
+  salt: Uint8Array<ArrayBuffer>
 ): Promise<CryptoKey> {
   const keyMaterial = await getKeyMaterial(psw)
   const key = await self.crypto.subtle.deriveKey(
@@ -55,7 +56,7 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const bufferToBase64 = (buff: ArrayBuffer) =>
+export const bufferToBase64 = (buff: Uint8Array<ArrayBuffer> | ArrayBuffer) =>
   Base64.btoa(
     Array.from(new Uint8Array(buff))
       .map((b) => String.fromCharCode(b))
@@ -63,9 +64,7 @@ export const bufferToBase64 = (buff: ArrayBuffer) =>
   )
 
 export const base64ToBuffer = (b64: string) =>
-  //FIX: What is this
-  //@ts-expect-error
-  Uint8Array.from(Base64.atob(b64), (c) => c.charCodeAt(null))
+  Uint8Array.from(Base64.atob(b64), (c) => c.charCodeAt(0))
 
 export const encryptedBuf_to_base64 = (
   encryptedBuff: ArrayBuffer,

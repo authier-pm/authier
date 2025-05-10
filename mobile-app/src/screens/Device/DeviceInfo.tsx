@@ -18,19 +18,19 @@ import {
 } from 'native-base'
 import React, { ReactElement } from 'react'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { LogoutDeviceAlert } from '@components/LogoutDeviceAlert'
+import { LogoutDeviceAlert } from '../../components/LogoutDeviceAlert'
 
-import { DevicesStackScreenProps } from '@navigation/types'
+import { DevicesStackScreenProps } from '../../navigation/types'
 import {
   useChangeDeviceSettingsMutation,
   useChangeMasterDeviceMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { icons } from './Devices'
 
-import { useDeviceStore } from '@src/utils/deviceStore'
-import { Loading } from '@src/components/Loading'
+import { useDeviceStore } from '../../utils/deviceStore'
+import { Loading } from '../../components/Loading'
 import { DeviceInfoDocument, useDeviceInfoQuery } from './DeviceInfo.codegen'
-import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
+import { useVaultLockTimeoutOptions } from '../../utils/useVaultLockTimeoutOptions'
 
 const ColumnWrapper = ({
   text,

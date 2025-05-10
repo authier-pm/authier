@@ -3,8 +3,8 @@ import * as React from 'react'
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs'
 import { t } from '@lingui/core/macro'
 import { SettingsTabParamList } from './types'
-import { UserSettings } from '@src/screens/Account/settings/UserSettings'
-import { DeviceSettings } from '@src/screens/Account/settings/DeviceSettings'
+import { UserSettings } from '../screens/Account/settings/UserSettings'
+import { DeviceSettings } from '../screens/Account/settings/DeviceSettings'
 
 const Tab = createMaterialTopTabNavigator<SettingsTabParamList>()
 

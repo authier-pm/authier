@@ -6,9 +6,9 @@ import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { InputHeader } from '../PasswordVault/EditPassword'
 import { useNavigation } from '@react-navigation/native'
 import { TOTPStackScreenProps } from '../../navigation/types'
-import { TotpTypeWithMeta } from '@utils/deviceStore'
+import { TotpTypeWithMeta } from '../../utils/deviceStore'
 import { TOTPSchema } from '@shared/formikSharedTypes'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 export const InputField = ({
   errors,
@@ -17,6 +17,13 @@ export const InputField = ({
   handleBlur,
   handleChange,
   header
+}: {
+  errors: any
+  values: any
+  name: any
+  handleBlur: any
+  handleChange: any
+  header: any
 }) => {
   return (
     <FormControl isInvalid={name in errors}>

@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 import { useNavigation } from '@react-navigation/native'
 import { AlertDialog, Button, Text, IconButton, Center } from 'native-base'
 import Ionicons from 'react-native-vector-icons/Ionicons'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../utils/deviceStateStore'
 
 import {
   EncryptedSecretsDocument,

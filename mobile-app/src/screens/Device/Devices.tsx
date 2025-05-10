@@ -17,7 +17,7 @@ import {
 
 import Ionicons from 'react-native-vector-icons/Ionicons'
 
-import { SearchBar } from '@components/SearchBar'
+import { SearchBar } from '../../components/SearchBar'
 import {
   useApproveChallengeMutation,
   useDevicesRequestsQuery,
@@ -30,11 +30,11 @@ import {
 } from '@shared/generated/graphqlBaseTypes'
 import { formatRelative } from 'date-fns'
 import { Trans } from '@lingui/macro'
-import { DevicesStackScreenProps } from '@navigation/types'
-import { useDeviceStateStore } from '@utils/deviceStateStore'
+import { DevicesStackScreenProps } from '../../navigation/types'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 import mitt from 'mitt'
-import { useDeviceStore } from '@src/utils/deviceStore'
+import { useDeviceStore } from '../../utils/deviceStore'
 import { useDevicesListQuery } from './Devices.codegen'
 
 export const icons = {

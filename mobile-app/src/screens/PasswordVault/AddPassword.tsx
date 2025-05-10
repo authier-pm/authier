@@ -26,7 +26,7 @@ import {
   defaultPasswordGeneratorConfig,
   generate
 } from '@shared/passwordGenerator'
-import { useDeviceStateStore } from '@src/utils/deviceStateStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 const InputField = ({
   errors,
@@ -35,6 +35,13 @@ const InputField = ({
   handleBlur,
   handleChange,
   header
+}: {
+  errors: any
+  values: any
+  name: any
+  handleBlur: any
+  handleChange: any
+  header: any
 }) => {
   return (
     <FormControl isInvalid={name in errors}>
