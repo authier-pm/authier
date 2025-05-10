@@ -1,0 +1,4 @@
+upgrade: true
+reject:
+  - '@trpc/client'
+  - '@trpc/server'

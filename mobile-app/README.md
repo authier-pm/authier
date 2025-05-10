@@ -69,3 +69,7 @@ Sometimes you need to copy the react native dependency from root to mobile folde
 ```
 cp -r ../node_modules/react-native/ ./node_modules
 ```
+
+## TODO
+
+- https://f-droid.org/en/ publish here
