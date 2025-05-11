@@ -1,7 +1,7 @@
 import { onError } from '@apollo/client/link/error'
 import { print } from 'graphql'
-//@ts-ignore
-import { device } from '../background/ExtensionDevice'
+
+import { device } from '../web-extension/src/background/ExtensionDevice'
 import { toast } from '../web-extension/src/ExtensionProviders'
 
 // Log any GraphQL errors or network error that occurred

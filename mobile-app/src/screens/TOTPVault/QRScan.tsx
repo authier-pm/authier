@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/native'
-import { Loading } from '../components/Loading'
-import { TOTPStackScreenProps } from '../navigation/types'
+import { Loading } from '../../components/Loading'
+import { TOTPStackScreenProps } from '../../navigation/types'
 import * as React from 'react'
 import { useEffect } from 'react'
 import queryString from 'query-string'
@@ -11,7 +11,7 @@ import { Camera } from 'react-native-vision-camera'
 import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
 
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { useDeviceStateStore } from '../utils/deviceStateStore'
+import { useDeviceStateStore } from '../../utils/deviceStateStore'
 
 function CameraFrame() {
   return (
@@ -89,7 +89,7 @@ export const QRScan = () => {
   useEffect(() => {
     ;(async () => {
       const status = await Camera.requestCameraPermission()
-      setHasPermission(status === 'authorized')
+      setHasPermission(status === 'granted')
     })()
   }, [])
 
