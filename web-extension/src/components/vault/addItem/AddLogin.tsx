@@ -13,7 +13,7 @@ import {
 } from '@chakra-ui/react'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { passwordStrength } from 'check-password-strength'
+
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 
 import { Field, Formik, FormikHelpers } from 'formik'
@@ -25,6 +25,7 @@ import { EditFormButtons } from '../EditFormButtons'
 import { generate } from 'generate-password'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import { defaultPasswordGeneratorConfig } from '@shared/passwordGenerator'
+import { evaluatePasswordStrength } from '../evaluatePasswordStrength'
 
 export const AddLogin = () => {
   const navigate = useNavigate()
@@ -78,7 +79,7 @@ export const AddLogin = () => {
         }}
       >
         {({ values, handleSubmit, errors, touched, setFieldValue }) => {
-          const levelOfPsw = passwordStrength(values.password)
+          const levelOfPsw = evaluatePasswordStrength(values.password)
           return (
             <form onSubmit={handleSubmit}>
               <Flex

@@ -175,8 +175,13 @@ export function useDevicesRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOp
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
         }
+export function useDevicesRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
+        }
 export type DevicesRequestsQueryHookResult = ReturnType<typeof useDevicesRequestsQuery>;
 export type DevicesRequestsLazyQueryHookResult = ReturnType<typeof useDevicesRequestsLazyQuery>;
+export type DevicesRequestsSuspenseQueryHookResult = ReturnType<typeof useDevicesRequestsSuspenseQuery>;
 export type DevicesRequestsQueryResult = Apollo.QueryResult<DevicesRequestsQuery, DevicesRequestsQueryVariables>;
 export const LogoutDeviceDocument = gql`
     mutation logoutDevice($id: String!) {

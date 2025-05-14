@@ -2,7 +2,8 @@ import { useState } from 'react'
 import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
 import { device } from '@src/background/ExtensionDevice'
-import { t, Trans } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 
 export function RefreshSecretsButton() {
   const [isSyncing, setIsSyncing] = useState(false)

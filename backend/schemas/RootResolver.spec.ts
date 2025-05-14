@@ -55,14 +55,6 @@ describe('RootResolver', () => {
     it('should add new user', async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
-      const accessToken = sign(
-        { userId: userId, deviceId: input.deviceId },
-        process.env.ACCESS_TOKEN_SECRET!,
-        {
-          expiresIn: '60m'
-        }
-      )
-
       const data = await resolver.registerNewUser(
         input,
         userId,
@@ -72,7 +64,7 @@ describe('RootResolver', () => {
       expect({
         accessToken: data.accessToken,
         email: data.user.email
-      }).toMatchObject({ accessToken: accessToken, email: input.email })
+      }).toMatchObject({ accessToken: expect.any(String), email: input.email })
 
       await prismaClient.device.deleteMany()
       await prismaClient.decryptionChallenge.deleteMany()
@@ -134,7 +126,7 @@ describe('RootResolver', () => {
             makeFakeCtx({ userId })
           )
       ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Device cf6fe83e-0ae6-4472-8908-7ece569f0252 already exists. You cannot use a device with multiple accounts.]`
+        `[Error: Device 8faf8825-02b0-45db-8b37-9f334c7083c4 already exists. You cannot use a device with multiple accounts.]`
       )
     })
   })

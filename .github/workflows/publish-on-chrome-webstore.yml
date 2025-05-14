@@ -41,7 +41,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - uses: cardinalby/export-env-action@v1
+      - uses: cardinalby/export-env-action@v2
         with:
           envFile: './.github/workflows/constants.env'
           expand: true
@@ -91,10 +91,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: cardinalby/export-env-action@v1
+      - uses: cardinalby/export-env-action@v2
         with:
           envFile: './.github/workflows/constants.env'
           expand: true
+
+      - name: Wait for CRX to be available
+        run: sleep 60 # Wait 1 minute for the CRX to be processed
 
       - name: Download published crx file
         id: gWebStoreDownloadCrx
@@ -116,7 +119,7 @@ jobs:
 
       - name: Upload webstore crx file artifact to workflow
         if: '!needs.publish-on-webstore.outputs.releaseUploadUrl'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WEBSTORE_CRX_FILE_NAME }}
           path: ${{ env.WEBSTORE_CRX_FILE_PATH }}

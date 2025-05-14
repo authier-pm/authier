@@ -1,6 +1,8 @@
-# authier
+[![Join our Discord](https://dcbadge.vercel.app/api/server/PdGCMeXtFG)](https://discord.gg/PdGCMeXtFG)
 
-monorepo for authier password manager
+# Authier
+
+monorepo for Authier password manager
 Includes:
 
 - web extension
@@ -43,10 +45,6 @@ pnpm schemas
 
 keep in mind that a single package can be in multiple subfolders, so if you update it in one place, make sure to update it everywhere
 
-## Pnpm install
-
-We are using pnpm workspaces so always run pnpm in root folder. That's where the lockfile is.
-
 ## How to run locally
 
 Refer to readme inside each sub project for all the instructions. Generally you will need to run backend + whatever client you want to develop.
@@ -55,7 +53,7 @@ Refer to readme inside each sub project for all the instructions. Generally you 
 
 Authier is a non profit organization. If we ever see any profit from this project, it will be divided at the end each month proportionally according to the latest numbers in `contrib-locs.json`.
 
-If you contribute to authier, your PR gets merged and from next month you will be eligible for a small portion of the profit.
+If you contribute to Authier, your PR gets merged and from next month you will be eligible for a small portion of the profit.
 For now this happens manually. We cannot open source our stripe dashboard, but we will expose publicly our stripe balance if there are more than 4 contributors. ATM it's just 2 contributors.
 
 ## Contrib locs

@@ -1,5 +1,6 @@
 import { constructURL } from '@shared/urlUtils'
 import { device } from './ExtensionDevice'
+import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 
 export const getWebInputsForUrl = (url: string) => {
   const hostname = constructURL(url).hostname
@@ -7,7 +8,9 @@ export const getWebInputsForUrl = (url: string) => {
     return []
   }
 
-  const exactMatch = device.state?.webInputs.filter((i) => i.url === url) ?? []
+  const webInputs = device.state?.webInputs ?? []
+
+  const exactMatch = webInputs.filter((i) => i.url === url) ?? []
   if (exactMatch.length > 0) {
     return exactMatch
   }
@@ -27,12 +30,18 @@ export const getWebInputsForUrl = (url: string) => {
   const hostnamesToCheck = stripSubdomains(hostname)
 
   for (const host of hostnamesToCheck) {
-    const partialMatch =
-      device.state?.webInputs.filter((i) => i.url.includes(host)) ?? []
+    const partialMatch = webInputs.filter((i) => i.url.includes(host)) ?? []
     if (partialMatch.length > 0) {
       return partialMatch
     }
   }
 
   return []
+}
+
+export const getWebInputsForUrlOfKinds = (
+  url: string,
+  kinds: WebInputType[]
+) => {
+  return getWebInputsForUrl(url).filter((i) => kinds.includes(i.kind))
 }

@@ -33,7 +33,7 @@ import {
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
 
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
@@ -44,8 +44,8 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
-import { isTorExit } from './isTorExit'
 import { firebaseAdmin } from '../lib/firebaseAdmin'
+import { WebInputMutation } from '../models/WebInput'
 
 const log = debug('au:RootResolver')
 
@@ -239,7 +239,7 @@ export class RootResolver {
     })
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device.id,
+      device,
       ctx
     )
   }
@@ -274,7 +274,9 @@ export class RootResolver {
     })
 
     if (!user) {
-      throw new GraphqlError('Login failed, create a new account.')
+      throw new GraphqlError(
+        'Login failed, check your email and master password'
+      )
     }
     const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
@@ -308,7 +310,7 @@ export class RootResolver {
       where: { id: deviceInput.id }
     })
 
-    console.log('device', device)
+    log('device', device)
 
     let challenge = await ctx.prisma.decryptionChallenge.findFirst({
       where: {
@@ -352,18 +354,28 @@ export class RootResolver {
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10
       ) {
-        console.log('sending notification to')
-        await firebaseAdmin
-          .messaging()
-          .sendToDevice(user.masterDevice.firebaseToken, {
-            notification: {
-              title: 'New device login!',
-              body: 'New device is trying to log in.'
-            },
-            data: {
-              type: 'Devices'
+        log('sending notification to', user.masterDevice.firebaseToken)
+        await firebaseAdmin.messaging().send({
+          token: user.masterDevice.firebaseToken,
+          notification: {
+            title: 'New device login!',
+            body: 'New device is trying to log in.'
+          },
+          data: {
+            type: 'Devices'
+          },
+          android: {
+            priority: 'high'
+          },
+          apns: {
+            payload: {
+              aps: {
+                contentAvailable: true,
+                priority: 10
+              }
             }
-          })
+          }
+        })
       }
       challenge = await ctx.prisma.decryptionChallenge.create({
         data: {
@@ -467,6 +479,24 @@ export class RootResolver {
         )
         .execute()
     }
+  }
+
+  @UseMiddleware(throwIfNotAuthenticated)
+  @Mutation(() => WebInputMutation, {
+    nullable: true
+  })
+  @Query(() => WebInputGQL, {
+    nullable: true
+  })
+  async webInput(
+    @Arg('id', () => Int) id: number,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return ctx.prisma.webInput.findUnique({
+      where: {
+        id
+      }
+    })
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

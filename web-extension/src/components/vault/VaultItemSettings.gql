@@ -1,0 +1,7 @@
+mutation removeWebInput($id: Int!) {
+  webInput(id: $id) {
+    delete {
+      id
+    }
+  }
+}

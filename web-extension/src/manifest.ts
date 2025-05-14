@@ -37,6 +37,8 @@ export async function getManifest() {
       'tabs',
       'activeTab',
       'storage',
+      'clipboardRead',
+      'scripting',
       'http://*/',
       'https://*/',
       '<all_urls>'

@@ -3,7 +3,7 @@ import React, { useContext } from 'react'
 import papaparse from 'papaparse'
 
 import { downloadAsFile } from '@src/util/downloadAsFile'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 export const ExportTOTPToCsvButton = () => {

@@ -8,13 +8,17 @@ import { EditIcon, CopyIcon } from '@chakra-ui/icons'
 
 import { GrUserAdmin } from 'react-icons/gr'
 import { Center, Box, Flex, Text, useToast, IconButton } from '@chakra-ui/react'
-import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
-import { Link } from 'react-router-dom'
+import {
+  ILoginSecret,
+  ITOTPSecret,
+  pathNameToTypes
+} from '@src/util/useDeviceState'
+import { Link, useLocation } from 'react-router-dom'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { Txt } from '../util/Txt'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { authierColors } from '@shared/chakraRawTheme'
 import { TbAuth2Fa } from 'react-icons/tb'
@@ -104,7 +108,7 @@ export function VaultListItem({
               }}
               aria-label="edit_item"
               to={{
-                pathname: `secret/${secret.id}`
+                pathname: `/secret/${secret.id}`
               }}
               state={{ data: secret }}
             >
@@ -153,9 +157,10 @@ export function VaultListItem({
               if (secret.kind === EncryptedSecretType.TOTP) {
                 const otpCode = authenticator.generate(secret.totp.secret)
                 navigator.clipboard.writeText(otpCode)
-              } else if (secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS) {
+              } else if (
+                secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS
+              ) {
                 navigator.clipboard.writeText(password)
-
               }
               secret.lastUsedAt = new Date().toISOString()
 
@@ -178,8 +183,9 @@ export function VaultListItem({
 export const VirtualizedList = ({ filter }: { filter: string }) => {
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets: search } = useContext(DeviceStateContext)
+  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
 
-  const filteredItems = search(debouncedSearchTerm)
+  const filteredItems = search(debouncedSearchTerm, pathNameToTypes[pathname])
 
   const ITEMS_COUNT = filteredItems.length
   const ITEM_SIZE = 250

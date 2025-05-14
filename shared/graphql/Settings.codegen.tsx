@@ -59,8 +59,13 @@ export function useSyncSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptio
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
         }
+export function useSyncSettingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
+        }
 export type SyncSettingsQueryHookResult = ReturnType<typeof useSyncSettingsQuery>;
 export type SyncSettingsLazyQueryHookResult = ReturnType<typeof useSyncSettingsLazyQuery>;
+export type SyncSettingsSuspenseQueryHookResult = ReturnType<typeof useSyncSettingsSuspenseQuery>;
 export type SyncSettingsQueryResult = Apollo.QueryResult<SyncSettingsQuery, SyncSettingsQueryVariables>;
 export const UpdateSettingsDocument = gql`
     mutation updateSettings($config: SettingsInput!) {

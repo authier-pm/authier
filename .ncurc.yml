@@ -1,0 +1,10 @@
+upgrade: true
+reject:
+  - react
+  - react-dom
+  - react-router-dom
+  - react-test-renderer
+  - '@chakra-ui/react'
+  - '@types/react'
+  - '@types/react-dom'
+  - '@types/react-test-renderer'

@@ -64,7 +64,7 @@ model Device {
   logoutAt                   DateTime?
   // Device settings
   syncTOTP                   Boolean // sync2FA
-  vaultLockTimeoutSeconds    Int // 8 hours
+  vaultLockTimeoutSeconds    Int 
   autofillCredentialsEnabled Boolean
   autofillTOTPEnabled        Boolean
 
@@ -228,7 +228,7 @@ model DefaultDeviceSettings {
   autofillTOTPEnabled        Boolean   @default(true)
   theme                      String    @default("dark")
   syncTOTP                   Boolean   @default(true)
-  vaultLockTimeoutSeconds    Int       @default(28800) // 8 hours
+  vaultLockTimeoutSeconds    Int       @default(86400) // 24 hours
 
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId String @unique @db.Uuid

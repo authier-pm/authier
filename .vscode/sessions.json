@@ -1,0 +1,27 @@
+{
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v10/terminal-keeper.json",
+  "theme": "tribe",
+  "active": "default",
+  "activateOnStartup": true,
+  "keepExistingTerminals": false,
+  "sessions": {
+    "default": [
+      {
+        "name": "backend",
+        "autoExecuteCommands": true,
+        "icon": "terminal-cmd",
+        "color": "terminal.ansiGreen",
+        "cwd": "backend",
+        "commands": ["pnpm dev"]
+      },
+      {
+        "name": "web-extension",
+        "autoExecuteCommands": true,
+        "icon": "watch-view-icon",
+        "color": "terminal.ansiYellow",
+        "cwd": "web-extension",
+        "commands": ["pnpm dev"]
+      }
+    ]
+  }
+}

@@ -6,7 +6,7 @@ import { PasswordVault } from '../screens/PasswordVault/PasswordVault'
 import { EditPassword } from '../screens/PasswordVault/EditPassword'
 import { AddPassword } from '../screens/PasswordVault/AddPassword'
 import { PasswordsStackParamList } from './types'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 
 const Stack = createNativeStackNavigator<PasswordsStackParamList>()
 

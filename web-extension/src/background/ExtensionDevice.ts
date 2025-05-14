@@ -406,8 +406,10 @@ export class DeviceState implements IBackgroundStateSerializable {
     return secretsAdded
   }
 
+  /**
+   * called on each backend sync
+   */
   async getWebInputs() {
-    // TODO use this for getting web inputs on each sync
     const hostnames = this.decryptedSecrets
       .map((s) =>
         s.kind === EncryptedSecretType.TOTP
@@ -456,6 +458,10 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 }
 
+/**
+ * This class is used to manage the state of Authier extension. It is used in vault, popup and service worker.
+ * Leverages local storage to store the state of the device and events to keep the state in sync between vault, popup and service worker
+ */
 class ExtensionDevice {
   state: DeviceState | null = null
   fireToken: string | null = null
@@ -486,7 +492,10 @@ class ExtensionDevice {
   async initialize() {
     const [id, storage] = await Promise.all([
       this.getDeviceId(),
-      browser.storage.local.get()
+      browser.storage.local.get() as Promise<{
+        backgroundState: IBackgroundStateSerializable | null
+        lockedState: IBackgroundStateSerializableLocked | null
+      }>
     ])
     this.id = id
     let storedState: IBackgroundStateSerializable | null = null
@@ -542,10 +551,13 @@ class ExtensionDevice {
     ) => {
       log('storage change UL', changes, areaName)
       if (areaName === 'local' && changes.backgroundState) {
-        this.state = new DeviceState(changes.backgroundState.newValue)
+        this.state = new DeviceState(
+          changes.backgroundState.newValue as IBackgroundStateSerializable
+        )
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       } else if (areaName === 'local' && changes.lockedState) {
-        this.lockedState = changes.lockedState.newValue
+        this.lockedState = changes.lockedState
+          .newValue as IBackgroundStateSerializableLocked
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
@@ -575,7 +587,7 @@ class ExtensionDevice {
       return deviceId
     } else {
       log('Got deviceID', storage.deviceId)
-      return storage.deviceId
+      return storage.deviceId as ReturnType<typeof crypto.randomUUID>
     }
   }
 
@@ -784,9 +796,19 @@ class ExtensionDevice {
     }
     this.lockInterval = null
   }
+
+  async setWebInputs(inputs: WebInputForAutofill[]) {
+    if (!this.state) {
+      console.warn('cannot set web inputs, device not initialized')
+      return
+    }
+    this.state.webInputs = inputs
+    await this.state.save()
+  }
 }
-if (location.href.startsWith('chrome-extension://') === false && 
-    location.href.startsWith('moz-extension://') === false
+if (
+  location.href.startsWith('chrome-extension://') === false &&
+  location.href.startsWith('moz-extension://') === false
 ) {
   console.warn('location.href', location.href)
 

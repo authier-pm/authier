@@ -15,7 +15,7 @@ import {
   ITOTPSecret,
   LoginCredentialsTypeWithMeta
 } from '../util/useDeviceState'
-import { renderPasswordGenerator } from './renderPasswordGenerator'
+
 import { trpc } from './connectTRPC'
 import { getAllVisibleTextOnDocumentBody } from './getAllVisibleTextOnDocumentBody'
 import { renderSaveCredentialsForm } from './renderSaveCredentialsForm'
@@ -26,8 +26,12 @@ import {
   getSelectorForElement
 } from './cssSelectorGenerators'
 import { notyf } from './notyf'
-import { WebInputForAutofill } from '../background/WebInputForAutofill'
+import {
+  WebInputForAutofill,
+  WebInputsArrayClientSide
+} from '../background/WebInputForAutofill'
 import { wait } from './wait'
+import { filterUselessInputs } from './getAllInputsIncludingShadowDom'
 
 const log = debug('au:autofill')
 
@@ -43,6 +47,7 @@ export const autofillEventsDispatched = new Set()
  * @param usefulInputs
  */
 function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
+  // TODO only do this after user confirmation as this could cause user to change their password by mistake-for example when they edit something on their profile and it also has the two password inputs
   for (let index = 0; index < usefulInputs.length - 1; index++) {
     const input = usefulInputs[index]
     if (
@@ -56,15 +61,17 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
       renderSaveCredentialsForm(null, newPassword)
       return true
     } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
-      renderPasswordGenerator({ input: input })
-      const password = generate({
-        length: 10,
-        numbers: true,
-        uppercase: true,
-        symbols: true,
-        strict: true
-      })
-      autofillValueIntoInput(input, password)
+      // TODO it would make sense to render the password generator here, but renderPasswordGenerator is not implemented yet
+      // renderPasswordGenerator({ input: input })
+      // const password = generate({
+      //   length: 10,
+      //   numbers: true,
+      //   uppercase: true,
+      //   symbols: true,
+      //   strict: true
+      // })
+      // autofillValueIntoInput(input, password)
+
       return true
     }
   }
@@ -186,39 +193,6 @@ export const fillStringIntoInput = ({
   return el
 }
 
-const uselessInputTypes = [
-  'hidden',
-  'submit',
-  'button',
-  'reset',
-  'button',
-  'checkbox',
-  'radio',
-  'file',
-  'color',
-  'image',
-  'range',
-  'search',
-  'time'
-]
-/**
- * @returns elements on the page which are visible and of type text, email, password, tel
- */
-const filterUselessInputs = (documentBody: HTMLElement) => {
-  const inputEls = documentBody.querySelectorAll('input')
-  const inputElsArray: HTMLInputElement[] = Array.from(inputEls).filter(
-    (el) => {
-      return (
-        uselessInputTypes.includes(el.type) === false &&
-        el.offsetWidth > 0 && // filter out hidden elements
-        el.offsetHeight > 0 &&
-        el.value === '' // filter out elements that already have a value
-      )
-    }
-  )
-  return inputElsArray
-}
-
 export const getElementCoordinates = (el: HTMLElement) => {
   const rect = el.getBoundingClientRect()
   return {
@@ -272,13 +246,34 @@ export const autofill = (initState: IInitStateRes) => {
 
     //Register screen
     //After certain condition is met, we can assume this is register page
-    log('usefulInputs', usefulInputs)
 
     if (usefulInputs.length === 0) {
       await wait(400)
 
       usefulInputs = filterUselessInputs(body)
     }
+
+    if (usefulInputs.length === 0) {
+      const filledInputs = (await trpc.executeMainWorldAutofillFunction.mutate(
+        secretsForHost.loginCredentials.map((cred) => ({
+          username: cred.loginCredentials.username,
+          password: cred.loginCredentials.password,
+          lastUsedAt: cred.lastUsedAt ?? null
+        }))
+      )) as Array<{
+        webInputType: WebInputType | null
+        username: string | null
+      }>
+
+      const filled = filledInputs.find(
+        (input) => input.webInputType === WebInputType.PASSWORD
+      )
+      if (filled) {
+        notyf.success(`Autofilled password for ${filled.username}`)
+      }
+    }
+
+    log('usefulInputs', usefulInputs)
 
     if (usefulInputs.length >= 2) {
       const isNewPassword = handleNewPasswordCase(usefulInputs)
@@ -327,7 +322,11 @@ export const autofill = (initState: IInitStateRes) => {
             firstLoginCred.loginCredentials.username
           )
           el && filledElements.add(el)
-        } else if (webInputGql.kind === WebInputType.TOTP && totpSecret) {
+        } else if (webInputGql.kind === WebInputType.TOTP) {
+          if (!totpSecret) {
+            log('no totp secret')
+            return
+          }
           const el = autofillValueIntoInput(
             inputEl,
             authenticator.generate(totpSecret.totp.secret)
@@ -468,7 +467,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
-      const newWebInputs: WebInputForAutofill[] = []
+      const newWebInputs: WebInputsArrayClientSide = []
       const inputElsArray = filterUselessInputs(documentBody)
       log('inputElsArray', inputElsArray)
 

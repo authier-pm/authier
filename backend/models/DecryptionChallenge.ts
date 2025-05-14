@@ -155,7 +155,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     }
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device.id,
+      device,
       ctx
     )
   }

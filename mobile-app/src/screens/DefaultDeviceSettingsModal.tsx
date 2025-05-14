@@ -13,7 +13,8 @@ import {
   Modal
 } from 'native-base'
 
-import { Trans, t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
+
 import { AuthierSelect } from '@src/components/AuthierSelect'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 import React, { useEffect, useState } from 'react'

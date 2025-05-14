@@ -5,4 +5,9 @@ describe('autofill', () => {
     it.todo('fills totp')
     it.todo('fills existing password')
   })
+
+  describe('shadow DOM', () => {
+    it.todo('fills username for input in shadow DOM')
+    it.todo('fills password for input in shadow DOM')
+  })
 })

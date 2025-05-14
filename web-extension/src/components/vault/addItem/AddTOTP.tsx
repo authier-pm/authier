@@ -33,6 +33,7 @@ export const AddTOTP = () => {
           period: 30
         }}
         validationSchema={TOTPSchema}
+        // @ts-expect-error
         onSubmit={async (
           values: TotpTypeWithMeta,
           { setSubmitting }: FormikHelpers<TotpTypeWithMeta>

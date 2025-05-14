@@ -66,6 +66,12 @@ export interface ISecuritySettingsInBg {
 
 let storageOnchangeListenerRegistered = false // we need to only register once
 
+export const pathNameToTypes = {
+  '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
+  '/totps': [EncryptedSecretType.TOTP],
+  '/': [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+}
+
 export function useDeviceState() {
   const [currentTab, setCurrentTab] = useState<browser.Tabs.Tab | null>(null)
   const [currentURL, setCurrentURL] = useState<string>('')
@@ -87,9 +93,9 @@ export function useDeviceState() {
     log('onStorageChange', areaName, changes)
     //WARNING: Not sure if this condition is correct
     if (areaName === 'local' && changes.backgroundState) {
-      setDeviceState(changes.backgroundState.newValue)
+      setDeviceState(changes.backgroundState.newValue as DeviceState)
       if (changes.lockedState) {
-        setLockedState(changes.lockedState.newValue)
+        setLockedState(changes.lockedState.newValue as DeviceState)
       }
 
       log('states loaded from storage')
@@ -179,9 +185,9 @@ export function useDeviceState() {
           getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
         )
       })
-
+      console.log('secrets', secrets)
       return secrets.sort((a, b) =>
-        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
+        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? -1 : 1
       )
     },
     selectedItems,

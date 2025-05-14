@@ -139,8 +139,13 @@ export function useSyncEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryH
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
         }
+export function useSyncEncryptedSecretsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>(SyncEncryptedSecretsDocument, options);
+        }
 export type SyncEncryptedSecretsQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsQuery>;
 export type SyncEncryptedSecretsLazyQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsLazyQuery>;
+export type SyncEncryptedSecretsSuspenseQueryHookResult = ReturnType<typeof useSyncEncryptedSecretsSuspenseQuery>;
 export type SyncEncryptedSecretsQueryResult = Apollo.QueryResult<SyncEncryptedSecretsQuery, SyncEncryptedSecretsQueryVariables>;
 export const AddEncryptedSecretsDocument = gql`
     mutation addEncryptedSecrets($secrets: [EncryptedSecretInput!]!) {

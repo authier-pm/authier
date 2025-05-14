@@ -26,7 +26,7 @@ We typically use `authier` and `auth133r` for testing.
 
 you can use this:
 
-```
+```sql
 ALTER USER authier WITH SUPERUSER;
 ```
 

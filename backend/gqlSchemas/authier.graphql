@@ -13,6 +13,7 @@ type Query {
     """
     hosts: [String!]
   ): [WebInputGQLScalars!]!
+  webInput(id: Int!): WebInputGQL
 }
 
 type UserQuery {
@@ -399,6 +400,7 @@ type Mutation {
   """
   logout(removeDevice: Boolean): Int
     @deprecated(reason: "prefer device methods")
+  webInput(id: Int!): WebInputMutation
   addWebInputs(webInputs: [WebInputElement!]!): [WebInputGQL!]!
 }
 
@@ -478,7 +480,10 @@ type DeviceMutation {
   userId: String!
   markAsSynced: DateTime!
   reportSecretUsageEvent(
-    webInputId: PositiveInt!
+    """
+    null when user has copied it using a button
+    """
+    webInputId: PositiveInt
     secretId: UUID!
     kind: String!
   ): SecretUsageEventGQLScalars!
@@ -686,6 +691,21 @@ input AddNewDeviceInput {
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!
   devicePlatform: String!
+}
+
+type WebInputMutation {
+  id: Int!
+  layoutType: String
+  createdAt: DateTime!
+  host: String!
+  url: String!
+  kind: WebInputType!
+  domPath: String!
+  domOrdinal: Int!
+  addedByUserId: String
+  addedByUser: UserGQL
+  UsageEvents: [SecretUsageEventGQL!]!
+  delete: WebInputGQLScalars
 }
 
 input WebInputElement {

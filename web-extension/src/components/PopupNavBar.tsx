@@ -1,8 +1,4 @@
-import {
-  FunctionComponent,
-  useEffect,
-  useState
-} from 'react'
+import { FunctionComponent, useEffect, useState } from 'react'
 
 import {
   Flex,
@@ -18,7 +14,7 @@ import { useLocation } from 'wouter'
 
 import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { IoMdArchive } from 'react-icons/io'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { AddSecretNavMenu } from '@src/pages/AddSecretNavMenu'

@@ -9,7 +9,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 import { device } from '@src/background/ExtensionDevice'
 
 export const UserNavMenu: FunctionComponent = () => {

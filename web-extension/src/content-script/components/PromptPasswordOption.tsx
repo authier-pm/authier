@@ -12,7 +12,11 @@ const nano = h
 import './Option.css'
 import debug from 'debug'
 const log = debug('au:PromptPasswordOption')
-import { autofill, filledElements, resetAutofillStateForThisPage } from '../autofill'
+import {
+  autofill,
+  filledElements,
+  resetAutofillStateForThisPage
+} from '../autofill'
 
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
@@ -64,7 +68,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
 
   return (
     <div
-      className="dropdown"
+      className="authier-dropdown"
       style={{
         zIndex: '2147483647', // max z-index according to stackoverflow
         justifyContent: 'center',
@@ -78,7 +82,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       }}
     >
       <span
-        className="iconAuthier"
+        className="authier-logo-icon"
         style={{
           backgroundImage: `url('${browser.runtime.getURL('icon-128.png')}')`,
           backgroundSize: 'contain',
@@ -86,7 +90,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         }}
       ></span>
 
-      <div className="dropdown-content">
+      <div className="authier-dropdown-content">
         {loginCredentials.map((loginCredential) => {
           return (
             <a
@@ -94,7 +98,10 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
               onClick={async () => {
                 resetAutofillStateForThisPage()
                 autofill({
-                  secretsForHost: { loginCredentials: [loginCredential], totpSecrets: [] },
+                  secretsForHost: {
+                    loginCredentials: [loginCredential],
+                    totpSecrets: []
+                  },
                   autofillEnabled: true,
                   extensionDeviceReady: true,
                   passwordCount: 0,

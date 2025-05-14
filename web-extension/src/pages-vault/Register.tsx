@@ -12,14 +12,18 @@ import {
   InputGroup,
   InputRightElement,
   Spinner,
-  Text
+  Text,
+  useToast,
+  Alert,
+  AlertIcon,
+  Progress
 } from '@chakra-ui/react'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Formik, Form, Field, FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import {
   bufferToBase64,
@@ -28,6 +32,20 @@ import {
 } from '@util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
 import { Link, useNavigate } from 'react-router-dom'
+
+const passwordStrength = (password: string) => {
+  if (password.length < 8) {
+    return 0
+  }
+
+  if (password.length < 12) {
+    return 1
+  }
+  if (password.length < 14) {
+    return 2
+  }
+  return 3
+}
 
 declare global {
   interface Crypto {
@@ -43,6 +61,7 @@ export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
+  const toast = useToast()
 
   const { fireToken } = device
   if (!fireToken) {
@@ -50,7 +69,20 @@ export default function Register() {
   }
 
   return (
-    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
+    <Box
+      p={8}
+      borderWidth={1}
+      borderRadius={6}
+      boxShadow="lg"
+      minW={{
+        base: '100vw',
+        md: '450px'
+      }}
+      mx={{
+        base: 10,
+        md: 0
+      }}
+    >
       <Flex alignItems="center" justifyContent="center">
         <Heading>Create account</Heading>
       </Flex>
@@ -64,6 +96,14 @@ export default function Register() {
           const deviceId = await device.getDeviceId()
 
           const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
+
+          if (values.password.length < 8) {
+            toast({
+              title: 'Password must be at least 8 characters long',
+              status: 'error'
+            })
+            return
+          }
 
           const masterEncryptionKey = await generateEncryptionKey(
             values.password,
@@ -148,8 +188,9 @@ export default function Register() {
                   isRequired
                 >
                   <FormLabel mt={3} htmlFor="password">
-                    Password
+                    Master password
                   </FormLabel>
+
                   <InputGroup>
                     <Input
                       {...field}
@@ -166,7 +207,41 @@ export default function Register() {
                       </Button>
                     </InputRightElement>
                   </InputGroup>
+                  {field.value.length > 0 && (
+                    <>
+                      <Progress
+                        value={passwordStrength(field.value)}
+                        size="xs"
+                        colorScheme="green"
+                        max={3}
+                        min={0}
+                        mt={2}
+                      />
+                      {field.value.length < 8 && (
+                        <Alert status="error" mt={2} size="sm">
+                          <AlertIcon />
+                          Password must be at least 8 characters long
+                        </Alert>
+                      )}
+                      {field.value.length >= 8 && field.value.length < 14 && (
+                        <Alert status="warning" mt={2} size="sm">
+                          <AlertIcon />
+                          We recommend using at least 14 characters for best
+                          security
+                        </Alert>
+                      )}
+                      {field.value.length >= 14 && (
+                        <Alert status="success" mt={2} size="sm">
+                          <AlertIcon />
+                          Good password length!
+                        </Alert>
+                      )}
+                    </>
+                  )}
                   <FormErrorMessage>{form.errors.password}</FormErrorMessage>
+                  <Text fontSize="xs" color="gray.500" mt={2}>
+                    it is never sent anywhere-your vault is e2e encrypted
+                  </Text>
                 </FormControl>
               )}
             </Field>

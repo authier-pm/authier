@@ -18,7 +18,7 @@ import {
   Select,
   VStack
 } from '@chakra-ui/react'
-import { Trans } from '@lingui/macro'
+import { Trans } from '@lingui/react/macro'
 
 import { Field, Formik, FormikHelpers } from 'formik'
 import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'

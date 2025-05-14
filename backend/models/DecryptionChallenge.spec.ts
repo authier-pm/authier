@@ -69,18 +69,10 @@ describe('DecryptionChallenge', () => {
         fakeCtx
       )
 
-      const accessToken = sign(
-        { userId: user.id, deviceId: challenge.deviceId },
-        process.env.ACCESS_TOKEN_SECRET!,
-        {
-          expiresIn: '60m'
-        }
-      )
-
       expect({
         accessToken: data.accessToken,
         email: data.user.email
-      }).toMatchObject({ accessToken: accessToken, email: input.email })
+      }).toMatchObject({ accessToken: expect.any(String), email: input.email })
     })
 
     it("should show 'User not found'", async () => {

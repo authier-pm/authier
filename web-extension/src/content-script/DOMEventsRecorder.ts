@@ -41,42 +41,50 @@ export class DOMEventsRecorder {
   }
 
   toJSON(): ICapturedInput[] {
-    return this.capturedInputEvents.map(
+    const json = this.capturedInputEvents.map(
       ({ element, inputted, eventType: type, kind }, i) => {
         const nextEvent = this.capturedInputEvents[i + 1]
 
-        if (
-          kind === null && // this can happen when the input for username is just a plain input with no attribute type="username"
-          nextEvent &&
-          nextEvent.kind === WebInputType.PASSWORD
-        ) {
-          kind = WebInputType.USERNAME_OR_EMAIL
+        if (kind === null) {
+          if (nextEvent && nextEvent.kind === WebInputType.PASSWORD) {
+            kind = WebInputType.USERNAME_OR_EMAIL // this can happen when the input for username is just a plain input with no attribute type="username"
+          } else {
+            console.warn('kind is null', element)
+          }
         }
 
         return {
           cssSelector: getSelectorForElement(element).css,
           domOrdinal: getSelectorForElement(element).domOrdinal,
           type,
-          kind: kind as WebInputType,
+          kind: kind,
           inputted
         }
       }
     )
+    return json.filter(({ kind }) => kind !== null) as ICapturedInput[]
   }
 
   /**
-   * if any email was inputted, we assume it's the username, if not we fallback to the input field just before the password
+   * Returns the username based on the following priority:
+   * 1. If user filled in any non-password input before the password, use that input's value
+   * 2. If there's a single email on the page (and not from the current domain), use that
+   * 3. Fallback to the last non-password input
    */
   getUsername(): string | undefined {
-    const emailInputs = this.capturedInputEvents.filter(
+    // First check if user filled any non-password input
+    const nonPasswordInputs = this.capturedInputEvents.filter(
       ({ eventType: type, element }) => {
-        return type === 'input' && element.type === 'email'
+        return type === 'input' && element.type !== 'password'
       }
     )
-    if (emailInputs.length === 1) {
-      return emailInputs[0].inputted
+
+    // If user has filled any non-password input, use the last one
+    if (nonPasswordInputs.length > 0) {
+      return nonPasswordInputs[nonPasswordInputs.length - 1]?.inputted
     }
 
+    // If no email input and no other inputs were filled, only then check for emails in the page text-this happens for example on google login page
     const matchedEmailsInText = document.body.innerText.match(simpleEmailRegex)
     if (matchedEmailsInText?.length === 1) {
       if (
@@ -84,19 +92,11 @@ export class DOMEventsRecorder {
           location.hostname.replace('www.', '') // exclude emails from the same domain as we're currently on
         ) === false
       ) {
-        return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text(it was probably entered somewhere else)
+        return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text
       }
     }
 
-    const inputEvents = this.capturedInputEvents.filter(
-      ({ eventType: type, element }) => {
-        return type === 'input' && element.type !== 'password'
-      }
-    )
-
-    const previouslyInputted = inputEvents[inputEvents.length - 1]?.inputted
-
-    return previouslyInputted
+    return undefined
   }
 
   getPassword(): string | undefined {

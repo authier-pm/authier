@@ -15,8 +15,8 @@ import {
   useToast
 } from 'native-base'
 
-import { t, Trans } from '@lingui/macro'
-
+import { t } from '@lingui/core/macro'
+import { Trans } from '@lingui/react/macro'
 import { useChangeMasterPasswordMutation } from './ChangeMasterPassword.codegen'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import {

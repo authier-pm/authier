@@ -18,7 +18,6 @@ import {
   debouncedAutofill,
   IDecryptedSecrets
 } from './autofill'
-import { authenticator } from 'otplib'
 import {
   recordInputs,
   contentScriptRender,
@@ -31,7 +30,7 @@ import { notyf } from './notyf'
 import browser from 'webextension-polyfill'
 import { PopupActionsEnum } from '../components/pages/PopupActionsEnum'
 import { getSelectorForElement } from './cssSelectorGenerators'
-import { WebInputForAutofill } from '../background/WebInputForAutofill'
+import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -51,7 +50,7 @@ export interface IInitStateRes {
   autofillEnabled: boolean
   secretsForHost: IDecryptedSecrets
   passwordCount: number
-  webInputs: Array<WebInputForAutofill>
+  webInputs: WebInputsArrayClientSide
   saveLoginModalsState?: ISaveLoginModalState | null | undefined
 }
 
@@ -127,6 +126,9 @@ export async function initInputWatch() {
 
   /**
    * responsible for saving new web inputs
+   *
+   * TODO fix when inputs are wrapped in shadow DOM. In those cases we get the ev.target as shadow root and inside there can be multiple inputs.
+   * this is an issue on github.com for example.
    */
   const debouncedInputEventListener = debounce((ev) => {
     log('Caught action', ev, ev.type)
@@ -221,15 +223,6 @@ export async function initInputWatch() {
 
 initInputWatch()
 
-// document.addEventListener('readystatechange', (event) => {
-//   if (
-//     event.target instanceof Document &&
-//     event.target?.readyState === 'complete'
-//   ) {
-//     initInputWatch()
-//   }
-// })
-
 // For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
 let lastUrl = location.href
 new MutationObserver(() => {
@@ -240,37 +233,44 @@ new MutationObserver(() => {
   }
 }).observe(document, { subtree: true, childList: true })
 
-browser.runtime.onMessage.addListener((message) => {
-  if (message.kind === PopupActionsEnum.TOTP_COPIED) {
-    async function elementSelected(event) {
-      event.preventDefault()
-      event.stopPropagation() // Stop the event from propagating further
+browser.runtime.onMessage.addListener(
+  // @ts-expect-error
+  (message: {
+    kind: PopupActionsEnum
+    event?: { otpCode: string; secretId: string }
+  }) => {
+    if (message.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
+      async function elementSelected(event) {
+        event.preventDefault()
+        event.stopPropagation() // Stop the event from propagating further
 
-      document.removeEventListener('click', elementSelected, true) // Remove the event listener
+        document.removeEventListener('click', elementSelected, true) // Remove the event listener
 
-      const selectedElement = event.target // Correctly gets the clicked element
-      if (selectedElement.tagName !== 'INPUT') {
-        notyf.error('You must select an input element')
+        const selectedElement = event.target // Correctly gets the clicked element
+        if (selectedElement.tagName !== 'INPUT') {
+          notyf.error('You must select an input element')
+        }
+        selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
+
+        const elementSelector = getSelectorForElement(selectedElement)
+        const webInput: WebInputElement = {
+          domPath: elementSelector.css,
+          domOrdinal: elementSelector.domOrdinal,
+          kind: WebInputType.TOTP,
+          url: location.href
+        }
+        await trpc.addTOTPInput.mutate(webInput)
+        const messageEvent = message.event
+
+        if (messageEvent?.otpCode) {
+          autofillValueIntoInput(selectedElement, messageEvent?.otpCode)
+          notyf.success(
+            `TOTP WebInput added for selector "${elementSelector.css}"`
+          )
+        }
       }
-      selectedElement.style.backgroundColor = 'yellow' // Highlight the selected element
 
-      const elementSelector = getSelectorForElement(selectedElement)
-      const webInput: WebInputElement = {
-        domPath: elementSelector.css,
-        domOrdinal: elementSelector.domOrdinal,
-        kind: WebInputType.TOTP,
-        url: location.href
-      }
-      await trpc.addTOTPInput.mutate(webInput)
-      const messageEvent = message.event as {
-        otpCode: string
-        secretId: string
-      }
-
-      autofillValueIntoInput(selectedElement, messageEvent.otpCode)
-      notyf.success(`TOTP WebInput added for selector "${elementSelector.css}"`)
+      document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
     }
-
-    document.addEventListener('click', elementSelected, true) // Use capturing to handle the event first
   }
-})
+)

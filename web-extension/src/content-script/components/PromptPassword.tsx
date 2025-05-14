@@ -5,6 +5,7 @@ import { loginPrompt } from '../renderSaveCredentialsForm'
 import { ICapturedInput } from '../../background/backgroundPage'
 import debug from 'debug'
 import { trpc } from '../connectTRPC'
+import { useState } from 'preact/hooks'
 
 const log = debug('au:PromptPassword')
 
@@ -21,6 +22,9 @@ const escapeHtml = (unsafe: string) => {
     .replaceAll("'", '&#039;')
 }
 
+/**
+ * a prompt alert for saving credentials to authier
+ */
 export const PromptPassword = ({
   username,
   password,
@@ -76,8 +80,8 @@ export const PromptPassword = ({
     await trpc.hideLoginCredentialsModal.mutate()
   }
 
-  let passwordShown = false
-
+  const [isHidden, setIsHidden] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
   return (
     <div
       style={{
@@ -90,53 +94,52 @@ export const PromptPassword = ({
         position: 'fixed',
         padding: '8px',
         backgroundColor: '#64cabd',
-        top: '0px'
+        top: '0px',
+        left: '0px'
       }}
     >
       <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
       <h3 style={h3Style}>{username}</h3>
       <span style={spanStyle}>Password: </span>{' '}
-      <h3 style={h3Style} id="__AUTHIER__pswdDisplay">
-        {password.replaceAll(/./g, '*')}
+      <h3 style={h3Style}>
+        {isHidden ? password.replaceAll(/./g, '*') : password}
       </h3>
       <button
         style={buttonStyle(authierColors.teal[100])}
         onClick={() => {
-          const passwordDisplayEl = document.querySelector(
-            '#__AUTHIER__pswdDisplay'
-          ) as HTMLElement
-          if (passwordShown) {
-            passwordDisplayEl.innerHTML = password.replaceAll(/./g, '*')
-            passwordShown = false
-          } else {
-            passwordDisplayEl.innerHTML = escapeHtml(password)
-            passwordShown = true
-          }
+          setIsHidden(!isHidden)
         }}
       >
-        👁️
+        {isHidden ? '👁️' : '❌'}
       </button>
       <div style={{ margin: '0 15px' }}>
         <button
           style={buttonStyle('#57c7e9')}
           onClick={async () => {
+            setIsSaving(true)
             await addCredential()
             loginPrompt?.remove()
+            setIsSaving(false)
           }}
         >
-          save
+          {isSaving ? 'saving...' : 'save'}
         </button>
         <button
           style={buttonStyle('#1EAE9B')}
           onClick={async () => {
+            setIsSaving(true)
             await addCredential(true)
             loginPrompt?.remove()
+            setIsSaving(false)
           }}
         >
           save & edit
         </button>
         <button
-          style={buttonStyle('#072C27')}
+          style={{
+            ...buttonStyle('#263734'),
+            color: 'white'
+          }}
           onClick={() => {
             removeCredential()
           }}

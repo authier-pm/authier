@@ -103,8 +103,13 @@ export function useAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<Ac
           const options = {...defaultOptions, ...baseOptions}
           return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
         }
+export function useAccountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>) {
+          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+        }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
+export type AccountSuspenseQueryHookResult = ReturnType<typeof useAccountSuspenseQuery>;
 export type AccountQueryResult = Apollo.QueryResult<AccountQuery, AccountQueryVariables>;
 export const ResendEmailVerificationDocument = gql`
     mutation resendEmailVerification {

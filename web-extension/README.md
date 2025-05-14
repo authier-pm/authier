@@ -26,9 +26,9 @@ and follow the instructions just instead `pnpm prodBuild` run `pnpm dev`
 
 ## Publishing a new version to stores
 
-We have all of the stores automated on CI except firefox. Firefox is handled manually from a separate branch.
+We have all of the stores automated on CI except firefox. Firefox is handled manually from a separate branch where we still have extension manifest V2
 
-To publish a new version, simply invoke: `pnpm newTag` inside the `web-extension` folder and
+To publish a new version, simply invoke: `pnpm release` inside the `web-extension` folder and
 
 <details>
   <summary>Loading the extension in Google Chrome</summary>

@@ -16,7 +16,7 @@ import { authenticator } from 'otplib'
 
 import { CopyIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 
 import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
@@ -24,6 +24,7 @@ import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
 import { SecretItemIcon } from '../SecretItemIcon'
+import { TbAuth2Fa } from 'react-icons/tb'
 
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
@@ -51,17 +52,22 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
       m={1}
       rounded="md"
       bg={useColorModeValue('gray.100', 'gray.700')}
-      minW="300px"
+      width="100%"
+      maxW="450px"
+      boxShadow="xl"
     >
       <Stat maxW="100%">
         <Flex justify="space-between" align="center" w="100%">
           <Flex flexDirection="column">
             <SecretItemIcon {...totpSecret.totp}></SecretItemIcon>
+            <TbAuth2Fa size={30}></TbAuth2Fa>
           </Flex>
           <Box ml={4} mr="auto">
             <StatLabel>{totpSecret.totp.label}</StatLabel>
 
             <StatNumber
+              w="full"
+              fontSize="sm"
               onClick={async () => {
                 setShowWhole(!showWhole)
                 if (!showWhole) {
@@ -86,14 +92,20 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               {showWhole ? (
                 otpCode
               ) : (
-                <Tooltip label={t`Click to show & copy`}>
+                <Tooltip
+                  label={t`Click to show & copy`}
+                  display={'flex'}
+                  width={'full'}
+                >
                   <div
                     onClick={() => {
                       onCopy()
                     }}
                   >
                     {otpCode.substr(0, 3) + '***'}
-                    <CopyIcon></CopyIcon>
+                    <Button size="xs" variant="ghost" ml="auto" p={0}>
+                      <CopyIcon></CopyIcon>
+                    </Button>
                   </div>
                 </Tooltip>
               )}
@@ -108,7 +120,7 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               onClick={() => {
                 // TODO log usage of this token to backend
                 browser.runtime.sendMessage({
-                  kind: PopupActionsEnum.TOTP_COPIED,
+                  kind: PopupActionsEnum.TOTP_FILL_ON_CLICK,
                   event: {
                     otpCode,
                     secretId: totpSecret.id
@@ -134,51 +146,51 @@ const LoginCredentialsListItem = ({
   const { onCopy } = useClipboard(loginCredentials.password)
 
   return (
-    <Box boxShadow="xl" m={1}>
-      <Flex
-        key={loginCredentials.url}
-        p="3"
-        rounded="md"
-        bg={useColorModeValue('gray.100', 'gray.700')}
-      >
-        <Stat maxW="100%">
-          <Flex justify="space-between" align="center" w="100%">
-            <Flex flexDirection="column">
-              <SecretItemIcon {...loginCredentials} />
-            </Flex>
-            <Box ml={2} mr="auto" maxW="200px">
-              <Heading
-                size="sm"
-                whiteSpace="nowrap"
-                textOverflow="ellipsis"
-                overflow="hidden"
-              >
-                {loginCredentials.label}
-              </Heading>
-              <Text fontSize="sm" whiteSpace="nowrap">
-                {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
-              </Text>
-            </Box>
-
-            <Tooltip label={t`Copy password`}>
-              <Button
-                size="md"
-                ml="auto"
-                boxShadow="md"
-                variant="solid"
-                color={'green.700'}
-                bgColor={'green.200'}
-                onClick={() => {
-                  onCopy()
-                  // TODO log usage of this token to backend
-                }}
-              >
-                <CopyIcon></CopyIcon>
-              </Button>
-            </Tooltip>
+    <Box
+      p="3"
+      m={1}
+      rounded="md"
+      bg={useColorModeValue('gray.100', 'gray.700')}
+      width="100%"
+      maxW="450px"
+      boxShadow="xl"
+    >
+      <Stat maxW="100%">
+        <Flex justify="space-between" align="center" w="100%">
+          <Flex flexDirection="column">
+            <SecretItemIcon {...loginCredentials} />
           </Flex>
-        </Stat>
-      </Flex>
+          <Box ml={4} mr="auto" maxW="200px">
+            <Heading
+              size="sm"
+              whiteSpace="nowrap"
+              textOverflow="ellipsis"
+              overflow="hidden"
+            >
+              {loginCredentials.label}
+            </Heading>
+            <Text fontSize="sm" whiteSpace="nowrap">
+              {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
+            </Text>
+          </Box>
+
+          <Tooltip label={t`Copy password`}>
+            <Button
+              size="md"
+              ml={2}
+              variant="solid"
+              color={'green.700'}
+              bgColor={'green.200'}
+              onClick={() => {
+                onCopy()
+                // TODO log usage of this token to backend
+              }}
+            >
+              <CopyIcon></CopyIcon>
+            </Button>
+          </Tooltip>
+        </Flex>
+      </Stat>
     </Box>
   )
 }
@@ -189,7 +201,6 @@ export const AuthsList = ({
   filterByTLD: boolean
   search: string
 }) => {
-  console.log('search:', search)
   const {
     deviceState,
     TOTPSecrets,

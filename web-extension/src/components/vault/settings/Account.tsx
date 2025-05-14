@@ -12,9 +12,17 @@ import {
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
-  AlertDialogOverlay
+  AlertDialogOverlay,
+  FormControl,
+  FormLabel,
+  FormErrorMessage,
+  Input,
+  InputGroup,
+  InputRightElement
 } from '@chakra-ui/react'
-import { t, Trans } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
+
+import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { device } from '@src/background/ExtensionDevice'
@@ -24,30 +32,40 @@ import {
   base64ToBuffer,
   cryptoKeyToString
 } from '@src/util/generateEncryptionKey'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
-import {
-  Form,
-  inputEmailFieldSchema,
-  inputPswFieldSchema
-} from '../../util/tsForm'
+import { zodResolver } from '@hookform/resolvers/zod'
 import {
   useChangeMasterPasswordMutation,
   useDeleteAccountMutation
 } from './Account.codegen'
+import { useDevicesRequestsQuery } from '@shared/graphql/AccountDevices.codegen'
+import { Trans } from '@lingui/react/macro'
 
 const AccountFormSchema = z.object({
-  email: inputEmailFieldSchema.describe('Email'),
-  currPassword: inputPswFieldSchema.describe(
-    t`Current password // Master password`
-  ),
-  newPassword: inputPswFieldSchema.describe(
-    t`Set new master password // New master password`
-  ),
-  confirmPassword: inputPswFieldSchema.describe(
-    t`Confirm new password // Confirm password`
-  )
+  email: z
+    .string()
+    .email({ message: 'Invalid email address' })
+    .describe('Email'),
+  currPassword: z
+    .string()
+    .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
+      message: `Password must be at least ${process.env.NODE_ENV === 'development' ? 1 : 8} characters`
+    })
+    .describe(t`Current password // Master password`),
+  newPassword: z
+    .string()
+    .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
+      message: `Password must be at least ${process.env.NODE_ENV === 'development' ? 1 : 8} characters`
+    })
+    .describe(t`Set new master password // New master password`),
+  confirmPassword: z
+    .string()
+    .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
+      message: `Password must be at least ${process.env.NODE_ENV === 'development' ? 1 : 8} characters`
+    })
+    .describe(t`Confirm new password // Confirm password`)
 })
 
 export const SettingsSubmitButton = ({
@@ -87,11 +105,19 @@ export default function Account() {
   const [deviceDecryptionChallenge] = useDeviceDecryptionChallengeMutation()
   const toast = useToast()
 
+  const [showPasswords, setShowPasswords] = useState(false)
+
   if (!email) {
     return <Spinner />
   }
 
-  const form = useForm<z.infer<typeof AccountFormSchema>>({
+  const {
+    register,
+    handleSubmit,
+    reset,
+    formState: { errors, isDirty, isSubmitting, isSubmitSuccessful }
+  } = useForm<z.infer<typeof AccountFormSchema>>({
+    resolver: zodResolver(AccountFormSchema),
     defaultValues: {
       email: email,
       currPassword: '',
@@ -100,11 +126,6 @@ export default function Account() {
     },
     mode: 'onChange'
   })
-
-  const {
-    formState: { isDirty, isSubmitting, isSubmitSuccessful },
-    reset
-  } = form
 
   async function onSubmit(data: z.infer<typeof AccountFormSchema>) {
     try {
@@ -191,6 +212,11 @@ export default function Account() {
       confirmPassword: ''
     })
   }, [isSubmitSuccessful])
+  const { data: devicesRequests } = useDevicesRequestsQuery({
+    fetchPolicy: 'cache-and-network'
+  })
+
+  const isMasterDevice = device.id === devicesRequests?.me.masterDeviceId
 
   return (
     <VStack
@@ -204,22 +230,113 @@ export default function Account() {
       p={30}
       bg={useColorModeValue('cyan.800', 'gray.800')}
     >
-      <Form
-        // @ts-ignore TODO figure out why this always has type error on CI
-        form={form}
-        schema={AccountFormSchema}
-        onSubmit={onSubmit}
-        formProps={{
-          formHeading: t`Change vault password`,
-          submitButton: (
-            <SettingsSubmitButton
-              isDirty={isDirty}
-              isSubmitting={isSubmitting}
-            />
-          )
-        }}
-      />
       <Box>
+        <Heading as="h3" size="lg" mb={5}>
+          <Trans>Change vault password</Trans>
+        </Heading>
+        {isMasterDevice ? (
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <VStack spacing={4} align="flex-start">
+              <FormControl isInvalid={!!errors.email}>
+                <FormLabel>Email</FormLabel>
+                <Input type="email" {...register('email')} />
+                {errors.email && (
+                  <FormErrorMessage>{errors.email.message}</FormErrorMessage>
+                )}
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.currPassword}>
+                <FormLabel>
+                  <Trans>Current password</Trans>
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPasswords ? 'text' : 'password'}
+                    {...register('currPassword')}
+                  />
+                  <InputRightElement width="4.5rem">
+                    <Button
+                      h="1.75rem"
+                      size="sm"
+                      onClick={() => setShowPasswords(!showPasswords)}
+                    >
+                      {showPasswords ? <ViewOffIcon /> : <ViewIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+                {errors.currPassword && (
+                  <FormErrorMessage>
+                    {errors.currPassword.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.newPassword}>
+                <FormLabel>
+                  <Trans>Set new master password</Trans>
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPasswords ? 'text' : 'password'}
+                    {...register('newPassword')}
+                  />
+                  <InputRightElement width="4.5rem">
+                    <Button
+                      h="1.75rem"
+                      size="sm"
+                      onClick={() => setShowPasswords(!showPasswords)}
+                    >
+                      {showPasswords ? <ViewOffIcon /> : <ViewIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+                {errors.newPassword && (
+                  <FormErrorMessage>
+                    {errors.newPassword.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.confirmPassword}>
+                <FormLabel>
+                  <Trans>Confirm new password</Trans>
+                </FormLabel>
+                <InputGroup>
+                  <Input
+                    type={showPasswords ? 'text' : 'password'}
+                    {...register('confirmPassword')}
+                  />
+                  <InputRightElement width="4.5rem">
+                    <Button
+                      h="1.75rem"
+                      size="sm"
+                      onClick={() => setShowPasswords(!showPasswords)}
+                    >
+                      {showPasswords ? <ViewOffIcon /> : <ViewIcon />}
+                    </Button>
+                  </InputRightElement>
+                </InputGroup>
+                {errors.confirmPassword && (
+                  <FormErrorMessage>
+                    {errors.confirmPassword.message}
+                  </FormErrorMessage>
+                )}
+              </FormControl>
+
+              <SettingsSubmitButton
+                isDirty={isDirty}
+                isSubmitting={isSubmitting}
+              />
+            </VStack>
+          </form>
+        ) : (
+          <Trans>
+            You can only change the password on the master device, "
+            {device.name}" is just a regular device
+          </Trans>
+        )}
+      </Box>
+      <Box bg={'orange.100'} rounded={'lg'} p={3}>
         <Heading as="h3" size="lg" color={'red'} mb={5}>
           <Trans>Danger zone</Trans>
         </Heading>

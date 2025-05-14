@@ -10,7 +10,9 @@ export let promptOption: HTMLDivElement | null
 
 export type PromptPasswordOptionProps = {
   loginCredentials: ILoginSecret[]
-  webInputs: Array<WebInputForAutofill>
+  webInputs: Array<
+    Omit<WebInputForAutofill, '__typename' | 'id'>
+  >
 }
 
 export function renderLoginCredOption(props: PromptPasswordOptionProps) {

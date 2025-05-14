@@ -1,9 +1,0 @@
-query me {
-  me {
-    encryptedSecrets {
-      id
-      encrypted
-      kind
-    }
-  }
-}

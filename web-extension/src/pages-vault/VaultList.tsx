@@ -16,9 +16,9 @@ import {
   InputRightElement,
   Flex
 } from '@chakra-ui/react'
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { t } from '@lingui/macro'
+import { t } from '@lingui/core/macro'
 import { useNavigate } from 'react-router-dom'
 import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
 import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
@@ -28,7 +28,7 @@ import { TableList } from '@src/components/vault/TableList'
 import browser from 'webextension-polyfill'
 import { StringParam, useQueryParam, withDefault } from 'use-query-params'
 
-export const VaultList = ({ tableView }) => {
+export const VaultList = ({ tableView }: { tableView: boolean }) => {
   const { loginCredentials: LoginCredentials, TOTPSecrets } =
     useContext(DeviceStateContext)
 

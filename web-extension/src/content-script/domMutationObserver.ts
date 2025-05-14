@@ -29,8 +29,44 @@ export const startBodyInputChangeObserver = () => {
   /**
    * inspired from https://usefulangle.com/post/357/javascript-detect-element-removed-from-dom
    */
+  // Initial scan for visible inputs
+  const initialInputs = document.querySelectorAll('input')
+  initialInputs.forEach((input) => {
+    const isVisible =
+      !(input as HTMLElement).hidden &&
+      window.getComputedStyle(input as HTMLElement).display !== 'none' &&
+      window.getComputedStyle(input as HTMLElement).visibility !== 'hidden'
+
+    if (isVisible) {
+      emitDebounced('inputAdded', input as HTMLInputElement)
+    }
+  })
+
   const domMutationObserver = new MutationObserver(function (mutationsList) {
     mutationsList.forEach(function (mutation) {
+      if (mutation.type === 'attributes') {
+        // Check if the target is an input or contains inputs that became visible
+        const target = mutation.target as HTMLElement
+        if (target.nodeName === 'INPUT' || target.querySelector('input')) {
+          const inputs =
+            target.nodeName === 'INPUT'
+              ? [target]
+              : Array.from(target.querySelectorAll('input'))
+          inputs.forEach((input) => {
+            const isVisible =
+              !(input as HTMLElement).hidden &&
+              window.getComputedStyle(input as HTMLElement).display !==
+                'none' &&
+              window.getComputedStyle(input as HTMLElement).visibility !==
+                'hidden'
+
+            if (isVisible) {
+              emitDebounced('inputAdded', input as HTMLInputElement)
+            }
+          })
+        }
+      }
+
       mutation.removedNodes.forEach(function (removedNode) {
         if (removedNode.nodeName === 'INPUT') {
           emitDebounced('inputRemoved', removedNode as HTMLInputElement)
@@ -42,9 +78,12 @@ export const startBodyInputChangeObserver = () => {
         if (node.nodeName === 'INPUT') {
           emitDebounced('inputAdded', node as HTMLInputElement)
         } else if (node['querySelectorAll']) {
-          node.querySelectorAll('input').forEach((input) => {
-            emitDebounced('inputAdded', input)
-          })
+          const inputs = node.querySelectorAll('input')
+          if (inputs.length > 0) {
+            inputs.forEach((input) => {
+              emitDebounced('inputAdded', input)
+            })
+          }
 
           const childIframe = node.querySelector('input')
           if (childIframe) {
@@ -59,7 +98,10 @@ export const startBodyInputChangeObserver = () => {
 
   domMutationObserver.observe(body, {
     subtree: true,
-    childList: true
+    childList: true,
+    attributes: true,
+    attributeFilter: ['style', 'class'],
+    characterData: true
   })
 
   return domMutationObserver

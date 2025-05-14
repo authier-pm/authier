@@ -17,7 +17,7 @@ import { UserGQL } from './generated/UserGQL'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
-import { EmailVerificationType } from '@prisma/client'
+import { Device, EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import {
   defaultDeviceSettingSystemValues,
@@ -38,10 +38,17 @@ export class UserBase extends UserGQL {
   })
   declare email: string
 
-  setCookiesAndConstructLoginResponse(deviceId: string, ctx: IContext) {
-    setNewRefreshToken(this, deviceId, ctx)
+  async setCookiesAndConstructLoginResponse(device: Device, ctx: IContext) {
+    const userDevice = await ctx.prisma.device.findFirstOrThrow({
+      where: {
+        userId: this.id,
+        id: device.id
+      }
+    })
 
-    const accessToken = setNewAccessTokenIntoCookie(this, deviceId, ctx)
+    setNewRefreshToken(this, userDevice, ctx)
+
+    const accessToken = setNewAccessTokenIntoCookie(this, userDevice, ctx)
 
     return {
       accessToken,
@@ -195,17 +202,16 @@ export class UserQuery extends UserBase {
     }
 
     try {
-      await firebaseAdmin
-        .messaging()
-        .sendToDevice(masterDevice?.firebaseToken as string, {
-          notification: {
-            title: title,
-            body: user.Devices.find(({ id }) => id === deviceId)?.name + body
-          },
-          data: {
-            type: type
-          }
-        })
+      await firebaseAdmin.messaging().send({
+        token: masterDevice.firebaseToken,
+        notification: {
+          title: title,
+          body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+        },
+        data: {
+          type: type
+        }
+      })
       return true
     } catch (err) {
       console.log(err)

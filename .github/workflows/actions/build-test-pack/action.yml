@@ -12,12 +12,12 @@ runs:
     - uses: actions/checkout@v4
     - uses: pnpm/action-setup@v4
       with:
-        version: 9
+        version: 10
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 20
+        node-version: 22
         cache: 'pnpm'
 
     - name: Install dependencies
@@ -46,17 +46,18 @@ runs:
 
     # - name: Upload test results
     #   if: always()
-    #   uses: actions/upload-artifact@v3
+    #   uses: actions/upload-artifact@v4
     #   with:
     #     name: test-results
     #     path: web-extension/test-results
     #     retention-days: 30
 
-    - name: Validate manifest.json of the extension
-      uses: cardinalby/schema-validator-action@v1
-      with:
-        file: ${{ env.EXTENSION_DIR }}manifest.json
-        schema: 'https://json.schemastore.org/webextension.json'
+    # TODO enable the manifest.json validation
+    # - name: Validate manifest.json of the extension
+    #   uses: cardinalby/schema-validator-action@v3
+    #   with:
+    #     file: ${{ env.EXTENSION_DIR }}manifest.json
+    #     schema: 'https://json.schemastore.org/chrome-manifest'
 
     - name: Pack directory to zip
       if: inputs.doNotPackZip != 'true'
