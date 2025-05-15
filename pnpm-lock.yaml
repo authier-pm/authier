@@ -395,7 +395,7 @@ importers:
         version: 5.22.2(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)
       '@shopify/flash-list':
         specifier: ^1.6.3
-        version: 1.6.3(@babel/runtime@7.26.10)(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)
+        version: 1.6.3(@babel/runtime@7.27.0)(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)
       '@testing-library/react':
         specifier: ^14.1.2
         version: 14.1.2(react-dom@19.0.0(react@18.2.0))(react@18.2.0)
@@ -585,7 +585,7 @@ importers:
         version: 7.27.1(@babel/core@7.27.1)
       '@babel/runtime':
         specifier: ^7.23.7
-        version: 7.26.10
+        version: 7.27.0
       '@jest/globals':
         specifier: ^29.7.0
         version: 29.7.0
@@ -660,7 +660,7 @@ importers:
         version: 0.72.0(@babel/preset-env@7.27.2(@babel/core@7.27.1))
       react-native-dotenv:
         specifier: ^3.4.9
-        version: 3.4.9(@babel/runtime@7.26.10)
+        version: 3.4.9(@babel/runtime@7.27.0)
       react-native-version:
         specifier: ^4.0.0
         version: 4.0.0
@@ -9658,6 +9658,7 @@ packages:
 
   formidable@2.1.2:
     resolution: {integrity: sha512-CM3GuJ57US06mlpQ47YcunuUZ9jpm8Vx+P2CGt2j7HpgkKZO/DJYQ0Bobim8G6PFQmK5lOqOOdUXboU+h73A4g==}
+    deprecated: 'ACTION REQUIRED: SWITCH TO v3 - v1 and v2 are VULNERABLE! v1 is DEPRECATED FOR OVER 2 YEARS! Use formidable@latest or try formidable-mini for fresh projects'
 
   formik@2.4.6:
     resolution: {integrity: sha512-A+2EI7U7aG296q2TLGvNapDNTZp1khVt5Vk0Q/fyfSROss0V/V6+txt2aJnwEos44IxTCW/LYAi/zgWzlevj+g==}
@@ -16710,7 +16711,7 @@ snapshots:
       '@babel/core': 7.27.1
       '@babel/generator': 7.27.0
       '@babel/parser': 7.27.0
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@babel/traverse': 7.27.0
       '@babel/types': 7.27.0
       babel-preset-fbjs: 3.4.0(@babel/core@7.27.1)
@@ -20739,7 +20740,7 @@ snapshots:
   '@lingui/babel-plugin-lingui-macro@5.3.1(babel-plugin-macros@3.1.0)':
     dependencies:
       '@babel/core': 7.27.1
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@babel/types': 7.27.0
       '@lingui/conf': 5.3.1
       '@lingui/core': 5.3.1(@lingui/babel-plugin-lingui-macro@5.3.1(babel-plugin-macros@3.1.0))(babel-plugin-macros@3.1.0)
@@ -20785,7 +20786,7 @@ snapshots:
 
   '@lingui/conf@5.3.1':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       chalk: 4.1.2
       cosmiconfig: 8.2.0
       jest-validate: 29.7.0
@@ -21764,7 +21765,7 @@ snapshots:
 
   '@react-aria/tabs@3.0.0-alpha.2(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-aria/i18n': 3.8.0(react@18.2.0)
       '@react-aria/interactions': 3.16.0(react@18.2.0)
       '@react-aria/selection': 3.16.0(react@18.2.0)
@@ -22541,7 +22542,7 @@ snapshots:
 
   '@react-stately/checkbox@3.0.3(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/toggle': 3.6.0(react@18.2.0)
       '@react-stately/utils': 3.7.0(react@18.2.0)
       '@react-types/checkbox': 3.4.4(react@18.2.0)
@@ -22558,7 +22559,7 @@ snapshots:
 
   '@react-stately/collections@3.3.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-types/shared': 3.18.1(react@18.2.0)
       react: 18.2.0
 
@@ -22570,7 +22571,7 @@ snapshots:
 
   '@react-stately/combobox@3.0.0-alpha.1(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/list': 3.9.0(react@18.2.0)
       '@react-stately/menu': 3.5.3(react@18.2.0)
       '@react-stately/select': 3.5.2(react@18.2.0)
@@ -22638,7 +22639,7 @@ snapshots:
 
   '@react-stately/radio@3.2.1(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/utils': 3.7.0(react@18.2.0)
       '@react-types/radio': 3.4.2(react@18.2.0)
       react: 18.2.0
@@ -22673,7 +22674,7 @@ snapshots:
 
   '@react-stately/slider@3.0.1(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-aria/i18n': 3.8.0(react@18.2.0)
       '@react-aria/utils': 3.18.0(react@18.2.0)
       '@react-stately/utils': 3.7.0(react@18.2.0)
@@ -22703,7 +22704,7 @@ snapshots:
 
   '@react-stately/tabs@3.0.0-alpha.0(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/list': 3.9.0(react@18.2.0)
       '@react-stately/utils': 3.7.0(react@18.2.0)
       '@react-types/tabs': 3.0.0-alpha.2(react@18.2.0)
@@ -22711,7 +22712,7 @@ snapshots:
 
   '@react-stately/tabs@3.0.0-alpha.1(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/list': 3.9.0(react@18.2.0)
       '@react-stately/utils': 3.7.0(react@18.2.0)
       '@react-types/tabs': 3.0.0-alpha.2(react@18.2.0)
@@ -22719,7 +22720,7 @@ snapshots:
 
   '@react-stately/toggle@3.2.1(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@react-stately/utils': 3.7.0(react@18.2.0)
       '@react-types/checkbox': 3.4.4(react@18.2.0)
       '@react-types/shared': 3.18.1(react@18.2.0)
@@ -23292,9 +23293,9 @@ snapshots:
     dependencies:
       '@sentry/types': 7.120.3
 
-  '@shopify/flash-list@1.6.3(@babel/runtime@7.26.10)(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)':
+  '@shopify/flash-list@1.6.3(@babel/runtime@7.27.0)(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react: 18.2.0
       react-native: 0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0)
       recyclerlistview: 4.2.0(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0)
@@ -23532,7 +23533,7 @@ snapshots:
   '@testing-library/dom@9.3.1':
     dependencies:
       '@babel/code-frame': 7.26.2
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@types/aria-query': 5.0.1
       aria-query: 5.1.3
       chalk: 4.1.2
@@ -23553,7 +23554,7 @@ snapshots:
 
   '@testing-library/react@14.1.2(react-dom@19.0.0(react@18.2.0))(react@18.2.0)':
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       '@testing-library/dom': 9.3.1
       '@types/react-dom': 18.2.18
       react: 18.2.0
@@ -25622,7 +25623,7 @@ snapshots:
 
   broadcast-channel@3.7.0:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       detect-node: 2.1.0
       js-sha3: 0.8.0
       microseconds: 0.2.0
@@ -26839,7 +26840,7 @@ snapshots:
 
   date-fns@2.30.0:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
 
   date-fns@3.6.0: {}
 
@@ -27091,7 +27092,7 @@ snapshots:
 
   dom-helpers@5.2.1:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       csstype: 3.1.3
 
   dom-serializer@1.4.1:
@@ -31144,7 +31145,7 @@ snapshots:
 
   match-sorter@6.3.1:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       remove-accents: 0.4.2
 
   math-intrinsics@1.1.0: {}
@@ -31613,17 +31614,17 @@ snapshots:
 
   metro-runtime@0.73.10:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react-refresh: 0.4.3
 
   metro-runtime@0.76.8:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react-refresh: 0.4.3
 
   metro-runtime@0.79.1:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react-refresh: 0.4.3
 
   metro-source-map@0.73.10:
@@ -33527,12 +33528,12 @@ snapshots:
 
   react-clientside-effect@1.2.6(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react: 18.3.1
 
   react-clientside-effect@1.2.6(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       react: 19.0.0
 
   react-data-grid@7.0.0-beta.52(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
@@ -33584,7 +33585,7 @@ snapshots:
 
   react-focus-lock@2.13.2(@types/react@18.3.12)(react@18.3.1):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       focus-lock: 1.3.5
       prop-types: 15.8.1
       react: 18.3.1
@@ -33596,7 +33597,7 @@ snapshots:
 
   react-focus-lock@2.13.2(@types/react@18.3.12)(react@19.0.0):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       focus-lock: 1.3.5
       prop-types: 15.8.1
       react: 19.0.0
@@ -33693,9 +33694,9 @@ snapshots:
     dependencies:
       react-native: 0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0)
 
-  react-native-dotenv@3.4.9(@babel/runtime@7.26.10):
+  react-native-dotenv@3.4.9(@babel/runtime@7.27.0):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       dotenv: 16.5.0
 
   react-native-fast-image@8.6.3(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0):
@@ -33997,7 +33998,7 @@ snapshots:
 
   react-query@3.39.3(react-dom@19.0.0(react@18.2.0))(react-native@0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0))(react@18.2.0):
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       broadcast-channel: 3.7.0
       match-sorter: 6.3.1
       react: 18.2.0
@@ -34416,7 +34417,7 @@ snapshots:
 
   relay-runtime@12.0.0:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       fbjs: 3.0.5
       invariant: 2.2.4
     transitivePeerDependencies:
@@ -35733,7 +35734,7 @@ snapshots:
       schema-utils: 4.3.0
       serialize-javascript: 6.0.2
       terser: 5.37.0
-      webpack: 5.99.8(@swc/core@1.11.24)(webpack-cli@4.9.2)
+      webpack: 5.99.8(@swc/core@1.11.24)(webpack-cli@6.0.1)
     optionalDependencies:
       '@swc/core': 1.11.24
 
@@ -36241,7 +36242,7 @@ snapshots:
 
   unload@2.2.0:
     dependencies:
-      '@babel/runtime': 7.26.10
+      '@babel/runtime': 7.27.0
       detect-node: 2.1.0
 
   unpipe@1.0.0: {}

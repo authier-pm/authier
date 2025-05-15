@@ -1,9 +1,7 @@
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
-  shadowDatabaseUrl = env("SHADOW_DATABASE_URL")
-  extensions        = [citext(schema: "pg_catalog")]
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [citext(schema: "pg_catalog")]
 }
 
 generator client {
@@ -57,14 +55,14 @@ model Device {
   id                         String    @id
   firstIpAddress             String    @db.Inet
   lastIpAddress              String    @db.Inet
-  firebaseToken              String?
+  firebaseToken              String?   @unique
   name                       String
   platform                   String // https://github.com/lancedikson/bowser/blob/f09411489ced05811c91cc6670a8e4ca9cbe39a7/src/constants.js#L93
   ipAddressLock              Boolean   @default(false) // when enabled, we check ip address and force new approval from master device if the IP changes
   logoutAt                   DateTime?
   // Device settings
   syncTOTP                   Boolean // sync2FA
-  vaultLockTimeoutSeconds    Int 
+  vaultLockTimeoutSeconds    Int
   autofillCredentialsEnabled Boolean
   autofillTOTPEnabled        Boolean
 

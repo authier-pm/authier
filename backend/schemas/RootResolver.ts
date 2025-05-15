@@ -44,8 +44,9 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
-import { firebaseAdmin } from '../lib/firebaseAdmin'
+import { firebaseAdmin, firebaseSendNotification } from '../lib/firebaseAdmin'
 import { WebInputMutation } from '../models/WebInput'
+import { FirebaseMessagingError } from 'firebase-admin/lib/utils/error'
 
 const log = debug('au:RootResolver')
 
@@ -355,7 +356,8 @@ export class RootResolver {
         user.masterDevice.firebaseToken.length > 10
       ) {
         log('sending notification to', user.masterDevice.firebaseToken)
-        await firebaseAdmin.messaging().send({
+
+        await firebaseSendNotification({
           token: user.masterDevice.firebaseToken,
           notification: {
             title: 'New device login!',
