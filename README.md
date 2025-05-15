@@ -13,7 +13,7 @@ If you are looking for the download links to use on your devices, use the offici
 
 ## Running the extension build on Ubuntu
 
-To build the browser extension please follow these commands:
+To build the browser extension follow these commands with a current LTS node version:
 
 ```bash
 curl -fsSL https://get.pnpm.io/install.sh | sh -
