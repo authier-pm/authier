@@ -538,7 +538,6 @@ class ExtensionDevice {
 
     const fireToken = await generateFireToken()
 
-
     this.fireToken = fireToken
     console.log('deviceId', this.id)
     this.initCallbacks.forEach((cb) => cb())

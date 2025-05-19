@@ -19,7 +19,7 @@ export async function generateFireToken() {
   const existingToken = await browser.storage.local.get('fireToken')
   if (existingToken.fireToken) {
     console.debug('Token already exists:', existingToken.fireToken)
-    return existingToken.fireToken
+    return existingToken.fireToken as string
   }
   const token = await getToken(messaging, {
     vapidKey:
