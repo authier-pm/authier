@@ -56,6 +56,7 @@ import {
   WebInputsForHostsQueryVariables
 } from './chromeRuntimeListener.codegen'
 import { WebInputForAutofill } from './WebInputForAutofill'
+import { generateFireToken } from './generateFireToken'
 
 export const log = debug('au:Device')
 
@@ -535,8 +536,8 @@ class ExtensionDevice {
       this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 
-    // const fireToken = await generateFireToken()
-    const fireToken = 'aaaa' // TODO remove this
+    const fireToken = await generateFireToken()
+
 
     this.fireToken = fireToken
     console.log('deviceId', this.id)
