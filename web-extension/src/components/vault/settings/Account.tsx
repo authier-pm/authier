@@ -348,7 +348,7 @@ export default function Account() {
 
 const DeleteAccountButton = () => {
   const { isOpen, onOpen, onClose } = useDisclosure()
-  const cancelRef = useRef<any>()
+  const cancelRef = useRef<any>(null)
 
   const [deleteAccount] = useDeleteAccountMutation()
 

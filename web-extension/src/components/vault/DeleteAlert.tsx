@@ -19,7 +19,7 @@ export function DeleteAlert({
   isOpen: boolean
   deleteItem: () => void
 }) {
-  const cancelRef = React.useRef()
+  const cancelRef = React.useRef(null)
 
   return (
     <>
@@ -41,7 +41,6 @@ export function DeleteAlert({
           </AlertDialogBody>
           <AlertDialogFooter>
             <Button
-              //@ts-expect-error
               ref={cancelRef}
               onClick={onClose}
             >

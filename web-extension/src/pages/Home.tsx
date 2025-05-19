@@ -17,7 +17,7 @@ import { TbWorld } from 'react-icons/tb'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AuthsList } from '@src/components/pages/AuthsList'
 
-export const Home: FunctionComponent = () => {
+export const Home = () => {
   const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
   const [search, setSearch] = useState('')
   const { deviceState, TOTPSecrets, currentURL } =
