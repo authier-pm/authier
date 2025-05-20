@@ -27,11 +27,11 @@
     "@graphql-codegen/typescript-operations": "^4.6.1",
     "@graphql-codegen/typescript-react-apollo": "^4.3.2",
     "@types/jest": "^29.5.14",
-    "@types/node": "^22.15.18",
+    "@types/node": "^22.15.20",
     "@typescript-eslint/eslint-plugin": "^8.32.1",
     "@typescript-eslint/parser": "^8.32.1",
     "concurrently": "^9.1.2",
-    "eslint": "^9.26.0",
+    "eslint": "^9.27.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-jest": "^28.11.0",
     "eslint-plugin-prettier": "^5.4.0",
@@ -44,7 +44,7 @@
     "prettier": "^3.5.3",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "zod": "^3.24.4",
+    "zod": "^3.25.7",
     "zx": "^8.5.4"
   },
   "scripts": {
