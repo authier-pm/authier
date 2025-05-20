@@ -114,7 +114,7 @@ jobs:
           pnpm test
 
       - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
