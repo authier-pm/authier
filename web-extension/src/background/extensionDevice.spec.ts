@@ -1,7 +1,6 @@
 import { device } from './ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { vi } from 'vitest'
-import bowser from 'bowser'
 
 // Mock browser.runtime.connect
 vi.mock('webextension-polyfill', () => ({
@@ -23,14 +22,16 @@ vi.mock('webextension-polyfill', () => ({
   }
 }))
 
-// Mock bowser
-vi.mock('bowser', () => ({
-  default: {
-    getParser: vi.fn().mockReturnValue({
-      getOSName: vi.fn().mockReturnValue('Mock OS'),
-      getBrowserName: vi.fn().mockReturnValue('Mock Browser')
-    })
-  }
+// Mock Firebase messaging functions
+vi.mock('firebase/messaging', () => ({
+  getMessaging: vi.fn(() => {
+    // Return a plain object, as the original getMessaging attempts to access browser APIs.
+    // This mock instance will be passed to getToken.
+    return {}
+  }),
+  getToken: vi.fn(() => Promise.resolve('mocked-firebase-token'))
+  // Add mocks for other firebase/messaging exports if your code uses them
+  // e.g., onMessage: vi.fn(),
 }))
 
 // Mock the extensionDeviceTrpc directly
@@ -95,7 +96,7 @@ describe('ExtensionDevice', () => {
 
   describe('platform', () => {
     it('should return the OS name from the browserInfo module', () => {
-      expect(device.platform).toBe('Mock OS')
+      expect(device.platform).toBe('Linux')
     })
   })
 

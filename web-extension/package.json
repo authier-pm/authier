@@ -21,6 +21,7 @@
     "lingui:compile": "lingui compile",
     "test": "vitest run",
     "test:watch": "vitest",
+    "w": "vitest",
     "test:coverage": "vitest run --coverage",
     "test:ui": "vitest --ui",
     "playwright:run": "npx playwright test",
