@@ -323,7 +323,7 @@ importers:
         version: 7.27.1(@babel/core@7.27.1)
       '@hookform/resolvers':
         specifier: ^2.9.11
-        version: 2.9.11(react-hook-form@7.56.3(react@18.2.0))
+        version: 2.9.11(react-hook-form@7.56.4(react@18.2.0))
       '@lingui/core':
         specifier: ^5.3.1
         version: 5.3.1(@lingui/babel-plugin-lingui-macro@5.3.1(babel-plugin-macros@3.1.0))(babel-plugin-macros@3.1.0)
@@ -401,7 +401,7 @@ importers:
         version: 14.1.2(react-dom@19.0.0(react@18.2.0))(react@18.2.0)
       '@ts-react/form':
         specifier: ^1.8.3
-        version: 1.8.3(@hookform/resolvers@2.9.11(react-hook-form@7.56.3(react@18.2.0)))(react-hook-form@7.56.3(react@18.2.0))(react@18.2.0)(zod@3.25.7)
+        version: 1.8.3(@hookform/resolvers@2.9.11(react-hook-form@7.56.4(react@18.2.0)))(react-hook-form@7.56.4(react@18.2.0))(react@18.2.0)(zod@3.25.7)
       '@tsconfig/react-native':
         specifier: ^3.0.2
         version: 3.0.2
@@ -476,7 +476,7 @@ importers:
         version: 18.2.0
       react-hook-form:
         specifier: ^7.49.2
-        version: 7.56.3(react@18.2.0)
+        version: 7.56.4(react@18.2.0)
       react-native:
         specifier: 0.71.11
         version: 0.71.11(@babel/core@7.27.1)(@babel/preset-env@7.27.2(@babel/core@7.27.1))(react@18.2.0)
@@ -702,7 +702,7 @@ importers:
         version: 11.14.0(@emotion/react@11.14.0(@types/react@19.1.4)(react@18.3.1))(@types/react@19.1.4)(react@18.3.1)
       '@hookform/resolvers':
         specifier: ^5.0.1
-        version: 5.0.1(react-hook-form@7.56.3(react@18.3.1))
+        version: 5.0.1(react-hook-form@7.56.4(react@18.3.1))
       '@lingui/cli':
         specifier: ^5.3.1
         version: 5.3.1
@@ -723,7 +723,7 @@ importers:
         version: 10.45.2
       '@ts-react/form':
         specifier: ^1.8.3
-        version: 1.8.3(@hookform/resolvers@5.0.1(react-hook-form@7.56.3(react@18.3.1)))(react-hook-form@7.56.3(react@18.3.1))(react@18.3.1)(zod@3.25.7)
+        version: 1.8.3(@hookform/resolvers@5.0.1(react-hook-form@7.56.4(react@18.3.1)))(react-hook-form@7.56.4(react@18.3.1))(react@18.3.1)(zod@3.25.7)
       '@types/offscreencanvas':
         specifier: ^2019.7.3
         version: 2019.7.3
@@ -794,8 +794,8 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1(react@18.3.1)
       react-hook-form:
-        specifier: ^7.56.3
-        version: 7.56.3(react@18.3.1)
+        specifier: ^7.56.4
+        version: 7.56.4(react@18.3.1)
       react-icons:
         specifier: ^5.5.0
         version: 5.5.0(react@18.3.1)
@@ -13454,8 +13454,8 @@ packages:
     peerDependencies:
       react: '>=17.0.0'
 
-  react-hook-form@7.56.3:
-    resolution: {integrity: sha512-IK18V6GVbab4TAo1/cz3kqajxbDPGofdF0w7VHdCo0Nt8PrPlOZcuuDq9YYIV1BtjcX78x0XsldbQRQnQXWXmw==}
+  react-hook-form@7.56.4:
+    resolution: {integrity: sha512-Rob7Ftz2vyZ/ZGsQZPaRdIefkgOSrQSPXfqBdvOPwJfoGnjwRJUs7EM7Kc1mcoDv3NOtqBzPGbcMB8CGn9CKgw==}
     engines: {node: '>=18.0.0'}
     peerDependencies:
       react: ^16.8.0 || ^17 || ^18 || ^19
@@ -20248,14 +20248,14 @@ snapshots:
       '@tanstack/vue-virtual': 3.11.3(vue@3.5.13(typescript@5.8.3))
       vue: 3.5.13(typescript@5.8.3)
 
-  '@hookform/resolvers@2.9.11(react-hook-form@7.56.3(react@18.2.0))':
+  '@hookform/resolvers@2.9.11(react-hook-form@7.56.4(react@18.2.0))':
     dependencies:
-      react-hook-form: 7.56.3(react@18.2.0)
+      react-hook-form: 7.56.4(react@18.2.0)
 
-  '@hookform/resolvers@5.0.1(react-hook-form@7.56.3(react@18.3.1))':
+  '@hookform/resolvers@5.0.1(react-hook-form@7.56.4(react@18.3.1))':
     dependencies:
       '@standard-schema/utils': 0.3.0
-      react-hook-form: 7.56.3(react@18.3.1)
+      react-hook-form: 7.56.4(react@18.3.1)
 
   '@humanfs/core@0.19.1': {}
 
@@ -23375,18 +23375,18 @@ snapshots:
 
   '@trysound/sax@0.2.0': {}
 
-  '@ts-react/form@1.8.3(@hookform/resolvers@2.9.11(react-hook-form@7.56.3(react@18.2.0)))(react-hook-form@7.56.3(react@18.2.0))(react@18.2.0)(zod@3.25.7)':
+  '@ts-react/form@1.8.3(@hookform/resolvers@2.9.11(react-hook-form@7.56.4(react@18.2.0)))(react-hook-form@7.56.4(react@18.2.0))(react@18.2.0)(zod@3.25.7)':
     dependencies:
-      '@hookform/resolvers': 2.9.11(react-hook-form@7.56.3(react@18.2.0))
+      '@hookform/resolvers': 2.9.11(react-hook-form@7.56.4(react@18.2.0))
       react: 18.2.0
-      react-hook-form: 7.56.3(react@18.2.0)
+      react-hook-form: 7.56.4(react@18.2.0)
       zod: 3.25.7
 
-  '@ts-react/form@1.8.3(@hookform/resolvers@5.0.1(react-hook-form@7.56.3(react@18.3.1)))(react-hook-form@7.56.3(react@18.3.1))(react@18.3.1)(zod@3.25.7)':
+  '@ts-react/form@1.8.3(@hookform/resolvers@5.0.1(react-hook-form@7.56.4(react@18.3.1)))(react-hook-form@7.56.4(react@18.3.1))(react@18.3.1)(zod@3.25.7)':
     dependencies:
-      '@hookform/resolvers': 5.0.1(react-hook-form@7.56.3(react@18.3.1))
+      '@hookform/resolvers': 5.0.1(react-hook-form@7.56.4(react@18.3.1))
       react: 18.3.1
-      react-hook-form: 7.56.3(react@18.3.1)
+      react-hook-form: 7.56.4(react@18.3.1)
       zod: 3.25.7
 
   '@tsconfig/node10@1.0.9': {}
@@ -33279,11 +33279,11 @@ snapshots:
     dependencies:
       react: 18.2.0
 
-  react-hook-form@7.56.3(react@18.2.0):
+  react-hook-form@7.56.4(react@18.2.0):
     dependencies:
       react: 18.2.0
 
-  react-hook-form@7.56.3(react@18.3.1):
+  react-hook-form@7.56.4(react@18.3.1):
     dependencies:
       react: 18.3.1
 
