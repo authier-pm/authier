@@ -75,8 +75,7 @@ export const useLogin = (props: { deviceName: string }) => {
 
     console.log('~ decryptionData', decryptionData)
     if (
-      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved' &&
-      fireToken
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved'
     ) {
       ;(async () => {
         const addDeviceSecretEncrypted =

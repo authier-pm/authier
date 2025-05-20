@@ -133,6 +133,7 @@ export default function Login(): ReactElement {
               </FormLabel>
               <InputGroup>
                 <Input
+                  autoComplete="off"
                   type={showPassword ? 'text' : 'password'}
                   {...register('password')}
                 />

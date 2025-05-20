@@ -77,7 +77,11 @@ export class UserMutation extends UserBase {
   @Field(() => DeviceGQL)
   async addDevice(
     @Arg('device', () => DeviceInput) device: DeviceInput,
-    @Arg('firebaseToken', () => String) firebaseToken: string,
+    @Arg('firebaseToken', () => String, {
+      nullable: true,
+      description: 'Firebase token is only used for mobile app'
+    })
+    firebaseToken: string | null,
     @Ctx() ctx: IContext
   ) {
     const ipAddress: string = ctx.getIpAddress()

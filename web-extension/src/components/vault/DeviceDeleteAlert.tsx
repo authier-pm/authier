@@ -30,7 +30,7 @@ export function DeviceDeleteAlert({
   id: string
 }) {
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
-  const cancelRef = useRef()
+  const cancelRef = useRef(null)
   const [remove, setRemove] = useState(false)
   const [logoutDevice] = useLogoutDeviceMutation({
     variables: {
@@ -68,7 +68,6 @@ export function DeviceDeleteAlert({
 
           <AlertDialogFooter>
             <Button
-              //@ts-expect-error TODO: fix this
               ref={cancelRef}
               onClick={onClose}
             >

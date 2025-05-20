@@ -534,10 +534,7 @@ class ExtensionDevice {
       this.startLockInterval(this.state.vaultLockTimeoutSeconds)
     }
 
-    // const fireToken = await generateFireToken()
-    const fireToken = 'aaaa' // TODO remove this
-
-    this.fireToken = fireToken
+    this.fireToken = null // TODO: remove this
     console.log('deviceId', this.id)
     this.initCallbacks.forEach((cb) => cb())
     log('Extension device initialized with id ', this.id)
