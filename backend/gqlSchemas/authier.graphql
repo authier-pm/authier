@@ -434,7 +434,13 @@ type UserMutation {
   addCookie: String!
   device(id: String!): DeviceMutation!
   defaultDeviceSettings: DefaultDeviceSettingsMutation!
-  addDevice(firebaseToken: String!, device: DeviceInput!): DeviceGQL!
+  addDevice(
+    """
+    Firebase token is only used for mobile app
+    """
+    firebaseToken: String
+    device: DeviceInput!
+  ): DeviceGQL!
   encryptedSecret(id: ID!): EncryptedSecretMutation!
   createSecretUsageEvent(
     event: SecretUsageEventInput!
@@ -648,7 +654,10 @@ type LoginResponse {
 }
 
 input RegisterNewAccountInput {
-  firebaseToken: String!
+  """
+  Firebase token is only used for mobile app
+  """
+  firebaseToken: String
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!
@@ -686,7 +695,10 @@ type DecryptionChallengeApproved {
 }
 
 input AddNewDeviceInput {
-  firebaseToken: String!
+  """
+  Firebase token is only used for mobile app
+  """
+  firebaseToken: String
   addDeviceSecret: NonEmptyString!
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!

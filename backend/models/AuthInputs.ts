@@ -8,8 +8,11 @@ import {
 
 @InputType()
 export class AddNewDeviceInput {
-  @Field()
-  firebaseToken: string
+  @Field(() => String, {
+    nullable: true,
+    description: 'Firebase token is only used for mobile app'
+  })
+  firebaseToken: string | null
 
   @Field(() => GraphQLNonEmptyString)
   addDeviceSecret: string

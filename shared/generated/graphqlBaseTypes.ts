@@ -35,7 +35,8 @@ export type AddNewDeviceInput = {
   addDeviceSecretEncrypted: Scalars['NonEmptyString']['input'];
   devicePlatform: Scalars['String']['input'];
   encryptionSalt: Scalars['NonEmptyString']['input'];
-  firebaseToken: Scalars['String']['input'];
+  /** Firebase token is only used for mobile app */
+  firebaseToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type ChangeMasterPasswordInput = {
@@ -489,7 +490,8 @@ export type RegisterNewAccountInput = {
   devicePlatform: Scalars['String']['input'];
   email: Scalars['EmailAddress']['input'];
   encryptionSalt: Scalars['NonEmptyString']['input'];
-  firebaseToken: Scalars['String']['input'];
+  /** Firebase token is only used for mobile app */
+  firebaseToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type SecretUsageEventGql = {
@@ -645,7 +647,7 @@ export type UserMutation = {
 
 export type UserMutationAddDeviceArgs = {
   device: DeviceInput;
-  firebaseToken: Scalars['String']['input'];
+  firebaseToken?: InputMaybe<Scalars['String']['input']>;
 };
 
 
