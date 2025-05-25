@@ -3,6 +3,14 @@ import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
 import { dir } from '../scripts/generateExtensionManifest'
 
+declare module 'webextension-polyfill' {
+  namespace Manifest {
+    interface GeckoAndroidSpecificProperties {
+      id?: string
+    }
+  }
+}
+
 export async function getManifest() {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType
 
@@ -50,7 +58,6 @@ export async function getManifest() {
         strict_min_version: '90.0'
       },
       gecko_android: {
-        // @ts-expect-error
         id: '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}',
         strict_min_version: '90.0'
       }

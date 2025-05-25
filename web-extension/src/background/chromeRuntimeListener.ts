@@ -62,8 +62,11 @@ const appRouter = tc.router({
   addLoginCredentials: tcProcedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {
-      // @ts-expect-error
-      const tab = ctx.sender.tab
+      const tab = ctx.sender?.tab
+
+      if (!tab) {
+        return false
+      }
 
       const deviceState = device.state
 
@@ -170,18 +173,16 @@ const appRouter = tc.router({
   saveLoginCredentialsModalShown: tcProcedure
     .input(loginCredentialSchema)
     .mutation(async ({ input, ctx }) => {
-      // @ts-expect-error
-      const tab = ctx.sender.tab
-      const currentTabId = tab.id
+      const tab = ctx.sender?.tab
+      const currentTabId = tab?.id
 
       if (currentTabId) {
         saveLoginModalsStates.set(currentTabId, input)
       }
     }),
   hideLoginCredentialsModal: tcProcedure.mutation(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
-    const currentTabId = tab.id
+    const tab = ctx.sender?.tab
+    const currentTabId = tab?.id
     if (currentTabId) {
       saveLoginModalsStates.delete(currentTabId)
     }
@@ -220,8 +221,7 @@ const appRouter = tc.router({
       )
     )
     .mutation(async ({ ctx, input }) => {
-      // @ts-expect-error
-      const tab = ctx.sender.tab
+      const tab = ctx.sender?.tab
       if (!tab?.id) return []
 
       const results = await browser.scripting.executeScript({
@@ -239,9 +239,8 @@ const appRouter = tc.router({
     return [deviceState?.email]
   }),
   getContentScriptInitialState: tcProcedure.query(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
-    const currentTabId = tab.id
+    const tab = ctx.sender?.tab
+    const currentTabId = tab?.id
     const tabUrl = tab?.url
     const deviceState = device.state
 
@@ -262,8 +261,7 @@ const appRouter = tc.router({
     }
   }),
   getCapturedInputEvents: tcProcedure.query(async ({ ctx }) => {
-    // @ts-expect-error
-    const tab = ctx.sender.tab
+    const tab = ctx.sender?.tab
     return { capturedInputEvents, inputsUrl: tab?.url }
   }),
   securitySettings: tcProcedure
