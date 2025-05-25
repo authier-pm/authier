@@ -117,3 +117,4 @@ authier.zip
 web-extension/dist/**
 
 web-extension/stats.json
+web-extension/web-ext-artifacts/*

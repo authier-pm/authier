@@ -55,11 +55,11 @@ export async function getManifest() {
       // from https://blog.mozilla.org/addons/2023/10/05/changes-to-android-extension-signing/
       gecko: {
         id: '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}',
-        strict_min_version: '90.0'
+        strict_min_version: '102.0'
       },
       gecko_android: {
         id: '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}',
-        strict_min_version: '90.0'
+        strict_min_version: '102.0'
       }
     },
     web_accessible_resources: ['icon-16.png'],

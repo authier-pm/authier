@@ -30,7 +30,7 @@
     "test:run": "cd .. && cd backend && pnpm gen && pnpm dev",
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "publishApp:chrome": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi",
-    "publishApp:firefox": "dotenv web-ext sign --source-dir=./src --api-key=$FIREFOX_API_KEY --api-secret=$FIREFOX_API_SECRET --channel=listed"
+    "publishApp:firefox": "bash -c 'source .env && pnpm exec web-ext sign --source-dir=./dist --api-key=\"$FIREFOX_API_KEY\" --api-secret=\"$FIREFOX_API_SECRET\" --channel=listed'"
   },
   "keywords": [
     "react",
