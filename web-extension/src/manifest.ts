@@ -3,6 +3,14 @@ import type { Manifest } from 'webextension-polyfill'
 import type PkgType from '../package.json'
 import { dir } from '../scripts/generateExtensionManifest'
 
+declare module 'webextension-polyfill' {
+  namespace Manifest {
+    interface GeckoAndroidSpecificProperties {
+      id?: string
+    }
+  }
+}
+
 export async function getManifest() {
   const pkg = (await fs.readJSON(dir('package.json'))) as typeof PkgType
 
