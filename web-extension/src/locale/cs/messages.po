@@ -13,6 +13,12 @@ msgstr ""
 "Language-Team: \n"
 "Plural-Forms: \n"
 
+#. placeholder {0}: secrets.length
+#: src/components/vault/DeleteSecretButton.tsx
+#: src/components/vault/DeleteSecretButton.tsx
+msgid "{0, plural, one {delete secret} other {delete # secrets}}"
+msgstr ""
+
 #: src/util/useVaultLockTimeoutOptions.tsx
 msgid "1 day"
 msgstr "1 den"
@@ -218,8 +224,8 @@ msgstr "Nebezpečná zóna"
 
 #: src/components/vault/DeleteSecretButton.tsx
 #: src/components/vault/DeleteSecretButton.tsx
-msgid "delete secret"
-msgstr ""
+#~ msgid "delete secret"
+#~ msgstr ""
 
 #: src/components/vault/settings/Account.tsx
 msgid "Delete your account"
