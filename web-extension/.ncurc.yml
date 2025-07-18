@@ -1,4 +1,5 @@
 upgrade: true
 reject:
-  - '@trpc/client'
-  - '@trpc/server'
+  - '@chakra-ui/react'
+  # - 'react'
+  # - 'react-dom'

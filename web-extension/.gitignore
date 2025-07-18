@@ -13,3 +13,4 @@ yarn-error.log
 
 playwright/.auth/user.json
 dist/manifest.json
+web-ext-artifacts/

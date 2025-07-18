@@ -5,21 +5,23 @@ import {
   PromptPasswordOptionProps
 } from '../renderLoginCredOption'
 import browser from 'webextension-polyfill'
+import { formatDistanceToNow } from 'date-fns'
 
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Option.css'
 import debug from 'debug'
-const log = debug('au:PromptPasswordOption')
 import {
   autofill,
   filledElements,
   resetAutofillStateForThisPage
 } from '../autofill'
 
+const log = debug('au:PromptPasswordOption')
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
+  console.log('PromptPasswordOption2', { loginCredentials, webInputs })
   if (webInputs.length === 0) {
     log('No web inputs in PromptPasswordOption')
     return null
@@ -90,7 +92,15 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         }}
       ></span>
 
-      <div className="authier-dropdown-content">
+      <div
+        className="authier-dropdown-content"
+        style={{
+          backgroundColor: window.matchMedia('(prefers-color-scheme: dark)')
+            .matches
+            ? '#1A202C'
+            : '#dbedee'
+        }}
+      >
         {loginCredentials.map((loginCredential) => {
           return (
             <a
@@ -110,7 +120,27 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
                 })
               }}
             >
-              {loginCredential.loginCredentials.username}
+              <div
+                style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}
+              >
+                <div style={{ fontWeight: 'bold', fontSize: '14px' }}>
+                  {loginCredential.loginCredentials.username}
+                </div>
+                <div
+                  style={{
+                    fontSize: '12px',
+                    color: '#252323',
+                    fontStyle: 'italic'
+                  }}
+                >
+                  {loginCredential.loginCredentials.label}
+                </div>
+                <div style={{ fontSize: '11px', color: '#888' }}>
+                  {loginCredential.lastUsedAt
+                    ? `Last used: ${formatDistanceToNow(new Date(loginCredential.lastUsedAt), { addSuffix: true })}`
+                    : `Created: ${formatDistanceToNow(new Date(loginCredential.createdAt), { addSuffix: true })}`}
+                </div>
+              </div>
             </a>
           )
         })}

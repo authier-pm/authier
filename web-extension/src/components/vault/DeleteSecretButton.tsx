@@ -1,6 +1,6 @@
 import { DeleteIcon } from '@chakra-ui/icons'
 import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
-import { t } from '@lingui/core/macro'
+import { t, plural } from '@lingui/core/macro'
 import {
   useDeleteEncryptedSecretMutation,
   useRemoveEncryptedSecretsMutation
@@ -28,10 +28,18 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
 
   return (
     <>
-      <Tooltip label={t`delete secret`}>
+      <Tooltip
+        label={plural(secrets.length, {
+          one: `delete secret`,
+          other: `delete # secrets`
+        })}
+      >
         <IconButton
           colorScheme="red"
-          aria-label={t`delete secret`}
+          aria-label={plural(secrets.length, {
+            one: `delete secret`,
+            other: `delete # secrets`
+          })}
           icon={<DeleteIcon />}
           onClick={onOpen}
         />
@@ -44,19 +52,13 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
           if (secrets.length > 1) {
             console.log('delete multiple secrets')
             const input = secrets.map(({ id }) => id)
-            await removeEncryptedSecrets({
-              variables: {
-                secrets: input
-              }
-            })
+            await removeEncryptedSecrets({ variables: { secrets: input } })
 
             device.state?.removeSecrets(input)
             setSelectedItems([])
           } else {
             await deleteEncryptedSecretMutation({
-              variables: {
-                id: secrets[0].id
-              }
+              variables: { id: secrets[0].id }
             })
             await device.state?.removeSecret(secrets[0].id)
 

@@ -44,7 +44,7 @@ export const sendEmail = async (
     Messages: [
       {
         From: {
-          Email: 'admin@authier.ml',
+          Email: 'no-reply@authier.pm',
           Name: 'Authier password manager'
         },
         To: [
