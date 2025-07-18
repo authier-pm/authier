@@ -10,6 +10,15 @@ import type { Browser } from 'webextension-polyfill'
 let browser: any
 let mockBrowser: any
 let mockBrowserNode: any
+// Mock chromeLink TODO figure out why vitest has issues with importing chromeLink
+vi.mock('@capaj/trpc-browser/link', () => ({
+  chromeLink: vi.fn((options) => {
+    return () => ({
+      subscribe: vi.fn(),
+      unsubscribe: vi.fn()
+    })
+  })
+}))
 
 // Mock BroadcastChannel
 // @ts-expect-error

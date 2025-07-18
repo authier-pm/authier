@@ -2,6 +2,7 @@ import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   AddWebInputsDocument,
+  AddWebInputsMutation,
   AddWebInputsMutationResult,
   AddWebInputsMutationVariables
 } from './chromeRuntimeListener.codegen'
@@ -193,7 +194,7 @@ const appRouter = tc.router({
       const hostname = constructURL(input.url).hostname
 
       const res = await apolloClient.mutate<
-        AddWebInputsMutationResult,
+        AddWebInputsMutation,
         AddWebInputsMutationVariables
       >({
         mutation: AddWebInputsDocument,
@@ -201,7 +202,7 @@ const appRouter = tc.router({
           webInputs: [input]
         }
       })
-      const resData = res.data?.data?.addWebInputs[0]
+      const resData = res.data?.addWebInputs[0]
       if (!resData || !hostname) {
         throw new Error('no data returned from addWebInputs')
       }

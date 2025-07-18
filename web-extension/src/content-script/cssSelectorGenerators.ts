@@ -3,8 +3,36 @@ export const generateQuerySelectorForOrphanedElement = (
 ) => {
   if (el.tagName.toLowerCase() === 'html') return 'HTML'
   let selector = el.tagName
-  selector += el.type ? `[type="${el.type}"]` : ''
-  selector += el.autocomplete ? `[autocomplete="${el.autocomplete}"]` : ''
+
+  if (el.name) {
+    selector += `[name="${el.name}"]`
+  }
+
+  if (el.className) {
+    selector += `[class="${el.className}"]`
+  }
+
+  if (el.type) {
+    selector += `[type="${el.type}"]`
+  }
+
+  if (el.autocomplete) {
+    selector += `[autocomplete="${el.autocomplete}"]`
+  }
+
+  if (!el.className && !el.name) {
+    if (el.placeholder) {
+      selector += `[placeholder="${el.placeholder}"]`
+    }
+
+    if (el.title) {
+      selector += `[title="${el.title}"]`
+    }
+
+    if (el.value && el.value.length > 0) {
+      selector += `[value="${el.value}"]`
+    }
+  }
 
   return selector
 }
