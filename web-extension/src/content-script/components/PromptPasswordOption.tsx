@@ -68,6 +68,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
+  const darkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
   return (
     <div
       className="authier-dropdown"
@@ -95,10 +96,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       <div
         className="authier-dropdown-content"
         style={{
-          backgroundColor: window.matchMedia('(prefers-color-scheme: dark)')
-            .matches
-            ? '#1A202C'
-            : '#dbedee'
+          backgroundColor: darkTheme ? '#1A202C' : '#dbedee'
         }}
       >
         {loginCredentials.map((loginCredential) => {
@@ -129,13 +127,18 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
                 <div
                   style={{
                     fontSize: '12px',
-                    color: '#252323',
+                    color: darkTheme ? '#dbedee' : '#252323',
                     fontStyle: 'italic'
                   }}
                 >
                   {loginCredential.loginCredentials.label}
                 </div>
-                <div style={{ fontSize: '11px', color: '#888' }}>
+                <div
+                  style={{
+                    fontSize: '11px',
+                    color: darkTheme ? '#d6fdff' : '#888'
+                  }}
+                >
                   {loginCredential.lastUsedAt
                     ? `Last used: ${formatDistanceToNow(new Date(loginCredential.lastUsedAt), { addSuffix: true })}`
                     : `Created: ${formatDistanceToNow(new Date(loginCredential.createdAt), { addSuffix: true })}`}
