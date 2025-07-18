@@ -25,7 +25,6 @@ export function DeleteAlert({
     <>
       <AlertDialog
         motionPreset="slideInBottom"
-        //@ts-expect-error
         leastDestructiveRef={cancelRef}
         onClose={onClose}
         isOpen={isOpen}
@@ -40,10 +39,7 @@ export function DeleteAlert({
             Are you sure you want to delete this item?
           </AlertDialogBody>
           <AlertDialogFooter>
-            <Button
-              ref={cancelRef}
-              onClick={onClose}
-            >
+            <Button ref={cancelRef} onClick={onClose}>
               No
             </Button>
             <Button

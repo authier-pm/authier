@@ -43,7 +43,6 @@ export function DeviceDeleteAlert({
     <>
       <AlertDialog
         motionPreset="slideInBottom"
-        //@ts-expect-error TODO: fix this
         leastDestructiveRef={cancelRef}
         onClose={onClose}
         isOpen={isOpen}
@@ -67,10 +66,7 @@ export function DeviceDeleteAlert({
           </AlertDialogBody>
 
           <AlertDialogFooter>
-            <Button
-              ref={cancelRef}
-              onClick={onClose}
-            >
+            <Button ref={cancelRef} onClick={onClose}>
               No
             </Button>
             <Button
