@@ -28,10 +28,7 @@ and follow the instructions just instead `pnpm prodBuild` run `pnpm dev`
 
 We have all of the stores automated on CI except firefox. Firefox is handled manually from a separate branch where we still have extension manifest V2
 
-To publish a new version invoke:
-
-1. `pnpm prodBuild`
-2. `pnpm publishApp:firefox`
+To publish a new version to Firefox extension store invoke: `pnpm release:firefox`
 
 The extension gets published and the xpi file is available in the `web-extension/web-ext-artifacts` directory.
 No need to upload the xpi file to the stores, that is already done.
