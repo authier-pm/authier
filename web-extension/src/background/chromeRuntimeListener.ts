@@ -92,7 +92,7 @@ const appRouter = tc.router({
         password: credentials.password,
         iconUrl: tab.favIconUrl ?? null,
         url: urlParsed.hostname,
-        label: tab.title ?? `${credentials.username}@${urlParsed.hostname}`
+        label: `${credentials.username} | ${urlParsed.hostname}`
       }
 
       encryptedDataSchema.parse(encryptedData)
