@@ -39,9 +39,14 @@ export const getContentScriptInitialState = async (
         (i) => i.kind === EncryptedSecretType.LOGIN_CREDENTIALS
       ).length ?? 0,
     secretsForHost: {
-      loginCredentials: decrypted.filter(
-        ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
-      ) as ILoginSecret[],
+      loginCredentials: decrypted
+        .filter(({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS)
+        .sort((a, b) => {
+          return (
+            new Date(b.lastUsedAt ?? b.createdAt).getTime() -
+            new Date(a.lastUsedAt ?? a.createdAt).getTime()
+          )
+        }) as ILoginSecret[],
       totpSecrets: decrypted.filter(
         ({ kind }) => kind === EncryptedSecretType.TOTP
       ) as ITOTPSecret[]

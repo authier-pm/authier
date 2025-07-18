@@ -91,13 +91,10 @@ async function clicked(e: MouseEvent) {
 export const contentScriptRender = (stateInit: IInitStateRes) => {
   const { saveLoginModalsState, secretsForHost, webInputs } = stateInit
 
-  if (secretsForHost.loginCredentials.length > 1 && webInputs.length > 0) {
-    renderLoginCredOption({
-      loginCredentials: secretsForHost.loginCredentials,
-      webInputs
-    })
-    return
-  }
+  renderLoginCredOption({
+    loginCredentials: secretsForHost.loginCredentials,
+    webInputs
+  })
 
   const isIframe = window.location !== window.parent.location
   if (isIframe) {
