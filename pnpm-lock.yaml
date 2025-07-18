@@ -680,8 +680,8 @@ importers:
         specifier: ^4.0.0
         version: 4.0.0(@types/react@19.1.8)(graphql-ws@5.14.0(graphql@16.11.0))(graphql@16.11.0)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       '@capaj/trpc-browser':
-        specifier: ^1.5.2
-        version: 1.5.2(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))
+        specifier: ^1.5.3
+        version: 1.5.3(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))
       '@chakra-ui/color-mode':
         specifier: ^2.2.0
         version: 2.2.0(react@18.3.1)
@@ -2435,8 +2435,8 @@ packages:
     engines: {node: '>=14'}
     hasBin: true
 
-  '@capaj/trpc-browser@1.5.2':
-    resolution: {integrity: sha512-mHj404AWlu95GGI/NdIswzEOW2uvFkZYh6W5dFtB/7kVDgeTY2YQxWp5cnrrY1EPn0PJWxTDcmpy41AJ7NpqDQ==}
+  '@capaj/trpc-browser@1.5.3':
+    resolution: {integrity: sha512-U+B4J9VTuUjH+AiQ48C5wBbyJHzOVO7fsPtKVLv1iKMKmn0snLpKimeECpFXbf6McddvInclp3SX4RuJYbnO/Q==}
     peerDependencies:
       '@trpc/client': ^11
       '@trpc/server': ^11
@@ -18358,7 +18358,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  '@capaj/trpc-browser@1.5.2(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))':
+  '@capaj/trpc-browser@1.5.3(@trpc/client@11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3))(@trpc/server@11.4.3(typescript@5.8.3))':
     dependencies:
       '@trpc/client': 11.4.3(@trpc/server@11.4.3(typescript@5.8.3))(typescript@5.8.3)
       '@trpc/server': 11.4.3(typescript@5.8.3)

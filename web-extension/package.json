@@ -105,7 +105,7 @@
   "dependencies": {
     "@apollo/client": "^3.13.8",
     "@apollo/react-hooks": "^4.0.0",
-    "@capaj/trpc-browser": "^1.5.2",
+    "@capaj/trpc-browser": "^1.5.3",
     "@chakra-ui/color-mode": "^2.2.0",
     "@chakra-ui/icons": "^2.2.4",
     "@chakra-ui/react": "2.10.4",

@@ -2,6 +2,16 @@ import { device } from './ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { vi } from 'vitest'
 
+// Mock chromeLink TODO figure out why vitest has issues with importing chromeLink
+vi.mock('@capaj/trpc-browser/link', () => ({
+  chromeLink: vi.fn((options) => {
+    return () => ({
+      subscribe: vi.fn(),
+      unsubscribe: vi.fn()
+    })
+  })
+}))
+
 // Mock browser.runtime.connect
 vi.mock('webextension-polyfill', () => ({
   default: {
