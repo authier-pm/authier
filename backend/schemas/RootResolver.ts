@@ -10,7 +10,6 @@ import {
   Int
 } from 'type-graphql'
 import { dmmf, prismaClient } from '../prisma/prismaClient'
-import { FastifyReply, FastifyRequest } from 'fastify'
 import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
@@ -24,9 +23,9 @@ import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
-import { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
+import type { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
-import { Device, User, WebInput } from '@prisma/client'
+import type { Device, User, WebInput } from '@prisma/client'
 
 import {
   WebInputGQL,
@@ -44,39 +43,14 @@ import {
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
-import { firebaseAdmin, firebaseSendNotification } from '../lib/firebaseAdmin'
+import { firebaseSendNotification } from '../lib/firebaseAdmin'
 import { WebInputMutation } from '../models/WebInput'
-import { FirebaseMessagingError } from 'firebase-admin/lib/utils/error'
+import type {
+  IContext,
+  IContextAuthenticated
+} from '../models/types/ContextTypes'
 
 const log = debug('au:RootResolver')
-
-export interface IContext {
-  request: FastifyRequest
-  reply: FastifyReply
-  getIpAddress: () => string
-  prisma: typeof prismaClient
-}
-
-export interface IJWTPayload {
-  userId: string
-  deviceId: string
-}
-
-export interface IContextAuthenticated extends IContext {
-  jwtPayload: IJWTPayload
-  device: Device
-  masterDeviceId: string | null | undefined
-}
-
-export interface IContextMaybeAuthenticated extends IContext {
-  jwtPayload?: IJWTPayload
-}
-
-export interface Payload {
-  userId: string
-  iat: number
-  exp: number
-}
 
 @Resolver()
 export class RootResolver {

@@ -1,7 +1,7 @@
 import { Field, ObjectType, Ctx } from 'type-graphql'
 import { WebInputGQL, WebInputGQLScalars } from './generated/WebInputGQL'
 import debug from 'debug'
-import { IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContextAuthenticated } from './types/ContextTypes'
 import { RedisBasicRateLimiter } from '../lib/RedisBasicRateLimiter'
 import { redisClient } from '../lib/redisClient'
 

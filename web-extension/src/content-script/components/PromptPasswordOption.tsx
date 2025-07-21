@@ -21,7 +21,7 @@ import {
 const log = debug('au:PromptPasswordOption')
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
-  console.log('PromptPasswordOption2', { loginCredentials, webInputs })
+
   if (webInputs.length === 0) {
     log('No web inputs in PromptPasswordOption')
     return null

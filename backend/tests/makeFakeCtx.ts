@@ -1,6 +1,6 @@
 import { prismaClient } from '../prisma/prismaClient'
 import { faker } from '@faker-js/faker'
-import { Device } from '@prisma/client'
+import type { Device } from '@prisma/client'
 import { vi } from 'vitest'
 
 // afterAll(async () => {

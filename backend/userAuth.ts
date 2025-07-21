@@ -1,8 +1,9 @@
-import { Device, User } from '@prisma/client'
-import { JwtPayload, sign } from 'jsonwebtoken'
+import type { Device, User } from '@prisma/client'
+import type { JwtPayload } from 'jsonwebtoken'
+import { sign } from 'jsonwebtoken'
 
 import { isProd } from './envUtils'
-import { IContext } from './schemas/RootResolver'
+import type { IContext } from './models/types/ContextTypes'
 
 export const setNewAccessTokenIntoCookie = (
   user: Pick<User, 'id'>,

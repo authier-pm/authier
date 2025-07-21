@@ -1,21 +1,21 @@
 import { prismaClient } from '../prisma/prismaClient'
 
 import { faker } from '@faker-js/faker'
-import {
+import type {
   AddNewDeviceInput,
   RegisterNewAccountInput
 } from '../models/AuthInputs'
-import { GraphQLResolveInfo } from 'graphql'
+
 import {
   makeAddNewDeviceInput,
   makeRegisterAccountInput
 } from '../schemas/__test__/makeRegisterAccountInput'
-import { sign } from 'jsonwebtoken'
+
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeMutation
 } from './DecryptionChallenge'
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 

@@ -1,4 +1,4 @@
-import { User } from '@prisma/client'
+import type { User } from '@prisma/client'
 import { faker } from '@faker-js/faker'
 import { plainToClass } from 'class-transformer'
 import { prismaClient } from '../prisma/prismaClient'
@@ -6,7 +6,7 @@ import { makeFakeCtx } from 'tests/makeFakeCtx'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { UserMutation } from './UserMutation'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
-import { EncryptedSecretInput, SettingsInput } from './models'
+import type { EncryptedSecretInput, SettingsInput } from './models'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
 describe('UserMutation', () => {

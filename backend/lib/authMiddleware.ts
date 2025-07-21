@@ -1,7 +1,9 @@
-import { MiddlewareFn } from 'type-graphql'
+import type { MiddlewareFn } from 'type-graphql'
 import { verify } from 'jsonwebtoken'
-import { IContextAuthenticated } from '../schemas/RootResolver'
-import { IJWTPayload } from '../schemas/RootResolver'
+import type {
+  IContextAuthenticated,
+  IJWTPayload
+} from '../models/types/ContextTypes'
 import '@fastify/cookie'
 import { GraphqlErrorUnauthorized } from './GraphqlError'
 

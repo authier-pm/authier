@@ -5,15 +5,13 @@ import mercurius from 'mercurius'
 import { gqlSchema } from './schemas/gqlSchema'
 import 'dotenv/config'
 
-import cookie, { FastifyCookieOptions } from '@fastify/cookie'
+import type { FastifyCookieOptions } from '@fastify/cookie'
+import cookie from '@fastify/cookie'
 import { prismaClient } from './prisma/prismaClient'
-import {
-  jwtPayloadRefreshToken,
-  setNewAccessTokenIntoCookie,
-  setNewRefreshToken
-} from './userAuth'
+import type { jwtPayloadRefreshToken } from './userAuth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
-import { IContext } from './schemas/RootResolver'
+import type { IContext } from './models/types/ContextTypes'
 import { captureException, init as sentryInit } from '@sentry/node'
 import { GraphqlError } from './lib/GraphqlError'
 

@@ -1,4 +1,5 @@
-import { Stack, StackProps } from 'aws-cdk-lib'
+import type { StackProps } from 'aws-cdk-lib'
+import { Stack } from 'aws-cdk-lib'
 
 import * as lambda from 'aws-cdk-lib/aws-lambda'
 import * as path from 'path'

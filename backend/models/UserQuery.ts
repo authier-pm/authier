@@ -7,7 +7,7 @@ import {
   ObjectType,
   GraphQLISODateTime
 } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 
 import { EncryptedSecretQuery } from './EncryptedSecret'
 
@@ -17,7 +17,8 @@ import { UserGQL } from './generated/UserGQL'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
-import { Device, EmailVerificationType } from '@prisma/client'
+import type { Device } from '@prisma/client'
+import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import {
   defaultDeviceSettingSystemValues,

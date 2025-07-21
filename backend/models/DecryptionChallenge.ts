@@ -1,8 +1,8 @@
 import 'reflect-metadata'
-import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import { Arg, Ctx, Field, ID, Int, ObjectType } from 'type-graphql'
+import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallengeGQL'
-import { GraphQLResolveInfo } from 'graphql'
+
 import { createUnionType } from 'type-graphql'
 import { GraphQLJSON, GraphQLNonEmptyString } from 'graphql-scalars'
 import { GraphqlError } from '../lib/GraphqlError'

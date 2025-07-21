@@ -1,6 +1,6 @@
 import { prismaClient } from '../../prisma/prismaClient'
 import { faker } from '@faker-js/faker'
-import { RegisterNewAccountInput } from '../../models/AuthInputs'
+import type { RegisterNewAccountInput } from '../../models/AuthInputs'
 import { makeRegisterAccountInput } from './makeRegisterAccountInput'
 
 export const fakeUserAndContext = async () => {

@@ -1,9 +1,9 @@
-import { FastifyRequest } from 'fastify'
+import type { FastifyRequest } from 'fastify'
 import { prismaClient } from './prisma/prismaClient'
 import { stripeClient } from './stripeClient'
 
 import { GraphQLError } from 'graphql'
-import Stripe from 'stripe'
+import type Stripe from 'stripe'
 import debug from 'debug'
 
 const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'

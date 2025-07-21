@@ -1,5 +1,6 @@
 import { log } from 'console'
-import firebase, { ServiceAccount } from 'firebase-admin'
+import type { ServiceAccount } from 'firebase-admin'
+import firebase from 'firebase-admin'
 import type { Message } from 'firebase-admin/lib/messaging/messaging-api'
 
 import { prismaClient } from '../prisma/prismaClient'

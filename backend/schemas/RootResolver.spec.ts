@@ -1,18 +1,18 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { prismaClient } from '../prisma/prismaClient'
-import { IContext, IContextAuthenticated, RootResolver } from './RootResolver'
+import { RootResolver } from './RootResolver'
+import type { IContextAuthenticated } from '../models/types/ContextTypes'
 import { faker } from '@faker-js/faker'
-import { RegisterNewAccountInput } from '../models/AuthInputs'
+import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
-import { sign } from 'jsonwebtoken'
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
+import type { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 import { defaultDeviceSettingSystemValues } from 'models/defaultDeviceSettingSystemValues'
-import { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,

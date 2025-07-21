@@ -1,19 +1,16 @@
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
-import { IContext, IContextAuthenticated } from '../schemas/RootResolver'
+import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import {
   EncryptedSecretMutation,
   EncryptedSecretQuery
 } from './EncryptedSecret'
-import {
-  DefaultSettingsInput,
-  EncryptedSecretInput,
-  SettingsInput
-} from './models'
+import { EncryptedSecretInput, SettingsInput } from './models'
 import { UserGQL } from './generated/UserGQL'
 
 import { DeviceGQL } from './generated/DeviceGQL'
 import { UserBase, UserQuery } from './UserQuery'
-import { GraphQLInt, GraphQLResolveInfo } from 'graphql'
+import { GraphQLInt } from 'graphql'
+import type { GraphQLResolveInfo } from 'graphql'
 import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 import { ChangeMasterPasswordInput } from './AuthInputs'
 import {

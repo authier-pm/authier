@@ -1,7 +1,7 @@
 import ms from 'ms'
 
 import { GraphQLError } from 'graphql'
-import { Redis } from '@upstash/redis'
+import type { Redis } from '@upstash/redis'
 
 export class RateLimitedError extends GraphQLError {
   constructor(message: string, errorCode: string) {

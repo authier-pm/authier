@@ -10,7 +10,7 @@ const esbuildFileLocPlugin = (rootPath) => ({
     build.onLoad(
       { filter: /.\.(js|ts|jsx|tsx)$/, namespace: 'file' },
       async (args) => {
-        const isWindows = /^win/.test(process.platform)
+        const isWindows = process.platform.startsWith('win')
         const esc = (p) => (isWindows ? p.replace(/\\/g, '/') : p)
         const pathInLambda = args.path
           .replace(process.cwd(), rootPath)
