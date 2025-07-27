@@ -7,7 +7,10 @@ import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { describe, expect, it } from 'vitest'
 
 import { makeFakeCtx } from '../tests/makeFakeCtx'
-import type { DecryptionChallengeApproved } from '../models/DecryptionChallenge'
+import type {
+  DecryptionChallengeApproved,
+  DecryptionChallengeForApproval
+} from '../models/DecryptionChallenge'
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
@@ -141,7 +144,7 @@ describe('RootResolver', () => {
           email: fakeData.email,
           addDeviceSecret: fakeData.addDeviceSecret,
           addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-
+          newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
           encryptionSalt: fakeData.encryptionSalt,
           ...userSecurityProps
         }
@@ -155,9 +158,9 @@ describe('RootResolver', () => {
           platform: 'macOS'
         },
         makeFakeCtx({ userId })
-      )) as DecryptionChallengeApproved
+      )) as DecryptionChallengeForApproval
 
-      expect(data?.addDeviceSecretEncrypted).toBe(undefined)
+      expect((data as any)?.addDeviceSecretEncrypted).toBe(undefined)
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
