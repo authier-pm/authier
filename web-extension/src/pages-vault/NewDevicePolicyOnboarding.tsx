@@ -1,13 +1,13 @@
 
 import { Box, Button, Center, FormControl, FormLabel, Heading, Radio, RadioGroup, Stack, Text, Icon, HStack } from '@chakra-ui/react'
-
+import { useUpdateNewDevicePolicyMutation } from './NewDevicePolicyOnboarding.codegen'
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { FiShield, FiShieldOff, FiAlertTriangle } from 'react-icons/fi'
 import { Txt } from '@src/components/util/Txt'
-
+import { UserNewDevicePolicy } from '../../../shared/generated/graphqlBaseTypes'
 export const NewDevicePolicyOnboarding = () => {
-  const [selectedPolicy, setSelectedPolicy] = useState<UserNewDevicePolicyGQL | null>(null)
+  const [selectedPolicy, setSelectedPolicy] = useState<UserNewDevicePolicy | null>(null)
   const [updateNewDevicePolicy, { loading, error }] = useUpdateNewDevicePolicyMutation()
   const navigate = useNavigate()
 
@@ -29,21 +29,21 @@ export const NewDevicePolicyOnboarding = () => {
         <Text mb={6}>Please select how you want to handle new devices.</Text>
         <FormControl as="fieldset">
           <FormLabel as="legend">Policy Options</FormLabel>
-          <RadioGroup onChange={setSelectedPolicy} value={selectedPolicy}>
+          <RadioGroup onChange={(value) => setSelectedPolicy(value as UserNewDevicePolicy)} value={selectedPolicy as string}>
             <Stack spacing={3}>
-              <Radio value={UserNewDevicePolicyGQL.Allow}>
+              <Radio value={UserNewDevicePolicy.ALLOW}>
                 <HStack spacing={2}>
                   <Icon as={FiShieldOff} color="orange.500" />
                   <Text>Allow any new device</Text>
                 </HStack>
               </Radio>
-              <Radio value={UserNewDevicePolicyGQL.RequireAnyDeviceApproval}>
+              <Radio value={UserNewDevicePolicy.REQUIRE_ANY_DEVICE_APPROVAL}>
                 <HStack spacing={2}>
                   <Icon as={FiAlertTriangle} color="yellow.500" />
                   <Text>Require Any Device Approval</Text>
                 </HStack>
               </Radio>
-              <Radio disabled value={UserNewDevicePolicyGQL.RequireMasterDeviceApproval}>
+              <Radio disabled value={UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL}>
                 <HStack spacing={2}>
                   <Icon as={FiShield} color="green.500" />
                   <Text>Require Master Device Approval</Text>
