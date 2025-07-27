@@ -204,6 +204,7 @@ model User {
   // User settings
   notificationOnVaultUnlock           Boolean @default(false)
   notificationOnWrongPasswordAttempts Int     @default(3)
+  newDevicePolicy                UserNewDevicePolicy?  
 
   UsageEvents           SecretUsageEvent[]
   EncryptedSecrets      EncryptedSecret[]
@@ -298,6 +299,12 @@ model Tag {
 enum EmailVerificationType {
   PRIMARY
   CONTACT
+}
+
+enum UserNewDevicePolicy {
+  ALLOW
+  REQUIRE_ANY_DEVICE_APPROVAL
+  REQUIRE_MASTER_DEVICE_APPROVAL  // requires master device to approve new device
 }
 
 model EmailVerification {

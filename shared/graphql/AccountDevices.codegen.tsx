@@ -1,4 +1,4 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
 import * as Apollo from '@apollo/client';
@@ -20,7 +20,7 @@ export type ApproveChallengeMutation = { __typename?: 'Mutation', me: { __typena
 export type DevicesRequestsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, ipGeoLocation?: any | null }> } };
+export type DevicesRequestsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, newDevicePolicy?: Types.UserNewDevicePolicy | null, decryptionChallengesWaiting: Array<{ __typename?: 'DecryptionChallengeForApproval', id: number, createdAt: string, deviceName: string, deviceId: string, ipAddress: string, ipGeoLocation?: any | null }> } };
 
 export type LogoutDeviceMutationVariables = Types.Exact<{
   id: Types.Scalars['String']['input'];
@@ -140,6 +140,7 @@ export const DevicesRequestsDocument = gql`
   me {
     id
     masterDeviceId
+    newDevicePolicy
     decryptionChallengesWaiting {
       id
       createdAt

@@ -18,6 +18,7 @@ import { formatRelative } from 'date-fns'
 import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from './LoginAwaitingApproval'
 import { useDevicesListWithDataQuery } from './Devices.codegen'
 import { device } from '@src/background/ExtensionDevice'
+import { UserNewDevicePolicy } from '@shared/generated/graphqlBaseTypes'
 
 export const NewDevicesApprovalStack = () => {
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
@@ -29,8 +30,8 @@ export const NewDevicesApprovalStack = () => {
   const [reject] = useRejectChallengeMutation()
   const [approve] = useApproveChallengeMutation()
 
-  const isMasterDevice = device.id === devicesRequests?.me.masterDeviceId
-  // const isMasterDevice = true
+  const showMasterDevicePolicyHint = device.id !== devicesRequests?.me.masterDeviceId && devicesRequests?.me.newDevicePolicy === UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL
+
   return (
     <VStack mt={3}>
       {devicesRequests?.me?.decryptionChallengesWaiting.map(
@@ -64,52 +65,52 @@ export const NewDevicesApprovalStack = () => {
                     from IP {challengeToApprove.ipAddress} ({parts.join(', ')})
                   </Trans>
                 </Center>
-                {isMasterDevice && (
-                  <Flex left={'auto'} marginLeft={'auto'} flexDirection={'row'}>
-                    <Center>
-                      <Button
-                        // w="30%"
-                        mx={2}
-                        colorScheme="red"
-                        onClick={async () => {
-                          await reject({
-                            variables: {
-                              id: challengeToApprove.id
-                            }
-                          })
-                          await refetch()
-                        }}
-                      >
-                        <Trans>Reject</Trans>
-                      </Button>
-                    </Center>
-                    <Center>
-                      <Button
-                        mx={2}
-                        colorScheme="green"
-                        onClick={async () => {
-                          await approve({
-                            variables: {
-                              id: challengeToApprove.id
-                            }
-                          })
-                          await refetch()
-                          setTimeout(() => {
-                            devicesRefetch()
-                          }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL) // this is needed, because it takes time one the client side to do the decryption challenge
-                        }}
-                      >
-                        <Trans>Approve</Trans>
-                      </Button>
-                    </Center>
-                  </Flex>
-                )}
+
+                <Flex left={'auto'} marginLeft={'auto'} flexDirection={'row'}>
+                  <Center>
+                    <Button
+                      // w="30%"
+                      mx={2}
+                      colorScheme="red"
+                      onClick={async () => {
+                        await reject({
+                          variables: {
+                            id: challengeToApprove.id
+                          }
+                        })
+                        await refetch()
+                      }}
+                    >
+                      <Trans>Reject</Trans>
+                    </Button>
+                  </Center>
+                  <Center>
+                    <Button
+                      mx={2}
+                      colorScheme="green"
+                      onClick={async () => {
+                        await approve({
+                          variables: {
+                            id: challengeToApprove.id
+                          }
+                        })
+                        await refetch()
+                        setTimeout(() => {
+                          devicesRefetch()
+                        }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL) // this is needed, because it takes time one the client side to do the decryption challenge
+                      }}
+                    >
+                      <Trans>Approve</Trans>
+                    </Button>
+                  </Center>
+                </Flex>
+
               </Flex>
             </Alert>
           )
         }
       )}
-      {!isMasterDevice && (
+      {showMasterDevicePolicyHint && (
         <Center>
           <Trans>Open device list on your master device to approve</Trans>
         </Center>

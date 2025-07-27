@@ -34,6 +34,13 @@ export const EmailVerificationType = {
 } as const
 export type EmailVerificationType =
   (typeof EmailVerificationType)[keyof typeof EmailVerificationType]
+export const UserNewDevicePolicy = {
+  ALLOW: 'ALLOW',
+  REQUIRE_ANY_DEVICE_APPROVAL: 'REQUIRE_ANY_DEVICE_APPROVAL',
+  REQUIRE_MASTER_DEVICE_APPROVAL: 'REQUIRE_MASTER_DEVICE_APPROVAL'
+} as const
+export type UserNewDevicePolicy =
+  (typeof UserNewDevicePolicy)[keyof typeof UserNewDevicePolicy]
 export type DecryptionChallenge = {
   id: Generated<number>
   ipAddress: string
@@ -153,6 +160,7 @@ export type User = {
   deviceRecoveryCooldownMinutes: number
   notificationOnVaultUnlock: Generated<boolean>
   notificationOnWrongPasswordAttempts: Generated<number>
+  newDevicePolicy: UserNewDevicePolicy | null
 }
 export type UserPaidProducts = {
   id: Generated<number>

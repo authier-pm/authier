@@ -12,6 +12,7 @@ import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { UserNewDevicePolicy } from '@prisma/client'
 
 @ObjectType()
 class DeviceLocation {
@@ -171,7 +172,11 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
       }
     })
 
-    if (user?.masterDeviceId !== ctx.device.id) {
+    if (
+      user?.newDevicePolicy ===
+        UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL &&
+      user?.masterDeviceId !== ctx.device.id
+    ) {
       throw new GraphqlError(
         'Only the master device can approve a decryption challenge'
       )

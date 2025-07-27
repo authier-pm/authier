@@ -1,0 +1,8 @@
+mutation UpdateNewDevicePolicy($newDevicePolicy: UserNewDevicePolicy!) {
+  me {
+    setNewDevicePolicy(newDevicePolicy: $newDevicePolicy) {
+      id
+      newDevicePolicy
+    }
+  }
+}

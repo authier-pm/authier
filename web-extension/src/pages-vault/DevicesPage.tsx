@@ -351,7 +351,7 @@ const DeviceListItem = ({
   )
 }
 
-export default function Devices() {
+export function DevicesPage() {
   const { data, loading } = useDevicesListWithDataQuery()
 
   const [filterBy, setFilterBy] = useState('')

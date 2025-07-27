@@ -1,12 +1,12 @@
 import { useContext, useEffect, useState } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 
-import { Route, Routes, useNavigate } from 'react-router-dom'
+import { Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/VaultItemSettings'
 import { VaultSettings } from './VaultSettings'
 
 import { Center } from '@chakra-ui/react'
-import Devices from './Devices'
+import { DevicesPage } from './DevicesPage'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
 
@@ -18,18 +18,36 @@ import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
 import browser from 'webextension-polyfill'
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider, useQuery, gql } from '@apollo/client'
 import {
   apolloClient,
-  apolloClientWithoutTokenRefresh
+  apolloClientWithoutTokenRefresh,
 } from '@src/apollo/apolloClient'
+import { NewDevicePolicyOnboarding } from './NewDevicePolicyOnboarding'
 
 const log = debug('au:VaultRouter')
+
+const GET_USER_NEW_DEVICE_POLICY = gql`
+  query GetUserNewDevicePolicy {
+    currentUser {
+      id
+      newDevicePolicy
+    }
+  }
+`
 
 export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
+  const location = useLocation()
   const [vaultTableView, setVaultTableView] = useState(false)
+  const { data: userData, loading: userLoading } = useQuery(
+    GET_USER_NEW_DEVICE_POLICY,
+    {
+      skip: !deviceState,
+      fetchPolicy: 'network-only',
+    },
+  )
 
   useEffect(() => {
     if (lockedState) {
@@ -49,6 +67,16 @@ export function VaultRouter() {
       }
     })
   }, [])
+
+  useEffect(() => {
+    if (
+      !userLoading &&
+      userData?.currentUser?.newDevicePolicy === null &&
+      location.pathname !== '/new-device-policy'
+    ) {
+      navigate('/new-device-policy')
+    }
+  }, [userData, userLoading, navigate, location])
 
   if (deviceState === null) {
     return (
@@ -73,6 +101,25 @@ export function VaultRouter() {
     )
   }
 
+  if (userLoading) {
+    // Show a loading indicator while we check the user's policy
+    return <Center h="100vh">Loading...</Center>
+  }
+
+  if (userData?.currentUser?.newDevicePolicy === null) {
+    return (
+      <ApolloProvider client={apolloClient}>
+        <Routes>
+          <Route
+            path="/new-device-policy"
+            element={<NewDevicePolicyOnboarding />}
+          />
+          <Route path="*" element={<Navigate to="/new-device-policy" />} />
+        </Routes>
+      </ApolloProvider>
+    )
+  }
+
   return (
     <ApolloProvider client={apolloClient}>
       <SidebarWithHeader>
@@ -92,7 +139,7 @@ export function VaultRouter() {
           <Route path="/secret/:secretId" element={<VaultItemSettings />} />
           <Route path="/account-limits" element={<AccountLimits />}></Route>
           <Route path="/settings/*" element={<VaultSettings />}></Route>
-          <Route path="/devices" element={<Devices />}></Route>
+          <Route path="/devices" element={<DevicesPage />}></Route>
           <Route path="/import-export" element={<VaultImportExport />}></Route>
           <Route path="/addItem" element={<AddItem />}></Route>
         </Routes>
