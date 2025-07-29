@@ -1,7 +1,13 @@
 import { useContext, useEffect, useState } from 'react'
 import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 
-import { Route, Routes, useNavigate, useLocation, Navigate } from 'react-router-dom'
+import {
+  Route,
+  Routes,
+  useNavigate,
+  useLocation,
+  Navigate
+} from 'react-router-dom'
 import { VaultItemSettings } from '@src/components/vault/VaultItemSettings'
 import { VaultSettings } from './VaultSettings'
 
@@ -18,36 +24,20 @@ import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
 import browser from 'webextension-polyfill'
-import { ApolloProvider, useQuery, gql } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client'
 import {
   apolloClient,
-  apolloClientWithoutTokenRefresh,
+  apolloClientWithoutTokenRefresh
 } from '@src/apollo/apolloClient'
 import { NewDevicePolicyOnboarding } from './NewDevicePolicyOnboarding'
 
 const log = debug('au:VaultRouter')
-
-const GET_USER_NEW_DEVICE_POLICY = gql`
-  query GetUserNewDevicePolicy {
-    currentUser {
-      id
-      newDevicePolicy
-    }
-  }
-`
 
 export function VaultRouter() {
   const { deviceState, lockedState } = useContext(DeviceStateContext)
   const navigate = useNavigate()
   const location = useLocation()
   const [vaultTableView, setVaultTableView] = useState(false)
-  const { data: userData, loading: userLoading } = useQuery(
-    GET_USER_NEW_DEVICE_POLICY,
-    {
-      skip: !deviceState,
-      fetchPolicy: 'network-only',
-    },
-  )
 
   useEffect(() => {
     if (lockedState) {
@@ -68,16 +58,6 @@ export function VaultRouter() {
     })
   }, [])
 
-  useEffect(() => {
-    if (
-      !userLoading &&
-      userData?.currentUser?.newDevicePolicy === null &&
-      location.pathname !== '/new-device-policy'
-    ) {
-      navigate('/new-device-policy')
-    }
-  }, [userData, userLoading, navigate, location])
-
   if (deviceState === null) {
     return (
       <ApolloProvider client={apolloClientWithoutTokenRefresh}>
@@ -97,25 +77,6 @@ export function VaultRouter() {
             ></Route>
           </Routes>
         </Center>
-      </ApolloProvider>
-    )
-  }
-
-  if (userLoading) {
-    // Show a loading indicator while we check the user's policy
-    return <Center h="100vh">Loading...</Center>
-  }
-
-  if (userData?.currentUser?.newDevicePolicy === null) {
-    return (
-      <ApolloProvider client={apolloClient}>
-        <Routes>
-          <Route
-            path="/new-device-policy"
-            element={<NewDevicePolicyOnboarding />}
-          />
-          <Route path="*" element={<Navigate to="/new-device-policy" />} />
-        </Routes>
       </ApolloProvider>
     )
   }
@@ -144,6 +105,7 @@ export function VaultRouter() {
           <Route path="/addItem" element={<AddItem />}></Route>
         </Routes>
       </SidebarWithHeader>
+      <NewDevicePolicyOnboarding />
     </ApolloProvider>
   )
 }

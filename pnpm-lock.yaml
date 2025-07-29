@@ -292,7 +292,7 @@ importers:
   mobile-app:
     dependencies:
       '@apollo/client':
-        specifier: ^3.13.5
+        specifier: ^3.13.9
         version: 3.13.9(@types/react@18.3.12)(graphql-ws@5.14.0(graphql@16.11.0))(graphql@16.11.0)(react-dom@19.1.0(react@18.2.0))(react@18.2.0)
       '@babel/preset-env':
         specifier: ^7.23.7

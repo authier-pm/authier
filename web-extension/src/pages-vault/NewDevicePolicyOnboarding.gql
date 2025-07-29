@@ -6,3 +6,10 @@ mutation UpdateNewDevicePolicy($newDevicePolicy: UserNewDevicePolicy!) {
     }
   }
 }
+
+query GetUserNewDevicePolicy {
+  me {
+    id
+    newDevicePolicy
+  }
+}
