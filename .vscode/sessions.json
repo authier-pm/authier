@@ -1,5 +1,5 @@
 {
-  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v10/terminal-keeper.json",
+  "$schema": "https://cdn.statically.io/gh/nguyenngoclongdev/cdn/main/schema/v11/terminal-keeper.json",
   "theme": "tribe",
   "active": "default",
   "activateOnStartup": true,
@@ -12,7 +12,9 @@
         "icon": "terminal-cmd",
         "color": "terminal.ansiGreen",
         "cwd": "backend",
-        "commands": ["pnpm dev"]
+        "commands": [
+          "pnpm dev"
+        ]
       },
       {
         "name": "web-extension",
@@ -20,7 +22,9 @@
         "icon": "watch-view-icon",
         "color": "terminal.ansiYellow",
         "cwd": "web-extension",
-        "commands": ["pnpm dev"]
+        "commands": [
+          "pnpm dev"
+        ]
       }
     ]
   }
