@@ -35,6 +35,7 @@ import debug from 'debug'
 import { setNewRefreshToken } from '../userAuth'
 import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
 
 const log = debug('au:userMutation')
 
@@ -428,6 +429,31 @@ export class UserMutation extends UserBase {
       where: {
         id,
         userId: ctx.jwtPayload.userId
+      }
+    })
+  }
+
+  @Field(() => UserGQL)
+  async setNewDevicePolicy(
+    @Arg('newDevicePolicy', () => UserNewDevicePolicyGQL)
+    newDevicePolicy: UserNewDevicePolicyGQL,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    if (
+      this.newDevicePolicy !== null &&
+      ctx.device.id !== this.masterDeviceId
+    ) {
+      throw new GraphqlError(
+        'newDevicePolicy can be set only from master device'
+      )
+    }
+
+    return ctx.prisma.user.update({
+      where: {
+        id: this.id
+      },
+      data: {
+        newDevicePolicy: newDevicePolicy
       }
     })
   }

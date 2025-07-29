@@ -9,6 +9,7 @@ import { TagGQL } from './TagGQL'
 import { UserPaidProductsGQL } from './UserPaidProductsGQL'
 import { MasterDeviceChangeGQL } from './MasterDeviceChangeGQL'
 import { DefaultDeviceSettingsGQL } from './DefaultDeviceSettingsGQL'
+import { UserNewDevicePolicyGQL } from '../types/UserNewDevicePolicy'
 
 @ObjectType()
 export class UserGQLScalars {
@@ -53,6 +54,9 @@ export class UserGQLScalars {
 
   @Field(() => Int)
   notificationOnWrongPasswordAttempts: number
+
+  @Field(() => UserNewDevicePolicyGQL, { nullable: true })
+  newDevicePolicy: UserNewDevicePolicyGQL | null
 }
 
 @ObjectType()

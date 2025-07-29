@@ -586,6 +586,7 @@ export type UserGql = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  newDevicePolicy?: Maybe<UserNewDevicePolicy>;
   notificationOnVaultUnlock: Scalars['Boolean']['output'];
   notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
@@ -629,6 +630,7 @@ export type UserMutation = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  newDevicePolicy?: Maybe<UserNewDevicePolicy>;
   notificationOnVaultUnlock: Scalars['Boolean']['output'];
   notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   recoveryDecryptionChallenge?: Maybe<DecryptionChallengeGql>;
@@ -636,6 +638,7 @@ export type UserMutation = {
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt']['output'];
   setMasterDevice: MasterDeviceChangeGql;
+  setNewDevicePolicy: UserGql;
   tokenVersion: Scalars['Int']['output'];
   uiLanguage: Scalars['String']['output'];
   updateFireToken: DeviceGql;
@@ -706,6 +709,11 @@ export type UserMutationSetMasterDeviceArgs = {
 };
 
 
+export type UserMutationSetNewDevicePolicyArgs = {
+  newDevicePolicy: UserNewDevicePolicy;
+};
+
+
 export type UserMutationUpdateFireTokenArgs = {
   firebaseToken: Scalars['String']['input'];
 };
@@ -714,6 +722,12 @@ export type UserMutationUpdateFireTokenArgs = {
 export type UserMutationUpdateSettingsArgs = {
   config: SettingsInput;
 };
+
+export enum UserNewDevicePolicy {
+  ALLOW = 'ALLOW',
+  REQUIRE_ANY_DEVICE_APPROVAL = 'REQUIRE_ANY_DEVICE_APPROVAL',
+  REQUIRE_MASTER_DEVICE_APPROVAL = 'REQUIRE_MASTER_DEVICE_APPROVAL'
+}
 
 export type UserPaidProductsGql = {
   __typename?: 'UserPaidProductsGQL';
@@ -756,6 +770,7 @@ export type UserQuery = {
   loginCredentialsLimit: Scalars['Int']['output'];
   masterDevice?: Maybe<DeviceGql>;
   masterDeviceId?: Maybe<Scalars['String']['output']>;
+  newDevicePolicy?: Maybe<UserNewDevicePolicy>;
   notificationOnVaultUnlock: Scalars['Boolean']['output'];
   notificationOnWrongPasswordAttempts: Scalars['Int']['output'];
   primaryEmailVerification?: Maybe<EmailVerificationGqlScalars>;

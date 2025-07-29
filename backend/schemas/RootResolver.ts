@@ -25,7 +25,12 @@ import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 import type { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
 
-import type { Device, User, WebInput } from '@prisma/client'
+import {
+  UserNewDevicePolicy,
+  type User,
+  type Device,
+  type WebInput
+} from '@prisma/client'
 
 import {
   WebInputGQL,
@@ -117,13 +122,15 @@ export class RootResolver {
   ) {
     const { jwtPayload } = ctx
 
-    return ctx.prisma.device.findUnique({
+    const currentDevice = await ctx.prisma.device.findUnique({
       where: { id: jwtPayload.deviceId },
       include: getPrismaRelationsFromGQLInfo({
         info,
         rootModel: dmmf.models.Device
       })
     })
+
+    if (currentDevice?.registeredWithMasterAt) return currentDevice
   }
 
   @Mutation(() => LoginResponse)
@@ -244,7 +251,8 @@ export class RootResolver {
         id: true,
         addDeviceSecretEncrypted: true,
         encryptionSalt: true,
-        masterDevice: true
+        masterDevice: true,
+        newDevicePolicy: true
       }
     })
 
@@ -324,7 +332,7 @@ export class RootResolver {
     }
 
     if (!challenge) {
-      // TODO: Will we have notifications for browser?
+      // TODO: send email notifications
       if (
         user.masterDevice?.firebaseToken &&
         user.masterDevice.firebaseToken.length > 10
@@ -363,8 +371,20 @@ export class RootResolver {
       })
     }
 
+    if (
+      user.newDevicePolicy === UserNewDevicePolicy.ALLOW ||
+      user.newDevicePolicy === null
+    ) {
+      // user has allowed new devices, we can return the challenge including salt and encrypted secret
+      return plainToClass(DecryptionChallengeApproved, {
+        ...challenge,
+        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+        encryptionSalt: user.encryptionSalt,
+        approvedAt: challenge.approvedAt || challenge.createdAt
+      })
+    }
+
     if (!challenge.approvedAt) {
-      // TODO: enable when we have device management in the vault
       return plainToClass(DecryptionChallengeForApproval, {
         id: challenge.id,
         approvedAt: challenge.approvedAt

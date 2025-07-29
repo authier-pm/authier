@@ -31,7 +31,6 @@ type UserQuery {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
-  newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -68,12 +67,6 @@ The javascript `Date` as string. Type represents date and time as the ISO Date s
 """
 scalar DateTime
 
-enum UserNewDevicePolicy {
-  ALLOW
-  REQUIRE_ANY_DEVICE_APPROVAL
-  REQUIRE_MASTER_DEVICE_APPROVAL
-}
-
 type TokenGQL {
   id: Int!
   createdAt: DateTime!
@@ -106,7 +99,6 @@ type UserGQL {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
-  newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -427,7 +419,6 @@ type UserMutation {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
-  newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
   recoveryDecryptionChallenge: DecryptionChallengeGQL
@@ -465,7 +456,6 @@ type UserMutation {
   changeMasterPassword(input: ChangeMasterPasswordInput!): Int!
   changeEmail(email: EmailAddress!): UserQuery!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
-  setNewDevicePolicy(newDevicePolicy: UserNewDevicePolicy!): UserGQL!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!

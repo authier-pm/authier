@@ -12,6 +12,7 @@ import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { UserNewDevicePolicy } from '@prisma/client'
 
 @ObjectType()
 class DeviceLocation {
@@ -165,13 +166,21 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
-    const user = await ctx.prisma.user.findFirst({
+    const user = await ctx.prisma.user.findFirstOrThrow({
       where: {
         id: ctx.jwtPayload.userId
+      },
+      select: {
+        newDevicePolicy: true,
+        masterDeviceId: true
       }
     })
 
-    if (user?.masterDeviceId !== ctx.device.id) {
+    if (
+      user?.newDevicePolicy ===
+        UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL &&
+      user?.masterDeviceId !== ctx.device.id
+    ) {
       throw new GraphqlError(
         'Only the master device can approve a decryption challenge'
       )

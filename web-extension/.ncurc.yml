@@ -1,5 +1,8 @@
 upgrade: true
 reject:
   - '@chakra-ui/react'
-  # - 'react'
-  # - 'react-dom'
+  - 'react'
+  - 'react-dom'
+  - '@types/react'
+  - '@types/react-dom'
+  - '@types/react-test-renderer'

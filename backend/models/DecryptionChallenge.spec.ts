@@ -133,6 +133,7 @@ describe('DecryptionChallenge', () => {
           addDeviceSecret: faker.string.sample(5),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           encryptionSalt: faker.string.sample(5),
+          newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
           ...userSecurityProps
         }
       })
@@ -194,11 +195,10 @@ describe('DecryptionChallenge', () => {
       await prismaClient.user.deleteMany()
     })
 
-    it("should show 'Only the master device can approve a decryption chllenge'", async () => {
+    it("should show 'Only the master device can approve a decryption challenge'", async () => {
       challengeMutation.id = faker.number.int({ min: 1, max: 1000 })
 
       const fakeCtx = {
-        // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {} },
         request: { headers: {} },
         prisma: prismaClient,
