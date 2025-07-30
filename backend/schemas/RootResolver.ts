@@ -130,7 +130,7 @@ export class RootResolver {
       })
     })
 
-    if (currentDevice?.registeredWithMasterAt) return currentDevice
+    return currentDevice
   }
 
   @Mutation(() => LoginResponse)
