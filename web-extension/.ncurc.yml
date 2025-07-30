@@ -3,6 +3,7 @@ reject:
   - '@chakra-ui/react'
   - 'react'
   - 'react-dom'
+  - 'react-router-dom'
   - '@types/react'
   - '@types/react-dom'
   - '@types/react-test-renderer'

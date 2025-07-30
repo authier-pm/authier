@@ -785,8 +785,8 @@ importers:
         specifier: ^2.0.18
         version: 2.0.18(react@18.3.1)
       react-router-dom:
-        specifier: 7.7.1
-        version: 7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+        specifier: 7.6.2
+        version: 7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       react-select:
         specifier: ^5.10.2
         version: 5.10.2(@types/react@18.3.12)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
@@ -816,7 +816,7 @@ importers:
         version: 3.0.0
       use-query-params:
         specifier: ^2.2.1
-        version: 2.2.1(react-dom@18.3.1(react@18.3.1))(react-router-dom@7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
+        version: 2.2.1(react-dom@18.3.1(react@18.3.1))(react-router-dom@7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1)
       usehooks-ts:
         specifier: ^3.1.1
         version: 3.1.1(react@18.3.1)
@@ -13706,15 +13706,15 @@ packages:
       '@types/react':
         optional: true
 
-  react-router-dom@7.7.1:
-    resolution: {integrity: sha512-bavdk2BA5r3MYalGKZ01u8PGuDBloQmzpBZVhDLrOOv1N943Wq6dcM9GhB3x8b7AbqPMEezauv4PeGkAJfy7FQ==}
+  react-router-dom@7.6.2:
+    resolution: {integrity: sha512-Q8zb6VlTbdYKK5JJBLQEN06oTUa/RAbG/oQS1auK1I0TbJOXktqm+QENEVJU6QvWynlXPRBXI3fiOQcSEA78rA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
       react-dom: '>=18'
 
-  react-router@7.7.1:
-    resolution: {integrity: sha512-jVKHXoWRIsD/qS6lvGveckwb862EekvapdHJN/cGmzw40KnJH5gg53ujOJ4qX6EKIK9LSBfFed/xiQ5yeXNrUA==}
+  react-router@7.6.2:
+    resolution: {integrity: sha512-U7Nv3y+bMimgWjhlT5CRdzHPu2/KVmqPwKUCChW8en5P3znxUqwlYFlbmyj8Rgp1SF6zs5X4+77kBVknkg6a0w==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
       react: '>=18'
@@ -33617,13 +33617,13 @@ snapshots:
     optionalDependencies:
       '@types/react': 18.3.12
 
-  react-router-dom@7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router-dom@7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
-      react-router: 7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router: 7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
-  react-router@7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
+  react-router@7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1):
     dependencies:
       cookie: 1.0.1
       react: 18.3.1
@@ -35904,13 +35904,13 @@ snapshots:
     dependencies:
       react: 18.2.0
 
-  use-query-params@2.2.1(react-dom@18.3.1(react@18.3.1))(react-router-dom@7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
+  use-query-params@2.2.1(react-dom@18.3.1(react@18.3.1))(react-router-dom@7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1))(react@18.3.1):
     dependencies:
       react: 18.3.1
       react-dom: 18.3.1(react@18.3.1)
       serialize-query-params: 2.0.2
     optionalDependencies:
-      react-router-dom: 7.7.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
+      react-router-dom: 7.6.2(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
 
   use-sidecar@1.1.2(@types/react@18.3.12)(react@18.3.1):
     dependencies:
