@@ -37,7 +37,7 @@ async function getKeyMaterial(password: string): Promise<CryptoKey> {
 
 export async function generateEncryptionKey(
   psw: string,
-  salt: ArrayBuffer
+  salt: BufferSource
 ): Promise<CryptoKey> {
   const keyMaterial = await getKeyMaterial(psw)
   const key = await self.crypto.subtle.deriveKey(
@@ -55,17 +55,25 @@ export async function generateEncryptionKey(
   return key
 }
 
-export const bufferToBase64 = (buff: ArrayBuffer) =>
-  Base64.btoa(
-    Array.from(new Uint8Array(buff))
+export const bufferToBase64 = (buff: BufferSource) => {
+  const view = ArrayBuffer.isView(buff)
+    ? new Uint8Array(buff.buffer, buff.byteOffset, buff.byteLength)
+    : new Uint8Array(buff as ArrayBuffer)
+  return Base64.btoa(
+    Array.from(view)
       .map((b) => String.fromCharCode(b))
       .join('')
   )
+}
 
-export const base64ToBuffer = (b64: string) =>
-  //FIX: What is this
-  //@ts-expect-error
-  Uint8Array.from(Base64.atob(b64), (c) => c.charCodeAt(null))
+export const base64ToBuffer = (b64: string): Uint8Array<ArrayBuffer> => {
+  const bin = Base64.atob(b64)
+  const out = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) {
+    out[i] = bin.charCodeAt(i)
+  }
+  return out
+}
 
 export const encryptedBuf_to_base64 = (
   encryptedBuff: ArrayBuffer,
