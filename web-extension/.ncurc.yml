@@ -1,5 +1,6 @@
 upgrade: true
 reject:
+  - '@apollo/client'
   - '@chakra-ui/react'
   - 'react'
   - 'react-dom'

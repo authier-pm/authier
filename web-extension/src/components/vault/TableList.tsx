@@ -10,7 +10,7 @@ import {
   useColorModeValue
 } from '@chakra-ui/react'
 import { CopyIcon, EditIcon } from '@chakra-ui/icons'
-import { FixedSizeList as List } from 'react-window'
+import { List, type RowComponentProps } from 'react-window'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import {
@@ -19,7 +19,6 @@ import {
   pathNameToTypes
 } from '@src/util/useDeviceState'
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { AutoSizer } from 'react-virtualized'
 import { Link, useLocation } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { authenticator } from 'otplib'
@@ -44,13 +43,7 @@ export function TableList({ filter }: { filter: string }) {
   const [showAllPasswords, setShowAllPasswords] = useState(false)
   const showText = showAllPasswords ? 'Hide' : 'Show'
 
-  const Row = ({
-    index,
-    style
-  }: {
-    index: number
-    style: React.CSSProperties
-  }) => {
+  const Row = ({ index, style }: RowComponentProps<Record<string, never>>) => {
     const [areIconsVisible, setAreIconsVisible] = useState(false)
     const [showPassword, setShowPassword] = useState(false)
     const row = data[index]
@@ -66,7 +59,7 @@ export function TableList({ filter }: { filter: string }) {
         cursor="pointer"
         justify="space-between"
         align="center"
-        style={style}
+        style={{ ...style, width: '100%' }}
         onMouseOver={() =>
           selectedItems.length == 0 || selectedItems.includes(row)
             ? setAreIconsVisible(true)
@@ -245,20 +238,14 @@ export function TableList({ filter }: { filter: string }) {
           </Flex>
         </HStack>
       </Flex>
-      <AutoSizer>
-        {({ height, width }) => {
-          return (
-            <List
-              itemCount={data.length}
-              itemSize={60}
-              width={width}
-              height={height - 62} // for some reason autosizer does not take into account the height of the header
-            >
-              {Row}
-            </List>
-          )
-        }}
-      </AutoSizer>
+      <Box style={{ width: '100%', height: 'calc(100% - 62px)' }}>
+        <List
+          rowCount={data.length}
+          rowHeight={60}
+          rowProps={{}}
+          rowComponent={Row}
+        ></List>
+      </Box>
     </>
   )
 }

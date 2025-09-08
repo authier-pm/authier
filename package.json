@@ -28,7 +28,7 @@
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.3.0",
-    "concurrently": "^9.2.0",
+    "concurrently": "^9.2.1",
     "framer-motion": "^12",
     "generate-password": "^1.7.1",
     "husky": "^9.1.7",
@@ -37,8 +37,8 @@
     "prettier": "^3.6.2",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "zod": "^4.0.17",
-    "zx": "^8.8.0"
+    "zod": "^4.1.5",
+    "zx": "^8.8.1"
   },
   "scripts": {
     "dev:be": "cd backend && pnpm run dev",
