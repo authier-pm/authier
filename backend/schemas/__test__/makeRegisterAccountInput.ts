@@ -2,7 +2,7 @@ import { faker } from '@faker-js/faker'
 
 export const makeAddNewDeviceInput = () => ({
   email: faker.internet.email(),
-  deviceName: faker.internet.userName(),
+  deviceName: faker.internet.username(),
   devicePlatform: faker.internet.domainWord(),
   deviceId: faker.string.uuid(),
   firebaseToken: faker.string.uuid(),
