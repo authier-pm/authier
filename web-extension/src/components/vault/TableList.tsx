@@ -184,9 +184,11 @@ export function TableList({ filter }: { filter: string }) {
                 <IconButton aria-label="Edit" icon={<EditIcon />} />
               </Link>
             </Tooltip>
-            <DeleteSecretButton
-              secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
-            ></DeleteSecretButton>
+            {selectedItems.length <= 1 ? (
+              <DeleteSecretButton
+                secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
+              ></DeleteSecretButton>
+            ) : null}
           </HStack>
         </Flex>
       </Flex>
@@ -231,10 +233,14 @@ export function TableList({ filter }: { filter: string }) {
               />
             </HStack>
           </Flex>
-          <Flex w="10%" justifyContent="center">
-            <Text w="100%" textAlign="center" fontWeight="bold">
+          <Flex w="10%" justifyContent="center" pr={3}>
+            {selectedItems.length > 1 ? (
+              <DeleteSecretButton secrets={[...selectedItems]} size="sm">
+                <Trans>Delete all</Trans>
+              </DeleteSecretButton>
+            ) : (
               <Trans>Actions</Trans>
-            </Text>
+            )}
           </Flex>
         </HStack>
       </Flex>

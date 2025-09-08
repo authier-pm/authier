@@ -1,5 +1,11 @@
 import { DeleteIcon } from '@chakra-ui/icons'
-import { IconButton, Tooltip, useDisclosure } from '@chakra-ui/react'
+import {
+  IconButton,
+  Tooltip,
+  useDisclosure,
+  IconButtonProps,
+  Button
+} from '@chakra-ui/react'
 import { t, plural } from '@lingui/core/macro'
 import {
   useDeleteEncryptedSecretMutation,
@@ -12,12 +18,14 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import React, { useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
-interface DeleteSecretButtonProps {
+interface DeleteSecretButtonProps extends Omit<IconButtonProps, 'aria-label'> {
   secrets: SecretTypeUnion[]
+  'aria-label'?: string
 }
 
 export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
-  secrets
+  secrets,
+  ...props
 }) => {
   const { setSelectedItems } = useContext(DeviceStateContext)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -34,15 +42,31 @@ export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
           other: `delete # secrets`
         })}
       >
-        <IconButton
-          colorScheme="red"
-          aria-label={plural(secrets.length, {
-            one: `delete secret`,
-            other: `delete # secrets`
-          })}
-          icon={<DeleteIcon />}
-          onClick={onOpen}
-        />
+        {props.children ? (
+          <Button
+            {...props}
+            colorScheme="red"
+            aria-label={plural(secrets.length, {
+              one: `delete secret`,
+              other: `delete # secrets`
+            })}
+            w="100%"
+            leftIcon={<DeleteIcon />}
+            onClick={onOpen}
+          >
+            {props.children}
+          </Button>
+        ) : (
+          <IconButton
+            {...props}
+            colorScheme="red"
+            icon={<DeleteIcon />}
+            aria-label={plural(secrets.length, {
+              one: `delete secret`,
+              other: `delete # secrets`
+            })}
+          />
+        )}
       </Tooltip>
       <DeleteAlert
         isOpen={isOpen}
