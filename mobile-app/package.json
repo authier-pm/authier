@@ -15,7 +15,7 @@
     "lingui:extract": "lingui extract",
     "lingui:compile": "lingui compile",
     "killPort": "lsof -ti tcp:8088 | xargs kill",
-    "postinstall": "./scripts/copyNodeModulesHack.mjs && react-native setup-ios-permissions",
+    "postinstall": "pnpm zx ./scripts/copyNodeModulesHack.mjs && react-native setup-ios-permissions",
     "pod:install": "cd ios && pod install",
     "cleanDerivedData": "rm -rf ~/Library/Developer/Xcode/DerivedData",
     "buildRelease": "cd android && ./gradlew clean && ./gradlew bundleRelease",

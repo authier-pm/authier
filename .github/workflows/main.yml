@@ -74,7 +74,6 @@ jobs:
 
       - name: Install dependencies
         run: |
-          pnpm i ts-node zx -g
           pnpm i --frozen-lockfile --prefer-offline
 
       - uses: dorny/paths-filter@v2
