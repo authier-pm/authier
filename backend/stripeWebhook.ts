@@ -33,10 +33,21 @@ export const webhookHandler = async (req: FastifyRequest, reply) => {
 
   let event: Stripe.Event
 
+  if (!sig) {
+    reply.status(400).send('Webhook Error: Missing stripe-signature header')
+    return
+  }
+
+  const rawBody = (req.body as { raw?: string } | undefined)?.raw
+
+  if (!rawBody) {
+    reply.status(400).send('Webhook Error: Missing raw request body')
+    return
+  }
+
   try {
     event = stripeClient.webhooks.constructEvent(
-      //@ts-expect-error TODO @capaj
-      req.body.raw,
+      rawBody,
       sig as string | string[] | Buffer,
       endpointSecret
     )
