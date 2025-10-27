@@ -106,7 +106,7 @@
     "test:docker": "pnpm docker:up && DATABASE_URL=postgresql://authier:auth133r@localhost:6432/authier && pnpm prisma db push && jest -i && pnpm docker:down",
     "dbReset": "prisma migrate reset --preview-feature",
     "cdk": "cdk deploy",
-    "cdkDeploy": "pnpm build && cdk deploy",
+    "cdkDeploy": "pnpm build && cdk deploy --require-approval=never",
     "removeTestAccounts": "pnpm ts-node scripts/removeTestAccounts"
   }
 }
