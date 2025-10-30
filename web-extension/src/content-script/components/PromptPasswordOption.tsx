@@ -1,5 +1,5 @@
 import { h } from 'preact'
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import {
   promptOption,
   PromptPasswordOptionProps
@@ -14,11 +14,12 @@ import './Option.css'
 import debug from 'debug'
 import {
   autofill,
-  filledElements,
   resetAutofillStateForThisPage
 } from '../autofill'
 
 const log = debug('au:PromptPasswordOption')
+const REFRESH_INTERVAL_MS = 100
+
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
 
@@ -50,21 +51,106 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     pos: JSON.stringify(pos)
   })
 
-  let resizeTimer: string | number | NodeJS.Timeout | undefined
-  window.onresize = function () {
-    if (promptOption) {
-      promptOption.remove()
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(function () {
-        if (promptOption && inputEl) {
-          setPos(inputEl.getBoundingClientRect())
-          document.body.appendChild(promptOption)
-        }
-      }, 100)
+  useEffect(() => {
+    if (!inputEl) {
+      return
     }
-  }
+
+    let frameId: number | null = null
+    let timeoutId: number | null = null
+    let disposed = false
+    let lastUpdate = 0
+
+    const removePrompt = () => {
+      if (promptOption && promptOption.parentNode) {
+        promptOption.remove()
+      }
+    }
+
+    const updatePosition = () => {
+      if (disposed) {
+        return
+      }
+
+      if (!inputEl || !inputEl.isConnected) {
+        removePrompt()
+        return
+      }
+
+      const bounds = inputEl.getBoundingClientRect()
+
+      if (bounds.width === 0 || bounds.height === 0) {
+        removePrompt()
+        return
+      }
+
+      setPos(bounds)
+      if (promptOption && !promptOption.parentNode) {
+        document.body.appendChild(promptOption)
+      }
+    }
+
+    const queuePositionUpdate = () => {
+      if (frameId !== null || timeoutId !== null) {
+        return
+      }
+
+      const elapsed = Date.now() - lastUpdate
+      const delay = Math.max(0, REFRESH_INTERVAL_MS - elapsed)
+
+      if (delay === 0) {
+        frameId = requestAnimationFrame(() => {
+          frameId = null
+          lastUpdate = Date.now()
+          updatePosition()
+        })
+      } else {
+        timeoutId = window.setTimeout(() => {
+          timeoutId = null
+          frameId = requestAnimationFrame(() => {
+            frameId = null
+            lastUpdate = Date.now()
+            updatePosition()
+          })
+        }, delay)
+      }
+    }
+
+    const resizeObserver =
+      typeof ResizeObserver !== 'undefined'
+        ? new ResizeObserver(queuePositionUpdate)
+        : null
+    resizeObserver?.observe(inputEl)
+
+    const mutationObserver =
+      typeof MutationObserver !== 'undefined'
+        ? new MutationObserver(queuePositionUpdate)
+        : null
+    mutationObserver?.observe(document.body, {
+      childList: true,
+      subtree: true
+    })
+
+    window.addEventListener('scroll', queuePositionUpdate, true)
+    window.addEventListener('resize', queuePositionUpdate)
+
+    queuePositionUpdate()
+
+    return () => {
+      disposed = true
+      if (frameId !== null) {
+        cancelAnimationFrame(frameId)
+      }
+      if (timeoutId !== null) {
+        clearTimeout(timeoutId)
+      }
+      resizeObserver?.disconnect()
+      mutationObserver?.disconnect()
+      window.removeEventListener('scroll', queuePositionUpdate, true)
+      window.removeEventListener('resize', queuePositionUpdate)
+    }
+  }, [inputEl, setPos])
   if (!pos) {
-    log('No pos in PromptPasswordOption')
     return null
   }
 
