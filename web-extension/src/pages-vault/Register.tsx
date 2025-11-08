@@ -63,10 +63,9 @@ export default function Register() {
   const navigate = useNavigate()
   const toast = useToast()
 
-  const { fireToken } = device
-  if (!fireToken) {
-    return <Spinner />
-  }
+  // Generate a unique firebaseToken if not available (Firebase doesn't work in extensions)
+  // Use deviceId + timestamp to ensure uniqueness across registrations
+  const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
 
   return (
     <Box

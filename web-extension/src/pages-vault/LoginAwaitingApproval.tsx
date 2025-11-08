@@ -69,7 +69,9 @@ export const useLogin = (props: { deviceName: string }) => {
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {
-    const { fireToken } = device
+    // Generate a unique firebaseToken if not available (Firebase doesn't work in extensions)
+    // Use UUID to ensure uniqueness across logins
+    const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
 
     console.log('~ decryptionData', decryptionData)
     if (
