@@ -66,8 +66,8 @@ export function getCssSelectorForInput(
     return { css: proposedSelector, domOrdinal: 0 }
   } else {
     for (let index = 0; index < inputsForProposedSelector.length; index++) {
-      const element = inputsForProposedSelector[index]
-      if (element === element) {
+      const foundElement = inputsForProposedSelector[index]
+      if (foundElement === element) {
         return { css: proposedSelector, domOrdinal: index }
       }
     }
