@@ -206,7 +206,7 @@ let onInputAddedHandler = (inputEl: any) => {}
 /**
  * tracks which input types have been autofilled for this page, so we don't autofill them again
  */
-export let inputTypesFilledForThisPage = new Set<WebInputType>()
+export const inputTypesFilledForThisPage = new Set<WebInputType>()
 
 /**
  * tracks autofilled elements, so we don't autofill them again. We clear this set when user decides to autofill again with different credentials
@@ -371,15 +371,13 @@ export const autofill = (initState: IInitStateRes) => {
           return // we have already filled 2 inputs on this page, we don't need to fill any more
         }
         log('onInputAddedHandler', inputEl)
-        const newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
-            fillStringIntoInput({
+            autofillValueIntoInput(
               inputEl,
-              loginCredential: firstLoginCred.loginCredentials,
-              inputType: WebInputType.USERNAME
-            })
+              firstLoginCred.loginCredentials.username
+            )
           } else {
             // todo show prompt to user to select which credential to use
           }
@@ -413,10 +411,6 @@ export const autofill = (initState: IInitStateRes) => {
             }
           }
         }
-
-        if (newPassword) {
-          renderSaveCredentialsForm(null, newPassword)
-        }
       },
       500,
       {
@@ -431,22 +425,17 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     if (filledElements.size === 2) {
-      const form = filledElements[0]?.form
+      const filledElementsArray = Array.from(filledElements)
+      const form = filledElementsArray[0]?.form
       if (form) {
-        // TODO try to submit the form
-        // filledElements[0]?.form?.dispatchEvent(
-        //   new Event('submit', {
-        //     bubbles: true,
-        //     cancelable: true
-        //   })
-        // )
         const clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,
           cancelable: true
         })
-        if (form.submit instanceof HTMLElement) {
-          form.submit.dispatchEvent(clickEvent)
+        const submitButton = form.querySelector('[type="submit"]') as HTMLElement | null
+        if (submitButton) {
+          submitButton.dispatchEvent(clickEvent)
         }
 
         let notAPasswordInput: HTMLInputElement | null = null
@@ -460,7 +449,7 @@ export const autofill = (initState: IInitStateRes) => {
 
         if (notAPasswordInput) {
           notyf.success(
-            `Submitted autofilled form for user "${notAPasswordInput[0].value}}"`
+            `Submitted autofilled form for user "${notAPasswordInput.value}"`
           )
         }
       }
