@@ -371,7 +371,6 @@ export const autofill = (initState: IInitStateRes) => {
           return // we have already filled 2 inputs on this page, we don't need to fill any more
         }
         log('onInputAddedHandler', inputEl)
-        const newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
@@ -411,10 +410,6 @@ export const autofill = (initState: IInitStateRes) => {
               }
             }
           }
-        }
-
-        if (newPassword) {
-          renderSaveCredentialsForm(null, newPassword)
         }
       },
       500,
