@@ -80,15 +80,6 @@ jobs:
           cp .env.sample .env
           pnpm test
 
-      - name: backend deploy to Cloudflare Workers
-        working-directory: ./backend
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        env:
-          NODE_ENV: production
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          pnpm deploy:worker
-
       ## TODO fix sentry release action
       # - name: Create a Sentry.io release
       #   uses: tclindner/sentry-releases-action@v1.2.0
