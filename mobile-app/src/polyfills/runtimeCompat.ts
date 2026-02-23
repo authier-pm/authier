@@ -3,19 +3,8 @@ type FinalizationRegistryInstance<T> = {
   unregister: (unregisterToken: object) => boolean
 }
 
-type FinalizationRegistryConstructor = new <T>(
-  cleanupCallback: (heldValue: T) => void
-) => FinalizationRegistryInstance<T>
-
 type WeakRefInstance<T extends object> = {
   deref: () => T
-}
-
-type WeakRefConstructor = new <T extends object>(value: T) => WeakRefInstance<T>
-
-type GlobalWithRuntimeCompat = typeof globalThis & {
-  FinalizationRegistry?: FinalizationRegistryConstructor
-  WeakRef?: WeakRefConstructor
 }
 
 type WeakRefHolder = {
@@ -51,14 +40,11 @@ SimpleWeakRef.prototype.deref = function <T extends object>(this: {
   return this._value
 }
 
-const runtimeGlobal = globalThis as GlobalWithRuntimeCompat
-
 // Hermes on some Android builds can throw when dependencies reference these globals.
-if (typeof runtimeGlobal.FinalizationRegistry === 'undefined') {
-  runtimeGlobal.FinalizationRegistry =
-    NoopFinalizationRegistry as unknown as FinalizationRegistryConstructor
+if (typeof globalThis.FinalizationRegistry === 'undefined') {
+  ;(globalThis as any).FinalizationRegistry = NoopFinalizationRegistry
 }
 
-if (typeof runtimeGlobal.WeakRef === 'undefined') {
-  runtimeGlobal.WeakRef = SimpleWeakRef as unknown as WeakRefConstructor
+if (typeof globalThis.WeakRef === 'undefined') {
+  ;(globalThis as any).WeakRef = SimpleWeakRef
 }

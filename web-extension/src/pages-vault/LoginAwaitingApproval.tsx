@@ -6,7 +6,8 @@ import React, { useContext, useEffect, useState } from 'react'
 import { LoginContext } from './Login'
 import {
   useAddNewDeviceForUserMutation,
-  useDeviceDecryptionChallengeMutation
+  useDeviceDecryptionChallengeMutation,
+  useInitiateMasterDeviceResetMutation
 } from '@shared/graphql/Login.codegen'
 import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
@@ -17,6 +18,7 @@ import {
   Flex,
   Heading,
   Spinner,
+  Button,
   useColorMode,
   useInterval
 } from '@chakra-ui/react'
@@ -248,6 +250,26 @@ export const LoginAwaitingApproval: React.FC = () => {
   const { deviceDecryptionChallenge, formState } = useLogin({
     deviceName
   })
+  const [initiateMasterDeviceReset, { loading: resetMasterDeviceLoading }] =
+    useInitiateMasterDeviceResetMutation({
+      onCompleted: ({ initiateMasterDeviceReset }) => {
+        toast({
+          title: t`Master device reset scheduled`,
+          description: new Date(
+            initiateMasterDeviceReset.processAt
+          ).toLocaleString(),
+          status: 'warning',
+          isClosable: true
+        })
+      },
+      onError: () => {
+        toast({
+          title: t`Failed to schedule master device reset`,
+          status: 'error',
+          isClosable: true
+        })
+      }
+    })
 
   if (!deviceDecryptionChallenge) {
     return <Spinner />
@@ -257,6 +279,15 @@ export const LoginAwaitingApproval: React.FC = () => {
     (deviceDecryptionChallenge?.id &&
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
   ) {
+    const pendingResetAt =
+      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetProcessAt
+        : null
+    const rejectedResetAt =
+      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetRejectedAt
+        : null
+
     return (
       <Card p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="600px">
         <Heading size="sm" mb={2}>
@@ -284,6 +315,71 @@ export const LoginAwaitingApproval: React.FC = () => {
                 your vault will open automatically in this tab.
               </Trans>
             </Txt>
+
+            {deviceDecryptionChallenge.__typename ===
+            'DecryptionChallengeForApproval' ? (
+              <>
+                <Txt fontSize="sm" mt={3}>
+                  <Trans>
+                    Push notifications sent:{' '}
+                    {deviceDecryptionChallenge.pushNotificationsSentCount}
+                  </Trans>
+                </Txt>
+                <Txt fontSize="sm" mb={3}>
+                  <Trans>
+                    Push notifications failed:{' '}
+                    {deviceDecryptionChallenge.pushNotificationsFailedCount}
+                  </Trans>
+                </Txt>
+
+                {pendingResetAt ? (
+                  <Txt fontSize="sm" mb={3}>
+                    <Trans>
+                      Master device reset scheduled for{' '}
+                      {new Date(pendingResetAt).toLocaleString()}.
+                    </Trans>
+                  </Txt>
+                ) : null}
+
+                {rejectedResetAt ? (
+                  <Txt fontSize="sm" mb={3}>
+                    <Trans>
+                      Master device reset was rejected at{' '}
+                      {new Date(rejectedResetAt).toLocaleString()}.
+                    </Trans>
+                  </Txt>
+                ) : null}
+
+                <Button
+                  colorScheme="red"
+                  variant="outline"
+                  isLoading={resetMasterDeviceLoading}
+                  isDisabled={!!pendingResetAt}
+                  onClick={async () => {
+                    if (
+                      deviceDecryptionChallenge.__typename !==
+                      'DecryptionChallengeForApproval'
+                    ) {
+                      return
+                    }
+
+                    await initiateMasterDeviceReset({
+                      variables: {
+                        email: formState.email,
+                        deviceInput: {
+                          id: device.id as string,
+                          name: deviceName,
+                          platform: device.platform
+                        },
+                        decryptionChallengeId: deviceDecryptionChallenge.id
+                      }
+                    })
+                  }}
+                >
+                  <Trans>Reset master device</Trans>
+                </Button>
+              </>
+            ) : null}
           </Flex>
         </Center>
       </Card>

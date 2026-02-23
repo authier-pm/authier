@@ -63,6 +63,27 @@ mutation deviceDecryptionChallenge(
     }
     ... on DecryptionChallengeForApproval {
       id
+      pushNotificationsSentCount
+      pushNotificationsFailedCount
+      masterDeviceResetRequestedAt
+      masterDeviceResetProcessAt
+      masterDeviceResetRejectedAt
     }
+  }
+}
+
+mutation initiateMasterDeviceReset(
+  $email: EmailAddress!
+  $deviceInput: DeviceInput!
+  $decryptionChallengeId: PositiveInt!
+) {
+  initiateMasterDeviceReset(
+    email: $email
+    deviceInput: $deviceInput
+    decryptionChallengeId: $decryptionChallengeId
+  ) {
+    requestedAt
+    processAt
+    alreadyPending
   }
 }

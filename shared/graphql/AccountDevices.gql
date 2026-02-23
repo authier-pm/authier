@@ -30,6 +30,11 @@ query DevicesRequests {
       deviceId
       ipAddress
       ipGeoLocation
+      pushNotificationsSentCount
+      pushNotificationsFailedCount
+      masterDeviceResetRequestedAt
+      masterDeviceResetProcessAt
+      masterDeviceResetRejectedAt
     }
   }
 }

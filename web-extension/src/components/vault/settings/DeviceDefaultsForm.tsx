@@ -12,7 +12,8 @@ import {
 import {
   DefaultSettingsDocument,
   useDefaultSettingsQuery,
-  useUpdateDefaultDeviceSettingsMutation
+  useUpdateDefaultDeviceSettingsMutation,
+  useUpdateMasterDeviceResetTimeoutMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { Trans } from '@lingui/react/macro'
 
@@ -22,6 +23,7 @@ import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions
 
 interface Values {
   vaultLockTimeoutSeconds: number
+  deviceRecoveryCooldownMinutes: number
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
   syncTOTP: boolean
@@ -36,8 +38,23 @@ export function DeviceDefaultsForm() {
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation({
     refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
   })
+  const [updateMasterDeviceResetTimeout] = useUpdateMasterDeviceResetTimeoutMutation(
+    {
+      refetchQueries: [{ query: DefaultSettingsDocument, variables: {} }]
+    }
+  )
   const bgColor = useColorModeValue('cyan.800', 'gray.800')
   const options = useVaultLockTimeoutOptions()
+  const masterDeviceResetTimeoutOptions = [
+    { label: '1 hour', value: 60 },
+    { label: '6 hours', value: 360 },
+    { label: '12 hours', value: 720 },
+    { label: '24 hours', value: 1440 },
+    { label: '3 days', value: 4320 },
+    { label: '7 days', value: 10080 },
+    { label: '14 days', value: 20160 },
+    { label: '30 days', value: 43200 }
+  ]
 
   if (loading || !data) return <Spinner />
 
@@ -62,6 +79,7 @@ export function DeviceDefaultsForm() {
           syncTOTP: data?.me.defaultDeviceSettings.syncTOTP,
           vaultLockTimeoutSeconds:
             data?.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
+          deviceRecoveryCooldownMinutes: data?.me.deviceRecoveryCooldownMinutes,
           theme: data?.me.defaultDeviceSettings.theme,
           uiLanguage: data?.me.uiLanguage
         }}
@@ -70,7 +88,11 @@ export function DeviceDefaultsForm() {
           { setSubmitting, resetForm }: FormikHelpers<Values>
         ) => {
           const config = {
-            ...values,
+            autofillTOTPEnabled: values.autofillTOTPEnabled,
+            autofillCredentialsEnabled: values.autofillCredentialsEnabled,
+            syncTOTP: values.syncTOTP,
+            theme: values.theme,
+            uiLanguage: values.uiLanguage,
             vaultLockTimeoutSeconds: parseInt(
               values.vaultLockTimeoutSeconds.toString()
             )
@@ -81,7 +103,21 @@ export function DeviceDefaultsForm() {
               config
             }
           })
-          resetForm({ values: config })
+          await updateMasterDeviceResetTimeout({
+            variables: {
+              deviceRecoveryCooldownMinutes: parseInt(
+                values.deviceRecoveryCooldownMinutes.toString()
+              )
+            }
+          })
+          resetForm({
+            values: {
+              ...config,
+              deviceRecoveryCooldownMinutes: parseInt(
+                values.deviceRecoveryCooldownMinutes.toString()
+              )
+            }
+          })
           setSubmitting(false)
         }}
       >
@@ -114,6 +150,23 @@ export function DeviceDefaultsForm() {
                 <Field as={Select} id="uiLanguage" name="uiLanguage">
                   <option value="en">English</option>
                   <option value="cs">Čeština</option>
+                </Field>
+              </FormControl>
+
+              <FormControl>
+                <FormLabel htmlFor="deviceRecoveryCooldownMinutes">
+                  <Trans>Master device reset timeout</Trans>
+                </FormLabel>
+                <Field
+                  as={Select}
+                  id="deviceRecoveryCooldownMinutes"
+                  name="deviceRecoveryCooldownMinutes"
+                >
+                  {masterDeviceResetTimeoutOptions.map((option, index) => (
+                    <option value={option.value.toString()} key={index}>
+                      {option.label}
+                    </option>
+                  ))}
                 </Field>
               </FormControl>
 

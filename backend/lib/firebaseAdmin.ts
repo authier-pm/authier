@@ -29,6 +29,10 @@ export interface Message {
   apns?: ApnsConfig
 }
 
+export type FirebaseSendNotificationResult =
+  | { ok: true }
+  | { ok: false; reason: 'UNREGISTERED' }
+
 type GoogleAccessTokenResponse = {
   access_token: string
   expires_in: number
@@ -260,6 +264,7 @@ const isFcmUnregisteredTokenError = (errorMessage: string) => {
 export async function firebaseSendNotification(msg: Message) {
   try {
     await sendFcmHttpV1Message(msg)
+    return { ok: true } satisfies FirebaseSendNotificationResult
   } catch (err) {
     if (
       err instanceof Error &&
@@ -276,7 +281,10 @@ export async function firebaseSendNotification(msg: Message) {
 
       if (!device) {
         log(`Device not found for firebase token ${msgToken}`)
-        return
+        return {
+          ok: false,
+          reason: 'UNREGISTERED'
+        } satisfies FirebaseSendNotificationResult
       }
 
       const user = await db.query.user.findFirst({
@@ -285,7 +293,10 @@ export async function firebaseSendNotification(msg: Message) {
 
       if (!user) {
         log(`No master-device user found for firebase token ${msgToken}`)
-        return
+        return {
+          ok: false,
+          reason: 'UNREGISTERED'
+        } satisfies FirebaseSendNotificationResult
       }
 
       if (user.email) {
@@ -296,6 +307,10 @@ export async function firebaseSendNotification(msg: Message) {
           You need to make another device your master device. To confirm making your latest device your master device, please click <a href="${process.env.FRONTEND_URL}/confirm-master-device?token=${device.id}">here</a></p>`
         })
       }
+      return {
+        ok: false,
+        reason: 'UNREGISTERED'
+      } satisfies FirebaseSendNotificationResult
     } else {
       throw err
     }

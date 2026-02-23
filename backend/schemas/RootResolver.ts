@@ -18,7 +18,11 @@ import { constructURL } from '../../shared/urlUtils'
 
 import { GraphqlError } from '../lib/GraphqlError'
 import { WebInputElement } from '../models/WebInputElement'
-import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
+import {
+  GraphQLEmailAddress,
+  GraphQLPositiveInt,
+  GraphQLUUID
+} from 'graphql-scalars'
 
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
@@ -34,21 +38,82 @@ import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
-  DecryptionChallengeUnion
+  DecryptionChallengeUnion,
+  MasterDeviceResetRequestResult
 } from '../models/DecryptionChallenge'
 import { plainToClass } from 'class-transformer'
 
 import { firebaseSendNotification } from '../lib/firebaseAdmin'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
+import { sendEmail } from '../utils/email'
 import { WebInputMutation } from '../models/WebInput'
 import type {
   IContext,
   IContextAuthenticated
 } from '../models/types/ContextTypes'
-import { eq, and, or, like, sql, gte, count } from 'drizzle-orm'
+import { eq, and, or, like, sql, gte, count, isNull, desc } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
 
 const log = debug('au:RootResolver')
+
+type PushDeliveryCounts = {
+  pushNotificationsSentCount: number
+  pushNotificationsFailedCount: number
+}
+
+const sendNewDeviceLoginPushNotifications = async (
+  firebaseTokens: string[],
+  notificationBody: string
+): Promise<PushDeliveryCounts> => {
+  const results = await Promise.allSettled(
+    firebaseTokens.map((firebaseToken) => {
+      log('sending notification to', firebaseToken)
+
+      return firebaseSendNotification({
+        token: firebaseToken,
+        notification: {
+          title: 'New device login!',
+          body: notificationBody
+        },
+        data: {
+          type: 'Devices'
+        },
+        android: {
+          priority: 'high'
+        },
+        apns: {
+          payload: {
+            aps: {
+              contentAvailable: true,
+              priority: 10
+            }
+          }
+        }
+      })
+    })
+  )
+
+  let pushNotificationsSentCount = 0
+  let pushNotificationsFailedCount = 0
+
+  for (const result of results) {
+    if (result.status === 'rejected') {
+      pushNotificationsFailedCount += 1
+      continue
+    }
+
+    if (result.value.ok) {
+      pushNotificationsSentCount += 1
+    } else {
+      pushNotificationsFailedCount += 1
+    }
+  }
+
+  return {
+    pushNotificationsSentCount,
+    pushNotificationsFailedCount
+  }
+}
 
 @Resolver()
 export class RootResolver {
@@ -265,6 +330,7 @@ export class RootResolver {
           where: { id: user.masterDeviceId }
         })
       : null
+    const userHasNoMasterDevice = !user.masterDeviceId
     const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
@@ -342,71 +408,72 @@ export class RootResolver {
       throw new GraphqlError('login failed')
     }
 
+    if (challenge && userHasNoMasterDevice && !challenge.approvedAt) {
+      const [updatedChallenge] = await ctx.db
+        .update(schema.decryptionChallenge)
+        .set({
+          approvedAt: new Date()
+        })
+        .where(eq(schema.decryptionChallenge.id, challenge.id))
+        .returning()
+      challenge = updatedChallenge
+    }
+
     if (!challenge) {
-      // TODO: send email notifications
-      const geoIp = await getGeoIpLocation
-        .memoized(ipAddress)
-        .catch((_error) => null)
-
-      const geoLocationParts = geoIp
-        ? [geoIp.city, geoIp.region_name, geoIp.country_name].filter(Boolean)
-        : []
-      const geoLocation =
-        geoLocationParts.length > 0 ? geoLocationParts.join(', ') : null
-
-      let notificationBody = `New device is trying to log in from ${ipAddress}.`
-
-      if (geoLocation) {
-        notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
+      let pushNotificationCounts: PushDeliveryCounts = {
+        pushNotificationsSentCount: 0,
+        pushNotificationsFailedCount: 0
       }
 
-      let devicesToNotify: { firebaseToken: string | null }[] = []
+      let approvedAt: Date | undefined
 
-      if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
-        devicesToNotify = await ctx.db.query.device.findMany({
-          where: { userId: user.id },
-          columns: { firebaseToken: true }
-        })
-      } else if (masterDevice?.firebaseToken) {
-        devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }]
-      }
+      if (userHasNoMasterDevice) {
+        approvedAt = new Date()
+      } else {
+        // TODO: send email notifications
+        const geoIp = await getGeoIpLocation
+          .memoized(ipAddress)
+          .catch((_error) => null)
 
-      const firebaseTokens = [
-        ...new Set(
-          devicesToNotify
-            .map((device) => device.firebaseToken)
-            .filter((firebaseToken): firebaseToken is string => !!firebaseToken)
-            .filter((firebaseToken) => firebaseToken.length > 10)
-        )
-      ]
+        const geoLocationParts = geoIp
+          ? [geoIp.city, geoIp.region_name, geoIp.country_name].filter(Boolean)
+          : []
+        const geoLocation =
+          geoLocationParts.length > 0 ? geoLocationParts.join(', ') : null
 
-      await Promise.all(
-        firebaseTokens.map((firebaseToken) => {
-          log('sending notification to', firebaseToken)
+        let notificationBody = `New device is trying to log in from ${ipAddress}.`
 
-          return firebaseSendNotification({
-            token: firebaseToken,
-            notification: {
-              title: 'New device login!',
-              body: notificationBody
-            },
-            data: {
-              type: 'Devices'
-            },
-            android: {
-              priority: 'high'
-            },
-            apns: {
-              payload: {
-                aps: {
-                  contentAvailable: true,
-                  priority: 10
-                }
-              }
-            }
+        if (geoLocation) {
+          notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
+        }
+
+        let devicesToNotify: { firebaseToken: string | null }[] = []
+
+        if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
+          devicesToNotify = await ctx.db.query.device.findMany({
+            where: { userId: user.id },
+            columns: { firebaseToken: true }
           })
-        })
-      )
+        } else if (masterDevice?.firebaseToken) {
+          devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }]
+        }
+
+        const firebaseTokens = [
+          ...new Set(
+            devicesToNotify
+              .map((device) => device.firebaseToken)
+              .filter(
+                (firebaseToken): firebaseToken is string => !!firebaseToken
+              )
+              .filter((firebaseToken) => firebaseToken.length > 10)
+          )
+        ]
+
+        pushNotificationCounts = await sendNewDeviceLoginPushNotifications(
+          firebaseTokens,
+          notificationBody
+        )
+      }
 
       const [created] = await ctx.db
         .insert(schema.decryptionChallenge)
@@ -414,10 +481,24 @@ export class RootResolver {
           deviceId: deviceInput.id,
           deviceName: deviceInput.name,
           userId: user.id,
-          ipAddress: ctx.getIpAddress()
+          ipAddress: ctx.getIpAddress(),
+          approvedAt,
+          pushNotificationsSentCount:
+            pushNotificationCounts.pushNotificationsSentCount,
+          pushNotificationsFailedCount:
+            pushNotificationCounts.pushNotificationsFailedCount
         })
         .returning()
       challenge = created
+    }
+
+    if (userHasNoMasterDevice) {
+      return plainToClass(DecryptionChallengeApproved, {
+        ...challenge,
+        addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
+        encryptionSalt: user.encryptionSalt,
+        approvedAt: challenge!.approvedAt || challenge!.createdAt
+      })
     }
 
     if (user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null) {
@@ -430,10 +511,33 @@ export class RootResolver {
       })
     }
 
+    const [masterDeviceResetRequest] = await ctx.db
+      .select({
+        requestedAt: schema.masterDeviceResetRequest.createdAt,
+        processAt: schema.masterDeviceResetRequest.processAt,
+        rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+      })
+      .from(schema.masterDeviceResetRequest)
+      .where(
+        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge!.id)
+      )
+      .limit(1)
+
     if (!challenge!.approvedAt) {
       return plainToClass(DecryptionChallengeForApproval, {
         id: challenge!.id,
-        approvedAt: challenge!.approvedAt
+        ipAddress: challenge!.ipAddress,
+        rejectedAt: challenge!.rejectedAt,
+        createdAt: challenge!.createdAt,
+        deviceName: challenge!.deviceName,
+        deviceId: challenge!.deviceId,
+        pushNotificationsSentCount: challenge!.pushNotificationsSentCount,
+        pushNotificationsFailedCount: challenge!.pushNotificationsFailedCount,
+        masterDeviceResetRequestedAt:
+          masterDeviceResetRequest?.requestedAt ?? null,
+        masterDeviceResetProcessAt: masterDeviceResetRequest?.processAt ?? null,
+        masterDeviceResetRejectedAt:
+          masterDeviceResetRequest?.rejectedAt ?? null
       })
     }
 
@@ -442,6 +546,139 @@ export class RootResolver {
       ...challenge,
       addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
       encryptionSalt: user.encryptionSalt
+    })
+  }
+
+  @Mutation(() => MasterDeviceResetRequestResult, {
+    description:
+      'initiates a delayed reset of the master device when the user cannot approve from an existing device'
+  })
+  async initiateMasterDeviceReset(
+    @Arg('email', () => GraphQLEmailAddress) email: string,
+    @Arg('deviceInput', () => DeviceInput) deviceInput: DeviceInput,
+    @Arg('decryptionChallengeId', () => GraphQLPositiveInt)
+    decryptionChallengeId: number,
+    @Ctx() ctx: IContext
+  ) {
+    const ipAddress = ctx.getIpAddress()
+
+    const user = await ctx.db.query.user.findFirst({
+      where: { email },
+      columns: {
+        id: true,
+        email: true,
+        masterDeviceId: true,
+        deviceRecoveryCooldownMinutes: true
+      }
+    })
+
+    if (!user) {
+      throw new GraphqlError(
+        'Login failed, check your email and master password'
+      )
+    }
+
+    const challenge = await ctx.db.query.decryptionChallenge.findFirst({
+      where: {
+        id: decryptionChallengeId,
+        userId: user.id,
+        deviceId: deviceInput.id
+      }
+    })
+
+    if (!challenge || challenge.rejectedAt) {
+      throw new GraphqlError('login failed')
+    }
+
+    const now = new Date()
+    const [activeResetRequest] = await ctx.db
+      .select({
+        id: schema.masterDeviceResetRequest.id,
+        requestedAt: schema.masterDeviceResetRequest.createdAt,
+        processAt: schema.masterDeviceResetRequest.processAt
+      })
+      .from(schema.masterDeviceResetRequest)
+      .where(
+        and(
+          eq(schema.masterDeviceResetRequest.userId, user.id),
+          isNull(schema.masterDeviceResetRequest.completedAt),
+          isNull(schema.masterDeviceResetRequest.rejectedAt)
+        )
+      )
+      .orderBy(desc(schema.masterDeviceResetRequest.createdAt))
+      .limit(1)
+
+    if (activeResetRequest) {
+      return plainToClass(MasterDeviceResetRequestResult, {
+        requestedAt: activeResetRequest.requestedAt,
+        processAt: activeResetRequest.processAt,
+        alreadyPending: true
+      })
+    }
+
+    if (!user.masterDeviceId) {
+      return plainToClass(MasterDeviceResetRequestResult, {
+        requestedAt: now,
+        processAt: now,
+        alreadyPending: false
+      })
+    }
+
+    const requestedAt = now
+    const processAt = new Date(
+      requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000
+    )
+
+    const [existingResetRequestForChallenge] = await ctx.db
+      .select({
+        id: schema.masterDeviceResetRequest.id
+      })
+      .from(schema.masterDeviceResetRequest)
+      .where(
+        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge.id)
+      )
+      .limit(1)
+
+    if (existingResetRequestForChallenge) {
+      await ctx.db
+        .update(schema.masterDeviceResetRequest)
+        .set({
+          createdAt: requestedAt,
+          processAt,
+          completedAt: null,
+          rejectedAt: null,
+          targetMasterDeviceId: user.masterDeviceId
+        })
+        .where(
+          eq(
+            schema.masterDeviceResetRequest.id,
+            existingResetRequestForChallenge.id
+          )
+        )
+    } else {
+      await ctx.db.insert(schema.masterDeviceResetRequest).values({
+        userId: user.id,
+        decryptionChallengeId: challenge.id,
+        targetMasterDeviceId: user.masterDeviceId,
+        processAt
+      })
+    }
+
+    if (user.email) {
+      await sendEmail(user.email, {
+        Subject: 'Master device reset initiated',
+        TextPart: `A delayed reset of your master device was initiated for account ${user.email} from IP ${ipAddress}.
+If this was you, no action is needed.
+The reset is scheduled for ${processAt.toISOString()}.
+If this was not you, log in from one of your existing devices and change your master device before that time.`,
+        HTMLPart: `<p>A delayed reset of your master device was initiated for account ${user.email} from IP ${ipAddress}.</p><p>If this was you, no action is needed.</p><p>The reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, log in from one of your existing devices and change your master device before that time.</p>`
+      })
+    }
+
+    return plainToClass(MasterDeviceResetRequestResult, {
+      requestedAt,
+      processAt,
+      alreadyPending: false
     })
   }
 

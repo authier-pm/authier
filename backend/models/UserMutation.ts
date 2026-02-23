@@ -44,6 +44,7 @@ import {
   emailVerification as emailVerificationSchema,
   decryptionChallenge as decryptionChallengeSchema,
   masterDeviceChange as masterDeviceChangeSchema,
+  masterDeviceResetRequest as masterDeviceResetRequestSchema,
   userPaidProducts as userPaidProductsSchema
 } from '../drizzle/schema'
 
@@ -472,6 +473,32 @@ export class UserMutation extends UserBase {
     return res[0]
   }
 
+  @Field(() => UserGQL)
+  async setDeviceRecoveryCooldownMinutes(
+    @Arg('deviceRecoveryCooldownMinutes', () => GraphQLNonNegativeInt)
+    deviceRecoveryCooldownMinutes: number,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    if (
+      this.masterDeviceId !== null &&
+      this.masterDeviceId !== undefined &&
+      ctx.device.id !== this.masterDeviceId
+    ) {
+      throw new GraphqlError(
+        'deviceRecoveryCooldownMinutes can be set only from master device'
+      )
+    }
+
+    const res = await ctx.db
+      .update(userSchema)
+      .set({
+        deviceRecoveryCooldownMinutes
+      })
+      .where(eq(userSchema.id, this.id))
+      .returning()
+    return res[0]
+  }
+
   @Field(() => MasterDeviceChangeGQL)
   async setMasterDevice(
     @Ctx() ctx: IContextAuthenticated,
@@ -492,6 +519,20 @@ export class UserMutation extends UserBase {
         .where(eq(userSchema.id, ctx.jwtPayload.userId))
         .returning()
       updatedUser = res[0]
+
+      await tx
+        .delete(masterDeviceResetRequestSchema)
+        .where(
+          and(
+            eq(masterDeviceResetRequestSchema.userId, ctx.jwtPayload.userId),
+            eq(
+              masterDeviceResetRequestSchema.targetMasterDeviceId,
+              ctx.masterDeviceId!
+            ),
+            isNull(masterDeviceResetRequestSchema.completedAt),
+            isNull(masterDeviceResetRequestSchema.rejectedAt)
+          )
+        )
 
       await tx.insert(masterDeviceChangeSchema).values({
         id: uuidv4(),

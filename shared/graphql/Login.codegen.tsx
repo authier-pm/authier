@@ -26,8 +26,17 @@ export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
 
 export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?:
     | { __typename?: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt?: string | null, deviceId: string, deviceName: string }
-    | { __typename?: 'DecryptionChallengeForApproval', id: number }
+    | { __typename?: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt?: string | null, masterDeviceResetProcessAt?: string | null, masterDeviceResetRejectedAt?: string | null }
    | null };
+
+export type InitiateMasterDeviceResetMutationVariables = Types.Exact<{
+  email: Types.Scalars['EmailAddress']['input'];
+  deviceInput: Types.DeviceInput;
+  decryptionChallengeId: Types.Scalars['PositiveInt']['input'];
+}>;
+
+
+export type InitiateMasterDeviceResetMutation = { __typename?: 'Mutation', initiateMasterDeviceReset: { __typename?: 'MasterDeviceResetRequestResult', requestedAt: string, processAt: string, alreadyPending: boolean } };
 
 
 export const AddNewDeviceForUserDocument = gql`
@@ -116,6 +125,11 @@ export const DeviceDecryptionChallengeDocument = gql`
     }
     ... on DecryptionChallengeForApproval {
       id
+      pushNotificationsSentCount
+      pushNotificationsFailedCount
+      masterDeviceResetRequestedAt
+      masterDeviceResetProcessAt
+      masterDeviceResetRejectedAt
     }
   }
 }
@@ -145,3 +159,42 @@ export function useDeviceDecryptionChallengeMutation(baseOptions?: ApolloReactHo
       }
 export type DeviceDecryptionChallengeMutationHookResult = ReturnType<typeof useDeviceDecryptionChallengeMutation>;
 export type DeviceDecryptionChallengeMutationResult = ApolloReactCommon.MutationResult<DeviceDecryptionChallengeMutation>;
+export const InitiateMasterDeviceResetDocument = gql`
+    mutation initiateMasterDeviceReset($email: EmailAddress!, $deviceInput: DeviceInput!, $decryptionChallengeId: PositiveInt!) {
+  initiateMasterDeviceReset(
+    email: $email
+    deviceInput: $deviceInput
+    decryptionChallengeId: $decryptionChallengeId
+  ) {
+    requestedAt
+    processAt
+    alreadyPending
+  }
+}
+    `;
+
+/**
+ * __useInitiateMasterDeviceResetMutation__
+ *
+ * To run a mutation, you first call `useInitiateMasterDeviceResetMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useInitiateMasterDeviceResetMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [initiateMasterDeviceResetMutation, { data, loading, error }] = useInitiateMasterDeviceResetMutation({
+ *   variables: {
+ *      email: // value for 'email'
+ *      deviceInput: // value for 'deviceInput'
+ *      decryptionChallengeId: // value for 'decryptionChallengeId'
+ *   },
+ * });
+ */
+export function useInitiateMasterDeviceResetMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<InitiateMasterDeviceResetMutation, InitiateMasterDeviceResetMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<InitiateMasterDeviceResetMutation, InitiateMasterDeviceResetMutationVariables>(InitiateMasterDeviceResetDocument, options);
+      }
+export type InitiateMasterDeviceResetMutationHookResult = ReturnType<typeof useInitiateMasterDeviceResetMutation>;
+export type InitiateMasterDeviceResetMutationResult = ApolloReactCommon.MutationResult<InitiateMasterDeviceResetMutation>;

@@ -357,6 +357,11 @@ type DecryptionChallengeForApproval {
   createdAt: DateTime!
   deviceName: String!
   deviceId: ID!
+  pushNotificationsSentCount: Int!
+  pushNotificationsFailedCount: Int!
+  masterDeviceResetRequestedAt: DateTime
+  masterDeviceResetProcessAt: DateTime
+  masterDeviceResetRejectedAt: DateTime
 }
 
 """
@@ -402,6 +407,15 @@ type Mutation {
     deviceInput: DeviceInput!
     email: EmailAddress!
   ): DecryptionChallenge
+
+  """
+  initiates a delayed reset of the master device when the user cannot approve from an existing device
+  """
+  initiateMasterDeviceReset(
+    decryptionChallengeId: PositiveInt!
+    deviceInput: DeviceInput!
+    email: EmailAddress!
+  ): MasterDeviceResetRequestResult!
 
   """
   removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
@@ -466,6 +480,9 @@ type UserMutation {
   changeEmail(email: EmailAddress!): UserQuery!
   decryptionChallenge(id: Int!): DecryptionChallengeMutation!
   setNewDevicePolicy(newDevicePolicy: UserNewDevicePolicy!): UserGQL!
+  setDeviceRecoveryCooldownMinutes(
+    deviceRecoveryCooldownMinutes: NonNegativeInt!
+  ): UserGQL!
   setMasterDevice(newMasterDeviceId: String!): MasterDeviceChangeGQL!
   createPortalSession: String!
   createCheckoutSession(product: String!): String!
@@ -713,6 +730,12 @@ input AddNewDeviceInput {
   addDeviceSecretEncrypted: NonEmptyString!
   encryptionSalt: NonEmptyString!
   devicePlatform: String!
+}
+
+type MasterDeviceResetRequestResult {
+  requestedAt: DateTime!
+  processAt: DateTime!
+  alreadyPending: Boolean!
 }
 
 type WebInputMutation {

@@ -14,11 +14,23 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
   }
 }
 
+mutation updateMasterDeviceResetTimeout($deviceRecoveryCooldownMinutes: NonNegativeInt!) {
+  me {
+    setDeviceRecoveryCooldownMinutes(
+      deviceRecoveryCooldownMinutes: $deviceRecoveryCooldownMinutes
+    ) {
+      id
+      deviceRecoveryCooldownMinutes
+    }
+  }
+}
+
 query defaultSettings {
   me {
     id
     masterDeviceId
     uiLanguage
+    deviceRecoveryCooldownMinutes
     defaultDeviceSettings {
       id
       autofillTOTPEnabled

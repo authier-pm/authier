@@ -82,7 +82,9 @@ export const decryptionChallenge = pgTable(
     blockIp: boolean(),
     rejectedAt: timestamp({ precision: 3 }),
     approvedByRecovery: boolean().default(false).notNull(),
-    deviceName: text().notNull()
+    deviceName: text().notNull(),
+    pushNotificationsSentCount: integer().default(0).notNull(),
+    pushNotificationsFailedCount: integer().default(0).notNull()
   },
   (table) => [
     index('DecryptionChallenge_deviceId_idx').using(
@@ -238,6 +240,43 @@ export const masterDeviceChange = pgTable('MasterDeviceChange', {
     .notNull()
     .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' })
 })
+
+export const masterDeviceResetRequest = pgTable(
+  'MasterDeviceResetRequest',
+  {
+    id: serial().primaryKey(),
+    createdAt: timestamp({ precision: 3 })
+      .default(sql`CURRENT_TIMESTAMP`)
+      .notNull(),
+    processAt: timestamp({ precision: 3 }).notNull(),
+    completedAt: timestamp({ precision: 3 }),
+    rejectedAt: timestamp({ precision: 3 }),
+    targetMasterDeviceId: text().notNull(),
+    decryptionChallengeId: integer()
+      .notNull()
+      .references(() => decryptionChallenge.id, {
+        onDelete: 'cascade',
+        onUpdate: 'cascade'
+      }),
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade', onUpdate: 'cascade' })
+  },
+  (table) => [
+    uniqueIndex('MasterDeviceResetRequest_decryptionChallengeId_key').using(
+      'btree',
+      table.decryptionChallengeId.asc().nullsLast()
+    ),
+    index('MasterDeviceResetRequest_userId_idx').using(
+      'btree',
+      table.userId.asc().nullsLast()
+    ),
+    index('MasterDeviceResetRequest_processAt_idx').using(
+      'btree',
+      table.processAt.asc().nullsLast()
+    )
+  ]
+)
 
 export const secretUsageEvent = pgTable(
   'SecretUsageEvent',

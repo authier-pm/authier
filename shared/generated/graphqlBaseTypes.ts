@@ -84,6 +84,11 @@ export type DecryptionChallengeForApproval = {
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
   ipGeoLocation?: Maybe<Scalars['JSON']['output']>;
+  masterDeviceResetProcessAt?: Maybe<Scalars['DateTime']['output']>;
+  masterDeviceResetRejectedAt?: Maybe<Scalars['DateTime']['output']>;
+  masterDeviceResetRequestedAt?: Maybe<Scalars['DateTime']['output']>;
+  pushNotificationsFailedCount: Scalars['Int']['output'];
+  pushNotificationsSentCount: Scalars['Int']['output'];
   rejectedAt?: Maybe<Scalars['DateTime']['output']>;
 };
 
@@ -417,12 +422,21 @@ export type MasterDeviceChangeGql = {
   userId: Scalars['String']['output'];
 };
 
+export type MasterDeviceResetRequestResult = {
+  __typename?: 'MasterDeviceResetRequestResult';
+  alreadyPending: Scalars['Boolean']['output'];
+  processAt: Scalars['DateTime']['output'];
+  requestedAt: Scalars['DateTime']['output'];
+};
+
 export type Mutation = {
   __typename?: 'Mutation';
   addWebInputs: Array<WebInputGql>;
   currentDevice: DeviceMutation;
   /** returns a decryption challenge, used when logging in */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>;
+  /** initiates a delayed reset of the master device when the user cannot approve from an existing device */
+  initiateMasterDeviceReset: MasterDeviceResetRequestResult;
   /**
    * removes current device. Returns null if user is not authenticated, alias for device logout/remove methods
    * @deprecated prefer device methods
@@ -441,6 +455,13 @@ export type MutationAddWebInputsArgs = {
 
 
 export type MutationDeviceDecryptionChallengeArgs = {
+  deviceInput: DeviceInput;
+  email: Scalars['EmailAddress']['input'];
+};
+
+
+export type MutationInitiateMasterDeviceResetArgs = {
+  decryptionChallengeId: Scalars['PositiveInt']['input'];
   deviceInput: DeviceInput;
   email: Scalars['EmailAddress']['input'];
 };
@@ -637,6 +658,7 @@ export type UserMutation = {
   removeEncryptedSecrets: Array<EncryptedSecretMutation>;
   revokeRefreshTokensForUser: UserGql;
   sendEmailVerification: Scalars['NonNegativeInt']['output'];
+  setDeviceRecoveryCooldownMinutes: UserGql;
   setMasterDevice: MasterDeviceChangeGql;
   setNewDevicePolicy: UserGql;
   tokenVersion: Scalars['Int']['output'];
@@ -701,6 +723,11 @@ export type UserMutationRemoveEncryptedSecretsArgs = {
 
 export type UserMutationSendEmailVerificationArgs = {
   isMobile?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+
+export type UserMutationSetDeviceRecoveryCooldownMinutesArgs = {
+  deviceRecoveryCooldownMinutes: Scalars['NonNegativeInt']['input'];
 };
 
 

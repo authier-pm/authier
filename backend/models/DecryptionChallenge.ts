@@ -20,8 +20,13 @@ import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
-import { user, decryptionChallenge, device } from '../drizzle/schema'
-import { eq, and } from 'drizzle-orm'
+import {
+  user,
+  decryptionChallenge,
+  device,
+  masterDeviceResetRequest
+} from '../drizzle/schema'
+import { eq, and, isNull } from 'drizzle-orm'
 
 @ObjectType()
 class DeviceLocation {
@@ -66,6 +71,21 @@ export class DecryptionChallengeForApproval {
 
   @Field(() => ID)
   deviceId: string
+
+  @Field(() => Int)
+  pushNotificationsSentCount: number
+
+  @Field(() => Int)
+  pushNotificationsFailedCount: number
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  masterDeviceResetRequestedAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  masterDeviceResetProcessAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  masterDeviceResetRejectedAt: Date | null
 }
 
 @ObjectType()
@@ -173,10 +193,32 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       deviceRec = res[0]!
     }
 
+    if (!userData.masterDeviceId) {
+      await ctx.db
+        .update(user)
+        .set({
+          masterDeviceId: deviceRec.id
+        })
+        .where(eq(user.id, userData.id))
+      userData.masterDeviceId = deviceRec.id
+    }
+
     return new UserMutation(
       userData as any
     ).setCookiesAndConstructLoginResponse(deviceRec as any, ctx)
   }
+}
+
+@ObjectType()
+export class MasterDeviceResetRequestResult {
+  @Field(() => GraphQLISODateTime)
+  requestedAt: Date
+
+  @Field(() => GraphQLISODateTime)
+  processAt: Date
+
+  @Field(() => Boolean)
+  alreadyPending: boolean
 }
 
 @ObjectType()
@@ -217,6 +259,13 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
 
   @Field(() => DecryptionChallengeGQL)
   async reject(@Ctx() ctx: IContextAuthenticated) {
+    const rejectingUser = await ctx.db.query.user.findFirst({
+      where: { id: this.userId },
+      columns: {
+        masterDeviceId: true
+      }
+    })
+
     const res = await ctx.db
       .update(decryptionChallenge)
       .set({
@@ -226,6 +275,22 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
       })
       .where(eq(decryptionChallenge.id, this.id))
       .returning()
+
+    if (rejectingUser?.masterDeviceId === ctx.device.id) {
+      await ctx.db
+        .update(masterDeviceResetRequest)
+        .set({
+          rejectedAt: new Date()
+        })
+        .where(
+          and(
+            eq(masterDeviceResetRequest.decryptionChallengeId, this.id),
+            isNull(masterDeviceResetRequest.completedAt),
+            isNull(masterDeviceResetRequest.rejectedAt)
+          )
+        )
+    }
+
     return res[0]!
   }
 

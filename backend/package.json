@@ -76,18 +76,15 @@
     "wrdeploy": "wrangler deploy",
     "kill": "kill $(lsof -t -i:5051)",
     "local": "nodemon server.ts",
-    "pgn": "pnpm prisma migrate dev && pnpm prisma db push && prisma generate",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
     "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
-    "studio": "prisma studio",
-    "dbPush": "prisma db push",
-    "gen": "prisma generate",
     "tsc": "tsc",
-    "start": "prisma migrate deploy && node server.js",
+    "start": "node server.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "test": "NODE_ENV=test pnpm vitest",
-    "test:docker": "pnpm docker:up && DATABASE_URL=postgresql://authier:auth133r@localhost:6432/authier && pnpm prisma db push && jest -i && pnpm docker:down",
-    "dbReset": "prisma migrate reset --preview-feature",
     "removeTestAccounts": "pnpm ts-node scripts/removeTestAccounts"
   }
 }

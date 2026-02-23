@@ -9,6 +9,7 @@ import {
   Text,
   VStack,
   WarningIcon,
+  Button,
   useColorMode,
   useColorModeValue,
   useToast
@@ -25,7 +26,8 @@ import { IBackgroundStateSerializable } from '@utils/deviceStore'
 import { useInterval } from '@src/utils/useInterval'
 import {
   useAddNewDeviceForUserMutation,
-  useDeviceDecryptionChallengeMutation
+  useDeviceDecryptionChallengeMutation,
+  useInitiateMasterDeviceResetMutation
 } from '@shared/graphql/Login.codegen'
 import { Platform } from 'react-native'
 import { ToastAlert } from '@components/ToastAlert'
@@ -239,9 +241,38 @@ export const LoginAwaitingApproval = () => {
   const { formState } = useContext(LoginContext)
   const device = useDeviceStore((state) => state)
   const [deviceName] = useState(device.name)
+  const toast = useToast()
   const { deviceDecryptionChallenge } = useLogin({
     deviceName
   })
+  const [initiateMasterDeviceReset, { loading: resetMasterDeviceLoading }] =
+    useInitiateMasterDeviceResetMutation({
+      onCompleted: (data) => {
+        const processAt = data.initiateMasterDeviceReset.processAt
+        toast.show({
+          render: () => (
+            <ToastAlert
+              title="Master device reset scheduled"
+              description={`Scheduled for ${new Date(processAt).toLocaleString()}`}
+              status="warning"
+              variant="subtle"
+            />
+          )
+        })
+      },
+      onError: () => {
+        toast.show({
+          render: () => (
+            <ToastAlert
+              title="Failed to schedule master device reset"
+              description="Try again later."
+              status="error"
+              variant="subtle"
+            />
+          )
+        })
+      }
+    })
 
   const bgColor = useColorModeValue('cyan.800', 'rgb(18, 18, 18)')
 
@@ -254,6 +285,18 @@ export const LoginAwaitingApproval = () => {
     (deviceDecryptionChallenge?.id &&
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
   ) {
+    const pendingResetAt =
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetProcessAt
+        : null
+    const rejectedResetAt =
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetRejectedAt
+        : null
+    const canResetMasterDevice =
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval' &&
+      !pendingResetAt
+
     return (
       <Flex flex={1} justifyContent={'center'}>
         <Box bgColor={bgColor} p={5} m={2} pt={8} pb={8} rounded="2xl">
@@ -287,6 +330,67 @@ export const LoginAwaitingApproval = () => {
                   this tab.
                 </Trans>
               </Text>
+
+              {deviceDecryptionChallenge?.__typename ===
+              'DecryptionChallengeForApproval' ? (
+                <>
+                  <Text mt={3} fontSize="sm">
+                    <Trans>
+                      Push notifications sent: {deviceDecryptionChallenge.pushNotificationsSentCount}
+                    </Trans>
+                  </Text>
+                  <Text fontSize="sm" mb={3}>
+                    <Trans>
+                      Push notifications failed: {deviceDecryptionChallenge.pushNotificationsFailedCount}
+                    </Trans>
+                  </Text>
+
+                  {pendingResetAt ? (
+                    <Text fontSize="sm" mb={3}>
+                      <Trans>
+                        Master device reset scheduled for{' '}
+                        {new Date(pendingResetAt).toLocaleString()}.
+                      </Trans>
+                    </Text>
+                  ) : null}
+
+                  {rejectedResetAt ? (
+                    <Text fontSize="sm" mb={3}>
+                      <Trans>
+                        Master device reset was rejected at{' '}
+                        {new Date(rejectedResetAt).toLocaleString()}.
+                      </Trans>
+                    </Text>
+                  ) : null}
+
+                  <Button
+                    isLoading={resetMasterDeviceLoading}
+                    isDisabled={!canResetMasterDevice}
+                    onPress={async () => {
+                      if (
+                        deviceDecryptionChallenge.__typename !==
+                        'DecryptionChallengeForApproval'
+                      ) {
+                        return
+                      }
+
+                      await initiateMasterDeviceReset({
+                        variables: {
+                          email: formState.email,
+                          deviceInput: {
+                            id: device.id as string,
+                            name: deviceName,
+                            platform: Platform.OS
+                          },
+                          decryptionChallengeId: deviceDecryptionChallenge.id
+                        }
+                      })
+                    }}
+                  >
+                    <Trans>Reset master device</Trans>
+                  </Button>
+                </>
+              ) : null}
             </Flex>
           </Center>
         </Box>

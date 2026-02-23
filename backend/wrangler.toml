@@ -8,6 +8,9 @@ observability = { logs = { enabled = true, invocation_logs = true}}
 [vars]
 NODE_ENV = "production"
 
+[triggers]
+crons = ["*/15 * * * *"]
+
 # Configure secrets with:
 # wrangler secret put DATABASE_URL
 # wrangler secret put ACCESS_TOKEN_SECRET

@@ -26,7 +26,8 @@ import Animated, { FadeInUp, FadeOutUp } from 'react-native-reanimated'
 import { AuthierSelect } from '@src/components/AuthierSelect'
 import {
   useDefaultSettingsQuery,
-  useUpdateDefaultDeviceSettingsMutation
+  useUpdateDefaultDeviceSettingsMutation,
+  useUpdateMasterDeviceResetTimeoutMutation
 } from '@shared/graphql/DefaultSettings.codegen'
 import { DefaultSettingsInput } from '@shared/generated/graphqlBaseTypes'
 import { useNetInfo } from '@react-native-community/netinfo'
@@ -35,6 +36,14 @@ import { i18n } from '@lingui/core'
 import { useVaultLockTimeoutOptions } from '@src/utils/useVaultLockTimeoutOptions'
 
 export function UserSettings() {
+  const masterDeviceResetTimeoutOptions = [
+    { label: '1 hour', value: 60 },
+    { label: '6 hours', value: 360 },
+    { label: '12 hours', value: 720 },
+    { label: '24 hours', value: 1440 },
+    { label: '3 days', value: 4320 },
+    { label: '7 days', value: 10080 }
+  ]
   const navigation =
     useNavigation<AccountStackScreenProps<'Account'>['navigation']>()
   const { isConnected } = useNetInfo()
@@ -54,6 +63,8 @@ export function UserSettings() {
   })
 
   const [updateDefaultSettings] = useUpdateDefaultDeviceSettingsMutation()
+  const [updateMasterDeviceResetTimeout] =
+    useUpdateMasterDeviceResetTimeoutMutation()
   const [isOpen, setIsOpen] = useState(
     !!deviceState.notificationOnWrongPasswordAttempts
   )
@@ -62,6 +73,12 @@ export function UserSettings() {
   const [form, setForm] = useState<SettingsFormType | null>(null)
   const [previousSettings, setPreviousSettings] =
     useState<SettingsFormType | null>(null)
+  const [masterDeviceResetTimeoutMinutes, setMasterDeviceResetTimeoutMinutes] =
+    useState<number | null>(null)
+  const [
+    previousMasterDeviceResetTimeoutMinutes,
+    setPreviousMasterDeviceResetTimeoutMinutes
+  ] = useState<number | null>(null)
 
   const itemBg = useColorModeValue('cyan.800', 'rgb(28, 28, 28)')
   const defaultData = data?.me.defaultDeviceSettings
@@ -114,6 +131,49 @@ export function UserSettings() {
       setPreviousSettings(form)
     }
   }, [defaultData, form])
+
+  useEffect(() => {
+    const nextTimeout = data?.me.deviceRecoveryCooldownMinutes
+    if (nextTimeout == null) {
+      return
+    }
+
+    if (masterDeviceResetTimeoutMinutes === null) {
+      setMasterDeviceResetTimeoutMinutes(nextTimeout)
+      setPreviousMasterDeviceResetTimeoutMinutes(nextTimeout)
+      return
+    }
+
+    if (previousMasterDeviceResetTimeoutMinutes === null) {
+      setPreviousMasterDeviceResetTimeoutMinutes(masterDeviceResetTimeoutMinutes)
+    }
+  }, [data?.me.deviceRecoveryCooldownMinutes])
+
+  useEffect(() => {
+    if (masterDeviceResetTimeoutMinutes === null) {
+      return
+    }
+
+    if (previousMasterDeviceResetTimeoutMinutes === null) {
+      setPreviousMasterDeviceResetTimeoutMinutes(masterDeviceResetTimeoutMinutes)
+      return
+    }
+
+    if (masterDeviceResetTimeoutMinutes === previousMasterDeviceResetTimeoutMinutes) {
+      return
+    }
+
+    ;(async () => {
+      await updateMasterDeviceResetTimeout({
+        variables: {
+          deviceRecoveryCooldownMinutes: masterDeviceResetTimeoutMinutes
+        }
+      })
+      refetchDefaultSettings()
+    })()
+
+    setPreviousMasterDeviceResetTimeoutMinutes(masterDeviceResetTimeoutMinutes)
+  }, [masterDeviceResetTimeoutMinutes])
 
   return (
     <ScrollView
@@ -241,6 +301,31 @@ export function UserSettings() {
 
                 <Trans>
                   Automatically locks vault after chosen period of time
+                </Trans>
+
+                <Divider />
+                <AuthierSelect
+                  variant="rounded"
+                  onValueChange={(value) => {
+                    setMasterDeviceResetTimeoutMinutes(parseInt(value, 10))
+                  }}
+                  selectedValue={(
+                    masterDeviceResetTimeoutMinutes ?? 1440
+                  ).toString()}
+                  accessibilityLabel="Master device reset timeout"
+                >
+                  {masterDeviceResetTimeoutOptions.map((option, index) => (
+                    <Select.Item
+                      label={option.label}
+                      value={option.value.toString()}
+                      key={`master-reset-timeout-${index}`}
+                    />
+                  ))}
+                </AuthierSelect>
+
+                <Trans>
+                  Delay before scheduled master device reset is executed when
+                  you lose access to your current master device
                 </Trans>
 
                 <Divider />
