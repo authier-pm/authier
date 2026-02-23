@@ -116,7 +116,7 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       })
       .where(
         and(
-          eq(decryptionChallenge.id, id),
+          id != null ? eq(decryptionChallenge.id, id) : undefined,
           eq(decryptionChallenge.deviceId, deviceId),
           eq(decryptionChallenge.userId, userData.id)
         )

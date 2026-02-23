@@ -6,7 +6,27 @@ import { relations } from '../drizzle/relations'
 const connectionString = process.env.DATABASE_URL ?? ''
 
 const globalClient = postgres(connectionString)
-export const db = drizzle({ client: globalClient, schema: dbSchema, relations })
+const defaultDb = drizzle({ client: globalClient, schema: dbSchema, relations })
+
+export type DbType = typeof defaultDb
+
+let _db: DbType = defaultDb
+
+// Proxy ensures that any reference to `db` always delegates to the current
+// `_db` target — allowing tests to swap in a PGlite instance via setDb().
+export const db: DbType = new Proxy({} as DbType, {
+  get(_, prop) {
+    const value = (_db as any)[prop]
+    if (typeof value === 'function') {
+      return value.bind(_db)
+    }
+    return value
+  }
+})
+
+export const setDb = (newDb: any) => {
+  _db = newDb
+}
 
 export const createRequestDb = () => {
   const client = postgres(connectionString, { max: 1 })

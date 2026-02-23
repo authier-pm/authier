@@ -1,15 +1,11 @@
 import 'reflect-metadata'
 import { faker } from '@faker-js/faker'
 import 'dotenv/config'
-import { afterAll, beforeAll } from 'vitest'
+import { beforeAll } from 'vitest'
 import debug from 'debug'
 
 faker.seed(1)
 export const log = debug('au:test')
-
-beforeAll(() => {
-  log('test environment initialized')
-})
 
 import { PGlite } from '@electric-sql/pglite'
 import { drizzle } from 'drizzle-orm/pglite'
@@ -17,6 +13,7 @@ import { dbSchema } from '../drizzle'
 import { relations } from '../drizzle/relations'
 import { runMigrationsForPGlite } from './runMigrationsForPGlite'
 import { join } from 'path'
+import { setDb } from '../prisma/prismaClient'
 
 export let testDb: ReturnType<typeof drizzle>
 
@@ -37,3 +34,9 @@ export async function setupTestDb(): Promise<PGlite> {
 
   return client
 }
+
+beforeAll(async () => {
+  log('test environment initialized')
+  await setupTestDb()
+  setDb(testDb)
+})
