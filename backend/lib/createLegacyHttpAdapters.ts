@@ -25,10 +25,13 @@ export type LegacyElysiaContext = ElysiaRouteContext
 
 const toHeadersRecord = (
   request: Request
-): Record<string, string | undefined> =>
-  Object.fromEntries(
-    Array.from(request.headers, ([key, value]) => [key.toLowerCase(), value])
-  )
+): Record<string, string | undefined> => {
+  const headers: Record<string, string | undefined> = {}
+  request.headers.forEach((value, key) => {
+    headers[key.toLowerCase()] = value
+  })
+  return headers
+}
 
 const toCookiesRecord = (ctx: ElysiaRouteContext) =>
   Object.fromEntries(
