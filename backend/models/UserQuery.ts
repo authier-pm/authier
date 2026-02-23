@@ -28,9 +28,10 @@ import { encryptedSecret, device as deviceSchema } from '../drizzle/schema'
 
 @ObjectType()
 export class UserBase extends UserGQL {
-  constructor(parameters) {
+  constructor(parameters: Record<string, unknown>) {
     super()
     Object.assign(this, parameters)
+    addUserGraphqlAliases(this)
   }
 
   @Field(() => GraphQLEmailAddress, {
@@ -45,13 +46,9 @@ export class UserBase extends UserGQL {
 
     if (!userDevice) throw new Error('Device not found')
 
-    setNewRefreshToken(this, userDevice as any, ctx)
+    setNewRefreshToken(this, userDevice, ctx)
 
-    const accessToken = setNewAccessTokenIntoCookie(
-      this,
-      userDevice as any,
-      ctx
-    )
+    const accessToken = setNewAccessTokenIntoCookie(this, userDevice, ctx)
 
     return {
       accessToken,
@@ -73,6 +70,20 @@ export class UserBase extends UserGQL {
 
     return deviceDefaultSettings ?? defaultDeviceSettingUserValuesWithId
   }
+}
+
+type UserTotpLimitShape = {
+  TOTPlimit?: number | null
+  TOTPlimit?: number | null
+}
+
+export function addUserGraphqlAliases<T extends UserTotpLimitShape>(
+  user: T
+): T {
+  if (user.TOTPlimit == null && user.TOTPlimit != null) {
+    Object.assign(user, { TOTPlimit: user.TOTPlimit })
+  }
+  return user
 }
 
 @ObjectType()
@@ -98,8 +109,8 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  async lastChangeInSecrets() {
-    const res = await db
+  async lastChangeInSecrets(@Ctx() ctx: IContext) {
+    const res = await ctx.db
       .select({
         updatedAt: max(encryptedSecret.updatedAt),
         createdAt: max(encryptedSecret.createdAt)
@@ -114,8 +125,8 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => Int)
-  async devicesCount() {
-    const res = await db
+  async devicesCount(@Ctx() ctx: IContext) {
+    const res = await ctx.db
       .select({ count: count() })
       .from(deviceSchema)
       .where(
@@ -125,8 +136,8 @@ export class UserQuery extends UserBase {
   }
 
   @Field(() => EmailVerificationGQLScalars, { nullable: true })
-  async primaryEmailVerification() {
-    const res = await db.query.emailVerification.findFirst({
+  async primaryEmailVerification(@Ctx() ctx: IContext) {
+    const res = await ctx.db.query.emailVerification.findFirst({
       where: {
         userId: this.id,
         address: this.email,
@@ -136,15 +147,15 @@ export class UserQuery extends UserBase {
     return res
   }
   @Field(() => [EmailVerificationGQLScalars])
-  async emailVerifications() {
-    return db.query.emailVerification.findMany({
+  async emailVerifications(@Ctx() ctx: IContext) {
+    return ctx.db.query.emailVerification.findMany({
       where: { userId: this.id }
     })
   }
 
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecrets() {
-    return db.query.encryptedSecret.findMany({
+  async encryptedSecrets(@Ctx() ctx: IContext) {
+    return ctx.db.query.encryptedSecret.findMany({
       where: {
         userId: this.id,
         deletedAt: { isNull: true } // check if this works for isNull
@@ -204,7 +215,7 @@ export class UserQuery extends UserBase {
 
   @Field(() => [DecryptionChallengeForApproval])
   async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
-    return db.query.decryptionChallenge.findMany({
+    return ctx.db.query.decryptionChallenge.findMany({
       where: {
         userId: ctx.jwtPayload.userId,
         approvedAt: { isNull: true },

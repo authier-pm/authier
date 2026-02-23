@@ -1,12 +1,15 @@
-import type { FastifyReply, FastifyRequest } from 'fastify'
+import type {
+  LegacyReply,
+  LegacyRequest
+} from '../../lib/createLegacyHttpAdapters'
 import type { db } from '../../prisma/prismaClient'
 import * as dbSchema from '../../drizzle/schema'
 import type { InferSelectModel } from 'drizzle-orm'
 export type Device = InferSelectModel<typeof dbSchema.device>
 
 export interface IContext {
-  request: FastifyRequest
-  reply: FastifyReply
+  request: LegacyRequest
+  reply: LegacyReply
   getIpAddress: () => string
   db: typeof db
 }

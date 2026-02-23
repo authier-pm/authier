@@ -6,13 +6,13 @@ export class TagGQLScalars {
   @Field(() => Int)
   id: number
 
-  @Field()
+  @Field(() => String)
   name: string
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 

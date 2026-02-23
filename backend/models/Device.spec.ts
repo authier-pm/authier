@@ -48,7 +48,7 @@ describe('Device', () => {
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         loginCredentialsLimit,
-        totPlimit: TOTPlimit,
+        TOTPlimit: TOTPlimit,
         deviceRecoveryCooldownMinutes: 960
       })
       .returning()
@@ -296,7 +296,7 @@ describe('Device', () => {
     })
 
     it('should not sync TOTP when device has syncTOTP set to false', async () => {
-      const testData = Array.from({ length: user.totPlimit }, () => ({
+      const testData = Array.from({ length: user.TOTPlimit }, () => ({
         id: crypto.randomUUID(),
         encrypted: faker.string.sample(25),
         kind: 'TOTP' as const,
@@ -317,7 +317,7 @@ describe('Device', () => {
       const numOverLimit = 5
 
       const testData = Array.from(
-        { length: user.totPlimit + numOverLimit },
+        { length: user.TOTPlimit + numOverLimit },
         () => ({
           id: crypto.randomUUID(),
           encrypted: faker.string.sample(25),

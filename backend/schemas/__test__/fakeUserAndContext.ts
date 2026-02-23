@@ -24,7 +24,7 @@ export const fakeUserAndContext = async () => {
       addDeviceSecret: fakeData.addDeviceSecret,
       addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
       encryptionSalt: fakeData.encryptionSalt,
-      totPlimit: 5,
+      TOTPlimit: 5,
       loginCredentialsLimit: 5,
       deviceRecoveryCooldownMinutes: 50
     })

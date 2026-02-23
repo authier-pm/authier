@@ -6,10 +6,10 @@ import { GraphQLUUID } from 'graphql-scalars'
 
 @ObjectType()
 export class DecryptionChallengeResponse {
-  @Field()
+  @Field(() => String)
   userId: string
 
-  @Field()
+  @Field(() => String)
   addDeviceSecretEncrypted: string
 }
 

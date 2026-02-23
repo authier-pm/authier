@@ -31,10 +31,10 @@ export class DeviceInput {
   @Field(() => String, { nullable: false })
   id: string
 
-  @Field()
+  @Field(() => String)
   name: string
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   platform: string
 }
 
@@ -54,7 +54,7 @@ export class DeviceQuery extends DeviceGQL {
 
     if (userData) {
       const pswLimit = userData.loginCredentialsLimit
-      const totpLimit = userData.totPlimit
+      const totpLimit = userData.TOTPlimit
 
       const [{ count: pswCount }] = await ctx.db
         .select({ count: count() })
@@ -160,7 +160,7 @@ export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => SecretUsageEventGQLScalars)
   async reportSecretUsageEvent(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('kind') kind: string,
+    @Arg('kind', () => String) kind: string,
     @Arg('secretId', () => GraphQLUUID) secretId: string,
     @Arg('webInputId', () => GraphQLPositiveInt, {
       nullable: true,
@@ -201,7 +201,10 @@ export class DeviceMutation extends DeviceGQLScalars {
   }
 
   @Field(() => DeviceGQL)
-  async rename(@Ctx() ctx: IContextAuthenticated, @Arg('name') name: string) {
+  async rename(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('name', () => String) name: string
+  ) {
     const res = await ctx.db
       .update(device)
       .set({

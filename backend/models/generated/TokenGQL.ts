@@ -19,13 +19,13 @@ export class TokenGQLScalars {
   @Field(() => String, { nullable: true })
   emailToken: string | null
 
-  @Field()
+  @Field(() => Boolean)
   valid: boolean
 
   @Field(() => GraphQLISODateTime)
   expiration: Date
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 

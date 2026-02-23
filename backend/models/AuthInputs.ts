@@ -23,7 +23,7 @@ export class AddNewDeviceInput {
   @Field(() => GraphQLNonEmptyString)
   encryptionSalt: string
 
-  @Field()
+  @Field(() => String)
   devicePlatform: string
 }
 
@@ -32,7 +32,7 @@ export class RegisterNewAccountInput extends AddNewDeviceInput {
   @Field(() => ID)
   deviceId: string
 
-  @Field()
+  @Field(() => String)
   deviceName: string
 
   @Field(() => GraphQLEmailAddress)

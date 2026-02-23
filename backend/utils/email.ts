@@ -1,35 +1,68 @@
 import debug from 'debug'
-import Mailjet from 'node-mailjet'
+
 const log = debug('au:email')
 
-let client = Mailjet.apiConnect(
-  process.env.MJ_APIKEY_PUBLIC!,
-  process.env.MJ_APIKEY_PRIVATE!
-)
+type MailjetRequestMessage = {
+  From: {
+    Email: string
+    Name: string
+  }
+  To: Array<{
+    Email: string
+  }>
+  Subject: string
+  TextPart: string
+  HTMLPart?: string
+}
 
-export const sentEmails = [] as any[]
+type MailjetSendPayload = {
+  Messages: MailjetRequestMessage[]
+}
 
-if (
+type MailjetSendResponse = {
+  response: {
+    status: number
+    body?: string
+  } & Record<string, unknown>
+}
+
+export const sentEmails: MailjetSendPayload[] = []
+
+const shouldDisableSending =
   process.env.NODE_ENV === 'test' ||
   process.env.DISABLE_EMAIL_SENDING !== 'false'
-) {
-  client = {
-    post: () => ({
-      request: (attrs) => {
-        console.log(
-          `would have sent emails to ${attrs.Messages.map(
-            (m: any) => m.To[0].Email
-          ).join(', ')}`
-        )
-        sentEmails.push(attrs as any)
-        // console.log(sentEmails)
 
-        return Promise.resolve({
-          response: {}
-        })
-      }
-    })
-  } as any
+const sendMailjetRequest = async (
+  payload: MailjetSendPayload
+): Promise<MailjetSendResponse> => {
+  const apiKey = process.env.MJ_APIKEY_PUBLIC
+  const apiSecret = process.env.MJ_APIKEY_PRIVATE
+
+  if (!apiKey || !apiSecret) {
+    throw new Error('Missing Mailjet credentials')
+  }
+
+  const response = await fetch('https://api.mailjet.com/v3.1/send', {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${btoa(`${apiKey}:${apiSecret}`)}`,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+
+  const body = await response.text()
+
+  if (!response.ok) {
+    throw new Error(`Mailjet send failed (${response.status}): ${body}`)
+  }
+
+  return {
+    response: {
+      status: response.status,
+      body
+    }
+  }
 }
 
 export const sendEmail = async (
@@ -40,7 +73,7 @@ export const sendEmail = async (
     HTMLPart?: string
   }
 ) => {
-  const res = client.post('send', { version: 'v3.1' }).request({
+  const payload: MailjetSendPayload = {
     Messages: [
       {
         From: {
@@ -55,7 +88,22 @@ export const sendEmail = async (
         ...props
       }
     ]
-  })
+  }
+
+  if (shouldDisableSending) {
+    console.log(
+      `would have sent emails to ${payload.Messages.map((message) => message.To[0]?.Email).join(', ')}`
+    )
+    sentEmails.push(payload)
+
+    return {
+      response: {
+        status: 200
+      }
+    }
+  }
+
+  const res = await sendMailjetRequest(payload)
 
   log(`sent email to ${emailAddress}`)
   return res

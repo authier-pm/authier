@@ -26,7 +26,7 @@ type User = InferSelectModel<typeof schema.user>
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
   loginCredentialsLimit: 50,
-  totPlimit: 4
+  TOTPlimit: 4
 }
 
 describe('DecryptionChallenge', () => {
@@ -49,7 +49,7 @@ describe('DecryptionChallenge', () => {
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         loginCredentialsLimit: 50,
-        totPlimit: 4,
+        TOTPlimit: 4,
         deviceRecoveryCooldownMinutes: 960
       })
       .returning()

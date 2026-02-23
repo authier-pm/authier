@@ -9,11 +9,10 @@ import {
   Info,
   Int
 } from 'type-graphql'
-import { db } from '../prisma/prismaClient'
 import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
-import { UserQuery } from '../models/UserQuery'
+import { addUserGraphqlAliases, UserQuery } from '../models/UserQuery'
 import { UserMutation } from '../models/UserMutation'
 import { constructURL } from '../../shared/urlUtils'
 
@@ -52,7 +51,7 @@ import type {
   IContext,
   IContextAuthenticated
 } from '../models/types/ContextTypes'
-import { eq, and, sql, gte, count } from 'drizzle-orm'
+import { eq, and, or, like, sql, gte, count } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
 
 const log = debug('au:RootResolver')
@@ -109,7 +108,11 @@ export class RootResolver {
       }
     })
 
-    return tmp
+    if (!tmp) {
+      return tmp
+    }
+
+    return addUserGraphqlAliases(tmp)
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
@@ -159,7 +162,7 @@ export class RootResolver {
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60,
           loginCredentialsLimit: 40,
-          totPlimit: 3
+          TOTPlimit: 3
         })
         .returning()
 
@@ -201,7 +204,9 @@ export class RootResolver {
             console.warn(
               `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
             )
-            await db.delete(schema.device).where(eq(schema.device.id, deviceId))
+            await ctx.db
+              .delete(schema.device)
+              .where(eq(schema.device.id, deviceId))
             return this.registerNewUser(input, userId, ctx)
           } else {
             throw new GraphqlError(
@@ -422,7 +427,8 @@ export class RootResolver {
   })
   async logout(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('removeDevice', { nullable: true }) removeDevice: boolean
+    @Arg('removeDevice', () => Boolean, { nullable: true })
+    removeDevice: boolean
   ) {
     ctx.reply.clearCookie('refresh-token')
     ctx.reply.clearCookie('access-token')
@@ -465,6 +471,10 @@ export class RootResolver {
     @Ctx() ctx: IContextAuthenticated
   ) {
     if (hosts) {
+      if (hosts.length === 0) {
+        return []
+      }
+
       const formattedDomains = hosts.map((url) => {
         const strippedUrl = url.replace('www.', '')
         return `%${strippedUrl}`
@@ -475,13 +485,16 @@ export class RootResolver {
         .select()
         .from(schema.webInput)
         .where(
-          sql`${schema.webInput.host} LIKE ANY(ARRAY[${sql.join(
-            formattedDomains.map((d) => sql`${d}`),
-            sql`, `
-          )}])`
+          or(
+            ...formattedDomains.map((domain) =>
+              like(schema.webInput.host, domain)
+            )
+          )
         )
       return results
     }
+
+    return []
   }
 
   @UseMiddleware(throwIfNotAuthenticated)

@@ -1,4 +1,3 @@
-import { fetch } from 'undici'
 import { memRedis } from './memRedis'
 
 // TODO memoize this function into redis so that we don't hit the API limit

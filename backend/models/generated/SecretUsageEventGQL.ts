@@ -10,22 +10,22 @@ export class SecretUsageEventGQLScalars {
   @Field(() => GraphQLScalars.BigIntResolver)
   id: number
 
-  @Field()
+  @Field(() => String)
   kind: string
 
   @Field(() => GraphQLISODateTime)
   timestamp: Date
 
-  @Field()
+  @Field(() => String)
   secretId: string
 
   @Field(() => String, { nullable: true })
   url: string | null
 
-  @Field()
+  @Field(() => String)
   userId: string
 
-  @Field()
+  @Field(() => String)
   deviceId: string
 
   @Field(() => Int, { nullable: true })

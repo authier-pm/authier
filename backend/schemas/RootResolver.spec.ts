@@ -22,7 +22,7 @@ import { eq } from 'drizzle-orm'
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
   loginCredentialsLimit: 50,
-  totPlimit: 4
+  TOTPlimit: 4
 }
 
 describe('RootResolver', () => {

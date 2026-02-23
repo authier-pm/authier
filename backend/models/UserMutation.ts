@@ -182,7 +182,7 @@ export class UserMutation extends UserBase {
     })
 
     const pswLimit = userData?.loginCredentialsLimit ?? 40
-    const TOTPLimit = userData?.totPlimit ?? 3
+    const TOTPLimit = userData?.TOTPlimit ?? 3
 
     let [{ count: pswCount }] = await ctx.db
       .select({ count: count() })

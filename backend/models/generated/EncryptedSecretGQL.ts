@@ -8,7 +8,7 @@ export class EncryptedSecretGQLScalars {
   @Field(() => ID)
   id: string
 
-  @Field()
+  @Field(() => String)
   encrypted: string
 
   @Field(() => Int)
@@ -26,7 +26,7 @@ export class EncryptedSecretGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   deletedAt: Date | null
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 

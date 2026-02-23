@@ -4,7 +4,6 @@ import type {
   IContextAuthenticated,
   IJWTPayload
 } from '../models/types/ContextTypes'
-import '@fastify/cookie'
 import { GraphqlErrorUnauthorized } from './GraphqlError'
 
 export const throwIfNotAuthenticated: MiddlewareFn<

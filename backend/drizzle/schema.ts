@@ -340,7 +340,7 @@ export const user = pgTable(
       onDelete: 'set null',
       onUpdate: 'cascade'
     }),
-    totPlimit: integer('TOTPlimit').notNull(),
+    TOTPlimit: integer('TOTPlimit').notNull(),
     loginCredentialsLimit: integer().notNull(),
     encryptionSalt: text().notNull(),
     deviceRecoveryCooldownMinutes: integer().notNull(),

@@ -24,7 +24,7 @@ describe('UserMutation', () => {
         email: `${crypto.randomUUID()}@test.com`,
         id: crypto.randomUUID(),
         loginCredentialsLimit: 3,
-        totPlimit: 3,
+        TOTPlimit: 3,
         deviceRecoveryCooldownMinutes: 960,
         addDeviceSecret: faker.string.sample(5),
         addDeviceSecretEncrypted: faker.string.sample(5),

@@ -12,22 +12,22 @@ export class DefaultDeviceSettingsGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   updatedAt: Date | null
 
-  @Field()
+  @Field(() => Boolean)
   autofillCredentialsEnabled: boolean
 
-  @Field()
+  @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
-  @Field()
+  @Field(() => String)
   theme: string
 
-  @Field()
+  @Field(() => Boolean)
   syncTOTP: boolean
 
   @Field(() => Int)
   vaultLockTimeoutSeconds: number
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 

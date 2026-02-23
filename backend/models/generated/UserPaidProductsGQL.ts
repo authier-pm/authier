@@ -15,13 +15,13 @@ export class UserPaidProductsGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   expiresAt: Date | null
 
-  @Field()
+  @Field(() => String)
   productId: string
 
-  @Field()
+  @Field(() => String)
   userId: string
 
-  @Field()
+  @Field(() => String)
   checkoutSessionId: string
 }
 

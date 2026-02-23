@@ -1,4 +1,4 @@
-import type { FastifyRequest } from 'fastify'
+import type { LegacyRequest } from './lib/createLegacyHttpAdapters'
 import { db } from './prisma/prismaClient'
 import { stripeClient } from './stripeClient'
 
@@ -30,24 +30,30 @@ log('endpointSecret', endpointSecret)
 const CREDS_SUBSCRIPTION_INCREASE = 250
 const TOTP_SUBSCRIPTION_INCREASE = 100
 
-export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
+interface WebhookReply {
+  status: (code: number) => {
+    send: (payload?: unknown) => unknown
+  }
+  send: (payload?: unknown) => unknown
+}
+
+export const webhookHandler = async (
+  req: Pick<LegacyRequest, 'headers' | 'body'>,
+  reply: WebhookReply
+) => {
   const sig = req.headers['stripe-signature']
 
   let event: Stripe.Event
 
   if (!sig) {
-    ;(reply as { status: (code: number) => { send: (msg: string) => void } })
-      .status(400)
-      .send('Webhook Error: Missing stripe-signature header')
+    reply.status(400).send('Webhook Error: Missing stripe-signature header')
     return
   }
 
   const rawBody = (req.body as { raw?: string } | undefined)?.raw
 
   if (!rawBody) {
-    ;(reply as { status: (code: number) => { send: (msg: string) => void } })
-      .status(400)
-      .send('Webhook Error: Missing raw request body')
+    reply.status(400).send('Webhook Error: Missing raw request body')
     return
   }
 
@@ -95,7 +101,7 @@ export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
       await db
         .update(schema.user)
         .set({
-          totPlimit: sql`${schema.user.totPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`
+          TOTPlimit: sql`${schema.user.TOTPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`
         })
         .where(eq(schema.user.email, userEmail))
     } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
@@ -109,7 +115,7 @@ export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
       await db
         .update(schema.user)
         .set({
-          totPlimit: sql`${schema.user.totPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`,
+          TOTPlimit: sql`${schema.user.TOTPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`,
           loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} + ${CREDS_SUBSCRIPTION_INCREASE}`
         })
         .where(eq(schema.user.email, userEmail))
@@ -143,7 +149,7 @@ export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
             await db
               .update(schema.user)
               .set({
-                totPlimit: sql`${schema.user.totPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`
+                TOTPlimit: sql`${schema.user.TOTPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`
               })
               .where(eq(schema.user.email, userEmail))
           } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
@@ -157,7 +163,7 @@ export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
             await db
               .update(schema.user)
               .set({
-                totPlimit: sql`${schema.user.totPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`,
+                TOTPlimit: sql`${schema.user.TOTPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`,
                 loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} - ${CREDS_SUBSCRIPTION_INCREASE}`
               })
               .where(eq(schema.user.email, userEmail))
@@ -178,31 +184,5 @@ export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
       console.log(`Unhandled event type ${event.type}.`)
   }
 
-  ;(reply as { send: () => void }).send()
-}
-
-export const stripeWebhook = (
-  fastify: unknown,
-  _opts: unknown,
-  done: () => void
-) => {
-  ;(
-    fastify as { addContentTypeParser: Function; post: Function }
-  ).addContentTypeParser(
-    'application/json',
-    { parseAs: 'string' },
-    function (
-      _req: unknown,
-      body: string,
-      done: (err: Error | null, result: unknown) => void
-    ) {
-      const newBody = {
-        raw: body,
-        parsed: JSON.parse(body)
-      }
-      done(null, newBody)
-    }
-  )
-  ;(fastify as { post: Function }).post('/webhook', webhookHandler)
-  done()
+  reply.send()
 }

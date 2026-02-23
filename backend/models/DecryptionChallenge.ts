@@ -1,5 +1,13 @@
 import 'reflect-metadata'
-import { Arg, Ctx, Field, ID, Int, ObjectType } from 'type-graphql'
+import {
+  Arg,
+  Ctx,
+  Field,
+  ID,
+  Int,
+  ObjectType,
+  GraphQLISODateTime
+} from 'type-graphql'
 import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import { DecryptionChallengeGQL } from './generated/DecryptionChallengeGQL'
 
@@ -45,16 +53,16 @@ export class DecryptionChallengeForApproval {
   @Field(() => Int)
   id: number
 
-  @Field()
+  @Field(() => String)
   ipAddress: string
 
-  @Field({ nullable: true })
+  @Field(() => GraphQLISODateTime, { nullable: true })
   rejectedAt?: Date
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field()
+  @Field(() => String)
   deviceName: string
 
   @Field(() => ID)
@@ -63,10 +71,10 @@ export class DecryptionChallengeForApproval {
 
 @ObjectType()
 export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
-  @Field()
+  @Field(() => String)
   addDeviceSecretEncrypted: string
 
-  @Field()
+  @Field(() => String)
   encryptionSalt: string
 
   @Field(() => LoginResponse)

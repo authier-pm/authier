@@ -12,13 +12,13 @@ export class MasterDeviceChangeGQLScalars {
   @Field(() => GraphQLISODateTime)
   processAt: Date
 
-  @Field()
+  @Field(() => String)
   oldDeviceId: string
 
-  @Field()
+  @Field(() => String)
   newDeviceId: string
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 

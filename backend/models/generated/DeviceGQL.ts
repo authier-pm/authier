@@ -8,37 +8,37 @@ export class DeviceGQLScalars {
   @Field(() => ID)
   id: string
 
-  @Field()
+  @Field(() => String)
   firstIpAddress: string
 
-  @Field()
+  @Field(() => String)
   lastIpAddress: string
 
   @Field(() => String, { nullable: true })
   firebaseToken: string | null
 
-  @Field()
+  @Field(() => String)
   name: string
 
-  @Field()
+  @Field(() => String)
   platform: string
 
-  @Field()
+  @Field(() => Boolean)
   ipAddressLock: boolean
 
   @Field(() => GraphQLISODateTime, { nullable: true })
   logoutAt: Date | null
 
-  @Field()
+  @Field(() => Boolean)
   syncTOTP: boolean
 
   @Field(() => Int)
   vaultLockTimeoutSeconds: number
 
-  @Field()
+  @Field(() => Boolean)
   autofillCredentialsEnabled: boolean
 
-  @Field()
+  @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
   @Field(() => GraphQLISODateTime)
@@ -65,7 +65,7 @@ export class DeviceGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   masterPasswordOutdatedAt: Date | null
 
-  @Field()
+  @Field(() => String)
   userId: string
 }
 
