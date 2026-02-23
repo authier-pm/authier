@@ -23,10 +23,6 @@ generator kysely {
   provider = "prisma-kysely"
 }
 
-generator prisma_checker {
-  provider = "npx prisma-generator-checker"
-}
-
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device
 model DecryptionChallenge {
   id                       Int       @id @default(autoincrement())
