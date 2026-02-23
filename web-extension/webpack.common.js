@@ -72,7 +72,8 @@ module.exports = {
 
     // new ExtensionReloader(),
     new Dotenv({
-      silent: false
+      silent: false,
+      systemvars: true
     })
     //new BundleAnalyzerPlugin()
   ],
