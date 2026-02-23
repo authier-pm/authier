@@ -177,9 +177,12 @@ export const useLogin = (props: { deviceName: string }) => {
             : null
 
         if (addNewDeviceForUser?.accessToken) {
-          setAccessToken(addNewDeviceForUser?.accessToken)
+          await setAccessToken(addNewDeviceForUser.accessToken)
 
           const decodedToken = await getUserFromToken()
+          if (!decodedToken) {
+            throw new Error('Missing access token after login approval')
+          }
 
           const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
 

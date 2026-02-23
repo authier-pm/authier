@@ -32,6 +32,7 @@ export const UserProvider = ({ children }: { children: JSX.Element }) => {
     async function getId() {
       try {
         const id = await getUserFromToken()
+        if (!id) return
 
         setUserId(id.userId)
       } catch (err) {

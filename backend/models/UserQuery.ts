@@ -76,9 +76,34 @@ type UserTotpLimitShape = {
   TOTPlimit?: number | null
 }
 
+// HOTFIX todo refactor
+const userRelationAliases = {
+  defaultSettings: 'DefaultDeviceSettings',
+  devicesUserId: 'Devices',
+  encryptedSecrets: 'EncryptedSecrets',
+  masterDeviceChanges: 'MasterDeviceChange',
+  secretUsageEvents: 'UsageEvents',
+  tags: 'Tags',
+  tokens: 'Token',
+  userPaidProducts: 'UserPaidProducts',
+  webInputs: 'WebInputsAdded'
+} as const
+
 export function addUserGraphqlAliases<T extends UserTotpLimitShape>(
   user: T
 ): T {
+  const userRecord = user as T & Record<string, unknown>
+
+  for (const [drizzleKey, graphQlKey] of Object.entries(userRelationAliases)) {
+    if (
+      userRecord[graphQlKey] == null &&
+      userRecord[drizzleKey] !== undefined
+    ) {
+      // @ts-expect-error
+      userRecord[graphQlKey] = userRecord[drizzleKey]
+    }
+  }
+
   return user
 }
 
