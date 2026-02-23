@@ -759,7 +759,6 @@ class ExtensionDevice {
   }
 
   startVaultLockTimer() {
-    // @ts-expect-error
     this.lockInterval = setInterval(() => {
       const now = Date.now()
       if (this.state?.lockTimeEnd && this.state.lockTimeEnd <= now) {

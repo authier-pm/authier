@@ -30,7 +30,7 @@ export function DeviceDeleteAlert({
   id: string
 }) {
   const { refetch: devicesRefetch } = useDevicesListWithDataQuery()
-  const cancelRef = useRef(null)
+  const cancelRef = useRef<HTMLButtonElement>(null!)
   const [remove, setRemove] = useState(false)
   const [logoutDevice] = useLogoutDeviceMutation({
     variables: {

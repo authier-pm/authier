@@ -8,6 +8,7 @@ import {
   AlertDialogFooter,
   AlertDialogCloseButton
 } from '@chakra-ui/react'
+import type { FocusableElement } from '@chakra-ui/utils'
 import React from 'react'
 
 export function DeleteAlert({
@@ -19,13 +20,14 @@ export function DeleteAlert({
   isOpen: boolean
   deleteItem: () => void
 }) {
-  const cancelRef = React.useRef(null)
+  const cancelRef = React.useRef<FocusableElement | null>(null)
 
   return (
     <>
+
       <AlertDialog
         motionPreset="slideInBottom"
-        leastDestructiveRef={cancelRef}
+        leastDestructiveRef={cancelRef as React.RefObject<FocusableElement>}
         onClose={onClose}
         isOpen={isOpen}
         isCentered
@@ -39,7 +41,7 @@ export function DeleteAlert({
             Are you sure you want to delete this item?
           </AlertDialogBody>
           <AlertDialogFooter>
-            <Button ref={cancelRef} onClick={onClose}>
+            <Button ref={cancelRef as React.RefObject<HTMLButtonElement>} onClick={onClose}>
               No
             </Button>
             <Button

@@ -30,7 +30,7 @@ export const PromptPasswordGenerator = ({
     })
   )
 
-  let resizeTimer: NodeJS.Timeout | undefined
+  let resizeTimer: ReturnType<typeof setTimeout> | undefined
   window.onresize = function () {
     if (generatorDiv) {
       generatorDiv.remove()
