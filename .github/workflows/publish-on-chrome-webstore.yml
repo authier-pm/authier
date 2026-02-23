@@ -105,6 +105,7 @@ jobs:
         with:
           extensionId: ${{ secrets.G_EXTENSION_ID }}
           crxFilePath: ${{ env.WEBSTORE_CRX_FILE_PATH }}
+          prodVersion: "133.0.6943.127"
 
       - name: Upload webstore published crx release asset
         if: needs.publish-on-webstore.outputs.releaseUploadUrl
