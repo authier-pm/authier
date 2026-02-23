@@ -249,16 +249,24 @@ const sendFcmHttpV1Message = async (msg: Message) => {
   return responseText
 }
 
+const isFcmUnregisteredTokenError = (errorMessage: string) => {
+  return (
+    errorMessage.includes('Requested entity was not found') ||
+    errorMessage.includes('"message": "NotRegistered"') ||
+    errorMessage.includes('"errorCode": "UNREGISTERED"')
+  )
+}
+
 export async function firebaseSendNotification(msg: Message) {
   try {
     await sendFcmHttpV1Message(msg)
   } catch (err) {
     if (
       err instanceof Error &&
-      err.message.match(/Requested entity was not found/) &&
+      isFcmUnregisteredTokenError(err.message) &&
       'token' in msg
     ) {
-      log('device not found, deleting master device')
+      log('firebase token is unregistered')
 
       const msgToken = (msg as { token: string }).token
 
@@ -267,7 +275,8 @@ export async function firebaseSendNotification(msg: Message) {
       })
 
       if (!device) {
-        throw new Error(`Device not found for firebase token ${msgToken}`)
+        log(`Device not found for firebase token ${msgToken}`)
+        return
       }
 
       const user = await db.query.user.findFirst({
@@ -275,7 +284,8 @@ export async function firebaseSendNotification(msg: Message) {
       })
 
       if (!user) {
-        throw new Error(`User not found for firebase token ${msgToken}`)
+        log(`No master-device user found for firebase token ${msgToken}`)
+        return
       }
 
       if (user.email) {

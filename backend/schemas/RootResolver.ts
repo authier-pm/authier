@@ -39,6 +39,7 @@ import {
 import { plainToClass } from 'class-transformer'
 
 import { firebaseSendNotification } from '../lib/firebaseAdmin'
+import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { WebInputMutation } from '../models/WebInput'
 import type {
   IContext,
@@ -343,34 +344,70 @@ export class RootResolver {
 
     if (!challenge) {
       // TODO: send email notifications
-      if (
-        masterDevice?.firebaseToken &&
-        masterDevice.firebaseToken.length > 10
-      ) {
-        log('sending notification to', masterDevice.firebaseToken)
+      const geoIp = await getGeoIpLocation
+        .memoized(ipAddress)
+        .catch((_error) => null)
 
-        await firebaseSendNotification({
-          token: masterDevice.firebaseToken,
-          notification: {
-            title: 'New device login!',
-            body: 'New device is trying to log in.'
-          },
-          data: {
-            type: 'Devices'
-          },
-          android: {
-            priority: 'high'
-          },
-          apns: {
-            payload: {
-              aps: {
-                contentAvailable: true,
-                priority: 10
+      const geoLocationParts = geoIp
+        ? [geoIp.city, geoIp.region_name, geoIp.country_name].filter(Boolean)
+        : []
+      const geoLocation =
+        geoLocationParts.length > 0 ? geoLocationParts.join(', ') : null
+
+      let notificationBody = `New device is trying to log in from ${ipAddress}.`
+
+      if (geoLocation) {
+        notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
+      }
+
+      let devicesToNotify: { firebaseToken: string | null }[] = []
+
+      if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
+        devicesToNotify = await ctx.db.query.device.findMany({
+          where: { userId: user.id },
+          columns: { firebaseToken: true }
+        })
+      } else if (masterDevice?.firebaseToken) {
+        devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }]
+      }
+
+      const firebaseTokens = [
+        ...new Set(
+          devicesToNotify
+            .map((device) => device.firebaseToken)
+            .filter((firebaseToken): firebaseToken is string => !!firebaseToken)
+            .filter((firebaseToken) => firebaseToken.length > 10)
+        )
+      ]
+
+      await Promise.all(
+        firebaseTokens.map((firebaseToken) => {
+          log('sending notification to', firebaseToken)
+
+          return firebaseSendNotification({
+            token: firebaseToken,
+            notification: {
+              title: 'New device login!',
+              body: notificationBody
+            },
+            data: {
+              type: 'Devices'
+            },
+            android: {
+              priority: 'high'
+            },
+            apns: {
+              payload: {
+                aps: {
+                  contentAvailable: true,
+                  priority: 10
+                }
               }
             }
-          }
+          })
         })
-      }
+      )
+
       const [created] = await ctx.db
         .insert(schema.decryptionChallenge)
         .values({
