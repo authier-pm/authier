@@ -2,7 +2,7 @@
 
 exports[`RootResolver > addWebInputs > should add to the DB and omit any url query when storing the url 1`] = `
 {
-  "addedByUserId": "a96f2e48-a328-4cb1-8e7f-813dbe58a936",
+  "addedByUserId": "1a108ed5-0ccd-4ace-b788-ba8d8d42fb49",
   "domOrdinal": 0,
   "domPath": "body",
   "host": "google.com",

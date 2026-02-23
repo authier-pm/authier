@@ -183,12 +183,19 @@ export class RootResolver {
         }
       })
     } catch (err: PrismaClientKnownRequestError | any) {
-      if (err.code === 'P2002' && err.meta.target[0] === 'email') {
+      // Prisma v6: meta.target is string[]
+      // Prisma v7 with driver adapter (@prisma/adapter-pg): meta.target is undefined,
+      // constraint info lives in meta.driverAdapterError.cause.constraint.fields
+      const p2002Fields: string[] | undefined =
+        err.meta?.target ??
+        err.meta?.driverAdapterError?.cause?.constraint?.fields
+
+      if (err.code === 'P2002' && p2002Fields?.[0] === 'email') {
         log('email', email)
 
         throw new GraphqlError(`User with such email already exists.`)
       }
-      if (err.code === 'P2002' && err.meta.target[0] === 'id') {
+      if (err.code === 'P2002' && p2002Fields?.[0] === 'id') {
         log('deviceId', deviceId)
         if (process.env.NODE_ENV === 'development') {
           console.warn(
@@ -494,6 +501,7 @@ export class RootResolver {
       }
     })
   }
+  2
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => [WebInputGQL])
