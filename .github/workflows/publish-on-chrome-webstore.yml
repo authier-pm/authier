@@ -3,17 +3,17 @@ on:
   workflow_dispatch:
     inputs:
       attemptNumber:
-        description: 'Attempt number'
+        description: "Attempt number"
         required: false
-        default: '1'
+        default: "1"
       maxAttempts:
-        description: 'Max attempts'
+        description: "Max attempts"
         required: false
-        default: '10'
+        default: "10"
       environment:
-        description: 'publish-on-webstore job environment'
+        description: "publish-on-webstore job environment"
         required: false
-        default: ''
+        default: ""
 jobs:
   publish-on-webstore:
     runs-on: ubuntu-latest
@@ -43,7 +43,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Obtain packed zip
@@ -51,7 +51,7 @@ jobs:
         uses: ./.github/workflows/actions/get-zip-asset
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          apiURL: ${{ secrets.API_URL }}
+          apiURL: ${{ vars.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
 
       - name: Fetch Google API access token
@@ -93,7 +93,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Wait for CRX to be available
@@ -118,7 +118,7 @@ jobs:
           asset_content_type: application/x-chrome-extension
 
       - name: Upload webstore crx file artifact to workflow
-        if: '!needs.publish-on-webstore.outputs.releaseUploadUrl'
+        if: "!needs.publish-on-webstore.outputs.releaseUploadUrl"
         uses: actions/upload-artifact@v4
         with:
           name: ${{ env.WEBSTORE_CRX_FILE_NAME }}

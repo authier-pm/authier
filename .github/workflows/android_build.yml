@@ -3,7 +3,7 @@ name: Android Build ## name of the workflow
 on:
   push:
     tags:
-      - 'v*.*.*-android'
+      - "v*.*.*-android"
   workflow_dispatch: # To trigger manual build
 jobs:
   android-build:
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: |
@@ -37,7 +37,7 @@ jobs:
 
       - name: Create .env file
         env:
-          API_URL: ${{ secrets.API_URL }}
+          API_URL: ${{ vars.API_URL }}
           PAGE_URL: ${{ secrets.SENTRY_DSN }}
         shell: bash
         working-directory: ./mobile-app

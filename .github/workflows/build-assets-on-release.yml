@@ -23,7 +23,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Find out "extension.zip" asset id from the release
@@ -39,16 +39,16 @@ jobs:
               .find(asset => asset.name == env.ASSET_NAME)?.id || ''
 
       - name: Build, test and pack
-        if: '!steps.getZipAssetId.outputs.result'
+        if: "!steps.getZipAssetId.outputs.result"
         id: buildPack
         env:
-          API_URL: ${{ secrets.API_URL }}
+          API_URL: ${{ vars.API_URL }}
           PAGE_URL: ${{ secrets.PAGE_URL }}
         uses: ./.github/workflows/actions/build-test-pack
 
       - name: Upload "extension.zip" asset to the release
         id: uploadZipAsset
-        if: '!steps.getZipAssetId.outputs.result'
+        if: "!steps.getZipAssetId.outputs.result"
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -70,7 +70,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Download zip release asset
@@ -108,7 +108,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Download zip release asset

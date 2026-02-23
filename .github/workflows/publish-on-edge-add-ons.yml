@@ -9,14 +9,14 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Obtain packed zip
         uses: ./.github/workflows/actions/get-zip-asset
         with:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
-          apiURL: ${{ secrets.API_URL }}
+          apiURL: ${{ vars.API_URL }}
           pageURL: ${{ secrets.PAGE_URL }}
 
       - name: Deploy to Edge Addons

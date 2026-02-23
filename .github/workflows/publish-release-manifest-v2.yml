@@ -2,7 +2,7 @@ name: Release and publish on tag
 on:
   push:
     branches:
-      - 'manifest-v2'
+      - "manifest-v2"
   workflow_dispatch:
 
 jobs:
@@ -14,7 +14,7 @@ jobs:
 
       - uses: cardinalby/export-env-action@v2
         with:
-          envFile: './.github/workflows/constants.env'
+          envFile: "./.github/workflows/constants.env"
           expand: true
 
       - name: Look for an existing release
@@ -29,7 +29,7 @@ jobs:
       - name: Build, test and pack to zip
         id: buildPack
         env:
-          API_URL: ${{ secrets.API_URL }}
+          API_URL: ${{ vars.API_URL }}
           PAGE_URL: ${{ secrets.PAGE_URL }}
         if: steps.getRelease.outcome != 'success'
         uses: ./.github/workflows/actions/build-test-pack
@@ -40,7 +40,7 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          draft: 'true'
+          draft: "true"
 
       - name: Upload zip asset to the release
         if: steps.getRelease.outcome != 'success'
