@@ -26,7 +26,9 @@ and follow the instructions just instead `pnpm prodBuild` run `pnpm dev`
 
 ## Publishing a new version to stores
 
-We have all of the stores automated on CI except firefox. Firefox is handled manually from a separate branch where we still have extension manifest V2
+We have all of the stores automated on CI except firefox. To publish a new version, just run `pnpm release` and commit the new tag. The CI will take care of the rest.
+
+Firefox is handled manually from a separate branch where we still have extension manifest V2
 
 To publish a new version to Firefox extension store invoke: `pnpm release:firefox`
 
