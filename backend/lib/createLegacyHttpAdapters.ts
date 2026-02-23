@@ -27,10 +27,7 @@ const toHeadersRecord = (
   request: Request
 ): Record<string, string | undefined> =>
   Object.fromEntries(
-    [...request.headers.entries()].map(([key, value]) => [
-      key.toLowerCase(),
-      value
-    ])
+    Array.from(request.headers, ([key, value]) => [key.toLowerCase(), value])
   )
 
 const toCookiesRecord = (ctx: ElysiaRouteContext) =>
