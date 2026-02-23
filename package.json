@@ -57,6 +57,14 @@
     "release": "cd web-extension && pnpm run release"
   },
   "pnpm": {
+    "onlyBuiltDependencies": [
+      "@capaj/type-graphql",
+      "@prisma/engines",
+      "@swc/core",
+      "esbuild",
+      "prisma",
+      "type-graphql"
+    ],
     "patchedDependencies": {
       "@graphql-codegen/visitor-plugin-common@6.2.3": "patches/@graphql-codegen__visitor-plugin-common@6.2.3.patch",
       "@graphql-codegen/cli@6.1.2": "patches/@graphql-codegen__cli@6.1.2.patch",
