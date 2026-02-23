@@ -1,6 +1,6 @@
 import type { LegacyRequest } from './lib/createLegacyHttpAdapters'
 import { db } from './prisma/prismaClient'
-import { stripeClient } from './stripeClient'
+import { createStripeClientGetter } from './stripeClient'
 
 import { GraphQLError } from 'graphql'
 import type Stripe from 'stripe'
@@ -41,6 +41,7 @@ export const webhookHandler = async (
   req: Pick<LegacyRequest, 'headers' | 'body'>,
   reply: WebhookReply
 ) => {
+  const stripeClient = createStripeClientGetter()()
   const sig = req.headers['stripe-signature']
 
   let event: Stripe.Event

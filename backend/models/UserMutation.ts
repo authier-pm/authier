@@ -26,7 +26,6 @@ import { DecryptionChallengeMutation } from './DecryptionChallenge'
 
 import { DeviceInput } from './Device'
 import { DeviceMutation } from './Device'
-import { stripeClient } from '../stripeClient'
 import { SecretUsageEventInput } from './types/SecretUsageEventInput'
 import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
@@ -509,6 +508,7 @@ export class UserMutation extends UserBase {
 
   @Field(() => String)
   async createPortalSession(@Ctx() ctx: IContextAuthenticated) {
+    const stripeClient = ctx.getStripeClient()
     const product = await ctx.db.query.userPaidProducts.findFirst({
       where: { userId: ctx.jwtPayload.userId },
       orderBy: (upp, { desc }) => [desc(upp.createdAt)]
@@ -539,6 +539,7 @@ export class UserMutation extends UserBase {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('product', () => String) product: string
   ) {
+    const stripeClient = ctx.getStripeClient()
     const userPaidProduct = await ctx.db.query.userPaidProducts.findFirst({
       where: { userId: ctx.jwtPayload.userId }
     })

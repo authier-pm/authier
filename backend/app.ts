@@ -6,6 +6,7 @@ import { createYoga } from 'graphql-yoga'
 import type { GraphQLError } from 'graphql'
 import { gqlSchema } from './schemas/gqlSchema'
 import { createRequestDb } from './prisma/prismaClient'
+import { createStripeClientGetter } from './stripeClient'
 import type { jwtPayloadRefreshToken } from './userAuth'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
@@ -25,6 +26,7 @@ type YogaServerContext = {
   legacyRequest: IContext['request']
   legacyReply: IContext['reply']
   getIpAddress: () => string
+  getStripeClient: IContext['getStripeClient']
   requestDb: IContext['db']
 }
 
@@ -74,6 +76,7 @@ const yoga = createYoga<YogaServerContext, IContext>({
     legacyRequest,
     legacyReply,
     getIpAddress,
+    getStripeClient,
     requestDb
   }) => {
     if (params.operationName) {
@@ -84,6 +87,7 @@ const yoga = createYoga<YogaServerContext, IContext>({
       request: legacyRequest,
       reply: legacyReply,
       getIpAddress,
+      getStripeClient,
       db: requestDb
     }
   }
@@ -134,6 +138,7 @@ const getIpAddressFromLegacyRequest = (request: IContext['request']) => () => {
 
 const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
   const requestDb = createRequestDb()
+  const getStripeClient = createStripeClientGetter()
   const legacyReply = createLegacyReplyAdapter(ctx)
   const legacyRequest = createLegacyRequestFromElysia(ctx)
   const getIpAddress = getIpAddressFromLegacyRequest(legacyRequest)
@@ -143,6 +148,7 @@ const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
       legacyRequest,
       legacyReply,
       getIpAddress,
+      getStripeClient,
       requestDb: requestDb.db
     })
 
@@ -199,6 +205,7 @@ export const buildApp = (app = new Elysia()) => {
     )
     .post('/refresh_token', async (ctx) => {
       const requestDb = createRequestDb()
+      const getStripeClient = createStripeClientGetter()
       const request = createLegacyRequestFromElysia(ctx)
       const reply = createLegacyReplyAdapter(ctx)
       try {
@@ -249,6 +256,7 @@ export const buildApp = (app = new Elysia()) => {
           request,
           reply,
           getIpAddress: getIpAddressFromLegacyRequest(request),
+          getStripeClient,
           db: requestDb.db
         }
 

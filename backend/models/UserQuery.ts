@@ -74,15 +74,11 @@ export class UserBase extends UserGQL {
 
 type UserTotpLimitShape = {
   TOTPlimit?: number | null
-  TOTPlimit?: number | null
 }
 
 export function addUserGraphqlAliases<T extends UserTotpLimitShape>(
   user: T
 ): T {
-  if (user.TOTPlimit == null && user.TOTPlimit != null) {
-    Object.assign(user, { TOTPlimit: user.TOTPlimit })
-  }
   return user
 }
 

@@ -1,7 +1,9 @@
 name = "authier-api"
+account_id = "fbd16d9252980833034caa69e11aa064"
 main = "worker.ts"
 compatibility_date = "2025-06-01"
 compatibility_flags = ["nodejs_compat", "nodejs_compat_populate_process_env"]
+observability = { logs = { enabled = true, invocation_logs = true}}
 
 [vars]
 NODE_ENV = "production"

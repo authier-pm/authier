@@ -2,6 +2,7 @@ import type {
   LegacyReply,
   LegacyRequest
 } from '../../lib/createLegacyHttpAdapters'
+import type Stripe from 'stripe'
 import type { db } from '../../prisma/prismaClient'
 import * as dbSchema from '../../drizzle/schema'
 import type { InferSelectModel } from 'drizzle-orm'
@@ -11,6 +12,7 @@ export interface IContext {
   request: LegacyRequest
   reply: LegacyReply
   getIpAddress: () => string
+  getStripeClient: () => Stripe
   db: typeof db
 }
 

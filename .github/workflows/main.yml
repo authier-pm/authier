@@ -21,16 +21,11 @@ jobs:
           --health-timeout 5s
           --health-retries 5
     env:
-      APPNAME: authier-api
-      AWS_REGION: eu-central-1
       DEBUG: au:*
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_KEY }}
       DATABASE_URL: ${{ secrets.DATABASE_URL }}
       ACCESS_TOKEN_SECRET: ${{ secrets.ACCESS_TOKEN_SECRET }}
       REFRESH_TOKEN_SECRET: ${{ secrets.REFRESH_TOKEN_SECRET }}
       COOKIE_SECRET: ${{ secrets.COOKIE_SECRET }}
-      SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
       MJ_APIKEY_PUBLIC: ${{ secrets.MJ_APIKEY_PUBLIC }}
       MJ_APIKEY_PRIVATE: ${{ secrets.MJ_APIKEY_PRIVATE }}
       STRIPE_ENDPOINT: ${{ secrets.STRIPE_ENDPOINT }}
@@ -92,22 +87,14 @@ jobs:
           cp .env.sample .env
           pnpm test
 
-      - name: Configure aws credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
-          aws-region: "eu-central-1"
-
-      - name: backend build and deploy
+      - name: backend deploy to Cloudflare Workers
         working-directory: ./backend
         if: github.ref == 'refs/heads/main' && steps.changes.outputs.backend == 'true'
         env:
           NODE_ENV: production
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
-          pnpm prisma:deploy
-          pnpm cdkDeploy
+          pnpm deploy:worker
 
       ## TODO fix sentry release action
       # - name: Create a Sentry.io release
