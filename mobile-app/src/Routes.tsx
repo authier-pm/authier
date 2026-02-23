@@ -27,6 +27,13 @@ export function Routes() {
 
   const navigation = useNavigationContainerRef()
 
+  React.useEffect(() => {
+    // Do not keep native splash visible while app-level initialization is pending.
+    if (isInitialized === false && !lockedState) {
+      void RNBootSplash.hide({ fade: true })
+    }
+  }, [isInitialized, lockedState])
+
   if (lockedState) {
     return <VaultUnlockVerification />
   }
@@ -39,7 +46,7 @@ export function Routes() {
     <NavigationContainer
       ref={navigation}
       onReady={() => {
-        RNBootSplash.hide({ fade: true })
+        void RNBootSplash.hide({ fade: true })
         routingInstrumentation.registerNavigationContainer(navigation)
       }}
       theme={colorMode === 'dark' ? DarkTheme : DefaultTheme}

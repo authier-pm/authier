@@ -8,7 +8,10 @@ import { StyleSheet } from 'react-native'
 import Svg, { Defs, Mask, Rect } from 'react-native-svg'
 import { useCameraDevices } from 'react-native-vision-camera'
 import { Camera } from 'react-native-vision-camera'
-import { useScanBarcodes, BarcodeFormat } from 'vision-camera-code-scanner'
+import {
+  useScanBarcodes,
+  BarcodeFormat
+} from '@utils/visionCameraCodeScannerCompat'
 
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'

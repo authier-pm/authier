@@ -68,7 +68,9 @@
     "patchedDependencies": {
       "@graphql-codegen/visitor-plugin-common@6.2.3": "patches/@graphql-codegen__visitor-plugin-common@6.2.3.patch",
       "@graphql-codegen/cli@6.1.2": "patches/@graphql-codegen__cli@6.1.2.patch",
-      "@graphql-codegen/typescript-react-apollo@4.4.0": "patches/@graphql-codegen__typescript-react-apollo@4.4.0.patch"
+      "@graphql-codegen/typescript-react-apollo@4.4.0": "patches/@graphql-codegen__typescript-react-apollo@4.4.0.patch",
+      "@react-native/gradle-plugin": "patches/@react-native__gradle-plugin.patch",
+      "native-base@3.4.28": "patches/native-base@3.4.28.patch"
     }
   }
 }

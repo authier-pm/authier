@@ -17,7 +17,7 @@ import {
 import { ButtonWithAlert } from '@components/ButtonWithAlert'
 
 import { AccountStackScreenProps } from '@navigation/types'
-import codePush, { LocalPackage } from 'react-native-code-push'
+import codePush, { LocalPackage } from '@utils/codePushCompat'
 import DeviceInfo from 'react-native-device-info'
 import { useDeviceStore } from '@src/utils/deviceStore'
 import { useDeviceStateStore } from '@src/utils/deviceStateStore'

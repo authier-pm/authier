@@ -24,6 +24,7 @@ import {
 import { getDeviceName, getUniqueId } from 'react-native-device-info'
 import { enc, encryptedBuf_to_base64 } from '@utils/generateEncryptionKey'
 import messaging from '@react-native-firebase/messaging'
+import { isSensorAvailable } from '@sbaiahmed1/react-native-biometrics'
 import {
   SyncSettingsDocument,
   SyncSettingsQuery,
@@ -197,13 +198,26 @@ export const useDeviceStore = create<Device>()(
       },
       initialize: async () => {
         const start = performance.now()
-        const [id, biometricsAvailable, name, token] = await Promise.all([
+        const [idResult, biometricsResult, nameResult, tokenResult] =
+          await Promise.allSettled([
           getUniqueId(),
           get().checkBiometrics(),
           getDeviceName(),
           messaging().getToken()
           // useDeviceStateStore.getState().initialize()
-        ])
+          ])
+
+        const id = idResult.status === 'fulfilled' ? idResult.value : null
+        const biometricsAvailable =
+          biometricsResult.status === 'fulfilled'
+            ? biometricsResult.value
+            : false
+        const name = nameResult.status === 'fulfilled' ? nameResult.value : ''
+        const token = tokenResult.status === 'fulfilled' ? tokenResult.value : null
+
+        if (tokenResult.status === 'rejected') {
+          console.warn('FCM token unavailable during startup', tokenResult.reason)
+        }
 
         set({
           fireToken: token,
@@ -436,10 +450,8 @@ export const useDeviceStore = create<Device>()(
         useDeviceStateStore.setState({ ...deviceState })
       },
       checkBiometrics: async () => {
-        const hasAnySensors = await SInfo.isSensorAvailable()
-        //TODO: This is just for android
-        //const hasAnyFingerprintsEnrolled = await SInfo.hasEnrolledFingerprints()
-        return !!hasAnySensors
+        const { available } = await isSensorAvailable()
+        return available
       },
       startVaultLockTimer() {
         const state = useDeviceStateStore.getState()

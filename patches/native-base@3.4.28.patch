@@ -1,0 +1,363 @@
+diff --git a/lib/commonjs/hooks/useKeyboardDismissable.js b/lib/commonjs/hooks/useKeyboardDismissable.js
+index e9364fb5447904ba67052f80fc14279c6a4da28f..eb61b9d5d7df36364fc6bac552563d5638b35c3f 100644
+--- a/lib/commonjs/hooks/useKeyboardDismissable.js
++++ b/lib/commonjs/hooks/useKeyboardDismissable.js
+@@ -68,14 +68,13 @@ function useBackHandler({
+       callback();
+       return true;
+     };
++    let subscription;
+ 
+     if (enabled) {
+-      _reactNative.BackHandler.addEventListener('hardwareBackPress', backHandler);
+-    } else {
+-      _reactNative.BackHandler.removeEventListener('hardwareBackPress', backHandler);
++      subscription = _reactNative.BackHandler.addEventListener('hardwareBackPress', backHandler);
+     }
+ 
+-    return () => _reactNative.BackHandler.removeEventListener('hardwareBackPress', backHandler);
++    return () => subscription === null || subscription === void 0 ? void 0 : subscription.remove();
+   }, [enabled, callback]);
+ }
+ //# sourceMappingURL=useKeyboardDismissable.js.map
+diff --git a/lib/commonjs/theme/components/input.js b/lib/commonjs/theme/components/input.js
+index 5c67b0aedc48ebcb5f7d43ad774936db8f6afa75..c498c64a40e45bbc6b54b92d66f3109cf4f00b5b 100644
+--- a/lib/commonjs/theme/components/input.js
++++ b/lib/commonjs/theme/components/input.js
+@@ -26,7 +26,7 @@ const baseStyle = props => {
+       }
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg',
+       // Todo: Move to _web inside size so that sm and xs don't have this much height
+@@ -60,7 +60,7 @@ const baseStyle = props => {
+       },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 0 0 1px ".concat(error[600])
+         }
+       }
+@@ -77,7 +77,7 @@ const baseStyle = props => {
+         },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(error[600])
+           }
+         }
+@@ -96,7 +96,7 @@ const baseStyle = props => {
+       },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 0 0 1px ".concat(primary[600])
+         }
+       }
+@@ -115,7 +115,7 @@ const baseStyle = props => {
+         },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(primary[500])
+           }
+         }
+@@ -124,7 +124,7 @@ const baseStyle = props => {
+         borderColor: 'error.500',
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(error[500])
+           }
+         },
+@@ -219,7 +219,7 @@ function unstyledStyle() {
+     _stack: {
+       _focus: {
+         style: {
+-          outlineWidth: '0'
++          outlineWidth: 0
+         }
+       }
+     }
+@@ -238,7 +238,7 @@ function underlinedStyle(props) {
+     _focus: {
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 1px 0 0 ".concat(primary[600])
+         }
+       }
+@@ -255,7 +255,7 @@ function underlinedStyle(props) {
+       _focus: {
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 1px 0 0 ".concat(primary[500])
+           }
+         }
+diff --git a/lib/commonjs/theme/v33x-theme/components/input.js b/lib/commonjs/theme/v33x-theme/components/input.js
+index 3300a99c8fabfa0da169f4a6e301b8487c295be4..ef00f08e05ce640b698da055a6a0811469fd7bfa 100644
+--- a/lib/commonjs/theme/v33x-theme/components/input.js
++++ b/lib/commonjs/theme/v33x-theme/components/input.js
+@@ -57,7 +57,7 @@ const baseStyle = props => {
+       borderColor: (0, _tools.mode)('primary.400', 'primary.500')(props)
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg',
+       // Todo: Move to _web inside size so that sm and xs don't have this much height
+diff --git a/lib/module/hooks/useKeyboardDismissable.js b/lib/module/hooks/useKeyboardDismissable.js
+index 266ed746056cbfad1fa247bd384761cb6325a626..0dd54f3b2607c771ed762cfb09137e451dba2586 100644
+--- a/lib/module/hooks/useKeyboardDismissable.js
++++ b/lib/module/hooks/useKeyboardDismissable.js
+@@ -49,14 +49,13 @@ export function useBackHandler({
+       callback();
+       return true;
+     };
++    let subscription;
+ 
+     if (enabled) {
+-      BackHandler.addEventListener('hardwareBackPress', backHandler);
+-    } else {
+-      BackHandler.removeEventListener('hardwareBackPress', backHandler);
++      subscription = BackHandler.addEventListener('hardwareBackPress', backHandler);
+     }
+ 
+-    return () => BackHandler.removeEventListener('hardwareBackPress', backHandler);
++    return () => subscription === null || subscription === void 0 ? void 0 : subscription.remove();
+   }, [enabled, callback]);
+ }
+ //# sourceMappingURL=useKeyboardDismissable.js.map
+diff --git a/lib/module/theme/components/input.js b/lib/module/theme/components/input.js
+index 4ac101a10839aef5a187bb4eaeef51be99825c86..de2e62cad4166a7d5b56695b175b0eed8d7e5886 100644
+--- a/lib/module/theme/components/input.js
++++ b/lib/module/theme/components/input.js
+@@ -19,7 +19,7 @@ const baseStyle = props => {
+       }
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg',
+       // Todo: Move to _web inside size so that sm and xs don't have this much height
+@@ -53,7 +53,7 @@ const baseStyle = props => {
+       },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 0 0 1px ".concat(error[600])
+         }
+       }
+@@ -70,7 +70,7 @@ const baseStyle = props => {
+         },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(error[600])
+           }
+         }
+@@ -89,7 +89,7 @@ const baseStyle = props => {
+       },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 0 0 1px ".concat(primary[600])
+         }
+       }
+@@ -108,7 +108,7 @@ const baseStyle = props => {
+         },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(primary[500])
+           }
+         }
+@@ -117,7 +117,7 @@ const baseStyle = props => {
+         borderColor: 'error.500',
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 0 0 1px ".concat(error[500])
+           }
+         },
+@@ -212,7 +212,7 @@ function unstyledStyle() {
+     _stack: {
+       _focus: {
+         style: {
+-          outlineWidth: '0'
++          outlineWidth: 0
+         }
+       }
+     }
+@@ -231,7 +231,7 @@ function underlinedStyle(props) {
+     _focus: {
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: "0 1px 0 0 ".concat(primary[600])
+         }
+       }
+@@ -248,7 +248,7 @@ function underlinedStyle(props) {
+       _focus: {
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: "0 1px 0 0 ".concat(primary[500])
+           }
+         }
+diff --git a/lib/module/theme/v33x-theme/components/input.js b/lib/module/theme/v33x-theme/components/input.js
+index 3713919b19587cad019f221b33b4f9ab012826f5..982d956cf74e7d13d581e54473c2df411da0d465 100644
+--- a/lib/module/theme/v33x-theme/components/input.js
++++ b/lib/module/theme/v33x-theme/components/input.js
+@@ -49,7 +49,7 @@ const baseStyle = props => {
+       borderColor: mode('primary.400', 'primary.500')(props)
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg',
+       // Todo: Move to _web inside size so that sm and xs don't have this much height
+diff --git a/src/hooks/useKeyboardDismissable.ts b/src/hooks/useKeyboardDismissable.ts
+index f3cfa44402b472db06be9fb6d5b9c376ddf539cb..611dbc759a3b092d89ce3632098257eef89639ec 100644
+--- a/src/hooks/useKeyboardDismissable.ts
++++ b/src/hooks/useKeyboardDismissable.ts
+@@ -48,12 +48,15 @@ export function useBackHandler({ enabled, callback }: IParams) {
+       callback();
+       return true;
+     };
++    let subscription:
++      | ReturnType<typeof BackHandler.addEventListener>
++      | undefined;
+     if (enabled) {
+-      BackHandler.addEventListener('hardwareBackPress', backHandler);
+-    } else {
+-      BackHandler.removeEventListener('hardwareBackPress', backHandler);
++      subscription = BackHandler.addEventListener(
++        'hardwareBackPress',
++        backHandler
++      );
+     }
+-    return () =>
+-      BackHandler.removeEventListener('hardwareBackPress', backHandler);
++    return () => subscription?.remove();
+   }, [enabled, callback]);
+ }
+diff --git a/src/theme/components/input.ts b/src/theme/components/input.ts
+index ed3047c619d21114315f84f7e1698738b4b0d104..efb63ddbafd0f6eaeb40bb56eb986ed6249eddbd 100644
+--- a/src/theme/components/input.ts
++++ b/src/theme/components/input.ts
+@@ -17,7 +17,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+       },
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg', // Todo: Move to _web inside size so that sm and xs don't have this much height
+       style: { outline: 'none' },
+@@ -47,7 +47,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+       _hover: { borderColor: 'error.600' },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: `0 0 0 1px ${error[600]}`,
+         },
+       },
+@@ -60,7 +60,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+         _hover: { borderColor: 'error.600' },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: `0 0 0 1px ${error[600]}`,
+           },
+         },
+@@ -79,7 +79,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+       },
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: `0 0 0 1px ${primary[600]}`,
+         },
+       },
+@@ -96,7 +96,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+         _hover: { borderColor: 'primary.500' },
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: `0 0 0 1px ${primary[500]}`,
+           },
+         },
+@@ -105,7 +105,7 @@ const baseStyle = (props: InterfaceInputProps & { theme: any }) => {
+         borderColor: 'error.500',
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: `0 0 0 1px ${error[500]}`,
+           },
+         },
+@@ -190,7 +190,7 @@ function unstyledStyle() {
+     _stack: {
+       _focus: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+         },
+       },
+     },
+@@ -206,7 +206,7 @@ function underlinedStyle(props: InterfaceInputProps & { theme: any }) {
+     _focus: {
+       _stack: {
+         style: {
+-          outlineWidth: '0',
++          outlineWidth: 0,
+           boxShadow: `0 1px 0 0 ${primary[600]}`,
+         },
+       },
+@@ -224,7 +224,7 @@ function underlinedStyle(props: InterfaceInputProps & { theme: any }) {
+       _focus: {
+         _stack: {
+           style: {
+-            outlineWidth: '0',
++            outlineWidth: 0,
+             boxShadow: `0 1px 0 0 ${primary[500]}`,
+           },
+         },
+diff --git a/src/theme/v33x-theme/components/input.ts b/src/theme/v33x-theme/components/input.ts
+index e1fc40565954a9d661f36fdec80867cff9b47f6d..f4f9856ba0467d7704abda63c350f8fe9b391715 100644
+--- a/src/theme/v33x-theme/components/input.ts
++++ b/src/theme/v33x-theme/components/input.ts
+@@ -50,7 +50,7 @@ const baseStyle = (props: Record<string, any>) => {
+       borderColor: mode('primary.400', 'primary.500')(props),
+     },
+     _web: {
+-      outlineWidth: '0',
++      outlineWidth: 0,
+       overflow: 'auto',
+       lineHeight: 'lg', // Todo: Move to _web inside size so that sm and xs don't have this much height
+       outline: 'none',

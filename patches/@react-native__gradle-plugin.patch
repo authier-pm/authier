@@ -1,0 +1,164 @@
+diff --git a/react-native-gradle-plugin/src/main/kotlin/com/facebook/react/tasks/GenerateAutolinkingNewArchitecturesFileTask.kt b/react-native-gradle-plugin/src/main/kotlin/com/facebook/react/tasks/GenerateAutolinkingNewArchitecturesFileTask.kt
+index 4c36c8a39fbe9f2b0829e01eff34320d6713e745..5f8c4cfbc3d993a5b941fab7da7a9fcbc314ff92 100644
+--- a/react-native-gradle-plugin/src/main/kotlin/com/facebook/react/tasks/GenerateAutolinkingNewArchitecturesFileTask.kt
++++ b/react-native-gradle-plugin/src/main/kotlin/com/facebook/react/tasks/GenerateAutolinkingNewArchitecturesFileTask.kt
+@@ -51,41 +51,33 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+   internal fun generateCmakeFileContent(
+       packages: List<ModelAutolinkingDependenciesPlatformAndroidJson>
+   ): String {
+-    val libraryIncludes =
++    val libraryConfigBlocks =
+         packages.joinToString("\n") { dep ->
+-          var addDirectoryString = ""
++          val blockLines = mutableListOf<String>()
+           val libraryName = dep.libraryName
+           val cmakeListsPath = dep.cmakeListsPath
+           val cxxModuleCMakeListsPath = dep.cxxModuleCMakeListsPath
+           if (libraryName != null && cmakeListsPath != null) {
+-            // If user provided a custom cmakeListsPath, let's honor it.
+             val nativeFolderPath = sanitizeCmakeListsPath(cmakeListsPath)
+-            addDirectoryString +=
+-                "add_subdirectory(\"$nativeFolderPath\" ${libraryName}_autolinked_build)"
++            blockLines += "if(EXISTS \"$nativeFolderPath/CMakeLists.txt\")"
++            blockLines += "  add_subdirectory(\"$nativeFolderPath\" ${libraryName}_autolinked_build)"
++            blockLines += "  list(APPEND AUTOLINKED_LIBRARIES $CODEGEN_LIB_PREFIX${libraryName})"
++            blockLines += "endif()"
+           }
+-          if (cxxModuleCMakeListsPath != null) {
+-            // If user provided a custom cxxModuleCMakeListsPath, let's honor it.
++          if (libraryName != null &&
++              cxxModuleCMakeListsPath != null &&
++              dep.cxxModuleCMakeListsModuleName != null) {
+             val nativeFolderPath = sanitizeCmakeListsPath(cxxModuleCMakeListsPath)
+-            addDirectoryString +=
+-                "\nadd_subdirectory(\"$nativeFolderPath\" ${libraryName}_cxxmodule_autolinked_build)"
++            blockLines += "if(EXISTS \"$nativeFolderPath/CMakeLists.txt\")"
++            blockLines +=
++                "  add_subdirectory(\"$nativeFolderPath\" ${libraryName}_cxxmodule_autolinked_build)"
++            blockLines += "  list(APPEND AUTOLINKED_LIBRARIES ${dep.cxxModuleCMakeListsModuleName})"
++            blockLines += "endif()"
+           }
+-          addDirectoryString
++          blockLines.joinToString("\n")
+         }
+ 
+-    val libraryModules =
+-        packages.joinToString("\n  ") { dep ->
+-          var autolinkedLibraries = ""
+-          if (dep.libraryName != null) {
+-            autolinkedLibraries += "$CODEGEN_LIB_PREFIX${dep.libraryName}"
+-          }
+-          if (dep.cxxModuleCMakeListsModuleName != null) {
+-            autolinkedLibraries += "\n${dep.cxxModuleCMakeListsModuleName}"
+-          }
+-          autolinkedLibraries
+-        }
+-
+-    return CMAKE_TEMPLATE.replace("{{ libraryIncludes }}", libraryIncludes)
+-        .replace("{{ libraryModules }}", libraryModules)
++    return CMAKE_TEMPLATE.replace("{{ libraryConfigBlocks }}", libraryConfigBlocks)
+   }
+ 
+   internal fun generateCppFileContent(
+@@ -95,15 +87,33 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+ 
+     val cppIncludes =
+         packagesWithLibraryNames.joinToString("\n") { dep ->
+-          var include = "#include <${dep.libraryName}.h>"
++          val includeBlocks = mutableListOf<String>()
++          includeBlocks +=
++              """
++              #if __has_include(<${dep.libraryName}.h>)
++              #include <${dep.libraryName}.h>
++              #endif
++              """
++                  .trimIndent()
+           if (dep.componentDescriptors.isNotEmpty()) {
+-            include +=
+-                "\n#include <${COMPONENT_INCLUDE_PATH}/${dep.libraryName}/${COMPONENT_DESCRIPTOR_FILENAME}>"
++            includeBlocks +=
++                """
++                #if __has_include(<$COMPONENT_INCLUDE_PATH/${dep.libraryName}/$COMPONENT_DESCRIPTOR_FILENAME>)
++                #include <$COMPONENT_INCLUDE_PATH/${dep.libraryName}/$COMPONENT_DESCRIPTOR_FILENAME>
++                #endif
++                """
++                    .trimIndent()
+           }
+           if (dep.cxxModuleHeaderName != null) {
+-            include += "\n#include <${dep.cxxModuleHeaderName}.h>"
++            includeBlocks +=
++                """
++                #if __has_include(<${dep.cxxModuleHeaderName}.h>)
++                #include <${dep.cxxModuleHeaderName}.h>
++                #endif
++                """
++                    .trimIndent()
+           }
+-          include
++          includeBlocks.joinToString("\n")
+         }
+ 
+     val cppTurboModuleJavaProviders =
+@@ -111,10 +121,12 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+           val libraryName = dep.libraryName
+           // language=cpp
+           """  
++      #if __has_include(<$libraryName.h>)
+       auto module_$libraryName = ${libraryName}_ModuleProvider(moduleName, params);
+       if (module_$libraryName != nullptr) {
+       return module_$libraryName;
+       }
++      #endif
+       """
+               .trimIndent()
+         }
+@@ -126,9 +138,11 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+               val cxxModuleHeaderName = dep.cxxModuleHeaderName
+               // language=cpp
+               """
++      #if __has_include(<$cxxModuleHeaderName.h>)
+       if (moduleName == $cxxModuleHeaderName::kModuleName) {
+       return std::make_shared<$cxxModuleHeaderName>(jsInvoker);
+       }
++      #endif
+       """
+                   .trimIndent()
+             }
+@@ -136,10 +150,19 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+     val cppComponentDescriptors =
+         packagesWithLibraryNames
+             .filter { it.componentDescriptors.isNotEmpty() }
+-            .joinToString("\n") {
+-              it.componentDescriptors.joinToString("\n") {
+-                "providerRegistry->add(concreteComponentDescriptorProvider<$it>());"
+-              }
++            .joinToString("\n") { dep ->
++              val libraryName = dep.libraryName
++              val descriptorRegistrations =
++                  dep.componentDescriptors.joinToString("\n") { descriptor ->
++                    "providerRegistry->add(concreteComponentDescriptorProvider<$descriptor>());"
++                  }
++              // language=cpp
++              """
++      #if __has_include(<$COMPONENT_INCLUDE_PATH/$libraryName/$COMPONENT_DESCRIPTOR_FILENAME>)
++      $descriptorRegistrations
++      #endif
++      """
++                  .trimIndent()
+             }
+ 
+     return CPP_TEMPLATE.replace("{{ autolinkingCppIncludes }}", cppIncludes)
+@@ -173,11 +196,9 @@ abstract class GenerateAutolinkingNewArchitecturesFileTask : DefaultTask() {
+         # or link against a old prefab target (this is needed for React Native 0.76 on).
+         set(REACTNATIVE_MERGED_SO true)
+ 
+-        {{ libraryIncludes }}
++        set(AUTOLINKED_LIBRARIES)
+ 
+-        set(AUTOLINKED_LIBRARIES
+-          {{ libraryModules }}
+-        )
++        {{ libraryConfigBlocks }}
+         """
+             .trimIndent()
+ 

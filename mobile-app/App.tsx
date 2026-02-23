@@ -16,7 +16,7 @@ import NetInfo from '@react-native-community/netinfo'
 import messaging from '@react-native-firebase/messaging'
 import * as Sentry from '@sentry/react-native'
 import PolyfillCrypto from 'react-native-webview-crypto'
-import CodePush from 'react-native-code-push'
+import CodePush from './src/utils/codePushCompat'
 import { useDeviceStore } from './src/utils/deviceStore'
 import './src/sentryInit'
 import { API_URL } from '@env'
@@ -58,6 +58,7 @@ const RnApp = () => {
         queueLink.close()
       }
     })
+
     return () => {
       unsubscribeNet()
     }
