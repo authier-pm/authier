@@ -1,5 +1,5 @@
 import debug from 'debug'
-import { and, eq, isNull, lte } from 'drizzle-orm'
+import { and, eq, isNotNull, isNull, lte } from 'drizzle-orm'
 import { createRequestDb } from '../prisma/prismaClient'
 import * as schema from '../drizzle/schema'
 import { sendEmail } from '../utils/email'
@@ -37,6 +37,7 @@ const processSinglePendingReset = async (
         targetMasterDeviceId:
           schema.masterDeviceResetRequest.targetMasterDeviceId,
         processAt: schema.masterDeviceResetRequest.processAt,
+        confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
         completedAt: schema.masterDeviceResetRequest.completedAt,
         rejectedAt: schema.masterDeviceResetRequest.rejectedAt
       })
@@ -48,7 +49,11 @@ const processSinglePendingReset = async (
       return
     }
 
-    if (resetRequest.completedAt || resetRequest.rejectedAt) {
+    if (
+      resetRequest.completedAt ||
+      resetRequest.rejectedAt ||
+      !resetRequest.confirmedAt
+    ) {
       return
     }
 
@@ -144,6 +149,7 @@ export const processPendingMasterDeviceResets = async (now = new Date()) => {
         and(
           isNull(schema.masterDeviceResetRequest.completedAt),
           isNull(schema.masterDeviceResetRequest.rejectedAt),
+          isNotNull(schema.masterDeviceResetRequest.confirmedAt),
           lte(schema.masterDeviceResetRequest.processAt, now)
         )
       )

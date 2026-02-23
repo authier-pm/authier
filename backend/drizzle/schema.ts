@@ -249,8 +249,10 @@ export const masterDeviceResetRequest = pgTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     processAt: timestamp({ precision: 3 }).notNull(),
+    confirmedAt: timestamp({ precision: 3 }),
     completedAt: timestamp({ precision: 3 }),
     rejectedAt: timestamp({ precision: 3 }),
+    confirmationToken: text().notNull(),
     targetMasterDeviceId: text().notNull(),
     decryptionChallengeId: integer()
       .notNull()
@@ -274,6 +276,10 @@ export const masterDeviceResetRequest = pgTable(
     index('MasterDeviceResetRequest_processAt_idx').using(
       'btree',
       table.processAt.asc().nullsLast()
+    ),
+    uniqueIndex('MasterDeviceResetRequest_confirmationToken_key').using(
+      'btree',
+      table.confirmationToken.asc().nullsLast()
     )
   ]
 )

@@ -26,7 +26,7 @@ export type DeviceDecryptionChallengeMutationVariables = Types.Exact<{
 
 export type DeviceDecryptionChallengeMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?:
     | { __typename?: 'DecryptionChallengeApproved', id: number, addDeviceSecretEncrypted: string, encryptionSalt: string, userId: string, approvedAt?: string | null, deviceId: string, deviceName: string }
-    | { __typename?: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt?: string | null, masterDeviceResetProcessAt?: string | null, masterDeviceResetRejectedAt?: string | null }
+    | { __typename?: 'DecryptionChallengeForApproval', id: number, pushNotificationsSentCount: number, pushNotificationsFailedCount: number, masterDeviceResetRequestedAt?: string | null, masterDeviceResetProcessAt?: string | null, masterDeviceResetConfirmedAt?: string | null, masterDeviceResetRejectedAt?: string | null }
    | null };
 
 export type InitiateMasterDeviceResetMutationVariables = Types.Exact<{
@@ -129,6 +129,7 @@ export const DeviceDecryptionChallengeDocument = gql`
       pushNotificationsFailedCount
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
+      masterDeviceResetConfirmedAt
       masterDeviceResetRejectedAt
     }
   }

@@ -14,6 +14,8 @@ import type { IContext } from './models/types/ContextTypes'
 import debug from 'debug'
 import { healthReportHandler } from './healthReportRoute'
 import { webhookHandler } from './stripeWebhook'
+import * as schema from './drizzle/schema'
+import { and, eq, isNull } from 'drizzle-orm'
 import {
   type LegacyElysiaContext,
   createLegacyReplyAdapter,
@@ -178,6 +180,68 @@ export const buildApp = (app = new Elysia()) => {
       const reply = createLegacyReplyAdapter(ctx)
       await healthReportHandler(undefined, reply)
       return reply.getPayload()
+    })
+    .get('/confirm-master-device-reset', async ({ query, redirect }) => {
+      const token =
+        typeof query?.token === 'string' && query.token.length > 0
+          ? query.token
+          : null
+
+      const frontendUrl = process.env.FRONTEND_URL ?? '/'
+      const redirectWithStatus = (status: string) =>
+        redirect(
+          `${frontendUrl}/confirm-master-device-reset?status=${encodeURIComponent(status)}`
+        )
+
+      if (!token) {
+        return redirectWithStatus('missing-token')
+      }
+
+      const requestDb = createRequestDb()
+      try {
+        const [resetRequest] = await requestDb.db
+          .select({
+            id: schema.masterDeviceResetRequest.id,
+            completedAt: schema.masterDeviceResetRequest.completedAt,
+            confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
+            rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+          })
+          .from(schema.masterDeviceResetRequest)
+          .where(eq(schema.masterDeviceResetRequest.confirmationToken, token))
+          .limit(1)
+
+        if (!resetRequest) {
+          return redirectWithStatus('not-found')
+        }
+
+        if (resetRequest.completedAt) {
+          return redirectWithStatus('already-completed')
+        }
+
+        if (resetRequest.rejectedAt) {
+          return redirectWithStatus('rejected')
+        }
+
+        if (!resetRequest.confirmedAt) {
+          await requestDb.db
+            .update(schema.masterDeviceResetRequest)
+            .set({
+              confirmedAt: new Date()
+            })
+            .where(
+              and(
+                eq(schema.masterDeviceResetRequest.id, resetRequest.id),
+                isNull(schema.masterDeviceResetRequest.completedAt),
+                isNull(schema.masterDeviceResetRequest.rejectedAt),
+                isNull(schema.masterDeviceResetRequest.confirmedAt)
+              )
+            )
+        }
+
+        return redirectWithStatus('confirmed')
+      } finally {
+        await requestDb.close()
+      }
     })
     .get('/graphiql', ({ redirect }) => redirect('/graphql'))
     .get('/graphql', handleGraphqlRequest)

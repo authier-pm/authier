@@ -253,7 +253,7 @@ export const LoginAwaitingApproval = () => {
           render: () => (
             <ToastAlert
               title="Master device reset scheduled"
-              description={`Scheduled for ${new Date(processAt).toLocaleString()}`}
+              description={`Confirmation email sent. After you confirm it, reset is scheduled for ${new Date(processAt).toLocaleString()}.`}
               status="warning"
               variant="subtle"
             />
@@ -289,13 +289,21 @@ export const LoginAwaitingApproval = () => {
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
         ? deviceDecryptionChallenge.masterDeviceResetProcessAt
         : null
+    const confirmedResetAt =
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetConfirmedAt
+        : null
+    const requestedResetAt =
+      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetRequestedAt
+        : null
     const rejectedResetAt =
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval'
         ? deviceDecryptionChallenge.masterDeviceResetRejectedAt
         : null
     const canResetMasterDevice =
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval' &&
-      !pendingResetAt
+      (!requestedResetAt || !!rejectedResetAt)
 
     return (
       <Flex flex={1} justifyContent={'center'}>
@@ -350,6 +358,15 @@ export const LoginAwaitingApproval = () => {
                       <Trans>
                         Master device reset scheduled for{' '}
                         {new Date(pendingResetAt).toLocaleString()}.
+                      </Trans>
+                    </Text>
+                  ) : null}
+
+                  {requestedResetAt && !confirmedResetAt && !rejectedResetAt ? (
+                    <Text fontSize="sm" mb={3}>
+                      <Trans>
+                        Master device reset confirmation email sent. Confirm the
+                        email link to arm the reset.
                       </Trans>
                     </Text>
                   ) : null}

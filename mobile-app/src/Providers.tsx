@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 import { apolloClient, cache } from './apollo/ApolloClient'
 import { NativeBaseProvider, StorageManager, Text } from 'native-base'
 import { theme } from './Theme'
@@ -10,10 +10,10 @@ import { messages as enMessages } from './locales/en/messages'
 import { messages as csMessages } from './locales/cs/messages'
 import { QueryClient, QueryClientProvider } from 'react-query'
 
-import { persistCache, MMKVWrapper } from 'apollo3-cache-persist'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { storage } from './utils/storage'
+import { apolloCacheStorage } from './utils/storage'
 import { useDeviceStateStore } from './utils/deviceStateStore'
+import { persistApolloCache } from './apollo/persistApolloCache'
 
 i18n.load({
   en: enMessages,
@@ -47,10 +47,7 @@ const queryClient = new QueryClient()
 
 export const Providers = () => {
   useEffect(() => {
-    persistCache({
-      cache,
-      storage: new MMKVWrapper(storage)
-    })
+    void persistApolloCache(cache, apolloCacheStorage)
   }, [])
 
   return (

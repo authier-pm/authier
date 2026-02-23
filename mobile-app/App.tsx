@@ -49,7 +49,7 @@ const RnApp = () => {
   useEffect(() => {
     requestUserPermission()
     initialize()
-    console.log('API_URL', API_URL)
+    console.log('API_URL2', API_URL)
 
     const unsubscribeNet = NetInfo.addEventListener((state) => {
       if (state.isConnected) {

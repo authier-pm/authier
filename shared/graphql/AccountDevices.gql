@@ -34,6 +34,7 @@ query DevicesRequests {
       pushNotificationsFailedCount
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
+      masterDeviceResetConfirmedAt
       masterDeviceResetRejectedAt
     }
   }

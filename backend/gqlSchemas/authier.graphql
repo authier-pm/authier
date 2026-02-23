@@ -361,6 +361,7 @@ type DecryptionChallengeForApproval {
   pushNotificationsFailedCount: Int!
   masterDeviceResetRequestedAt: DateTime
   masterDeviceResetProcessAt: DateTime
+  masterDeviceResetConfirmedAt: DateTime
   masterDeviceResetRejectedAt: DateTime
 }
 

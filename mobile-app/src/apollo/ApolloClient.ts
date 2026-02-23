@@ -1,4 +1,5 @@
 import { onError } from '@apollo/client/link/error'
+import { CombinedGraphQLErrors } from '@apollo/client/errors'
 import fetch from 'cross-fetch'
 import {
   ApolloClient,
@@ -9,11 +10,11 @@ import {
 } from '@apollo/client'
 import { RetryLink } from 'apollo-link-retry'
 import { print } from 'graphql'
-
-import QueueLink from 'apollo-link-queue'
+import { tap } from 'rxjs'
 
 import { setContext } from '@apollo/client/link/context'
 import { tokenRefresh } from './tokenRefresh'
+import { QueueLink } from './QueueLink'
 import { API_URL } from '@env'
 import { Toast } from 'native-base'
 import { useDeviceStore } from '@src/utils/deviceStore'
@@ -24,6 +25,7 @@ import { useDeviceStateStore } from '@src/utils/deviceStateStore'
 if (!API_URL) {
   throw new Error('API_URL is not defined')
 }
+console.log('API_URL23', API_URL)
 
 const httpLink = new HttpLink({
   uri: API_URL,
@@ -37,23 +39,25 @@ const timeStartLink = new ApolloLink((operation, forward) => {
 })
 
 const logTimeLink = new ApolloLink((operation, forward) => {
-  return forward(operation).map((data) => {
+  return forward(operation).pipe(
+    tap((data) => {
     // data from a previous link
-    const time = performance.now() - operation.getContext().start
-    const opIdentifier = operation.operationName
-      ? `operation ${operation.operationName}`
-      : `operation ${print(operation.query).substring(0, 160)}`
-    if (time > 3000) {
-      console.warn(`${opIdentifier} ${time.toFixed()}ms`)
-      if (__DEV__) {
-        console.warn('operation', print(operation.query))
-        console.warn('variables', operation.variables)
+      const time = performance.now() - operation.getContext().start
+      const opIdentifier = operation.operationName
+        ? `operation ${operation.operationName}`
+        : `operation ${print(operation.query).substring(0, 160)}`
+      if (time > 3000) {
+        console.warn(`${opIdentifier} ${time.toFixed()}ms`)
+        if (__DEV__) {
+          console.warn('operation', print(operation.query))
+          console.warn('variables', operation.variables)
+        }
+      } else {
+        console.log(`${opIdentifier} ${time.toFixed()}ms`)
       }
-    } else {
-      console.log(`${opIdentifier} ${time.toFixed()}ms`)
-    }
-    return data
-  })
+      return data
+    })
+  )
 })
 
 const retryLink = new RetryLink()
@@ -78,14 +82,14 @@ const ToastServerErrorDetails = {
 }
 
 // Log any GraphQL errors or network error that occurred
-const errorLink = onError(({ graphQLErrors, networkError, response }) => {
-  if (graphQLErrors && graphQLErrors.length > 0) {
-    console.log(graphQLErrors[0].message)
-    if (graphQLErrors[0].message === 'not authenticated') {
+const errorLink = onError(({ error, result }) => {
+  if (CombinedGraphQLErrors.is(error) && error.errors.length > 0) {
+    console.log(error.errors[0].message)
+    if (error.errors[0].message === 'not authenticated') {
       //Here just logout the user
       useDeviceStore.getState().clearAndReload()
     }
-    graphQLErrors.map(({ message, locations, path }) => {
+    error.errors.map(({ message, locations, path }) => {
       console.error(
         `[GraphQL error]: Message: ${message}, Location: ${locations}, Path: ${path}`
       )
@@ -97,10 +101,11 @@ const errorLink = onError(({ graphQLErrors, networkError, response }) => {
         variant: 'subtle'
       })
     })
+    return
   }
-  if (networkError) {
-    console.error(`[Network error]: ${networkError}`)
-    console.error(response)
+  if (error) {
+    console.error(`[Network error]: ${error}`)
+    console.error(result)
   }
 })
 

@@ -67,6 +67,7 @@ mutation deviceDecryptionChallenge(
       pushNotificationsFailedCount
       masterDeviceResetRequestedAt
       masterDeviceResetProcessAt
+      masterDeviceResetConfirmedAt
       masterDeviceResetRejectedAt
     }
   }

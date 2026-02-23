@@ -3,7 +3,7 @@ import { I18nProvider } from '@lingui/react'
 import { NativeBaseProvider } from 'native-base'
 
 import { QueryClientProvider } from 'react-query'
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 
 import { RenderOptions, render } from '@testing-library/react-native'
 import { makeSsrClient } from '@src/apollo/ApolloClientMock'

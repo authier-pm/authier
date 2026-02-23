@@ -254,10 +254,10 @@ export const LoginAwaitingApproval: React.FC = () => {
     useInitiateMasterDeviceResetMutation({
       onCompleted: ({ initiateMasterDeviceReset }) => {
         toast({
-          title: t`Master device reset scheduled`,
-          description: new Date(
+          title: t`Master device reset confirmation email sent`,
+          description: `${t`After you confirm the email link, reset is scheduled for`} ${new Date(
             initiateMasterDeviceReset.processAt
-          ).toLocaleString(),
+          ).toLocaleString()}`,
           status: 'warning',
           isClosable: true
         })
@@ -282,6 +282,14 @@ export const LoginAwaitingApproval: React.FC = () => {
     const pendingResetAt =
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
         ? deviceDecryptionChallenge.masterDeviceResetProcessAt
+        : null
+    const confirmedResetAt =
+      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetConfirmedAt
+        : null
+    const requestedResetAt =
+      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
+        ? deviceDecryptionChallenge.masterDeviceResetRequestedAt
         : null
     const rejectedResetAt =
       deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
@@ -341,6 +349,15 @@ export const LoginAwaitingApproval: React.FC = () => {
                   </Txt>
                 ) : null}
 
+                {requestedResetAt && !confirmedResetAt && !rejectedResetAt ? (
+                  <Txt fontSize="sm" mb={3}>
+                    <Trans>
+                      Master device reset confirmation email sent. Confirm the
+                      email link to arm the reset.
+                    </Trans>
+                  </Txt>
+                ) : null}
+
                 {rejectedResetAt ? (
                   <Txt fontSize="sm" mb={3}>
                     <Trans>
@@ -354,7 +371,7 @@ export const LoginAwaitingApproval: React.FC = () => {
                   colorScheme="red"
                   variant="outline"
                   isLoading={resetMasterDeviceLoading}
-                  isDisabled={!!pendingResetAt}
+                  isDisabled={!!(requestedResetAt && !rejectedResetAt)}
                   onClick={async () => {
                     if (
                       deviceDecryptionChallenge.__typename !==

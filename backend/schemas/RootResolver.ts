@@ -115,6 +115,23 @@ const sendNewDeviceLoginPushNotifications = async (
   }
 }
 
+const getBackendOriginFromRequest = (ctx: IContext) => {
+  const forwardedProto = ctx.request.headers['x-forwarded-proto']
+  const host = ctx.request.headers['host']
+
+  if (host) {
+    let protocol = 'https'
+    if (forwardedProto === 'http' || forwardedProto === 'https') {
+      protocol = forwardedProto
+    } else if (process.env.NODE_ENV === 'development') {
+      protocol = 'http'
+    }
+    return `${protocol}://${host}`
+  }
+
+  return process.env.FRONTEND_URL ?? ''
+}
+
 @Resolver()
 export class RootResolver {
   @Query(() => String)
@@ -515,6 +532,7 @@ export class RootResolver {
       .select({
         requestedAt: schema.masterDeviceResetRequest.createdAt,
         processAt: schema.masterDeviceResetRequest.processAt,
+        confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
         rejectedAt: schema.masterDeviceResetRequest.rejectedAt
       })
       .from(schema.masterDeviceResetRequest)
@@ -535,7 +553,11 @@ export class RootResolver {
         pushNotificationsFailedCount: challenge!.pushNotificationsFailedCount,
         masterDeviceResetRequestedAt:
           masterDeviceResetRequest?.requestedAt ?? null,
-        masterDeviceResetProcessAt: masterDeviceResetRequest?.processAt ?? null,
+        masterDeviceResetProcessAt: masterDeviceResetRequest?.confirmedAt
+          ? masterDeviceResetRequest.processAt
+          : null,
+        masterDeviceResetConfirmedAt:
+          masterDeviceResetRequest?.confirmedAt ?? null,
         masterDeviceResetRejectedAt:
           masterDeviceResetRequest?.rejectedAt ?? null
       })
@@ -628,6 +650,7 @@ export class RootResolver {
     const processAt = new Date(
       requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000
     )
+    const confirmationToken = crypto.randomUUID()
 
     const [existingResetRequestForChallenge] = await ctx.db
       .select({
@@ -645,8 +668,10 @@ export class RootResolver {
         .set({
           createdAt: requestedAt,
           processAt,
+          confirmedAt: null,
           completedAt: null,
           rejectedAt: null,
+          confirmationToken,
           targetMasterDeviceId: user.masterDeviceId
         })
         .where(
@@ -659,19 +684,24 @@ export class RootResolver {
       await ctx.db.insert(schema.masterDeviceResetRequest).values({
         userId: user.id,
         decryptionChallengeId: challenge.id,
+        confirmationToken,
         targetMasterDeviceId: user.masterDeviceId,
         processAt
       })
     }
 
     if (user.email) {
+      const backendOrigin = getBackendOriginFromRequest(ctx)
+      const confirmationLink = `${backendOrigin}/confirm-master-device-reset?token=${confirmationToken}`
       await sendEmail(user.email, {
-        Subject: 'Master device reset initiated',
-        TextPart: `A delayed reset of your master device was initiated for account ${user.email} from IP ${ipAddress}.
-If this was you, no action is needed.
-The reset is scheduled for ${processAt.toISOString()}.
-If this was not you, log in from one of your existing devices and change your master device before that time.`,
-        HTMLPart: `<p>A delayed reset of your master device was initiated for account ${user.email} from IP ${ipAddress}.</p><p>If this was you, no action is needed.</p><p>The reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, log in from one of your existing devices and change your master device before that time.</p>`
+        Subject: 'Confirm master device reset',
+        TextPart: `A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.
+To confirm this request, open:
+${confirmationLink}
+
+After confirmation, the reset is scheduled for ${processAt.toISOString()}.
+If this was not you, ignore this email or reject the login request from your current master device.`,
+        HTMLPart: `<p>A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.</p><p>To confirm this request, click <a href="${confirmationLink}">Confirm master device reset</a>.</p><p>After confirmation, the reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, ignore this email or reject the login request from your current master device.</p>`
       })
     }
 

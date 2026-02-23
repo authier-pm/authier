@@ -84,6 +84,7 @@ export type DecryptionChallengeForApproval = {
   id: Scalars['Int']['output'];
   ipAddress: Scalars['String']['output'];
   ipGeoLocation?: Maybe<Scalars['JSON']['output']>;
+  masterDeviceResetConfirmedAt?: Maybe<Scalars['DateTime']['output']>;
   masterDeviceResetProcessAt?: Maybe<Scalars['DateTime']['output']>;
   masterDeviceResetRejectedAt?: Maybe<Scalars['DateTime']['output']>;
   masterDeviceResetRequestedAt?: Maybe<Scalars['DateTime']['output']>;

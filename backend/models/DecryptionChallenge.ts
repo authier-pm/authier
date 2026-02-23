@@ -85,6 +85,9 @@ export class DecryptionChallengeForApproval {
   masterDeviceResetProcessAt: Date | null
 
   @Field(() => GraphQLISODateTime, { nullable: true })
+  masterDeviceResetConfirmedAt: Date | null
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
   masterDeviceResetRejectedAt: Date | null
 }
 
