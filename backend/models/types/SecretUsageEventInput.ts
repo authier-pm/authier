@@ -2,12 +2,12 @@ import { Field, InputType } from 'type-graphql'
 
 @InputType()
 export class SecretUsageEventInput {
-  @Field()
+  @Field(() => String)
   kind: string
 
-  @Field()
+  @Field(() => String)
   secretId: string
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   url?: string
 }

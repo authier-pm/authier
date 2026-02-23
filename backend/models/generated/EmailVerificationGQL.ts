@@ -13,7 +13,7 @@ export class EmailVerificationGQLScalars {
   @Field(() => GraphQLISODateTime, { nullable: true })
   verifiedAt: Date | null
 
-  @Field()
+  @Field(() => String)
   userId: string
 
   @Field(() => EmailVerificationTypeGQL)

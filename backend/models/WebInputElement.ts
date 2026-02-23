@@ -9,14 +9,14 @@ export interface ICoordinates {
 
 @InputType()
 export class WebInputElement {
-  @Field()
+  @Field(() => String)
   domPath: string
   @Field(() => GraphQLNonNegativeInt, {
     description:
       'The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day.'
   })
   domOrdinal: number
-  @Field()
+  @Field(() => String)
   url: string
   @Field(() => WebInputTypeGQL)
   kind: WebInputTypeGQL

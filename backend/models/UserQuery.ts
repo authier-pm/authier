@@ -1,4 +1,4 @@
-import { prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 import {
   Arg,
   Ctx,
@@ -20,18 +20,18 @@ import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
 import type { Device } from '@prisma/client'
 import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
-import {
-  defaultDeviceSettingSystemValues,
-  defaultDeviceSettingUserValuesWithId
-} from './defaultDeviceSettingSystemValues'
+import { defaultDeviceSettingUserValuesWithId } from './defaultDeviceSettingSystemValues'
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
-import { firebaseAdmin, firebaseSendNotification } from '../lib/firebaseAdmin'
+import { firebaseSendNotification } from '../lib/firebaseAdmin'
+import { eq, max, and, isNull, count } from 'drizzle-orm'
+import { encryptedSecret, device as deviceSchema } from '../drizzle/schema'
 
 @ObjectType()
 export class UserBase extends UserGQL {
-  constructor(parameters) {
+  constructor(parameters: Record<string, unknown>) {
     super()
     Object.assign(this, parameters)
+    addUserGraphqlAliases(this)
   }
 
   @Field(() => GraphQLEmailAddress, {
@@ -40,12 +40,11 @@ export class UserBase extends UserGQL {
   declare email: string
 
   async setCookiesAndConstructLoginResponse(device: Device, ctx: IContext) {
-    const userDevice = await ctx.prisma.device.findFirstOrThrow({
-      where: {
-        userId: this.id,
-        id: device.id
-      }
+    const userDevice = await ctx.db.query.device.findFirst({
+      where: { userId: this.id, id: device.id }
     })
+
+    if (!userDevice) throw new Error('Device not found')
 
     setNewRefreshToken(this, userDevice, ctx)
 
@@ -65,33 +64,31 @@ export class UserBase extends UserGQL {
   }
 
   async defaultDeviceSettings(@Ctx() ctx: IContext) {
-    const deviceDefaultSettings =
-      await ctx.prisma.defaultDeviceSettings.findFirst({
-        where: {
-          userId: this.id
-        }
-      })
+    const deviceDefaultSettings = await ctx.db.query.defaultSettings.findFirst({
+      where: { userId: this.id }
+    })
 
     return deviceDefaultSettings ?? defaultDeviceSettingUserValuesWithId
   }
+}
+
+type UserTotpLimitShape = {
+  TOTPlimit?: number | null
+}
+
+export function addUserGraphqlAliases<T extends UserTotpLimitShape>(
+  user: T
+): T {
+  return user
 }
 
 @ObjectType()
 export class UserQuery extends UserBase {
   @Field(() => [DeviceQuery])
   async devices(@Ctx() ctx: IContext) {
-    return ctx.prisma.device.findMany({
-      where: {
-        userId: this.id
-      },
-      orderBy: [
-        {
-          lastSyncAt: 'desc'
-        },
-        {
-          createdAt: 'desc'
-        }
-      ]
+    return ctx.db.query.device.findMany({
+      where: { userId: this.id },
+      orderBy: (d, { desc }) => [desc(d.lastSyncAt), desc(d.createdAt)]
     })
   }
 
@@ -102,65 +99,62 @@ export class UserQuery extends UserBase {
 
   @Field(() => DeviceQuery)
   async device(@Ctx() ctx: IContext, @Arg('id', () => String) id: string) {
-    return ctx.prisma.device.findFirst({
-      where: {
-        userId: this.id,
-        id
-      }
+    return ctx.db.query.device.findFirst({
+      where: { userId: this.id, id: id }
     })
   }
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  async lastChangeInSecrets() {
-    const res = await prismaClient.encryptedSecret.aggregate({
-      where: {
-        userId: this.id
-      },
-      _max: {
-        updatedAt: true,
-        createdAt: true
-      }
-    })
+  async lastChangeInSecrets(@Ctx() ctx: IContext) {
+    const res = await ctx.db
+      .select({
+        updatedAt: max(encryptedSecret.updatedAt),
+        createdAt: max(encryptedSecret.createdAt)
+      })
+      .from(encryptedSecret)
+      .where(eq(encryptedSecret.userId, this.id))
+
+    if (!res[0]) return null
     return new Date(
-      Math.max(Number(res._max.createdAt), Number(res._max.updatedAt))
+      Math.max(Number(res[0].createdAt), Number(res[0].updatedAt))
     )
   }
 
   @Field(() => Int)
-  async devicesCount() {
-    return prismaClient.device.count({
-      where: {
-        userId: this.id,
-        deletedAt: null
-      }
-    })
+  async devicesCount(@Ctx() ctx: IContext) {
+    const res = await ctx.db
+      .select({ count: count() })
+      .from(deviceSchema)
+      .where(
+        and(eq(deviceSchema.userId, this.id), isNull(deviceSchema.deletedAt))
+      )
+    return res[0]?.count ?? 0
   }
 
   @Field(() => EmailVerificationGQLScalars, { nullable: true })
-  async primaryEmailVerification() {
-    return prismaClient.emailVerification.findFirst({
+  async primaryEmailVerification(@Ctx() ctx: IContext) {
+    const res = await ctx.db.query.emailVerification.findFirst({
       where: {
         userId: this.id,
         address: this.email,
         kind: EmailVerificationType.PRIMARY
       }
     })
+    return res
   }
   @Field(() => [EmailVerificationGQLScalars])
-  async emailVerifications() {
-    return prismaClient.emailVerification.findMany({
-      where: {
-        userId: this.id
-      }
+  async emailVerifications(@Ctx() ctx: IContext) {
+    return ctx.db.query.emailVerification.findMany({
+      where: { userId: this.id }
     })
   }
 
   @Field(() => [EncryptedSecretQuery])
-  async encryptedSecrets() {
-    return prismaClient.encryptedSecret.findMany({
+  async encryptedSecrets(@Ctx() ctx: IContext) {
+    return ctx.db.query.encryptedSecret.findMany({
       where: {
         userId: this.id,
-        deletedAt: null
+        deletedAt: { isNull: true } // check if this works for isNull
       }
     })
   }
@@ -173,16 +167,12 @@ export class UserQuery extends UserBase {
     type: string
   ) {
     console.log('NOTIFICATION')
-    const user = await prismaClient.user.findUnique({
+    const user = await db.query.user.findFirst({
       where: {
         id: this.id
       },
-      include: {
-        Devices: {
-          where: {
-            id: deviceId
-          }
-        }
+      with: {
+        devicesUserId: true
       }
     })
 
@@ -191,10 +181,8 @@ export class UserQuery extends UserBase {
       return false // no point in sending messages to the master device
     }
 
-    const masterDevice = await prismaClient.device.findUnique({
-      where: {
-        id: user?.masterDeviceId as string
-      }
+    const masterDevice = await db.query.device.findFirst({
+      where: { id: user.masterDeviceId! }
     })
 
     if (!masterDevice?.firebaseToken || masterDevice.firebaseToken.length < 8) {
@@ -207,7 +195,8 @@ export class UserQuery extends UserBase {
         token: masterDevice.firebaseToken,
         notification: {
           title: title,
-          body: user.Devices.find(({ id }) => id === deviceId)?.name + body
+          body:
+            user.devicesUserId.find(({ id }) => id === deviceId)?.name + body
         },
         data: {
           type: type
@@ -222,11 +211,11 @@ export class UserQuery extends UserBase {
 
   @Field(() => [DecryptionChallengeForApproval])
   async decryptionChallengesWaiting(@Ctx() ctx: IContextAuthenticated) {
-    return ctx.prisma.decryptionChallenge.findMany({
+    return ctx.db.query.decryptionChallenge.findMany({
       where: {
         userId: ctx.jwtPayload.userId,
-        approvedAt: null,
-        rejectedAt: null
+        approvedAt: { isNull: true },
+        rejectedAt: { isNull: true }
       }
     })
   }

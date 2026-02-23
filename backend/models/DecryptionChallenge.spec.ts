@@ -1,4 +1,4 @@
-import { prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 
 import { faker } from '@faker-js/faker'
 import type {
@@ -15,9 +15,13 @@ import {
   DecryptionChallengeApproved,
   DecryptionChallengeMutation
 } from './DecryptionChallenge'
-import type { User } from '@prisma/client'
+import type { InferSelectModel } from 'drizzle-orm'
+import * as schema from '../drizzle/schema'
+import { eq } from 'drizzle-orm'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+
+type User = InferSelectModel<typeof schema.user>
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -30,14 +34,15 @@ describe('DecryptionChallenge', () => {
 
   const challenge: DecryptionChallengeApproved =
     new DecryptionChallengeApproved()
-  challenge.deviceId = faker.string.uuid()
+  challenge.deviceId = crypto.randomUUID()
   challenge.deviceName = faker.lorem.word()
-  const userId = faker.string.uuid()
+  const userId = crypto.randomUUID()
   const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
   beforeAll(async () => {
-    user = await prismaClient.user.create({
-      data: {
+    const [insertedUser] = await db
+      .insert(schema.user)
+      .values({
         id: userId,
         email: input.email,
         addDeviceSecret: input.addDeviceSecret,
@@ -46,8 +51,9 @@ describe('DecryptionChallenge', () => {
         loginCredentialsLimit: 50,
         TOTPlimit: 4,
         deviceRecoveryCooldownMinutes: 960
-      }
-    })
+      })
+      .returning()
+    user = insertedUser
   })
 
   describe('addNewDeviceForUser', () => {
@@ -55,10 +61,12 @@ describe('DecryptionChallenge', () => {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
       reply: { setCookie: () => {} },
       request: { headers: {} },
-      prisma: prismaClient,
+      db,
       jwtPayload: { userId: userId },
       getIpAddress: () => faker.internet.ip()
-    } as any
+    } as unknown as Parameters<
+      DecryptionChallengeApproved['addNewDeviceForUser']
+    >[2]
     it('should add new device for user', async () => {
       challenge.userId = user.id
       const data = await challenge.addNewDeviceForUser(
@@ -77,7 +85,7 @@ describe('DecryptionChallenge', () => {
 
     it("should show 'User not found'", async () => {
       const input: AddNewDeviceInput = makeAddNewDeviceInput()
-      challenge.userId = faker.string.uuid()
+      challenge.userId = crypto.randomUUID()
       await expect(async () => {
         await challenge.addNewDeviceForUser(
           input,
@@ -88,20 +96,18 @@ describe('DecryptionChallenge', () => {
     })
 
     it("should show 'Wrong master password used'", async () => {
-      const userId = faker.string.uuid()
+      const userId = crypto.randomUUID()
 
       const input = makeAddNewDeviceInput()
       challenge.userId = userId
 
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: input.email,
-          addDeviceSecret: faker.string.sample(5),
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: faker.string.sample(5),
-          ...userSecurityProps
-        }
+      await db.insert(schema.user).values({
+        id: userId,
+        email: input.email,
+        addDeviceSecret: faker.string.sample(5),
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+        encryptionSalt: faker.string.sample(5),
+        ...userSecurityProps
       })
 
       expect(async () => {
@@ -119,53 +125,47 @@ describe('DecryptionChallenge', () => {
       new DecryptionChallengeMutation()
     challengeMutation.id = faker.number.int({ min: 1, max: 1000 })
     challengeMutation.blockIp = false
-    const slaveDeviceId = faker.string.uuid()
-    const masterDeviceId = faker.string.uuid()
-    const userId = faker.string.uuid()
+    const slaveDeviceId = crypto.randomUUID()
+    const masterDeviceId = crypto.randomUUID()
+    const userId = crypto.randomUUID()
 
     const createUserData = async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: input.email,
-          addDeviceSecret: faker.string.sample(5),
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: faker.string.sample(5),
-          newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
-          ...userSecurityProps
-        }
+      await db.insert(schema.user).values({
+        id: userId,
+        email: input.email,
+        addDeviceSecret: faker.string.sample(5),
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+        encryptionSalt: faker.string.sample(5),
+        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        ...userSecurityProps
       })
 
-      await prismaClient.device.create({
-        data: {
-          id: masterDeviceId,
-          name: faker.lorem.word(),
-          firebaseToken: faker.string.sample(5),
-          firstIpAddress: faker.internet.ip(),
-          lastIpAddress: faker.internet.ip(),
-          platform: faker.lorem.word(),
-          userId,
-          ...defaultDeviceSettingSystemValues
-        }
+      await db.insert(schema.device).values({
+        id: masterDeviceId,
+        name: faker.lorem.word(),
+        firebaseToken: crypto.randomUUID(),
+        firstIpAddress: faker.internet.ip(),
+        lastIpAddress: faker.internet.ip(),
+        platform: faker.lorem.word(),
+        userId,
+        ...defaultDeviceSettingSystemValues
       })
 
-      await prismaClient.user.update({
-        where: { id: userId },
-        data: {
+      await db
+        .update(schema.user)
+        .set({
           masterDeviceId
-        }
-      })
+        })
+        .where(eq(schema.user.id, userId))
 
-      await prismaClient.decryptionChallenge.create({
-        data: {
-          id: challengeMutation.id,
-          userId,
-          deviceId: slaveDeviceId,
-          deviceName: faker.lorem.word(),
-          ipAddress: faker.internet.ip()
-        }
+      await db.insert(schema.decryptionChallenge).values({
+        id: challengeMutation.id,
+        userId,
+        deviceId: slaveDeviceId,
+        deviceName: faker.lorem.word(),
+        ipAddress: faker.internet.ip()
       })
     }
     it('should approve challenge', async () => {
@@ -173,11 +173,11 @@ describe('DecryptionChallenge', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {} },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         getIpAddress: () => faker.internet.ip(),
         device: { id: masterDeviceId }
-      } as any
+      } as unknown as Parameters<DecryptionChallengeMutation['approve']>[0]
 
       await createUserData()
 
@@ -192,7 +192,7 @@ describe('DecryptionChallenge', () => {
         id: expect.any(Number)
       })
 
-      await prismaClient.user.deleteMany()
+      await db.delete(schema.user).where(eq(schema.user.id, userId))
     })
 
     it("should show 'Only the master device can approve a decryption challenge'", async () => {
@@ -201,12 +201,12 @@ describe('DecryptionChallenge', () => {
       const fakeCtx = {
         reply: { setCookie: () => {} },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         getIpAddress: () => faker.internet.ip(),
         //NOTE: Change ID to be different from masterDeviceId
-        device: { id: faker.string.uuid() }
-      } as any
+        device: { id: crypto.randomUUID() }
+      } as unknown as Parameters<DecryptionChallengeMutation['approve']>[0]
 
       await createUserData()
 
@@ -216,9 +216,11 @@ describe('DecryptionChallenge', () => {
         'Only the master device can approve a decryption challenge'
       )
 
-      await prismaClient.decryptionChallenge.deleteMany()
-      await prismaClient.device.deleteMany()
-      await prismaClient.user.deleteMany()
+      await db
+        .delete(schema.decryptionChallenge)
+        .where(eq(schema.decryptionChallenge.userId, userId))
+      await db.delete(schema.device).where(eq(schema.device.userId, userId))
+      await db.delete(schema.user).where(eq(schema.user.id, userId))
     })
   })
 })

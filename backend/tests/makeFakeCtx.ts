@@ -1,6 +1,6 @@
-import { prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 import { faker } from '@faker-js/faker'
-import type { Device } from '@prisma/client'
+import type { Device } from '../models/types/ContextTypes'
 import { vi } from 'vitest'
 
 // afterAll(async () => {
@@ -16,6 +16,6 @@ export const makeFakeCtx = (overload: { userId: string; device?: Device }) =>
     request: { headers: {} },
     jwtPayload: { userId: overload.userId },
     device: overload.device,
-    prisma: prismaClient,
+    db,
     getIpAddress: () => faker.internet.ip()
   }) as any

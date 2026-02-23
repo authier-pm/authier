@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-empty-function */
-import { prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 import { RootResolver } from './RootResolver'
 import type { IContextAuthenticated } from '../models/types/ContextTypes'
 import { faker } from '@faker-js/faker'
@@ -16,6 +16,8 @@ import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
 import { defaultDeviceSettingSystemValues } from 'models/defaultDeviceSettingSystemValues'
 import type { GraphQLResolveInfo } from 'graphql'
+import * as schema from '../drizzle/schema'
+import { eq } from 'drizzle-orm'
 
 const userSecurityProps = {
   deviceRecoveryCooldownMinutes: 960,
@@ -28,22 +30,24 @@ describe('RootResolver', () => {
 
   describe('me', () => {
     it('should return current user', async () => {
-      const user = await prismaClient.user.create({
-        data: {
-          id: faker.string.uuid(),
-          email: faker.internet.email(),
+      const userId = crypto.randomUUID()
+      const [user] = await db
+        .insert(schema.user)
+        .values({
+          id: userId,
+          email: `${crypto.randomUUID()}@test.com`,
           addDeviceSecret: faker.string.sample(5),
           addDeviceSecretEncrypted: faker.string.sample(5),
           encryptionSalt: faker.string.sample(5),
           ...userSecurityProps
-        }
-      })
+        })
+        .returning()
 
       expect(
         await resolver.me(
           {
             request: { headers: {} },
-            prisma: prismaClient,
+            db,
             jwtPayload: { userId: user.id }
           } as IContextAuthenticated,
           {} as GraphQLResolveInfo
@@ -53,7 +57,7 @@ describe('RootResolver', () => {
   })
 
   describe('registerNewUser', () => {
-    const userId = faker.string.uuid()
+    const userId = crypto.randomUUID()
 
     it('should add new user', async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
@@ -69,23 +73,23 @@ describe('RootResolver', () => {
         email: data.user.email
       }).toMatchObject({ accessToken: expect.any(String), email: input.email })
 
-      await prismaClient.device.deleteMany()
-      await prismaClient.decryptionChallenge.deleteMany()
-      await prismaClient.user.deleteMany()
+      await db.delete(schema.device).where(eq(schema.device.userId, userId))
+      await db
+        .delete(schema.decryptionChallenge)
+        .where(eq(schema.decryptionChallenge.userId, userId))
+      await db.delete(schema.user).where(eq(schema.user.id, userId))
     })
 
     it('should throw User with such email already exists', async () => {
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
-      await prismaClient.user.create({
-        data: {
-          id: faker.string.uuid(),
-          //Same email
-          email: input.email,
-          addDeviceSecret: input.addDeviceSecret,
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: input.encryptionSalt,
-          ...userSecurityProps
-        }
+      const newUserId = crypto.randomUUID()
+      await db.insert(schema.user).values({
+        id: newUserId,
+        email: input.email,
+        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+        encryptionSalt: input.encryptionSalt,
+        ...userSecurityProps
       })
 
       await expect(
@@ -95,37 +99,34 @@ describe('RootResolver', () => {
     })
 
     it("should show 'Device already exists. You cannot register this device for multiple accounts.'", async () => {
-      const userId = faker.string.uuid()
+      const userId = crypto.randomUUID()
 
       const input: RegisterNewAccountInput = makeRegisterAccountInput()
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: faker.internet.email(),
-          addDeviceSecret: input.addDeviceSecret,
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          encryptionSalt: input.encryptionSalt,
-          ...userSecurityProps,
+      await db.insert(schema.user).values({
+        id: userId,
+        email: `${crypto.randomUUID()}@test.com`,
+        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+        encryptionSalt: input.encryptionSalt,
+        ...userSecurityProps
+      })
 
-          Devices: {
-            create: {
-              id: input.deviceId,
-              platform: 'iOS',
-              firstIpAddress: faker.internet.ip(),
-              lastIpAddress: faker.internet.ip(),
-              firebaseToken: faker.string.uuid(),
-              name: input.deviceName,
-              ...defaultDeviceSettingSystemValues
-            }
-          }
-        }
+      await db.insert(schema.device).values({
+        id: input.deviceId,
+        platform: 'iOS',
+        firstIpAddress: faker.internet.ip(),
+        lastIpAddress: faker.internet.ip(),
+        firebaseToken: crypto.randomUUID(),
+        name: input.deviceName,
+        userId,
+        ...defaultDeviceSettingSystemValues
       })
 
       await expect(
         async () =>
           await resolver.registerNewUser(
             input,
-            faker.string.uuid(),
+            crypto.randomUUID(),
             makeFakeCtx({ userId })
           )
       ).rejects.toThrow(
@@ -136,66 +137,62 @@ describe('RootResolver', () => {
 
   describe('deviceDecryptionChallenge', () => {
     it('should return a DecryptionChallengeForApproval', async () => {
-      const userId = faker.string.uuid()
+      const userId = crypto.randomUUID()
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: fakeData.email,
-          addDeviceSecret: fakeData.addDeviceSecret,
-          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-          newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
-          encryptionSalt: fakeData.encryptionSalt,
-          ...userSecurityProps
-        }
+      await db.insert(schema.user).values({
+        id: userId,
+        email: fakeData.email,
+        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+        newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
+        encryptionSalt: fakeData.encryptionSalt,
+        ...userSecurityProps
       })
 
       const data = (await resolver.deviceDecryptionChallenge(
         fakeData.email,
         {
-          id: faker.string.uuid(),
+          id: crypto.randomUUID(),
           name: 'chrome ',
           platform: 'macOS'
         },
         makeFakeCtx({ userId })
       )) as DecryptionChallengeForApproval
 
-      expect((data as any)?.addDeviceSecretEncrypted).toBe(undefined)
+      expect(
+        (data as { addDeviceSecretEncrypted?: string })
+          ?.addDeviceSecretEncrypted
+      ).toBe(undefined)
     })
 
     it("should show 'Too many decryption challenges, wait for cooldown'", async () => {
-      const userId = faker.string.uuid()
+      const userId = crypto.randomUUID()
 
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: fakeData.email,
-          addDeviceSecret: fakeData.addDeviceSecret,
-          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-          encryptionSalt: fakeData.encryptionSalt,
-
-          ...userSecurityProps
-        }
+      await db.insert(schema.user).values({
+        id: userId,
+        email: fakeData.email,
+        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+        encryptionSalt: fakeData.encryptionSalt,
+        ...userSecurityProps
       })
 
       const data = Array.from({ length: 10 }).map(() => ({
         userId: userId,
         ipAddress: faker.internet.ip(),
         masterPasswordVerifiedAt: null,
-        deviceId: faker.string.uuid(),
+        deviceId: crypto.randomUUID(),
         deviceName: 'chrome'
       }))
 
-      await prismaClient.decryptionChallenge.createMany({
-        data
-      })
+      await db.insert(schema.decryptionChallenge).values(data)
 
       await expect(async () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           {
-            id: faker.string.uuid(),
+            id: crypto.randomUUID(),
             name: 'chrome ',
             platform: 'macOS'
           },
@@ -205,45 +202,40 @@ describe('RootResolver', () => {
     })
 
     it('should block creation of a challenge from an IP which was blocked previously', async () => {
-      const userId = faker.string.uuid()
+      const userId = crypto.randomUUID()
       const blockedIp = faker.internet.ip()
       const fakeCtx = {
         reply: { setCookie: () => {} },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         getIpAddress: () => blockedIp
-      } as any
+      } as unknown as IContextAuthenticated
 
       const fakeData: RegisterNewAccountInput = makeRegisterAccountInput()
-      await prismaClient.user.create({
-        data: {
-          id: userId,
-          email: fakeData.email,
-          addDeviceSecret: fakeData.addDeviceSecret,
-          addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
-          encryptionSalt: fakeData.encryptionSalt,
-
-          ...userSecurityProps
-        }
+      await db.insert(schema.user).values({
+        id: userId,
+        email: fakeData.email,
+        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
+        encryptionSalt: fakeData.encryptionSalt,
+        ...userSecurityProps
       })
 
-      await prismaClient.decryptionChallenge.create({
-        data: {
-          userId: userId,
-          ipAddress: blockedIp,
-          masterPasswordVerifiedAt: null,
-          deviceId: faker.string.uuid(),
-          deviceName: 'chrome',
-          blockIp: true
-        }
+      await db.insert(schema.decryptionChallenge).values({
+        userId: userId,
+        ipAddress: blockedIp,
+        masterPasswordVerifiedAt: null,
+        deviceId: crypto.randomUUID(),
+        deviceName: 'chrome',
+        blockIp: true
       })
 
       await expect(async () => {
         await resolver.deviceDecryptionChallenge(
           fakeData.email,
           {
-            id: faker.string.uuid(),
+            id: crypto.randomUUID(),
             name: 'chrome ',
             platform: 'macOS'
           },
@@ -271,11 +263,13 @@ describe('RootResolver', () => {
 
       expect(inputs).toHaveLength(1) // TODO: flaky here, fix
 
-      // @ts-expect-error
-      delete inputs[0].createdAt
-      // @ts-expect-error
-      delete inputs[0].id
-      expect(inputs[0]).toMatchSnapshot()
+      expect(inputs[0]).toMatchObject({
+        domOrdinal: 0,
+        domPath: 'body',
+        host: 'google.com',
+        kind: 'PASSWORD',
+        url: 'https://google.com'
+      })
     })
   })
 })

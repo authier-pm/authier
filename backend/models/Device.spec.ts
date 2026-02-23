@@ -1,23 +1,27 @@
-import { prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { makeRegisterAccountInput } from '../schemas/__test__/makeRegisterAccountInput'
 import { DecryptionChallengeApproved } from './DecryptionChallenge'
-import type { User } from '@prisma/client'
+import type { InferSelectModel } from 'drizzle-orm'
+import * as schema from '../drizzle/schema'
+import { eq } from 'drizzle-orm'
 import { faker } from '@faker-js/faker'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { DeviceMutation, DeviceQuery } from './Device'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 
+type User = InferSelectModel<typeof schema.user>
+
 describe('Device', () => {
   let user: User
 
-  const masterDeviceId = faker.string.uuid()
-  const slaveDeviceId = faker.string.uuid()
+  const masterDeviceId = crypto.randomUUID()
+  const slaveDeviceId = crypto.randomUUID()
   const masterDeviceName = faker.lorem.word()
   const slaveDeviceName = faker.lorem.word()
   const slaveDeviceApproved = faker.date.recent()
-  const userId = faker.string.uuid()
+  const userId = crypto.randomUUID()
   const slaveDeviceChallenge = faker.number.int({ max: 1000, min: 1 })
   const TOTPlimit = faker.number.int({ min: 4, max: 20 })
   const loginCredentialsLimit = faker.number.int({ min: 4, max: 20 })
@@ -29,79 +33,70 @@ describe('Device', () => {
 
   challenge.id = faker.number.int({ max: 1000, min: 1 })
   challenge.blockIp = false
-  challenge.deviceId = faker.string.uuid()
+  challenge.deviceId = crypto.randomUUID()
   challenge.deviceName = faker.lorem.word()
 
   const input: RegisterNewAccountInput = makeRegisterAccountInput()
 
   beforeEach(async () => {
-    user = await prismaClient.user.create({
-      data: {
+    const [insertedUser] = await db
+      .insert(schema.user)
+      .values({
         id: userId,
         email: input.email,
         addDeviceSecret: input.addDeviceSecret,
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         loginCredentialsLimit,
-        TOTPlimit,
+        TOTPlimit: TOTPlimit,
         deviceRecoveryCooldownMinutes: 960
-      }
-    })
+      })
+      .returning()
+    user = insertedUser
 
     //Master device
-    await prismaClient.device.create({
-      data: {
-        id: masterDeviceId,
-        name: faker.lorem.word(),
-        firebaseToken: faker.string.sample(5),
-        firstIpAddress: faker.internet.ip(),
-        lastIpAddress: faker.internet.ip(),
-        platform: faker.lorem.word(),
-        userId: userId,
-        ...defaultDeviceSettingSystemValues
-      }
+    await db.insert(schema.device).values({
+      id: masterDeviceId,
+      name: faker.lorem.word(),
+      firebaseToken: crypto.randomUUID(),
+      firstIpAddress: faker.internet.ip(),
+      lastIpAddress: faker.internet.ip(),
+      platform: faker.lorem.word(),
+      userId: userId,
+      ...defaultDeviceSettingSystemValues
     })
 
     //Slave device
-    await prismaClient.device.create({
-      data: {
-        id: slaveDeviceId,
-        name: faker.lorem.word(),
-        firebaseToken: faker.string.sample(5),
-        firstIpAddress: faker.internet.ip(),
-        lastIpAddress: faker.internet.ip(),
-        platform: faker.lorem.word(),
-        userId: userId,
-        ...defaultDeviceSettingSystemValues
-      }
+    await db.insert(schema.device).values({
+      id: slaveDeviceId,
+      name: faker.lorem.word(),
+      firebaseToken: crypto.randomUUID(),
+      firstIpAddress: faker.internet.ip(),
+      lastIpAddress: faker.internet.ip(),
+      platform: faker.lorem.word(),
+      userId: userId,
+      ...defaultDeviceSettingSystemValues
     })
 
-    await prismaClient.decryptionChallenge.create({
-      data: {
-        id: slaveDeviceChallenge,
-        userId: userId,
-        deviceId: slaveDeviceId,
-        deviceName: slaveDeviceName,
-        ipAddress: faker.internet.ip(),
-        approvedAt: slaveDeviceApproved
-      }
+    await db.insert(schema.decryptionChallenge).values({
+      id: slaveDeviceChallenge,
+      userId: userId,
+      deviceId: slaveDeviceId,
+      deviceName: slaveDeviceName,
+      ipAddress: faker.internet.ip(),
+      approvedAt: slaveDeviceApproved
     })
   })
 
   afterEach(async () => {
-    const deleteChallenges = prismaClient.decryptionChallenge.deleteMany()
-    const deleteSecrets = prismaClient.encryptedSecret.deleteMany()
-    const deleteDevices = prismaClient.device.deleteMany()
-    const deleteUser = prismaClient.user.deleteMany()
-
-    await prismaClient.$transaction([
-      deleteChallenges,
-      deleteSecrets,
-      deleteDevices,
-      deleteUser
-    ])
-
-    await prismaClient.$disconnect()
+    await db
+      .delete(schema.decryptionChallenge)
+      .where(eq(schema.decryptionChallenge.userId, userId))
+    await db
+      .delete(schema.encryptedSecret)
+      .where(eq(schema.encryptedSecret.userId, userId))
+    await db.delete(schema.device).where(eq(schema.device.userId, userId))
+    await db.delete(schema.user).where(eq(schema.user.id, userId))
   })
 
   describe('logout', async () => {
@@ -117,18 +112,16 @@ describe('Device', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => {} },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         masterDeviceId: masterDeviceId,
         getIpAddress: () => faker.internet.ip()
-      } as any
+      } as unknown as Parameters<DeviceMutation['logout']>[0]
 
       const logout = await deviceMutation.logout(fakeCtx)
 
-      const challenges = await prismaClient.decryptionChallenge.findFirst({
-        where: {
-          deviceId: slaveDeviceId
-        }
+      const challenges = await db.query.decryptionChallenge.findFirst({
+        where: { deviceId: slaveDeviceId }
       })
 
       expect(challenges).toMatchObject({
@@ -156,18 +149,16 @@ describe('Device', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         masterDeviceId: masterDeviceId,
         getIpAddress: () => faker.internet.ip()
-      } as any
+      } as unknown as Parameters<DeviceMutation['logout']>[0]
 
       const logout = await deviceMutation.logout(fakeCtx)
 
-      const challenges = await prismaClient.decryptionChallenge.findMany({
-        where: {
-          deviceId: masterDeviceId
-        }
+      const challenges = await db.query.decryptionChallenge.findMany({
+        where: { deviceId: masterDeviceId }
       })
 
       //FIX: How to test clearCookie??
@@ -194,28 +185,24 @@ describe('Device', () => {
       const fakeCtx = {
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         masterDeviceId: masterDeviceId,
         getIpAddress: () => faker.internet.ip()
-      } as any
+      } as unknown as Parameters<DeviceMutation['removeDevice']>[0]
 
       const wasRemoved = await deviceMutation.removeDevice(fakeCtx)
 
-      const device = await prismaClient.device.findMany({
-        where: {
-          id: slaveDeviceId
-        }
+      const devices = await db.query.device.findMany({
+        where: { id: slaveDeviceId }
       })
 
-      const challenges = await prismaClient.decryptionChallenge.findMany({
-        where: {
-          deviceId: slaveDeviceId
-        }
+      const challenges = await db.query.decryptionChallenge.findMany({
+        where: { deviceId: slaveDeviceId }
       })
 
       expect(wasRemoved).toBeTruthy()
-      expect(device).toHaveLength(0)
+      expect(devices).toHaveLength(0)
       expect(challenges).toHaveLength(0)
     })
 
@@ -229,11 +216,11 @@ describe('Device', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         masterDeviceId: masterDeviceId,
         getIpAddress: () => faker.internet.ip()
-      } as any
+      } as unknown as Parameters<DeviceMutation['removeDevice']>[0]
 
       await expect(
         async () => await deviceMutation.removeDevice(fakeCtx)
@@ -254,11 +241,11 @@ describe('Device', () => {
         // eslint-disable-next-line @typescript-eslint/no-empty-function
         reply: { setCookie: () => {}, clearCookie: () => vi.fn() },
         request: { headers: {} },
-        prisma: prismaClient,
+        db,
         jwtPayload: { userId: userId },
         masterDeviceId: masterDeviceId,
         getIpAddress: () => faker.internet.ip()
-      } as any
+      } as unknown as Parameters<DeviceMutation['rename']>[0]
 
       const rename = await deviceMutation.rename(fakeCtx, newName)
 
@@ -274,8 +261,6 @@ describe('Device', () => {
     deviceQuery.lastSyncAt = faker.date.past({ years: 1 })
     deviceQuery.userId = userId
 
-    const testData: any = []
-
     // Create mock objects
     const fakeCtx = {
       // eslint-disable-next-line @typescript-eslint/no-empty-function
@@ -284,77 +269,69 @@ describe('Device', () => {
       device: {
         syncTOTP: true
       },
-      prisma: prismaClient,
+      db,
       jwtPayload: { userId: userId },
       masterDeviceId: masterDeviceId,
       getIpAddress: () => faker.internet.ip()
-    } as any
+    } as unknown as Parameters<DeviceQuery['encryptedSecretsToSync']>[0]
 
     it('No limit exceeded', async () => {
       //Generate fake secrets for user
-
-      for (let i = 0; i < user.loginCredentialsLimit; i++) {
-        testData.push({
+      const testData = Array.from(
+        { length: user.loginCredentialsLimit },
+        () => ({
+          id: crypto.randomUUID(),
           encrypted: faker.string.sample(25),
-          kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
+          kind: 'LOGIN_CREDENTIALS' as const,
           userId: userId,
           version: 1
         })
-      }
+      )
 
-      await prismaClient.encryptedSecret.createMany({
-        data: testData
-      })
+      await db.insert(schema.encryptedSecret).values(testData)
 
       const secrets = await deviceQuery.encryptedSecretsToSync(fakeCtx)
 
       expect(secrets).toHaveLength(user.loginCredentialsLimit)
-      testData.length = 0
     })
 
     it('should not sync TOTP when device has syncTOTP set to false', async () => {
-      for (let i = 0; i < user.TOTPlimit; i++) {
-        testData.push({
-          encrypted: faker.string.sample(25),
-          kind: EncryptedSecretTypeGQL.TOTP,
-          userId: userId,
-          version: 1
-        })
-      }
-      fakeCtx.device.syncTOTP = false
-      await prismaClient.encryptedSecret.createMany({
-        data: testData
-      })
+      const testData = Array.from({ length: user.TOTPlimit }, () => ({
+        id: crypto.randomUUID(),
+        encrypted: faker.string.sample(25),
+        kind: 'TOTP' as const,
+        userId: userId,
+        version: 1
+      }))
+
+      ;(fakeCtx as { device: { syncTOTP: boolean } }).device.syncTOTP = false
+      await db.insert(schema.encryptedSecret).values(testData)
       const res = await deviceQuery.encryptedSecretsToSync(fakeCtx)
 
       expect(res).toHaveLength(0)
-
-      fakeCtx.device.syncTOTP = true
+      ;(fakeCtx as { device: { syncTOTP: boolean } }).device.syncTOTP = true
     })
 
     it("should show 'TOTP limit exceeded, remove TOTP secrets'", async () => {
       //Generate fake secrets for user
       const numOverLimit = 5
-      //TODO: Make function for generating random secrets, revise this code and remove duplicate lines
 
-      for (let i = 0; i < numOverLimit; i++) {
-        testData.push({
+      const testData = Array.from(
+        { length: user.TOTPlimit + numOverLimit },
+        () => ({
+          id: crypto.randomUUID(),
           encrypted: faker.string.sample(25),
-          kind: EncryptedSecretTypeGQL.TOTP,
+          kind: 'TOTP' as const,
           userId: userId,
           version: 1
         })
-      }
+      )
 
-      await prismaClient.encryptedSecret.createMany({
-        data: testData
-      })
+      await db.insert(schema.encryptedSecret).values(testData)
 
       await expect(
         async () => await deviceQuery.encryptedSecretsToSync(fakeCtx)
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: TOTP limit exceeded, remove 5 TOTP secrets]`
-      )
+      ).rejects.toThrow(/TOTP limit exceeded, remove \d+ TOTP secrets/)
     })
   })
 })

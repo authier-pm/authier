@@ -25,7 +25,7 @@ export class UserGQLScalars {
   @Field(() => String, { nullable: true })
   username: string | null
 
-  @Field()
+  @Field(() => String)
   addDeviceSecretEncrypted: string
 
   @Field(() => GraphQLISODateTime)
@@ -37,7 +37,7 @@ export class UserGQLScalars {
   @Field(() => String, { nullable: true })
   masterDeviceId: string | null
 
-  @Field()
+  @Field(() => String)
   uiLanguage: string
 
   @Field(() => Int)
@@ -49,7 +49,7 @@ export class UserGQLScalars {
   @Field(() => Int)
   deviceRecoveryCooldownMinutes: number
 
-  @Field()
+  @Field(() => Boolean)
   notificationOnVaultUnlock: boolean
 
   @Field(() => Int)

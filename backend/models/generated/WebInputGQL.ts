@@ -14,16 +14,16 @@ export class WebInputGQLScalars {
   @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field()
+  @Field(() => String)
   host: string
 
-  @Field()
+  @Field(() => String)
   url: string
 
   @Field(() => WebInputTypeGQL)
   kind: WebInputTypeGQL
 
-  @Field()
+  @Field(() => String)
   domPath: string
 
   @Field(() => Int)

@@ -21,7 +21,7 @@
 ## TypeScript
 
 - avoid `try`/`catch` unless absolutely necessary. We want to fail fast and see the original stack trace. Let errors propagate up to the caller from all the way down.
-- avoid casting to `any`
+- never cast to `any`
 - use named exports when possible
 - avoid async imports, always import stuff at the top level
 - nested ternaries are forbidden

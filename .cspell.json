@@ -23,6 +23,7 @@
     "deauthorize",
     "deauthorized",
     "Deduplication",
+    "Elysia",
     "esbuild",
     "farmhash",
     "Fastify",
@@ -68,6 +69,7 @@
     "uuidv",
     "webextension",
     "wouter",
+    "wrdeploy",
     "zustand"
   ]
 }

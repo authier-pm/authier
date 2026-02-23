@@ -76,7 +76,11 @@ function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
 
       return { inputEl, index, total }
     })
-    .filter(Boolean) as Array<{ inputEl: HTMLInputElement; index: number; total: number }>
+    .filter(Boolean) as Array<{
+    inputEl: HTMLInputElement
+    index: number
+    total: number
+  }>
 
   if (labeledCandidates.length > 0) {
     log(
@@ -116,7 +120,9 @@ function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
   }
 
   if (usefulInputs.length > 0) {
-    const numericInputs = usefulInputs.filter((input) => input.type === 'number')
+    const numericInputs = usefulInputs.filter(
+      (input) => input.type === 'number'
+    )
     if (numericInputs.length >= 4) {
       log(
         'segmented TOTP detection miss',
@@ -135,10 +141,7 @@ function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
   return null
 }
 
-function fillSegmentedTotpInputs(
-  inputs: HTMLInputElement[],
-  totpCode: string
-) {
+function fillSegmentedTotpInputs(inputs: HTMLInputElement[], totpCode: string) {
   if (inputs.length !== 6 || totpCode.length < 6) {
     return false
   }
@@ -198,7 +201,10 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
 }
 
 function imitateKeyInput(el: HTMLInputElement, input: string) {
-  const setNativeInputValue = (targetEl: HTMLInputElement, nextValue: string) => {
+  const setNativeInputValue = (
+    targetEl: HTMLInputElement,
+    nextValue: string
+  ) => {
     const valueSetter = Object.getOwnPropertyDescriptor(
       HTMLInputElement.prototype,
       'value'
@@ -506,10 +512,7 @@ export const autofill = (initState: IInitStateRes) => {
           if (!totpCode) {
             return
           }
-          const el = autofillValueIntoInput(
-            inputEl,
-            totpCode
-          )
+          const el = autofillValueIntoInput(inputEl, totpCode)
           el && filledElements.add(el)
         }
 
@@ -563,9 +566,11 @@ export const autofill = (initState: IInitStateRes) => {
         let dynamicTotpSecret = totpSecret
         if (isLikelyOtpField && !dynamicTotpSecret) {
           try {
-            const refreshedState = await trpc.getContentScriptInitialState.query()
+            const refreshedState =
+              await trpc.getContentScriptInitialState.query()
             dynamicTotpSecret =
-              refreshedState?.secretsForHost?.totpSecrets?.[0] ?? dynamicTotpSecret
+              refreshedState?.secretsForHost?.totpSecrets?.[0] ??
+              dynamicTotpSecret
             log('refetched content script state for OTP', {
               totpSecretsCount:
                 refreshedState?.secretsForHost?.totpSecrets?.length ?? 0,
@@ -668,7 +673,9 @@ export const autofill = (initState: IInitStateRes) => {
           bubbles: true,
           cancelable: true
         })
-        const submitButton = form.querySelector('[type="submit"]') as HTMLElement | null
+        const submitButton = form.querySelector(
+          '[type="submit"]'
+        ) as HTMLElement | null
         if (submitButton) {
           submitButton.dispatchEvent(clickEvent)
         }

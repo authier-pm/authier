@@ -17,16 +17,24 @@ import { GraphqlError } from '../lib/GraphqlError'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
+import {
+  user,
+  encryptedSecret,
+  device,
+  decryptionChallenge,
+  secretUsageEvent
+} from '../drizzle/schema'
+import { eq, and, or, isNull, gte, count } from 'drizzle-orm'
 
 @InputType()
 export class DeviceInput {
   @Field(() => String, { nullable: false })
   id: string
 
-  @Field()
+  @Field(() => String)
   name: string
 
-  @Field({ nullable: false })
+  @Field(() => String, { nullable: false })
   platform: string
 }
 
@@ -36,33 +44,39 @@ export class DeviceQuery extends DeviceGQL {
     description: 'Get all secrets that were change since last device sync'
   })
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
-    const lastSyncCondition = { gte: this.lastSyncAt ?? undefined }
+    const lastSyncCondition = this.lastSyncAt
+      ? gte(encryptedSecret.createdAt, this.lastSyncAt)
+      : undefined
 
-    const userData = await ctx.prisma.user.findFirst({
-      where: {
-        id: ctx.jwtPayload.userId
-      }
+    const userData = await ctx.db.query.user.findFirst({
+      where: { id: ctx.jwtPayload.userId }
     })
 
     if (userData) {
-      const pswLimit = userData?.loginCredentialsLimit
-      const totpLimit = userData?.TOTPlimit
+      const pswLimit = userData.loginCredentialsLimit
+      const totpLimit = userData.TOTPlimit
 
-      const pswCount = await ctx.prisma.encryptedSecret.count({
-        where: {
-          userId: ctx.jwtPayload.userId,
-          kind: EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
-          deletedAt: null
-        }
-      })
+      const [{ count: pswCount }] = await ctx.db
+        .select({ count: count() })
+        .from(encryptedSecret)
+        .where(
+          and(
+            eq(encryptedSecret.userId, ctx.jwtPayload.userId),
+            eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS),
+            isNull(encryptedSecret.deletedAt)
+          )
+        )
 
-      const TOTPCount = await ctx.prisma.encryptedSecret.count({
-        where: {
-          userId: ctx.jwtPayload.userId,
-          kind: EncryptedSecretTypeGQL.TOTP,
-          deletedAt: null
-        }
-      })
+      const [{ count: TOTPCount }] = await ctx.db
+        .select({ count: count() })
+        .from(encryptedSecret)
+        .where(
+          and(
+            eq(encryptedSecret.userId, ctx.jwtPayload.userId),
+            eq(encryptedSecret.kind, EncryptedSecretTypeGQL.TOTP),
+            isNull(encryptedSecret.deletedAt)
+          )
+        )
 
       if (pswCount > pswLimit) {
         throw new GraphqlError(
@@ -78,30 +92,35 @@ export class DeviceQuery extends DeviceGQL {
 
       const kindOfSecret =
         ctx.device.syncTOTP === true
-          ? undefined // returns all secrets
-          : EncryptedSecretTypeGQL.LOGIN_CREDENTIALS // returns only login credentials
+          ? undefined
+          : eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS)
 
-      const res = await ctx.prisma.encryptedSecret.findMany({
-        where: {
-          OR: [
-            {
-              userId: this.userId,
-              kind: kindOfSecret,
-              createdAt: lastSyncCondition
-            },
-            {
-              userId: this.userId,
-              kind: kindOfSecret,
-              updatedAt: lastSyncCondition
-            },
-            {
-              userId: this.userId,
-              kind: kindOfSecret,
-              deletedAt: lastSyncCondition
-            }
-          ]
-        }
-      })
+      const kindCondition = kindOfSecret ? kindOfSecret : undefined
+
+      const cAtCondition = this.lastSyncAt
+        ? gte(encryptedSecret.createdAt, this.lastSyncAt)
+        : undefined
+      const uAtCondition = this.lastSyncAt
+        ? gte(encryptedSecret.updatedAt, this.lastSyncAt)
+        : undefined
+      const dAtCondition = this.lastSyncAt
+        ? gte(encryptedSecret.deletedAt, this.lastSyncAt)
+        : undefined
+
+      const orConditions = [cAtCondition, uAtCondition, dAtCondition].filter(
+        (c): c is NonNullable<typeof c> => c !== undefined
+      )
+
+      const res = await ctx.db
+        .select()
+        .from(encryptedSecret)
+        .where(
+          and(
+            eq(encryptedSecret.userId, this.userId),
+            kindCondition,
+            orConditions.length > 0 ? or(...orConditions) : undefined
+          )
+        )
       return res
     }
   }
@@ -129,21 +148,19 @@ export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => GraphQLISODateTime)
   async markAsSynced(@Ctx() ctx: IContext) {
     const syncedAt = new Date()
-    await ctx.prisma.device.update({
-      data: {
+    await ctx.db
+      .update(device)
+      .set({
         lastSyncAt: syncedAt
-      },
-      where: {
-        id: this.id
-      }
-    })
+      })
+      .where(eq(device.id, this.id))
     return syncedAt
   }
 
   @Field(() => SecretUsageEventGQLScalars)
   async reportSecretUsageEvent(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('kind') kind: string,
+    @Arg('kind', () => String) kind: string,
     @Arg('secretId', () => GraphQLUUID) secretId: string,
     @Arg('webInputId', () => GraphQLPositiveInt, {
       nullable: true,
@@ -151,8 +168,9 @@ export class DeviceMutation extends DeviceGQLScalars {
     })
     webInputId: number
   ) {
-    const res = await ctx.prisma.secretUsageEvent.create({
-      data: {
+    const res = await ctx.db
+      .insert(secretUsageEvent)
+      .values({
         ipAddress: ctx.getIpAddress(),
         kind,
         timestamp: new Date(),
@@ -160,9 +178,9 @@ export class DeviceMutation extends DeviceGQLScalars {
         userId: this.userId,
         deviceId: this.id,
         webInputId
-      }
-    })
-    return res
+      })
+      .returning()
+    return res[0]
   }
 
   @Field(() => DeviceGQL)
@@ -171,40 +189,41 @@ export class DeviceMutation extends DeviceGQLScalars {
     @Arg('vaultLockTimeoutSeconds', () => Int) vaultLockTimeoutSeconds: number,
     @Ctx() ctx: IContext
   ) {
-    return await ctx.prisma.device.update({
-      where: {
-        id: this.id
-      },
-      data: {
+    const res = await ctx.db
+      .update(device)
+      .set({
         syncTOTP: syncTOTP,
         vaultLockTimeoutSeconds: vaultLockTimeoutSeconds
-      }
-    })
+      })
+      .where(eq(device.id, this.id))
+      .returning()
+    return res[0]
   }
 
   @Field(() => DeviceGQL)
-  async rename(@Ctx() ctx: IContextAuthenticated, @Arg('name') name: string) {
-    return ctx.prisma.device.update({
-      data: {
+  async rename(
+    @Ctx() ctx: IContextAuthenticated,
+    @Arg('name', () => String) name: string
+  ) {
+    const res = await ctx.db
+      .update(device)
+      .set({
         name
-      },
-      where: {
-        id: this.id
-      }
-    })
+      })
+      .where(eq(device.id, this.id))
+      .returning()
+    return res[0]
   }
 
   @Field(() => DeviceGQL)
   async logout(@Ctx() ctx: IContextAuthenticated) {
     if (this.id === ctx.masterDeviceId) {
-      await ctx.prisma.decryptionChallenge.create({
-        data: {
-          deviceId: this.id,
-          ipAddress: ctx.getIpAddress(),
-          deviceName: this.name,
-          userId: this.userId,
-          approvedAt: new Date()
-        }
+      await ctx.db.insert(decryptionChallenge).values({
+        deviceId: this.id,
+        ipAddress: ctx.getIpAddress(),
+        deviceName: this.name,
+        userId: this.userId,
+        approvedAt: new Date()
       })
     }
 
@@ -213,12 +232,15 @@ export class DeviceMutation extends DeviceGQLScalars {
       ctx.reply.clearCookie('access-token')
     }
 
-    return await ctx.prisma.device.update({
-      where: {
-        id: this.id
-      },
-      data: { logoutAt: new Date(), firebaseToken: null }
-    })
+    const res = await ctx.db
+      .update(device)
+      .set({
+        logoutAt: new Date(),
+        firebaseToken: null
+      })
+      .where(eq(device.id, this.id))
+      .returning()
+    return res[0]
   }
 
   @Field(() => Boolean, {
@@ -230,18 +252,13 @@ export class DeviceMutation extends DeviceGQLScalars {
     }
     await this.logout(ctx)
 
-    await ctx.prisma.$transaction([
-      ctx.prisma.device.delete({
-        where: {
-          id: this.id
-        }
-      }),
-      ctx.prisma.decryptionChallenge.deleteMany({
-        where: {
-          deviceId: this.id
-        }
-      })
-    ])
+    await ctx.db.transaction(async (tx) => {
+      await tx
+        .delete(decryptionChallenge)
+        .where(eq(decryptionChallenge.deviceId, this.id))
+      await tx.delete(device).where(eq(device.id, this.id))
+    })
+
     return true
   }
 }

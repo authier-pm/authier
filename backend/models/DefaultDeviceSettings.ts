@@ -3,6 +3,8 @@ import { DefaultDeviceSettingsGQLScalars } from './generated/DefaultDeviceSettin
 
 import type { IContextAuthenticated } from './types/ContextTypes'
 import { DefaultSettingsInput } from './models'
+import { defaultSettings } from '../drizzle/schema'
+import { eq } from 'drizzle-orm'
 
 @ObjectType()
 export class DefaultDeviceSettingsQuery extends DefaultDeviceSettingsGQLScalars {
@@ -29,24 +31,21 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
     }
 
     if (this.id && this.id !== 0) {
-      return await ctx.prisma.defaultDeviceSettings.update({
-        where: {
-          id: this.id
-        },
-
-        data
-      })
+      const res = await ctx.db
+        .update(defaultSettings)
+        .set(data)
+        .where(eq(defaultSettings.id, this.id))
+        .returning()
+      return res[0]
     }
 
-    return await ctx.prisma.defaultDeviceSettings.create({
-      data: {
+    const res = await ctx.db
+      .insert(defaultSettings)
+      .values({
         ...data,
-        user: {
-          connect: {
-            id: ctx.jwtPayload.userId
-          }
-        }
-      }
-    })
+        userId: ctx.jwtPayload.userId
+      })
+      .returning()
+    return res[0]
   }
 }

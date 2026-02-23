@@ -4,6 +4,8 @@ import debug from 'debug'
 import type { IContextAuthenticated } from './types/ContextTypes'
 import { RedisBasicRateLimiter } from '../lib/RedisBasicRateLimiter'
 import { redisClient } from '../lib/redisClient'
+import { webInput } from '../drizzle/schema'
+import { eq } from 'drizzle-orm'
 
 const log = debug('au:WebInput')
 
@@ -20,10 +22,11 @@ export class WebInputMutation extends WebInputGQL {
     await rateLimiter.increment(ctx.jwtPayload.userId)
     log('delete of WebInput id: ', this.id)
 
-    const res = await ctx.prisma.webInput.delete({
-      where: { id: this.id }
-    })
+    const res = await ctx.db
+      .delete(webInput)
+      .where(eq(webInput.id, this.id))
+      .returning()
 
-    return res
+    return res[0]
   }
 }

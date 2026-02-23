@@ -7,7 +7,7 @@ export class DecryptionChallengeGQLScalars {
   @Field(() => Int)
   id: number
 
-  @Field()
+  @Field(() => String)
   ipAddress: string
 
   @Field(() => GraphQLISODateTime, { nullable: true })
@@ -19,19 +19,19 @@ export class DecryptionChallengeGQLScalars {
   @Field(() => Boolean, { nullable: true })
   blockIp: boolean | null
 
-  @Field()
+  @Field(() => String)
   deviceName: string
 
-  @Field()
+  @Field(() => String)
   deviceId: string
 
-  @Field()
+  @Field(() => String)
   userId: string
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date
 
-  @Field()
+  @Field(() => Boolean)
   approvedByRecovery: boolean
 
   @Field(() => String, { nullable: true })
