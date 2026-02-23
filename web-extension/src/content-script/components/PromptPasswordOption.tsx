@@ -20,6 +20,35 @@ import {
 const log = debug('au:PromptPasswordOption')
 const REFRESH_INTERVAL_MS = 100
 
+function didRectChange(prev: DOMRect, next: DOMRect) {
+  return (
+    prev.x !== next.x ||
+    prev.y !== next.y ||
+    prev.width !== next.width ||
+    prev.height !== next.height ||
+    prev.top !== next.top ||
+    prev.right !== next.right ||
+    prev.bottom !== next.bottom ||
+    prev.left !== next.left
+  )
+}
+
+function findVisibleInputEl(webInputs: PromptPasswordOptionProps['webInputs']) {
+  for (const webInput of webInputs) {
+    const el = document.querySelector(webInput.domPath)
+    if (!(el instanceof HTMLInputElement)) {
+      continue
+    }
+
+    const bounds = el.getBoundingClientRect()
+    if (bounds.width > 0 && bounds.height > 0) {
+      return el
+    }
+  }
+
+  return null
+}
+
 export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
   const { loginCredentials, webInputs } = props
 
@@ -28,17 +57,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
-  let inputEl: HTMLInputElement | null = null
-
-  for (const webInput of webInputs) {
-    inputEl = document.querySelector(webInput.domPath)
-    if (inputEl) {
-      const bounds = inputEl.getBoundingClientRect()
-      if (bounds.width > 0 && bounds.height > 0) {
-        break // found a visible input element
-      }
-    }
-  }
+  const inputEl = findVisibleInputEl(webInputs)
 
   if (!inputEl) {
     log('No el in PromptPasswordOption')
@@ -56,14 +75,29 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       return
     }
 
+    const mountedPromptOption = promptOption
+    let trackedInputEl: HTMLInputElement | null = inputEl
     let frameId: number | null = null
     let timeoutId: number | null = null
     let disposed = false
     let lastUpdate = 0
 
     const removePrompt = () => {
-      if (promptOption && promptOption.parentNode) {
-        promptOption.remove()
+      if (mountedPromptOption && mountedPromptOption.parentNode) {
+        mountedPromptOption.remove()
+      }
+    }
+
+    let resizeObserver: ResizeObserver | null = null
+
+    const observeTrackedInput = (nextInputEl: HTMLInputElement | null) => {
+      if (trackedInputEl === nextInputEl) {
+        return
+      }
+      resizeObserver?.disconnect()
+      trackedInputEl = nextInputEl
+      if (trackedInputEl) {
+        resizeObserver?.observe(trackedInputEl)
       }
     }
 
@@ -72,21 +106,29 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         return
       }
 
-      if (!inputEl || !inputEl.isConnected) {
+      if (!trackedInputEl || !trackedInputEl.isConnected) {
+        observeTrackedInput(findVisibleInputEl(webInputs))
+      }
+
+      if (!trackedInputEl) {
         removePrompt()
         return
       }
 
-      const bounds = inputEl.getBoundingClientRect()
+      const bounds = trackedInputEl.getBoundingClientRect()
 
       if (bounds.width === 0 || bounds.height === 0) {
-        removePrompt()
-        return
+        observeTrackedInput(findVisibleInputEl(webInputs))
+        if (!trackedInputEl) {
+          removePrompt()
+          return
+        }
       }
 
-      setPos(bounds)
-      if (promptOption && !promptOption.parentNode) {
-        document.body.appendChild(promptOption)
+      const nextBounds = trackedInputEl.getBoundingClientRect()
+      setPos((prev) => (didRectChange(prev, nextBounds) ? nextBounds : prev))
+      if (mountedPromptOption && !mountedPromptOption.parentNode) {
+        document.body.appendChild(mountedPromptOption)
       }
     }
 
@@ -116,15 +158,23 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       }
     }
 
-    const resizeObserver =
+    resizeObserver =
       typeof ResizeObserver !== 'undefined'
         ? new ResizeObserver(queuePositionUpdate)
         : null
-    resizeObserver?.observe(inputEl)
+    resizeObserver?.observe(trackedInputEl)
 
     const mutationObserver =
       typeof MutationObserver !== 'undefined'
-        ? new MutationObserver(queuePositionUpdate)
+        ? new MutationObserver((records) => {
+            if (
+              mountedPromptOption &&
+              records.every((record) => mountedPromptOption.contains(record.target))
+            ) {
+              return
+            }
+            queuePositionUpdate()
+          })
         : null
     mutationObserver?.observe(document.body, {
       childList: true,
@@ -149,7 +199,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       window.removeEventListener('scroll', queuePositionUpdate, true)
       window.removeEventListener('resize', queuePositionUpdate)
     }
-  }, [inputEl, setPos])
+  }, [inputEl, setPos, webInputs])
   if (!pos) {
     return null
   }
