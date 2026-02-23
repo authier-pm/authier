@@ -32,7 +32,7 @@ const migrateOneDb = async (dbName: string) => {
       const DATABASE_URL = `${dbUrl}/${dbName}`
       execFile(
         '../node_modules/prisma/build/index.js',
-        ['migrate', command, '--force', '--skip-generate'],
+        ['migrate', command, '--force'],
         {
           env: {
             ...process.env,
