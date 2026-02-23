@@ -33,9 +33,9 @@ export const LogoutDeviceAlert = ({
   const onClose = async (goBack: boolean) => {
     if (remove) {
       console.log('remove')
-      await removeDevice()
+      await removeDevice({ variables: { id: selectedDeviceId } })
     } else {
-      await logoutDevice()
+      await logoutDevice({ variables: { id: selectedDeviceId } })
     }
 
     if (goBack) {

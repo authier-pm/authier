@@ -23,7 +23,7 @@ import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
-import type { PrismaClientKnownRequestError } from '@prisma/engine-core/dist/common/errors/PrismaClientKnownRequestError'
+import type { PrismaClientKnownRequestError } from '@prisma/client/runtime/client'
 
 import {
   UserNewDevicePolicy,
