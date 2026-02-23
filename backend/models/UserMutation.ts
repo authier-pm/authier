@@ -21,7 +21,6 @@ import {
 import { sendEmail } from '../utils/email'
 import { v4 as uuidv4 } from 'uuid'
 
-import { EmailVerificationType } from '@prisma/client'
 import { DecryptionChallengeMutation } from './DecryptionChallenge'
 
 import { DeviceInput } from './Device'
@@ -308,7 +307,7 @@ export class UserMutation extends UserBase {
             token: uuidv4(),
             address: this.email,
             userId: this.id,
-            kind: EmailVerificationType.PRIMARY
+            kind: 'PRIMARY'
           })
           .returning()
         verification = res[0]

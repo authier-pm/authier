@@ -1,4 +1,7 @@
-import type { Device, User } from '@prisma/client'
+import type { InferSelectModel } from 'drizzle-orm'
+import type { user, device } from './drizzle/schema'
+type User = InferSelectModel<typeof user>
+type Device = InferSelectModel<typeof device>
 import type { JwtPayload } from 'jsonwebtoken'
 import { sign } from 'jsonwebtoken'
 

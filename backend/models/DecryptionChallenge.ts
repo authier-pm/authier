@@ -20,7 +20,6 @@ import { LoginResponse } from './models'
 import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
-import { UserNewDevicePolicy } from '@prisma/client'
 import { user, decryptionChallenge, device } from '../drizzle/schema'
 import { eq, and } from 'drizzle-orm'
 
@@ -195,8 +194,7 @@ export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
     if (!userData) throw new Error('User not found')
 
     if (
-      userData.newDevicePolicy ===
-        UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL &&
+      userData.newDevicePolicy === 'REQUIRE_MASTER_DEVICE_APPROVAL' &&
       userData.masterDeviceId !== ctx.device.id
     ) {
       throw new GraphqlError(

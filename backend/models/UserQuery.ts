@@ -17,8 +17,8 @@ import { UserGQL } from './generated/UserGQL'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DeviceQuery } from './Device'
 import { EmailVerificationGQLScalars } from './generated/EmailVerificationGQL'
-import type { Device } from '@prisma/client'
-import { EmailVerificationType } from '@prisma/client'
+import type { InferSelectModel } from 'drizzle-orm'
+type Device = InferSelectModel<typeof deviceSchema>
 import { DecryptionChallengeForApproval } from './DecryptionChallenge'
 import { defaultDeviceSettingUserValuesWithId } from './defaultDeviceSettingSystemValues'
 import { DefaultDeviceSettingsQuery } from './DefaultDeviceSettings'
@@ -137,7 +137,7 @@ export class UserQuery extends UserBase {
       where: {
         userId: this.id,
         address: this.email,
-        kind: EmailVerificationType.PRIMARY
+        kind: 'PRIMARY'
       }
     })
     return res

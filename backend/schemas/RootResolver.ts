@@ -24,13 +24,6 @@ import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
 
 import {
-  UserNewDevicePolicy,
-  type User,
-  type Device,
-  type WebInput
-} from '@prisma/client'
-
-import {
   WebInputGQL,
   WebInputGQLScalars
 } from '../models/generated/WebInputGQL'
@@ -390,10 +383,7 @@ export class RootResolver {
       challenge = created
     }
 
-    if (
-      user.newDevicePolicy === UserNewDevicePolicy.ALLOW ||
-      user.newDevicePolicy === null
-    ) {
+    if (user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null) {
       // user has allowed new devices, we can return the challenge including salt and encrypted secret
       return plainToClass(DecryptionChallengeApproved, {
         ...challenge,
