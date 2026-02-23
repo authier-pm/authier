@@ -1,6 +1,5 @@
 datasource db {
   provider   = "postgresql"
-  url        = env("DATABASE_URL")
   extensions = [citext(schema: "pg_catalog")]
 }
 
@@ -22,10 +21,6 @@ generator PrismaTypeGraphQLTypesGenerator {
 
 generator kysely {
   provider = "prisma-kysely"
-}
-
-generator prisma_checker {
-  provider = "npx prisma-generator-checker"
 }
 
 // this gets created when a user asks for a new Decryption Challenge in order to login on a new device

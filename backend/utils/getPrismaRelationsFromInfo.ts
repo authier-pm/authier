@@ -2,7 +2,7 @@ import getFieldNames from 'graphql-list-fields'
 import type { GraphQLResolveInfo } from 'graphql'
 import set from 'lodash.set'
 
-import type { DMMF } from '@prisma/client/runtime/library'
+import type { DMMF } from '@prisma/client/runtime/client'
 import { dmmf } from '../prisma/prismaClient'
 
 /**

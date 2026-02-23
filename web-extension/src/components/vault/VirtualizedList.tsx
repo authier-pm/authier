@@ -22,7 +22,7 @@ import { t } from '@lingui/core/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { authierColors } from '@shared/chakraRawTheme'
 import { TbAuth2Fa } from 'react-icons/tb'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 
 export function VaultListItem({
   secret
@@ -153,7 +153,7 @@ export function VaultListItem({
             colorScheme="gray"
             onClick={() => {
               if (secret.kind === EncryptedSecretType.TOTP) {
-                const otpCode = authenticator.generate(secret.totp.secret)
+                const otpCode = generateSync({ secret: secret.totp.secret })
                 navigator.clipboard.writeText(otpCode)
               } else if (
                 secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS

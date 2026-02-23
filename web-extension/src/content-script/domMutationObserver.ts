@@ -84,11 +84,6 @@ export const startBodyInputChangeObserver = () => {
               emitDebounced('inputAdded', input)
             })
           }
-
-          const childIframe = node.querySelector('input')
-          if (childIframe) {
-            emitDebounced('inputAdded', node as HTMLInputElement)
-          }
         }
       })
     })

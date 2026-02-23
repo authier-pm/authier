@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type RejectChallengeMutationVariables = Types.Exact<{
   id: Types.Scalars['Int']['input'];
@@ -72,7 +73,6 @@ export const RejectChallengeDocument = gql`
   }
 }
     `;
-export type RejectChallengeMutationFn = Apollo.MutationFunction<RejectChallengeMutation, RejectChallengeMutationVariables>;
 
 /**
  * __useRejectChallengeMutation__
@@ -91,13 +91,12 @@ export type RejectChallengeMutationFn = Apollo.MutationFunction<RejectChallengeM
  *   },
  * });
  */
-export function useRejectChallengeMutation(baseOptions?: Apollo.MutationHookOptions<RejectChallengeMutation, RejectChallengeMutationVariables>) {
+export function useRejectChallengeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RejectChallengeMutation, RejectChallengeMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RejectChallengeMutation, RejectChallengeMutationVariables>(RejectChallengeDocument, options);
+        return ApolloReactHooks.useMutation<RejectChallengeMutation, RejectChallengeMutationVariables>(RejectChallengeDocument, options);
       }
 export type RejectChallengeMutationHookResult = ReturnType<typeof useRejectChallengeMutation>;
-export type RejectChallengeMutationResult = Apollo.MutationResult<RejectChallengeMutation>;
-export type RejectChallengeMutationOptions = Apollo.BaseMutationOptions<RejectChallengeMutation, RejectChallengeMutationVariables>;
+export type RejectChallengeMutationResult = ApolloReactCommon.MutationResult<RejectChallengeMutation>;
 export const ApproveChallengeDocument = gql`
     mutation ApproveChallenge($id: Int!) {
   me {
@@ -109,7 +108,6 @@ export const ApproveChallengeDocument = gql`
   }
 }
     `;
-export type ApproveChallengeMutationFn = Apollo.MutationFunction<ApproveChallengeMutation, ApproveChallengeMutationVariables>;
 
 /**
  * __useApproveChallengeMutation__
@@ -128,13 +126,12 @@ export type ApproveChallengeMutationFn = Apollo.MutationFunction<ApproveChalleng
  *   },
  * });
  */
-export function useApproveChallengeMutation(baseOptions?: Apollo.MutationHookOptions<ApproveChallengeMutation, ApproveChallengeMutationVariables>) {
+export function useApproveChallengeMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ApproveChallengeMutation, ApproveChallengeMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ApproveChallengeMutation, ApproveChallengeMutationVariables>(ApproveChallengeDocument, options);
+        return ApolloReactHooks.useMutation<ApproveChallengeMutation, ApproveChallengeMutationVariables>(ApproveChallengeDocument, options);
       }
 export type ApproveChallengeMutationHookResult = ReturnType<typeof useApproveChallengeMutation>;
-export type ApproveChallengeMutationResult = Apollo.MutationResult<ApproveChallengeMutation>;
-export type ApproveChallengeMutationOptions = Apollo.BaseMutationOptions<ApproveChallengeMutation, ApproveChallengeMutationVariables>;
+export type ApproveChallengeMutationResult = ApolloReactCommon.MutationResult<ApproveChallengeMutation>;
 export const DevicesRequestsDocument = gql`
     query DevicesRequests {
   me {
@@ -168,22 +165,26 @@ export const DevicesRequestsDocument = gql`
  *   },
  * });
  */
-export function useDevicesRequestsQuery(baseOptions?: Apollo.QueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
+export function useDevicesRequestsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
+        return ApolloReactHooks.useQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
       }
-export function useDevicesRequestsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
+export function useDevicesRequestsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
+          return ApolloReactHooks.useLazyQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
         }
-export function useDevicesRequestsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
+// @ts-ignore
+export function useDevicesRequestsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DevicesRequestsQuery, DevicesRequestsQueryVariables>;
+// @ts-ignore
+export function useDevicesRequestsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DevicesRequestsQuery | undefined, DevicesRequestsQueryVariables>;
+export function useDevicesRequestsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DevicesRequestsQuery, DevicesRequestsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DevicesRequestsQuery, DevicesRequestsQueryVariables>(DevicesRequestsDocument, options);
         }
 export type DevicesRequestsQueryHookResult = ReturnType<typeof useDevicesRequestsQuery>;
 export type DevicesRequestsLazyQueryHookResult = ReturnType<typeof useDevicesRequestsLazyQuery>;
 export type DevicesRequestsSuspenseQueryHookResult = ReturnType<typeof useDevicesRequestsSuspenseQuery>;
-export type DevicesRequestsQueryResult = Apollo.QueryResult<DevicesRequestsQuery, DevicesRequestsQueryVariables>;
+export type DevicesRequestsQueryResult = ApolloReactCommon.QueryResult<DevicesRequestsQuery, DevicesRequestsQueryVariables>;
 export const LogoutDeviceDocument = gql`
     mutation logoutDevice($id: String!) {
   me {
@@ -195,7 +196,6 @@ export const LogoutDeviceDocument = gql`
   }
 }
     `;
-export type LogoutDeviceMutationFn = Apollo.MutationFunction<LogoutDeviceMutation, LogoutDeviceMutationVariables>;
 
 /**
  * __useLogoutDeviceMutation__
@@ -214,13 +214,12 @@ export type LogoutDeviceMutationFn = Apollo.MutationFunction<LogoutDeviceMutatio
  *   },
  * });
  */
-export function useLogoutDeviceMutation(baseOptions?: Apollo.MutationHookOptions<LogoutDeviceMutation, LogoutDeviceMutationVariables>) {
+export function useLogoutDeviceMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<LogoutDeviceMutation, LogoutDeviceMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LogoutDeviceMutation, LogoutDeviceMutationVariables>(LogoutDeviceDocument, options);
+        return ApolloReactHooks.useMutation<LogoutDeviceMutation, LogoutDeviceMutationVariables>(LogoutDeviceDocument, options);
       }
 export type LogoutDeviceMutationHookResult = ReturnType<typeof useLogoutDeviceMutation>;
-export type LogoutDeviceMutationResult = Apollo.MutationResult<LogoutDeviceMutation>;
-export type LogoutDeviceMutationOptions = Apollo.BaseMutationOptions<LogoutDeviceMutation, LogoutDeviceMutationVariables>;
+export type LogoutDeviceMutationResult = ApolloReactCommon.MutationResult<LogoutDeviceMutation>;
 export const RemoveDeviceDocument = gql`
     mutation removeDevice($id: String!) {
   me {
@@ -230,7 +229,6 @@ export const RemoveDeviceDocument = gql`
   }
 }
     `;
-export type RemoveDeviceMutationFn = Apollo.MutationFunction<RemoveDeviceMutation, RemoveDeviceMutationVariables>;
 
 /**
  * __useRemoveDeviceMutation__
@@ -249,13 +247,12 @@ export type RemoveDeviceMutationFn = Apollo.MutationFunction<RemoveDeviceMutatio
  *   },
  * });
  */
-export function useRemoveDeviceMutation(baseOptions?: Apollo.MutationHookOptions<RemoveDeviceMutation, RemoveDeviceMutationVariables>) {
+export function useRemoveDeviceMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveDeviceMutation, RemoveDeviceMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveDeviceMutation, RemoveDeviceMutationVariables>(RemoveDeviceDocument, options);
+        return ApolloReactHooks.useMutation<RemoveDeviceMutation, RemoveDeviceMutationVariables>(RemoveDeviceDocument, options);
       }
 export type RemoveDeviceMutationHookResult = ReturnType<typeof useRemoveDeviceMutation>;
-export type RemoveDeviceMutationResult = Apollo.MutationResult<RemoveDeviceMutation>;
-export type RemoveDeviceMutationOptions = Apollo.BaseMutationOptions<RemoveDeviceMutation, RemoveDeviceMutationVariables>;
+export type RemoveDeviceMutationResult = ApolloReactCommon.MutationResult<RemoveDeviceMutation>;
 export const ChangeMasterDeviceDocument = gql`
     mutation ChangeMasterDevice($newMasterDeviceId: String!) {
   me {
@@ -265,7 +262,6 @@ export const ChangeMasterDeviceDocument = gql`
   }
 }
     `;
-export type ChangeMasterDeviceMutationFn = Apollo.MutationFunction<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>;
 
 /**
  * __useChangeMasterDeviceMutation__
@@ -284,13 +280,12 @@ export type ChangeMasterDeviceMutationFn = Apollo.MutationFunction<ChangeMasterD
  *   },
  * });
  */
-export function useChangeMasterDeviceMutation(baseOptions?: Apollo.MutationHookOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>) {
+export function useChangeMasterDeviceMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>(ChangeMasterDeviceDocument, options);
+        return ApolloReactHooks.useMutation<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>(ChangeMasterDeviceDocument, options);
       }
 export type ChangeMasterDeviceMutationHookResult = ReturnType<typeof useChangeMasterDeviceMutation>;
-export type ChangeMasterDeviceMutationResult = Apollo.MutationResult<ChangeMasterDeviceMutation>;
-export type ChangeMasterDeviceMutationOptions = Apollo.BaseMutationOptions<ChangeMasterDeviceMutation, ChangeMasterDeviceMutationVariables>;
+export type ChangeMasterDeviceMutationResult = ApolloReactCommon.MutationResult<ChangeMasterDeviceMutation>;
 export const ChangeDeviceSettingsDocument = gql`
     mutation changeDeviceSettings($id: String!, $syncTOTP: Boolean!, $vaultLockTimeoutSeconds: Int!) {
   me {
@@ -305,7 +300,6 @@ export const ChangeDeviceSettingsDocument = gql`
   }
 }
     `;
-export type ChangeDeviceSettingsMutationFn = Apollo.MutationFunction<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>;
 
 /**
  * __useChangeDeviceSettingsMutation__
@@ -326,13 +320,12 @@ export type ChangeDeviceSettingsMutationFn = Apollo.MutationFunction<ChangeDevic
  *   },
  * });
  */
-export function useChangeDeviceSettingsMutation(baseOptions?: Apollo.MutationHookOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>) {
+export function useChangeDeviceSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>(ChangeDeviceSettingsDocument, options);
+        return ApolloReactHooks.useMutation<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>(ChangeDeviceSettingsDocument, options);
       }
 export type ChangeDeviceSettingsMutationHookResult = ReturnType<typeof useChangeDeviceSettingsMutation>;
-export type ChangeDeviceSettingsMutationResult = Apollo.MutationResult<ChangeDeviceSettingsMutation>;
-export type ChangeDeviceSettingsMutationOptions = Apollo.BaseMutationOptions<ChangeDeviceSettingsMutation, ChangeDeviceSettingsMutationVariables>;
+export type ChangeDeviceSettingsMutationResult = ApolloReactCommon.MutationResult<ChangeDeviceSettingsMutation>;
 export const RenameDeviceDocument = gql`
     mutation renameDevice($id: String!, $name: String!) {
   me {
@@ -344,7 +337,6 @@ export const RenameDeviceDocument = gql`
   }
 }
     `;
-export type RenameDeviceMutationFn = Apollo.MutationFunction<RenameDeviceMutation, RenameDeviceMutationVariables>;
 
 /**
  * __useRenameDeviceMutation__
@@ -364,10 +356,9 @@ export type RenameDeviceMutationFn = Apollo.MutationFunction<RenameDeviceMutatio
  *   },
  * });
  */
-export function useRenameDeviceMutation(baseOptions?: Apollo.MutationHookOptions<RenameDeviceMutation, RenameDeviceMutationVariables>) {
+export function useRenameDeviceMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RenameDeviceMutation, RenameDeviceMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RenameDeviceMutation, RenameDeviceMutationVariables>(RenameDeviceDocument, options);
+        return ApolloReactHooks.useMutation<RenameDeviceMutation, RenameDeviceMutationVariables>(RenameDeviceDocument, options);
       }
 export type RenameDeviceMutationHookResult = ReturnType<typeof useRenameDeviceMutation>;
-export type RenameDeviceMutationResult = Apollo.MutationResult<RenameDeviceMutation>;
-export type RenameDeviceMutationOptions = Apollo.BaseMutationOptions<RenameDeviceMutation, RenameDeviceMutationVariables>;
+export type RenameDeviceMutationResult = ApolloReactCommon.MutationResult<RenameDeviceMutation>;

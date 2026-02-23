@@ -21,7 +21,7 @@ import {
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link, useLocation } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 import { Trans } from '@lingui/react/macro'
 
 export function TableList({ filter }: { filter: string }) {
@@ -152,7 +152,7 @@ export function TableList({ filter }: { filter: string }) {
                 onClick={() => {
                   navigator.clipboard.writeText(
                     isTotp
-                      ? authenticator.generate(row.totp.secret)
+                      ? generateSync({ secret: row.totp.secret })
                       : row.loginCredentials.password
                   )
                 }}
@@ -184,11 +184,9 @@ export function TableList({ filter }: { filter: string }) {
                 <IconButton aria-label="Edit" icon={<EditIcon />} />
               </Link>
             </Tooltip>
-            {selectedItems.length <= 1 ? (
-              <DeleteSecretButton
-                secrets={selectedItems.length > 1 ? [...selectedItems] : [row]}
-              ></DeleteSecretButton>
-            ) : null}
+            {selectedItems.length > 0 ? null : (
+              <DeleteSecretButton secrets={[row]}></DeleteSecretButton>
+            )}
           </HStack>
         </Flex>
       </Flex>
@@ -234,9 +232,9 @@ export function TableList({ filter }: { filter: string }) {
             </HStack>
           </Flex>
           <Flex w="10%" justifyContent="center" pr={3}>
-            {selectedItems.length > 1 ? (
+            {selectedItems.length > 0 ? (
               <DeleteSecretButton secrets={[...selectedItems]} size="sm">
-                <Trans>Delete all</Trans>
+                <Trans>Delete {selectedItems.length}</Trans>
               </DeleteSecretButton>
             ) : (
               <Trans>Actions</Trans>

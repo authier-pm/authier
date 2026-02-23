@@ -1,7 +1,7 @@
 import * as Types from '../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as Apollo from '@apollo/client/react';
 const defaultOptions =  {}
 export type DeleteEncryptedSecretMutationVariables = Types.Exact<{
   id: Types.Scalars['ID'];
@@ -23,7 +23,7 @@ export const DeleteEncryptedSecretDocument = gql`
   }
 }
     `;
-export type DeleteEncryptedSecretMutationFn = Apollo.MutationFunction<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
+export type DeleteEncryptedSecretMutationFn = Apollo.MutationTuple<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>[0];
 
 /**
  * __useDeleteEncryptedSecretMutation__
@@ -48,4 +48,4 @@ export function useDeleteEncryptedSecretMutation(baseOptions?: Apollo.MutationHo
       }
 export type DeleteEncryptedSecretMutationHookResult = ReturnType<typeof useDeleteEncryptedSecretMutation>;
 export type DeleteEncryptedSecretMutationResult = Apollo.MutationResult<DeleteEncryptedSecretMutation>;
-export type DeleteEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
+export type DeleteEncryptedSecretMutationOptions = Apollo.MutationFunctionOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;

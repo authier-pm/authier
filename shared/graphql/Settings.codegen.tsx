@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -51,22 +52,26 @@ export const SyncSettingsDocument = gql`
  *   },
  * });
  */
-export function useSyncSettingsQuery(baseOptions?: Apollo.QueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
+export function useSyncSettingsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
+        return ApolloReactHooks.useQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
       }
-export function useSyncSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
+export function useSyncSettingsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
+          return ApolloReactHooks.useLazyQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
         }
-export function useSyncSettingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
+// @ts-ignore
+export function useSyncSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<SyncSettingsQuery, SyncSettingsQueryVariables>;
+// @ts-ignore
+export function useSyncSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<SyncSettingsQuery | undefined, SyncSettingsQueryVariables>;
+export function useSyncSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<SyncSettingsQuery, SyncSettingsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<SyncSettingsQuery, SyncSettingsQueryVariables>(SyncSettingsDocument, options);
         }
 export type SyncSettingsQueryHookResult = ReturnType<typeof useSyncSettingsQuery>;
 export type SyncSettingsLazyQueryHookResult = ReturnType<typeof useSyncSettingsLazyQuery>;
 export type SyncSettingsSuspenseQueryHookResult = ReturnType<typeof useSyncSettingsSuspenseQuery>;
-export type SyncSettingsQueryResult = Apollo.QueryResult<SyncSettingsQuery, SyncSettingsQueryVariables>;
+export type SyncSettingsQueryResult = ApolloReactCommon.QueryResult<SyncSettingsQuery, SyncSettingsQueryVariables>;
 export const UpdateSettingsDocument = gql`
     mutation updateSettings($config: SettingsInput!) {
   me {
@@ -76,7 +81,6 @@ export const UpdateSettingsDocument = gql`
   }
 }
     `;
-export type UpdateSettingsMutationFn = Apollo.MutationFunction<UpdateSettingsMutation, UpdateSettingsMutationVariables>;
 
 /**
  * __useUpdateSettingsMutation__
@@ -95,10 +99,9 @@ export type UpdateSettingsMutationFn = Apollo.MutationFunction<UpdateSettingsMut
  *   },
  * });
  */
-export function useUpdateSettingsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateSettingsMutation, UpdateSettingsMutationVariables>) {
+export function useUpdateSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateSettingsMutation, UpdateSettingsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateSettingsMutation, UpdateSettingsMutationVariables>(UpdateSettingsDocument, options);
+        return ApolloReactHooks.useMutation<UpdateSettingsMutation, UpdateSettingsMutationVariables>(UpdateSettingsDocument, options);
       }
 export type UpdateSettingsMutationHookResult = ReturnType<typeof useUpdateSettingsMutation>;
-export type UpdateSettingsMutationResult = Apollo.MutationResult<UpdateSettingsMutation>;
-export type UpdateSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateSettingsMutation, UpdateSettingsMutationVariables>;
+export type UpdateSettingsMutationResult = ApolloReactCommon.MutationResult<UpdateSettingsMutation>;

@@ -1,5 +1,5 @@
 import { bodyInputChangeEmitter } from './domMutationObserver'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementInViewport, isHidden } from './isElementInViewport'
@@ -42,6 +42,126 @@ export type IDecryptedSecrets = {
 
 export const autofillEventsDispatched = new Set()
 
+function safeGenerateTotpCode(totpSecret: ITOTPSecret) {
+  try {
+    return generateSync({ secret: totpSecret.totp.secret })
+  } catch (error) {
+    log('failed to generate totp code', error)
+    return null
+  }
+}
+
+function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
+  const codeInputRegex = /code input\s*(\d+)\s*of\s*(\d+)/i
+
+  const labeledCandidates = usefulInputs
+    .map((inputEl) => {
+      const ariaLabel = inputEl.getAttribute('aria-label') ?? ''
+      const match = ariaLabel.match(codeInputRegex)
+      if (!match) {
+        return null
+      }
+
+      const index = Number(match[1])
+      const total = Number(match[2])
+
+      if (
+        !Number.isFinite(index) ||
+        !Number.isFinite(total) ||
+        total !== 6 ||
+        inputEl.type !== 'number'
+      ) {
+        return null
+      }
+
+      return { inputEl, index, total }
+    })
+    .filter(Boolean) as Array<{ inputEl: HTMLInputElement; index: number; total: number }>
+
+  if (labeledCandidates.length > 0) {
+    log(
+      'segmented TOTP candidates found',
+      labeledCandidates.map(({ inputEl, index, total }) => ({
+        id: inputEl.id,
+        type: inputEl.type,
+        ariaLabel: inputEl.getAttribute('aria-label'),
+        index,
+        total
+      }))
+    )
+  }
+
+  if (labeledCandidates.length >= 6) {
+    const byIndex = new Map<number, HTMLInputElement>()
+    for (const candidate of labeledCandidates) {
+      if (!byIndex.has(candidate.index)) {
+        byIndex.set(candidate.index, candidate.inputEl)
+      }
+    }
+
+    const ordered = [1, 2, 3, 4, 5, 6]
+      .map((index) => byIndex.get(index))
+      .filter(Boolean) as HTMLInputElement[]
+
+    if (ordered.length === 6) {
+      log(
+        'segmented TOTP inputs detected',
+        ordered.map((input) => ({
+          id: input.id,
+          ariaLabel: input.getAttribute('aria-label')
+        }))
+      )
+      return ordered
+    }
+  }
+
+  if (usefulInputs.length > 0) {
+    const numericInputs = usefulInputs.filter((input) => input.type === 'number')
+    if (numericInputs.length >= 4) {
+      log(
+        'segmented TOTP detection miss',
+        numericInputs.map((input) => ({
+          id: input.id,
+          type: input.type,
+          ariaLabel: input.getAttribute('aria-label'),
+          inputMode: input.inputMode,
+          pattern: input.getAttribute('pattern'),
+          value: input.value
+        }))
+      )
+    }
+  }
+
+  return null
+}
+
+function fillSegmentedTotpInputs(
+  inputs: HTMLInputElement[],
+  totpCode: string
+) {
+  if (inputs.length !== 6 || totpCode.length < 6) {
+    return false
+  }
+
+  const digits = totpCode.slice(0, 6).split('')
+  let filledAny = false
+
+  for (let index = 0; index < inputs.length; index++) {
+    const el = autofillValueIntoInput(inputs[index], digits[index])
+    if (el) {
+      filledElements.add(el)
+      filledAny = true
+    }
+  }
+
+  if (filledAny) {
+    inputTypesFilledForThisPage.add(WebInputType.TOTP)
+    notyf.success('Autofilled 2FA code')
+  }
+
+  return filledAny
+}
+
 /**
  * triggered when page contains 2 or more useful inputs
  * @param usefulInputs
@@ -78,6 +198,42 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
 }
 
 function imitateKeyInput(el: HTMLInputElement, input: string) {
+  const setNativeInputValue = (targetEl: HTMLInputElement, nextValue: string) => {
+    const valueSetter = Object.getOwnPropertyDescriptor(
+      HTMLInputElement.prototype,
+      'value'
+    )?.set
+
+    if (valueSetter) {
+      valueSetter.call(targetEl, nextValue)
+      return
+    }
+
+    targetEl.value = nextValue
+  }
+
+  const dispatchTextInputEvent = (
+    targetEl: HTMLInputElement,
+    key: string | null
+  ) => {
+    if (typeof InputEvent !== 'undefined') {
+      const event = new InputEvent('input', {
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        data: key,
+        inputType: key ? 'insertText' : 'insertReplacementText'
+      })
+      autofillEventsDispatched.add(event)
+      targetEl.dispatchEvent(event)
+      return
+    }
+
+    const event = new Event('input', { bubbles: true })
+    autofillEventsDispatched.add(event)
+    targetEl.dispatchEvent(event)
+  }
+
   if (el) {
     if (el.value === input) {
       return
@@ -95,9 +251,9 @@ function imitateKeyInput(el: HTMLInputElement, input: string) {
     for (let i = 0; i < input.length; i++) {
       const key = input[i]
       const keyboardEventInit = {
-        bubbles: false,
-        cancelable: false,
-        composed: false,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
 
         key: key,
         keyCode: key.charCodeAt(0),
@@ -114,16 +270,14 @@ function imitateKeyInput(el: HTMLInputElement, input: string) {
       const keyUp = new KeyboardEvent('keyup', keyboardEventInit)
 
       dispatchAutofillEvent(keyUp)
-      el.value += key
+      setNativeInputValue(el, `${el.value}${key}`)
 
       const change = new Event('change', { bubbles: true })
 
       dispatchAutofillEvent(change)
+      dispatchTextInputEvent(el, key)
       // await sleep(2) // this is to make it a bit more realistic
     }
-
-    const inputEvent = new Event('input', { bubbles: true })
-    dispatchAutofillEvent(inputEvent)
 
     const blurEvent = new Event('blur', { bubbles: true }) // this is needed, because some websites actually trigger form validation on blur. for example coinmate.io
     dispatchAutofillEvent(blurEvent)
@@ -206,7 +360,7 @@ let onInputAddedHandler = (inputEl: any) => {}
 /**
  * tracks which input types have been autofilled for this page, so we don't autofill them again
  */
-export let inputTypesFilledForThisPage = new Set<WebInputType>()
+export const inputTypesFilledForThisPage = new Set<WebInputType>()
 
 /**
  * tracks autofilled elements, so we don't autofill them again. We clear this set when user decides to autofill again with different credentials
@@ -228,6 +382,11 @@ export const autofill = (initState: IInitStateRes) => {
 
   const firstLoginCred = secretsForHost.loginCredentials[0]
   const totpSecret = secretsForHost.totpSecrets[0]
+  log('autofill secrets snapshot', {
+    loginCredentialsCount: secretsForHost.loginCredentials.length,
+    totpSecretsCount: secretsForHost.totpSecrets.length,
+    hasTotpSecret: Boolean(totpSecret)
+  })
 
   //NOTE: scan all inputs
   /**
@@ -274,6 +433,22 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     log('usefulInputs', usefulInputs)
+
+    if (totpSecret && !inputTypesFilledForThisPage.has(WebInputType.TOTP)) {
+      const segmentedTotpInputs = findSegmentedTotpInputs(usefulInputs)
+      if (segmentedTotpInputs) {
+        const totpCode = safeGenerateTotpCode(totpSecret)
+        if (totpCode) {
+          const didFillSegmentedTotp = fillSegmentedTotpInputs(
+            segmentedTotpInputs,
+            totpCode
+          )
+          if (didFillSegmentedTotp) {
+            return
+          }
+        }
+      }
+    }
 
     if (usefulInputs.length >= 2) {
       const isNewPassword = handleNewPasswordCase(usefulInputs)
@@ -327,9 +502,13 @@ export const autofill = (initState: IInitStateRes) => {
             log('no totp secret')
             return
           }
+          const totpCode = safeGenerateTotpCode(totpSecret)
+          if (!totpCode) {
+            return
+          }
           const el = autofillValueIntoInput(
             inputEl,
-            authenticator.generate(totpSecret.totp.secret)
+            totpCode
           )
           el && filledElements.add(el)
         }
@@ -366,20 +545,74 @@ export const autofill = (initState: IInitStateRes) => {
     //TODO: write a test for this
     // Catch new inputs
     onInputAddedHandler = debounce(
-      (inputEl) => {
+      async (inputEl) => {
+        log('onInputAddedHandler received input', {
+          id: inputEl?.id,
+          type: inputEl?.type,
+          ariaLabel: inputEl?.getAttribute?.('aria-label'),
+          autocomplete: inputEl?.autocomplete
+        })
+        const isLikelyOtpField =
+          inputEl?.type === 'number' ||
+          (inputEl?.getAttribute?.('aria-label') ?? '')
+            .toLowerCase()
+            .includes('code input')
+        const totpAlreadyFilled = inputTypesFilledForThisPage.has(
+          WebInputType.TOTP
+        )
+        let dynamicTotpSecret = totpSecret
+        if (isLikelyOtpField && !dynamicTotpSecret) {
+          try {
+            const refreshedState = await trpc.getContentScriptInitialState.query()
+            dynamicTotpSecret =
+              refreshedState?.secretsForHost?.totpSecrets?.[0] ?? dynamicTotpSecret
+            log('refetched content script state for OTP', {
+              totpSecretsCount:
+                refreshedState?.secretsForHost?.totpSecrets?.length ?? 0,
+              hasTotpSecretAfterRefetch: Boolean(dynamicTotpSecret)
+            })
+          } catch (error) {
+            log('failed to refetch content script state for OTP', error)
+          }
+        }
+
+        if (isLikelyOtpField) {
+          log('segmented TOTP gate state', {
+            hasTotpSecret: Boolean(dynamicTotpSecret),
+            totpAlreadyFilled,
+            filledElementsSize: filledElements.size
+          })
+        }
+        if (dynamicTotpSecret && !totpAlreadyFilled) {
+          log('checking for segmented TOTP inputs on inputAdded')
+          const segmentedTotpInputs = findSegmentedTotpInputs(
+            filterUselessInputs(document.body)
+          )
+          if (segmentedTotpInputs) {
+            const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
+            if (totpCode) {
+              const didFillSegmentedTotp = fillSegmentedTotpInputs(
+                segmentedTotpInputs,
+                totpCode
+              )
+              if (didFillSegmentedTotp) {
+                return
+              }
+            }
+          }
+        }
+
         if (filledElements.size >= 2) {
           return // we have already filled 2 inputs on this page, we don't need to fill any more
         }
         log('onInputAddedHandler', inputEl)
-        const newPassword: string | null = null
         // For one input on page
         if (inputEl.type === 'username' || inputEl.type === 'email') {
           if (secretsForHost.loginCredentials.length === 1) {
-            fillStringIntoInput({
+            autofillValueIntoInput(
               inputEl,
-              loginCredential: firstLoginCred.loginCredentials,
-              inputType: WebInputType.USERNAME
-            })
+              firstLoginCred.loginCredentials.username
+            )
           } else {
             // todo show prompt to user to select which credential to use
           }
@@ -413,10 +646,6 @@ export const autofill = (initState: IInitStateRes) => {
             }
           }
         }
-
-        if (newPassword) {
-          renderSaveCredentialsForm(null, newPassword)
-        }
       },
       500,
       {
@@ -431,22 +660,17 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     if (filledElements.size === 2) {
-      const form = filledElements[0]?.form
+      const filledElementsArray = Array.from(filledElements)
+      const form = filledElementsArray[0]?.form
       if (form) {
-        // TODO try to submit the form
-        // filledElements[0]?.form?.dispatchEvent(
-        //   new Event('submit', {
-        //     bubbles: true,
-        //     cancelable: true
-        //   })
-        // )
         const clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,
           cancelable: true
         })
-        if (form.submit instanceof HTMLElement) {
-          form.submit.dispatchEvent(clickEvent)
+        const submitButton = form.querySelector('[type="submit"]') as HTMLElement | null
+        if (submitButton) {
+          submitButton.dispatchEvent(clickEvent)
         }
 
         let notAPasswordInput: HTMLInputElement | null = null
@@ -460,7 +684,7 @@ export const autofill = (initState: IInitStateRes) => {
 
         if (notAPasswordInput) {
           notyf.success(
-            `Submitted autofilled form for user "${notAPasswordInput[0].value}}"`
+            `Submitted autofilled form for user "${notAPasswordInput.value}"`
           )
         }
       }
@@ -641,17 +865,21 @@ export const autofill = (initState: IInitStateRes) => {
     }
   }
 
+  const onInputAddedRelay = (inputEl: HTMLInputElement) => {
+    onInputAddedHandler(inputEl)
+  }
+
   const initAutofill = () => {
     scanKnownWebInputsAndFillWhenFound()
 
     //If input shows on loaded page
 
-    bodyInputChangeEmitter.on('inputAdded', onInputAddedHandler)
+    bodyInputChangeEmitter.on('inputAdded', onInputAddedRelay)
   }
   const initTimeout = setTimeout(initAutofill, 150) // let's wait a bit for the page to load
 
   return () => {
-    bodyInputChangeEmitter.off('inputAdded', initAutofill)
+    bodyInputChangeEmitter.off('inputAdded', onInputAddedRelay)
     clearTimeout(initTimeout)
     inputTypesFilledForThisPage.clear()
   }

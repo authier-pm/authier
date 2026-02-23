@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type AddEncryptedSecretsMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretInput> | Types.EncryptedSecretInput;
@@ -25,7 +26,6 @@ export const AddEncryptedSecretsDocument = gql`
   }
 }
     `;
-export type AddEncryptedSecretsMutationFn = Apollo.MutationFunction<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>;
 
 /**
  * __useAddEncryptedSecretsMutation__
@@ -44,10 +44,9 @@ export type AddEncryptedSecretsMutationFn = Apollo.MutationFunction<AddEncrypted
  *   },
  * });
  */
-export function useAddEncryptedSecretsMutation(baseOptions?: Apollo.MutationHookOptions<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>) {
+export function useAddEncryptedSecretsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>(AddEncryptedSecretsDocument, options);
+        return ApolloReactHooks.useMutation<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>(AddEncryptedSecretsDocument, options);
       }
 export type AddEncryptedSecretsMutationHookResult = ReturnType<typeof useAddEncryptedSecretsMutation>;
-export type AddEncryptedSecretsMutationResult = Apollo.MutationResult<AddEncryptedSecretsMutation>;
-export type AddEncryptedSecretsMutationOptions = Apollo.BaseMutationOptions<AddEncryptedSecretsMutation, AddEncryptedSecretsMutationVariables>;
+export type AddEncryptedSecretsMutationResult = ApolloReactCommon.MutationResult<AddEncryptedSecretsMutation>;

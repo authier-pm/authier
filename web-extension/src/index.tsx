@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/browser'
 
 import ReactDOM from 'react-dom/client'
 import browser from 'webextension-polyfill'
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 import { apolloCache, apolloClient } from './apollo/apolloClient'
 import { ColorModeScript } from '@chakra-ui/react'
 import { chakraRawTheme } from '@shared/chakraRawTheme'

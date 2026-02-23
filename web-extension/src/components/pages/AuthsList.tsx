@@ -12,7 +12,7 @@ import {
   useColorModeValue,
   Center
 } from '@chakra-ui/react'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 
 import { CopyIcon, NotAllowedIcon } from '@chakra-ui/icons'
 import { Tooltip } from '@chakra-ui/react'
@@ -37,8 +37,15 @@ const log = debug('au:AuthsList')
 const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
   const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
 
-  // const otpCode = '1111'
-  const otpCode = authenticator.generate(totpSecret.totp.secret)
+  let otpCode = ''
+  let otpCodeError: string | null = null
+  try {
+    // const otpCode = '1111'
+    otpCode = generateSync({ secret: totpSecret.totp.secret })
+  } catch (err) {
+    otpCodeError =
+      err instanceof Error ? err.message : t`Failed to generate OTP code`
+  }
   const [showWhole, setShowWhole] = useState(false)
   const { onCopy } = useClipboard(otpCode)
 
@@ -69,6 +76,9 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               w="full"
               fontSize="sm"
               onClick={async () => {
+                if (otpCodeError) {
+                  return
+                }
                 setShowWhole(!showWhole)
                 if (!showWhole) {
                   // CHECK
@@ -89,7 +99,11 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
                 }
               }}
             >
-              {showWhole ? (
+              {otpCodeError ? (
+                <Text color="red.500" fontSize="xs" whiteSpace="normal">
+                  {otpCodeError}
+                </Text>
+              ) : showWhole ? (
                 otpCode
               ) : (
                 <Tooltip
@@ -117,7 +131,11 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
               ml={2}
               variant="solid"
               colorScheme={'cyan'}
+              isDisabled={Boolean(otpCodeError)}
               onClick={() => {
+                if (otpCodeError) {
+                  return
+                }
                 // TODO log usage of this token to backend
                 browser.runtime.sendMessage({
                   kind: PopupActionsEnum.TOTP_FILL_ON_CLICK,

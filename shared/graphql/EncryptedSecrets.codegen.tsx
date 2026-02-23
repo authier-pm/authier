@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type EncryptedSecretsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -59,22 +60,26 @@ export const EncryptedSecretsDocument = gql`
  *   },
  * });
  */
-export function useEncryptedSecretsQuery(baseOptions?: Apollo.QueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useEncryptedSecretsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+        return ApolloReactHooks.useQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
       }
-export function useEncryptedSecretsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+export function useEncryptedSecretsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+          return ApolloReactHooks.useLazyQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
         }
-export function useEncryptedSecretsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
+// @ts-ignore
+export function useEncryptedSecretsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
+// @ts-ignore
+export function useEncryptedSecretsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<EncryptedSecretsQuery | undefined, EncryptedSecretsQueryVariables>;
+export function useEncryptedSecretsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>(EncryptedSecretsDocument, options);
         }
 export type EncryptedSecretsQueryHookResult = ReturnType<typeof useEncryptedSecretsQuery>;
 export type EncryptedSecretsLazyQueryHookResult = ReturnType<typeof useEncryptedSecretsLazyQuery>;
 export type EncryptedSecretsSuspenseQueryHookResult = ReturnType<typeof useEncryptedSecretsSuspenseQuery>;
-export type EncryptedSecretsQueryResult = Apollo.QueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
+export type EncryptedSecretsQueryResult = ApolloReactCommon.QueryResult<EncryptedSecretsQuery, EncryptedSecretsQueryVariables>;
 export const DeleteEncryptedSecretDocument = gql`
     mutation deleteEncryptedSecret($id: ID!) {
   me {
@@ -87,7 +92,6 @@ export const DeleteEncryptedSecretDocument = gql`
   }
 }
     `;
-export type DeleteEncryptedSecretMutationFn = Apollo.MutationFunction<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
 
 /**
  * __useDeleteEncryptedSecretMutation__
@@ -106,13 +110,12 @@ export type DeleteEncryptedSecretMutationFn = Apollo.MutationFunction<DeleteEncr
  *   },
  * });
  */
-export function useDeleteEncryptedSecretMutation(baseOptions?: Apollo.MutationHookOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>) {
+export function useDeleteEncryptedSecretMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>(DeleteEncryptedSecretDocument, options);
+        return ApolloReactHooks.useMutation<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>(DeleteEncryptedSecretDocument, options);
       }
 export type DeleteEncryptedSecretMutationHookResult = ReturnType<typeof useDeleteEncryptedSecretMutation>;
-export type DeleteEncryptedSecretMutationResult = Apollo.MutationResult<DeleteEncryptedSecretMutation>;
-export type DeleteEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<DeleteEncryptedSecretMutation, DeleteEncryptedSecretMutationVariables>;
+export type DeleteEncryptedSecretMutationResult = ApolloReactCommon.MutationResult<DeleteEncryptedSecretMutation>;
 export const RemoveEncryptedSecretsDocument = gql`
     mutation removeEncryptedSecrets($secrets: [UUID!]!) {
   me {
@@ -122,7 +125,6 @@ export const RemoveEncryptedSecretsDocument = gql`
   }
 }
     `;
-export type RemoveEncryptedSecretsMutationFn = Apollo.MutationFunction<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>;
 
 /**
  * __useRemoveEncryptedSecretsMutation__
@@ -141,13 +143,12 @@ export type RemoveEncryptedSecretsMutationFn = Apollo.MutationFunction<RemoveEnc
  *   },
  * });
  */
-export function useRemoveEncryptedSecretsMutation(baseOptions?: Apollo.MutationHookOptions<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>) {
+export function useRemoveEncryptedSecretsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>(RemoveEncryptedSecretsDocument, options);
+        return ApolloReactHooks.useMutation<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>(RemoveEncryptedSecretsDocument, options);
       }
 export type RemoveEncryptedSecretsMutationHookResult = ReturnType<typeof useRemoveEncryptedSecretsMutation>;
-export type RemoveEncryptedSecretsMutationResult = Apollo.MutationResult<RemoveEncryptedSecretsMutation>;
-export type RemoveEncryptedSecretsMutationOptions = Apollo.BaseMutationOptions<RemoveEncryptedSecretsMutation, RemoveEncryptedSecretsMutationVariables>;
+export type RemoveEncryptedSecretsMutationResult = ApolloReactCommon.MutationResult<RemoveEncryptedSecretsMutation>;
 export const UpdateEncryptedSecretDocument = gql`
     mutation updateEncryptedSecret($id: ID!, $patch: EncryptedSecretInput!) {
   me {
@@ -160,7 +161,6 @@ export const UpdateEncryptedSecretDocument = gql`
   }
 }
     `;
-export type UpdateEncryptedSecretMutationFn = Apollo.MutationFunction<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>;
 
 /**
  * __useUpdateEncryptedSecretMutation__
@@ -180,10 +180,9 @@ export type UpdateEncryptedSecretMutationFn = Apollo.MutationFunction<UpdateEncr
  *   },
  * });
  */
-export function useUpdateEncryptedSecretMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>) {
+export function useUpdateEncryptedSecretMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>(UpdateEncryptedSecretDocument, options);
+        return ApolloReactHooks.useMutation<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>(UpdateEncryptedSecretDocument, options);
       }
 export type UpdateEncryptedSecretMutationHookResult = ReturnType<typeof useUpdateEncryptedSecretMutation>;
-export type UpdateEncryptedSecretMutationResult = Apollo.MutationResult<UpdateEncryptedSecretMutation>;
-export type UpdateEncryptedSecretMutationOptions = Apollo.BaseMutationOptions<UpdateEncryptedSecretMutation, UpdateEncryptedSecretMutationVariables>;
+export type UpdateEncryptedSecretMutationResult = ApolloReactCommon.MutationResult<UpdateEncryptedSecretMutation>;

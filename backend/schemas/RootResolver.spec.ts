@@ -128,8 +128,8 @@ describe('RootResolver', () => {
             faker.string.uuid(),
             makeFakeCtx({ userId })
           )
-      ).rejects.toThrowErrorMatchingInlineSnapshot(
-        `[Error: Device 8faf8825-02b0-45db-8b37-9f334c7083c4 already exists. You cannot use a device with multiple accounts.]`
+      ).rejects.toThrow(
+        `Device ${input.deviceId} already exists. You cannot use a device with multiple accounts.`
       )
     })
   })

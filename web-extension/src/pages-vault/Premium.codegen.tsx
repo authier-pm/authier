@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type CreateCheckoutSessionVaultMutationVariables = Types.Exact<{
   product: Types.Scalars['String']['input'];
@@ -18,7 +19,6 @@ export const CreateCheckoutSessionVaultDocument = gql`
   }
 }
     `;
-export type CreateCheckoutSessionVaultMutationFn = Apollo.MutationFunction<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>;
 
 /**
  * __useCreateCheckoutSessionVaultMutation__
@@ -37,10 +37,9 @@ export type CreateCheckoutSessionVaultMutationFn = Apollo.MutationFunction<Creat
  *   },
  * });
  */
-export function useCreateCheckoutSessionVaultMutation(baseOptions?: Apollo.MutationHookOptions<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>) {
+export function useCreateCheckoutSessionVaultMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>(CreateCheckoutSessionVaultDocument, options);
+        return ApolloReactHooks.useMutation<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>(CreateCheckoutSessionVaultDocument, options);
       }
 export type CreateCheckoutSessionVaultMutationHookResult = ReturnType<typeof useCreateCheckoutSessionVaultMutation>;
-export type CreateCheckoutSessionVaultMutationResult = Apollo.MutationResult<CreateCheckoutSessionVaultMutation>;
-export type CreateCheckoutSessionVaultMutationOptions = Apollo.BaseMutationOptions<CreateCheckoutSessionVaultMutation, CreateCheckoutSessionVaultMutationVariables>;
+export type CreateCheckoutSessionVaultMutationResult = ApolloReactCommon.MutationResult<CreateCheckoutSessionVaultMutation>;

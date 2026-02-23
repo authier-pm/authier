@@ -1,7 +1,8 @@
-import * as Types from '../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type RemoveWebInputMutationVariables = Types.Exact<{
   id: Types.Scalars['Int']['input'];
@@ -20,7 +21,6 @@ export const RemoveWebInputDocument = gql`
   }
 }
     `;
-export type RemoveWebInputMutationFn = Apollo.MutationFunction<RemoveWebInputMutation, RemoveWebInputMutationVariables>;
 
 /**
  * __useRemoveWebInputMutation__
@@ -39,10 +39,9 @@ export type RemoveWebInputMutationFn = Apollo.MutationFunction<RemoveWebInputMut
  *   },
  * });
  */
-export function useRemoveWebInputMutation(baseOptions?: Apollo.MutationHookOptions<RemoveWebInputMutation, RemoveWebInputMutationVariables>) {
+export function useRemoveWebInputMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RemoveWebInputMutation, RemoveWebInputMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveWebInputMutation, RemoveWebInputMutationVariables>(RemoveWebInputDocument, options);
+        return ApolloReactHooks.useMutation<RemoveWebInputMutation, RemoveWebInputMutationVariables>(RemoveWebInputDocument, options);
       }
 export type RemoveWebInputMutationHookResult = ReturnType<typeof useRemoveWebInputMutation>;
-export type RemoveWebInputMutationResult = Apollo.MutationResult<RemoveWebInputMutation>;
-export type RemoveWebInputMutationOptions = Apollo.BaseMutationOptions<RemoveWebInputMutation, RemoveWebInputMutationVariables>;
+export type RemoveWebInputMutationResult = ApolloReactCommon.MutationResult<RemoveWebInputMutation>;

@@ -40,18 +40,19 @@ export const useLogin = (props: { deviceName: string }) => {
   const { colorMode, toggleColorMode } = useColorMode()
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
+  const deviceDecryptionChallengeVariables = {
+    deviceInput: {
+      id: device.id as string,
+      name: props.deviceName,
+      platform: device.platform
+    },
+    email: formStateContext.email
+  }
   const [
     getDeviceDecryptionChallenge,
     { data: decryptionData, error: decryptionChallengeError }
   ] = useDeviceDecryptionChallengeMutation({
-    variables: {
-      deviceInput: {
-        id: device.id as string,
-        name: props.deviceName,
-        platform: device.platform
-      },
-      email: formStateContext.email
-    }
+    variables: deviceDecryptionChallengeVariables
   })
 
   useEffect(() => {
@@ -64,7 +65,7 @@ export const useLogin = (props: { deviceName: string }) => {
   }, [error, decryptionChallengeError])
 
   useInterval(() => {
-    getDeviceDecryptionChallenge()
+    getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
   }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
@@ -232,7 +233,7 @@ export const useLogin = (props: { deviceName: string }) => {
         }
       })()
     } else if (!deviceDecryptionChallenge) {
-      getDeviceDecryptionChallenge()
+      getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
     }
   }, [deviceDecryptionChallenge])
 

@@ -11,20 +11,26 @@ import {
   Switch,
   useInterval
 } from '@chakra-ui/react'
-import { authenticator } from 'otplib'
 import { TbWorld } from 'react-icons/tb'
 
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AuthsList } from '@src/components/pages/AuthsList'
 
+const TOTP_PERIOD_SECONDS = 30
+
+const getTotpTimeRemaining = () => {
+  const remainder = Math.floor(Date.now() / 1000) % TOTP_PERIOD_SECONDS
+  return remainder === 0 ? TOTP_PERIOD_SECONDS : TOTP_PERIOD_SECONDS - remainder
+}
+
 export const Home = () => {
-  const [seconds, setRemainingSeconds] = useState(authenticator.timeRemaining())
+  const [seconds, setRemainingSeconds] = useState(getTotpTimeRemaining())
   const [search, setSearch] = useState('')
   const { deviceState, TOTPSecrets, currentURL } =
     useContext(DeviceStateContext)
 
   useInterval(() => {
-    setRemainingSeconds(authenticator.timeRemaining())
+    setRemainingSeconds(getTotpTimeRemaining())
   }, 1000)
 
   const [filterByTLDManual, setFilterByTLD] = useState<null | boolean>(null) // when in vault or browser config, show all: ;

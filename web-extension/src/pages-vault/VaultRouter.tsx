@@ -24,7 +24,7 @@ import { AccountLimits } from './AccountLimits'
 import debug from 'debug'
 import Login from './Login'
 import browser from 'webextension-polyfill'
-import { ApolloProvider } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 import {
   apolloClient,
   apolloClientWithoutTokenRefresh

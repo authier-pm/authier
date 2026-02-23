@@ -1,0 +1,218 @@
+diff --git a/cjs/base-visitor.js b/cjs/base-visitor.js
+index 68073accf82f8b989163505937e2ab1c1b322a67..149cf89b4d2fa47bd850ff2f613e4507e4ee35e5 100644
+--- a/cjs/base-visitor.js
++++ b/cjs/base-visitor.js
+@@ -5,12 +5,23 @@ const tslib_1 = require("tslib");
+ const auto_bind_1 = tslib_1.__importDefault(require("auto-bind"));
+ const naming_js_1 = require("./naming.js");
+ const plugin_helpers_1 = require("@graphql-codegen/plugin-helpers");
++const normalizeImportExtensionCompat = typeof plugin_helpers_1.normalizeImportExtension === 'function'
++    ? plugin_helpers_1.normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ class BaseVisitor {
+     _parsedConfig;
+     _declarationBlockConfig = {};
+     scalars;
+     constructor(rawConfig, additionalConfig) {
+-        const importExtension = (0, plugin_helpers_1.normalizeImportExtension)({
++        const importExtension = normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: rawConfig.emitLegacyCommonJSImports,
+             importExtension: rawConfig.importExtension,
+         });
+diff --git a/cjs/client-side-base-visitor.js b/cjs/client-side-base-visitor.js
+index 42e50f507ef4feb4f156db7192c6b9be9c7524c6..752e2bfb5e267e70ef4ef99e66f546f62da85a41 100644
+--- a/cjs/client-side-base-visitor.js
++++ b/cjs/client-side-base-visitor.js
+@@ -14,6 +14,17 @@ const base_visitor_js_1 = require("./base-visitor.js");
+ const utils_js_1 = require("./utils.js");
+ const imports_js_1 = require("./imports.js");
+ graphql_tag_1.default.enableExperimentalFragmentVariables();
++const normalizeImportExtensionCompat = typeof plugin_helpers_1.normalizeImportExtension === 'function'
++    ? plugin_helpers_1.normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ var DocumentMode;
+ (function (DocumentMode) {
+     DocumentMode["graphQLTag"] = "graphQLTag";
+@@ -296,7 +307,7 @@ class ClientSideBaseVisitor extends base_visitor_js_1.BaseVisitor {
+     }
+     clearExtension(path) {
+         const extension = (0, path_1.extname)(path);
+-        const importExtension = (0, plugin_helpers_1.normalizeImportExtension)({
++        const importExtension = normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+             importExtension: this.config.importExtension,
+         });
+@@ -334,7 +345,7 @@ class ClientSideBaseVisitor extends base_visitor_js_1.BaseVisitor {
+                 if (this._collectedOperations.length > 0) {
+                     if (this.config.importDocumentNodeExternallyFrom === 'near-operation-file' && this._documents.length === 1) {
+                         let documentPath = `./${this.clearExtension((0, path_1.basename)(this._documents[0].location))}`;
+-                        documentPath += (0, plugin_helpers_1.normalizeImportExtension)({
++                        documentPath += normalizeImportExtensionCompat({
+                             emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+                             importExtension: this.config.importExtension,
+                         });
+@@ -355,7 +366,7 @@ class ClientSideBaseVisitor extends base_visitor_js_1.BaseVisitor {
+         }
+         const excludeFragments = options.excludeFragments || this.config.globalNamespace || this.config.documentMode !== DocumentMode.graphQLTag;
+         if (!excludeFragments) {
+-            const importExtension = (0, plugin_helpers_1.normalizeImportExtension)({
++            const importExtension = normalizeImportExtensionCompat({
+                 emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+                 importExtension: this.config.importExtension,
+             });
+diff --git a/cjs/imports.js b/cjs/imports.js
+index 49569f3aa3a404e90893e59b59c1958d5ad53844..558525cd6e5ea242728d9c26300f140075cd58b7 100644
+--- a/cjs/imports.js
++++ b/cjs/imports.js
+@@ -10,6 +10,17 @@ const tslib_1 = require("tslib");
+ const path_1 = require("path");
+ const parse_filepath_1 = tslib_1.__importDefault(require("parse-filepath"));
+ const plugin_helpers_1 = require("@graphql-codegen/plugin-helpers");
++const normalizeImportExtensionCompat = typeof plugin_helpers_1.normalizeImportExtension === 'function'
++    ? plugin_helpers_1.normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ function generateFragmentImportStatement(statement, kind) {
+     const { importSource: fragmentImportSource, ...rest } = statement;
+     const { identifiers, path, namespace } = fragmentImportSource;
+@@ -33,7 +44,7 @@ function generateImportStatement(statement) {
+         ? `{ ${Array.from(new Set(importSource.identifiers)).join(', ')} }`
+         : '*';
+     const importExtension = importPath.startsWith('/') || importPath.startsWith('.')
+-        ? (0, plugin_helpers_1.normalizeImportExtension)({
++        ? normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: statement.emitLegacyCommonJSImports,
+             importExtension: statement.importExtension,
+         })
+diff --git a/esm/base-visitor.js b/esm/base-visitor.js
+index 96b78c80ca8258b0677ec1949ebd434774170154..03384b70b2aface897d74a7da0c2e6288ab2e3b3 100644
+--- a/esm/base-visitor.js
++++ b/esm/base-visitor.js
+@@ -1,12 +1,23 @@
+ import autoBind from 'auto-bind';
+ import { convertFactory } from './naming.js';
+ import { normalizeImportExtension } from '@graphql-codegen/plugin-helpers';
++const normalizeImportExtensionCompat = typeof normalizeImportExtension === 'function'
++    ? normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ export class BaseVisitor {
+     _parsedConfig;
+     _declarationBlockConfig = {};
+     scalars;
+     constructor(rawConfig, additionalConfig) {
+-        const importExtension = normalizeImportExtension({
++        const importExtension = normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: rawConfig.emitLegacyCommonJSImports,
+             importExtension: rawConfig.importExtension,
+         });
+diff --git a/esm/client-side-base-visitor.js b/esm/client-side-base-visitor.js
+index 8541f60fc546d668c663881f3aca3e0f417df64a..188e7cf4dcbbf0186184e1392d5882c37f299f93 100644
+--- a/esm/client-side-base-visitor.js
++++ b/esm/client-side-base-visitor.js
+@@ -10,6 +10,17 @@ import { BaseVisitor } from './base-visitor.js';
+ import { buildScalarsFromConfig, unique, flatten, getConfigValue, groupBy } from './utils.js';
+ import { generateFragmentImportStatement } from './imports.js';
+ gqlTag.enableExperimentalFragmentVariables();
++const normalizeImportExtensionCompat = typeof normalizeImportExtension === 'function'
++    ? normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ export var DocumentMode;
+ (function (DocumentMode) {
+     DocumentMode["graphQLTag"] = "graphQLTag";
+@@ -292,7 +303,7 @@ export class ClientSideBaseVisitor extends BaseVisitor {
+     }
+     clearExtension(path) {
+         const extension = extname(path);
+-        const importExtension = normalizeImportExtension({
++        const importExtension = normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+             importExtension: this.config.importExtension,
+         });
+@@ -330,7 +341,7 @@ export class ClientSideBaseVisitor extends BaseVisitor {
+                 if (this._collectedOperations.length > 0) {
+                     if (this.config.importDocumentNodeExternallyFrom === 'near-operation-file' && this._documents.length === 1) {
+                         let documentPath = `./${this.clearExtension(basename(this._documents[0].location))}`;
+-                        documentPath += normalizeImportExtension({
++                        documentPath += normalizeImportExtensionCompat({
+                             emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+                             importExtension: this.config.importExtension,
+                         });
+@@ -351,7 +362,7 @@ export class ClientSideBaseVisitor extends BaseVisitor {
+         }
+         const excludeFragments = options.excludeFragments || this.config.globalNamespace || this.config.documentMode !== DocumentMode.graphQLTag;
+         if (!excludeFragments) {
+-            const importExtension = normalizeImportExtension({
++            const importExtension = normalizeImportExtensionCompat({
+                 emitLegacyCommonJSImports: this.config.emitLegacyCommonJSImports,
+                 importExtension: this.config.importExtension,
+             });
+diff --git a/esm/imports.js b/esm/imports.js
+index 4c9cb24138a6e88ba036abfc2cdf977cafcd3c9d..e5b369c7de1b19ef6c1f10535299bec0eed384f5 100644
+--- a/esm/imports.js
++++ b/esm/imports.js
+@@ -1,6 +1,17 @@
+ import { dirname, isAbsolute, join, relative, resolve } from 'path';
+ import parse from 'parse-filepath';
+ import { normalizeImportExtension } from '@graphql-codegen/plugin-helpers';
++const normalizeImportExtensionCompat = typeof normalizeImportExtension === 'function'
++    ? normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ export function generateFragmentImportStatement(statement, kind) {
+     const { importSource: fragmentImportSource, ...rest } = statement;
+     const { identifiers, path, namespace } = fragmentImportSource;
+@@ -24,7 +35,7 @@ export function generateImportStatement(statement) {
+         ? `{ ${Array.from(new Set(importSource.identifiers)).join(', ')} }`
+         : '*';
+     const importExtension = importPath.startsWith('/') || importPath.startsWith('.')
+-        ? normalizeImportExtension({
++        ? normalizeImportExtensionCompat({
+             emitLegacyCommonJSImports: statement.emitLegacyCommonJSImports,
+             importExtension: statement.importExtension,
+         })
