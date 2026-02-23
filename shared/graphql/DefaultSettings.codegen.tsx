@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
   config: Types.DefaultSettingsInput;
@@ -33,7 +34,6 @@ export const UpdateDefaultDeviceSettingsDocument = gql`
   }
 }
     `;
-export type UpdateDefaultDeviceSettingsMutationFn = Apollo.MutationFunction<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>;
 
 /**
  * __useUpdateDefaultDeviceSettingsMutation__
@@ -52,13 +52,12 @@ export type UpdateDefaultDeviceSettingsMutationFn = Apollo.MutationFunction<Upda
  *   },
  * });
  */
-export function useUpdateDefaultDeviceSettingsMutation(baseOptions?: Apollo.MutationHookOptions<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>) {
+export function useUpdateDefaultDeviceSettingsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>(UpdateDefaultDeviceSettingsDocument, options);
+        return ApolloReactHooks.useMutation<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>(UpdateDefaultDeviceSettingsDocument, options);
       }
 export type UpdateDefaultDeviceSettingsMutationHookResult = ReturnType<typeof useUpdateDefaultDeviceSettingsMutation>;
-export type UpdateDefaultDeviceSettingsMutationResult = Apollo.MutationResult<UpdateDefaultDeviceSettingsMutation>;
-export type UpdateDefaultDeviceSettingsMutationOptions = Apollo.BaseMutationOptions<UpdateDefaultDeviceSettingsMutation, UpdateDefaultDeviceSettingsMutationVariables>;
+export type UpdateDefaultDeviceSettingsMutationResult = ApolloReactCommon.MutationResult<UpdateDefaultDeviceSettingsMutation>;
 export const DefaultSettingsDocument = gql`
     query defaultSettings {
   me {
@@ -92,19 +91,23 @@ export const DefaultSettingsDocument = gql`
  *   },
  * });
  */
-export function useDefaultSettingsQuery(baseOptions?: Apollo.QueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
+export function useDefaultSettingsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
+        return ApolloReactHooks.useQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
       }
-export function useDefaultSettingsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
+export function useDefaultSettingsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
+          return ApolloReactHooks.useLazyQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
         }
-export function useDefaultSettingsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
+// @ts-ignore
+export function useDefaultSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;
+// @ts-ignore
+export function useDefaultSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DefaultSettingsQuery | undefined, DefaultSettingsQueryVariables>;
+export function useDefaultSettingsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DefaultSettingsQuery, DefaultSettingsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DefaultSettingsQuery, DefaultSettingsQueryVariables>(DefaultSettingsDocument, options);
         }
 export type DefaultSettingsQueryHookResult = ReturnType<typeof useDefaultSettingsQuery>;
 export type DefaultSettingsLazyQueryHookResult = ReturnType<typeof useDefaultSettingsLazyQuery>;
 export type DefaultSettingsSuspenseQueryHookResult = ReturnType<typeof useDefaultSettingsSuspenseQuery>;
-export type DefaultSettingsQueryResult = Apollo.QueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;
+export type DefaultSettingsQueryResult = ApolloReactCommon.QueryResult<DefaultSettingsQuery, DefaultSettingsQueryVariables>;

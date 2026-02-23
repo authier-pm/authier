@@ -1,7 +1,8 @@
-import * as Types from '../../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type ChangeMasterPasswordMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
@@ -38,7 +39,6 @@ export const ChangeMasterPasswordDocument = gql`
   }
 }
     `;
-export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
 
 /**
  * __useChangeMasterPasswordMutation__
@@ -60,13 +60,12 @@ export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<ChangeMaste
  *   },
  * });
  */
-export function useChangeMasterPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>) {
+export function useChangeMasterPasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>(ChangeMasterPasswordDocument, options);
+        return ApolloReactHooks.useMutation<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>(ChangeMasterPasswordDocument, options);
       }
 export type ChangeMasterPasswordMutationHookResult = ReturnType<typeof useChangeMasterPasswordMutation>;
-export type ChangeMasterPasswordMutationResult = Apollo.MutationResult<ChangeMasterPasswordMutation>;
-export type ChangeMasterPasswordMutationOptions = Apollo.BaseMutationOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
+export type ChangeMasterPasswordMutationResult = ApolloReactCommon.MutationResult<ChangeMasterPasswordMutation>;
 export const AccountDocument = gql`
     query Account {
   me {
@@ -95,22 +94,26 @@ export const AccountDocument = gql`
  *   },
  * });
  */
-export function useAccountQuery(baseOptions?: Apollo.QueryHookOptions<AccountQuery, AccountQueryVariables>) {
+export function useAccountQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<AccountQuery, AccountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+        return ApolloReactHooks.useQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
       }
-export function useAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>) {
+export function useAccountLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<AccountQuery, AccountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+          return ApolloReactHooks.useLazyQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
         }
-export function useAccountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
+// @ts-ignore
+export function useAccountSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<AccountQuery, AccountQueryVariables>;
+// @ts-ignore
+export function useAccountSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<AccountQuery | undefined, AccountQueryVariables>;
+export function useAccountSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<AccountQuery, AccountQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<AccountQuery, AccountQueryVariables>(AccountDocument, options);
         }
 export type AccountQueryHookResult = ReturnType<typeof useAccountQuery>;
 export type AccountLazyQueryHookResult = ReturnType<typeof useAccountLazyQuery>;
 export type AccountSuspenseQueryHookResult = ReturnType<typeof useAccountSuspenseQuery>;
-export type AccountQueryResult = Apollo.QueryResult<AccountQuery, AccountQueryVariables>;
+export type AccountQueryResult = ApolloReactCommon.QueryResult<AccountQuery, AccountQueryVariables>;
 export const ResendEmailVerificationDocument = gql`
     mutation resendEmailVerification {
   me {
@@ -118,7 +121,6 @@ export const ResendEmailVerificationDocument = gql`
   }
 }
     `;
-export type ResendEmailVerificationMutationFn = Apollo.MutationFunction<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>;
 
 /**
  * __useResendEmailVerificationMutation__
@@ -136,13 +138,12 @@ export type ResendEmailVerificationMutationFn = Apollo.MutationFunction<ResendEm
  *   },
  * });
  */
-export function useResendEmailVerificationMutation(baseOptions?: Apollo.MutationHookOptions<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>) {
+export function useResendEmailVerificationMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>(ResendEmailVerificationDocument, options);
+        return ApolloReactHooks.useMutation<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>(ResendEmailVerificationDocument, options);
       }
 export type ResendEmailVerificationMutationHookResult = ReturnType<typeof useResendEmailVerificationMutation>;
-export type ResendEmailVerificationMutationResult = Apollo.MutationResult<ResendEmailVerificationMutation>;
-export type ResendEmailVerificationMutationOptions = Apollo.BaseMutationOptions<ResendEmailVerificationMutation, ResendEmailVerificationMutationVariables>;
+export type ResendEmailVerificationMutationResult = ApolloReactCommon.MutationResult<ResendEmailVerificationMutation>;
 export const DeleteAccountDocument = gql`
     mutation deleteAccount {
   me {
@@ -152,7 +153,6 @@ export const DeleteAccountDocument = gql`
   }
 }
     `;
-export type DeleteAccountMutationFn = Apollo.MutationFunction<DeleteAccountMutation, DeleteAccountMutationVariables>;
 
 /**
  * __useDeleteAccountMutation__
@@ -170,10 +170,9 @@ export type DeleteAccountMutationFn = Apollo.MutationFunction<DeleteAccountMutat
  *   },
  * });
  */
-export function useDeleteAccountMutation(baseOptions?: Apollo.MutationHookOptions<DeleteAccountMutation, DeleteAccountMutationVariables>) {
+export function useDeleteAccountMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<DeleteAccountMutation, DeleteAccountMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteAccountMutation, DeleteAccountMutationVariables>(DeleteAccountDocument, options);
+        return ApolloReactHooks.useMutation<DeleteAccountMutation, DeleteAccountMutationVariables>(DeleteAccountDocument, options);
       }
 export type DeleteAccountMutationHookResult = ReturnType<typeof useDeleteAccountMutation>;
-export type DeleteAccountMutationResult = Apollo.MutationResult<DeleteAccountMutation>;
-export type DeleteAccountMutationOptions = Apollo.BaseMutationOptions<DeleteAccountMutation, DeleteAccountMutationVariables>;
+export type DeleteAccountMutationResult = ApolloReactCommon.MutationResult<DeleteAccountMutation>;

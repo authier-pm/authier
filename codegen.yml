@@ -13,7 +13,7 @@ generates:
     preset: near-operation-file
     presetConfig:
       extension: .codegen.tsx
-      baseTypesPath: graphqlBaseTypes
+      baseTypesPath: ~@shared/generated/graphqlBaseTypes
 
   shared/generated/graphqlSchemaFragments.ts:
     plugins:
@@ -28,8 +28,11 @@ config:
   withHooks: true
   withHOC: false
   withComponent: false
-  apolloClientVersion: 3
+  withMutationFn: false
+  withMutationOptionsType: false
   reactApolloVersion: 3
+  apolloReactCommonImportFrom: '@apollo/client/react'
+  apolloReactHooksImportFrom: '@apollo/client/react'
   scalars:
     EmailAddressWithTLD: string
     NonNegativeFloat: number

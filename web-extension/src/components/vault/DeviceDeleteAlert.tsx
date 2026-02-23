@@ -74,9 +74,9 @@ export function DeviceDeleteAlert({
               ml={3}
               onClick={async () => {
                 if (remove) {
-                  await removeDevice()
+                  await removeDevice({ variables: { id } })
                 } else {
-                  await logoutDevice()
+                  await logoutDevice({ variables: { id } })
                 }
                 onClose()
                 devicesRefetch()

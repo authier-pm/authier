@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UpdateNewDevicePolicyMutationVariables = Types.Exact<{
   newDevicePolicy: Types.UserNewDevicePolicy;
@@ -26,7 +27,6 @@ export const UpdateNewDevicePolicyDocument = gql`
   }
 }
     `;
-export type UpdateNewDevicePolicyMutationFn = Apollo.MutationFunction<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>;
 
 /**
  * __useUpdateNewDevicePolicyMutation__
@@ -45,13 +45,12 @@ export type UpdateNewDevicePolicyMutationFn = Apollo.MutationFunction<UpdateNewD
  *   },
  * });
  */
-export function useUpdateNewDevicePolicyMutation(baseOptions?: Apollo.MutationHookOptions<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>) {
+export function useUpdateNewDevicePolicyMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>(UpdateNewDevicePolicyDocument, options);
+        return ApolloReactHooks.useMutation<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>(UpdateNewDevicePolicyDocument, options);
       }
 export type UpdateNewDevicePolicyMutationHookResult = ReturnType<typeof useUpdateNewDevicePolicyMutation>;
-export type UpdateNewDevicePolicyMutationResult = Apollo.MutationResult<UpdateNewDevicePolicyMutation>;
-export type UpdateNewDevicePolicyMutationOptions = Apollo.BaseMutationOptions<UpdateNewDevicePolicyMutation, UpdateNewDevicePolicyMutationVariables>;
+export type UpdateNewDevicePolicyMutationResult = ApolloReactCommon.MutationResult<UpdateNewDevicePolicyMutation>;
 export const GetUserNewDevicePolicyDocument = gql`
     query GetUserNewDevicePolicy {
   me {
@@ -76,19 +75,23 @@ export const GetUserNewDevicePolicyDocument = gql`
  *   },
  * });
  */
-export function useGetUserNewDevicePolicyQuery(baseOptions?: Apollo.QueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
+export function useGetUserNewDevicePolicyQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
+        return ApolloReactHooks.useQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
       }
-export function useGetUserNewDevicePolicyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
+export function useGetUserNewDevicePolicyLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
+          return ApolloReactHooks.useLazyQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
         }
-export function useGetUserNewDevicePolicySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
+// @ts-ignore
+export function useGetUserNewDevicePolicySuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>;
+// @ts-ignore
+export function useGetUserNewDevicePolicySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<GetUserNewDevicePolicyQuery | undefined, GetUserNewDevicePolicyQueryVariables>;
+export function useGetUserNewDevicePolicySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>(GetUserNewDevicePolicyDocument, options);
         }
 export type GetUserNewDevicePolicyQueryHookResult = ReturnType<typeof useGetUserNewDevicePolicyQuery>;
 export type GetUserNewDevicePolicyLazyQueryHookResult = ReturnType<typeof useGetUserNewDevicePolicyLazyQuery>;
 export type GetUserNewDevicePolicySuspenseQueryHookResult = ReturnType<typeof useGetUserNewDevicePolicySuspenseQuery>;
-export type GetUserNewDevicePolicyQueryResult = Apollo.QueryResult<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>;
+export type GetUserNewDevicePolicyQueryResult = ApolloReactCommon.QueryResult<GetUserNewDevicePolicyQuery, GetUserNewDevicePolicyQueryVariables>;

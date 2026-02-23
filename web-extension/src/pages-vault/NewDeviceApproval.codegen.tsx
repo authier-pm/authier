@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type UserNewDevicePolicyQueryQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -34,19 +35,23 @@ export const UserNewDevicePolicyQueryDocument = gql`
  *   },
  * });
  */
-export function useUserNewDevicePolicyQueryQuery(baseOptions?: Apollo.QueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
+export function useUserNewDevicePolicyQueryQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
+        return ApolloReactHooks.useQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
       }
-export function useUserNewDevicePolicyQueryLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
+export function useUserNewDevicePolicyQueryLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
+          return ApolloReactHooks.useLazyQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
         }
-export function useUserNewDevicePolicyQuerySuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
+// @ts-ignore
+export function useUserNewDevicePolicyQuerySuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>;
+// @ts-ignore
+export function useUserNewDevicePolicyQuerySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<UserNewDevicePolicyQueryQuery | undefined, UserNewDevicePolicyQueryQueryVariables>;
+export function useUserNewDevicePolicyQuerySuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>(UserNewDevicePolicyQueryDocument, options);
         }
 export type UserNewDevicePolicyQueryQueryHookResult = ReturnType<typeof useUserNewDevicePolicyQueryQuery>;
 export type UserNewDevicePolicyQueryLazyQueryHookResult = ReturnType<typeof useUserNewDevicePolicyQueryLazyQuery>;
 export type UserNewDevicePolicyQuerySuspenseQueryHookResult = ReturnType<typeof useUserNewDevicePolicyQuerySuspenseQuery>;
-export type UserNewDevicePolicyQueryQueryResult = Apollo.QueryResult<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>;
+export type UserNewDevicePolicyQueryQueryResult = ApolloReactCommon.QueryResult<UserNewDevicePolicyQueryQuery, UserNewDevicePolicyQueryQueryVariables>;

@@ -36,13 +36,12 @@ export class RedisBasicRateLimiter {
    */
   async increment(resourceKey: string) {
     const key = this.getKey(resourceKey)
-    const res = await this.redisClient
-      .multi()
-      .incr(key)
-      .expire(key, this.options.intervalSeconds)
-      .exec()
+    // Avoid Upstash multi-exec here; some REST deployments return a non-array
+    // response shape and the client crashes while parsing Pipeline.exec().
+    const hits = await this.redisClient.incr(key)
+    await this.redisClient.expire(key, this.options.intervalSeconds)
 
-    if (res && res[0] > this.options.maxHits) {
+    if (typeof hits === 'number' && hits > this.options.maxHits) {
       throw new RateLimitedError(
         `rate limit exceeded, try in ${this.duration}`,
         'RATE_LIMIT_EXCEEDED'

@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type DeviceCountQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -32,19 +33,23 @@ export const DeviceCountDocument = gql`
  *   },
  * });
  */
-export function useDeviceCountQuery(baseOptions?: Apollo.QueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
+export function useDeviceCountQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
+        return ApolloReactHooks.useQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
       }
-export function useDeviceCountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
+export function useDeviceCountLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
+          return ApolloReactHooks.useLazyQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
         }
-export function useDeviceCountSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
+// @ts-ignore
+export function useDeviceCountSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DeviceCountQuery, DeviceCountQueryVariables>;
+// @ts-ignore
+export function useDeviceCountSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DeviceCountQuery | undefined, DeviceCountQueryVariables>;
+export function useDeviceCountSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceCountQuery, DeviceCountQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DeviceCountQuery, DeviceCountQueryVariables>(DeviceCountDocument, options);
         }
 export type DeviceCountQueryHookResult = ReturnType<typeof useDeviceCountQuery>;
 export type DeviceCountLazyQueryHookResult = ReturnType<typeof useDeviceCountLazyQuery>;
 export type DeviceCountSuspenseQueryHookResult = ReturnType<typeof useDeviceCountSuspenseQuery>;
-export type DeviceCountQueryResult = Apollo.QueryResult<DeviceCountQuery, DeviceCountQueryVariables>;
+export type DeviceCountQueryResult = ApolloReactCommon.QueryResult<DeviceCountQuery, DeviceCountQueryVariables>;

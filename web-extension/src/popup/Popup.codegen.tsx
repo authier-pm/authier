@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type SaveFirebaseTokenMutationVariables = Types.Exact<{
   firebaseToken: Types.Scalars['String']['input'];
@@ -20,7 +21,6 @@ export const SaveFirebaseTokenDocument = gql`
   }
 }
     `;
-export type SaveFirebaseTokenMutationFn = Apollo.MutationFunction<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>;
 
 /**
  * __useSaveFirebaseTokenMutation__
@@ -39,10 +39,9 @@ export type SaveFirebaseTokenMutationFn = Apollo.MutationFunction<SaveFirebaseTo
  *   },
  * });
  */
-export function useSaveFirebaseTokenMutation(baseOptions?: Apollo.MutationHookOptions<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>) {
+export function useSaveFirebaseTokenMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>(SaveFirebaseTokenDocument, options);
+        return ApolloReactHooks.useMutation<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>(SaveFirebaseTokenDocument, options);
       }
 export type SaveFirebaseTokenMutationHookResult = ReturnType<typeof useSaveFirebaseTokenMutation>;
-export type SaveFirebaseTokenMutationResult = Apollo.MutationResult<SaveFirebaseTokenMutation>;
-export type SaveFirebaseTokenMutationOptions = Apollo.BaseMutationOptions<SaveFirebaseTokenMutation, SaveFirebaseTokenMutationVariables>;
+export type SaveFirebaseTokenMutationResult = ApolloReactCommon.MutationResult<SaveFirebaseTokenMutation>;

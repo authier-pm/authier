@@ -1,7 +1,7 @@
 import * as Types from '../../../../shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as Apollo from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type AddOtpEventMutationVariables = Types.Exact<{
   event: Types.SecretUsageEventInput;
@@ -20,7 +20,7 @@ export const AddOtpEventDocument = gql`
   }
 }
     `;
-export type AddOtpEventMutationFn = Apollo.MutationFunction<AddOtpEventMutation, AddOtpEventMutationVariables>;
+export type AddOtpEventMutationFn = Apollo.MutationTuple<AddOtpEventMutation, AddOtpEventMutationVariables>[0];
 
 /**
  * __useAddOtpEventMutation__
@@ -45,4 +45,4 @@ export function useAddOtpEventMutation(baseOptions?: Apollo.MutationHookOptions<
       }
 export type AddOtpEventMutationHookResult = ReturnType<typeof useAddOtpEventMutation>;
 export type AddOtpEventMutationResult = Apollo.MutationResult<AddOtpEventMutation>;
-export type AddOtpEventMutationOptions = Apollo.BaseMutationOptions<AddOtpEventMutation, AddOtpEventMutationVariables>;
+export type AddOtpEventMutationOptions = Apollo.MutationFunctionOptions<AddOtpEventMutation, AddOtpEventMutationVariables>;

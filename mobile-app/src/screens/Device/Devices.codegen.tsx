@@ -1,7 +1,8 @@
-import * as Types from '../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type DevicesListQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -41,19 +42,23 @@ export const DevicesListDocument = gql`
  *   },
  * });
  */
-export function useDevicesListQuery(baseOptions?: Apollo.QueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+export function useDevicesListQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+        return ApolloReactHooks.useQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
       }
-export function useDevicesListLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+export function useDevicesListLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+          return ApolloReactHooks.useLazyQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
         }
-export function useDevicesListSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
+// @ts-ignore
+export function useDevicesListSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DevicesListQuery, DevicesListQueryVariables>;
+// @ts-ignore
+export function useDevicesListSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DevicesListQuery | undefined, DevicesListQueryVariables>;
+export function useDevicesListSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DevicesListQuery, DevicesListQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DevicesListQuery, DevicesListQueryVariables>(DevicesListDocument, options);
         }
 export type DevicesListQueryHookResult = ReturnType<typeof useDevicesListQuery>;
 export type DevicesListLazyQueryHookResult = ReturnType<typeof useDevicesListLazyQuery>;
 export type DevicesListSuspenseQueryHookResult = ReturnType<typeof useDevicesListSuspenseQuery>;
-export type DevicesListQueryResult = Apollo.QueryResult<DevicesListQuery, DevicesListQueryVariables>;
+export type DevicesListQueryResult = ApolloReactCommon.QueryResult<DevicesListQuery, DevicesListQueryVariables>;

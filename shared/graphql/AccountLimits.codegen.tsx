@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type LimitsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -37,19 +38,23 @@ export const LimitsDocument = gql`
  *   },
  * });
  */
-export function useLimitsQuery(baseOptions?: Apollo.QueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
+export function useLimitsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
+        return ApolloReactHooks.useQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
       }
-export function useLimitsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
+export function useLimitsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
+          return ApolloReactHooks.useLazyQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
         }
-export function useLimitsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
+// @ts-ignore
+export function useLimitsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<LimitsQuery, LimitsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<LimitsQuery, LimitsQueryVariables>;
+// @ts-ignore
+export function useLimitsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<LimitsQuery, LimitsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<LimitsQuery | undefined, LimitsQueryVariables>;
+export function useLimitsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<LimitsQuery, LimitsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<LimitsQuery, LimitsQueryVariables>(LimitsDocument, options);
         }
 export type LimitsQueryHookResult = ReturnType<typeof useLimitsQuery>;
 export type LimitsLazyQueryHookResult = ReturnType<typeof useLimitsLazyQuery>;
 export type LimitsSuspenseQueryHookResult = ReturnType<typeof useLimitsSuspenseQuery>;
-export type LimitsQueryResult = Apollo.QueryResult<LimitsQuery, LimitsQueryVariables>;
+export type LimitsQueryResult = ApolloReactCommon.QueryResult<LimitsQuery, LimitsQueryVariables>;

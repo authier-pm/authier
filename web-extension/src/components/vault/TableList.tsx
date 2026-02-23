@@ -21,7 +21,7 @@ import {
 import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
 import { Link, useLocation } from 'react-router-dom'
 import { DeleteSecretButton } from './DeleteSecretButton'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 import { Trans } from '@lingui/react/macro'
 
 export function TableList({ filter }: { filter: string }) {
@@ -152,7 +152,7 @@ export function TableList({ filter }: { filter: string }) {
                 onClick={() => {
                   navigator.clipboard.writeText(
                     isTotp
-                      ? authenticator.generate(row.totp.secret)
+                      ? generateSync({ secret: row.totp.secret })
                       : row.loginCredentials.password
                   )
                 }}

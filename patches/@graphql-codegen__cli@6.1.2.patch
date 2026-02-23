@@ -1,0 +1,62 @@
+diff --git a/cjs/codegen.js b/cjs/codegen.js
+index 36aeab03a273d38a77e97e0cecbca75850446848..346e36308b6ba1f7c8296dbd00bc3c66f7d6d803 100644
+--- a/cjs/codegen.js
++++ b/cjs/codegen.js
+@@ -16,6 +16,17 @@ const plugins_js_1 = require("./plugins.js");
+ const presets_js_1 = require("./presets.js");
+ const debugging_js_1 = require("./utils/debugging.js");
+ const documentTransforms_js_1 = require("./documentTransforms.js");
++const normalizeImportExtensionCompat = typeof plugin_helpers_1.normalizeImportExtension === 'function'
++    ? plugin_helpers_1.normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ /**
+  * Poor mans ESM detection.
+  * Looking at this and you have a better method?
+@@ -245,7 +256,7 @@ async function executeCodegen(input) {
+                                             const name = Object.keys(plugin)[0];
+                                             return [name, pkg];
+                                         }));
+-                                        const importExtension = (0, plugin_helpers_1.normalizeImportExtension)({
++                                        const importExtension = normalizeImportExtensionCompat({
+                                             emitLegacyCommonJSImports: config.emitLegacyCommonJSImports,
+                                             importExtension: config.importExtension,
+                                         });
+diff --git a/esm/codegen.js b/esm/codegen.js
+index 60e48c7f199e21021c018195b58b46f480e8b966..c424df0fc4b371cfba47492fcc22243a799c8666 100644
+--- a/esm/codegen.js
++++ b/esm/codegen.js
+@@ -12,6 +12,17 @@ import { getPluginByName } from './plugins.js';
+ import { getPresetByName } from './presets.js';
+ import { debugLog, printLogs } from './utils/debugging.js';
+ import { getDocumentTransform } from './documentTransforms.js';
++const normalizeImportExtensionCompat = typeof normalizeImportExtension === 'function'
++    ? normalizeImportExtension
++    : ({ emitLegacyCommonJSImports, importExtension, }) => {
++        if (importExtension !== undefined) {
++            return importExtension;
++        }
++        if (emitLegacyCommonJSImports === undefined || emitLegacyCommonJSImports === true) {
++            return '';
++        }
++        return '.js';
++    };
+ /**
+  * Poor mans ESM detection.
+  * Looking at this and you have a better method?
+@@ -241,7 +252,7 @@ export async function executeCodegen(input) {
+                                             const name = Object.keys(plugin)[0];
+                                             return [name, pkg];
+                                         }));
+-                                        const importExtension = normalizeImportExtension({
++                                        const importExtension = normalizeImportExtensionCompat({
+                                             emitLegacyCommonJSImports: config.emitLegacyCommonJSImports,
+                                             importExtension: config.importExtension,
+                                         });

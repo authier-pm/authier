@@ -33,7 +33,31 @@ export interface SuspiciousFactors {
   isTorNode: boolean
 }
 
-const { env } = process
+interface IIpApiComSuccessResponse {
+  status: 'success'
+  country: string
+  countryCode: string
+  region: string
+  regionName: string
+  city: string
+  zip: string
+  lat: number
+  lon: number
+  timezone: string
+  isp: string
+  org: string
+  query: string
+  proxy?: boolean
+  hosting?: boolean
+}
+
+interface IIpApiComFailResponse {
+  status: 'fail'
+  message: string
+  query?: string
+}
+
+type IIpApiComResponse = IIpApiComSuccessResponse | IIpApiComFailResponse
 
 export const getGeoIpLocation = memRedis(
   async function getGeoIpLocation(ipAddress: string) {
@@ -67,15 +91,62 @@ export const getGeoIpLocation = memRedis(
       } as IIpApiResponse
     }
     const res = await fetch(
-      `https://ip-api.io/json/${ipAddress}?api_key=${env.IP_API_IO_API_KEY}`
+      `http://ip-api.com/json/${ipAddress}?fields=status,message,country,countryCode,region,regionName,city,zip,lat,lon,timezone,isp,org,query,proxy,hosting`
     )
+    const bodyText = await res.text()
 
     if (res.status > 201) {
       console.warn('Failed to get geo location for ip', ipAddress)
+      return null
     }
-    const json = (await res.json()) as IIpApiResponse
 
-    return json
+    try {
+      const json = JSON.parse(bodyText) as IIpApiComResponse
+
+      if (json.status !== 'success') {
+        console.warn(
+          'Geo location lookup failed for ip',
+          ipAddress,
+          json.message
+        )
+        return null
+      }
+
+      return {
+        callingCode: '',
+        city: json.city ?? '',
+        countryCapital: '',
+        country_code: json.countryCode ?? '',
+        country_name: json.country ?? '',
+        currency: '',
+        currencySymbol: '',
+        emojiFlag: '',
+        flagUrl: '',
+        ip: json.query ?? ipAddress,
+        is_in_european_union: false,
+        latitude: json.lat ?? 0,
+        longitude: json.lon ?? 0,
+        metro_code: 0,
+        organisation: json.org ?? json.isp ?? '',
+        region_code: json.region ?? '',
+        region_name: json.regionName ?? '',
+        suspiciousFactors: {
+          isProxy: Boolean(json.proxy),
+          isSpam: false,
+          isSuspicious: Boolean(json.proxy || json.hosting),
+          isTorNode: false
+        },
+        time_zone: json.timezone ?? '',
+        zip_code: json.zip ?? ''
+      } satisfies IIpApiResponse
+    } catch {
+      console.warn(
+        'Failed to parse geo location response for ip',
+        ipAddress,
+        bodyText.slice(0, 120)
+      )
+      return null
+    }
   },
   {
     cachePrefix: 'geoIpLocation',

@@ -1,7 +1,8 @@
-import * as Types from '../generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type RegisterNewUserMutationVariables = Types.Exact<{
   input: Types.RegisterNewAccountInput;
@@ -29,7 +30,6 @@ export const RegisterNewUserDocument = gql`
   }
 }
     `;
-export type RegisterNewUserMutationFn = Apollo.MutationFunction<RegisterNewUserMutation, RegisterNewUserMutationVariables>;
 
 /**
  * __useRegisterNewUserMutation__
@@ -49,10 +49,9 @@ export type RegisterNewUserMutationFn = Apollo.MutationFunction<RegisterNewUserM
  *   },
  * });
  */
-export function useRegisterNewUserMutation(baseOptions?: Apollo.MutationHookOptions<RegisterNewUserMutation, RegisterNewUserMutationVariables>) {
+export function useRegisterNewUserMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<RegisterNewUserMutation, RegisterNewUserMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RegisterNewUserMutation, RegisterNewUserMutationVariables>(RegisterNewUserDocument, options);
+        return ApolloReactHooks.useMutation<RegisterNewUserMutation, RegisterNewUserMutationVariables>(RegisterNewUserDocument, options);
       }
 export type RegisterNewUserMutationHookResult = ReturnType<typeof useRegisterNewUserMutation>;
-export type RegisterNewUserMutationResult = Apollo.MutationResult<RegisterNewUserMutation>;
-export type RegisterNewUserMutationOptions = Apollo.BaseMutationOptions<RegisterNewUserMutation, RegisterNewUserMutationVariables>;
+export type RegisterNewUserMutationResult = ApolloReactCommon.MutationResult<RegisterNewUserMutation>;

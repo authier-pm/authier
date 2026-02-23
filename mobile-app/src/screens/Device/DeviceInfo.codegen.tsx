@@ -1,7 +1,8 @@
-import * as Types from '../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type DeviceInfoQueryVariables = Types.Exact<{
   id: Types.Scalars['String']['input'];
@@ -50,19 +51,23 @@ export const DeviceInfoDocument = gql`
  *   },
  * });
  */
-export function useDeviceInfoQuery(baseOptions: Apollo.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables> & ({ variables: DeviceInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
+export function useDeviceInfoQuery(baseOptions: ApolloReactHooks.QueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables> & ({ variables: DeviceInfoQueryVariables; skip?: boolean; } | { skip: boolean; }) ) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
+        return ApolloReactHooks.useQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
       }
-export function useDeviceInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+export function useDeviceInfoLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
+          return ApolloReactHooks.useLazyQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
-export function useDeviceInfoSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
+// @ts-ignore
+export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;
+// @ts-ignore
+export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DeviceInfoQuery | undefined, DeviceInfoQueryVariables>;
+export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
 export type DeviceInfoQueryHookResult = ReturnType<typeof useDeviceInfoQuery>;
 export type DeviceInfoLazyQueryHookResult = ReturnType<typeof useDeviceInfoLazyQuery>;
 export type DeviceInfoSuspenseQueryHookResult = ReturnType<typeof useDeviceInfoSuspenseQuery>;
-export type DeviceInfoQueryResult = Apollo.QueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;
+export type DeviceInfoQueryResult = ApolloReactCommon.QueryResult<DeviceInfoQuery, DeviceInfoQueryVariables>;

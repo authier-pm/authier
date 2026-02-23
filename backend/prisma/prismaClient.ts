@@ -5,7 +5,9 @@ import { enablePrismaDebug } from './prismaDebug'
 import { getDbCount } from '../scripts/getDbCount'
 
 import { PrismaClient, Prisma } from '@prisma/client'
+import { PrismaPg } from '@prisma/adapter-pg'
 import kyselyExtension from 'prisma-extension-kysely'
+import pg from 'pg'
 import type { DB } from './generated/types'
 
 import {
@@ -34,7 +36,37 @@ if (workerId) {
   log('DATABASE_URL', dbUrl)
 }
 
+let prismaSchema: string | undefined
+if (dbUrl) {
+  try {
+    const parsedUrl = new URL(dbUrl)
+    prismaSchema = parsedUrl.searchParams.get('schema') || undefined
+
+    // `schema` is a Prisma datasource URL parameter, not a `pg` connection option.
+    // The driver adapter expects it separately.
+    if (prismaSchema) {
+      parsedUrl.searchParams.delete('schema')
+      dbUrl = parsedUrl.toString()
+    }
+  } catch {
+    // Keep backward-compatible behavior if DATABASE_URL is not a valid URL string.
+  }
+}
+
 export const prismaClient = new PrismaClient({
+  adapter: new PrismaPg(
+    new pg.Pool({
+      connectionString: dbUrl
+    }),
+    prismaSchema
+      ? {
+          schema: prismaSchema,
+          disposeExternalPool: true
+        }
+      : {
+          disposeExternalPool: true
+        }
+  ),
   transactionOptions: {
     timeout: 55_000,
     maxWait: 55_000
@@ -50,12 +82,7 @@ export const prismaClient = new PrismaClient({
           'info',
           'warn'
         ],
-  errorFormat: workerId ? 'pretty' : undefined,
-  datasources: {
-    db: {
-      url: dbUrl
-    }
-  }
+  errorFormat: workerId ? 'pretty' : undefined
 }).$extends(
   kyselyExtension({
     kysely: (driver) =>

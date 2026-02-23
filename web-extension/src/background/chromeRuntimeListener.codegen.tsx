@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type AddWebInputsMutationVariables = Types.Exact<{
   webInputs: Array<Types.WebInputElement> | Types.WebInputElement;
@@ -26,7 +27,6 @@ export const AddWebInputsDocument = gql`
   }
 }
     `;
-export type AddWebInputsMutationFn = Apollo.MutationFunction<AddWebInputsMutation, AddWebInputsMutationVariables>;
 
 /**
  * __useAddWebInputsMutation__
@@ -45,13 +45,12 @@ export type AddWebInputsMutationFn = Apollo.MutationFunction<AddWebInputsMutatio
  *   },
  * });
  */
-export function useAddWebInputsMutation(baseOptions?: Apollo.MutationHookOptions<AddWebInputsMutation, AddWebInputsMutationVariables>) {
+export function useAddWebInputsMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<AddWebInputsMutation, AddWebInputsMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddWebInputsMutation, AddWebInputsMutationVariables>(AddWebInputsDocument, options);
+        return ApolloReactHooks.useMutation<AddWebInputsMutation, AddWebInputsMutationVariables>(AddWebInputsDocument, options);
       }
 export type AddWebInputsMutationHookResult = ReturnType<typeof useAddWebInputsMutation>;
-export type AddWebInputsMutationResult = Apollo.MutationResult<AddWebInputsMutation>;
-export type AddWebInputsMutationOptions = Apollo.BaseMutationOptions<AddWebInputsMutation, AddWebInputsMutationVariables>;
+export type AddWebInputsMutationResult = ApolloReactCommon.MutationResult<AddWebInputsMutation>;
 export const WebInputsForHostsDocument = gql`
     query webInputsForHosts($hosts: [String!]) {
   webInputs(hosts: $hosts) {
@@ -82,19 +81,23 @@ export const WebInputsForHostsDocument = gql`
  *   },
  * });
  */
-export function useWebInputsForHostsQuery(baseOptions?: Apollo.QueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
+export function useWebInputsForHostsQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
+        return ApolloReactHooks.useQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
       }
-export function useWebInputsForHostsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
+export function useWebInputsForHostsLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
+          return ApolloReactHooks.useLazyQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
         }
-export function useWebInputsForHostsSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
+// @ts-ignore
+export function useWebInputsForHostsSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;
+// @ts-ignore
+export function useWebInputsForHostsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<WebInputsForHostsQuery | undefined, WebInputsForHostsQueryVariables>;
+export function useWebInputsForHostsSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>(WebInputsForHostsDocument, options);
         }
 export type WebInputsForHostsQueryHookResult = ReturnType<typeof useWebInputsForHostsQuery>;
 export type WebInputsForHostsLazyQueryHookResult = ReturnType<typeof useWebInputsForHostsLazyQuery>;
 export type WebInputsForHostsSuspenseQueryHookResult = ReturnType<typeof useWebInputsForHostsSuspenseQuery>;
-export type WebInputsForHostsQueryResult = Apollo.QueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;
+export type WebInputsForHostsQueryResult = ApolloReactCommon.QueryResult<WebInputsForHostsQuery, WebInputsForHostsQueryVariables>;

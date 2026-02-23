@@ -1,7 +1,8 @@
-import * as Types from '../../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type ChangeMasterPasswordMutationVariables = Types.Exact<{
   secrets: Array<Types.EncryptedSecretPatchInput> | Types.EncryptedSecretPatchInput;
@@ -23,7 +24,6 @@ export const ChangeMasterPasswordDocument = gql`
   }
 }
     `;
-export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
 
 /**
  * __useChangeMasterPasswordMutation__
@@ -45,10 +45,9 @@ export type ChangeMasterPasswordMutationFn = Apollo.MutationFunction<ChangeMaste
  *   },
  * });
  */
-export function useChangeMasterPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>) {
+export function useChangeMasterPasswordMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>(ChangeMasterPasswordDocument, options);
+        return ApolloReactHooks.useMutation<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>(ChangeMasterPasswordDocument, options);
       }
 export type ChangeMasterPasswordMutationHookResult = ReturnType<typeof useChangeMasterPasswordMutation>;
-export type ChangeMasterPasswordMutationResult = Apollo.MutationResult<ChangeMasterPasswordMutation>;
-export type ChangeMasterPasswordMutationOptions = Apollo.BaseMutationOptions<ChangeMasterPasswordMutation, ChangeMasterPasswordMutationVariables>;
+export type ChangeMasterPasswordMutationResult = ApolloReactCommon.MutationResult<ChangeMasterPasswordMutation>;

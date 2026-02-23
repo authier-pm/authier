@@ -1,5 +1,5 @@
 import { bodyInputChangeEmitter } from './domMutationObserver'
-import { authenticator } from 'otplib'
+import { generateSync } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementInViewport, isHidden } from './isElementInViewport'
@@ -329,7 +329,7 @@ export const autofill = (initState: IInitStateRes) => {
           }
           const el = autofillValueIntoInput(
             inputEl,
-            authenticator.generate(totpSecret.totp.secret)
+            generateSync({ secret: totpSecret.totp.secret })
           )
           el && filledElements.add(el)
         }

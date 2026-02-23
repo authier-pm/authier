@@ -1,7 +1,8 @@
-import * as Types from '../../../shared/generated/graphqlBaseTypes';
+import * as Types from '@shared/generated/graphqlBaseTypes';
 
 import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+import * as ApolloReactCommon from '@apollo/client/react';
+import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
 export type DefaultDeviceSettingsModalQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
@@ -36,19 +37,23 @@ export const DefaultDeviceSettingsModalDocument = gql`
  *   },
  * });
  */
-export function useDefaultDeviceSettingsModalQuery(baseOptions?: Apollo.QueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
+export function useDefaultDeviceSettingsModalQuery(baseOptions?: ApolloReactHooks.QueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
         const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
+        return ApolloReactHooks.useQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
       }
-export function useDefaultDeviceSettingsModalLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
+export function useDefaultDeviceSettingsModalLazyQuery(baseOptions?: ApolloReactHooks.LazyQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
           const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
+          return ApolloReactHooks.useLazyQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
         }
-export function useDefaultDeviceSettingsModalSuspenseQuery(baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
-          const options = baseOptions === Apollo.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
-          return Apollo.useSuspenseQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
+// @ts-ignore
+export function useDefaultDeviceSettingsModalSuspenseQuery(baseOptions?: ApolloReactHooks.SuspenseQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>;
+// @ts-ignore
+export function useDefaultDeviceSettingsModalSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DefaultDeviceSettingsModalQuery | undefined, DefaultDeviceSettingsModalQueryVariables>;
+export function useDefaultDeviceSettingsModalSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>) {
+          const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          return ApolloReactHooks.useSuspenseQuery<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>(DefaultDeviceSettingsModalDocument, options);
         }
 export type DefaultDeviceSettingsModalQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalQuery>;
 export type DefaultDeviceSettingsModalLazyQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalLazyQuery>;
 export type DefaultDeviceSettingsModalSuspenseQueryHookResult = ReturnType<typeof useDefaultDeviceSettingsModalSuspenseQuery>;
-export type DefaultDeviceSettingsModalQueryResult = Apollo.QueryResult<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>;
+export type DefaultDeviceSettingsModalQueryResult = ApolloReactCommon.QueryResult<DefaultDeviceSettingsModalQuery, DefaultDeviceSettingsModalQueryVariables>;

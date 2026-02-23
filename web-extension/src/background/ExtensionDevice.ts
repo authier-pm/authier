@@ -382,7 +382,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       })
     )
 
-    const { data, errors } = await apolloClient.mutate<
+    const { data } = await apolloClient.mutate<
       AddEncryptedSecretsMutation,
       AddEncryptedSecretsMutationVariables
     >({
@@ -392,10 +392,6 @@ export class DeviceState implements IBackgroundStateSerializable {
       }
     })
 
-    if (errors) {
-      console.error('errors', errors)
-      throw new Error('Error adding secret')
-    }
     if (!data) {
       throw new Error('failed to save secret')
     }
@@ -429,7 +425,7 @@ export class DeviceState implements IBackgroundStateSerializable {
       },
       fetchPolicy: 'network-only'
     })
-    return data.webInputs ?? []
+    return data?.webInputs ?? []
   }
 
   async removeSecret(secretId: string) {

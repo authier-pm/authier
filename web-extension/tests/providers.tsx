@@ -1,4 +1,5 @@
-import { ApolloClient, InMemoryCache, ApolloProvider } from '@apollo/client'
+import { ApolloClient, InMemoryCache } from '@apollo/client'
+import { ApolloProvider } from '@apollo/client/react'
 import { SchemaLink } from '@apollo/client/link/schema'
 import { I18nProvider } from '@lingui/react'
 import React from 'react'
@@ -27,7 +28,7 @@ export const makeSsrClient = (ctx: any) => {
  */
 export const wrapInFEProviders = (
   jsx: JSX.Element,
-  client: ApolloClient<any>
+  client: ApolloClient
 ) => {
   return (
     <ApolloProvider client={client}>
