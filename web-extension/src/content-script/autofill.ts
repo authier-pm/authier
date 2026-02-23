@@ -564,7 +564,8 @@ export const autofill = (initState: IInitStateRes) => {
         if (isLikelyOtpField && !dynamicTotpSecret) {
           try {
             const refreshedState = await trpc.getContentScriptInitialState.query()
-            dynamicTotpSecret = refreshedState?.secretsForHost?.totpSecrets?.[0]
+            dynamicTotpSecret =
+              refreshedState?.secretsForHost?.totpSecrets?.[0] ?? dynamicTotpSecret
             log('refetched content script state for OTP', {
               totpSecretsCount:
                 refreshedState?.secretsForHost?.totpSecrets?.length ?? 0,
