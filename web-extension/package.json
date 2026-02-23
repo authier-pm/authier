@@ -1,7 +1,7 @@
 {
   "name": "authier-web-extension",
   "displayName": "Authier",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Authier web Extension for all our supported browsers",
   "license": "AGPL-3.0-or-later",
   "webExt": {
@@ -61,7 +61,7 @@
     "@vitest/coverage-v8": "^4.0.18",
     "@vitest/ui": "^4.0.18",
     "acorn": "^8.16.0",
-    "ajv": "^8.17.1",
+    "ajv": "^8.18.0",
     "babel-core": "^6.26.3",
     "babel-loader": "^10.0.0",
     "babel-plugin-import-graphql": "^2.8.1",
