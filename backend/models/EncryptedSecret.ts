@@ -3,22 +3,21 @@ import type { IContextAuthenticated } from './types/ContextTypes'
 import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
 import { WebInputGQLScalars } from './generated/WebInputGQL'
+import { secretUsageEvent, encryptedSecret } from '../drizzle/schema'
+import { eq, desc } from 'drizzle-orm'
 
 @ObjectType()
 export class EncryptedSecretQuery extends EncryptedSecretGQL {
   @Field(() => Date, { nullable: true })
   async lastUsedAt(@Ctx() ctx: IContextAuthenticated) {
-    const lastUsed = await ctx.prisma.secretUsageEvent.findFirst({
-      where: {
-        secretId: this.id
-      },
-      orderBy: {
-        timestamp: 'desc'
-      },
-      select: {
+    const lastUsed = await ctx.db.query.secretUsageEvent.findFirst({
+      where: { secretId: this.id },
+      orderBy: (s, { desc }) => [desc(s.timestamp)],
+      columns: {
         timestamp: true
       }
     })
+
     return lastUsed?.timestamp
   }
 }
@@ -26,24 +25,36 @@ export class EncryptedSecretQuery extends EncryptedSecretGQL {
 @ObjectType()
 export class EncryptedSecretMutation extends EncryptedSecretQuery {
   @Field(() => EncryptedSecretGQL)
-  update(
+  async update(
     @Ctx() ctx: IContextAuthenticated,
     @Arg('patch', () => EncryptedSecretInput) patch: EncryptedSecretInput
   ) {
-    console.log('delete', this.id)
+    console.log('update', this.id)
 
-    return ctx.prisma.encryptedSecret.update({
-      where: { id: this.id },
-      data: { ...patch, version: this.version + 1 }
-    })
+    const res = await ctx.db
+      .update(encryptedSecret)
+      .set({
+        ...patch,
+        version: this.version + 1
+      })
+      .where(eq(encryptedSecret.id, this.id))
+      .returning()
+
+    return res[0]
   }
 
   @Field(() => EncryptedSecretGQL)
-  delete(@Ctx() ctx: IContextAuthenticated) {
+  async delete(@Ctx() ctx: IContextAuthenticated) {
     console.log('delete', this.id)
-    return ctx.prisma.encryptedSecret.update({
-      where: { id: this.id },
-      data: { deletedAt: new Date() }
-    })
+
+    const res = await ctx.db
+      .update(encryptedSecret)
+      .set({
+        deletedAt: new Date()
+      })
+      .where(eq(encryptedSecret.id, this.id))
+      .returning()
+
+    return res[0]
   }
 }

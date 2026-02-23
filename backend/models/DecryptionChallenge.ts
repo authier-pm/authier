@@ -13,6 +13,8 @@ import { UserMutation } from './UserMutation'
 import { getGeoIpLocation } from '../lib/getGeoIpLocation'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 import { UserNewDevicePolicy } from '@prisma/client'
+import { user, decryptionChallenge, device } from '../drizzle/schema'
+import { eq, and } from 'drizzle-orm'
 
 @ObjectType()
 class DeviceLocation {
@@ -76,89 +78,97 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   ) {
     const { id, deviceId, userId } = this
 
-    const user = await ctx.prisma.user.findUnique({
+    const userData = await ctx.db.query.user.findFirst({
       where: { id: userId },
-      include: {
-        EncryptedSecrets: true,
-        DefaultDeviceSettings: true
+      with: {
+        encryptedSecrets: true,
+        defaultSettings: true
       }
     })
 
-    if (!user) {
+    if (!userData) {
       throw new GraphqlError('User not found')
     }
 
-    if (user?.addDeviceSecret !== currentAddDeviceSecret) {
-      // TODO rate limit these attempts and notify current devices
+    if (userData.addDeviceSecret !== currentAddDeviceSecret) {
       throw new GraphqlError('Wrong master password used')
     }
 
-    await ctx.prisma.user.update({
-      data: {
+    await ctx.db
+      .update(user)
+      .set({
         addDeviceSecret: input.addDeviceSecret,
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
-      },
-      where: {
-        id: user.id
-      }
-    })
+      })
+      .where(eq(user.id, userData.id))
 
-    await ctx.prisma.decryptionChallenge.updateMany({
-      where: {
-        id,
-        deviceId,
-        userId: user.id
-      },
-      data: { masterPasswordVerifiedAt: new Date() }
-    })
+    await ctx.db
+      .update(decryptionChallenge)
+      .set({
+        masterPasswordVerifiedAt: new Date()
+      })
+      .where(
+        and(
+          eq(decryptionChallenge.id, id),
+          eq(decryptionChallenge.deviceId, deviceId),
+          eq(decryptionChallenge.userId, userData.id)
+        )
+      )
 
     const { firebaseToken } = input
     const ipAddress = ctx.getIpAddress()
 
-    let device = await ctx.prisma.device.findUnique({
+    let deviceRec = await ctx.db.query.device.findFirst({
       where: { id: deviceId }
     })
 
     const defaultSettings =
-      user.DefaultDeviceSettings ?? defaultDeviceSettingSystemValues
+      userData.defaultSettings ?? defaultDeviceSettingSystemValues
 
-    if (device) {
-      if (device.userId !== user.id) {
-        const deviceOwner = await ctx.prisma.user.findUniqueOrThrow({
-          where: { id: device.userId }
+    if (deviceRec) {
+      if (deviceRec.userId !== userData.id) {
+        const deviceOwner = await ctx.db.query.user.findFirst({
+          where: { id: deviceRec!.userId }
         })
+        if (!deviceOwner) throw new Error('Device owner not found')
         throw new GraphqlError(
           `Device is already registered with user ${deviceOwner.email}`
-        ) // prevents users from circumventing our limits by using multiple accounts
+        )
       }
 
-      device = await ctx.prisma.device.update({
-        data: { logoutAt: null, firebaseToken },
-        where: { id: device.id }
-      })
+      const res = await ctx.db
+        .update(device)
+        .set({
+          logoutAt: null,
+          firebaseToken
+        })
+        .where(eq(device.id, deviceRec.id))
+        .returning()
+      deviceRec = res[0]!
     } else {
-      device = await ctx.prisma.device.create({
-        data: {
+      const res = await ctx.db
+        .insert(device)
+        .values({
           id: deviceId,
           firstIpAddress: ipAddress,
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
           name: this.deviceName,
-          userId: user.id,
+          userId: userData.id,
           platform: input.devicePlatform,
           syncTOTP: defaultSettings.syncTOTP,
           autofillCredentialsEnabled:
             defaultSettings.autofillCredentialsEnabled,
           autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
           vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
-        }
-      })
+        })
+        .returning()
+      deviceRec = res[0]!
     }
 
-    return new UserMutation(user).setCookiesAndConstructLoginResponse(
-      device,
-      ctx
-    )
+    return new UserMutation(
+      userData as any
+    ).setCookiesAndConstructLoginResponse(deviceRec as any, ctx)
   }
 }
 
@@ -166,52 +176,63 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
 export class DecryptionChallengeMutation extends DecryptionChallengeGQL {
   @Field(() => DecryptionChallengeGQL)
   async approve(@Ctx() ctx: IContextAuthenticated) {
-    const user = await ctx.prisma.user.findFirstOrThrow({
-      where: {
-        id: ctx.jwtPayload.userId
-      },
-      select: {
+    const userData = await ctx.db.query.user.findFirst({
+      where: { id: ctx.jwtPayload.userId },
+      columns: {
         newDevicePolicy: true,
         masterDeviceId: true
       }
     })
 
+    if (!userData) throw new Error('User not found')
+
     if (
-      user?.newDevicePolicy ===
+      userData.newDevicePolicy ===
         UserNewDevicePolicy.REQUIRE_MASTER_DEVICE_APPROVAL &&
-      user?.masterDeviceId !== ctx.device.id
+      userData.masterDeviceId !== ctx.device.id
     ) {
       throw new GraphqlError(
         'Only the master device can approve a decryption challenge'
       )
     }
 
-    return ctx.prisma.decryptionChallenge.update({
-      where: { id: this.id },
-      data: {
+    const res = await ctx.db
+      .update(decryptionChallenge)
+      .set({
         approvedAt: new Date(),
         approvedFromDeviceId: ctx.device.id,
         rejectedAt: null,
-        blockIp: this.blockIp ? false : null // if it was previously rejected, we mark it as false
-      }
-    })
+        blockIp: this.blockIp ? false : null
+      })
+      .where(eq(decryptionChallenge.id, this.id))
+      .returning()
+    return res[0]!
   }
 
   @Field(() => DecryptionChallengeGQL)
   async reject(@Ctx() ctx: IContextAuthenticated) {
-    return ctx.prisma.decryptionChallenge.update({
-      where: { id: this.id },
-      data: { rejectedAt: new Date(), blockIp: true, approvedAt: null }
-    })
+    const res = await ctx.db
+      .update(decryptionChallenge)
+      .set({
+        rejectedAt: new Date(),
+        blockIp: true,
+        approvedAt: null
+      })
+      .where(eq(decryptionChallenge.id, this.id))
+      .returning()
+    return res[0]!
   }
 
   @Field(() => DecryptionChallengeGQL)
   async recoverAccount(@Ctx() ctx: IContextAuthenticated) {
-    // TODO send notification to all contacts we have, just email for now
-    return ctx.prisma.user.update({
-      where: { id: this.userId },
-      data: { recoveryDecryptionChallengeId: this.id } // rest is handled by our CRON job
-    })
+    const res = await ctx.db
+      .update(user)
+      .set({
+        recoveryDecryptionChallengeId: this.id
+      })
+      .where(eq(user.id, this.userId))
+      .returning()
+    return res[0]!
   }
 }
 

@@ -1,50 +1,27 @@
 import { format } from 'sql-formatter'
 import { highlight } from 'sql-highlight'
 import debug from 'debug'
-import type { prismaClient } from './prismaClient'
+import type { Logger } from 'drizzle-orm/logger'
 
 export let queryCount = 0
 
-const log = debug('prisma:sql')
-const logQueries = debug('mm:prisma')
+const log = debug('drizzle:sql')
+const logQueries = debug('au:drizzle')
 
-export const enablePrismaDebug = (client: typeof prismaClient) => {
-  // @ts-ignore
-  client.$on('query', (event: any) => {
+export class DrizzleDebugLogger implements Logger {
+  logQuery(query: string, params: unknown[]): void {
     queryCount++
 
-    const { params, query } = event
-    const paramsAsArray = params.substring(1, params.length - 1).split(',')
-
-    const queryWithVarsReplaced = query.replaceAll(/\$\d/g, (m: string) => {
-      const param = paramsAsArray[Number(m.substring(1)) - 1]
-      return param
+    let queryWithVarsReplaced = query
+    params.forEach((param, index) => {
+      const value = typeof param === 'string' ? `'${param}'` : String(param)
+      queryWithVarsReplaced = queryWithVarsReplaced.replace(
+        `$${index + 1}`,
+        value
+      )
     })
 
     log(highlight(format(queryWithVarsReplaced)))
-  })
-
-  // @ts-ignore
-  client.$use(async (params, next) => {
-    const before = Date.now()
-    // log(params) // use for debugging mysteriously failing prisma queries
-    const result = await next(params)
-
-    const after = Date.now()
-    if (Array.isArray(result) && params.action !== 'findUnique') {
-      logQueries(
-        `${params.model}.${params.action} results: ${result.length} ${
-          after - before
-        }ms`
-      )
-    } else {
-      logQueries(
-        `${params.model}.${params.action} returned ${
-          result?.id ?? result?.[0]?.id ?? null
-        } ${after - before}ms`
-      )
-    }
-
-    return result
-  })
+    logQueries(`query #${queryCount}`)
+  }
 }

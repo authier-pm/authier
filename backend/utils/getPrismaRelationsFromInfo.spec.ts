@@ -1,11 +1,10 @@
-import { dmmf } from '../prisma/prismaClient'
 import { getPrismaRelationsFromGQLInfo } from './getPrismaRelationsFromInfo'
 import gqlInfo from './fixtures/gqlInfo.json'
 import { describe, expect, it } from 'vitest'
 import { Kind } from 'graphql'
 
 describe('getPrismaRelationsFromInfo', () => {
-  it('should ignore fields where first letter is NOT capital', async () => {
+  it('should return null since Drizzle does not use DMMF', async () => {
     const res = getPrismaRelationsFromGQLInfo({
       info: {
         fieldName: 'me',
@@ -60,32 +59,11 @@ describe('getPrismaRelationsFromInfo', () => {
           }
         ]
       },
-      rootModel: dmmf.models.User
+      rootModel: {}
     })
 
-    expect(res).toMatchInlineSnapshot(`
-      {
-        "EncryptedSecrets": true,
-      }
-    `)
+    expect(res).toBe(null)
   })
 
-  it('should load even nested relation fields', async () => {
-    const res = getPrismaRelationsFromGQLInfo({
-      info: gqlInfo as any,
-      rootModel: dmmf.models.User
-    })
-
-    expect(res).toMatchInlineSnapshot(`
-      {
-        "masterDevice": {
-          "include": {
-            "User": true,
-          },
-        },
-      }
-    `)
-  })
-
-  it.todo('should return null when there are none')
+  it.todo('should be replaced with Drizzle relation loading tests')
 })

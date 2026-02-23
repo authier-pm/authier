@@ -34,7 +34,7 @@ export const throwIfNotAuthenticated: MiddlewareFn<
     throw new GraphqlErrorUnauthorized('not authenticated')
   }
 
-  const currentDevice = await context.prisma.device.findUnique({
+  const currentDevice = await context.db.query.device.findFirst({
     where: {
       id: jwtPayload.deviceId
     }
@@ -52,15 +52,19 @@ export const throwIfNotAuthenticated: MiddlewareFn<
   }
   context.device = currentDevice
 
-  const user = await context.prisma.user.findUniqueOrThrow({
+  const user = await context.db.query.user.findFirst({
     where: {
       id: context.jwtPayload.userId
     },
-    select: {
+    columns: {
       masterDeviceId: true
     }
   })
 
+  if (!user) {
+    context.reply.clearCookie('access-token')
+    throw new GraphqlErrorUnauthorized('not authenticated')
+  }
   context.masterDeviceId = user.masterDeviceId
 
   return next()

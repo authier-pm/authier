@@ -7,7 +7,7 @@ import 'dotenv/config'
 
 import type { FastifyCookieOptions } from '@fastify/cookie'
 import cookie from '@fastify/cookie'
-import { prismaClient } from './prisma/prismaClient'
+import { db } from './prisma/prismaClient'
 import type { jwtPayloadRefreshToken } from './userAuth'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
 import { verify } from 'jsonwebtoken'
@@ -116,10 +116,8 @@ app.post('/refresh_token', async (request, reply) => {
   }
 
   //token is valid and we can send back access token
-  const user = await prismaClient.user.findUnique({
-    where: {
-      id: payload.userId
-    }
+  const user = await db.query.user.findFirst({
+    where: { id: payload.userId }
   })
 
   if (!user) {
@@ -130,11 +128,10 @@ app.post('/refresh_token', async (request, reply) => {
     return reply.send({ ok: false, accessToken: '' })
   }
 
-  const device = await prismaClient.device.findFirstOrThrow({
-    where: {
-      id: payload.deviceId
-    }
+  const device = await db.query.device.findFirst({
+    where: { id: payload.deviceId }
   })
+  if (!device) throw new Error('Device not found')
   const ctx = { request, reply } as IContext
 
   setNewRefreshToken(user, device, ctx)
@@ -160,7 +157,7 @@ app.register(mercurius, {
       log(request.body?.operationName, request.body?.variables ?? '')
     }
 
-    return { request, reply, getIpAddress, prisma: prismaClient }
+    return { request, reply, getIpAddress, db }
   },
   errorFormatter: (res, ctx) => {
     // console.error(ctx)

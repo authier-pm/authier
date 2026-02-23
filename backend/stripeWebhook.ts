@@ -1,10 +1,12 @@
 import type { FastifyRequest } from 'fastify'
-import { prismaClient } from './prisma/prismaClient'
+import { db } from './prisma/prismaClient'
 import { stripeClient } from './stripeClient'
 
 import { GraphQLError } from 'graphql'
 import type Stripe from 'stripe'
 import debug from 'debug'
+import { eq, sql } from 'drizzle-orm'
+import * as schema from './drizzle/schema'
 
 const STRIPE_ENV = (process.env.STRIPE_ENV as 'test' | 'live') ?? 'live'
 
@@ -28,205 +30,179 @@ log('endpointSecret', endpointSecret)
 const CREDS_SUBSCRIPTION_INCREASE = 250
 const TOTP_SUBSCRIPTION_INCREASE = 100
 
-export const webhookHandler = async (req: FastifyRequest, reply) => {
+export const webhookHandler = async (req: FastifyRequest, reply: unknown) => {
   const sig = req.headers['stripe-signature']
 
   let event: Stripe.Event
 
   if (!sig) {
-    reply.status(400).send('Webhook Error: Missing stripe-signature header')
+    ;(reply as { status: (code: number) => { send: (msg: string) => void } })
+      .status(400)
+      .send('Webhook Error: Missing stripe-signature header')
     return
   }
 
   const rawBody = (req.body as { raw?: string } | undefined)?.raw
 
   if (!rawBody) {
-    reply.status(400).send('Webhook Error: Missing raw request body')
+    ;(reply as { status: (code: number) => { send: (msg: string) => void } })
+      .status(400)
+      .send('Webhook Error: Missing raw request body')
     return
   }
 
-  try {
-    event = stripeClient.webhooks.constructEvent(
-      rawBody,
-      sig as string | string[] | Buffer,
-      endpointSecret
-    )
-  } catch (err: any) {
-    console.error(err)
-    reply.status(400).send(`Webhook Error: ${err.message}`)
-    return
-  }
+  event = stripeClient.webhooks.constructEvent(
+    rawBody,
+    sig as string | string[] | Buffer,
+    endpointSecret
+  )
+
   log('event', event)
 
   let subscription: { status: string }
   let status: string
 
-  async function incrementAccountLimits(session: any, productId: any) {
-    await prismaClient.$transaction(async (trx) => {
-      await trx.user.update({
-        where: {
-          email: session.customer_details.email
-        },
-        data: {
-          UserPaidProducts: {
-            create: {
-              checkoutSessionId: session.id,
-              productId,
-              expiresAt: new Date(session.expires_at)
-            }
-          }
-        }
-      })
+  async function incrementAccountLimits(
+    session: {
+      id: string
+      customer_details?: { email?: string }
+      expires_at?: number
+      metadata?: { productId?: string }
+    },
+    productId: string
+  ) {
+    const userEmail = session.customer_details?.email
+    if (!userEmail) return
 
-      if (productId === stripeProducts[STRIPE_ENV].TOTP) {
-        await trx.user.update({
-          where: {
-            email: session.customer_details.email
-          },
-          data: {
-            TOTPlimit: {
-              increment: TOTP_SUBSCRIPTION_INCREASE
-            }
-          }
-        })
-      } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
-        await trx.user.update({
-          where: {
-            email: session.customer_details.email
-          },
-          data: {
-            loginCredentialsLimit: {
-              increment: CREDS_SUBSCRIPTION_INCREASE
-            }
-          }
-        })
-      } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
-        await trx.user.update({
-          where: {
-            email: session.customer_details.email
-          },
-          data: {
-            TOTPlimit: {
-              increment: TOTP_SUBSCRIPTION_INCREASE
-            },
-            loginCredentialsLimit: {
-              increment: CREDS_SUBSCRIPTION_INCREASE
-            }
-          }
-        })
-      }
+    // Find user by email
+    const foundUser = await db.query.user.findFirst({
+      where: { email: userEmail },
+      columns: { id: true }
     })
+    if (!foundUser) return
+
+    // Insert paid product record
+    await db.insert(schema.userPaidProducts).values({
+      checkoutSessionId: session.id,
+      productId,
+      expiresAt: session.expires_at
+        ? new Date(session.expires_at * 1000)
+        : null,
+      userId: foundUser.id
+    })
+
+    if (productId === stripeProducts[STRIPE_ENV].TOTP) {
+      await db
+        .update(schema.user)
+        .set({
+          totPlimit: sql`${schema.user.totPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`
+        })
+        .where(eq(schema.user.email, userEmail))
+    } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
+      await db
+        .update(schema.user)
+        .set({
+          loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} + ${CREDS_SUBSCRIPTION_INCREASE}`
+        })
+        .where(eq(schema.user.email, userEmail))
+    } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
+      await db
+        .update(schema.user)
+        .set({
+          totPlimit: sql`${schema.user.totPlimit} + ${TOTP_SUBSCRIPTION_INCREASE}`,
+          loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} + ${CREDS_SUBSCRIPTION_INCREASE}`
+        })
+        .where(eq(schema.user.email, userEmail))
+    }
   }
 
-  const session = event.data.object as any
+  const session = event.data.object as {
+    id: string
+    customer_details?: { email?: string }
+    expires_at?: number
+    metadata?: { productId?: string }
+    status?: string
+  }
+  const productId = session.metadata?.productId ?? ''
 
-  const productId = session.metadata.productId
-  //Handle the event
   switch (event.type) {
     case 'customer.subscription.deleted':
     case 'customer.subscription.paused':
-      // Then define and call a method to handle the subscription deleted.
-      subscription = event.data.object as any // TODO type properly
+      subscription = event.data.object as { status: string }
       status = subscription.status
       if (status === 'canceled') {
-        await prismaClient.$transaction(async (trx) => {
-          await trx.user.update({
-            where: {
-              email: session.customer_details.email
-            },
-            data: {
-              UserPaidProducts: {
-                delete: {
-                  id: productId,
-                  expiresAt: session.expires_at
-                }
-              }
-            }
-          })
+        const userEmail = session.customer_details?.email
+        if (userEmail) {
+          // Delete the paid product record
+          await db
+            .delete(schema.userPaidProducts)
+            .where(eq(schema.userPaidProducts.productId, productId))
 
+          // Decrement the appropriate limits
           if (productId === stripeProducts[STRIPE_ENV].TOTP) {
-            await trx.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  decrement: TOTP_SUBSCRIPTION_INCREASE
-                }
-              }
-            })
+            await db
+              .update(schema.user)
+              .set({
+                totPlimit: sql`${schema.user.totPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`
+              })
+              .where(eq(schema.user.email, userEmail))
           } else if (productId === stripeProducts[STRIPE_ENV].Credentials) {
-            await trx.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                loginCredentialsLimit: {
-                  decrement: CREDS_SUBSCRIPTION_INCREASE
-                }
-              }
-            })
+            await db
+              .update(schema.user)
+              .set({
+                loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} - ${CREDS_SUBSCRIPTION_INCREASE}`
+              })
+              .where(eq(schema.user.email, userEmail))
           } else if (productId === stripeProducts[STRIPE_ENV].TOTPCredentials) {
-            await trx.user.update({
-              where: {
-                email: session.customer_details.email
-              },
-              data: {
-                TOTPlimit: {
-                  decrement: TOTP_SUBSCRIPTION_INCREASE
-                },
-                loginCredentialsLimit: {
-                  decrement: CREDS_SUBSCRIPTION_INCREASE
-                }
-              }
-            })
+            await db
+              .update(schema.user)
+              .set({
+                totPlimit: sql`${schema.user.totPlimit} - ${TOTP_SUBSCRIPTION_INCREASE}`,
+                loginCredentialsLimit: sql`${schema.user.loginCredentialsLimit} - ${CREDS_SUBSCRIPTION_INCREASE}`
+              })
+              .where(eq(schema.user.email, userEmail))
           }
-        })
+        }
       }
       console.log(`Subscription status is ${status}.`)
       break
 
     case 'customer.subscription.resumed':
       await incrementAccountLimits(session, productId)
-
       break
     case 'checkout.session.completed':
       console.log('Session completed:', session)
-
-      try {
-        await incrementAccountLimits(session, productId)
-      } catch (error) {
-        console.error(error)
-        throw new GraphQLError('Error completing checkout session')
-      }
-
+      await incrementAccountLimits(session, productId)
       break
     default:
       console.log(`Unhandled event type ${event.type}.`)
   }
 
-  //Return a 200 response to acknowledge receipt of the event
-  reply.send()
+  ;(reply as { send: () => void }).send()
 }
 
-export const stripeWebhook = (fastify, opts, done) => {
-  fastify.addContentTypeParser(
+export const stripeWebhook = (
+  fastify: unknown,
+  _opts: unknown,
+  done: () => void
+) => {
+  ;(
+    fastify as { addContentTypeParser: Function; post: Function }
+  ).addContentTypeParser(
     'application/json',
     { parseAs: 'string' },
-    function (req, body, done) {
-      try {
-        const newBody = {
-          raw: body,
-          parsed: JSON.parse(body as string)
-        }
-        done(null, newBody)
-      } catch (error: any) {
-        error.statusCode = 400
-        done(error, undefined)
+    function (
+      _req: unknown,
+      body: string,
+      done: (err: Error | null, result: unknown) => void
+    ) {
+      const newBody = {
+        raw: body,
+        parsed: JSON.parse(body)
       }
+      done(null, newBody)
     }
   )
-
-  fastify.post('/webhook', webhookHandler)
+  ;(fastify as { post: Function }).post('/webhook', webhookHandler)
   done()
 }

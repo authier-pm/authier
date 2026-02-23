@@ -109,7 +109,6 @@ jobs:
         run: |
           pnpm tsc
           cp .env.sample .env
-          pnpm test:prepare
           pnpm test
 
       - name: Configure aws credentials

@@ -1,11 +1,11 @@
 import { faker } from '@faker-js/faker'
 
 export const makeAddNewDeviceInput = () => ({
-  email: faker.internet.email(),
+  email: `${crypto.randomUUID()}@test.com`,
   deviceName: faker.internet.username(),
   devicePlatform: faker.internet.domainWord(),
-  deviceId: faker.string.uuid(),
-  firebaseToken: faker.string.uuid(),
+  deviceId: crypto.randomUUID(),
+  firebaseToken: crypto.randomUUID(),
   addDeviceSecret: faker.string.sample(5),
   addDeviceSecretEncrypted: faker.string.sample(5),
   decryptionChallengeId: faker.number.int(),

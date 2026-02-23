@@ -25,3 +25,30 @@ beforeAll(() => {
     }
   }))
 })
+
+import { PGlite } from '@electric-sql/pglite'
+import { drizzle } from 'drizzle-orm/pglite'
+import { dbSchema } from '../drizzle'
+import { relations } from '../drizzle/relations'
+import { runMigrationsForPGlite } from './runMigrationsForPGlite'
+import { join } from 'path'
+
+export let testDb: ReturnType<typeof drizzle>
+
+export async function setupTestDb(): Promise<PGlite> {
+  const client = new PGlite()
+  const db = drizzle({ client, schema: dbSchema, relations, logger: false })
+
+  db.transaction = async (cb: any) => {
+    return cb(db)
+  }
+
+  testDb = db
+  // @ts-expect-error
+  testDb.__instance = db
+
+  const migrationsFolder = join(__dirname, '../drizzle/migrations')
+  await runMigrationsForPGlite(client, migrationsFolder)
+
+  return client
+}

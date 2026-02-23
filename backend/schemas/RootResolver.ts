@@ -9,7 +9,7 @@ import {
   Info,
   Int
 } from 'type-graphql'
-import { dmmf, prismaClient } from '../prisma/prismaClient'
+import { db } from '../prisma/prismaClient'
 import { LoginResponse } from '../models/models'
 
 import { verify } from 'jsonwebtoken'
@@ -23,7 +23,6 @@ import { GraphQLEmailAddress, GraphQLUUID } from 'graphql-scalars'
 
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
-import type { PrismaClientKnownRequestError } from '@prisma/client/runtime/client'
 
 import {
   UserNewDevicePolicy,
@@ -38,7 +37,6 @@ import {
 } from '../models/generated/WebInputGQL'
 
 import type { GraphQLResolveInfo } from 'graphql'
-import { getPrismaRelationsFromGQLInfo } from '../utils/getPrismaRelationsFromInfo'
 
 import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
 import {
@@ -54,6 +52,8 @@ import type {
   IContext,
   IContextAuthenticated
 } from '../models/types/ContextTypes'
+import { eq, and, sql, gte, count } from 'drizzle-orm'
+import * as schema from '../drizzle/schema'
 
 const log = debug('au:RootResolver')
 
@@ -100,14 +100,13 @@ export class RootResolver {
   ) {
     const { jwtPayload } = ctx
 
-    const include = getPrismaRelationsFromGQLInfo({
-      info,
-      rootModel: dmmf.models.User
-    })
-
-    const tmp = await ctx.prisma.user.findUnique({
+    const tmp = await ctx.db.query.user.findFirst({
       where: { id: jwtPayload.userId },
-      include
+      with: {
+        encryptedSecrets: true,
+        devicesUserId: true,
+        defaultSettings: true
+      }
     })
 
     return tmp
@@ -122,12 +121,8 @@ export class RootResolver {
   ) {
     const { jwtPayload } = ctx
 
-    const currentDevice = await ctx.prisma.device.findUnique({
-      where: { id: jwtPayload.deviceId },
-      include: getPrismaRelationsFromGQLInfo({
-        info,
-        rootModel: dmmf.models.Device
-      })
+    const currentDevice = await ctx.db.query.device.findFirst({
+      where: { id: jwtPayload.deviceId }
     })
 
     return currentDevice
@@ -149,83 +144,85 @@ export class RootResolver {
       addDeviceSecretEncrypted,
       encryptionSalt
     } = input
-    let user: User & { Devices: Device[] }
+    let user: any
+    let devices: any[]
 
     try {
-      user = await ctx.prisma.user.create({
-        data: {
+      // Insert user
+      const [insertedUser] = await ctx.db
+        .insert(schema.user)
+        .values({
           id: userId,
           email: email,
           addDeviceSecret,
           addDeviceSecretEncrypted,
           encryptionSalt,
-          deviceRecoveryCooldownMinutes: 16 * 60, // 16 hours should be plenty enough
-          loginCredentialsLimit: 40, // default limit
-          TOTPlimit: 3,
-          Devices: {
-            create: {
-              platform: input.devicePlatform,
-              id: deviceId,
-              firstIpAddress: ipAddress,
-              lastIpAddress: ipAddress,
-              firebaseToken: firebaseToken,
-              name: deviceName,
-              autofillCredentialsEnabled: true,
-              vaultLockTimeoutSeconds: 28800, // 8 hours
-              syncTOTP: true,
-              autofillTOTPEnabled: true
-            }
-          }
-        },
-        include: {
-          EncryptedSecrets: true,
-          Devices: true
+          deviceRecoveryCooldownMinutes: 16 * 60,
+          loginCredentialsLimit: 40,
+          totPlimit: 3
+        })
+        .returning()
+
+      // Insert device
+      const [insertedDevice] = await ctx.db
+        .insert(schema.device)
+        .values({
+          platform: input.devicePlatform,
+          id: deviceId,
+          firstIpAddress: ipAddress,
+          lastIpAddress: ipAddress,
+          firebaseToken: firebaseToken,
+          name: deviceName,
+          autofillCredentialsEnabled: true,
+          vaultLockTimeoutSeconds: 28800,
+          syncTOTP: true,
+          autofillTOTPEnabled: true,
+          userId: userId
+        })
+        .returning()
+
+      user = insertedUser
+      devices = [insertedDevice]
+    } catch (err: unknown) {
+      // Drizzle wraps PG errors in DrizzleQueryError with the original error in .cause
+      const pgError = (err as { cause?: { code?: string; detail?: string } })
+        .cause
+
+      // Handle unique constraint violations
+      if (pgError?.code === '23505') {
+        const detail = pgError.detail || ''
+        if (detail.includes('email')) {
+          log('email', email)
+          throw new GraphqlError(`User with such email already exists.`)
         }
-      })
-    } catch (err: PrismaClientKnownRequestError | any) {
-      // Prisma v6: meta.target is string[]
-      // Prisma v7 with driver adapter (@prisma/adapter-pg): meta.target is undefined,
-      // constraint info lives in meta.driverAdapterError.cause.constraint.fields
-      const p2002Fields: string[] | undefined =
-        err.meta?.target ??
-        err.meta?.driverAdapterError?.cause?.constraint?.fields
-
-      if (err.code === 'P2002' && p2002Fields?.[0] === 'email') {
-        log('email', email)
-
-        throw new GraphqlError(`User with such email already exists.`)
-      }
-      if (err.code === 'P2002' && p2002Fields?.[0] === 'id') {
-        log('deviceId', deviceId)
-        if (process.env.NODE_ENV === 'development') {
-          console.warn(
-            `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
-          )
-          await prismaClient.device.delete({
-            where: { id: deviceId }
-          })
-          return this.registerNewUser(input, userId, ctx)
-        } else {
-          throw new GraphqlError(
-            `Device ${deviceId} already exists. You cannot use a device with multiple accounts.`
-          )
+        if (detail.includes('id')) {
+          log('deviceId', deviceId)
+          if (process.env.NODE_ENV === 'development') {
+            console.warn(
+              `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
+            )
+            await db.delete(schema.device).where(eq(schema.device.id, deviceId))
+            return this.registerNewUser(input, userId, ctx)
+          } else {
+            throw new GraphqlError(
+              `Device ${deviceId} already exists. You cannot use a device with multiple accounts.`
+            )
+          }
         }
       }
       throw err
     }
 
-    const device = user.Devices[0]
-    user = await ctx.prisma.user.update({
-      where: {
-        id: user.id
-      },
-      data: {
+    const device = devices[0]
+    // Update user with masterDeviceId
+    const [updatedUser] = await ctx.db
+      .update(schema.user)
+      .set({
         masterDeviceId: device.id
-      },
-      include: {
-        Devices: true
-      }
-    })
+      })
+      .where(eq(schema.user.id, user.id))
+      .returning()
+    user = updatedUser
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device,
@@ -246,20 +243,14 @@ export class RootResolver {
   ) {
     const ipAddress = ctx.getIpAddress()
 
-    // if (await isTorExit(ipAddress)) { // this is broken ATM, TODO figure out another way to check for tor exit nodes
-    //   throw new GraphqlError(
-    //     'Tor exit nodes are prohibited from login/adding new devices.'
-    //   )
-    // }
-
-    const user = await ctx.prisma.user.findUnique({
+    const user = await ctx.db.query.user.findFirst({
       where: { email },
-      select: {
+      columns: {
         id: true,
         addDeviceSecretEncrypted: true,
         encryptionSalt: true,
-        masterDevice: true,
-        newDevicePolicy: true
+        newDevicePolicy: true,
+        masterDeviceId: true
       }
     })
 
@@ -268,7 +259,14 @@ export class RootResolver {
         'Login failed, check your email and master password'
       )
     }
-    const isBlocked = await ctx.prisma.decryptionChallenge.findFirst({
+
+    // Fetch masterDevice separately since it's not a relation but a FK column
+    const masterDevice = user.masterDeviceId
+      ? await ctx.db.query.device.findFirst({
+          where: { id: user.masterDeviceId }
+        })
+      : null
+    const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
         blockIp: true,
@@ -280,15 +278,20 @@ export class RootResolver {
       throw new GraphqlError('Login failed, try again later.')
     }
 
-    const inLastHour = await ctx.prisma.decryptionChallenge.count({
-      where: {
-        userId: user.id,
-        createdAt: {
-          gte: new Date(Date.now() - 3600000)
-        },
-        masterPasswordVerifiedAt: null
-      }
-    })
+    const inLastHourResult = await ctx.db
+      .select({ count: count() })
+      .from(schema.decryptionChallenge)
+      .where(
+        and(
+          eq(schema.decryptionChallenge.userId, user.id),
+          gte(
+            schema.decryptionChallenge.createdAt,
+            new Date(Date.now() - 3600000)
+          ),
+          sql`${schema.decryptionChallenge.masterPasswordVerifiedAt} IS NULL`
+        )
+      )
+    const inLastHour = inLastHourResult[0]?.count ?? 0
 
     if (inLastHour > 5) {
       throw new GraphqlError(
@@ -296,13 +299,13 @@ export class RootResolver {
       )
     }
 
-    const device = await ctx.prisma.device.findUnique({
+    const device = await ctx.db.query.device.findFirst({
       where: { id: deviceInput.id }
     })
 
     log('device', device)
 
-    let challenge = await ctx.prisma.decryptionChallenge.findFirst({
+    let challenge = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         deviceId: deviceInput.id,
         userId: user.id
@@ -312,23 +315,25 @@ export class RootResolver {
     //TODO: Check this condition, not sure what is this doing
     if (device) {
       if (!challenge) {
-        const deviceCount = await ctx.prisma.device.count({
-          where: {
-            userId: user.id
-          }
-        })
+        const deviceCountResult = await ctx.db
+          .select({ count: count() })
+          .from(schema.device)
+          .where(eq(schema.device.userId, user.id))
+        const deviceCount = deviceCountResult[0]?.count ?? 0
         //FIX: This is not working, we need to check if the device is already approved
         if (deviceCount === 1) {
           // user has only one device
-          challenge = await ctx.prisma.decryptionChallenge.create({
-            data: {
+          const [created] = await ctx.db
+            .insert(schema.decryptionChallenge)
+            .values({
               deviceId: deviceInput.id,
               deviceName: deviceInput.name,
               userId: user.id,
               ipAddress,
-              approvedAt: device.createdAt // we mark this as approved immediately, because user has only one device
-            }
-          })
+              approvedAt: device.createdAt
+            })
+            .returning()
+          challenge = created
         }
       }
     }
@@ -341,13 +346,13 @@ export class RootResolver {
     if (!challenge) {
       // TODO: send email notifications
       if (
-        user.masterDevice?.firebaseToken &&
-        user.masterDevice.firebaseToken.length > 10
+        masterDevice?.firebaseToken &&
+        masterDevice.firebaseToken.length > 10
       ) {
-        log('sending notification to', user.masterDevice.firebaseToken)
+        log('sending notification to', masterDevice.firebaseToken)
 
         await firebaseSendNotification({
-          token: user.masterDevice.firebaseToken,
+          token: masterDevice.firebaseToken,
           notification: {
             title: 'New device login!',
             body: 'New device is trying to log in.'
@@ -368,14 +373,16 @@ export class RootResolver {
           }
         })
       }
-      challenge = await ctx.prisma.decryptionChallenge.create({
-        data: {
+      const [created] = await ctx.db
+        .insert(schema.decryptionChallenge)
+        .values({
           deviceId: deviceInput.id,
           deviceName: deviceInput.name,
           userId: user.id,
           ipAddress: ctx.getIpAddress()
-        }
-      })
+        })
+        .returning()
+      challenge = created
     }
 
     if (
@@ -387,14 +394,14 @@ export class RootResolver {
         ...challenge,
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
         encryptionSalt: user.encryptionSalt,
-        approvedAt: challenge.approvedAt || challenge.createdAt
+        approvedAt: challenge!.approvedAt || challenge!.createdAt
       })
     }
 
-    if (!challenge.approvedAt) {
+    if (!challenge!.approvedAt) {
       return plainToClass(DecryptionChallengeForApproval, {
-        id: challenge.id,
-        approvedAt: challenge.approvedAt
+        id: challenge!.id,
+        approvedAt: challenge!.approvedAt
       })
     }
 
@@ -423,39 +430,29 @@ export class RootResolver {
     if (!ctx.jwtPayload) {
       return null
     }
-    const user = await ctx.prisma.user.update({
-      data: {
-        Devices: {
-          update: {
-            where: {
-              id: ctx.jwtPayload.deviceId
-            },
-            data: {
-              logoutAt: new Date()
-            }
-          }
-        }
-      },
-      where: {
-        id: ctx.jwtPayload.userId
-      }
+
+    // Update the device with logoutAt
+    await ctx.db
+      .update(schema.device)
+      .set({
+        logoutAt: new Date()
+      })
+      .where(eq(schema.device.id, ctx.jwtPayload.deviceId))
+
+    // Get user for token version
+    const user = await ctx.db.query.user.findFirst({
+      where: { id: ctx.jwtPayload.userId }
     })
 
     if (removeDevice) {
-      await ctx.prisma.$transaction([
-        ctx.prisma.device.delete({
-          where: {
-            id: ctx.jwtPayload.deviceId
-          }
-        }),
-        ctx.prisma.decryptionChallenge.deleteMany({
-          where: {
-            deviceId: ctx.jwtPayload.deviceId
-          }
-        })
-      ])
+      await ctx.db
+        .delete(schema.device)
+        .where(eq(schema.device.id, ctx.jwtPayload.deviceId))
+      await ctx.db
+        .delete(schema.decryptionChallenge)
+        .where(eq(schema.decryptionChallenge.deviceId, ctx.jwtPayload.deviceId))
     }
-    return user.tokenVersion
+    return user?.tokenVersion
   }
 
   @Query(() => [WebInputGQLScalars])
@@ -474,13 +471,16 @@ export class RootResolver {
       })
 
       // TODO only return new web inputs created after last sync
-      return ctx.prisma.$kysely
-        .selectFrom('WebInput')
-        .selectAll()
-        .where((eb) =>
-          eb.or(formattedDomains.map((domain) => eb('host', 'like', domain)))
+      const results = await ctx.db
+        .select()
+        .from(schema.webInput)
+        .where(
+          sql`${schema.webInput.host} LIKE ANY(ARRAY[${sql.join(
+            formattedDomains.map((d) => sql`${d}`),
+            sql`, `
+          )}])`
         )
-        .execute()
+      return results
     }
   }
 
@@ -495,13 +495,10 @@ export class RootResolver {
     @Arg('id', () => Int) id: number,
     @Ctx() ctx: IContextAuthenticated
   ) {
-    return ctx.prisma.webInput.findUnique({
-      where: {
-        id
-      }
+    return ctx.db.query.webInput.findFirst({
+      where: { id }
     })
   }
-  2
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => [WebInputGQL])
@@ -509,7 +506,7 @@ export class RootResolver {
     @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
     @Ctx() ctx: IContextAuthenticated
   ) {
-    const returnedInputs: WebInput[] = []
+    const returnedInputs: any[] = []
     for (const webInput of webInputs) {
       const host = constructURL(webInput.url).host
       if (!host) {
@@ -523,37 +520,33 @@ export class RootResolver {
         addedByUserId: ctx.jwtPayload.userId
       }
 
-      const existing = await ctx.prisma.webInput.findFirst({
+      const existing = await ctx.db.query.webInput.findFirst({
         where: {
           url: forUpsert.url,
           kind: forUpsert.kind
         },
-        select: {
+        columns: {
           id: true
         }
       })
 
       if (existing) {
         // it can happen that website changes the input field, so we delete the old one and add the new one
-        await ctx.prisma.webInput.delete({
-          where: {
-            id: existing.id
-          }
-        })
+        await ctx.db
+          .delete(schema.webInput)
+          .where(eq(schema.webInput.id, existing.id))
       }
 
       try {
-        // prisma is weird because it is throwing unique constraint conflict errors here. upsert should never throw that.
-        const input = await ctx.prisma.webInput.upsert({
-          create: forUpsert,
-          update: forUpsert,
-          where: {
-            webInputIdentifier: {
-              url: webInput.url,
-              domPath: webInput.domPath
-            }
-          }
-        })
+        // Try to insert, on conflict update
+        const [input] = await ctx.db
+          .insert(schema.webInput)
+          .values(forUpsert as any)
+          .onConflictDoUpdate({
+            target: [schema.webInput.url, schema.webInput.domPath],
+            set: forUpsert as any
+          })
+          .returning()
         returnedInputs.push(input)
       } catch (err: unknown) {
         console.warn('error adding web input', err)
