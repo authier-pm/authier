@@ -146,8 +146,7 @@ export function DeviceSettings() {
                   onToggle={async () => {
                     if (deviceState.biometricsEnabled) {
                       await SInfo.deleteItem('psw', {
-                        sharedPreferencesName: 'authierShared',
-                        keychainService: 'authierKCH'
+                        service: 'authierKCH'
                       })
                       deviceState.changeBiometricsEnabled(false)
                     } else {

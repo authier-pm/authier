@@ -77,11 +77,8 @@ export function Register({ navigation }: NavigationProps) {
     if (device.biometricsAvailable && deviceState.biometricsEnabled) {
       try {
         await SInfo.setItem('psw', values.password, {
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH',
-          touchID: true,
-          showModal: true,
-          kSecAccessControl: 'kSecAccessControlBiometryAny'
+          service: 'authierKCH',
+          accessControl: 'biometryAny'
         })
         useDeviceStateStore.setState({ biometricsEnabled: true })
       } catch (error) {

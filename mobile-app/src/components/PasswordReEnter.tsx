@@ -67,11 +67,8 @@ export function PasswordReEnter({
                   throw new Error(`Incorrect password`)
                 }
                 await SInfo.setItem('psw', values.password, {
-                  sharedPreferencesName: 'authierShared',
-                  keychainService: 'authierKCH',
-                  touchID: true,
-                  showModal: true,
-                  kSecAccessControl: 'kSecAccessControlBiometryAny'
+                  service: 'authierKCH',
+                  accessControl: 'biometryAny'
                 })
                 deviceState.changeBiometricsEnabled(true)
                 setModalVisible(false)

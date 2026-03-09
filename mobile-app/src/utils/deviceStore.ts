@@ -242,6 +242,7 @@ export const useDeviceStore = create<Device>()(
           })
 
           const queryData = query.data
+          if (!queryData) return
 
           const config = {
             autofillTOTPEnabled: queryData.currentDevice.autofillTOTPEnabled,
@@ -383,8 +384,7 @@ export const useDeviceStore = create<Device>()(
 
         get().clearLockInterval()
         SInfo.deleteItem('psw', {
-          sharedPreferencesName: 'authierShared',
-          keychainService: 'authierKCH'
+          service: 'authierKCH'
         })
         useDeviceStateStore.getState().reset()
         const newToken = await messaging().getToken()

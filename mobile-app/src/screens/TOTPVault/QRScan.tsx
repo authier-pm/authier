@@ -46,7 +46,7 @@ export const QRScan = () => {
   const deviceState = useDeviceStateStore((state) => state)
   const [hasPermission, setHasPermission] = React.useState(false)
   const devices = useCameraDevices()
-  const cameraDevice = devices.back
+  const cameraDevice = devices.find((d) => d.position === 'back')
 
   const [frameProcessor, barcodes] = useScanBarcodes([BarcodeFormat.QR_CODE], {
     checkInverted: true
@@ -92,7 +92,7 @@ export const QRScan = () => {
   useEffect(() => {
     ;(async () => {
       const status = await Camera.requestCameraPermission()
-      setHasPermission(status === 'authorized')
+      setHasPermission(status === 'granted')
     })()
   }, [])
 
@@ -101,11 +101,10 @@ export const QRScan = () => {
   return (
     <>
       <Camera
-        style={StyleSheet.absoluteFill}
+        style={StyleSheet.absoluteFillObject}
         device={cameraDevice}
         isActive={true}
         frameProcessor={frameProcessor}
-        frameProcessorFps={5}
         audio={false}
       />
       <CameraFrame />

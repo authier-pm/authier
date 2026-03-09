@@ -5,15 +5,14 @@ export function setSensitiveItem(key: string, value: any) {
     key,
     typeof value === 'object' ? JSON.stringify(value) : value,
     {
-      sharedPreferencesName: 'authierShared',
-      keychainService: 'authierKCH'
+      service: 'authierKCH'
     }
   )
 }
 
-export function getSensitiveItem(key: string) {
-  return SInfo.getItem(key, {
-    sharedPreferencesName: 'authierShared',
-    keychainService: 'authierKCH'
+export async function getSensitiveItem(key: string) {
+  const item = await SInfo.getItem(key, {
+    service: 'authierKCH'
   })
+  return item?.value ?? null
 }

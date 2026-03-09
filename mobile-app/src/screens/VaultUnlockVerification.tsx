@@ -57,19 +57,15 @@ export function VaultUnlockVerification() {
         setLoading(true)
 
         try {
-          const psw = await SInfo.getItem('psw', {
-            sharedPreferencesName: 'authierShared',
-            keychainService: 'authierKCH',
-            touchID: true,
-            showModal: true,
-            strings: {
-              header: 'Unlock your vault',
+          const pswItem = await SInfo.getItem('psw', {
+            service: 'authierKCH',
+            accessControl: 'biometryAny',
+            authenticationPrompt: {
+              title: 'Unlock your vault',
               description: 'decrypt your vault with your fingerprint'
-            },
-            kSecUseOperationPrompt:
-              'We need your permission to retrieve encrypted data'
+            }
           })
-          unlockVault(psw)
+          unlockVault(pswItem?.value ?? '')
         } catch (error) {
           console.log(error)
           setTries(tries + 1)

@@ -290,6 +290,7 @@ export function DeviceList({
         <SearchBar setFilterBy={setFilterBy} />
       </HStack>
       {/* List of requests*/}
+      {/* @ts-ignore */}
       <FlatList
         flexGrow={0}
         ListEmptyComponent={empty}
@@ -303,6 +304,7 @@ export function DeviceList({
       />
 
       {/* List of devices */}
+      {/* @ts-ignore */}
       <FlatList
         onRefresh={() => {
           devicesRefetch()

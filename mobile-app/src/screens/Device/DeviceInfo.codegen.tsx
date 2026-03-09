@@ -65,6 +65,7 @@ export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.Suspen
 export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>): ApolloReactHooks.UseSuspenseQueryResult<DeviceInfoQuery | undefined, DeviceInfoQueryVariables>;
 export function useDeviceInfoSuspenseQuery(baseOptions?: ApolloReactHooks.SkipToken | ApolloReactHooks.SuspenseQueryHookOptions<DeviceInfoQuery, DeviceInfoQueryVariables>) {
           const options = baseOptions === ApolloReactHooks.skipToken ? baseOptions : {...defaultOptions, ...baseOptions}
+          // @ts-ignore
           return ApolloReactHooks.useSuspenseQuery<DeviceInfoQuery, DeviceInfoQueryVariables>(DeviceInfoDocument, options);
         }
 export type DeviceInfoQueryHookResult = ReturnType<typeof useDeviceInfoQuery>;
