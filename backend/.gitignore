@@ -1,5 +1,8 @@
 pgdata
 dist
-cdk.out
+
 .env.*
 .wrangler
+.temp-drizzle
+.temp-drizzle-meta
+drizzle.temp.config.ts

@@ -104,7 +104,7 @@ importers:
         version: 0.3.15
       '@elysiajs/cors':
         specifier: ^1.4.1
-        version: 1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.38)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))
+        version: 1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.38)(@types/bun@1.3.10)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))
       '@react-native-firebase/app':
         specifier: ^23.8.6
         version: 23.8.6(@react-native-async-storage/async-storage@2.2.0(react-native@0.84.0(@babel/core@7.29.0)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.84.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.4)))(react-native@0.84.0(@babel/core@7.29.0)(@react-native-community/cli@20.1.1(typescript@5.9.3))(@react-native/metro-config@0.84.0(@babel/core@7.29.0))(@types/react@19.2.14)(react@19.2.4))(react@19.2.4)
@@ -137,10 +137,10 @@ importers:
         version: 17.3.1
       drizzle-orm:
         specifier: 1.0.0-beta.15-859cf75
-        version: 1.0.0-beta.15-859cf75(@electric-sql/pglite@0.3.15)(@opentelemetry/api@1.9.0)(@prisma/client@7.4.1(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@sinclair/typebox@0.34.38)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.15.6)(@upstash/redis@1.36.4)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(pg@8.18.0)(postgres@3.4.8)(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
+        version: 1.0.0-beta.15-859cf75(@electric-sql/pglite@0.3.15)(@opentelemetry/api@1.9.0)(@prisma/client@7.4.1(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@sinclair/typebox@0.34.38)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.15.6)(@upstash/redis@1.36.4)(bun-types@1.3.10)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(pg@8.18.0)(postgres@3.4.8)(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6)
       elysia:
         specifier: ^1.4.27
-        version: 1.4.27(@sinclair/typebox@0.34.38)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
+        version: 1.4.27(@sinclair/typebox@0.34.38)(@types/bun@1.3.10)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
       graphql-fields:
         specifier: ^2.0.3
         version: 2.0.3
@@ -217,6 +217,9 @@ importers:
       '@swc/core':
         specifier: ^1.15.18
         version: 1.15.18
+      '@types/bun':
+        specifier: ^1.3.10
+        version: 1.3.10
       '@types/graphql-list-fields':
         specifier: ^2.0.7
         version: 2.0.7
@@ -5713,6 +5716,9 @@ packages:
   '@types/babel__traverse@7.20.1':
     resolution: {integrity: sha512-MitHFXnhtgwsGZWtT68URpOvLN4EREih1u3QtQiN4VdAxWKRVvGCSvw/Qth0M0Qq3pJpnGOu5JaM/ydK7OGbqg==}
 
+  '@types/bun@1.3.10':
+    resolution: {integrity: sha512-0+rlrUrOrTSskibryHbvQkDOWRJwJZqZlxrUs1u4oOoTln8+WIXBPmAuCF35SWB2z4Zl3E84Nl/D0P7803nigQ==}
+
   '@types/chai@5.2.2':
     resolution: {integrity: sha512-8kB30R7Hwqf40JPiKhVzodJs2Qc1ZJ5zuT3uzw5Hq/dhNCl3G3l83jfpdI1e20BP348+fV7VIL/+FxaXkqBmWg==}
 
@@ -6837,7 +6843,6 @@ packages:
   basic-ftp@5.0.3:
     resolution: {integrity: sha512-QHX8HLlncOLpy54mh+k/sWIFd0ThmRqwe9ZjELybGZK+tZ8rUb9VO0saKJUROTbE+KhzDUT7xziGpGrW8Kmd+g==}
     engines: {node: '>=10.0.0'}
-    deprecated: Security vulnerability fixed in 5.2.0, please upgrade
 
   bcrypt-pbkdf@1.0.2:
     resolution: {integrity: sha512-qeFIXtP4MSoi6NLqO12WfqARWWuCKi2Rn/9hJLEmtB5yTNr9DqFWkJRCf2qShWzPeAMRnOgCrq0sg/KLv5ES9w==}
@@ -6984,6 +6989,9 @@ packages:
   buffers@0.1.1:
     resolution: {integrity: sha512-9q/rDEGSb/Qsvv2qvzIzdluL5k7AaJOTrw23z9reQthrbF7is4CtlT0DXyO1oei2DCp4uojjzQ7igaSHp1kAEQ==}
     engines: {node: '>=0.2.0'}
+
+  bun-types@1.3.10:
+    resolution: {integrity: sha512-tcpfCCl6XWo6nCVnpcVrxQ+9AYN1iqMIzgrSKYMB/fjLtV2eyAVEg7AxQJuCq/26R6HpKWykQXuSOq/21RYcbg==}
 
   bundle-name@4.1.0:
     resolution: {integrity: sha512-tjwM5exMg6BGRI+kNmTntNsvdZS1X8BFYS6tnJ2hdH0kVxM6/eVZ2xy+FqStSWvYmtfFMDLIxurorHwDKfDz5Q==}
@@ -11032,14 +11040,12 @@ packages:
   metro-react-native-babel-preset@0.76.8:
     resolution: {integrity: sha512-Ptza08GgqzxEdK8apYsjTx2S8WDUlS2ilBlu9DR1CUcHmg4g3kOkFylZroogVAUKtpYQNYwAvdsjmrSdDNtiAg==}
     engines: {node: '>=16'}
-    deprecated: Use @react-native/babel-preset instead
     peerDependencies:
       '@babel/core': '*'
 
   metro-react-native-babel-preset@0.77.0:
     resolution: {integrity: sha512-HPPD+bTxADtoE4y/4t1txgTQ1LVR6imOBy7RMHUsqMVTbekoi8Ph5YI9vKX2VMPtVWeFt0w9YnCSLPa76GcXsA==}
     engines: {node: '>=18'}
-    deprecated: Use @react-native/babel-preset instead
     peerDependencies:
       '@babel/core': '*'
 
@@ -16777,9 +16783,9 @@ snapshots:
 
   '@electric-sql/pglite@0.3.15': {}
 
-  '@elysiajs/cors@1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.38)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))':
+  '@elysiajs/cors@1.4.1(elysia@1.4.27(@sinclair/typebox@0.34.38)(@types/bun@1.3.10)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3))':
     dependencies:
-      elysia: 1.4.27(@sinclair/typebox@0.34.38)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
+      elysia: 1.4.27(@sinclair/typebox@0.34.38)(@types/bun@1.3.10)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3)
 
   '@emnapi/runtime@1.8.1':
     dependencies:
@@ -21317,6 +21323,10 @@ snapshots:
     dependencies:
       '@babel/types': 7.29.0
 
+  '@types/bun@1.3.10':
+    dependencies:
+      bun-types: 1.3.10
+
   '@types/chai@5.2.2':
     dependencies:
       '@types/deep-eql': 4.0.2
@@ -23080,6 +23090,10 @@ snapshots:
 
   buffers@0.1.1: {}
 
+  bun-types@1.3.10:
+    dependencies:
+      '@types/node': 25.3.5
+
   bundle-name@4.1.0:
     dependencies:
       run-applescript: 7.0.0
@@ -24423,7 +24437,7 @@ snapshots:
       esbuild: 0.25.11
       jiti: 2.6.1
 
-  drizzle-orm@1.0.0-beta.15-859cf75(@electric-sql/pglite@0.3.15)(@opentelemetry/api@1.9.0)(@prisma/client@7.4.1(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@sinclair/typebox@0.34.38)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.15.6)(@upstash/redis@1.36.4)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(pg@8.18.0)(postgres@3.4.8)(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6):
+  drizzle-orm@1.0.0-beta.15-859cf75(@electric-sql/pglite@0.3.15)(@opentelemetry/api@1.9.0)(@prisma/client@7.4.1(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(typescript@5.9.3))(@sinclair/typebox@0.34.38)(@types/mssql@9.1.9(@azure/core-client@1.10.1))(@types/pg@8.15.6)(@upstash/redis@1.36.4)(bun-types@1.3.10)(mssql@11.0.1(@azure/core-client@1.10.1))(mysql2@3.15.3)(pg@8.18.0)(postgres@3.4.8)(prisma@7.4.1(@types/react@19.2.14)(magicast@0.3.5)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(typescript@5.9.3))(valibot@1.2.0(typescript@5.9.3))(zod@4.3.6):
     dependencies:
       '@types/mssql': 9.1.9(@azure/core-client@1.10.1)
       mssql: 11.0.1(@azure/core-client@1.10.1)
@@ -24434,6 +24448,7 @@ snapshots:
       '@sinclair/typebox': 0.34.38
       '@types/pg': 8.15.6
       '@upstash/redis': 1.36.4
+      bun-types: 1.3.10
       mysql2: 3.15.3
       pg: 8.18.0
       postgres: 3.4.8
@@ -24518,7 +24533,7 @@ snapshots:
       minimalistic-assert: 1.0.1
       minimalistic-crypto-utils: 1.0.1
 
-  elysia@1.4.27(@sinclair/typebox@0.34.38)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3):
+  elysia@1.4.27(@sinclair/typebox@0.34.38)(@types/bun@1.3.10)(exact-mirror@0.2.7(@sinclair/typebox@0.34.38))(file-type@21.3.0)(openapi-types@12.1.3)(typescript@5.9.3):
     dependencies:
       '@sinclair/typebox': 0.34.38
       cookie: 1.1.1
@@ -24528,6 +24543,7 @@ snapshots:
       memoirist: 0.4.0
       openapi-types: 12.1.3
     optionalDependencies:
+      '@types/bun': 1.3.10
       typescript: 5.9.3
 
   emittery@0.13.1: {}

@@ -8,6 +8,8 @@ faker.seed(1)
 export const log = debug('au:test')
 
 import { PGlite } from '@electric-sql/pglite'
+// @ts-expect-error
+import { citext } from '@electric-sql/pglite/contrib/citext'
 import { drizzle } from 'drizzle-orm/pglite'
 import { dbSchema } from '../drizzle'
 import { relations } from '../drizzle/relations'
@@ -18,7 +20,9 @@ import { setDb } from '../prisma/prismaClient'
 export let testDb: ReturnType<typeof drizzle>
 
 export async function setupTestDb(): Promise<PGlite> {
-  const client = new PGlite()
+  const client = new PGlite({
+    extensions: { citext }
+  })
   const db = drizzle({ client, schema: dbSchema, relations, logger: false })
 
   db.transaction = async (cb: any) => {

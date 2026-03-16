@@ -1,8 +1,15 @@
-CREATE TYPE "TokenType" AS ENUM('EMAIL', 'API');--> statement-breakpoint
-CREATE TYPE "EncryptedSecretType" AS ENUM('TOTP', 'LOGIN_CREDENTIALS');--> statement-breakpoint
-CREATE TYPE "WebInputType" AS ENUM('TOTP', 'USERNAME', 'EMAIL', 'USERNAME_OR_EMAIL', 'PASSWORD', 'NEW_PASSWORD', 'NEW_PASSWORD_CONFIRMATION', 'SUBMIT_BUTTON', 'CUSTOM');--> statement-breakpoint
-CREATE TYPE "EmailVerificationType" AS ENUM('PRIMARY', 'CONTACT');--> statement-breakpoint
-CREATE TYPE "UserNewDevicePolicy" AS ENUM('ALLOW', 'REQUIRE_ANY_DEVICE_APPROVAL', 'REQUIRE_MASTER_DEVICE_APPROVAL');--> statement-breakpoint
+CREATE EXTENSION IF NOT EXISTS citext
+--> statement-breakpoint
+CREATE TYPE "EmailVerificationType" AS ENUM('PRIMARY', 'CONTACT');
+--> statement-breakpoint
+CREATE TYPE "EncryptedSecretType" AS ENUM('TOTP', 'LOGIN_CREDENTIALS');
+--> statement-breakpoint
+CREATE TYPE "TokenType" AS ENUM('EMAIL', 'API');
+--> statement-breakpoint
+CREATE TYPE "UserNewDevicePolicy" AS ENUM('ALLOW', 'REQUIRE_ANY_DEVICE_APPROVAL', 'REQUIRE_MASTER_DEVICE_APPROVAL');
+--> statement-breakpoint
+CREATE TYPE "WebInputType" AS ENUM('TOTP', 'USERNAME', 'EMAIL', 'USERNAME_OR_EMAIL', 'PASSWORD', 'NEW_PASSWORD', 'NEW_PASSWORD_CONFIRMATION', 'SUBMIT_BUTTON', 'CUSTOM');
+--> statement-breakpoint
 CREATE TABLE "DecryptionChallenge" (
 	"id" serial PRIMARY KEY,
 	"ipAddress" inet NOT NULL,
@@ -15,8 +22,11 @@ CREATE TABLE "DecryptionChallenge" (
 	"blockIp" boolean,
 	"rejectedAt" timestamp(3),
 	"approvedByRecovery" boolean DEFAULT false NOT NULL,
-	"deviceName" text NOT NULL
-);--> statement-breakpoint
+	"deviceName" text NOT NULL,
+	"pushNotificationsSentCount" integer DEFAULT 0 NOT NULL,
+	"pushNotificationsFailedCount" integer DEFAULT 0 NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "DefaultSettings" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -27,7 +37,8 @@ CREATE TABLE "DefaultSettings" (
 	"userId" uuid NOT NULL,
 	"syncTOTP" boolean DEFAULT true NOT NULL,
 	"theme" text DEFAULT 'dark' NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "Device" (
 	"id" text PRIMARY KEY,
 	"firstIpAddress" inet NOT NULL,
@@ -50,15 +61,17 @@ CREATE TABLE "Device" (
 	"deletedAt" timestamp(3),
 	"autofillCredentialsEnabled" boolean NOT NULL,
 	"autofillTOTPEnabled" boolean NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "EmailVerification" (
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"userId" uuid NOT NULL,
 	"token" uuid NOT NULL,
-	"address" text PRIMARY KEY,
+	"address" citext PRIMARY KEY,
 	"kind" "EmailVerificationType" NOT NULL,
 	"verifiedAt" timestamp(3)
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "EncryptedSecret" (
 	"encrypted" text NOT NULL,
 	"version" integer NOT NULL,
@@ -68,7 +81,8 @@ CREATE TABLE "EncryptedSecret" (
 	"updatedAt" timestamp(3),
 	"id" uuid PRIMARY KEY,
 	"deletedAt" timestamp(3)
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "MasterDeviceChange" (
 	"id" text PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -76,7 +90,21 @@ CREATE TABLE "MasterDeviceChange" (
 	"oldDeviceId" text NOT NULL,
 	"newDeviceId" text NOT NULL,
 	"userId" uuid NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
+CREATE TABLE "MasterDeviceResetRequest" (
+	"id" serial PRIMARY KEY,
+	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	"processAt" timestamp(3) NOT NULL,
+	"confirmedAt" timestamp(3),
+	"completedAt" timestamp(3),
+	"rejectedAt" timestamp(3),
+	"confirmationToken" text NOT NULL,
+	"targetMasterDeviceId" text NOT NULL,
+	"decryptionChallengeId" integer NOT NULL,
+	"userId" uuid NOT NULL
+);
+--> statement-breakpoint
 CREATE TABLE "SecretUsageEvent" (
 	"id" bigserial PRIMARY KEY,
 	"kind" text NOT NULL,
@@ -87,13 +115,15 @@ CREATE TABLE "SecretUsageEvent" (
 	"deviceId" text NOT NULL,
 	"webInputId" integer,
 	"secretId" uuid NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "Tag" (
 	"id" serial PRIMARY KEY,
 	"name" text NOT NULL,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"userId" uuid NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "Token" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -103,10 +133,11 @@ CREATE TABLE "Token" (
 	"valid" boolean DEFAULT true NOT NULL,
 	"expiration" timestamp(3) NOT NULL,
 	"userId" uuid NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "User" (
 	"id" uuid PRIMARY KEY,
-	"email" text,
+	"email" citext,
 	"tokenVersion" integer DEFAULT 0 NOT NULL,
 	"username" text,
 	"addDeviceSecret" text NOT NULL,
@@ -123,7 +154,8 @@ CREATE TABLE "User" (
 	"notificationOnWrongPasswordAttempts" integer DEFAULT 3 NOT NULL,
 	"uiLanguage" text DEFAULT 'en' NOT NULL,
 	"newDevicePolicy" "UserNewDevicePolicy"
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "UserPaidProducts" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
@@ -132,7 +164,8 @@ CREATE TABLE "UserPaidProducts" (
 	"productId" text NOT NULL,
 	"userId" uuid NOT NULL,
 	"checkoutSessionId" text NOT NULL
-);--> statement-breakpoint
+);
+--> statement-breakpoint
 CREATE TABLE "WebInput" (
 	"id" serial PRIMARY KEY,
 	"layoutType" text,
@@ -143,42 +176,92 @@ CREATE TABLE "WebInput" (
 	"addedByUserId" uuid,
 	"host" varchar(253) NOT NULL,
 	"domOrdinal" integer DEFAULT 0 NOT NULL
-);--> statement-breakpoint
-CREATE INDEX "DecryptionChallenge_deviceId_idx" ON "DecryptionChallenge" ("deviceId");--> statement-breakpoint
-CREATE INDEX "DecryptionChallenge_userId_idx" ON "DecryptionChallenge" ("userId");--> statement-breakpoint
-CREATE UNIQUE INDEX "DefaultSettings_userId_key" ON "DefaultSettings" ("userId");--> statement-breakpoint
-CREATE UNIQUE INDEX "Device_firebaseToken_key" ON "Device" ("firebaseToken");--> statement-breakpoint
-CREATE INDEX "Device_lastSyncAt_idx" ON "Device" ("lastSyncAt");--> statement-breakpoint
-CREATE INDEX "Device_updatedAt_idx" ON "Device" ("updatedAt");--> statement-breakpoint
-CREATE UNIQUE INDEX "Device_userId_id_key" ON "Device" ("userId","id");--> statement-breakpoint
-CREATE UNIQUE INDEX "EmailVerification_token_key" ON "EmailVerification" ("token");--> statement-breakpoint
-CREATE INDEX "EmailVerification_userId_idx" ON "EmailVerification" ("userId");--> statement-breakpoint
-CREATE INDEX "EncryptedSecret_userId_idx" ON "EncryptedSecret" ("userId");--> statement-breakpoint
-CREATE INDEX "SecretUsageEvent_secretId_idx" ON "SecretUsageEvent" ("secretId");--> statement-breakpoint
-CREATE UNIQUE INDEX "Tag_userId_name_key" ON "Tag" ("userId","name");--> statement-breakpoint
-CREATE UNIQUE INDEX "Token_emailToken_key" ON "Token" ("emailToken");--> statement-breakpoint
-CREATE INDEX "Token_userId_idx" ON "Token" ("userId");--> statement-breakpoint
-CREATE UNIQUE INDEX "User_email_key" ON "User" ("email");--> statement-breakpoint
-CREATE UNIQUE INDEX "User_masterDeviceId_key" ON "User" ("masterDeviceId");--> statement-breakpoint
-CREATE UNIQUE INDEX "User_username_key" ON "User" ("username");--> statement-breakpoint
-CREATE INDEX "UserPaidProducts_userId_idx" ON "UserPaidProducts" ("userId");--> statement-breakpoint
-CREATE INDEX "WebInput_host_idx" ON "WebInput" ("host");--> statement-breakpoint
-CREATE INDEX "WebInput_kind_idx" ON "WebInput" ("kind");--> statement-breakpoint
-CREATE UNIQUE INDEX "WebInput_url_domPath_key" ON "WebInput" ("url","domPath");--> statement-breakpoint
-ALTER TABLE "EncryptedSecret" ADD CONSTRAINT "EncryptedSecret_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "Device" ADD CONSTRAINT "Device_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_deviceId_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_secretId_fkey" FOREIGN KEY ("secretId") REFERENCES "EncryptedSecret"("id") ON DELETE RESTRICT ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_webInputId_fkey" FOREIGN KEY ("webInputId") REFERENCES "WebInput"("id") ON DELETE SET NULL ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "WebInput" ADD CONSTRAINT "WebInput_addedByUserId_fkey" FOREIGN KEY ("addedByUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "User" ADD CONSTRAINT "User_masterDeviceId_fkey" FOREIGN KEY ("masterDeviceId") REFERENCES "Device"("id") ON DELETE SET NULL ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "User" ADD CONSTRAINT "User_recoveryDecryptionChallengeId_fkey" FOREIGN KEY ("recoveryDecryptionChallengeId") REFERENCES "DecryptionChallenge"("id") ON DELETE SET NULL ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "UserPaidProducts" ADD CONSTRAINT "UserPaidProducts_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "Tag" ADD CONSTRAINT "Tag_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "DecryptionChallenge" ADD CONSTRAINT "DecryptionChallenge_approvedFromDeviceId_fkey" FOREIGN KEY ("approvedFromDeviceId") REFERENCES "Device"("id") ON DELETE SET NULL ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "DecryptionChallenge" ADD CONSTRAINT "DecryptionChallenge_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "EmailVerification" ADD CONSTRAINT "EmailVerification_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "MasterDeviceChange" ADD CONSTRAINT "MasterDeviceChange_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;--> statement-breakpoint
-ALTER TABLE "DefaultSettings" ADD CONSTRAINT "DefaultSettings_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+);
+--> statement-breakpoint
+ALTER TABLE "DecryptionChallenge" ADD CONSTRAINT "DecryptionChallenge_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "DecryptionChallenge" ADD CONSTRAINT "DecryptionChallenge_approvedFromDeviceId_Device_id_fkey" FOREIGN KEY ("approvedFromDeviceId") REFERENCES "Device"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "DefaultSettings" ADD CONSTRAINT "DefaultSettings_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "Device" ADD CONSTRAINT "Device_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "EmailVerification" ADD CONSTRAINT "EmailVerification_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "EncryptedSecret" ADD CONSTRAINT "EncryptedSecret_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "MasterDeviceChange" ADD CONSTRAINT "MasterDeviceChange_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "MasterDeviceResetRequest" ADD CONSTRAINT "MasterDeviceResetRequest_HvFB3D6sZNJH_fkey" FOREIGN KEY ("decryptionChallengeId") REFERENCES "DecryptionChallenge"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "MasterDeviceResetRequest" ADD CONSTRAINT "MasterDeviceResetRequest_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_deviceId_Device_id_fkey" FOREIGN KEY ("deviceId") REFERENCES "Device"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_webInputId_WebInput_id_fkey" FOREIGN KEY ("webInputId") REFERENCES "WebInput"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "SecretUsageEvent" ADD CONSTRAINT "SecretUsageEvent_secretId_EncryptedSecret_id_fkey" FOREIGN KEY ("secretId") REFERENCES "EncryptedSecret"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "Tag" ADD CONSTRAINT "Tag_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "User" ADD CONSTRAINT "User_masterDeviceId_Device_id_fkey" FOREIGN KEY ("masterDeviceId") REFERENCES "Device"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "User" ADD CONSTRAINT "User_recoveryDecryptionChallengeId_DecryptionChallenge_id_fkey" FOREIGN KEY ("recoveryDecryptionChallengeId") REFERENCES "DecryptionChallenge"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "UserPaidProducts" ADD CONSTRAINT "UserPaidProducts_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "WebInput" ADD CONSTRAINT "WebInput_addedByUserId_User_id_fkey" FOREIGN KEY ("addedByUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+--> statement-breakpoint
+CREATE UNIQUE INDEX "DefaultSettings_userId_key" ON "DefaultSettings" ("userId");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "Device_firebaseToken_key" ON "Device" ("firebaseToken");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "Device_userId_id_key" ON "Device" ("userId","id");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "EmailVerification_token_key" ON "EmailVerification" ("token");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "MasterDeviceResetRequest_decryptionChallengeId_key" ON "MasterDeviceResetRequest" ("decryptionChallengeId");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "MasterDeviceResetRequest_confirmationToken_key" ON "MasterDeviceResetRequest" ("confirmationToken");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "Tag_userId_name_key" ON "Tag" ("userId","name");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "Token_emailToken_key" ON "Token" ("emailToken");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "User_email_key" ON "User" ("email");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "User_masterDeviceId_key" ON "User" ("masterDeviceId");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "User_username_key" ON "User" ("username");
+--> statement-breakpoint
+CREATE UNIQUE INDEX "WebInput_url_domPath_key" ON "WebInput" ("url","domPath");
+--> statement-breakpoint
+CREATE INDEX "DecryptionChallenge_deviceId_idx" ON "DecryptionChallenge" ("deviceId");
+--> statement-breakpoint
+CREATE INDEX "DecryptionChallenge_userId_idx" ON "DecryptionChallenge" ("userId");
+--> statement-breakpoint
+CREATE INDEX "Device_lastSyncAt_idx" ON "Device" ("lastSyncAt");
+--> statement-breakpoint
+CREATE INDEX "Device_updatedAt_idx" ON "Device" ("updatedAt");
+--> statement-breakpoint
+CREATE INDEX "EmailVerification_userId_idx" ON "EmailVerification" ("userId");
+--> statement-breakpoint
+CREATE INDEX "EncryptedSecret_userId_idx" ON "EncryptedSecret" ("userId");
+--> statement-breakpoint
+CREATE INDEX "MasterDeviceResetRequest_userId_idx" ON "MasterDeviceResetRequest" ("userId");
+--> statement-breakpoint
+CREATE INDEX "MasterDeviceResetRequest_processAt_idx" ON "MasterDeviceResetRequest" ("processAt");
+--> statement-breakpoint
+CREATE INDEX "SecretUsageEvent_secretId_idx" ON "SecretUsageEvent" ("secretId");
+--> statement-breakpoint
+CREATE INDEX "Token_userId_idx" ON "Token" ("userId");
+--> statement-breakpoint
+CREATE INDEX "UserPaidProducts_userId_idx" ON "UserPaidProducts" ("userId");
+--> statement-breakpoint
+CREATE INDEX "WebInput_host_idx" ON "WebInput" ("host");
+--> statement-breakpoint
+CREATE INDEX "WebInput_kind_idx" ON "WebInput" ("kind");

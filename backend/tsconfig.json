@@ -37,7 +37,6 @@
     "**/dist/**",
     "**/build/**",
     "./node_modules/*",
-    "./generated/typegraphql-prisma/resolvers/**/*",
-    "cdk.out/**/*"
+    "./generated/typegraphql-prisma/resolvers/**/*"
   ]
 }
