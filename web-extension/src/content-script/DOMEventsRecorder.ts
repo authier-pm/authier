@@ -46,11 +46,9 @@ export class DOMEventsRecorder {
         const nextEvent = this.capturedInputEvents[i + 1]
 
         if (kind === null) {
-          if (nextEvent && nextEvent.kind === WebInputType.PASSWORD) {
-            kind = WebInputType.USERNAME_OR_EMAIL // this can happen when the input for username is just a plain input with no attribute type="username"
-          } else {
-            console.warn('kind is null', element)
-          }
+          const nextEventIsPassword = nextEvent?.kind === WebInputType.PASSWORD
+          const eventType = nextEventIsPassword ? 'inferred-username' : 'unknown'
+          console.warn(`Skipping ${eventType} web input`, element)
         }
 
         return {

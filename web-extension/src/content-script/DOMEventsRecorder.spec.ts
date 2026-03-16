@@ -8,7 +8,7 @@ describe('DOMEventsRecorder', () => {
   })
 
   describe('getUsername', () => {
-    it('should mark the input previous to the password kind as username', async () => {
+    it('should skip unknown input before password when kind is null', async () => {
       const recorder = new DOMEventsRecorder()
       recorder.addInputEvent({
         element: document.createElement('input'),
@@ -23,13 +23,6 @@ describe('DOMEventsRecorder', () => {
       })
       expect(recorder.toJSON()).toMatchInlineSnapshot(`
         [
-          {
-            "cssSelector": "INPUT[type="text"]",
-            "domOrdinal": 0,
-            "inputted": undefined,
-            "kind": "USERNAME_OR_EMAIL",
-            "type": "input",
-          },
           {
             "cssSelector": "INPUT[type="text"]",
             "domOrdinal": 0,
