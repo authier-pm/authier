@@ -149,6 +149,25 @@ describe('RootResolver', () => {
         ...userSecurityProps
       })
 
+      // Insert a master device and set masterDeviceId on user so
+      // userHasNoMasterDevice is false, otherwise the resolver
+      // auto-approves and returns addDeviceSecretEncrypted
+      const masterDeviceId = crypto.randomUUID()
+      await db.insert(schema.device).values({
+        id: masterDeviceId,
+        platform: 'iOS',
+        firstIpAddress: faker.internet.ip(),
+        lastIpAddress: faker.internet.ip(),
+        firebaseToken: crypto.randomUUID(),
+        name: 'master device',
+        userId,
+        ...defaultDeviceSettingSystemValues
+      })
+      await db
+        .update(schema.user)
+        .set({ masterDeviceId })
+        .where(eq(schema.user.id, userId))
+
       const data = (await resolver.deviceDecryptionChallenge(
         fakeData.email,
         {
