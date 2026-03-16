@@ -47,12 +47,6 @@ const passwordStrength = (password: string) => {
   return 3
 }
 
-declare global {
-  interface Crypto {
-    randomUUID: () => `${string}-${string}-${string}-${string}-${string}`
-  }
-}
-
 interface Values {
   password: string
   email: string
