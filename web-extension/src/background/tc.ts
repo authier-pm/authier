@@ -1,8 +1,9 @@
 import { initTRPC } from '@trpc/server'
+import type { Runtime } from 'webextension-polyfill'
 
 export const tc = initTRPC
   .context<{
-    sender: chrome.runtime.MessageSender | undefined
+    sender: Runtime.MessageSender | undefined
   }>()
   .create({
     isServer: false,

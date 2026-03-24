@@ -61,7 +61,6 @@ export const log = debug('au:Device')
 
 const port = browser.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
-  // @ts-expect-error types in chromeLink are not correct, this is fine
   links: [chromeLink({ port })]
 })
 
@@ -466,7 +465,7 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
-  lockInterval: number | null
+  lockInterval: ReturnType<typeof setInterval> | null
 
   async startLockInterval(lockTime: number) {
     await extensionDeviceTrpc.setLockInterval.mutate({ time: lockTime })

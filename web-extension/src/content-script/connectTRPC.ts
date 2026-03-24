@@ -7,7 +7,6 @@ const connectTRPC = () => {
   const port = browser.runtime.connect()
 
   trpc = createTRPCProxyClient<AppRouter>({
-    // @ts-expect-error
     links: [chromeLink({ port })]
   })
 
@@ -21,7 +20,6 @@ const connectTRPC = () => {
 const port = browser.runtime.connect()
 
 export let trpc = createTRPCProxyClient<AppRouter>({
-  // @ts-expect-error
   links: [chromeLink({ port })]
 })
 

@@ -308,12 +308,12 @@ createChromeHandler({
 console.log('background page loaded')
 
 browser.runtime.onMessage.addListener((request) => {
-  chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
     const firstTabId = tabs[0].id
 
     if (!firstTabId) {
       return
     }
-    chrome.tabs.sendMessage(firstTabId, request)
+    browser.tabs.sendMessage(firstTabId, request)
   })
 })

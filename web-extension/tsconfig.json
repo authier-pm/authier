@@ -25,6 +25,6 @@
     "incremental": true,
     "noImplicitAny": false
   },
-  "exclude": ["../backend/**", "dist/**"],
+  "exclude": ["../backend/**", "dist/**", "**/*.spec.*"],
   "include": ["./src/**/*", "../shared/**/*"]
 }
