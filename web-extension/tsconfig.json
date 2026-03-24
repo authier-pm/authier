@@ -9,7 +9,7 @@
     "module": "ESNext",
     "noEmit": true,
     "moduleResolution": "bundler",
-    "rootDir": "../../authier",
+    "rootDir": "..",
     "outDir": "dist/js",
     "strict": true,
     "sourceMap": true,
