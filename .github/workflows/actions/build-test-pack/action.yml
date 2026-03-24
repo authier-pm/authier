@@ -1,24 +1,22 @@
-name: 'Build, test and pack WebExtension'
-description: 'Builds, tests, and packs extension dir into zip file'
+name: "Build, test and pack WebExtension"
+description: "Builds, tests, and packs extension dir into zip file"
 
 inputs:
   doNotPackZip:
-    description: 'Set `true` to omit pack step'
+    description: "Set `true` to omit pack step"
     required: false
 
 runs:
-  using: 'composite'
+  using: "composite"
   steps:
     - uses: actions/checkout@v4
     - uses: pnpm/action-setup@v4
-      with:
-        version: 10
 
     - name: Set up Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: 22
-        cache: 'pnpm'
+        node-version: 24
+        cache: "pnpm"
 
     - name: Install dependencies
       shell: bash
