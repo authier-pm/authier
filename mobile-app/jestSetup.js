@@ -24,15 +24,28 @@ jest.mock('@react-native-firebase/messaging', () => {
   })
 })
 
-// include this section and the NativeAnimatedHelper section for mocking react-native-reanimated
 jest.mock('react-native-reanimated', () => {
-  const Reanimated = require('react-native-reanimated/mock')
-
-  // The mock for `call` immediately calls the callback which is incorrect
-  // So we override it with a no-op
-  Reanimated.default.call = () => {}
-
-  return Reanimated
+  return {
+    default: {
+      call: () => {},
+      createAnimatedComponent: (component) => component,
+      addWhitelistedNativeProps: () => {},
+      addWhitelistedUIProps: () => {}
+    },
+    useSharedValue: jest.fn(() => ({ value: 0 })),
+    useAnimatedStyle: jest.fn(() => ({})),
+    withTiming: jest.fn((value) => value),
+    withSpring: jest.fn((value) => value),
+    withDelay: jest.fn((_, value) => value),
+    withSequence: jest.fn((...values) => values[0]),
+    withRepeat: jest.fn((value) => value),
+    cancelAnimation: jest.fn(),
+    useAnimatedGestureHandler: jest.fn(),
+    createAnimatedComponent: (component) => component,
+    FadeIn: { duration: jest.fn(() => ({ delay: jest.fn() })) },
+    FadeOut: { duration: jest.fn(() => ({ delay: jest.fn() })) },
+    Layout: { springify: jest.fn() }
+  }
 })
 
 jest.mock('@react-navigation/native', () => {
@@ -49,8 +62,6 @@ jest.mock('@react-navigation/native', () => {
   }
 })
 
-// Silence the warning: Animated: `useNativeDriver` is not supported because the native animated module is missing
-jest.mock('react-native/Libraries/Animated/NativeAnimatedHelper')
 
 // Mock crypto.subtle methods
 const subtleMock = {
