@@ -8,7 +8,6 @@ faker.seed(1)
 export const log = debug('au:test')
 
 import { PGlite } from '@electric-sql/pglite'
-// @ts-expect-error
 import { citext } from '@electric-sql/pglite/contrib/citext'
 import { drizzle } from 'drizzle-orm/pglite'
 import { dbSchema } from '../drizzle'

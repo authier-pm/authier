@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "paths": {
       "@shared/*": ["../shared/*"]
     },
+    "outDir": "dist",
+    "rootDir": "..",
     "target": "es2022",
     "lib": ["esnext", "esnext.asynciterable", "dom"],
-    "outDir": "dist",
-    "module": "commonjs",
-    "moduleResolution": "node",
+    "module": "preserve",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
@@ -25,7 +25,6 @@
     "strictPropertyInitialization": false,
     "allowUnreachableCode": false,
     "allowJs": true,
-    "downlevelIteration": true,
     "preserveConstEnums": true,
     "skipLibCheck": true,
     "isolatedModules": true,

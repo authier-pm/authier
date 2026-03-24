@@ -14,7 +14,7 @@ import type {
 import { WebInputTypeGQL } from '../models/types/WebInputType'
 import { fakeUserAndContext } from './__test__/fakeUserAndContext'
 import { makeRegisterAccountInput } from './__test__/makeRegisterAccountInput'
-import { defaultDeviceSettingSystemValues } from 'models/defaultDeviceSettingSystemValues'
+import { defaultDeviceSettingSystemValues } from '../models/defaultDeviceSettingSystemValues'
 import type { GraphQLResolveInfo } from 'graphql'
 import * as schema from '../drizzle/schema'
 import { eq } from 'drizzle-orm'

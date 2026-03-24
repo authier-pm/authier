@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "baseUrl": "./",
     "paths": {
-      "@src/*": ["src/*"],
+      "@src/*": ["./src/*"],
       "@shared/*": ["../shared/*"],
-      "@util/*": ["src/util/*"]
+      "@util/*": ["./src/util/*"]
     },
     "target": "ES2022",
     "module": "ESNext",
