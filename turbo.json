@@ -1,0 +1,17 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "tsc": {
+      "outputs": ["dist/**"]
+    },
+    "authier-mobile-app#tsc": {
+      "outputs": []
+    },
+    "authier-web-extension#tsc": {
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": ["tsc"]
+    }
+  }
+}

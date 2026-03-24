@@ -9,6 +9,7 @@
     "Jiri Spac <capajj@gmail.com>"
   ],
   "license": "AGPL-3.0-or-later",
+  "packageManager": "pnpm@10.26.2",
   "overrides": {
     "graphql": "^16.8.1",
     "react": "^19.2.4",
@@ -35,6 +36,7 @@
     "lint-staged": "^16.4.0",
     "npm-run-all": "^4.1.5",
     "prettier": "^3.8.1",
+    "turbo": "^2.8.20",
     "typescript": "^6.0.2",
     "vite-tsconfig-paths": "^6.1.1",
     "zod": "^4.3.6",
@@ -44,7 +46,7 @@
     "dev:be": "cd backend && pnpm run dev",
     "dev:ex": "cd web-extension && pnpm run dev",
     "dev": "concurrently \"pnpm dev:be\" \"pnpm dev:ex\"",
-    "tsc": "cd backend && tsc && cd .. && cd web-extension && tsc && cd .. && cd mobile-app && tsc",
+    "tsc": "turbo run tsc",
     "bump": "npm-run-all --parallel bump:*",
     "bump:be": "cd backend && ncu -u",
     "bump:ex": "cd web-extension && ncu -u",

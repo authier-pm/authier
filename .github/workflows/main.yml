@@ -49,15 +49,24 @@ jobs:
           cache: "pnpm"
 
       - name: Install dependencies
-        run: |
-          pnpm i --frozen-lockfile --prefer-offline
+        run: pnpm i --frozen-lockfile --prefer-offline
+
+      - name: Cache turbo
+        uses: actions/cache@v4
+        with:
+          path: .turbo
+          key: turbo-${{ runner.os }}-${{ github.sha }}
+          restore-keys: turbo-${{ runner.os }}-
+
+      - name: Typecheck all packages
+        run: pnpm tsc
 
       - uses: dorny/paths-filter@v2
         id: changes
         with:
           filters: |
             backend:
-              - 'backend/**' 
+              - 'backend/**'
               - '.github/**'
               - 'pnpm-lock.yaml'
             webExtension:
@@ -69,14 +78,13 @@ jobs:
               - '.github/**'
               - 'pnpm-lock.yaml'
 
-      - name: backend install deps, check TS and run tests
+      - name: backend tests
         working-directory: ./backend
         if: steps.changes.outputs.backend == 'true'
         env:
           REDIS_URL: redis://localhost:6379
           NODE_ENV: test
         run: |
-          pnpm tsc
           cp .env.sample .env
           pnpm test
 
@@ -92,12 +100,11 @@ jobs:
       #     tagName: ${{ github.sha }}
       #     environment: production
 
-      - name: web-extension, check TS and run tests
+      - name: web-extension tests
         working-directory: ./web-extension
         if: steps.changes.outputs.webExtension == 'true' || steps.changes.outputs.backend == 'true'
-        run: |
-          pnpm tsc
-          pnpm test
+        run: pnpm test
+
       # - name: Install Playwright Browsers & Run Playwright tests with backend
       #   if: steps.changes.outputs.backend == 'true'
       #   working-directory: ./web-extension
@@ -113,9 +120,7 @@ jobs:
       #     path: web-extension/test-results
       #     retention-days: 30
 
-      - name: mobile-app, check TS and run tests
+      - name: mobile-app tests
         working-directory: ./mobile-app
         if: steps.changes.outputs.mobileApp == 'true'
-        run: |
-          pnpm tsc
-          pnpm test
+        run: pnpm test
