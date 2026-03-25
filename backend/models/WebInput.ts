@@ -12,20 +12,22 @@ const log = debug('au:WebInput')
 const rateLimiter = new RedisBasicRateLimiter(redisClient, {
   limiterPrefix: 'web_input_delete',
   maxHits: 1,
-  intervalSeconds: 3600
+  intervalSeconds: 5
 })
 
 @ObjectType()
 export class WebInputMutation extends WebInputGQL {
   @Field(() => WebInputGQLScalars, { nullable: true })
   async delete(@Ctx() ctx: IContextAuthenticated) {
-    await rateLimiter.increment(ctx.jwtPayload.userId)
-    log('delete of WebInput id: ', this.id)
-
+    const isSameUser = ctx.jwtPayload.userId === this.addedByUserId
+    if (!isSameUser) {
+      await rateLimiter.increment(ctx.jwtPayload.userId)
+    }
     const res = await ctx.db
       .delete(webInput)
       .where(eq(webInput.id, this.id))
       .returning()
+    log('deleted WebInput id: ', this.id)
 
     return res[0]
   }
