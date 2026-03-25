@@ -82,22 +82,21 @@ module.exports = {
       {
         exclude: /node_modules/,
         test: /\.tsx?$/,
-        use: {
-          loader: 'ts-loader',
-          options: {
-            transpileOnly: true
+        use: [
+          {
+            loader: 'esbuild-loader',
+            options: {
+              target: 'es2022',
+              jsx: 'automatic'
+            }
+          },
+          {
+            loader: 'babel-loader',
+            options: {
+              plugins: ['@emotion', 'macros']
+            }
           }
-        }
-      },
-      {
-        exclude: /node_modules/,
-        test: /\.tsx?$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            plugins: ['@emotion', 'macros']
-          }
-        }
+        ]
       },
       {
         test: /\.m?js$/,
@@ -109,10 +108,11 @@ module.exports = {
         exclude: /node_modules/,
         test: /src\/content-script.*\.tsx?$/,
         use: {
-          loader: 'ts-loader',
+          loader: 'esbuild-loader',
           options: {
-            transpileOnly: true,
-            configFile: path.join(__dirname, 'src/content-script/tsconfig.json')
+            target: 'es2015',
+            jsx: 'automatic',
+            jsxImportSource: 'preact'
           }
         }
       },
