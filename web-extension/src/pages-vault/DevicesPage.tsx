@@ -37,7 +37,8 @@ import { FaUserCheck } from 'react-icons/fa'
 import { LiaUserAltSlashSolid } from 'react-icons/lia'
 import {
   useChangeDeviceSettingsMutation,
-  useChangeMasterDeviceMutation
+  useChangeMasterDeviceMutation,
+  useRenameDeviceMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { formatDistance, intlFormat } from 'date-fns'
 import { DeviceDeleteAlert } from '@src/components/vault/DeviceDeleteAlert'
@@ -57,6 +58,10 @@ interface SettingsValues {
   syncTOTP: boolean
 }
 
+interface RenameValues {
+  name: string
+}
+
 export const BadgeWithIcon = (props) => {
   return (
     <Badge display={'flex'} alignItems={'center'} {...props}>
@@ -74,7 +79,9 @@ const DeviceListItem = ({
 }) => {
   const [changeMasterDeviceMutation] = useChangeMasterDeviceMutation()
   const [changedDeviceSettings] = useChangeDeviceSettingsMutation()
+  const [renameDeviceMutation] = useRenameDeviceMutation()
   const [isConfigOpen, setIsConfigOpen] = useState(false)
+  const [isRenameOpen, setIsRenameOpen] = useState(false)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const navigate = useNavigate()
 
@@ -176,9 +183,82 @@ const DeviceListItem = ({
             )}
           </Stack>
 
-          <Heading fontSize={'xl'} fontFamily={'body'}>
-            {deviceInfo.name}
-          </Heading>
+          {isRenameOpen ? (
+            <Formik
+              initialValues={{
+                name: deviceInfo.name ?? ''
+              }}
+              onSubmit={async (
+                values: RenameValues,
+                { setSubmitting, resetForm }: FormikHelpers<RenameValues>
+              ) => {
+                await renameDeviceMutation({
+                  variables: {
+                    id: deviceInfo.id as string,
+                    name: values.name
+                  },
+                  refetchQueries: [
+                    {
+                      query: DevicesListWithDataDocument,
+                      variables: { id: deviceInfo.id as string }
+                    }
+                  ]
+                })
+                setSubmitting(false)
+                setIsRenameOpen(false)
+                resetForm({ values })
+              }}
+            >
+              {({ isSubmitting, handleSubmit }) => (
+                <form onSubmit={handleSubmit}>
+                  <HStack align="flex-end">
+                    <FormControl>
+                      <FormLabel mb={1}>
+                        <Trans>Device name</Trans>
+                      </FormLabel>
+                      <Field
+                        as={Input}
+                        id="name"
+                        name="name"
+                        size="sm"
+                        maxLength={128}
+                      />
+                    </FormControl>
+                    <Button
+                      colorScheme="teal"
+                      size="sm"
+                      type="submit"
+                      isLoading={isSubmitting}
+                    >
+                      <Trans>Save</Trans>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsRenameOpen(false)}
+                    >
+                      <Trans>Cancel</Trans>
+                    </Button>
+                  </HStack>
+                </form>
+              )}
+            </Formik>
+          ) : (
+            <HStack justify="space-between" align="center">
+              <Heading fontSize={'xl'} fontFamily={'body'}>
+                {deviceInfo.name}
+              </Heading>
+              {currentDevice && (
+                <Button
+                  size="xs"
+                  variant="outline"
+                  onClick={() => setIsRenameOpen(true)}
+                >
+                  <Trans>Rename</Trans>
+                </Button>
+              )}
+            </HStack>
+          )}
           {isConfigOpen ? (
             <Box mt={5}>
               <Formik
@@ -323,7 +403,7 @@ const DeviceListItem = ({
                   <Text fontWeight={600} color={'gray.500'} fontSize={'md'}>
                     <Trans>Last sync</Trans>
                   </Text>
-                  {deviceInfo.lastSyncAt && (
+                  {deviceInfo.lastSyncAt ? (
                     <Tooltip
                       label={intlFormat(new Date(deviceInfo.lastSyncAt ?? ''), {
                         weekday: 'long',
@@ -340,6 +420,10 @@ const DeviceListItem = ({
                         ago
                       </Text>
                     </Tooltip>
+                  ) : (
+                    <Text fontSize={'sm'}>
+                      <Trans>Never synced</Trans>
+                    </Text>
                   )}
                 </Box>
               </HStack>
@@ -356,6 +440,13 @@ export function DevicesPage() {
 
   const [filterBy, setFilterBy] = useState('')
   const { height } = useWindowSize()
+
+  const currentDevice = data?.me?.devices?.find((deviceInfo) => deviceInfo.id === device.id)
+  const otherDevices =
+    data?.me?.devices
+      ?.filter((deviceInfo) => deviceInfo.id !== device.id)
+      .filter(({ name }) => name.includes(filterBy)) ?? []
+
   return (
     <Flex flexDirection="column">
       <Center
@@ -388,25 +479,42 @@ export function DevicesPage() {
           maxH={`${height - 70}px`}
           overflow={'auto'}
         >
-          <Flex flexDirection="row" flexWrap="wrap" justify={'center'}>
+          <Flex flexDirection="column">
             {loading ? (
               <Center pt={5}>
                 <Spinner size="lg" />
               </Center>
             ) : (
-              data?.me?.devices
-                ?.filter(({ name }) => {
-                  return name.includes(filterBy)
-                })
-                .map((el, i) => {
-                  return (
+              <>
+                {currentDevice ? (
+                  <Box px={4} pt={4}>
+                    <Text fontWeight={700} fontSize="sm" color="gray.400">
+                      <Trans>This device</Trans>
+                    </Text>
                     <DeviceListItem
-                      deviceInfo={el}
-                      key={i}
-                      masterDeviceId={data.me.masterDeviceId as string}
+                      deviceInfo={currentDevice}
+                      masterDeviceId={data?.me?.masterDeviceId as string}
                     />
-                  )
-                })
+                  </Box>
+                ) : null}
+
+                <Box px={4} pt={2}>
+                  <Text fontWeight={700} fontSize="sm" color="gray.400">
+                    <Trans>Other devices</Trans>
+                  </Text>
+                </Box>
+                <Flex flexDirection="row" flexWrap="wrap" justify={'center'}>
+                  {otherDevices.map((el) => {
+                    return (
+                      <DeviceListItem
+                        deviceInfo={el}
+                        key={el.id}
+                        masterDeviceId={data?.me?.masterDeviceId as string}
+                      />
+                    )
+                  })}
+                </Flex>
+              </>
             )}
           </Flex>
         </Flex>
