@@ -5,7 +5,8 @@ import React, {
   createContext,
   Dispatch,
   SetStateAction,
-  useEffect
+  useEffect,
+  type JSX
 } from 'react'
 import browser from 'webextension-polyfill'
 

@@ -13,7 +13,9 @@
   "overrides": {
     "graphql": "^16.8.1",
     "react": "^19.2.4",
-    "react-dom": "^19.2.4"
+    "react-dom": "^19.2.4",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
   },
   "devDependencies": {
     "@apollo/client": "^4.1.6",
@@ -72,7 +74,9 @@
     "overrides": {
       "ajv": "^8.18.0",
       "react": "^19.2.4",
-      "react-dom": "^19.2.4"
+      "react-dom": "^19.2.4",
+      "@types/react": "^19",
+      "@types/react-dom": "^19"
     },
     "patchedDependencies": {
       "@react-native/gradle-plugin": "patches/@react-native__gradle-plugin.patch",
