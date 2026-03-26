@@ -531,7 +531,6 @@ class ExtensionDevice {
     }
 
     this.fireToken = null // TODO: remove this
-    console.log('deviceId', this.id)
     this.initCallbacks.forEach((cb) => cb())
     log('Extension device initialized with id ', this.id)
   }

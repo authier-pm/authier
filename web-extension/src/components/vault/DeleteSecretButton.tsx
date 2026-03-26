@@ -72,9 +72,7 @@ export const DeleteSecretButton = ({
         isOpen={isOpen}
         onClose={() => setIsOpen(false)}
         deleteItem={async () => {
-          console.log('delete secret', secrets)
           if (secrets.length > 1) {
-            console.log('delete multiple secrets')
             const input = secrets.map(({ id }) => id)
             await removeEncryptedSecrets({ variables: { secrets: input } })
 
