@@ -1,3 +1,7 @@
+if (process.env.NODE_ENV === 'development') {
+  import('react-grab')
+}
+
 import * as Sentry from '@sentry/browser'
 
 import './index.css'
