@@ -881,6 +881,9 @@ importers:
       react-dom:
         specifier: ^19.2.4
         version: 19.2.4(react@19.2.4)
+      react-grab:
+        specifier: ^0.1.29
+        version: 0.1.29(@types/react@19.2.14)(react@19.2.4)
       react-hook-form:
         specifier: ^7.72.0
         version: 7.72.0(react@19.2.4)
