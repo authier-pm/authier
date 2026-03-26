@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
+import { Input, inputClassName } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { orpc, orpcClient } from '@/lib/orpc'
 
@@ -16,8 +16,8 @@ export function SecurityPage() {
   }
 
   return (
-    <div className="grid gap-6 lg:grid-cols-3">
-      <Card className="lg:col-span-2">
+    <div className="grid gap-4 lg:grid-cols-3">
+      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px] lg:col-span-2">
         <CardHeader>
           <CardTitle>Approval policy</CardTitle>
           <CardDescription>
@@ -26,7 +26,7 @@ export function SecurityPage() {
         </CardHeader>
         <CardContent className="space-y-4">
           <select
-            className="h-11 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-4 text-[color:var(--color-foreground)]"
+            className={`${inputClassName} h-10 px-3`}
             defaultValue={security.newDevicePolicy ?? 'ALLOW'}
             onChange={(event) => {
               void orpcClient.security
@@ -52,7 +52,7 @@ export function SecurityPage() {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
         <CardHeader>
           <CardTitle>Recovery cooldown</CardTitle>
           <CardDescription>
@@ -79,7 +79,7 @@ export function SecurityPage() {
         </CardContent>
       </Card>
 
-      <Card className="lg:col-span-3">
+      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px] lg:col-span-3">
         <CardHeader>
           <CardTitle>Vault lock timeout</CardTitle>
           <CardDescription>
@@ -99,6 +99,7 @@ export function SecurityPage() {
                     void securityQuery.refetch()
                   })
               }}
+              size="sm"
               type="button"
               variant={
                 security.vaultLockTimeoutSeconds === seconds

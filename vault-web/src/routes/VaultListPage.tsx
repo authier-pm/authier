@@ -1,8 +1,7 @@
-import { File } from 'lucide-react'
+import { File, Plus, Search, X } from 'lucide-react'
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { constructURL } from '@shared/urlUtils'
-import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -13,6 +12,16 @@ type FilterMode = 'ALL' | 'LOGIN_CREDENTIALS' | 'TOTP'
 type VaultListPageProps = {
   initialFilterMode?: FilterMode
 }
+
+const filterTabs: Array<{
+  label: string
+  path: string
+  value: FilterMode
+}> = [
+  { label: 'All', path: '/vault', value: 'ALL' },
+  { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
+  { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
+]
 
 export function VaultListPage({
   initialFilterMode = 'ALL'
@@ -39,47 +48,82 @@ export function VaultListPage({
     })
   }, [decryptedSecrets, deferredQuery, filterMode])
 
+  const visibleSecretCountLabel = `${visibleSecrets.length} ${
+    visibleSecrets.length === 1 ? 'secret' : 'secrets'
+  }`
+
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6">
-      <Card className="shrink-0">
-        <CardContent className="p-5">
-          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-            <Input
-              className="max-w-xl"
-              onChange={(event) => setQuery(event.target.value)}
-              placeholder="Search by label, URL, username, password, or TOTP secret"
-              value={query}
-            />
-            <div className="flex gap-2">
-              <Button asChild variant={filterMode === 'ALL' ? 'primary' : 'outline'}>
-                <Link to="/vault">All</Link>
-              </Button>
-              <Button
-                asChild
-                variant={filterMode === 'LOGIN_CREDENTIALS' ? 'primary' : 'outline'}
-              >
-                <Link to="/vault/passwords">Passwords</Link>
-              </Button>
-              <Button asChild variant={filterMode === 'TOTP' ? 'primary' : 'outline'}>
-                <Link to="/vault/totp">TOTP</Link>
+    <div className="flex min-h-0 flex-1 flex-col gap-4">
+      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="relative w-full max-w-3xl">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-muted)]" />
+              <Input
+                className="h-11 rounded-full bg-[color:var(--color-input)] pl-10 pr-11"
+                onChange={(event) => setQuery(event.target.value)}
+                placeholder="Search by label, URL, username, password, or TOTP secret"
+                value={query}
+              />
+              {query ? (
+                <button
+                  aria-label="Clear search"
+                  className="absolute right-3 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--color-muted)] transition hover:bg-[color:var(--color-accent)] hover:text-[color:var(--color-foreground)]"
+                  onClick={() => setQuery('')}
+                  type="button"
+                >
+                  <X className="size-4" />
+                </button>
+              ) : null}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
+                {visibleSecretCountLabel}
+              </div>
+              {filterTabs.map((item) => (
+                <Button
+                  asChild
+                  className="rounded-full"
+                  key={item.path}
+                  size="sm"
+                  variant={filterMode === item.value ? 'outline' : 'ghost'}
+                >
+                  <Link to={item.path}>{item.label}</Link>
+                </Button>
+              ))}
+              <Button asChild size="sm" variant="primary">
+                <Link to="/vault/new">
+                  <Plus className="size-4" />
+                  Add item
+                </Link>
               </Button>
             </div>
           </div>
         </CardContent>
       </Card>
+
       {skippedSecretsCount > 0 ? (
-        <Card>
-          <CardContent className="p-5 text-sm text-[color:var(--color-muted)]">
+        <Card className="border-amber-400/30 bg-amber-500/10">
+          <CardContent className="p-4 text-sm text-amber-200">
             Skipped {skippedSecretsCount} secret
             {skippedSecretsCount === 1 ? '' : 's'} that could not be decoded by
             this web vault build.
           </CardContent>
         </Card>
       ) : null}
+
       {visibleSecrets.length === 0 ? (
-        <Card>
-          <CardContent className="p-8 text-sm text-[color:var(--color-muted)]">
-            No secrets match the current filter.
+        <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
+          <CardContent className="flex min-h-[320px] items-center justify-center p-6 text-center text-sm text-[color:var(--color-muted)]">
+            <div>
+              <div className="text-base font-medium text-[color:var(--color-foreground)]">
+                No secrets found
+              </div>
+              <div className="mt-2">
+                Try a different search term or add a new item.
+              </div>
+            </div>
           </CardContent>
         </Card>
       ) : (
@@ -141,37 +185,45 @@ function VirtualizedSecretList({
     setScrollTop(0)
   }, [secrets])
 
-  const itemHeight = containerWidth >= 1024 ? 72 : 96
+  const itemHeight = containerWidth >= 1024 ? 88 : 104
   const overscan = 6
   const startIndex = Math.max(0, Math.floor(scrollTop / itemHeight) - overscan)
   const visibleCount = Math.ceil(containerHeight / itemHeight) + overscan * 2
   const endIndex = Math.min(secrets.length, startIndex + visibleCount)
   const totalHeight = secrets.length * itemHeight
+  const resultCountLabel = `${secrets.length} ${secrets.length === 1 ? 'item' : 'items'}`
 
   return (
-    <div
-      className="min-h-0 flex-1 overflow-y-auto rounded-[var(--radius-lg)] pr-3"
-      onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
-      ref={scrollContainerRef}
-    >
-      <div className="relative" style={{ height: totalHeight }}>
-        {secrets.slice(startIndex, endIndex).map((secret, index) => {
-          const itemIndex = startIndex + index
+    <Card className="min-h-0 flex-1 overflow-hidden border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
+      <CardContent className="flex h-full min-h-0 flex-col p-0">
+        <div className="border-b border-[color:var(--color-border)] px-4 py-3 text-sm text-[color:var(--color-muted)]">
+          {resultCountLabel}
+        </div>
+        <div
+          className="extension-scrollbar min-h-0 flex-1 overflow-y-auto p-4"
+          onScroll={(event) => setScrollTop(event.currentTarget.scrollTop)}
+          ref={scrollContainerRef}
+        >
+          <div className="relative" style={{ height: totalHeight }}>
+            {secrets.slice(startIndex, endIndex).map((secret, index) => {
+              const itemIndex = startIndex + index
 
-          return (
-            <div
-              className="absolute inset-x-0"
-              key={secret.id}
-              style={{
-                top: itemIndex * itemHeight
-              }}
-            >
-              <VaultSecretListItem secret={secret} />
-            </div>
-          )
-        })}
-      </div>
-    </div>
+              return (
+                <div
+                  className="absolute inset-x-0 pb-4"
+                  key={secret.id}
+                  style={{
+                    top: itemIndex * itemHeight
+                  }}
+                >
+                  <VaultSecretListItem secret={secret} />
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
@@ -198,29 +250,33 @@ function VaultSecretListItem({
     secret.kind === 'LOGIN_CREDENTIALS'
       ? `${secret.loginCredentials.username} at ${secret.loginCredentials.url}`
       : secret.totp.url ?? 'No linked website'
+  const kindLabel = secret.kind === 'LOGIN_CREDENTIALS' ? 'Credential' : 'TOTP'
 
   return (
-    <Link className="block w-full pb-3" to={`/vault/${secret.id}`}>
-      <Card className="w-full transition hover:-translate-y-0.5 hover:border-[color:var(--color-primary)]">
-        <CardContent className="flex w-full min-w-0 items-center gap-3 p-3 max-lg:flex-wrap">
-          <VaultSecretIcon iconUrl={iconUrl} label={title} url={url} />
+    <Link className="block w-full" to={`/vault/${secret.id}`}>
+      <Card className="w-full border-white/10 bg-[color:var(--color-surface-muted)] transition hover:bg-[color:var(--color-accent)]/35">
+        <CardContent className="flex w-full min-w-0 items-center gap-4 p-4">
+          <div className="flex size-12 shrink-0 items-center justify-center rounded-2xl bg-[color:var(--color-accent)]/70">
+            <VaultSecretIcon iconUrl={iconUrl} label={title} url={url} />
+          </div>
+
           <div className="min-w-0 flex-1">
-            <div className="flex min-w-0 items-center gap-3 max-lg:flex-wrap">
+            <div className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--color-muted)] uppercase">
+              {kindLabel}
+            </div>
+            <div className="mt-1 flex min-w-0 items-center gap-3 max-lg:flex-wrap">
               <h3 className="truncate text-base font-semibold" title={title}>
                 {title}
               </h3>
-              <Badge className="shrink-0">
-                {secret.kind === 'LOGIN_CREDENTIALS' ? 'Password' : 'TOTP'}
-              </Badge>
               <p
                 className="min-w-0 flex-1 truncate text-sm text-[color:var(--color-muted)]"
                 title={subtitle}
               >
                 {subtitle}
               </p>
-              <p className="shrink-0 text-xs uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
+              <div className="shrink-0 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-3 py-1 text-[11px] font-medium tracking-[0.14em] text-[color:var(--color-muted)] uppercase">
                 {new Date(secret.updatedAt ?? secret.createdAt).toLocaleDateString()}
-              </p>
+              </div>
             </div>
           </div>
         </CardContent>
@@ -259,17 +315,13 @@ function VaultSecretIcon({
   }, [iconUrl, url])
 
   if (!resolvedIconUrl || hasImageError) {
-    return (
-      <div className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-muted)]">
-        <File className="size-4" />
-      </div>
-    )
+    return <File className="size-5 text-[color:var(--color-muted)]" />
   }
 
   return (
     <img
       alt={`${label} favicon`}
-      className="size-10 shrink-0 rounded-[var(--radius-md)] border border-[color:var(--color-border)] object-cover"
+      className="size-8 rounded-md object-cover"
       onError={() => setHasImageError(true)}
       src={resolvedIconUrl}
     />

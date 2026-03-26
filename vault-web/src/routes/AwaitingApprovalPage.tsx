@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
 
 export function AwaitingApprovalPage() {
@@ -49,29 +55,37 @@ export function AwaitingApprovalPage() {
 
   return (
     <div className="vault-grid flex min-h-screen items-center justify-center px-4 py-8">
-      <Card className="w-full max-w-2xl">
+      <Card className="w-full max-w-2xl border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
         <CardHeader>
-          <CardTitle>Waiting for device approval</CardTitle>
+          <div className="inline-flex w-fit rounded-full border border-white/10 bg-white/5 px-4 py-2 text-[11px] font-medium tracking-[0.24em] text-[color:var(--color-muted)] uppercase">
+            Waiting for approval
+          </div>
+          <CardTitle className="pt-3 text-2xl">
+            Approve this browser from a trusted device
+          </CardTitle>
           <CardDescription>
-            {pendingLogin.email} is trying to access the vault from this browser.
+            {pendingLogin.email} is trying to access the vault from this
+            browser.
           </CardDescription>
         </CardHeader>
+
         <CardContent className="space-y-4">
           <p className="text-sm text-[color:var(--color-muted)]">
-            Approve this browser from one of your trusted devices. As soon as it
-            is approved, this page will finish the login automatically.
+            As soon as one of your approved devices confirms this login, the web
+            vault will finish the sign-in automatically.
           </p>
-          <div className="grid gap-4 rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4 md:grid-cols-2">
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
+
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+              <p className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
                 Push notifications sent
               </p>
               <p className="mt-2 text-3xl font-semibold">
                 {pendingLogin.lastResult.pushNotificationsSentCount}
               </p>
             </div>
-            <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
+            <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+              <p className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
                 Push notifications failed
               </p>
               <p className="mt-2 text-3xl font-semibold">
@@ -79,8 +93,9 @@ export function AwaitingApprovalPage() {
               </p>
             </div>
           </div>
+
           {pendingLogin.lastResult.masterDeviceResetProcessAt ? (
-            <p className="rounded-[var(--radius-md)] bg-[color:var(--color-accent)] px-4 py-3 text-sm text-[color:var(--color-foreground)]">
+            <p className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-4 py-3 text-sm text-[color:var(--color-foreground)]">
               Recovery is scheduled for{' '}
               {new Date(
                 pendingLogin.lastResult.masterDeviceResetProcessAt
@@ -104,6 +119,7 @@ export function AwaitingApprovalPage() {
                     setIsRequestingReset(false)
                   })
               }}
+              size="sm"
               variant="outline"
             >
               {isRequestingReset
@@ -111,8 +127,9 @@ export function AwaitingApprovalPage() {
                 : 'I no longer have an approved device'}
             </Button>
           )}
+
           {errorMessage ? (
-            <p className="rounded-[var(--radius-md)] bg-red-50 px-4 py-3 text-sm text-red-700">
+            <p className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
               {errorMessage}
             </p>
           ) : null}

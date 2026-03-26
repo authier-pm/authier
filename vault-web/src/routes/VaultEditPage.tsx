@@ -118,20 +118,21 @@ export function VaultEditPage() {
   const shouldShowTotpToken = kind === 'TOTP' && (isEditing || totpSecret.trim().length > 0)
 
   return (
-    <div className="space-y-6">
-      <Card>
+    <div className="space-y-4">
+      <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
         <CardHeader>
           <CardTitle>{isEditing ? 'Edit item' : 'Add item'}</CardTitle>
           <CardDescription>
             Keep the plaintext only in the browser. The API only receives encrypted payloads.
           </CardDescription>
         </CardHeader>
-        <CardContent className="flex gap-2">
+        <CardContent className="flex flex-wrap gap-2">
           {(['LOGIN_CREDENTIALS', 'TOTP'] as const).map((type) => (
             <Button
               key={type}
               disabled={isEditing}
               onClick={() => setKind(type)}
+              size="sm"
               type="button"
               variant={kind === type ? 'primary' : 'outline'}
             >
@@ -161,7 +162,7 @@ export function VaultEditPage() {
       ) : null}
 
       {kind === 'LOGIN_CREDENTIALS' ? (
-        <Card>
+        <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
           <CardHeader>
             <CardTitle>Password item</CardTitle>
           </CardHeader>
@@ -206,21 +207,20 @@ export function VaultEditPage() {
                     Delete
                   </Button>
                 ) : null}
-                <Button asChild type="button" variant="outline">
+                <Button asChild size="sm" type="button" variant="outline">
                   <Link to="/vault">Cancel</Link>
                 </Button>
                 <div className="ml-auto flex flex-wrap gap-3">
-                  <Button type="submit">
+                  <Button size="sm" type="submit">
                     {isEditing ? 'Save changes' : 'Create password'}
                   </Button>
-
                 </div>
               </div>
             </form>
           </CardContent>
         </Card>
       ) : (
-        <Card>
+        <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
           <CardHeader>
             <CardTitle>TOTP item</CardTitle>
           </CardHeader>
@@ -261,10 +261,10 @@ export function VaultEditPage() {
                   </Button>
                 ) : null}
                 <div className="ml-auto flex flex-wrap gap-3">
-                  <Button type="submit">
+                  <Button size="sm" type="submit">
                     {isEditing ? 'Save changes' : 'Create TOTP'}
                   </Button>
-                  <Button asChild type="button" variant="outline">
+                  <Button asChild size="sm" type="button" variant="outline">
                     <Link to="/vault">Cancel</Link>
                   </Button>
                 </div>

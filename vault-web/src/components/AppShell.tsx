@@ -1,209 +1,288 @@
 import {
+  type LucideIcon,
+  KeyRound,
   LockKeyhole,
   LogOut,
+  Menu,
   MoonStar,
-  Plus,
   ShieldCheck,
   Smartphone,
   SunMedium,
   Vault
 } from 'lucide-react'
-import { useEffect, useState, type ReactNode } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import {
+  useEffect,
+  useState,
+  type Dispatch,
+  type ReactNode,
+  type SetStateAction
+} from 'react'
+import { NavLink } from 'react-router-dom'
 import authierLogo from '@shared/imgs/logo.svg'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { useVaultSession } from '@/providers/VaultSessionProvider'
+import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/cn'
+import { applyTheme, getInitialTheme, type ThemeMode } from '@/lib/theme'
+import { useVaultSession } from '@/providers/VaultSessionProvider'
 
-type ThemeMode = 'light' | 'dark'
-
-const THEME_STORAGE_KEY = 'authier-vault-theme'
-
-const getInitialTheme = (): ThemeMode => {
-  if (typeof window === 'undefined') {
-    return 'light'
-  }
-
-  const storedTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
-
-  if (storedTheme === 'light' || storedTheme === 'dark') {
-    return storedTheme
-  }
-
-  return window.matchMedia('(prefers-color-scheme: dark)').matches
-    ? 'dark'
-    : 'light'
+type LinkItem = {
+  icon: LucideIcon
+  label: string
+  path: string
 }
 
-const navigation = [
-  { to: '/vault', label: 'Vault', icon: Vault },
-  { to: '/devices', label: 'Devices', icon: Smartphone },
-  { to: '/security', label: 'Security', icon: ShieldCheck }
+const primaryNavigation: LinkItem[] = [
+  { icon: Vault, label: 'Vault', path: '/vault' },
+  { icon: LockKeyhole, label: 'Passwords', path: '/vault/passwords' },
+  { icon: KeyRound, label: 'TOTP', path: '/vault/totp' }
 ]
 
+const workspaceNavigation: LinkItem[] = [
+  { icon: Smartphone, label: 'Devices', path: '/devices' },
+  { icon: ShieldCheck, label: 'Security', path: '/security' }
+]
+
+const getAccountInitial = (email: string) =>
+  email.slice(0, 1).toUpperCase() || 'A'
+
+function LogoMark() {
+  return (
+    <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[color:var(--color-card)] shadow-lg">
+      <img alt="Authier logo" className="h-full w-full object-cover" src={authierLogo} />
+    </div>
+  )
+}
+
+function SidebarSectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-3 text-[11px] font-medium tracking-[0.24em] text-[color:var(--color-muted)] uppercase">
+      {children}
+    </div>
+  )
+}
+
+function NavItem({
+  item,
+  onNavigate
+}: {
+  item: LinkItem
+  onNavigate: () => void
+}) {
+  const Icon = item.icon
+
+  return (
+    <NavLink
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium transition',
+          isActive
+            ? 'bg-[color:var(--color-accent)] text-[color:var(--color-foreground)]'
+            : 'text-[color:var(--color-muted)] hover:bg-[color:var(--color-accent)]/60 hover:text-[color:var(--color-foreground)]'
+        )
+      }
+      onClick={onNavigate}
+      to={item.path}
+    >
+      <Icon className="size-5 shrink-0" />
+      <span>{item.label}</span>
+    </NavLink>
+  )
+}
+
+function SidebarContent({
+  currentDevice,
+  currentEmail,
+  onNavigate,
+  passwordCount,
+  setThemeMode,
+  themeMode,
+  totpCount
+}: {
+  currentDevice: string
+  currentEmail: string
+  onNavigate: () => void
+  passwordCount: number
+  setThemeMode: Dispatch<SetStateAction<ThemeMode>>
+  themeMode: ThemeMode
+  totpCount: number
+}) {
+  const { lockVault, logout } = useVaultSession()
+
+  return (
+    <div className="flex h-full flex-col p-4">
+      <div className="mb-6 flex items-center gap-3 px-2">
+        <LogoMark />
+        <div>
+          <div className="text-sm font-semibold tracking-[0.18em] uppercase">
+            Authier
+          </div>
+          <div className="text-xs text-[color:var(--color-muted)]">
+            vault.authier.pm
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <SidebarSectionLabel>Vault</SidebarSectionLabel>
+        {primaryNavigation.map((item) => (
+          <NavItem item={item} key={item.path} onNavigate={onNavigate} />
+        ))}
+      </div>
+
+      <div className="mt-6 space-y-2">
+        <SidebarSectionLabel>Workspace</SidebarSectionLabel>
+        {workspaceNavigation.map((item) => (
+          <NavItem item={item} key={item.path} onNavigate={onNavigate} />
+        ))}
+      </div>
+
+      <Card className="mt-auto border-white/10 bg-[color:var(--color-surface-muted)] p-4 backdrop-blur-[14px]">
+        <div className="flex items-center gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-card)] text-sm font-semibold uppercase">
+            {getAccountInitial(currentEmail)}
+          </div>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-medium">{currentEmail}</div>
+            <div className="truncate text-xs text-[color:var(--color-muted)]">
+              {currentDevice}
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Badge className="border-white/10 bg-[color:var(--color-card)] px-2.5 py-1 text-[11px] text-[color:var(--color-muted)]">
+            {passwordCount} passwords
+          </Badge>
+          <Badge className="border-white/10 bg-[color:var(--color-card)] px-2.5 py-1 text-[11px] text-[color:var(--color-muted)]">
+            {totpCount} TOTP
+          </Badge>
+        </div>
+
+        <div className="mt-4 flex gap-2">
+          <Button
+            className="flex-1"
+            onClick={() => {
+              onNavigate()
+              lockVault()
+            }}
+            size="sm"
+            variant="outline"
+          >
+            <LockKeyhole className="size-4" />
+            Lock
+          </Button>
+          <Button
+            className="flex-1"
+            onClick={() => {
+              onNavigate()
+              void logout()
+            }}
+            size="sm"
+            variant="destructive"
+          >
+            <LogOut className="size-4" />
+            Log out
+          </Button>
+        </div>
+
+        <Button
+          className="mt-2 w-full justify-start"
+          onClick={() =>
+            setThemeMode((currentTheme) =>
+              currentTheme === 'light' ? 'dark' : 'light'
+            )
+          }
+          size="sm"
+          variant="ghost"
+        >
+          {themeMode === 'light' ? (
+            <MoonStar className="size-4" />
+          ) : (
+            <SunMedium className="size-4" />
+          )}
+          {themeMode === 'light' ? 'Dark theme' : 'Light theme'}
+        </Button>
+      </Card>
+    </div>
+  )
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
-  const { decryptedSecrets, lockedState, lockVault, logout, session } = useVaultSession()
+  const { decryptedSecrets, lockedState, session } = useVaultSession()
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme)
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
   const currentEmail = lockedState?.email ?? session?.user.email ?? 'Signed out'
-  const currentDevice = lockedState?.deviceName ?? session?.currentDevice.name ?? 'Unknown device'
+  const currentDevice =
+    lockedState?.deviceName ?? session?.currentDevice.name ?? 'Unknown device'
   const passwordCount = decryptedSecrets.filter(
     (secret) => secret.kind === 'LOGIN_CREDENTIALS'
   ).length
   const totpCount = decryptedSecrets.filter((secret) => secret.kind === 'TOTP').length
 
   useEffect(() => {
-    document.documentElement.dataset.theme = themeMode
-    window.localStorage.setItem(THEME_STORAGE_KEY, themeMode)
+    applyTheme(themeMode)
   }, [themeMode])
 
   return (
-    <div className="vault-grid min-h-screen lg:h-screen lg:overflow-hidden">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:h-full lg:min-h-0 lg:flex-row">
-        <aside className="w-full lg:sticky lg:top-6 lg:self-start lg:w-80 lg:shrink-0 xl:w-[22rem]">
-          <header className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[0_20px_60px_rgba(17,85,85,0.08)] backdrop-blur">
-            <div className="flex items-center gap-4">
-              <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-md)] border border-[#2ad5d4] bg-[#2ad5d4] shadow-[0_10px_30px_rgba(17,85,85,0.08)]">
-                <img
-                  alt="Authier logo"
-                  className="h-full w-full object-cover"
-                  src={authierLogo}
-                />
-              </div>
-              <div className="min-w-0 space-y-2">
-                <div className="inline-flex rounded-full bg-[color:var(--color-primary)] px-4 py-2 text-xs font-bold uppercase tracking-[0.32em] text-[color:var(--color-primary-foreground)]">
-                  Authier
-                </div>
-                <div>
-                  <Badge>vault.authier.pm</Badge>
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen text-[color:var(--color-foreground)] lg:h-screen lg:overflow-hidden">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[color:var(--color-border)] bg-[color:var(--color-surface)] backdrop-blur-[14px] lg:block">
+        <SidebarContent
+          currentDevice={currentDevice}
+          currentEmail={currentEmail}
+          onNavigate={() => {}}
+          passwordCount={passwordCount}
+          setThemeMode={setThemeMode}
+          themeMode={themeMode}
+          totpCount={totpCount}
+        />
+      </aside>
 
-            <div className="mt-6 space-y-3">
-              <div>
-                <p className="text-sm text-[color:var(--color-muted)]">
-                  {currentEmail}
-                </p>
-              </div>
+      {isMobileSidebarOpen ? (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            aria-label="Close navigation"
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setIsMobileSidebarOpen(false)}
+            type="button"
+          />
+          <aside className="relative flex h-full w-[min(85vw,20rem)] flex-col border-r border-[color:var(--color-border)] bg-[color:var(--color-surface)] backdrop-blur-[14px]">
+            <SidebarContent
+              currentDevice={currentDevice}
+              currentEmail={currentEmail}
+              onNavigate={() => setIsMobileSidebarOpen(false)}
+              passwordCount={passwordCount}
+              setThemeMode={setThemeMode}
+              themeMode={themeMode}
+              totpCount={totpCount}
+            />
+          </aside>
+        </div>
+      ) : null}
 
-              <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3">
-                <p className="text-xs uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
-                  Local device
-                </p>
-                <p className="mt-2 text-sm font-medium text-[color:var(--color-foreground)]">
-                  {currentDevice}
-                </p>
-              </div>
-            </div>
-
-            <nav className="mt-6 flex flex-col gap-2">
-              {navigation.slice(0, 1).map((item) => (
-                <NavLink
-                  key={item.to}
-                  className={({ isActive }) =>
-                    cn(
-                      'inline-flex w-full items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition',
-                      isActive
-                        ? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]'
-                        : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-foreground)] hover:bg-[color:var(--color-accent)]'
-                    )
-                  }
-                  to={item.to}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="mt-3 ml-4 space-y-3 border-l border-[color:var(--color-border)] pl-4">
-              <Button asChild className="w-full justify-start" variant="ghost">
-                <Link to="/vault/new">
-                  <Plus className="size-4" />
-                  Add item
-                </Link>
-              </Button>
-              <div className="grid grid-cols-2 gap-2">
-                <Link
-                  className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3 transition hover:border-[color:var(--color-primary)] hover:bg-[color:var(--color-accent)]"
-                  to="/vault/passwords"
-                >
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
-                    Passwords
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[color:var(--color-foreground)]">
-                    {passwordCount}
-                  </p>
-                </Link>
-                <Link
-                  className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3 transition hover:border-[color:var(--color-primary)] hover:bg-[color:var(--color-accent)]"
-                  to="/vault/totp"
-                >
-                  <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
-                    TOTP
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-[color:var(--color-foreground)]">
-                    {totpCount}
-                  </p>
-                </Link>
+      <div className="flex min-h-screen flex-col lg:h-screen lg:pl-72">
+        <header className="sticky top-0 z-30 border-b border-[color:var(--color-border)] bg-[color:var(--color-surface)] backdrop-blur-[14px] lg:hidden">
+          <div className="flex h-16 items-center justify-between px-4">
+            <Button
+              aria-label="Open navigation"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              size="icon"
+              variant="ghost"
+            >
+              <Menu className="size-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <LogoMark />
+              <div className="text-sm font-semibold tracking-[0.18em] uppercase">
+                Authier
               </div>
             </div>
-
-            <nav className="mt-3 flex flex-col gap-2">
-              {navigation.slice(1).map((item) => (
-                <NavLink
-                  key={item.to}
-                  className={({ isActive }) =>
-                    cn(
-                      'inline-flex w-full items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition',
-                      isActive
-                        ? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]'
-                        : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-foreground)] hover:bg-[color:var(--color-accent)]'
-                    )
-                  }
-                  to={item.to}
-                >
-                  <item.icon className="size-4" />
-                  {item.label}
-                </NavLink>
-              ))}
-            </nav>
-
-            <div className="mt-6 grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-              <Button
-                className="w-full justify-center"
-                onClick={() =>
-                  setThemeMode((currentTheme) =>
-                    currentTheme === 'light' ? 'dark' : 'light'
-                  )
-                }
-                type="button"
-                variant="outline"
-              >
-                {themeMode === 'light' ? (
-                  <MoonStar className="size-4" />
-                ) : (
-                  <SunMedium className="size-4" />
-                )}
-                {themeMode === 'light' ? 'Dark theme' : 'Light theme'}
-              </Button>
-              <Button className="w-full justify-center" variant="outline" onClick={lockVault}>
-                <LockKeyhole className="size-4" />
-                Lock
-              </Button>
-              <Button className="w-full justify-center" variant="secondary" onClick={() => void logout()}>
-                <LogOut className="size-4" />
-                Log out
-              </Button>
-            </div>
-          </header>
-        </aside>
-
-        <main className="min-w-0 flex-1 pb-8 lg:flex lg:min-h-0 lg:self-stretch lg:flex-col lg:overflow-hidden lg:pb-0">
-          <div className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
-            {children}
+            <div className="size-10" />
           </div>
+        </header>
+
+        <main className="vault-grid flex flex-1 flex-col px-4 py-4 lg:min-h-0 lg:overflow-hidden lg:px-6 lg:py-6">
+          <div className="flex flex-1 flex-col lg:min-h-0">{children}</div>
         </main>
       </div>
     </div>

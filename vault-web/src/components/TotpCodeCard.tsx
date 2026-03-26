@@ -93,7 +93,7 @@ export function TotpCodeCard({
   }
 
   return (
-    <Card>
+    <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
       <CardHeader>
         <CardTitle>Current token</CardTitle>
         <CardDescription>
@@ -104,13 +104,15 @@ export function TotpCodeCard({
         <button
           aria-disabled={!canCopy}
           className={cn(
-            'block w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] px-5 py-4 text-left transition-colors',
-            canCopy ? 'cursor-copy hover:bg-[color:var(--color-accent)]' : 'cursor-default'
+            'block w-full rounded-[var(--radius-lg)] border border-white/10 bg-[color:var(--color-surface-muted)] px-5 py-4 text-left transition-colors',
+            canCopy
+              ? 'cursor-copy hover:bg-[color:var(--color-accent)]/35'
+              : 'cursor-default'
           )}
           onClick={handleCopy}
           type="button"
         >
-          <p className="text-3xl font-semibold tracking-[0.3em] sm:text-4xl">
+          <p className="font-mono text-3xl font-semibold tracking-[0.3em] sm:text-4xl">
             {formattedToken}
           </p>
         </button>
