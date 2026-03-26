@@ -185,6 +185,7 @@ export function VaultEditPage() {
                 label="Password"
                 name="password"
                 register={loginForm.register}
+                showPasswordCopyButton={currentSecret?.kind === 'LOGIN_CREDENTIALS'}
                 type="password"
               />
               <VaultField label="Icon URL" name="iconUrl" register={loginForm.register} />
@@ -280,6 +281,7 @@ type VaultFieldProps<FormValues extends FieldValues> = {
   label: string
   name: Path<FormValues>
   register: UseFormRegister<FormValues>
+  showPasswordCopyButton?: boolean
   type?: 'text' | 'number' | 'password'
 }
 
@@ -288,13 +290,19 @@ function VaultField<FormValues extends FieldValues>(
     label,
     name,
     register,
+    showPasswordCopyButton,
     type = 'text'
   }: VaultFieldProps<FormValues>
 ) {
   return (
     <div className="space-y-2">
       <Label htmlFor={name}>{label}</Label>
-      <Input id={name} type={type} {...register(name)} />
+      <Input
+        id={name}
+        showPasswordCopyButton={showPasswordCopyButton}
+        type={type}
+        {...register(name)}
+      />
     </div>
   )
 }

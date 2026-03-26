@@ -35,10 +35,30 @@ describe('Input', () => {
     clipboardMocks.copyTextToClipboard.mockReset()
     clipboardMocks.copyTextToClipboard.mockResolvedValue(undefined)
 
-    render(<Input aria-label="Password" defaultValue="hunter2" type="password" />)
+    render(
+      <Input
+        aria-label="Password"
+        defaultValue="hunter2"
+        showPasswordCopyButton
+        type="password"
+      />
+    )
 
     await user.click(screen.getByRole('button', { name: 'Copy password' }))
 
     expect(clipboardMocks.copyTextToClipboard).toHaveBeenCalledWith('hunter2')
+  })
+
+  it('does not show the copy button by default for password inputs', () => {
+    render(
+      <Input
+        aria-label="Password"
+        defaultValue="hunter2"
+        type="password"
+      />
+    )
+
+    expect(screen.queryByRole('button', { name: 'Copy password' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument()
   })
 })
