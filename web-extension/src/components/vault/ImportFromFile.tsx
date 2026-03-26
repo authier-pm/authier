@@ -1,7 +1,7 @@
 import React from 'react'
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Center, useColorModeValue, Icon } from '@chakra-ui/react'
+import { Center, Icon, useColorModeValue } from '@src/components/ui/legacy'
 import { AiFillFileAdd } from 'react-icons/ai'
 
 export function ImportFromFile({

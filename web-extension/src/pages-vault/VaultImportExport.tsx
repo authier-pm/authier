@@ -1,62 +1,38 @@
-import {
-  Alert,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Heading,
-  Link,
-  ListItem,
-  UnorderedList
-} from '@chakra-ui/react'
+import { useEffect, useState } from 'react'
+import papaparse from 'papaparse'
 import { Trans } from '@lingui/react/macro'
+import {
+  AddSecretInput,
+  device,
+  type DeviceState,
+  type SecretTypeUnion
+} from '@src/background/ExtensionDevice'
 import {
   ExportLoginCredentialsToCsvButton,
   ExportTOTPToCsvButton
 } from '@src/components/vault/ExportCsvButtons'
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
-import React, { useEffect, useState } from 'react'
-import papaparse from 'papaparse'
-import {
-  AddSecretInput,
-  device,
-  DeviceState,
-  SecretTypeUnion
-} from '@src/background/ExtensionDevice'
-import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { Txt } from '@src/components/util/Txt'
+import { Button } from '@src/components/ui/button'
 import {
   ILoginSecret,
-  LoginCredentialsTypeWithMeta
+  type LoginCredentialsTypeWithMeta
 } from '@src/util/useDeviceState'
 import { toast } from '@src/ExtensionProviders'
-import { constructURL } from '@shared/urlUtils'
-import { Txt } from '@src/components/util/Txt'
 import { useRemoveEncryptedSecretsMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
+import { constructURL } from '@shared/urlUtils'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
 
 type MappedCSVInput = LoginCredentialsTypeWithMeta[]
-// const csvHeaderNames = {
-//   password: [
-//     'password',
-//     'login_password'
-//   ],
-//   url: [
-//     'url', // lastpass
-//     'login_uri' // bitwarden
-//   ]
-// }
 
 const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
   const [header] = csv
-
-  //TODO: Make this regexp for all possible headers
-  //Later we can split it for every app eg. lastpass, bitwarden, etc.
   const indexUsername = header.findIndex((x) => x.match(/username/i))
   const indexLabel = header.findIndex((x) => x.match(/name|title/i))
   const indexPassword = header.findIndex((x) => x.match(/password/i))
   const indexUrl = header.findIndex((x) => x.match(/url|uri|login_url/i))
 
-  console.log(indexUsername, indexLabel, indexPassword, indexUrl)
   if (
     indexUsername === -1 ||
     indexLabel === -1 ||
@@ -74,7 +50,7 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
       url: row[indexUrl],
       username: row[indexUsername],
       password: row[indexPassword],
-      iconUrl: null // TODO add icon Url if it is in the CSV
+      iconUrl: null
     }))
 }
 
@@ -83,9 +59,6 @@ export interface IImportedStat {
   skipped: number
 }
 
-/**
- * should support lastpass and bitwarden for now, TODO write e2e specs
- */
 export const onCSVFileAccepted = (
   file: File,
   pswCount: number
@@ -101,13 +74,11 @@ export const onCSVFileAccepted = (
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
-        console.log('mapped', mapped)
-
         const state = device.state as DeviceState
-
         const toAdd: AddSecretInput = []
         let skipped = 0
         let added = 0
+
         for (const creds of mapped) {
           if (
             (device.state?.decryptedSecrets.length as number) + added >=
@@ -129,9 +100,6 @@ export const onCSVFileAccepted = (
               status: 'warning',
               isClosable: true
             })
-            console.warn(
-              `skipping secret because url ${creds.url} could not be parsed`
-            )
             continue
           }
 
@@ -141,7 +109,7 @@ export const onCSVFileAccepted = (
               ...creds,
               url: hostname
             },
-            encrypted: await state?.encrypt(JSON.stringify(creds)),
+            encrypted: await state.encrypt(JSON.stringify(creds)),
             createdAt: new Date().toJSON()
           }
 
@@ -155,11 +123,7 @@ export const onCSVFileAccepted = (
         }
 
         await state.addSecrets(toAdd)
-
-        resolve({
-          added,
-          skipped
-        })
+        resolve({ added, skipped })
       }
     })
   })
@@ -179,8 +143,9 @@ export const onJsonFileAccepted = async (file: File) => {
   const toAdd: AddSecretInput = []
   for (const totp of parsed) {
     if (!totp.originalName) {
-      continue // for some reason authy has secrets without any name. These are not shown in the Authy app, so we are skipping. Nobody would know what these secrets are for anyway
+      continue
     }
+
     const totpWithMeta = {
       ...totp,
       iconUrl: null,
@@ -189,7 +154,6 @@ export const onJsonFileAccepted = async (file: File) => {
     toAdd.push({
       kind: EncryptedSecretType.TOTP,
       totp: totpWithMeta,
-
       encrypted: await state.encrypt(JSON.stringify(totpWithMeta)),
       createdAt: new Date().toJSON()
     })
@@ -202,6 +166,7 @@ export const VaultImportExport = () => {
   const [importedStat, setImportedStat] = useState<IImportedStat | null>(null)
   const [duplicates, setDuplicates] = useState<SecretTypeUnion[]>([])
   const [removeEncryptedSecrets] = useRemoveEncryptedSecretsMutation()
+  const { data } = useLimitsQuery()
 
   useEffect(() => {
     if (!device.state?.decryptedSecrets) {
@@ -224,7 +189,8 @@ export const VaultImportExport = () => {
                 secret.loginCredentials.username &&
               s.loginCredentials.password === secret.loginCredentials.password
             )
-          } else if (
+          }
+          if (
             s.kind === EncryptedSecretType.TOTP &&
             secret.kind === EncryptedSecretType.TOTP
           ) {
@@ -244,12 +210,14 @@ export const VaultImportExport = () => {
 
     setDuplicates(foundDuplicates)
   }, [device.state?.decryptedSecrets])
-  const { data } = useLimitsQuery()
+
   return (
-    <Center p={5}>
-      <Flex maxW={'1200px'} flexDir={'column'}>
-        <Heading size="sm">Import</Heading>
-        <Box p={30} width="100%">
+    <div className="flex justify-center p-5">
+      <div className="flex max-w-[1200px] flex-col">
+        <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
+          Import
+        </h2>
+        <div className="w-full p-[30px]">
           {!importedStat ? (
             <>
               <ImportFromFile
@@ -264,62 +232,70 @@ export const VaultImportExport = () => {
                   }
                 }}
               />
-              <UnorderedList fontSize={16} mt={8} mb={6}>
-                <Trans>
-                  We support importing from <code>csv</code> and{' '}
-                  <code>json</code> files.
-                </Trans>
-                <ListItem>
+              <ul className="mb-6 mt-8 list-disc space-y-2 pl-5 text-base">
+                <li>
+                  <Trans>
+                    We support importing from <code>csv</code> and{' '}
+                    <code>json</code> files.
+                  </Trans>
+                </li>
+                <li>
                   Lastpass/Bitwarden will work fine, file exported from other
-                  password managers might work as well, but it's not guaranteed.
+                  password managers might work as well, but it&apos;s not guaranteed.
                   Please send us a request for a new type of export{' '}
-                  <a href="https://twitter.com/authierpm">here</a>.
-                </ListItem>
-                <ListItem>
+                  <a className="underline" href="https://twitter.com/authierpm">
+                    here
+                  </a>
+                  .
+                </li>
+                <li>
                   For JSON, it must be a file exported from{' '}
-                  <Link
-                    textDecor={'underline'}
+                  <a
+                    className="underline"
                     href="https://www.npmjs.com/package/authy-desktop-export"
                   >
                     authy-desktop-export
-                  </Link>
-                </ListItem>
-              </UnorderedList>
+                  </a>
+                </li>
+              </ul>
             </>
           ) : (
             <>
-              <Alert status="success">
+              <div className="rounded-[var(--radius-md)] border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
                 <Trans>
                   Successfully added {importedStat.added}, skipped{' '}
                   {importedStat.skipped}
                 </Trans>
-              </Alert>
-              <Center>
+              </div>
+              <div className="flex justify-center">
                 <Button
-                  m={2}
+                  className="m-2"
                   onClick={() => {
                     setImportedStat(null)
                   }}
                 >
                   <Trans>Import another</Trans>
                 </Button>
-              </Center>
+              </div>
             </>
           )}
-        </Box>
+        </div>
 
-        <Heading size="sm">Export</Heading>
-        <Box m={8}>
+        <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
+          Export
+        </h2>
+        <div className="m-8">
           <ExportLoginCredentialsToCsvButton />
           <br />
-
           <ExportTOTPToCsvButton />
-        </Box>
+        </div>
 
-        <Box>
-          <Heading size="sm">Merge duplicates</Heading>
+        <div>
+          <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
+            Merge duplicates
+          </h2>
           {duplicates.length ? (
-            <Flex m={8} align={'center'}>
+            <div className="m-8 flex items-center">
               <Txt mr={6}>
                 found {duplicates.length} duplicates in your secrets
               </Txt>
@@ -338,12 +314,12 @@ export const VaultImportExport = () => {
               >
                 Delete duplicates now
               </Button>
-            </Flex>
+            </div>
           ) : (
             <Trans>You have no duplicates in your secrets</Trans>
           )}
-        </Box>
-      </Flex>
-    </Center>
+        </div>
+      </div>
+    </div>
   )
 }

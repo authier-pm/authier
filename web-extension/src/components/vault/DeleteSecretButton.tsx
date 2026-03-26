@@ -1,12 +1,7 @@
-import { DeleteIcon } from '@chakra-ui/icons'
-import {
-  IconButton,
-  Tooltip,
-  useDisclosure,
-  IconButtonProps,
-  Button
-} from '@chakra-ui/react'
-import { t, plural } from '@lingui/core/macro'
+import { useState, type ButtonHTMLAttributes, type ReactNode } from 'react'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { plural } from '@lingui/core/macro'
 import {
   useDeleteEncryptedSecretMutation,
   useRemoveEncryptedSecretsMutation
@@ -14,63 +9,68 @@ import {
 import { SecretTypeUnion, device } from '@src/background/ExtensionDevice'
 import { DeleteAlert } from '@src/components/vault/DeleteAlert'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { DeleteIcon } from '@src/components/ui/icons'
+import { cn } from '@src/lib/cn'
 
-interface DeleteSecretButtonProps extends Omit<IconButtonProps, 'aria-label'> {
+interface DeleteSecretButtonProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
   secrets: SecretTypeUnion[]
   'aria-label'?: string
+  size?: 'sm' | 'md' | 'lg' | 'icon'
+  children?: ReactNode
 }
 
-export const DeleteSecretButton: React.FC<DeleteSecretButtonProps> = ({
+export const DeleteSecretButton = ({
   secrets,
+  children,
+  className,
+  size,
   ...props
-}) => {
+}: DeleteSecretButtonProps) => {
   const { setSelectedItems } = useContext(DeviceStateContext)
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isOpen, setIsOpen] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const [deleteEncryptedSecretMutation] = useDeleteEncryptedSecretMutation()
   const [removeEncryptedSecrets] = useRemoveEncryptedSecretsMutation()
+  const label = plural(secrets.length, {
+    one: `delete secret`,
+    other: `delete # secrets`
+  })
 
   return (
     <>
-      <Tooltip
-        label={plural(secrets.length, {
-          one: `delete secret`,
-          other: `delete # secrets`
-        })}
-      >
-        {props.children ? (
+      <Tooltip content={label}>
+        {children ? (
           <Button
             {...props}
-            colorScheme="red"
-            aria-label={plural(secrets.length, {
-              one: `delete secret`,
-              other: `delete # secrets`
-            })}
-            w="100%"
-            leftIcon={<DeleteIcon />}
-            onClick={onOpen}
+            aria-label={label}
+            className={cn('w-full', className)}
+            onClick={() => setIsOpen(true)}
+            size={size}
+            variant="destructive"
           >
-            {props.children}
+            <DeleteIcon boxSize={16} />
+            {children}
           </Button>
         ) : (
-          <IconButton
+          <Button
             {...props}
-            colorScheme="red"
-            icon={<DeleteIcon />}
-            aria-label={plural(secrets.length, {
-              one: `delete secret`,
-              other: `delete # secrets`
-            })}
-          />
+            aria-label={label}
+            className={className}
+            onClick={() => setIsOpen(true)}
+            size={size ?? 'icon'}
+            variant="ghost"
+          >
+            <DeleteIcon boxSize={16} />
+          </Button>
         )}
       </Tooltip>
       <DeleteAlert
         isOpen={isOpen}
-        onClose={onClose}
+        onClose={() => setIsOpen(false)}
         deleteItem={async () => {
           console.log('delete secret', secrets)
           if (secrets.length > 1) {

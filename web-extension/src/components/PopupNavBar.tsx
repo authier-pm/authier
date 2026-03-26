@@ -1,118 +1,92 @@
-import { FunctionComponent, useEffect, useState } from 'react'
-
-import {
-  Flex,
-  IconButton,
-  useDisclosure,
-  Box,
-  Tooltip,
-  useColorModeValue
-} from '@chakra-ui/react'
-import { CloseIcon, LockIcon, AddIcon } from '@chakra-ui/icons'
-
-import { useLocation } from 'wouter'
-
-import { UserNavMenu } from '@src/pages/UserNavMenu'
-import { IoMdArchive } from 'react-icons/io'
+import { type FunctionComponent, useState } from 'react'
 import { t } from '@lingui/core/macro'
-import { RefreshSecretsButton } from './RefreshSecretsButton'
+import { IoMdArchive } from 'react-icons/io'
+import { IoAdd, IoClose, IoLockClosed } from 'react-icons/io5'
 import { openVaultTab } from '@src/AuthLinkPage'
 import { AddSecretNavMenu } from '@src/pages/AddSecretNavMenu'
+import { UserNavMenu } from '@src/pages/UserNavMenu'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { RefreshSecretsButton } from './RefreshSecretsButton'
 
 export const PopupNavBar: FunctionComponent = () => {
-  const {
-    isOpen: isAddSecretNavMenuOpen,
-    onOpen: onAddSecretNavMenuOpen,
-    onClose: onAddSecretNavMenuClose
-  } = useDisclosure()
-  const {
-    isOpen: isUserMenuOpen,
-    onOpen: onUserMenuOpen,
-    onClose: onUserMenuClose
-  } = useDisclosure()
-  const [location, setLocation] = useLocation()
-  const [lastPage, SetLastPage] = useState<string>('/')
-
-  const bg = useColorModeValue('gray.100', 'gray.800')
-
-  useEffect(() => {
-    SetLastPage(location)
-  }, [])
+  const [isAddSecretNavMenuOpen, setIsAddSecretNavMenuOpen] = useState(false)
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
 
   return (
-    <Flex flexDir="column" top="0" w="100%" backgroundColor={bg} zIndex={2}>
-      <Flex
-        p={1}
-        textAlign="center"
-        fontSize="16px"
-        borderBottom="1px"
-        borderBottomColor="gray.300"
-        width="100%"
-      >
-        <Flex justify="space-between" minW={205}>
-          <Box mr={2}>
-            {isUserMenuOpen ? (
-              <IconButton
-                size="md"
-                aria-label="menu"
-                icon={<CloseIcon />}
-                onClick={() => {
-                  onUserMenuClose()
-                }}
-              />
-            ) : (
-              <IconButton
-                size="md"
-                aria-label="menu"
-                icon={<LockIcon />}
-                onClick={() => {
-                  onUserMenuOpen()
-                  onAddSecretNavMenuClose()
-                }}
-              />
-            )}
-          </Box>
+    <div className="extension-surface sticky top-0 z-20 flex w-full flex-col border-b border-[color:var(--color-border)]">
+      <div className="flex items-center gap-2 px-2 py-2">
+        <Button
+          aria-label="menu"
+          size="icon"
+          variant={isUserMenuOpen ? 'secondary' : 'outline'}
+          onClick={() => {
+            setIsUserMenuOpen((currentValue) => {
+              const nextValue = !currentValue
 
-          <RefreshSecretsButton />
+              if (nextValue) {
+                setIsAddSecretNavMenuOpen(false)
+              }
 
-          <Tooltip
-            label={isAddSecretNavMenuOpen ? t`close menu` : t`add secret`}
-            aria-label={isAddSecretNavMenuOpen ? t`close menu` : t`add secret`}
+              return nextValue
+            })
+          }}
+        >
+          {isUserMenuOpen ? (
+            <IoClose className="size-4" />
+          ) : (
+            <IoLockClosed className="size-4" />
+          )}
+        </Button>
+
+        <RefreshSecretsButton />
+
+        <Tooltip
+          content={isAddSecretNavMenuOpen ? t`close menu` : t`add secret`}
+        >
+          <Button
+            aria-label="Add item"
+            className="rounded-full"
+            size="icon"
+            variant="primary"
+            onClick={() => {
+              setIsAddSecretNavMenuOpen((currentValue) => {
+                const nextValue = !currentValue
+
+                if (nextValue) {
+                  setIsUserMenuOpen(false)
+                }
+
+                return nextValue
+              })
+            }}
           >
-            <IconButton
-              mr={15}
-              ml="2"
-              colorScheme="blue"
-              aria-label="Add item"
-              icon={isAddSecretNavMenuOpen ? <CloseIcon /> : <AddIcon />}
-              rounded={'full'}
-              onClick={async () => {
-                !isAddSecretNavMenuOpen
-                  ? onAddSecretNavMenuOpen()
-                  : onAddSecretNavMenuClose()
-                onUserMenuClose()
-              }}
-            />
-          </Tooltip>
-        </Flex>
+            {isAddSecretNavMenuOpen ? (
+              <IoClose className="size-4" />
+            ) : (
+              <IoAdd className="size-4" />
+            )}
+          </Button>
+        </Tooltip>
 
-        <Box ml="auto">
-          <Tooltip label={t`Open vault`} aria-label={t`Open vault`} mr={4}>
-            <IconButton
-              size="md"
-              ml="2"
-              aria-label="menu"
-              icon={<IoMdArchive />}
-              onClick={async () => {
+        <div className="ml-auto">
+          <Tooltip content={t`Open vault`}>
+            <Button
+              aria-label="Open vault"
+              size="icon"
+              variant="outline"
+              onClick={() => {
                 openVaultTab()
               }}
-            />
+            >
+              <IoMdArchive className="size-4" />
+            </Button>
           </Tooltip>
-        </Box>
-      </Flex>
+        </div>
+      </div>
 
-      {isAddSecretNavMenuOpen && <AddSecretNavMenu />}
-      {isUserMenuOpen && <UserNavMenu />}
-    </Flex>
+      {isAddSecretNavMenuOpen ? <AddSecretNavMenu /> : null}
+      {isUserMenuOpen ? <UserNavMenu /> : null}
+    </div>
   )
 }

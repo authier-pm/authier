@@ -1,24 +1,24 @@
-import { Checkbox } from '@chakra-ui/react'
 import {
-  Button,
   AlertDialog,
-  AlertDialogOverlay,
-  AlertDialogContent,
-  AlertDialogHeader,
   AlertDialogBody,
+  AlertDialogCloseButton,
+  AlertDialogContent,
   AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogOverlay,
+  Button,
+  Checkbox,
   Text,
   Tooltip,
-  AlertDialogCloseButton
-} from '@chakra-ui/react'
-import { QuestionOutlineIcon } from '@chakra-ui/icons'
+  HStack
+} from '@src/components/ui/legacy'
 import { useRef, useState } from 'react'
-import { HStack } from '@chakra-ui/react'
 import {
   useRemoveDeviceMutation,
   useLogoutDeviceMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { useDevicesListWithDataQuery } from '@src/pages-vault/Devices.codegen'
+import { QuestionOutlineIcon } from '@src/components/ui/icons'
 
 export function DeviceDeleteAlert({
   isOpen,

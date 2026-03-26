@@ -1,10 +1,10 @@
 import * as Sentry from '@sentry/browser'
+import './index.css'
 import ReactDOM from 'react-dom/client'
 import browser from 'webextension-polyfill'
 
 import { apolloCache } from './apollo/apolloClient'
 import { HashRouter } from 'react-router-dom'
-import { ColorModeScript } from '@chakra-ui/react'
 import { chakraRawTheme } from '../../shared/chakraRawTheme'
 import { ExtensionProviders } from './ExtensionProviders'
 import { VaultRouter } from './pages-vault/VaultRouter'
@@ -21,9 +21,6 @@ export const renderVault = () => {
   vaultRoot.render(
     <HashRouter basename="/">
       <QueryParamProvider adapter={ReactRouter6Adapter}>
-          <ColorModeScript
-            initialColorMode={chakraRawTheme.config?.initialColorMode}
-          />
           <ExtensionProviders>
             <VaultRouter />
           </ExtensionProviders>
@@ -38,6 +35,8 @@ browser.tabs.query({ active: true, currentWindow: true }).then(async () => {
 
   div.style.overflow = 'hidden' // needed to prevent extra scrollbar on the right
   div.style.height = '100vh'
+  document.documentElement.dataset.theme =
+    chakraRawTheme.config?.initialColorMode ?? 'dark'
   await persistCache({
     cache: apolloCache,
     storage: new LocalStorageWrapper(window.localStorage)

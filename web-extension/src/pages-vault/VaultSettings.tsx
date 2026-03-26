@@ -1,106 +1,72 @@
-import {
-  Box,
-  Center,
-  Flex,
-  HStack,
-  Link,
-  useColorModeValue
-} from '@chakra-ui/react'
-import {
-  Link as RouterLink,
-  Route,
-  useLocation,
-  Routes
-} from 'react-router-dom'
+import { Route, Routes, Link as RouterLink, useLocation } from 'react-router-dom'
 import { useEffect, useState } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import Security from '@src/components/vault/settings/Security'
 import Account from '@src/components/vault/settings/Account'
 import { DeviceDefaultsForm } from '@src/components/vault/settings/DeviceDefaultsForm'
 import { AboutPage } from './AboutPage'
+import { cn } from '@src/lib/cn'
 
 interface LinkItemProps {
   name: string
   path: string
 }
 
-interface Props extends LinkItemProps {
-  url: string
-  handleClick: () => void
-  selected: LinkItemProps
-}
 const LinkItems: Array<LinkItemProps> = [
   { name: 'Account', path: '/account' },
   { name: 'Security', path: '/security' },
-  { name: 'Defaults', path: '/defaults' }
+  { name: 'Defaults', path: '/defaults' },
+  { name: 'About', path: '/about' }
 ]
-
-const NavLink = ({ name, path, handleClick, url, selected }: Props) => {
-  return (
-    <Link as={RouterLink} to={url + path} style={{ textDecoration: 'none' }}>
-      <Box
-        verticalAlign="center"
-        px={2}
-        py={1}
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        fontSize={20}
-        bgColor={
-          selected.name === name
-            ? useColorModeValue('gray.100', 'gray.700')
-            : 'transparent'
-        }
-        onClick={() => handleClick()}
-      >
-        {name}
-      </Box>
-    </Link>
-  )
-}
 
 export const VaultSettings = () => {
   const location = useLocation()
   const [selectedTab, setSelectedTab] = useState(LinkItems[0])
 
   useEffect(() => {
-    if (location.pathname === '/settings/account') {
-      setSelectedTab(LinkItems[0])
-    } else if (location.pathname === '/settings/security') {
-      setSelectedTab(LinkItems[1])
+    const currentTab = LinkItems.find((link) =>
+      location.pathname.endsWith(link.path)
+    )
+
+    if (currentTab) {
+      setSelectedTab(currentTab)
     }
-  }, [location])
+  }, [location.pathname])
 
   return (
-    <Flex align={'center'} justify={'center'} flexDirection={'column'} mb={10}>
-      <Center w={'100%'} bgColor={'teal.900'} p={3}>
-        <HStack as={'nav'} spacing={4}>
+    <div className="mb-10 flex flex-col items-center justify-center">
+      <div className="w-full bg-[color:var(--color-secondary)] p-3">
+        <nav className="flex justify-center gap-4">
           {LinkItems.map((link) => {
-            const handleClick = () => {
-              setSelectedTab(link)
-            }
             return (
-              <NavLink
+              <RouterLink
+                className={cn(
+                  'rounded-[var(--radius-md)] px-2 py-1 text-xl transition',
+                  selectedTab.name === link.name
+                    ? 'bg-[color:var(--color-surface-muted)]'
+                    : 'bg-transparent'
+                )}
                 key={link.name}
-                path={link.path}
-                selected={selectedTab}
-                handleClick={handleClick}
-                name={link.name}
-                url={'/settings'}
-              />
+                onClick={() => {
+                  setSelectedTab(link)
+                }}
+                to={`/settings${link.path}`}
+              >
+                {link.name}
+              </RouterLink>
             )
           })}
-        </HStack>
-      </Center>
+        </nav>
+      </div>
 
       <AnimatePresence mode="wait">
         <Routes key={location.pathname}>
-          <Route path={'/account'} element={<Account />}></Route>
-          <Route path={'/security'} element={<Security />}></Route>
-          <Route path={'/defaults'} element={<DeviceDefaultsForm />}></Route>
-          <Route path={'/about'} element={<AboutPage />}></Route>
+          <Route element={<Account />} path="/account" />
+          <Route element={<Security />} path="/security" />
+          <Route element={<DeviceDefaultsForm />} path="/defaults" />
+          <Route element={<AboutPage />} path="/about" />
         </Routes>
       </AnimatePresence>
-    </Flex>
+    </div>
   )
 }

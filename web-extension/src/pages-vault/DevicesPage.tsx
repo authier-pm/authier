@@ -1,32 +1,31 @@
-import { SettingsIcon } from '@chakra-ui/icons'
 import {
-  Heading,
-  Box,
-  Center,
-  Text,
-  Stack,
   Badge,
-  useColorModeValue,
-  IconButton,
+  Box,
+  Button,
+  Center,
   Flex,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  HStack,
+  Heading,
+  Checkbox,
+  IconButton,
   Input,
   Menu,
   MenuButton,
   MenuItem,
   MenuList,
-  Spinner,
-  FormControl,
-  FormLabel,
-  Checkbox,
   Select,
-  Button,
+  Spinner,
+  Stack,
+  Stat,
+  Text,
   Tooltip,
   useDisclosure,
   VStack,
-  Stat,
-  FormHelperText,
-  HStack
-} from '@chakra-ui/react'
+  useColorModeValue
+} from '@src/components/ui/legacy'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { NbSp } from '@src/components/util/NbSp'
@@ -53,6 +52,7 @@ import {
 } from './Devices.codegen'
 import { vaultLockTimeoutOptions } from '@shared/constants'
 import { useWindowSize } from 'usehooks-ts'
+import { SettingsIcon } from '@src/components/ui/icons'
 interface SettingsValues {
   lockTime: number
   syncTOTP: boolean

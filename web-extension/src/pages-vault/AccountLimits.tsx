@@ -3,21 +3,21 @@ import { ReactNode, useState } from 'react'
 import {
   Box,
   Button,
+  Flex,
   HStack,
   List,
   ListIcon,
   ListItem,
-  useColorModeValue,
-  VStack,
   Table,
-  Thead,
-  Tbody,
-  Tr,
-  Th,
-  Td,
   TableContainer,
-  Flex
-} from '@chakra-ui/react'
+  Tbody,
+  Td,
+  Th,
+  Thead,
+  Tr,
+  VStack,
+  useColorModeValue
+} from '@src/components/ui/legacy'
 import { FaCheckCircle } from 'react-icons/fa'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 import ProfileCard from '@src/components/vault/ProfileCard'

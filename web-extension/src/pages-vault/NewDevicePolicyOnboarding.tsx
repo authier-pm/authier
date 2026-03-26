@@ -5,13 +5,13 @@ import {
   FormControl,
   FormLabel,
   Heading,
-  Radio,
   RadioGroup,
   Stack,
   Text,
   Icon,
-  HStack
-} from '@chakra-ui/react'
+  HStack,
+  Radio
+} from '@src/components/ui/legacy'
 import {
   useUpdateNewDevicePolicyMutation,
   useGetUserNewDevicePolicyQuery

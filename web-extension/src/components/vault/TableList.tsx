@@ -1,255 +1,314 @@
-import { useContext, useState } from 'react'
-import {
-  IconButton,
-  Tooltip,
-  Box,
-  Text,
-  Flex,
-  Checkbox,
-  HStack,
-  useColorModeValue
-} from '@chakra-ui/react'
-import { CopyIcon, EditIcon } from '@chakra-ui/icons'
-import { List, type RowComponentProps } from 'react-window'
+import { useContext, useMemo, useRef, useState } from 'react'
+import { Link, useLocation } from 'react-router-dom'
+import { Trans } from '@lingui/react/macro'
+import { t } from '@lingui/core/macro'
+import { CopyIcon, EditIcon, ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
+import { Button, buttonVariants } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { DeleteSecretButton } from './DeleteSecretButton'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { pathNameToTypes, type ILoginSecret, type ITOTPSecret } from '@src/util/useDeviceState'
+import { useAppToast } from '@src/ExtensionProviders'
+import { cn } from '@src/lib/cn'
 import {
-  ILoginSecret,
-  ITOTPSecret,
-  pathNameToTypes
-} from '@src/util/useDeviceState'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Link, useLocation } from 'react-router-dom'
-import { DeleteSecretButton } from './DeleteSecretButton'
-import { generateSync } from 'otplib'
-import { Trans } from '@lingui/react/macro'
+  getMaskedSecretValue,
+  getSecretCopyValue,
+  getSecretLabel,
+  getSecretUrl,
+  getSecretUsername,
+  getSecretValue,
+  isTotpSecret
+} from './secretUtils'
+import { useElementSize, useVirtualWindow } from './useVirtualWindow'
+
+const tableGridStyle = {
+  gridTemplateColumns:
+    '40px minmax(240px, 1.4fr) minmax(220px, 1.2fr) minmax(200px, 1fr) minmax(220px, 1fr) 168px'
+} as const
+
+const tableGridClassName = 'grid min-w-[1128px] gap-4 px-4'
+const TABLE_ROW_HEIGHT = 76
+const TABLE_HEADER_HEIGHT = 56
 
 export function TableList({ filter }: { filter: string }) {
-  const { selectedItems, setSelectedItems } = useContext(DeviceStateContext)
-  const debouncedSearchTerm = useDebounce(filter, 400)
-  const { searchSecrets: search } = useContext(DeviceStateContext)
-
+  const { selectedItems, setSelectedItems, searchSecrets } =
+    useContext(DeviceStateContext)
   const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
+  const debouncedSearchTerm = useDebounce(filter, 400)
+  const data = useMemo(
+    () => searchSecrets(debouncedSearchTerm, pathNameToTypes[pathname]),
+    [debouncedSearchTerm, pathname, searchSecrets]
+  )
+  const showBulkActions = selectedItems.length > 0
+  const [showAllSecrets, setShowAllSecrets] = useState(false)
+  const parentRef = useRef<HTMLDivElement | null>(null)
+  const [scrollTop, setScrollTop] = useState(0)
+  const { height: containerHeight } = useElementSize(parentRef)
+  const bodyViewportHeight = Math.max(containerHeight - TABLE_HEADER_HEIGHT, 0)
+  const virtualWindow = useVirtualWindow({
+    itemCount: data.length,
+    itemSize: TABLE_ROW_HEIGHT,
+    overscan: 10,
+    scrollOffset: Math.max(scrollTop - TABLE_HEADER_HEIGHT, 0),
+    viewportSize: bodyViewportHeight
+  })
 
-  const data = search(debouncedSearchTerm, pathNameToTypes[pathname])
   const handleSelect = (secret: ILoginSecret | ITOTPSecret) => {
     if (selectedItems.includes(secret)) {
-      setSelectedItems(selectedItems.filter((s) => s !== secret))
-    } else {
-      setSelectedItems([...selectedItems, secret])
+      setSelectedItems(selectedItems.filter((item) => item !== secret))
+      return
     }
+
+    setSelectedItems([...selectedItems, secret])
   }
 
-  const [showAllPasswords, setShowAllPasswords] = useState(false)
-  const showText = showAllPasswords ? 'Hide' : 'Show'
-
-  const Row = ({ index, style }: RowComponentProps<Record<string, never>>) => {
-    const [areIconsVisible, setAreIconsVisible] = useState(false)
-    const [showPassword, setShowPassword] = useState(false)
-    const row = data[index]
-    const isTotp = row.kind === 'TOTP'
-
+  if (data.length === 0) {
     return (
-      <Flex
-        p={10}
-        pb={0}
-        pt={0}
-        m={['auto', '3']}
-        key={row.id}
-        cursor="pointer"
-        justify="space-between"
-        align="center"
-        style={{ ...style, width: '100%' }}
-        onMouseOver={() =>
-          selectedItems.length == 0 || selectedItems.includes(row)
-            ? setAreIconsVisible(true)
-            : null
-        }
-        onMouseOut={() => setAreIconsVisible(false)}
-        _hover={{
-          backgroundColor: useColorModeValue('gray.400', 'gray.700')
-        }}
-      >
-        <Flex p={1} justifyContent="inherit" w="100%">
-          <HStack
-            onClick={() => handleSelect(row)}
-            w="90%"
-            justifyContent="space-between"
-            alignItems="center"
-            p={'1em'}
-            m={'-1em'}
-          >
-            <Box minW={'16px'}>
-              <Checkbox
-                isChecked={selectedItems.includes(row)}
-                onChange={() => handleSelect(row)}
-                mr={2}
-              />
-            </Box>
-
-            <Box w={'inherit'}>
-              <Text
-                textAlign="left"
-                textOverflow="ellipsis"
-                overflow="hidden"
-                whiteSpace="nowrap"
-                fontWeight="bold"
-              >
-                {isTotp ? row.totp.label : row.loginCredentials.label}
-              </Text>
-            </Box>
-
-            <Text
-              textOverflow="ellipsis"
-              w="100%"
-              textAlign="start"
-              overflow="hidden"
-              whiteSpace="nowrap"
-            >
-              {isTotp ? row.totp.url : row.loginCredentials.url}
-            </Text>
-
-            <Box w={'inherit'}>
-              <Text
-                textAlign="left"
-                textOverflow="ellipsis"
-                overflow="hidden"
-                whiteSpace="nowrap"
-                fontWeight="bold"
-              >
-                {isTotp ? '' : row.loginCredentials.username}
-              </Text>
-            </Box>
-            <Text
-              w="inherit"
-              // textAlign="end"
-              textAlign={'center'}
-              textOverflow="ellipsis"
-              overflow="hidden"
-              whiteSpace="nowrap"
-            >
-              {showPassword || showAllPasswords
-                ? isTotp
-                  ? row.totp.secret
-                  : row.loginCredentials.password
-                : '*'.repeat(
-                    isTotp
-                      ? row.totp.secret.length
-                      : row.loginCredentials.password.length
-                  )}
-            </Text>
-          </HStack>
-
-          <HStack
-            justifyContent="flex-center"
-            display={areIconsVisible ? 'flex' : 'none'}
-            spacing={2}
-          >
-            <Tooltip label={isTotp ? 'Copy token' : 'Copy'} aria-label="Copy">
-              <IconButton
-                icon={<CopyIcon />}
-                aria-label="Copy"
-                onClick={() => {
-                  navigator.clipboard.writeText(
-                    isTotp
-                      ? generateSync({ secret: row.totp.secret })
-                      : row.loginCredentials.password
-                  )
-                }}
-              />
-            </Tooltip>
-            <Tooltip label={showText} aria-label={showText}>
-              <IconButton
-                display={areIconsVisible ? 'block' : 'none'}
-                aria-label={showText}
-                icon={
-                  showPassword || showAllPasswords ? (
-                    <ViewOffIcon />
-                  ) : (
-                    <ViewIcon />
-                  )
-                }
-                onClick={() => setShowPassword(!showPassword)}
-              />
-            </Tooltip>
-            <Tooltip label="Edit" aria-label="Edit">
-              <Link
-                to={{
-                  pathname: `/secret/${row.id}`
-                }}
-                state={{
-                  data: isTotp ? row.totp : row.loginCredentials
-                }}
-              >
-                <IconButton aria-label="Edit" icon={<EditIcon />} />
-              </Link>
-            </Tooltip>
-            {selectedItems.length > 0 ? null : (
-              <DeleteSecretButton secrets={[row]}></DeleteSecretButton>
-            )}
-          </HStack>
-        </Flex>
-      </Flex>
+      <div className="flex h-full items-center justify-center p-8 text-center text-sm text-[color:var(--color-muted)]">
+        <div>
+          <div className="text-base font-medium text-[color:var(--color-foreground)]">
+            <Trans>No secrets found</Trans>
+          </div>
+          <div className="mt-2">
+            <Trans>Try a different search term or add a new item.</Trans>
+          </div>
+        </div>
+      </div>
     )
   }
 
   return (
-    <>
-      <Flex
-        borderBottom="1px"
-        borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-      >
-        <HStack mt={2} w="100%" justifyContent="space-between">
-          <Flex w="20%" justifyContent="center">
-            <Text w="100%" textAlign="center" fontWeight="bold">
-              <Trans>Label</Trans>
-            </Text>
-          </Flex>
-
-          <Flex w="20%" justifyContent="center">
-            <Text w="100%" textAlign="center" fontWeight="bold">
-              <Trans>URL</Trans>
-            </Text>
-          </Flex>
-          <Flex w="20%" justifyContent="center">
-            <Text w="100%" textAlign="center" fontWeight="bold">
-              <Trans>Username</Trans>
-            </Text>
-          </Flex>
-          <Flex w="20%" justifyContent="center">
-            <HStack>
-              <Text pr={4} w="100%" textAlign="end" fontWeight="bold">
-                <Trans>Secret</Trans>
-              </Text>
-              <IconButton
-                size="sm"
-                aria-label={showText}
-                icon={showAllPasswords ? <ViewOffIcon /> : <ViewIcon />}
-                onClick={() => setShowAllPasswords(!showAllPasswords)}
-                ml={2}
-                mb={2}
-              />
-            </HStack>
-          </Flex>
-          <Flex w="10%" justifyContent="center" pr={3}>
-            {selectedItems.length > 0 ? (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="border-b border-[color:var(--color-border)] px-4 py-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="text-sm text-[color:var(--color-muted)]">
+            {showBulkActions
+              ? `${selectedItems.length} selected`
+              : `${data.length} results`}
+          </div>
+          <div className="flex items-center gap-2">
+            <Button
+              aria-label={
+                showAllSecrets ? t`Hide all secrets` : t`Show all secrets`
+              }
+              onClick={() => setShowAllSecrets((currentValue) => !currentValue)}
+              size="sm"
+              variant="outline"
+            >
+              {showAllSecrets ? (
+                <ViewOffIcon boxSize={16} />
+              ) : (
+                <ViewIcon boxSize={16} />
+              )}
+              {showAllSecrets ? (
+                <Trans>Hide secrets</Trans>
+              ) : (
+                <Trans>Show secrets</Trans>
+              )}
+            </Button>
+            {showBulkActions ? (
               <DeleteSecretButton secrets={[...selectedItems]} size="sm">
-                <Trans>Delete {selectedItems.length}</Trans>
+                <Trans>Delete selected</Trans>
               </DeleteSecretButton>
-            ) : (
-              <Trans>Actions</Trans>
+            ) : null}
+          </div>
+        </div>
+      </div>
+
+      <div
+        className="extension-scrollbar min-h-0 flex-1 overflow-auto"
+        onScroll={(event) => {
+          setScrollTop(event.currentTarget.scrollTop)
+        }}
+        ref={parentRef}
+      >
+        <div className="min-w-[1128px]">
+          <div
+            className={cn(
+              tableGridClassName,
+              'sticky top-0 z-10 h-14 items-center border-b border-[color:var(--color-border)] bg-[color:var(--color-card)]/95 text-xs font-semibold tracking-[0.18em] text-[color:var(--color-muted)] uppercase backdrop-blur'
             )}
-          </Flex>
-        </HStack>
-      </Flex>
-      <Box style={{ width: '100%', height: 'calc(100% - 62px)' }}>
-        <List
-          rowCount={data.length}
-          rowHeight={60}
-          rowProps={{}}
-          rowComponent={Row}
-        ></List>
-      </Box>
-    </>
+            style={tableGridStyle}
+          >
+            <div />
+            <div>
+              <Trans>Label</Trans>
+            </div>
+            <div>
+              <Trans>URL</Trans>
+            </div>
+            <div>
+              <Trans>Username</Trans>
+            </div>
+            <div>
+              <Trans>Secret</Trans>
+            </div>
+            <div className="text-right">
+              <Trans>Actions</Trans>
+            </div>
+          </div>
+
+          <div
+            className="relative min-w-[1128px]"
+            style={{ height: `${virtualWindow.totalSize}px` }}
+          >
+            {data
+              .slice(virtualWindow.startIndex, virtualWindow.endIndex + 1)
+              .map((row, offsetIndex) => {
+                const rowIndex = virtualWindow.startIndex + offsetIndex
+
+                return (
+                  <div
+                    className="absolute left-0 top-0 w-full"
+                    key={row.id}
+                    style={{
+                      height: `${TABLE_ROW_HEIGHT}px`,
+                      transform: `translateY(${rowIndex * TABLE_ROW_HEIGHT}px)`
+                    }}
+                  >
+                    <SecretTableRow
+                      isBulkMode={showBulkActions}
+                      isSelected={selectedItems.includes(row)}
+                      onSelect={() => handleSelect(row)}
+                      row={row}
+                      showAllSecrets={showAllSecrets}
+                    />
+                  </div>
+                )
+              })}
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function SecretTableRow({
+  row,
+  isSelected,
+  onSelect,
+  showAllSecrets,
+  isBulkMode
+}: {
+  row: ILoginSecret | ITOTPSecret
+  isSelected: boolean
+  onSelect: () => void
+  showAllSecrets: boolean
+  isBulkMode: boolean
+}) {
+  const [isSecretVisible, setIsSecretVisible] = useState(false)
+  const toast = useAppToast()
+  const secretUrl = getSecretUrl(row)
+  const username = getSecretUsername(row)
+  const isTotp = isTotpSecret(row)
+  const renderedSecret =
+    isSecretVisible || showAllSecrets
+      ? getSecretValue(row)
+      : getMaskedSecretValue(row)
+
+  return (
+    <div
+      className={cn(
+        tableGridClassName,
+        'h-full items-center border-b border-[color:var(--color-border)]/70 py-3 transition',
+        isSelected
+          ? 'bg-[color:var(--color-accent)]/60'
+          : 'hover:bg-[color:var(--color-accent)]/35'
+      )}
+      style={tableGridStyle}
+    >
+      <div className="flex items-center justify-center">
+        <input
+          checked={isSelected}
+          className="size-4 rounded border border-[color:var(--color-border)] accent-[color:var(--color-primary)]"
+          onChange={onSelect}
+          type="checkbox"
+        />
+      </div>
+
+      <div className="min-w-0">
+        <div className="truncate text-sm font-semibold text-[color:var(--color-foreground)]">
+          {getSecretLabel(row)}
+        </div>
+        <div className="mt-1 text-xs text-[color:var(--color-muted)]">
+          {isTotp ? 'TOTP' : 'Credential'}
+        </div>
+      </div>
+
+      <div className="truncate text-sm text-[color:var(--color-muted)]">
+        {secretUrl || '—'}
+      </div>
+
+      <div className="truncate text-sm text-[color:var(--color-foreground)]">
+        {username || '—'}
+      </div>
+
+      <div className="truncate font-mono text-sm text-[color:var(--color-foreground)]">
+        {renderedSecret}
+      </div>
+
+      <div className="flex items-center justify-end gap-1">
+        <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
+          <Button
+            aria-label={isTotp ? t`Copy token` : t`Copy`}
+            onClick={async () => {
+              await navigator.clipboard.writeText(getSecretCopyValue(row))
+              toast({
+                title: t`Copied to clipboard`,
+                status: 'success'
+              })
+            }}
+            size="icon"
+            variant="ghost"
+          >
+            <CopyIcon boxSize={16} />
+          </Button>
+        </Tooltip>
+
+        <Tooltip
+          content={
+            isSecretVisible || showAllSecrets ? t`Hide secret` : t`Show secret`
+          }
+        >
+          <Button
+            aria-label={
+              isSecretVisible || showAllSecrets
+                ? t`Hide secret`
+                : t`Show secret`
+            }
+            onClick={() => {
+              setIsSecretVisible((currentValue) => !currentValue)
+            }}
+            size="icon"
+            variant="ghost"
+          >
+            {isSecretVisible || showAllSecrets ? (
+              <ViewOffIcon boxSize={16} />
+            ) : (
+              <ViewIcon boxSize={16} />
+            )}
+          </Button>
+        </Tooltip>
+
+        <Tooltip content={t`Edit`}>
+          <Link
+            className={buttonVariants({ size: 'icon', variant: 'ghost' })}
+            state={{
+              data: isTotp ? row.totp : row.loginCredentials
+            }}
+            to={{
+              pathname: `/secret/${row.id}`
+            }}
+          >
+            <EditIcon boxSize={16} />
+          </Link>
+        </Tooltip>
+
+        {isBulkMode ? null : (
+          <DeleteSecretButton secrets={[row]} size="icon" />
+        )}
+      </div>
+    </div>
   )
 }

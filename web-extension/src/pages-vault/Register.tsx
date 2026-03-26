@@ -1,26 +1,10 @@
 import { useState } from 'react'
-import {
-  Box,
-  Button,
-  chakra,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Spinner,
-  Text,
-  useToast,
-  Alert,
-  AlertIcon,
-  Progress
-} from '@chakra-ui/react'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-import { Formik, Form, Field, FormikHelpers } from 'formik'
+import { Formik, Form, Field, type FormikHelpers } from 'formik'
 import browser from 'webextension-polyfill'
+import { Link, useNavigate } from 'react-router-dom'
+import { IoEye, IoEyeOff } from 'react-icons/io5'
+import { Button } from '@src/components/ui/button'
+import { Input } from '@src/components/ui/input'
 import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
 import { Trans } from '@lingui/react/macro'
@@ -31,13 +15,12 @@ import {
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
 import { useRegisterNewUserMutation } from '@shared/graphql/registerNewUser.codegen'
-import { Link, useNavigate } from 'react-router-dom'
+import { useAppToast } from '@src/ExtensionProviders'
 
 const passwordStrength = (password: string) => {
   if (password.length < 8) {
     return 0
   }
-
   if (password.length < 12) {
     return 1
   }
@@ -51,34 +34,55 @@ interface Values {
   password: string
   email: string
 }
+
+const PasswordHint = ({ password }: { password: string }) => {
+  if (password.length === 0) {
+    return null
+  }
+
+  const progress = ((passwordStrength(password) + 1) / 4) * 100
+
+  return (
+    <div className="mt-2 space-y-2">
+      <div className="h-2 overflow-hidden rounded-full bg-[color:var(--color-border)]">
+        <div
+          className="h-full bg-[color:var(--color-primary)] transition-all"
+          style={{ width: `${progress}%` }}
+        />
+      </div>
+      {password.length < 8 ? (
+        <div className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-3 py-2 text-sm text-[color:var(--color-danger)]">
+          Password must be at least 8 characters long
+        </div>
+      ) : null}
+      {password.length >= 8 && password.length < 14 ? (
+        <div className="rounded-[var(--radius-md)] border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-sm text-amber-300">
+          We recommend using at least 14 characters for best security
+        </div>
+      ) : null}
+      {password.length >= 14 ? (
+        <div className="rounded-[var(--radius-md)] border border-emerald-400/40 bg-emerald-500/10 px-3 py-2 text-sm text-emerald-300">
+          Good password length!
+        </div>
+      ) : null}
+    </div>
+  )
+}
+
 export default function Register() {
   const [showPassword, setShowPassword] = useState(false)
   const [register] = useRegisterNewUserMutation()
   const navigate = useNavigate()
-  const toast = useToast()
-
-  // Generate a unique firebaseToken if not available (Firebase doesn't work in extensions)
-  // Use deviceId + timestamp to ensure uniqueness across registrations
+  const toast = useAppToast()
   const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
 
   return (
-    <Box
-      p={8}
-      borderWidth={1}
-      borderRadius={6}
-      boxShadow="lg"
-      minW={{
-        base: '100vw',
-        md: '450px'
-      }}
-      mx={{
-        base: 10,
-        md: 0
-      }}
-    >
-      <Flex alignItems="center" justifyContent="center">
-        <Heading>Create account</Heading>
-      </Flex>
+    <div className="extension-surface mx-10 min-w-[100vw] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-8 shadow-lg md:mx-0 md:min-w-[450px]">
+      <div className="mb-6 flex items-center justify-center">
+        <h1 className="text-2xl font-semibold text-[color:var(--color-foreground)]">
+          Create account
+        </h1>
+      </div>
       <Formik
         initialValues={{ email: '', password: '' }}
         onSubmit={async (
@@ -87,7 +91,6 @@ export default function Register() {
         ) => {
           const userId = crypto.randomUUID()
           const deviceId = await device.getDeviceId()
-
           const encryptionSalt = self.crypto.getRandomValues(new Uint8Array(16))
 
           if (values.password.length < 8) {
@@ -95,6 +98,7 @@ export default function Register() {
               title: 'Password must be at least 8 characters long',
               status: 'error'
             })
+            setSubmitting(false)
             return
           }
 
@@ -102,7 +106,6 @@ export default function Register() {
             values.password,
             encryptionSalt
           )
-
           const params = await device.initLocalDeviceAuthSecret(
             masterEncryptionKey,
             encryptionSalt
@@ -125,141 +128,115 @@ export default function Register() {
 
           const registerResult = res.data?.registerNewUser
 
-          if (registerResult?.accessToken) {
-            //FIX: is this right, maybe someone could use proxy and send random string
-            await browser.storage.local.set({
-              'access-token': res.data?.registerNewUser.accessToken
-            })
-            setAccessToken(registerResult.accessToken as string)
-            const stringKey = await cryptoKeyToString(masterEncryptionKey)
-
-            const deviceState: IBackgroundStateSerializable = {
-              masterEncryptionKey: stringKey,
-              userId: userId,
-              secrets: [],
-              email: values.email,
-              deviceName: device.name,
-              encryptionSalt: bufferToBase64(encryptionSalt),
-              authSecret: params.addDeviceSecret,
-              authSecretEncrypted: params.addDeviceSecretEncrypted,
-              vaultLockTimeoutSeconds: null,
-              autofillTOTPEnabled: null,
-              autofillCredentialsEnabled: null,
-              uiLanguage: null,
-              syncTOTP: null,
-              theme: 'dark',
-              notificationOnVaultUnlock:
-                registerResult.user.notificationOnVaultUnlock,
-              notificationOnWrongPasswordAttempts:
-                registerResult.user.notificationOnWrongPasswordAttempts
-            }
-
-            device.save(deviceState)
-            navigate('/')
+          if (!registerResult?.accessToken) {
             setSubmitting(false)
+            return
           }
+
+          await browser.storage.local.set({
+            'access-token': registerResult.accessToken
+          })
+          setAccessToken(registerResult.accessToken as string)
+          const stringKey = await cryptoKeyToString(masterEncryptionKey)
+
+          const deviceState: IBackgroundStateSerializable = {
+            masterEncryptionKey: stringKey,
+            userId,
+            secrets: [],
+            email: values.email,
+            deviceName: device.name,
+            encryptionSalt: bufferToBase64(encryptionSalt),
+            authSecret: params.addDeviceSecret,
+            authSecretEncrypted: params.addDeviceSecretEncrypted,
+            vaultLockTimeoutSeconds: null,
+            autofillTOTPEnabled: null,
+            autofillCredentialsEnabled: null,
+            uiLanguage: null,
+            syncTOTP: null,
+            theme: 'dark',
+            notificationOnVaultUnlock:
+              registerResult.user.notificationOnVaultUnlock,
+            notificationOnWrongPasswordAttempts:
+              registerResult.user.notificationOnWrongPasswordAttempts
+          }
+
+          device.save(deviceState)
+          navigate('/')
+          setSubmitting(false)
         }}
       >
         {(props) => (
-          <Form>
+          <Form className="space-y-4">
             <Field name="email">
               {({ field, form }: any) => (
-                <FormControl
-                  isInvalid={form.errors.email && form.touched.email}
-                  isRequired
-                >
-                  <FormLabel htmlFor="email">Email</FormLabel>
+                <label className="block">
+                  <div className="mb-2 text-sm font-medium">Email</div>
                   <Input {...field} id="Email" />
-                  <FormErrorMessage>{form.errors.email}</FormErrorMessage>
-                </FormControl>
+                  {form.errors.email && form.touched.email ? (
+                    <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+                      {form.errors.email}
+                    </div>
+                  ) : null}
+                </label>
               )}
             </Field>
             <Field name="password">
               {({ field, form }: any) => (
-                <FormControl
-                  isInvalid={form.errors.password && form.touched.password}
-                  isRequired
-                >
-                  <FormLabel mt={3} htmlFor="password">
+                <label className="block">
+                  <div className="mb-2 mt-3 text-sm font-medium">
                     Master password
-                  </FormLabel>
-
-                  <InputGroup>
+                  </div>
+                  <div className="relative">
                     <Input
                       {...field}
-                      type={showPassword ? 'text' : 'password'}
+                      className="pr-10"
                       placeholder="*******"
+                      type={showPassword ? 'text' : 'password'}
                     />
-                    <InputRightElement width="3rem">
-                      <Button
-                        h="1.5rem"
-                        size="sm"
-                        onClick={() => setShowPassword(!showPassword)}
-                      >
-                        {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                      </Button>
-                    </InputRightElement>
-                  </InputGroup>
-                  {field.value.length > 0 && (
-                    <>
-                      <Progress
-                        value={passwordStrength(field.value)}
-                        size="xs"
-                        colorScheme="green"
-                        max={3}
-                        min={0}
-                        mt={2}
-                      />
-                      {field.value.length < 8 && (
-                        <Alert status="error" mt={2} size="sm">
-                          <AlertIcon />
-                          Password must be at least 8 characters long
-                        </Alert>
+                    <button
+                      className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[color:var(--color-muted)]"
+                      onClick={() => setShowPassword((value) => !value)}
+                      type="button"
+                    >
+                      {showPassword ? (
+                        <IoEyeOff className="size-4" />
+                      ) : (
+                        <IoEye className="size-4" />
                       )}
-                      {field.value.length >= 8 && field.value.length < 14 && (
-                        <Alert status="warning" mt={2} size="sm">
-                          <AlertIcon />
-                          We recommend using at least 14 characters for best
-                          security
-                        </Alert>
-                      )}
-                      {field.value.length >= 14 && (
-                        <Alert status="success" mt={2} size="sm">
-                          <AlertIcon />
-                          Good password length!
-                        </Alert>
-                      )}
-                    </>
-                  )}
-                  <FormErrorMessage>{form.errors.password}</FormErrorMessage>
-                  <Text fontSize="xs" color="gray.500" mt={2}>
+                    </button>
+                  </div>
+                  <PasswordHint password={field.value} />
+                  {form.errors.password && form.touched.password ? (
+                    <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+                      {form.errors.password}
+                    </div>
+                  ) : null}
+                  <p className="mt-2 text-xs text-[color:var(--color-muted)]">
                     it is never sent anywhere-your vault is e2e encrypted
-                  </Text>
-                </FormControl>
+                  </p>
+                </label>
               )}
             </Field>
             <Button
-              colorScheme="teal"
-              variant="outline"
+              className="w-full"
+              disabled={props.isSubmitting}
               type="submit"
-              width="full"
-              mt={4}
-              isLoading={props.isSubmitting}
+              variant="outline"
             >
               Register
             </Button>
-            <chakra.p p={2} fontSize="xs" textAlign="center" color="gray.600">
-              By signing up you agree to our{' '}
-              <chakra.a color="brand.500">Terms of Service</chakra.a>
-            </chakra.p>
+            <p className="p-2 text-center text-xs text-[color:var(--color-muted)]">
+              By signing up you agree to our Terms of Service
+            </p>
           </Form>
         )}
       </Formik>
-      <Link to="/">
-        <Text pt={3}>
-          <Trans>Already have an account?</Trans>
-        </Text>
+      <Link
+        className="pt-3 text-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)]"
+        to="/"
+      >
+        <Trans>Already have an account?</Trans>
       </Link>
-    </Box>
+    </div>
   )
 }

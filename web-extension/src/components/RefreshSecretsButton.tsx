@@ -1,34 +1,35 @@
 import { useState } from 'react'
-import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
-import { IoMdRefreshCircle } from 'react-icons/io'
-import { device } from '@src/background/ExtensionDevice'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
+import { IoMdRefreshCircle } from 'react-icons/io'
+import { device } from '@src/background/ExtensionDevice'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { cn } from '@src/lib/cn'
+import { useAppToast } from '@src/ExtensionProviders'
 
 export function RefreshSecretsButton() {
   const [isSyncing, setIsSyncing] = useState(false)
-  const toast = useToast()
+  const toast = useAppToast()
 
   return (
-    <Tooltip
-      label={<Trans>Synchronize vault</Trans>}
-      aria-label={t`Synchronize vault`}
-    >
-      <IconButton
-        size="md"
-        aria-label="menu"
-        icon={<IoMdRefreshCircle />}
-        isDisabled={isSyncing}
-        isLoading={isSyncing}
+    <Tooltip content={<Trans>Synchronize vault</Trans>}>
+      <Button
+        aria-label={t`Synchronize vault`}
+        disabled={isSyncing}
+        size="icon"
+        variant="outline"
         onClick={async () => {
           setIsSyncing(true)
           let res
+
           try {
             res = await device.state?.backendSync()
-          } catch (error) {
+          } catch {
             setIsSyncing(false)
             return
           }
+
           toast({
             title: t`Sync successful`,
             description: `added/updated ${res?.newAndUpdatedSecrets}, removed ${res?.removedSecrets}`,
@@ -38,7 +39,11 @@ export function RefreshSecretsButton() {
           })
           setIsSyncing(false)
         }}
-      />
+      >
+        <IoMdRefreshCircle
+          className={cn('size-5', isSyncing ? 'animate-spin' : undefined)}
+        />
+      </Button>
     </Tooltip>
   )
 }

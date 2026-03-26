@@ -6,7 +6,7 @@ import React, {
   Dispatch,
   SetStateAction,
   useEffect,
-  type JSX
+  type PropsWithChildren
 } from 'react'
 import browser from 'webextension-polyfill'
 
@@ -18,7 +18,7 @@ export type IUserContext = {
 
 export const UserContext = createContext<IUserContext>({} as any)
 
-export const UserProvider = ({ children }: { children: JSX.Element }) => {
+export const UserProvider = ({ children }: PropsWithChildren) => {
   const [userId, setUserId] = useState<string>()
   const [localStorage, setLocalStorage] = useState<any>()
 

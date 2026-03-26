@@ -20,7 +20,7 @@ import {
   Text,
   useColorModeValue,
   useToast
-} from '@chakra-ui/react'
+} from '@src/components/ui/legacy'
 import { Field, Formik, FormikHelpers } from 'formik'
 import { useContext, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'

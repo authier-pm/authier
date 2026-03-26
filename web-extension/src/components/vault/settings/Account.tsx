@@ -1,28 +1,28 @@
 import {
-  useToast,
-  Spinner,
-  Box,
-  Button,
-  Heading,
-  VStack,
-  useColorModeValue,
-  useDisclosure,
   AlertDialog,
   AlertDialogBody,
   AlertDialogContent,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogOverlay,
+  Box,
+  Button,
   FormControl,
-  FormLabel,
   FormErrorMessage,
+  FormLabel,
+  Heading,
   Input,
   InputGroup,
-  InputRightElement
-} from '@chakra-ui/react'
+  InputRightElement,
+  Spinner,
+  VStack,
+  useColorModeValue,
+  useDisclosure,
+  useToast
+} from '@src/components/ui/legacy'
 import { t } from '@lingui/core/macro'
 
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
 import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { device } from '@src/background/ExtensionDevice'

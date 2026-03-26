@@ -1,31 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react'
-import {
-  Box,
-  Button,
-  Flex,
-  Stat,
-  StatLabel,
-  StatNumber,
-  useClipboard,
-  Text,
-  Heading,
-  useColorModeValue,
-  Center
-} from '@chakra-ui/react'
-import { generateSync } from 'otplib'
-
-import { CopyIcon, NotAllowedIcon } from '@chakra-ui/icons'
-import { Tooltip } from '@chakra-ui/react'
+import { useContext, useEffect, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
-
-import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
-
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import debug from 'debug'
-import { SecretItemIcon } from '../SecretItemIcon'
+import { generateSync } from 'otplib'
 import { TbAuth2Fa } from 'react-icons/tb'
-
+import { IoBanOutline, IoCopyOutline } from 'react-icons/io5'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { ILoginSecret, ISecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { copyTextToClipboard } from '@src/lib/clipboard'
+import { SecretItemIcon } from '../SecretItemIcon'
 import { useAddOtpEventMutation } from './AuthList.codegen'
 import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
@@ -34,124 +19,109 @@ import { SquareMousePointer } from './SquareMousePointerIcon'
 
 const log = debug('au:AuthsList')
 
+const cardClassName =
+  'extension-surface m-1 w-full max-w-[450px] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-3 shadow-lg'
+
 const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
-  const [addOTPEvent, { data, error }] = useAddOtpEventMutation() //ignore results??
+  const [addOTPEvent, { data, error }] = useAddOtpEventMutation()
+  const [showWhole, setShowWhole] = useState(false)
 
   let otpCode = ''
   let otpCodeError: string | null = null
+
   try {
-    // const otpCode = '1111'
     otpCode = generateSync({ secret: totpSecret.totp.secret })
   } catch (err) {
     otpCodeError =
       err instanceof Error ? err.message : t`Failed to generate OTP code`
   }
-  const [showWhole, setShowWhole] = useState(false)
-  const { onCopy } = useClipboard(otpCode)
 
   useEffect(() => {
     setShowWhole(false)
   }, [otpCode])
 
   return (
-    <Box
-      p="3"
-      m={1}
-      rounded="md"
-      bg={useColorModeValue('gray.100', 'gray.700')}
-      width="100%"
-      maxW="450px"
-      boxShadow="xl"
-    >
-      <Stat maxW="100%">
-        <Flex justify="space-between" align="center" w="100%">
-          <Flex flexDirection="column">
-            <SecretItemIcon {...totpSecret.totp}></SecretItemIcon>
-            <TbAuth2Fa size={30}></TbAuth2Fa>
-          </Flex>
-          <Box ml={4} mr="auto">
-            <StatLabel>{totpSecret.totp.label}</StatLabel>
+    <div className={cardClassName}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col items-center gap-1">
+          <SecretItemIcon {...totpSecret.totp} />
+          <TbAuth2Fa className="size-7 text-[color:var(--color-primary)]" />
+        </div>
 
-            <StatNumber
-              w="full"
-              fontSize="sm"
-              onClick={async () => {
-                if (otpCodeError) {
-                  return
-                }
-                setShowWhole(!showWhole)
-                if (!showWhole) {
-                  // CHECK
+        <div className="mr-auto min-w-0">
+          <div className="text-sm text-[color:var(--color-muted)]">
+            {totpSecret.totp.label}
+          </div>
+
+          {otpCodeError ? (
+            <div className="mt-1 text-xs text-[color:var(--color-danger)]">
+              {otpCodeError}
+            </div>
+          ) : showWhole ? (
+            <button
+              className="mt-1 text-left text-lg font-semibold tracking-[0.18em]"
+              onClick={() => {
+                setShowWhole(false)
+              }}
+              type="button"
+            >
+              {otpCode}
+            </button>
+          ) : (
+            <Tooltip content={t`Click to show & copy`}>
+              <button
+                className="mt-1 inline-flex items-center gap-2 rounded-[var(--radius-sm)] px-2 py-1 text-left text-lg font-semibold tracking-[0.18em] hover:bg-[color:var(--color-accent)]/50"
+                onClick={async () => {
+                  await copyTextToClipboard(otpCode)
+                  setShowWhole(true)
+
                   const tabs = await browser.tabs.query({ active: true })
-
-                  const url = tabs[0].url as string
+                  const url = tabs[0]?.url as string
 
                   await addOTPEvent({
                     variables: {
                       event: {
                         kind: 'show OTP',
-                        url: url,
+                        url,
                         secretId: totpSecret.id
                       }
                     }
                   })
                   log(data, error)
+                }}
+                type="button"
+              >
+                <span>{otpCode.substring(0, 3) + '***'}</span>
+                <IoCopyOutline className="size-4" />
+              </button>
+            </Tooltip>
+          )}
+        </div>
+
+        <Tooltip content={t`Fill TOTP into input on screen by point&click`}>
+          <Button
+            disabled={Boolean(otpCodeError)}
+            size="icon"
+            variant="primary"
+            onClick={() => {
+              if (otpCodeError) {
+                return
+              }
+
+              browser.runtime.sendMessage({
+                kind: PopupActionsEnum.TOTP_FILL_ON_CLICK,
+                event: {
+                  otpCode,
+                  secretId: totpSecret.id
                 }
-              }}
-            >
-              {otpCodeError ? (
-                <Text color="red.500" fontSize="xs" whiteSpace="normal">
-                  {otpCodeError}
-                </Text>
-              ) : showWhole ? (
-                otpCode
-              ) : (
-                <Tooltip
-                  label={t`Click to show & copy`}
-                  display={'flex'}
-                  width={'full'}
-                >
-                  <div
-                    onClick={() => {
-                      onCopy()
-                    }}
-                  >
-                    {otpCode.substr(0, 3) + '***'}
-                    <Button size="xs" variant="ghost" ml="auto" p={0}>
-                      <CopyIcon></CopyIcon>
-                    </Button>
-                  </div>
-                </Tooltip>
-              )}
-            </StatNumber>
-          </Box>
-          <Tooltip label={t`Fill TOTP into input on screen by point&click`}>
-            <Button
-              size="md"
-              ml={2}
-              variant="solid"
-              colorScheme={'cyan'}
-              isDisabled={Boolean(otpCodeError)}
-              onClick={() => {
-                if (otpCodeError) {
-                  return
-                }
-                // TODO log usage of this token to backend
-                browser.runtime.sendMessage({
-                  kind: PopupActionsEnum.TOTP_FILL_ON_CLICK,
-                  event: {
-                    otpCode,
-                    secretId: totpSecret.id
-                  }
-                })
-              }}
-            >
-              <SquareMousePointer></SquareMousePointer>
-            </Button>
-          </Tooltip>
-        </Flex>
-      </Stat>
-    </Box>
+              })
+            }}
+          >
+            <SquareMousePointer />
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
   )
 }
 
@@ -161,57 +131,39 @@ const LoginCredentialsListItem = ({
   loginSecret: ILoginSecret
 }) => {
   const { loginCredentials } = loginSecret
-  const { onCopy } = useClipboard(loginCredentials.password)
 
   return (
-    <Box
-      p="3"
-      m={1}
-      rounded="md"
-      bg={useColorModeValue('gray.100', 'gray.700')}
-      width="100%"
-      maxW="450px"
-      boxShadow="xl"
-    >
-      <Stat maxW="100%">
-        <Flex justify="space-between" align="center" w="100%">
-          <Flex flexDirection="column">
-            <SecretItemIcon {...loginCredentials} />
-          </Flex>
-          <Box ml={4} mr="auto" maxW="200px">
-            <Heading
-              size="sm"
-              whiteSpace="nowrap"
-              textOverflow="ellipsis"
-              overflow="hidden"
-            >
-              {loginCredentials.label}
-            </Heading>
-            <Text fontSize="sm" whiteSpace="nowrap">
-              {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
-            </Text>
-          </Box>
+    <div className={cardClassName}>
+      <div className="flex items-center justify-between gap-3">
+        <div className="flex flex-col">
+          <SecretItemIcon {...loginCredentials} />
+        </div>
 
-          <Tooltip label={t`Copy password`}>
-            <Button
-              size="md"
-              ml={2}
-              variant="solid"
-              color={'green.700'}
-              bgColor={'green.200'}
-              onClick={() => {
-                onCopy()
-                // TODO log usage of this token to backend
-              }}
-            >
-              <CopyIcon></CopyIcon>
-            </Button>
-          </Tooltip>
-        </Flex>
-      </Stat>
-    </Box>
+        <div className="mr-auto min-w-0 max-w-[200px]">
+          <h3 className="truncate text-sm font-semibold text-[color:var(--color-foreground)]">
+            {loginCredentials.label}
+          </h3>
+          <div className="truncate text-sm text-[color:var(--color-muted)]">
+            {loginCredentials.username.replace(/http:\/\/|https:\/\//, '')}
+          </div>
+        </div>
+
+        <Tooltip content={t`Copy password`}>
+          <Button
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              void copyTextToClipboard(loginCredentials.password)
+            }}
+          >
+            <IoCopyOutline className="size-4" />
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
   )
 }
+
 export const AuthsList = ({
   filterByTLD,
   search
@@ -230,20 +182,24 @@ export const AuthsList = ({
   if (!deviceState) {
     return null
   }
+
   const TOTPForCurrentDomain = TOTPSecrets.filter(({ totp }) => {
     if (!currentURL || !totp.url) {
       return true
     }
+
     return (
       getDomainNameAndTldFromUrl(totp.url) ===
       getDomainNameAndTldFromUrl(currentURL)
     )
   })
+
   const loginCredentialForCurrentDomain = loginCredentials.filter(
     ({ loginCredentials }) => {
       if (!loginCredentials.url) {
-        return false // for example TOTP secrets do not have any URL after import from authy
+        return false
       }
+
       if (!currentURL) {
         return true
       }
@@ -254,82 +210,58 @@ export const AuthsList = ({
       )
     }
   )
+
   const hasNoSecrets = deviceState.secrets.length === 0
-
-  const getRecentlyUsed = <T extends ISecret>(secrets: T[]) => {
-    return secrets
-      .sort((a, b) =>
-        (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? 1 : -1
-      )
-      .slice(0, 20) // we get items
-  }
-
-  const totps = searchSecrets(search, [
-    EncryptedSecretType.TOTP
-  ]) as ITOTPSecret[]
+  const totps = searchSecrets(search, [EncryptedSecretType.TOTP]) as ITOTPSecret[]
   const creds = searchSecrets(search, [
     EncryptedSecretType.LOGIN_CREDENTIALS
   ]) as ILoginSecret[]
-  return (
-    <>
-      <Flex flexDirection="column">
-        {hasNoSecrets === false &&
-          filterByTLD &&
-          TOTPForCurrentDomain.length === 0 &&
-          loginCredentialForCurrentDomain.length === 0 && (
-            <Center h="50vh">
-              <Text>
-                <NotAllowedIcon></NotAllowedIcon>
-                There are no stored secrets for current domain.
-              </Text>
-            </Center>
-          )}
 
-        {filterByTLD ? (
-          <>
-            {TOTPForCurrentDomain.map((auth, i) => {
-              return (
-                <OtpCode
-                  totpSecret={auth as ITOTPSecret}
-                  key={auth.totp.label + i}
-                />
-              )
-            })}
-            {loginCredentialForCurrentDomain.map((credentials, i) => {
-              return (
-                <LoginCredentialsListItem
-                  loginSecret={credentials as ILoginSecret}
-                  key={credentials.loginCredentials.label + i}
-                />
-              )
-            })}
-          </>
-        ) : (
-          [
-            totps.slice(0, 20).map((auth, i) => {
-              return (
-                <OtpCode
-                  totpSecret={auth as ITOTPSecret}
-                  key={auth.totp.label + i}
-                />
-              )
-            }),
-            creds.slice(0, 20).map((psw, i) => {
-              // console.log(psw.loginCredentials.url)
-              return (
-                <LoginCredentialsListItem
-                  loginSecret={psw as ILoginSecret}
-                  key={psw.loginCredentials.label + i}
-                />
-              )
-            })
-          ]
-        )}
-        {hasNoSecrets && (
-          // TODO login form illustration
-          <Text>Start by adding a login secret or TOTP code</Text>
-        )}
-      </Flex>
-    </>
+  const renderedSecrets = filterByTLD
+    ? [
+        ...TOTPForCurrentDomain.map((auth, i) => (
+          <OtpCode totpSecret={auth as ITOTPSecret} key={auth.totp.label + i} />
+        )),
+        ...loginCredentialForCurrentDomain.map((credentials, i) => (
+          <LoginCredentialsListItem
+            key={credentials.loginCredentials.label + i}
+            loginSecret={credentials as ILoginSecret}
+          />
+        ))
+      ]
+    : [
+        ...totps.slice(0, 20).map((auth, i) => (
+          <OtpCode totpSecret={auth as ITOTPSecret} key={auth.totp.label + i} />
+        )),
+        ...creds.slice(0, 20).map((psw, i) => (
+          <LoginCredentialsListItem
+            key={psw.loginCredentials.label + i}
+            loginSecret={psw as ILoginSecret}
+          />
+        ))
+      ]
+
+  return (
+    <div className="flex flex-col">
+      {!hasNoSecrets &&
+      filterByTLD &&
+      TOTPForCurrentDomain.length === 0 &&
+      loginCredentialForCurrentDomain.length === 0 ? (
+        <div className="flex h-[50vh] items-center justify-center text-sm text-[color:var(--color-muted)]">
+          <span className="inline-flex items-center gap-2">
+            <IoBanOutline className="size-4" />
+            There are no stored secrets for current domain.
+          </span>
+        </div>
+      ) : null}
+
+      {renderedSecrets}
+
+      {hasNoSecrets ? (
+        <div className="px-2 py-3 text-sm text-[color:var(--color-muted)]">
+          Start by adding a login secret or TOTP code
+        </div>
+      ) : null}
+    </div>
   )
 }

@@ -1,23 +1,19 @@
 import {
+  Button,
+  Checkbox,
+  FormControl,
+  FormHelperText,
+  FormLabel,
+  Select,
+  VStack,
+  useColorModeValue
+} from '@src/components/ui/legacy'
+import {
   useUpdateSettingsMutation,
   SyncSettingsDocument
 } from '@shared/graphql/Settings.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { useContext } from 'react'
-import { useColorModeValue } from '@chakra-ui/color-mode'
-import {
-  Button,
-  Checkbox,
-  FormControl,
-  FormLabel,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Select,
-  VStack
-} from '@chakra-ui/react'
 import { Trans } from '@lingui/react/macro'
 
 import { Field, Formik, FormikHelpers } from 'formik'
@@ -159,23 +155,18 @@ export default function Security() {
 
                 <Field name="notificationOnWrongPasswordAttempts">
                   {({ field, form }) => (
-                    <NumberInput
+                    <input
+                      className="h-10 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3"
                       id="notificationOnWrongPasswordAttempts"
-                      mr={5}
-                      name="notificationOnWrongPasswordAttempts"
-                      size="md"
-                      value={field.value} // TODO make this configurable per user
                       min={0}
-                      onChange={(val) => {
-                        form.setFieldValue(field.name, parseInt(val))
+                      name="notificationOnWrongPasswordAttempts"
+                      style={{ marginRight: '20px' }}
+                      type="number"
+                      value={field.value}
+                      onChange={(event) => {
+                        form.setFieldValue(field.name, parseInt(event.target.value))
                       }}
-                    >
-                      <NumberInputField />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
+                    />
                   )}
                 </Field>
 

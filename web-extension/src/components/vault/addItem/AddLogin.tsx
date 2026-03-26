@@ -1,16 +1,16 @@
 import {
   Button,
+  Box,
   Flex,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
   Input,
   InputGroup,
   InputRightElement,
   Progress,
   useDisclosure,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Box
-} from '@chakra-ui/react'
+} from '@src/components/ui/legacy'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 

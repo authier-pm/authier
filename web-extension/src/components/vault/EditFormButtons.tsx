@@ -3,9 +3,8 @@ import {
   Flex,
   HStack,
   IconButton,
-  Tooltip,
-  useToast
-} from '@chakra-ui/react'
+  Tooltip
+} from '@src/components/ui/legacy'
 import { useNavigate } from 'react-router-dom'
 import { useFormikContext } from 'formik'
 
@@ -14,10 +13,11 @@ import { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { IoDuplicate } from 'react-icons/io5'
 import { t } from '@lingui/core/macro'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import { useAppToast } from '@src/ExtensionProviders'
 
 export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
   const navigate = useNavigate()
-  const toast = useToast()
+  const toast = useAppToast()
 
   const { isSubmitting, dirty } = useFormikContext()
 

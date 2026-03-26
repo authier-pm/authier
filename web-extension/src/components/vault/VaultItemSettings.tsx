@@ -1,32 +1,36 @@
 import {
-  useColorModeValue,
-  Button,
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Progress,
-  IconButton,
-  useDisclosure,
-  Spinner,
   Alert,
+  Box,
+  Button,
+  Center,
+  Flex,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Tooltip,
-  Box,
-  useToast,
-  Center,
   Heading,
+  HStack,
+  IconButton,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Link,
   List,
   ListItem,
-  Link,
-  HStack,
-  VStack
-} from '@chakra-ui/react'
+  Progress,
+  Spinner,
+  Tooltip,
+  VStack,
+  useColorModeValue,
+  useDisclosure,
+  useToast
+} from '@src/components/ui/legacy'
 import { useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronDownIcon, ChevronUpIcon, CloseIcon } from '@chakra-ui/icons'
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  CloseIcon
+} from '@src/components/ui/icons'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 import { device } from '@src/background/ExtensionDevice'

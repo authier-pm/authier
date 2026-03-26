@@ -1,28 +1,16 @@
 import { useContext, useEffect, useState } from 'react'
-import {
-  Flex,
-  Input,
-  InputGroup,
-  InputRightElement,
-  Button,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Heading,
-  Center
-} from '@chakra-ui/react'
-
 import { useForm } from 'react-hook-form'
-import { LockIcon, ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
-
+import { IoEye, IoEyeOff, IoLockClosed } from 'react-icons/io5'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
+import { Button } from '@src/components/ui/button'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { Input } from '@src/components/ui/input'
+import { toast } from '@src/ExtensionProviders'
 import {
   cryptoKeyToString,
   decryptDeviceSecretWithPassword
 } from '@util/generateEncryptionKey'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { toast } from '@src/ExtensionProviders'
 
 interface FormValues {
   password: string
@@ -31,7 +19,6 @@ interface FormValues {
 export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
   const [showPassword, setShowPassword] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
-
   const {
     register,
     handleSubmit,
@@ -44,14 +31,13 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
   })
 
   const password = watch('password')
-
   const { setDeviceState, lockedState, device } = useContext(DeviceStateContext)
 
   useEffect(() => {
     if (lockedState === null) {
       onUnlocked()
     }
-  }, [lockedState])
+  }, [lockedState, onUnlocked])
 
   if (!lockedState) {
     return null
@@ -59,6 +45,7 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
 
   const onSubmit = async (values: FormValues) => {
     setIsSubmitting(true)
+
     try {
       const { addDeviceSecret, masterEncryptionKey } =
         await decryptDeviceSecretWithPassword(values.password, lockedState)
@@ -77,40 +64,39 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
       }
 
       onUnlocked()
-    } catch (err: any) {
-      if (
-        err.message ===
-        'DOMException: The operation failed for an operation-specific reason'
-      ) {
-        toast({
-          title: 'Incorrect password',
-          status: 'error',
-          isClosable: true
-        })
-      } else {
-        toast({
-          title: err.message,
-          status: 'error',
-          isClosable: true
-        })
-      }
+    } catch (err) {
+      const errorMessage =
+        err instanceof Error
+          ? err.message ===
+            'DOMException: The operation failed for an operation-specific reason'
+            ? 'Incorrect password'
+            : err.message
+          : 'Incorrect password'
+
+      toast({
+        title: errorMessage,
+        status: 'error',
+        isClosable: true
+      })
     } finally {
       setIsSubmitting(false)
     }
   }
 
   return (
-    <Flex flexDirection="column" minWidth="315px" p={4}>
-      <Center>
-        <LockIcon boxSize="50px" mx={20} my={3}></LockIcon>
-      </Center>
+    <div className="flex min-w-[315px] flex-col px-4 py-5">
+      <div className="mb-4 flex justify-center">
+        <div className="flex size-16 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-accent)]/30">
+          <IoLockClosed className="size-8 text-[color:var(--color-primary)]" />
+        </div>
+      </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl isInvalid={!!errors.password}>
-          <FormLabel htmlFor="password">
-            <Heading size="md">Re-enter your Master Password</Heading>
-          </FormLabel>
-          <InputGroup>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <label className="block">
+          <div className="mb-2 text-base font-semibold text-[color:var(--color-foreground)]">
+            Re-enter your Master Password
+          </div>
+          <div className="relative">
             <Input
               id="password"
               type={showPassword ? 'text' : 'password'}
@@ -118,31 +104,34 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
                 required: 'Password is required'
               })}
             />
-            <InputRightElement width="3rem">
-              <Button
-                h="1.5rem"
-                size="sm"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-              </Button>
-            </InputRightElement>
-          </InputGroup>
-          <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
-        </FormControl>
+            <button
+              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[color:var(--color-muted)]"
+              onClick={() => setShowPassword((currentValue) => !currentValue)}
+              type="button"
+            >
+              {showPassword ? (
+                <IoEyeOff className="size-4" />
+              ) : (
+                <IoEye className="size-4" />
+              )}
+            </button>
+          </div>
+          {errors.password?.message ? (
+            <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+              {errors.password.message}
+            </div>
+          ) : null}
+        </label>
 
         <Button
-          colorScheme="teal"
-          variant="outline"
-          isDisabled={!password || password.length < 3}
+          className="w-full"
+          disabled={!password || password.length < 3 || isSubmitting}
           type="submit"
-          width="full"
-          mt={4}
-          isLoading={isSubmitting}
+          variant="outline"
         >
           <Trans>Unlock vault</Trans>
         </Button>
       </form>
-    </Flex>
+    </div>
   )
 }

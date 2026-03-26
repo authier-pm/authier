@@ -1,30 +1,23 @@
+import { useContext, useEffect, useState } from 'react'
+import { formatRelative } from 'date-fns'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
+import debug from 'debug'
+import browser from 'webextension-polyfill'
+import { IoWarningOutline } from 'react-icons/io5'
 import { device } from '@src/background/ExtensionDevice'
+import { useThemeMode } from '@src/ExtensionProviders'
+import { Txt } from '@src/components/util/Txt'
+import { Button } from '@src/components/ui/button'
 import { UserContext } from '@src/providers/UserProvider'
-import React, { useContext, useEffect, useState } from 'react'
 import { LoginContext } from './Login'
 import {
   useAddNewDeviceForUserMutation,
   useDeviceDecryptionChallengeMutation,
   useInitiateMasterDeviceResetMutation
 } from '@shared/graphql/Login.codegen'
-import browser from 'webextension-polyfill'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
-import {
-  Card,
-  Center,
-  Flex,
-  Heading,
-  Spinner,
-  Button,
-  useColorMode,
-  useInterval
-} from '@chakra-ui/react'
-import { formatRelative } from 'date-fns'
-import { WarningIcon } from '@chakra-ui/icons'
-import debug from 'debug'
 import {
   base64ToBuffer,
   cryptoKeyToString,
@@ -32,14 +25,13 @@ import {
   generateEncryptionKey
 } from '@util/generateEncryptionKey'
 import { toast } from '@src/ExtensionProviders'
-import { Txt } from '@src/components/util/Txt'
 
 export const LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL = 6000
 export const log = debug('au:LoginAwaitingApproval')
 
 export const useLogin = (props: { deviceName: string }) => {
   const { formStateContext, setFormStateContext } = useContext(LoginContext)
-  const { colorMode, toggleColorMode } = useColorMode()
+  const { colorMode, toggleColorMode } = useThemeMode()
   const { setUserId } = useContext(UserContext)
   const [addNewDevice, { loading, error }] = useAddNewDeviceForUserMutation()
   const deviceDecryptionChallengeVariables = {
@@ -64,27 +56,32 @@ export const useLogin = (props: { deviceName: string }) => {
         isSubmitted: false
       })
     }
-  }, [error, decryptionChallengeError])
+  }, [decryptionChallengeError, error, formStateContext, setFormStateContext])
 
-  useInterval(() => {
-    getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
-  }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      getDeviceDecryptionChallenge({
+        variables: deviceDecryptionChallengeVariables
+      })
+    }, LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL)
+
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [getDeviceDecryptionChallenge, deviceDecryptionChallengeVariables])
+
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
 
   useEffect(() => {
-    // Generate a unique firebaseToken if not available (Firebase doesn't work in extensions)
-    // Use UUID to ensure uniqueness across logins
     const fireToken = device.fireToken || `web-ext-${crypto.randomUUID()}`
 
-    console.log('~ decryptionData', decryptionData)
     if (
       deviceDecryptionChallenge?.__typename === 'DecryptionChallengeApproved'
     ) {
       ;(async () => {
         const addDeviceSecretEncrypted =
-          deviceDecryptionChallenge?.addDeviceSecretEncrypted
-
-        const userId = deviceDecryptionChallenge?.userId
+          deviceDecryptionChallenge.addDeviceSecretEncrypted
+        const userId = deviceDecryptionChallenge.userId
 
         if (!addDeviceSecretEncrypted || !userId) {
           toast({
@@ -95,7 +92,7 @@ export const useLogin = (props: { deviceName: string }) => {
           return
         }
 
-        if (!deviceDecryptionChallenge?.id) {
+        if (!deviceDecryptionChallenge.id) {
           toast({
             title: t`Failed to create decryption challenge`,
             status: 'error',
@@ -104,8 +101,7 @@ export const useLogin = (props: { deviceName: string }) => {
           return
         }
 
-        const encryptionSalt = deviceDecryptionChallenge?.encryptionSalt
-
+        const encryptionSalt = deviceDecryptionChallenge.encryptionSalt
         const masterEncryptionKey = await generateEncryptionKey(
           formStateContext.password,
           base64ToBuffer(encryptionSalt)
@@ -116,7 +112,6 @@ export const useLogin = (props: { deviceName: string }) => {
           const encryptedDataBuff = base64ToBuffer(addDeviceSecretEncrypted)
           const iv = encryptedDataBuff.slice(16, 16 + 12)
           const data = encryptedDataBuff.slice(16 + 12)
-
           const decryptedContent = await self.crypto.subtle.decrypt(
             { name: 'AES-GCM', iv },
             masterEncryptionKey,
@@ -160,10 +155,9 @@ export const useLogin = (props: { deviceName: string }) => {
                 newDeviceSecretsPair.addDeviceSecretEncrypted,
               firebaseToken: fireToken,
               devicePlatform: device.platform,
-              //WARNING: Has to be the same all the time
               encryptionSalt
             },
-            currentAddDeviceSecret: currentAddDeviceSecret
+            currentAddDeviceSecret
           }
         })
 
@@ -175,81 +169,89 @@ export const useLogin = (props: { deviceName: string }) => {
         const addNewDeviceForUser =
           response.data?.deviceDecryptionChallenge?.__typename ===
           'DecryptionChallengeApproved'
-            ? response.data?.deviceDecryptionChallenge.addNewDeviceForUser
+            ? response.data.deviceDecryptionChallenge.addNewDeviceForUser
             : null
 
-        if (addNewDeviceForUser?.accessToken) {
-          await setAccessToken(addNewDeviceForUser.accessToken)
-
-          const decodedToken = await getUserFromToken()
-          if (!decodedToken) {
-            throw new Error('Missing access token after login approval')
-          }
-
-          const EncryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
-
-          const deviceState: IBackgroundStateSerializable = {
-            masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
-            userId: userId,
-            secrets: EncryptedSecrets,
-            email: formStateContext.email,
-            encryptionSalt,
-            deviceName: props.deviceName,
-            authSecret: newDeviceSecretsPair.addDeviceSecret,
-            authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
-            vaultLockTimeoutSeconds:
-              addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
-            autofillTOTPEnabled:
-              addNewDeviceForUser.user.device.autofillTOTPEnabled,
-            autofillCredentialsEnabled:
-              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
-            uiLanguage: addNewDeviceForUser.user.uiLanguage,
-            syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
-            notificationOnWrongPasswordAttempts:
-              addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
-            notificationOnVaultUnlock:
-              addNewDeviceForUser.user.notificationOnVaultUnlock,
-            theme: addNewDeviceForUser.user.defaultDeviceSettings.theme
-          }
-
-          if (
-            colorMode !== addNewDeviceForUser.user.defaultDeviceSettings.theme
-          ) {
-            toggleColorMode()
-          }
-
-          setUserId(decodedToken.userId)
-          device.save(deviceState)
-
-          toast({
-            title: t`Device approved at ${formatRelative(
-              new Date(),
-              new Date(deviceDecryptionChallenge.approvedAt as string)
-            )}`,
-            status: 'success',
-            isClosable: true
-          })
-        } else {
+        if (!addNewDeviceForUser?.accessToken) {
           toast({
             title: t`Login failed, check your username or password`,
             status: 'error',
             isClosable: true
           })
+          return
         }
+
+        await setAccessToken(addNewDeviceForUser.accessToken)
+        const decodedToken = await getUserFromToken()
+        if (!decodedToken) {
+          throw new Error('Missing access token after login approval')
+        }
+
+        const encryptedSecrets = addNewDeviceForUser.user.EncryptedSecrets
+        const deviceState: IBackgroundStateSerializable = {
+          masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
+          userId,
+          secrets: encryptedSecrets,
+          email: formStateContext.email,
+          encryptionSalt,
+          deviceName: props.deviceName,
+          authSecret: newDeviceSecretsPair.addDeviceSecret,
+          authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
+          vaultLockTimeoutSeconds:
+            addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
+          autofillTOTPEnabled:
+            addNewDeviceForUser.user.device.autofillTOTPEnabled,
+          autofillCredentialsEnabled:
+            addNewDeviceForUser.user.device.autofillCredentialsEnabled,
+          uiLanguage: addNewDeviceForUser.user.uiLanguage,
+          syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
+          notificationOnWrongPasswordAttempts:
+            addNewDeviceForUser.user.notificationOnWrongPasswordAttempts,
+          notificationOnVaultUnlock:
+            addNewDeviceForUser.user.notificationOnVaultUnlock,
+          theme: addNewDeviceForUser.user.defaultDeviceSettings.theme
+        }
+
+        if (
+          colorMode !== addNewDeviceForUser.user.defaultDeviceSettings.theme
+        ) {
+          toggleColorMode()
+        }
+
+        setUserId(decodedToken.userId)
+        device.save(deviceState)
+
+        toast({
+          title: t`Device approved at ${formatRelative(
+            new Date(),
+            new Date(deviceDecryptionChallenge.approvedAt as string)
+          )}`,
+          status: 'success',
+          isClosable: true
+        })
       })()
     } else if (!deviceDecryptionChallenge) {
       getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
     }
-  }, [deviceDecryptionChallenge])
+  }, [
+    addNewDevice,
+    colorMode,
+    deviceDecryptionChallenge,
+    deviceDecryptionChallengeVariables,
+    formStateContext,
+    getDeviceDecryptionChallenge,
+    props.deviceName,
+    setFormStateContext,
+    setUserId,
+    toggleColorMode
+  ])
 
   return { deviceDecryptionChallenge, loading, formState: formStateContext }
 }
 
-export const LoginAwaitingApproval: React.FC = () => {
+export const LoginAwaitingApproval = () => {
   const [deviceName] = useState(device.generateDeviceName())
-  const { deviceDecryptionChallenge, formState } = useLogin({
-    deviceName
-  })
+  const { deviceDecryptionChallenge, formState } = useLogin({ deviceName })
   const [initiateMasterDeviceReset, { loading: resetMasterDeviceLoading }] =
     useInitiateMasterDeviceResetMutation({
       onCompleted: ({ initiateMasterDeviceReset }) => {
@@ -272,44 +274,39 @@ export const LoginAwaitingApproval: React.FC = () => {
     })
 
   if (!deviceDecryptionChallenge) {
-    return <Spinner />
+    return (
+      <div className="flex min-h-[220px] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
+      </div>
+    )
   }
+
   if (
-    !deviceDecryptionChallenge ||
-    (deviceDecryptionChallenge?.id &&
-      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval')
+    deviceDecryptionChallenge.id &&
+    deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
   ) {
-    const pendingResetAt =
-      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
-        ? deviceDecryptionChallenge.masterDeviceResetProcessAt
-        : null
+    const pendingResetAt = deviceDecryptionChallenge.masterDeviceResetProcessAt
     const confirmedResetAt =
-      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
-        ? deviceDecryptionChallenge.masterDeviceResetConfirmedAt
-        : null
+      deviceDecryptionChallenge.masterDeviceResetConfirmedAt
     const requestedResetAt =
-      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
-        ? deviceDecryptionChallenge.masterDeviceResetRequestedAt
-        : null
+      deviceDecryptionChallenge.masterDeviceResetRequestedAt
     const rejectedResetAt =
-      deviceDecryptionChallenge.__typename === 'DecryptionChallengeForApproval'
-        ? deviceDecryptionChallenge.masterDeviceResetRejectedAt
-        : null
+      deviceDecryptionChallenge.masterDeviceResetRejectedAt
 
     return (
-      <Card p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="600px">
-        <Heading size="sm" mb={2}>
+      <div className="extension-surface min-w-[600px] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-8 shadow-lg">
+        <h2 className="mb-2 text-sm font-semibold text-[color:var(--color-muted)]">
           <Trans>Username: {formState.email}</Trans>
-        </Heading>
-        <Flex align={'center'}>
-          <WarningIcon mr={2} boxSize={30} />
-          <Heading size="md" mr={4}>
+        </h2>
+        <div className="flex items-center gap-3">
+          <IoWarningOutline className="size-8 text-amber-300" />
+          <h3 className="text-lg font-semibold text-[color:var(--color-foreground)]">
             <Trans>Device: </Trans>
-          </Heading>
-          <Heading size="sm">{deviceName}</Heading>
-        </Flex>
-        <Center mt={3}>
-          <Flex flexDir="column">
+          </h3>
+          <div className="text-sm">{deviceName}</div>
+        </div>
+        <div className="mt-3 flex justify-center">
+          <div className="flex flex-col">
             <Txt fontSize="md" mb={2}>
               <Trans>
                 Approve this device in your device management in the vault on
@@ -324,84 +321,70 @@ export const LoginAwaitingApproval: React.FC = () => {
               </Trans>
             </Txt>
 
-            {deviceDecryptionChallenge.__typename ===
-            'DecryptionChallengeForApproval' ? (
-              <>
-                <Txt fontSize="sm" mt={3}>
-                  <Trans>
-                    Push notifications sent:{' '}
-                    {deviceDecryptionChallenge.pushNotificationsSentCount}
-                  </Trans>
-                </Txt>
-                <Txt fontSize="sm" mb={3}>
-                  <Trans>
-                    Push notifications failed:{' '}
-                    {deviceDecryptionChallenge.pushNotificationsFailedCount}
-                  </Trans>
-                </Txt>
+            <Txt fontSize="sm" mt={3}>
+              <Trans>
+                Push notifications sent:{' '}
+                {deviceDecryptionChallenge.pushNotificationsSentCount}
+              </Trans>
+            </Txt>
+            <Txt fontSize="sm" mb={3}>
+              <Trans>
+                Push notifications failed:{' '}
+                {deviceDecryptionChallenge.pushNotificationsFailedCount}
+              </Trans>
+            </Txt>
 
-                {pendingResetAt ? (
-                  <Txt fontSize="sm" mb={3}>
-                    <Trans>
-                      Master device reset scheduled for{' '}
-                      {new Date(pendingResetAt).toLocaleString()}.
-                    </Trans>
-                  </Txt>
-                ) : null}
-
-                {requestedResetAt && !confirmedResetAt && !rejectedResetAt ? (
-                  <Txt fontSize="sm" mb={3}>
-                    <Trans>
-                      Master device reset confirmation email sent. Confirm the
-                      email link to arm the reset.
-                    </Trans>
-                  </Txt>
-                ) : null}
-
-                {rejectedResetAt ? (
-                  <Txt fontSize="sm" mb={3}>
-                    <Trans>
-                      Master device reset was rejected at{' '}
-                      {new Date(rejectedResetAt).toLocaleString()}.
-                    </Trans>
-                  </Txt>
-                ) : null}
-
-                <Button
-                  colorScheme="red"
-                  variant="outline"
-                  isLoading={resetMasterDeviceLoading}
-                  isDisabled={!!(requestedResetAt && !rejectedResetAt)}
-                  onClick={async () => {
-                    if (
-                      deviceDecryptionChallenge.__typename !==
-                      'DecryptionChallengeForApproval'
-                    ) {
-                      return
-                    }
-
-                    await initiateMasterDeviceReset({
-                      variables: {
-                        email: formState.email,
-                        deviceInput: {
-                          id: device.id as string,
-                          name: deviceName,
-                          platform: device.platform
-                        },
-                        decryptionChallengeId: deviceDecryptionChallenge.id
-                      }
-                    })
-                  }}
-                >
-                  <Trans>Reset master device</Trans>
-                </Button>
-              </>
+            {pendingResetAt ? (
+              <Txt fontSize="sm" mb={3}>
+                <Trans>
+                  Master device reset scheduled for{' '}
+                  {new Date(pendingResetAt).toLocaleString()}.
+                </Trans>
+              </Txt>
             ) : null}
-          </Flex>
-        </Center>
-      </Card>
+
+            {requestedResetAt && !confirmedResetAt && !rejectedResetAt ? (
+              <Txt fontSize="sm" mb={3}>
+                <Trans>
+                  Master device reset confirmation email sent. Confirm the email
+                  link to arm the reset.
+                </Trans>
+              </Txt>
+            ) : null}
+
+            {rejectedResetAt ? (
+              <Txt fontSize="sm" mb={3}>
+                <Trans>
+                  Master device reset was rejected at{' '}
+                  {new Date(rejectedResetAt).toLocaleString()}.
+                </Trans>
+              </Txt>
+            ) : null}
+
+            <Button
+              disabled={Boolean(requestedResetAt && !rejectedResetAt) || resetMasterDeviceLoading}
+              onClick={async () => {
+                await initiateMasterDeviceReset({
+                  variables: {
+                    email: formState.email,
+                    deviceInput: {
+                      id: device.id as string,
+                      name: deviceName,
+                      platform: device.platform
+                    },
+                    decryptionChallengeId: deviceDecryptionChallenge.id
+                  }
+                })
+              }}
+              variant="destructive"
+            >
+              <Trans>Reset master device</Trans>
+            </Button>
+          </div>
+        </div>
+      </div>
     )
-  } else {
-    return null
   }
+
+  return null
 }

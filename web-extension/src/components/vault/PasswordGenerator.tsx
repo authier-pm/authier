@@ -5,13 +5,8 @@ import {
   Collapse,
   HStack,
   VStack,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
   Flex
-} from '@chakra-ui/react'
+} from '@src/components/ui/legacy'
 
 import { Formik, Field, FormikHelpers } from 'formik'
 import {
@@ -58,23 +53,18 @@ export const PasswordGenerator = ({
                   <Flex justifyContent={'right'}>
                     <Field name="length">
                       {({ field, form }) => (
-                        <NumberInput
+                        <input
+                          className="h-10 w-24 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3"
                           id="length"
-                          mr={5}
-                          name="length"
-                          size="md"
-                          value={field.value} // TODO make this configurable per user
                           min={5}
-                          onChange={(val) => {
-                            form.setFieldValue(field.name, parseInt(val))
+                          name="length"
+                          style={{ marginRight: '20px' }}
+                          type="number"
+                          value={field.value} // TODO make this configurable per user
+                          onChange={(event) => {
+                            form.setFieldValue(field.name, parseInt(event.target.value))
                           }}
-                        >
-                          <NumberInputField />
-                          <NumberInputStepper>
-                            <NumberIncrementStepper />
-                            <NumberDecrementStepper />
-                          </NumberInputStepper>
-                        </NumberInput>
+                        />
                       )}
                     </Field>
                     <Field name="numbers">

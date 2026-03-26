@@ -1,4 +1,3 @@
-import { useColorModeValue } from '@chakra-ui/color-mode'
 import {
   Button,
   Checkbox,
@@ -6,8 +5,9 @@ import {
   FormLabel,
   Select,
   Spinner,
-  VStack
-} from '@chakra-ui/react'
+  VStack,
+  useColorModeValue
+} from '@src/components/ui/legacy'
 
 import {
   DefaultSettingsDocument,

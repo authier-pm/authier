@@ -1,5 +1,4 @@
 import { useDescription, useTsController } from '@ts-react/form'
-import { Checkbox } from '@chakra-ui/react'
 
 export default function CheckboxField({ name }: { name: string }) {
   const {
@@ -8,11 +7,15 @@ export default function CheckboxField({ name }: { name: string }) {
   const { label } = useDescription()
 
   return (
-    <Checkbox
-      onChange={(e) => onChange(e.target.checked)}
-      defaultChecked={value ? value : false}
-    >
-      {label}
-    </Checkbox>
+    <label className="inline-flex items-center gap-2 text-sm text-[color:var(--color-foreground)]">
+      <input
+        checked={Boolean(value)}
+        className="size-4 rounded border border-[color:var(--color-border)] bg-[color:var(--color-input)]"
+        name={name}
+        onChange={(e) => onChange(e.target.checked)}
+        type="checkbox"
+      />
+      <span>{label}</span>
+    </label>
   )
 }
