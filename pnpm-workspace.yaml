@@ -1,7 +1,9 @@
 packages:
   - "backend/**"
   - 'mobile-app/**'
+  - 'vault-web/**'
   - 'web-extension/**'
   # if required, exclude some directories
   - '!backend/dist/**'
+  - '!vault-web/dist/**'
   - '!web-extension/dist/**'

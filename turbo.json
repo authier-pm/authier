@@ -1,6 +1,14 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "local": {
+      "cache": false,
+      "persistent": true
+    },
     "tsc": {
       "outputs": ["dist/**"]
     },
@@ -8,6 +16,9 @@
       "outputs": []
     },
     "authier-web-extension#tsc": {
+      "outputs": []
+    },
+    "authier-vault-web#tsc": {
       "outputs": []
     },
     "test": {

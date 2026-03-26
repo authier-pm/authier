@@ -6,6 +6,9 @@ import debug from 'debug'
 
 faker.seed(1)
 export const log = debug('au:test')
+process.env.ACCESS_TOKEN_SECRET ??= 'test-access-token-secret'
+process.env.REFRESH_TOKEN_SECRET ??= 'test-refresh-token-secret'
+process.env.FRONTEND_URL ??= 'https://app.authier.pm'
 
 import { PGlite } from '@electric-sql/pglite'
 import { citext } from '@electric-sql/pglite/contrib/citext'

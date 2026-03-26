@@ -13,13 +13,7 @@ export const setNewAccessTokenIntoCookie = (
   device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>,
   ctx: IContext
 ) => {
-  const accessToken = sign(
-    { userId: user.id, deviceId: device.id },
-    process.env.ACCESS_TOKEN_SECRET!,
-    {
-      expiresIn: `${Math.floor(device.vaultLockTimeoutSeconds / 3)}s`
-    }
-  )
+  const accessToken = createAccessToken(user, device)
 
   ctx.reply.setCookie('access-token', accessToken, {
     secure: isProd, // send cookie over HTTPS only
@@ -29,6 +23,19 @@ export const setNewAccessTokenIntoCookie = (
 
   return accessToken
 }
+
+export const createAccessToken = (
+  user: Pick<User, 'id'>,
+  device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>
+) =>
+  sign(
+    { userId: user.id, deviceId: device.id },
+    process.env.ACCESS_TOKEN_SECRET!,
+    {
+      jwtid: crypto.randomUUID(),
+      expiresIn: `${Math.floor(device.vaultLockTimeoutSeconds / 3)}s`
+    }
+  )
 
 export interface jwtPayloadRefreshToken extends JwtPayload {
   userId: string
@@ -41,14 +48,7 @@ export const setNewRefreshToken = (
   device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>,
   ctx: IContext
 ) => {
-  const payload = {
-    userId: user.id,
-    deviceId: device.id,
-    tokenVersion: user.tokenVersion
-  }
-  const refreshToken = sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
-    expiresIn: `${device.vaultLockTimeoutSeconds}s`
-  })
+  const refreshToken = createRefreshToken(user, device)
 
   ctx.reply.setCookie('refresh-token', refreshToken, {
     secure: isProd, // send cookie over HTTPS only
@@ -58,3 +58,26 @@ export const setNewRefreshToken = (
 
   return refreshToken
 }
+
+export const createRefreshToken = (
+  user: Pick<User, 'id' | 'tokenVersion'>,
+  device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>
+) => {
+  const payload = {
+    userId: user.id,
+    deviceId: device.id,
+    tokenVersion: user.tokenVersion
+  }
+  return sign(payload, process.env.REFRESH_TOKEN_SECRET!, {
+    jwtid: crypto.randomUUID(),
+    expiresIn: `${device.vaultLockTimeoutSeconds}s`
+  })
+}
+
+export const createAuthTokens = (
+  user: Pick<User, 'id' | 'tokenVersion'>,
+  device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>
+) => ({
+  accessToken: createAccessToken(user, device),
+  refreshToken: createRefreshToken(user, device)
+})

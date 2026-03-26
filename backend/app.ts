@@ -4,6 +4,8 @@ import { Elysia, serializeCookie } from 'elysia'
 import { cors } from '@elysiajs/cors'
 import { createYoga } from 'graphql-yoga'
 import type { GraphQLError } from 'graphql'
+import { onError } from '@orpc/server'
+import { RPCHandler } from '@orpc/server/fetch'
 import { gqlSchema } from './schemas/gqlSchema'
 import { createRequestDb } from './prisma/prismaClient'
 import { createStripeClientGetter } from './stripeClient'
@@ -21,6 +23,8 @@ import {
   createLegacyReplyAdapter,
   createLegacyRequestFromElysia
 } from './lib/createLegacyHttpAdapters'
+import { createOrpcRequestContext } from './orpc/context'
+import { vaultOrpcRouter } from './orpc/router'
 
 const log = debug('au:app')
 
@@ -95,6 +99,14 @@ const yoga = createYoga<YogaServerContext, IContext>({
   }
 })
 
+const orpcHandler = new RPCHandler(vaultOrpcRouter, {
+  interceptors: [
+    onError((error) => {
+      console.error(error)
+    })
+  ]
+})
+
 const copyYogaResponseToElysia = async (
   ctx: Pick<LegacyElysiaContext, 'set'>,
   response: Response
@@ -160,12 +172,42 @@ const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
   }
 }
 
+const handleOrpcRequest = async (ctx: LegacyElysiaContext) => {
+  const requestContext = createOrpcRequestContext(ctx)
+
+  try {
+    const result = await orpcHandler.handle(ctx.request, {
+      prefix: '/rpc',
+      context: requestContext.context
+    })
+
+    if (!result.matched) {
+      return new Response('Not found', {
+        status: 404
+      })
+    }
+
+    return copyYogaResponseToElysia(ctx, result.response)
+  } finally {
+    await requestContext.close()
+  }
+}
+
 export const buildApp = (app = new Elysia()) => {
+  const allowedOrigins = [
+    'https://vault.authier.pm',
+    process.env.FRONTEND_URL,
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ].filter((origin): origin is string => Boolean(origin))
+
   app
     .use(
       cors({
-        origin: true,
-        credentials: true
+        origin: allowedOrigins,
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ['GET', 'POST', 'OPTIONS']
       })
     )
     .onError(({ code, error, set }) => {
@@ -244,6 +286,12 @@ export const buildApp = (app = new Elysia()) => {
       }
     })
     .get('/graphiql', ({ redirect }) => redirect('/graphql'))
+    .all('/rpc', handleOrpcRequest, {
+      parse: 'none'
+    })
+    .all('/rpc/*', handleOrpcRequest, {
+      parse: 'none'
+    })
     .get('/graphql', handleGraphqlRequest)
     .post('/graphql', handleGraphqlRequest, {
       parse: 'none'

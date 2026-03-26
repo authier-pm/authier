@@ -14,6 +14,8 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.4.1",
     "@elysiajs/cors": "^1.4.1",
+    "@orpc/contract": "1.13.11",
+    "@orpc/server": "1.13.11",
     "@react-native-firebase/app": "^23.8.8",
     "@types/jsonwebtoken": "^9.0.10",
     "@upstash/redis": "^1.37.0",
@@ -45,7 +47,8 @@
     "type-graphql": "npm:@capaj/type-graphql@2.0.0-alpha.1",
     "typescript": "^6.0.2",
     "uuid": "^13.0.0",
-    "wrangler": "^4.76.0"
+    "wrangler": "^4.76.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@anatine/esbuild-decorators": "^0.2.19",
@@ -75,7 +78,7 @@
     "dev:worker": "wrangler dev",
     "wrdeploy": "wrangler deploy",
     "kill": "kill $(lsof -t -i:5051)",
-    "local": "nodemon server.ts",
+    "local": "wrangler dev --port 5051",
     "db:generate": "drizzle-kit generate && bun tests/generateBaseSql.ts",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",

@@ -29,6 +29,13 @@ export const setDb = (newDb: any) => {
 }
 
 export const createRequestDb = () => {
+  if (process.env.NODE_ENV === 'test') {
+    return {
+      db: _db,
+      close: async () => {}
+    }
+  }
+
   const client = postgres(connectionString, { max: 1 })
   const requestDb = drizzle({ client, schema: dbSchema, relations })
   return {
