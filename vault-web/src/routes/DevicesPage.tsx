@@ -29,6 +29,59 @@ export function DevicesPage() {
     <div className="grid gap-6 lg:grid-cols-[1.1fr,0.9fr]">
       <Card>
         <CardHeader>
+          <CardTitle>Pending approvals</CardTitle>
+          <CardDescription>
+            Review and approve new browser or device logins.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {challengesQuery.data?.challenges.map((challenge) => (
+            <Card key={challenge.id} className="border-dashed">
+              <CardContent className="space-y-3 p-5">
+                <div>
+                  <h3 className="text-lg font-semibold">{challenge.deviceName}</h3>
+                  <p className="text-sm text-[color:var(--color-muted)]">
+                    {challenge.ipAddress} ·{' '}
+                    {new Date(challenge.createdAt).toLocaleString()}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    disabled={approveMutation.isPending}
+                    onClick={() => {
+                      void approveMutation.mutateAsync({ id: challenge.id }).then(() => {
+                        void refreshLists()
+                      })
+                    }}
+                    type="button"
+                  >
+                    Approve
+                  </Button>
+                  <Button
+                    disabled={rejectMutation.isPending}
+                    onClick={() => {
+                      void rejectMutation.mutateAsync({ id: challenge.id }).then(() => {
+                        void refreshLists()
+                      })
+                    }}
+                    type="button"
+                    variant="secondary"
+                  >
+                    Reject
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+          {challengesQuery.data?.challenges.length === 0 ? (
+            <p className="text-sm text-[color:var(--color-muted)]">
+              No pending approvals right now.
+            </p>
+          ) : null}
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
           <CardTitle>Your devices</CardTitle>
           <CardDescription>
             Rename, remove, or promote trusted devices.
@@ -122,59 +175,7 @@ export function DevicesPage() {
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Pending approvals</CardTitle>
-          <CardDescription>
-            Review and approve new browser or device logins.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {challengesQuery.data?.challenges.map((challenge) => (
-            <Card key={challenge.id} className="border-dashed">
-              <CardContent className="space-y-3 p-5">
-                <div>
-                  <h3 className="text-lg font-semibold">{challenge.deviceName}</h3>
-                  <p className="text-sm text-[color:var(--color-muted)]">
-                    {challenge.ipAddress} ·{' '}
-                    {new Date(challenge.createdAt).toLocaleString()}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    disabled={approveMutation.isPending}
-                    onClick={() => {
-                      void approveMutation.mutateAsync({ id: challenge.id }).then(() => {
-                        void refreshLists()
-                      })
-                    }}
-                    type="button"
-                  >
-                    Approve
-                  </Button>
-                  <Button
-                    disabled={rejectMutation.isPending}
-                    onClick={() => {
-                      void rejectMutation.mutateAsync({ id: challenge.id }).then(() => {
-                        void refreshLists()
-                      })
-                    }}
-                    type="button"
-                    variant="secondary"
-                  >
-                    Reject
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-          {challengesQuery.data?.challenges.length === 0 ? (
-            <p className="text-sm text-[color:var(--color-muted)]">
-              No pending approvals right now.
-            </p>
-          ) : null}
-        </CardContent>
-      </Card>
+
     </div>
   )
 }

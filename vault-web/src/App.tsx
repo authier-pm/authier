@@ -26,6 +26,14 @@ function ProtectedArea() {
     <AppShell>
       <Routes>
         <Route element={<VaultListPage />} path="/vault" />
+        <Route
+          element={<VaultListPage initialFilterMode="LOGIN_CREDENTIALS" />}
+          path="/vault/passwords"
+        />
+        <Route
+          element={<VaultListPage initialFilterMode="TOTP" />}
+          path="/vault/totp"
+        />
         <Route element={<VaultEditPage />} path="/vault/new" />
         <Route element={<VaultEditPage />} path="/vault/:secretId" />
         <Route element={<DevicesPage />} path="/devices" />

@@ -2,13 +2,14 @@ import {
   LockKeyhole,
   LogOut,
   MoonStar,
+  Plus,
   ShieldCheck,
   Smartphone,
   SunMedium,
   Vault
 } from 'lucide-react'
 import { useEffect, useState, type ReactNode } from 'react'
-import { NavLink } from 'react-router-dom'
+import { Link, NavLink } from 'react-router-dom'
 import authierLogo from '@shared/imgs/logo.svg'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -42,10 +43,14 @@ const navigation = [
 ]
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const { lockedState, lockVault, logout, session } = useVaultSession()
+  const { decryptedSecrets, lockedState, lockVault, logout, session } = useVaultSession()
   const [themeMode, setThemeMode] = useState<ThemeMode>(getInitialTheme)
   const currentEmail = lockedState?.email ?? session?.user.email ?? 'Signed out'
   const currentDevice = lockedState?.deviceName ?? session?.currentDevice.name ?? 'Unknown device'
+  const passwordCount = decryptedSecrets.filter(
+    (secret) => secret.kind === 'LOGIN_CREDENTIALS'
+  ).length
+  const totpCount = decryptedSecrets.filter((secret) => secret.kind === 'TOTP').length
 
   useEffect(() => {
     document.documentElement.dataset.theme = themeMode
@@ -93,7 +98,60 @@ export function AppShell({ children }: { children: ReactNode }) {
             </div>
 
             <nav className="mt-6 flex flex-col gap-2">
-              {navigation.map((item) => (
+              {navigation.slice(0, 1).map((item) => (
+                <NavLink
+                  key={item.to}
+                  className={({ isActive }) =>
+                    cn(
+                      'inline-flex w-full items-center gap-3 rounded-[var(--radius-md)] border px-4 py-3 text-sm font-medium transition',
+                      isActive
+                        ? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)]'
+                        : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-foreground)] hover:bg-[color:var(--color-accent)]'
+                    )
+                  }
+                  to={item.to}
+                >
+                  <item.icon className="size-4" />
+                  {item.label}
+                </NavLink>
+              ))}
+            </nav>
+
+            <div className="mt-3 ml-4 space-y-3 border-l border-[color:var(--color-border)] pl-4">
+              <Button asChild className="w-full justify-start" variant="ghost">
+                <Link to="/vault/new">
+                  <Plus className="size-4" />
+                  Add item
+                </Link>
+              </Button>
+              <div className="grid grid-cols-2 gap-2">
+                <Link
+                  className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3 transition hover:border-[color:var(--color-primary)] hover:bg-[color:var(--color-accent)]"
+                  to="/vault/passwords"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
+                    Passwords
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-[color:var(--color-foreground)]">
+                    {passwordCount}
+                  </p>
+                </Link>
+                <Link
+                  className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3 transition hover:border-[color:var(--color-primary)] hover:bg-[color:var(--color-accent)]"
+                  to="/vault/totp"
+                >
+                  <p className="text-[11px] uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
+                    TOTP
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-[color:var(--color-foreground)]">
+                    {totpCount}
+                  </p>
+                </Link>
+              </div>
+            </div>
+
+            <nav className="mt-3 flex flex-col gap-2">
+              {navigation.slice(1).map((item) => (
                 <NavLink
                   key={item.to}
                   className={({ isActive }) =>

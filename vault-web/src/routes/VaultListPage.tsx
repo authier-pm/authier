@@ -1,17 +1,25 @@
-import { useState } from 'react'
+import { File } from 'lucide-react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { constructURL } from '@shared/urlUtils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
 
 type FilterMode = 'ALL' | 'LOGIN_CREDENTIALS' | 'TOTP'
 
-export function VaultListPage() {
+type VaultListPageProps = {
+  initialFilterMode?: FilterMode
+}
+
+export function VaultListPage({
+  initialFilterMode = 'ALL'
+}: VaultListPageProps) {
   const { decryptedSecrets, skippedSecretsCount } = useVaultSession()
   const [query, setQuery] = useState('')
-  const [filterMode, setFilterMode] = useState<FilterMode>('ALL')
+  const filterMode = initialFilterMode
 
   const visibleSecrets = decryptedSecrets.filter((secret) => {
     if (filterMode !== 'ALL' && secret.kind !== filterMode) {
@@ -28,15 +36,9 @@ export function VaultListPage() {
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>Vault</CardTitle>
-          <CardDescription>
-            Search, review, and edit your encrypted credentials and TOTP seeds.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+      <Card className="sticky top-4 z-20 lg:top-6">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
             <Input
               className="max-w-xl"
               onChange={(event) => setQuery(event.target.value)}
@@ -44,25 +46,20 @@ export function VaultListPage() {
               value={query}
             />
             <div className="flex gap-2">
-              {(['ALL', 'LOGIN_CREDENTIALS', 'TOTP'] as const).map((mode) => (
-                <Button
-                  key={mode}
-                  onClick={() => setFilterMode(mode)}
-                  type="button"
-                  variant={filterMode === mode ? 'primary' : 'outline'}
-                >
-                  {mode === 'ALL'
-                    ? 'All'
-                    : mode === 'LOGIN_CREDENTIALS'
-                      ? 'Passwords'
-                      : 'TOTP'}
-                </Button>
-              ))}
+              <Button asChild variant={filterMode === 'ALL' ? 'primary' : 'outline'}>
+                <Link to="/vault">All</Link>
+              </Button>
+              <Button
+                asChild
+                variant={filterMode === 'LOGIN_CREDENTIALS' ? 'primary' : 'outline'}
+              >
+                <Link to="/vault/passwords">Passwords</Link>
+              </Button>
+              <Button asChild variant={filterMode === 'TOTP' ? 'primary' : 'outline'}>
+                <Link to="/vault/totp">TOTP</Link>
+              </Button>
             </div>
           </div>
-          <Button asChild>
-            <Link to="/vault/new">Add item</Link>
-          </Button>
         </CardContent>
       </Card>
       {skippedSecretsCount > 0 ? (
@@ -80,6 +77,14 @@ export function VaultListPage() {
             secret.kind === 'LOGIN_CREDENTIALS'
               ? secret.loginCredentials.label
               : secret.totp.label
+          const iconUrl =
+            secret.kind === 'LOGIN_CREDENTIALS'
+              ? secret.loginCredentials.iconUrl
+              : secret.totp.iconUrl
+          const url =
+            secret.kind === 'LOGIN_CREDENTIALS'
+              ? secret.loginCredentials.url
+              : secret.totp.url
           const subtitle =
             secret.kind === 'LOGIN_CREDENTIALS'
               ? `${secret.loginCredentials.username} at ${secret.loginCredentials.url}`
@@ -89,21 +94,24 @@ export function VaultListPage() {
             <Link className="block w-full" key={secret.id} to={`/vault/${secret.id}`}>
               <Card className="w-full transition hover:-translate-y-0.5 hover:border-[color:var(--color-primary)]">
                 <CardContent className="flex w-full min-w-0 items-center justify-between gap-4 p-5 max-md:flex-col max-md:items-start">
-                  <div className="min-w-0 flex-1 space-y-1">
-                    <div className="flex min-w-0 items-center gap-3">
-                      <h3 className="min-w-0 flex-1 truncate text-lg font-semibold" title={title}>
-                        {title}
-                      </h3>
-                      <Badge className="shrink-0">
-                        {secret.kind === 'LOGIN_CREDENTIALS' ? 'Password' : 'TOTP'}
-                      </Badge>
+                  <div className="flex min-w-0 flex-1 items-center gap-4">
+                    <VaultSecretIcon iconUrl={iconUrl} label={title} url={url} />
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex min-w-0 items-center gap-3">
+                        <h3 className="min-w-0 flex-1 truncate text-lg font-semibold" title={title}>
+                          {title}
+                        </h3>
+                        <Badge className="shrink-0">
+                          {secret.kind === 'LOGIN_CREDENTIALS' ? 'Password' : 'TOTP'}
+                        </Badge>
+                      </div>
+                      <p
+                        className="truncate text-sm text-[color:var(--color-muted)]"
+                        title={subtitle}
+                      >
+                        {subtitle}
+                      </p>
                     </div>
-                    <p
-                      className="truncate text-sm text-[color:var(--color-muted)]"
-                      title={subtitle}
-                    >
-                      {subtitle}
-                    </p>
                   </div>
                   <p className="shrink-0 text-xs uppercase tracking-[0.24em] text-[color:var(--color-muted)]">
                     {new Date(secret.updatedAt ?? secret.createdAt).toLocaleDateString()}
@@ -122,5 +130,52 @@ export function VaultListPage() {
         ) : null}
       </div>
     </div>
+  )
+}
+
+type VaultSecretIconProps = {
+  iconUrl: string | null
+  label: string
+  url?: string | null
+}
+
+function VaultSecretIcon({
+  iconUrl,
+  label,
+  url
+}: VaultSecretIconProps) {
+  const [hasImageError, setHasImageError] = useState(false)
+  const resolvedIconUrl = useMemo(() => {
+    if (iconUrl) {
+      return iconUrl
+    }
+
+    if (!url) {
+      return null
+    }
+
+    const hostname = constructURL(url).hostname
+    if (!hostname) {
+      return null
+    }
+
+    return `https://icons.duckduckgo.com/ip3/${hostname}.ico`
+  }, [iconUrl, url])
+
+  if (!resolvedIconUrl || hasImageError) {
+    return (
+      <div className="flex size-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] text-[color:var(--color-muted)]">
+        <File className="size-4" />
+      </div>
+    )
+  }
+
+  return (
+    <img
+      alt={`${label} favicon`}
+      className="size-10 shrink-0 rounded-[var(--radius-md)] border border-[color:var(--color-border)] object-cover"
+      onError={() => setHasImageError(true)}
+      src={resolvedIconUrl}
+    />
   )
 }
