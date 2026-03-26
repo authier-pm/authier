@@ -82,6 +82,7 @@ export const PromptPassword = ({
 
   const [isHidden, setIsHidden] = useState(true)
   const [isSaving, setIsSaving] = useState(false)
+  const usernameDisplay = username ?? 'Not captured'
   return (
     <div
       style={{
@@ -99,7 +100,7 @@ export const PromptPassword = ({
       }}
     >
       <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
-      <h3 style={h3Style}>{username}</h3>
+      <h3 style={h3Style}>{usernameDisplay}</h3>
       <span style={spanStyle}>Password: </span>{' '}
       <h3 style={h3Style}>
         {isHidden ? password.replaceAll(/./g, '*') : password}

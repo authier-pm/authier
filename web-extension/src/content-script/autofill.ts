@@ -32,6 +32,10 @@ import {
 } from '../background/WebInputForAutofill'
 import { wait } from './wait'
 import { filterUselessInputs } from './getAllInputsIncludingShadowDom'
+import {
+  appendGeneratedPasswordHistoryEntry,
+  createGeneratedPasswordHistoryEntry
+} from '@src/util/generatedPasswordHistory'
 
 const log = debug('au:autofill')
 
@@ -169,7 +173,23 @@ function fillSegmentedTotpInputs(inputs: HTMLInputElement[], totpCode: string) {
  * triggered when page contains 2 or more useful inputs
  * @param usefulInputs
  */
-function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
+export async function handleGeneratedPasswordAutofill(
+  password: string,
+  options: { showSavePrompt: boolean }
+) {
+  await appendGeneratedPasswordHistoryEntry(
+    createGeneratedPasswordHistoryEntry({
+      pageUrl: window.location.href,
+      password
+    })
+  )
+
+  if (options.showSavePrompt) {
+    await renderSaveCredentialsForm(null, password)
+  }
+}
+
+async function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
   // TODO only do this after user confirmation as this could cause user to change their password by mistake-for example when they edit something on their profile and it also has the two password inputs
   for (let index = 0; index < usefulInputs.length - 1; index++) {
     const input = usefulInputs[index]
@@ -181,7 +201,9 @@ function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
       autofillValueIntoInput(usefulInputs[index], newPassword)
       autofillValueIntoInput(usefulInputs[index + 1], newPassword)
 
-      renderSaveCredentialsForm(null, newPassword)
+      await handleGeneratedPasswordAutofill(newPassword, {
+        showSavePrompt: true
+      })
       return true
     } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
       // TODO it would make sense to render the password generator here, but renderPasswordGenerator is not implemented yet
@@ -457,7 +479,7 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     if (usefulInputs.length >= 2) {
-      const isNewPassword = handleNewPasswordCase(usefulInputs)
+      const isNewPassword = await handleNewPasswordCase(usefulInputs)
       if (isNewPassword) {
         return
       }
@@ -624,7 +646,9 @@ export const autofill = (initState: IInitStateRes) => {
         } else if (inputEl.autocomplete?.includes('new-password')) {
           const newPassword = generatePasswordBasedOnUserConfig()
           autofillValueIntoInput(inputEl, newPassword)
-          // TODO show prompt to user to save the newly generated password
+          await handleGeneratedPasswordAutofill(newPassword, {
+            showSavePrompt: false
+          })
         } else {
           // More inputs on page
           if (inputEl.type === 'password') {
@@ -647,6 +671,9 @@ export const autofill = (initState: IInitStateRes) => {
                 autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
 
                 autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
+                await handleGeneratedPasswordAutofill(newPassword, {
+                  showSavePrompt: true
+                })
               }
             }
           }

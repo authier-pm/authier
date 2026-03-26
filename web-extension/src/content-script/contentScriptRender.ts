@@ -102,14 +102,10 @@ export const contentScriptRender = (stateInit: IInitStateRes) => {
   }
 
   // Render save credential modal after page-rerender
-  if (
-    saveLoginModalsState &&
-    saveLoginModalsState.username &&
-    saveLoginModalsState.password
-  ) {
+  if (saveLoginModalsState?.password) {
     log('rendering save credentials form')
     renderSaveCredentialsForm(
-      saveLoginModalsState.username,
+      saveLoginModalsState.username ?? null,
       saveLoginModalsState.password
     )
     return // the modal is already displayed
