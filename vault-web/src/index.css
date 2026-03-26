@@ -17,6 +17,7 @@
   --color-surface: rgba(255, 255, 255, 0.72);
   --color-surface-muted: rgba(255, 255, 255, 0.82);
   --color-input: rgba(255, 255, 255, 0.9);
+  --color-danger: #c43d3d;
   --color-danger-bg: #fff1f1;
   --color-danger-foreground: #8b2c2c;
   --radius-sm: 0.625rem;
@@ -49,8 +50,9 @@
   --color-surface: rgba(18, 30, 30, 0.8);
   --color-surface-muted: rgba(23, 39, 39, 0.92);
   --color-input: rgba(23, 39, 39, 0.96);
+  --color-danger: #ff7a7a;
   --color-danger-bg: #3a1f26;
-  --color-danger-foreground: #ffd4d9;
+  --color-danger-foreground: #3a0f14;
   color: var(--color-foreground);
   background:
     radial-gradient(circle at top left, rgba(42, 213, 212, 0.18), transparent 28%),

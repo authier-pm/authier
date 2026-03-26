@@ -665,6 +665,9 @@ importers:
       lucide-react:
         specifier: ^0.548.0
         version: 0.548.0(react@19.2.4)
+      otplib:
+        specifier: ^13.4.0
+        version: 13.4.0
       react:
         specifier: ^19.2.4
         version: 19.2.4

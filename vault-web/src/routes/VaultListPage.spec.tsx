@@ -57,7 +57,7 @@ describe('VaultListPage', () => {
   it('filters vault items by text search and secret kind', async () => {
     const user = userEvent.setup()
 
-    render(
+    const { rerender } = render(
       <MemoryRouter>
         <VaultListPage />
       </MemoryRouter>
@@ -81,7 +81,12 @@ describe('VaultListPage', () => {
         'Search by label, URL, username, password, or TOTP secret'
       )
     )
-    await user.click(screen.getByRole('button', { name: 'Passwords' }))
+
+    rerender(
+      <MemoryRouter>
+        <VaultListPage initialFilterMode="LOGIN_CREDENTIALS" />
+      </MemoryRouter>
+    )
 
     expect(screen.getByText('GitHub')).toBeInTheDocument()
     expect(screen.queryByText('Cloudflare')).not.toBeInTheDocument()

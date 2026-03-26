@@ -10,6 +10,8 @@ const buttonVariants = cva(
       variant: {
         primary:
           'border-[color:var(--color-primary)] bg-[color:var(--color-primary)] text-[color:var(--color-primary-foreground)] shadow-[0_16px_40px_rgba(25,128,127,0.18)] hover:brightness-105',
+        destructive:
+          'border-[color:var(--color-danger)] bg-[color:var(--color-danger)] text-[color:var(--color-danger-foreground)] shadow-[0_16px_40px_rgba(196,61,61,0.18)] hover:brightness-105',
         secondary:
           'border-[color:var(--color-secondary)] bg-[color:var(--color-secondary)] text-white hover:bg-[#0f4b4b]',
         outline:

@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { type FieldValues, type Path, type UseFormRegister, useForm } from 'react-hook-form'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
+import { TotpCodeCard } from '@/components/TotpCodeCard'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -109,6 +110,11 @@ export function VaultEditPage() {
   }
 
   const isEditing = Boolean(currentSecret)
+  const totpLabel = totpForm.watch('label')
+  const totpSecret = totpForm.watch('secret')
+  const totpDigits = totpForm.watch('digits')
+  const totpPeriod = totpForm.watch('period')
+  const shouldShowTotpToken = kind === 'TOTP' && (isEditing || totpSecret.trim().length > 0)
 
   return (
     <div className="space-y-6">
@@ -133,6 +139,15 @@ export function VaultEditPage() {
           ))}
         </CardContent>
       </Card>
+
+      {shouldShowTotpToken ? (
+        <TotpCodeCard
+          digits={totpDigits}
+          label={totpLabel}
+          period={totpPeriod}
+          secret={totpSecret}
+        />
+      ) : null}
 
       {kind === 'LOGIN_CREDENTIALS' ? (
         <Card>
@@ -164,26 +179,27 @@ export function VaultEditPage() {
               <VaultField label="Icon URL" name="iconUrl" register={loginForm.register} />
               <VaultField label="Android URI" name="androidUri" register={loginForm.register} />
               <VaultField label="iOS URI" name="iosUri" register={loginForm.register} />
-              <div className="col-span-full flex gap-3">
-                <Button type="submit">
-                  {isEditing ? 'Save changes' : 'Create password'}
-                </Button>
-                <Button asChild type="button" variant="outline">
-                  <Link to="/vault">Cancel</Link>
-                </Button>
+              <div className="col-span-full flex flex-wrap gap-3">
                 {currentSecret ? (
                   <Button
+                    className="mr-auto"
                     onClick={() => {
                       void deleteSecret(currentSecret.id).then(() => {
                         navigate('/vault')
                       })
                     }}
                     type="button"
-                    variant="secondary"
+                    variant="destructive"
                   >
                     Delete
                   </Button>
                 ) : null}
+                <Button className={currentSecret ? 'ml-auto' : undefined} type="submit">
+                  {isEditing ? 'Save changes' : 'Create password'}
+                </Button>
+                <Button asChild type="button" variant="outline">
+                  <Link to="/vault">Cancel</Link>
+                </Button>
               </div>
             </form>
           </CardContent>
@@ -214,26 +230,27 @@ export function VaultEditPage() {
               <VaultField label="Icon URL" name="iconUrl" register={totpForm.register} />
               <VaultField label="Android URI" name="androidUri" register={totpForm.register} />
               <VaultField label="iOS URI" name="iosUri" register={totpForm.register} />
-              <div className="col-span-full flex gap-3">
-                <Button type="submit">
-                  {isEditing ? 'Save changes' : 'Create TOTP'}
-                </Button>
-                <Button asChild type="button" variant="outline">
-                  <Link to="/vault">Cancel</Link>
-                </Button>
+              <div className="col-span-full flex flex-wrap gap-3">
                 {currentSecret ? (
                   <Button
+                    className="mr-auto"
                     onClick={() => {
                       void deleteSecret(currentSecret.id).then(() => {
                         navigate('/vault')
                       })
                     }}
                     type="button"
-                    variant="secondary"
+                    variant="destructive"
                   >
                     Delete
                   </Button>
                 ) : null}
+                <Button className={currentSecret ? 'ml-auto' : undefined} type="submit">
+                  {isEditing ? 'Save changes' : 'Create TOTP'}
+                </Button>
+                <Button asChild type="button" variant="outline">
+                  <Link to="/vault">Cancel</Link>
+                </Button>
               </div>
             </form>
           </CardContent>
