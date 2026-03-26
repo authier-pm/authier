@@ -1,22 +1,20 @@
+import { useContext } from 'react'
+import { Field, Formik, type FormikHelpers } from 'formik'
+import { Trans } from '@lingui/react/macro'
 import {
-  Button,
-  Checkbox,
-  FormControl,
-  FormHelperText,
-  FormLabel,
-  Select,
-  VStack,
-  useColorModeValue
-} from '@src/components/ui/legacy'
-import {
-  useUpdateSettingsMutation,
-  SyncSettingsDocument
+  SyncSettingsDocument,
+  useUpdateSettingsMutation
 } from '@shared/graphql/Settings.codegen'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { useContext } from 'react'
-import { Trans } from '@lingui/react/macro'
-
-import { Field, Formik, FormikHelpers } from 'formik'
+import { Button } from '@src/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@src/components/ui/card'
+import { Switch } from '@src/components/ui/switch'
 import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
 
 interface Values {
@@ -37,20 +35,21 @@ export default function Security() {
     refetchQueries: [{ query: SyncSettingsDocument, variables: {} }]
   })
 
-  if (deviceState) {
-    return (
-      <VStack
-        width={'70%'}
-        maxW="600px"
-        alignItems={'normal'}
-        mt={8}
-        spacing={20}
-        rounded={'lg'}
-        className="Security"
-        boxShadow={'lg'}
-        p={30}
-        bg={useColorModeValue('cyan.800', 'gray.800')}
-      >
+  if (!deviceState) {
+    return null
+  }
+
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader>
+        <CardTitle>Security behavior</CardTitle>
+        <CardDescription>
+          Control locking, language, autofill, and vault notifications for this
+          device.
+        </CardDescription>
+      </CardHeader>
+
+      <CardContent>
         <Formik
           initialValues={{
             autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
@@ -64,12 +63,13 @@ export default function Security() {
           }}
           onSubmit={async (
             values: Values,
-            { setSubmitting, resetForm }: FormikHelpers<Values>
+            { resetForm, setSubmitting }: FormikHelpers<Values>
           ) => {
             const config = {
               ...values,
-              vaultLockTimeoutSeconds: parseInt(
-                values.vaultLockTimeoutSeconds.toString()
+              vaultLockTimeoutSeconds: Number.parseInt(
+                values.vaultLockTimeoutSeconds.toString(),
+                10
               )
             }
 
@@ -83,132 +83,182 @@ export default function Security() {
             setSubmitting(false)
           }}
         >
-          {({ isSubmitting, dirty, handleSubmit }) => (
-            <form onSubmit={handleSubmit}>
-              <VStack spacing={4} align="flex-start">
-                <FormControl>
-                  <FormLabel htmlFor="vaultLockTimeoutSeconds">
-                    <Trans>Lock time</Trans>
-                  </FormLabel>
-                  <Field
-                    as={Select}
-                    id="vaultLockTimeoutSeconds"
-                    name="vaultLockTimeoutSeconds"
+          {({ dirty, handleSubmit, isSubmitting, setFieldValue, values }) => (
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field name="vaultLockTimeoutSeconds">
+                  {() => (
+                    <FormField
+                      description="Automatically locks the vault after a period of inactivity."
+                      label="Lock time"
+                    >
+                      <select
+                        className="h-10 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 text-sm text-[color:var(--color-foreground)] outline-none transition focus:border-[color:var(--color-ring)] focus:ring-2 focus:ring-[color:var(--color-ring)]/30"
+                        id="vaultLockTimeoutSeconds"
+                        name="vaultLockTimeoutSeconds"
+                        onChange={(event) => {
+                          setFieldValue(
+                            'vaultLockTimeoutSeconds',
+                            Number.parseInt(event.target.value, 10)
+                          )
+                        }}
+                        value={values.vaultLockTimeoutSeconds}
+                      >
+                        {options.map((option) => (
+                          <option key={option.value} value={option.value}>
+                            {option.label}
+                          </option>
+                        ))}
+                      </select>
+                    </FormField>
+                  )}
+                </Field>
+
+                <Field name="uiLanguage">
+                  {() => (
+                    <FormField
+                      description="Choose the language used across the vault UI."
+                      label="Language"
+                    >
+                      <select
+                        className="h-10 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 text-sm text-[color:var(--color-foreground)] outline-none transition focus:border-[color:var(--color-ring)] focus:ring-2 focus:ring-[color:var(--color-ring)]/30"
+                        id="uiLanguage"
+                        name="uiLanguage"
+                        onChange={(event) => {
+                          setFieldValue('uiLanguage', event.target.value)
+                        }}
+                        value={values.uiLanguage}
+                      >
+                        <option value="en">English</option>
+                        <option value="cs">Cesky</option>
+                      </select>
+                    </FormField>
+                  )}
+                </Field>
+              </div>
+
+              <div className="grid gap-4">
+                <SettingToggle
+                  checked={values.autofillCredentialsEnabled}
+                  description="Allow saved credentials to be offered for autofill."
+                  label="Credentials autofill"
+                  onCheckedChange={(checked) => {
+                    setFieldValue('autofillCredentialsEnabled', checked)
+                  }}
+                />
+                <SettingToggle
+                  checked={values.autofillTOTPEnabled}
+                  description="Enable one-time password autofill where supported."
+                  label="TOTP autofill"
+                  onCheckedChange={(checked) => {
+                    setFieldValue('autofillTOTPEnabled', checked)
+                  }}
+                />
+                <SettingToggle
+                  checked={values.syncTOTP}
+                  description="Keep your one-time password data synced to this device."
+                  label="2FA sync"
+                  onCheckedChange={(checked) => {
+                    setFieldValue('syncTOTP', checked)
+                  }}
+                />
+                <SettingToggle
+                  checked={values.notificationOnVaultUnlock}
+                  description="Show a notification whenever the vault is unlocked."
+                  label="Notification on vault unlock"
+                  onCheckedChange={(checked) => {
+                    setFieldValue('notificationOnVaultUnlock', checked)
+                  }}
+                />
+              </div>
+
+              <Field name="notificationOnWrongPasswordAttempts">
+                {() => (
+                  <FormField
+                    description="Set how many wrong password attempts trigger a notification."
+                    label="Wrong password threshold"
                   >
-                    {options.map((option, index) => (
-                      <option value={option.value.toString()} key={index}>
-                        {option.label}
-                      </option>
-                    ))}
-                  </Field>
-                </FormControl>
-
-                <FormControl>
-                  <FormLabel htmlFor="uiLanguage">Language</FormLabel>
-                  <Field as={Select} id="uiLanguage" name="uiLanguage">
-                    <option value="en">English</option>
-                    <option value="cs">Čeština</option>
-                  </Field>
-                </FormControl>
-
-                <Field name="autofillCredentialsEnabled">
-                  {({ field }) => (
-                    <Checkbox
-                      id="autofillCredentialsEnabled"
-                      name="autofillCredentialsEnabled"
-                      isChecked={field.value}
-                      mr={5}
-                      {...field}
-                    >
-                      <Trans>Credentials autofill</Trans>
-                    </Checkbox>
-                  )}
-                </Field>
-
-                <Field name="autofillTOTPEnabled">
-                  {({ field }) => (
-                    <Checkbox
-                      id="autofillTOTPEnabled"
-                      name="autofillTOTPEnabled"
-                      isChecked={field.value}
-                      mr={5}
-                      {...field}
-                    >
-                      TOTP autofill
-                    </Checkbox>
-                  )}
-                </Field>
-
-                <Field name="syncTOTP">
-                  {({ field }) => (
-                    <Checkbox
-                      id="syncTOTP"
-                      name="syncTOTP"
-                      isChecked={field.value}
-                      mr={5}
-                      {...field}
-                    >
-                      <Trans>2FA sync</Trans>
-                    </Checkbox>
-                  )}
-                </Field>
-
-                <Field name="notificationOnWrongPasswordAttempts">
-                  {({ field, form }) => (
                     <input
-                      className="h-10 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3"
+                      className="h-10 w-full rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 text-sm text-[color:var(--color-foreground)] outline-none transition focus:border-[color:var(--color-ring)] focus:ring-2 focus:ring-[color:var(--color-ring)]/30"
                       id="notificationOnWrongPasswordAttempts"
                       min={0}
                       name="notificationOnWrongPasswordAttempts"
-                      style={{ marginRight: '20px' }}
-                      type="number"
-                      value={field.value}
                       onChange={(event) => {
-                        form.setFieldValue(field.name, parseInt(event.target.value))
+                        setFieldValue(
+                          'notificationOnWrongPasswordAttempts',
+                          Number.parseInt(event.target.value || '0', 10)
+                        )
                       }}
+                      type="number"
+                      value={values.notificationOnWrongPasswordAttempts}
                     />
-                  )}
-                </Field>
+                  </FormField>
+                )}
+              </Field>
 
-                <Field name="notificationOnVaultUnlock">
-                  {({ field }) => (
-                    <Checkbox
-                      id="notificationOnVaultUnlock"
-                      name="notificationOnVaultUnlock"
-                      isChecked={field.value}
-                      mr={5}
-                      {...field}
-                    >
-                      <Trans>Notification on vault unlock</Trans>
-                    </Checkbox>
-                  )}
-                </Field>
-
+              <div className="flex justify-end">
                 <Button
-                  isDisabled={isSubmitting || !dirty}
-                  isLoading={isSubmitting}
+                  disabled={isSubmitting || !dirty}
                   type="submit"
-                  bg={'blue.400'}
-                  color={'white'}
-                  boxShadow={
-                    '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                  }
-                  _hover={{
-                    bg: 'blue.500'
-                  }}
-                  _focus={{
-                    bg: 'blue.500'
-                  }}
-                  aria-label="Save"
+                  variant="primary"
                 >
                   <Trans>Save</Trans>
                 </Button>
-              </VStack>
+              </div>
             </form>
           )}
         </Formik>
-      </VStack>
-    )
-  }
-  return null
+      </CardContent>
+    </Card>
+  )
+}
+
+function FormField({
+  children,
+  description,
+  label
+}: {
+  children: React.ReactNode
+  description?: string
+  label: string
+}) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+      <label className="block text-sm font-medium text-[color:var(--color-foreground)]">
+        {label}
+      </label>
+      {description ? (
+        <p className="mt-1 text-xs leading-5 text-[color:var(--color-muted)]">
+          {description}
+        </p>
+      ) : null}
+      <div className="mt-3">{children}</div>
+    </div>
+  )
+}
+
+function SettingToggle({
+  checked,
+  description,
+  label,
+  onCheckedChange
+}: {
+  checked: boolean
+  description: string
+  label: string
+  onCheckedChange: (checked: boolean) => void
+}) {
+  return (
+    <div className="flex items-center justify-between gap-4 rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+      <div>
+        <div className="text-sm font-medium text-[color:var(--color-foreground)]">
+          {label}
+        </div>
+        <div className="mt-1 text-xs leading-5 text-[color:var(--color-muted)]">
+          {description}
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  )
 }
