@@ -373,4 +373,109 @@ describe('VaultSessionProvider', () => {
       refreshToken: 'refresh-token-1'
     })
   })
+
+  it('re-authenticates the trusted device on unlock when the refresh token is missing', async () => {
+    const password = 'super secure password'
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const encryptionSalt = bufferToBase64(salt)
+    const masterKey = await generateEncryptionKey(password, salt)
+    const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
+    const existingEncryptedSecret = await encryptLoginSecret(
+      {
+        label: 'GitHub',
+        url: 'https://github.com',
+        iconUrl: null,
+        username: 'capaj',
+        password: 'hunter2',
+        androidUri: null,
+        iosUri: null
+      },
+      masterKey,
+      salt
+    )
+
+    window.localStorage.setItem(
+      'authier-vault-locked-state',
+      JSON.stringify({
+        userId: '11111111-1111-1111-1111-111111111111',
+        email: 'capaj@test.com',
+        deviceName: 'Primary browser',
+        encryptionSalt,
+        authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
+        vaultLockTimeoutSeconds: 28800
+      })
+    )
+
+    orpcMocks.requestDeviceChallenge.mockResolvedValue({
+      status: 'approved',
+      challengeId: 42,
+      userId: '11111111-1111-1111-1111-111111111111',
+      deviceId: 'device-1',
+      deviceName: 'Primary browser',
+      approvedAt: new Date('2026-03-25T10:00:00.000Z').toISOString(),
+      addDeviceSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
+      encryptionSalt
+    })
+    orpcMocks.completeDeviceLogin.mockResolvedValue({
+      accessToken: 'access-token-2',
+      refreshToken: 'refresh-token-2',
+      session: {
+        user: {
+          id: '11111111-1111-1111-1111-111111111111',
+          email: 'capaj@test.com',
+          masterDeviceId: 'device-1',
+          newDevicePolicy: 'ALLOW',
+          deviceRecoveryCooldownMinutes: 960
+        },
+        currentDevice: {
+          id: 'device-1',
+          name: 'Primary browser',
+          platform: 'web',
+          syncTOTP: true,
+          vaultLockTimeoutSeconds: 28800,
+          createdAt: new Date('2026-03-25T10:00:00.000Z').toISOString(),
+          lastSyncAt: null,
+          logoutAt: null
+        },
+        secrets: [
+          {
+            id: '11111111-1111-1111-1111-111111111112',
+            encrypted: existingEncryptedSecret,
+            kind: 'LOGIN_CREDENTIALS',
+            version: 1,
+            createdAt: new Date('2026-03-25T10:01:00.000Z').toISOString(),
+            updatedAt: null
+          }
+        ],
+        pendingChallenges: []
+      }
+    })
+
+    const user = userEvent.setup()
+
+    render(
+      <VaultSessionProvider>
+        <VaultSessionHarness />
+      </VaultSessionProvider>
+    )
+
+    expect(screen.getByTestId('status')).toHaveTextContent('locked')
+
+    await user.click(screen.getByRole('button', { name: 'Unlock' }))
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('authenticated')
+    })
+    expect(await screen.findByText('GitHub')).toBeInTheDocument()
+    expect(orpcMocks.refresh).not.toHaveBeenCalled()
+    expect(orpcMocks.requestDeviceChallenge).toHaveBeenCalledWith({
+      email: 'capaj@test.com',
+      deviceInput: expect.objectContaining({
+        id: expect.any(String),
+        name: expect.any(String),
+        platform: expect.any(String)
+      })
+    })
+    expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
+  })
 })

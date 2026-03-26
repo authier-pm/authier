@@ -464,6 +464,27 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     })
   }
 
+  const reauthenticateLockedDevice = async (
+    email: string,
+    password: string
+  ) => {
+    const result = await orpcClient.auth.requestDeviceChallenge({
+      email,
+      deviceInput: deviceIdentity
+    })
+
+    if (result.status !== 'approved') {
+      setPendingLogin({
+        email,
+        password,
+        lastResult: result
+      })
+      throw new Error('Session expired. Log in again to approve this device')
+    }
+
+    await completeApprovedLogin(result, email, password)
+  }
+
   const register = async (email: string, password: string) => {
     setIsBusy(true)
 
@@ -501,7 +522,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const unlockVault = async (password: string) => {
-    if (!refreshToken || !lockedState) {
+    if (!lockedState) {
       throw new Error('No locked vault available')
     }
 
@@ -517,16 +538,25 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         throw new Error('Wrong master password')
       }
 
-      const authenticatedSession = await orpcClient.auth.refresh({
-        refreshToken
-      })
+      if (!refreshToken) {
+        await reauthenticateLockedDevice(lockedState.email, password)
+        return
+      }
 
-      await completeAuthenticatedSession(authenticatedSession, {
-        email: lockedState.email,
-        encryptionSalt: lockedState.encryptionSalt,
-        authSecretEncrypted: lockedState.authSecretEncrypted,
-        masterEncryptionKey: decryptResult.masterEncryptionKey
-      })
+      try {
+        const authenticatedSession = await orpcClient.auth.refresh({
+          refreshToken
+        })
+
+        await completeAuthenticatedSession(authenticatedSession, {
+          email: lockedState.email,
+          encryptionSalt: lockedState.encryptionSalt,
+          authSecretEncrypted: lockedState.authSecretEncrypted,
+          masterEncryptionKey: decryptResult.masterEncryptionKey
+        })
+      } catch {
+        await reauthenticateLockedDevice(lockedState.email, password)
+      }
     } finally {
       setIsBusy(false)
     }
