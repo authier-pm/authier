@@ -1,8 +1,7 @@
-import React from 'react'
 import { useCallback } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { Center, Icon, useColorModeValue } from '@src/components/ui/legacy'
 import { AiFillFileAdd } from 'react-icons/ai'
+import { cn } from '@src/lib/cn'
 
 export function ImportFromFile({
   onFileAccepted
@@ -11,45 +10,49 @@ export function ImportFromFile({
 }) {
   const onDrop = useCallback(
     (acceptedFiles: File[]) => {
-      onFileAccepted(acceptedFiles[0])
+      if (acceptedFiles[0]) {
+        onFileAccepted(acceptedFiles[0])
+      }
     },
     [onFileAccepted]
   )
 
-  const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    onDrop,
+  const { getInputProps, getRootProps, isDragActive } = useDropzone({
     accept: {
       'text/*': ['.csv', '.json']
     },
     maxFiles: 1,
-    multiple: false
+    multiple: false,
+    onDrop
   })
 
   const dropText = isDragActive
-    ? 'Drop the files here ...'
-    : "Drag 'n' drop .csv, json file here, or click to select files"
-
-  const activeBg = useColorModeValue('gray.100', 'gray.600')
-  const borderColor = useColorModeValue(
-    isDragActive ? 'teal.300' : 'gray.300',
-    isDragActive ? 'teal.500' : 'gray.500'
-  )
+    ? 'Drop the file here'
+    : "Drag and drop a .csv or .json file here, or click to select one"
 
   return (
-    <Center
-      p={10}
-      cursor="pointer"
-      bg={isDragActive ? activeBg : 'transparent'}
-      _hover={{ bg: activeBg }}
-      transition="background-color 0.2s ease"
-      borderRadius={4}
-      border="3px dashed"
-      borderColor={borderColor}
+    <button
+      className={cn(
+        'flex w-full flex-col items-center justify-center gap-4 rounded-[var(--radius-lg)] border-2 border-dashed p-8 text-center transition',
+        isDragActive
+          ? 'border-[color:var(--color-primary)] bg-[color:var(--color-primary)]/8'
+          : 'border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] hover:border-[color:var(--color-primary)]/40 hover:bg-[color:var(--color-accent)]/20'
+      )}
+      type="button"
       {...getRootProps()}
     >
       <input {...getInputProps()} />
-      <Icon as={AiFillFileAdd} mr={2} boxSize={20} />
-      <p>{dropText}</p>
-    </Center>
+      <div className="flex size-14 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--color-card)] text-[color:var(--color-primary)]">
+        <AiFillFileAdd className="size-7" />
+      </div>
+      <div>
+        <div className="text-base font-medium text-[color:var(--color-foreground)]">
+          Import file
+        </div>
+        <p className="mt-2 max-w-lg text-sm leading-6 text-[color:var(--color-muted)]">
+          {dropText}
+        </p>
+      </div>
+    </button>
   )
 }

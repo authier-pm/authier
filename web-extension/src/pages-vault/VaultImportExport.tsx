@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import papaparse from 'papaparse'
 import { Trans } from '@lingui/react/macro'
+import { FiArrowRight, FiCheckCircle, FiCopy, FiDownload, FiUpload } from 'react-icons/fi'
 import {
   AddSecretInput,
   device,
@@ -12,8 +13,14 @@ import {
   ExportTOTPToCsvButton
 } from '@src/components/vault/ExportCsvButtons'
 import { ImportFromFile } from '@src/components/vault/ImportFromFile'
-import { Txt } from '@src/components/util/Txt'
 import { Button } from '@src/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@src/components/ui/card'
 import {
   ILoginSecret,
   type LoginCredentialsTypeWithMeta
@@ -46,11 +53,11 @@ const mapCsvToLoginCredentials = (csv: string[][]): MappedCSVInput => {
     .slice(1)
     .filter((row) => row[indexUrl] && row[indexUsername] && row[indexPassword])
     .map((row) => ({
+      iconUrl: null,
       label: row[indexLabel],
-      url: row[indexUrl],
-      username: row[indexUsername],
       password: row[indexPassword],
-      iconUrl: null
+      url: row[indexUrl],
+      username: row[indexUsername]
     }))
 }
 
@@ -68,9 +75,9 @@ export const onCSVFileAccepted = (
       complete: async (results) => {
         if (!results.data) {
           toast({
-            title: 'failed to parse',
+            isClosable: true,
             status: 'error',
-            isClosable: true
+            title: 'failed to parse'
           })
         }
         const mapped: MappedCSVInput = mapCsvToLoginCredentials(results.data)
@@ -85,9 +92,9 @@ export const onCSVFileAccepted = (
             pswCount
           ) {
             toast({
-              title: 'You have reached your limit of secrets',
+              isClosable: true,
               status: 'error',
-              isClosable: true
+              title: 'You have reached your limit of secrets'
             })
             break
           }
@@ -96,21 +103,21 @@ export const onCSVFileAccepted = (
           if (!hostname) {
             skipped++
             toast({
-              title: `skipping secret because url ${creds.url} could not be parsed`,
+              isClosable: true,
               status: 'warning',
-              isClosable: true
+              title: `skipping secret because url ${creds.url} could not be parsed`
             })
             continue
           }
 
           const input: Omit<ILoginSecret, 'id'> = {
+            createdAt: new Date().toJSON(),
+            encrypted: await state.encrypt(JSON.stringify(creds)),
             kind: EncryptedSecretType.LOGIN_CREDENTIALS,
             loginCredentials: {
               ...creds,
               url: hostname
-            },
-            encrypted: await state.encrypt(JSON.stringify(creds)),
-            createdAt: new Date().toJSON()
+            }
           }
 
           if (await state.findExistingSecret(creds)) {
@@ -132,11 +139,11 @@ export const onCSVFileAccepted = (
 export const onJsonFileAccepted = async (file: File) => {
   const state = device.state as DeviceState
   type AuthyExportType = {
-    secret: string
-    period: number
-    originalName: string
     createdDate: number
     digits: number
+    originalName: string
+    period: number
+    secret: string
   }[]
 
   const parsed: AuthyExportType = JSON.parse(await file.text())
@@ -152,10 +159,10 @@ export const onJsonFileAccepted = async (file: File) => {
       label: totp.originalName
     }
     toAdd.push({
-      kind: EncryptedSecretType.TOTP,
-      totp: totpWithMeta,
+      createdAt: new Date().toJSON(),
       encrypted: await state.encrypt(JSON.stringify(totpWithMeta)),
-      createdAt: new Date().toJSON()
+      kind: EncryptedSecretType.TOTP,
+      totp: totpWithMeta
     })
   }
   await state.addSecrets(toAdd)
@@ -185,8 +192,7 @@ export const VaultImportExport = () => {
             return (
               s.loginCredentials.url === secret.loginCredentials.url &&
               s.id !== secret.id &&
-              s.loginCredentials.username ===
-                secret.loginCredentials.username &&
+              s.loginCredentials.username === secret.loginCredentials.username &&
               s.loginCredentials.password === secret.loginCredentials.password
             )
           }
@@ -212,114 +218,158 @@ export const VaultImportExport = () => {
   }, [device.state?.decryptedSecrets])
 
   return (
-    <div className="flex justify-center p-5">
-      <div className="flex max-w-[1200px] flex-col">
-        <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
-          Import
-        </h2>
-        <div className="w-full p-[30px]">
-          {!importedStat ? (
-            <>
-              <ImportFromFile
-                onFileAccepted={async (f) => {
-                  if (f.type === 'text/csv') {
-                    const loginCredentialsLimit = data?.me.loginCredentialsLimit
-                    setImportedStat(
-                      await onCSVFileAccepted(f, loginCredentialsLimit ?? 50)
-                    )
-                  } else if (f.type === 'application/json') {
-                    setImportedStat(await onJsonFileAccepted(f))
-                  }
-                }}
-              />
-              <ul className="mb-6 mt-8 list-disc space-y-2 pl-5 text-base">
-                <li>
-                  <Trans>
-                    We support importing from <code>csv</code> and{' '}
-                    <code>json</code> files.
-                  </Trans>
-                </li>
-                <li>
-                  Lastpass/Bitwarden will work fine, file exported from other
-                  password managers might work as well, but it&apos;s not guaranteed.
-                  Please send us a request for a new type of export{' '}
-                  <a className="underline" href="https://twitter.com/authierpm">
-                    here
-                  </a>
-                  .
-                </li>
-                <li>
-                  For JSON, it must be a file exported from{' '}
-                  <a
-                    className="underline"
-                    href="https://www.npmjs.com/package/authy-desktop-export"
-                  >
-                    authy-desktop-export
-                  </a>
-                </li>
-              </ul>
-            </>
-          ) : (
-            <>
-              <div className="rounded-[var(--radius-md)] border border-emerald-400/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-300">
-                <Trans>
-                  Successfully added {importedStat.added}, skipped{' '}
-                  {importedStat.skipped}
-                </Trans>
-              </div>
-              <div className="flex justify-center">
+    <div className="extension-scrollbar mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col gap-6 overflow-y-auto p-6 md:p-8">
+      <section className="flex flex-col gap-3">
+        <div className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
+          Import & Export
+        </div>
+        <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--color-foreground)] md:text-4xl">
+          Move secrets in and out without losing structure
+        </h1>
+        <p className="max-w-3xl text-sm leading-6 text-[color:var(--color-muted)] md:text-base">
+          Import credentials from supported file formats, export backups on
+          demand, and clean duplicate records before they spread.
+        </p>
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+        <Card className="overflow-hidden bg-[linear-gradient(145deg,rgba(16,54,56,0.96)_0%,rgba(17,31,32,1)_75%)]">
+          <CardHeader>
+            <div className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--color-card)] text-[color:var(--color-primary)]">
+              <FiUpload className="size-5" />
+            </div>
+            <CardTitle>Import secrets</CardTitle>
+            <CardDescription>
+              Bring in CSV exports from mainstream password managers or JSON
+              files from Authy export tooling.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            {!importedStat ? (
+              <>
+                <ImportFromFile
+                  onFileAccepted={async (file) => {
+                    if (file.type === 'text/csv') {
+                      const loginCredentialsLimit = data?.me.loginCredentialsLimit
+                      setImportedStat(
+                        await onCSVFileAccepted(file, loginCredentialsLimit ?? 50)
+                      )
+                    } else if (file.type === 'application/json') {
+                      setImportedStat(await onJsonFileAccepted(file))
+                    }
+                  }}
+                />
+                <div className="grid gap-3">
+                  <InfoRow>
+                    <Trans>
+                      We support importing from <code>csv</code> and <code>json</code>{' '}
+                      files.
+                    </Trans>
+                  </InfoRow>
+                  <InfoRow>
+                    LastPass and Bitwarden exports usually work well. Other
+                    password manager exports may work too, but are not guaranteed.
+                  </InfoRow>
+                  <InfoRow>
+                    JSON imports must come from the `authy-desktop-export` format.
+                  </InfoRow>
+                </div>
+              </>
+            ) : (
+              <div className="space-y-4">
+                <div className="rounded-[var(--radius-lg)] border border-emerald-400/25 bg-emerald-500/10 p-4">
+                  <div className="flex items-center gap-3 text-emerald-300">
+                    <FiCheckCircle className="size-5" />
+                    <div className="text-sm font-medium">
+                      <Trans>
+                        Successfully added {importedStat.added}, skipped{' '}
+                        {importedStat.skipped}
+                      </Trans>
+                    </div>
+                  </div>
+                </div>
                 <Button
-                  className="m-2"
                   onClick={() => {
                     setImportedStat(null)
                   }}
                 >
+                  <FiArrowRight className="size-4" />
                   <Trans>Import another</Trans>
                 </Button>
               </div>
-            </>
-          )}
-        </div>
+            )}
+          </CardContent>
+        </Card>
 
-        <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
-          Export
-        </h2>
-        <div className="m-8">
-          <ExportLoginCredentialsToCsvButton />
-          <br />
-          <ExportTOTPToCsvButton />
-        </div>
+        <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+              <div className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--color-surface-muted)] text-[color:var(--color-primary)]">
+                <FiDownload className="size-5" />
+              </div>
+              <CardTitle>Export backups</CardTitle>
+              <CardDescription>
+                Download your credentials or one-time passwords as CSV whenever
+                you need an offline copy.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="flex flex-col gap-3">
+              <ExportLoginCredentialsToCsvButton />
+              <ExportTOTPToCsvButton />
+            </CardContent>
+          </Card>
 
-        <div>
-          <h2 className="text-sm font-semibold text-[color:var(--color-foreground)]">
-            Merge duplicates
-          </h2>
-          {duplicates.length ? (
-            <div className="m-8 flex items-center">
-              <Txt mr={6}>
-                found {duplicates.length} duplicates in your secrets
-              </Txt>
-              <Button
-                onClick={async () => {
-                  const duplicateIds = duplicates.map(({ id }) => id)
-                  await removeEncryptedSecrets({
-                    variables: {
-                      secrets: duplicateIds
-                    }
-                  })
+          <Card>
+            <CardHeader>
+              <div className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--color-surface-muted)] text-[color:var(--color-primary)]">
+                <FiCopy className="size-5" />
+              </div>
+              <CardTitle>Merge duplicates</CardTitle>
+              <CardDescription>
+                Detect repeated login credentials and TOTP entries stored in your
+                vault.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {duplicates.length ? (
+                <>
+                  <div className="rounded-[var(--radius-lg)] border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-200">
+                    Found {duplicates.length} duplicates in your secrets.
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      const duplicateIds = duplicates.map(({ id }) => id)
+                      await removeEncryptedSecrets({
+                        variables: {
+                          secrets: duplicateIds
+                        }
+                      })
 
-                  await device.state?.removeSecrets(duplicateIds)
-                  setDuplicates([])
-                }}
-              >
-                Delete duplicates now
-              </Button>
-            </div>
-          ) : (
-            <Trans>You have no duplicates in your secrets</Trans>
-          )}
+                      await device.state?.removeSecrets(duplicateIds)
+                      setDuplicates([])
+                    }}
+                    variant="destructive"
+                  >
+                    Delete duplicates now
+                  </Button>
+                </>
+              ) : (
+                <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4 text-sm text-[color:var(--color-muted)]">
+                  <Trans>You have no duplicates in your secrets</Trans>
+                </div>
+              )}
+            </CardContent>
+          </Card>
         </div>
-      </div>
+      </section>
+    </div>
+  )
+}
+
+function InfoRow({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4 text-sm leading-6 text-[color:var(--color-muted)]">
+      {children}
     </div>
   )
 }
