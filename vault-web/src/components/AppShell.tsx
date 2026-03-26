@@ -58,9 +58,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   }, [themeMode])
 
   return (
-    <div className="vault-grid min-h-screen">
-      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:flex-row lg:items-start">
-        <aside className="w-full lg:sticky lg:top-6 lg:w-80 lg:shrink-0 xl:w-[22rem]">
+    <div className="vault-grid min-h-screen lg:h-screen lg:overflow-hidden">
+      <div className="mx-auto flex min-h-screen w-full max-w-7xl flex-col gap-6 px-4 py-6 md:px-6 lg:h-full lg:min-h-0 lg:flex-row">
+        <aside className="w-full lg:sticky lg:top-6 lg:self-start lg:w-80 lg:shrink-0 xl:w-[22rem]">
           <header className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface)] p-5 shadow-[0_20px_60px_rgba(17,85,85,0.08)] backdrop-blur">
             <div className="flex items-center gap-4">
               <div className="flex size-16 shrink-0 items-center justify-center overflow-hidden rounded-[var(--radius-md)] border border-[#2ad5d4] bg-[#2ad5d4] shadow-[0_10px_30px_rgba(17,85,85,0.08)]">
@@ -200,7 +200,11 @@ export function AppShell({ children }: { children: ReactNode }) {
           </header>
         </aside>
 
-        <main className="min-w-0 flex-1 pb-8">{children}</main>
+        <main className="min-w-0 flex-1 pb-8 lg:flex lg:min-h-0 lg:self-stretch lg:flex-col lg:overflow-hidden lg:pb-0">
+          <div className="lg:flex lg:min-h-0 lg:flex-1 lg:flex-col">
+            {children}
+          </div>
+        </main>
       </div>
     </div>
   )

@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { KeyRound, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { type FieldValues, type Path, type UseFormRegister, useForm } from 'react-hook-form'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
@@ -44,14 +45,14 @@ export function VaultEditPage() {
     defaultValues: currentSecret?.kind === 'LOGIN_CREDENTIALS'
       ? currentSecret.loginCredentials
       : {
-          label: '',
-          url: '',
-          iconUrl: null,
-          username: '',
-          password: '',
-          androidUri: null,
-          iosUri: null
-        }
+        label: '',
+        url: '',
+        iconUrl: null,
+        username: '',
+        password: '',
+        androidUri: null,
+        iosUri: null
+      }
   })
 
   const totpForm = useForm<z.infer<typeof totpFormSchema>>({
@@ -59,15 +60,15 @@ export function VaultEditPage() {
     defaultValues: currentSecret?.kind === 'TOTP'
       ? currentSecret.totp
       : {
-          label: '',
-          url: '',
-          iconUrl: null,
-          secret: '',
-          digits: 6,
-          period: 30,
-          androidUri: null,
-          iosUri: null
-        }
+        label: '',
+        url: '',
+        iconUrl: null,
+        secret: '',
+        digits: 6,
+        period: 30,
+        androidUri: null,
+        iosUri: null
+      }
   })
 
   useEffect(() => {
@@ -134,7 +135,17 @@ export function VaultEditPage() {
               type="button"
               variant={kind === type ? 'primary' : 'outline'}
             >
-              {type === 'LOGIN_CREDENTIALS' ? 'Password' : 'TOTP'}
+              {type === 'LOGIN_CREDENTIALS' ? (
+                <>
+                  <KeyRound className="size-4" />
+                  Password
+                </>
+              ) : (
+                <>
+                  <ShieldCheck className="size-4" />
+                  TOTP
+                </>
+              )}
             </Button>
           ))}
         </CardContent>
@@ -194,12 +205,15 @@ export function VaultEditPage() {
                     Delete
                   </Button>
                 ) : null}
-                <Button className={currentSecret ? 'ml-auto' : undefined} type="submit">
-                  {isEditing ? 'Save changes' : 'Create password'}
-                </Button>
                 <Button asChild type="button" variant="outline">
                   <Link to="/vault">Cancel</Link>
                 </Button>
+                <div className="ml-auto flex flex-wrap gap-3">
+                  <Button type="submit">
+                    {isEditing ? 'Save changes' : 'Create password'}
+                  </Button>
+
+                </div>
               </div>
             </form>
           </CardContent>
@@ -245,12 +259,14 @@ export function VaultEditPage() {
                     Delete
                   </Button>
                 ) : null}
-                <Button className={currentSecret ? 'ml-auto' : undefined} type="submit">
-                  {isEditing ? 'Save changes' : 'Create TOTP'}
-                </Button>
-                <Button asChild type="button" variant="outline">
-                  <Link to="/vault">Cancel</Link>
-                </Button>
+                <div className="ml-auto flex flex-wrap gap-3">
+                  <Button type="submit">
+                    {isEditing ? 'Save changes' : 'Create TOTP'}
+                  </Button>
+                  <Button asChild type="button" variant="outline">
+                    <Link to="/vault">Cancel</Link>
+                  </Button>
+                </div>
               </div>
             </form>
           </CardContent>
