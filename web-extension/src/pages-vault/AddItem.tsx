@@ -1,81 +1,62 @@
-import {
-  useColorModeValue,
-  Flex,
-  Select,
-  Box,
-  Text,
-  Spinner,
-  Link
-} from '@chakra-ui/react'
 import { useContext, useState } from 'react'
-
 import { motion } from 'framer-motion'
-
+import { Trans } from '@lingui/react/macro'
+import { Link as RouterLink } from 'react-router-dom'
 import { AddLogin } from '@src/components/vault/addItem/AddLogin'
 import { AddTOTP } from '@src/components/vault/addItem/AddTOTP'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { Txt } from '@src/components/util/Txt'
-import { Trans } from '@lingui/react/macro'
-import { Link as RouterLink } from 'react-router-dom'
 import { device } from '@src/background/ExtensionDevice'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
 
 export const AddItem = () => {
-  type secretType = 'login' | 'totp'
-  const [type, setType] = useState<secretType>('login')
-  const { loginCredentials: LoginCredentials, TOTPSecrets } =
+  type SecretType = 'login' | 'totp'
+  const [type, setType] = useState<SecretType>('login')
+  const { loginCredentials: loginCredentialsList, TOTPSecrets } =
     useContext(DeviceStateContext)
   const { data, loading } = useLimitsQuery()
 
-  const bg = useColorModeValue('cyan.800', 'gray.800')
-
   if (loading) {
-    return <Spinner />
+    return (
+      <div className="flex min-h-[220px] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
+      </div>
+    )
   }
+
   const totpLimitReached = (data?.me.TOTPlimit ?? 0) <= TOTPSecrets.length
   const pswLimitReached =
-    (data?.me.loginCredentialsLimit ?? 0) <= LoginCredentials.length
+    (data?.me.loginCredentialsLimit ?? 0) <= loginCredentialsList.length
 
   return (
     <motion.div
       animate={{ opacity: 1 }}
-      initial={{ opacity: 0 }}
       exit={{ opacity: 0 }}
-      transition={{ duration: 0.25 }}
+      initial={{ opacity: 0 }}
       style={{
         width: '80%',
         display: 'contents'
       }}
+      transition={{ duration: 0.25 }}
     >
-      <Flex
-        width={{ base: '90%', sm: '70%', lg: '60%' }}
-        flexDirection="column"
-        boxShadow={'2xl'}
-        rounded={'md'}
-        overflow={'hidden'}
-        m="auto"
-        alignItems={'center'}
-        bg={bg}
-      >
+      <div className="m-auto flex w-[90%] flex-col items-center overflow-hidden rounded-[var(--radius-md)] bg-[color:var(--color-card)] shadow-2xl sm:w-[70%] lg:w-[60%]">
         {totpLimitReached || pswLimitReached ? (
-          <Txt mt={10} fontSize={'lg'} color="yellow.600">
+          <Txt color="yellow.600" fontSize="lg" mt={10}>
             <Trans>
               You have reached your account limit. Go to{' '}
-              <Link as={RouterLink} to="/account-limits">
-                {' '}
-                Account Limits to upgrade your account.
-              </Link>{' '}
+              <RouterLink className="underline" to="/account-limits">
+                Account Limits
+              </RouterLink>{' '}
+              to upgrade your account.
             </Trans>
           </Txt>
         ) : null}
         {device.state?.syncTOTP ? (
           <>
-            <Select
-              onChange={(e) => setType(e.target.value as secretType)}
+            <select
+              className="mt-5 w-1/2 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 py-2"
+              onChange={(e) => setType(e.target.value as SecretType)}
               value={type}
-              placeholder="Select type"
-              w={'50%'}
-              mt={5}
             >
               <option disabled={totpLimitReached} value="totp">
                 TOTP
@@ -83,18 +64,14 @@ export const AddItem = () => {
               <option disabled={pswLimitReached} value="login">
                 Login
               </option>
-            </Select>
-            {type === 'login' ? (
-              <AddLogin />
-            ) : type === 'totp' ? (
-              <AddTOTP />
-            ) : null}
+            </select>
+            {type === 'login' ? <AddLogin /> : null}
+            {type === 'totp' ? <AddTOTP /> : null}
           </>
         ) : (
-          // we only allow to add logins if the user has synced TOTP secrets false on this device
           <AddLogin />
         )}
-      </Flex>
+      </div>
     </motion.div>
   )
 }

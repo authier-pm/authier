@@ -1,60 +1,57 @@
-import { Button } from '@chakra-ui/react'
-import React, { useContext } from 'react'
+import { useContext } from 'react'
 import papaparse from 'papaparse'
-
-import { downloadAsFile } from '@src/util/downloadAsFile'
 import { Trans } from '@lingui/react/macro'
+import { FiDownload } from 'react-icons/fi'
+import { Button } from '@src/components/ui/button'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { downloadAsFile } from '@src/util/downloadAsFile'
 
 export const ExportTOTPToCsvButton = () => {
   const { TOTPSecrets } = useContext(DeviceStateContext)
 
   return (
     <Button
-      mt={4}
-      minW="300px"
-      colorScheme="teal"
-      type="submit"
+      className="w-full justify-start sm:w-auto"
       onClick={() => {
         const csv = papaparse.unparse(
           TOTPSecrets.map(({ id, totp }) => ({
             id,
-            url: totp.url,
             label: totp.label,
-            sercret: totp.secret
+            sercret: totp.secret,
+            url: totp.url
           }))
         )
         downloadAsFile(csv, 'totp')
       }}
+      variant="outline"
     >
+      <FiDownload className="size-4" />
       <Trans>Export TOTP to CSV</Trans>
     </Button>
   )
 }
 
 export const ExportLoginCredentialsToCsvButton = () => {
-  const { loginCredentials: LoginCredentials } = useContext(DeviceStateContext)
+  const { loginCredentials } = useContext(DeviceStateContext)
 
   return (
     <Button
-      mt={4}
-      minW="300px"
-      colorScheme="teal"
-      type="submit"
+      className="w-full justify-start sm:w-auto"
       onClick={() => {
-        //TODO: Call here export mutation for export notification
         const csv = papaparse.unparse(
-          LoginCredentials.map(({ id, loginCredentials }) => ({
+          loginCredentials.map(({ id, loginCredentials: secret }) => ({
             id,
-            url: loginCredentials.url,
-            label: loginCredentials.label,
-            username: loginCredentials.username,
-            password: loginCredentials.password
+            label: secret.label,
+            password: secret.password,
+            url: secret.url,
+            username: secret.username
           }))
         )
         downloadAsFile(csv, 'credentials')
       }}
+      variant="outline"
     >
+      <FiDownload className="size-4" />
       <Trans>Export Login Credentials to CSV</Trans>
     </Button>
   )

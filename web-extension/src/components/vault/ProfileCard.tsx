@@ -1,12 +1,12 @@
 import {
-  Heading,
   Avatar,
   Box,
-  Center,
   Button,
-  useColorModeValue,
-  Flex
-} from '@chakra-ui/react'
+  Center,
+  Flex,
+  Heading,
+  useColorModeValue
+} from '@src/components/ui/legacy'
 import { device } from '@src/background/ExtensionDevice'
 import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
 import { MD5 } from 'crypto-js'

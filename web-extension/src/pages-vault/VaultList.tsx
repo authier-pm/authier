@@ -1,176 +1,148 @@
-import { IconButton } from '@chakra-ui/react'
-import { useColorModeValue } from '@chakra-ui/color-mode'
-import { AddIcon, CheckIcon, CloseIcon } from '@chakra-ui/icons'
-
-import { PiSquaresFourDuotone } from 'react-icons/pi'
-import {
-  Center,
-  Box,
-  Input,
-  Stat,
-  Tooltip,
-  Spinner,
-  VStack,
-  HStack,
-  InputGroup,
-  InputRightElement,
-  Flex
-} from '@chakra-ui/react'
 import { useContext, useEffect } from 'react'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { t } from '@lingui/core/macro'
 import { useNavigate } from 'react-router-dom'
-import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
-import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
-import { VirtualizedList } from '@src/components/vault/VirtualizedList'
-import { IoList } from 'react-icons/io5'
-import { TableList } from '@src/components/vault/TableList'
 import browser from 'webextension-polyfill'
 import { StringParam, useQueryParam, withDefault } from 'use-query-params'
+import { FiPlus, FiSearch, FiX } from 'react-icons/fi'
+import { IoList } from 'react-icons/io5'
+import { PiSquaresFourDuotone } from 'react-icons/pi'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { useSyncSettingsQuery } from '@shared/graphql/Settings.codegen'
+import { RefreshSecretsButton } from '@src/components/RefreshSecretsButton'
+import { TableList } from '@src/components/vault/TableList'
+import { VirtualizedList } from '@src/components/vault/VirtualizedList'
+import { Button } from '@src/components/ui/button'
+import { Card, CardContent } from '@src/components/ui/card'
+import { Input } from '@src/components/ui/input'
+import { Tooltip } from '@src/components/ui/tooltip'
 
 export const VaultList = ({ tableView }: { tableView: boolean }) => {
-  const { loginCredentials: LoginCredentials, TOTPSecrets } =
+  const { loginCredentials, TOTPSecrets, setSecuritySettings } =
     useContext(DeviceStateContext)
-
   const navigate = useNavigate()
-  const { setSecuritySettings } = useContext(DeviceStateContext)
   const { data, loading, error } = useSyncSettingsQuery()
-
-  const screenHeight =
-    window.innerHeight ||
-    document.documentElement.clientHeight ||
-    document.body.clientHeight
-  const bg = useColorModeValue('cyan.800', 'gray.800')
-
   const [filterBy, setFilterBy] = useQueryParam(
     'filterBy',
     withDefault(StringParam, '')
   )
 
-  // Here is bug wut theme change, this is not ideal
   useEffect(() => {
-    if (data) {
-      setSecuritySettings({
-        autofillCredentialsEnabled:
-          data.currentDevice.autofillCredentialsEnabled,
-        autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
-        uiLanguage: data.me.uiLanguage,
-        syncTOTP: data.currentDevice.syncTOTP,
-        vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
-        notificationOnWrongPasswordAttempts:
-          data.me.notificationOnWrongPasswordAttempts,
-        notificationOnVaultUnlock: data.me.notificationOnVaultUnlock
-      })
+    if (!data) {
+      return
     }
-  }, [data, loading])
+
+    setSecuritySettings({
+      autofillCredentialsEnabled: data.currentDevice.autofillCredentialsEnabled,
+      autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
+      uiLanguage: data.me.uiLanguage,
+      syncTOTP: data.currentDevice.syncTOTP,
+      vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
+      notificationOnWrongPasswordAttempts:
+        data.me.notificationOnWrongPasswordAttempts,
+      notificationOnVaultUnlock: data.me.notificationOnVaultUnlock
+    })
+  }, [data, setSecuritySettings])
 
   if (loading && !data) {
-    return <Spinner />
+    return (
+      <Card className="extension-surface">
+        <CardContent className="flex min-h-[320px] items-center justify-center p-6 text-sm text-[color:var(--color-muted)]">
+          Loading vault...
+        </CardContent>
+      </Card>
+    )
   }
 
+  const secretCount = loginCredentials.length + TOTPSecrets.length
+
   return (
-    <Box overflow="hidden">
-      <Center
-        justifyContent={'space-evenly'}
-        w={'100%'}
-        bg={bg}
-        p={3}
-        // color="cyan.500"
-      >
-        <Flex m="auto">
-          <InputGroup>
-            <Input
-              variant={'filled'}
-              w={['300px', '350px', '400px', '500px']}
-              color={
-                useColorModeValue('gray.100', 'gray.100') // This is not ideal
-              }
-              bg={'gray.800'}
-              placeholder={t`Search vault by url, username, label or password`}
-              value={filterBy}
-              onChange={(ev) => {
-                setFilterBy(ev.target.value)
-              }}
-            />
-            <InputRightElement>
-              {filterBy && (
-                <CloseIcon
-                  cursor={'pointer'}
+    <div className="flex h-full min-h-0 flex-col gap-4">
+      <Card className="border-white/10 extension-surface">
+        <CardContent className="p-4">
+          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <div className="relative w-full max-w-3xl">
+              <FiSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-muted)]" />
+              <Input
+                className="h-11 rounded-full bg-[color:var(--color-input)] pl-10 pr-11"
+                placeholder={t`Search vault by url, username, label or password`}
+                value={filterBy}
+                onChange={(event) => {
+                  setFilterBy(event.target.value)
+                }}
+              />
+              {filterBy ? (
+                <button
+                  aria-label={t`Clear search`}
+                  className="absolute right-3 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--color-muted)] transition hover:bg-[color:var(--color-accent)] hover:text-[color:var(--color-foreground)]"
                   onClick={() => {
                     setFilterBy('')
                   }}
-                />
-              )}
-            </InputRightElement>
-          </InputGroup>
-        </Flex>
-        <HStack spacing={4}>
-          <Center>
-            <Stat
-              px={3}
-              ml="auto"
-              w={'100%'}
-              sx={{
-                dl: {
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap'
-                }
-              }}
-            >
-              {LoginCredentials.length + TOTPSecrets.length} {t`secrets`}
-            </Stat>
-            <RefreshSecretsButton />
-          </Center>
-          <IconButton
-            size="md"
-            ml="2"
-            aria-label="menu"
-            icon={
-              !tableView ? (
-                <IoList />
-              ) : (
-                <PiSquaresFourDuotone color="green.500" />
-              )
-            }
-            onClick={async () => {
-              browser.storage.sync.set({ vaultTableView: !tableView })
-            }}
-          />
+                  type="button"
+                >
+                  <FiX className="size-4" />
+                </button>
+              ) : null}
+            </div>
 
-          {error ? (
-            <Tooltip
-              shouldWrapChildren
-              label="You have reached your limit"
-              aria-label="A tooltip"
-            >
-              <IconButton
-                disabled={true}
-                aria-label="Add item"
-                icon={<AddIcon />}
-                rounded={'full'}
-                onClick={async () => navigate('/addItem')}
-              />
-            </Tooltip>
-          ) : (
-            <IconButton
-              aria-label="Add item"
-              icon={<AddIcon />}
-              rounded={'full'}
-              onClick={async () => navigate('/addItem')}
-            />
-          )}
-        </HStack>
-      </Center>
-      <VStack flexDirection="column" h={screenHeight - 42}>
-        <div style={{ flex: '1 1 auto', height: '100%', width: '100%' }}>
-          {!tableView ? (
-            <VirtualizedList filter={filterBy} />
-          ) : (
+            <div className="flex flex-wrap items-center gap-2">
+              <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
+                {secretCount} {t`secrets`}
+              </div>
+              <RefreshSecretsButton />
+              <Tooltip
+                content={tableView ? t`Show card view` : t`Show table view`}
+              >
+                <Button
+                  aria-label={tableView ? t`Show card view` : t`Show table view`}
+                  onClick={async () => {
+                    await browser.storage.sync.set({
+                      vaultTableView: !tableView
+                    })
+                  }}
+                  size="icon"
+                  variant="outline"
+                >
+                  {tableView ? (
+                    <PiSquaresFourDuotone className="size-5" />
+                  ) : (
+                    <IoList className="size-5" />
+                  )}
+                </Button>
+              </Tooltip>
+
+              {error ? (
+                <Tooltip content={t`You have reached your limit`}>
+                  <span>
+                    <Button disabled size="sm" variant="outline">
+                      <FiPlus className="size-4" />
+                      {t`Add item`}
+                    </Button>
+                  </span>
+                </Tooltip>
+              ) : (
+                <Button
+                  onClick={async () => navigate('/addItem')}
+                  size="sm"
+                  variant="primary"
+                >
+                  <FiPlus className="size-4" />
+                  {t`Add item`}
+                </Button>
+              )}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="min-h-0 flex-1 overflow-hidden border-white/10 extension-surface">
+        <CardContent className="flex h-full min-h-0 flex-1 flex-col p-0">
+          {tableView ? (
             <TableList filter={filterBy} />
+          ) : (
+            <VirtualizedList filter={filterBy} />
           )}
-        </div>
-      </VStack>
-    </Box>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

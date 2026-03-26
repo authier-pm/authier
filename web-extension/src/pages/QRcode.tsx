@@ -1,48 +1,51 @@
-import { Box, Button, Flex, Heading } from '@chakra-ui/react'
-
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect } from 'react'
 import ReactQRCode from 'react-qr-code'
-import { useDeviceCountQuery } from './QRcode.codegen'
 import { useLocation } from 'wouter'
-import { ArrowForwardIcon } from '@chakra-ui/icons'
+import { IoArrowForward } from 'react-icons/io5'
+import { Button } from '@src/components/ui/button'
 import { UserContext } from '@src/providers/UserProvider'
+import { useDeviceCountQuery } from './QRcode.codegen'
 
 export function QRCode() {
-  const [interval, setInterval] = useState<number>(500)
-  const [location, setLocation] = useLocation()
-  const [count, setCount] = useState<number>(1)
+  const [, setLocation] = useLocation()
   const { userId } = useContext(UserContext)
-  const { data, error, startPolling, stopPolling } = useDeviceCountQuery()
+  const { data, startPolling, stopPolling } = useDeviceCountQuery()
 
   useEffect(() => {
-    startPolling(interval)
-  }, [])
+    startPolling(500)
+
+    return () => {
+      stopPolling()
+    }
+  }, [startPolling, stopPolling])
 
   useEffect(() => {
     const devicesCount = data?.me?.devicesCount ?? 0
 
-    if (typeof count !== undefined && devicesCount > count) {
+    if (devicesCount > 1) {
       stopPolling()
       setLocation('/')
     }
-  }, [data])
+  }, [data, setLocation, stopPolling])
 
   return (
-    <Flex flexDirection="column" alignItems="center">
-      <Heading as="h3" size="lg">
+    <div className="flex flex-col items-center gap-5 px-4 py-6">
+      <h3 className="text-lg font-semibold text-[color:var(--color-foreground)]">
         Scan QR code in app
-      </Heading>
-      <ReactQRCode size={200} value={userId as string} />
+      </h3>
+      <div className="rounded-[var(--radius-lg)] bg-white p-4 shadow-lg">
+        <ReactQRCode size={200} value={userId ?? ''} />
+      </div>
       <Button
         variant="outline"
         onClick={() => {
           stopPolling()
           setLocation('/')
         }}
-        leftIcon={<ArrowForwardIcon />}
       >
+        <IoArrowForward className="size-4" />
         Skip
       </Button>
-    </Flex>
+    </div>
   )
 }

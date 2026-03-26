@@ -1,5 +1,4 @@
-import { VStack, Box, Heading } from '@chakra-ui/react'
-import { ReactNode } from 'react'
+import type { FormEventHandler, ReactNode } from 'react'
 
 export default function FormComponent({
   children,
@@ -10,19 +9,17 @@ export default function FormComponent({
   children: ReactNode
   formHeading: string
   submitButton: ReactNode
-  onSubmit: () => void
+  onSubmit: FormEventHandler<HTMLFormElement>
 }) {
   return (
-    <Box>
-      <Heading as="h3" size="lg" mb={5}>
+    <div>
+      <h3 className="mb-5 text-2xl font-semibold text-[color:var(--color-foreground)]">
         {formHeading}
-      </Heading>
-      <form onSubmit={onSubmit}>
-        <VStack spacing={4} align="flex-start">
-          {children}
-          {submitButton}
-        </VStack>
+      </h3>
+      <form className="flex flex-col items-start gap-4" onSubmit={onSubmit}>
+        {children}
+        {submitButton}
       </form>
-    </Box>
+    </div>
   )
 }

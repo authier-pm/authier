@@ -1,13 +1,13 @@
 import {
-  Stack,
   Button,
+  Box,
   Flex,
-  Input,
   FormControl,
   FormErrorMessage,
   FormLabel,
-  Box
-} from '@chakra-ui/react'
+  Input,
+  Stack
+} from '@src/components/ui/legacy'
 import React from 'react'
 
 import { Field, Formik, FormikHelpers } from 'formik'

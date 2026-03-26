@@ -1,34 +1,18 @@
-import React, { Dispatch, ReactElement, SetStateAction, useState } from 'react'
-import {
-  Box,
-  Button,
-  Flex,
-  Spinner,
-  Text,
-  FormControl,
-  FormLabel,
-  FormErrorMessage,
-  Input,
-  Heading,
-  VStack,
-  InputGroup,
-  InputRightElement
-} from '@chakra-ui/react'
+import React, { createContext, useState, type Dispatch, type ReactElement, type SetStateAction } from 'react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
-import { device } from '@src/background/ExtensionDevice'
-import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { ViewIcon, ViewOffIcon } from '@chakra-ui/icons'
+import { IoEye, IoEyeOff } from 'react-icons/io5'
+import { device } from '@src/background/ExtensionDevice'
+import { Button } from '@src/components/ui/button'
+import { Input } from '@src/components/ui/input'
+import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 const LoginFormSchema = z.object({
-  email: z
-    .string()
-    .email({ message: 'Invalid email address' })
-    .describe('Email'),
+  email: z.string().email({ message: 'Invalid email address' }).describe('Email'),
   password: z
     .string()
     .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
@@ -43,22 +27,21 @@ export interface LoginFormValues {
   isSubmitted: boolean
 }
 
-// @ts-expect-error TODO: fix types
-export const LoginContext = React.createContext<{
+export const LoginContext = createContext<{
   formStateContext: LoginFormValues
   setFormStateContext: Dispatch<SetStateAction<LoginFormValues>>
-}>()
+}>({
+  formStateContext: {
+    password: '',
+    email: '',
+    isSubmitted: false
+  },
+  setFormStateContext: () => {}
+})
 
 const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
   return (
-    <Button
-      colorScheme="teal"
-      variant="outline"
-      type="submit"
-      width="full"
-      mt={4}
-      isLoading={isSubmitting}
-    >
+    <Button className="mt-1 w-full" disabled={isSubmitting} type="submit" variant="outline">
       <Trans>Submit</Trans>
     </Button>
   )
@@ -70,9 +53,7 @@ export default function Login(): ReactElement {
     email: '',
     isSubmitted: false
   })
-
   const [showPassword, setShowPassword] = useState(false)
-
   const {
     register,
     handleSubmit,
@@ -87,17 +68,16 @@ export default function Login(): ReactElement {
   })
 
   if (!device.id) {
-    return <Spinner />
+    return (
+      <div className="flex min-h-[220px] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
+      </div>
+    )
   }
 
   if (formStateContext.isSubmitted) {
     return (
-      <LoginContext.Provider
-        value={{
-          formStateContext,
-          setFormStateContext
-        }}
-      >
+      <LoginContext.Provider value={{ formStateContext, setFormStateContext }}>
         <LoginAwaitingApproval />
       </LoginContext.Provider>
     )
@@ -111,56 +91,57 @@ export default function Login(): ReactElement {
   }
 
   return (
-    <Box p={8} borderWidth={1} borderRadius={6} boxShadow="lg" minW="400px">
-      <Box>
-        <Heading as="h3" size="lg" mb={5}>
-          <Trans>Login</Trans>
-        </Heading>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <VStack spacing={4} align="flex-start">
-            <FormControl isInvalid={!!errors.email}>
-              <FormLabel>Email</FormLabel>
-              <Input type="email" {...register('email')} />
-              {errors.email && (
-                <FormErrorMessage>{errors.email.message}</FormErrorMessage>
-              )}
-            </FormControl>
+    <div className="extension-surface min-w-[400px] rounded-[var(--radius-lg)] border border-[color:var(--color-border)] p-8 shadow-lg">
+      <h3 className="mb-5 text-2xl font-semibold text-[color:var(--color-foreground)]">
+        <Trans>Login</Trans>
+      </h3>
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <label className="block">
+          <div className="mb-2 text-sm font-medium">Email</div>
+          <Input type="email" {...register('email')} />
+          {errors.email ? (
+            <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+              {errors.email.message}
+            </div>
+          ) : null}
+        </label>
 
-            <FormControl isInvalid={!!errors.password}>
-              <FormLabel>
-                <Trans>Password</Trans>
-              </FormLabel>
-              <InputGroup>
-                <Input
-                  autoComplete="off"
-                  type={showPassword ? 'text' : 'password'}
-                  {...register('password')}
-                />
-                <InputRightElement width="4.5rem">
-                  <Button
-                    h="1.75rem"
-                    size="sm"
-                    onClick={() => setShowPassword(!showPassword)}
-                  >
-                    {showPassword ? <ViewOffIcon /> : <ViewIcon />}
-                  </Button>
-                </InputRightElement>
-              </InputGroup>
-              {errors.password && (
-                <FormErrorMessage>{errors.password.message}</FormErrorMessage>
+        <label className="block">
+          <div className="mb-2 text-sm font-medium">
+            <Trans>Password</Trans>
+          </div>
+          <div className="relative">
+            <Input
+              autoComplete="off"
+              className="pr-10"
+              type={showPassword ? 'text' : 'password'}
+              {...register('password')}
+            />
+            <button
+              className="absolute inset-y-0 right-0 flex w-10 items-center justify-center text-[color:var(--color-muted)]"
+              onClick={() => setShowPassword((value) => !value)}
+              type="button"
+            >
+              {showPassword ? (
+                <IoEyeOff className="size-4" />
+              ) : (
+                <IoEye className="size-4" />
               )}
-            </FormControl>
-            <SubmitButton isSubmitting={isSubmitting} />
-          </VStack>
-        </form>
-      </Box>
-      <Flex>
-        <Link to="/signup">
-          <Text pt={3}>
-            <Trans>Don't have account?</Trans>
-          </Text>
+            </button>
+          </div>
+          {errors.password ? (
+            <div className="mt-1 text-sm text-[color:var(--color-danger)]">
+              {errors.password.message}
+            </div>
+          ) : null}
+        </label>
+        <SubmitButton isSubmitting={isSubmitting} />
+      </form>
+      <div className="pt-3">
+        <Link className="text-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)]" to="/signup">
+          <Trans>Don't have account?</Trans>
         </Link>
-      </Flex>
-    </Box>
+      </div>
+    </div>
   )
 }

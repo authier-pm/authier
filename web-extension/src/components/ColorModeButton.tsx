@@ -1,19 +1,21 @@
-import { IconButton, useColorMode } from '@chakra-ui/react'
 import { FiMoon } from 'react-icons/fi'
+import { useThemeMode } from '@src/ExtensionProviders'
+import { Button } from '@src/components/ui/button'
 
 export const ColorModeButton = () => {
-  const { toggleColorMode } = useColorMode()
+  const { toggleColorMode } = useThemeMode()
 
   return (
-    <IconButton
-      size="lg"
-      variant="ghost"
+    <Button
       aria-label="change color mode"
-      icon={<FiMoon />}
-      onClick={async () => {
+      className="mt-auto"
+      size="icon"
+      variant="ghost"
+      onClick={() => {
         toggleColorMode()
       }}
-      mt="auto"
-    />
+    >
+      <FiMoon className="size-4" />
+    </Button>
   )
 }

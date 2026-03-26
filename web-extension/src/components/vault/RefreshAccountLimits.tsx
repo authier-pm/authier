@@ -1,10 +1,12 @@
 import { useState } from 'react'
-import { IconButton, Tooltip, useToast } from '@chakra-ui/react'
 import { IoMdRefreshCircle } from 'react-icons/io'
-
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { useLimitsQuery } from '@shared/graphql/AccountLimits.codegen'
+import { useAppToast } from '@src/ExtensionProviders'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { cn } from '@src/lib/cn'
 
 export function RefreshAccountLimits({
   refreshAccountTooltip,
@@ -14,26 +16,19 @@ export function RefreshAccountLimits({
   setRefreshAccountTooltip: React.Dispatch<React.SetStateAction<boolean>>
 }) {
   const [isSyncing, setIsSyncing] = useState(false)
-  const toast = useToast()
+  const toast = useAppToast()
   const { refetch } = useLimitsQuery({
     fetchPolicy: 'cache-and-network'
   })
 
   return (
-    <Tooltip
-      label={<Trans>Refresh account limits!</Trans>}
-      aria-label={t`refresh account limits`}
-      placement="top"
-      isOpen={refreshAccountTooltip}
-      bg="orange.300"
-    >
-      <IconButton
-        alignSelf={'end'}
-        size="md"
-        ml="2"
-        aria-label="menu"
-        icon={<IoMdRefreshCircle />}
+    <Tooltip content={<Trans>Refresh account limits!</Trans>}>
+      <Button
+        aria-label={t`refresh account limits`}
+        className="ml-2 self-end"
         disabled={isSyncing}
+        size="icon"
+        variant="outline"
         onClick={async () => {
           setIsSyncing(true)
           refetch()
@@ -43,7 +38,11 @@ export function RefreshAccountLimits({
           })
           setRefreshAccountTooltip(false)
         }}
-      />
+      >
+        <IoMdRefreshCircle
+          className={cn('size-5', refreshAccountTooltip ? 'text-amber-300' : undefined)}
+        />
+      </Button>
     </Tooltip>
   )
 }

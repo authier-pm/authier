@@ -4,8 +4,6 @@ const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
-const BundleAnalyzerPlugin =
-  require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const entries = {
   backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
@@ -119,7 +117,7 @@ module.exports = {
 
       {
         test: /\.css$/i,
-        use: ['style-loader', 'css-loader']
+        use: ['style-loader', 'css-loader', 'postcss-loader']
       },
       {
         test: /\.svg$/i,

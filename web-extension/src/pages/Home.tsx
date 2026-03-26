@@ -1,20 +1,10 @@
-import { FunctionComponent, useContext, useState } from 'react'
-
-import {
-  Box,
-  CircularProgress,
-  Flex,
-  FormControl,
-  FormLabel,
-  Grid,
-  Input,
-  Switch,
-  useInterval
-} from '@chakra-ui/react'
+import { useContext, useEffect, useState } from 'react'
 import { TbWorld } from 'react-icons/tb'
-
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { AuthsList } from '@src/components/pages/AuthsList'
+import { ProgressCircle } from '@src/components/ui/progressCircle'
+import { Input } from '@src/components/ui/input'
+import { Switch } from '@src/components/ui/switch'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 
 const TOTP_PERIOD_SECONDS = 30
 
@@ -26,70 +16,70 @@ const getTotpTimeRemaining = () => {
 export const Home = () => {
   const [seconds, setRemainingSeconds] = useState(getTotpTimeRemaining())
   const [search, setSearch] = useState('')
-  const { deviceState, TOTPSecrets, currentURL } =
+  const { currentURL, deviceState, TOTPSecrets } =
     useContext(DeviceStateContext)
 
-  useInterval(() => {
-    setRemainingSeconds(getTotpTimeRemaining())
-  }, 1000)
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setRemainingSeconds(getTotpTimeRemaining())
+    }, 1000)
 
-  const [filterByTLDManual, setFilterByTLD] = useState<null | boolean>(null) // when in vault or browser config, show all: ;
+    return () => {
+      window.clearInterval(interval)
+    }
+  }, [])
+
+  const [filterByTLDManual, setFilterByTLD] = useState<null | boolean>(null)
 
   const filterByTLD = !currentURL
     ? true
     : filterByTLDManual === null
       ? currentURL.startsWith('http')
       : filterByTLDManual
+
   return (
-    <>
-      <Flex position="sticky" align="center" pl={4} pr={4} mt={'10px'}>
-        <FormControl display="flex" alignItems="center">
-          <Flex alignItems="center">
-            <FormLabel mb="0">
-              <Flex alignItems="center">
-                <TbWorld></TbWorld> TLD
-              </Flex>
-            </FormLabel>
-            <Switch
-              mr="auto"
-              isChecked={filterByTLD}
-              onChange={(enabled) => {
-                setFilterByTLD(enabled.target.checked)
-              }}
-            ></Switch>
+    <div className="px-2 pb-2">
+      <div className="sticky top-0 z-10 mt-2 flex items-center gap-3 px-2">
+        <label className="flex shrink-0 items-center gap-2 text-sm font-medium text-[color:var(--color-foreground)]">
+          <span className="inline-flex items-center gap-1.5 text-[color:var(--color-muted)]">
+            <TbWorld className="size-4" />
+            TLD
+          </span>
+          <Switch
+            checked={filterByTLD}
+            onCheckedChange={(checked) => {
+              setFilterByTLD(checked)
+            }}
+          />
+        </label>
 
-            <Input
-              ml={5}
-              mr={3}
-              size="sm"
-              placeholder="Search"
-              onChange={(e) => {
-                setFilterByTLD(false)
-                if (e.target.value === '') {
-                  setFilterByTLD(true)
-                }
-                setSearch(e.target.value)
-              }}
-            />
-          </Flex>
-        </FormControl>
+        <Input
+          className="h-9"
+          placeholder="Search"
+          value={search}
+          onChange={(e) => {
+            const nextValue = e.target.value
 
-        {deviceState && TOTPSecrets.length > 0 && (
-          <CircularProgress
-            min={1}
-            ml="auto"
+            setFilterByTLD(nextValue === '' ? true : false)
+            setSearch(nextValue)
+          }}
+        />
+
+        {deviceState && TOTPSecrets.length > 0 ? (
+          <ProgressCircle
+            className="ml-auto shrink-0"
             max={30}
             value={30 - seconds}
-            valueText={seconds.toString()}
-            size="40px"
+            valueLabel={seconds.toString()}
           />
-        )}
-      </Flex>
-      <Box height={300} width={350} pr={1} pl={1} mb={2} mt={2}>
-        <Grid gap={3} mb={5}>
+        ) : null}
+      </div>
+
+      <div className="mt-2 h-[300px] w-[350px] px-1">
+        <div className="grid gap-3 pb-5">
           <AuthsList filterByTLD={filterByTLD} search={search} />
-        </Grid>
-      </Box>
-    </>
+        </div>
+      </div>
+    </div>
   )
 }

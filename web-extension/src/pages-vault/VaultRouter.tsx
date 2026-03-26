@@ -1,34 +1,26 @@
 import { useContext, useEffect, useState } from 'react'
-import SidebarWithHeader from '../components/vault/SidebarWithHeader'
-
 import {
   Route,
   Routes,
   useNavigate,
-  useLocation,
-  Navigate
+  useLocation
 } from 'react-router-dom'
+import debug from 'debug'
+import browser from 'webextension-polyfill'
+import { ApolloProvider } from '@apollo/client/react'
+import { apolloClient, apolloClientWithoutTokenRefresh } from '@src/apollo/apolloClient'
 import { VaultItemSettings } from '@src/components/vault/VaultItemSettings'
+import SidebarWithHeader from '../components/vault/SidebarWithHeader'
 import { VaultSettings } from './VaultSettings'
-
-import { Center } from '@chakra-ui/react'
 import { DevicesPage } from './DevicesPage'
 import { VaultImportExport } from './VaultImportExport'
 import Register from './Register'
-
 import { AddItem } from './AddItem'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { UnlockDeviceForm } from '@src/pages/UnlockDeviceForm'
 import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
-import debug from 'debug'
 import Login from './Login'
-import browser from 'webextension-polyfill'
-import { ApolloProvider } from '@apollo/client/react'
-import {
-  apolloClient,
-  apolloClientWithoutTokenRefresh
-} from '@src/apollo/apolloClient'
 import { NewDevicePolicyOnboarding } from './NewDevicePolicyOnboarding'
 import { PasswordGenerationHistory } from './PasswordGenerationHistory'
 
@@ -45,29 +37,34 @@ export function VaultRouter() {
       navigate('verify')
     }
     log('VaultRouter: deviceState', deviceState, lockedState)
-  }, [lockedState])
+  }, [deviceState, lockedState, navigate])
 
   useEffect(() => {
     browser.storage.sync.get('vaultTableView').then((res) => {
       setVaultTableView(res.vaultTableView as boolean)
     })
 
-    browser.storage.sync.onChanged.addListener((changes) => {
+    const handleStorageChange = (changes: Record<string, browser.Storage.StorageChange>) => {
       if (changes.vaultTableView) {
         setVaultTableView(changes.vaultTableView.newValue as boolean)
       }
-    })
+    }
+
+    browser.storage.sync.onChanged.addListener(handleStorageChange)
+
+    return () => {
+      browser.storage.sync.onChanged.removeListener(handleStorageChange)
+    }
   }, [])
 
   if (deviceState === null) {
     return (
       <ApolloProvider client={apolloClientWithoutTokenRefresh}>
-        <Center marginX="50%" h="100vh">
+        <div className="flex min-h-screen items-center justify-center px-4">
           <Routes>
-            <Route path="/" element={<Login />}></Route>
-            <Route path="/signup" element={<Register />}></Route>
+            <Route element={<Login />} path="/" />
+            <Route element={<Register />} path="/signup" />
             <Route
-              path="/verify"
               element={
                 <UnlockDeviceForm
                   onUnlocked={() => {
@@ -75,9 +72,10 @@ export function VaultRouter() {
                   }}
                 />
               }
-            ></Route>
+              path="/verify"
+            />
           </Routes>
-        </Center>
+        </div>
       </ApolloProvider>
     )
   }
@@ -85,29 +83,17 @@ export function VaultRouter() {
   return (
     <ApolloProvider client={apolloClient}>
       <SidebarWithHeader>
-        <Routes>
-          <Route
-            path="/"
-            element={<VaultList tableView={vaultTableView} />}
-          ></Route>
-          <Route
-            path="/credentials"
-            element={<VaultList tableView={vaultTableView} />}
-          ></Route>
-          <Route
-            path="/totps"
-            element={<VaultList tableView={vaultTableView} />}
-          ></Route>
-          <Route path="/secret/:secretId" element={<VaultItemSettings />} />
-          <Route path="/account-limits" element={<AccountLimits />}></Route>
-          <Route path="/settings/*" element={<VaultSettings />}></Route>
-          <Route path="/devices" element={<DevicesPage />}></Route>
-          <Route path="/import-export" element={<VaultImportExport />}></Route>
-          <Route
-            path="/password-generation-history"
-            element={<PasswordGenerationHistory />}
-          ></Route>
-          <Route path="/addItem" element={<AddItem />}></Route>
+        <Routes key={location.pathname}>
+          <Route element={<VaultList tableView={vaultTableView} />} path="/" />
+          <Route element={<VaultList tableView={vaultTableView} />} path="/credentials" />
+          <Route element={<VaultList tableView={vaultTableView} />} path="/totps" />
+          <Route element={<VaultItemSettings />} path="/secret/:secretId" />
+          <Route element={<AccountLimits />} path="/account-limits" />
+          <Route element={<VaultSettings />} path="/settings/*" />
+          <Route element={<DevicesPage />} path="/devices" />
+          <Route element={<VaultImportExport />} path="/import-export" />
+          <Route element={<PasswordGenerationHistory />} path="/password-generation-history" />
+          <Route element={<AddItem />} path="/addItem" />
         </Routes>
       </SidebarWithHeader>
       <NewDevicePolicyOnboarding />

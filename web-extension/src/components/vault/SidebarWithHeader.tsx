@@ -1,56 +1,44 @@
-import { ReactNode, type JSX } from 'react'
-import {
-  IconButton,
-  Avatar,
-  Box,
-  CloseButton,
-  Flex,
-  HStack,
-  VStack,
-  Icon,
-  useColorModeValue,
-  Link,
-  Drawer,
-  DrawerContent,
-  Text,
-  useDisclosure,
-  BoxProps,
-  FlexProps,
-  Menu,
-  MenuButton,
-  MenuDivider,
-  MenuItem,
-  MenuList,
-  Spinner
-} from '@chakra-ui/react'
-import {
-  FiHome,
-  FiStar,
-  FiSettings,
-  FiMenu,
-  FiChevronDown,
-  FiHardDrive,
-  FiDisc,
-  FiKey,
-  FiLock,
-  FiClock
-} from 'react-icons/fi'
-import { IconType } from 'react-icons'
+import { type JSX, type ReactNode, useState } from 'react'
 import { NavLink as RouterLink } from 'react-router-dom'
-import { device } from '@src/background/ExtensionDevice'
 import MD5 from 'crypto-js/md5'
-import { ChevronDownIcon, LockIcon } from '@chakra-ui/icons'
-import { Trans } from '@lingui/react/macro'
-import { ColorModeButton } from '../ColorModeButton'
-import { TbLogout } from 'react-icons/tb'
 import browser from 'webextension-polyfill'
+import { Trans } from '@lingui/react/macro'
+import { FiClock, FiHardDrive, FiHome, FiKey, FiLock, FiMenu, FiSettings, FiStar } from 'react-icons/fi'
+import { TbLogout } from 'react-icons/tb'
+import type { IconType } from 'react-icons'
+import { device } from '@src/background/ExtensionDevice'
+import { Button } from '@src/components/ui/button'
+import { Card } from '@src/components/ui/card'
+import { cn } from '@src/lib/cn'
+import { useThemeMode } from '@src/ExtensionProviders'
 
 interface LinkItemProps {
   title: JSX.Element
   icon: IconType
   path: string
+  exact?: boolean
 }
-const LinkItems: Array<LinkItemProps> = [
+
+const primaryLinks: LinkItemProps[] = [
+  {
+    title: <Trans>Vault</Trans>,
+    icon: FiHome,
+    path: '/',
+    exact: true
+  },
+  {
+    title: <Trans>Credentials</Trans>,
+    icon: FiLock,
+    path: '/credentials'
+  },
+  {
+    title: <Trans>TOTPs</Trans>,
+    icon: FiKey,
+    path: '/totps'
+  }
+]
+
+const secondaryLinks: LinkItemProps[] = [
   {
     title: <Trans>Settings</Trans>,
     icon: FiSettings,
@@ -61,10 +49,14 @@ const LinkItems: Array<LinkItemProps> = [
     icon: FiStar,
     path: '/account-limits'
   },
-  { title: <Trans>Devices</Trans>, icon: FiHardDrive, path: '/devices' },
+  {
+    title: <Trans>Devices</Trans>,
+    icon: FiHardDrive,
+    path: '/devices'
+  },
   {
     title: <Trans>Import & Export</Trans>,
-    icon: FiDisc,
+    icon: FiClock,
     path: '/import-export'
   },
   {
@@ -79,309 +71,204 @@ export default function SidebarWithHeader({
 }: {
   children: ReactNode
 }) {
-  const { isOpen, onOpen, onClose } = useDisclosure()
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false)
+
   return (
-    <Box minH="100vh" bg={useColorModeValue('gray.50', 'gray.900')}>
-      <SidebarContent
-        onClose={() => onClose}
-        display={{ base: 'none', md: 'block' }}
-      />
-      <Drawer
-        autoFocus={false}
-        isOpen={isOpen}
-        placement="left"
-        onClose={onClose}
-        returnFocusOnClose={false}
-        onOverlayClick={onClose}
-        size={'xs'}
-      >
-        <DrawerContent>
-          <SidebarContent onClose={onClose} />
-        </DrawerContent>
-      </Drawer>
-      {/* mobile nav */}
-      <MobileNav display={{ base: 'flex', md: 'none' }} onOpen={onOpen} />
-      <Box overflow="hidden" ml={{ base: 0, md: 60 }} paddingBottom={0}>
-        {children}
-      </Box>
-    </Box>
+    <div className="min-h-screen text-[color:var(--color-foreground)] lg:h-screen lg:overflow-hidden">
+      <aside className="fixed inset-y-0 left-0 z-40 hidden w-72 border-r border-[color:var(--color-border)] extension-surface lg:block">
+        <SidebarContent onNavigate={() => {}} />
+      </aside>
+
+      {isMobileSidebarOpen ? (
+        <div className="fixed inset-0 z-50 lg:hidden">
+          <button
+            aria-label="Close navigation"
+            className="absolute inset-0 bg-black/60"
+            onClick={() => setIsMobileSidebarOpen(false)}
+            type="button"
+          />
+          <aside className="relative flex h-full w-[min(85vw,20rem)] flex-col border-r border-[color:var(--color-border)] extension-surface">
+            <SidebarContent
+              onNavigate={() => {
+                setIsMobileSidebarOpen(false)
+              }}
+            />
+          </aside>
+        </div>
+      ) : null}
+
+      <div className="flex min-h-screen flex-col lg:h-screen lg:pl-72">
+        <header className="sticky top-0 z-30 border-b border-[color:var(--color-border)] extension-surface lg:hidden">
+          <div className="flex h-16 items-center justify-between px-4">
+            <Button
+              aria-label="Open navigation"
+              onClick={() => setIsMobileSidebarOpen(true)}
+              size="icon"
+              variant="ghost"
+            >
+              <FiMenu className="size-5" />
+            </Button>
+            <div className="flex items-center gap-3">
+              <LogoMark />
+              <span className="text-sm font-semibold tracking-[0.18em] uppercase">
+                Authier
+              </span>
+            </div>
+            <div className="size-10" />
+          </div>
+        </header>
+        <main className="flex flex-1 flex-col px-4 py-4 lg:min-h-0 lg:overflow-hidden lg:px-6 lg:py-6">
+          {children}
+        </main>
+      </div>
+    </div>
   )
 }
 
-interface SidebarProps extends BoxProps {
-  onClose: () => void
-}
-
-const SidebarContent = ({ onClose, ...rest }: SidebarProps) => {
+function SidebarContent({ onNavigate }: { onNavigate: () => void }) {
   const email = device.state?.email
+  const { colorMode, toggleColorMode } = useThemeMode()
+
   if (!email) {
-    return <Spinner />
+    return (
+      <div className="flex h-full items-center justify-center p-6 text-sm text-[color:var(--color-muted)]">
+        Loading vault...
+      </div>
+    )
   }
+
   return (
-    <Flex
-      transition="0.5s ease"
-      bg={useColorModeValue('cyan.800', 'gray.800')}
-      borderRight="1px"
-      borderRightColor={useColorModeValue('gray.200', 'gray.700')}
-      w={{ base: '400px', md: 60 }}
-      pos="fixed"
-      h="full"
-      flexDirection="column"
-      alignItems="center"
-      {...rest}
-    >
-      <Flex
-        justifyContent={'flex-end'}
-        flexDirection="column"
-        height="inherit"
-        w={{ base: '400px', md: 60 }}
-      >
-        <Flex h={'72px'} alignItems="center" mx="6">
-          <Box
-            className="iconAuthier"
-            boxSize={8}
-            mr={3}
-            style={{
-              backgroundImage: `url('${browser.runtime.getURL('icon-128.png')}')`,
-              backgroundSize: 'cover',
-              borderRadius: '20%'
-            }}
-          ></Box>
-          <Text fontSize="xl" fontWeight="bold">
+    <div className="flex h-full flex-col p-4">
+      <div className="mb-6 flex items-center gap-3 px-2">
+        <LogoMark />
+        <div>
+          <div className="text-sm font-semibold tracking-[0.18em] uppercase">
             Authier
-          </Text>
-          <CloseButton
-            ml="auto"
-            display={{ base: 'flex', md: 'none' }}
-            onClick={onClose}
+          </div>
+          <div className="text-xs text-[color:var(--color-muted)]">
+            Secure vault
+          </div>
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <SidebarSectionLabel>
+          <Trans>Vault</Trans>
+        </SidebarSectionLabel>
+        {primaryLinks.map((item) => (
+          <NavItem item={item} key={item.path} onNavigate={onNavigate} />
+        ))}
+      </div>
+
+      <div className="mt-6 space-y-2">
+        <SidebarSectionLabel>
+          <Trans>Workspace</Trans>
+        </SidebarSectionLabel>
+        {secondaryLinks.map((item) => (
+          <NavItem item={item} key={item.path} onNavigate={onNavigate} />
+        ))}
+      </div>
+
+      <Card className="mt-auto border-white/10 bg-[color:var(--color-surface-muted)] p-4">
+        <div className="flex items-center gap-3">
+          <img
+            alt={email}
+            className="size-11 rounded-full border border-[color:var(--color-border)] object-cover"
+            src={`https://www.gravatar.com/avatar/${MD5(email).toString()}`}
           />
-        </Flex>
-        <Flex flexDirection="column" height="100%">
-          <NavItem icon={FiHome} path="/" onClick={onClose}>
-            <Trans>Vault</Trans>
-          </NavItem>
-          <NavItem
-            level={1}
-            icon={FiLock}
-            path="/credentials"
-            onClick={onClose}
-          >
-            <Trans>Credentials</Trans>
-          </NavItem>
-          <NavItem level={1} icon={FiKey} path="/totps" onClick={onClose}>
-            <Trans>TOTPs</Trans>
-          </NavItem>
+          <div className="min-w-0">
+            <div className="truncate text-sm font-medium">{email}</div>
+            <div className="text-xs text-[color:var(--color-muted)]">
+              <Trans>Vault unlocked</Trans>
+            </div>
+          </div>
+        </div>
 
-          {LinkItems.map((link, i) => (
-            <NavItem
-              key={i}
-              icon={link.icon}
-              path={link.path}
-              onClick={onClose}
-            >
-              {link.title}
-            </NavItem>
-          ))}
-          <ColorModeButton />
-        </Flex>
-
-        <HStack spacing={{ base: '0', md: '6' }} w="80%" m={4}>
-          <Flex alignItems={'center'} w="100%">
-            <Menu>
-              <MenuButton
-                py={2}
-                transition="all 0.3s"
-                _focus={{ boxShadow: 'none' }}
-                w="100%"
-              >
-                <Flex w="100%">
-                  <Avatar
-                    size={'sm'}
-                    src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
-                  />
-                  <VStack
-                    display={{ base: 'none', md: 'flex' }}
-                    alignItems="flex-start"
-                    spacing="1px"
-                    ml="2"
-                    mr="auto"
-                  >
-                    <Text fontSize="sm">{email}</Text>
-                  </VStack>
-                  <Box display={{ base: 'none', md: 'flex' }} ml="auto">
-                    <ChevronDownIcon boxSize={19} />
-                  </Box>
-                </Flex>
-              </MenuButton>
-              <MenuList
-                bg={useColorModeValue('cyan.800', 'gray.900')}
-                borderColor={useColorModeValue('gray.200', 'gray.700')}
-              >
-                <MenuItem
-                  backgroundColor="red.400"
-                  _hover={{
-                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
-                  }}
-                  onClick={async () => {
-                    await device.logout()
-                  }}
-                >
-                  <TbLogout size={16} />
-                  <Box ml={3}>Logout</Box>
-                </MenuItem>
-                <MenuItem
-                  backgroundColor="yellow.500"
-                  _hover={{
-                    backgroundColor: useColorModeValue('teal.200', 'teal.400')
-                  }}
-                  onClick={async () => {
-                    await device.lock()
-                  }}
-                >
-                  <LockIcon />
-                  <Box ml={3}>
-                    <Trans>Lock device</Trans>
-                  </Box>
-                </MenuItem>
-              </MenuList>
-            </Menu>
-          </Flex>
-        </HStack>
-      </Flex>
-    </Flex>
-  )
-}
-
-interface NavItemProps extends FlexProps {
-  icon: IconType
-  path: string
-  level?: number
-  children: JSX.Element
-}
-const NavItem = ({ icon, path, level, children, ...rest }: NavItemProps) => {
-  return (
-    <Link
-      as={RouterLink}
-      to={path}
-      style={{ textDecoration: 'none' }}
-      _activeLink={{
-        bg: useColorModeValue('teal.200', 'teal.700')
-      }}
-      _hover={{
-        bg: useColorModeValue('teal.200', 'teal.700')
-      }}
-    >
-      <Flex
-        align="center"
-        p="4"
-        mx="4"
-        pl={level ? level * 6 : 0}
-        borderRadius="lg"
-        role="group"
-        cursor="pointer"
-        {...rest}
-      >
-        {icon && (
-          <Icon
-            mr="4"
-            fontSize="32"
-            _groupHover={{
-              color: 'gray.400'
+        <div className="mt-4 flex gap-2">
+          <Button
+            className="flex-1"
+            onClick={async () => {
+              onNavigate()
+              await device.lock()
             }}
-            as={icon}
-          />
-        )}
-        {children}
-      </Flex>
-    </Link>
+            size="sm"
+            variant="outline"
+          >
+            <FiLock className="size-4" />
+            <Trans>Lock</Trans>
+          </Button>
+          <Button
+            className="flex-1"
+            onClick={async () => {
+              onNavigate()
+              await device.logout()
+            }}
+            size="sm"
+            variant="destructive"
+          >
+            <TbLogout className="size-4" />
+            <Trans>Logout</Trans>
+          </Button>
+        </div>
+
+        <Button
+          className="mt-2 w-full justify-start"
+          onClick={toggleColorMode}
+          size="sm"
+          variant="ghost"
+        >
+          <FiSettings className="size-4" />
+          {colorMode === 'dark' ? 'Light theme' : 'Dark theme'}
+        </Button>
+      </Card>
+    </div>
   )
 }
 
-interface MobileProps extends FlexProps {
-  onOpen: () => void
+function SidebarSectionLabel({ children }: { children: ReactNode }) {
+  return (
+    <div className="px-3 text-[11px] font-medium tracking-[0.24em] text-[color:var(--color-muted)] uppercase">
+      {children}
+    </div>
+  )
 }
-const MobileNav = ({ onOpen, ...rest }: MobileProps) => {
-  const email = device.state?.email as string
+
+function NavItem({
+  item,
+  onNavigate
+}: {
+  item: LinkItemProps
+  onNavigate: () => void
+}) {
+  const Icon = item.icon
 
   return (
-    <Flex
-      ml={{ base: 0, md: 60 }}
-      px={{ base: 4, md: 4 }}
-      height="20"
-      alignItems="center"
-      bg={useColorModeValue('cyan.800', 'gray.900')}
-      borderBottomWidth="1px"
-      borderBottomColor={useColorModeValue('gray.200', 'gray.700')}
-      justifyContent={{ base: 'space-between', md: 'flex-end' }}
-      {...rest}
+    <RouterLink
+      className={({ isActive }) =>
+        cn(
+          'flex items-center gap-3 rounded-[var(--radius-md)] px-3 py-3 text-sm font-medium transition',
+          isActive
+            ? 'bg-[color:var(--color-accent)] text-[color:var(--color-foreground)]'
+            : 'text-[color:var(--color-muted)] hover:bg-[color:var(--color-accent)]/60 hover:text-[color:var(--color-foreground)]'
+        )
+      }
+      end={item.exact}
+      onClick={onNavigate}
+      to={item.path}
     >
-      <IconButton
-        display={{ base: 'flex', md: 'none' }}
-        onClick={onOpen}
-        variant="outline"
-        aria-label="open menu"
-        icon={<FiMenu />}
-      />
+      <Icon className="size-5 shrink-0" />
+      <span>{item.title}</span>
+    </RouterLink>
+  )
+}
 
-      <Text
-        display={{ base: 'flex', md: 'none' }}
-        fontSize="2xl"
-        fontFamily="monospace"
-        fontWeight="bold"
-      >
-        Logo
-      </Text>
-
-      <HStack spacing={{ base: '0', md: '6' }}>
-        <ColorModeButton />
-        <Flex alignItems={'center'}>
-          <Menu>
-            <MenuButton
-              py={2}
-              transition="all 0.3s"
-              _focus={{ boxShadow: 'none' }}
-            >
-              <HStack>
-                <Avatar
-                  size={'sm'}
-                  src={`https://www.gravatar.com/avatar/${MD5(email)}}`}
-                />
-                <VStack
-                  display={{ base: 'none', md: 'flex' }}
-                  alignItems="flex-start"
-                  spacing="1px"
-                  ml="2"
-                >
-                  <Text fontSize="sm">{email}</Text>
-                </VStack>
-                <Box display={{ base: 'none', md: 'flex' }}>
-                  <FiChevronDown />
-                </Box>
-              </HStack>
-            </MenuButton>
-            <MenuList>
-              <Link as={RouterLink} to="/settings/account">
-                <MenuItem>Settings</MenuItem>
-              </Link>
-              <Link as={RouterLink} to="/account-limits">
-                <MenuItem>Billing</MenuItem>
-              </Link>
-              <MenuDivider />
-              <MenuItem
-                backgroundColor="red.400"
-                _hover={{
-                  backgroundColor: 'red.600'
-                }}
-                onClick={async () => {
-                  await device.logout()
-                }}
-              >
-                Logout
-              </MenuItem>
-            </MenuList>
-          </Menu>
-        </Flex>
-      </HStack>
-    </Flex>
+function LogoMark() {
+  return (
+    <div
+      className="size-10 rounded-2xl border border-white/10 bg-cover bg-center shadow-lg"
+      style={{
+        backgroundImage: `url('${browser.runtime.getURL('icon-128.png')}')`
+      }}
+    />
   )
 }

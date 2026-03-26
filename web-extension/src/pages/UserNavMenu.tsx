@@ -1,44 +1,32 @@
-import React, { FunctionComponent } from 'react'
-
-import {
-  Button,
-  ButtonGroup,
-  Center,
-  Heading,
-  Stack,
-  useColorModeValue
-} from '@chakra-ui/react'
-
+import { type FunctionComponent } from 'react'
 import { Trans } from '@lingui/react/macro'
 import { device } from '@src/background/ExtensionDevice'
+import { Button } from '@src/components/ui/button'
 
 export const UserNavMenu: FunctionComponent = () => {
-  const bg = useColorModeValue('teal.200', 'teal.700')
   return (
-    <Stack direction="row" bgColor={bg} justify="center" p="10px">
-      <Center>
-        <Heading size={'sm'}>Logged as {device.state?.email}</Heading>
-      </Center>
-      <ButtonGroup spacing={4} variant="solid" m="10px">
-        <Stack direction="column">
-          <Button
-            colorScheme="yellow"
-            onClick={async () => {
-              device.lock()
-            }}
-          >
-            <Trans>Lock device</Trans>
-          </Button>
-          <Button
-            colorScheme="red"
-            onClick={async () => {
-              device.logout()
-            }}
-          >
-            <Trans>Logout</Trans>
-          </Button>
-        </Stack>
-      </ButtonGroup>
-    </Stack>
+    <div className="border-t border-[color:var(--color-border)] bg-[color:var(--color-accent)]/40 px-3 py-3">
+      <div className="mb-3 text-sm font-semibold text-[color:var(--color-foreground)]">
+        Logged as {device.state?.email}
+      </div>
+      <div className="flex flex-col gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            device.lock()
+          }}
+        >
+          <Trans>Lock device</Trans>
+        </Button>
+        <Button
+          variant="destructive"
+          onClick={() => {
+            device.logout()
+          }}
+        >
+          <Trans>Logout</Trans>
+        </Button>
+      </div>
+    </div>
   )
 }

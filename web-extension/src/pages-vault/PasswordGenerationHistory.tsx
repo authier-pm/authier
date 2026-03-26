@@ -1,29 +1,17 @@
-import {
-  Badge,
-  Box,
-  Button,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Heading,
-  Input,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Spinner,
-  Stack,
-  Text,
-  useColorModeValue,
-  useToast
-} from '@chakra-ui/react'
-import { Field, Formik, FormikHelpers } from 'formik'
 import { useContext, useEffect, useState } from 'react'
 import browser from 'webextension-polyfill'
+import { Field, Formik, type FormikHelpers } from 'formik'
+import {
+  FiCheckCircle,
+  FiClock,
+  FiCopy,
+  FiEye,
+  FiEyeOff,
+  FiKey,
+  FiPlus,
+  FiTrash2,
+  FiX
+} from 'react-icons/fi'
 import { PasswordSchema, credentialValues } from '@shared/formikSharedTypes'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { device } from '@src/background/ExtensionDevice'
@@ -36,6 +24,16 @@ import {
   GeneratedPasswordHistoryEntry,
   normalizeHistoryHostname
 } from '@src/util/generatedPasswordHistory'
+import { toast } from '@src/ExtensionProviders'
+import { Button } from '@src/components/ui/button'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@src/components/ui/card'
+import { Input } from '@src/components/ui/input'
 
 const emptyCredentialValues: credentialValues = {
   label: '',
@@ -66,10 +64,6 @@ export const PasswordGenerationHistory = () => {
   const [revealedEntryIds, setRevealedEntryIds] = useState<string[]>([])
   const [selectedEntry, setSelectedEntry] =
     useState<GeneratedPasswordHistoryEntry | null>(null)
-  const toast = useToast()
-
-  const panelBg = useColorModeValue('cyan.800', 'gray.800')
-  const itemBg = useColorModeValue('whiteAlpha.300', 'whiteAlpha.100')
 
   useEffect(() => {
     let isDisposed = false
@@ -127,8 +121,8 @@ export const PasswordGenerationHistory = () => {
   const copyPassword = async (password: string) => {
     await navigator.clipboard.writeText(password)
     toast({
-      title: 'Password copied',
-      status: 'success'
+      status: 'success',
+      title: 'Password copied'
     })
   }
 
@@ -145,242 +139,394 @@ export const PasswordGenerationHistory = () => {
     setSelectedEntry(null)
     setRevealedEntryIds([])
     toast({
-      title: 'Password generation history cleared',
-      status: 'success'
+      status: 'success',
+      title: 'Password generation history cleared'
     })
   }
 
   if (!historyLoaded) {
-    return <Spinner />
+    return (
+      <div className="flex min-h-[240px] items-center justify-center">
+        <div className="size-10 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
+      </div>
+    )
   }
 
   return (
-    <Box p={6}>
-      <Flex
-        alignItems="center"
-        bg={panelBg}
-        borderRadius="lg"
-        justifyContent="space-between"
-        mb={6}
-        p={5}
-      >
-        <Box>
-          <Heading size="md">Password generation history</Heading>
-          <Text mt={2}>
-            Generated passwords are kept locally so they can still be recovered
-            after fast redirects or form submission.
-          </Text>
-        </Box>
-        <Button
-          colorScheme="red"
-          isDisabled={history.length === 0}
-          onClick={() => {
-            void clearHistory()
-          }}
-        >
-          Clear history
-        </Button>
-      </Flex>
+    <>
+      <div className="extension-scrollbar mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col gap-6 overflow-y-auto p-6 md:p-8">
+        <section className="flex flex-col gap-3">
+          <div className="text-[11px] font-medium tracking-[0.22em] text-[color:var(--color-muted)] uppercase">
+            Password generation history
+          </div>
+          <h1 className="text-3xl font-semibold tracking-tight text-[color:var(--color-foreground)] md:text-4xl">
+            Recover generated passwords before they disappear into redirects
+          </h1>
+          <p className="max-w-3xl text-sm leading-6 text-[color:var(--color-muted)] md:text-base">
+            Generated passwords are kept locally so you can recover them after
+            fast form submissions, redirects, or interrupted account creation.
+          </p>
+        </section>
 
-      {history.length === 0 ? (
-        <Box bg={panelBg} borderRadius="lg" p={6}>
-          <Text>No generated passwords have been recorded yet.</Text>
-        </Box>
-      ) : (
-        <Stack spacing={4}>
-          {history.map((entry) => {
-            const isSaved = isEntrySaved(entry)
-            const isRevealed = revealedEntryIds.includes(entry.id)
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1.15fr)]">
+          {history.length === 0 ? (
+            <Card>
+              <CardContent className="flex min-h-[320px] items-center justify-center p-8 text-center text-sm text-[color:var(--color-muted)]">
+                No generated passwords have been recorded yet.
+              </CardContent>
+            </Card>
+          ) : (
+            <div className="grid gap-4">
+              {history.map((entry) => {
+                const isSaved = isEntrySaved(entry)
+                const isRevealed = revealedEntryIds.includes(entry.id)
 
-            return (
-              <Box
-                bg={itemBg}
-                borderRadius="lg"
-                key={entry.id}
-                p={5}
-                shadow="md"
-              >
-                <Flex
-                  alignItems={{ base: 'start', md: 'center' }}
-                  direction={{ base: 'column', md: 'row' }}
-                  gap={3}
-                  justifyContent="space-between"
-                  mb={4}
+                return (
+                  <Card key={entry.id}>
+                    <CardContent className="p-5">
+                      <div className="flex flex-col gap-4">
+                        <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+                          <div>
+                            <div className="text-lg font-semibold text-[color:var(--color-foreground)]">
+                              {entry.hostname}
+                            </div>
+                            <div className="mt-2 flex items-center gap-2 text-sm text-[color:var(--color-muted)]">
+                              <FiClock className="size-4" />
+                              {new Date(entry.createdAt).toLocaleString()}
+                            </div>
+                          </div>
+
+                          {isSaved ? (
+                            <div className="inline-flex items-center gap-2 rounded-full border border-emerald-400/25 bg-emerald-500/10 px-3 py-1 text-sm font-medium text-emerald-300">
+                              <FiCheckCircle className="size-4" />
+                              Saved
+                            </div>
+                          ) : (
+                            <Button
+                              onClick={() => {
+                                setSelectedEntry(entry)
+                              }}
+                              variant="outline"
+                            >
+                              <FiPlus className="size-4" />
+                              Save
+                            </Button>
+                          )}
+                        </div>
+
+                        <HistoryField label="URL" value={entry.pageUrl} />
+
+                        <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+                          <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
+                            Password
+                          </div>
+                          <div className="mt-3 flex flex-col gap-3 md:flex-row">
+                            <Input
+                              className="font-mono"
+                              readOnly
+                              type={isRevealed ? 'text' : 'password'}
+                              value={entry.password}
+                            />
+                            <div className="flex gap-2">
+                              <Button
+                                onClick={() => {
+                                  togglePasswordVisibility(entry.id)
+                                }}
+                                variant="outline"
+                              >
+                                {isRevealed ? (
+                                  <FiEyeOff className="size-4" />
+                                ) : (
+                                  <FiEye className="size-4" />
+                                )}
+                                {isRevealed ? 'Hide' : 'Reveal'}
+                              </Button>
+                              <Button
+                                onClick={() => {
+                                  void copyPassword(entry.password)
+                                }}
+                                variant="outline"
+                              >
+                                <FiCopy className="size-4" />
+                                Copy
+                              </Button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )
+              })}
+            </div>
+          )}
+
+          <Card className="overflow-hidden bg-[linear-gradient(145deg,rgba(16,54,56,0.96)_0%,rgba(17,31,32,1)_75%)]">
+            <CardHeader>
+              <div className="flex size-12 items-center justify-center rounded-2xl border border-white/10 bg-[color:var(--color-card)] text-[color:var(--color-primary)]">
+                <FiKey className="size-5" />
+              </div>
+              <CardTitle>History overview</CardTitle>
+              <CardDescription>
+                Review recent generated passwords, reveal them briefly, copy them,
+                or save them as credentials.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
+              <MetricCard
+                label="Entries"
+                value={`${history.length}`}
+              />
+              <MetricCard
+                label="Already saved"
+                value={`${history.filter((entry) => isEntrySaved(entry)).length}`}
+              />
+              <MetricCard
+                label="Unsaved"
+                value={`${history.filter((entry) => !isEntrySaved(entry)).length}`}
+              />
+              <div className="rounded-[var(--radius-lg)] border border-white/10 bg-black/10 p-4">
+                <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
+                  Actions
+                </div>
+                <Button
+                  className="mt-3 w-full"
+                  disabled={history.length === 0}
+                  onClick={() => {
+                    void clearHistory()
+                  }}
+                  variant="destructive"
                 >
-                  <Box>
-                    <Heading size="sm">{entry.hostname}</Heading>
-                    <Text fontSize="sm" mt={1}>
-                      {new Date(entry.createdAt).toLocaleString()}
-                    </Text>
-                  </Box>
-                  {isSaved ? (
-                    <Badge colorScheme="green" fontSize="0.9em" px={3} py={1}>
-                      Saved
-                    </Badge>
-                  ) : (
-                    <Button
-                      colorScheme="blue"
-                      onClick={() => {
-                        setSelectedEntry(entry)
-                      }}
-                    >
-                      Save
-                    </Button>
-                  )}
-                </Flex>
+                  <FiTrash2 className="size-4" />
+                  Clear history
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+      </div>
 
-                <Text fontSize="sm" mb={2}>
-                  URL
-                </Text>
-                <Text mb={4} wordBreak="break-all">
-                  {entry.pageUrl}
-                </Text>
-
-                <Text fontSize="sm" mb={2}>
-                  Password
-                </Text>
-                <Flex
-                  alignItems={{ base: 'stretch', md: 'center' }}
-                  direction={{ base: 'column', md: 'row' }}
-                  gap={3}
-                >
-                  <Input
-                    isReadOnly
-                    type={isRevealed ? 'text' : 'password'}
-                    value={entry.password}
-                  />
-                  <Flex gap={3}>
-                    <Button
-                      onClick={() => {
-                        togglePasswordVisibility(entry.id)
-                      }}
-                    >
-                      {isRevealed ? 'Hide' : 'Reveal'}
-                    </Button>
-                    <Button
-                      onClick={() => {
-                        void copyPassword(entry.password)
-                      }}
-                    >
-                      Copy
-                    </Button>
-                  </Flex>
-                </Flex>
-              </Box>
-            )
-          })}
-        </Stack>
-      )}
-
-      <Modal
-        isOpen={selectedEntry !== null}
+      <SaveGeneratedPasswordModal
+        entry={selectedEntry}
         onClose={() => {
           setSelectedEntry(null)
         }}
-      >
-        <ModalOverlay />
-        <ModalContent>
-          <Formik
-            enableReinitialize
-            initialValues={getInitialValuesForEntry(selectedEntry)}
-            validationSchema={PasswordSchema}
-            onSubmit={async (
-              values: credentialValues,
-              { setSubmitting, resetForm }: FormikHelpers<credentialValues>
-            ) => {
-              if (!device.state) {
-                setSubmitting(false)
-                return
-              }
+      />
+    </>
+  )
+}
 
-              const loginCredentials = {
-                password: values.password,
-                username: values.username,
-                url: values.url,
-                label: values.label,
-                iconUrl: null
-              }
+function MetricCard({
+  label,
+  value
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-white/10 bg-black/10 p-4">
+      <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
+        {label}
+      </div>
+      <div className="mt-2 text-2xl font-semibold text-[color:var(--color-foreground)]">
+        {value}
+      </div>
+    </div>
+  )
+}
 
-              loginCredentialsSchema.parse(loginCredentials)
+function HistoryField({
+  label,
+  value
+}: {
+  label: string
+  value: string
+}) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+      <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
+        {label}
+      </div>
+      <div className="mt-3 break-all text-sm text-[color:var(--color-foreground)]">
+        {value}
+      </div>
+    </div>
+  )
+}
 
-              await device.state.addSecrets([
-                {
-                  kind: EncryptedSecretType.LOGIN_CREDENTIALS,
-                  loginCredentials,
-                  encrypted: await device.state.encrypt(
-                    JSON.stringify(loginCredentials)
-                  ),
-                  createdAt: new Date().toJSON()
-                }
-              ])
+function SaveGeneratedPasswordModal({
+  entry,
+  onClose
+}: {
+  entry: GeneratedPasswordHistoryEntry | null
+  onClose: () => void
+}) {
+  if (!entry) {
+    return null
+  }
 
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        aria-label="Close save generated password modal"
+        className="absolute inset-0 bg-black/70 backdrop-blur-sm"
+        onClick={onClose}
+        type="button"
+      />
+
+      <div className="relative w-full max-w-2xl rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-card)] p-6 shadow-xl">
+        <button
+          aria-label="Close save generated password modal"
+          className="absolute right-4 top-4 inline-flex size-8 items-center justify-center rounded-full text-[color:var(--color-muted)] transition hover:bg-[color:var(--color-accent)] hover:text-[color:var(--color-foreground)]"
+          onClick={onClose}
+          type="button"
+        >
+          <FiX className="size-4" />
+        </button>
+
+        <Formik
+          enableReinitialize
+          initialValues={getInitialValuesForEntry(entry)}
+          onSubmit={async (
+            values: credentialValues,
+            { resetForm, setSubmitting }: FormikHelpers<credentialValues>
+          ) => {
+            if (!device.state) {
               setSubmitting(false)
-              resetForm()
-              setSelectedEntry(null)
-              toast({
-                title: 'Credential saved',
-                status: 'success'
-              })
-            }}
-          >
-            {({ handleSubmit, errors, isSubmitting, touched }) => (
-              <form onSubmit={handleSubmit}>
-                <ModalHeader>Save generated password</ModalHeader>
-                <ModalCloseButton />
-                <ModalBody>
-                  <Stack spacing={4}>
-                    <FormControl isInvalid={!!errors.url && touched.url}>
-                      <FormLabel htmlFor="url">URL</FormLabel>
-                      <Field as={Input} id="url" name="url" />
-                      <FormErrorMessage>{errors.url}</FormErrorMessage>
-                    </FormControl>
+              return
+            }
 
-                    <FormControl isInvalid={!!errors.label && touched.label}>
-                      <FormLabel htmlFor="label">Label</FormLabel>
-                      <Field as={Input} id="label" name="label" />
-                      <FormErrorMessage>{errors.label}</FormErrorMessage>
-                    </FormControl>
+            const loginCredentials = {
+              iconUrl: null,
+              label: values.label,
+              password: values.password,
+              url: values.url,
+              username: values.username
+            }
 
-                    <FormControl
-                      isInvalid={!!errors.username && touched.username}
+            loginCredentialsSchema.parse(loginCredentials)
+
+            await device.state.addSecrets([
+              {
+                createdAt: new Date().toJSON(),
+                encrypted: await device.state.encrypt(
+                  JSON.stringify(loginCredentials)
+                ),
+                kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+                loginCredentials
+              }
+            ])
+
+            setSubmitting(false)
+            resetForm()
+            onClose()
+            toast({
+              status: 'success',
+              title: 'Credential saved'
+            })
+          }}
+          validationSchema={PasswordSchema}
+        >
+          {({ errors, handleSubmit, isSubmitting, touched }) => (
+            <form className="space-y-5" onSubmit={handleSubmit}>
+              <div>
+                <h2 className="text-xl font-semibold text-[color:var(--color-foreground)]">
+                  Save generated password
+                </h2>
+                <p className="mt-2 text-sm text-[color:var(--color-muted)]">
+                  Convert this history entry into a saved credential.
+                </p>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <Field name="url">
+                  {({ field }: { field: credentialValues & { value: string } }) => (
+                    <ModalField
+                      error={touched.url ? errors.url : undefined}
+                      inputId="url"
+                      label="URL"
                     >
-                      <FormLabel htmlFor="username">Username</FormLabel>
-                      <Field as={Input} id="username" name="username" />
-                      <FormErrorMessage>{errors.username}</FormErrorMessage>
-                    </FormControl>
+                      <Input id="url" {...field} />
+                    </ModalField>
+                  )}
+                </Field>
 
-                    <FormControl
-                      isInvalid={!!errors.password && touched.password}
+                <Field name="label">
+                  {({ field }: { field: credentialValues & { value: string } }) => (
+                    <ModalField
+                      error={touched.label ? errors.label : undefined}
+                      inputId="label"
+                      label="Label"
                     >
-                      <FormLabel htmlFor="password">Password</FormLabel>
-                      <Field as={Input} id="password" name="password" />
-                      <FormErrorMessage>{errors.password}</FormErrorMessage>
-                    </FormControl>
-                  </Stack>
-                </ModalBody>
+                      <Input id="label" {...field} />
+                    </ModalField>
+                  )}
+                </Field>
 
-                <ModalFooter gap={3}>
-                  <Button
-                    onClick={() => {
-                      setSelectedEntry(null)
-                    }}
-                    variant="ghost"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    colorScheme="blue"
-                    isLoading={isSubmitting}
-                    type="submit"
-                  >
-                    Save credential
-                  </Button>
-                </ModalFooter>
-              </form>
-            )}
-          </Formik>
-        </ModalContent>
-      </Modal>
-    </Box>
+                <Field name="username">
+                  {({ field }: { field: credentialValues & { value: string } }) => (
+                    <ModalField
+                      error={touched.username ? errors.username : undefined}
+                      inputId="username"
+                      label="Username"
+                    >
+                      <Input id="username" {...field} />
+                    </ModalField>
+                  )}
+                </Field>
+
+                <Field name="password">
+                  {({ field }: { field: credentialValues & { value: string } }) => (
+                    <ModalField
+                      error={touched.password ? errors.password : undefined}
+                      inputId="password"
+                      label="Password"
+                    >
+                      <Input id="password" {...field} />
+                    </ModalField>
+                  )}
+                </Field>
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <Button onClick={onClose} type="button" variant="outline">
+                  Cancel
+                </Button>
+                <Button disabled={isSubmitting} type="submit">
+                  Save credential
+                </Button>
+              </div>
+            </form>
+          )}
+        </Formik>
+      </div>
+    </div>
+  )
+}
+
+function ModalField({
+  children,
+  error,
+  inputId,
+  label
+}: {
+  children: React.ReactNode
+  error?: string
+  inputId: string
+  label: string
+}) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
+      <label
+        className="block text-sm font-medium text-[color:var(--color-foreground)]"
+        htmlFor={inputId}
+      >
+        {label}
+      </label>
+      <div className="mt-3">{children}</div>
+      {error ? (
+        <p className="mt-2 text-xs text-rose-300">{error}</p>
+      ) : null}
+    </div>
   )
 }

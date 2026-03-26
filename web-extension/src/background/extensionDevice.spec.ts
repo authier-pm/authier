@@ -103,23 +103,6 @@ describe('ExtensionDevice', () => {
   })
 
   describe('initialize', () => {
-    beforeEach(() => {
-      // Mock DeviceState to prevent errors
-      vi.mock('./ExtensionDevice', async () => {
-        const originalModule = await vi.importActual('./ExtensionDevice')
-        return {
-          ...originalModule,
-          DeviceState: vi.fn().mockImplementation(() => ({
-            save: vi.fn(),
-            initialize: vi.fn(),
-            vaultLockTimeoutSeconds: 1234,
-            deviceName: 'Mock device',
-            secrets: []
-          }))
-        }
-      })
-    })
-
     it('should initialize the device and start the lock interval if a device state is present in storage', async () => {
       // Mock getDeviceId
       const mockGetDeviceId = vi.fn().mockResolvedValue('mock-device-id')

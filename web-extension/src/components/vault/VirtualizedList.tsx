@@ -1,236 +1,260 @@
-import { useContext, useState } from 'react'
-import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { AutoSizer, List } from 'react-virtualized'
-import { useDebounce } from '@src/pages-vault/useDebounce'
-
-import { useColorModeValue } from '@chakra-ui/color-mode'
-import { EditIcon, CopyIcon } from '@chakra-ui/icons'
-
-import { GrUserAdmin } from 'react-icons/gr'
-import { Center, Box, Flex, Text, useToast, IconButton } from '@chakra-ui/react'
-import {
-  ILoginSecret,
-  ITOTPSecret,
-  pathNameToTypes
-} from '@src/util/useDeviceState'
+import { useContext, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { SecretItemIcon } from '@src/components/SecretItemIcon'
-import { getDecryptedSecretProp } from '@src/background/ExtensionDevice'
-import browser from 'webextension-polyfill'
-import { Txt } from '../util/Txt'
+import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
-import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import { authierColors } from '@shared/chakraRawTheme'
-import { TbAuth2Fa } from 'react-icons/tb'
-import { generateSync } from 'otplib'
+import { FiKey, FiLock } from 'react-icons/fi'
+import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
+import { useDebounce } from '@src/pages-vault/useDebounce'
+import { SecretItemIcon } from '@src/components/SecretItemIcon'
+import { Button, buttonVariants } from '@src/components/ui/button'
+import { Card, CardContent } from '@src/components/ui/card'
+import { Tooltip } from '@src/components/ui/tooltip'
+import { useAppToast } from '@src/ExtensionProviders'
+import { pathNameToTypes, type ILoginSecret, type ITOTPSecret } from '@src/util/useDeviceState'
+import { CopyIcon, EditIcon, ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
+import {
+  getMaskedSecretValue,
+  getSecretCopyValue,
+  getSecretKindLabel,
+  getSecretLabel,
+  getSecretUrl,
+  getSecretUsername,
+  getSecretValue,
+  isTotpSecret
+} from './secretUtils'
+import { useElementSize, useVirtualWindow } from './useVirtualWindow'
 
-export function VaultListItem({
+const CARD_GAP = 16
+const CARD_MIN_WIDTH = 280
+const CARD_ROW_HEIGHT = 280
+
+export const VirtualizedList = ({ filter }: { filter: string }) => {
+  const debouncedSearchTerm = useDebounce(filter, 400)
+  const { searchSecrets } = useContext(DeviceStateContext)
+  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
+  const filteredItems = useMemo(
+    () => searchSecrets(debouncedSearchTerm, pathNameToTypes[pathname]),
+    [debouncedSearchTerm, pathname, searchSecrets]
+  )
+  const parentRef = useRef<HTMLDivElement | null>(null)
+  const [scrollTop, setScrollTop] = useState(0)
+  const { height: containerHeight, width: containerWidth } =
+    useElementSize(parentRef)
+
+  const columnCount = Math.max(
+    1,
+    Math.floor(
+      (Math.max(containerWidth, CARD_MIN_WIDTH) + CARD_GAP) /
+        (CARD_MIN_WIDTH + CARD_GAP)
+    )
+  )
+  const cardWidth =
+    containerWidth > 0
+      ? (containerWidth - CARD_GAP * (columnCount - 1)) / columnCount
+      : CARD_MIN_WIDTH
+  const rowCount = Math.ceil(filteredItems.length / columnCount)
+
+  const virtualWindow = useVirtualWindow({
+    itemCount: rowCount,
+    itemSize: CARD_ROW_HEIGHT,
+    overscan: 4,
+    scrollOffset: scrollTop,
+    viewportSize: containerHeight
+  })
+
+  if (filteredItems.length === 0) {
+    return (
+      <div className="flex h-full items-center justify-center p-8 text-center text-sm text-[color:var(--color-muted)]">
+        <div>
+          <div className="text-base font-medium text-[color:var(--color-foreground)]">
+            <Trans>No secrets found</Trans>
+          </div>
+          <div className="mt-2">
+            <Trans>Try a different search term or add a new item.</Trans>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className="extension-scrollbar h-full min-h-0 overflow-auto p-4"
+      onScroll={(event) => {
+        setScrollTop(event.currentTarget.scrollTop)
+      }}
+      ref={parentRef}
+    >
+      <div
+        className="relative"
+        style={{ height: `${virtualWindow.totalSize}px` }}
+      >
+        {Array.from(
+          {
+            length: Math.max(0, virtualWindow.endIndex - virtualWindow.startIndex + 1)
+          },
+          (_, offsetIndex) => {
+            const rowIndex = virtualWindow.startIndex + offsetIndex
+            const startIndex = rowIndex * columnCount
+            const rowItems = filteredItems.slice(
+              startIndex,
+              startIndex + columnCount
+            )
+
+            return (
+              <div
+                className="absolute left-0 top-0 flex w-full gap-4"
+                key={rowIndex}
+                style={{
+                  height: `${CARD_ROW_HEIGHT}px`,
+                  transform: `translateY(${rowIndex * CARD_ROW_HEIGHT}px)`
+                }}
+              >
+                {rowItems.map((secret) => (
+                  <div key={secret.id} style={{ width: `${cardWidth}px` }}>
+                    <VaultListCard secret={secret} />
+                  </div>
+                ))}
+              </div>
+            )
+          }
+        )}
+      </div>
+    </div>
+  )
+}
+
+function VaultListCard({
   secret
 }: {
   secret: ILoginSecret | ITOTPSecret
 }) {
-  const [isVisible, setIsVisible] = useState(false)
-
-  const { deviceState } = useContext(DeviceStateContext)
-  const toast = useToast()
-
-  const username = getDecryptedSecretProp(secret, 'username')
-  const password = getDecryptedSecretProp(secret, 'password')
-  const secretUrl = getDecryptedSecretProp(secret, 'url')
-  const iconUrl = getDecryptedSecretProp(secret, 'iconUrl')
-  const label = getDecryptedSecretProp(secret, 'label')
-  const bg = useColorModeValue('cyan.800', 'gray.800')
-
-  if (!deviceState) {
-    return null
-  }
+  const [isSecretVisible, setIsSecretVisible] = useState(false)
+  const toast = useAppToast()
+  const secretUrl = getSecretUrl(secret)
+  const username = getSecretUsername(secret)
+  const isTotp = isTotpSecret(secret)
+  const secretPreview = isSecretVisible
+    ? getSecretValue(secret)
+    : getMaskedSecretValue(secret)
 
   return (
-    <Center py={3} m={['auto', '3']}>
-      <Box
-        w="250px"
-        h="195px"
-        bg={bg}
-        transition={'transform .2s ease-in-out'}
-        boxShadow={'2xl'}
-        rounded={'md'}
-        overflow={'hidden'}
-        _hover={{ transform: 'scale(1.05)' }}
-        onMouseOver={() => setIsVisible(true)}
-        onMouseOut={() => setIsVisible(false)}
-      >
-        <Box bg={'gray.100'} h="70%" pos={'relative'}>
-          <Box>
-            <Center h={130}>
-              <SecretItemIcon url={secretUrl} iconUrl={iconUrl} />
-            </Center>
-
-            <Txt
-              color={'blue.800'}
-              position="relative"
-              bottom={'15px'}
-              left="15px"
-            >
-              {username}
-            </Txt>
-          </Box>
-          <Box
-            pos="absolute"
-            top={secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? 3 : 1}
-            left={4}
-          >
-            {secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS ? (
-              <GrUserAdmin size={13}></GrUserAdmin>
-            ) : (
-              <TbAuth2Fa color={authierColors.gray[700]} size={25}></TbAuth2Fa>
-            )}
-          </Box>
-          <Flex
-            display={isVisible ? 'flex' : 'none'}
-            alignItems="center"
-            justifyContent="center"
-            zIndex={9}
-            position="absolute"
-            top={0}
-            w="100%"
-            h="full"
-            sx={{
-              svg: {
-                position: 'absolute' // needed for DeleteSecretButton
+    <Card className="group flex h-[264px] flex-col overflow-hidden border-white/10 bg-[color:var(--color-surface-muted)]">
+      <div className="flex items-start justify-between gap-3 border-b border-[color:var(--color-border)]/70 p-4">
+        <div className="flex items-center gap-3">
+          <div className="flex size-12 items-center justify-center rounded-2xl bg-[color:var(--color-accent)]/70">
+            <SecretItemIcon
+              iconUrl={
+                isTotp ? secret.totp.iconUrl : secret.loginCredentials.iconUrl
               }
-            }}
-          >
-            <Link
-              //HACK: https://playwright.dev/docs/actionability#visible
-              style={{
-                width: '1px',
-                height: '1px'
+              url={secretUrl}
+            />
+          </div>
+          <div className="min-w-0">
+            <div className="text-[11px] font-medium tracking-[0.2em] text-[color:var(--color-muted)] uppercase">
+              {getSecretKindLabel(secret)}
+            </div>
+            <div className="truncate text-base font-semibold">
+              {getSecretLabel(secret)}
+            </div>
+          </div>
+        </div>
+        <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-card)] text-[color:var(--color-muted)]">
+          {isTotp ? (
+            <FiKey className="size-4" />
+          ) : (
+            <FiLock className="size-4" />
+          )}
+        </div>
+      </div>
+
+      <CardContent className="relative flex flex-1 flex-col gap-4 overflow-hidden p-4">
+        <SecretMetaBlock label={t`Username`} value={username || '—'} />
+        <SecretMetaBlock label={t`URL`} value={secretUrl || '—'} />
+        <SecretMetaBlock
+          label={isTotp ? t`Shared secret` : t`Password`}
+          mono
+          value={secretPreview}
+        />
+
+        <div className="pointer-events-none absolute inset-x-4 bottom-4 z-10 rounded-2xl bg-[linear-gradient(180deg,rgba(19,38,38,0)_0%,rgba(19,38,38,0.92)_28%,rgba(19,38,38,1)_100%)] px-1 pt-10 pb-1 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
+          <div className="flex flex-wrap gap-2">
+            <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
+              <Button
+                aria-label={isTotp ? t`Copy token` : t`Copy`}
+                onClick={async () => {
+                  await navigator.clipboard.writeText(getSecretCopyValue(secret))
+                  toast({
+                    title: t`Copied to clipboard`,
+                    status: 'success'
+                  })
+                }}
+                size="sm"
+                variant="outline"
+              >
+                <CopyIcon boxSize={16} />
+                <Trans>Copy</Trans>
+              </Button>
+            </Tooltip>
+
+            <Button
+              aria-label={isSecretVisible ? t`Hide secret` : t`Show secret`}
+              onClick={() => {
+                setIsSecretVisible((currentValue) => !currentValue)
               }}
-              aria-label="edit_item"
+              size="sm"
+              variant="ghost"
+            >
+              {isSecretVisible ? (
+                <ViewOffIcon boxSize={16} />
+              ) : (
+                <ViewIcon boxSize={16} />
+              )}
+              {isSecretVisible ? <Trans>Hide</Trans> : <Trans>Show</Trans>}
+            </Button>
+
+            <Link
+              className={buttonVariants({ size: 'sm', variant: 'ghost' })}
+              state={{
+                data: isTotp ? secret.totp : secret.loginCredentials
+              }}
               to={{
                 pathname: `/secret/${secret.id}`
               }}
-              state={{ data: secret }}
             >
-              <EditIcon
-                cursor={'pointer'}
-                boxSize={29}
-                padding={1.5}
-                alignSelf="end"
-                overflow={'visible'}
-                backgroundColor={'blue.400'}
-                _hover={{ backgroundColor: 'orange.500' }}
-                right={0}
-                top={0}
-              />
+              <EditIcon boxSize={16} />
+              <Trans>Edit</Trans>
             </Link>
-
-            {secretUrl ? (
-              <IconButton
-                aria-label="open_item"
-                colorScheme="blackAlpha"
-                h={'50px'}
-                w={'55px'}
-                onClick={() => browser.tabs.create({ url: secretUrl })}
-              />
-            ) : null}
-          </Flex>
-        </Box>
-        <Flex
-          flexDirection="row"
-          align="center"
-          justifyContent="space-between"
-          p={4}
-        >
-          <Text fontWeight={'bold'} fontSize={'lg'} noOfLines={1}>
-            {label}
-          </Text>
-
-          <IconButton
-            size="sm"
-            display={isVisible ? 'block' : 'none'}
-            aria-label="copy to clipboard"
-            colorScheme="gray"
-            onClick={() => {
-              if (secret.kind === EncryptedSecretType.TOTP) {
-                const otpCode = generateSync({ secret: secret.totp.secret })
-                navigator.clipboard.writeText(otpCode)
-              } else if (
-                secret.kind === EncryptedSecretType.LOGIN_CREDENTIALS
-              ) {
-                navigator.clipboard.writeText(password)
-              }
-              secret.lastUsedAt = new Date().toISOString()
-
-              toast({
-                title: t`Copied to clipboard`,
-                status: 'success'
-              })
-
-              // TODO store SecretUsageEvent
-            }}
-            icon={<CopyIcon />}
-          />
-        </Flex>
-      </Box>
-    </Center>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   )
 }
 
-//Inspiration => https://plnkr.co/edit/zjCwNeRZ7XtmFp1PDBsc?p=preview&preview
-export const VirtualizedList = ({ filter }: { filter: string }) => {
-  const debouncedSearchTerm = useDebounce(filter, 400)
-  const { searchSecrets: search } = useContext(DeviceStateContext)
-  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
-
-  const filteredItems = search(debouncedSearchTerm, pathNameToTypes[pathname])
-
-  const ITEMS_COUNT = filteredItems.length
-  const ITEM_SIZE = 250
-
+function SecretMetaBlock({
+  label,
+  value,
+  mono = false
+}: {
+  label: string
+  value: string
+  mono?: boolean
+}) {
   return (
-    <AutoSizer>
-      {({ height, width }) => {
-        const itemsPerRow = Math.floor(width / ITEM_SIZE)
-        const rowCount = Math.ceil(ITEMS_COUNT / itemsPerRow)
-
-        return (
-          <List
-            width={width}
-            height={height - 23} //for some reason the height is 23px too much
-            rowCount={rowCount}
-            rowHeight={ITEM_SIZE}
-            rowRenderer={({ index, key, style }) => {
-              const items = [] as any
-              const fromIndex = index * itemsPerRow
-              const toIndex = Math.min(fromIndex + itemsPerRow, ITEMS_COUNT)
-
-              for (let i = fromIndex; i < toIndex; i++) {
-                items.push(
-                  <VaultListItem
-                    key={filteredItems[i].id}
-                    secret={filteredItems[i]}
-                  />
-                )
-              }
-
-              return (
-                <Flex
-                  flexDirection={'row'}
-                  justifyContent="center"
-                  alignItems={'center'}
-                  w={'100%'}
-                  h="100%"
-                  key={key}
-                  style={style}
-                >
-                  {items}
-                </Flex>
-              )
-            }}
-          />
-        )
-      }}
-    </AutoSizer>
+    <div className="space-y-1">
+      <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
+        {label}
+      </div>
+      <div
+        className={
+          mono
+            ? 'truncate font-mono text-sm text-[color:var(--color-foreground)]'
+            : 'truncate text-sm text-[color:var(--color-foreground)]'
+        }
+      >
+        {value}
+      </div>
+    </div>
   )
 }

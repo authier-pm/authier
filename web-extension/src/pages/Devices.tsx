@@ -1,77 +1,76 @@
-import {
-  Box,
-  Flex,
-  Text,
-  Icon,
-  Button,
-  Spinner,
-  IconButton,
-  Tooltip
-} from '@chakra-ui/react'
-import { DeleteIcon, StarIcon } from '@chakra-ui/icons'
-
 import { IoIosPhonePortrait } from 'react-icons/io'
+import { IoTrashOutline } from 'react-icons/io5'
+import { HiStar } from 'react-icons/hi'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
 import { useDevicesListWithDataQuery } from '@src/pages-vault/Devices.codegen'
 
 export default function Devices() {
   const { data, loading, error } = useDevicesListWithDataQuery()
 
-  return (
-    <Box>
-      {data && !loading ? (
-        data.me?.devices.map((device) => {
-          return (
-            <Flex
-              key={device.lastIpAddress}
-              boxShadow="xl"
-              //bg="white"
-              m={2}
-              pb={2}
-              flexDirection="column"
-              borderWidth="5px"
-            >
-              <Flex justifyContent="flex-end" mr={2}>
-                <Tooltip hasArrow label="Main device" fontSize="sm">
-                  <IconButton
-                    size="xs"
-                    variant="unstyled"
-                    aria-label="Main device"
-                    fontSize="17px"
-                    icon={<StarIcon color="gold" />}
-                  />
-                </Tooltip>
-                <Tooltip hasArrow label="Remove device" fontSize="sm">
-                  <IconButton
-                    size="xs"
-                    variant="unstyled"
-                    aria-label="Remove device"
-                    fontSize="17px"
-                    icon={<DeleteIcon />}
-                  />
-                </Tooltip>
-              </Flex>
-              <Flex justify="flex-start" align="center" flexDirection="row">
-                <Icon as={IoIosPhonePortrait} w={20} h={20} />
-                <Flex flexDirection="column" ml="5px" fontSize="md">
-                  <Text>{device.name}</Text>
-                  <Text>{device.lastIpAddress}</Text>
-                  <Text>Location: {device.lastGeoLocation}</Text>
-                </Flex>
-              </Flex>
-            </Flex>
-          )
-        })
-      ) : (
-        <Spinner />
-      )}
+  if (loading) {
+    return (
+      <div className="flex min-h-[220px] items-center justify-center">
+        <div className="size-8 animate-spin rounded-full border-2 border-[color:var(--color-border)] border-t-[color:var(--color-primary)]" />
+      </div>
+    )
+  }
 
-      <Button
-        onClick={() => {
-          //setLocation('/qr-code')
-        }}
-      >
+  if (error) {
+    return (
+      <div className="p-4 text-sm text-[color:var(--color-danger)]">
+        Failed to load devices.
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-3 p-2">
+      {data?.me?.devices.map((device) => {
+        return (
+          <div
+            key={device.lastIpAddress}
+            className="extension-surface rounded-[var(--radius-lg)] border border-[color:var(--color-border)] px-3 py-3 shadow-lg"
+          >
+            <div className="mb-2 flex justify-end gap-2">
+              <Tooltip content="Main device">
+                <button
+                  aria-label="Main device"
+                  className="text-amber-400"
+                  type="button"
+                >
+                  <HiStar className="size-4" />
+                </button>
+              </Tooltip>
+              <Tooltip content="Remove device">
+                <button
+                  aria-label="Remove device"
+                  className="text-[color:var(--color-muted)]"
+                  type="button"
+                >
+                  <IoTrashOutline className="size-4" />
+                </button>
+              </Tooltip>
+            </div>
+            <div className="flex items-center gap-3">
+              <IoIosPhonePortrait className="size-12 text-[color:var(--color-primary)]" />
+              <div className="min-w-0 text-sm text-[color:var(--color-foreground)]">
+                <div className="font-semibold">{device.name}</div>
+                <div className="truncate text-[color:var(--color-muted)]">
+                  {device.lastIpAddress}
+                </div>
+                <div className="truncate text-[color:var(--color-muted)]">
+                  Location: {device.lastGeoLocation}
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      })}
+
+      <Button className="w-full" variant="outline">
         Add device
       </Button>
-    </Box>
+    </div>
   )
 }

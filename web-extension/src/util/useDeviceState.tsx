@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import browser from 'webextension-polyfill'
 
 import {
@@ -110,7 +110,6 @@ export function useDeviceState() {
     })
 
     device.onInitDone(() => {
-      console.log('device.onInitDone')
       setDeviceState(device.state)
       if (device.lockedState) {
         setLockedState(device.lockedState)
@@ -118,7 +117,6 @@ export function useDeviceState() {
       setIsInitialized(true)
     })
     if (storageOnchangeListenerRegistered) {
-      console.log('storage change listener already registered')
       return
     }
     browser.storage.onChanged.addListener(onStorageChange)
@@ -126,38 +124,41 @@ export function useDeviceState() {
     log('registered storage change listener')
   }, [])
 
-  const backgroundStateContext = {
-    currentURL,
-    deviceState,
-    currentTab,
-    get loginCredentials() {
-      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
+  const loginCredentials = useMemo(
+    () =>
+      (deviceState?.decryptedSecrets.filter(({ kind }) => {
         return kind === EncryptedSecretType.LOGIN_CREDENTIALS
-      }) ?? []) as ILoginSecret[]
-    },
-    get TOTPSecrets() {
-      return (deviceState?.decryptedSecrets.filter(({ kind }) => {
-        return kind === EncryptedSecretType.TOTP
-      }) ?? []) as ITOTPSecret[]
-    },
+      }) ?? []) as ILoginSecret[],
+    [deviceState?.decryptedSecrets]
+  )
 
-    setSecuritySettings: async (config: SettingsInput) => {
-      device.setDeviceSettings(config)
-    },
-    setDeviceState: async (state: IBackgroundStateSerializable) => {
+  const TOTPSecrets = useMemo(
+    () =>
+      (deviceState?.decryptedSecrets.filter(({ kind }) => {
+        return kind === EncryptedSecretType.TOTP
+      }) ?? []) as ITOTPSecret[],
+    [deviceState?.decryptedSecrets]
+  )
+
+  const setSecuritySettings = useCallback(async (config: SettingsInput) => {
+    device.setDeviceSettings(config)
+  }, [])
+
+  const saveDeviceState = useCallback(
+    async (state: IBackgroundStateSerializable) => {
       device.save(state)
     },
-    lockedState,
-    device,
-    registered: storageOnchangeListenerRegistered,
-    /*
-     * searches for secrets in the vault, tries to include all fields which can be searched, returns sorted by lastUsedAt
-     */
-    searchSecrets: (
+    []
+  )
+
+  const searchSecrets = useCallback(
+    (
       filterBy: string,
-      types = [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+      types = [
+        EncryptedSecretType.LOGIN_CREDENTIALS,
+        EncryptedSecretType.TOTP
+      ]
     ) => {
-      const { loginCredentials, TOTPSecrets } = backgroundStateContext
       let secrets = [] as (ILoginSecret | ITOTPSecret)[]
 
       if (types.includes(EncryptedSecretType.LOGIN_CREDENTIALS)) {
@@ -167,6 +168,9 @@ export function useDeviceState() {
       if (types.includes(EncryptedSecretType.TOTP)) {
         secrets = secrets.concat(TOTPSecrets)
       }
+
+      const normalizedFilterBy = filterBy.toLowerCase()
+
       secrets = secrets.filter((item) => {
         const label =
           (item.kind === EncryptedSecretType.TOTP
@@ -175,25 +179,57 @@ export function useDeviceState() {
 
         const username = getDecryptedSecretProp(item, 'username')
         const url = getDecryptedSecretProp(item, 'url')
+        const password = getDecryptedSecretProp(item, 'password')
+
         return (
           label.includes(filterBy) ||
-          label.toLowerCase().includes(filterBy.toLowerCase()) ||
+          label.toLowerCase().includes(normalizedFilterBy) ||
           url.includes(filterBy) ||
-          url.toLowerCase().includes(filterBy.toLowerCase()) ||
+          url.toLowerCase().includes(normalizedFilterBy) ||
           username.includes(filterBy) ||
-          username.toLowerCase().includes(filterBy.toLowerCase()) ||
-          getDecryptedSecretProp(item, 'password').includes(filterBy) // make sure user can search by password. This can be useful for searching where a concrete password is used
+          username.toLowerCase().includes(normalizedFilterBy) ||
+          password.includes(filterBy)
         )
       })
-      console.log('secrets', secrets)
+
       return secrets.sort((a, b) =>
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? -1 : 1
       )
     },
-    selectedItems,
-    setSelectedItems,
-    isInitialized
-  }
+    [TOTPSecrets, loginCredentials]
+  )
+
+  const backgroundStateContext = useMemo(
+    () => ({
+      currentURL,
+      deviceState,
+      currentTab,
+      loginCredentials,
+      TOTPSecrets,
+      setSecuritySettings,
+      setDeviceState: saveDeviceState,
+      lockedState,
+      device,
+      registered: storageOnchangeListenerRegistered,
+      searchSecrets,
+      selectedItems,
+      setSelectedItems,
+      isInitialized
+    }),
+    [
+      TOTPSecrets,
+      currentTab,
+      currentURL,
+      deviceState,
+      isInitialized,
+      lockedState,
+      loginCredentials,
+      saveDeviceState,
+      searchSecrets,
+      selectedItems,
+      setSecuritySettings
+    ]
+  )
 
   window['backgroundState'] = backgroundStateContext
   return backgroundStateContext

@@ -1,12 +1,11 @@
-import { Box, Center, Heading } from '@chakra-ui/react'
-import { Tooltip, IconButton } from '@chakra-ui/react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { IoMdArchive } from 'react-icons/io'
 import browser from 'webextension-polyfill'
+import { Button } from '@src/components/ui/button'
+import { Tooltip } from '@src/components/ui/tooltip'
 
 export function openVaultTab(afterHash = '') {
-  //WARNING: In firefox, the path does not need js/ but in chrome it does
   const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1
 
   browser.tabs.create({
@@ -16,25 +15,24 @@ export function openVaultTab(afterHash = '') {
 
 export function AuthLinkPage() {
   return (
-    <>
-      <Box width="315px" p={30}>
-        <Center>
-          <Heading size="sm">
-            <Trans>Open vault to login or sign up</Trans>
-          </Heading>
-          <Tooltip label={t`Open vault`} aria-label={t`Open vault`}>
-            <IconButton
-              size="md"
-              ml="2"
-              aria-label="menu"
-              icon={<IoMdArchive />}
-              onClick={async () => {
-                openVaultTab()
-              }}
-            />
-          </Tooltip>
-        </Center>
-      </Box>
-    </>
+    <div className="flex min-h-[220px] w-[315px] items-center justify-center px-6 py-8">
+      <div className="extension-surface flex items-center gap-3 rounded-[var(--radius-lg)] border border-[color:var(--color-border)] px-5 py-4 shadow-lg">
+        <h1 className="text-sm font-semibold text-[color:var(--color-foreground)]">
+          <Trans>Open vault to login or sign up</Trans>
+        </h1>
+        <Tooltip content={t`Open vault`}>
+          <Button
+            aria-label="Open vault"
+            size="icon"
+            variant="outline"
+            onClick={() => {
+              openVaultTab()
+            }}
+          >
+            <IoMdArchive className="size-4" />
+          </Button>
+        </Tooltip>
+      </div>
+    </div>
   )
 }

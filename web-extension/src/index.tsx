@@ -1,10 +1,14 @@
+if (process.env.NODE_ENV === 'development') {
+  import('react-grab')
+}
+
 import * as Sentry from '@sentry/browser'
 
+import './index.css'
 import ReactDOM from 'react-dom/client'
 import browser from 'webextension-polyfill'
 import { ApolloProvider } from '@apollo/client/react'
 import { apolloCache, apolloClient } from './apollo/apolloClient'
-import { ColorModeScript } from '@chakra-ui/react'
 import { chakraRawTheme } from '@shared/chakraRawTheme'
 import { ExtensionProviders } from './ExtensionProviders'
 import PopupRoutes from './PopupRoutes'
@@ -18,9 +22,6 @@ let popupRoot: ReactDOM.Root
 export const renderPopup = () => {
   popupRoot.render(
     <ApolloProvider client={apolloClient}>
-      <ColorModeScript
-        initialColorMode={chakraRawTheme.config?.initialColorMode}
-      />
       <ExtensionProviders>
         <PopupRoutes />
       </ExtensionProviders>
@@ -32,6 +33,8 @@ const createRoot = async () => {
   popupRoot = ReactDOM.createRoot(
     document.getElementById('popup') as HTMLElement
   )
+  document.documentElement.dataset.theme =
+    chakraRawTheme.config?.initialColorMode ?? 'dark'
   await persistCache({
     cache: apolloCache,
     storage: new LocalStorageWrapper(window.localStorage)
