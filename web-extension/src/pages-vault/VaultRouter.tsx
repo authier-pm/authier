@@ -30,6 +30,7 @@ import {
   apolloClientWithoutTokenRefresh
 } from '@src/apollo/apolloClient'
 import { NewDevicePolicyOnboarding } from './NewDevicePolicyOnboarding'
+import { PasswordGenerationHistory } from './PasswordGenerationHistory'
 
 const log = debug('au:VaultRouter')
 
@@ -102,6 +103,10 @@ export function VaultRouter() {
           <Route path="/settings/*" element={<VaultSettings />}></Route>
           <Route path="/devices" element={<DevicesPage />}></Route>
           <Route path="/import-export" element={<VaultImportExport />}></Route>
+          <Route
+            path="/password-generation-history"
+            element={<PasswordGenerationHistory />}
+          ></Route>
           <Route path="/addItem" element={<AddItem />}></Route>
         </Routes>
       </SidebarWithHeader>

@@ -47,6 +47,20 @@ Object.defineProperty(window, 'location', {
   writable: true
 })
 
+Object.defineProperty(window.navigator, 'clipboard', {
+  value: {
+    writeText: vi.fn().mockResolvedValue(undefined)
+  },
+  writable: true,
+  configurable: true
+})
+
+Object.defineProperty(globalThis, 'location', {
+  value: window.location,
+  writable: true,
+  configurable: true
+})
+
 // Create a manual mock for browser extension API
 const browserMock = {
   storage: {
@@ -116,6 +130,7 @@ beforeAll(() => {
           decryptedSecrets: [],
           getAllSecretsDecrypted: vi.fn().mockResolvedValue([]),
           getSecretsDecryptedByTLD: vi.fn().mockResolvedValue([]),
+          addSecrets: vi.fn().mockResolvedValue([]),
           encrypt: vi.fn().mockResolvedValue('encrypted-string'),
           decrypt: vi.fn().mockResolvedValue('decrypted-string'),
           save: vi.fn().mockResolvedValue(undefined)

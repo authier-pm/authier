@@ -32,7 +32,8 @@ import {
   FiHardDrive,
   FiDisc,
   FiKey,
-  FiLock
+  FiLock,
+  FiClock
 } from 'react-icons/fi'
 import { IconType } from 'react-icons'
 import { NavLink as RouterLink } from 'react-router-dom'
@@ -65,6 +66,11 @@ const LinkItems: Array<LinkItemProps> = [
     title: <Trans>Import & Export</Trans>,
     icon: FiDisc,
     path: '/import-export'
+  },
+  {
+    title: <Trans>Password generation history</Trans>,
+    icon: FiClock,
+    path: '/password-generation-history'
   }
 ]
 
