@@ -118,4 +118,4 @@ web-extension/dist/**
 
 web-extension/stats.json
 .turbo
-vault-web/dist/assets/
+vault-web/dist
