@@ -1,4 +1,3 @@
-import { ChakraProvider } from '@chakra-ui/react'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { PasswordGenerationHistory } from './PasswordGenerationHistory'
 import { render, screen, waitFor } from '@testing-library/react'
@@ -70,11 +69,9 @@ describe('PasswordGenerationHistory', () => {
     } as React.ContextType<typeof DeviceStateContext>
 
     return render(
-      <ChakraProvider>
-        <DeviceStateContext.Provider value={contextValue}>
-          <PasswordGenerationHistory />
-        </DeviceStateContext.Provider>
-      </ChakraProvider>
+      <DeviceStateContext.Provider value={contextValue}>
+        <PasswordGenerationHistory />
+      </DeviceStateContext.Provider>
     )
   }
 

@@ -109,54 +109,52 @@ const browserMock = {
 // Make browser available globally
 global.browser = browserMock
 
+vi.mock('webextension-polyfill', () => {
+  return {
+    default: browserMock,
+    browser: browserMock
+  }
+})
+
+vi.mock('@src/background/ExtensionDevice', () => {
+  return {
+    device: {
+      initialize: vi.fn().mockResolvedValue(undefined),
+      state: {
+        decryptedSecrets: [],
+        getAllSecretsDecrypted: vi.fn().mockResolvedValue([]),
+        getSecretsDecryptedByTLD: vi.fn().mockResolvedValue([]),
+        addSecrets: vi.fn().mockResolvedValue([]),
+        encrypt: vi.fn().mockResolvedValue('encrypted-string'),
+        decrypt: vi.fn().mockResolvedValue('decrypted-string'),
+        save: vi.fn().mockResolvedValue(undefined)
+      },
+      platform: 'Mock OS',
+      startLockInterval: vi.fn().mockResolvedValue(undefined),
+      clearLockInterval: vi.fn().mockResolvedValue(undefined),
+      generateDeviceName: vi.fn().mockReturnValue('Mock Device Name'),
+      setLockTime: vi.fn(),
+      onInitDone: vi.fn((callback) => callback()),
+      id: 'mock-device-id',
+      name: 'Mock Device Name',
+      lockedState: null,
+      fireToken: 'mock-fire-token',
+      listenForUserLogin: vi.fn()
+    },
+    log: vi.fn(),
+    isRunningInBgServiceWorker: false,
+    getDecryptedSecretProp: vi.fn().mockReturnValue(''),
+    extensionDeviceTrpc: {
+      setLockInterval: {
+        mutate: vi.fn().mockResolvedValue(undefined)
+      }
+    }
+  }
+})
+
 // Global setup
 beforeAll(() => {
   mockDate('2037-03-03T13:33:33.333Z')
-
-  // Mock webextension-polyfill
-  vi.mock('webextension-polyfill', () => {
-    return {
-      default: browserMock,
-      browser: browserMock
-    }
-  })
-
-  // Mock ExtensionDevice
-  vi.mock('@src/background/ExtensionDevice', () => {
-    return {
-      device: {
-        initialize: vi.fn().mockResolvedValue(undefined),
-        state: {
-          decryptedSecrets: [],
-          getAllSecretsDecrypted: vi.fn().mockResolvedValue([]),
-          getSecretsDecryptedByTLD: vi.fn().mockResolvedValue([]),
-          addSecrets: vi.fn().mockResolvedValue([]),
-          encrypt: vi.fn().mockResolvedValue('encrypted-string'),
-          decrypt: vi.fn().mockResolvedValue('decrypted-string'),
-          save: vi.fn().mockResolvedValue(undefined)
-        },
-        platform: 'Mock OS',
-        startLockInterval: vi.fn().mockResolvedValue(undefined),
-        clearLockInterval: vi.fn().mockResolvedValue(undefined),
-        generateDeviceName: vi.fn().mockReturnValue('Mock Device Name'),
-        setLockTime: vi.fn(),
-        onInitDone: vi.fn((callback) => callback()),
-        id: 'mock-device-id',
-        name: 'Mock Device Name',
-        lockedState: null,
-        fireToken: 'mock-fire-token',
-        listenForUserLogin: vi.fn()
-      },
-      log: vi.fn(),
-      isRunningInBgServiceWorker: false,
-      getDecryptedSecretProp: vi.fn().mockReturnValue(''),
-      extensionDeviceTrpc: {
-        setLockInterval: {
-          mutate: vi.fn().mockResolvedValue(undefined)
-        }
-      }
-    }
-  })
 })
 
 // Global teardown

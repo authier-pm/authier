@@ -443,6 +443,7 @@ function SaveGeneratedPasswordModal({
                   {({ field }: { field: credentialValues & { value: string } }) => (
                     <ModalField
                       error={touched.url ? errors.url : undefined}
+                      inputId="url"
                       label="URL"
                     >
                       <Input id="url" {...field} />
@@ -454,6 +455,7 @@ function SaveGeneratedPasswordModal({
                   {({ field }: { field: credentialValues & { value: string } }) => (
                     <ModalField
                       error={touched.label ? errors.label : undefined}
+                      inputId="label"
                       label="Label"
                     >
                       <Input id="label" {...field} />
@@ -465,6 +467,7 @@ function SaveGeneratedPasswordModal({
                   {({ field }: { field: credentialValues & { value: string } }) => (
                     <ModalField
                       error={touched.username ? errors.username : undefined}
+                      inputId="username"
                       label="Username"
                     >
                       <Input id="username" {...field} />
@@ -476,6 +479,7 @@ function SaveGeneratedPasswordModal({
                   {({ field }: { field: credentialValues & { value: string } }) => (
                     <ModalField
                       error={touched.password ? errors.password : undefined}
+                      inputId="password"
                       label="Password"
                     >
                       <Input id="password" {...field} />
@@ -503,15 +507,20 @@ function SaveGeneratedPasswordModal({
 function ModalField({
   children,
   error,
+  inputId,
   label
 }: {
   children: React.ReactNode
   error?: string
+  inputId: string
   label: string
 }) {
   return (
     <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
-      <label className="block text-sm font-medium text-[color:var(--color-foreground)]">
+      <label
+        className="block text-sm font-medium text-[color:var(--color-foreground)]"
+        htmlFor={inputId}
+      >
         {label}
       </label>
       <div className="mt-3">{children}</div>
