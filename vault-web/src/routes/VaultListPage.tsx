@@ -18,10 +18,10 @@ const filterTabs: Array<{
   path: string
   value: FilterMode
 }> = [
-  { label: 'All', path: '/vault', value: 'ALL' },
-  { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
-  { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
-]
+    { label: 'All', path: '/vault', value: 'ALL' },
+    { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
+    { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
+  ]
 
 export function VaultListPage({
   initialFilterMode = 'ALL'
@@ -48,9 +48,8 @@ export function VaultListPage({
     })
   }, [decryptedSecrets, deferredQuery, filterMode])
 
-  const visibleSecretCountLabel = `${visibleSecrets.length} ${
-    visibleSecrets.length === 1 ? 'secret' : 'secrets'
-  }`
+  const visibleSecretCountLabel = `${visibleSecrets.length} ${visibleSecrets.length === 1 ? 'secret' : 'secrets'
+    }`
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
@@ -92,12 +91,7 @@ export function VaultListPage({
                   <Link to={item.path}>{item.label}</Link>
                 </Button>
               ))}
-              <Button asChild size="sm" variant="primary">
-                <Link to="/vault/new">
-                  <Plus className="size-4" />
-                  Add item
-                </Link>
-              </Button>
+
             </div>
           </div>
         </CardContent>
@@ -198,6 +192,12 @@ function VirtualizedSecretList({
       <CardContent className="flex h-full min-h-0 flex-col p-0">
         <div className="border-b border-[color:var(--color-border)] px-4 py-3 text-sm text-[color:var(--color-muted)]">
           {resultCountLabel}
+          <Button asChild size="sm" className='ml-auto' variant="primary">
+            <Link to="/vault/new">
+              <Plus className="size-4" />
+              Add item
+            </Link>
+          </Button>
         </div>
         <div
           className="extension-scrollbar min-h-0 flex-1 overflow-y-auto p-4"
