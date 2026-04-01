@@ -1,5 +1,8 @@
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-import { DOMEventsRecorder } from './DOMEventsRecorder'
+import {
+  DOMEventsRecorder,
+  getSingleVisibleEmailFromPage
+} from './DOMEventsRecorder'
 
 describe('DOMEventsRecorder', () => {
   it('should only add event once per input', async () => {
@@ -34,15 +37,42 @@ describe('DOMEventsRecorder', () => {
       `)
     })
 
-    it.todo('should use email input as username if there is one')
+    it('should use email input as username if there is one', async () => {
+      const recorder = new DOMEventsRecorder()
+
+      const emailInput = document.createElement('input')
+      emailInput.type = 'email'
+      recorder.addInputEvent({
+        element: emailInput,
+        eventType: 'input',
+        kind: WebInputType.EMAIL,
+        inputted: ' jiri@groas.ai '
+      })
+
+      const textInput = document.createElement('input')
+      textInput.type = 'text'
+      recorder.addInputEvent({
+        element: textInput,
+        eventType: 'input',
+        kind: WebInputType.USERNAME,
+        inputted: 'display name'
+      })
+
+      expect(recorder.getUsername()).toBe('jiri@groas.ai')
+    })
 
     it.todo(
       'should use username input as username if there are more than one email inputs'
     )
 
-    it.todo(
-      'should grep inner text of the HTML page body and return the email if there is exactly one on the page'
-    )
+    it('should grep inner text of the HTML page body and return the email if there is exactly one on the page', async () => {
+      expect(
+        getSingleVisibleEmailFromPage(
+          'Welcome back jiri@groas.ai',
+          'accounts.google.com'
+        )
+      ).toBe('jiri@groas.ai')
+    })
   })
 })
 

@@ -1,6 +1,10 @@
 import { h, render } from 'preact'
 import { PromptPassword } from './components/PromptPassword'
 import { trpc } from './connectTRPC'
+import {
+  getSingleVisibleEmailFromPage,
+  getUsernameFromCapturedInputs
+} from './DOMEventsRecorder'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
@@ -12,6 +16,11 @@ export async function renderSaveCredentialsForm(
   password: string
 ) {
   const inputEvents = await trpc.getCapturedInputEvents.query()
+  const resolvedUsername =
+    username ??
+    getUsernameFromCapturedInputs(inputEvents.capturedInputEvents) ??
+    getSingleVisibleEmailFromPage(document.body.innerText, location.hostname) ??
+    null
   if (loginPrompt) {
     loginPrompt.remove() // remove if already in the page
   }
@@ -41,7 +50,7 @@ export async function renderSaveCredentialsForm(
 
   render(
     <PromptPassword
-      username={username}
+      username={resolvedUsername}
       password={password}
       // @ts-expect-error TODO fix
       inputEvents={inputEvents}
@@ -51,5 +60,8 @@ export async function renderSaveCredentialsForm(
 
   document.body.appendChild(loginPrompt)
 
-  await trpc.saveLoginCredentialsModalShown.mutate({ username, password })
+  await trpc.saveLoginCredentialsModalShown.mutate({
+    username: resolvedUsername,
+    password
+  })
 }

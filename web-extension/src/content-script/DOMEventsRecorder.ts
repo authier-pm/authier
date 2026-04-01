@@ -9,7 +9,55 @@ export interface IInputRecord {
   inputted?: string
 }
 
-const simpleEmailRegex = /\S+@\S+\.\S+/g
+const simpleEmailRegex = /\S+@\S+\.\S+/
+const simpleEmailGlobalRegex = /\S+@\S+\.\S+/g
+
+type UsernameCandidate = Pick<IInputRecord, 'kind' | 'inputted'>
+
+const normalizeInputtedValue = (value?: string) => {
+  const trimmed = value?.trim()
+  return trimmed ? trimmed : undefined
+}
+
+export const isLikelyEmail = (value?: string): value is string => {
+  const normalizedValue = normalizeInputtedValue(value)
+  return normalizedValue ? simpleEmailRegex.test(normalizedValue) : false
+}
+
+export const getUsernameFromCapturedInputs = (
+  capturedInputEvents: UsernameCandidate[]
+) => {
+  const nonPasswordInputs = capturedInputEvents
+    .filter(({ kind }) => kind !== WebInputType.PASSWORD)
+    .map(({ inputted }) => normalizeInputtedValue(inputted))
+    .filter((inputted): inputted is string => Boolean(inputted))
+
+  const emailInput = [...nonPasswordInputs].reverse().find((inputted) =>
+    isLikelyEmail(inputted)
+  )
+
+  if (emailInput) {
+    return emailInput
+  }
+
+  return nonPasswordInputs[nonPasswordInputs.length - 1]
+}
+
+export const getSingleVisibleEmailFromPage = (
+  pageText: string,
+  hostname: string
+) => {
+  const currentHostname = hostname.replace('www.', '')
+  const matchedEmailsInText = [
+    ...new Set(pageText.match(simpleEmailGlobalRegex)?.map((item) => item.trim()))
+  ].filter((email) => email.includes(currentHostname) === false)
+
+  if (matchedEmailsInText.length === 1) {
+    return matchedEmailsInText[0]
+  }
+
+  return undefined
+}
 
 export class DOMEventsRecorder {
   capturedInputEvents: IInputRecord[]
@@ -70,31 +118,18 @@ export class DOMEventsRecorder {
    * 3. Fallback to the last non-password input
    */
   getUsername(): string | undefined {
-    // First check if user filled any non-password input
-    const nonPasswordInputs = this.capturedInputEvents.filter(
-      ({ eventType: type, element }) => {
-        return type === 'input' && element.type !== 'password'
-      }
+    const usernameFromInputs = getUsernameFromCapturedInputs(
+      this.capturedInputEvents.filter(({ eventType: type }) => type === 'input')
     )
-
-    // If user has filled any non-password input, use the last one
-    if (nonPasswordInputs.length > 0) {
-      return nonPasswordInputs[nonPasswordInputs.length - 1]?.inputted
+    if (usernameFromInputs) {
+      return usernameFromInputs
     }
 
     // If no email input and no other inputs were filled, only then check for emails in the page text-this happens for example on google login page
-    const matchedEmailsInText = document.body.innerText.match(simpleEmailRegex)
-    if (matchedEmailsInText?.length === 1) {
-      if (
-        matchedEmailsInText[0].includes(
-          location.hostname.replace('www.', '') // exclude emails from the same domain as we're currently on
-        ) === false
-      ) {
-        return matchedEmailsInText[0] // the email is displayed on the page somewhere as regular text
-      }
-    }
-
-    return undefined
+    return getSingleVisibleEmailFromPage(
+      document.body.innerText,
+      location.hostname
+    )
   }
 
   getPassword(): string | undefined {

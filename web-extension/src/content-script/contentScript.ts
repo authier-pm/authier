@@ -1,6 +1,10 @@
 import { debounce } from 'lodash'
 
-import { DOMEventsRecorder, IInputRecord } from './DOMEventsRecorder'
+import {
+  DOMEventsRecorder,
+  IInputRecord,
+  isLikelyEmail
+} from './DOMEventsRecorder'
 import debug from 'debug'
 import {
   WebInputElement,
@@ -68,6 +72,37 @@ export const domRecorder = new DOMEventsRecorder()
 
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 export let stateInitRes: IInitStateRes | null = null
+
+const shouldRecordInput = (targetElement: HTMLInputElement) => {
+  return (
+    targetElement.type === 'password' ||
+    targetElement.type === 'text' ||
+    targetElement.type === 'email'
+  )
+}
+
+const captureInputValue = (targetElement: HTMLInputElement) => {
+  if (!shouldRecordInput(targetElement) || !targetElement.value) {
+    return false
+  }
+
+  const inputRecord: IInputRecord = {
+    element: targetElement,
+    eventType: 'input',
+    inputted: targetElement.value,
+    kind: getWebInputKind(targetElement)
+  }
+  domRecorder.addInputEvent(inputRecord)
+
+  return true
+}
+
+const persistCapturedInputs = () => {
+  void trpc.saveCapturedInputEvents.mutate({
+    inputEvents: domRecorder.toJSON(),
+    url: document.documentURI
+  })
+}
 
 export async function initInputWatch() {
   stateInitRes = await trpc.getContentScriptInitialState.query()
@@ -140,73 +175,71 @@ export async function initInputWatch() {
     const targetElement = ev.target as HTMLInputElement
     const isPasswordType = targetElement.type === 'password'
 
-    const inputted = targetElement.value
+    if (captureInputValue(targetElement) && targetElement.type === 'password') {
+      log('password inputted', targetElement.value)
 
-    if (
-      isPasswordType ||
-      targetElement.type === 'text' ||
-      targetElement.type === 'email'
-    ) {
-      if (inputted) {
-        const inputRecord: IInputRecord = {
-          element: targetElement,
-          eventType: 'input',
-          inputted,
-          kind: getWebInputKind(targetElement)
+      const form = targetElement.form
+
+      if (form) {
+        // handle case when this is inside a form
+        if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
+          log('includes')
+          return
         }
-        domRecorder.addInputEvent(inputRecord)
 
-        if (targetElement.type === 'password') {
-          log('password inputted', inputted)
-
-          const form = targetElement.form
-
-          if (form) {
-            // handle case when this is inside a form
-            if (formsRegisteredForSubmitEvent.includes(targetElement.form)) {
-              log('includes')
-              return
-            }
-
-            form.addEventListener(
-              'submit',
-              (ev) => {
-                onSubmit(form)
-              },
-              { once: true }
-            )
-            formsRegisteredForSubmitEvent.push(form)
-          }
-
-          // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
-          targetElement.addEventListener(
-            'keydown',
-            (ev: KeyboardEvent) => {
-              if (ev.code === 'Enter') {
-                domRecorder.addInputEvent({
-                  element: targetElement,
-                  eventType: 'keydown',
-                  kind: null
-                })
-                showSavePromptIfAppropriate(secretsForHost)
-              }
-            },
-            { once: true }
-          )
-
-          // some login flows don't have any forms, in that case we are listening for click, keydown
-          targetElement.ownerDocument.body.addEventListener(
-            'click',
-            () => showSavePromptIfAppropriate(secretsForHost),
-            {
-              once: true
-            }
-          )
-        }
+        form.addEventListener(
+          'submit',
+          (ev) => {
+            onSubmit(form)
+          },
+          { once: true }
+        )
+        formsRegisteredForSubmitEvent.push(form)
       }
+
+      // handle when the user uses enter key-custom JS might be listening for keydown as well and trigger submit externally
+      targetElement.addEventListener(
+        'keydown',
+        (ev: KeyboardEvent) => {
+          if (ev.code === 'Enter') {
+            domRecorder.addInputEvent({
+              element: targetElement,
+              eventType: 'keydown',
+              kind: null
+            })
+            showSavePromptIfAppropriate(secretsForHost)
+          }
+        },
+        { once: true }
+      )
+
+      // some login flows don't have any forms, in that case we are listening for click, keydown
+      targetElement.ownerDocument.body.addEventListener(
+        'click',
+        () => showSavePromptIfAppropriate(secretsForHost),
+        {
+          once: true
+        }
+      )
     }
   }, 400)
+  const focusoutEventListener = (ev: FocusEvent) => {
+    const targetElement = ev.target
+
+    if (!(targetElement instanceof HTMLInputElement)) {
+      return
+    }
+
+    if (!captureInputValue(targetElement)) {
+      return
+    }
+
+    if (isLikelyEmail(targetElement.value)) {
+      persistCapturedInputs()
+    }
+  }
   document.body.addEventListener('input', debouncedInputEventListener, true) // maybe there are websites where this won't work, we need to test this out larger number of websites
+  document.body.addEventListener('focusout', focusoutEventListener, true)
 
   return () => {
     document.body.removeEventListener(
@@ -214,6 +247,7 @@ export async function initInputWatch() {
       debouncedInputEventListener,
       true
     )
+    document.body.removeEventListener('focusout', focusoutEventListener, true)
 
     stopAutofillListener()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
