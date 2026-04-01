@@ -16,7 +16,7 @@
     "@elysiajs/cors": "^1.4.1",
     "@orpc/contract": "1.13.13",
     "@orpc/server": "1.13.13",
-    "@react-native-firebase/app": "^23.8.8",
+    "@react-native-firebase/app": "^24.0.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@upstash/redis": "^1.37.0",
     "bytes": "^3.1.2",
@@ -46,7 +46,7 @@
     "type-graphql": "npm:@capaj/type-graphql@2.0.0-alpha.1",
     "typescript": "^6.0.2",
     "uuid": "^13.0.0",
-    "wrangler": "^4.78.0",
+    "wrangler": "^4.79.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
