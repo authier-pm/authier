@@ -482,7 +482,7 @@ describe('VaultSessionProvider', () => {
     })
   })
 
-  it('clears persisted vault auth state when the API reports an unauthorized session', async () => {
+  it('clears persisted vault auth state when the unauthorized session event is emitted', async () => {
     const password = 'super secure password'
     const salt = crypto.getRandomValues(new Uint8Array(16))
     const encryptionSalt = bufferToBase64(salt)

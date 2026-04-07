@@ -134,10 +134,13 @@ const copyYogaResponseToElysia = async (
   headers.delete('content-length')
 
   const body = response.body === null ? null : await response.arrayBuffer()
+  const status =
+    typeof ctx.set.status === 'number' && response.status === 200
+      ? ctx.set.status
+      : response.status
 
   return new Response(body, {
-    status:
-      typeof ctx.set.status === 'number' ? ctx.set.status : response.status,
+    status,
     headers
   })
 }

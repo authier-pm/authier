@@ -58,11 +58,7 @@ export const webhookHandler = async (
     return
   }
 
-  event = stripeClient.webhooks.constructEvent(
-    rawBody,
-    sig as string | string[] | Buffer,
-    endpointSecret
-  )
+  event = stripeClient.webhooks.constructEvent(rawBody, sig, endpointSecret)
 
   log('event', event)
 

@@ -138,15 +138,16 @@ describe('oRPC handler', () => {
     )
     const guestClient = createVaultClient(app, createAuthState())
 
-    expect(await guestClient.session.bootstrap({})).toMatchObject({
+    await expect(guestClient.session.bootstrap({})).rejects.toMatchObject({
       code: 'UNAUTHORIZED',
+      status: 401,
       message: 'not authenticated'
     })
-    expect(
-      await guestClient.auth.refresh({
+    await expect(
+      guestClient.auth.refresh({
         refreshToken: ''
       })
-    ).toMatchObject({
+    ).rejects.toMatchObject({
       code: 'BAD_REQUEST',
       status: 400
     })
