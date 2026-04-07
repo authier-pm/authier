@@ -42,7 +42,7 @@ export function DevicesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {challengesQuery.data?.challenges.map((challenge) => (
+          {challengesQuery.data?.challenges?.map((challenge) => (
             <Card
               className="border-dashed border-white/10 bg-[color:var(--color-surface-muted)]"
               key={challenge.id}
@@ -90,7 +90,7 @@ export function DevicesPage() {
             </Card>
           ))}
 
-          {challengesQuery.data?.challenges.length === 0 ? (
+          {challengesQuery.data?.challenges?.length === 0 ? (
             <p className="text-sm text-[color:var(--color-muted)]">
               No pending approvals right now.
             </p>
@@ -106,7 +106,7 @@ export function DevicesPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          {devicesQuery.data?.devices.map((device) => (
+          {devicesQuery.data?.devices?.map((device) => (
             <Card
               className="border-dashed border-white/10 bg-[color:var(--color-surface-muted)]"
               key={device.id}
