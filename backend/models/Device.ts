@@ -24,7 +24,7 @@ import {
   decryptionChallenge,
   secretUsageEvent
 } from '../drizzle/schema'
-import { eq, and, or, isNull, gte, count } from 'drizzle-orm'
+import { eq, and, or, isNull, gte, count, sql } from 'drizzle-orm'
 
 @InputType()
 export class DeviceInput {
@@ -38,91 +38,100 @@ export class DeviceInput {
   platform: string
 }
 
+export const getEncryptedSecretsToSync = async (
+  ctx: Pick<IContextAuthenticated, 'db' | 'device' | 'jwtPayload'>,
+  deviceState: {
+    lastSyncAt: Date | null
+    userId: string
+  }
+) => {
+  const userData = await ctx.db.query.user.findFirst({
+    where: { id: ctx.jwtPayload.userId }
+  })
+
+  if (!userData) {
+    return []
+  }
+
+  const pswLimit = userData.loginCredentialsLimit
+  const totpLimit = userData.TOTPlimit
+
+  const [{ count: pswCount }] = await ctx.db
+    .select({ count: count() })
+    .from(encryptedSecret)
+    .where(
+      and(
+        eq(encryptedSecret.userId, ctx.jwtPayload.userId),
+        eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS),
+        isNull(encryptedSecret.deletedAt)
+      )
+    )
+
+  const [{ count: TOTPCount }] = await ctx.db
+    .select({ count: count() })
+    .from(encryptedSecret)
+    .where(
+      and(
+        eq(encryptedSecret.userId, ctx.jwtPayload.userId),
+        eq(encryptedSecret.kind, EncryptedSecretTypeGQL.TOTP),
+        isNull(encryptedSecret.deletedAt)
+      )
+    )
+
+  if (pswCount > pswLimit) {
+    throw new GraphqlError(
+      `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
+    )
+  }
+
+  if (TOTPCount > totpLimit) {
+    throw new GraphqlError(
+      `TOTP limit exceeded, remove ${TOTPCount - totpLimit} TOTP secrets`
+    )
+  }
+
+  const kindCondition =
+    ctx.device.syncTOTP === true
+      ? undefined
+      : eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS)
+
+  const cAtCondition = deviceState.lastSyncAt
+    ? gte(encryptedSecret.createdAt, deviceState.lastSyncAt)
+    : undefined
+  const uAtCondition = deviceState.lastSyncAt
+    ? gte(encryptedSecret.updatedAt, deviceState.lastSyncAt)
+    : undefined
+  const dAtCondition = deviceState.lastSyncAt
+    ? gte(encryptedSecret.deletedAt, deviceState.lastSyncAt)
+    : undefined
+
+  const orConditions = [cAtCondition, uAtCondition, dAtCondition].filter(
+    (condition): condition is NonNullable<typeof condition> =>
+      condition !== undefined
+  )
+
+  return ctx.db
+    .select()
+    .from(encryptedSecret)
+    .where(
+      and(
+        eq(encryptedSecret.userId, deviceState.userId),
+        kindCondition,
+        orConditions.length > 0 ? or(...orConditions) : undefined
+      )
+    )
+}
+
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery], {
     description: 'Get all secrets that were change since last device sync'
   })
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
-    const lastSyncCondition = this.lastSyncAt
-      ? gte(encryptedSecret.createdAt, this.lastSyncAt)
-      : undefined
-
-    const userData = await ctx.db.query.user.findFirst({
-      where: { id: ctx.jwtPayload.userId }
+    return getEncryptedSecretsToSync(ctx, {
+      lastSyncAt: this.lastSyncAt,
+      userId: this.userId
     })
-
-    if (userData) {
-      const pswLimit = userData.loginCredentialsLimit
-      const totpLimit = userData.TOTPlimit
-
-      const [{ count: pswCount }] = await ctx.db
-        .select({ count: count() })
-        .from(encryptedSecret)
-        .where(
-          and(
-            eq(encryptedSecret.userId, ctx.jwtPayload.userId),
-            eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS),
-            isNull(encryptedSecret.deletedAt)
-          )
-        )
-
-      const [{ count: TOTPCount }] = await ctx.db
-        .select({ count: count() })
-        .from(encryptedSecret)
-        .where(
-          and(
-            eq(encryptedSecret.userId, ctx.jwtPayload.userId),
-            eq(encryptedSecret.kind, EncryptedSecretTypeGQL.TOTP),
-            isNull(encryptedSecret.deletedAt)
-          )
-        )
-
-      if (pswCount > pswLimit) {
-        throw new GraphqlError(
-          `Password limit exceeded, remove ${pswCount - pswLimit} passwords`
-        )
-      }
-
-      if (TOTPCount > totpLimit) {
-        throw new GraphqlError(
-          `TOTP limit exceeded, remove ${TOTPCount - totpLimit} TOTP secrets`
-        )
-      }
-
-      const kindOfSecret =
-        ctx.device.syncTOTP === true
-          ? undefined
-          : eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS)
-
-      const kindCondition = kindOfSecret ? kindOfSecret : undefined
-
-      const cAtCondition = this.lastSyncAt
-        ? gte(encryptedSecret.createdAt, this.lastSyncAt)
-        : undefined
-      const uAtCondition = this.lastSyncAt
-        ? gte(encryptedSecret.updatedAt, this.lastSyncAt)
-        : undefined
-      const dAtCondition = this.lastSyncAt
-        ? gte(encryptedSecret.deletedAt, this.lastSyncAt)
-        : undefined
-
-      const orConditions = [cAtCondition, uAtCondition, dAtCondition].filter(
-        (c): c is NonNullable<typeof c> => c !== undefined
-      )
-
-      const res = await ctx.db
-        .select()
-        .from(encryptedSecret)
-        .where(
-          and(
-            eq(encryptedSecret.userId, this.userId),
-            kindCondition,
-            orConditions.length > 0 ? or(...orConditions) : undefined
-          )
-        )
-      return res
-    }
   }
 
   @Field(() => String)
@@ -147,14 +156,21 @@ export class DeviceQuery extends DeviceGQL {
 export class DeviceMutation extends DeviceGQLScalars {
   @Field(() => GraphQLISODateTime)
   async markAsSynced(@Ctx() ctx: IContext) {
-    const syncedAt = new Date()
-    await ctx.db
+    const [syncedDevice] = await ctx.db
       .update(device)
       .set({
-        lastSyncAt: syncedAt
+        lastSyncAt: sql`CURRENT_TIMESTAMP`
       })
       .where(eq(device.id, this.id))
-    return syncedAt
+      .returning({
+        lastSyncAt: device.lastSyncAt
+      })
+
+    if (!syncedDevice?.lastSyncAt) {
+      throw new GraphqlError('Device not found')
+    }
+
+    return syncedDevice.lastSyncAt
   }
 
   @Field(() => SecretUsageEventGQLScalars)

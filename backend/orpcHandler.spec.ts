@@ -156,15 +156,28 @@ describe('oRPC handler', () => {
     expect(bootstrap.user.email).toBe(masterBrowser.email)
     expect(bootstrap.currentDevice.id).toBe(masterBrowser.device.id)
     expect(bootstrap.pendingChallenges).toHaveLength(0)
+    expect(masterBrowser.session.session.currentDevice.lastSyncAt).toBeNull()
+    expect(bootstrap.currentDevice.lastSyncAt).toBeNull()
 
     const createdSecret = await masterBrowser.client.vault.createSecret({
       kind: 'LOGIN_CREDENTIALS',
       encrypted: 'ciphertext-v1'
     })
     const listedSecrets = await masterBrowser.client.vault.listSecrets({})
+    const initialSyncSecrets = await masterBrowser.client.session.syncSecrets(
+      {}
+    )
 
     expect(listedSecrets.secrets).toHaveLength(1)
     expect(listedSecrets.secrets[0]?.id).toBe(createdSecret.id)
+    expect(initialSyncSecrets.secrets).toHaveLength(1)
+    expect(initialSyncSecrets.secrets[0]?.id).toBe(createdSecret.id)
+
+    await masterBrowser.client.session.markAsSynced({})
+
+    expect(await masterBrowser.client.session.syncSecrets({})).toMatchObject({
+      secrets: []
+    })
 
     const updatedSecret = await masterBrowser.client.vault.updateSecret({
       id: createdSecret.id,
@@ -176,6 +189,17 @@ describe('oRPC handler', () => {
 
     expect(updatedSecret.encrypted).toBe('ciphertext-v2')
     expect(updatedSecret.version).toBe(createdSecret.version + 1)
+    expect(await masterBrowser.client.session.syncSecrets({})).toMatchObject({
+      secrets: [
+        expect.objectContaining({
+          id: createdSecret.id,
+          deletedAt: null,
+          encrypted: 'ciphertext-v2'
+        })
+      ]
+    })
+
+    await masterBrowser.client.session.markAsSynced({})
 
     const updatedPolicy =
       await masterBrowser.client.security.updateNewDevicePolicy({
@@ -207,9 +231,20 @@ describe('oRPC handler', () => {
     expect(await masterBrowser.client.vault.listSecrets({})).toMatchObject({
       secrets: []
     })
+    expect(await masterBrowser.client.session.syncSecrets({})).toMatchObject({
+      secrets: [
+        expect.objectContaining({
+          id: createdSecret.id,
+          deletedAt: expect.any(String)
+        })
+      ]
+    })
 
     const refreshedSession = await masterBrowser.client.auth.refresh({
       refreshToken: masterBrowser.session.refreshToken
+    })
+    const refreshedTokens = await masterBrowser.client.auth.refreshTokens({
+      refreshToken: refreshedSession.refreshToken
     })
 
     expect(refreshedSession.accessToken).not.toBe(
@@ -218,11 +253,21 @@ describe('oRPC handler', () => {
     expect(refreshedSession.refreshToken).not.toBe(
       masterBrowser.session.refreshToken
     )
+    expect(refreshedSession.session.currentDevice.lastSyncAt).toEqual(
+      expect.any(String)
+    )
+    expect(refreshedTokens.accessToken).toEqual(expect.any(String))
+    expect(refreshedTokens.refreshToken).toEqual(expect.any(String))
 
     masterBrowser.authState.accessToken = refreshedSession.accessToken
 
+    const syncedDevice = await masterBrowser.client.session.markAsSynced({})
     const refreshedBootstrap = await masterBrowser.client.session.bootstrap({})
 
+    expect(syncedDevice.lastSyncAt).toEqual(expect.any(String))
+    expect(refreshedBootstrap.currentDevice.lastSyncAt).toBe(
+      syncedDevice.lastSyncAt
+    )
     expect(refreshedBootstrap.currentDevice.vaultLockTimeoutSeconds).toBe(600)
     expect(refreshedBootstrap.user.deviceRecoveryCooldownMinutes).toBe(90)
   })

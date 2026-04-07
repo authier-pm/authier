@@ -112,6 +112,10 @@ export const encryptedSecretRecordSchema = z.object({
   updatedAt: z.string().nullable()
 })
 
+export const syncEncryptedSecretRecordSchema = encryptedSecretRecordSchema.extend({
+  deletedAt: z.string().nullable()
+})
+
 export const currentDeviceSchema = z.object({
   id: z.string().min(1),
   name: z.string().min(1),
@@ -167,6 +171,14 @@ export const sessionBootstrapSchema = z.object({
 
 export const authenticatedSessionSchema = tokenPairSchema.extend({
   session: sessionBootstrapSchema
+})
+
+export const markAsSyncedResultSchema = z.object({
+  lastSyncAt: z.string()
+})
+
+export const syncSecretsSchema = z.object({
+  secrets: z.array(syncEncryptedSecretRecordSchema)
 })
 
 export const approvedChallengeSchema = z.object({

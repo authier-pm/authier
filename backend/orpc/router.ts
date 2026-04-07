@@ -1,11 +1,16 @@
 import { implement, ORPCError } from '@orpc/server'
-import { desc, eq } from 'drizzle-orm'
+import { desc, eq, sql } from 'drizzle-orm'
 import { verify } from 'jsonwebtoken'
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeMutation
 } from '../models/DecryptionChallenge'
-import { DeviceMutation, DeviceQuery, type DeviceInput } from '../models/Device'
+import {
+  DeviceMutation,
+  DeviceQuery,
+  getEncryptedSecretsToSync,
+  type DeviceInput
+} from '../models/Device'
 import { UserMutation } from '../models/UserMutation'
 import { UserQuery } from '../models/UserQuery'
 import type { IContext } from '../models/types/ContextTypes'
@@ -70,6 +75,19 @@ const mapSecretRecord = (secret: {
   version: secret.version,
   createdAt: new Date(secret.createdAt).toISOString(),
   updatedAt: asIsoString(secret.updatedAt)
+})
+
+const mapSyncSecretRecord = (secret: {
+  id: string
+  encrypted: string
+  kind: 'TOTP' | 'LOGIN_CREDENTIALS'
+  version: number
+  createdAt: Date | string
+  updatedAt: Date | string | null
+  deletedAt: Date | string | null
+}) => ({
+  ...mapSecretRecord(secret),
+  deletedAt: asIsoString(secret.deletedAt)
 })
 
 const mapCurrentDevice = (device: {
@@ -249,6 +267,42 @@ const getAuthenticatedSession = async (
   return {
     ...createAuthTokens(user, device),
     session: await getSessionBootstrap(ctx, userId, deviceId)
+  }
+}
+
+const getRefreshSessionActor = async (
+  ctx: OrpcContext['legacyCtx'],
+  refreshToken: string
+) => {
+  const payload = getRefreshPayload(refreshToken)
+
+  const user = await ctx.db.query.user.findFirst({
+    where: { id: payload.userId },
+    columns: {
+      id: true,
+      tokenVersion: true
+    }
+  })
+
+  if (!user || user.tokenVersion !== payload.tokenVersion) {
+    throw new ORPCError('UNAUTHORIZED', {
+      message: 'not authenticated'
+    })
+  }
+
+  const device = await ctx.db.query.device.findFirst({
+    where: { id: payload.deviceId }
+  })
+
+  if (!device || device.logoutAt) {
+    throw new ORPCError('UNAUTHORIZED', {
+      message: 'not authenticated'
+    })
+  }
+
+  return {
+    device,
+    user
   }
 }
 
@@ -484,33 +538,19 @@ export const vaultOrpcRouter = os.router({
         }
       }
     ),
+    refreshTokens: os.auth.refreshTokens.handler(async ({ input, context }) => {
+      const { user, device } = await getRefreshSessionActor(
+        context.legacyCtx,
+        input.refreshToken
+      )
+
+      return createAuthTokens(user, device)
+    }),
     refresh: os.auth.refresh.handler(async ({ input, context }) => {
-      const payload = getRefreshPayload(input.refreshToken)
-
-      const user = await context.legacyCtx.db.query.user.findFirst({
-        where: { id: payload.userId },
-        columns: {
-          id: true,
-          tokenVersion: true
-        }
-      })
-
-      if (!user || user.tokenVersion !== payload.tokenVersion) {
-        throw new ORPCError('UNAUTHORIZED', {
-          message: 'not authenticated'
-        })
-      }
-
-      const device = await context.legacyCtx.db.query.device.findFirst({
-        where: { id: payload.deviceId }
-      })
-
-      if (!device || device.logoutAt) {
-        throw new ORPCError('UNAUTHORIZED', {
-          message: 'not authenticated'
-        })
-      }
-
+      const { user, device } = await getRefreshSessionActor(
+        context.legacyCtx,
+        input.refreshToken
+      )
       return getAuthenticatedSession(context.legacyCtx, user.id, device.id)
     }),
     logout: protectedBase.auth.logout.handler(async ({ context }) => {
@@ -531,7 +571,58 @@ export const vaultOrpcRouter = os.router({
         context.authCtx.jwtPayload.userId,
         context.authCtx.jwtPayload.deviceId
       )
-    })
+    }),
+    markAsSynced: protectedBase.session.markAsSynced.handler(
+      async ({ context }) => {
+        const [syncedDevice] = await context.legacyCtx.db
+          .update(schema.device)
+          .set({
+            lastSyncAt: sql`CURRENT_TIMESTAMP`
+          })
+          .where(eq(schema.device.id, context.authCtx.jwtPayload.deviceId))
+          .returning({
+            lastSyncAt: schema.device.lastSyncAt
+          })
+
+        if (!syncedDevice?.lastSyncAt) {
+          throw new ORPCError('UNAUTHORIZED', {
+            message: 'not authenticated'
+          })
+        }
+
+        return { lastSyncAt: syncedDevice.lastSyncAt.toISOString() }
+      }
+    ),
+    syncSecrets: protectedBase.session.syncSecrets.handler(
+      async ({ context }) => {
+        const currentDevice = await context.legacyCtx.db.query.device.findFirst(
+          {
+            where: { id: context.authCtx.jwtPayload.deviceId }
+          }
+        )
+
+        if (!currentDevice) {
+          throw new ORPCError('UNAUTHORIZED', {
+            message: 'not authenticated'
+          })
+        }
+
+        const secrets = await getEncryptedSecretsToSync(
+          {
+            ...context.authCtx,
+            device: currentDevice
+          },
+          {
+            lastSyncAt: currentDevice.lastSyncAt,
+            userId: context.authCtx.jwtPayload.userId
+          }
+        )
+
+        return {
+          secrets: secrets.map(mapSyncSecretRecord)
+        }
+      }
+    )
   },
   vault: {
     listSecrets: protectedBase.vault.listSecrets.handler(
@@ -608,7 +699,8 @@ export const vaultOrpcRouter = os.router({
             .set({
               encrypted: input.patch.encrypted,
               kind: input.patch.kind,
-              version: secret.version + 1
+              version: secret.version + 1,
+              updatedAt: sql`CURRENT_TIMESTAMP`
             })
             .where(eq(schema.encryptedSecret.id, secret.id))
             .returning()
@@ -639,7 +731,7 @@ export const vaultOrpcRouter = os.router({
           const [deleted] = await context.legacyCtx.db
             .update(schema.encryptedSecret)
             .set({
-              deletedAt: new Date()
+              deletedAt: sql`CURRENT_TIMESTAMP`
             })
             .where(eq(schema.encryptedSecret.id, secret.id))
             .returning()

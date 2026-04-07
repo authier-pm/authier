@@ -15,6 +15,7 @@ import {
   emptyInputSchema,
   encryptedSecretPayloadSchema,
   encryptedSecretRecordSchema,
+  markAsSyncedResultSchema,
   masterDeviceResetResultSchema,
   okResultSchema,
   pendingChallengesListSchema,
@@ -27,6 +28,8 @@ import {
   securityResponseSchema,
   setMasterDeviceInputSchema,
   sessionBootstrapSchema,
+  syncSecretsSchema,
+  tokenPairSchema,
   updateEncryptedSecretInputSchema,
   updateNewDevicePolicyInputSchema,
   updateRecoveryCooldownInputSchema,
@@ -47,11 +50,14 @@ export const vaultApiContract = {
     initiateMasterDeviceReset: oc
       .input(initiateMasterDeviceResetInputSchema)
       .output(masterDeviceResetResultSchema),
+    refreshTokens: oc.input(refreshInputSchema).output(tokenPairSchema),
     refresh: oc.input(refreshInputSchema).output(authenticatedSessionSchema),
     logout: oc.input(emptyInputSchema).output(okResultSchema)
   },
   session: {
-    bootstrap: oc.input(emptyInputSchema).output(sessionBootstrapSchema)
+    bootstrap: oc.input(emptyInputSchema).output(sessionBootstrapSchema),
+    markAsSynced: oc.input(emptyInputSchema).output(markAsSyncedResultSchema),
+    syncSecrets: oc.input(emptyInputSchema).output(syncSecretsSchema)
   },
   vault: {
     listSecrets: oc.input(emptyInputSchema).output(secretsListSchema),

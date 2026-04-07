@@ -162,7 +162,7 @@ export class UserMutation extends UserBase {
     const res = await ctx.db
       .update(encryptedSecretSchema)
       .set({
-        deletedAt: new Date()
+        deletedAt: sql`CURRENT_TIMESTAMP`
       })
       .where(inArray(encryptedSecretSchema.id, secrets))
       .returning()
@@ -392,7 +392,10 @@ export class UserMutation extends UserBase {
       for (const { id, ...patch } of input.secrets) {
         await tx
           .update(encryptedSecretSchema)
-          .set(patch)
+          .set({
+            ...patch,
+            updatedAt: sql`CURRENT_TIMESTAMP`
+          })
           .where(eq(encryptedSecretSchema.id, id))
       }
     })

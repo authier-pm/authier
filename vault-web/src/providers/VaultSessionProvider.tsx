@@ -9,7 +9,14 @@ import {
   initLocalDeviceAuthSecret
 } from '@shared/cryptoUtils'
 import type { VaultApiOutputs } from '@shared/orpc/contract'
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode
+} from 'react'
 import { orpcClient } from '@/lib/orpc'
 import { getOrCreateDeviceIdentity, type DeviceIdentity } from '@/lib/deviceIdentity'
 import { setAccessToken } from '@/lib/accessToken'
@@ -32,6 +39,14 @@ type PendingChallenge = Extract<
   { status: 'pending' }
 >
 type AuthenticatedSession = VaultApiOutputs['auth']['refresh']
+type RefreshedTokens = VaultApiOutputs['auth']['refreshTokens']
+type SyncSecretsResponse = VaultApiOutputs['session']['syncSecrets']
+type SessionAuthOptions = {
+  email: string
+  encryptionSalt: string
+  authSecretEncrypted: string
+  masterEncryptionKey: CryptoKey
+}
 
 type LockedVaultState = {
   userId: string
@@ -64,11 +79,13 @@ type VaultSessionContextValue = {
   skippedSecretsCount: number
   pendingLogin: PendingLoginState | null
   isBusy: boolean
+  isSyncingVault: boolean
   submitLogin: (email: string, password: string) => Promise<'authenticated' | 'pending'>
   pollPendingLogin: () => Promise<'authenticated' | 'pending'>
   requestMasterDeviceReset: (challengeId: number) => Promise<void>
   register: (email: string, password: string) => Promise<void>
   unlockVault: (password: string) => Promise<void>
+  syncVault: () => Promise<void>
   lockVault: () => void
   logout: () => Promise<void>
   createLoginSecret: (values: LoginSecretValues) => Promise<void>
@@ -81,10 +98,56 @@ type VaultSessionContextValue = {
 const REFRESH_TOKEN_STORAGE_KEY = 'authier-vault-refresh-token'
 const LOCKED_STATE_STORAGE_KEY = 'authier-vault-locked-state'
 const UNLOCKED_STATE_STORAGE_KEY = 'authier-vault-unlocked-state'
+const STALE_SYNC_THRESHOLD_MS = 48 * 60 * 60 * 1000
 
 const VaultSessionContext = createContext<VaultSessionContextValue | null>(null)
 
 const readStoredString = (key: string) => window.localStorage.getItem(key)
+
+const sortSessionSecrets = (secrets: SessionBootstrap['secrets']) =>
+  [...secrets].sort((left, right) => {
+    const leftUpdatedAt = Date.parse(left.updatedAt ?? left.createdAt)
+    const rightUpdatedAt = Date.parse(right.updatedAt ?? right.createdAt)
+
+    if (rightUpdatedAt !== leftUpdatedAt) {
+      return rightUpdatedAt - leftUpdatedAt
+    }
+
+    return Date.parse(right.createdAt) - Date.parse(left.createdAt)
+  })
+
+const mergeSyncedSecrets = (
+  currentSecrets: SessionBootstrap['secrets'],
+  syncedSecrets: SyncSecretsResponse['secrets']
+) => {
+  const nextSecrets = new Map(currentSecrets.map((secret) => [secret.id, secret]))
+
+  syncedSecrets.forEach((secret) => {
+    if (secret.deletedAt) {
+      nextSecrets.delete(secret.id)
+      return
+    }
+
+    const { deletedAt: _deletedAt, ...activeSecret } = secret
+    nextSecrets.set(secret.id, activeSecret)
+  })
+
+  return sortSessionSecrets(Array.from(nextSecrets.values()))
+}
+
+const isSyncStale = (lastSyncAt: string | null) => {
+  if (!lastSyncAt) {
+    return true
+  }
+
+  const lastSyncTime = Date.parse(lastSyncAt)
+
+  if (Number.isNaN(lastSyncTime)) {
+    return true
+  }
+
+  return Date.now() - lastSyncTime >= STALE_SYNC_THRESHOLD_MS
+}
 
 const readStoredJson = <T,>(key: string): T | null => {
   const rawValue = window.localStorage.getItem(key)
@@ -124,6 +187,13 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   )
   const [pendingLogin, setPendingLogin] = useState<PendingLoginState | null>(null)
   const [isBusy, setIsBusy] = useState(false)
+  const [isSyncingVault, setIsSyncingVault] = useState(false)
+  const syncVaultPromiseRef = useRef<Promise<void> | null>(null)
+  const lastKnownSyncAtRef = useRef<string | null>(
+    initialUnlockedState?.session.currentDevice.lastSyncAt ?? null
+  )
+  const startupSyncHandledRef = useRef(false)
+  const attemptedAutoSyncKeyRef = useRef<string | null>(null)
 
   const status: VaultStatus = session ? 'authenticated' : lockedState ? 'locked' : 'guest'
 
@@ -147,6 +217,10 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       cancelled = true
     }
   }, [masterKey, session])
+
+  useEffect(() => {
+    lastKnownSyncAtRef.current = session?.currentDevice.lastSyncAt ?? null
+  }, [session?.currentDevice.lastSyncAt])
 
   useEffect(() => {
     if (!session || !lockedState) {
@@ -238,12 +312,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
   const completeAuthenticatedSession = async (
     authenticatedSession: AuthenticatedSession,
-    options: {
-      email: string
-      encryptionSalt: string
-      authSecretEncrypted: string
-      masterEncryptionKey: CryptoKey
-    }
+    options: SessionAuthOptions
   ) => {
     setAccessToken(authenticatedSession.accessToken)
     setRefreshToken(authenticatedSession.refreshToken)
@@ -259,6 +328,52 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         authenticatedSession.session.currentDevice.vaultLockTimeoutSeconds
     })
     setPendingLogin(null)
+  }
+
+  const resolveStoredMasterKey = async () => {
+    if (masterKey) {
+      return masterKey
+    }
+
+    if (!initialUnlockedState?.masterKey) {
+      return null
+    }
+
+    return abToCryptoKey(base64ToBuffer(initialUnlockedState.masterKey))
+  }
+
+  const applyRefreshedTokens = (tokens: RefreshedTokens) => {
+    setAccessToken(tokens.accessToken)
+    setRefreshToken(tokens.refreshToken)
+  }
+
+  const refreshAuthTokens = async (nextRefreshToken = refreshToken) => {
+    if (!nextRefreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    const refreshedTokens = await orpcClient.auth.refreshTokens({
+      refreshToken: nextRefreshToken
+    })
+
+    applyRefreshedTokens(refreshedTokens)
+
+    return refreshedTokens
+  }
+
+  const refreshAuthenticatedSession = async (
+    options: SessionAuthOptions,
+    nextRefreshToken = refreshToken
+  ) => {
+    if (!nextRefreshToken) {
+      throw new Error('No refresh token available')
+    }
+
+    const authenticatedSession = await orpcClient.auth.refresh({
+      refreshToken: nextRefreshToken
+    })
+
+    await completeAuthenticatedSession(authenticatedSession, options)
   }
 
   useEffect(() => {
@@ -293,25 +408,19 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
     let cancelled = false
 
-    void orpcClient.auth
-      .refresh({
-        refreshToken
-      })
-      .then(async (authenticatedSession) => {
-        const restoredMasterKey =
-          masterKey ??
-          await abToCryptoKey(base64ToBuffer(initialUnlockedState.masterKey))
+    void resolveStoredMasterKey()
+      .then(async (restoredMasterKey) => {
+        if (!restoredMasterKey || cancelled) {
+          return
+        }
 
+        await refreshAuthTokens(refreshToken)
+      })
+      .then(() => {
         if (cancelled) {
           return
         }
 
-        await completeAuthenticatedSession(authenticatedSession, {
-          email: lockedState.email,
-          encryptionSalt: lockedState.encryptionSalt,
-          authSecretEncrypted: lockedState.authSecretEncrypted,
-          masterEncryptionKey: restoredMasterKey
-        })
         setShouldRestoreUnlockedSession(false)
       })
       .catch((error) => {
@@ -328,9 +437,83 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }, [
     initialUnlockedState,
     lockedState,
-    masterKey,
     refreshToken,
     shouldRestoreUnlockedSession
+  ])
+
+  useEffect(() => {
+    if (
+      startupSyncHandledRef.current ||
+      !initialUnlockedState ||
+      status !== 'authenticated' ||
+      shouldRestoreUnlockedSession ||
+      !refreshToken ||
+      !lockedState ||
+      document.visibilityState === 'hidden' ||
+      syncVaultPromiseRef.current ||
+      !isSyncStale(lastKnownSyncAtRef.current)
+    ) {
+      return
+    }
+
+    startupSyncHandledRef.current = true
+
+    void syncVault().catch((error) => {
+      console.warn('Unable to sync stale vault session on startup.', error)
+    })
+  }, [
+    initialUnlockedState,
+    lockedState,
+    refreshToken,
+    shouldRestoreUnlockedSession,
+    status
+  ])
+
+  useEffect(() => {
+    if (
+      status !== 'authenticated' ||
+      shouldRestoreUnlockedSession ||
+      !refreshToken ||
+      !lockedState
+    ) {
+      return
+    }
+
+    const syncStaleVault = () => {
+      const syncKey = lastKnownSyncAtRef.current ?? 'never'
+
+      if (
+        document.visibilityState === 'hidden' ||
+        syncVaultPromiseRef.current ||
+        attemptedAutoSyncKeyRef.current === syncKey ||
+        !isSyncStale(lastKnownSyncAtRef.current)
+      ) {
+        return
+      }
+
+      attemptedAutoSyncKeyRef.current = syncKey
+
+      void syncVault().catch((error) => {
+        if (attemptedAutoSyncKeyRef.current === syncKey) {
+          attemptedAutoSyncKeyRef.current = null
+        }
+        console.warn('Unable to sync stale vault session.', error)
+      })
+    }
+
+    window.addEventListener('focus', syncStaleVault)
+    document.addEventListener('visibilitychange', syncStaleVault)
+
+    return () => {
+      window.removeEventListener('focus', syncStaleVault)
+      document.removeEventListener('visibilitychange', syncStaleVault)
+    }
+  }, [
+    lockedState,
+    masterKey,
+    refreshToken,
+    shouldRestoreUnlockedSession,
+    status
   ])
 
   useEffect(() => {
@@ -544,11 +727,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       }
 
       try {
-        const authenticatedSession = await orpcClient.auth.refresh({
-          refreshToken
-        })
-
-        await completeAuthenticatedSession(authenticatedSession, {
+        await refreshAuthenticatedSession({
           email: lockedState.email,
           encryptionSalt: lockedState.encryptionSalt,
           authSecretEncrypted: lockedState.authSecretEncrypted,
@@ -560,6 +739,55 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     } finally {
       setIsBusy(false)
     }
+  }
+
+  const syncVault = async () => {
+    if (syncVaultPromiseRef.current) {
+      return syncVaultPromiseRef.current
+    }
+
+    setIsSyncingVault(true)
+
+    const syncPromise = (async () => {
+      if (!lockedState) {
+        throw new Error('Vault is locked')
+      }
+
+      const currentMasterKey = await resolveStoredMasterKey()
+
+      if (!currentMasterKey) {
+        throw new Error('Vault is locked')
+      }
+
+      await refreshAuthTokens()
+
+      const syncedSecrets = await orpcClient.session.syncSecrets({})
+
+      const syncedDevice = await orpcClient.session.markAsSynced({})
+      lastKnownSyncAtRef.current = syncedDevice.lastSyncAt
+
+      setSession((currentSession) => {
+        if (!currentSession) {
+          return currentSession
+        }
+
+        return {
+          ...currentSession,
+          secrets: mergeSyncedSecrets(currentSession.secrets, syncedSecrets.secrets),
+          currentDevice: {
+            ...currentSession.currentDevice,
+            lastSyncAt: syncedDevice.lastSyncAt
+          }
+        }
+      })
+    })().finally(() => {
+      syncVaultPromiseRef.current = null
+      setIsSyncingVault(false)
+    })
+
+    syncVaultPromiseRef.current = syncPromise
+
+    return syncPromise
   }
 
   const lockVault = () => {
@@ -693,11 +921,13 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         skippedSecretsCount,
         pendingLogin,
         isBusy,
+        isSyncingVault,
         submitLogin,
         pollPendingLogin,
         requestMasterDeviceReset,
         register,
         unlockVault,
+        syncVault,
         lockVault,
         logout,
         createLoginSecret,

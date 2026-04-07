@@ -1,4 +1,4 @@
-import { File, Plus, Search, X } from 'lucide-react'
+import { File, Plus, RefreshCw, Search, X } from 'lucide-react'
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { constructURL } from '@shared/urlUtils'
@@ -23,11 +23,32 @@ const filterTabs: Array<{
     { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
   ]
 
+const formatLastSyncLabel = (lastSyncAt: string | null | undefined) => {
+  if (!lastSyncAt) {
+    return 'Last synced: never'
+  }
+
+  const lastSyncDate = new Date(lastSyncAt)
+
+  if (Number.isNaN(lastSyncDate.getTime())) {
+    return 'Last synced: never'
+  }
+
+  return `Last synced: ${lastSyncDate.toLocaleString()}`
+}
+
 export function VaultListPage({
   initialFilterMode = 'ALL'
 }: VaultListPageProps) {
-  const { decryptedSecrets, skippedSecretsCount } = useVaultSession()
+  const {
+    decryptedSecrets,
+    isSyncingVault,
+    session,
+    skippedSecretsCount,
+    syncVault
+  } = useVaultSession()
   const [query, setQuery] = useState('')
+  const [syncErrorMessage, setSyncErrorMessage] = useState<string | null>(null)
   const deferredQuery = useDeferredValue(query)
   const filterMode = initialFilterMode
 
@@ -50,48 +71,83 @@ export function VaultListPage({
 
   const visibleSecretCountLabel = `${visibleSecrets.length} ${visibleSecrets.length === 1 ? 'secret' : 'secrets'
     }`
+  const lastSyncLabel = formatLastSyncLabel(session?.currentDevice.lastSyncAt)
+
+  const handleSync = () => {
+    void syncVault()
+      .then(() => {
+        setSyncErrorMessage(null)
+      })
+      .catch((error) => {
+        setSyncErrorMessage(
+          error instanceof Error ? error.message : 'Unable to sync vault'
+        )
+      })
+  }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col gap-4">
       <Card className="border-white/10 bg-[color:var(--color-surface)] backdrop-blur-[14px]">
         <CardContent className="p-4">
-          <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-            <div className="relative w-full max-w-3xl">
-              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-muted)]" />
-              <Input
-                className="h-11 rounded-full bg-[color:var(--color-input)] pl-10 pr-11"
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search by label, URL, username, password, or TOTP secret"
-                value={query}
-              />
-              {query ? (
-                <button
-                  aria-label="Clear search"
-                  className="absolute right-3 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--color-muted)] transition hover:bg-[color:var(--color-accent)] hover:text-[color:var(--color-foreground)]"
-                  onClick={() => setQuery('')}
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+              <div className="relative w-full max-w-3xl">
+                <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[color:var(--color-muted)]" />
+                <Input
+                  className="h-11 rounded-full bg-[color:var(--color-input)] pl-10 pr-11"
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search by label, URL, username, password, or TOTP secret"
+                  value={query}
+                />
+                {query ? (
+                  <button
+                    aria-label="Clear search"
+                    className="absolute right-3 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-full text-[color:var(--color-muted)] transition hover:bg-[color:var(--color-accent)] hover:text-[color:var(--color-foreground)]"
+                    onClick={() => setQuery('')}
+                    type="button"
+                  >
+                    <X className="size-4" />
+                  </button>
+                ) : null}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-2">
+                <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
+                  {visibleSecretCountLabel}
+                </div>
+                {filterTabs.map((item) => (
+                  <Button
+                    asChild
+                    className="rounded-full"
+                    key={item.path}
+                    size="sm"
+                    variant={filterMode === item.value ? 'outline' : 'ghost'}
+                  >
+                    <Link to={item.path}>{item.label}</Link>
+                  </Button>
+                ))}
+                <Button
+                  disabled={isSyncingVault}
+                  onClick={handleSync}
+                  size="sm"
                   type="button"
+                  variant="outline"
                 >
-                  <X className="size-4" />
-                </button>
-              ) : null}
+                  <RefreshCw
+                    className={isSyncingVault ? 'size-4 animate-spin' : 'size-4'}
+                  />
+                  {isSyncingVault ? 'Syncing...' : 'Sync now'}
+                </Button>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-2 text-sm font-medium">
-                {visibleSecretCountLabel}
-              </div>
-              {filterTabs.map((item) => (
-                <Button
-                  asChild
-                  className="rounded-full"
-                  key={item.path}
-                  size="sm"
-                  variant={filterMode === item.value ? 'outline' : 'ghost'}
-                >
-                  <Link to={item.path}>{item.label}</Link>
-                </Button>
-              ))}
-
+            <div className="flex flex-col gap-2 text-sm text-[color:var(--color-muted)]">
+              <p>{lastSyncLabel}</p>
+              {syncErrorMessage ? (
+                <p className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
+                  {syncErrorMessage}
+                </p>
+              ) : null}
             </div>
           </div>
         </CardContent>
