@@ -10,6 +10,7 @@ import {
 } from '@shared/cryptoUtils'
 import type { VaultApiOutputs } from '@shared/orpc/contract'
 import { setAccessToken } from '@/lib/accessToken'
+import { notifyUnauthorizedSession } from '@/lib/authEvents'
 import { encryptLoginSecret } from '@/lib/vaultSecrets'
 import { VaultSessionProvider, useVaultSession } from './VaultSessionProvider'
 
@@ -479,6 +480,63 @@ describe('VaultSessionProvider', () => {
     expect(orpcMocks.refreshTokens).toHaveBeenCalledWith({
       refreshToken: 'refresh-token-1'
     })
+  })
+
+  it('clears persisted vault auth state when the API reports an unauthorized session', async () => {
+    const password = 'super secure password'
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const encryptionSalt = bufferToBase64(salt)
+    const masterKey = await generateEncryptionKey(password, salt)
+    const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
+
+    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-locked-state',
+      JSON.stringify({
+        userId: 'user-1',
+        email: 'capaj@test.com',
+        deviceName: 'Primary browser',
+        encryptionSalt,
+        authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
+        vaultLockTimeoutSeconds: 28800
+      })
+    )
+    window.localStorage.setItem(
+      'authier-vault-unlocked-state',
+      JSON.stringify({
+        session: createSession({
+          lastSyncAt: new Date().toISOString(),
+          secrets: []
+        }),
+        masterKey: await cryptoKeyToString(masterKey)
+      })
+    )
+    window.localStorage.setItem('authier-vault-access-token', 'access-token-1')
+
+    orpcMocks.refreshTokens.mockResolvedValue({
+      accessToken: 'access-token-2',
+      refreshToken: 'refresh-token-2'
+    })
+
+    render(
+      <VaultSessionProvider>
+        <VaultSessionHarness />
+      </VaultSessionProvider>
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('authenticated')
+    })
+
+    notifyUnauthorizedSession()
+
+    await waitFor(() => {
+      expect(screen.getByTestId('status')).toHaveTextContent('guest')
+    })
+    expect(window.localStorage.getItem('authier-vault-access-token')).toBeNull()
+    expect(window.localStorage.getItem('authier-vault-refresh-token')).toBeNull()
+    expect(window.localStorage.getItem('authier-vault-locked-state')).toBeNull()
+    expect(window.localStorage.getItem('authier-vault-unlocked-state')).toBeNull()
   })
 
   it('re-authenticates the trusted device on unlock when the refresh token is missing', async () => {

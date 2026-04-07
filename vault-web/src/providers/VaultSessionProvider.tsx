@@ -17,6 +17,7 @@ import {
   useState,
   type ReactNode
 } from 'react'
+import { onUnauthorizedSession } from '@/lib/authEvents'
 import { orpcClient } from '@/lib/orpc'
 import { getOrCreateDeviceIdentity, type DeviceIdentity } from '@/lib/deviceIdentity'
 import { setAccessToken } from '@/lib/accessToken'
@@ -197,6 +198,24 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
   const status: VaultStatus = session ? 'authenticated' : lockedState ? 'locked' : 'guest'
 
+  const clearUnlockedSession = () => {
+    setAccessToken(null)
+    setSession(null)
+    setMasterKey(null)
+    setPendingLogin(null)
+    setDecryptedSecrets([])
+    setSkippedSecretsCount(0)
+    setUnlockedState(null)
+  }
+
+  const clearVaultSession = () => {
+    clearUnlockedSession()
+    setRefreshToken(null)
+    setLockedState(null)
+  }
+
+  useEffect(() => onUnauthorizedSession(clearVaultSession), [])
+
   useEffect(() => {
     if (!session || !masterKey) {
       setDecryptedSecrets([])
@@ -298,16 +317,6 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     }
 
     window.localStorage.removeItem(UNLOCKED_STATE_STORAGE_KEY)
-  }
-
-  const clearUnlockedSession = () => {
-    setAccessToken(null)
-    setSession(null)
-    setMasterKey(null)
-    setPendingLogin(null)
-    setDecryptedSecrets([])
-    setSkippedSecretsCount(0)
-    setUnlockedState(null)
   }
 
   const completeAuthenticatedSession = async (
@@ -800,9 +809,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
         await orpcClient.auth.logout({})
       }
     } finally {
-      clearUnlockedSession()
-      setRefreshToken(null)
-      setLockedState(null)
+      clearVaultSession()
     }
   }
 

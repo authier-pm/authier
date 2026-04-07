@@ -1,9 +1,10 @@
-import { createORPCClient } from '@orpc/client'
+import { createORPCClient, ORPCError } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
 import type { ContractRouterClient } from '@orpc/contract'
 import { createTanstackQueryUtils } from '@orpc/tanstack-query'
 import { vaultApiContract } from '@shared/orpc/contract'
 import { apiOrigin } from '@/env'
+import { notifyUnauthorizedSession } from './authEvents'
 import { getAccessToken } from './accessToken'
 
 const link = new RPCLink({
@@ -16,7 +17,23 @@ const link = new RPCLink({
           authorization: `Bearer ${token}`
         }
       : {}
-  }
+  },
+  interceptors: [
+    async ({ next }) => {
+      try {
+        return await next()
+      } catch (error) {
+        if (
+          error instanceof ORPCError &&
+          (error.code === 'UNAUTHORIZED' || error.status === 401)
+        ) {
+          notifyUnauthorizedSession()
+        }
+
+        throw error
+      }
+    }
+  ]
 })
 
 export const orpcClient: ContractRouterClient<typeof vaultApiContract> =
