@@ -7,3 +7,5 @@ packages:
   - '!backend/dist/**'
   - '!vault-web/dist/**'
   - '!web-extension/dist/**'
+
+# minimumReleaseAge: 1440
