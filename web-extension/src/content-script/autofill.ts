@@ -2,7 +2,7 @@ import { bodyInputChangeEmitter } from './domMutationObserver'
 import { generateSync } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
-import { isElementInViewport, isHidden } from './isElementInViewport'
+import { isElementVisibleInViewport } from './isElementInViewport'
 import { domRecorder, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
 import { authierColors } from '../../../shared/chakraRawTheme'
@@ -330,8 +330,8 @@ export const autofillValueIntoInput = (
     filledElements.add(element)
   }
 
-  if (isElementInViewport(element) === false || isHidden(element)) {
-    log('isHidden')
+  if (!isElementVisibleInViewport(element)) {
+    log('input is not visible in viewport, skipping autofill')
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
   }
 
@@ -694,7 +694,11 @@ export const autofill = (initState: IInitStateRes) => {
     if (filledElements.size === 2) {
       const filledElementsArray = Array.from(filledElements)
       const form = filledElementsArray[0]?.form
-      if (form) {
+      const areFilledElementsVisible = filledElementsArray.every((inputEl) =>
+        isElementVisibleInViewport(inputEl)
+      )
+
+      if (form && isElementVisibleInViewport(form) && areFilledElementsVisible) {
         const clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,
@@ -721,6 +725,10 @@ export const autofill = (initState: IInitStateRes) => {
             `Submitted autofilled form for user "${notAPasswordInput.value}"`
           )
         }
+      } else {
+        log(
+          'skipping submit for autofilled form because form or filled inputs are not visible in viewport'
+        )
       }
     }
 
