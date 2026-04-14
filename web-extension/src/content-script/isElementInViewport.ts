@@ -18,7 +18,31 @@ export function isElementInViewport(el: HTMLElement): boolean {
   )
 }
 
-export function isHidden(el) {
+export function isHidden(el: HTMLElement): boolean {
   const style = window.getComputedStyle(el)
-  return style.display === 'none'
+  const isHiddenAttributeSet = el.hidden === true
+
+  return (
+    style.display === 'none' ||
+    style.visibility === 'hidden' ||
+    style.visibility === 'collapse' ||
+    style.opacity === '0' ||
+    isHiddenAttributeSet
+  )
+}
+
+export function isElementVisibleInViewport(el: HTMLElement): boolean {
+  if (!el.isConnected) {
+    return false
+  }
+
+  if (el.getClientRects().length === 0) {
+    return false
+  }
+
+  if (isHidden(el)) {
+    return false
+  }
+
+  return isElementInViewport(el)
 }
