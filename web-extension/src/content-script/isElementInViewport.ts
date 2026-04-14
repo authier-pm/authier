@@ -20,12 +20,14 @@ export function isElementInViewport(el: HTMLElement): boolean {
 
 export function isHidden(el: HTMLElement): boolean {
   const style = window.getComputedStyle(el)
+  const isHiddenAttributeSet = el.hidden === true
+
   return (
     style.display === 'none' ||
     style.visibility === 'hidden' ||
     style.visibility === 'collapse' ||
     style.opacity === '0' ||
-    el.hidden
+    isHiddenAttributeSet
   )
 }
 
