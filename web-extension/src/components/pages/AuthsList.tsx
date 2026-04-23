@@ -16,6 +16,9 @@ import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { PopupActionsEnum } from './PopupActionsEnum'
 import { SquareMousePointer } from './SquareMousePointerIcon'
+import { useRemoveWebInputMutation } from '../vault/VaultItemSettings.codegen'
+import { device } from '@src/background/ExtensionDevice'
+import { getWebInputsForUrl } from '@src/background/getWebInputsForUrl'
 
 const log = debug('au:AuthsList')
 
@@ -178,6 +181,7 @@ export const AuthsList = ({
     currentURL,
     searchSecrets
   } = useContext(DeviceStateContext)
+  const [removeWebInput] = useRemoveWebInputMutation()
 
   if (!deviceState) {
     return null
@@ -212,6 +216,9 @@ export const AuthsList = ({
   )
 
   const hasNoSecrets = deviceState.secrets.length === 0
+  const matchingWebInputsForCurrentPage = currentURL
+    ? getWebInputsForUrl(currentURL)
+    : []
   const totps = searchSecrets(search, [EncryptedSecretType.TOTP]) as ITOTPSecret[]
   const creds = searchSecrets(search, [
     EncryptedSecretType.LOGIN_CREDENTIALS
@@ -260,6 +267,41 @@ export const AuthsList = ({
       {hasNoSecrets ? (
         <div className="px-2 py-3 text-sm text-[color:var(--color-muted)]">
           Start by adding a login secret or TOTP code
+        </div>
+      ) : null}
+
+      {filterByTLD &&
+      currentURL &&
+      matchingWebInputsForCurrentPage.length > 0 ? (
+        <div className="mt-2 px-2 pb-2">
+          <Button
+            className="w-full"
+            variant="outline"
+            onClick={async () => {
+              await Promise.all(
+                matchingWebInputsForCurrentPage.map(({ id }) =>
+                  removeWebInput({
+                    variables: {
+                      id
+                    }
+                  })
+                )
+              )
+
+              const removedIds = new Set(
+                matchingWebInputsForCurrentPage.map(({ id }) => id)
+              )
+
+              const remainingWebInputs =
+                device.state?.webInputs.filter((webInput) => {
+                  return !removedIds.has(webInput.id)
+                }) ?? []
+
+              device.setWebInputs(remainingWebInputs)
+            }}
+          >
+            {t`Remove saved autofill inputs for this page`}
+          </Button>
         </div>
       ) : null}
     </div>
