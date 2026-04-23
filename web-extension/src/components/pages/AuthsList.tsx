@@ -16,6 +16,10 @@ import { getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { PopupActionsEnum } from './PopupActionsEnum'
 import { SquareMousePointer } from './SquareMousePointerIcon'
+import { useRemoveWebInputMutation } from '../vault/VaultItemSettings.codegen'
+import { device } from '@src/background/ExtensionDevice'
+import { getWebInputsForUrl } from '@src/background/getWebInputsForUrl'
+import type { WebInputForAutofill } from '@src/background/WebInputForAutofill'
 
 const log = debug('au:AuthsList')
 
@@ -178,6 +182,7 @@ export const AuthsList = ({
     currentURL,
     searchSecrets
   } = useContext(DeviceStateContext)
+  const [removeWebInput] = useRemoveWebInputMutation()
 
   if (!deviceState) {
     return null
@@ -212,6 +217,24 @@ export const AuthsList = ({
   )
 
   const hasNoSecrets = deviceState.secrets.length === 0
+  const matchingWebInputsForCurrentPage = currentURL
+    ? getWebInputsForUrl(currentURL)
+    : []
+
+  const removeOneWebInput = async (webInput: WebInputForAutofill) => {
+    await removeWebInput({
+      variables: {
+        id: webInput.id
+      }
+    })
+
+    const remainingWebInputs =
+      device.state?.webInputs.filter((savedWebInput) => {
+        return savedWebInput.id !== webInput.id
+      }) ?? []
+
+    device.setWebInputs(remainingWebInputs)
+  }
   const totps = searchSecrets(search, [EncryptedSecretType.TOTP]) as ITOTPSecret[]
   const creds = searchSecrets(search, [
     EncryptedSecretType.LOGIN_CREDENTIALS
@@ -260,6 +283,34 @@ export const AuthsList = ({
       {hasNoSecrets ? (
         <div className="px-2 py-3 text-sm text-[color:var(--color-muted)]">
           Start by adding a login secret or TOTP code
+        </div>
+      ) : null}
+
+      {filterByTLD &&
+      currentURL &&
+      matchingWebInputsForCurrentPage.length > 0 ? (
+        <div className="mt-2 px-2 pb-2">
+          <div className="mb-2 text-xs text-[color:var(--color-muted)]">
+            {t`Remove matched web input`}
+          </div>
+
+          <div className="grid gap-2">
+            {matchingWebInputsForCurrentPage.map((webInput) => (
+              <Button
+                className="w-full justify-between gap-2"
+                key={webInput.id}
+                variant="outline"
+                onClick={async () => {
+                  await removeOneWebInput(webInput)
+                }}
+              >
+                <span className="truncate text-left text-xs">
+                  {webInput.kind}: {webInput.domPath}
+                </span>
+                <span className="shrink-0">{t`Remove`}</span>
+              </Button>
+            ))}
+          </div>
         </div>
       ) : null}
     </div>
