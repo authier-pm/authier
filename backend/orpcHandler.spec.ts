@@ -383,12 +383,12 @@ describe('oRPC handler', () => {
       id: rejectedChallenge.challengeId
     })
 
-    expect(
-      await rejectedClient.auth.requestDeviceChallenge({
+    await expect(
+      rejectedClient.auth.requestDeviceChallenge({
         email: masterBrowser.email,
         deviceInput: rejectedDevice
       })
-    ).toMatchObject({
+    ).rejects.toMatchObject({
       code: 'BAD_REQUEST',
       message: 'Login failed, try again later.'
     })
