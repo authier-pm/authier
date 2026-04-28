@@ -105,7 +105,7 @@
     "webpack-merge": "^6.0.1"
   },
   "dependencies": {
-    "@apollo/client": "^4.1.6",
+    "@apollo/client": "^4.1.9",
     "@apollo/react-hooks": "^4.0.0",
     "@capaj/trpc-browser": "^1.5.3",
     "@chakra-ui/color-mode": "^2.2.0",
@@ -116,7 +116,6 @@
     "@emotion/styled": "11.14.1",
     "@hookform/resolvers": "^5.2.2",
     "@lingui/cli": "^6.0.0",
-    "@lingui/macro": "^5.9.5",
     "@radix-ui/react-slot": "^1.2.4",
     "@radix-ui/react-tooltip": "^1.2.8",
     "@sentry/browser": "^10.50.0",
