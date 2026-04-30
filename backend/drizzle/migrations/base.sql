@@ -96,10 +96,11 @@ CREATE TABLE "MasterDeviceResetRequest" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"processAt" timestamp(3) NOT NULL,
+	"expiresAt" timestamp(3) NOT NULL,
 	"confirmedAt" timestamp(3),
 	"completedAt" timestamp(3),
 	"rejectedAt" timestamp(3),
-	"confirmationToken" text NOT NULL,
+	"confirmationTokenHash" text NOT NULL,
 	"targetMasterDeviceId" text NOT NULL,
 	"decryptionChallengeId" integer NOT NULL,
 	"userId" uuid NOT NULL
@@ -226,7 +227,7 @@ CREATE UNIQUE INDEX "EmailVerification_token_key" ON "EmailVerification" ("token
 --> statement-breakpoint
 CREATE UNIQUE INDEX "MasterDeviceResetRequest_decryptionChallengeId_key" ON "MasterDeviceResetRequest" ("decryptionChallengeId");
 --> statement-breakpoint
-CREATE UNIQUE INDEX "MasterDeviceResetRequest_confirmationToken_key" ON "MasterDeviceResetRequest" ("confirmationToken");
+CREATE UNIQUE INDEX "MasterDeviceResetRequest_confirmationTokenHash_key" ON "MasterDeviceResetRequest" ("confirmationTokenHash");
 --> statement-breakpoint
 CREATE UNIQUE INDEX "Tag_userId_name_key" ON "Tag" ("userId","name");
 --> statement-breakpoint
@@ -255,6 +256,8 @@ CREATE INDEX "EncryptedSecret_userId_idx" ON "EncryptedSecret" ("userId");
 CREATE INDEX "MasterDeviceResetRequest_userId_idx" ON "MasterDeviceResetRequest" ("userId");
 --> statement-breakpoint
 CREATE INDEX "MasterDeviceResetRequest_processAt_idx" ON "MasterDeviceResetRequest" ("processAt");
+--> statement-breakpoint
+CREATE INDEX "MasterDeviceResetRequest_expiresAt_idx" ON "MasterDeviceResetRequest" ("expiresAt");
 --> statement-breakpoint
 CREATE INDEX "SecretUsageEvent_secretId_idx" ON "SecretUsageEvent" ("secretId");
 --> statement-breakpoint

@@ -1,5 +1,5 @@
 import debug from 'debug'
-import { and, eq, isNotNull, isNull, lte } from 'drizzle-orm'
+import { and, eq, gt, isNotNull, isNull, lte } from 'drizzle-orm'
 import { createRequestDb } from '../prisma/prismaClient'
 import * as schema from '../drizzle/schema'
 import { sendEmail } from '../utils/email'
@@ -150,7 +150,13 @@ export const processPendingMasterDeviceResets = async (now = new Date()) => {
           isNull(schema.masterDeviceResetRequest.completedAt),
           isNull(schema.masterDeviceResetRequest.rejectedAt),
           isNotNull(schema.masterDeviceResetRequest.confirmedAt),
-          lte(schema.masterDeviceResetRequest.processAt, now)
+          lte(schema.masterDeviceResetRequest.processAt, now),
+          // Belt-and-braces: don't process a confirmation whose token has
+          // already expired. The /confirm endpoint refuses to set
+          // confirmedAt past expiresAt, so this should never fire — but if
+          // it ever did (e.g. a bad migration), we'd rather skip than
+          // silently delete a master device.
+          gt(schema.masterDeviceResetRequest.expiresAt, now)
         )
       )
 

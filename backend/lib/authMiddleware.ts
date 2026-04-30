@@ -56,11 +56,21 @@ export const throwIfNotAuthenticated: MiddlewareFn<
       id: context.jwtPayload.userId
     },
     columns: {
-      masterDeviceId: true
+      masterDeviceId: true,
+      tokenVersion: true
     }
   })
 
   if (!user) {
+    context.reply.clearCookie('access-token')
+    throw new GraphqlErrorUnauthorized('not authenticated')
+  }
+  // Reject access tokens issued before the latest tokenVersion bump so that
+  // password-change / master-device reset flows immediately invalidate
+  // already-handed-out access tokens (refresh tokens are checked at
+  // /refresh_token, but without this check access tokens would survive
+  // until natural expiry).
+  if (user.tokenVersion !== context.jwtPayload.tokenVersion) {
     context.reply.clearCookie('access-token')
     throw new GraphqlErrorUnauthorized('not authenticated')
   }

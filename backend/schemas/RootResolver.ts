@@ -53,8 +53,20 @@ import type {
 } from '../models/types/ContextTypes'
 import { eq, and, or, like, sql, gte, count, isNull, desc } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
+import { createHash } from 'crypto'
 
 const log = debug('au:RootResolver')
+
+// Confirmation links for master-device-reset are valid for 7 days from the
+// moment they are created. Anything still outstanding past that window is
+// considered abandoned and must be re-initiated.
+const MASTER_DEVICE_RESET_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
+
+// SHA-256 of a 122-bit UUID is sufficient — these tokens have plenty of
+// entropy on their own, so we just need a one-way function to make DB
+// reads non-actionable. (No bcrypt/argon2 needed for high-entropy tokens.)
+export const hashMasterDeviceResetToken = (token: string) =>
+  createHash('sha256').update(token).digest('hex')
 
 type PushDeliveryCounts = {
   pushNotificationsSentCount: number
@@ -650,7 +662,14 @@ export class RootResolver {
     const processAt = new Date(
       requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000
     )
+    const expiresAt = new Date(
+      Math.max(
+        processAt.getTime(),
+        requestedAt.getTime() + MASTER_DEVICE_RESET_TOKEN_TTL_MS
+      )
+    )
     const confirmationToken = crypto.randomUUID()
+    const confirmationTokenHash = hashMasterDeviceResetToken(confirmationToken)
 
     const [existingResetRequestForChallenge] = await ctx.db
       .select({
@@ -668,10 +687,11 @@ export class RootResolver {
         .set({
           createdAt: requestedAt,
           processAt,
+          expiresAt,
           confirmedAt: null,
           completedAt: null,
           rejectedAt: null,
-          confirmationToken,
+          confirmationTokenHash,
           targetMasterDeviceId: user.masterDeviceId
         })
         .where(
@@ -684,9 +704,10 @@ export class RootResolver {
       await ctx.db.insert(schema.masterDeviceResetRequest).values({
         userId: user.id,
         decryptionChallengeId: challenge.id,
-        confirmationToken,
+        confirmationTokenHash,
         targetMasterDeviceId: user.masterDeviceId,
-        processAt
+        processAt,
+        expiresAt
       })
     }
 

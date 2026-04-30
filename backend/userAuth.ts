@@ -9,7 +9,7 @@ import { isProd } from './envUtils'
 import type { IContext } from './models/types/ContextTypes'
 
 export const setNewAccessTokenIntoCookie = (
-  user: Pick<User, 'id'>,
+  user: Pick<User, 'id' | 'tokenVersion'>,
   device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>,
   ctx: IContext
 ) => {
@@ -25,11 +25,18 @@ export const setNewAccessTokenIntoCookie = (
 }
 
 export const createAccessToken = (
-  user: Pick<User, 'id'>,
+  user: Pick<User, 'id' | 'tokenVersion'>,
   device: Pick<Device, 'id' | 'vaultLockTimeoutSeconds'>
 ) =>
   sign(
-    { userId: user.id, deviceId: device.id },
+    {
+      userId: user.id,
+      deviceId: device.id,
+      // tokenVersion lets the server invalidate already-issued access tokens
+      // (e.g. on master-device reset or password change) by bumping the
+      // user.tokenVersion column.
+      tokenVersion: user.tokenVersion
+    },
     process.env.ACCESS_TOKEN_SECRET!,
     {
       jwtid: crypto.randomUUID(),

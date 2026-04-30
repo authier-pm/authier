@@ -30,7 +30,7 @@ import { SecretUsageEventGQLScalars } from './generated/SecretUsageEventGQL'
 import { MasterDeviceChangeGQL } from './generated/MasterDeviceChangeGQL'
 import { GraphqlError } from '../lib/GraphqlError'
 import debug from 'debug'
-import { setNewRefreshToken } from '../userAuth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
 import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
@@ -400,7 +400,12 @@ export class UserMutation extends UserBase {
       }
     })
 
-    setNewRefreshToken(targetUser, ctx.device, ctx) // set new refresh token to force all other devices to re-login
+    // Bumping tokenVersion above invalidates every access token already in
+    // flight (forcing other devices to re-login on next request). Re-issue
+    // both tokens for THIS device so the originating client doesn't 401 on
+    // its very next request.
+    setNewRefreshToken(targetUser, ctx.device, ctx)
+    setNewAccessTokenIntoCookie(targetUser, ctx.device, ctx)
     return input.secrets.length
   }
 

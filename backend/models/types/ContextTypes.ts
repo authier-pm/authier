@@ -19,6 +19,7 @@ export interface IContext {
 export interface IJWTPayload {
   userId: string
   deviceId: string
+  tokenVersion: number
 }
 
 export interface IContextAuthenticated extends IContext {

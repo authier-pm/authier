@@ -68,11 +68,20 @@ export const loadAuthenticatedContextByIds = async (
   const user = await ctx.db.query.user.findFirst({
     where: { id: payload.userId },
     columns: {
-      masterDeviceId: true
+      masterDeviceId: true,
+      tokenVersion: true
     }
   })
 
   if (!user) {
+    throw new ORPCError('UNAUTHORIZED', {
+      message: 'not authenticated'
+    })
+  }
+
+  // See authMiddleware.ts — bumping user.tokenVersion must immediately
+  // invalidate any access token already in flight, not just future refreshes.
+  if (user.tokenVersion !== payload.tokenVersion) {
     throw new ORPCError('UNAUTHORIZED', {
       message: 'not authenticated'
     })

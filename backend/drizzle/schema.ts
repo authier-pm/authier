@@ -249,10 +249,14 @@ export const masterDeviceResetRequest = pgTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     processAt: timestamp({ precision: 3 }).notNull(),
+    expiresAt: timestamp({ precision: 3 }).notNull(),
     confirmedAt: timestamp({ precision: 3 }),
     completedAt: timestamp({ precision: 3 }),
     rejectedAt: timestamp({ precision: 3 }),
-    confirmationToken: text().notNull(),
+    // SHA-256 hex digest of the confirmation token. The plaintext token is
+    // emailed to the user once and never persisted, so a DB read does not
+    // grant takeover even during an active cooldown window.
+    confirmationTokenHash: text().notNull(),
     targetMasterDeviceId: text().notNull(),
     decryptionChallengeId: integer()
       .notNull()
@@ -277,9 +281,13 @@ export const masterDeviceResetRequest = pgTable(
       'btree',
       table.processAt.asc().nullsLast()
     ),
-    uniqueIndex('MasterDeviceResetRequest_confirmationToken_key').using(
+    uniqueIndex('MasterDeviceResetRequest_confirmationTokenHash_key').using(
       'btree',
-      table.confirmationToken.asc().nullsLast()
+      table.confirmationTokenHash.asc().nullsLast()
+    ),
+    index('MasterDeviceResetRequest_expiresAt_idx').using(
+      'btree',
+      table.expiresAt.asc().nullsLast()
     )
   ]
 )

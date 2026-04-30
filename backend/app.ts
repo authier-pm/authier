@@ -17,7 +17,8 @@ import debug from 'debug'
 import { healthReportHandler } from './healthReportRoute'
 import { webhookHandler } from './stripeWebhook'
 import * as schema from './drizzle/schema'
-import { and, eq, isNull } from 'drizzle-orm'
+import { and, eq, gt, isNull } from 'drizzle-orm'
+import { hashMasterDeviceResetToken } from './schemas/RootResolver'
 import {
   type LegacyElysiaContext,
   createLegacyReplyAdapter,
@@ -244,15 +245,24 @@ export const buildApp = (app = new Elysia()) => {
 
       const requestDb = createRequestDb()
       try {
+        // Look up by hash, not by the plaintext token: the DB only stores
+        // SHA-256(token) so a DB read alone cannot be used to confirm a
+        // pending reset. The plaintext token is single-use leverage that
+        // only exists in the user's email inbox.
+        const tokenHash = hashMasterDeviceResetToken(token)
+        const now = new Date()
         const [resetRequest] = await requestDb.db
           .select({
             id: schema.masterDeviceResetRequest.id,
             completedAt: schema.masterDeviceResetRequest.completedAt,
             confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
-            rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+            rejectedAt: schema.masterDeviceResetRequest.rejectedAt,
+            expiresAt: schema.masterDeviceResetRequest.expiresAt
           })
           .from(schema.masterDeviceResetRequest)
-          .where(eq(schema.masterDeviceResetRequest.confirmationToken, token))
+          .where(
+            eq(schema.masterDeviceResetRequest.confirmationTokenHash, tokenHash)
+          )
           .limit(1)
 
         if (!resetRequest) {
@@ -267,18 +277,23 @@ export const buildApp = (app = new Elysia()) => {
           return redirectWithStatus('rejected')
         }
 
+        if (resetRequest.expiresAt <= now) {
+          return redirectWithStatus('expired')
+        }
+
         if (!resetRequest.confirmedAt) {
           await requestDb.db
             .update(schema.masterDeviceResetRequest)
             .set({
-              confirmedAt: new Date()
+              confirmedAt: now
             })
             .where(
               and(
                 eq(schema.masterDeviceResetRequest.id, resetRequest.id),
                 isNull(schema.masterDeviceResetRequest.completedAt),
                 isNull(schema.masterDeviceResetRequest.rejectedAt),
-                isNull(schema.masterDeviceResetRequest.confirmedAt)
+                isNull(schema.masterDeviceResetRequest.confirmedAt),
+                gt(schema.masterDeviceResetRequest.expiresAt, now)
               )
             )
         }
