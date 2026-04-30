@@ -769,9 +769,19 @@ If this was not you, ignore this email or reject the login request from your cur
         return []
       }
 
+      // By design we return web inputs added by ANY user — the table is a
+      // shared corpus of form-field selectors so the extension can autofill
+      // sites it has not seen on this account yet. Do not filter by
+      // addedByUserId here.
       const formattedDomains = hosts.map((url) => {
         const strippedUrl = url.replace('www.', '')
-        return `%${strippedUrl}`
+        // Escape LIKE metacharacters in user input so callers cannot pass
+        // wildcards like `_` or `%` to widen the match.
+        const escaped = strippedUrl
+          .replace(/\\/g, '\\\\')
+          .replace(/%/g, '\\%')
+          .replace(/_/g, '\\_')
+        return `%${escaped}`
       })
 
       // TODO only return new web inputs created after last sync
