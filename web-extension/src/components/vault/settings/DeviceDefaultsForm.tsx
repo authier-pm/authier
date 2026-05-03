@@ -104,7 +104,8 @@ export function DeviceDefaultsForm() {
             syncTOTP: data.me.defaultDeviceSettings.syncTOTP,
             vaultLockTimeoutSeconds:
               data.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
-            deviceRecoveryCooldownMinutes: data.me.deviceRecoveryCooldownMinutes,
+            deviceRecoveryCooldownMinutes:
+              data.me.deviceRecoveryCooldownMinutes,
             theme: data.me.defaultDeviceSettings.theme,
             uiLanguage: data.me.uiLanguage
           }}

@@ -10,8 +10,17 @@ import { Button, buttonVariants } from '@src/components/ui/button'
 import { Card, CardContent } from '@src/components/ui/card'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { useAppToast } from '@src/ExtensionProviders'
-import { pathNameToTypes, type ILoginSecret, type ITOTPSecret } from '@src/util/useDeviceState'
-import { CopyIcon, EditIcon, ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
+import {
+  pathNameToTypes,
+  type ILoginSecret,
+  type ITOTPSecret
+} from '@src/util/useDeviceState'
+import {
+  CopyIcon,
+  EditIcon,
+  ViewIcon,
+  ViewOffIcon
+} from '@src/components/ui/icons'
 import {
   getMaskedSecretValue,
   getSecretCopyValue,
@@ -91,7 +100,10 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
       >
         {Array.from(
           {
-            length: Math.max(0, virtualWindow.endIndex - virtualWindow.startIndex + 1)
+            length: Math.max(
+              0,
+              virtualWindow.endIndex - virtualWindow.startIndex + 1
+            )
           },
           (_, offsetIndex) => {
             const rowIndex = virtualWindow.startIndex + offsetIndex
@@ -124,11 +136,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   )
 }
 
-function VaultListCard({
-  secret
-}: {
-  secret: ILoginSecret | ITOTPSecret
-}) {
+function VaultListCard({ secret }: { secret: ILoginSecret | ITOTPSecret }) {
   const [isSecretVisible, setIsSecretVisible] = useState(false)
   const toast = useAppToast()
   const secretUrl = getSecretUrl(secret)
@@ -183,7 +191,9 @@ function VaultListCard({
               <Button
                 aria-label={isTotp ? t`Copy token` : t`Copy`}
                 onClick={async () => {
-                  await navigator.clipboard.writeText(getSecretCopyValue(secret))
+                  await navigator.clipboard.writeText(
+                    getSecretCopyValue(secret)
+                  )
                   toast({
                     title: t`Copied to clipboard`,
                     status: 'success'

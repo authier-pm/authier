@@ -93,7 +93,9 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
                 content={tableView ? t`Show card view` : t`Show table view`}
               >
                 <Button
-                  aria-label={tableView ? t`Show card view` : t`Show table view`}
+                  aria-label={
+                    tableView ? t`Show card view` : t`Show table view`
+                  }
                   onClick={async () => {
                     await browser.storage.sync.set({
                       vaultTableView: !tableView

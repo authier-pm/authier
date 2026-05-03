@@ -85,10 +85,10 @@ export const Txt = ({
     <p
       className={cn('text-[color:var(--color-foreground)]', className)}
       style={{
-        background: bg ? colorMap[bg] ?? bg : undefined,
+        background: bg ? (colorMap[bg] ?? bg) : undefined,
         bottom: spacingValue(bottom),
-        color: color ? colorMap[color] ?? color : undefined,
-        fontSize: fontSize ? fontSizeMap[fontSize] ?? fontSize : undefined,
+        color: color ? (colorMap[color] ?? color) : undefined,
+        fontSize: fontSize ? (fontSizeMap[fontSize] ?? fontSize) : undefined,
         fontWeight,
         left: spacingValue(left),
         marginBottom: spacingValue(mb),
@@ -98,7 +98,7 @@ export const Txt = ({
         paddingInline: spacingValue(px),
         paddingBlock: spacingValue(py),
         position,
-        borderRadius: rounded ? radiusMap[rounded] ?? rounded : undefined,
+        borderRadius: rounded ? (radiusMap[rounded] ?? rounded) : undefined,
         textOverflow: noOfLines ? 'ellipsis' : undefined,
         textTransform,
         top: spacingValue(top),

@@ -32,9 +32,9 @@ export const getUsernameFromCapturedInputs = (
     .map(({ inputted }) => normalizeInputtedValue(inputted))
     .filter((inputted): inputted is string => Boolean(inputted))
 
-  const emailInput = [...nonPasswordInputs].reverse().find((inputted) =>
-    isLikelyEmail(inputted)
-  )
+  const emailInput = [...nonPasswordInputs]
+    .reverse()
+    .find((inputted) => isLikelyEmail(inputted))
 
   if (emailInput) {
     return emailInput
@@ -49,7 +49,9 @@ export const getSingleVisibleEmailFromPage = (
 ) => {
   const currentHostname = hostname.replace('www.', '')
   const matchedEmailsInText = [
-    ...new Set(pageText.match(simpleEmailGlobalRegex)?.map((item) => item.trim()))
+    ...new Set(
+      pageText.match(simpleEmailGlobalRegex)?.map((item) => item.trim())
+    )
   ].filter((email) => email.includes(currentHostname) === false)
 
   if (matchedEmailsInText.length === 1) {
@@ -95,7 +97,9 @@ export class DOMEventsRecorder {
 
         if (kind === null) {
           const nextEventIsPassword = nextEvent?.kind === WebInputType.PASSWORD
-          const eventType = nextEventIsPassword ? 'inferred-username' : 'unknown'
+          const eventType = nextEventIsPassword
+            ? 'inferred-username'
+            : 'unknown'
           console.warn(`Skipping ${eventType} web input`, element)
         }
 

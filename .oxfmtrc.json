@@ -1,0 +1,15 @@
+{
+  "arrowParens": "always",
+  "trailingComma": "none",
+  "singleQuote": true,
+  "semi": false,
+  "bracketSpacing": true,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "node_modules/*",
+    "*.snap",
+    "**/*.codegen.*",
+    "pnpm-lock.yaml"
+  ]
+}

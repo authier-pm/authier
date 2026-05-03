@@ -54,7 +54,8 @@ vi.mock('@/lib/orpc', () => ({
 
 type SessionBootstrap = VaultApiOutputs['session']['bootstrap']
 type SecretRecord = SessionBootstrap['secrets'][number]
-type SyncedSecretRecord = VaultApiOutputs['session']['syncSecrets']['secrets'][number]
+type SyncedSecretRecord =
+  VaultApiOutputs['session']['syncSecrets']['secrets'][number]
 
 const createSession = ({
   secrets,
@@ -146,8 +147,13 @@ function VaultSessionHarness() {
     <div>
       <p data-testid="status">{status}</p>
       <p data-testid="sync-state">{isSyncingVault ? 'syncing' : 'idle'}</p>
-      <p data-testid="last-sync">{session?.currentDevice.lastSyncAt ?? 'never'}</p>
-      <button onClick={() => void unlockVault('super secure password')} type="button">
+      <p data-testid="last-sync">
+        {session?.currentDevice.lastSyncAt ?? 'never'}
+      </p>
+      <button
+        onClick={() => void unlockVault('super secure password')}
+        type="button"
+      >
         Unlock
       </button>
       <button onClick={() => void syncVault()} type="button">
@@ -250,7 +256,10 @@ describe('VaultSessionProvider', () => {
       salt
     )
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     window.localStorage.setItem(
       'authier-vault-locked-state',
       JSON.stringify({
@@ -376,9 +385,9 @@ describe('VaultSessionProvider', () => {
       expect(screen.getByText('GitHub Updated')).toBeInTheDocument()
     })
     expect(orpcMocks.updateSecret).toHaveBeenCalledOnce()
-    expect(orpcMocks.updateSecret.mock.calls[0]?.[0].patch.encrypted).not.toContain(
-      'rotated-password'
-    )
+    expect(
+      orpcMocks.updateSecret.mock.calls[0]?.[0].patch.encrypted
+    ).not.toContain('rotated-password')
 
     await user.click(screen.getByRole('button', { name: 'Delete' }))
 
@@ -441,7 +450,10 @@ describe('VaultSessionProvider', () => {
       pendingChallenges: []
     }
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     window.localStorage.setItem(
       'authier-vault-locked-state',
       JSON.stringify({
@@ -489,7 +501,10 @@ describe('VaultSessionProvider', () => {
     const masterKey = await generateEncryptionKey(password, salt)
     const deviceSecrets = await initLocalDeviceAuthSecret(masterKey, salt)
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     window.localStorage.setItem(
       'authier-vault-locked-state',
       JSON.stringify({
@@ -534,9 +549,13 @@ describe('VaultSessionProvider', () => {
       expect(screen.getByTestId('status')).toHaveTextContent('guest')
     })
     expect(window.localStorage.getItem('authier-vault-access-token')).toBeNull()
-    expect(window.localStorage.getItem('authier-vault-refresh-token')).toBeNull()
+    expect(
+      window.localStorage.getItem('authier-vault-refresh-token')
+    ).toBeNull()
     expect(window.localStorage.getItem('authier-vault-locked-state')).toBeNull()
-    expect(window.localStorage.getItem('authier-vault-unlocked-state')).toBeNull()
+    expect(
+      window.localStorage.getItem('authier-vault-unlocked-state')
+    ).toBeNull()
   })
 
   it('re-authenticates the trusted device on unlock when the refresh token is missing', async () => {
@@ -677,7 +696,10 @@ describe('VaultSessionProvider', () => {
       salt
     )
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     storeLockedState({
       authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
       encryptionSalt
@@ -812,7 +834,10 @@ describe('VaultSessionProvider', () => {
       ]
     })
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     storeLockedState({
       authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
       encryptionSalt
@@ -902,7 +927,10 @@ describe('VaultSessionProvider', () => {
       salt
     )
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     storeLockedState({
       authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
       encryptionSalt
@@ -1006,7 +1034,10 @@ describe('VaultSessionProvider', () => {
       salt
     )
 
-    window.localStorage.setItem('authier-vault-refresh-token', 'refresh-token-1')
+    window.localStorage.setItem(
+      'authier-vault-refresh-token',
+      'refresh-token-1'
+    )
     storeLockedState({
       authSecretEncrypted: deviceSecrets.addDeviceSecretEncrypted,
       encryptionSalt

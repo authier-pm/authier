@@ -116,9 +116,7 @@ describe('PasswordGenerationHistory', () => {
 
     renderPage()
 
-    expect(
-      await screen.findByText('Password generation history')
-    ).toBeTruthy()
+    expect(await screen.findByText('Password generation history')).toBeTruthy()
     expect(screen.getByText('accounts.google.com')).toBeTruthy()
     expect(screen.getByText('github.com')).toBeTruthy()
     expect(screen.getByText('Saved')).toBeTruthy()
@@ -127,16 +125,12 @@ describe('PasswordGenerationHistory', () => {
 
     expect(await screen.findByText('Save generated password')).toBeTruthy()
 
-    await user.click(
-      screen.getByRole('button', { name: 'Save credential' })
-    )
+    await user.click(screen.getByRole('button', { name: 'Save credential' }))
 
     expect(await screen.findByText('Required')).toBeTruthy()
 
     await user.type(screen.getByLabelText('Username'), 'new-user')
-    await user.click(
-      screen.getByRole('button', { name: 'Save credential' })
-    )
+    await user.click(screen.getByRole('button', { name: 'Save credential' }))
 
     await waitFor(() => {
       expect(device.state!.addSecrets).toHaveBeenCalledTimes(1)

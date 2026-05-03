@@ -60,8 +60,12 @@ export function DevicesPage() {
 
   const devices = data?.me?.devices ?? []
   const masterDeviceId = data?.me?.masterDeviceId ?? ''
-  const currentDevice = devices.find((deviceInfo) => deviceInfo.id === device.id)
-  const otherDevices = devices.filter((deviceInfo) => deviceInfo.id !== device.id)
+  const currentDevice = devices.find(
+    (deviceInfo) => deviceInfo.id === device.id
+  )
+  const otherDevices = devices.filter(
+    (deviceInfo) => deviceInfo.id !== device.id
+  )
 
   const filteredOtherDevices = useMemo(() => {
     const normalizedFilter = filterBy.trim().toLowerCase()
@@ -119,7 +123,8 @@ export function DevicesPage() {
                   {devices.length} {t`devices`}
                 </div>
                 <div className="mt-2 text-sm text-[color:var(--color-muted)]">
-                  {currentDevice?.name ?? 'Current device'} is this vault session.
+                  {currentDevice?.name ?? 'Current device'} is this vault
+                  session.
                 </div>
               </div>
 
@@ -138,8 +143,8 @@ export function DevicesPage() {
                 icon={<FiStar className="size-4" />}
                 label="Master"
                 value={
-                  devices.find((deviceInfo) => deviceInfo.id === masterDeviceId)?.name ??
-                  'Not found'
+                  devices.find((deviceInfo) => deviceInfo.id === masterDeviceId)
+                    ?.name ?? 'Not found'
                 }
               />
               <MetricChip
@@ -285,7 +290,11 @@ function DeviceCard({ deviceInfo, masterDeviceId }: DeviceCardProps) {
   const [isConfigOpen, setIsConfigOpen] = useState(false)
   const [deviceName, setDeviceName] = useState(deviceInfo.name ?? '')
   const [lockTime, setLockTime] = useState(
-    String(deviceInfo.vaultLockTimeoutSeconds ?? vaultLockTimeoutOptions[0]?.value ?? 0)
+    String(
+      deviceInfo.vaultLockTimeoutSeconds ??
+        vaultLockTimeoutOptions[0]?.value ??
+        0
+    )
   )
   const [syncTOTP, setSyncTOTP] = useState(Boolean(deviceInfo.syncTOTP))
   const navigate = useNavigate()
@@ -306,8 +315,12 @@ function DeviceCard({ deviceInfo, masterDeviceId }: DeviceCardProps) {
                 </div>
                 <div className="min-w-0">
                   <div className="flex flex-wrap gap-2">
-                    {isCurrentDevice ? <StateBadge tone="primary">Current</StateBadge> : null}
-                    {isMasterDevice ? <StateBadge tone="warning">Master</StateBadge> : null}
+                    {isCurrentDevice ? (
+                      <StateBadge tone="primary">Current</StateBadge>
+                    ) : null}
+                    {isMasterDevice ? (
+                      <StateBadge tone="warning">Master</StateBadge>
+                    ) : null}
                     {isLoggedOut ? (
                       <StateBadge tone="danger">
                         <FiXCircle className="size-3.5" />
@@ -403,7 +416,11 @@ function DeviceCard({ deviceInfo, masterDeviceId }: DeviceCardProps) {
                 variant="ghost"
               >
                 <FiSettings className="size-4" />
-                {isCurrentDevice ? <Trans>Settings</Trans> : <Trans>Config</Trans>}
+                {isCurrentDevice ? (
+                  <Trans>Settings</Trans>
+                ) : (
+                  <Trans>Config</Trans>
+                )}
               </Button>
 
               <Button
@@ -483,10 +500,7 @@ function DeviceCard({ deviceInfo, masterDeviceId }: DeviceCardProps) {
                       Keep one-time password data synced to this device.
                     </div>
                   </div>
-                  <Switch
-                    checked={syncTOTP}
-                    onCheckedChange={setSyncTOTP}
-                  />
+                  <Switch checked={syncTOTP} onCheckedChange={setSyncTOTP} />
                 </div>
 
                 <div className="flex justify-end">
@@ -550,13 +564,7 @@ function MetricChip({
   )
 }
 
-function InlineStat({
-  label,
-  value
-}: {
-  label: string
-  value: string
-}) {
+function InlineStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] px-4 py-3">
       <div className="text-xs text-[color:var(--color-muted)]">{label}</div>
@@ -582,8 +590,7 @@ function StateBadge({
           'border-amber-400/30 bg-amber-400/10 text-amber-300',
         tone === 'success' &&
           'border-emerald-400/30 bg-emerald-400/10 text-emerald-300',
-        tone === 'danger' &&
-          'border-rose-400/30 bg-rose-400/10 text-rose-300'
+        tone === 'danger' && 'border-rose-400/30 bg-rose-400/10 text-rose-300'
       )}
     >
       {children}

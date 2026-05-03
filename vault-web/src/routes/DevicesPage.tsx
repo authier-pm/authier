@@ -49,7 +49,9 @@ export function DevicesPage() {
             >
               <CardContent className="space-y-3 p-5">
                 <div>
-                  <h3 className="text-lg font-semibold">{challenge.deviceName}</h3>
+                  <h3 className="text-lg font-semibold">
+                    {challenge.deviceName}
+                  </h3>
                   <p className="text-sm text-[color:var(--color-muted)]">
                     {challenge.ipAddress} ·{' '}
                     {new Date(challenge.createdAt).toLocaleString()}
@@ -133,7 +135,10 @@ export function DevicesPage() {
                 <div className="flex flex-wrap gap-2">
                   <Button
                     onClick={() => {
-                      const nextName = window.prompt('Rename device', device.name)
+                      const nextName = window.prompt(
+                        'Rename device',
+                        device.name
+                      )
 
                       if (!nextName) {
                         return
@@ -159,9 +164,11 @@ export function DevicesPage() {
                     <>
                       <Button
                         onClick={() => {
-                          void orpcClient.devices.logout({ id: device.id }).then(() => {
-                            void refreshLists()
-                          })
+                          void orpcClient.devices
+                            .logout({ id: device.id })
+                            .then(() => {
+                              void refreshLists()
+                            })
                         }}
                         size="sm"
                         type="button"
@@ -171,9 +178,11 @@ export function DevicesPage() {
                       </Button>
                       <Button
                         onClick={() => {
-                          void orpcClient.devices.remove({ id: device.id }).then(() => {
-                            void refreshLists()
-                          })
+                          void orpcClient.devices
+                            .remove({ id: device.id })
+                            .then(() => {
+                              void refreshLists()
+                            })
                         }}
                         size="sm"
                         type="button"

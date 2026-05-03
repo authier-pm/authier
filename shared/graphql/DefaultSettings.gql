@@ -14,7 +14,9 @@ mutation updateDefaultDeviceSettings($config: DefaultSettingsInput!) {
   }
 }
 
-mutation updateMasterDeviceResetTimeout($deviceRecoveryCooldownMinutes: NonNegativeInt!) {
+mutation updateMasterDeviceResetTimeout(
+  $deviceRecoveryCooldownMinutes: NonNegativeInt!
+) {
   me {
     setDeviceRecoveryCooldownMinutes(
       deviceRecoveryCooldownMinutes: $deviceRecoveryCooldownMinutes

@@ -62,7 +62,6 @@ jest.mock('@react-navigation/native', () => {
   }
 })
 
-
 // Mock crypto.subtle methods
 const subtleMock = {
   getRandomValues: jest.fn().mockReturnValue(new Uint8Array(12)),

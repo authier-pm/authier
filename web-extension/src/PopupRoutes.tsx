@@ -8,8 +8,7 @@ import { useLocation } from 'wouter'
 const log = debug('au:popupRoutes')
 
 export default function PopupRoutes(): ReactElement {
-  const { deviceState, lockedState } =
-    useContext(DeviceStateContext)
+  const { deviceState, lockedState } = useContext(DeviceStateContext)
 
   const [, setLocation] = useLocation()
 

@@ -12,12 +12,8 @@ import { useVaultSession } from '@/providers/VaultSessionProvider'
 
 export function AwaitingApprovalPage() {
   const navigate = useNavigate()
-  const {
-    pendingLogin,
-    pollPendingLogin,
-    requestMasterDeviceReset,
-    status
-  } = useVaultSession()
+  const { pendingLogin, pollPendingLogin, requestMasterDeviceReset, status } =
+    useVaultSession()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isRequestingReset, setIsRequestingReset] = useState(false)
 
@@ -107,7 +103,9 @@ export function AwaitingApprovalPage() {
               disabled={isRequestingReset}
               onClick={() => {
                 setIsRequestingReset(true)
-                void requestMasterDeviceReset(pendingLogin.lastResult.challengeId)
+                void requestMasterDeviceReset(
+                  pendingLogin.lastResult.challengeId
+                )
                   .catch((error) => {
                     setErrorMessage(
                       error instanceof Error

@@ -154,10 +154,7 @@ export function useDeviceState() {
   const searchSecrets = useCallback(
     (
       filterBy: string,
-      types = [
-        EncryptedSecretType.LOGIN_CREDENTIALS,
-        EncryptedSecretType.TOTP
-      ]
+      types = [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
     ) => {
       let secrets = [] as (ILoginSecret | ITOTPSecret)[]
 

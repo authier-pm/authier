@@ -49,7 +49,11 @@ const getAccountInitial = (email: string) =>
 function LogoMark() {
   return (
     <div className="flex size-10 shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-white/10 bg-[color:var(--color-card)] shadow-lg">
-      <img alt="Authier logo" className="h-full w-full object-cover" src={authierLogo} />
+      <img
+        alt="Authier logo"
+        className="h-full w-full object-cover"
+        src={authierLogo}
+      />
     </div>
   )
 }
@@ -218,7 +222,9 @@ export function AppShell({ children }: { children: ReactNode }) {
   const passwordCount = decryptedSecrets.filter(
     (secret) => secret.kind === 'LOGIN_CREDENTIALS'
   ).length
-  const totpCount = decryptedSecrets.filter((secret) => secret.kind === 'TOTP').length
+  const totpCount = decryptedSecrets.filter(
+    (secret) => secret.kind === 'TOTP'
+  ).length
 
   useEffect(() => {
     applyTheme(themeMode)

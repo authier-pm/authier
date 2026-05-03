@@ -38,12 +38,11 @@ const AccountFormSchema = z.object({
   newPassword: z.string().min(process.env.NODE_ENV === 'development' ? 1 : 8, {
     message: `Password must be at least ${process.env.NODE_ENV === 'development' ? 1 : 8} characters`
   }),
-  confirmPassword: z.string().min(
-    process.env.NODE_ENV === 'development' ? 1 : 8,
-    {
+  confirmPassword: z
+    .string()
+    .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
       message: `Password must be at least ${process.env.NODE_ENV === 'development' ? 1 : 8} characters`
-    }
-  )
+    })
 })
 
 export default function Account() {
@@ -138,8 +137,8 @@ export default function Account() {
       variables: {
         addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
         addDeviceSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
-        decryptionChallengeId: decryptionChallenge.data?.deviceDecryptionChallenge
-          ?.id as number,
+        decryptionChallengeId: decryptionChallenge.data
+          ?.deviceDecryptionChallenge?.id as number,
         secrets: await device.serializeSecrets(state.secrets, data.newPassword)
       }
     })
@@ -183,7 +182,8 @@ export default function Account() {
                 'This device can change the vault password.'
               ) : (
                 <Trans>
-                  You can only change the password on the master device, "{device.name}" is just a regular device
+                  You can only change the password on the master device, "
+                  {device.name}" is just a regular device
                 </Trans>
               )}
             </div>
@@ -191,10 +191,7 @@ export default function Account() {
 
           {isMasterDevice ? (
             <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
-              <FormField
-                error={errors.email?.message}
-                label="Email"
-              >
+              <FormField error={errors.email?.message} label="Email">
                 <Input type="email" {...register('email')} />
               </FormField>
 
@@ -247,7 +244,8 @@ export default function Account() {
             <div>
               <CardTitle>Danger zone</CardTitle>
               <CardDescription>
-                This action removes your account and clears the local vault state.
+                This action removes your account and clears the local vault
+                state.
               </CardDescription>
             </div>
           </div>
@@ -316,9 +314,7 @@ function FormField({
         {label}
       </label>
       <div className="mt-3">{children}</div>
-      {error ? (
-        <p className="mt-2 text-xs text-rose-300">{error}</p>
-      ) : null}
+      {error ? <p className="mt-2 text-xs text-rose-300">{error}</p> : null}
     </div>
   )
 }
@@ -332,9 +328,9 @@ function PasswordField({
 }: {
   error?: string
   label: string
-  registration: ReturnType<typeof useForm<z.infer<typeof AccountFormSchema>>>['register'] extends (
-    ...args: never[]
-  ) => infer T
+  registration: ReturnType<
+    typeof useForm<z.infer<typeof AccountFormSchema>>
+  >['register'] extends (...args: never[]) => infer T
     ? T
     : never
   showPasswords: boolean

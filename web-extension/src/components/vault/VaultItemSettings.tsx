@@ -36,7 +36,10 @@ import {
 } from '@shared/formikSharedTypes'
 import { useUpdateEncryptedSecretMutation } from '@shared/graphql/EncryptedSecrets.codegen'
 import { useRemoveWebInputMutation } from './VaultItemSettings.codegen'
-import { WebInputType, EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
+import {
+  WebInputType,
+  EncryptedSecretType
+} from '@shared/generated/graphqlBaseTypes'
 import { getWebInputsForUrlOfKinds } from '@src/background/getWebInputsForUrl'
 import { evaluatePasswordStrength } from './evaluatePasswordStrength'
 import { cn } from '@src/lib/cn'
@@ -86,7 +89,9 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
       createdAt={secretProps.createdAt}
       kindLabel="Credential"
       navigate={navigate}
-      title={secretProps.loginCredentials.label || secretProps.loginCredentials.url}
+      title={
+        secretProps.loginCredentials.label || secretProps.loginCredentials.url
+      }
       webInputs={webInputs}
       onRemoveWebInput={async (id) => {
         await removeWebInput({ variables: { id } })

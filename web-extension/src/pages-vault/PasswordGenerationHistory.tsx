@@ -268,15 +268,12 @@ export const PasswordGenerationHistory = () => {
               </div>
               <CardTitle>History overview</CardTitle>
               <CardDescription>
-                Review recent generated passwords, reveal them briefly, copy them,
-                or save them as credentials.
+                Review recent generated passwords, reveal them briefly, copy
+                them, or save them as credentials.
               </CardDescription>
             </CardHeader>
             <CardContent className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-              <MetricCard
-                label="Entries"
-                value={`${history.length}`}
-              />
+              <MetricCard label="Entries" value={`${history.length}`} />
               <MetricCard
                 label="Already saved"
                 value={`${history.filter((entry) => isEntrySaved(entry)).length}`}
@@ -316,13 +313,7 @@ export const PasswordGenerationHistory = () => {
   )
 }
 
-function MetricCard({
-  label,
-  value
-}: {
-  label: string
-  value: string
-}) {
+function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[var(--radius-lg)] border border-white/10 bg-black/10 p-4">
       <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
@@ -335,13 +326,7 @@ function MetricCard({
   )
 }
 
-function HistoryField({
-  label,
-  value
-}: {
-  label: string
-  value: string
-}) {
+function HistoryField({ label, value }: { label: string; value: string }) {
   return (
     <div className="rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-4">
       <div className="text-[11px] font-medium tracking-[0.18em] text-[color:var(--color-muted)] uppercase">
@@ -440,7 +425,11 @@ function SaveGeneratedPasswordModal({
 
               <div className="grid gap-4 md:grid-cols-2">
                 <Field name="url">
-                  {({ field }: { field: credentialValues & { value: string } }) => (
+                  {({
+                    field
+                  }: {
+                    field: credentialValues & { value: string }
+                  }) => (
                     <ModalField
                       error={touched.url ? errors.url : undefined}
                       inputId="url"
@@ -452,7 +441,11 @@ function SaveGeneratedPasswordModal({
                 </Field>
 
                 <Field name="label">
-                  {({ field }: { field: credentialValues & { value: string } }) => (
+                  {({
+                    field
+                  }: {
+                    field: credentialValues & { value: string }
+                  }) => (
                     <ModalField
                       error={touched.label ? errors.label : undefined}
                       inputId="label"
@@ -464,7 +457,11 @@ function SaveGeneratedPasswordModal({
                 </Field>
 
                 <Field name="username">
-                  {({ field }: { field: credentialValues & { value: string } }) => (
+                  {({
+                    field
+                  }: {
+                    field: credentialValues & { value: string }
+                  }) => (
                     <ModalField
                       error={touched.username ? errors.username : undefined}
                       inputId="username"
@@ -476,7 +473,11 @@ function SaveGeneratedPasswordModal({
                 </Field>
 
                 <Field name="password">
-                  {({ field }: { field: credentialValues & { value: string } }) => (
+                  {({
+                    field
+                  }: {
+                    field: credentialValues & { value: string }
+                  }) => (
                     <ModalField
                       error={touched.password ? errors.password : undefined}
                       inputId="password"
@@ -524,9 +525,7 @@ function ModalField({
         {label}
       </label>
       <div className="mt-3">{children}</div>
-      {error ? (
-        <p className="mt-2 text-xs text-rose-300">{error}</p>
-      ) : null}
+      {error ? <p className="mt-2 text-xs text-rose-300">{error}</p> : null}
     </div>
   )
 }

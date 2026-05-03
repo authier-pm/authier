@@ -145,7 +145,9 @@ export function UserSettings() {
     }
 
     if (previousMasterDeviceResetTimeoutMinutes === null) {
-      setPreviousMasterDeviceResetTimeoutMinutes(masterDeviceResetTimeoutMinutes)
+      setPreviousMasterDeviceResetTimeoutMinutes(
+        masterDeviceResetTimeoutMinutes
+      )
     }
   }, [data?.me.deviceRecoveryCooldownMinutes])
 
@@ -155,11 +157,16 @@ export function UserSettings() {
     }
 
     if (previousMasterDeviceResetTimeoutMinutes === null) {
-      setPreviousMasterDeviceResetTimeoutMinutes(masterDeviceResetTimeoutMinutes)
+      setPreviousMasterDeviceResetTimeoutMinutes(
+        masterDeviceResetTimeoutMinutes
+      )
       return
     }
 
-    if (masterDeviceResetTimeoutMinutes === previousMasterDeviceResetTimeoutMinutes) {
+    if (
+      masterDeviceResetTimeoutMinutes ===
+      previousMasterDeviceResetTimeoutMinutes
+    ) {
       return
     }
 

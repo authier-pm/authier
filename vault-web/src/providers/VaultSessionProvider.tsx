@@ -19,7 +19,10 @@ import {
 } from 'react'
 import { onUnauthorizedSession } from '@/lib/authEvents'
 import { orpcClient } from '@/lib/orpc'
-import { getOrCreateDeviceIdentity, type DeviceIdentity } from '@/lib/deviceIdentity'
+import {
+  getOrCreateDeviceIdentity,
+  type DeviceIdentity
+} from '@/lib/deviceIdentity'
 import { setAccessToken } from '@/lib/accessToken'
 import {
   decryptSecrets,
@@ -81,7 +84,10 @@ type VaultSessionContextValue = {
   pendingLogin: PendingLoginState | null
   isBusy: boolean
   isSyncingVault: boolean
-  submitLogin: (email: string, password: string) => Promise<'authenticated' | 'pending'>
+  submitLogin: (
+    email: string,
+    password: string
+  ) => Promise<'authenticated' | 'pending'>
   pollPendingLogin: () => Promise<'authenticated' | 'pending'>
   requestMasterDeviceReset: (challengeId: number) => Promise<void>
   register: (email: string, password: string) => Promise<void>
@@ -121,7 +127,9 @@ const mergeSyncedSecrets = (
   currentSecrets: SessionBootstrap['secrets'],
   syncedSecrets: SyncSecretsResponse['secrets']
 ) => {
-  const nextSecrets = new Map(currentSecrets.map((secret) => [secret.id, secret]))
+  const nextSecrets = new Map(
+    currentSecrets.map((secret) => [secret.id, secret])
+  )
 
   syncedSecrets.forEach((secret) => {
     if (secret.deletedAt) {
@@ -179,14 +187,15 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     () => initialUnlockedState?.session ?? null
   )
   const [masterKey, setMasterKey] = useState<CryptoKey | null>(null)
-  const [decryptedSecrets, setDecryptedSecrets] = useState<DecryptedVaultSecret[]>(
-    []
-  )
+  const [decryptedSecrets, setDecryptedSecrets] = useState<
+    DecryptedVaultSecret[]
+  >([])
   const [skippedSecretsCount, setSkippedSecretsCount] = useState(0)
-  const [shouldRestoreUnlockedSession, setShouldRestoreUnlockedSession] = useState(
-    () => Boolean(initialUnlockedState)
+  const [shouldRestoreUnlockedSession, setShouldRestoreUnlockedSession] =
+    useState(() => Boolean(initialUnlockedState))
+  const [pendingLogin, setPendingLogin] = useState<PendingLoginState | null>(
+    null
   )
-  const [pendingLogin, setPendingLogin] = useState<PendingLoginState | null>(null)
   const [isBusy, setIsBusy] = useState(false)
   const [isSyncingVault, setIsSyncingVault] = useState(false)
   const syncVaultPromiseRef = useRef<Promise<void> | null>(null)
@@ -196,7 +205,11 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   const startupSyncHandledRef = useRef(false)
   const attemptedAutoSyncKeyRef = useRef<string | null>(null)
 
-  const status: VaultStatus = session ? 'authenticated' : lockedState ? 'locked' : 'guest'
+  const status: VaultStatus = session
+    ? 'authenticated'
+    : lockedState
+      ? 'locked'
+      : 'guest'
 
   const clearUnlockedSession = () => {
     setAccessToken(null)
@@ -272,7 +285,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
     const onActivity = () => scheduleLock()
 
-    events.forEach((eventName) => window.addEventListener(eventName, onActivity))
+    events.forEach((eventName) =>
+      window.addEventListener(eventName, onActivity)
+    )
 
     return () => {
       window.clearTimeout(timeoutId)
@@ -395,7 +410,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     void abToCryptoKey(base64ToBuffer(initialUnlockedState.masterKey)).then(
       (restoredMasterKey) => {
         if (!cancelled) {
-          setMasterKey((currentMasterKey) => currentMasterKey ?? restoredMasterKey)
+          setMasterKey(
+            (currentMasterKey) => currentMasterKey ?? restoredMasterKey
+          )
         }
       }
     )
@@ -782,7 +799,10 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
         return {
           ...currentSession,
-          secrets: mergeSyncedSecrets(currentSession.secrets, syncedSecrets.secrets),
+          secrets: mergeSyncedSecrets(
+            currentSession.secrets,
+            syncedSecrets.secrets
+          ),
           currentDevice: {
             ...currentSession.currentDevice,
             lastSyncAt: syncedDevice.lastSyncAt
@@ -814,7 +834,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const updateSecretsState = (
-    updater: (current: SessionBootstrap['secrets']) => SessionBootstrap['secrets']
+    updater: (
+      current: SessionBootstrap['secrets']
+    ) => SessionBootstrap['secrets']
   ) => {
     setSession((currentSession) => {
       if (!currentSession) {

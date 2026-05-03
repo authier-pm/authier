@@ -14,7 +14,9 @@ type CodePushOptions = {
 }
 
 type CodePushEnhancer = {
-  <P>(options?: CodePushOptions): (Component: React.ComponentType<P>) => React.ComponentType<P>
+  <P>(
+    options?: CodePushOptions
+  ): (Component: React.ComponentType<P>) => React.ComponentType<P>
   CheckFrequency: {
     MANUAL: number
     ON_APP_RESUME: number
@@ -25,8 +27,8 @@ type CodePushEnhancer = {
   getUpdateMetadata: () => Promise<LocalPackage | null>
 }
 
-const codePush = ((() => {
-  const enhancer = (<P,>(_options?: CodePushOptions) => {
+const codePush = (() => {
+  const enhancer = (<P>(_options?: CodePushOptions) => {
     return (Component: React.ComponentType<P>) => Component
   }) as CodePushEnhancer
 
@@ -40,6 +42,6 @@ const codePush = ((() => {
   enhancer.getUpdateMetadata = async () => null
 
   return enhancer
-})()) as CodePushEnhancer
+})() as CodePushEnhancer
 
 export default codePush

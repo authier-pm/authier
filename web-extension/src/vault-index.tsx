@@ -25,9 +25,9 @@ export const renderVault = () => {
   vaultRoot.render(
     <HashRouter basename="/">
       <QueryParamProvider adapter={ReactRouter6Adapter}>
-          <ExtensionProviders>
-            <VaultRouter />
-          </ExtensionProviders>
+        <ExtensionProviders>
+          <VaultRouter />
+        </ExtensionProviders>
       </QueryParamProvider>
     </HashRouter>
   )

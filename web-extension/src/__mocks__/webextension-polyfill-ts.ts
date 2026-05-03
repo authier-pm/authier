@@ -6,8 +6,8 @@ export const browser: any = {
   tabs: {
     executeScript(currentTabId: number, details: any) {
       return Promise.resolve({ done: true })
-    },
-  },
+    }
+  }
 }
 
 export interface Tabs {

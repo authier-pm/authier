@@ -222,7 +222,9 @@ export const AuthsList = ({
   const matchingWebInputsForCurrentPage = currentURL
     ? getWebInputsForUrl(currentURL)
     : []
-  const totps = searchSecrets(search, [EncryptedSecretType.TOTP]) as ITOTPSecret[]
+  const totps = searchSecrets(search, [
+    EncryptedSecretType.TOTP
+  ]) as ITOTPSecret[]
   const creds = searchSecrets(search, [
     EncryptedSecretType.LOGIN_CREDENTIALS
   ]) as ILoginSecret[]
@@ -240,15 +242,22 @@ export const AuthsList = ({
         ))
       ]
     : [
-        ...totps.slice(0, 20).map((auth, i) => (
-          <OtpCode totpSecret={auth as ITOTPSecret} key={auth.totp.label + i} />
-        )),
-        ...creds.slice(0, 20).map((psw, i) => (
-          <LoginCredentialsListItem
-            key={psw.loginCredentials.label + i}
-            loginSecret={psw as ILoginSecret}
-          />
-        ))
+        ...totps
+          .slice(0, 20)
+          .map((auth, i) => (
+            <OtpCode
+              totpSecret={auth as ITOTPSecret}
+              key={auth.totp.label + i}
+            />
+          )),
+        ...creds
+          .slice(0, 20)
+          .map((psw, i) => (
+            <LoginCredentialsListItem
+              key={psw.loginCredentials.label + i}
+              loginSecret={psw as ILoginSecret}
+            />
+          ))
       ]
 
   return (

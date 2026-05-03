@@ -56,8 +56,7 @@ export interface IBackgroundStateSerializableLocked {
   accessToken: string | null
 }
 
-export interface IBackgroundStateSerializable
-  extends IBackgroundStateSerializableLocked {
+export interface IBackgroundStateSerializable extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
 }
 
@@ -200,11 +199,11 @@ export const useDeviceStore = create<Device>()(
         const start = performance.now()
         const [idResult, biometricsResult, nameResult, tokenResult] =
           await Promise.allSettled([
-          getUniqueId(),
-          get().checkBiometrics(),
-          getDeviceName(),
-          messaging().getToken()
-          // useDeviceStateStore.getState().initialize()
+            getUniqueId(),
+            get().checkBiometrics(),
+            getDeviceName(),
+            messaging().getToken()
+            // useDeviceStateStore.getState().initialize()
           ])
 
         const id = idResult.status === 'fulfilled' ? idResult.value : null
@@ -213,10 +212,14 @@ export const useDeviceStore = create<Device>()(
             ? biometricsResult.value
             : false
         const name = nameResult.status === 'fulfilled' ? nameResult.value : ''
-        const token = tokenResult.status === 'fulfilled' ? tokenResult.value : null
+        const token =
+          tokenResult.status === 'fulfilled' ? tokenResult.value : null
 
         if (tokenResult.status === 'rejected') {
-          console.warn('FCM token unavailable during startup', tokenResult.reason)
+          console.warn(
+            'FCM token unavailable during startup',
+            tokenResult.reason
+          )
         }
 
         set({

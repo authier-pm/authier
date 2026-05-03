@@ -1,8 +1,18 @@
 import { useEffect, useState } from 'react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import { copyTextToClipboard } from '@/lib/clipboard'
 import { cn } from '@/lib/cn'
-import { formatTotpToken, generateTotpToken, getTotpRemainingSeconds } from '@/lib/totp'
+import {
+  formatTotpToken,
+  generateTotpToken,
+  getTotpRemainingSeconds
+} from '@/lib/totp'
 
 type TotpCodeCardProps = {
   digits: number
@@ -69,7 +79,8 @@ export function TotpCodeCard({
   }, [isCopied])
 
   const remainingSeconds = getTotpRemainingSeconds(period, now)
-  const formattedToken = token === null ? 'Invalid TOTP secret' : formatTotpToken(token)
+  const formattedToken =
+    token === null ? 'Invalid TOTP secret' : formatTotpToken(token)
   const displayLabel = label.trim() || 'This item'
   const canCopy = token !== null
   let helperText = `Expires in ${remainingSeconds}s. Click the token to copy it.`
@@ -85,11 +96,14 @@ export function TotpCodeCard({
       return
     }
 
-    void copyTextToClipboard(token).then(() => {
-      setIsCopied(true)
-    }, () => {
-      setIsCopied(false)
-    })
+    void copyTextToClipboard(token).then(
+      () => {
+        setIsCopied(true)
+      },
+      () => {
+        setIsCopied(false)
+      }
+    )
   }
 
   return (

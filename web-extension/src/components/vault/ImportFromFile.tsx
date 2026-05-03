@@ -28,7 +28,7 @@ export function ImportFromFile({
 
   const dropText = isDragActive
     ? 'Drop the file here'
-    : "Drag and drop a .csv or .json file here, or click to select one"
+    : 'Drag and drop a .csv or .json file here, or click to select one'
 
   return (
     <button

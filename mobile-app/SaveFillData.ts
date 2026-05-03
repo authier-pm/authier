@@ -12,7 +12,10 @@ module.exports = async () => {
     //Wrong dataset
     const gettingFirstData = await getSensitiveItem('data')
 
-    console.log('initial data', gettingFirstData ? JSON.parse(gettingFirstData) : null)
+    console.log(
+      'initial data',
+      gettingFirstData ? JSON.parse(gettingFirstData) : null
+    )
     if (gettingFirstData) {
       AutofillModule.sendData(JSON.parse(gettingFirstData))
     }

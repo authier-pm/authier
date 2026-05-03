@@ -1,5 +1,8 @@
 import { decryptString, encryptString } from '@shared/cryptoUtils'
-import { loginCredentialsSchema, totpSchema } from '@shared/loginCredentialsSchema'
+import {
+  loginCredentialsSchema,
+  totpSchema
+} from '@shared/loginCredentialsSchema'
 import type { VaultApiOutputs } from '@shared/orpc/contract'
 import { z } from 'zod'
 
@@ -26,7 +29,8 @@ export type DecryptSecretsResult = {
 
 const secretPayloadSchema = z.record(z.string(), z.unknown())
 
-const readStringValue = (value: unknown) => (typeof value === 'string' ? value : '')
+const readStringValue = (value: unknown) =>
+  typeof value === 'string' ? value : ''
 
 const readNullableStringValue = (value: unknown) => {
   if (typeof value !== 'string') {
@@ -60,7 +64,8 @@ const normalizeLoginSecret = (payload: SecretPayload): LoginSecretValues => {
   const username = readStringValue(payload.username)
 
   return {
-    label: readStringValue(payload.label) || url || username || 'Untitled login',
+    label:
+      readStringValue(payload.label) || url || username || 'Untitled login',
     url,
     iconUrl: readNullableStringValue(payload.iconUrl),
     username,
@@ -124,7 +129,9 @@ export const decryptSecrets = async (
   const failedCount = settled.length - decryptedSecrets.length
 
   if (failedCount > 0) {
-    console.warn(`Skipped ${failedCount} vault secrets that could not be decoded.`)
+    console.warn(
+      `Skipped ${failedCount} vault secrets that could not be decoded.`
+    )
   }
 
   return {

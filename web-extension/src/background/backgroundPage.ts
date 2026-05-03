@@ -40,8 +40,7 @@ export interface IBackgroundStateSerializableLocked {
   notificationOnWrongPasswordAttempts: number
 }
 
-export interface IBackgroundStateSerializable
-  extends IBackgroundStateSerializableLocked {
+export interface IBackgroundStateSerializable extends IBackgroundStateSerializableLocked {
   masterEncryptionKey: string
 }
 

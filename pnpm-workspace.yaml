@@ -1,5 +1,5 @@
 packages:
-  - "backend/**"
+  - 'backend/**'
   - 'mobile-app/**'
   - 'vault-web/**'
   - 'web-extension/**'

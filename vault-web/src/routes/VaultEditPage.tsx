@@ -1,16 +1,30 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { KeyRound, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { type FieldValues, type Path, type UseFormRegister, useForm } from 'react-hook-form'
+import {
+  type FieldValues,
+  type Path,
+  type UseFormRegister,
+  useForm
+} from 'react-hook-form'
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom'
 import { z } from 'zod'
 import { TotpCodeCard } from '@/components/TotpCodeCard'
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
-import { loginCredentialsSchema, totpSchema } from '@shared/loginCredentialsSchema'
+import {
+  loginCredentialsSchema,
+  totpSchema
+} from '@shared/loginCredentialsSchema'
 
 const loginFormSchema = loginCredentialsSchema
 const totpFormSchema = totpSchema
@@ -42,33 +56,35 @@ export function VaultEditPage() {
 
   const loginForm = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),
-    defaultValues: currentSecret?.kind === 'LOGIN_CREDENTIALS'
-      ? currentSecret.loginCredentials
-      : {
-        label: '',
-        url: '',
-        iconUrl: null,
-        username: '',
-        password: '',
-        androidUri: null,
-        iosUri: null
-      }
+    defaultValues:
+      currentSecret?.kind === 'LOGIN_CREDENTIALS'
+        ? currentSecret.loginCredentials
+        : {
+            label: '',
+            url: '',
+            iconUrl: null,
+            username: '',
+            password: '',
+            androidUri: null,
+            iosUri: null
+          }
   })
 
   const totpForm = useForm<z.infer<typeof totpFormSchema>>({
     resolver: zodResolver(totpFormSchema),
-    defaultValues: currentSecret?.kind === 'TOTP'
-      ? currentSecret.totp
-      : {
-        label: '',
-        url: '',
-        iconUrl: null,
-        secret: '',
-        digits: 6,
-        period: 30,
-        androidUri: null,
-        iosUri: null
-      }
+    defaultValues:
+      currentSecret?.kind === 'TOTP'
+        ? currentSecret.totp
+        : {
+            label: '',
+            url: '',
+            iconUrl: null,
+            secret: '',
+            digits: 6,
+            period: 30,
+            androidUri: null,
+            iosUri: null
+          }
   })
 
   useEffect(() => {
@@ -115,7 +131,8 @@ export function VaultEditPage() {
   const totpSecret = totpForm.watch('secret')
   const totpDigits = totpForm.watch('digits')
   const totpPeriod = totpForm.watch('period')
-  const shouldShowTotpToken = kind === 'TOTP' && (isEditing || totpSecret.trim().length > 0)
+  const shouldShowTotpToken =
+    kind === 'TOTP' && (isEditing || totpSecret.trim().length > 0)
 
   return (
     <div className="space-y-4">
@@ -123,7 +140,8 @@ export function VaultEditPage() {
         <CardHeader>
           <CardTitle>{isEditing ? 'Edit item' : 'Add item'}</CardTitle>
           <CardDescription>
-            Keep the plaintext only in the browser. The API only receives encrypted payloads.
+            Keep the plaintext only in the browser. The API only receives
+            encrypted payloads.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
@@ -179,19 +197,45 @@ export function VaultEditPage() {
                 navigate('/vault')
               })}
             >
-              <VaultField label="Label" name="label" register={loginForm.register} />
-              <VaultField label="URL" name="url" register={loginForm.register} />
-              <VaultField label="Username" name="username" register={loginForm.register} />
+              <VaultField
+                label="Label"
+                name="label"
+                register={loginForm.register}
+              />
+              <VaultField
+                label="URL"
+                name="url"
+                register={loginForm.register}
+              />
+              <VaultField
+                label="Username"
+                name="username"
+                register={loginForm.register}
+              />
               <VaultField
                 label="Password"
                 name="password"
                 register={loginForm.register}
-                showPasswordCopyButton={currentSecret?.kind === 'LOGIN_CREDENTIALS'}
+                showPasswordCopyButton={
+                  currentSecret?.kind === 'LOGIN_CREDENTIALS'
+                }
                 type="password"
               />
-              <VaultField label="Icon URL" name="iconUrl" register={loginForm.register} />
-              <VaultField label="Android URI" name="androidUri" register={loginForm.register} />
-              <VaultField label="iOS URI" name="iosUri" register={loginForm.register} />
+              <VaultField
+                label="Icon URL"
+                name="iconUrl"
+                register={loginForm.register}
+              />
+              <VaultField
+                label="Android URI"
+                name="androidUri"
+                register={loginForm.register}
+              />
+              <VaultField
+                label="iOS URI"
+                name="iosUri"
+                register={loginForm.register}
+              />
               <div className="col-span-full flex flex-wrap gap-3">
                 {currentSecret ? (
                   <Button
@@ -237,14 +281,44 @@ export function VaultEditPage() {
                 navigate('/vault')
               })}
             >
-              <VaultField label="Label" name="label" register={totpForm.register} />
+              <VaultField
+                label="Label"
+                name="label"
+                register={totpForm.register}
+              />
               <VaultField label="URL" name="url" register={totpForm.register} />
-              <VaultField label="Secret" name="secret" register={totpForm.register} />
-              <VaultField label="Digits" name="digits" register={totpForm.register} type="number" />
-              <VaultField label="Period" name="period" register={totpForm.register} type="number" />
-              <VaultField label="Icon URL" name="iconUrl" register={totpForm.register} />
-              <VaultField label="Android URI" name="androidUri" register={totpForm.register} />
-              <VaultField label="iOS URI" name="iosUri" register={totpForm.register} />
+              <VaultField
+                label="Secret"
+                name="secret"
+                register={totpForm.register}
+              />
+              <VaultField
+                label="Digits"
+                name="digits"
+                register={totpForm.register}
+                type="number"
+              />
+              <VaultField
+                label="Period"
+                name="period"
+                register={totpForm.register}
+                type="number"
+              />
+              <VaultField
+                label="Icon URL"
+                name="iconUrl"
+                register={totpForm.register}
+              />
+              <VaultField
+                label="Android URI"
+                name="androidUri"
+                register={totpForm.register}
+              />
+              <VaultField
+                label="iOS URI"
+                name="iosUri"
+                register={totpForm.register}
+              />
               <div className="col-span-full flex flex-wrap gap-3">
                 {currentSecret ? (
                   <Button
@@ -285,15 +359,13 @@ type VaultFieldProps<FormValues extends FieldValues> = {
   type?: 'text' | 'number' | 'password'
 }
 
-function VaultField<FormValues extends FieldValues>(
-  {
-    label,
-    name,
-    register,
-    showPasswordCopyButton,
-    type = 'text'
-  }: VaultFieldProps<FormValues>
-) {
+function VaultField<FormValues extends FieldValues>({
+  label,
+  name,
+  register,
+  showPasswordCopyButton,
+  type = 'text'
+}: VaultFieldProps<FormValues>) {
   return (
     <div className="space-y-2">
       <Label htmlFor={name}>{label}</Label>

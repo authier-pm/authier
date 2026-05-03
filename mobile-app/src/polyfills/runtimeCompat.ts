@@ -30,7 +30,10 @@ NoopFinalizationRegistry.prototype.unregister = function <T>(
   return false
 }
 
-const SimpleWeakRef = function <T extends object>(this: WeakRefHolder, value: T) {
+const SimpleWeakRef = function <T extends object>(
+  this: WeakRefHolder,
+  value: T
+) {
   this._value = value
 }
 

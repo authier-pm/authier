@@ -41,7 +41,7 @@ const timeStartLink = new ApolloLink((operation, forward) => {
 const logTimeLink = new ApolloLink((operation, forward) => {
   return forward(operation).pipe(
     tap((data) => {
-    // data from a previous link
+      // data from a previous link
       const time = performance.now() - operation.getContext().start
       const opIdentifier = operation.operationName
         ? `operation ${operation.operationName}`

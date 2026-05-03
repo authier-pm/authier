@@ -33,8 +33,8 @@ export const ToastAlert = ({
                 variant === 'solid'
                   ? 'lightText'
                   : variant !== 'outline'
-                  ? 'darkText'
-                  : null
+                    ? 'darkText'
+                    : null
               }
             >
               {title}
@@ -47,8 +47,8 @@ export const ToastAlert = ({
             variant === 'solid'
               ? 'lightText'
               : variant !== 'outline'
-              ? 'darkText'
-              : null
+                ? 'darkText'
+                : null
           }
         >
           {description}

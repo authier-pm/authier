@@ -1,11 +1,11 @@
-import { Route, Routes, Link as RouterLink, useLocation } from 'react-router-dom'
-import { AnimatePresence } from 'framer-motion'
 import {
-  FiInfo,
-  FiSettings,
-  FiShield,
-  FiSliders
-} from 'react-icons/fi'
+  Route,
+  Routes,
+  Link as RouterLink,
+  useLocation
+} from 'react-router-dom'
+import { AnimatePresence } from 'framer-motion'
+import { FiInfo, FiSettings, FiShield, FiSliders } from 'react-icons/fi'
 import type { IconType } from 'react-icons'
 import Security from '@src/components/vault/settings/Security'
 import Account from '@src/components/vault/settings/Account'
@@ -51,7 +51,8 @@ const linkItems: LinkItemProps[] = [
 export const VaultSettings = () => {
   const location = useLocation()
   const selectedTab =
-    linkItems.find((link) => location.pathname.endsWith(link.path)) ?? linkItems[0]
+    linkItems.find((link) => location.pathname.endsWith(link.path)) ??
+    linkItems[0]
 
   return (
     <div className="extension-scrollbar mx-auto flex h-full min-h-0 w-full max-w-7xl flex-col gap-6 overflow-y-auto p-6 md:p-8">

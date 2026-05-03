@@ -2,8 +2,7 @@ import browser from 'webextension-polyfill'
 import { z } from 'zod'
 import { constructURL } from '@shared/urlUtils'
 
-export const GENERATED_PASSWORD_HISTORY_STORAGE_KEY =
-  'generatedPasswordHistory'
+export const GENERATED_PASSWORD_HISTORY_STORAGE_KEY = 'generatedPasswordHistory'
 
 const generatedPasswordHistoryEntrySchema = z.object({
   id: z.string().min(1),

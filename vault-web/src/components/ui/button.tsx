@@ -38,17 +38,16 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> &
     asChild?: boolean
   }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { asChild, className, size, variant, ...props },
-  ref
-) {
-  const Component = asChild ? Slot : 'button'
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  function Button({ asChild, className, size, variant, ...props }, ref) {
+    const Component = asChild ? Slot : 'button'
 
-  return (
-    <Component
-      className={cn(buttonVariants({ variant, size }), className)}
-      ref={ref}
-      {...props}
-    />
-  )
-})
+    return (
+      <Component
+        className={cn(buttonVariants({ variant, size }), className)}
+        ref={ref}
+        {...props}
+      />
+    )
+  }
+)

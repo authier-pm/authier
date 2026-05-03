@@ -29,15 +29,17 @@ const parseFrameToken = (token) => {
   if (!match) return null
   return {
     lineNumber: Number(match[1]),
-    column: Number(match[2]),
+    column: Number(match[2])
   }
 }
 
 const extractFramesFromText = (text) => {
-  const matches = [...text.matchAll(/(?:url-server|index\.bundle[^:\s)]*):(\d+):(\d+)/g)]
+  const matches = [
+    ...text.matchAll(/(?:url-server|index\.bundle[^:\s)]*):(\d+):(\d+)/g)
+  ]
   return matches.map((match) => ({
     lineNumber: Number(match[1]),
-    column: Number(match[2]),
+    column: Number(match[2])
   }))
 }
 
@@ -66,21 +68,23 @@ const payload = {
     methodName: '<unknown>',
     file: DEFAULT_BUNDLE_URL,
     lineNumber: frame.lineNumber,
-    column: frame.column,
+    column: frame.column
   })),
-  version: 0,
+  version: 0
 }
 
 const response = await fetch(`${DEFAULT_METRO_BASE}/symbolicate`, {
   method: 'POST',
   headers: {
-    'content-type': 'application/json',
+    'content-type': 'application/json'
   },
-  body: JSON.stringify(payload),
+  body: JSON.stringify(payload)
 })
 
 if (!response.ok) {
-  console.error(`Metro symbolicate failed: ${response.status} ${response.statusText}`)
+  console.error(
+    `Metro symbolicate failed: ${response.status} ${response.statusText}`
+  )
   console.error(await response.text())
   process.exit(1)
 }

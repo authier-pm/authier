@@ -26,7 +26,8 @@ const CHARSETS = {
 } as const
 
 const getWebCrypto = (): CryptoLike => {
-  const crypto = (globalThis as typeof globalThis & { crypto?: CryptoLike }).crypto
+  const crypto = (globalThis as typeof globalThis & { crypto?: CryptoLike })
+    .crypto
 
   if (!crypto) {
     throw new Error(

@@ -147,13 +147,7 @@ export function LoginPage() {
   )
 }
 
-function FeatureRow({
-  icon: Icon,
-  text
-}: {
-  icon: LucideIcon
-  text: string
-}) {
+function FeatureRow({ icon: Icon, text }: { icon: LucideIcon; text: string }) {
   return (
     <div className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-white/10 bg-white/5 px-4 py-4">
       <Icon className="mt-0.5 size-5 shrink-0 text-[color:var(--color-primary)]" />

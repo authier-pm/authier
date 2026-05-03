@@ -3,7 +3,7 @@ name: Android Build ## name of the workflow
 on:
   push:
     tags:
-      - "v*.*.*-android"
+      - 'v*.*.*-android'
   workflow_dispatch: # To trigger manual build
 jobs:
   android-build:
@@ -27,7 +27,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 24
-          cache: "pnpm"
+          cache: 'pnpm'
 
       - name: Install dependencies
         run: |

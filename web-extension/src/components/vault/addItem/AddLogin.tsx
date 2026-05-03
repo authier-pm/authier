@@ -9,7 +9,7 @@ import {
   InputGroup,
   InputRightElement,
   Progress,
-  useDisclosure,
+  useDisclosure
 } from '@src/components/ui/legacy'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'

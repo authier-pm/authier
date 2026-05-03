@@ -12,9 +12,7 @@
         "icon": "terminal-cmd",
         "color": "terminal.ansiGreen",
         "cwd": "backend",
-        "commands": [
-          "pnpm dev"
-        ]
+        "commands": ["pnpm dev"]
       },
       {
         "name": "web-extension",
@@ -22,9 +20,7 @@
         "icon": "watch-view-icon",
         "color": "terminal.ansiYellow",
         "cwd": "web-extension",
-        "commands": [
-          "pnpm dev"
-        ]
+        "commands": ["pnpm dev"]
       }
     ]
   }

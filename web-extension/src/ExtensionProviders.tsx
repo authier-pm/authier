@@ -61,9 +61,7 @@ function ThemeModeProvider({ children }: PropsWithChildren) {
   }, [colorMode])
 
   const toggleColorMode = useCallback(() => {
-    setColorMode((currentValue) =>
-      currentValue === 'dark' ? 'light' : 'dark'
-    )
+    setColorMode((currentValue) => (currentValue === 'dark' ? 'light' : 'dark'))
   }, [])
 
   const value = useMemo(

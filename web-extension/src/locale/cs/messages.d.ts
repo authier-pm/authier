@@ -1,4 +1,3 @@
-import { Messages } from '@lingui/core';
-          declare const messages: Messages;
-          export { messages };
-          
+import { Messages } from '@lingui/core'
+declare const messages: Messages
+export { messages }

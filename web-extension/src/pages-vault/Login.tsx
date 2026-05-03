@@ -1,4 +1,10 @@
-import React, { createContext, useState, type Dispatch, type ReactElement, type SetStateAction } from 'react'
+import React, {
+  createContext,
+  useState,
+  type Dispatch,
+  type ReactElement,
+  type SetStateAction
+} from 'react'
 import { t } from '@lingui/core/macro'
 import { Trans } from '@lingui/react/macro'
 import { z } from 'zod'
@@ -12,7 +18,10 @@ import { Input } from '@src/components/ui/input'
 import { LoginAwaitingApproval } from './LoginAwaitingApproval'
 
 const LoginFormSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }).describe('Email'),
+  email: z
+    .string()
+    .email({ message: 'Invalid email address' })
+    .describe('Email'),
   password: z
     .string()
     .min(process.env.NODE_ENV === 'development' ? 1 : 8, {
@@ -41,7 +50,12 @@ export const LoginContext = createContext<{
 
 const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
   return (
-    <Button className="mt-1 w-full" disabled={isSubmitting} type="submit" variant="outline">
+    <Button
+      className="mt-1 w-full"
+      disabled={isSubmitting}
+      type="submit"
+      variant="outline"
+    >
       <Trans>Submit</Trans>
     </Button>
   )
@@ -138,7 +152,10 @@ export default function Login(): ReactElement {
         <SubmitButton isSubmitting={isSubmitting} />
       </form>
       <div className="pt-3">
-        <Link className="text-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)]" to="/signup">
+        <Link
+          className="text-sm text-[color:var(--color-muted)] hover:text-[color:var(--color-foreground)]"
+          to="/signup"
+        >
           <Trans>Don't have account?</Trans>
         </Link>
       </div>

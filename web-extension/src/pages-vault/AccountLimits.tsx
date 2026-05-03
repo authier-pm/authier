@@ -67,8 +67,8 @@ export const AccountLimits = () => {
           Scale your vault without losing clarity
         </h1>
         <p className="max-w-3xl text-sm leading-6 text-[color:var(--color-muted)] md:text-base">
-          Review your current usage, refresh synced limits, and add capacity only
-          where you need it.
+          Review your current usage, refresh synced limits, and add capacity
+          only where you need it.
         </p>
       </section>
 
@@ -232,7 +232,10 @@ export const AccountLimits = () => {
               />
             }
             description="Best value if you want both password and TOTP capacity together."
-            features={['Additional 250 login secrets', 'Additional 100 TOTP secrets']}
+            features={[
+              'Additional 250 login secrets',
+              'Additional 100 TOTP secrets'
+            ]}
             icon={<FiCreditCard className="size-5" />}
             name="TOTP and Credentials"
             popular
@@ -279,11 +282,14 @@ function StatPanel({
   limit: number
   name: string
 }) {
-  const usageRatio = limit > 0 ? Math.min(100, Math.round((count / limit) * 100)) : 0
+  const usageRatio =
+    limit > 0 ? Math.min(100, Math.round((count / limit) * 100)) : 0
 
   return (
     <div className="relative overflow-hidden rounded-[var(--radius-lg)] border border-[color:var(--color-border)] bg-[color:var(--color-surface-muted)] p-5">
-      <div className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${accent}`} />
+      <div
+        className={`pointer-events-none absolute inset-0 bg-gradient-to-br ${accent}`}
+      />
       <div className="relative">
         <div className="flex items-center justify-between gap-3">
           <div>
@@ -350,9 +356,13 @@ function PlanCard({
 
       <CardContent className="flex h-full flex-col gap-6">
         <div className="flex items-end gap-2">
-          <span className="text-2xl font-semibold text-[color:var(--color-muted)]">$</span>
+          <span className="text-2xl font-semibold text-[color:var(--color-muted)]">
+            $
+          </span>
           <span className="text-5xl font-semibold leading-none">{price}</span>
-          <span className="pb-1 text-sm text-[color:var(--color-muted)]">/month</span>
+          <span className="pb-1 text-sm text-[color:var(--color-muted)]">
+            /month
+          </span>
         </div>
 
         <ul className="space-y-3 text-sm text-[color:var(--color-foreground)]">

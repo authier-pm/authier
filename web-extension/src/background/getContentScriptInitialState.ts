@@ -38,9 +38,12 @@ export const getContentScriptInitialState = async (
       // Retry once with a refreshed decrypted cache if TOTP is unexpectedly missing.
       if (
         initialTotpCount === 0 &&
-        device.state.secrets.some((secret) => secret.kind === EncryptedSecretType.TOTP)
+        device.state.secrets.some(
+          (secret) => secret.kind === EncryptedSecretType.TOTP
+        )
       ) {
-        device.state.decryptedSecrets = await device.state.getAllSecretsDecrypted()
+        device.state.decryptedSecrets =
+          await device.state.getAllSecretsDecrypted()
         decrypted = await device.state.getSecretsDecryptedByTLD(hostname)
 
         log('host-matched secrets after cache refresh', {
@@ -48,8 +51,9 @@ export const getContentScriptInitialState = async (
           loginCount: decrypted.filter(
             ({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS
           ).length,
-          totpCount: decrypted.filter(({ kind }) => kind === EncryptedSecretType.TOTP)
-            .length
+          totpCount: decrypted.filter(
+            ({ kind }) => kind === EncryptedSecretType.TOTP
+          ).length
         })
       }
     } else {

@@ -40,7 +40,10 @@ export function RefreshAccountLimits({
         }}
       >
         <IoMdRefreshCircle
-          className={cn('size-5', refreshAccountTooltip ? 'text-amber-300' : undefined)}
+          className={cn(
+            'size-5',
+            refreshAccountTooltip ? 'text-amber-300' : undefined
+          )}
         />
       </Button>
     </Tooltip>

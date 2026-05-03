@@ -57,6 +57,8 @@ describe('VaultEditPage', () => {
 
     expect(screen.getByText('Current token')).toBeInTheDocument()
     expect(await screen.findByText('287 082')).toBeInTheDocument()
-    expect(screen.getByText('Expires in 1s. Click the token to copy it.')).toBeInTheDocument()
+    expect(
+      screen.getByText('Expires in 1s. Click the token to copy it.')
+    ).toBeInTheDocument()
   })
 })

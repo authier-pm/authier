@@ -2,8 +2,6 @@ import { device } from './ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { vi } from 'vitest'
 
-
-
 // Mock browser.runtime.connect
 vi.mock('webextension-polyfill', () => ({
   default: {

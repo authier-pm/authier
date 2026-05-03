@@ -67,7 +67,9 @@ export const useLogin = (props: { deviceName: string }) => {
   }, [error, newDeviceError])
 
   useInterval(() => {
-    getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
+    getDeviceDecryptionChallenge({
+      variables: deviceDecryptionChallengeVariables
+    })
   }, 6000)
 
   const deviceDecryptionChallenge = decryptionData?.deviceDecryptionChallenge
@@ -227,7 +229,9 @@ export const useLogin = (props: { deviceName: string }) => {
         }
       })()
     } else if (!deviceDecryptionChallenge) {
-      getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
+      getDeviceDecryptionChallenge({
+        variables: deviceDecryptionChallengeVariables
+      })
     }
   }, [deviceDecryptionChallenge])
 
@@ -299,7 +303,8 @@ export const LoginAwaitingApproval = () => {
         ? deviceDecryptionChallenge.masterDeviceResetRejectedAt
         : null
     const canResetMasterDevice =
-      deviceDecryptionChallenge?.__typename === 'DecryptionChallengeForApproval' &&
+      deviceDecryptionChallenge?.__typename ===
+        'DecryptionChallengeForApproval' &&
       (!requestedResetAt || !!rejectedResetAt)
 
     return (
@@ -341,12 +346,14 @@ export const LoginAwaitingApproval = () => {
                 <>
                   <Text mt={3} fontSize="sm">
                     <Trans>
-                      Push notifications sent: {deviceDecryptionChallenge.pushNotificationsSentCount}
+                      Push notifications sent:{' '}
+                      {deviceDecryptionChallenge.pushNotificationsSentCount}
                     </Trans>
                   </Text>
                   <Text fontSize="sm" mb={3}>
                     <Trans>
-                      Push notifications failed: {deviceDecryptionChallenge.pushNotificationsFailedCount}
+                      Push notifications failed:{' '}
+                      {deviceDecryptionChallenge.pushNotificationsFailedCount}
                     </Trans>
                   </Text>
 

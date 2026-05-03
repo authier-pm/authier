@@ -231,7 +231,9 @@ export const useLogin = (props: { deviceName: string }) => {
         })
       })()
     } else if (!deviceDecryptionChallenge) {
-      getDeviceDecryptionChallenge({ variables: deviceDecryptionChallengeVariables })
+      getDeviceDecryptionChallenge({
+        variables: deviceDecryptionChallengeVariables
+      })
     }
   }, [
     addNewDevice,
@@ -362,7 +364,10 @@ export const LoginAwaitingApproval = () => {
             ) : null}
 
             <Button
-              disabled={Boolean(requestedResetAt && !rejectedResetAt) || resetMasterDeviceLoading}
+              disabled={
+                Boolean(requestedResetAt && !rejectedResetAt) ||
+                resetMasterDeviceLoading
+              }
               onClick={async () => {
                 await initiateMasterDeviceReset({
                   variables: {

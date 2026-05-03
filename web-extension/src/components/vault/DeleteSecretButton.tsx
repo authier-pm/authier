@@ -14,8 +14,10 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { DeleteIcon } from '@src/components/ui/icons'
 import { cn } from '@src/lib/cn'
 
-interface DeleteSecretButtonProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'aria-label'> {
+interface DeleteSecretButtonProps extends Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'aria-label'
+> {
   secrets: SecretTypeUnion[]
   'aria-label'?: string
   size?: 'sm' | 'md' | 'lg' | 'icon'

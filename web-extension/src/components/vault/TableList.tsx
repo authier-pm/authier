@@ -2,13 +2,22 @@ import { useContext, useMemo, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import { Trans } from '@lingui/react/macro'
 import { t } from '@lingui/core/macro'
-import { CopyIcon, EditIcon, ViewIcon, ViewOffIcon } from '@src/components/ui/icons'
+import {
+  CopyIcon,
+  EditIcon,
+  ViewIcon,
+  ViewOffIcon
+} from '@src/components/ui/icons'
 import { Button, buttonVariants } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import { pathNameToTypes, type ILoginSecret, type ITOTPSecret } from '@src/util/useDeviceState'
+import {
+  pathNameToTypes,
+  type ILoginSecret,
+  type ITOTPSecret
+} from '@src/util/useDeviceState'
 import { useAppToast } from '@src/ExtensionProviders'
 import { cn } from '@src/lib/cn'
 import {
@@ -305,9 +314,7 @@ function SecretTableRow({
           </Link>
         </Tooltip>
 
-        {isBulkMode ? null : (
-          <DeleteSecretButton secrets={[row]} size="icon" />
-        )}
+        {isBulkMode ? null : <DeleteSecretButton secrets={[row]} size="icon" />}
       </div>
     </div>
   )

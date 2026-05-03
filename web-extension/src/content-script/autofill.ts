@@ -699,7 +699,11 @@ export const autofill = (initState: IInitStateRes) => {
         isElementVisibleInViewport(inputEl)
       )
 
-      if (form && isElementVisibleInViewport(form) && areFilledElementsVisible) {
+      if (
+        form &&
+        isElementVisibleInViewport(form) &&
+        areFilledElementsVisible
+      ) {
         const clickEvent = new MouseEvent('click', {
           view: window,
           bubbles: true,

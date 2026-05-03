@@ -3,7 +3,17 @@ import { NavLink as RouterLink } from 'react-router-dom'
 import MD5 from 'crypto-js/md5'
 import browser from 'webextension-polyfill'
 import { Trans } from '@lingui/react/macro'
-import { FiClock, FiHardDrive, FiHome, FiKey, FiLock, FiMenu, FiRepeat, FiSettings, FiStar } from 'react-icons/fi'
+import {
+  FiClock,
+  FiHardDrive,
+  FiHome,
+  FiKey,
+  FiLock,
+  FiMenu,
+  FiRepeat,
+  FiSettings,
+  FiStar
+} from 'react-icons/fi'
 import { TbLogout } from 'react-icons/tb'
 import type { IconType } from 'react-icons'
 import { device } from '@src/background/ExtensionDevice'

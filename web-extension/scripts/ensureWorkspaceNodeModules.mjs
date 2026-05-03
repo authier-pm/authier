@@ -5,7 +5,10 @@ import { fileURLToPath } from 'node:url'
 const currentFilePath = fileURLToPath(import.meta.url)
 const scriptsDirectoryPath = path.dirname(currentFilePath)
 const packageDirectoryPath = path.resolve(scriptsDirectoryPath, '..')
-const workspaceNodeModulesPath = path.resolve(packageDirectoryPath, '../node_modules')
+const workspaceNodeModulesPath = path.resolve(
+  packageDirectoryPath,
+  '../node_modules'
+)
 const packageNodeModulesPath = path.join(packageDirectoryPath, 'node_modules')
 
 const getPackageVersion = (packageJsonPath) => {

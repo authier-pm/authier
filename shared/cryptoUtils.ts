@@ -16,13 +16,10 @@ export async function abToCryptoKey(raw: BufferSource): Promise<CryptoKey> {
 }
 
 async function getKeyMaterial(password: string): Promise<CryptoKey> {
-  return crypto.subtle.importKey(
-    'raw',
-    enc.encode(password),
-    'PBKDF2',
-    false,
-    ['deriveBits', 'deriveKey']
-  )
+  return crypto.subtle.importKey('raw', enc.encode(password), 'PBKDF2', false, [
+    'deriveBits',
+    'deriveKey'
+  ])
 }
 
 export async function generateEncryptionKey(

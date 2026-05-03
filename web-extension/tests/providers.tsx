@@ -26,10 +26,7 @@ export const makeSsrClient = (ctx: any) => {
 /**
  * almost all of our FE components need these providers
  */
-export const wrapInFEProviders = (
-  jsx: JSX.Element,
-  client: ApolloClient
-) => {
+export const wrapInFEProviders = (jsx: JSX.Element, client: ApolloClient) => {
   return (
     <ApolloProvider client={client}>
       <I18nProvider i18n={i18n}>

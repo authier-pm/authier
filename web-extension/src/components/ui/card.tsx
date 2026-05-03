@@ -1,10 +1,7 @@
 import type { HTMLAttributes } from 'react'
 import { cn } from '@src/lib/cn'
 
-export function Card({
-  className,
-  ...props
-}: HTMLAttributes<HTMLDivElement>) {
+export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(

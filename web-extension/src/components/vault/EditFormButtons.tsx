@@ -70,7 +70,11 @@ export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
           </>
         ) : null}
 
-        <Button aria-label="Save" disabled={isSubmitting || !dirty} type="submit">
+        <Button
+          aria-label="Save"
+          disabled={isSubmitting || !dirty}
+          type="submit"
+        >
           {isSubmitting ? 'Saving...' : 'Save changes'}
         </Button>
       </div>

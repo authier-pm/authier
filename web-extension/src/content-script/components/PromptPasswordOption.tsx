@@ -12,10 +12,7 @@ import { formatDistanceToNow } from 'date-fns'
 const nano = h
 import './Option.css'
 import debug from 'debug'
-import {
-  autofill,
-  resetAutofillStateForThisPage
-} from '../autofill'
+import { autofill, resetAutofillStateForThisPage } from '../autofill'
 
 const log = debug('au:PromptPasswordOption')
 const REFRESH_INTERVAL_MS = 100
@@ -169,7 +166,9 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         ? new MutationObserver((records) => {
             if (
               mountedPromptOption &&
-              records.every((record) => mountedPromptOption.contains(record.target))
+              records.every((record) =>
+                mountedPromptOption.contains(record.target)
+              )
             ) {
               return
             }

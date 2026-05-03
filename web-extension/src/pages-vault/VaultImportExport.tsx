@@ -1,7 +1,13 @@
 import { useEffect, useState } from 'react'
 import papaparse from 'papaparse'
 import { Trans } from '@lingui/react/macro'
-import { FiArrowRight, FiCheckCircle, FiCopy, FiDownload, FiUpload } from 'react-icons/fi'
+import {
+  FiArrowRight,
+  FiCheckCircle,
+  FiCopy,
+  FiDownload,
+  FiUpload
+} from 'react-icons/fi'
 import {
   AddSecretInput,
   device,
@@ -192,7 +198,8 @@ export const VaultImportExport = () => {
             return (
               s.loginCredentials.url === secret.loginCredentials.url &&
               s.id !== secret.id &&
-              s.loginCredentials.username === secret.loginCredentials.username &&
+              s.loginCredentials.username ===
+                secret.loginCredentials.username &&
               s.loginCredentials.password === secret.loginCredentials.password
             )
           }
@@ -250,9 +257,13 @@ export const VaultImportExport = () => {
                 <ImportFromFile
                   onFileAccepted={async (file) => {
                     if (file.type === 'text/csv') {
-                      const loginCredentialsLimit = data?.me.loginCredentialsLimit
+                      const loginCredentialsLimit =
+                        data?.me.loginCredentialsLimit
                       setImportedStat(
-                        await onCSVFileAccepted(file, loginCredentialsLimit ?? 50)
+                        await onCSVFileAccepted(
+                          file,
+                          loginCredentialsLimit ?? 50
+                        )
                       )
                     } else if (file.type === 'application/json') {
                       setImportedStat(await onJsonFileAccepted(file))
@@ -262,16 +273,18 @@ export const VaultImportExport = () => {
                 <div className="grid gap-3">
                   <InfoRow>
                     <Trans>
-                      We support importing from <code>csv</code> and <code>json</code>{' '}
-                      files.
+                      We support importing from <code>csv</code> and{' '}
+                      <code>json</code> files.
                     </Trans>
                   </InfoRow>
                   <InfoRow>
                     LastPass and Bitwarden exports usually work well. Other
-                    password manager exports may work too, but are not guaranteed.
+                    password manager exports may work too, but are not
+                    guaranteed.
                   </InfoRow>
                   <InfoRow>
-                    JSON imports must come from the `authy-desktop-export` format.
+                    JSON imports must come from the `authy-desktop-export`
+                    format.
                   </InfoRow>
                 </div>
               </>
@@ -326,8 +339,8 @@ export const VaultImportExport = () => {
               </div>
               <CardTitle>Merge duplicates</CardTitle>
               <CardDescription>
-                Detect repeated login credentials and TOTP entries stored in your
-                vault.
+                Detect repeated login credentials and TOTP entries stored in
+                your vault.
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

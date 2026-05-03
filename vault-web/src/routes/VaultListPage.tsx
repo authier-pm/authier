@@ -18,10 +18,10 @@ const filterTabs: Array<{
   path: string
   value: FilterMode
 }> = [
-    { label: 'All', path: '/vault', value: 'ALL' },
-    { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
-    { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
-  ]
+  { label: 'All', path: '/vault', value: 'ALL' },
+  { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
+  { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
+]
 
 const formatLastSyncLabel = (lastSyncAt: string | null | undefined) => {
   if (!lastSyncAt) {
@@ -69,8 +69,9 @@ export function VaultListPage({
     })
   }, [decryptedSecrets, deferredQuery, filterMode])
 
-  const visibleSecretCountLabel = `${visibleSecrets.length} ${visibleSecrets.length === 1 ? 'secret' : 'secrets'
-    }`
+  const visibleSecretCountLabel = `${visibleSecrets.length} ${
+    visibleSecrets.length === 1 ? 'secret' : 'secrets'
+  }`
   const lastSyncLabel = formatLastSyncLabel(session?.currentDevice.lastSyncAt)
 
   const handleSync = () => {
@@ -134,7 +135,9 @@ export function VaultListPage({
                   variant="outline"
                 >
                   <RefreshCw
-                    className={isSyncingVault ? 'size-4 animate-spin' : 'size-4'}
+                    className={
+                      isSyncingVault ? 'size-4 animate-spin' : 'size-4'
+                    }
                   />
                   {isSyncingVault ? 'Syncing...' : 'Sync now'}
                 </Button>
@@ -187,9 +190,7 @@ type VirtualizedSecretListProps = {
   secrets: ReturnType<typeof useVaultSession>['decryptedSecrets']
 }
 
-function VirtualizedSecretList({
-  secrets
-}: VirtualizedSecretListProps) {
+function VirtualizedSecretList({ secrets }: VirtualizedSecretListProps) {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
   const [scrollTop, setScrollTop] = useState(0)
   const [containerHeight, setContainerHeight] = useState(640)
@@ -248,7 +249,7 @@ function VirtualizedSecretList({
       <CardContent className="flex h-full min-h-0 flex-col p-0">
         <div className="border-b border-[color:var(--color-border)] px-4 py-3 text-sm text-[color:var(--color-muted)]">
           {resultCountLabel}
-          <Button asChild size="sm" className='ml-auto' variant="primary">
+          <Button asChild size="sm" className="ml-auto" variant="primary">
             <Link to="/vault/new">
               <Plus className="size-4" />
               Add item
@@ -287,9 +288,7 @@ type VaultSecretListItemProps = {
   secret: ReturnType<typeof useVaultSession>['decryptedSecrets'][number]
 }
 
-function VaultSecretListItem({
-  secret
-}: VaultSecretListItemProps) {
+function VaultSecretListItem({ secret }: VaultSecretListItemProps) {
   const title =
     secret.kind === 'LOGIN_CREDENTIALS'
       ? secret.loginCredentials.label
@@ -305,7 +304,7 @@ function VaultSecretListItem({
   const subtitle =
     secret.kind === 'LOGIN_CREDENTIALS'
       ? `${secret.loginCredentials.username} at ${secret.loginCredentials.url}`
-      : secret.totp.url ?? 'No linked website'
+      : (secret.totp.url ?? 'No linked website')
   const kindLabel = secret.kind === 'LOGIN_CREDENTIALS' ? 'Credential' : 'TOTP'
 
   return (
@@ -331,7 +330,9 @@ function VaultSecretListItem({
                 {subtitle}
               </p>
               <div className="shrink-0 rounded-full border border-[color:var(--color-border)] bg-[color:var(--color-card)] px-3 py-1 text-[11px] font-medium tracking-[0.14em] text-[color:var(--color-muted)] uppercase">
-                {new Date(secret.updatedAt ?? secret.createdAt).toLocaleDateString()}
+                {new Date(
+                  secret.updatedAt ?? secret.createdAt
+                ).toLocaleDateString()}
               </div>
             </div>
           </div>
@@ -347,11 +348,7 @@ type VaultSecretIconProps = {
   url?: string | null
 }
 
-function VaultSecretIcon({
-  iconUrl,
-  label,
-  url
-}: VaultSecretIconProps) {
+function VaultSecretIcon({ iconUrl, label, url }: VaultSecretIconProps) {
   const [hasImageError, setHasImageError] = useState(false)
   const resolvedIconUrl = useMemo(() => {
     if (iconUrl) {

@@ -15,7 +15,9 @@ describe('Input', () => {
   it('toggles password visibility for password inputs', async () => {
     const user = userEvent.setup()
 
-    render(<Input aria-label="Password" defaultValue="hunter2" type="password" />)
+    render(
+      <Input aria-label="Password" defaultValue="hunter2" type="password" />
+    )
 
     const input = screen.getByLabelText('Password')
 
@@ -51,14 +53,14 @@ describe('Input', () => {
 
   it('does not show the copy button by default for password inputs', () => {
     render(
-      <Input
-        aria-label="Password"
-        defaultValue="hunter2"
-        type="password"
-      />
+      <Input aria-label="Password" defaultValue="hunter2" type="password" />
     )
 
-    expect(screen.queryByRole('button', { name: 'Copy password' })).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Show password' })).toBeInTheDocument()
+    expect(
+      screen.queryByRole('button', { name: 'Copy password' })
+    ).not.toBeInTheDocument()
+    expect(
+      screen.getByRole('button', { name: 'Show password' })
+    ).toBeInTheDocument()
   })
 })

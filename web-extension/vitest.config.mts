@@ -47,11 +47,7 @@ export default async function () {
   ])
 
   return defineConfig({
-    plugins: [
-      linguiBabelTransform(),
-      react(),
-      tsconfigPaths()
-    ],
+    plugins: [linguiBabelTransform(), react(), tsconfigPaths()],
     test: {
       globals: true,
       environment: 'jsdom',

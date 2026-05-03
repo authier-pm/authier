@@ -1,5 +1,10 @@
 import { describe, expect, it } from 'vitest'
-import { decryptSecretRecord, decryptSecrets, encryptLoginSecret, encryptTotpSecret } from './vaultSecrets'
+import {
+  decryptSecretRecord,
+  decryptSecrets,
+  encryptLoginSecret,
+  encryptTotpSecret
+} from './vaultSecrets'
 import { encryptString, generateEncryptionKey } from '@shared/cryptoUtils'
 
 describe('vaultSecrets', () => {
@@ -83,7 +88,11 @@ describe('vaultSecrets', () => {
       }),
       salt
     )
-    const invalidEncryptedRecord = await encryptString(masterKey, 'not json', salt)
+    const invalidEncryptedRecord = await encryptString(
+      masterKey,
+      'not json',
+      salt
+    )
 
     const result = await decryptSecrets(
       [

@@ -76,8 +76,12 @@ export const vaultApiContract = {
     listPendingChallenges: oc
       .input(emptyInputSchema)
       .output(pendingChallengesListSchema),
-    approveChallenge: oc.input(challengeActionInputSchema).output(okResultSchema),
-    rejectChallenge: oc.input(challengeActionInputSchema).output(okResultSchema),
+    approveChallenge: oc
+      .input(challengeActionInputSchema)
+      .output(okResultSchema),
+    rejectChallenge: oc
+      .input(challengeActionInputSchema)
+      .output(okResultSchema),
     rename: oc.input(renameDeviceInputSchema).output(currentDeviceSchema),
     logout: oc.input(deviceActionInputSchema).output(okResultSchema),
     remove: oc.input(deviceActionInputSchema).output(okResultSchema),
@@ -98,4 +102,6 @@ export const vaultApiContract = {
 }
 
 export type VaultApiInputs = InferContractRouterInputs<typeof vaultApiContract>
-export type VaultApiOutputs = InferContractRouterOutputs<typeof vaultApiContract>
+export type VaultApiOutputs = InferContractRouterOutputs<
+  typeof vaultApiContract
+>

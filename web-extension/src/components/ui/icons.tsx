@@ -16,7 +16,13 @@ import {
 import { FiSettings } from 'react-icons/fi'
 
 const createIcon = (IconComponent: ComponentType<any>) => {
-  return function WrappedIcon({ boxSize, ...props }: { boxSize?: number | string; [key: string]: any }) {
+  return function WrappedIcon({
+    boxSize,
+    ...props
+  }: {
+    boxSize?: number | string
+    [key: string]: any
+  }) {
     return <IconComponent size={boxSize} {...props} />
   }
 }
