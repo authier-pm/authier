@@ -1,3 +1,5 @@
+import { formatter } from '@lingui/format-po'
+
 export default {
   locales: ['en', 'cs'],
   sourceLocale: 'en',
@@ -8,8 +10,7 @@ export default {
       exclude: ['**/node_modules/**']
     }
   ],
-  format: 'po',
-  formatOptions: { origins: true, lineNumbers: false },
+  format: formatter({ origins: true, lineNumbers: false }),
   pseudoLocale: 'pseudo',
   fallbackLocales: {
     pseudo: 'en'

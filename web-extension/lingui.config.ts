@@ -1,3 +1,5 @@
+import { formatter } from '@lingui/format-po'
+
 export default {
   catalogs: [
     {
@@ -13,6 +15,5 @@ export default {
   fallbackLocales: {
     pseudo: 'en'
   },
-  format: 'po',
-  formatOptions: { origins: true, lineNumbers: false }
+  format: formatter({ origins: true, lineNumbers: false })
 }
