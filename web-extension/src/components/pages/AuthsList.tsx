@@ -2,7 +2,6 @@ import { useContext, useEffect, useState } from 'react'
 import { t } from '@lingui/core/macro'
 import browser from 'webextension-polyfill'
 import debug from 'debug'
-import { generateSync } from 'otplib'
 import { TbAuth2Fa } from 'react-icons/tb'
 import { IoBanOutline, IoCopyOutline } from 'react-icons/io5'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
@@ -19,6 +18,7 @@ import { SquareMousePointer } from './SquareMousePointerIcon'
 import { useRemoveWebInputMutation } from '../vault/VaultItemSettings.codegen'
 import { device } from '@src/background/ExtensionDevice'
 import { getWebInputsForUrl } from '@src/background/getWebInputsForUrl'
+import { generateTotpTokenSync } from '@shared/totp'
 
 const log = debug('au:AuthsList')
 
@@ -32,11 +32,14 @@ const OtpCode = ({ totpSecret }: { totpSecret: ITOTPSecret }) => {
   let otpCode = ''
   let otpCodeError: string | null = null
 
-  try {
-    otpCode = generateSync({ secret: totpSecret.totp.secret })
-  } catch (err) {
-    otpCodeError =
-      err instanceof Error ? err.message : t`Failed to generate OTP code`
+  const generatedOtpCode = generateTotpTokenSync({
+    secret: totpSecret.totp.secret
+  })
+
+  if (generatedOtpCode === null) {
+    otpCodeError = t`Failed to generate OTP code`
+  } else {
+    otpCode = generatedOtpCode
   }
 
   useEffect(() => {

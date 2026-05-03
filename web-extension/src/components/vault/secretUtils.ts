@@ -1,11 +1,13 @@
-import { getDecryptedSecretProp, type SecretTypeUnion } from '@src/background/ExtensionDevice'
+import {
+  getDecryptedSecretProp,
+  type SecretTypeUnion
+} from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import type { ITOTPSecret } from '@src/util/useDeviceState'
-import { generateSync } from 'otplib'
+import { generateTotpTokenSync } from '@shared/totp'
 
-export const isTotpSecret = (
-  secret: SecretTypeUnion
-): secret is ITOTPSecret => secret.kind === EncryptedSecretType.TOTP
+export const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
+  secret.kind === EncryptedSecretType.TOTP
 
 export const getSecretLabel = (secret: SecretTypeUnion) =>
   getDecryptedSecretProp(secret, 'label') || 'Untitled'
@@ -17,7 +19,9 @@ export const getSecretUsername = (secret: SecretTypeUnion) =>
   isTotpSecret(secret) ? '' : getDecryptedSecretProp(secret, 'username')
 
 export const getSecretValue = (secret: SecretTypeUnion) =>
-  isTotpSecret(secret) ? secret.totp.secret : getDecryptedSecretProp(secret, 'password')
+  isTotpSecret(secret)
+    ? secret.totp.secret
+    : getDecryptedSecretProp(secret, 'password')
 
 export const getMaskedSecretValue = (secret: SecretTypeUnion) =>
   '*'.repeat(Math.max(getSecretValue(secret).length, 8))
@@ -27,7 +31,8 @@ export const getSecretKindLabel = (secret: SecretTypeUnion) =>
 
 export const getSecretCopyValue = (secret: SecretTypeUnion) =>
   isTotpSecret(secret)
-    ? generateSync({ secret: secret.totp.secret })
+    ? (generateTotpTokenSync({ secret: secret.totp.secret }) ??
+      secret.totp.secret)
     : getDecryptedSecretProp(secret, 'password')
 
 export const getNavigableSecretUrl = (secret: SecretTypeUnion) => {

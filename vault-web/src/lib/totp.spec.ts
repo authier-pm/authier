@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import { formatTotpToken, generateTotpToken, getTotpRemainingSeconds } from './totp'
+import {
+  formatTotpToken,
+  generateTotpToken,
+  getTotpRemainingSeconds
+} from './totp'
 
 describe('totp helpers', () => {
   it('generates the expected 6-digit token for a known RFC test vector', async () => {
@@ -11,6 +15,17 @@ describe('totp helpers', () => {
     })
 
     expect(token).toBe('287082')
+  })
+
+  it('generates tokens for legacy short secrets', async () => {
+    const token = await generateTotpToken({
+      secret: 'JBSWY3DPEHPK3PXP',
+      digits: 6,
+      period: 30,
+      now: 59_000
+    })
+
+    expect(token).toBe('996554')
   })
 
   it('formats tokens into readable groups', () => {

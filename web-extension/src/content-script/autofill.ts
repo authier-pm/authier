@@ -1,5 +1,4 @@
 import { bodyInputChangeEmitter } from './domMutationObserver'
-import { generateSync } from 'otplib'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementVisibleInViewport } from './isElementInViewport'
@@ -36,6 +35,7 @@ import {
   appendGeneratedPasswordHistoryEntry,
   createGeneratedPasswordHistoryEntry
 } from '@src/util/generatedPasswordHistory'
+import { generateTotpTokenSync } from '@shared/totp'
 
 const log = debug('au:autofill')
 
@@ -47,12 +47,13 @@ export type IDecryptedSecrets = {
 export const autofillEventsDispatched = new Set()
 
 function safeGenerateTotpCode(totpSecret: ITOTPSecret) {
-  try {
-    return generateSync({ secret: totpSecret.totp.secret })
-  } catch (error) {
-    log('failed to generate totp code', error)
-    return null
+  const otpCode = generateTotpTokenSync({ secret: totpSecret.totp.secret })
+
+  if (otpCode === null) {
+    log('failed to generate totp code')
   }
+
+  return otpCode
 }
 
 function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
