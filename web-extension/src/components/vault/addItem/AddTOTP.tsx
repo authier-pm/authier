@@ -1,31 +1,24 @@
-import {
-  Button,
-  Box,
-  Flex,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Stack
-} from '@src/components/ui/legacy'
-import React from 'react'
+import { Formik, FormikHelpers, useField } from 'formik'
+import { useNavigate } from 'react-router-dom'
 
-import { Field, Formik, FormikHelpers } from 'formik'
 import { device } from '@src/background/ExtensionDevice'
 import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
-import { useNavigate } from 'react-router-dom'
 import { TotpTypeWithMeta } from '@src/util/useDeviceState'
 import { TOTPSchema } from '@shared/formikSharedTypes'
+import { Input } from '@src/components/ui/input'
+import { EditFormButtons } from '../EditFormButtons'
+import { cn } from '@src/lib/cn'
 
 export const AddTOTP = () => {
   const navigate = useNavigate()
+  const urlQuery = new URLSearchParams(window.location.hash.split('?')[1])
 
   return (
-    <Box width={{ base: '90%', sm: '70%', lg: '60%', xl: '70%' }}>
+    <div className="w-full max-w-2xl px-5 py-6">
       <Formik
         enableReinitialize
         initialValues={{
-          url: '',
+          url: urlQuery.get('url') || '',
           secret: '',
           label: '',
           iconUrl: '',
@@ -51,83 +44,86 @@ export const AddTOTP = () => {
           navigate(-1)
         }}
       >
-        {({ isSubmitting, handleSubmit, dirty, errors, touched }) => {
-          return (
-            <form onSubmit={handleSubmit}>
-              <Flex p={5} flexDirection="column" w="inherit">
-                <FormControl isInvalid={!!errors.url && touched.url}>
-                  <FormLabel htmlFor="url">URL:</FormLabel>
-                  <Field as={Input} id="url" name="url" />
-                  <FormErrorMessage>{errors.url}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.label && touched.label}>
-                  <FormLabel htmlFor="label">Label:</FormLabel>
-                  <Field as={Input} id="label" name="label" />
-                  <FormErrorMessage>{errors.label}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.secret && touched.secret}>
-                  <FormLabel htmlFor="secret">Secret:</FormLabel>
-                  <Field as={Input} id="secret" name="secret" />
-                  <FormErrorMessage>{errors.secret}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.digits && touched.digits}>
-                  <FormLabel htmlFor="digits">Digits:</FormLabel>
-                  <Field as={Input} id="digits" name="digits" />
-                  <FormErrorMessage>{errors.digits}</FormErrorMessage>
-                </FormControl>
-
-                <FormControl isInvalid={!!errors.period && touched.period}>
-                  <FormLabel htmlFor="period">Period:</FormLabel>
-                  <Field as={Input} id="period" name="period" />
-                  <FormErrorMessage>{errors.period}</FormErrorMessage>
-                </FormControl>
-                <Stack
-                  direction={'row'}
-                  justifyContent="flex-end"
-                  spacing={1}
-                  my={5}
-                  alignItems={'baseline'}
-                >
-                  <Button
-                    _focus={{
-                      bg: 'gray.200'
-                    }}
-                    fontSize={'sm'}
-                    size="sm"
-                    onClick={() => navigate('/')}
-                  >
-                    Go back
-                  </Button>
-                  <Button
-                    disabled={isSubmitting || !dirty}
-                    isLoading={isSubmitting}
-                    type="submit"
-                    size={'sm'}
-                    fontSize={'sm'}
-                    bg={'blue.400'}
-                    color={'white'}
-                    boxShadow={
-                      '0px 1px 25px -5px rgb(66 153 225 / 48%), 0 10px 10px -5px rgb(66 153 225 / 43%)'
-                    }
-                    _hover={{
-                      bg: 'blue.500'
-                    }}
-                    _focus={{
-                      bg: 'blue.500'
-                    }}
-                    aria-label="Create"
-                  >
-                    Create
-                  </Button>
-                </Stack>
-              </Flex>
-            </form>
-          )
-        }}
+        {({ handleSubmit }) => (
+          <form
+            className="space-y-5"
+            onSubmit={(event) => {
+              event.preventDefault()
+              handleSubmit()
+            }}
+          >
+            <TextField
+              label="URL"
+              name="url"
+              placeholder="https://example.com"
+            />
+            <TextField label="Label" name="label" />
+            <TextField label="Secret" name="secret" />
+            <div className="grid gap-4 md:grid-cols-2">
+              <NumberField label="Digits" name="digits" />
+              <NumberField label="Period" name="period" />
+            </div>
+            <EditFormButtons />
+          </form>
+        )}
       </Formik>
-    </Box>
+    </div>
+  )
+}
+
+function TextField({
+  label,
+  name,
+  placeholder
+}: {
+  label: string
+  name: string
+  placeholder?: string
+}) {
+  const [field, meta] = useField<string>(name)
+
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      <Input
+        {...field}
+        className={cn(
+          meta.touched && meta.error
+            ? 'border-danger focus:border-danger focus:ring-danger/30'
+            : undefined
+        )}
+        placeholder={placeholder}
+      />
+      {meta.touched && meta.error ? (
+        <p className="text-xs text-danger">{meta.error}</p>
+      ) : null}
+    </label>
+  )
+}
+
+function NumberField({ label, name }: { label: string; name: string }) {
+  const [field, meta, helpers] = useField<number | string>(name)
+
+  return (
+    <label className="block space-y-2">
+      <span className="text-sm font-medium text-foreground">{label}</span>
+      <Input
+        className={cn(
+          meta.touched && meta.error
+            ? 'border-danger focus:border-danger focus:ring-danger/30'
+            : undefined
+        )}
+        min={0}
+        type="number"
+        value={field.value}
+        onChange={(event) => {
+          const nextValue = Number.parseInt(event.target.value, 10)
+          helpers.setValue(Number.isNaN(nextValue) ? 0 : nextValue)
+        }}
+      />
+      {meta.touched && meta.error ? (
+        <p className="text-xs text-danger">{meta.error}</p>
+      ) : null}
+    </label>
   )
 }
