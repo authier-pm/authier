@@ -23,12 +23,14 @@ import { cn } from '@src/lib/cn'
 import {
   getMaskedSecretValue,
   getSecretCopyValue,
+  getSecretIconUrl,
   getSecretLabel,
   getSecretUrl,
   getSecretUsername,
   getSecretValue,
   isTotpSecret
 } from './secretUtils'
+import { SecretItemIcon } from '@src/components/SecretItemIcon'
 import { useElementSize, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
@@ -236,12 +238,15 @@ function SecretTableRow({
         />
       </div>
 
-      <div className="min-w-0">
-        <div className="truncate text-sm font-semibold text-[color:var(--color-foreground)]">
-          {getSecretLabel(row)}
-        </div>
-        <div className="mt-1 text-xs text-[color:var(--color-muted)]">
-          {isTotp ? 'TOTP' : 'Credential'}
+      <div className="flex min-w-0 items-center gap-3">
+        <SecretItemIcon iconUrl={getSecretIconUrl(row)} url={secretUrl} />
+        <div className="min-w-0">
+          <div className="truncate text-sm font-semibold text-[color:var(--color-foreground)]">
+            {getSecretLabel(row)}
+          </div>
+          <div className="mt-1 text-xs text-[color:var(--color-muted)]">
+            {isTotp ? 'TOTP' : 'Credential'}
+          </div>
         </div>
       </div>
 

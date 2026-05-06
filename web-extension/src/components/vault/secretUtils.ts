@@ -15,6 +15,9 @@ export const getSecretLabel = (secret: SecretTypeUnion) =>
 export const getSecretUrl = (secret: SecretTypeUnion) =>
   getDecryptedSecretProp(secret, 'url')
 
+export const getSecretIconUrl = (secret: SecretTypeUnion) =>
+  getDecryptedSecretProp(secret, 'iconUrl')
+
 export const getSecretUsername = (secret: SecretTypeUnion) =>
   isTotpSecret(secret) ? '' : getDecryptedSecretProp(secret, 'username')
 
