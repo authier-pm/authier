@@ -54,6 +54,7 @@ import type {
 import { eq, and, or, like, sql, gte, count, isNull, desc } from 'drizzle-orm'
 import * as schema from '../drizzle/schema'
 import { createHash } from 'crypto'
+import { defaultAccountLimits } from '../models/accountLimits'
 
 const log = debug('au:RootResolver')
 
@@ -249,8 +250,8 @@ export class RootResolver {
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60,
-          loginCredentialsLimit: 40,
-          TOTPlimit: 3
+          loginCredentialsLimit: defaultAccountLimits.loginCredentialsLimit,
+          TOTPlimit: defaultAccountLimits.TOTPlimit
         })
         .returning()
 

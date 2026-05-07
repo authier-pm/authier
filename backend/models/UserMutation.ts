@@ -33,6 +33,7 @@ import debug from 'debug'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
+import { defaultAccountLimits } from './accountLimits'
 import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
 import { eq, and, sql, inArray, isNull, count } from 'drizzle-orm'
 import {
@@ -180,8 +181,10 @@ export class UserMutation extends UserBase {
       where: { id: ctx.jwtPayload.userId }
     })
 
-    const pswLimit = userData?.loginCredentialsLimit ?? 40
-    const TOTPLimit = userData?.TOTPlimit ?? 3
+    const pswLimit =
+      userData?.loginCredentialsLimit ??
+      defaultAccountLimits.loginCredentialsLimit
+    const TOTPLimit = userData?.TOTPlimit ?? defaultAccountLimits.TOTPlimit
 
     let [{ count: pswCount }] = await ctx.db
       .select({ count: count() })
