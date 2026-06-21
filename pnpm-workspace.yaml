@@ -7,5 +7,25 @@ packages:
   - '!backend/dist/**'
   - '!vault-web/dist/**'
   - '!web-extension/dist/**'
+allowBuilds:
+  '@capaj/type-graphql': set this to true or false
+  '@firebase/util': set this to true or false
+  '@prisma/engines': set this to true or false
+  '@sentry/cli': set this to true or false
+  '@swc/core': set this to true or false
+  core-js: set this to true or false
+  esbuild: set this to true or false
+  prisma: set this to true or false
+  protobufjs: set this to true or false
+  puppeteer: set this to true or false
+  react-grab: set this to true or false
+  sharp: set this to true or false
+  type-graphql: set this to true or false
+  vue-demi: set this to true or false
+  workerd: set this to true or false
+minimumReleaseAgeExclude:
+  - '@types/chrome@0.2.0'
+  - lint-staged@17.0.8
+  - sql-formatter@15.8.2
 
 # minimumReleaseAge: 1440
