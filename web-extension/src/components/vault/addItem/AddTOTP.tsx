@@ -14,7 +14,7 @@ export const AddTOTP = () => {
   const urlQuery = new URLSearchParams(window.location.hash.split('?')[1])
 
   return (
-    <div className="w-full max-w-2xl px-5 py-6">
+    <div className="w-full px-5 py-6">
       <Formik
         enableReinitialize
         initialValues={{
@@ -46,7 +46,7 @@ export const AddTOTP = () => {
       >
         {({ handleSubmit }) => (
           <form
-            className="space-y-5"
+            className="grid w-full gap-5 md:grid-cols-2"
             onSubmit={(event) => {
               event.preventDefault()
               handleSubmit()
@@ -58,12 +58,12 @@ export const AddTOTP = () => {
               placeholder="https://example.com"
             />
             <TextField label="Label" name="label" />
-            <TextField label="Secret" name="secret" />
-            <div className="grid gap-4 md:grid-cols-2">
-              <NumberField label="Digits" name="digits" />
-              <NumberField label="Period" name="period" />
+            <TextField className="md:col-span-2" label="Secret" name="secret" />
+            <NumberField label="Digits" name="digits" />
+            <NumberField label="Period" name="period" />
+            <div className="md:col-span-2">
+              <EditFormButtons />
             </div>
-            <EditFormButtons />
           </form>
         )}
       </Formik>
@@ -74,8 +74,10 @@ export const AddTOTP = () => {
 function TextField({
   label,
   name,
+  className,
   placeholder
 }: {
+  className?: string
   label: string
   name: string
   placeholder?: string
@@ -83,7 +85,7 @@ function TextField({
   const [field, meta] = useField<string>(name)
 
   return (
-    <label className="block space-y-2">
+    <label className={cn('block space-y-2', className)}>
       <span className="text-sm font-medium text-foreground">{label}</span>
       <Input
         {...field}

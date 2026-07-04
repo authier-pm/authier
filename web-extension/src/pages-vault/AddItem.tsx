@@ -39,7 +39,7 @@ export const AddItem = () => {
       }}
       transition={{ duration: 0.25 }}
     >
-      <div className="m-auto flex w-[90%] flex-col items-center overflow-hidden rounded-[var(--radius-md)] bg-[color:var(--color-card)] shadow-2xl sm:w-[70%] lg:w-[60%]">
+      <div className="m-auto flex w-full max-w-5xl flex-col items-stretch overflow-hidden rounded-[var(--radius-md)] bg-[color:var(--color-card)] shadow-2xl">
         {totpLimitReached || pswLimitReached ? (
           <Txt color="yellow.600" fontSize="lg" mt={10}>
             <Trans>
@@ -54,7 +54,7 @@ export const AddItem = () => {
         {device.state?.syncTOTP ? (
           <>
             <select
-              className="mt-5 w-1/2 rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 py-2"
+              className="mx-5 mt-5 max-w-xs rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 py-2"
               onChange={(e) => setType(e.target.value as SecretType)}
               value={type}
             >

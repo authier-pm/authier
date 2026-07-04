@@ -26,7 +26,6 @@ import {
   getSecretIconUrl,
   getSecretLabel,
   getSecretUrl,
-  getSecretUsername,
   getSecretValue,
   isTotpSecret
 } from './secretUtils'
@@ -35,10 +34,10 @@ import { useElementSize, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
   gridTemplateColumns:
-    '40px minmax(240px, 1.4fr) minmax(220px, 1.2fr) minmax(200px, 1fr) minmax(220px, 1fr) 168px'
+    '40px minmax(280px, 1.5fr) minmax(260px, 1.2fr) minmax(260px, 1fr) 168px'
 } as const
 
-const tableGridClassName = 'grid min-w-[1128px] gap-4 px-4'
+const tableGridClassName = 'grid min-w-[940px] gap-4 px-4'
 const TABLE_ROW_HEIGHT = 76
 const TABLE_HEADER_HEIGHT = 56
 
@@ -134,7 +133,7 @@ export function TableList({ filter }: { filter: string }) {
         }}
         ref={parentRef}
       >
-        <div className="min-w-[1128px]">
+        <div className="min-w-[940px]">
           <div
             className={cn(
               tableGridClassName,
@@ -150,9 +149,6 @@ export function TableList({ filter }: { filter: string }) {
               <Trans>URL</Trans>
             </div>
             <div>
-              <Trans>Username</Trans>
-            </div>
-            <div>
               <Trans>Secret</Trans>
             </div>
             <div className="text-right">
@@ -161,7 +157,7 @@ export function TableList({ filter }: { filter: string }) {
           </div>
 
           <div
-            className="relative min-w-[1128px]"
+            className="relative min-w-[940px]"
             style={{ height: `${virtualWindow.totalSize}px` }}
           >
             {data
@@ -211,7 +207,6 @@ function SecretTableRow({
   const [isSecretVisible, setIsSecretVisible] = useState(false)
   const toast = useAppToast()
   const secretUrl = getSecretUrl(row)
-  const username = getSecretUsername(row)
   const isTotp = isTotpSecret(row)
   const renderedSecret =
     isSecretVisible || showAllSecrets
@@ -252,10 +247,6 @@ function SecretTableRow({
 
       <div className="truncate text-sm text-[color:var(--color-muted)]">
         {secretUrl || '—'}
-      </div>
-
-      <div className="truncate text-sm text-[color:var(--color-foreground)]">
-        {username || '—'}
       </div>
 
       <div className="truncate font-mono text-sm text-[color:var(--color-foreground)]">
