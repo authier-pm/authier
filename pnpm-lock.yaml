@@ -170,6 +170,12 @@ importers:
       mem:
         specifier: ^8
         version: 8.1.1
+      ms:
+        specifier: ^2.1.3
+        version: 2.1.3
+      object-hash:
+        specifier: ^3.0.0
+        version: 3.0.0
       pino:
         specifier: ^10.3.1
         version: 10.3.1
@@ -234,6 +240,12 @@ importers:
       '@types/lodash.set':
         specifier: ^4.3.9
         version: 4.3.9
+      '@types/ms':
+        specifier: ^2.1.0
+        version: 2.1.0
+      '@types/object-hash':
+        specifier: ^3.0.6
+        version: 3.0.6
       '@types/uuid':
         specifier: ^11.0.0
         version: 11.0.0
@@ -8663,6 +8675,9 @@ packages:
   '@types/ms@0.7.31':
     resolution: {integrity: sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==}
 
+  '@types/ms@2.1.0':
+    resolution: {integrity: sha512-GsCCIZDE/p3i96vtEqx+7dBUGXrc7zeSK3wwPHIaRThS+9OhWIXRqzs4d6k1SVU8g91DrNRWxWUGhp5KXQb2VA==}
+
   '@types/mssql@9.1.9':
     resolution: {integrity: sha512-P0nCgw6vzY23UxZMnbI4N7fnLGANt4LI4yvxze1paPj+LuN28cFv5EI+QidP8udnId/BKhkcRhm/BleNsjK65A==}
 
@@ -8677,6 +8692,9 @@ packages:
 
   '@types/node@26.0.0':
     resolution: {integrity: sha512-vf2YFi1iY9lHGwNJMs01biZFbKJkrZR1T6/MlzjhJLPdntOHLhTrDSnSVcdtvjihi4VQNlrFRIxLsDBlQpAipA==}
+
+  '@types/object-hash@3.0.6':
+    resolution: {integrity: sha512-fOBV8C1FIu2ELinoILQ+ApxcUKz4ngq+IWUYrxSGjXzzjUALijilampwkMgEtJ+h2njAW3pi853QpzNVCHB73w==}
 
   '@types/offscreencanvas@2019.7.3':
     resolution: {integrity: sha512-ieXiYmgSRXUDeOntE1InxjWyvEelZGP63M+cGuquuRLuIKKT1osnkXjxev9B7d1nXSug5vpunx+gNlbVxMlC9A==}
@@ -28044,7 +28062,7 @@ snapshots:
 
   '@types/jsonwebtoken@9.0.10':
     dependencies:
-      '@types/ms': 0.7.31
+      '@types/ms': 2.1.0
       '@types/node': 25.6.0
 
   '@types/lodash.mergewith@4.6.9':
@@ -28062,6 +28080,8 @@ snapshots:
   '@types/minimatch@5.1.2': {}
 
   '@types/ms@0.7.31': {}
+
+  '@types/ms@2.1.0': {}
 
   '@types/mssql@9.1.9(@azure/core-client@1.10.1)':
     dependencies:
@@ -28088,6 +28108,8 @@ snapshots:
   '@types/node@26.0.0':
     dependencies:
       undici-types: 8.3.0
+
+  '@types/object-hash@3.0.6': {}
 
   '@types/offscreencanvas@2019.7.3': {}
 
