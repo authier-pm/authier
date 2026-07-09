@@ -1,6 +1,7 @@
 packages:
   - 'backend/**'
   - 'mobile-app/**'
+  - 'shared'
   - 'vault-web/**'
   - 'web-extension/**'
   # if required, exclude some directories

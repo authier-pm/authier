@@ -26,7 +26,7 @@ export default defineConfig({
     alias: {
       stripe: path.resolve(
         __dirname,
-        '../node_modules/stripe/cjs/stripe.cjs.node.js'
+        'node_modules/stripe/cjs/stripe.cjs.node.js'
       )
     }
   }
