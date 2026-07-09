@@ -8,23 +8,6 @@ packages:
   - '!vault-web/dist/**'
   - '!web-extension/dist/**'
 
-onlyBuiltDependencies:
-  - '@capaj/type-graphql'
-  - '@firebase/util'
-  - '@prisma/engines'
-  - '@sentry/cli'
-  - '@swc/core'
-  - core-js
-  - esbuild
-  - prisma
-  - protobufjs
-  - puppeteer
-  - react-grab
-  - sharp
-  - type-graphql
-  - vue-demi
-  - workerd
-
 overrides:
   ajv: ^8.18.0
   react: ^19.2.4
@@ -41,5 +24,22 @@ minimumReleaseAgeExclude:
   - '@types/chrome@0.2.0'
   - lint-staged@17.0.8
   - sql-formatter@15.8.2
+
+allowBuilds:
+  '@capaj/type-graphql': true
+  '@firebase/util': true
+  '@prisma/engines': true
+  '@sentry/cli': true
+  '@swc/core': true
+  core-js: true
+  esbuild: true
+  prisma: true
+  protobufjs: true
+  puppeteer: true
+  react-grab: true
+  sharp: true
+  type-graphql: true
+  vue-demi: true
+  workerd: true
 
 # minimumReleaseAge: 1440
