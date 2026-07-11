@@ -9,7 +9,7 @@
     "Jiri Spac <capajj@gmail.com>"
   ],
   "license": "AGPL-3.0-or-later",
-  "packageManager": "pnpm@11.8.0",
+  "packageManager": "pnpm@11.10.0",
   "overrides": {
     "graphql": "^16.8.1",
     "react": "^19.2.4",
@@ -67,27 +67,5 @@
   },
   "lint-staged": {
     "*": "oxfmt --no-error-on-unmatched-pattern"
-  },
-  "pnpm": {
-    "onlyBuiltDependencies": [
-      "@capaj/type-graphql",
-      "@prisma/engines",
-      "@swc/core",
-      "esbuild",
-      "prisma",
-      "type-graphql"
-    ],
-    "overrides": {
-      "ajv": "^8.18.0",
-      "react": "^19.2.4",
-      "react-dom": "^19.2.4",
-      "@types/react": "^19",
-      "@types/react-dom": "^19"
-    },
-    "patchedDependencies": {
-      "@react-native/gradle-plugin": "patches/@react-native__gradle-plugin.patch",
-      "native-base@3.4.28": "patches/native-base@3.4.28.patch",
-      "@graphql-codegen/typescript-react-apollo": "patches/@graphql-codegen__typescript-react-apollo.patch"
-    }
   }
 }

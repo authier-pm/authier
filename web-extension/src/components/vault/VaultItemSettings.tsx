@@ -153,7 +153,7 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
 
           return (
             <form
-              className="space-y-5"
+              className="grid w-full gap-5 md:grid-cols-2"
               onSubmit={(event) => {
                 event.preventDefault()
                 handleSubmit()
@@ -193,16 +193,18 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
                 />
               </div>
 
-              <PasswordGenerator
-                isOpen={isGeneratorOpen}
-                onGenerate={(generatedPassword) => {
-                  setFieldValue('password', generatedPassword)
-                  setShowPassword(true)
-                }}
-              />
+              <div className="md:col-span-2">
+                <PasswordGenerator
+                  isOpen={isGeneratorOpen}
+                  onGenerate={(generatedPassword) => {
+                    setFieldValue('password', generatedPassword)
+                    setShowPassword(true)
+                  }}
+                />
+              </div>
 
               {secretProps.loginCredentials.parseError ? (
-                <div className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
+                <div className="rounded-[var(--radius-md)] border border-[color:var(--color-danger)] md:col-span-2 bg-[color:var(--color-danger-bg)] px-4 py-3 text-sm text-[color:var(--color-danger-foreground)]">
                   <div className="font-medium">
                     <Trans>Failed to parse this secret</Trans>
                   </div>
@@ -212,7 +214,9 @@ function LoginSecret({ secretProps }: { secretProps: ILoginSecret }) {
                 </div>
               ) : null}
 
-              <EditFormButtons secret={secretProps} />
+              <div className="md:col-span-2">
+                <EditFormButtons secret={secretProps} />
+              </div>
             </form>
           )
         }}
@@ -294,7 +298,7 @@ function TotpSecret({ secretProps }: { secretProps: ITOTPSecret }) {
       >
         {({ handleSubmit }) => (
           <form
-            className="space-y-5"
+            className="grid w-full gap-5 md:grid-cols-2"
             onSubmit={(event) => {
               event.preventDefault()
               handleSubmit()
@@ -302,28 +306,30 @@ function TotpSecret({ secretProps }: { secretProps: ITOTPSecret }) {
           >
             <TextField label="URL" name="url" />
             <TextField label="Label" name="label" />
-            <PasswordField
-              copyLabel={t`Copy shared secret`}
-              label="Secret"
-              name="secret"
-              onCopy={(value) => {
-                navigator.clipboard.writeText(value)
-                toast({
-                  title: t`Copied to clipboard`,
-                  status: 'success'
-                })
-              }}
-              onToggleVisibility={() => {
-                setShowSecret((currentValue) => !currentValue)
-              }}
-              showValue={showSecret}
-              toggleGeneratorLabel={null}
-            />
-            <div className="grid gap-4 md:grid-cols-2">
-              <NumberField label="Digits" name="digits" />
-              <NumberField label="Period" name="period" />
+            <div className="md:col-span-2">
+              <PasswordField
+                copyLabel={t`Copy shared secret`}
+                label="Secret"
+                name="secret"
+                onCopy={(value) => {
+                  navigator.clipboard.writeText(value)
+                  toast({
+                    title: t`Copied to clipboard`,
+                    status: 'success'
+                  })
+                }}
+                onToggleVisibility={() => {
+                  setShowSecret((currentValue) => !currentValue)
+                }}
+                showValue={showSecret}
+                toggleGeneratorLabel={null}
+              />
             </div>
-            <EditFormButtons secret={secretProps} />
+            <NumberField label="Digits" name="digits" />
+            <NumberField label="Period" name="period" />
+            <div className="md:col-span-2">
+              <EditFormButtons secret={secretProps} />
+            </div>
           </form>
         )}
       </Formik>

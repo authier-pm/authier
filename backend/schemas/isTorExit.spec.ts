@@ -1,9 +1,20 @@
-import { describe, expect, it } from 'vitest'
-import { isTorExit } from './isTorExit'
+import { lookup } from "dns/promises";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { isTorExit } from "./isTorExit";
 
-describe('isTorExit', () => {
-  it('should return true for a Tor exit node', async () => {
-    const res = await isTorExit('2.58.56.220') // a random address from https://www.dan.me.uk/tornodes we might need to change it in the future if the node goes down
-    expect(res).toBe(true)
-  })
-})
+vi.mock("dns/promises", () => ({ lookup: vi.fn() }));
+
+const lookupMock = vi.mocked(lookup);
+
+describe("isTorExit", () => {
+  beforeEach(() => {
+    lookupMock.mockReset();
+  });
+
+  it("returns true when the Tor DNS exit list matches the address", async () => {
+    lookupMock.mockResolvedValue({ address: "127.0.0.2", family: 4 });
+
+    await expect(isTorExit("2.58.56.220")).resolves.toBe(true);
+    expect(lookupMock).toHaveBeenCalledWith("220.56.58.2.dnsel.torproject.org");
+  });
+});

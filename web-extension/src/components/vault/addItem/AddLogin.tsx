@@ -39,7 +39,7 @@ export const AddLogin = () => {
   const handleClick = () => setShow(!showPassword)
 
   return (
-    <Box width={{ base: '90%', sm: '70%', lg: '60%', xl: '70%' }}>
+    <Box width="100%" px={5} py={6}>
       <Formik
         initialValues={{
           url: urlQuery.get('url') || '',
@@ -85,11 +85,17 @@ export const AddLogin = () => {
               <Flex
                 p={5}
                 flexDirection="column"
-                w="inherit"
+                w="100%"
                 sx={{
+                  display: 'grid',
+                  gap: '20px',
+                  gridTemplateColumns: {
+                    base: '1fr',
+                    md: 'repeat(2, minmax(0, 1fr))'
+                  },
                   label: {
                     marginBottom: '0px',
-                    marginTop: '10px'
+                    marginTop: '0px'
                   }
                 }}
               >
@@ -121,7 +127,10 @@ export const AddLogin = () => {
                   <FormErrorMessage>{errors.username}</FormErrorMessage>
                 </FormControl>
 
-                <FormControl isInvalid={!!errors.password && touched.password}>
+                <FormControl
+                  isInvalid={!!errors.password && touched.password}
+                  gridColumn={{ md: '1 / -1' }}
+                >
                   <FormLabel htmlFor="password">Password:</FormLabel>
                   <InputGroup size="md">
                     <Field
@@ -148,14 +157,18 @@ export const AddLogin = () => {
 
                   <FormErrorMessage>{errors.password}</FormErrorMessage>
                 </FormControl>
-                <PasswordGenerator
-                  isOpen={isOpen}
-                  onGenerate={(password) => {
-                    setFieldValue('password', password)
-                  }}
-                />
+                <Box gridColumn={{ md: '1 / -1' }}>
+                  <PasswordGenerator
+                    isOpen={isOpen}
+                    onGenerate={(password) => {
+                      setFieldValue('password', password)
+                    }}
+                  />
+                </Box>
 
-                <EditFormButtons />
+                <Box gridColumn={{ md: '1 / -1' }}>
+                  <EditFormButtons />
+                </Box>
               </Flex>
             </form>
           )
