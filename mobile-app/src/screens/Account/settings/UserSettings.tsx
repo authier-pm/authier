@@ -90,7 +90,6 @@ export function UserSettings() {
         vaultLockTimeoutSeconds: defaultData.vaultLockTimeoutSeconds,
         theme,
         syncTOTP: defaultData.syncTOTP,
-        autofillCredentialsEnabled: defaultData.autofillCredentialsEnabled,
         autofillTOTPEnabled: defaultData.autofillTOTPEnabled
       }
 
@@ -114,7 +113,6 @@ export function UserSettings() {
           theme: form.theme,
           vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds,
           autofillTOTPEnabled: form.autofillTOTPEnabled,
-          autofillCredentialsEnabled: form.autofillCredentialsEnabled,
           syncTOTP: form.syncTOTP,
           uiLanguage
         }
@@ -348,23 +346,6 @@ export function UserSettings() {
                       setForm({
                         ...(form as DefaultSettingsInput),
                         syncTOTP: e
-                      })
-                    }}
-                    size="md"
-                  />
-                </HStack>
-                <HStack
-                  justifyContent="space-between"
-                  alignContent="center"
-                  p={2}
-                >
-                  <Trans>Credentials autofill</Trans>
-                  <Switch
-                    value={form?.autofillCredentialsEnabled}
-                    onToggle={async (e) => {
-                      setForm({
-                        ...(form as DefaultSettingsInput),
-                        autofillCredentialsEnabled: e
                       })
                     }}
                     size="md"

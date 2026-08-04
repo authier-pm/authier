@@ -1,119 +1,116 @@
-import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
-import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
+import { Field, ID, InputType, Int, ObjectType } from "type-graphql";
+import { EncryptedSecretTypeGQL } from "./types/EncryptedSecretType";
 
-import { UserMutation } from './UserMutation'
-import { GraphQLUUID } from 'graphql-scalars'
+import { UserMutation } from "./UserMutation";
+import { GraphQLUUID } from "graphql-scalars";
 
 @ObjectType()
 export class DecryptionChallengeResponse {
   @Field(() => String)
-  userId: string
+  userId: string;
 
   @Field(() => String)
-  addDeviceSecretEncrypted: string
+  addDeviceSecretEncrypted: string;
 }
 
 @ObjectType()
 export class UserBase {
   @Field(() => GraphQLUUID)
-  id: string
+  id: string;
 
   @Field(() => String, { nullable: true })
-  email?: string
+  email?: string;
 
   @Field(() => String)
-  phone_number?: string
+  phone_number?: string;
 
   @Field(() => String)
-  account_name?: string
+  account_name?: string;
 
   @Field(() => String)
-  password: string
+  password: string;
 
   @Field(() => Number)
-  tokenVersion: number
+  tokenVersion: number;
 
   @Field(() => Int)
-  primaryDeviceId: number
+  primaryDeviceId: number;
 }
 
 @ObjectType()
 export class LoginResponse {
   @Field(() => String)
-  accessToken: string
+  accessToken: string;
 
   @Field(() => UserMutation)
-  user: UserMutation
+  user: UserMutation;
 
   @Field(() => String, { nullable: false })
-  encryptionSalt: string
+  encryptionSalt: string;
 }
 
 @InputType()
 export class OTPEvent {
   @Field(() => EncryptedSecretTypeGQL)
-  kind: EncryptedSecretTypeGQL
+  kind: EncryptedSecretTypeGQL;
 
   @Field(() => String)
-  url: string
+  url: string;
 }
 
 @InputType()
 export class EncryptedSecretInput {
   @Field(() => EncryptedSecretTypeGQL, { nullable: false })
-  kind: EncryptedSecretTypeGQL
+  kind: EncryptedSecretTypeGQL;
 
   @Field(() => String, { nullable: false })
-  encrypted: string
+  encrypted: string;
 }
 
 @InputType()
 export class SettingsInput {
   @Field(() => Boolean)
-  syncTOTP: boolean
+  syncTOTP: boolean;
 
   @Field(() => Int)
-  vaultLockTimeoutSeconds: number
+  vaultLockTimeoutSeconds: number;
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
+  autofillTOTPEnabled: boolean;
 
-  @Field(() => Boolean)
-  autofillTOTPEnabled: boolean
+  @Field(() => String, { nullable: true })
+  autofillForbiddenUrlPatterns?: string;
 
   @Field(() => String)
-  uiLanguage: string
+  uiLanguage: string;
 
   @Field(() => Boolean)
-  notificationOnVaultUnlock: boolean
+  notificationOnVaultUnlock: boolean;
 
   @Field(() => Int)
-  notificationOnWrongPasswordAttempts: number
+  notificationOnWrongPasswordAttempts: number;
 }
 
 @InputType()
 export class DefaultSettingsInput {
   @Field(() => Boolean, { nullable: false })
-  syncTOTP: boolean
+  syncTOTP: boolean;
 
   @Field(() => Int, { nullable: false })
-  vaultLockTimeoutSeconds: number
+  vaultLockTimeoutSeconds: number;
 
   @Field(() => Boolean, { nullable: false })
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean, { nullable: false })
-  autofillTOTPEnabled: boolean
+  autofillTOTPEnabled: boolean;
 
   @Field(() => String, { nullable: false })
-  uiLanguage: string
+  uiLanguage: string;
 
   @Field(() => String, { nullable: false })
-  theme: string
+  theme: string;
 }
 
 @InputType()
 export class EncryptedSecretPatchInput extends EncryptedSecretInput {
   @Field(() => GraphQLUUID)
-  id: string
+  id: string;
 }

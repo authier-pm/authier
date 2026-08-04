@@ -6,6 +6,7 @@ import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
 
 import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
+import { isAutofillForbiddenForUrl } from '@shared/autofillForbiddenUrlPatterns'
 import { getWebInputsForUrl } from './getWebInputsForUrl'
 const log = debug('au:getContentScriptInitialState')
 
@@ -113,7 +114,12 @@ export const getContentScriptInitialState = async (
   return {
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
-    autofillEnabled: !!device.state?.autofillCredentialsEnabled,
+    autofillEnabled:
+      !!device.state?.autofillCredentialsEnabled &&
+      !isAutofillForbiddenForUrl(
+        tabUrl,
+        device.state?.autofillForbiddenUrlPatterns ?? ''
+      ),
     webInputs: webInputs,
     passwordCount:
       device.state?.secrets.filter(

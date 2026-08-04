@@ -14,7 +14,7 @@ export type AddNewDeviceForUserMutationVariables = Types.Exact<{
 
 
 export type AddNewDeviceForUserMutation = { __typename?: 'Mutation', deviceDecryptionChallenge?:
-    | { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean }, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
+    | { __typename?: 'DecryptionChallengeApproved', id: number, addNewDeviceForUser: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'UserMutation', id: string, uiLanguage: string, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, autofillForbiddenUrlPatterns: string, EncryptedSecrets: Array<{ __typename?: 'EncryptedSecretGQL', id: string, encrypted: string, kind: Types.EncryptedSecretType, createdAt: string, updatedAt?: string | null, version: number }>, device: { __typename?: 'DeviceMutation', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean }, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } }
     | { __typename?: 'DecryptionChallengeForApproval' }
    | null };
 
@@ -62,17 +62,16 @@ export const AddNewDeviceForUserDocument = gql`
           }
           notificationOnVaultUnlock
           notificationOnWrongPasswordAttempts
+          autofillForbiddenUrlPatterns
           device(id: $deviceId) {
             id
             syncTOTP
             vaultLockTimeoutSeconds
-            autofillCredentialsEnabled
             autofillTOTPEnabled
           }
           defaultDeviceSettings {
             id
             autofillTOTPEnabled
-            autofillCredentialsEnabled
             theme
             syncTOTP
             vaultLockTimeoutSeconds

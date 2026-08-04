@@ -1,101 +1,104 @@
-import { Field, ObjectType, ID, Int, GraphQLISODateTime } from 'type-graphql'
-import { TokenGQL } from './TokenGQL'
-import { DeviceGQL } from './DeviceGQL'
-import { DecryptionChallengeGQL } from './DecryptionChallengeGQL'
-import { SecretUsageEventGQL } from './SecretUsageEventGQL'
-import { EncryptedSecretGQL } from './EncryptedSecretGQL'
-import { WebInputGQL } from './WebInputGQL'
-import { TagGQL } from './TagGQL'
-import { UserPaidProductsGQL } from './UserPaidProductsGQL'
-import { MasterDeviceChangeGQL } from './MasterDeviceChangeGQL'
-import { DefaultDeviceSettingsGQL } from './DefaultDeviceSettingsGQL'
-import { UserNewDevicePolicyGQL } from '../types/UserNewDevicePolicy'
+import { Field, ObjectType, ID, Int, GraphQLISODateTime } from "type-graphql";
+import { TokenGQL } from "./TokenGQL";
+import { DeviceGQL } from "./DeviceGQL";
+import { DecryptionChallengeGQL } from "./DecryptionChallengeGQL";
+import { SecretUsageEventGQL } from "./SecretUsageEventGQL";
+import { EncryptedSecretGQL } from "./EncryptedSecretGQL";
+import { WebInputGQL } from "./WebInputGQL";
+import { TagGQL } from "./TagGQL";
+import { UserPaidProductsGQL } from "./UserPaidProductsGQL";
+import { MasterDeviceChangeGQL } from "./MasterDeviceChangeGQL";
+import { DefaultDeviceSettingsGQL } from "./DefaultDeviceSettingsGQL";
+import { UserNewDevicePolicyGQL } from "../types/UserNewDevicePolicy";
 
 @ObjectType()
 export class UserGQLScalars {
   @Field(() => ID)
-  id: string
+  id: string;
 
   @Field(() => String, { nullable: true })
-  email: string | null
+  email: string | null;
 
   @Field(() => Int)
-  tokenVersion: number
+  tokenVersion: number;
 
   @Field(() => String, { nullable: true })
-  username: string | null
+  username: string | null;
 
   @Field(() => String)
-  addDeviceSecretEncrypted: string
+  addDeviceSecretEncrypted: string;
 
   @Field(() => GraphQLISODateTime)
-  createdAt: Date
+  createdAt: Date;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  updatedAt: Date | null
+  updatedAt: Date | null;
 
   @Field(() => String, { nullable: true })
-  masterDeviceId: string | null
+  masterDeviceId: string | null;
 
   @Field(() => String)
-  uiLanguage: string
+  uiLanguage: string;
 
   @Field(() => Int)
-  TOTPlimit: number
+  TOTPlimit: number;
 
   @Field(() => Int)
-  loginCredentialsLimit: number
+  loginCredentialsLimit: number;
 
   @Field(() => Int)
-  deviceRecoveryCooldownMinutes: number
+  deviceRecoveryCooldownMinutes: number;
 
   @Field(() => Boolean)
-  notificationOnVaultUnlock: boolean
+  notificationOnVaultUnlock: boolean;
 
   @Field(() => Int)
-  notificationOnWrongPasswordAttempts: number
+  notificationOnWrongPasswordAttempts: number;
+
+  @Field(() => String)
+  autofillForbiddenUrlPatterns: string;
 
   @Field(() => UserNewDevicePolicyGQL, { nullable: true })
-  newDevicePolicy: UserNewDevicePolicyGQL | null
+  newDevicePolicy: UserNewDevicePolicyGQL | null;
 }
 
 @ObjectType()
 export class UserGQL extends UserGQLScalars {
   @Field(() => [TokenGQL])
-  Token: TokenGQL[]
+  Token: TokenGQL[];
 
   @Field(() => DeviceGQL, { nullable: true })
-  masterDevice: DeviceGQL | null
+  masterDevice: DeviceGQL | null;
 
   @Field(() => DecryptionChallengeGQL, { nullable: true })
-  recoveryDecryptionChallenge: DecryptionChallengeGQL | null
+  recoveryDecryptionChallenge: DecryptionChallengeGQL | null;
 
   @Field(() => [SecretUsageEventGQL])
-  UsageEvents: SecretUsageEventGQL[]
+  UsageEvents: SecretUsageEventGQL[];
 
   @Field(() => [EncryptedSecretGQL])
-  EncryptedSecrets: EncryptedSecretGQL[]
+  EncryptedSecrets: EncryptedSecretGQL[];
 
   @Field(() => [DeviceGQL])
-  Devices: DeviceGQL[]
+  Devices: DeviceGQL[];
 
   @Field(() => [WebInputGQL])
-  WebInputsAdded: WebInputGQL[]
+  WebInputsAdded: WebInputGQL[];
 
   @Field(() => [TagGQL])
-  Tags: TagGQL[]
+  Tags: TagGQL[];
 
   @Field(() => [UserPaidProductsGQL])
-  UserPaidProducts: UserPaidProductsGQL[]
+  UserPaidProducts: UserPaidProductsGQL[];
 
   @Field(() => [DecryptionChallengeGQL])
-  DecryptionChallenges: DecryptionChallengeGQL[]
+  DecryptionChallenges: DecryptionChallengeGQL[];
 
   @Field(() => [MasterDeviceChangeGQL])
-  MasterDeviceChange: MasterDeviceChangeGQL[]
+  MasterDeviceChange: MasterDeviceChangeGQL[];
 
   @Field(() => DefaultDeviceSettingsGQL, { nullable: true })
-  DefaultDeviceSettings: DefaultDeviceSettingsGQL | null
+  DefaultDeviceSettings: DefaultDeviceSettingsGQL | null;
 
   // skip overwrite 👇
 }

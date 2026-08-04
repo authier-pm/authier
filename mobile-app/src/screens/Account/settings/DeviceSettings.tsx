@@ -39,8 +39,6 @@ export function DeviceSettings() {
   const currentSettings = (): SettingsInput => {
     return {
       autofillTOTPEnabled: deviceState.autofillTOTPEnabled as boolean,
-      autofillCredentialsEnabled:
-        deviceState.autofillCredentialsEnabled as boolean,
       uiLanguage: deviceState.uiLanguage as string,
       syncTOTP: deviceState.syncTOTP as boolean,
       vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds as number,

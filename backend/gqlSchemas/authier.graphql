@@ -31,6 +31,7 @@ type UserQuery {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
+  autofillForbiddenUrlPatterns: String!
   newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
@@ -106,6 +107,7 @@ type UserGQL {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
+  autofillForbiddenUrlPatterns: String!
   newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
@@ -132,7 +134,6 @@ type DeviceGQL {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -263,7 +264,6 @@ type DefaultDeviceSettingsGQL {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
   syncTOTP: Boolean!
@@ -283,7 +283,6 @@ type DeviceQuery {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -327,7 +326,6 @@ type DefaultDeviceSettingsQuery {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
   syncTOTP: Boolean!
@@ -442,6 +440,7 @@ type UserMutation {
   deviceRecoveryCooldownMinutes: Int!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!
+  autofillForbiddenUrlPatterns: String!
   newDevicePolicy: UserNewDevicePolicy
   Token: [TokenGQL!]!
   masterDevice: DeviceGQL
@@ -501,7 +500,6 @@ type DeviceMutation {
   logoutAt: DateTime
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   createdAt: DateTime!
   updatedAt: DateTime
@@ -559,7 +557,6 @@ type DefaultDeviceSettingsMutation {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
   syncTOTP: Boolean!
@@ -572,7 +569,6 @@ type DefaultDeviceSettingsGQLScalars {
   id: Int!
   createdAt: DateTime!
   updatedAt: DateTime
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   theme: String!
   syncTOTP: Boolean!
@@ -583,7 +579,6 @@ type DefaultDeviceSettingsGQLScalars {
 input DefaultSettingsInput {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
   uiLanguage: String!
   theme: String!
@@ -625,8 +620,8 @@ input SecretUsageEventInput {
 input SettingsInput {
   syncTOTP: Boolean!
   vaultLockTimeoutSeconds: Int!
-  autofillCredentialsEnabled: Boolean!
   autofillTOTPEnabled: Boolean!
+  autofillForbiddenUrlPatterns: String
   uiLanguage: String!
   notificationOnVaultUnlock: Boolean!
   notificationOnWrongPasswordAttempts: Int!

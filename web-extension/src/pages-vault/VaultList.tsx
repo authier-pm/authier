@@ -17,8 +17,11 @@ import { Input } from '@src/components/ui/input'
 import { Tooltip } from '@src/components/ui/tooltip'
 
 export const VaultList = ({ tableView }: { tableView: boolean }) => {
-  const { loginCredentials, TOTPSecrets, setSecuritySettings } =
+  const { deviceState, loginCredentials, TOTPSecrets, setSecuritySettings } =
     useContext(DeviceStateContext)
+  const autofillCredentialsEnabled =
+    deviceState?.autofillCredentialsEnabled ?? true
+  const isDeviceStateReady = deviceState !== null
   const navigate = useNavigate()
   const { data, loading, error } = useSyncSettingsQuery()
   const [filterBy, setFilterBy] = useQueryParam(
@@ -27,13 +30,14 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
   )
 
   useEffect(() => {
-    if (!data) {
+    if (!data || !isDeviceStateReady) {
       return
     }
 
     setSecuritySettings({
-      autofillCredentialsEnabled: data.currentDevice.autofillCredentialsEnabled,
+      autofillCredentialsEnabled,
       autofillTOTPEnabled: data.currentDevice.autofillTOTPEnabled,
+      autofillForbiddenUrlPatterns: data.me.autofillForbiddenUrlPatterns,
       uiLanguage: data.me.uiLanguage,
       syncTOTP: data.currentDevice.syncTOTP,
       vaultLockTimeoutSeconds: data.currentDevice.vaultLockTimeoutSeconds,
@@ -41,7 +45,12 @@ export const VaultList = ({ tableView }: { tableView: boolean }) => {
         data.me.notificationOnWrongPasswordAttempts,
       notificationOnVaultUnlock: data.me.notificationOnVaultUnlock
     })
-  }, [data, setSecuritySettings])
+  }, [
+    autofillCredentialsEnabled,
+    data,
+    isDeviceStateReady,
+    setSecuritySettings
+  ])
 
   if (loading && !data) {
     return (

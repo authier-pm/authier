@@ -1,4 +1,4 @@
-import { throwIfNotAuthenticated } from '../lib/authMiddleware'
+import { throwIfNotAuthenticated } from "../lib/authMiddleware";
 import {
   Query,
   Resolver,
@@ -7,201 +7,201 @@ import {
   Ctx,
   UseMiddleware,
   Info,
-  Int
-} from 'type-graphql'
-import { LoginResponse } from '../models/models'
+  Int,
+} from "type-graphql";
+import { LoginResponse } from "../models/models";
 
-import { verify } from 'jsonwebtoken'
-import { addUserGraphqlAliases, UserQuery } from '../models/UserQuery'
-import { UserMutation } from '../models/UserMutation'
-import { constructURL } from '../../shared/urlUtils'
+import { verify } from "jsonwebtoken";
+import { addUserGraphqlAliases, UserQuery } from "../models/UserQuery";
+import { UserMutation } from "../models/UserMutation";
+import { constructURL } from "../../shared/urlUtils";
 
-import { GraphqlError } from '../lib/GraphqlError'
-import { WebInputElement } from '../models/WebInputElement'
+import { GraphqlError } from "../lib/GraphqlError";
+import { WebInputElement } from "../models/WebInputElement";
 import {
   GraphQLEmailAddress,
   GraphQLPositiveInt,
-  GraphQLUUID
-} from 'graphql-scalars'
+  GraphQLUUID,
+} from "graphql-scalars";
 
-import debug from 'debug'
-import { RegisterNewAccountInput } from '../models/AuthInputs'
+import debug from "debug";
+import { RegisterNewAccountInput } from "../models/AuthInputs";
 
 import {
   WebInputGQL,
-  WebInputGQLScalars
-} from '../models/generated/WebInputGQL'
+  WebInputGQLScalars,
+} from "../models/generated/WebInputGQL";
 
-import type { GraphQLResolveInfo } from 'graphql'
+import type { GraphQLResolveInfo } from "graphql";
 
-import { DeviceInput, DeviceMutation, DeviceQuery } from '../models/Device'
+import { DeviceInput, DeviceMutation, DeviceQuery } from "../models/Device";
 import {
   DecryptionChallengeApproved,
   DecryptionChallengeForApproval,
   DecryptionChallengeUnion,
-  MasterDeviceResetRequestResult
-} from '../models/DecryptionChallenge'
-import { plainToClass } from 'class-transformer'
+  MasterDeviceResetRequestResult,
+} from "../models/DecryptionChallenge";
+import { plainToClass } from "class-transformer";
 
-import { firebaseSendNotification } from '../lib/firebaseAdmin'
-import { getGeoIpLocation } from '../lib/getGeoIpLocation'
-import { sendEmail } from '../utils/email'
-import { WebInputMutation } from '../models/WebInput'
+import { firebaseSendNotification } from "../lib/firebaseAdmin";
+import { getGeoIpLocation } from "../lib/getGeoIpLocation";
+import { sendEmail } from "../utils/email";
+import { WebInputMutation } from "../models/WebInput";
 import type {
   IContext,
-  IContextAuthenticated
-} from '../models/types/ContextTypes'
-import { eq, and, or, like, sql, gte, count, isNull, desc } from 'drizzle-orm'
-import * as schema from '../drizzle/schema'
-import { createHash } from 'crypto'
-import { defaultAccountLimits } from '../models/accountLimits'
+  IContextAuthenticated,
+} from "../models/types/ContextTypes";
+import { eq, and, or, like, sql, gte, count, isNull, desc } from "drizzle-orm";
+import * as schema from "../drizzle/schema";
+import { createHash } from "crypto";
+import { defaultAccountLimits } from "../models/accountLimits";
 
-const log = debug('au:RootResolver')
+const log = debug("au:RootResolver");
 
 // Confirmation links for master-device-reset are valid for 7 days from the
 // moment they are created. Anything still outstanding past that window is
 // considered abandoned and must be re-initiated.
-const MASTER_DEVICE_RESET_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000
+const MASTER_DEVICE_RESET_TOKEN_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
 // SHA-256 of a 122-bit UUID is sufficient — these tokens have plenty of
 // entropy on their own, so we just need a one-way function to make DB
 // reads non-actionable. (No bcrypt/argon2 needed for high-entropy tokens.)
 export const hashMasterDeviceResetToken = (token: string) =>
-  createHash('sha256').update(token).digest('hex')
+  createHash("sha256").update(token).digest("hex");
 
 type PushDeliveryCounts = {
-  pushNotificationsSentCount: number
-  pushNotificationsFailedCount: number
-}
+  pushNotificationsSentCount: number;
+  pushNotificationsFailedCount: number;
+};
 
 const sendNewDeviceLoginPushNotifications = async (
   firebaseTokens: string[],
-  notificationBody: string
+  notificationBody: string,
 ): Promise<PushDeliveryCounts> => {
   const results = await Promise.allSettled(
     firebaseTokens.map((firebaseToken) => {
-      log('sending notification to', firebaseToken)
+      log("sending notification to", firebaseToken);
 
       return firebaseSendNotification({
         token: firebaseToken,
         notification: {
-          title: 'New device login!',
-          body: notificationBody
+          title: "New device login!",
+          body: notificationBody,
         },
         data: {
-          type: 'Devices'
+          type: "Devices",
         },
         android: {
-          priority: 'high'
+          priority: "high",
         },
         apns: {
           payload: {
             aps: {
               contentAvailable: true,
-              priority: 10
-            }
-          }
-        }
-      })
-    })
-  )
+              priority: 10,
+            },
+          },
+        },
+      });
+    }),
+  );
 
-  let pushNotificationsSentCount = 0
-  let pushNotificationsFailedCount = 0
+  let pushNotificationsSentCount = 0;
+  let pushNotificationsFailedCount = 0;
 
   for (const result of results) {
-    if (result.status === 'rejected') {
-      pushNotificationsFailedCount += 1
-      continue
+    if (result.status === "rejected") {
+      pushNotificationsFailedCount += 1;
+      continue;
     }
 
     if (result.value.ok) {
-      pushNotificationsSentCount += 1
+      pushNotificationsSentCount += 1;
     } else {
-      pushNotificationsFailedCount += 1
+      pushNotificationsFailedCount += 1;
     }
   }
 
   return {
     pushNotificationsSentCount,
-    pushNotificationsFailedCount
-  }
-}
+    pushNotificationsFailedCount,
+  };
+};
 
 const getBackendOriginFromRequest = (ctx: IContext) => {
-  const forwardedProto = ctx.request.headers['x-forwarded-proto']
-  const host = ctx.request.headers['host']
+  const forwardedProto = ctx.request.headers["x-forwarded-proto"];
+  const host = ctx.request.headers["host"];
 
   if (host) {
-    let protocol = 'https'
-    if (forwardedProto === 'http' || forwardedProto === 'https') {
-      protocol = forwardedProto
-    } else if (process.env.NODE_ENV === 'development') {
-      protocol = 'http'
+    let protocol = "https";
+    if (forwardedProto === "http" || forwardedProto === "https") {
+      protocol = forwardedProto;
+    } else if (process.env.NODE_ENV === "development") {
+      protocol = "http";
     }
-    return `${protocol}://${host}`
+    return `${protocol}://${host}`;
   }
 
-  return process.env.FRONTEND_URL ?? ''
-}
+  return process.env.FRONTEND_URL ?? "";
+};
 
 @Resolver()
 export class RootResolver {
   @Query(() => String)
   osTime() {
-    return new Date().toISOString()
+    return new Date().toISOString();
   }
 
   @Query(() => Boolean, {
-    description: 'you need to be authenticated to call this resolver'
+    description: "you need to be authenticated to call this resolver",
   })
   authenticated(@Ctx() ctx: IContext) {
-    const inCookies = ctx.request.cookies['access-token']
-    const inHeader = ctx.request.headers['authorization']
+    const inCookies = ctx.request.cookies["access-token"];
+    const inHeader = ctx.request.headers["authorization"];
 
     try {
       if (inHeader) {
-        const token = inHeader?.split(' ')[1]
-        verify(token, process.env.ACCESS_TOKEN_SECRET!)
-        return true
+        const token = inHeader?.split(" ")[1];
+        verify(token, process.env.ACCESS_TOKEN_SECRET!);
+        return true;
       } else if (inCookies) {
-        verify(inCookies, process.env.ACCESS_TOKEN_SECRET!)
-        return true
+        verify(inCookies, process.env.ACCESS_TOKEN_SECRET!);
+        return true;
       }
 
-      return false
+      return false;
     } catch (err) {
-      return false
+      return false;
     }
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Query(() => UserQuery)
   @Mutation(() => UserMutation, {
-    description: 'you need to be authenticated to call this resolver',
-    name: 'me',
-    nullable: false
+    description: "you need to be authenticated to call this resolver",
+    name: "me",
+    nullable: false,
   })
   async me(
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() info: GraphQLResolveInfo,
   ) {
-    const { jwtPayload } = ctx
+    const { jwtPayload } = ctx;
 
     const tmp = await ctx.db.query.user.findFirst({
       where: { id: jwtPayload.userId },
       with: {
         encryptedSecrets: true,
         devicesUserId: true,
-        defaultSettings: true
-      }
-    })
+        defaultSettings: true,
+      },
+    });
 
     if (!tmp) {
-      return tmp
+      return tmp;
     }
 
-    return addUserGraphqlAliases(tmp)
+    return addUserGraphqlAliases(tmp);
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
@@ -209,24 +209,24 @@ export class RootResolver {
   @Mutation(() => DeviceMutation)
   async currentDevice(
     @Ctx() ctx: IContextAuthenticated,
-    @Info() info: GraphQLResolveInfo
+    @Info() info: GraphQLResolveInfo,
   ) {
-    const { jwtPayload } = ctx
+    const { jwtPayload } = ctx;
 
     const currentDevice = await ctx.db.query.device.findFirst({
-      where: { id: jwtPayload.deviceId }
-    })
+      where: { id: jwtPayload.deviceId },
+    });
 
-    return currentDevice
+    return currentDevice;
   }
 
   @Mutation(() => LoginResponse)
   async registerNewUser(
-    @Arg('input', () => RegisterNewAccountInput) input: RegisterNewAccountInput,
-    @Arg('userId', () => GraphQLUUID) userId: string,
-    @Ctx() ctx: IContext
+    @Arg("input", () => RegisterNewAccountInput) input: RegisterNewAccountInput,
+    @Arg("userId", () => GraphQLUUID) userId: string,
+    @Ctx() ctx: IContext,
   ) {
-    const ipAddress = ctx.getIpAddress()
+    const ipAddress = ctx.getIpAddress();
     const {
       email,
       firebaseToken,
@@ -234,10 +234,10 @@ export class RootResolver {
       deviceId,
       addDeviceSecret,
       addDeviceSecretEncrypted,
-      encryptionSalt
-    } = input
-    let user: any
-    let devices: any[]
+      encryptionSalt,
+    } = input;
+    let user: any;
+    let devices: any[];
 
     try {
       // Insert user
@@ -251,9 +251,9 @@ export class RootResolver {
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60,
           loginCredentialsLimit: defaultAccountLimits.loginCredentialsLimit,
-          TOTPlimit: defaultAccountLimits.TOTPlimit
+          TOTPlimit: defaultAccountLimits.TOTPlimit,
         })
-        .returning()
+        .returning();
 
       // Insert device
       const [insertedDevice] = await ctx.db
@@ -265,77 +265,76 @@ export class RootResolver {
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
           name: deviceName,
-          autofillCredentialsEnabled: true,
           vaultLockTimeoutSeconds: 28800,
           syncTOTP: true,
           autofillTOTPEnabled: true,
-          userId: userId
+          userId: userId,
         })
-        .returning()
+        .returning();
 
-      user = insertedUser
-      devices = [insertedDevice]
+      user = insertedUser;
+      devices = [insertedDevice];
     } catch (err: unknown) {
       // Drizzle wraps PG errors in DrizzleQueryError with the original error in .cause
       const pgError = (err as { cause?: { code?: string; detail?: string } })
-        .cause
+        .cause;
 
       // Handle unique constraint violations
-      if (pgError?.code === '23505') {
-        const detail = pgError.detail || ''
-        if (detail.includes('email')) {
-          log('email', email)
-          throw new GraphqlError(`User with such email already exists.`)
+      if (pgError?.code === "23505") {
+        const detail = pgError.detail || "";
+        if (detail.includes("email")) {
+          log("email", email);
+          throw new GraphqlError(`User with such email already exists.`);
         }
-        if (detail.includes('id')) {
-          log('deviceId', deviceId)
-          if (process.env.NODE_ENV === 'development') {
+        if (detail.includes("id")) {
+          log("deviceId", deviceId);
+          if (process.env.NODE_ENV === "development") {
             console.warn(
-              `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`
-            )
+              `deleting device ${deviceId} because we are in dev mode and we don't care about the other account`,
+            );
             await ctx.db
               .delete(schema.device)
-              .where(eq(schema.device.id, deviceId))
-            return this.registerNewUser(input, userId, ctx)
+              .where(eq(schema.device.id, deviceId));
+            return this.registerNewUser(input, userId, ctx);
           } else {
             throw new GraphqlError(
-              `Device ${deviceId} already exists. You cannot use a device with multiple accounts.`
-            )
+              `Device ${deviceId} already exists. You cannot use a device with multiple accounts.`,
+            );
           }
         }
       }
-      throw err
+      throw err;
     }
 
-    const device = devices[0]
+    const device = devices[0];
     // Update user with masterDeviceId
     const [updatedUser] = await ctx.db
       .update(schema.user)
       .set({
-        masterDeviceId: device.id
+        masterDeviceId: device.id,
       })
       .where(eq(schema.user.id, user.id))
-      .returning()
-    user = updatedUser
+      .returning();
+    user = updatedUser;
 
     return new UserMutation(user).setCookiesAndConstructLoginResponse(
       device,
-      ctx
-    )
+      ctx,
+    );
   }
 
   // TODO rate limit this per IP
   @Mutation(() => DecryptionChallengeUnion, {
-    description: 'returns a decryption challenge, used when logging in',
-    nullable: true
+    description: "returns a decryption challenge, used when logging in",
+    nullable: true,
   })
   async deviceDecryptionChallenge(
-    @Arg('email', () => GraphQLEmailAddress) email: string,
-    @Arg('deviceInput', () => DeviceInput)
+    @Arg("email", () => GraphQLEmailAddress) email: string,
+    @Arg("deviceInput", () => DeviceInput)
     deviceInput: DeviceInput,
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContext,
   ) {
-    const ipAddress = ctx.getIpAddress()
+    const ipAddress = ctx.getIpAddress();
 
     const user = await ctx.db.query.user.findFirst({
       where: { email },
@@ -344,33 +343,33 @@ export class RootResolver {
         addDeviceSecretEncrypted: true,
         encryptionSalt: true,
         newDevicePolicy: true,
-        masterDeviceId: true
-      }
-    })
+        masterDeviceId: true,
+      },
+    });
 
     if (!user) {
       throw new GraphqlError(
-        'Login failed, check your email and master password'
-      )
+        "Login failed, check your email and master password",
+      );
     }
 
     // Fetch masterDevice separately since it's not a relation but a FK column
     const masterDevice = user.masterDeviceId
       ? await ctx.db.query.device.findFirst({
-          where: { id: user.masterDeviceId }
+          where: { id: user.masterDeviceId },
         })
-      : null
-    const userHasNoMasterDevice = !user.masterDeviceId
+      : null;
+    const userHasNoMasterDevice = !user.masterDeviceId;
     const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
         blockIp: true,
-        ipAddress
-      }
-    })
+        ipAddress,
+      },
+    });
 
     if (isBlocked) {
-      throw new GraphqlError('Login failed, try again later.')
+      throw new GraphqlError("Login failed, try again later.");
     }
 
     const inLastHourResult = await ctx.db
@@ -381,31 +380,31 @@ export class RootResolver {
           eq(schema.decryptionChallenge.userId, user.id),
           gte(
             schema.decryptionChallenge.createdAt,
-            new Date(Date.now() - 3600000)
+            new Date(Date.now() - 3600000),
           ),
-          sql`${schema.decryptionChallenge.masterPasswordVerifiedAt} IS NULL`
-        )
-      )
-    const inLastHour = inLastHourResult[0]?.count ?? 0
+          sql`${schema.decryptionChallenge.masterPasswordVerifiedAt} IS NULL`,
+        ),
+      );
+    const inLastHour = inLastHourResult[0]?.count ?? 0;
 
     if (inLastHour > 5) {
       throw new GraphqlError(
-        'Too many decryption challenges, wait for cooldown'
-      )
+        "Too many decryption challenges, wait for cooldown",
+      );
     }
 
     const device = await ctx.db.query.device.findFirst({
-      where: { id: deviceInput.id }
-    })
+      where: { id: deviceInput.id },
+    });
 
-    log('device', device)
+    log("device", device);
 
     let challenge = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         deviceId: deviceInput.id,
-        userId: user.id
-      }
-    })
+        userId: user.id,
+      },
+    });
 
     //TODO: Check this condition, not sure what is this doing
     if (device) {
@@ -413,8 +412,8 @@ export class RootResolver {
         const deviceCountResult = await ctx.db
           .select({ count: count() })
           .from(schema.device)
-          .where(eq(schema.device.userId, user.id))
-        const deviceCount = deviceCountResult[0]?.count ?? 0
+          .where(eq(schema.device.userId, user.id));
+        const deviceCount = deviceCountResult[0]?.count ?? 0;
         //FIX: This is not working, we need to check if the device is already approved
         if (deviceCount === 1) {
           // user has only one device
@@ -425,67 +424,67 @@ export class RootResolver {
               deviceName: deviceInput.name,
               userId: user.id,
               ipAddress,
-              approvedAt: device.createdAt
+              approvedAt: device.createdAt,
             })
-            .returning()
-          challenge = created
+            .returning();
+          challenge = created;
         }
       }
     }
 
     if (challenge?.rejectedAt) {
       // someone tried to login with this device and it was rejected in the past, we don't want to create a new challenge
-      throw new GraphqlError('login failed')
+      throw new GraphqlError("login failed");
     }
 
     if (challenge && userHasNoMasterDevice && !challenge.approvedAt) {
       const [updatedChallenge] = await ctx.db
         .update(schema.decryptionChallenge)
         .set({
-          approvedAt: new Date()
+          approvedAt: new Date(),
         })
         .where(eq(schema.decryptionChallenge.id, challenge.id))
-        .returning()
-      challenge = updatedChallenge
+        .returning();
+      challenge = updatedChallenge;
     }
 
     if (!challenge) {
       let pushNotificationCounts: PushDeliveryCounts = {
         pushNotificationsSentCount: 0,
-        pushNotificationsFailedCount: 0
-      }
+        pushNotificationsFailedCount: 0,
+      };
 
-      let approvedAt: Date | undefined
+      let approvedAt: Date | undefined;
 
       if (userHasNoMasterDevice) {
-        approvedAt = new Date()
+        approvedAt = new Date();
       } else {
         // TODO: send email notifications
         const geoIp = await getGeoIpLocation
           .memoized(ipAddress)
-          .catch((_error) => null)
+          .catch((_error) => null);
 
         const geoLocationParts = geoIp
           ? [geoIp.city, geoIp.region_name, geoIp.country_name].filter(Boolean)
-          : []
+          : [];
         const geoLocation =
-          geoLocationParts.length > 0 ? geoLocationParts.join(', ') : null
+          geoLocationParts.length > 0 ? geoLocationParts.join(", ") : null;
 
-        let notificationBody = `New device is trying to log in from ${ipAddress}.`
+        let notificationBody = `New device is trying to log in from ${ipAddress}.`;
 
         if (geoLocation) {
-          notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`
+          notificationBody = `New device is trying to log in from ${ipAddress} (${geoLocation}).`;
         }
 
-        let devicesToNotify: { firebaseToken: string | null }[] = []
+        let devicesToNotify: { firebaseToken: string | null }[] = [];
 
-        if (user.newDevicePolicy === 'REQUIRE_ANY_DEVICE_APPROVAL') {
+        if (user.newDevicePolicy === "REQUIRE_ANY_DEVICE_APPROVAL") {
           devicesToNotify = await ctx.db.query.device.findMany({
             where: { userId: user.id },
-            columns: { firebaseToken: true }
-          })
+            columns: { firebaseToken: true },
+          });
         } else if (masterDevice?.firebaseToken) {
-          devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }]
+          devicesToNotify = [{ firebaseToken: masterDevice.firebaseToken }];
         }
 
         const firebaseTokens = [
@@ -493,16 +492,16 @@ export class RootResolver {
             devicesToNotify
               .map((device) => device.firebaseToken)
               .filter(
-                (firebaseToken): firebaseToken is string => !!firebaseToken
+                (firebaseToken): firebaseToken is string => !!firebaseToken,
               )
-              .filter((firebaseToken) => firebaseToken.length > 10)
-          )
-        ]
+              .filter((firebaseToken) => firebaseToken.length > 10),
+          ),
+        ];
 
         pushNotificationCounts = await sendNewDeviceLoginPushNotifications(
           firebaseTokens,
-          notificationBody
-        )
+          notificationBody,
+        );
       }
 
       const [created] = await ctx.db
@@ -516,10 +515,10 @@ export class RootResolver {
           pushNotificationsSentCount:
             pushNotificationCounts.pushNotificationsSentCount,
           pushNotificationsFailedCount:
-            pushNotificationCounts.pushNotificationsFailedCount
+            pushNotificationCounts.pushNotificationsFailedCount,
         })
-        .returning()
-      challenge = created
+        .returning();
+      challenge = created;
     }
 
     if (userHasNoMasterDevice) {
@@ -527,18 +526,18 @@ export class RootResolver {
         ...challenge,
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
         encryptionSalt: user.encryptionSalt,
-        approvedAt: challenge!.approvedAt || challenge!.createdAt
-      })
+        approvedAt: challenge!.approvedAt || challenge!.createdAt,
+      });
     }
 
-    if (user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null) {
+    if (user.newDevicePolicy === "ALLOW" || user.newDevicePolicy === null) {
       // user has allowed new devices, we can return the challenge including salt and encrypted secret
       return plainToClass(DecryptionChallengeApproved, {
         ...challenge,
         addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
         encryptionSalt: user.encryptionSalt,
-        approvedAt: challenge!.approvedAt || challenge!.createdAt
-      })
+        approvedAt: challenge!.approvedAt || challenge!.createdAt,
+      });
     }
 
     const [masterDeviceResetRequest] = await ctx.db
@@ -546,13 +545,16 @@ export class RootResolver {
         requestedAt: schema.masterDeviceResetRequest.createdAt,
         processAt: schema.masterDeviceResetRequest.processAt,
         confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
-        rejectedAt: schema.masterDeviceResetRequest.rejectedAt
+        rejectedAt: schema.masterDeviceResetRequest.rejectedAt,
       })
       .from(schema.masterDeviceResetRequest)
       .where(
-        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge!.id)
+        eq(
+          schema.masterDeviceResetRequest.decryptionChallengeId,
+          challenge!.id,
+        ),
       )
-      .limit(1)
+      .limit(1);
 
     if (!challenge!.approvedAt) {
       return plainToClass(DecryptionChallengeForApproval, {
@@ -572,30 +574,30 @@ export class RootResolver {
         masterDeviceResetConfirmedAt:
           masterDeviceResetRequest?.confirmedAt ?? null,
         masterDeviceResetRejectedAt:
-          masterDeviceResetRequest?.rejectedAt ?? null
-      })
+          masterDeviceResetRequest?.rejectedAt ?? null,
+      });
     }
 
     // user has approved this device in the past, we can return the challenge including salt and encrypted secret
     return plainToClass(DecryptionChallengeApproved, {
       ...challenge,
       addDeviceSecretEncrypted: user.addDeviceSecretEncrypted,
-      encryptionSalt: user.encryptionSalt
-    })
+      encryptionSalt: user.encryptionSalt,
+    });
   }
 
   @Mutation(() => MasterDeviceResetRequestResult, {
     description:
-      'initiates a delayed reset of the master device when the user cannot approve from an existing device'
+      "initiates a delayed reset of the master device when the user cannot approve from an existing device",
   })
   async initiateMasterDeviceReset(
-    @Arg('email', () => GraphQLEmailAddress) email: string,
-    @Arg('deviceInput', () => DeviceInput) deviceInput: DeviceInput,
-    @Arg('decryptionChallengeId', () => GraphQLPositiveInt)
+    @Arg("email", () => GraphQLEmailAddress) email: string,
+    @Arg("deviceInput", () => DeviceInput) deviceInput: DeviceInput,
+    @Arg("decryptionChallengeId", () => GraphQLPositiveInt)
     decryptionChallengeId: number,
-    @Ctx() ctx: IContext
+    @Ctx() ctx: IContext,
   ) {
-    const ipAddress = ctx.getIpAddress()
+    const ipAddress = ctx.getIpAddress();
 
     const user = await ctx.db.query.user.findFirst({
       where: { email },
@@ -603,84 +605,84 @@ export class RootResolver {
         id: true,
         email: true,
         masterDeviceId: true,
-        deviceRecoveryCooldownMinutes: true
-      }
-    })
+        deviceRecoveryCooldownMinutes: true,
+      },
+    });
 
     if (!user) {
       throw new GraphqlError(
-        'Login failed, check your email and master password'
-      )
+        "Login failed, check your email and master password",
+      );
     }
 
     const challenge = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         id: decryptionChallengeId,
         userId: user.id,
-        deviceId: deviceInput.id
-      }
-    })
+        deviceId: deviceInput.id,
+      },
+    });
 
     if (!challenge || challenge.rejectedAt) {
-      throw new GraphqlError('login failed')
+      throw new GraphqlError("login failed");
     }
 
-    const now = new Date()
+    const now = new Date();
     const [activeResetRequest] = await ctx.db
       .select({
         id: schema.masterDeviceResetRequest.id,
         requestedAt: schema.masterDeviceResetRequest.createdAt,
-        processAt: schema.masterDeviceResetRequest.processAt
+        processAt: schema.masterDeviceResetRequest.processAt,
       })
       .from(schema.masterDeviceResetRequest)
       .where(
         and(
           eq(schema.masterDeviceResetRequest.userId, user.id),
           isNull(schema.masterDeviceResetRequest.completedAt),
-          isNull(schema.masterDeviceResetRequest.rejectedAt)
-        )
+          isNull(schema.masterDeviceResetRequest.rejectedAt),
+        ),
       )
       .orderBy(desc(schema.masterDeviceResetRequest.createdAt))
-      .limit(1)
+      .limit(1);
 
     if (activeResetRequest) {
       return plainToClass(MasterDeviceResetRequestResult, {
         requestedAt: activeResetRequest.requestedAt,
         processAt: activeResetRequest.processAt,
-        alreadyPending: true
-      })
+        alreadyPending: true,
+      });
     }
 
     if (!user.masterDeviceId) {
       return plainToClass(MasterDeviceResetRequestResult, {
         requestedAt: now,
         processAt: now,
-        alreadyPending: false
-      })
+        alreadyPending: false,
+      });
     }
 
-    const requestedAt = now
+    const requestedAt = now;
     const processAt = new Date(
-      requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000
-    )
+      requestedAt.getTime() + user.deviceRecoveryCooldownMinutes * 60_000,
+    );
     const expiresAt = new Date(
       Math.max(
         processAt.getTime(),
-        requestedAt.getTime() + MASTER_DEVICE_RESET_TOKEN_TTL_MS
-      )
-    )
-    const confirmationToken = crypto.randomUUID()
-    const confirmationTokenHash = hashMasterDeviceResetToken(confirmationToken)
+        requestedAt.getTime() + MASTER_DEVICE_RESET_TOKEN_TTL_MS,
+      ),
+    );
+    const confirmationToken = crypto.randomUUID();
+    const confirmationTokenHash = hashMasterDeviceResetToken(confirmationToken);
 
     const [existingResetRequestForChallenge] = await ctx.db
       .select({
-        id: schema.masterDeviceResetRequest.id
+        id: schema.masterDeviceResetRequest.id,
       })
       .from(schema.masterDeviceResetRequest)
       .where(
-        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge.id)
+        eq(schema.masterDeviceResetRequest.decryptionChallengeId, challenge.id),
       )
-      .limit(1)
+      .limit(1);
 
     if (existingResetRequestForChallenge) {
       await ctx.db
@@ -693,14 +695,14 @@ export class RootResolver {
           completedAt: null,
           rejectedAt: null,
           confirmationTokenHash,
-          targetMasterDeviceId: user.masterDeviceId
+          targetMasterDeviceId: user.masterDeviceId,
         })
         .where(
           eq(
             schema.masterDeviceResetRequest.id,
-            existingResetRequestForChallenge.id
-          )
-        )
+            existingResetRequestForChallenge.id,
+          ),
+        );
     } else {
       await ctx.db.insert(schema.masterDeviceResetRequest).values({
         userId: user.id,
@@ -708,87 +710,89 @@ export class RootResolver {
         confirmationTokenHash,
         targetMasterDeviceId: user.masterDeviceId,
         processAt,
-        expiresAt
-      })
+        expiresAt,
+      });
     }
 
     if (user.email) {
-      const backendOrigin = getBackendOriginFromRequest(ctx)
-      const confirmationLink = `${backendOrigin}/confirm-master-device-reset?token=${confirmationToken}`
+      const backendOrigin = getBackendOriginFromRequest(ctx);
+      const confirmationLink = `${backendOrigin}/confirm-master-device-reset?token=${confirmationToken}`;
       await sendEmail(user.email, {
-        Subject: 'Confirm master device reset',
+        Subject: "Confirm master device reset",
         TextPart: `A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.
 To confirm this request, open:
 ${confirmationLink}
 
 After confirmation, the reset is scheduled for ${processAt.toISOString()}.
 If this was not you, ignore this email or reject the login request from your current master device.`,
-        HTMLPart: `<p>A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.</p><p>To confirm this request, click <a href="${confirmationLink}">Confirm master device reset</a>.</p><p>After confirmation, the reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, ignore this email or reject the login request from your current master device.</p>`
-      })
+        HTMLPart: `<p>A delayed reset of your master device was requested for account ${user.email} from IP ${ipAddress}.</p><p>To confirm this request, click <a href="${confirmationLink}">Confirm master device reset</a>.</p><p>After confirmation, the reset is scheduled for <strong>${processAt.toISOString()}</strong>.</p><p>If this was not you, ignore this email or reject the login request from your current master device.</p>`,
+      });
     }
 
     return plainToClass(MasterDeviceResetRequestResult, {
       requestedAt,
       processAt,
-      alreadyPending: false
-    })
+      alreadyPending: false,
+    });
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => Int, {
     nullable: true,
-    deprecationReason: 'prefer device methods',
+    deprecationReason: "prefer device methods",
     description:
-      'removes current device. Returns null if user is not authenticated, alias for device logout/remove methods'
+      "removes current device. Returns null if user is not authenticated, alias for device logout/remove methods",
   })
   async logout(
     @Ctx() ctx: IContextAuthenticated,
-    @Arg('removeDevice', () => Boolean, { nullable: true })
-    removeDevice: boolean
+    @Arg("removeDevice", () => Boolean, { nullable: true })
+    removeDevice: boolean,
   ) {
-    ctx.reply.clearCookie('refresh-token')
-    ctx.reply.clearCookie('access-token')
+    ctx.reply.clearCookie("refresh-token");
+    ctx.reply.clearCookie("access-token");
 
     if (!ctx.jwtPayload) {
-      return null
+      return null;
     }
 
     // Update the device with logoutAt
     await ctx.db
       .update(schema.device)
       .set({
-        logoutAt: new Date()
+        logoutAt: new Date(),
       })
-      .where(eq(schema.device.id, ctx.jwtPayload.deviceId))
+      .where(eq(schema.device.id, ctx.jwtPayload.deviceId));
 
     // Get user for token version
     const user = await ctx.db.query.user.findFirst({
-      where: { id: ctx.jwtPayload.userId }
-    })
+      where: { id: ctx.jwtPayload.userId },
+    });
 
     if (removeDevice) {
       await ctx.db
         .delete(schema.device)
-        .where(eq(schema.device.id, ctx.jwtPayload.deviceId))
+        .where(eq(schema.device.id, ctx.jwtPayload.deviceId));
       await ctx.db
         .delete(schema.decryptionChallenge)
-        .where(eq(schema.decryptionChallenge.deviceId, ctx.jwtPayload.deviceId))
+        .where(
+          eq(schema.decryptionChallenge.deviceId, ctx.jwtPayload.deviceId),
+        );
     }
-    return user?.tokenVersion
+    return user?.tokenVersion;
   }
 
   @Query(() => [WebInputGQLScalars])
   async webInputs(
-    @Arg('hosts', () => [String], {
+    @Arg("hosts", () => [String], {
       nullable: true,
-      description: 'accepts strings like example.com and similar'
+      description: "accepts strings like example.com and similar",
     })
     hosts: string[] | null,
-    @Ctx() ctx: IContextAuthenticated
+    @Ctx() ctx: IContextAuthenticated,
   ) {
     if (hosts) {
       if (hosts.length === 0) {
-        return []
+        return [];
       }
 
       // By design we return web inputs added by ANY user — the table is a
@@ -796,15 +800,15 @@ If this was not you, ignore this email or reject the login request from your cur
       // sites it has not seen on this account yet. Do not filter by
       // addedByUserId here.
       const formattedDomains = hosts.map((url) => {
-        const strippedUrl = url.replace('www.', '')
+        const strippedUrl = url.replace("www.", "");
         // Escape LIKE metacharacters in user input so callers cannot pass
         // wildcards like `_` or `%` to widen the match.
         const escaped = strippedUrl
-          .replace(/\\/g, '\\\\')
-          .replace(/%/g, '\\%')
-          .replace(/_/g, '\\_')
-        return `%${escaped}`
-      })
+          .replace(/\\/g, "\\\\")
+          .replace(/%/g, "\\%")
+          .replace(/_/g, "\\_");
+        return `%${escaped}`;
+      });
 
       // TODO only return new web inputs created after last sync
       const results = await ctx.db
@@ -813,68 +817,68 @@ If this was not you, ignore this email or reject the login request from your cur
         .where(
           or(
             ...formattedDomains.map((domain) =>
-              like(schema.webInput.host, domain)
-            )
-          )
-        )
-      return results
+              like(schema.webInput.host, domain),
+            ),
+          ),
+        );
+      return results;
     }
 
-    return []
+    return [];
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => WebInputMutation, {
-    nullable: true
+    nullable: true,
   })
   @Query(() => WebInputGQL, {
-    nullable: true
+    nullable: true,
   })
   async webInput(
-    @Arg('id', () => Int) id: number,
-    @Ctx() ctx: IContextAuthenticated
+    @Arg("id", () => Int) id: number,
+    @Ctx() ctx: IContextAuthenticated,
   ) {
     return ctx.db.query.webInput.findFirst({
-      where: { id }
-    })
+      where: { id },
+    });
   }
-  2
+  2;
 
   @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => [WebInputGQL])
   async addWebInputs(
-    @Arg('webInputs', () => [WebInputElement]) webInputs: WebInputElement[],
-    @Ctx() ctx: IContextAuthenticated
+    @Arg("webInputs", () => [WebInputElement]) webInputs: WebInputElement[],
+    @Ctx() ctx: IContextAuthenticated,
   ) {
-    const returnedInputs: any[] = []
+    const returnedInputs: any[] = [];
     for (const webInput of webInputs) {
-      const host = constructURL(webInput.url).host
+      const host = constructURL(webInput.url).host;
       if (!host) {
-        continue
+        continue;
       }
       const forUpsert = {
-        url: webInput.url.split('?')[0], // query can often have sensitive data, so we omit it here and on FE too
+        url: webInput.url.split("?")[0], // query can often have sensitive data, so we omit it here and on FE too
         host: host,
         domPath: webInput.domPath,
         kind: webInput.kind,
-        addedByUserId: ctx.jwtPayload.userId
-      }
+        addedByUserId: ctx.jwtPayload.userId,
+      };
 
       const existing = await ctx.db.query.webInput.findFirst({
         where: {
           url: forUpsert.url,
-          kind: forUpsert.kind
+          kind: forUpsert.kind,
         },
         columns: {
-          id: true
-        }
-      })
+          id: true,
+        },
+      });
 
       if (existing) {
         // it can happen that website changes the input field, so we delete the old one and add the new one
         await ctx.db
           .delete(schema.webInput)
-          .where(eq(schema.webInput.id, existing.id))
+          .where(eq(schema.webInput.id, existing.id));
       }
 
       try {
@@ -884,14 +888,14 @@ If this was not you, ignore this email or reject the login request from your cur
           .values(forUpsert as any)
           .onConflictDoUpdate({
             target: [schema.webInput.url, schema.webInput.domPath],
-            set: forUpsert as any
+            set: forUpsert as any,
           })
-          .returning()
-        returnedInputs.push(input)
+          .returning();
+        returnedInputs.push(input);
       } catch (err: unknown) {
-        console.warn('error adding web input', err)
+        console.warn("error adding web input", err);
       }
     }
-    return returnedInputs
+    return returnedInputs;
   }
 }

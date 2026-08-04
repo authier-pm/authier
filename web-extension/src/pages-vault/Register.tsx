@@ -9,6 +9,7 @@ import { setAccessToken } from '@src/util/accessTokenExtension'
 import { device } from '@src/background/ExtensionDevice'
 import { Trans } from '@lingui/react/macro'
 import type { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
 import {
   bufferToBase64,
   cryptoKeyToString,
@@ -150,7 +151,8 @@ export default function Register() {
             authSecretEncrypted: params.addDeviceSecretEncrypted,
             vaultLockTimeoutSeconds: null,
             autofillTOTPEnabled: null,
-            autofillCredentialsEnabled: null,
+            autofillCredentialsEnabled: await getAutofillCredentialsEnabled(),
+            autofillForbiddenUrlPatterns: '',
             uiLanguage: null,
             syncTOTP: null,
             theme: 'dark',

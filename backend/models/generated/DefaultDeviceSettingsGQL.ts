@@ -1,40 +1,37 @@
-import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
-import { UserGQL } from './UserGQL'
+import { Field, ObjectType, Int, GraphQLISODateTime } from "type-graphql";
+import { UserGQL } from "./UserGQL";
 
 @ObjectType()
 export class DefaultDeviceSettingsGQLScalars {
   @Field(() => Int)
-  id: number
+  id: number;
 
   @Field(() => GraphQLISODateTime)
-  createdAt: Date
+  createdAt: Date;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  updatedAt: Date | null
+  updatedAt: Date | null;
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean)
-  autofillTOTPEnabled: boolean
+  autofillTOTPEnabled: boolean;
 
   @Field(() => String)
-  theme: string
+  theme: string;
 
   @Field(() => Boolean)
-  syncTOTP: boolean
+  syncTOTP: boolean;
 
   @Field(() => Int)
-  vaultLockTimeoutSeconds: number
+  vaultLockTimeoutSeconds: number;
 
   @Field(() => String)
-  userId: string
+  userId: string;
 }
 
 @ObjectType()
 export class DefaultDeviceSettingsGQL extends DefaultDeviceSettingsGQLScalars {
   @Field(() => UserGQL)
-  user: UserGQL
+  user: UserGQL;
 
   // skip overwrite 👇
 }

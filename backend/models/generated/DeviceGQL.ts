@@ -1,87 +1,84 @@
-import { Field, ObjectType, ID, GraphQLISODateTime, Int } from 'type-graphql'
-import { UserGQL } from './UserGQL'
-import { SecretUsageEventGQL } from './SecretUsageEventGQL'
-import { DecryptionChallengeGQL } from './DecryptionChallengeGQL'
+import { Field, ObjectType, ID, GraphQLISODateTime, Int } from "type-graphql";
+import { UserGQL } from "./UserGQL";
+import { SecretUsageEventGQL } from "./SecretUsageEventGQL";
+import { DecryptionChallengeGQL } from "./DecryptionChallengeGQL";
 
 @ObjectType()
 export class DeviceGQLScalars {
   @Field(() => ID)
-  id: string
+  id: string;
 
   @Field(() => String)
-  firstIpAddress: string
+  firstIpAddress: string;
 
   @Field(() => String)
-  lastIpAddress: string
+  lastIpAddress: string;
 
   @Field(() => String, { nullable: true })
-  firebaseToken: string | null
+  firebaseToken: string | null;
 
   @Field(() => String)
-  name: string
+  name: string;
 
   @Field(() => String)
-  platform: string
+  platform: string;
 
   @Field(() => Boolean)
-  ipAddressLock: boolean
+  ipAddressLock: boolean;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  logoutAt: Date | null
+  logoutAt: Date | null;
 
   @Field(() => Boolean)
-  syncTOTP: boolean
+  syncTOTP: boolean;
 
   @Field(() => Int)
-  vaultLockTimeoutSeconds: number
+  vaultLockTimeoutSeconds: number;
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean)
-  autofillTOTPEnabled: boolean
+  autofillTOTPEnabled: boolean;
 
   @Field(() => GraphQLISODateTime)
-  createdAt: Date
+  createdAt: Date;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  updatedAt: Date | null
+  updatedAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  deletedAt: Date | null
+  deletedAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  registeredWithMasterAt: Date | null
+  registeredWithMasterAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  lastSyncAt: Date | null
+  lastSyncAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  lastUnlockAt: Date | null
+  lastUnlockAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  lastLockAt: Date | null
+  lastLockAt: Date | null;
 
   @Field(() => GraphQLISODateTime, { nullable: true })
-  masterPasswordOutdatedAt: Date | null
+  masterPasswordOutdatedAt: Date | null;
 
   @Field(() => String)
-  userId: string
+  userId: string;
 }
 
 @ObjectType()
 export class DeviceGQL extends DeviceGQLScalars {
   @Field(() => UserGQL)
-  User: UserGQL
+  User: UserGQL;
 
   @Field(() => UserGQL, { nullable: true })
-  UserMaster: UserGQL | null
+  UserMaster: UserGQL | null;
 
   @Field(() => [SecretUsageEventGQL])
-  SecretUsageEvents: SecretUsageEventGQL[]
+  SecretUsageEvents: SecretUsageEventGQL[];
 
   @Field(() => [DecryptionChallengeGQL])
-  DeviceDecryptionChallengesApproved: DecryptionChallengeGQL[]
+  DeviceDecryptionChallengesApproved: DecryptionChallengeGQL[];
 
   // skip overwrite 👇
 }
