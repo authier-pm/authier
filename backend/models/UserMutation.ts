@@ -109,8 +109,6 @@ export class UserMutation extends UserBase {
         userId: this.id,
         lastIpAddress: ipAddress,
         vaultLockTimeoutSeconds: deviceDefaultSettings.vaultLockTimeoutSeconds,
-        autofillCredentialsEnabled:
-          deviceDefaultSettings.autofillCredentialsEnabled,
         autofillTOTPEnabled: deviceDefaultSettings.autofillTOTPEnabled,
         syncTOTP: deviceDefaultSettings.syncTOTP
       })
@@ -272,7 +270,6 @@ export class UserMutation extends UserBase {
       .set({
         syncTOTP: config.syncTOTP,
         vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-        autofillCredentialsEnabled: config.autofillCredentialsEnabled,
         autofillTOTPEnabled: config.autofillTOTPEnabled
       })
       .where(eq(deviceSchema.id, ctx.device.id))
@@ -282,6 +279,9 @@ export class UserMutation extends UserBase {
       .set({
         notificationOnVaultUnlock: config.notificationOnVaultUnlock,
         uiLanguage: config.uiLanguage,
+        autofillForbiddenUrlPatterns:
+          config.autofillForbiddenUrlPatterns ??
+          this.autofillForbiddenUrlPatterns,
         notificationOnWrongPasswordAttempts:
           config.notificationOnWrongPasswordAttempts
       })

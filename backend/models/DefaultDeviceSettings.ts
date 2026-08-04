@@ -26,7 +26,6 @@ export class DefaultDeviceSettingsMutation extends DefaultDeviceSettingsGQLScala
       autofillTOTPEnabled: config.autofillTOTPEnabled,
       syncTOTP: config.syncTOTP,
       vaultLockTimeoutSeconds: config.vaultLockTimeoutSeconds,
-      autofillCredentialsEnabled: config.autofillCredentialsEnabled,
       theme: config.theme
     }
 

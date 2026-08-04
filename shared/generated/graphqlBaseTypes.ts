@@ -148,7 +148,6 @@ export type DecryptionChallengeMutation = {
 
 export type DefaultDeviceSettingsGql = {
   __typename?: 'DefaultDeviceSettingsGQL'
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
@@ -162,7 +161,6 @@ export type DefaultDeviceSettingsGql = {
 
 export type DefaultDeviceSettingsGqlScalars = {
   __typename?: 'DefaultDeviceSettingsGQLScalars'
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
@@ -175,7 +173,6 @@ export type DefaultDeviceSettingsGqlScalars = {
 
 export type DefaultDeviceSettingsMutation = {
   __typename?: 'DefaultDeviceSettingsMutation'
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   id: Scalars['Int']['output']
@@ -193,7 +190,6 @@ export type DefaultDeviceSettingsMutationUpdateArgs = {
 
 export type DefaultDeviceSettingsQuery = {
   __typename?: 'DefaultDeviceSettingsQuery'
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   /** 0 index for system defaults */
@@ -206,7 +202,6 @@ export type DefaultDeviceSettingsQuery = {
 }
 
 export type DefaultSettingsInput = {
-  autofillCredentialsEnabled: Scalars['Boolean']['input']
   autofillTOTPEnabled: Scalars['Boolean']['input']
   syncTOTP: Scalars['Boolean']['input']
   theme: Scalars['String']['input']
@@ -220,7 +215,6 @@ export type DeviceGql = {
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
   UserMaster?: Maybe<UserGql>
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
@@ -257,7 +251,6 @@ export type DeviceLocation = {
 
 export type DeviceMutation = {
   __typename?: 'DeviceMutation'
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
@@ -308,7 +301,6 @@ export type DeviceQuery = {
   SecretUsageEvents: Array<SecretUsageEventGql>
   User: UserGql
   UserMaster?: Maybe<UserGql>
-  autofillCredentialsEnabled: Scalars['Boolean']['output']
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
@@ -552,7 +544,7 @@ export type SecretUsageEventInput = {
 }
 
 export type SettingsInput = {
-  autofillCredentialsEnabled: Scalars['Boolean']['input']
+  autofillForbiddenUrlPatterns?: InputMaybe<Scalars['String']['input']>
   autofillTOTPEnabled: Scalars['Boolean']['input']
   notificationOnVaultUnlock: Scalars['Boolean']['input']
   notificationOnWrongPasswordAttempts: Scalars['Int']['input']
@@ -602,6 +594,7 @@ export type UserGql = {
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
   addDeviceSecretEncrypted: Scalars['String']['output']
+  autofillForbiddenUrlPatterns: Scalars['String']['output']
   createdAt: Scalars['DateTime']['output']
   deviceRecoveryCooldownMinutes: Scalars['Int']['output']
   email?: Maybe<Scalars['String']['output']>
@@ -636,6 +629,7 @@ export type UserMutation = {
   addDevice: DeviceGql
   addDeviceSecretEncrypted: Scalars['String']['output']
   addEncryptedSecrets: Array<EncryptedSecretQuery>
+  autofillForbiddenUrlPatterns: Scalars['String']['output']
   changeEmail: UserQuery
   changeMasterPassword: Scalars['Int']['output']
   createCheckoutSession: Scalars['String']['output']
@@ -768,6 +762,7 @@ export type UserQuery = {
   UserPaidProducts: Array<UserPaidProductsGql>
   WebInputsAdded: Array<WebInputGql>
   addDeviceSecretEncrypted: Scalars['String']['output']
+  autofillForbiddenUrlPatterns: Scalars['String']['output']
   createdAt: Scalars['DateTime']['output']
   decryptionChallengesWaiting: Array<DecryptionChallengeForApproval>
   defaultDeviceSettings: DefaultDeviceSettingsQuery

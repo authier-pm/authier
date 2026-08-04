@@ -5,10 +5,8 @@ import {
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked
 } from '@src/background/backgroundPage'
-import {
-  EncryptedSecretType,
-  SettingsInput
-} from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import type { SecuritySettings } from '@src/background/backgroundSchemas'
 import debug from 'debug'
 import {
   device,
@@ -140,8 +138,8 @@ export function useDeviceState() {
     [deviceState?.decryptedSecrets]
   )
 
-  const setSecuritySettings = useCallback(async (config: SettingsInput) => {
-    device.setDeviceSettings(config)
+  const setSecuritySettings = useCallback(async (config: SecuritySettings) => {
+    await device.setDeviceSettings(config)
   }, [])
 
   const saveDeviceState = useCallback(

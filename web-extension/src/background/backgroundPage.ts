@@ -34,6 +34,7 @@ export interface IBackgroundStateSerializableLocked {
   syncTOTP: boolean | null
   autofillCredentialsEnabled: boolean | null
   autofillTOTPEnabled: boolean | null
+  autofillForbiddenUrlPatterns: string
   uiLanguage: string | null
   theme: string
   notificationOnVaultUnlock: boolean

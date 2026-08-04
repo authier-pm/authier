@@ -26,17 +26,16 @@ mutation addNewDeviceForUser(
           }
           notificationOnVaultUnlock
           notificationOnWrongPasswordAttempts
+          autofillForbiddenUrlPatterns
           device(id: $deviceId) {
             id
             syncTOTP
             vaultLockTimeoutSeconds
-            autofillCredentialsEnabled
             autofillTOTPEnabled
           }
           defaultDeviceSettings {
             id
             autofillTOTPEnabled
-            autofillCredentialsEnabled
             theme
             syncTOTP
             vaultLockTimeoutSeconds

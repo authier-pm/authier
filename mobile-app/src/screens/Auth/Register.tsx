@@ -141,7 +141,7 @@ export function Register({ navigation }: NavigationProps) {
         syncTOTP: null,
         uiLanguage: null,
         autofillTOTPEnabled: null,
-        autofillCredentialsEnabled: null,
+        autofillCredentialsEnabled: true,
         lockTimeEnd: null,
         theme: 'dark',
         notificationOnWrongPasswordAttempts:

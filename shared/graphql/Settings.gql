@@ -6,12 +6,12 @@ query SyncSettings {
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
     uiLanguage
+    autofillForbiddenUrlPatterns
   }
   currentDevice {
     id
     syncTOTP
     vaultLockTimeoutSeconds
-    autofillCredentialsEnabled
     autofillTOTPEnabled
   }
 }

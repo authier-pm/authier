@@ -9,7 +9,7 @@ export type UpdateDefaultDeviceSettingsMutationVariables = Types.Exact<{
 }>;
 
 
-export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
+export type UpdateDefaultDeviceSettingsMutation = { __typename?: 'Mutation', me: { __typename?: 'UserMutation', defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsMutation', id: number, update: { __typename?: 'DefaultDeviceSettingsGQLScalars', id: number, autofillTOTPEnabled: boolean, theme: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number } } } };
 
 export type UpdateMasterDeviceResetTimeoutMutationVariables = Types.Exact<{
   deviceRecoveryCooldownMinutes: Types.Scalars['NonNegativeInt']['input'];
@@ -21,7 +21,7 @@ export type UpdateMasterDeviceResetTimeoutMutation = { __typename?: 'Mutation', 
 export type DefaultSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id: number, autofillTOTPEnabled: boolean, autofillCredentialsEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
+export type DefaultSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, masterDeviceId?: string | null, uiLanguage: string, deviceRecoveryCooldownMinutes: number, defaultDeviceSettings: { __typename?: 'DefaultDeviceSettingsQuery', id: number, autofillTOTPEnabled: boolean, syncTOTP: boolean, vaultLockTimeoutSeconds: number, theme: string } } };
 
 
 export const UpdateDefaultDeviceSettingsDocument = gql`
@@ -32,7 +32,6 @@ export const UpdateDefaultDeviceSettingsDocument = gql`
       update(config: $config) {
         id
         autofillTOTPEnabled
-        autofillCredentialsEnabled
         theme
         syncTOTP
         vaultLockTimeoutSeconds
@@ -111,7 +110,6 @@ export const DefaultSettingsDocument = gql`
     defaultDeviceSettings {
       id
       autofillTOTPEnabled
-      autofillCredentialsEnabled
       syncTOTP
       vaultLockTimeoutSeconds
       theme

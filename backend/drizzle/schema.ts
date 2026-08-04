@@ -106,7 +106,6 @@ export const defaultSettings = pgTable(
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),
     updatedAt: timestamp({ precision: 3 }),
-    autofillCredentialsEnabled: boolean().default(true).notNull(),
     autofillTOTPEnabled: boolean().default(true).notNull(),
     vaultLockTimeoutSeconds: integer().default(86400).notNull(),
     userId: uuid()
@@ -152,7 +151,6 @@ export const device = pgTable(
     lastUnlockAt: timestamp({ precision: 3 }),
     syncTOTP: boolean().notNull(),
     deletedAt: timestamp({ precision: 3 }),
-    autofillCredentialsEnabled: boolean().notNull(),
     autofillTOTPEnabled: boolean().notNull()
   },
   (table) => [
@@ -404,6 +402,7 @@ export const user = pgTable(
     notificationOnVaultUnlock: boolean().default(false).notNull(),
     notificationOnWrongPasswordAttempts: integer().default(3).notNull(),
     uiLanguage: text().default('en').notNull(),
+    autofillForbiddenUrlPatterns: text().default('').notNull(),
     newDevicePolicy: userNewDevicePolicy()
   },
   (table) => [

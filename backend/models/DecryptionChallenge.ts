@@ -187,8 +187,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
           userId: userData.id,
           platform: input.devicePlatform,
           syncTOTP: defaultSettings.syncTOTP,
-          autofillCredentialsEnabled:
-            defaultSettings.autofillCredentialsEnabled,
           autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
           vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
         })

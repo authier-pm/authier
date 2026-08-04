@@ -76,10 +76,10 @@ export class SettingsInput {
   vaultLockTimeoutSeconds: number
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean)
   autofillTOTPEnabled: boolean
+
+  @Field(() => String, { nullable: true })
+  autofillForbiddenUrlPatterns?: string
 
   @Field(() => String)
   uiLanguage: string
@@ -98,9 +98,6 @@ export class DefaultSettingsInput {
 
   @Field(() => Int, { nullable: false })
   vaultLockTimeoutSeconds: number
-
-  @Field(() => Boolean, { nullable: false })
-  autofillCredentialsEnabled: boolean
 
   @Field(() => Boolean, { nullable: false })
   autofillTOTPEnabled: boolean

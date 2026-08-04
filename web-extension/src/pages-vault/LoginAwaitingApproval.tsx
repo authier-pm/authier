@@ -18,6 +18,7 @@ import {
 } from '@shared/graphql/Login.codegen'
 import { getUserFromToken, setAccessToken } from '../util/accessTokenExtension'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
+import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
 import {
   base64ToBuffer,
   cryptoKeyToString,
@@ -201,8 +202,9 @@ export const useLogin = (props: { deviceName: string }) => {
             addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
           autofillTOTPEnabled:
             addNewDeviceForUser.user.device.autofillTOTPEnabled,
-          autofillCredentialsEnabled:
-            addNewDeviceForUser.user.device.autofillCredentialsEnabled,
+          autofillCredentialsEnabled: await getAutofillCredentialsEnabled(),
+          autofillForbiddenUrlPatterns:
+            addNewDeviceForUser.user.autofillForbiddenUrlPatterns,
           uiLanguage: addNewDeviceForUser.user.uiLanguage,
           syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
           notificationOnWrongPasswordAttempts:
