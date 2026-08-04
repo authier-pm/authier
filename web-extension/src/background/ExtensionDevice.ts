@@ -9,9 +9,9 @@ import {
 } from './backgroundPage'
 import {
   EncryptedSecretPatchInput,
-  EncryptedSecretType,
-  SettingsInput
+  EncryptedSecretType
 } from '../../../shared/generated/graphqlBaseTypes'
+import type { SecuritySettings } from './backgroundSchemas'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
   SyncEncryptedSecretsDocument,
@@ -56,6 +56,10 @@ import {
   WebInputsForHostsQueryVariables
 } from './chromeRuntimeListener.codegen'
 import { WebInputForAutofill } from './WebInputForAutofill'
+import {
+  getAutofillCredentialsEnabled,
+  setAutofillCredentialsEnabled
+} from '@src/util/autofillCredentialsPreference'
 
 export const log = debug('au:Device')
 
@@ -105,6 +109,10 @@ export class DeviceState implements IBackgroundStateSerializable {
   webInputs: WebInputForAutofill[]
   constructor(parameters: IBackgroundStateSerializable) {
     Object.assign(this, parameters)
+    this.autofillCredentialsEnabled =
+      parameters.autofillCredentialsEnabled ?? true
+    this.autofillForbiddenUrlPatterns =
+      parameters.autofillForbiddenUrlPatterns ?? ''
     //log('device state created', this)
 
     browser.storage.onChanged.addListener(this.onStorageChange)
@@ -122,6 +130,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   syncTOTP: boolean
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
+  autofillForbiddenUrlPatterns: string
   uiLanguage: string
   theme: string
   authSecret: string
@@ -197,10 +206,13 @@ export class DeviceState implements IBackgroundStateSerializable {
     device.lockedState = null
     //TODO: Fix perf
     this.decryptedSecrets = await this.getAllSecretsDecrypted()
-    await browser.storage.local.set({
-      backgroundState: this,
-      lockedState: null
-    })
+    await Promise.all([
+      browser.storage.local.set({
+        backgroundState: this,
+        lockedState: null
+      }),
+      setAutofillCredentialsEnabled(this.autofillCredentialsEnabled)
+    ])
     if (isRunningInBgServiceWorker) {
       const icon = browser.runtime.getURL('icon-48.png')
       browser.action.setIcon({ path: icon })
@@ -560,12 +572,18 @@ class ExtensionDevice {
     return `${browserInfo.getOSName()} ${browserInfo.getBrowserName()} extension`
   }
   async clearLocalStorage() {
-    const deviceId = await this.getDeviceId()
+    const [deviceId, autofillCredentialsEnabled] = await Promise.all([
+      this.getDeviceId(),
+      getAutofillCredentialsEnabled()
+    ])
     this.state?.destroy()
     await browser.storage.local.clear()
     this.state = null
 
-    await browser.storage.local.set({ deviceId: deviceId }) // restore deviceId so that we keep it even after logout
+    await Promise.all([
+      browser.storage.local.set({ deviceId }),
+      setAutofillCredentialsEnabled(autofillCredentialsEnabled)
+    ])
   }
   /**
    * @returns a stored deviceId or a new UUID if the extension was just installed
@@ -646,6 +664,7 @@ class ExtensionDevice {
       syncTOTP,
       autofillCredentialsEnabled,
       autofillTOTPEnabled,
+      autofillForbiddenUrlPatterns,
       uiLanguage,
       theme,
       authSecret,
@@ -668,6 +687,7 @@ class ExtensionDevice {
       syncTOTP,
       autofillTOTPEnabled,
       autofillCredentialsEnabled,
+      autofillForbiddenUrlPatterns,
       uiLanguage,
       theme
     }
@@ -732,7 +752,7 @@ class ExtensionDevice {
     )
   }
 
-  setDeviceSettings(config: SettingsInput) {
+  async setDeviceSettings(config: SecuritySettings) {
     if (!this.state) {
       console.warn('cannot set device settings, device not initialized')
       return
@@ -740,6 +760,9 @@ class ExtensionDevice {
 
     this.state.autofillCredentialsEnabled = config.autofillCredentialsEnabled
     this.state.autofillTOTPEnabled = config.autofillTOTPEnabled
+    this.state.autofillForbiddenUrlPatterns =
+      config.autofillForbiddenUrlPatterns ??
+      this.state.autofillForbiddenUrlPatterns
     this.state.syncTOTP = config.syncTOTP
     this.state.uiLanguage = config.uiLanguage
     this.state.notificationOnWrongPasswordAttempts =
@@ -748,7 +771,7 @@ class ExtensionDevice {
 
     device.setLockTime(config.vaultLockTimeoutSeconds)
 
-    this.state.save()
+    await this.state.save()
   }
 
   async save(deviceState: IBackgroundStateSerializable) {

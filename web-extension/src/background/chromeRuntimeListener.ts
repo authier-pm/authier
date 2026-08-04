@@ -271,7 +271,7 @@ const appRouter = tc.router({
       const deviceState = device.state
       // console.log('securitySettings', input, device.state)
       if (deviceState) {
-        device.setDeviceSettings(input)
+        await device.setDeviceSettings(input)
       }
 
       return true

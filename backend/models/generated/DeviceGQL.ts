@@ -36,9 +36,6 @@ export class DeviceGQLScalars {
   vaultLockTimeoutSeconds: number
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
   @Field(() => GraphQLISODateTime)

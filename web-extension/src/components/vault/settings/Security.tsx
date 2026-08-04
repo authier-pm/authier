@@ -16,12 +16,15 @@ import {
 } from '@src/components/ui/card'
 import { Switch } from '@src/components/ui/switch'
 import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions'
+import { serializeAutofillForbiddenUrlPatterns } from '@shared/autofillForbiddenUrlPatterns'
+import { toBackendSettings } from '@src/util/securitySettings'
 
 interface Values {
   vaultLockTimeoutSeconds: number
   uiLanguage: string
   autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
+  autofillForbiddenUrlPatterns: string
   syncTOTP: boolean
   notificationOnWrongPasswordAttempts: number
   notificationOnVaultUnlock: boolean
@@ -44,8 +47,7 @@ export default function Security() {
       <CardHeader>
         <CardTitle>Security behavior</CardTitle>
         <CardDescription>
-          Control locking, language, autofill, and vault notifications for this
-          device.
+          Control locking, language, autofill, and vault notifications.
         </CardDescription>
       </CardHeader>
 
@@ -54,6 +56,8 @@ export default function Security() {
           initialValues={{
             autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
             autofillCredentialsEnabled: deviceState.autofillCredentialsEnabled,
+            autofillForbiddenUrlPatterns:
+              deviceState.autofillForbiddenUrlPatterns,
             uiLanguage: deviceState.uiLanguage,
             syncTOTP: deviceState.syncTOTP,
             vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds,
@@ -67,18 +71,22 @@ export default function Security() {
           ) => {
             const config = {
               ...values,
+              autofillForbiddenUrlPatterns:
+                serializeAutofillForbiddenUrlPatterns(
+                  values.autofillForbiddenUrlPatterns
+                ),
               vaultLockTimeoutSeconds: Number.parseInt(
                 values.vaultLockTimeoutSeconds.toString(),
                 10
               )
             }
 
+            await setSecuritySettings(config)
             await updateSettings({
               variables: {
-                config
+                config: toBackendSettings(config)
               }
             })
-            setSecuritySettings(config)
             resetForm({ values: config })
             setSubmitting(false)
           }}
@@ -140,7 +148,7 @@ export default function Security() {
               <div className="grid gap-4">
                 <SettingToggle
                   checked={values.autofillCredentialsEnabled}
-                  description="Allow saved credentials to be offered for autofill."
+                  description="Enable login autofill in this browser. This preference is stored only on this device."
                   label="Credentials autofill"
                   onCheckedChange={(checked) => {
                     setFieldValue('autofillCredentialsEnabled', checked)
@@ -154,6 +162,35 @@ export default function Security() {
                     setFieldValue('autofillTOTPEnabled', checked)
                   }}
                 />
+              </div>
+
+              <Field name="autofillForbiddenUrlPatterns">
+                {() => (
+                  <FormField
+                    description="These patterns disable autofill on every device. Enter one URL pattern per line and use * as a wildcard."
+                    label="Never autofill on"
+                  >
+                    <textarea
+                      className="min-h-32 w-full resize-y rounded-[var(--radius-md)] border border-[color:var(--color-border)] bg-[color:var(--color-input)] px-3 py-2 text-sm text-[color:var(--color-foreground)] outline-none transition placeholder:text-[color:var(--color-muted)] focus:border-[color:var(--color-ring)] focus:ring-2 focus:ring-[color:var(--color-ring)]/30"
+                      id="autofillForbiddenUrlPatterns"
+                      name="autofillForbiddenUrlPatterns"
+                      onChange={(event) => {
+                        setFieldValue(
+                          'autofillForbiddenUrlPatterns',
+                          event.target.value
+                        )
+                      }}
+                      placeholder={
+                        'www.google.com/my-path/*\nhttps://internal.company.test/*'
+                      }
+                      spellCheck={false}
+                      value={values.autofillForbiddenUrlPatterns}
+                    />
+                  </FormField>
+                )}
+              </Field>
+
+              <div className="grid gap-4">
                 <SettingToggle
                   checked={values.syncTOTP}
                   description="Keep your one-time password data synced to this device."

@@ -7,7 +7,7 @@ const defaultOptions = {} as const;
 export type SyncSettingsQueryVariables = Types.Exact<{ [key: string]: never; }>;
 
 
-export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, loginCredentialsLimit: number, TOTPlimit: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, uiLanguage: string }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillCredentialsEnabled: boolean, autofillTOTPEnabled: boolean } };
+export type SyncSettingsQuery = { __typename?: 'Query', me: { __typename?: 'UserQuery', id: string, loginCredentialsLimit: number, TOTPlimit: number, notificationOnVaultUnlock: boolean, notificationOnWrongPasswordAttempts: number, uiLanguage: string, autofillForbiddenUrlPatterns: string }, currentDevice: { __typename?: 'DeviceQuery', id: string, syncTOTP: boolean, vaultLockTimeoutSeconds: number, autofillTOTPEnabled: boolean } };
 
 export type UpdateSettingsMutationVariables = Types.Exact<{
   config: Types.SettingsInput;
@@ -26,12 +26,12 @@ export const SyncSettingsDocument = gql`
     notificationOnVaultUnlock
     notificationOnWrongPasswordAttempts
     uiLanguage
+    autofillForbiddenUrlPatterns
   }
   currentDevice {
     id
     syncTOTP
     vaultLockTimeoutSeconds
-    autofillCredentialsEnabled
     autofillTOTPEnabled
   }
 }

@@ -265,7 +265,6 @@ export class RootResolver {
           lastIpAddress: ipAddress,
           firebaseToken: firebaseToken,
           name: deviceName,
-          autofillCredentialsEnabled: true,
           vaultLockTimeoutSeconds: 28800,
           syncTOTP: true,
           autofillTOTPEnabled: true,

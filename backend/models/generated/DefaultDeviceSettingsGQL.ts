@@ -13,9 +13,6 @@ export class DefaultDeviceSettingsGQLScalars {
   updatedAt: Date | null
 
   @Field(() => Boolean)
-  autofillCredentialsEnabled: boolean
-
-  @Field(() => Boolean)
   autofillTOTPEnabled: boolean
 
   @Field(() => String)

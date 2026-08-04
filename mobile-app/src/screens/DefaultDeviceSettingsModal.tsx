@@ -52,7 +52,6 @@ export function DefaultDeviceSettingsModal() {
     uiLanguage: 'en',
     theme: 'dark',
     syncTOTP: true,
-    autofillCredentialsEnabled: true,
     autofillTOTPEnabled: true
   })
 
@@ -135,20 +134,6 @@ export function DefaultDeviceSettingsModal() {
                   alignContent="center"
                   p={2}
                 >
-                  <Text>Credentials autofill</Text>
-                  <Switch
-                    value={form.autofillCredentialsEnabled}
-                    onToggle={async (e) => {
-                      setForm({ ...form, autofillCredentialsEnabled: e })
-                    }}
-                    size="md"
-                  />
-                </HStack>
-                <HStack
-                  justifyContent="space-between"
-                  alignContent="center"
-                  p={2}
-                >
                   <Text>TOTP autofill</Text>
                   <Switch
                     value={form.autofillTOTPEnabled}
@@ -205,7 +190,6 @@ export function DefaultDeviceSettingsModal() {
               onPress={async () => {
                 const formData = {
                   uiLanguage: form.uiLanguage,
-                  autofillCredentialsEnabled: form.autofillCredentialsEnabled,
                   syncTOTP: form.syncTOTP,
                   autofillTOTPEnabled: form.autofillTOTPEnabled,
                   vaultLockTimeoutSeconds: form.vaultLockTimeoutSeconds

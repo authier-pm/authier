@@ -249,8 +249,6 @@ export const useDeviceStore = create<Device>()(
 
           const config = {
             autofillTOTPEnabled: queryData.currentDevice.autofillTOTPEnabled,
-            autofillCredentialsEnabled:
-              queryData.currentDevice.autofillCredentialsEnabled,
             syncTOTP: queryData.currentDevice.syncTOTP,
             vaultLockTimeoutSeconds:
               queryData.currentDevice.vaultLockTimeoutSeconds,

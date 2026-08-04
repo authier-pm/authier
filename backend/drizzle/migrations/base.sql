@@ -31,7 +31,6 @@ CREATE TABLE "DefaultSettings" (
 	"id" serial PRIMARY KEY,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updatedAt" timestamp(3),
-	"autofillCredentialsEnabled" boolean DEFAULT true NOT NULL,
 	"autofillTOTPEnabled" boolean DEFAULT true NOT NULL,
 	"vaultLockTimeoutSeconds" integer DEFAULT 86400 NOT NULL,
 	"userId" uuid NOT NULL,
@@ -59,7 +58,6 @@ CREATE TABLE "Device" (
 	"lastUnlockAt" timestamp(3),
 	"syncTOTP" boolean NOT NULL,
 	"deletedAt" timestamp(3),
-	"autofillCredentialsEnabled" boolean NOT NULL,
 	"autofillTOTPEnabled" boolean NOT NULL
 );
 --> statement-breakpoint
@@ -154,6 +152,7 @@ CREATE TABLE "User" (
 	"notificationOnVaultUnlock" boolean DEFAULT false NOT NULL,
 	"notificationOnWrongPasswordAttempts" integer DEFAULT 3 NOT NULL,
 	"uiLanguage" text DEFAULT 'en' NOT NULL,
+	"autofillForbiddenUrlPatterns" text DEFAULT '' NOT NULL,
 	"newDevicePolicy" "UserNewDevicePolicy"
 );
 --> statement-breakpoint

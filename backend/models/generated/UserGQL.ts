@@ -55,6 +55,9 @@ export class UserGQLScalars {
   @Field(() => Int)
   notificationOnWrongPasswordAttempts: number
 
+  @Field(() => String)
+  autofillForbiddenUrlPatterns: string
+
   @Field(() => UserNewDevicePolicyGQL, { nullable: true })
   newDevicePolicy: UserNewDevicePolicyGQL | null
 }

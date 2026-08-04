@@ -155,21 +155,21 @@ describe('UserMutation', () => {
         syncTOTP: true,
         vaultLockTimeoutSeconds: 3600,
         uiLanguage: 'cs',
-        autofillCredentialsEnabled: false,
         autofillTOTPEnabled: false,
+        autofillForbiddenUrlPatterns:
+          'www.google.com/my-path/*\nhttps://internal.test/*',
         notificationOnVaultUnlock: false,
         notificationOnWrongPasswordAttempts: 3
       }
 
-      const res = await user.updateSettings(
-        newSettings,
-        makeFakeCtx({
-          userId: user.id,
-          device: {
-            id: masterDeviceId
-          } as Parameters<typeof makeFakeCtx>[0]['device']
-        })
-      )
+      const ctx = makeFakeCtx({
+        userId: user.id,
+        device: {
+          id: masterDeviceId
+        } as Parameters<typeof makeFakeCtx>[0]['device']
+      })
+
+      const res = await user.updateSettings(newSettings, ctx)
 
       const deviceData = await db.query.device.findFirst({
         where: { id: masterDeviceId }
@@ -180,6 +180,25 @@ describe('UserMutation', () => {
         newSettings.vaultLockTimeoutSeconds
       )
       expect(deviceData?.syncTOTP).toBe(newSettings.syncTOTP)
+      expect(res.autofillForbiddenUrlPatterns).toBe(
+        newSettings.autofillForbiddenUrlPatterns
+      )
+
+      const {
+        autofillForbiddenUrlPatterns: omittedAutofillForbiddenUrlPatterns,
+        ...legacySettings
+      } = newSettings
+      expect(omittedAutofillForbiddenUrlPatterns).toBeDefined()
+
+      const userWithUpdatedSettings = plainToClass(UserMutation, res)
+      await userWithUpdatedSettings.updateSettings(legacySettings, ctx)
+
+      const userDataAfterLegacyUpdate = await db.query.user.findFirst({
+        where: { id: user.id }
+      })
+      expect(userDataAfterLegacyUpdate?.autofillForbiddenUrlPatterns).toBe(
+        newSettings.autofillForbiddenUrlPatterns
+      )
     })
   })
 

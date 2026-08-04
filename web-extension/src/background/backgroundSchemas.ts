@@ -53,12 +53,15 @@ export const webInputElementSchema = z.object({
 export const settingsSchema = z.object({
   autofillCredentialsEnabled: z.boolean(),
   autofillTOTPEnabled: z.boolean(),
+  autofillForbiddenUrlPatterns: z.string().optional(),
   uiLanguage: z.string(),
   syncTOTP: z.boolean(),
   vaultLockTimeoutSeconds: z.number(),
   notificationOnVaultUnlock: z.boolean(),
   notificationOnWrongPasswordAttempts: z.number()
 })
+
+export type SecuritySettings = z.infer<typeof settingsSchema>
 
 export const backgroundStateSerializableLockedSchema = z.object({
   email: z.string(),
@@ -80,6 +83,7 @@ export const backgroundStateSerializableLockedSchema = z.object({
   vaultLockTimeoutSeconds: z.number().nullable(),
   autofillCredentialsEnabled: z.boolean().nullable(),
   autofillTOTPEnabled: z.boolean().nullable(),
+  autofillForbiddenUrlPatterns: z.string().default(''),
   uiLanguage: z.string().nullable(),
   syncTOTP: z.boolean().nullable(),
   theme: z.string(),

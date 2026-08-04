@@ -20,7 +20,6 @@ import { useVaultLockTimeoutOptions } from '@src/util/useVaultLockTimeoutOptions
 interface Values {
   vaultLockTimeoutSeconds: number
   deviceRecoveryCooldownMinutes: number
-  autofillCredentialsEnabled: boolean
   autofillTOTPEnabled: boolean
   syncTOTP: boolean
   uiLanguage: string
@@ -99,8 +98,6 @@ export function DeviceDefaultsForm() {
           initialValues={{
             autofillTOTPEnabled:
               data.me.defaultDeviceSettings.autofillTOTPEnabled,
-            autofillCredentialsEnabled:
-              data.me.defaultDeviceSettings.autofillCredentialsEnabled,
             syncTOTP: data.me.defaultDeviceSettings.syncTOTP,
             vaultLockTimeoutSeconds:
               data.me.defaultDeviceSettings.vaultLockTimeoutSeconds,
@@ -115,7 +112,6 @@ export function DeviceDefaultsForm() {
           ) => {
             const config = {
               autofillTOTPEnabled: values.autofillTOTPEnabled,
-              autofillCredentialsEnabled: values.autofillCredentialsEnabled,
               syncTOTP: values.syncTOTP,
               theme: values.theme,
               uiLanguage: values.uiLanguage,
@@ -250,14 +246,6 @@ export function DeviceDefaultsForm() {
               </div>
 
               <div className="grid gap-4">
-                <SettingToggle
-                  checked={values.autofillCredentialsEnabled}
-                  description="Offer saved credentials for autofill on new devices."
-                  label="Credentials autofill"
-                  onCheckedChange={(checked) => {
-                    setFieldValue('autofillCredentialsEnabled', checked)
-                  }}
-                />
                 <SettingToggle
                   checked={values.autofillTOTPEnabled}
                   description="Enable one-time password autofill by default."

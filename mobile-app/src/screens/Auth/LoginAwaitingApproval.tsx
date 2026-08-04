@@ -200,8 +200,7 @@ export const useLogin = (props: { deviceName: string }) => {
               addNewDeviceForUser.user.device.vaultLockTimeoutSeconds,
             autofillTOTPEnabled:
               addNewDeviceForUser.user.device.autofillTOTPEnabled,
-            autofillCredentialsEnabled:
-              addNewDeviceForUser.user.device.autofillCredentialsEnabled,
+            autofillCredentialsEnabled: true,
             uiLanguage: addNewDeviceForUser.user.uiLanguage,
             syncTOTP: addNewDeviceForUser.user.device.syncTOTP,
             lockTimeEnd:
