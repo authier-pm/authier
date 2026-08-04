@@ -25,6 +25,40 @@ minimumReleaseAgeExclude:
   - '@types/chrome@0.2.0'
   - lint-staged@17.0.8
   - sql-formatter@15.8.2
+  - '@orpc/client@1.14.14'
+  - '@orpc/contract@1.14.14'
+  - '@orpc/interop@1.14.14'
+  - '@orpc/server@1.14.14'
+  - '@orpc/shared@1.14.14'
+  - '@orpc/standard-server-aws-lambda@1.14.14'
+  - '@orpc/standard-server-fastify@1.14.14'
+  - '@orpc/standard-server-fetch@1.14.14'
+  - '@orpc/standard-server-node@1.14.14'
+  - '@orpc/standard-server-peer@1.14.14'
+  - '@orpc/standard-server@1.14.14'
+  - '@oxfmt/binding-android-arm-eabi@0.62.0'
+  - '@oxfmt/binding-android-arm64@0.62.0'
+  - '@oxfmt/binding-darwin-arm64@0.62.0'
+  - '@oxfmt/binding-darwin-x64@0.62.0'
+  - '@oxfmt/binding-freebsd-x64@0.62.0'
+  - '@oxfmt/binding-linux-arm-gnueabihf@0.62.0'
+  - '@oxfmt/binding-linux-arm-musleabihf@0.62.0'
+  - '@oxfmt/binding-linux-arm64-gnu@0.62.0'
+  - '@oxfmt/binding-linux-arm64-musl@0.62.0'
+  - '@oxfmt/binding-linux-ppc64-gnu@0.62.0'
+  - '@oxfmt/binding-linux-riscv64-gnu@0.62.0'
+  - '@oxfmt/binding-linux-riscv64-musl@0.62.0'
+  - '@oxfmt/binding-linux-s390x-gnu@0.62.0'
+  - '@oxfmt/binding-linux-x64-gnu@0.62.0'
+  - '@oxfmt/binding-linux-x64-musl@0.62.0'
+  - '@oxfmt/binding-openharmony-arm64@0.62.0'
+  - '@oxfmt/binding-win32-arm64-msvc@0.62.0'
+  - '@oxfmt/binding-win32-ia32-msvc@0.62.0'
+  - '@oxfmt/binding-win32-x64-msvc@0.62.0'
+  - '@react-native-firebase/app@26.1.0'
+  - '@testing-library/user-event@14.6.3'
+  - oxfmt@0.62.0
+  - unplugin-swc@1.5.10
 
 allowBuilds:
   '@capaj/type-graphql': true
