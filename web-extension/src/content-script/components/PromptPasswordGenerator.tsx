@@ -1,13 +1,16 @@
 import { h } from 'preact'
 
 import { useState } from 'preact/hooks'
-import { generate } from 'generate-password'
 //import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 import './Option.css'
 import { generatorDiv } from '../renderPasswordGenerator'
-import { autofillValueIntoInput } from '../autofill'
+import {
+  autofillValueIntoInput,
+  generatePasswordBasedOnUserConfig,
+  handleGeneratedPasswordAutofill
+} from '../autofill'
 
 export const PromptPasswordGenerator = ({
   input
@@ -20,15 +23,7 @@ export const PromptPasswordGenerator = ({
   }
   const [pos, setPos] = useState(input.getBoundingClientRect())
   const [showDropdown, setShowDropdown] = useState(false)
-  const [password, setPassword] = useState(
-    generate({
-      length: 10,
-      numbers: true,
-      uppercase: true,
-      symbols: true,
-      strict: true
-    })
-  )
+  const [password, setPassword] = useState(generatePasswordBasedOnUserConfig())
 
   let resizeTimer: ReturnType<typeof setTimeout> | undefined
   window.onresize = function () {
@@ -101,22 +96,19 @@ export const PromptPasswordGenerator = ({
         >
           <button
             onClick={async () => {
-              setPassword(
-                generate({
-                  length: 10,
-                  numbers: true,
-                  uppercase: true,
-                  symbols: true,
-                  strict: true
-                })
-              )
+              setPassword(generatePasswordBasedOnUserConfig())
             }}
           >
             Next
           </button>
           <button
-            onClick={() => {
+            onClick={async () => {
               autofillValueIntoInput(input, password)
+              // the user opted in, so record it in history and offer to save it
+              await handleGeneratedPasswordAutofill(password, {
+                showSavePrompt: true
+              })
+              generatorDiv?.remove()
             }}
           >
             Use

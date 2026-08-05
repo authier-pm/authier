@@ -32,6 +32,13 @@ import {
 import { wait } from './wait'
 import { filterUselessInputs } from './getAllInputsIncludingShadowDom'
 import {
+  classifyPageForAutofill,
+  classifyPasswordForm,
+  PasswordFormClassification,
+  PasswordFormKind
+} from './classifyPasswordForm'
+import { renderPasswordGenerator } from './renderPasswordGenerator'
+import {
   appendGeneratedPasswordHistoryEntry,
   createGeneratedPasswordHistoryEntry
 } from '@src/util/generatedPasswordHistory'
@@ -190,37 +197,30 @@ export async function handleGeneratedPasswordAutofill(
   }
 }
 
-async function handleNewPasswordCase(usefulInputs: HTMLInputElement[]) {
-  // TODO only do this after user confirmation as this could cause user to change their password by mistake-for example when they edit something on their profile and it also has the two password inputs
-  for (let index = 0; index < usefulInputs.length - 1; index++) {
-    const input = usefulInputs[index]
-    if (
-      input.type === 'password' &&
-      usefulInputs[index + 1].type === 'password'
-    ) {
-      const newPassword = generatePasswordBasedOnUserConfig()
-      autofillValueIntoInput(usefulInputs[index], newPassword)
-      autofillValueIntoInput(usefulInputs[index + 1], newPassword)
-
-      await handleGeneratedPasswordAutofill(newPassword, {
-        showSavePrompt: true
-      })
-      return true
-    } else if (input.getAttribute('autocomplete')?.includes('new-password')) {
-      // TODO it would make sense to render the password generator here, but renderPasswordGenerator is not implemented yet
-      // renderPasswordGenerator({ input: input })
-      // const password = generate({
-      //   length: 10,
-      //   numbers: true,
-      //   uppercase: true,
-      //   symbols: true,
-      //   strict: true
-      // })
-      // autofillValueIntoInput(input, password)
-
-      return true
-    }
+/**
+ * Handles pages that ask for a brand new password - signup forms and
+ * change-password forms. We never type a password here on our own: filling a
+ * "new password" field unprompted is how a user ends up with their password
+ * silently changed while editing their profile. Instead we offer the generator
+ * and let the click come from the user.
+ *
+ * @returns true when this page wants a new password, which aborts the rest of autofill
+ */
+function handleNewPasswordCase(classification: PasswordFormClassification) {
+  if (
+    classification.kind !== PasswordFormKind.SIGNUP &&
+    classification.kind !== PasswordFormKind.CHANGE_PASSWORD
+  ) {
+    return false
   }
+
+  const targetInput = classification.newPasswordInputs[0]
+  if (targetInput) {
+    log('offering the password generator for', classification.kind)
+    renderPasswordGenerator({ input: targetInput })
+  }
+
+  return true
 }
 
 function imitateKeyInput(el: HTMLInputElement, input: string) {
@@ -417,6 +417,42 @@ export const autofill = (initState: IInitStateRes) => {
     hasTotpSecret: Boolean(totpSecret)
   })
 
+  /**
+   * Our fallback whenever we refuse to autofill - the user gets the Authier icon
+   * next to the password field and fills with a single click.
+   */
+  const offerCredentialPicker = (
+    classification: PasswordFormClassification
+  ) => {
+    if (secretsForHost.loginCredentials.length === 0) {
+      return
+    }
+
+    const anchorInput =
+      classification.currentPasswordInput ?? classification.usernameInput
+    if (!anchorInput) {
+      return
+    }
+
+    const selector = getSelectorForElement(anchorInput)
+    renderLoginCredOption({
+      loginCredentials: secretsForHost.loginCredentials,
+      webInputs: [
+        {
+          createdAt: new Date().toString(),
+          domPath: selector.css,
+          domOrdinal: selector.domOrdinal,
+          host: location.host,
+          url: location.href,
+          kind:
+            anchorInput.type === 'password'
+              ? WebInputType.PASSWORD
+              : WebInputType.USERNAME_OR_EMAIL
+        }
+      ]
+    })
+  }
+
   //NOTE: scan all inputs
   /**
    *
@@ -479,11 +515,29 @@ export const autofill = (initState: IInitStateRes) => {
       }
     }
 
-    if (usefulInputs.length >= 2) {
-      const isNewPassword = await handleNewPasswordCase(usefulInputs)
-      if (isNewPassword) {
-        return
+    /**
+     * Everything below this point needs to know what kind of page we are on. A
+     * change-password or signup form must never receive the stored password, and
+     * a page we cannot confidently read gets the credential picker instead of a
+     * silent fill.
+     */
+    const classification = classifyPageForAutofill(usefulInputs, body)
+
+    // arm this before any of the bail-outs below - even on a page we refuse to
+    // autofill, the next form to appear may be a login form
+    armInputAddedHandler()
+
+    if (handleNewPasswordCase(classification)) {
+      if (classification.kind === PasswordFormKind.CHANGE_PASSWORD) {
+        offerCredentialPicker(classification)
       }
+      return
+    }
+
+    if (classification.kind === PasswordFormKind.UNKNOWN) {
+      log('page kind is unknown, offering the picker instead of autofilling')
+      offerCredentialPicker(classification)
+      return
     }
 
     // Fill known inputs
@@ -504,7 +558,11 @@ export const autofill = (initState: IInitStateRes) => {
         if (
           webInputGql.kind === WebInputType.PASSWORD &&
           firstLoginCred &&
-          inputEl.type === 'password' // we don't want to autofill password to any other type of input
+          inputEl.type === 'password' && // we don't want to autofill password to any other type of input
+          // DOM paths are matched loosely by URL, so a path learned on the login
+          // page also gets served on the settings page - never let it land in a
+          // field meant to receive a brand new password
+          classification.newPasswordInputs.includes(inputEl) === false
         ) {
           const el = fillStringIntoInput({
             inputEl,
@@ -564,128 +622,106 @@ export const autofill = (initState: IInitStateRes) => {
       log('autofillResult', autofillResult)
     }
 
-    if (onInputAddedHandler) {
-      bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
-    }
-
-    //TODO: write a test for this
-    // Catch new inputs
-    onInputAddedHandler = debounce(
-      async (inputEl) => {
-        log('onInputAddedHandler received input', {
-          id: inputEl?.id,
-          type: inputEl?.type,
-          ariaLabel: inputEl?.getAttribute?.('aria-label'),
-          autocomplete: inputEl?.autocomplete
-        })
-        const isLikelyOtpField =
-          inputEl?.type === 'number' ||
-          (inputEl?.getAttribute?.('aria-label') ?? '')
-            .toLowerCase()
-            .includes('code input')
-        const totpAlreadyFilled = inputTypesFilledForThisPage.has(
-          WebInputType.TOTP
-        )
-        let dynamicTotpSecret = totpSecret
-        if (isLikelyOtpField && !dynamicTotpSecret) {
-          try {
-            const refreshedState =
-              await trpc.getContentScriptInitialState.query()
-            dynamicTotpSecret =
-              refreshedState?.secretsForHost?.totpSecrets?.[0] ??
-              dynamicTotpSecret
-            log('refetched content script state for OTP', {
-              totpSecretsCount:
-                refreshedState?.secretsForHost?.totpSecrets?.length ?? 0,
-              hasTotpSecretAfterRefetch: Boolean(dynamicTotpSecret)
-            })
-          } catch (error) {
-            log('failed to refetch content script state for OTP', error)
-          }
-        }
-
-        if (isLikelyOtpField) {
-          log('segmented TOTP gate state', {
-            hasTotpSecret: Boolean(dynamicTotpSecret),
-            totpAlreadyFilled,
-            filledElementsSize: filledElements.size
-          })
-        }
-        if (dynamicTotpSecret && !totpAlreadyFilled) {
-          log('checking for segmented TOTP inputs on inputAdded')
-          const segmentedTotpInputs = findSegmentedTotpInputs(
-            filterUselessInputs(document.body)
-          )
-          if (segmentedTotpInputs) {
-            const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
-            if (totpCode) {
-              const didFillSegmentedTotp = fillSegmentedTotpInputs(
-                segmentedTotpInputs,
-                totpCode
-              )
-              if (didFillSegmentedTotp) {
-                return
-              }
-            }
-          }
-        }
-
-        if (filledElements.size >= 2) {
-          return // we have already filled 2 inputs on this page, we don't need to fill any more
-        }
-        log('onInputAddedHandler', inputEl)
-        // For one input on page
-        if (inputEl.type === 'username' || inputEl.type === 'email') {
-          if (secretsForHost.loginCredentials.length === 1) {
-            autofillValueIntoInput(
-              inputEl,
-              firstLoginCred.loginCredentials.username
-            )
-          } else {
-            // todo show prompt to user to select which credential to use
-          }
-        } else if (inputEl.autocomplete?.includes('new-password')) {
-          const newPassword = generatePasswordBasedOnUserConfig()
-          autofillValueIntoInput(inputEl, newPassword)
-          await handleGeneratedPasswordAutofill(newPassword, {
-            showSavePrompt: false
-          })
-        } else {
-          // More inputs on page
-          if (inputEl.type === 'password') {
-            const passwordInputsOnPage = document.querySelectorAll(
-              'input[type="password"]'
-            ) as NodeListOf<HTMLInputElement>
-
-            if (passwordInputsOnPage.length === 2) {
-              if (
-                passwordInputsOnPage[0].autocomplete?.includes(
-                  'current-password'
-                ) === false &&
-                passwordInputsOnPage[1].autocomplete?.includes(
-                  'current-password'
-                ) === false
-              ) {
-                const newPassword = generatePasswordBasedOnUserConfig()
-
-                // must be some kind of signup page
-                autofillValueIntoInput(passwordInputsOnPage[0], newPassword)
-
-                autofillValueIntoInput(passwordInputsOnPage[1], newPassword)
-                await handleGeneratedPasswordAutofill(newPassword, {
-                  showSavePrompt: true
-                })
-              }
-            }
-          }
-        }
-      },
-      500,
-      {
-        trailing: true,
-        leading: false
+    /**
+     * Watches for inputs that show up after the initial scan - SPA route changes,
+     * multi step logins, lazily rendered forms. Armed on every page, including the
+     * ones we refuse to autofill, because the next form on the page may well be a
+     * login form.
+     */
+    function armInputAddedHandler() {
+      if (onInputAddedHandler) {
+        bodyInputChangeEmitter.off('inputAdded', onInputAddedHandler)
       }
-    )
+
+      //TODO: write a test for this
+      // Catch new inputs
+      onInputAddedHandler = debounce(
+        async (inputEl) => {
+          log('onInputAddedHandler received input', {
+            id: inputEl?.id,
+            type: inputEl?.type,
+            ariaLabel: inputEl?.getAttribute?.('aria-label'),
+            autocomplete: inputEl?.autocomplete
+          })
+          const isLikelyOtpField =
+            inputEl?.type === 'number' ||
+            (inputEl?.getAttribute?.('aria-label') ?? '')
+              .toLowerCase()
+              .includes('code input')
+          const totpAlreadyFilled = inputTypesFilledForThisPage.has(
+            WebInputType.TOTP
+          )
+          let dynamicTotpSecret = totpSecret
+          if (isLikelyOtpField && !dynamicTotpSecret) {
+            try {
+              const refreshedState =
+                await trpc.getContentScriptInitialState.query()
+              dynamicTotpSecret =
+                refreshedState?.secretsForHost?.totpSecrets?.[0] ??
+                dynamicTotpSecret
+              log('refetched content script state for OTP', {
+                totpSecretsCount:
+                  refreshedState?.secretsForHost?.totpSecrets?.length ?? 0,
+                hasTotpSecretAfterRefetch: Boolean(dynamicTotpSecret)
+              })
+            } catch (error) {
+              log('failed to refetch content script state for OTP', error)
+            }
+          }
+
+          if (isLikelyOtpField) {
+            log('segmented TOTP gate state', {
+              hasTotpSecret: Boolean(dynamicTotpSecret),
+              totpAlreadyFilled,
+              filledElementsSize: filledElements.size
+            })
+          }
+          if (dynamicTotpSecret && !totpAlreadyFilled) {
+            log('checking for segmented TOTP inputs on inputAdded')
+            const segmentedTotpInputs = findSegmentedTotpInputs(
+              filterUselessInputs(document.body)
+            )
+            if (segmentedTotpInputs) {
+              const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
+              if (totpCode) {
+                const didFillSegmentedTotp = fillSegmentedTotpInputs(
+                  segmentedTotpInputs,
+                  totpCode
+                )
+                if (didFillSegmentedTotp) {
+                  return
+                }
+              }
+            }
+          }
+
+          if (filledElements.size >= 2) {
+            return // we have already filled 2 inputs on this page, we don't need to fill any more
+          }
+          log('onInputAddedHandler', inputEl)
+          // For one input on page
+          if (inputEl.type === 'username' || inputEl.type === 'email') {
+            if (secretsForHost.loginCredentials.length === 1) {
+              autofillValueIntoInput(
+                inputEl,
+                firstLoginCred.loginCredentials.username
+              )
+            } else {
+              // todo show prompt to user to select which credential to use
+            }
+          } else if (inputEl.type === 'password') {
+            // a password field appearing late is either a login step or a form
+            // asking for a new password - classify before touching it
+            handleNewPasswordCase(classifyPasswordForm(inputEl))
+          }
+        },
+        500,
+        {
+          trailing: true,
+          leading: false
+        }
+      )
+    }
 
     if (!firstLoginCred && !totpSecret) {
       log('no secrets for host')
@@ -699,7 +735,12 @@ export const autofill = (initState: IInitStateRes) => {
         isElementVisibleInViewport(inputEl)
       )
 
+      const mayAutoSubmit =
+        classification.kind === PasswordFormKind.LOGIN &&
+        classification.confidence === 'high'
+
       if (
+        mayAutoSubmit &&
         form &&
         isElementVisibleInViewport(form) &&
         areFilledElementsVisible
@@ -732,14 +773,21 @@ export const autofill = (initState: IInitStateRes) => {
         }
       } else {
         log(
-          'skipping submit for autofilled form because form or filled inputs are not visible in viewport'
+          'skipping submit for autofilled form',
+          mayAutoSubmit
+            ? 'because form or filled inputs are not visible in viewport'
+            : `because page kind is ${classification.kind} (${classification.confidence} confidence)`
         )
       }
     }
 
     async function searchInputsAndAutofill(documentBody: HTMLElement) {
       const newWebInputs: WebInputsArrayClientSide = []
-      const inputElsArray = filterUselessInputs(documentBody)
+      // only look inside the credential form - a flat scan of the whole document
+      // is how a site-wide search box ends up being treated as the username field
+      const inputElsArray = (
+        filterUselessInputs(documentBody) as HTMLInputElement[]
+      ).filter((el) => classification.scope.contains(el))
       log('inputElsArray', inputElsArray)
 
       if (inputElsArray.length === 1) {
@@ -807,34 +855,34 @@ export const autofill = (initState: IInitStateRes) => {
               })
             }
 
-            //Search for a username input by going backwards in the array from the password input
-            for (let j = index - 1; j >= 0; j--) {
-              if (inputElsArray[j].type !== 'hidden') {
-                log('found username input', inputElsArray[j])
+            // the classifier already picked the username field out of the form,
+            // which avoids grabbing whatever input happens to precede the password
+            const usernameInputEl = classification.usernameInput
+            if (usernameInputEl) {
+              log('found username input', usernameInputEl)
 
-                //Save username input, if we have more credentials with no DOM PATH then break from loop and let user choose which psw to use
-                if (
-                  webInputs.length === 0 &&
-                  secretsForHost.loginCredentials.length > 1
-                ) {
-                  const selector = getSelectorForElement(inputElsArray[j])
-                  newWebInputs.push({
-                    createdAt: new Date().toString(),
-                    domPath: selector.css,
-                    domOrdinal: selector.domOrdinal,
-                    host: location.host,
-                    url: location.href,
-                    kind: WebInputType.USERNAME
-                  })
+              //Save username input, if we have more credentials with no DOM PATH then let user choose which psw to use
+              if (
+                webInputs.length === 0 &&
+                secretsForHost.loginCredentials.length > 1
+              ) {
+                const selector = getSelectorForElement(usernameInputEl)
+                newWebInputs.push({
+                  createdAt: new Date().toString(),
+                  domPath: selector.css,
+                  domOrdinal: selector.domOrdinal,
+                  host: location.host,
+                  url: location.href,
+                  kind: WebInputType.USERNAME
+                })
 
-                  domRecorder.addInputEvent({
-                    element: inputElsArray[j],
-                    eventType: 'input',
-                    kind: WebInputType.USERNAME_OR_EMAIL,
-                    inputted: inputElsArray[j].value
-                  })
-                  break
-                }
+                domRecorder.addInputEvent({
+                  element: usernameInputEl,
+                  eventType: 'input',
+                  kind: WebInputType.USERNAME_OR_EMAIL,
+                  inputted: usernameInputEl.value
+                })
+              } else {
                 const recentlyUsedLogin = secretsForHost.loginCredentials.sort(
                   (a, b) => {
                     return (a.lastUsedAt ?? '') > (b.lastUsedAt ?? '') ? -1 : 1
@@ -842,12 +890,12 @@ export const autofill = (initState: IInitStateRes) => {
                 )[0]
 
                 const autofilledElUsername = autofillValueIntoInput(
-                  inputElsArray[j],
+                  usernameInputEl,
                   recentlyUsedLogin.loginCredentials.username
                 )
 
                 domRecorder.addInputEvent({
-                  element: inputElsArray[j],
+                  element: usernameInputEl,
                   eventType: 'input',
                   inputted: recentlyUsedLogin.loginCredentials.username,
                   kind: WebInputType.USERNAME
@@ -937,7 +985,7 @@ export const debouncedAutofill = debounce(autofill, 300, {
   leading: false
 })
 
-function generatePasswordBasedOnUserConfig() {
+export function generatePasswordBasedOnUserConfig() {
   const config = {
     // TODO get config from device.state
     length: 12,

@@ -11,6 +11,8 @@ export function renderPasswordGenerator({
 }: {
   input: HTMLInputElement
 }) {
+  // pages can add password inputs repeatedly, don't stack a generator per call
+  generatorDiv?.remove()
   generatorDiv = document.createElement('div')
   render(<PromptPasswordGenerator input={input} />, generatorDiv)
 
