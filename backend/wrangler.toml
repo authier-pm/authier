@@ -11,6 +11,9 @@ NODE_ENV = "production"
 [triggers]
 crons = ["*/15 * * * *"]
 
+[alias]
+"graphql/package.json" = "./node_modules/graphql/package.json"
+
 # Configure secrets with:
 # wrangler secret put DATABASE_URL
 # wrangler secret put ACCESS_TOKEN_SECRET
