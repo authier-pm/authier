@@ -4,6 +4,21 @@ const webpack = require('webpack')
 const Dotenv = require('dotenv-webpack')
 const CopyWebpackPlugin = require('copy-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
+const resolveWorkspaceDependency = (id) => {
+  try {
+    return path.dirname(require.resolve(`${id}/package.json`))
+  } catch {
+    return path.resolve(__dirname, '..', 'node_modules', id)
+  }
+}
+
+const resolveWorkspaceDependencyFile = (id) => {
+  try {
+    return require.resolve(id)
+  } catch {
+    return path.resolve(__dirname, '..', 'node_modules', id)
+  }
+}
 
 const entries = {
   backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
@@ -25,9 +40,8 @@ module.exports = {
     new CopyWebpackPlugin({
       patterns: [
         {
-          from: path.join(
-            __dirname,
-            '../node_modules/webextension-polyfill/dist/browser-polyfill.js'
+          from: resolveWorkspaceDependencyFile(
+            'webextension-polyfill/dist/browser-polyfill.js'
           ),
           to: path.join(__dirname, 'dist/js')
         }
@@ -129,10 +143,10 @@ module.exports = {
   resolve: {
     extensions: ['.ts', '.tsx', '.js', '.jsx'],
     alias: {
-      react: path.resolve('../node_modules/react'),
-      'react-dom': path.resolve('../node_modules/react-dom'),
-      '@emotion/react': path.resolve('../node_modules/@emotion/react'),
-      '@emotion/core': path.resolve('../node_modules/@emotion/core'),
+      react: resolveWorkspaceDependency('react'),
+      'react-dom': resolveWorkspaceDependency('react-dom'),
+      '@emotion/react': resolveWorkspaceDependency('@emotion/react'),
+      '@emotion/core': resolveWorkspaceDependency('@emotion/core'),
       '@src': path.resolve(__dirname, 'src/'),
       '@shared': path.resolve(__dirname, '../shared/'),
       '@util': path.resolve(__dirname, 'src/util/')
