@@ -8,3 +8,4 @@ reject:
   - '@types/react'
   - '@types/react-dom'
   - '@types/react-test-renderer'
+  - graphql

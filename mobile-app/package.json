@@ -75,7 +75,7 @@
     "date-fns": "^2.30.0",
     "fast-text-encoding": "^1.0.6",
     "formik": "^2.4.9",
-    "graphql": "17.0.1",
+    "graphql": "16.8.1",
     "graphql-tools": "^9.0.26",
     "intl": "^1.2.5",
     "jest-environment-node": "^29.7.0",
