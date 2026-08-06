@@ -112,6 +112,10 @@ export const isPlausibleUsernameInput = (el: HTMLInputElement) => {
   if (el.readOnly || el.disabled) {
     return false
   }
+  // a single character box is an OTP digit or similar, never a username
+  if (el.maxLength === 1 || el.maxLength === 2) {
+    return false
+  }
   const haystack = [
     el.getAttribute('name'),
     el.getAttribute('id'),

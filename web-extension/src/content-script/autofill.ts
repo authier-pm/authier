@@ -39,6 +39,11 @@ import {
 } from './classifyPasswordForm'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import {
+  findSegmentedOtpInputs,
+  isLikelyOtpField,
+  pickWholeCodeEntryBox
+} from './findSegmentedOtpInputs'
+import {
   appendGeneratedPasswordHistoryEntry,
   createGeneratedPasswordHistoryEntry
 } from '@src/util/generatedPasswordHistory'
@@ -63,106 +68,107 @@ function safeGenerateTotpCode(totpSecret: ITOTPSecret) {
   return otpCode
 }
 
-function findSegmentedTotpInputs(usefulInputs: HTMLInputElement[]) {
-  const codeInputRegex = /code input\s*(\d+)\s*of\s*(\d+)/i
-
-  const labeledCandidates = usefulInputs
-    .map((inputEl) => {
-      const ariaLabel = inputEl.getAttribute('aria-label') ?? ''
-      const match = ariaLabel.match(codeInputRegex)
-      if (!match) {
-        return null
-      }
-
-      const index = Number(match[1])
-      const total = Number(match[2])
-
-      if (
-        !Number.isFinite(index) ||
-        !Number.isFinite(total) ||
-        total !== 6 ||
-        inputEl.type !== 'number'
-      ) {
-        return null
-      }
-
-      return { inputEl, index, total }
-    })
-    .filter(Boolean) as Array<{
-    inputEl: HTMLInputElement
-    index: number
-    total: number
-  }>
-
-  if (labeledCandidates.length > 0) {
-    log(
-      'segmented TOTP candidates found',
-      labeledCandidates.map(({ inputEl, index, total }) => ({
-        id: inputEl.id,
-        type: inputEl.type,
-        ariaLabel: inputEl.getAttribute('aria-label'),
-        index,
-        total
-      }))
-    )
-  }
-
-  if (labeledCandidates.length >= 6) {
-    const byIndex = new Map<number, HTMLInputElement>()
-    for (const candidate of labeledCandidates) {
-      if (!byIndex.has(candidate.index)) {
-        byIndex.set(candidate.index, candidate.inputEl)
-      }
-    }
-
-    const ordered = [1, 2, 3, 4, 5, 6]
-      .map((index) => byIndex.get(index))
-      .filter(Boolean) as HTMLInputElement[]
-
-    if (ordered.length === 6) {
-      log(
-        'segmented TOTP inputs detected',
-        ordered.map((input) => ({
-          id: input.id,
-          ariaLabel: input.getAttribute('aria-label')
-        }))
-      )
-      return ordered
-    }
-  }
-
-  if (usefulInputs.length > 0) {
-    const numericInputs = usefulInputs.filter(
-      (input) => input.type === 'number'
-    )
-    if (numericInputs.length >= 4) {
-      log(
-        'segmented TOTP detection miss',
-        numericInputs.map((input) => ({
-          id: input.id,
-          type: input.type,
-          ariaLabel: input.getAttribute('aria-label'),
-          inputMode: input.inputMode,
-          pattern: input.getAttribute('pattern'),
-          value: input.value
-        }))
-      )
-    }
-  }
-
-  return null
+const markSegmentedTotpFilled = (inputs: HTMLInputElement[]) => {
+  inputs.forEach((el) => filledElements.add(el))
+  inputTypesFilledForThisPage.add(WebInputType.TOTP)
+  notyf.success('Autofilled 2FA code')
 }
 
-function fillSegmentedTotpInputs(inputs: HTMLInputElement[], totpCode: string) {
-  if (inputs.length !== 6 || totpCode.length < 6) {
+/**
+ * Pastes the whole code into a code widget.
+ *
+ * Several widgets never look at their boxes' `input` events at all - Bitfinex
+ * renders the boxes as pure display and accumulates the code from a `paste`
+ * listener on `document` plus a `keydown` listener on `window`, and Coinbase
+ * calls preventDefault() on every keydown except the paste chord. Both do
+ * handle a paste carrying the full code, as does Revolut.
+ *
+ * A synthetic paste never inserts text by itself - the browser gives untrusted
+ * paste events no default action - so this only does anything when the page has
+ * its own paste handler. That is exactly the case we cannot reach otherwise.
+ */
+const tryPasteWholeCode = (target: HTMLInputElement, totpCode: string) => {
+  if (
+    typeof DataTransfer === 'undefined' ||
+    typeof ClipboardEvent === 'undefined'
+  ) {
     return false
   }
 
-  const digits = totpCode.slice(0, 6).split('')
+  try {
+    const clipboardData = new DataTransfer()
+    clipboardData.setData('text/plain', totpCode)
+    const pasteEvent = new ClipboardEvent('paste', {
+      clipboardData,
+      bubbles: true,
+      cancelable: true
+    })
+
+    target.focus()
+    autofillEventsDispatched.add(pasteEvent)
+    target.dispatchEvent(pasteEvent)
+    return true
+  } catch (error) {
+    log('could not dispatch a synthetic paste', error)
+    return false
+  }
+}
+
+async function fillSegmentedTotpInputs(
+  inputs: HTMLInputElement[],
+  totpCode: string
+) {
+  // one box per digit, or we would leave the widget in a half filled state
+  if (inputs.length !== totpCode.length) {
+    return false
+  }
+
+  const isFullyFilled = () => inputs.every((el) => el.value !== '')
+
+  // when the widget designates a box for the whole code, one write there lets
+  // it spread the digits itself, which is far more reliable than racing it
+  const entryBox = pickWholeCodeEntryBox(inputs, totpCode.length)
+  if (entryBox && autofillValueIntoInput(entryBox, totpCode)) {
+    await Promise.resolve()
+
+    if (isFullyFilled()) {
+      log('widget distributed the code from its entry box')
+      markSegmentedTotpFilled(inputs)
+      return true
+    }
+
+    log('entry box did not distribute, trying a paste')
+    filledElements.delete(entryBox)
+  }
+
+  // widgets that drive their boxes from a paste handler rather than from the
+  // boxes' own input events only respond to this
+  if (tryPasteWholeCode(inputs[0], totpCode)) {
+    await Promise.resolve()
+
+    if (isFullyFilled()) {
+      log('widget accepted the code as a paste')
+      markSegmentedTotpFilled(inputs)
+      return true
+    }
+
+    log('paste did not take, falling back to one box at a time')
+  }
+
+  const digits = totpCode.split('')
   let filledAny = false
 
   for (let index = 0; index < inputs.length; index++) {
-    const el = autofillValueIntoInput(inputs[index], digits[index])
+    const box = inputs[index]
+    box.focus()
+    /**
+     * Widgets move focus to the next box as soon as one accepts a character.
+     * Writing the whole row synchronously races that, and every box ends up
+     * holding the same digit - see bitwarden/clients#11076.
+     */
+    await Promise.resolve()
+
+    const el = autofillValueIntoInput(box, digits[index])
     if (el) {
       filledElements.add(el)
       filledAny = true
@@ -170,8 +176,7 @@ function fillSegmentedTotpInputs(inputs: HTMLInputElement[], totpCode: string) {
   }
 
   if (filledAny) {
-    inputTypesFilledForThisPage.add(WebInputType.TOTP)
-    notyf.success('Autofilled 2FA code')
+    markSegmentedTotpFilled(inputs.filter((el) => el.value !== ''))
   }
 
   return filledAny
@@ -301,15 +306,22 @@ function imitateKeyInput(el: HTMLInputElement, input: string) {
       dispatchAutofillEvent(keyUp)
       setNativeInputValue(el, `${el.value}${key}`)
 
-      const change = new Event('change', { bubbles: true })
-
-      dispatchAutofillEvent(change)
+      /**
+       * input before change, the order a real browser uses. The other way round
+       * the change event consumes React's value-tracker delta, so the InputEvent
+       * that follows is a no-op and handlers reading inputType see nothing.
+       */
       dispatchTextInputEvent(el, key)
+
+      const change = new Event('change', { bubbles: true })
+      dispatchAutofillEvent(change)
       // await sleep(2) // this is to make it a bit more realistic
     }
 
-    const blurEvent = new Event('blur', { bubbles: true }) // this is needed, because some websites actually trigger form validation on blur. for example coinmate.io
-    dispatchAutofillEvent(blurEvent)
+    // blur does not bubble, and React maps onBlur from focusout - dispatch both
+    // so validation-on-blur pages like coinmate.io still fire
+    dispatchAutofillEvent(new Event('blur', { bubbles: false }))
+    dispatchAutofillEvent(new Event('focusout', { bubbles: true }))
   } else {
     console.error('el is null')
   }
@@ -500,17 +512,15 @@ export const autofill = (initState: IInitStateRes) => {
     log('usefulInputs', usefulInputs)
 
     if (totpSecret && !inputTypesFilledForThisPage.has(WebInputType.TOTP)) {
-      const segmentedTotpInputs = findSegmentedTotpInputs(usefulInputs)
-      if (segmentedTotpInputs) {
-        const totpCode = safeGenerateTotpCode(totpSecret)
-        if (totpCode) {
-          const didFillSegmentedTotp = fillSegmentedTotpInputs(
-            segmentedTotpInputs,
-            totpCode
-          )
-          if (didFillSegmentedTotp) {
-            return
-          }
+      const totpCode = safeGenerateTotpCode(totpSecret)
+      if (totpCode) {
+        // generate first, so we only accept a widget with one box per digit
+        const segmented = findSegmentedOtpInputs(usefulInputs, totpCode.length)
+        if (
+          segmented &&
+          (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
+        ) {
+          return
         }
       }
     }
@@ -643,16 +653,12 @@ export const autofill = (initState: IInitStateRes) => {
             ariaLabel: inputEl?.getAttribute?.('aria-label'),
             autocomplete: inputEl?.autocomplete
           })
-          const isLikelyOtpField =
-            inputEl?.type === 'number' ||
-            (inputEl?.getAttribute?.('aria-label') ?? '')
-              .toLowerCase()
-              .includes('code input')
+          const looksLikeOtp = isLikelyOtpField(inputEl)
           const totpAlreadyFilled = inputTypesFilledForThisPage.has(
             WebInputType.TOTP
           )
           let dynamicTotpSecret = totpSecret
-          if (isLikelyOtpField && !dynamicTotpSecret) {
+          if (looksLikeOtp && !dynamicTotpSecret) {
             try {
               const refreshedState =
                 await trpc.getContentScriptInitialState.query()
@@ -669,7 +675,7 @@ export const autofill = (initState: IInitStateRes) => {
             }
           }
 
-          if (isLikelyOtpField) {
+          if (looksLikeOtp) {
             log('segmented TOTP gate state', {
               hasTotpSecret: Boolean(dynamicTotpSecret),
               totpAlreadyFilled,
@@ -678,19 +684,17 @@ export const autofill = (initState: IInitStateRes) => {
           }
           if (dynamicTotpSecret && !totpAlreadyFilled) {
             log('checking for segmented TOTP inputs on inputAdded')
-            const segmentedTotpInputs = findSegmentedTotpInputs(
-              filterUselessInputs(document.body)
-            )
-            if (segmentedTotpInputs) {
-              const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
-              if (totpCode) {
-                const didFillSegmentedTotp = fillSegmentedTotpInputs(
-                  segmentedTotpInputs,
-                  totpCode
-                )
-                if (didFillSegmentedTotp) {
-                  return
-                }
+            const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
+            if (totpCode) {
+              const segmented = findSegmentedOtpInputs(
+                filterUselessInputs(document.body),
+                totpCode.length
+              )
+              if (
+                segmented &&
+                (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
+              ) {
+                return
               }
             }
           }

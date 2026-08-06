@@ -36,11 +36,18 @@ vi.mock('./isElementInViewport', () => ({
   isElementInViewport: () => true,
   isHidden: () => false
 }))
+vi.mock('@shared/totp', () => ({
+  generateTotpTokenSync: () => TOTP_CODE
+}))
 
 const STORED_USERNAME = 'jiri@example.com'
 const STORED_PASSWORD = 'stored-password-42'
+const TOTP_CODE = '481502'
 
-const initState = (webInputs: IInitStateRes['webInputs'] = []) =>
+const initState = (
+  webInputs: IInitStateRes['webInputs'] = [],
+  { withTotp = false } = {}
+) =>
   ({
     extensionDeviceReady: true,
     autofillEnabled: true,
@@ -55,7 +62,7 @@ const initState = (webInputs: IInitStateRes['webInputs'] = []) =>
           }
         }
       ],
-      totpSecrets: []
+      totpSecrets: withTotp ? [{ totp: { secret: 'JBSWY3DPEHPK3PXP' } }] : []
     }
   }) as unknown as IInitStateRes
 
@@ -107,6 +114,38 @@ beforeAll(() => {
     class extends Event {
       constructor(type: string, init?: EventInit) {
         super(type, init)
+      }
+    }
+  )
+
+  // jsdom implements neither, so the paste path would be skipped entirely.
+  // The real DataTransfer normalises the "text" shorthand to "text/plain", and
+  // sites rely on that - Bitfinex and Coinbase both call getData("Text").
+  const normaliseFormat = (type: string) =>
+    type.toLowerCase() === 'text' ? 'text/plain' : type.toLowerCase()
+
+  vi.stubGlobal(
+    'DataTransfer',
+    class {
+      private data = new Map<string, string>()
+      setData(type: string, value: string) {
+        this.data.set(normaliseFormat(type), value)
+      }
+      getData(type: string) {
+        return this.data.get(normaliseFormat(type)) ?? ''
+      }
+    }
+  )
+  vi.stubGlobal(
+    'ClipboardEvent',
+    class extends Event {
+      clipboardData: unknown
+      constructor(
+        type: string,
+        init?: EventInit & { clipboardData?: unknown }
+      ) {
+        super(type, init)
+        this.clipboardData = init?.clipboardData ?? null
       }
     }
   )
@@ -313,6 +352,146 @@ describe('autofill on an unclassifiable page', () => {
 
     expect(inputById('pw').value).toBe('')
     expect(renderLoginCredOption).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe('segmented 2FA widgets', () => {
+  /** verbatim from accounts.bitfinex.com */
+  const BITFINEX_2FA = `
+    <div class="auth-layout login"><div class="auth-layout__content"><div class="login__otp">
+      <h1>Two-Factor Authentication</h1>
+      <div class="auth-layout__form-group">
+        <p>Please input Bitfinex's 2FA token from your prefered app</p>
+        <div class="login__otp-code">${[0, 1, 2, 3, 4, 5]
+          .map(
+            (i) =>
+              `<div class="otp-code-digit-wraper"><input id="otp-${i}" inputmode="numeric"
+                maxlength="1" autocomplete="off" class="login__otp-code-digit"
+                data-1p-ignore="true" data-lpignore="true" data-form-type="other"
+                data-bwignore="true" data-protonpass-ignore="true" type="text" value=""></div>`
+          )
+          .join('')}</div>
+      </div>
+    </div></div></div>`
+
+  it('fills the bitfinex six box widget', async () => {
+    setPage(BITFINEX_2FA, { url: '/2fa' })
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(
+      [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`).value).join('')
+    ).toBe(TOTP_CODE)
+  })
+
+  it('does not put the username in a digit box', async () => {
+    setPage(BITFINEX_2FA, { url: '/2fa' })
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(inputById('otp-0').value).toBe(TOTP_CODE[0])
+    expect(inputById('otp-0').value).not.toBe(STORED_USERNAME)
+  })
+
+  it('leaves the widget alone when there is no TOTP secret for the host', async () => {
+    setPage(BITFINEX_2FA, { url: '/2fa' })
+
+    await runAutofill(initState())
+
+    expect(
+      [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`).value).join('')
+    ).toBe('')
+  })
+
+  it('fills a widget whose boxes are pure display, driven by a paste listener', async () => {
+    // this is Bitfinex's real behaviour: the boxes have no onChange at all, the
+    // code is accumulated by a paste listener on document and a keydown
+    // listener on window, and React rewrites the box values from its own state
+    setPage(BITFINEX_2FA, { url: '/2fa' })
+
+    const boxes = [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`))
+    let state = ''
+    const render = () =>
+      boxes.forEach((box, i) => {
+        box.value = state[i] ?? ''
+      })
+
+    document.addEventListener('paste', (event) => {
+      const pasted = (event as ClipboardEvent).clipboardData?.getData('text')
+      state = (pasted ?? '').replace(/\D/g, '').slice(0, 6)
+      render()
+    })
+    // the boxes themselves ignore direct writes, as on the real site
+    boxes.forEach((box) => box.addEventListener('input', render))
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(boxes.map((box) => box.value).join('')).toBe(TOTP_CODE)
+  })
+
+  it('writes the whole code once into a designated entry box', async () => {
+    // Radix / Vuetify / Clerk give one box maxlength=6 so the widget itself
+    // spreads the code across the rest
+    setPage(
+      `<div class="otp-group">${[0, 1, 2, 3, 4, 5]
+        .map(
+          (i) =>
+            `<input id="s${i}" class="slot" type="text" inputmode="numeric"
+               maxlength="${i === 0 ? 6 : 1}"
+               autocomplete="${i === 0 ? 'one-time-code' : 'off'}">`
+        )
+        .join('')}</div>`,
+      { url: '/2fa' }
+    )
+
+    // stand in for the widget distributing the code on input
+    const boxes = [0, 1, 2, 3, 4, 5].map((i) => inputById(`s${i}`))
+    boxes[0].addEventListener('input', () => {
+      if (boxes[0].value.length === 6) {
+        boxes.forEach((box, i) => {
+          box.value = TOTP_CODE[i]
+        })
+      }
+    })
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(boxes.map((box) => box.value).join('')).toBe(TOTP_CODE)
+  })
+
+  it('falls back to one box at a time when the entry box does not distribute', async () => {
+    setPage(
+      `<div class="otp-group">${[0, 1, 2, 3, 4, 5]
+        .map(
+          (i) =>
+            `<input id="s${i}" class="slot" type="text" inputmode="numeric"
+               maxlength="${i === 0 ? 6 : 1}"
+               autocomplete="${i === 0 ? 'one-time-code' : 'off'}">`
+        )
+        .join('')}</div>`,
+      { url: '/2fa' }
+    )
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(
+      [0, 1, 2, 3, 4, 5].map((i) => inputById(`s${i}`).value).join('')
+    ).toBe(TOTP_CODE)
+  })
+
+  it('fills a widget that appears only after the initial scan', async () => {
+    setPage(`<div id="root"></div>`, { url: '/2fa' })
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    document.body.innerHTML = BITFINEX_2FA
+    const { bodyInputChangeEmitter } = await import('./domMutationObserver')
+    bodyInputChangeEmitter.emit('inputAdded', inputById('otp-0'))
+    await vi.advanceTimersByTimeAsync(600)
+
+    expect(
+      [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`).value).join('')
+    ).toBe(TOTP_CODE)
   })
 })
 
