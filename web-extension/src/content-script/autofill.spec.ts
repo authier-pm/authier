@@ -495,6 +495,67 @@ describe('segmented 2FA widgets', () => {
   })
 })
 
+describe('single field 2FA', () => {
+  it('fills a plain one-time-code input', async () => {
+    setPage(
+      `<form><input id="otp" type="text" inputmode="numeric" maxlength="6"
+         autocomplete="one-time-code" /></form>`,
+      { url: '/2fa' }
+    )
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(inputById('otp').value).toBe(TOTP_CODE)
+  })
+
+  it('fills the real input hidden behind fake digit boxes', async () => {
+    // input-otp powers shadcn, Clerk and Supabase; Stripe and Shopify do the same
+    setPage(
+      `<div data-input-otp-container>
+        ${[0, 1, 2, 3, 4, 5]
+          .map(() => `<div data-slot="input-otp-slot"></div>`)
+          .join('')}
+        <div style="position:absolute;inset:0;pointer-events:none">
+          <input id="otp" data-input-otp autocomplete="one-time-code"
+                 inputmode="numeric" maxlength="6" spellcheck="false">
+        </div>
+      </div>`,
+      { url: '/2fa' }
+    )
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(inputById('otp').value).toBe(TOTP_CODE)
+  })
+
+  it('fills an okta style field even though autocomplete is off', async () => {
+    setPage(
+      `<form><input id="otp" type="text" inputmode="numeric" autocomplete="off"
+         name="credentials.passcode" /></form>`,
+      { url: '/2fa' }
+    )
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(inputById('otp').value).toBe(TOTP_CODE)
+  })
+
+  it('does not touch the password field of a login form', async () => {
+    setPage(
+      `<form>
+        <input id="user" type="text" autocomplete="username" />
+        <input id="pw" type="password" autocomplete="current-password" />
+      </form>`,
+      { url: '/login' }
+    )
+
+    await runAutofill(initState([], { withTotp: true }))
+
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+    expect(inputById('pw').value).not.toBe(TOTP_CODE)
+  })
+})
+
 describe('auto-submit', () => {
   const submitSpy = vi.fn()
 

@@ -1,6 +1,6 @@
 import debug from 'debug'
 
-const log = debug('au:findSegmentedOtpInputs')
+const log = debug('au:findOtpInputs')
 
 /** TOTP codes are 6 digits, occasionally 8. Backup/SMS codes go as low as 4. */
 const MIN_GROUP_SIZE = 4
@@ -393,10 +393,165 @@ export const findSegmentedOtpInputs = (
   return matches[0]
 }
 
+export interface SingleOtpInput {
+  input: HTMLInputElement
+  signals: string[]
+}
+
+/** the widest a single OTP field gets - Microsoft allows 8, nobody allows 20 */
+const MAX_SINGLE_FIELD_LENGTH = 10
+
 /**
- * Cheap check for "this input might belong to a one-time-code widget", used to
- * decide whether it is worth refetching the TOTP secret when an input shows up
- * late. Deliberately loose - the real decision is findSegmentedOtpInputs.
+ * Vocabulary lifted from Bitwarden's autofill-constants, with separators made
+ * optional - Auth0 ships `name="mfa_code"`, Okta `name="credentials.passcode"`.
+ */
+const STRONG_OTP_NAME_RE =
+  /(2fa[-_ ]?code|approvals?[-_ ]?code|mfa[-_ ]?code|one[-_ ]?time[-_ ]?(code|password)|otc[-_ ]?code|otp[-_ ]?code|second[-_ ]?factor|totp|two[-_ ]?factor([-_ ]?code)?|multi[-_ ]?factor|verification[-_ ]?code|passcode|auth(entication)?[-_ ]?code)/i
+
+const AMBIGUOUS_OTP_NAME_RE =
+  /(\bcode\b|\bpin\b|\botc\b|\botp\b|\b2fa\b|\bmfa\b)/i
+
+/**
+ * A recovery code is not a TOTP and must never receive one. A card security
+ * code is not one either - "security code" is what most checkout forms call the
+ * CVV, which is why that phrase is disqualifying here rather than a signal.
+ */
+const RECOVERY_CODE_RE =
+  /(backup|recovery|recover|\bcvv\b|\bcvc\b|\bcsc\b|card[-_ ]?(security|code)|security[-_ ]?code)/i
+
+/** autocomplete values that prove the field is something else entirely */
+const NON_OTP_AUTOCOMPLETE_RE =
+  /(username|email|current-password|new-password|cc-|tel|address|name)/
+
+/**
+ * Everything a site might label a field with. `class` is included because Wise
+ * ships `class="form-control plain-code-input"` and nothing else useful.
+ */
+const describeInput = (el: HTMLInputElement) =>
+  [
+    el.getAttribute('name'),
+    el.getAttribute('id'),
+    el.getAttribute('placeholder'),
+    el.getAttribute('aria-label'),
+    el.getAttribute('data-testid'),
+    el.getAttribute('data-e2e'),
+    el.className
+  ]
+    .filter(Boolean)
+    .join(' ')
+
+/**
+ * Finds the plain single-field variant of a one-time-code input - the shape most
+ * real sites actually ship, including every widget that paints fake digit boxes
+ * over one real input (input-otp, Stripe, Shopify, Plaid).
+ *
+ * `autocomplete="one-time-code"` settles it on its own, but it is far from
+ * universal: Okta downgrades it to `off` on desktop on purpose, Google sends
+ * `off`, and Wise omits it. So a field also qualifies on a naming signal backed
+ * by numeric input and a plausible length.
+ *
+ * @param usefulInputs visible, empty inputs, as produced by filterUselessInputs
+ * @param codeLength length of the code we are about to fill
+ */
+export const findSingleOtpInput = (
+  usefulInputs: HTMLInputElement[],
+  codeLength: number
+): SingleOtpInput | null => {
+  const scored = usefulInputs
+    .map((el) => {
+      if (el.disabled || el.readOnly) {
+        return null
+      }
+      // never put a one time code in a password box, and a single character box
+      // belongs to a segmented widget, not here
+      if (el.type === 'password' || isSingleCharBox(el)) {
+        return null
+      }
+      if (DIGIT_BOX_TYPES.includes(el.type) === false) {
+        return null
+      }
+
+      const autocomplete = attr(el, 'autocomplete')
+      if (NON_OTP_AUTOCOMPLETE_RE.test(autocomplete)) {
+        return null
+      }
+
+      const described = describeInput(el)
+      if (RECOVERY_CODE_RE.test(described)) {
+        return null
+      }
+
+      // a maxlength shorter than the code cannot hold it
+      const hasRoom =
+        el.maxLength === -1 ||
+        (el.maxLength >= codeLength && el.maxLength <= MAX_SINGLE_FIELD_LENGTH)
+      if (!hasRoom) {
+        return null
+      }
+
+      const signals: string[] = []
+      if (autocomplete.includes('one-time-code')) {
+        signals.push('autocomplete-one-time-code')
+      }
+      if (STRONG_OTP_NAME_RE.test(described)) {
+        signals.push('otp-name')
+      } else if (AMBIGUOUS_OTP_NAME_RE.test(described)) {
+        signals.push('ambiguous-otp-name')
+      }
+      if (isNumericish(el)) {
+        signals.push('numeric')
+      }
+      if (el.maxLength >= codeLength) {
+        signals.push('length-fits')
+      }
+
+      /**
+       * The spec attribute is proof on its own. Otherwise an unambiguous name
+       * needs one corroborating signal, and a name as vague as "code" or "pin"
+       * needs both numeric entry and a matching length before we type a code
+       * into it.
+       */
+      const qualifies =
+        signals.includes('autocomplete-one-time-code') ||
+        (signals.includes('otp-name') && signals.length >= 2) ||
+        (signals.includes('ambiguous-otp-name') &&
+          signals.includes('numeric') &&
+          signals.includes('length-fits'))
+
+      return qualifies ? { input: el, signals } : null
+    })
+    .filter(Boolean) as SingleOtpInput[]
+
+  if (scored.length === 0) {
+    return null
+  }
+
+  scored.sort((a, b) => b.signals.length - a.signals.length)
+
+  // two equally plausible fields means we cannot tell which is the code box
+  if (
+    scored.length > 1 &&
+    scored[0].signals.length === scored[1].signals.length
+  ) {
+    log('ambiguous single OTP candidates, not guessing', {
+      candidates: scored.map((entry) => describeInput(entry.input))
+    })
+    return null
+  }
+
+  log('single OTP field detected', {
+    signals: scored[0].signals,
+    description: describeInput(scored[0].input)
+  })
+
+  return scored[0]
+}
+
+/**
+ * Cheap check for "this input might be a one-time-code field", used to decide
+ * whether it is worth refetching the TOTP secret when an input shows up late.
+ * Deliberately loose - the real decisions are findSegmentedOtpInputs and
+ * findSingleOtpInput.
  */
 export const isLikelyOtpField = (el: HTMLInputElement) => {
   if (!el) {
@@ -407,6 +562,7 @@ export const isLikelyOtpField = (el: HTMLInputElement) => {
     isSingleCharBox(el) ||
     attr(el, 'autocomplete').includes('one-time-code') ||
     ariaIndexOf(el) !== null ||
+    STRONG_OTP_NAME_RE.test(describeInput(el)) ||
     PASSWORD_MANAGER_IGNORE_ATTRS.some((name) => el.hasAttribute(name))
   )
 }

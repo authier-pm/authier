@@ -1,8 +1,9 @@
 import { beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import {
   findSegmentedOtpInputs,
+  findSingleOtpInput,
   isLikelyOtpField
-} from './findSegmentedOtpInputs'
+} from './findOtpInputs'
 
 beforeAll(() => {
   Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
@@ -322,5 +323,144 @@ describe('isLikelyOtpField', () => {
     expect(
       isLikelyOtpField(document.getElementById('x') as HTMLInputElement)
     ).toBe(false)
+  })
+})
+
+describe('single field OTP inputs', () => {
+  const find = () => findSingleOtpInput(allInputs(), 6)
+
+  // markup below is taken from each site's shipped production bundle
+  it.each([
+    [
+      'binance',
+      `<input class="bn-textField-input" data-e2e="input-mfa" maxlength="6"
+         inputmode="numeric" autocomplete="one-time-code" spellcheck="false"
+         role="textbox" aria-label="Text field">`
+    ],
+    [
+      'kraken',
+      `<input type="text" name="tfa" autocomplete="one-time-code"
+         spellcheck="false" placeholder="• • • • • •">`
+    ],
+    [
+      'robinhood',
+      `<input type="text" inputmode="numeric" maxlength="6"
+         autocomplete="one-time-code" placeholder="000000"
+         data-testid="MfaCodeInput">`
+    ],
+    [
+      'okta (autocomplete deliberately downgraded to off on desktop)',
+      `<input type="text" inputmode="numeric" autocomplete="off"
+         id="credentials.passcode" name="credentials.passcode"
+         data-se="credentials.passcode">`
+    ],
+    [
+      'google (autocomplete off)',
+      `<input type="tel" pattern="[0-9 ]*" id="totpPin" name="Pin"
+         autocomplete="off" placeholder="Enter the 6-digit code">`
+    ],
+    [
+      'wise (no autocomplete at all)',
+      `<input id="code-4271" class="form-control plain-code-input"
+         pattern="\\d*" inputmode="numeric" maxlength="6" data-testid="plain">`
+    ],
+    [
+      'auth0 lock',
+      `<input id="1-mfa_code" type="text" name="mfa_code" class="auth0-lock-input"
+         autocomplete="off" inputmode="numeric"
+         aria-label="Multi factor authentication code">`
+    ],
+    [
+      'twilio recommended markup',
+      `<input type="text" inputmode="numeric" autocomplete="one-time-code" pattern="\\d{6}" required>`
+    ]
+  ])('detects %s', (_name, html) => {
+    document.body.innerHTML = html
+
+    expect(find()).not.toBeNull()
+  })
+
+  it('detects the single real input behind fake digit boxes', () => {
+    // input-otp / Stripe / Shopify all render one input over N fake divs
+    document.body.innerHTML = `
+      <div data-input-otp-container>
+        ${[0, 1, 2, 3, 4, 5].map(() => `<div data-slot="input-otp-slot"></div>`).join('')}
+        <div style="position:absolute;inset:0;pointer-events:none">
+          <input data-input-otp autocomplete="one-time-code" inputmode="numeric"
+                 maxlength="6" spellcheck="false">
+        </div>
+      </div>`
+
+    expect(find()!.signals).toContain('autocomplete-one-time-code')
+  })
+
+  describe('refuses to guess', () => {
+    it('leaves password fields alone', () => {
+      document.body.innerHTML = `<input type="password" name="otp-code" maxlength="6">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('leaves a username field alone', () => {
+      document.body.innerHTML = `<input type="text" autocomplete="username" name="code">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('leaves a recovery code field alone', () => {
+      document.body.innerHTML = `<input type="text" inputmode="numeric" maxlength="8"
+        name="backupCode" placeholder="xxxx-xxxx">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('ignores a field too short to hold the code', () => {
+      document.body.innerHTML = `<input type="text" inputmode="numeric" maxlength="4" name="otp">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('ignores a bare unnamed text input', () => {
+      document.body.innerHTML = `<input type="text">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('needs more than the word "code" on its own', () => {
+      // no numeric hint, no length hint - too weak to type a code into
+      document.body.innerHTML = `<input type="text" name="discount_code">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('bails when two fields look equally plausible', () => {
+      document.body.innerHTML = `
+        <input type="text" name="otp" inputmode="numeric" maxlength="6">
+        <input type="text" name="mfa" inputmode="numeric" maxlength="6">`
+
+      expect(find()).toBeNull()
+    })
+
+    it('does not pick a digit box out of a segmented widget', () => {
+      document.body.innerHTML = BITFINEX_2FA
+
+      expect(find()).toBeNull()
+    })
+  })
+})
+
+describe('single field OTP inputs vs payment fields', () => {
+  it('never treats a card security code as a TOTP field', () => {
+    // "security code" is the CVV label on most checkout forms
+    document.body.innerHTML = `<input type="text" inputmode="numeric" maxlength="4"
+      name="security_code" placeholder="Security code" autocomplete="cc-csc">`
+
+    expect(findSingleOtpInput(allInputs(), 6)).toBeNull()
+  })
+
+  it('never treats a CVV field as a TOTP field', () => {
+    document.body.innerHTML = `<input type="text" inputmode="numeric" maxlength="6" name="cvv">`
+
+    expect(findSingleOtpInput(allInputs(), 6)).toBeNull()
   })
 })
