@@ -40,9 +40,10 @@ import {
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import {
   findSegmentedOtpInputs,
+  findSingleOtpInput,
   isLikelyOtpField,
   pickWholeCodeEntryBox
-} from './findSegmentedOtpInputs'
+} from './findOtpInputs'
 import {
   appendGeneratedPasswordHistoryEntry,
   createGeneratedPasswordHistoryEntry
@@ -68,7 +69,7 @@ function safeGenerateTotpCode(totpSecret: ITOTPSecret) {
   return otpCode
 }
 
-const markSegmentedTotpFilled = (inputs: HTMLInputElement[]) => {
+const markTotpFilled = (inputs: HTMLInputElement[]) => {
   inputs.forEach((el) => filledElements.add(el))
   inputTypesFilledForThisPage.add(WebInputType.TOTP)
   notyf.success('Autofilled 2FA code')
@@ -114,6 +115,32 @@ const tryPasteWholeCode = (target: HTMLInputElement, totpCode: string) => {
   }
 }
 
+/**
+ * Fills a one-time code into whatever shape the page uses for it: a row of digit
+ * boxes, or the single field that most sites - and every widget that paints fake
+ * boxes over one real input - actually ship.
+ */
+async function fillTotpCode(
+  usefulInputs: HTMLInputElement[],
+  totpCode: string
+) {
+  const segmented = findSegmentedOtpInputs(usefulInputs, totpCode.length)
+  if (
+    segmented &&
+    (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
+  ) {
+    return true
+  }
+
+  const single = findSingleOtpInput(usefulInputs, totpCode.length)
+  if (single && autofillValueIntoInput(single.input, totpCode)) {
+    markTotpFilled([single.input])
+    return true
+  }
+
+  return false
+}
+
 async function fillSegmentedTotpInputs(
   inputs: HTMLInputElement[],
   totpCode: string
@@ -133,7 +160,7 @@ async function fillSegmentedTotpInputs(
 
     if (isFullyFilled()) {
       log('widget distributed the code from its entry box')
-      markSegmentedTotpFilled(inputs)
+      markTotpFilled(inputs)
       return true
     }
 
@@ -148,7 +175,7 @@ async function fillSegmentedTotpInputs(
 
     if (isFullyFilled()) {
       log('widget accepted the code as a paste')
-      markSegmentedTotpFilled(inputs)
+      markTotpFilled(inputs)
       return true
     }
 
@@ -176,7 +203,7 @@ async function fillSegmentedTotpInputs(
   }
 
   if (filledAny) {
-    markSegmentedTotpFilled(inputs.filter((el) => el.value !== ''))
+    markTotpFilled(inputs.filter((el) => el.value !== ''))
   }
 
   return filledAny
@@ -512,16 +539,10 @@ export const autofill = (initState: IInitStateRes) => {
     log('usefulInputs', usefulInputs)
 
     if (totpSecret && !inputTypesFilledForThisPage.has(WebInputType.TOTP)) {
+      // generate first, so a segmented widget only matches at one box per digit
       const totpCode = safeGenerateTotpCode(totpSecret)
-      if (totpCode) {
-        // generate first, so we only accept a widget with one box per digit
-        const segmented = findSegmentedOtpInputs(usefulInputs, totpCode.length)
-        if (
-          segmented &&
-          (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
-        ) {
-          return
-        }
+      if (totpCode && (await fillTotpCode(usefulInputs, totpCode))) {
+        return
       }
     }
 
@@ -683,19 +704,13 @@ export const autofill = (initState: IInitStateRes) => {
             })
           }
           if (dynamicTotpSecret && !totpAlreadyFilled) {
-            log('checking for segmented TOTP inputs on inputAdded')
+            log('checking for TOTP inputs on inputAdded')
             const totpCode = safeGenerateTotpCode(dynamicTotpSecret)
-            if (totpCode) {
-              const segmented = findSegmentedOtpInputs(
-                filterUselessInputs(document.body),
-                totpCode.length
-              )
-              if (
-                segmented &&
-                (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
-              ) {
-                return
-              }
+            if (
+              totpCode &&
+              (await fillTotpCode(filterUselessInputs(document.body), totpCode))
+            ) {
+              return
             }
           }
 
