@@ -26,14 +26,9 @@ and follow the instructions just instead `pnpm prodBuild` run `pnpm dev`
 
 ## Publishing a new version to stores
 
-We have all of the stores automated on CI except firefox. To publish a new version, just run `pnpm release` and commit the new tag. The CI will take care of the rest.
+Chrome, Edge, and Firefox publishing is automated on CI. Run `pnpm release` to create and push a new extension tag; CI builds manifest V3 for Chrome and Edge and manifest V2 for Firefox before submitting each bundle to its store.
 
-Firefox is handled manually from a separate branch where we still have extension manifest V2
-
-To publish a new version to Firefox extension store invoke: `pnpm release:firefox`
-
-The extension gets published and the xpi file is available in the `web-extension/web-ext-artifacts` directory.
-No need to upload the xpi file to the stores, that is already done.
+To build the Firefox manifest V2 extension locally, run `MANIFEST_VERSION=2 pnpm generateManifest && MANIFEST_VERSION=2 pnpm prodBuild`.
 
 <details>
   <summary>Loading the extension in Google Chrome</summary>
@@ -72,7 +67,7 @@ In [Mozilla Firefox](https://www.mozilla.org/en-US/firefox/new/), open up the [a
 
 - Example icons courtesy of [FontAwesome](https://fontawesome.com).
 
-- [Microsoft Edge]() is not currently supported.
+- [Microsoft Edge](<>) is not currently supported.
 
 - Includes Storybook configured to work with React + TypeScript. Note that it maintains its own `webpack.config.js` and `tsconfig.json` files. See example story in `src/components/hello/__tests__/hello.stories.tsx`
 

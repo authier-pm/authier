@@ -28,6 +28,7 @@ const entries = {
 }
 require('dotenv/config')
 console.log('API_URL:', process.env.API_URL)
+const manifestVersion = Number(process.env.MANIFEST_VERSION ?? 3)
 module.exports = {
   entry: entries,
   output: {
@@ -81,6 +82,15 @@ module.exports = {
       </body>
     </html>`
     }),
+    ...(manifestVersion === 2
+      ? [
+          new HtmlWebpackPlugin({
+            scriptLoading: 'blocking',
+            chunks: ['backgroundPage'],
+            filename: 'backgroundPage.html'
+          })
+        ]
+      : []),
 
     // new ExtensionReloader(),
     new Dotenv({

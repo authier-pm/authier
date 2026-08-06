@@ -1,0 +1,49 @@
+name: publish-on-firefox-add-ons
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'publish-on-firefox-add-ons job environment'
+        required: false
+        default: ''
+
+jobs:
+  publish-on-firefox-add-ons:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: ${{ github.event.inputs.environment }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: cardinalby/export-env-action@v2
+        with:
+          envFile: './.github/workflows/constants.env'
+          expand: true
+
+      - name: Build and pack Firefox manifest v2 extension
+        env:
+          API_URL: ${{ vars.API_URL }}
+          PAGE_URL: ${{ secrets.PAGE_URL }}
+        uses: ./.github/workflows/actions/build-test-pack
+        with:
+          manifestVersion: '2'
+
+      - name: Upload to Firefox Add-ons
+        working-directory: ./web-extension
+        env:
+          FIREFOX_API_KEY: ${{ secrets.FF_JWT_ISSUER }}
+          FIREFOX_API_SECRET: ${{ secrets.FF_JWT_SECRET }}
+        run: |
+          pnpm exec web-ext sign \
+            --source-dir=./dist \
+            --api-key="$FIREFOX_API_KEY" \
+            --api-secret="$FIREFOX_API_SECRET" \
+            --channel=listed \
+            --approval-timeout=0
+
+      - name: Upload Firefox bundle artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: firefox-manifest-v2-${{ github.ref_name }}
+          path: ${{ env.ZIP_FILE_PATH }}
