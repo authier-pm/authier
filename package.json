@@ -18,7 +18,7 @@
     "@types/react-dom": "^19"
   },
   "devDependencies": {
-    "@apollo/client": "^4.2.9",
+    "@apollo/client": "^4.2.10",
     "@chakra-ui/react": "2.10.4",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.1",
@@ -27,11 +27,11 @@
     "@graphql-codegen/introspection": "^6.1.0",
     "@graphql-codegen/near-operation-file-preset": "^5.2.1",
     "@graphql-codegen/typescript": "^6.1.0",
-    "@graphql-codegen/typescript-operations": "^6.1.2",
+    "@graphql-codegen/typescript-operations": "^6.1.5",
     "@graphql-codegen/typescript-react-apollo": "^4.4.2",
     "@types/jest": "^30.0.0",
     "@types/node": "^26.1.2",
-    "framer-motion": "^12.43.0",
+    "framer-motion": "^13.0.0",
     "generate-password": "^1.7.1",
     "husky": "^9.1.7",
     "lint-staged": "^17.3.0",
