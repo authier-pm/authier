@@ -12,40 +12,17 @@ import { RefreshSecretsButton } from './RefreshSecretsButton'
 export const PopupNavBar: FunctionComponent = () => {
   const [isAddSecretNavMenuOpen, setIsAddSecretNavMenuOpen] = useState(false)
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false)
+  const addSecretTooltip = isAddSecretNavMenuOpen
+    ? t`close menu`
+    : t`add secret`
+  const userMenuButtonLabel = isUserMenuOpen ? t`close menu` : t`open menu`
 
   return (
     <div className="extension-surface sticky top-0 z-20 flex w-full flex-col border-b border-[color:var(--color-border)]">
       <div className="flex items-center gap-2 px-2 py-2">
-        <Button
-          aria-label="menu"
-          size="icon"
-          variant={isUserMenuOpen ? 'secondary' : 'outline'}
-          onClick={() => {
-            setIsUserMenuOpen((currentValue) => {
-              const nextValue = !currentValue
-
-              if (nextValue) {
-                setIsAddSecretNavMenuOpen(false)
-              }
-
-              return nextValue
-            })
-          }}
-        >
-          {isUserMenuOpen ? (
-            <IoClose className="size-4" />
-          ) : (
-            <IoLockClosed className="size-4" />
-          )}
-        </Button>
-
-        <RefreshSecretsButton />
-
-        <Tooltip
-          content={isAddSecretNavMenuOpen ? t`close menu` : t`add secret`}
-        >
+        <Tooltip content={addSecretTooltip}>
           <Button
-            aria-label="Add item"
+            aria-label={isAddSecretNavMenuOpen ? t`close menu` : 'Add item'}
             className="rounded-full"
             size="icon"
             variant="primary"
@@ -69,10 +46,37 @@ export const PopupNavBar: FunctionComponent = () => {
           </Button>
         </Tooltip>
 
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <Tooltip content={userMenuButtonLabel}>
+            <Button
+              aria-label={userMenuButtonLabel}
+              size="icon"
+              variant={isUserMenuOpen ? 'secondary' : 'outline'}
+              onClick={() => {
+                setIsUserMenuOpen((currentValue) => {
+                  const nextValue = !currentValue
+
+                  if (nextValue) {
+                    setIsAddSecretNavMenuOpen(false)
+                  }
+
+                  return nextValue
+                })
+              }}
+            >
+              {isUserMenuOpen ? (
+                <IoClose className="size-4" />
+              ) : (
+                <IoLockClosed className="size-4" />
+              )}
+            </Button>
+          </Tooltip>
+
+          <RefreshSecretsButton />
+
           <Tooltip content={t`Open vault`}>
             <Button
-              aria-label="Open vault"
+              aria-label={t`Open vault`}
               size="icon"
               variant="outline"
               onClick={() => {
