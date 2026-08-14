@@ -21,6 +21,7 @@ import {
   encryptedDataSchema,
   loginCredentialSchema,
   loginCredentialsFromContentScriptSchema,
+  loginDraftSchema,
   settingsSchema,
   webInputElementSchema
 } from './backgroundSchemas'
@@ -30,6 +31,7 @@ import { tc } from './tc'
 import { loggerMiddleware } from './loggerMiddleware'
 import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludingShadowDom'
 import { constructURL } from '@shared/urlUtils'
+import { loginSessionManager } from './loginSession'
 
 const log = debug('au:chListener')
 
@@ -59,7 +61,30 @@ let inputsUrl: string
 
 const tcProcedure = tc.procedure.use(loggerMiddleware)
 
+void loginSessionManager.initialize().catch((error: unknown) => {
+  console.error('Failed to initialize the background login session', error)
+})
+
+browser.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName === 'local' && changes.backgroundState?.newValue) {
+    void loginSessionManager.resetLogin().catch((error: unknown) => {
+      console.error('Failed to clear the completed login session', error)
+    })
+  }
+})
+
 const appRouter = tc.router({
+  getLoginSession: tcProcedure.query(() => loginSessionManager.getSnapshot()),
+  updateLoginDraft: tcProcedure
+    .input(loginDraftSchema)
+    .mutation(({ input }) => loginSessionManager.updateDraft(input)),
+  startLogin: tcProcedure
+    .input(loginDraftSchema)
+    .mutation(({ input }) => loginSessionManager.startLogin(input)),
+  resetLogin: tcProcedure.mutation(() => loginSessionManager.resetLogin()),
+  initiateLoginMasterDeviceReset: tcProcedure.mutation(() =>
+    loginSessionManager.initiateMasterDeviceReset()
+  ),
   addLoginCredentials: tcProcedure
     .input(loginCredentialsFromContentScriptSchema)
     .mutation(async ({ ctx, input }) => {

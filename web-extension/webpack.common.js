@@ -29,6 +29,8 @@ const entries = {
 require('dotenv/config')
 console.log('API_URL:', process.env.API_URL)
 const manifestVersion = Number(process.env.MANIFEST_VERSION ?? 3)
+const mobileViewport =
+  '<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">'
 module.exports = {
   entry: entries,
   output: {
@@ -60,6 +62,7 @@ module.exports = {
     <html>
     <head>
       <title>Authier Extension - Popup</title>
+      ${mobileViewport}
     </head>
       <body>
         <div id="popup"></div>
@@ -75,6 +78,7 @@ module.exports = {
     <html>
     <head>
       <title>Authier Extension - Vault</title>
+      ${mobileViewport}
     </head>
       <body>
         <div id="vault"></div>

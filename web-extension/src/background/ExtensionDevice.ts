@@ -2,7 +2,7 @@ import debug from 'debug'
 import browser from 'webextension-polyfill'
 import bowser from 'bowser'
 import { removeToken } from '@src/util/accessTokenExtension'
-import {
+import type {
   IBackgroundStateSerializable,
   IBackgroundStateSerializableLocked,
   SecretSerializedType
@@ -46,7 +46,7 @@ import {
 } from '@util/generateEncryptionKey'
 import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
-import { AppRouter } from './chromeRuntimeListener'
+import type { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from '@capaj/trpc-browser/link'
 import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
@@ -477,6 +477,7 @@ class ExtensionDevice {
   id: string | null = null
   name: string
   initCallbacks: (() => void)[] = []
+  isInitialized = false
   lockInterval: ReturnType<typeof setInterval> | null
 
   async startLockInterval(lockTime: number) {
@@ -484,7 +485,7 @@ class ExtensionDevice {
   }
 
   onInitDone(callback: () => void) {
-    if (this.state || this.lockedState) {
+    if (this.isInitialized) {
       callback()
     } else {
       this.initCallbacks.push(callback)
@@ -498,6 +499,7 @@ class ExtensionDevice {
    * runs on startup
    */
   async initialize() {
+    this.isInitialized = false
     const [id, storage] = await Promise.all([
       this.getDeviceId(),
       browser.storage.local.get() as Promise<{
@@ -543,7 +545,10 @@ class ExtensionDevice {
     }
 
     this.fireToken = null // TODO: remove this
-    this.initCallbacks.forEach((cb) => cb())
+    this.isInitialized = true
+    const initCallbacks = this.initCallbacks
+    this.initCallbacks = []
+    initCallbacks.forEach((callback) => callback())
     log('Extension device initialized with id ', this.id)
   }
 
@@ -554,14 +559,18 @@ class ExtensionDevice {
       areaName: string
     ) => {
       log('storage change UL', changes, areaName)
-      if (areaName === 'local' && changes.backgroundState) {
-        this.state = new DeviceState(
-          changes.backgroundState.newValue as IBackgroundStateSerializable
-        )
+      const nextBackgroundState = changes.backgroundState?.newValue
+      const nextLockedState = changes.lockedState?.newValue
+
+      if (areaName === 'local' && nextBackgroundState) {
+        if (!this.state) {
+          this.state = new DeviceState(
+            nextBackgroundState as IBackgroundStateSerializable
+          )
+        }
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
-      } else if (areaName === 'local' && changes.lockedState) {
-        this.lockedState = changes.lockedState
-          .newValue as IBackgroundStateSerializableLocked
+      } else if (areaName === 'local' && nextLockedState) {
+        this.lockedState = nextLockedState as IBackgroundStateSerializableLocked
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
     }
@@ -776,7 +785,7 @@ class ExtensionDevice {
 
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
-    this.state.save()
+    await this.state.save()
   }
 
   startVaultLockTimer() {
@@ -831,4 +840,4 @@ if (
   )
 }
 export const device = new ExtensionDevice()
-device.initialize()
+export const deviceInitialization = device.initialize()

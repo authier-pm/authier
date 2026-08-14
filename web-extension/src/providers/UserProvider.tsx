@@ -23,24 +23,44 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
   const [localStorage, setLocalStorage] = useState<any>()
 
   useEffect(() => {
+    let isActive = true
+
     async function checkStorage() {
       const storage = await browser.storage.local.get()
-      setLocalStorage(storage.encryptedAuthsMasterPassword)
+      if (isActive) {
+        setLocalStorage(storage.encryptedAuthsMasterPassword)
+      }
       return storage
     }
-    checkStorage()
+    void checkStorage()
 
-    async function getId() {
-      try {
-        const id = await getUserFromToken()
-        if (!id) return
+    const refreshUserId = () =>
+      getUserFromToken()
+        .then((id) => {
+          if (isActive) {
+            setUserId(id?.userId)
+          }
+        })
+        .catch((error: unknown) => {
+          console.error('Failed to read the logged-in user', error)
+        })
 
-        setUserId(id.userId)
-      } catch (err) {
-        console.log(err)
+    const onStorageChange = (
+      changes: Record<string, browser.Storage.StorageChange>,
+      areaName: string
+    ) => {
+      if (areaName === 'local' && changes['access-token']) {
+        void refreshUserId()
       }
     }
-    getId()
+
+    void refreshUserId()
+    browser.storage.onChanged.addListener(onStorageChange)
+
+    return () => {
+      isActive = false
+      browser.storage.onChanged.removeListener(onStorageChange)
+    }
   }, [])
 
   const value = {

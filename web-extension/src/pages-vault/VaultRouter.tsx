@@ -18,7 +18,7 @@ import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
 import { UnlockDeviceForm } from '@src/pages/UnlockDeviceForm'
 import { VaultList } from './VaultList'
 import { AccountLimits } from './AccountLimits'
-import Login from './Login'
+import Login from '@src/components/auth/Login'
 import { NewDevicePolicyOnboarding } from './NewDevicePolicyOnboarding'
 import { PasswordGenerationHistory } from './PasswordGenerationHistory'
 

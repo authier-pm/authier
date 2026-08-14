@@ -15,7 +15,6 @@ msgstr ""
 
 #. placeholder {0}: secrets.length
 #: src/components/vault/DeleteSecretButton.tsx
-#: src/components/vault/DeleteSecretButton.tsx
 msgid "{0, plural, one {delete secret} other {delete # secrets}}"
 msgstr "{0, plural, one {delete secret} other {delete # secrets}}"
 
@@ -65,8 +64,8 @@ msgstr "2 weeks"
 
 #: src/components/vault/settings/Security.tsx
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
-msgid "2FA sync"
-msgstr "2FA sync"
+#~ msgid "2FA sync"
+#~ msgstr "2FA sync"
 
 #: src/util/useVaultLockTimeoutOptions.tsx
 msgid "3 days"
@@ -101,6 +100,7 @@ msgid "8 hours"
 msgstr "8 hours"
 
 #: src/components/vault/SidebarWithHeader.tsx
+#: src/pages-vault/AccountLimits.tsx
 msgid "Account Limits"
 msgstr "Account Limits"
 
@@ -108,22 +108,33 @@ msgstr "Account Limits"
 msgid "Actions"
 msgstr "Actions"
 
+#: src/pages-vault/VaultList.tsx
+msgid "Add item"
+msgstr "Add item"
+
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "Add QR TOTP from current page"
 msgstr "Add QR TOTP from current page"
 
 #: src/components/PopupNavBar.tsx
-#: src/components/PopupNavBar.tsx
 msgid "add secret"
 msgstr "add secret"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Added"
 msgstr "Added"
 
-#: src/pages-vault/LoginAwaitingApproval.tsx
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "After you approve it, the vault password will be checked and your vault will open automatically in this popup."
+msgstr "After you approve it, the vault password will be checked and your vault will open automatically in this popup."
+
+#: src/components/auth/LoginAwaitingApproval.tsx
 msgid "After you approve it, the vault password will be checked and your vault will open automatically in this tab."
 msgstr "After you approve it, the vault password will be checked and your vault will open automatically in this tab."
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "After you confirm the email link, reset is scheduled for"
+msgstr "After you confirm the email link, reset is scheduled for"
 
 #: src/pages-vault/Register.tsx
 msgid "Already have an account?"
@@ -133,17 +144,25 @@ msgstr "Already have an account?"
 msgid "Approve"
 msgstr "Approve"
 
-#: src/pages-vault/LoginAwaitingApproval.tsx
+#: src/components/auth/LoginAwaitingApproval.tsx
 msgid "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 msgstr "Approve this device in your device management in the vault on your master device in order to proceed adding new device."
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Automatically locks vault after chosen period of time"
 msgstr "Automatically locks vault after chosen period of time"
 
 #: src/components/vault/settings/Account.tsx
-msgid "Change vault password"
-msgstr "Change vault password"
+#~ msgid "Change vault password"
+#~ msgstr "Change vault password"
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Checking device approval…"
+msgstr "Checking device approval…"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Clear search"
+msgstr "Clear search"
 
 #: src/components/pages/AuthsList.tsx
 msgid "Click to show & copy"
@@ -154,11 +173,10 @@ msgstr "Click to show & copy"
 #~ msgstr "Click to show the whole"
 
 #: src/components/PopupNavBar.tsx
-#: src/components/PopupNavBar.tsx
 msgid "close menu"
 msgstr "close menu"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Config"
 msgstr "Config"
 
@@ -167,39 +185,58 @@ msgid "Confirm new password"
 msgstr "Confirm new password"
 
 #: src/components/vault/settings/Account.tsx
-msgid "Confirm new password // Confirm password"
-msgstr "Confirm new password // Confirm password"
+#~ msgid "Confirm new password // Confirm password"
+#~ msgstr "Confirm new password // Confirm password"
 
-#: src/components/vault/VirtualizedList.tsx
-#: src/components/vault/VaultItemSettings.tsx
 #: src/components/vault/EditFormButtons.tsx
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VaultItemSettings.tsx
+#: src/components/vault/VirtualizedList.tsx
 msgid "Copied to clipboard"
 msgstr "Copied to clipboard"
 
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Copy"
+msgstr "Copy"
+
 #: src/components/vault/VaultItemSettings.tsx
-msgid "copy password"
-msgstr "copy password"
+#~ msgid "copy password"
+#~ msgstr "copy password"
 
 #: src/components/pages/AuthsList.tsx
+#: src/components/vault/VaultItemSettings.tsx
 msgid "Copy password"
 msgstr "Copy password"
+
+#: src/components/vault/VaultItemSettings.tsx
+msgid "Copy shared secret"
+msgstr "Copy shared secret"
+
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Copy token"
+msgstr "Copy token"
 
 #: src/components/pages/AuthsList.tsx
 #~ msgid "Copy TOTP"
 #~ msgstr "Copy TOTP"
 
 #: src/components/vault/EditFormButtons.tsx
+#~ msgid "copy whole secret"
+#~ msgstr "copy whole secret"
+
 #: src/components/vault/EditFormButtons.tsx
-msgid "copy whole secret"
-msgstr "copy whole secret"
+msgid "Copy whole secret"
+msgstr "Copy whole secret"
 
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "could not find any QR code on this page. Make sure QR code is visible."
 msgstr "could not find any QR code on this page. Make sure QR code is visible."
 
 #: src/components/vault/VaultItemSettings.tsx
-msgid "Created "
-msgstr "Created "
+#~ msgid "Created "
+#~ msgstr "Created "
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Credentials"
@@ -207,25 +244,28 @@ msgstr "Credentials"
 
 #: src/components/vault/settings/Security.tsx
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
-msgid "Credentials autofill"
-msgstr "Credentials autofill"
+#~ msgid "Credentials autofill"
+#~ msgstr "Credentials autofill"
 
 #: src/components/vault/settings/Account.tsx
 msgid "Current password"
 msgstr "Current password"
 
 #: src/components/vault/settings/Account.tsx
-msgid "Current password // Master password"
-msgstr "Current password // Master password"
+#~ msgid "Current password // Master password"
+#~ msgstr "Current password // Master password"
 
 #: src/components/vault/settings/Account.tsx
-msgid "Danger zone"
-msgstr "Danger zone"
+#~ msgid "Danger zone"
+#~ msgstr "Danger zone"
 
-#: src/components/vault/DeleteSecretButton.tsx
 #: src/components/vault/DeleteSecretButton.tsx
 #~ msgid "delete secret"
 #~ msgstr "delete secret"
+
+#: src/components/vault/TableList.tsx
+msgid "Delete selected"
+msgstr "Delete selected"
 
 #: src/components/vault/settings/Account.tsx
 msgid "Delete your account"
@@ -233,28 +273,34 @@ msgstr "Delete your account"
 
 #. placeholder {0}: formatRelative( new Date(), new Date(deviceDecryptionChallenge.approvedAt as string) )
 #: src/pages-vault/LoginAwaitingApproval.tsx
-msgid "Device approved at {0}"
-msgstr "Device approved at {0}"
+#~ msgid "Device approved at {0}"
+#~ msgstr "Device approved at {0}"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
 #~ msgid "Device:"
 #~ msgstr "Device:"
 
-#: src/pages-vault/LoginAwaitingApproval.tsx
+#: src/components/auth/LoginAwaitingApproval.tsx
 msgid "Device: "
 msgstr "Device: "
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "devices"
 msgstr "devices"
 
 #: src/components/vault/SidebarWithHeader.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Devices"
 msgstr "Devices"
 
-#: src/pages-vault/Login.tsx
+#: src/components/auth/Login.tsx
 msgid "Don't have account?"
 msgstr "Don't have account?"
+
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Edit"
+msgstr "Edit"
 
 #: src/components/vault/ExportCsvButtons.tsx
 msgid "Export Login Credentials to CSV"
@@ -265,16 +311,32 @@ msgid "Export TOTP to CSV"
 msgstr "Export TOTP to CSV"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
-msgid "Failed to create decryption challenge"
-msgstr "Failed to create decryption challenge"
+#~ msgid "Failed to create decryption challenge"
+#~ msgstr "Failed to create decryption challenge"
+
+#: src/components/pages/AuthsList.tsx
+msgid "Failed to generate OTP code"
+msgstr "Failed to generate OTP code"
 
 #: src/components/vault/VaultItemSettings.tsx
-msgid "Failed to parse this secret:"
-msgstr "Failed to parse this secret:"
+msgid "Failed to parse this secret"
+msgstr "Failed to parse this secret"
+
+#: src/components/vault/VaultItemSettings.tsx
+#~ msgid "Failed to parse this secret:"
+#~ msgstr "Failed to parse this secret:"
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Failed to schedule master device reset"
+msgstr "Failed to schedule master device reset"
 
 #: src/components/pages/AuthsList.tsx
 msgid "Fill TOTP into input on screen by point&click"
 msgstr "Fill TOTP into input on screen by point&click"
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Finishing login…"
+msgstr "Finishing login…"
 
 #. placeholder {0}: challengeToApprove.ipAddress
 #. placeholder {1}: parts.join(', ')
@@ -282,9 +344,26 @@ msgstr "Fill TOTP into input on screen by point&click"
 msgid "from IP {0} ({1})"
 msgstr "from IP {0} ({1})"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Geolocation"
 msgstr "Geolocation"
+
+#: src/components/vault/VirtualizedList.tsx
+msgid "Hide"
+msgstr "Hide"
+
+#: src/components/vault/TableList.tsx
+msgid "Hide all secrets"
+msgstr "Hide all secrets"
+
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Hide secret"
+msgstr "Hide secret"
+
+#: src/components/vault/TableList.tsx
+msgid "Hide secrets"
+msgstr "Hide secrets"
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Import & Export"
@@ -303,58 +382,77 @@ msgid "Label"
 msgstr "Label"
 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
-msgid "Language"
-msgstr "Language"
+#~ msgid "Language"
+#~ msgstr "Language"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Last IP Address"
 msgstr "Last IP Address"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Last sync"
 msgstr "Last sync"
 
-#: src/pages/UserNavMenu.tsx
 #: src/components/vault/SidebarWithHeader.tsx
+msgid "Lock"
+msgstr "Lock"
+
+#: src/pages/UserNavMenu.tsx
 msgid "Lock device"
 msgstr "Lock device"
 
-#: src/pages-vault/Devices.tsx
-#: src/components/vault/settings/Security.tsx
-#: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Lock time"
 msgstr "Lock time"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Logged in"
 msgstr "Logged in"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Logged out"
 msgstr "Logged out"
 
-#: src/pages-vault/Login.tsx
+#: src/components/auth/Login.tsx
 msgid "Login"
 msgstr "Login"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
-msgid "Login failed, check your email or password"
-msgstr "Login failed, check your email or password"
+#~ msgid "Login failed, check your email or password"
+#~ msgstr "Login failed, check your email or password"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
-msgid "Login failed, check your username or password"
-msgstr "Login failed, check your username or password"
+#~ msgid "Login failed, check your username or password"
+#~ msgstr "Login failed, check your username or password"
 
 #: src/pages-vault/LoginAwaitingApproval.tsx
-msgid "Login failed, try removing and adding the extension again"
-msgstr "Login failed, try removing and adding the extension again"
+#~ msgid "Login failed, try removing and adding the extension again"
+#~ msgstr "Login failed, try removing and adding the extension again"
 
-#: src/pages-vault/Devices.tsx
+#: src/components/vault/SidebarWithHeader.tsx
+#: src/pages-vault/DevicesPage.tsx
 #: src/pages/UserNavMenu.tsx
 msgid "Logout"
 msgstr "Logout"
 
-#: src/components/vault/VaultItemSettings.tsx
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Master device reset confirmation email sent"
+msgstr "Master device reset confirmation email sent"
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Master device reset confirmation email sent. Confirm the email link to arm the reset."
+msgstr "Master device reset confirmation email sent. Confirm the email link to arm the reset."
+
+#. placeholder {0}: new Date(pendingResetAt).toLocaleString()
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Master device reset scheduled for {0}."
+msgstr "Master device reset scheduled for {0}."
+
+#. placeholder {0}: new Date(rejectedResetAt).toLocaleString()
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Master device reset was rejected at {0}."
+msgstr "Master device reset was rejected at {0}."
+
 #: src/components/vault/VaultItemSettings.tsx
 msgid "Matching Web inputs"
 msgstr "Matching Web inputs"
@@ -363,6 +461,10 @@ msgstr "Matching Web inputs"
 msgid "Never"
 msgstr "Never"
 
+#: src/pages-vault/DevicesPage.tsx
+msgid "Never synced"
+msgstr "Never synced"
+
 #. placeholder {0}: challengeToApprove.deviceName
 #. placeholder {1}: formatRelative( new Date(challengeToApprove.createdAt), new Date() )
 #: src/pages-vault/NewDeviceApproval.tsx
@@ -370,21 +472,27 @@ msgid "New device \"{0}\" tried to login {1}"
 msgstr "New device \"{0}\" tried to login {1}"
 
 #: src/components/vault/VaultItemSettings.tsx
-#: src/components/vault/VaultItemSettings.tsx
 msgid "No matching web inputs found"
 msgstr "No matching web inputs found"
 
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "No secrets found"
+msgstr "No secrets found"
+
 #: src/components/vault/settings/Security.tsx
-msgid "Notification on vault unlock"
-msgstr "Notification on vault unlock"
+#~ msgid "Notification on vault unlock"
+#~ msgstr "Notification on vault unlock"
 
 #: src/pages-vault/NewDeviceApproval.tsx
 msgid "Open device list on your master device to approve"
 msgstr "Open device list on your master device to approve"
 
-#: src/AuthLinkPage.tsx
-#: src/AuthLinkPage.tsx
 #: src/components/PopupNavBar.tsx
+msgid "open menu"
+msgstr "open menu"
+
+#: src/AuthLinkPage.tsx
 #: src/components/PopupNavBar.tsx
 msgid "Open vault"
 msgstr "Open vault"
@@ -393,11 +501,12 @@ msgstr "Open vault"
 msgid "Open vault to login or sign up"
 msgstr "Open vault to login or sign up"
 
-#: src/pages-vault/Login.tsx
+#: src/components/auth/Login.tsx
+#: src/components/vault/VirtualizedList.tsx
 msgid "Password"
 msgstr "Password"
 
-#: src/pages-vault/Login.tsx
+#: src/components/auth/Login.tsx
 msgid "Password // *******"
 msgstr "Password // *******"
 
@@ -405,9 +514,23 @@ msgstr "Password // *******"
 msgid "Password changed, all your other devices will be logged out and you will need to log in again"
 msgstr "Password changed, all your other devices will be logged out and you will need to log in again"
 
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Password generation history"
+msgstr "Password generation history"
+
 #: src/components/vault/settings/Account.tsx
 msgid "Passwords do not match"
 msgstr "Passwords do not match"
+
+#. placeholder {0}: challenge.pushNotificationsFailedCount
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Push notifications failed: {0}"
+msgstr "Push notifications failed: {0}"
+
+#. placeholder {0}: challenge.pushNotificationsSentCount
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Push notifications sent: {0}"
+msgstr "Push notifications sent: {0}"
 
 #: src/components/vault/RefreshAccountLimits.tsx
 msgid "refresh account limits"
@@ -422,17 +545,24 @@ msgid "Reject"
 msgstr "Reject"
 
 #: src/components/vault/VaultItemSettings.tsx
-#: src/components/vault/VaultItemSettings.tsx
-msgid "Remove"
-msgstr "Remove"
+#~ msgid "Remove"
+#~ msgstr "Remove"
 
-#: src/pages-vault/Devices.tsx
-#: src/components/vault/settings/Security.tsx
+#: src/components/pages/AuthsList.tsx
+msgid "Remove saved autofill inputs for this page"
+msgstr "Remove saved autofill inputs for this page"
+
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Reset master device"
+msgstr "Reset master device"
+
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
+#: src/components/vault/settings/Security.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Save"
 msgstr "Save"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Search for device"
 msgstr "Search for device"
 
@@ -448,7 +578,7 @@ msgstr "Secret"
 msgid "secrets"
 msgstr "secrets"
 
-#: src/pages-vault/Devices.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Set as master device"
 msgstr "Set as master device"
 
@@ -457,14 +587,44 @@ msgid "Set new master password"
 msgstr "Set new master password"
 
 #: src/components/vault/settings/Account.tsx
-msgid "Set new master password // New master password"
-msgstr "Set new master password // New master password"
+#~ msgid "Set new master password // New master password"
+#~ msgstr "Set new master password // New master password"
 
 #: src/components/vault/SidebarWithHeader.tsx
+#: src/pages-vault/DevicesPage.tsx
 msgid "Settings"
 msgstr "Settings"
 
-#: src/pages-vault/Login.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Shared secret"
+msgstr "Shared secret"
+
+#: src/components/vault/VirtualizedList.tsx
+msgid "Show"
+msgstr "Show"
+
+#: src/components/vault/TableList.tsx
+msgid "Show all secrets"
+msgstr "Show all secrets"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Show card view"
+msgstr "Show card view"
+
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Show secret"
+msgstr "Show secret"
+
+#: src/components/vault/TableList.tsx
+msgid "Show secrets"
+msgstr "Show secrets"
+
+#: src/pages-vault/VaultList.tsx
+msgid "Show table view"
+msgstr "Show table view"
+
+#: src/components/auth/Login.tsx
 #: src/components/vault/settings/Account.tsx
 msgid "Submit"
 msgstr "Submit"
@@ -481,57 +641,69 @@ msgid "Successfully added TOTP for {0}"
 msgstr "Successfully added TOTP for {0}"
 
 #: src/components/RefreshSecretsButton.tsx
-#: src/components/vault/RefreshDeviceButton.tsx
 #: src/components/vault/RefreshAccountLimits.tsx
+#: src/components/vault/RefreshDeviceButton.tsx
 msgid "Sync successful"
 msgstr "Sync successful"
 
-#: src/components/vault/RefreshDeviceButton.tsx
 #: src/components/vault/RefreshDeviceButton.tsx
 msgid "Synchronize devices"
 msgstr "Synchronize devices"
 
 #: src/components/RefreshSecretsButton.tsx
-#: src/components/RefreshSecretsButton.tsx
 msgid "Synchronize vault"
 msgstr "Synchronize vault"
 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
-msgid "Theme"
-msgstr "Theme"
+#~ msgid "Theme"
+#~ msgstr "Theme"
 
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "This TOTP secret is already in your vault"
 msgstr "This TOTP secret is already in your vault"
 
 #: src/components/vault/settings/DeviceDefaultsForm.tsx
-msgid "TOTP autofill"
-msgstr "TOTP autofill"
+#~ msgid "TOTP autofill"
+#~ msgstr "TOTP autofill"
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "TOTPs"
 msgstr "TOTPs"
+
+#: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
+msgid "Try a different search term or add a new item."
+msgstr "Try a different search term or add a new item."
 
 #: src/pages/UnlockDeviceForm.tsx
 msgid "Unlock vault"
 msgstr "Unlock vault"
 
 #: src/components/vault/TableList.tsx
+#: src/components/vault/VirtualizedList.tsx
 msgid "URL"
 msgstr "URL"
 
-#: src/components/vault/TableList.tsx
+#: src/components/auth/LoginAwaitingApproval.tsx
+msgid "Use a different account"
+msgstr "Use a different account"
+
+#: src/components/vault/VirtualizedList.tsx
 msgid "Username"
 msgstr "Username"
 
-#. placeholder {0}: formState.email
-#: src/pages-vault/LoginAwaitingApproval.tsx
+#. placeholder {0}: session.email
+#: src/components/auth/LoginAwaitingApproval.tsx
 msgid "Username: {0}"
 msgstr "Username: {0}"
 
 #: src/components/vault/SidebarWithHeader.tsx
 msgid "Vault"
 msgstr "Vault"
+
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Vault unlocked"
+msgstr "Vault unlocked"
 
 #. placeholder {0}: pkg.version
 #: src/pages-vault/AboutPage.tsx
@@ -543,11 +715,13 @@ msgid "We support importing from <0>csv</0> and <1>json</1> files."
 msgstr "We support importing from <0>csv</0> and <1>json</1> files."
 
 #: src/components/vault/VaultItemSettings.tsx
-#: src/components/vault/VaultItemSettings.tsx
 msgid "Web input removed"
 msgstr "Web input removed"
 
-#: src/components/vault/settings/Account.tsx
+#: src/components/vault/SidebarWithHeader.tsx
+msgid "Workspace"
+msgstr "Workspace"
+
 #: src/components/vault/settings/Account.tsx
 msgid "Wrong password"
 msgstr "Wrong password"
@@ -562,12 +736,20 @@ msgid "You have no duplicates in your secrets"
 msgstr "You have no duplicates in your secrets"
 
 #: src/pages-vault/AddItem.tsx
-msgid "You have reached your account limit. Go to <0> Account Limits to upgrade your account.</0> "
-msgstr "You have reached your account limit. Go to <0> Account Limits to upgrade your account.</0> "
+#~ msgid "You have reached your account limit. Go to <0> Account Limits to upgrade your account.</0> "
+#~ msgstr "You have reached your account limit. Go to <0> Account Limits to upgrade your account.</0> "
 
 #: src/pages-vault/AddItem.tsx
 #~ msgid "You have reached your account limit. Go to <0>Account Limits to upgrade your account.</0>"
 #~ msgstr "You have reached your account limit. Go to <0>Account Limits to upgrade your account.</0>"
+
+#: src/pages-vault/AddItem.tsx
+msgid "You have reached your account limit. Go to <0>Account Limits</0> to upgrade your account."
+msgstr "You have reached your account limit. Go to <0>Account Limits</0> to upgrade your account."
+
+#: src/pages-vault/VaultList.tsx
+msgid "You have reached your limit"
+msgstr "You have reached your limit"
 
 #: src/components/pages/AddTOTPSecretButton.tsx
 msgid "You have reached your password limit. Please upgrade your account to add more passwords."

@@ -8,7 +8,7 @@ import {
   useRejectChallengeMutation
 } from '@shared/graphql/AccountDevices.codegen'
 import { UserNewDevicePolicy } from '@shared/generated/graphqlBaseTypes'
-import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from './LoginAwaitingApproval'
+import { LOGIN_DECRYPTION_CHALLENGE_REFETCH_INTERVAL } from '@src/background/loginSessionTypes'
 import { useDevicesListWithDataQuery } from './Devices.codegen'
 
 export const NewDevicesApprovalStack = () => {

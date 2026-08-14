@@ -26,6 +26,11 @@ export const loginCredentialSchema = z.object({
   password: z.string()
 })
 
+export const loginDraftSchema = z.object({
+  email: z.string(),
+  password: z.string()
+})
+
 export const loginCredentialsFromContentScriptSchema =
   contentScriptContextSchema.extend({
     username: z.string().nullable(),

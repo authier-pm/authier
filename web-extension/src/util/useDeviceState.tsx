@@ -79,7 +79,7 @@ export function useDeviceState() {
   const [deviceState, setDeviceState] = useState<DeviceState | null>(
     device.state
   )
-  const [isInitialized, setIsInitialized] = useState<boolean>(false)
+  const [isInitialized, setIsInitialized] = useState(device.isInitialized)
   const [selectedItems, setSelectedItems] = useState<
     (ILoginSecret | ITOTPSecret)[]
   >([])

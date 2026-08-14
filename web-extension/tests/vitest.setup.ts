@@ -135,6 +135,7 @@ vi.mock('@src/background/ExtensionDevice', () => {
       generateDeviceName: vi.fn().mockReturnValue('Mock Device Name'),
       setLockTime: vi.fn(),
       onInitDone: vi.fn((callback) => callback()),
+      isInitialized: true,
       id: 'mock-device-id',
       name: 'Mock Device Name',
       lockedState: null,

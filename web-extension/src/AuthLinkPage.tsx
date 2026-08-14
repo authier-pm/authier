@@ -9,6 +9,7 @@ export function openVaultTab(afterHash = '') {
   const isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1
 
   browser.tabs.create({
+    active: true,
     url: isChrome ? `js/vault.html#${afterHash}` : `vault.html#${afterHash}`
   })
 }
