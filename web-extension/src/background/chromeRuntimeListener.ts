@@ -32,6 +32,7 @@ import { loggerMiddleware } from './loggerMiddleware'
 import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludingShadowDom'
 import { constructURL } from '@shared/urlUtils'
 import { loginSessionManager } from './loginSession'
+import { createLoginCredentialData } from './createLoginCredentialData'
 
 const log = debug('au:chListener')
 
@@ -112,13 +113,13 @@ const appRouter = tc.router({
       const credentials = input
       log('addLoginCredentials', credentials)
 
-      const encryptedData = {
-        username: credentials.username ?? deviceState.email,
+      const encryptedData = createLoginCredentialData({
+        fallbackUsername: deviceState.email,
+        favIconUrl: tab.favIconUrl,
+        hostname: urlParsed.hostname,
         password: credentials.password,
-        iconUrl: tab.favIconUrl ?? null,
-        url: urlParsed.hostname,
-        label: `${credentials.username} | ${urlParsed.hostname}`
-      }
+        username: credentials.username
+      })
 
       encryptedDataSchema.parse(encryptedData)
 

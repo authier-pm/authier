@@ -2,9 +2,8 @@ import { bodyInputChangeEmitter } from './domMutationObserver'
 import debug from 'debug'
 import { generate } from 'generate-password'
 import { isElementVisibleInViewport } from './isElementInViewport'
-import { domRecorder, IInitStateRes } from './contentScript'
+import { domRecorder, getWebInputKind, IInitStateRes } from './contentScript'
 import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-import { authierColors } from '../../../shared/chakraRawTheme'
 import 'notyf/notyf.min.css'
 import { debounce } from 'lodash'
 import { renderLoginCredOption } from './renderLoginCredOption'
@@ -30,7 +29,10 @@ import {
   WebInputsArrayClientSide
 } from '../background/WebInputForAutofill'
 import { wait } from './wait'
-import { filterUselessInputs } from './getAllInputsIncludingShadowDom'
+import {
+  filterUselessInputs,
+  getAllInputsIncludingShadowDom
+} from './getAllInputsIncludingShadowDom'
 import {
   classifyPageForAutofill,
   classifyPasswordForm,
@@ -215,7 +217,10 @@ async function fillSegmentedTotpInputs(
  */
 export async function handleGeneratedPasswordAutofill(
   password: string,
-  options: { showSavePrompt: boolean }
+  options: {
+    passwordInput?: HTMLInputElement
+    showSavePrompt: boolean
+  }
 ) {
   await appendGeneratedPasswordHistoryEntry(
     createGeneratedPasswordHistoryEntry({
@@ -224,8 +229,41 @@ export async function handleGeneratedPasswordAutofill(
     })
   )
 
+  let capturedUsername: string | null = null
+  if (options.passwordInput) {
+    const classification = classifyPasswordForm(options.passwordInput)
+    const usernameInput = classification.usernameInput
+    const username = usernameInput?.value.trim()
+
+    if (usernameInput && username) {
+      capturedUsername = username
+      domRecorder.addInputEvent({
+        element: usernameInput,
+        eventType: 'input',
+        inputted: username,
+        kind: getWebInputKind(usernameInput)
+      })
+    }
+
+    const livePasswordInput = options.passwordInput.isConnected
+      ? options.passwordInput
+      : (classification.newPasswordInputs[0] ?? options.passwordInput)
+    domRecorder.addInputEvent({
+      element: livePasswordInput,
+      eventType: 'input',
+      inputted: password,
+      kind: WebInputType.PASSWORD
+    })
+
+    await trpc.saveCapturedInputEvents.mutate({
+      inputEvents: domRecorder.toJSON(),
+      url: document.documentURI
+    })
+    capturedUsername = capturedUsername ?? domRecorder.getUsername() ?? null
+  }
+
   if (options.showSavePrompt) {
-    await renderSaveCredentialsForm(null, password)
+    await renderSaveCredentialsForm(capturedUsername, password)
   }
 }
 
@@ -361,7 +399,13 @@ export const autofillValueIntoInput = (
   log('autofillValueIntoInput:', value, element)
 
   if (filledElements.has(element)) {
-    return null
+    if (element.value === value) {
+      return null
+    }
+
+    // Controlled inputs can be cleared by a framework re-render while keeping
+    // the same DOM node. Let the next input-added/attribute mutation retry it.
+    filledElements.delete(element)
   }
   if (element.childNodes.length > 0) {
     //we should again loop through the children of the element and find the right input
@@ -375,7 +419,6 @@ export const autofillValueIntoInput = (
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
   }
 
-  element.style.backgroundColor = authierColors.green[400]
   browser.storage.local.set({
     // used for multi-step password autofill later
     lastAutofilledValue: value
@@ -384,6 +427,78 @@ export const autofillValueIntoInput = (
   filledElements.add(element)
 
   return element
+}
+
+const GENERATED_PASSWORD_FILL_ATTEMPTS = 2
+const GENERATED_PASSWORD_IDENTITY_ATTRIBUTES = [
+  'aria-label',
+  'autocomplete',
+  'id',
+  'name',
+  'placeholder'
+] as const
+
+export const resolveLiveGeneratedPasswordInput = (
+  initialInput: HTMLInputElement
+) => {
+  if (
+    initialInput.type === 'password' &&
+    isElementVisibleInViewport(initialInput)
+  ) {
+    return initialInput
+  }
+
+  const candidates = getAllInputsIncludingShadowDom(document.body).filter(
+    (candidate) =>
+      candidate.type === 'password' &&
+      !candidate.disabled &&
+      !candidate.readOnly &&
+      isElementVisibleInViewport(candidate)
+  )
+  const identityMatch = candidates.find((candidate) =>
+    GENERATED_PASSWORD_IDENTITY_ATTRIBUTES.some((attribute) => {
+      const initialValue = initialInput.getAttribute(attribute)
+      return (
+        Boolean(initialValue) &&
+        candidate.getAttribute(attribute) === initialValue
+      )
+    })
+  )
+  if (identityMatch) {
+    return identityMatch
+  }
+
+  const classification = classifyPageForAutofill(candidates, document.body)
+  return classification.newPasswordInputs[0] ?? null
+}
+
+/**
+ * Fills and verifies a generated password against the current live input. Some
+ * controlled forms replace their input during the first synthetic input event,
+ * so a successful write to the original detached node is not enough.
+ */
+export const fillGeneratedPasswordIntoInput = async (
+  initialInput: HTMLInputElement,
+  password: string
+) => {
+  for (let attempt = 0; attempt < GENERATED_PASSWORD_FILL_ATTEMPTS; attempt++) {
+    const currentInput = resolveLiveGeneratedPasswordInput(initialInput)
+    if (!currentInput) {
+      return null
+    }
+
+    autofillValueIntoInput(currentInput, password)
+    await wait(0)
+
+    const verifiedInput = resolveLiveGeneratedPasswordInput(currentInput)
+    if (verifiedInput?.value === password) {
+      return verifiedInput
+    }
+
+    filledElements.delete(currentInput)
+  }
+
+  return null
 }
 
 export const fillStringIntoInput = ({
@@ -397,13 +512,28 @@ export const fillStringIntoInput = ({
   inputType: WebInputType
 }) => {
   if (inputTypesFilledForThisPage.has(inputType)) {
-    log(`inputType ${inputType} already filled for this page`)
-    return
+    const hasLiveFilledInput = Array.from(filledElements).some(
+      (element) =>
+        element.isConnected &&
+        element.value !== '' &&
+        element.type === inputEl.type
+    )
+
+    if (hasLiveFilledInput) {
+      log(`inputType ${inputType} already filled for this page`)
+      return
+    }
+
+    // Some apps replace their password input during hydration. The old node is
+    // no longer useful and must not prevent filling the replacement.
+    inputTypesFilledForThisPage.delete(inputType)
   }
 
-  inputTypesFilledForThisPage.add(inputType)
-
   const el = autofillValueIntoInput(inputEl, loginCredential.password)
+
+  if (el) {
+    inputTypesFilledForThisPage.add(inputType)
+  }
 
   el &&
     notyf.success(
@@ -643,7 +773,7 @@ export const autofill = (initState: IInitStateRes) => {
       secretsForHost.loginCredentials.length > 0
       // filledElements.length === 0
     ) {
-      const autofillResult = await searchInputsAndAutofill(body)
+      const autofillResult = await searchInputsAndAutofill(body, classification)
       if (autofillResult) {
         await trpc.saveCapturedInputEvents.mutate({
           inputEvents: domRecorder.toJSON(),
@@ -714,10 +844,46 @@ export const autofill = (initState: IInitStateRes) => {
             }
           }
 
+          for (const filledElement of filledElements) {
+            if (
+              filledElement.value === '' ||
+              !isElementVisibleInViewport(filledElement)
+            ) {
+              filledElements.delete(filledElement)
+            }
+          }
+
           if (filledElements.size >= 2) {
             return // we have already filled 2 inputs on this page, we don't need to fill any more
           }
           log('onInputAddedHandler', inputEl)
+
+          // The mutation observer batches all inputs through one trailing
+          // debounce. The last event may be a checkbox or helper field even
+          // though a password input was added in the same render, so always
+          // rescan the live form instead of trusting only `inputEl`.
+          const dynamicPasswordInput = filterUselessInputs(document.body).find(
+            (element) => element.type === 'password'
+          )
+          if (dynamicPasswordInput) {
+            const dynamicClassification =
+              classifyPasswordForm(dynamicPasswordInput)
+            if (handleNewPasswordCase(dynamicClassification)) {
+              return
+            }
+
+            if (dynamicClassification.kind === PasswordFormKind.LOGIN) {
+              await searchInputsAndAutofill(
+                document.body,
+                dynamicClassification
+              )
+              return
+            }
+
+            offerCredentialPicker(dynamicClassification)
+            return
+          }
+
           // For one input on page
           if (inputEl.type === 'username' || inputEl.type === 'email') {
             if (secretsForHost.loginCredentials.length === 1) {
@@ -728,10 +894,6 @@ export const autofill = (initState: IInitStateRes) => {
             } else {
               // todo show prompt to user to select which credential to use
             }
-          } else if (inputEl.type === 'password') {
-            // a password field appearing late is either a login step or a form
-            // asking for a new password - classify before touching it
-            handleNewPasswordCase(classifyPasswordForm(inputEl))
           }
         },
         500,
@@ -800,13 +962,16 @@ export const autofill = (initState: IInitStateRes) => {
       }
     }
 
-    async function searchInputsAndAutofill(documentBody: HTMLElement) {
+    async function searchInputsAndAutofill(
+      documentBody: HTMLElement,
+      formClassification: PasswordFormClassification
+    ) {
       const newWebInputs: WebInputsArrayClientSide = []
       // only look inside the credential form - a flat scan of the whole document
       // is how a site-wide search box ends up being treated as the username field
       const inputElsArray = (
         filterUselessInputs(documentBody) as HTMLInputElement[]
-      ).filter((el) => classification.scope.contains(el))
+      ).filter((el) => formClassification.scope.contains(el))
       log('inputElsArray', inputElsArray)
 
       if (inputElsArray.length === 1) {
@@ -876,7 +1041,7 @@ export const autofill = (initState: IInitStateRes) => {
 
             // the classifier already picked the username field out of the form,
             // which avoids grabbing whatever input happens to precede the password
-            const usernameInputEl = classification.usernameInput
+            const usernameInputEl = formClassification.usernameInput
             if (usernameInputEl) {
               log('found username input', usernameInputEl)
 

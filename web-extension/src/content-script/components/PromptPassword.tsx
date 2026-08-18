@@ -1,30 +1,179 @@
 import { h } from 'preact'
-import { authierColors } from '../../../../shared/chakraRawTheme'
-import { loginPrompt } from '../renderSaveCredentialsForm'
+import { useState } from 'preact/hooks'
+import type { ReactNode } from 'react'
+import browser from 'webextension-polyfill'
 
 import { ICapturedInput } from '../../background/backgroundPage'
-import debug from 'debug'
 import { trpc } from '../connectTRPC'
-import { useState } from 'preact/hooks'
+import { loginPrompt } from '../renderSaveCredentialsForm'
+import { authierOverlayBaseStyles } from './authierOverlayStyles'
 
-const log = debug('au:PromptPassword')
-
-//import { css } from '@emotion/css'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
-const escapeHtml = (unsafe: string) => {
-  return unsafe
-    .replaceAll('&', '&amp;')
-    .replaceAll('<', '&lt;')
-    .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;')
-    .replaceAll("'", '&#039;')
-}
+const savePromptStyles = `
+  ${authierOverlayBaseStyles}
 
-/**
- * a prompt alert for saving credentials to authier
- */
+  .authier-save-card {
+    background: #111827;
+    border: 1px solid #334155;
+    border-radius: 18px;
+    box-shadow: 0 20px 56px rgba(0, 0, 0, 0.44);
+    color: #f8fafc;
+    padding: 16px;
+    position: fixed;
+    right: 16px;
+    top: 16px;
+    width: min(380px, calc(100vw - 32px));
+  }
+
+  .authier-save-card__header {
+    align-items: flex-start;
+    display: flex;
+    gap: 12px;
+  }
+
+  .authier-save-card__mark {
+    align-items: center;
+    background: #0f73ff;
+    border-radius: 12px;
+    display: flex;
+    flex: 0 0 auto;
+    height: 38px;
+    object-fit: contain;
+    padding: 7px;
+    width: 38px;
+  }
+
+  .authier-save-card__title-group {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .authier-save-card__title {
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    line-height: 1.25;
+    margin: 0;
+  }
+
+  .authier-save-card__subtitle {
+    color: #94a3b8;
+    font-size: 12px;
+    margin: 3px 0 0;
+  }
+
+  .authier-save-card__credentials {
+    background: #1e293b;
+    border: 1px solid #334155;
+    border-radius: 12px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+
+  .authier-save-card__row {
+    align-items: center;
+    display: grid;
+    gap: 10px;
+    grid-template-columns: 70px minmax(0, 1fr) auto;
+    min-height: 42px;
+    padding: 8px 10px;
+  }
+
+  .authier-save-card__row + .authier-save-card__row {
+    border-top: 1px solid #334155;
+  }
+
+  .authier-save-card__label {
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .authier-save-card__value {
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .authier-save-card__value--password {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+      monospace;
+    letter-spacing: 0.04em;
+  }
+
+  .authier-save-card__reveal {
+    all: unset;
+    border-radius: 8px;
+    box-sizing: border-box;
+    color: #60a5fa;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 5px 7px;
+  }
+
+  .authier-save-card__reveal:hover {
+    background: #334155;
+    color: #bfdbfe;
+  }
+
+  .authier-save-card__reveal:focus-visible {
+    outline: 3px solid rgba(96, 165, 250, 0.45);
+    outline-offset: 1px;
+  }
+
+  .authier-save-card__actions {
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+    margin-top: 14px;
+  }
+
+  @media (max-width: 420px) {
+    .authier-save-card {
+      left: 12px;
+      right: 12px;
+      top: 12px;
+      width: auto;
+    }
+
+    .authier-save-card__actions {
+      flex-wrap: wrap;
+    }
+  }
+`
+
+const CredentialRow = ({
+  action,
+  label,
+  password,
+  value
+}: {
+  action?: ReactNode
+  label: string
+  password?: boolean
+  value: string
+}) => (
+  <div className="authier-save-card__row">
+    <span className="authier-save-card__label">{label}</span>
+    <span
+      className={`authier-save-card__value${
+        password ? ' authier-save-card__value--password' : ''
+      }`}
+      title={value}
+    >
+      {value}
+    </span>
+    {action ?? <span />}
+  </div>
+)
+
+/** A compact prompt for saving credentials to Authier. */
 export const PromptPassword = ({
   username,
   password,
@@ -37,117 +186,99 @@ export const PromptPassword = ({
     inputsUrl: string
   }
 }) => {
-  const h3Style = {
-    margin: 0,
-    fontFamily: 'sans-serif !important',
-    fontSize: '14px',
-    fontWeight: 'bold',
-    color: '#000'
-  }
+  const [isHidden, setIsHidden] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const usernameDisplay = username ?? 'Not captured'
 
-  const spanStyle = {
-    fontSize: '13px',
-    color: '#000',
-    marginRight: '8px'
-  }
-
-  const buttonStyle = (bgColor: string) => {
-    return {
-      backgroundColor: bgColor,
-      margin: '4px',
-      borderRadius: '8px',
-      fontSize: '13px',
-      fontWeight: '500',
-      height: '40px',
-      outline: 'none',
-      padding: '10px 16px',
-      borderDecoration: 'none'
-    }
-  }
   const addCredential = async (openInVault = false) => {
-    const loginCredential = {
+    await trpc.addLoginCredentials.mutate({
       capturedInputEvents: inputEvents.capturedInputEvents,
       openInVault,
       username,
       password
-    }
-
-    await trpc.addLoginCredentials.mutate(loginCredential)
+    })
   }
 
-  const removeCredential = async () => {
+  const saveCredential = async (openInVault = false) => {
+    setIsSaving(true)
+    await addCredential(openInVault)
+    loginPrompt?.remove()
+    setIsSaving(false)
+  }
+
+  const dismiss = async () => {
     loginPrompt?.remove()
     await trpc.hideLoginCredentialsModal.mutate()
   }
 
-  const [isHidden, setIsHidden] = useState(true)
-  const [isSaving, setIsSaving] = useState(false)
-  const usernameDisplay = username ?? 'Not captured'
   return (
-    <div
-      style={{
-        zIndex: '2147483647', // max z-index according to stackoverflow
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'baseline',
-        fontFamily: 'sans-serif !important',
-        width: '100%',
-        position: 'fixed',
-        padding: '8px',
-        backgroundColor: '#64cabd',
-        top: '0px',
-        left: '0px'
-      }}
-    >
-      <span style={{ fontWeight: '13px', color: 'black' }}>Username: </span>
-      <h3 style={h3Style}>{usernameDisplay}</h3>
-      <span style={spanStyle}>Password: </span>{' '}
-      <h3 style={h3Style}>
-        {isHidden ? password.replaceAll(/./g, '*') : password}
-      </h3>
-      <button
-        style={buttonStyle(authierColors.teal[100])}
-        onClick={() => {
-          setIsHidden(!isHidden)
-        }}
+    <>
+      <style>{savePromptStyles}</style>
+      <section
+        aria-label="Save login to Authier"
+        className="authier-save-card authier-surface"
+        role="dialog"
       >
-        {isHidden ? '👁️' : '❌'}
-      </button>
-      <div style={{ margin: '0 15px' }}>
-        <button
-          style={buttonStyle('#57c7e9')}
-          onClick={async () => {
-            setIsSaving(true)
-            await addCredential()
-            loginPrompt?.remove()
-            setIsSaving(false)
-          }}
-        >
-          {isSaving ? 'saving...' : 'save'}
-        </button>
-        <button
-          style={buttonStyle('#1EAE9B')}
-          onClick={async () => {
-            setIsSaving(true)
-            await addCredential(true)
-            loginPrompt?.remove()
-            setIsSaving(false)
-          }}
-        >
-          save & edit
-        </button>
-        <button
-          style={{
-            ...buttonStyle('#263734'),
-            color: 'white'
-          }}
-          onClick={() => {
-            removeCredential()
-          }}
-        >
-          close
-        </button>
-      </div>
-    </div>
+        <header className="authier-save-card__header">
+          <img
+            alt=""
+            className="authier-save-card__mark"
+            src={browser.runtime.getURL('icon-128.png')}
+          />
+          <div className="authier-save-card__title-group">
+            <h2 className="authier-save-card__title">Save this login?</h2>
+            <p className="authier-save-card__subtitle">
+              Keep these credentials in your Authier vault.
+            </p>
+          </div>
+          <button
+            aria-label="Dismiss save login prompt"
+            className="authier-icon-button"
+            onClick={dismiss}
+            type="button"
+          >
+            ✕
+          </button>
+        </header>
+
+        <div className="authier-save-card__credentials">
+          <CredentialRow label="Username" value={usernameDisplay} />
+          <CredentialRow
+            action={
+              <button
+                aria-label={isHidden ? 'Show password' : 'Hide password'}
+                className="authier-save-card__reveal"
+                onClick={() => setIsHidden((hidden) => !hidden)}
+                type="button"
+              >
+                {isHidden ? 'Show' : 'Hide'}
+              </button>
+            }
+            label="Password"
+            password
+            value={isHidden ? '•'.repeat(password.length) : password}
+          />
+        </div>
+
+        <div className="authier-save-card__actions">
+          <button
+            className="authier-button authier-button--secondary"
+            disabled={isSaving}
+            onClick={() => saveCredential(true)}
+            type="button"
+          >
+            Save &amp; edit
+          </button>
+          <button
+            className="authier-button authier-button--primary"
+            disabled={isSaving}
+            onClick={() => saveCredential()}
+            type="button"
+          >
+            {isSaving ? 'Saving…' : 'Save'}
+          </button>
+        </div>
+      </section>
+    </>
   )
 }

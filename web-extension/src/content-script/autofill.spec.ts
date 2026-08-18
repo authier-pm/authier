@@ -5,6 +5,7 @@ const renderSaveCredentialsForm = vi.fn().mockResolvedValue(undefined)
 const renderLoginCredOption = vi.fn()
 const renderPasswordGenerator = vi.fn()
 const notyfSuccess = vi.fn()
+const isElementVisibleInViewport = vi.fn(() => true)
 
 vi.mock('./renderSaveCredentialsForm', () => ({ renderSaveCredentialsForm }))
 vi.mock('./renderLoginCredOption', () => ({ renderLoginCredOption }))
@@ -32,7 +33,7 @@ vi.mock('./contentScript', () => ({
 }))
 // jsdom does no layout, so every element would read as invisible
 vi.mock('./isElementInViewport', () => ({
-  isElementVisibleInViewport: () => true,
+  isElementVisibleInViewport,
   isElementInViewport: () => true,
   isHidden: () => false
 }))
@@ -157,6 +158,8 @@ beforeEach(() => {
   renderPasswordGenerator.mockClear()
   renderSaveCredentialsForm.mockClear()
   notyfSuccess.mockClear()
+  isElementVisibleInViewport.mockReset()
+  isElementVisibleInViewport.mockReturnValue(true)
   vi.mocked(browser.storage.local.get).mockResolvedValue({})
   vi.mocked(browser.storage.local.set).mockResolvedValue(undefined)
 })
@@ -191,6 +194,75 @@ describe('autofill on a login page', () => {
     )
 
     await runAutofill()
+
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+  })
+
+  it('fills a password field inserted after the initial scan', async () => {
+    setPage(`<input type="text" name="search" />`, {
+      url: '/signin/challenge/pwd'
+    })
+
+    await runAutofill()
+
+    document.body.insertAdjacentHTML(
+      'beforeend',
+      `<form>
+        <input id="pw" type="password" autocomplete="current-password" />
+        <input id="show-pw" type="checkbox" />
+      </form>`
+    )
+    const { bodyInputChangeEmitter } = await import('./domMutationObserver')
+    bodyInputChangeEmitter.emit('inputAdded', inputById('pw'))
+    // The observer debounces a batch to its last input, which need not be the
+    // password field itself.
+    bodyInputChangeEmitter.emit('inputAdded', inputById('show-pw'))
+    await vi.advanceTimersByTimeAsync(600)
+
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+  })
+
+  it('refills a password field replaced during page hydration', async () => {
+    setPage(
+      `<form>
+        <input id="pw" type="password" autocomplete="current-password" />
+      </form>`,
+      { url: '/signin/challenge/pwd' }
+    )
+
+    await runAutofill()
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+
+    document.querySelector('form')?.replaceChildren()
+    document
+      .querySelector('form')
+      ?.insertAdjacentHTML(
+        'beforeend',
+        `<input id="replacement-pw" type="password" autocomplete="current-password" />`
+      )
+    const { bodyInputChangeEmitter } = await import('./domMutationObserver')
+    bodyInputChangeEmitter.emit('inputAdded', inputById('replacement-pw'))
+    await vi.advanceTimersByTimeAsync(600)
+
+    expect(inputById('replacement-pw').value).toBe(STORED_PASSWORD)
+  })
+
+  it('retries a password field that was not visible on the first attempt', async () => {
+    setPage(
+      `<form>
+        <input id="pw" type="password" autocomplete="current-password" />
+      </form>`,
+      { url: '/signin/challenge/pwd' }
+    )
+    isElementVisibleInViewport.mockReturnValue(false)
+
+    await runAutofill()
+    expect(inputById('pw').value).toBe('')
+
+    isElementVisibleInViewport.mockReturnValue(true)
+    const { bodyInputChangeEmitter } = await import('./domMutationObserver')
+    bodyInputChangeEmitter.emit('inputAdded', inputById('pw'))
+    await vi.advanceTimersByTimeAsync(600)
 
     expect(inputById('pw').value).toBe(STORED_PASSWORD)
   })

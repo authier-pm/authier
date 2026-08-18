@@ -1,119 +1,208 @@
 import { h } from 'preact'
+import { useEffect, useState } from 'preact/hooks'
+import browser from 'webextension-polyfill'
 
-import { useState } from 'preact/hooks'
-//import { css } from '@emotion/css'
+import {
+  fillGeneratedPasswordIntoInput,
+  generatePasswordBasedOnUserConfig,
+  handleGeneratedPasswordAutofill,
+  resolveLiveGeneratedPasswordInput
+} from '../autofill'
+import { removePasswordGenerator } from '../renderPasswordGenerator'
+
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
-import './Option.css'
-import { generatorDiv } from '../renderPasswordGenerator'
-import {
-  autofillValueIntoInput,
-  generatePasswordBasedOnUserConfig,
-  handleGeneratedPasswordAutofill
-} from '../autofill'
+
+const TRIGGER_SIZE = 36
+const FIELD_INSET = 6
+const VIEWPORT_INSET = 8
+const POPOVER_HEIGHT = 174
+
+type GeneratorPosition = {
+  left: number
+  openAbove: boolean
+  top: number
+}
+
+const clamp = (value: number, min: number, max: number) =>
+  Math.min(Math.max(value, min), max)
+
+const getGeneratorPosition = (input: HTMLInputElement): GeneratorPosition => {
+  const rect = input.getBoundingClientRect()
+  const maxLeft = Math.max(
+    VIEWPORT_INSET,
+    window.innerWidth - TRIGGER_SIZE - VIEWPORT_INSET
+  )
+  const maxTop = Math.max(
+    VIEWPORT_INSET,
+    window.innerHeight - TRIGGER_SIZE - VIEWPORT_INSET
+  )
+
+  return {
+    left: clamp(
+      rect.right - TRIGGER_SIZE - FIELD_INSET,
+      VIEWPORT_INSET,
+      maxLeft
+    ),
+    openAbove:
+      rect.bottom + POPOVER_HEIGHT > window.innerHeight &&
+      rect.top > POPOVER_HEIGHT,
+    top: clamp(
+      rect.top + (rect.height - TRIGGER_SIZE) / 2,
+      VIEWPORT_INSET,
+      maxTop
+    )
+  }
+}
+
+const didPositionChange = (
+  current: GeneratorPosition,
+  next: GeneratorPosition
+) =>
+  current.left !== next.left ||
+  current.openAbove !== next.openAbove ||
+  current.top !== next.top
 
 export const PromptPasswordGenerator = ({
   input
 }: {
   input: HTMLInputElement
 }) => {
-  if (!input) {
-    console.log('No web inputs in PromptPasswordOption')
-    return null
-  }
-  const [pos, setPos] = useState(input.getBoundingClientRect())
+  const [position, setPosition] = useState(getGeneratorPosition(input))
   const [showDropdown, setShowDropdown] = useState(false)
   const [password, setPassword] = useState(generatePasswordBasedOnUserConfig())
+  const [fillError, setFillError] = useState<string | null>(null)
+  const [isFilling, setIsFilling] = useState(false)
 
-  let resizeTimer: ReturnType<typeof setTimeout> | undefined
-  window.onresize = function () {
-    if (generatorDiv) {
-      generatorDiv.remove()
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(function () {
-        setPos(input.getBoundingClientRect())
-        document.body.appendChild(generatorDiv!)
-      }, 100)
+  useEffect(() => {
+    let frameId: number | null = null
+
+    const updatePosition = () => {
+      frameId = null
+      const currentInput = resolveLiveGeneratedPasswordInput(input)
+      if (!currentInput) {
+        return
+      }
+
+      const nextPosition = getGeneratorPosition(currentInput)
+      setPosition((currentPosition) => {
+        if (didPositionChange(currentPosition, nextPosition)) {
+          return nextPosition
+        }
+        return currentPosition
+      })
     }
+
+    const queuePositionUpdate = () => {
+      if (frameId !== null) {
+        return
+      }
+      frameId = window.requestAnimationFrame(updatePosition)
+    }
+
+    const mutationObserver = new MutationObserver(queuePositionUpdate)
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true
+    })
+    window.addEventListener('resize', queuePositionUpdate)
+    window.addEventListener('scroll', queuePositionUpdate, true)
+    queuePositionUpdate()
+
+    return () => {
+      if (frameId !== null) {
+        window.cancelAnimationFrame(frameId)
+      }
+      mutationObserver.disconnect()
+      window.removeEventListener('resize', queuePositionUpdate)
+      window.removeEventListener('scroll', queuePositionUpdate, true)
+    }
+  }, [input])
+
+  const generateNextPassword = () => {
+    setPassword(generatePasswordBasedOnUserConfig())
+    setFillError(null)
   }
-  if (!pos) {
-    console.log('No pos in PromptPasswordOption')
-    return null
+
+  const fillPassword = async () => {
+    setIsFilling(true)
+    setFillError(null)
+
+    const filledInput = await fillGeneratedPasswordIntoInput(input, password)
+    if (!filledInput) {
+      setIsFilling(false)
+      setFillError('Could not fill this password field. Please try again.')
+      setShowDropdown(true)
+      return
+    }
+
+    await handleGeneratedPasswordAutofill(password, {
+      passwordInput: filledInput,
+      showSavePrompt: true
+    })
+    removePasswordGenerator()
   }
+
+  const popoverPositionClass = position.openAbove
+    ? 'authier-generator__popover--above'
+    : 'authier-generator__popover--below'
 
   return (
     <div
+      className="authier-generator authier-surface"
       onMouseEnter={() => setShowDropdown(true)}
       onMouseLeave={() => setShowDropdown(false)}
       style={{
-        zIndex: '2147483647', // max z-index according to stackoverflow
-        justifyContent: 'center',
-        alignItems: 'baseline',
-        fontFamily: 'sans-serif !important',
-        position: 'fixed',
-        top: (pos.top as number) - 10 + 'px',
-        left: pos.left + pos.width + 'px',
-        right: pos.right + 'px',
-        bottom: pos.bottom + 'px'
+        left: `${position.left}px`,
+        top: `${position.top}px`
       }}
     >
-      <span
-        style={{
-          height: '25px',
-          width: '25px',
-          backgroundColor: '#3e8e41',
-          display: 'block'
-        }}
-      ></span>
+      <button
+        aria-expanded={showDropdown}
+        aria-label="Open Authier password generator"
+        className="authier-generator__trigger"
+        onClick={() => setShowDropdown(true)}
+        title="Generate a secure password"
+        type="button"
+      >
+        <img
+          alt=""
+          className="authier-generator__logo"
+          src={browser.runtime.getURL('icon-128.png')}
+        />
+      </button>
 
       <div
-        style={{
-          display: showDropdown ? 'flex' : 'none',
-          justifyContent: 'space-between',
-          flexDirection: 'row',
-          position: 'absolute',
-          backgroundColor: 'white',
-          minWidth: '160px',
-          zIndex: '1',
-          boxShadow: '0px 8px 16px 0px rgba(0,0,0,0.2)'
-          /*background: url('./icon-16.png');*/
-        }}
+        aria-label="Authier password generator"
+        className={`authier-generator__popover ${popoverPositionClass}`}
+        hidden={!showDropdown}
+        role="dialog"
       >
-        <a
-          style={{
-            textDecoration: 'none',
-            color: 'black',
-            padding: '12px 16px'
-          }}
-        >
-          {password}
-        </a>
-        <div
-          style={{
-            display: 'flex',
-            flexDirection: 'column'
-          }}
-        >
+        <p className="authier-generator__eyebrow">Suggested password</p>
+        <code className="authier-generator__password">{password}</code>
+        <div className="authier-generator__actions">
           <button
-            onClick={async () => {
-              setPassword(generatePasswordBasedOnUserConfig())
-            }}
+            className="authier-button authier-button--secondary"
+            disabled={isFilling}
+            onClick={generateNextPassword}
+            type="button"
           >
             Next
           </button>
           <button
-            onClick={async () => {
-              autofillValueIntoInput(input, password)
-              // the user opted in, so record it in history and offer to save it
-              await handleGeneratedPasswordAutofill(password, {
-                showSavePrompt: true
-              })
-              generatorDiv?.remove()
-            }}
+            className="authier-button authier-button--primary"
+            disabled={isFilling}
+            onClick={fillPassword}
+            type="button"
           >
-            Use
+            {isFilling ? 'Filling…' : 'Fill'}
           </button>
         </div>
+        {fillError ? (
+          <p aria-live="polite" className="authier-generator__error">
+            {fillError}
+          </p>
+        ) : null}
       </div>
     </div>
   )
