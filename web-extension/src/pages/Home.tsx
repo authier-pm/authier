@@ -101,7 +101,7 @@ export const Home = () => {
         ) : null}
       </div>
 
-      <div className="mt-2 h-[300px] w-[350px] px-1">
+      <div className="mt-2 h-[300px] w-full px-1">
         <div className="grid gap-3 pb-5">
           <AuthsList filterByTLD={filterByTLD} search={search} />
         </div>
