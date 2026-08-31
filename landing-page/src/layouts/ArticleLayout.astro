@@ -14,6 +14,7 @@ interface Props {
   eyebrow?: string
   schemaType?: 'Article' | 'TechArticle'
   extraSchema?: readonly Record<string, unknown>[]
+  imagePaths?: readonly string[]
 }
 
 const {
@@ -26,8 +27,13 @@ const {
   collectionLabel = 'Blog',
   eyebrow = 'Authier journal',
   schemaType = 'Article',
-  extraSchema
+  extraSchema,
+  imagePaths = []
 } = Astro.props
+
+const articleImages = imagePaths.map((imagePath) =>
+  new URL(imagePath, site.url).href
+)
 
 const articleSchema = {
   '@context': 'https://schema.org',
@@ -49,7 +55,8 @@ const articleSchema = {
       '@type': 'ImageObject',
       url: `${site.url}/brand/authier-logo.png`
     }
-  }
+  },
+  image: articleImages.length > 0 ? articleImages : undefined
 }
 
 const schema = [articleSchema, ...(extraSchema ?? [])]
@@ -190,6 +197,67 @@ const schema = [articleSchema, ...(extraSchema ?? [])]
 
   .article-body :global(.article-callout p:last-child) {
     margin-bottom: 0;
+  }
+
+  .article-body :global(.product-ui-gallery) {
+    position: relative;
+    left: 50%;
+    display: grid;
+    width: min(1040px, calc(100vw - 40px));
+    gap: 28px;
+    margin: 36px 0 46px;
+    transform: translateX(-50%);
+  }
+
+  .article-body :global(.product-ui-shot) {
+    overflow: hidden;
+    margin: 0;
+    border: 1px solid var(--border-strong);
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .article-body :global(.product-ui-image-frame) {
+    display: block;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border);
+    background: #0d1515;
+  }
+
+  .article-body :global(.product-ui-shot img) {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1162 / 646;
+    object-fit: cover;
+    transition: transform 280ms ease;
+  }
+
+  .article-body :global(.product-ui-shot:hover img) {
+    transform: scale(1.008);
+  }
+
+  .article-body :global(.product-ui-shot figcaption) {
+    padding: 16px 20px 18px;
+    color: var(--text-subtle);
+    font-size: 0.78rem;
+    line-height: 1.65;
+  }
+
+  .article-body :global(.product-ui-shot figcaption strong) {
+    color: var(--text-muted);
+  }
+
+  .article-body :global(.comparison-disclosure) {
+    color: var(--text-subtle);
+    font-size: 0.78rem;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .article-body :global(.product-ui-shot img) {
+      transition: none;
+    }
   }
 
   @media (max-width: 700px) {

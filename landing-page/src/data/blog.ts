@@ -12,7 +12,7 @@ export const blogPosts = [
   {
     title: 'Authier vs Bitwarden: an honest comparison',
     description:
-      'A practical comparison of two open-source password managers, including device approval, maturity, audits, encryption, and who each project suits.',
+      'A practical Authier vs Bitwarden comparison with UI screenshots, covering device approval, maturity, audits, encryption, and who each password manager suits.',
     href: '/blog/authier-vs-bitwarden',
     publishedAt: '2023-02-23',
     updatedAt: '2026-08-31',
