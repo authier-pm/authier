@@ -1,0 +1,52 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "status",
+    "slug",
+    "title",
+    "description",
+    "readingTime",
+    "summary",
+    "articleBody",
+    "coveredFeatures",
+    "excludedChanges"
+  ],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["generated", "no_publishable_changes"]
+    },
+    "slug": {
+      "type": "string"
+    },
+    "title": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "readingTime": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "articleBody": {
+      "type": "string"
+    },
+    "coveredFeatures": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "excludedChanges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

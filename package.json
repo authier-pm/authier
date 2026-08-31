@@ -49,6 +49,8 @@
     "dev:be:local": "cd backend && pnpm run local",
     "dev:ex": "cd web-extension && pnpm run dev",
     "dev:landing": "cd landing-page && pnpm run dev",
+    "article:new": "bun run landing-page/scripts/generateFeatureArticle.ts",
+    "article:new:dry": "bun run landing-page/scripts/generateFeatureArticle.ts --dry-run",
     "dev:vault-fe": "cd vault-web && pnpm run dev",
     "dev:vault": "turbo run local --filter=authier-backend --filter=authier-vault-web",
     "dev": "turbo run dev --filter=authier-backend --filter=authier-web-extension",
