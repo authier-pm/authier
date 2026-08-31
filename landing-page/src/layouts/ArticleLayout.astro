@@ -1,0 +1,175 @@
+---
+import BaseLayout from './BaseLayout.astro'
+import Breadcrumbs from '../components/Breadcrumbs.astro'
+import { site } from '../config'
+
+interface Props {
+  title: string
+  description: string
+  publishedAt: string
+  updatedAt?: string
+  readingTime: string
+}
+
+const { title, description, publishedAt, updatedAt = publishedAt, readingTime } = Astro.props
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: publishedAt,
+  dateModified: updatedAt,
+  mainEntityOfPage: Astro.url.href,
+  author: {
+    '@type': 'Organization',
+    name: 'Authier contributors',
+    url: site.githubUrl
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: site.name,
+    logo: {
+      '@type': 'ImageObject',
+      url: `${site.url}/brand/authier-logo.png`
+    }
+  }
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <article>
+    <header class="article-header narrow-shell">
+      <Breadcrumbs
+        items={[
+          { label: 'Home', href: '/' },
+          { label: 'Blog', href: '/blog' },
+          { label: title }
+        ]}
+      />
+      <p class="eyebrow">Authier journal</p>
+      <h1>{title}</h1>
+      <p class="dek">{description}</p>
+      <div class="article-meta">
+        <time datetime={publishedAt}>
+          {new Intl.DateTimeFormat('en', {
+            dateStyle: 'long',
+            timeZone: 'UTC'
+          }).format(new Date(publishedAt))}
+        </time>
+        <span>·</span>
+        <span>{readingTime}</span>
+      </div>
+    </header>
+    <div class="article-body narrow-shell">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
+
+<style>
+  article {
+    padding: 86px 0 40px;
+  }
+
+  .article-header {
+    padding-bottom: 50px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(3rem, 7vw, 5.8rem);
+    font-weight: 670;
+    letter-spacing: -0.068em;
+    line-height: 0.99;
+    text-wrap: balance;
+  }
+
+  .dek {
+    max-width: 700px;
+    margin: 26px 0 0;
+    color: var(--text-muted);
+    font-size: clamp(1.05rem, 2vw, 1.24rem);
+    line-height: 1.7;
+  }
+
+  .article-meta {
+    display: flex;
+    gap: 9px;
+    margin-top: 24px;
+    color: var(--text-subtle);
+    font-size: 0.78rem;
+  }
+
+  .article-body {
+    padding-top: 54px;
+    padding-bottom: 70px;
+    color: #c3cecb;
+  }
+
+  .article-body :global(h2) {
+    margin: 58px 0 18px;
+    color: var(--text);
+    font-size: clamp(1.8rem, 4vw, 2.7rem);
+    font-weight: 660;
+    letter-spacing: -0.045em;
+    line-height: 1.15;
+  }
+
+  .article-body :global(h3) {
+    margin: 38px 0 14px;
+    color: var(--text);
+    font-size: 1.25rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  .article-body :global(p),
+  .article-body :global(li) {
+    font-size: 1rem;
+    line-height: 1.85;
+  }
+
+  .article-body :global(p) {
+    margin: 0 0 24px;
+  }
+
+  .article-body :global(ul),
+  .article-body :global(ol) {
+    display: grid;
+    gap: 9px;
+    margin: 0 0 28px;
+    padding-left: 22px;
+  }
+
+  .article-body :global(a) {
+    color: var(--accent);
+    text-underline-offset: 4px;
+  }
+
+  .article-body :global(blockquote) {
+    margin: 34px 0;
+    padding: 4px 0 4px 24px;
+    border-left: 2px solid var(--accent);
+    color: var(--text-muted);
+  }
+
+  .article-body :global(.article-callout) {
+    margin: 34px 0;
+    padding: 22px 24px;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    background: rgba(105, 230, 204, 0.045);
+  }
+
+  .article-body :global(.article-callout p:last-child) {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 700px) {
+    article {
+      padding-top: 62px;
+    }
+  }
+</style>

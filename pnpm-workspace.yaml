@@ -1,11 +1,13 @@
 packages:
   - 'backend/**'
+  - 'landing-page/**'
   - 'mobile-app/**'
   - 'shared'
   - 'vault-web/**'
   - 'web-extension/**'
   # if required, exclude some directories
   - '!backend/dist/**'
+  - '!landing-page/dist/**'
   - '!vault-web/dist/**'
   - '!web-extension/dist/**'
 

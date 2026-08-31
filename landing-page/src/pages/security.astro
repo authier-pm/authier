@@ -1,0 +1,375 @@
+---
+import CtaBand from '../components/CtaBand.astro'
+import Icon from '../components/Icon.astro'
+import PageHero from '../components/PageHero.astro'
+import { site } from '../config'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Security Architecture'
+const description =
+  'Read how Authier encrypts vault data in the browser, derives keys, approves new devices, and communicates current security limitations.'
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'TechArticle',
+  headline: 'Authier security architecture',
+  description,
+  url: `${site.url}/security`,
+  author: {
+    '@type': 'Organization',
+    name: 'Authier contributors',
+    url: site.githubUrl
+  },
+  proficiencyLevel: 'Intermediate'
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Security architecture"
+    title="Security claims you can inspect."
+    description="Authier encrypts vault contents before they leave your browser and puts approved devices into the decision about who may join your account. This page explains both the design and its limits."
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Security' }
+    ]}
+  >
+    <div class="hero-links">
+      <a class="button" href={`${site.githubUrl}/blob/main/SECURITY.md`} target="_blank" rel="noreferrer">
+        Vulnerability policy
+        <Icon name="arrow" size={18} />
+      </a>
+      <a class="button button-secondary" href={`${site.githubUrl}/tree/main/shared`} target="_blank" rel="noreferrer">
+        Inspect cryptography code
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section shell">
+    <div class="architecture-grid">
+      <div class="architecture-copy">
+        <p class="eyebrow">Encryption flow</p>
+        <h2 class="section-heading">Plaintext stays on the client.</h2>
+        <p class="section-copy">
+          Your master password is used locally to derive an encryption key. Vault
+          items are encrypted before synchronization, so the API stores encrypted
+          payloads rather than readable credentials or TOTP seeds.
+        </p>
+      </div>
+
+      <ol class="architecture-steps">
+        <li>
+          <span>01</span>
+          <div>
+            <h3>Key derivation</h3>
+            <p>PBKDF2 with SHA-512 and 600,000 iterations derives a key from the master password and a per-account salt.</p>
+          </div>
+        </li>
+        <li>
+          <span>02</span>
+          <div>
+            <h3>Authenticated encryption</h3>
+            <p>AES-256-GCM encrypts vault items with a fresh initialization vector before they are sent to the API.</p>
+          </div>
+        </li>
+        <li>
+          <span>03</span>
+          <div>
+            <h3>Encrypted synchronization</h3>
+            <p>The server stores and synchronizes ciphertext. Approved clients decrypt it locally after the vault is unlocked.</p>
+          </div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell">
+      <p class="eyebrow">Device-aware access</p>
+      <h2 class="section-heading">A new device starts outside the vault.</h2>
+      <p class="section-copy">
+        Knowing an account email and master password is not intended to be enough
+        to silently enroll an unfamiliar client. The device must request access,
+        and an approved device reviews that request.
+      </p>
+
+      <div class="device-flow card" aria-label="Three-step new-device approval flow">
+        <article>
+          <span class="flow-icon neutral"><Icon name="device" size={23} /></span>
+          <small>STEP 1</small>
+          <h3>New browser requests access</h3>
+          <p>The browser creates its identity and starts a pending challenge.</p>
+        </article>
+        <i aria-hidden="true"><span></span></i>
+        <article>
+          <span class="flow-icon warm"><Icon name="lock" size={23} /></span>
+          <small>STEP 2</small>
+          <h3>Trusted device reviews it</h3>
+          <p>An existing approved device can accept or reject the new login.</p>
+        </article>
+        <i aria-hidden="true"><span></span></i>
+        <article>
+          <span class="flow-icon approved"><Icon name="check" size={23} /></span>
+          <small>STEP 3</small>
+          <h3>Encrypted vault becomes available</h3>
+          <p>Only after approval does the client complete enrollment and sync.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell transparency-grid">
+      <div>
+        <p class="eyebrow">Transparent limitations</p>
+        <h2 class="section-heading">Open source is evidence—not an audit.</h2>
+      </div>
+      <div class="transparency-copy">
+        <p>
+          Authier has not yet published an independent third-party security audit.
+          The project is actively developed and has a much shorter operational
+          history than established password managers.
+        </p>
+        <p>
+          For accounts with an unusually high impact—such as banking,
+          cryptocurrency custody, or administrative access—you should evaluate
+          that maturity gap as part of your own threat model.
+        </p>
+        <p>
+          The source is public so researchers can inspect the implementation and
+          report vulnerabilities responsibly. No software can promise absolute
+          security.
+        </p>
+      </div>
+    </div>
+
+    <div class="shell principles-grid">
+      <article class="page-card">
+        <div class="icon-box"><Icon name="code" size={22} /></div>
+        <h3>Public implementation</h3>
+        <p>Application and server code, history, tests, and issues are available in the public repository.</p>
+      </article>
+      <article class="page-card">
+        <div class="icon-box"><Icon name="device" size={22} /></div>
+        <h3>Revocable devices</h3>
+        <p>Review devices connected to the account and remove access when a device is lost or retired.</p>
+      </article>
+      <article class="page-card">
+        <div class="icon-box"><Icon name="lock" size={22} /></div>
+        <h3>Responsible disclosure</h3>
+        <p>Security researchers can follow the published disclosure process and use the project PGP key.</p>
+      </article>
+    </div>
+  </section>
+
+  <CtaBand
+    eyebrow="Evaluate it yourself"
+    title="Read the code before you trust the claims."
+    description="Authier is developed in public under the GNU Affero General Public License."
+    primaryLabel="View source on GitHub"
+    primaryHref={site.githubUrl}
+    secondaryLabel="Read product features"
+    secondaryHref="/features"
+  />
+</BaseLayout>
+
+<style>
+  .hero-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+  }
+
+  .architecture-grid {
+    display: grid;
+    align-items: start;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(60px, 9vw, 120px);
+  }
+
+  .architecture-steps {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .architecture-steps li {
+    display: grid;
+    padding: 28px 0;
+    grid-template-columns: 52px 1fr;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .architecture-steps li:first-child {
+    padding-top: 0;
+  }
+
+  .architecture-steps > li > span {
+    padding-top: 4px;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.67rem;
+  }
+
+  .architecture-steps h3 {
+    margin: 0;
+    font-size: 1.08rem;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+  }
+
+  .architecture-steps p {
+    margin: 9px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.9rem;
+    line-height: 1.72;
+  }
+
+  .device-flow {
+    display: grid;
+    align-items: center;
+    margin-top: 60px;
+    padding: clamp(24px, 5vw, 52px);
+    grid-template-columns: 1fr 70px 1fr 70px 1fr;
+    gap: 10px;
+  }
+
+  .device-flow article {
+    min-height: 220px;
+  }
+
+  .flow-icon {
+    display: grid;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 28px;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 13px;
+    background: var(--surface-raised);
+    color: var(--text-muted);
+  }
+
+  .flow-icon.warm {
+    border-color: rgba(255, 200, 87, 0.2);
+    background: rgba(255, 200, 87, 0.07);
+    color: var(--warm);
+  }
+
+  .flow-icon.approved {
+    border-color: rgba(105, 230, 204, 0.2);
+    background: rgba(105, 230, 204, 0.07);
+    color: var(--accent);
+  }
+
+  .device-flow small {
+    color: var(--text-subtle);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.13em;
+  }
+
+  .device-flow h3 {
+    margin: 10px 0 0;
+    font-size: 1rem;
+    font-weight: 640;
+    letter-spacing: -0.02em;
+  }
+
+  .device-flow p {
+    margin: 10px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.82rem;
+    line-height: 1.7;
+  }
+
+  .device-flow > i {
+    position: relative;
+    height: 1px;
+    overflow: hidden;
+    background: #2b3734;
+  }
+
+  .device-flow > i span {
+    position: absolute;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+    animation: security-flow 2s linear infinite;
+  }
+
+  .transparency-grid {
+    display: grid;
+    grid-template-columns: 1fr 0.8fr;
+    gap: 70px;
+  }
+
+  .transparency-copy {
+    color: var(--text-muted);
+  }
+
+  .transparency-copy p {
+    margin: 0 0 20px;
+    line-height: 1.78;
+  }
+
+  .principles-grid {
+    display: grid;
+    margin-top: 64px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  @keyframes security-flow {
+    from { left: -20px; }
+    to { left: 100%; }
+  }
+
+  @media (max-width: 900px) {
+    .architecture-grid,
+    .transparency-grid {
+      grid-template-columns: 1fr;
+      gap: 45px;
+    }
+
+    .device-flow {
+      grid-template-columns: 1fr;
+    }
+
+    .device-flow article {
+      min-height: auto;
+    }
+
+    .device-flow > i {
+      width: 1px;
+      height: 38px;
+      margin-left: 23px;
+    }
+
+    .device-flow > i span {
+      width: 1px;
+      height: 14px;
+      animation-name: security-flow-vertical;
+    }
+  }
+
+  @media (max-width: 700px) {
+    .hero-links {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .principles-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @keyframes security-flow-vertical {
+    from { top: -14px; }
+    to { top: 100%; }
+  }
+</style>

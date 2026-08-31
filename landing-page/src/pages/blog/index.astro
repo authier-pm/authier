@@ -1,0 +1,148 @@
+---
+import Icon from '../../components/Icon.astro'
+import PageHero from '../../components/PageHero.astro'
+import { site } from '../../config'
+import { blogPosts } from '../../data/blog'
+import BaseLayout from '../../layouts/BaseLayout.astro'
+
+const title = 'Password Manager Blog'
+const description =
+  'Read Authier articles about password security, trusted devices, open-source development, TOTP authentication, and password manager comparisons.'
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'CollectionPage',
+  name: 'Authier password manager blog',
+  description,
+  url: `${site.url}/blog`,
+  hasPart: blogPosts.map((post) => ({
+    '@type': 'Article',
+    headline: post.title,
+    description: post.description,
+    url: `${site.url}${post.href}`,
+    datePublished: post.publishedAt,
+    dateModified: post.updatedAt
+  }))
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Authier journal"
+    title="Security notes from an open project."
+    description={description}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Blog' }
+    ]}
+    compact
+  />
+
+  <section class="section shell posts">
+    {blogPosts.map((post, index) => (
+      <article class:list={['post-card', 'card', { featured: index === 0 }]}>
+        <div class="post-meta">
+          <span>{post.category}</span>
+          <time datetime={post.updatedAt}>
+            {new Intl.DateTimeFormat('en', {
+              month: 'short',
+              day: 'numeric',
+              year: 'numeric',
+              timeZone: 'UTC'
+            }).format(new Date(post.updatedAt))}
+          </time>
+        </div>
+        <h2><a href={post.href}>{post.title}</a></h2>
+        <p>{post.description}</p>
+        <a class="read-link" href={post.href}>
+          Read article
+          <Icon name="arrow" size={18} />
+        </a>
+      </article>
+    ))}
+  </section>
+</BaseLayout>
+
+<style>
+  .posts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .post-card {
+    display: flex;
+    min-height: 390px;
+    padding: clamp(28px, 4vw, 46px);
+    flex-direction: column;
+  }
+
+  .post-card.featured {
+    background:
+      radial-gradient(circle at 90% 5%, rgba(105, 230, 204, 0.11), transparent 34%),
+      linear-gradient(145deg, rgba(18, 25, 25, 0.88), rgba(10, 15, 15, 0.78));
+  }
+
+  .post-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    color: var(--text-subtle);
+    font-size: 0.66rem;
+    font-weight: 680;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .post-meta span {
+    color: var(--accent);
+  }
+
+  h2 {
+    max-width: 520px;
+    margin: 62px 0 0;
+    font-size: clamp(1.8rem, 4vw, 3.1rem);
+    font-weight: 660;
+    letter-spacing: -0.055em;
+    line-height: 1.05;
+  }
+
+  h2 a {
+    text-decoration: none;
+  }
+
+  h2 a:hover {
+    color: var(--accent);
+  }
+
+  .post-card > p {
+    max-width: 560px;
+    margin: 20px 0 0;
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    line-height: 1.72;
+  }
+
+  .read-link {
+    display: inline-flex;
+    align-items: center;
+    align-self: start;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 35px;
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 680;
+    text-decoration: none;
+  }
+
+  @media (max-width: 780px) {
+    .posts {
+      grid-template-columns: 1fr;
+    }
+
+    .post-card {
+      min-height: 350px;
+    }
+  }
+</style>

@@ -1,0 +1,21 @@
+{
+  "name": "authier-landing-page",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "astro dev --host 0.0.0.0 --port 4321",
+    "build": "astro check && astro build",
+    "check:seo": "bun run scripts/checkSeo.ts",
+    "preview": "astro preview --host 0.0.0.0 --port 4321",
+    "typecheck": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.9"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.6",
+    "typescript": "^6.0.3"
+  }
+}

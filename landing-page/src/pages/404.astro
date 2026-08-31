@@ -1,0 +1,63 @@
+---
+import Icon from '../components/Icon.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+---
+
+<BaseLayout
+  title="Page not found"
+  description="The requested Authier page could not be found."
+  noindex
+>
+  <section class="not-found shell">
+    <p class="error-code">404 · VAULT ITEM NOT FOUND</p>
+    <h1>This key does not fit any page.</h1>
+    <p>The address may have changed, or the page may no longer exist.</p>
+    <div>
+      <a class="button" href="/">
+        Back to Authier
+        <Icon name="arrow" size={18} />
+      </a>
+      <a class="button button-secondary" href="/download">Download Authier</a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    display: grid;
+    min-height: 72vh;
+    align-content: center;
+    justify-items: start;
+    padding-block: 80px;
+  }
+
+  .error-code {
+    margin: 0 0 22px;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.11em;
+  }
+
+  h1 {
+    max-width: 800px;
+    margin: 0;
+    font-size: clamp(3rem, 8vw, 6.5rem);
+    font-weight: 670;
+    letter-spacing: -0.07em;
+    line-height: 0.98;
+  }
+
+  .not-found > p:nth-of-type(2) {
+    margin: 28px 0 0;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .not-found > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+  }
+</style>

@@ -1,0 +1,185 @@
+---
+import PageHero from '../components/PageHero.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Privacy Policy'
+const description =
+  'Authier privacy policy covering the public website, account data, encrypted vault content, payments, technical data, retention, and privacy rights.'
+---
+
+<BaseLayout title={title} description={description}>
+  <PageHero
+    eyebrow="Privacy"
+    title="Privacy policy"
+    description="How Authier handles data across this public website and the password manager service. Last updated 31 August 2026."
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Privacy policy' }
+    ]}
+    compact
+  />
+
+  <article class="section narrow-shell policy">
+    <p>
+      This policy explains how Authier (“we”, “us”, or “the service”) handles
+      information when you visit <strong>authier.pm</strong> or use Authier’s
+      applications, browser extensions, web vault, and related services.
+    </p>
+
+    <h2>1. The public website</h2>
+
+    <p>
+      The public marketing website does not use advertising trackers or
+      behavioral analytics. It does not set its own analytics cookies. Cloudflare,
+      which hosts and protects the website, may process request data such as IP
+      addresses, browser information, timestamps, and security signals to deliver
+      the site and prevent abuse.
+    </p>
+
+    <h2>2. Information used to provide Authier</h2>
+
+    <p>Depending on the feature you use, Authier may process:</p>
+
+    <ul>
+      <li><strong>Account information</strong>, such as your email address and account identifiers.</li>
+      <li><strong>Encrypted vault payloads</strong>, containing credentials or TOTP data encrypted by your client before synchronization.</li>
+      <li><strong>Device and security information</strong>, such as device identifiers, platform, approval state, recent IP address, approximate location derived from network data, and security-event timestamps.</li>
+      <li><strong>Subscription information</strong>, such as the product selected, subscription state, and Stripe customer or checkout identifiers. Authier does not receive full payment-card numbers.</li>
+      <li><strong>Support and diagnostic information</strong> that you submit or that applications generate when something fails.</li>
+    </ul>
+
+    <h2>3. Vault encryption</h2>
+
+    <p>
+      Authier clients encrypt vault items before they are sent to the API. The
+      service stores encrypted payloads for synchronization. Your master password
+      is used locally to derive an encryption key and is not sent to the Authier
+      API as plaintext.
+    </p>
+
+    <p>
+      Encryption reduces what the service can learn from stored vault content, but
+      it does not make all account or network metadata invisible. Device records,
+      account identifiers, billing status, and operational logs may still be
+      processed as described in this policy.
+    </p>
+
+    <h2>4. Why information is processed</h2>
+
+    <p>We use information to:</p>
+
+    <ul>
+      <li>create and operate accounts;</li>
+      <li>synchronize encrypted vault data;</li>
+      <li>authenticate users and approve, manage, or remove devices;</li>
+      <li>process subscriptions and provide billing support;</li>
+      <li>detect abuse, investigate security events, and protect the service;</li>
+      <li>diagnose failures and improve reliability; and</li>
+      <li>comply with legal obligations and respond to valid legal requests.</li>
+    </ul>
+
+    <h2>5. Service providers</h2>
+
+    <p>
+      Authier relies on infrastructure and specialist providers where necessary to
+      operate the service. These may include Cloudflare for hosting and network
+      security, Stripe for subscription payments, Firebase for device
+      notifications, and error-monitoring or email-delivery providers. Those
+      providers process data under their own terms and privacy commitments.
+    </p>
+
+    <p>
+      We do not sell personal information and do not use vault content for
+      advertising.
+    </p>
+
+    <h2>6. Retention</h2>
+
+    <p>
+      Account information and encrypted vault data are retained while an account
+      is active and as needed to provide the service. Billing and transaction
+      records may be kept for legal, accounting, and fraud-prevention obligations.
+      Security and operational logs are retained only for as long as reasonably
+      needed for reliability, abuse prevention, and incident investigation.
+    </p>
+
+    <h2>7. International processing</h2>
+
+    <p>
+      Providers may process data in countries outside your own. Where required,
+      transfers are handled through applicable contractual or legal safeguards.
+    </p>
+
+    <h2>8. Your choices and rights</h2>
+
+    <p>
+      Depending on where you live, you may have rights to access, correct, export,
+      restrict, object to, or delete personal data, and to complain to a data
+      protection authority. You can also remove devices and manage subscription
+      status through the product where those controls are available.
+    </p>
+
+    <h2>9. Children</h2>
+
+    <p>
+      Authier is not directed to children under 13, and we do not knowingly
+      collect personal data from children under 13. Local law may require a higher
+      age threshold.
+    </p>
+
+    <h2>10. Changes to this policy</h2>
+
+    <p>
+      We may update this policy when the product, providers, or legal requirements
+      change. The date at the top of the page indicates the current version.
+    </p>
+
+    <h2>11. Contact</h2>
+
+    <p>
+      Privacy questions or requests can be sent to
+      <a href="mailto:authier.ml@google.com">authier.ml@google.com</a>. Security
+      vulnerabilities should follow the responsible-disclosure process in the
+      <a href="https://github.com/authier-pm/authier/blob/main/SECURITY.md">Authier security policy</a>.
+    </p>
+  </article>
+</BaseLayout>
+
+<style>
+  .policy {
+    color: var(--text-muted);
+  }
+
+  .policy h2 {
+    margin: 52px 0 16px;
+    color: var(--text);
+    font-size: clamp(1.55rem, 3vw, 2.1rem);
+    font-weight: 650;
+    letter-spacing: -0.04em;
+  }
+
+  .policy p,
+  .policy li {
+    font-size: 0.98rem;
+    line-height: 1.84;
+  }
+
+  .policy p {
+    margin: 0 0 22px;
+  }
+
+  .policy ul {
+    display: grid;
+    gap: 9px;
+    padding-left: 22px;
+  }
+
+  .policy strong {
+    color: var(--text);
+  }
+
+  .policy a {
+    color: var(--accent);
+    text-underline-offset: 4px;
+  }
+</style>

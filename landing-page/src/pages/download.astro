@@ -1,0 +1,314 @@
+---
+import Icon from '../components/Icon.astro'
+import PageHero from '../components/PageHero.astro'
+import { site } from '../config'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Download Authier'
+const description =
+  'Install the Authier password manager extension for Chrome, Firefox, Microsoft Edge, or Firefox for Android, then open the web vault.'
+
+const browsers = [
+  {
+    name: 'Google Chrome',
+    label: 'Chrome Web Store',
+    href: site.chromeUrl,
+    note: 'For Chrome and Chromium-based desktop browsers.',
+    monogram: 'C',
+    color: 'chrome'
+  },
+  {
+    name: 'Mozilla Firefox',
+    label: 'Firefox Add-ons',
+    href: site.firefoxUrl,
+    note: 'Available for Firefox desktop and Firefox for Android.',
+    monogram: 'F',
+    color: 'firefox'
+  },
+  {
+    name: 'Microsoft Edge',
+    label: 'Microsoft Edge Add-ons',
+    href: site.edgeUrl,
+    note: 'Install directly from the Microsoft Edge Add-ons store.',
+    monogram: 'E',
+    color: 'edge'
+  }
+] as const
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: site.name,
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'Chrome, Firefox, Microsoft Edge, Android',
+  description,
+  url: `${site.url}/download`,
+  downloadUrl: browsers.map(({ href }) => href),
+  isAccessibleForFree: true
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Download Authier"
+    title="Start with your browser."
+    description="Choose your browser extension, create a vault, and make that browser your first trusted device. Authier works on desktop and on Firefox for Android."
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Download' }
+    ]}
+  />
+
+  <section class="section shell">
+    <div class="browser-grid">
+      {browsers.map((browser) => (
+        <a class="browser-card card" href={browser.href} target="_blank" rel="noreferrer">
+          <span class:list={['browser-icon', browser.color]}>{browser.monogram}</span>
+          <div>
+            <small>{browser.label}</small>
+            <h2>{browser.name}</h2>
+            <p>{browser.note}</p>
+          </div>
+          <span class="external-arrow"><Icon name="arrow" size={20} /></span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell start-layout">
+      <div>
+        <p class="eyebrow">First-time setup</p>
+        <h2 class="section-heading">Three steps to an encrypted vault.</h2>
+        <p class="section-copy">
+          Your first browser becomes the trusted starting point for the account.
+          Keep access to it while you approve additional browsers and devices.
+        </p>
+      </div>
+
+      <ol class="setup-list">
+        <li>
+          <span>01</span>
+          <div><h3>Install the extension</h3><p>Use the official store listing for your browser.</p></div>
+        </li>
+        <li>
+          <span>02</span>
+          <div><h3>Create your account</h3><p>Choose a strong, unique master password that you can remember.</p></div>
+        </li>
+        <li>
+          <span>03</span>
+          <div><h3>Add another device</h3><p>Request access there, then approve it from a device you already trust.</p></div>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell vault-callout card">
+      <div class="vault-icon"><Icon name="lock" size={27} /></div>
+      <div>
+        <p class="eyebrow">Already have an account?</p>
+        <h2>Use Authier in the web vault.</h2>
+        <p>Open the browser-based vault to view credentials, TOTP codes, devices, and security settings.</p>
+      </div>
+      <a class="button" href={site.vaultUrl}>
+        Open web vault
+        <Icon name="arrow" size={18} />
+      </a>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .browser-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .browser-card {
+    display: grid;
+    min-height: 310px;
+    align-content: start;
+    padding: 28px;
+    grid-template-columns: 1fr auto;
+    text-decoration: none;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease;
+  }
+
+  .browser-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(105, 230, 204, 0.26);
+  }
+
+  .browser-icon {
+    display: grid;
+    width: 54px;
+    height: 54px;
+    margin-bottom: 58px;
+    grid-column: 1;
+    place-items: center;
+    border-radius: 15px;
+    font-size: 1rem;
+    font-weight: 820;
+  }
+
+  .browser-icon.chrome {
+    background: linear-gradient(145deg, #f1cd50, #55ae7a 55%, #4d80d9);
+    color: #07110f;
+  }
+
+  .browser-icon.firefox {
+    background: linear-gradient(145deg, #f08d43, #8a4dd5);
+    color: white;
+  }
+
+  .browser-icon.edge {
+    background: linear-gradient(145deg, #2fc5b6, #2987d8);
+    color: white;
+  }
+
+  .external-arrow {
+    grid-row: 1;
+    grid-column: 2;
+    color: var(--text-subtle);
+    transition: color 180ms ease;
+  }
+
+  .browser-card:hover .external-arrow {
+    color: var(--accent);
+  }
+
+  .browser-card small {
+    color: var(--text-subtle);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .browser-card h2 {
+    margin: 7px 0 0;
+    font-size: 1.2rem;
+    font-weight: 660;
+    letter-spacing: -0.03em;
+  }
+
+  .browser-card p {
+    margin: 12px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+
+  .start-layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1fr;
+    gap: clamp(60px, 9vw, 120px);
+  }
+
+  .setup-list {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .setup-list li {
+    display: grid;
+    padding: 24px 0;
+    grid-template-columns: 54px 1fr;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .setup-list li:first-child {
+    padding-top: 0;
+  }
+
+  .setup-list > li > span {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.65rem;
+  }
+
+  .setup-list h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .setup-list p {
+    margin: 8px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.86rem;
+    line-height: 1.7;
+  }
+
+  .vault-callout {
+    display: grid;
+    align-items: center;
+    padding: clamp(30px, 5vw, 54px);
+    grid-template-columns: 64px 1fr auto;
+    gap: 26px;
+  }
+
+  .vault-icon {
+    display: grid;
+    width: 58px;
+    height: 58px;
+    place-items: center;
+    border: 1px solid rgba(105, 230, 204, 0.2);
+    border-radius: 16px;
+    background: rgba(105, 230, 204, 0.07);
+    color: var(--accent);
+  }
+
+  .vault-callout h2 {
+    margin: 0;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 660;
+    letter-spacing: -0.05em;
+  }
+
+  .vault-callout div > p:last-child {
+    max-width: 650px;
+    margin: 12px 0 0;
+    color: var(--text-subtle);
+  }
+
+  @media (max-width: 900px) {
+    .browser-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .browser-card {
+      min-height: 230px;
+    }
+
+    .browser-icon {
+      margin-bottom: 34px;
+    }
+
+    .start-layout {
+      grid-template-columns: 1fr;
+      gap: 45px;
+    }
+
+    .vault-callout {
+      align-items: start;
+      grid-template-columns: 58px 1fr;
+    }
+
+    .vault-callout .button {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .vault-callout {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

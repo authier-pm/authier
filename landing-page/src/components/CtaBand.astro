@@ -1,0 +1,98 @@
+---
+import Icon from './Icon.astro'
+
+interface Props {
+  eyebrow?: string
+  title: string
+  description: string
+  primaryLabel?: string
+  primaryHref?: string
+  secondaryLabel?: string
+  secondaryHref?: string
+}
+
+const {
+  eyebrow = 'Ready when you are',
+  title,
+  description,
+  primaryLabel = 'Get Authier',
+  primaryHref = '/download',
+  secondaryLabel = 'Open web vault',
+  secondaryHref = 'https://vault.authier.pm'
+} = Astro.props
+---
+
+<section class="section section-border">
+  <div class="shell cta-band card">
+    <div>
+      <p class="eyebrow">{eyebrow}</p>
+      <h2>{title}</h2>
+      <p>{description}</p>
+    </div>
+    <div class="actions">
+      <a class="button" href={primaryHref}>
+        {primaryLabel}
+        <Icon name="arrow" size={18} />
+      </a>
+      <a class="secondary-link" href={secondaryHref}>{secondaryLabel}</a>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta-band {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 50px;
+    padding: clamp(34px, 6vw, 68px);
+    background:
+      radial-gradient(circle at 90% 5%, rgba(105, 230, 204, 0.13), transparent 30%),
+      linear-gradient(145deg, rgba(18, 25, 25, 0.9), rgba(10, 15, 15, 0.8));
+  }
+
+  h2 {
+    max-width: 700px;
+    margin: 0;
+    font-size: clamp(2.3rem, 4.8vw, 4.2rem);
+    font-weight: 670;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+
+  div > p:last-child {
+    max-width: 650px;
+    margin: 20px 0 0;
+    color: var(--text-muted);
+  }
+
+  .actions {
+    display: grid;
+    flex: none;
+    gap: 14px;
+    justify-items: center;
+  }
+
+  .secondary-link {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    font-weight: 650;
+    text-underline-offset: 4px;
+  }
+
+  .secondary-link:hover {
+    color: var(--accent);
+  }
+
+  @media (max-width: 780px) {
+    .cta-band {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .actions,
+    .button {
+      width: 100%;
+    }
+  }
+</style>

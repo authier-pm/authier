@@ -1,0 +1,137 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="Authier vs Bitwarden: an honest comparison"
+  description="A practical comparison of two open-source password managers, including device approval, maturity, audits, encryption, and who each project suits."
+  publishedAt="2023-02-23"
+  updatedAt="2026-08-31"
+  readingTime="7 min read"
+>
+  <div class="article-callout">
+    <p><strong>Short answer:</strong> Bitwarden is the safer default recommendation for most people today. It has a larger ecosystem, a long operating history, and recurring independent security audits. Authier is a smaller, experimental project for people who value its browser-first workflow, want to examine the entire stack, or want to help shape a device-aware password manager.</p>
+  </div>
+
+  <p>
+    We originally wrote this comparison in 2023, after using Bitwarden for years.
+    Both products have evolved since then, so this version removes outdated
+    feature claims and makes the trade-offs more explicit.
+  </p>
+
+  <h2>What both projects have in common</h2>
+
+  <p>
+    Authier and Bitwarden are both open-source password managers that encrypt
+    vault data on the client before synchronizing it. Both offer browser-based
+    workflows, credential storage, TOTP support, and ways to review devices or
+    login requests.
+  </p>
+
+  <p>
+    That overlap matters. “Open source” or “device approval” is not, by itself, a
+    reason to choose Authier over Bitwarden. The useful comparison is about
+    maturity, implementation choices, product scope, and the experience you want.
+  </p>
+
+  <h2>Where Bitwarden is clearly ahead</h2>
+
+  <h3>Security maturity and independent audits</h3>
+
+  <p>
+    Bitwarden publishes recurring third-party security assessments, including
+    source-code reviews, penetration tests, and a 2025 cryptography report. It
+    also has a public security whitepaper and a much larger population of users
+    exercising its clients and infrastructure.
+  </p>
+
+  <p>
+    Authier has not published an independent third-party audit. Public source
+    code makes review possible, but it does not create the same evidence as a
+    professional audit program or years of operational exposure.
+  </p>
+
+  <h3>Platform breadth and ecosystem</h3>
+
+  <p>
+    Bitwarden offers mature desktop, mobile, browser, command-line, organization,
+    sharing, passkey, and enterprise capabilities. Authier is currently centered
+    on its browser extension and web vault, with a smaller mobile footprint and a
+    narrower feature set.
+  </p>
+
+  <h3>Key-derivation options</h3>
+
+  <p>
+    Bitwarden supports both PBKDF2 and Argon2id with configurable parameters.
+    Authier currently derives its client encryption key with PBKDF2 using SHA-512
+    and 600,000 iterations. Argon2id is not currently offered as an Authier
+    setting.
+  </p>
+
+  <h2>What Authier is exploring</h2>
+
+  <h3>A device-first enrollment model</h3>
+
+  <p>
+    Authier treats approved devices as a central part of account enrollment. A
+    new browser begins with a pending challenge, and an already-approved device
+    reviews the request before the browser completes enrollment and synchronizes
+    the encrypted vault.
+  </p>
+
+  <p>
+    Bitwarden also supports login approval from another device and new-device
+    verification. The distinction is not that Bitwarden lacks device controls;
+    it is that Authier’s smaller product is organized around that trusted-device
+    concept from the outset.
+  </p>
+
+  <h3>A compact browser workflow</h3>
+
+  <p>
+    Authier focuses on keeping credentials and TOTP codes close to the browser
+    login flow. If you mostly live in Firefox or Chromium and prefer a smaller,
+    focused interface, that constraint may feel appealing. If you need native
+    clients and a broad ecosystem, it will feel limiting.
+  </p>
+
+  <h3>A single public monorepo</h3>
+
+  <p>
+    Authier’s extension, web vault, mobile application, shared cryptography, and
+    backend live in one AGPL-licensed repository. That makes it relatively easy
+    to trace a product behavior across the stack or start contributing without
+    first mapping several projects.
+  </p>
+
+  <h2>Which password manager should you choose?</h2>
+
+  <p>
+    Choose Bitwarden if you want the more established option, need broad platform
+    support, depend on enterprise features, or consider published independent
+    audits a requirement. That describes most people looking for a primary
+    password manager.
+  </p>
+
+  <p>
+    Consider Authier if you specifically want to explore its trusted-device
+    workflow, prefer a browser-first product, want to inspect a compact full
+    stack, or are interested in contributing to a young open-source project.
+  </p>
+
+  <blockquote>
+    For high-impact secrets, evaluate product maturity, recovery design, device
+    security, audit history, and your own threat model—not just a feature table.
+  </blockquote>
+
+  <h2>Try both with low-risk data</h2>
+
+  <p>
+    Password managers are unusually sensitive software. If you are curious about
+    Authier, start with low-impact accounts, keep independent recovery options,
+    export backups where appropriate, and read the
+    <a href="/security">security architecture and limitations</a> before moving
+    anything important.
+  </p>
+</ArticleLayout>

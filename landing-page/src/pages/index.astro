@@ -1,0 +1,791 @@
+---
+import Icon from '../components/Icon.astro'
+import VaultPreview from '../components/VaultPreview.astro'
+import { site } from '../config'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const description =
+  'Authier is an open-source password manager for credentials and TOTP codes, with client-side encryption and trusted-device approval.'
+
+const schema = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: site.name,
+    url: site.url,
+    logo: `${site.url}/brand/authier-logo.png`,
+    sameAs: [site.githubUrl]
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: site.name,
+    applicationCategory: 'SecurityApplication',
+    operatingSystem: 'Web browser',
+    description,
+    url: site.url,
+    downloadUrl: `${site.url}/download`,
+    license: 'https://www.gnu.org/licenses/agpl-3.0.html',
+    isAccessibleForFree: true,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: 'Free tier available'
+    }
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    name: site.name,
+    url: site.url,
+    description
+  }
+] as const
+
+const features = [
+  {
+    icon: 'device',
+    label: 'Trusted-device approval',
+    copy: 'A new browser waits until one of your approved devices lets it into the vault.'
+  },
+  {
+    icon: 'lock',
+    label: 'Encrypted before sync',
+    copy: 'Credentials and TOTP secrets are encrypted locally before the API stores them.'
+  },
+  {
+    icon: 'totp',
+    label: 'Passwords and TOTP',
+    copy: 'Keep logins and time-based one-time passwords together, then fill both in the browser.'
+  },
+  {
+    icon: 'code',
+    label: 'Open source',
+    copy: 'Inspect the code, follow development, report issues, or contribute under AGPL-3.0.'
+  }
+] as const
+---
+
+<BaseLayout
+  title="Open-Source Password Manager with Device Approval"
+  description={description}
+  schema={schema}
+>
+  <section class="hero shell">
+    <div class="hero-copy">
+      <div class="hero-kicker">
+        <span></span>
+        Open-source password manager
+      </div>
+      <h1>Your vault.<br /><em>Your devices.</em></h1>
+      <p>
+        Save passwords and 2FA codes in one encrypted vault. Authier adds a
+        second decision to new logins: a device you already trust has to approve
+        them.
+      </p>
+      <div class="hero-actions">
+        <a class="button" href="/download">
+          Get Authier
+          <Icon name="arrow" size={18} />
+        </a>
+        <a class="button button-secondary" href={site.vaultUrl}>
+          Open web vault
+        </a>
+      </div>
+      <div class="hero-proof" aria-label="Product highlights">
+        <span><Icon name="check" size={14} /> Free to start</span>
+        <span><Icon name="check" size={14} /> Browser-based</span>
+        <span><Icon name="check" size={14} /> AGPL-3.0</span>
+      </div>
+    </div>
+    <VaultPreview />
+  </section>
+
+  <section class="signal-strip" aria-label="Authier availability">
+    <div class="shell signal-inner">
+      <p>Available for</p>
+      <div>
+        <span>Chrome</span>
+        <span>Firefox</span>
+        <span>Edge</span>
+        <span>Firefox for Android</span>
+      </div>
+      <a href="/download">View downloads <Icon name="arrow" size={16} /></a>
+    </div>
+  </section>
+
+  <section class="section shell" id="why-authier">
+    <div class="section-intro">
+      <div>
+        <p class="eyebrow">Security with a human in the loop</p>
+        <h2 class="section-heading">A password should not be the only key.</h2>
+      </div>
+      <p class="section-copy">
+        Traditional vaults often treat the right master password as the whole
+        decision. Authier also understands which devices belong to you, so an
+        unfamiliar browser stays pending until you approve it.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      {features.map((feature, index) => (
+        <article class:list={['feature-card', { featured: index === 0 }]}>
+          <div class="feature-icon"><Icon name={feature.icon} size={22} /></div>
+          <h3>{feature.label}</h3>
+          <p>{feature.copy}</p>
+          {index === 0 && (
+            <div class="approval-flow" aria-hidden="true">
+              <span class="device-node current"><Icon name="device" size={18} /></span>
+              <span class="flow-line"><i></i></span>
+              <span class="flow-lock"><Icon name="lock" size={18} /></span>
+              <span class="flow-line approved"><i></i></span>
+              <span class="device-node approved"><Icon name="device" size={18} /></span>
+            </div>
+          )}
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell security-layout">
+      <div class="security-visual card">
+        <div class="terminal-bar">
+          <span></span><span></span><span></span>
+          <p>ENCRYPTION FLOW</p>
+        </div>
+        <div class="crypto-stack">
+          <div class="crypto-row active">
+            <span class="crypto-index">01</span>
+            <span class="crypto-symbol"><Icon name="key" size={19} /></span>
+            <span><b>Master password</b><small>Stays on your device</small></span>
+          </div>
+          <div class="stack-line"><span></span></div>
+          <div class="crypto-row">
+            <span class="crypto-index">02</span>
+            <span class="crypto-symbol"><Icon name="spark" size={19} /></span>
+            <span><b>PBKDF2 · SHA-512</b><small>600,000 derivation rounds</small></span>
+          </div>
+          <div class="stack-line"><span></span></div>
+          <div class="crypto-row">
+            <span class="crypto-index">03</span>
+            <span class="crypto-symbol"><Icon name="lock" size={19} /></span>
+            <span><b>AES-256-GCM</b><small>Encrypted payload leaves the browser</small></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="security-copy">
+        <p class="eyebrow">Designed in the open</p>
+        <h2 class="section-heading">Understand what protects your vault.</h2>
+        <p class="section-copy">
+          Security claims should be inspectable. Authier’s encryption flow,
+          application code, issue history, and development are public—not hidden
+          behind a trust-us page.
+        </p>
+        <div class="link-list">
+          <a href="/security">
+            Read the security model
+            <Icon name="arrow" size={18} />
+          </a>
+          <a href={site.githubUrl} target="_blank" rel="noreferrer">
+            Inspect the source on GitHub
+            <Icon name="arrow" size={18} />
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell cta-panel card">
+      <div>
+        <p class="eyebrow">Start with the browser you already use</p>
+        <h2>Make safer logins feel simple.</h2>
+        <p>
+          Install Authier, create your vault, and make your first browser a
+          trusted device in a few minutes.
+        </p>
+      </div>
+      <div class="cta-actions">
+        <a class="button" href="/download">
+          Choose your browser
+          <Icon name="arrow" size={18} />
+        </a>
+        <a class="text-link" href="/faq">Read the FAQ</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: grid;
+    min-height: calc(100vh - 72px);
+    align-items: center;
+    padding-top: 54px;
+    padding-bottom: 72px;
+    grid-template-columns: minmax(0, 0.9fr) minmax(500px, 1.1fr);
+    gap: clamp(40px, 6vw, 90px);
+  }
+
+  .hero-copy {
+    position: relative;
+    z-index: 2;
+  }
+
+  .hero-kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 24px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    font-weight: 680;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .hero-kicker span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 15px rgba(105, 230, 204, 0.7);
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  h1 {
+    max-width: 650px;
+    margin: 0;
+    font-size: clamp(3.6rem, 7vw, 6.9rem);
+    font-weight: 670;
+    letter-spacing: -0.075em;
+    line-height: 0.91;
+  }
+
+  h1 em {
+    color: var(--accent);
+    font-style: normal;
+    font-weight: inherit;
+  }
+
+  .hero-copy > p {
+    max-width: 590px;
+    margin: 30px 0 0;
+    color: var(--text-muted);
+    font-size: clamp(1.04rem, 1.7vw, 1.22rem);
+    line-height: 1.72;
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 36px;
+  }
+
+  .hero-proof {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    margin-top: 25px;
+  }
+
+  .hero-proof span {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--text-subtle);
+    font-size: 0.76rem;
+  }
+
+  .hero-proof span :global(svg) {
+    color: var(--accent);
+  }
+
+  .signal-strip {
+    border-block: 1px solid var(--border);
+    background: rgba(11, 16, 16, 0.56);
+  }
+
+  .signal-inner {
+    display: grid;
+    min-height: 82px;
+    align-items: center;
+    grid-template-columns: auto 1fr auto;
+    gap: 40px;
+  }
+
+  .signal-inner p {
+    margin: 0;
+    color: var(--text-subtle);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .signal-inner div {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: clamp(20px, 4vw, 52px);
+    color: #96a29f;
+    font-size: 0.82rem;
+    font-weight: 640;
+  }
+
+  .signal-inner div span {
+    white-space: nowrap;
+  }
+
+  .signal-inner a {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .section-intro {
+    display: grid;
+    align-items: end;
+    grid-template-columns: 1fr 0.8fr;
+    gap: 70px;
+  }
+
+  .section-intro .section-copy {
+    margin-bottom: 3px;
+  }
+
+  .feature-grid {
+    display: grid;
+    margin-top: 68px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .feature-card {
+    min-height: 274px;
+    padding: 28px;
+    border: 1px solid var(--border);
+    border-radius: 19px;
+    background: rgba(13, 19, 19, 0.62);
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease,
+      background 220ms ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    background: rgba(17, 24, 24, 0.82);
+  }
+
+  .feature-card.featured {
+    position: relative;
+    overflow: hidden;
+    grid-column: span 2;
+    background:
+      radial-gradient(circle at 85% 20%, rgba(105, 230, 204, 0.12), transparent 34%),
+      rgba(13, 19, 19, 0.72);
+  }
+
+  .feature-card.featured::after {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    opacity: 0.4;
+    content: '';
+  }
+
+  .feature-icon {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 1px solid rgba(105, 230, 204, 0.16);
+    border-radius: 12px;
+    background: rgba(105, 230, 204, 0.07);
+    color: var(--accent);
+  }
+
+  .feature-card h3 {
+    margin: 25px 0 0;
+    font-size: 1.05rem;
+    font-weight: 650;
+    letter-spacing: -0.025em;
+  }
+
+  .feature-card p {
+    max-width: 450px;
+    margin: 12px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+
+  .approval-flow {
+    position: absolute;
+    right: 36px;
+    bottom: 38px;
+    display: flex;
+    align-items: center;
+  }
+
+  .device-node,
+  .flow-lock {
+    display: grid;
+    width: 44px;
+    height: 44px;
+    place-items: center;
+    border: 1px solid var(--border-strong);
+    border-radius: 13px;
+    background: var(--surface-raised);
+    color: var(--text-subtle);
+  }
+
+  .device-node.approved,
+  .flow-lock {
+    border-color: rgba(105, 230, 204, 0.28);
+    color: var(--accent);
+  }
+
+  .flow-line {
+    position: relative;
+    width: 54px;
+    height: 1px;
+    overflow: hidden;
+    background: #27322f;
+  }
+
+  .flow-line i {
+    position: absolute;
+    top: 0;
+    left: -20%;
+    width: 20%;
+    height: 1px;
+    background: var(--accent);
+    animation: flow 2.4s linear infinite;
+  }
+
+  .security-layout {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr 0.9fr;
+    gap: clamp(60px, 9vw, 120px);
+  }
+
+  .security-visual {
+    overflow: hidden;
+  }
+
+  .terminal-bar {
+    display: flex;
+    height: 48px;
+    align-items: center;
+    gap: 6px;
+    padding: 0 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .terminal-bar > span {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3b4744;
+  }
+
+  .terminal-bar p {
+    margin: 0 0 0 auto;
+    color: var(--text-subtle);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.59rem;
+    letter-spacing: 0.12em;
+  }
+
+  .crypto-stack {
+    padding: 32px;
+  }
+
+  .crypto-row {
+    display: grid;
+    min-height: 74px;
+    align-items: center;
+    padding: 10px 16px;
+    grid-template-columns: 28px 44px 1fr;
+    gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: 13px;
+    background: rgba(8, 12, 12, 0.52);
+  }
+
+  .crypto-row.active {
+    border-color: rgba(105, 230, 204, 0.18);
+    background: rgba(105, 230, 204, 0.04);
+  }
+
+  .crypto-index {
+    color: #52605c;
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.63rem;
+  }
+
+  .crypto-symbol {
+    display: grid;
+    width: 36px;
+    height: 36px;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(105, 230, 204, 0.08);
+    color: var(--accent);
+  }
+
+  .crypto-row b,
+  .crypto-row small {
+    display: block;
+  }
+
+  .crypto-row b {
+    font-size: 0.86rem;
+    font-weight: 620;
+  }
+
+  .crypto-row small {
+    margin-top: 2px;
+    color: var(--text-subtle);
+    font-size: 0.67rem;
+  }
+
+  .stack-line {
+    width: 1px;
+    height: 22px;
+    margin-left: 69px;
+    overflow: hidden;
+    background: #293532;
+  }
+
+  .stack-line span {
+    display: block;
+    width: 1px;
+    height: 8px;
+    background: var(--accent);
+    animation: stack-flow 1.8s linear infinite;
+  }
+
+  .link-list {
+    display: grid;
+    margin-top: 34px;
+  }
+
+  .link-list a {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 16px 0;
+    border-bottom: 1px solid var(--border);
+    color: var(--text);
+    font-size: 0.9rem;
+    font-weight: 620;
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  .link-list a:hover {
+    color: var(--accent);
+  }
+
+  .cta-panel {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 60px;
+    overflow: hidden;
+    padding: clamp(36px, 6vw, 70px);
+    background:
+      radial-gradient(circle at 90% 0%, rgba(105, 230, 204, 0.14), transparent 34%),
+      linear-gradient(145deg, rgba(18, 25, 25, 0.9), rgba(10, 15, 15, 0.8));
+  }
+
+  .cta-panel h2 {
+    max-width: 650px;
+    margin: 0;
+    font-size: clamp(2.3rem, 5vw, 4.4rem);
+    font-weight: 670;
+    letter-spacing: -0.06em;
+    line-height: 1;
+  }
+
+  .cta-panel > div > p:last-child {
+    max-width: 600px;
+    margin: 22px 0 0;
+    color: var(--text-muted);
+  }
+
+  .cta-actions {
+    display: grid;
+    flex: none;
+    gap: 16px;
+    justify-items: center;
+  }
+
+  .text-link {
+    color: var(--text-muted);
+    font-size: 0.84rem;
+    font-weight: 650;
+    text-underline-offset: 4px;
+  }
+
+  @keyframes pulse {
+    0%,
+    100% {
+      opacity: 0.65;
+      transform: scale(0.9);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes flow {
+    to {
+      left: 120%;
+    }
+  }
+
+  @keyframes stack-flow {
+    to {
+      transform: translateY(22px);
+    }
+  }
+
+  @media (max-width: 1050px) {
+    .hero {
+      min-height: auto;
+      padding-top: 90px;
+      grid-template-columns: 1fr;
+    }
+
+    .hero-copy {
+      max-width: 760px;
+    }
+
+    .feature-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .feature-card.featured {
+      grid-column: span 2;
+    }
+  }
+
+  @media (max-width: 850px) {
+    .signal-inner {
+      padding-block: 20px;
+      grid-template-columns: 1fr auto;
+      gap: 16px;
+    }
+
+    .signal-inner div {
+      grid-column: 1 / -1;
+      grid-row: 2;
+      justify-content: flex-start;
+      overflow-x: auto;
+    }
+
+    .section-intro,
+    .security-layout {
+      grid-template-columns: 1fr;
+      gap: 42px;
+    }
+
+    .security-copy {
+      grid-row: 1;
+    }
+
+    .cta-panel {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .cta-actions {
+      justify-items: start;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .hero {
+      padding-top: 70px;
+      padding-bottom: 52px;
+    }
+
+    h1 {
+      font-size: clamp(3.1rem, 17vw, 5rem);
+    }
+
+    .hero-actions {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .hero-actions .button {
+      width: 100%;
+    }
+
+    .hero-proof {
+      gap: 10px 16px;
+    }
+
+    .feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .feature-card.featured {
+      min-height: 350px;
+      grid-column: auto;
+    }
+
+    .approval-flow {
+      right: auto;
+      bottom: 30px;
+      left: 28px;
+    }
+
+    .flow-line {
+      width: 40px;
+    }
+
+    .crypto-stack {
+      padding: 18px;
+    }
+
+    .crypto-row {
+      padding-inline: 10px;
+      grid-template-columns: 24px 38px 1fr;
+      gap: 8px;
+    }
+
+    .stack-line {
+      margin-left: 55px;
+    }
+
+    .cta-panel {
+      gap: 34px;
+    }
+
+    .cta-actions,
+    .cta-actions .button {
+      width: 100%;
+    }
+  }
+</style>

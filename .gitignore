@@ -119,3 +119,5 @@ web-extension/dist/**
 web-extension/stats.json
 .turbo
 vault-web/dist
+landing-page/.astro
+landing-page/dist

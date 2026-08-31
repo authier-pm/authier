@@ -1,0 +1,513 @@
+---
+import Icon from './Icon.astro'
+---
+
+<div class="preview-wrap" aria-label="Illustration of the Authier vault interface">
+  <div class="orbit orbit-one"></div>
+  <div class="orbit orbit-two"></div>
+
+  <div class="vault-window">
+    <div class="window-bar">
+      <div class="window-dots" aria-hidden="true"><span></span><span></span><span></span></div>
+      <div class="window-status"><span></span> Vault unlocked</div>
+    </div>
+
+    <div class="window-body">
+      <aside>
+        <div class="mini-brand">
+          <img src="/brand/authier-logo.png" alt="" width="30" height="30" />
+        </div>
+        <div class="side-link active"><Icon name="key" size={17} /></div>
+        <div class="side-link"><Icon name="totp" size={17} /></div>
+        <div class="side-link"><Icon name="device" size={17} /></div>
+      </aside>
+
+      <div class="vault-content">
+        <div class="vault-title-row">
+          <div>
+            <p>MY VAULT</p>
+            <h2>Good morning</h2>
+          </div>
+          <span class="avatar">A</span>
+        </div>
+
+        <div class="search-row">
+          <span class="search-icon"></span>
+          Search your vault
+          <kbd>⌘ K</kbd>
+        </div>
+
+        <div class="credential-list">
+          <div class="credential-card active-card">
+            <span class="credential-icon warm">N</span>
+            <span><b>Notion</b><small>work@company.com</small></span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="credential-card">
+            <span class="credential-icon violet">G</span>
+            <span><b>GitHub</b><small>dev@authier.pm</small></span>
+            <span class="status-dot"></span>
+          </div>
+          <div class="credential-card">
+            <span class="credential-icon blue">D</span>
+            <span><b>DigitalOcean</b><small>ops@authier.pm</small></span>
+            <span class="status-dot"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="approval-card">
+    <div class="approval-icon"><Icon name="device" size={19} /></div>
+    <div>
+      <span>Trusted device</span>
+      <strong>MacBook Pro approved</strong>
+    </div>
+    <span class="approval-check"><Icon name="check" size={15} /></span>
+  </div>
+
+  <div class="encryption-pill"><Icon name="lock" size={15} /> AES-256-GCM</div>
+</div>
+
+<style>
+  .preview-wrap {
+    position: relative;
+    min-height: 560px;
+    perspective: 1200px;
+  }
+
+  .preview-wrap::before {
+    position: absolute;
+    inset: 14% 5% 10%;
+    border-radius: 50%;
+    background: rgba(58, 211, 181, 0.13);
+    filter: blur(80px);
+    content: '';
+  }
+
+  .orbit {
+    position: absolute;
+    border: 1px solid rgba(105, 230, 204, 0.11);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .orbit-one {
+    inset: 2% 5% 12% 0;
+    transform: rotate(-12deg);
+  }
+
+  .orbit-two {
+    inset: 14% -2% 2% 11%;
+    transform: rotate(20deg);
+  }
+
+  .vault-window {
+    position: absolute;
+    top: 54px;
+    right: 0;
+    left: 4%;
+    overflow: hidden;
+    border: 1px solid rgba(183, 221, 212, 0.18);
+    border-radius: 22px;
+    background: rgba(10, 15, 15, 0.96);
+    box-shadow:
+      0 50px 100px rgba(0, 0, 0, 0.56),
+      inset 0 1px rgba(255, 255, 255, 0.04);
+    transform: rotateY(-5deg) rotateX(2deg);
+    animation: window-float 7s ease-in-out infinite;
+  }
+
+  .window-bar {
+    display: flex;
+    height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 17px;
+    border-bottom: 1px solid var(--border);
+    background: rgba(19, 26, 26, 0.88);
+  }
+
+  .window-dots {
+    display: flex;
+    gap: 6px;
+  }
+
+  .window-dots span {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #384441;
+  }
+
+  .window-dots span:first-child {
+    background: #ef745b;
+  }
+
+  .window-dots span:nth-child(2) {
+    background: #e8b752;
+  }
+
+  .window-dots span:last-child {
+    background: #66d18b;
+  }
+
+  .window-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    color: var(--text-subtle);
+    font-size: 0.68rem;
+  }
+
+  .window-status span,
+  .status-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px rgba(105, 230, 204, 0.7);
+  }
+
+  .window-body {
+    display: grid;
+    min-height: 378px;
+    grid-template-columns: 56px 1fr;
+  }
+
+  aside {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    padding: 18px 10px;
+    border-right: 1px solid var(--border);
+    background: rgba(14, 20, 20, 0.78);
+  }
+
+  .mini-brand {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    margin-bottom: 14px;
+    place-items: center;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #1fd7d0;
+  }
+
+  .mini-brand img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    image-rendering: pixelated;
+  }
+
+  .side-link {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 9px;
+    color: #66716f;
+  }
+
+  .side-link.active {
+    background: rgba(105, 230, 204, 0.1);
+    color: var(--accent);
+  }
+
+  .vault-content {
+    padding: 26px 28px 30px;
+  }
+
+  .vault-title-row {
+    display: flex;
+    align-items: start;
+    justify-content: space-between;
+  }
+
+  .vault-title-row p {
+    margin: 0 0 5px;
+    color: var(--text-subtle);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+  }
+
+  .vault-title-row h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 620;
+    letter-spacing: -0.03em;
+  }
+
+  .avatar {
+    display: grid;
+    width: 30px;
+    height: 30px;
+    place-items: center;
+    border: 1px solid rgba(105, 230, 204, 0.3);
+    border-radius: 50%;
+    background: rgba(105, 230, 204, 0.1);
+    color: var(--accent);
+    font-size: 0.7rem;
+    font-weight: 700;
+  }
+
+  .search-row {
+    display: flex;
+    height: 44px;
+    align-items: center;
+    gap: 9px;
+    margin-top: 24px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: rgba(17, 24, 24, 0.76);
+    color: #697572;
+    font-size: 0.7rem;
+  }
+
+  .search-icon {
+    width: 11px;
+    height: 11px;
+    border: 1.3px solid currentColor;
+    border-radius: 50%;
+  }
+
+  .search-icon::after {
+    display: block;
+    width: 5px;
+    height: 1px;
+    margin: 9px 0 0 8px;
+    transform: rotate(45deg);
+    background: currentColor;
+    content: '';
+  }
+
+  kbd {
+    margin-left: auto;
+    padding: 2px 6px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    color: #66716f;
+    font-family: inherit;
+    font-size: 0.58rem;
+  }
+
+  .credential-list {
+    display: grid;
+    gap: 9px;
+    margin-top: 18px;
+  }
+
+  .credential-card {
+    display: grid;
+    min-height: 62px;
+    align-items: center;
+    padding: 9px 12px;
+    grid-template-columns: 38px 1fr auto;
+    gap: 11px;
+    border: 1px solid transparent;
+    border-radius: 11px;
+    background: rgba(18, 25, 25, 0.62);
+  }
+
+  .credential-card.active-card {
+    border-color: rgba(105, 230, 204, 0.16);
+    background: rgba(105, 230, 204, 0.05);
+  }
+
+  .credential-icon {
+    display: grid;
+    width: 34px;
+    height: 34px;
+    place-items: center;
+    border-radius: 9px;
+    font-size: 0.66rem;
+    font-weight: 800;
+  }
+
+  .credential-icon.warm {
+    background: #f3eee5;
+    color: #1c1b19;
+  }
+
+  .credential-icon.violet {
+    background: #2e2c47;
+    color: #bcb8ff;
+  }
+
+  .credential-icon.blue {
+    background: #193d4b;
+    color: #7ad6f4;
+  }
+
+  .credential-card b,
+  .credential-card small {
+    display: block;
+  }
+
+  .credential-card b {
+    color: #d9e1df;
+    font-size: 0.74rem;
+    font-weight: 610;
+  }
+
+  .credential-card small {
+    margin-top: 2px;
+    color: #66716f;
+    font-size: 0.62rem;
+  }
+
+  .approval-card {
+    position: absolute;
+    right: -18px;
+    bottom: 48px;
+    display: grid;
+    min-width: 260px;
+    align-items: center;
+    padding: 14px 15px;
+    grid-template-columns: 38px 1fr 26px;
+    gap: 10px;
+    border: 1px solid rgba(105, 230, 204, 0.2);
+    border-radius: 14px;
+    background: rgba(15, 22, 22, 0.94);
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.42);
+    animation: badge-float 5s ease-in-out infinite;
+    backdrop-filter: blur(18px);
+  }
+
+  .approval-icon,
+  .approval-check {
+    display: grid;
+    place-items: center;
+  }
+
+  .approval-icon {
+    width: 38px;
+    height: 38px;
+    border-radius: 10px;
+    background: rgba(105, 230, 204, 0.1);
+    color: var(--accent);
+  }
+
+  .approval-card span,
+  .approval-card strong {
+    display: block;
+  }
+
+  .approval-card div > span {
+    color: var(--text-subtle);
+    font-size: 0.63rem;
+  }
+
+  .approval-card strong {
+    margin-top: 1px;
+    color: #e4ebe9;
+    font-size: 0.72rem;
+    font-weight: 610;
+  }
+
+  .approval-check {
+    width: 25px;
+    height: 25px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #07110f;
+  }
+
+  .encryption-pill {
+    position: absolute;
+    bottom: 9px;
+    left: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 8px 11px;
+    border: 1px solid var(--border-strong);
+    border-radius: 99px;
+    background: rgba(11, 16, 16, 0.88);
+    color: var(--text-subtle);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.61rem;
+    letter-spacing: 0.04em;
+  }
+
+  @keyframes window-float {
+    0%,
+    100% {
+      transform: rotateY(-5deg) rotateX(2deg) translateY(0);
+    }
+    50% {
+      transform: rotateY(-4deg) rotateX(1deg) translateY(-7px);
+    }
+  }
+
+  @keyframes badge-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-5px);
+    }
+  }
+
+  @media (max-width: 1050px) {
+    .preview-wrap {
+      min-height: 520px;
+    }
+
+    .approval-card {
+      right: 0;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .preview-wrap {
+      min-height: 435px;
+    }
+
+    .vault-window {
+      top: 24px;
+      left: 0;
+      transform: none;
+    }
+
+    .window-body {
+      min-height: 320px;
+      grid-template-columns: 46px 1fr;
+    }
+
+    aside {
+      padding-inline: 6px;
+    }
+
+    .vault-content {
+      padding: 21px 16px;
+    }
+
+    .credential-card {
+      min-height: 55px;
+      padding: 7px 9px;
+    }
+
+    .credential-card:last-child {
+      display: none;
+    }
+
+    .approval-card {
+      right: 6px;
+      bottom: 6px;
+      min-width: 230px;
+    }
+
+    .encryption-pill,
+    .orbit {
+      display: none;
+    }
+  }
+</style>

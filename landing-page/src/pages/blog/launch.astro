@@ -1,0 +1,57 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="Liftoff: why we built Authier"
+  description="The original launch note from the team after almost two years of building an open-source password manager, and the thinking behind it."
+  publishedAt="2023-02-04"
+  updatedAt="2026-08-31"
+  readingTime="2 min read"
+>
+  <div class="article-callout">
+    <p><strong>Archive note:</strong> This launch post is retained for project history. Product details and availability have changed since it was first published.</p>
+  </div>
+
+  <p>
+    It is here. After almost two years of work, Authier reached the point where we
+    could run the service in production and invite people outside the team to try
+    it.
+  </p>
+
+  <p>
+    The idea started with a frustration: secure login tools often make the common
+    path feel harder than it needs to be. We wanted the transparency of an
+    open-source password manager, the convenience of strong browser autofill, and
+    a clearer role for devices in account security.
+  </p>
+
+  <h2>Built by two people, in public</h2>
+
+  <p>
+    I brought the original idea, but Authier would not have reached a usable state
+    without Petr. Turning a security-sensitive prototype into an extension,
+    mobile client, backend, and deployment pipeline required far more than a good
+    concept.
+  </p>
+
+  <p>
+    Publishing the source was not a launch flourish. It was part of the premise:
+    users and researchers should be able to inspect how credentials are encrypted,
+    how a device is approved, and how the service changes over time.
+  </p>
+
+  <h2>Launch was the beginning</h2>
+
+  <p>
+    Authier remains a young project. It does not have the audit history or product
+    breadth of established password managers. The work after launch has focused on
+    modernizing the backend, rebuilding the web vault, improving device flows, and
+    keeping browser extensions current.
+  </p>
+
+  <p>
+    If that direction interests you, the best place to follow it is the
+    <a href="https://github.com/authier-pm/authier">public GitHub repository</a>.
+  </p>
+</ArticleLayout>
