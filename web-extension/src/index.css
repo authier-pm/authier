@@ -94,6 +94,17 @@ body {
   color: inherit;
 }
 
+body.extension-popup {
+  width: 350px;
+  min-width: 350px;
+  max-width: 350px;
+  overflow-x: clip;
+}
+
+body.extension-popup #popup {
+  width: 100%;
+}
+
 button,
 input {
   font: inherit;
