@@ -4,13 +4,17 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
 <ArticleLayout
   title="Authier vs Bitwarden: an honest comparison"
-  description="A practical comparison of two open-source password managers, including device approval, maturity, audits, encryption, and who each project suits."
+  description="A practical Authier vs Bitwarden comparison with UI screenshots, covering device approval, maturity, audits, encryption, and who each password manager suits."
   publishedAt="2023-02-23"
   updatedAt="2026-08-31"
   readingTime="7 min read"
+  imagePaths={[
+    '/blog/authier-web-vault-ui.webp',
+    '/blog/bitwarden-web-vault-ui.webp'
+  ]}
 >
   <div class="article-callout">
-    <p><strong>Short answer:</strong> Bitwarden is the safer default recommendation for most people today. It has a larger ecosystem, a long operating history, and recurring independent security audits. Authier is a smaller, experimental project for people who value its browser-first workflow, want to examine the entire stack, or want to help shape a device-aware password manager.</p>
+    <p><strong>Short answer:</strong> <a href="https://bitwarden.com/" target="_blank" rel="noreferrer">Bitwarden</a> is the safer default recommendation for most people today. It has a larger ecosystem, a long operating history, and recurring independent security audits. Authier is a smaller, experimental project for people who value its browser-first workflow, want to examine the entire stack, or want to help shape a device-aware password manager.</p>
   </div>
 
   <p>
@@ -34,6 +38,63 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro'
     That overlap matters. “Open source” or “device approval” is not, by itself, a
     reason to choose Authier over Bitwarden. The useful comparison is about
     maturity, implementation choices, product scope, and the experience you want.
+  </p>
+
+  <h2>How the Authier and Bitwarden interfaces look</h2>
+
+  <p>
+    These desktop web-vault screenshots show each product’s main item-list view.
+    They are representative rather than a feature-for-feature test: Authier uses
+    fictional demo credentials, while the Bitwarden image comes from Bitwarden’s
+    official documentation.
+  </p>
+
+  <div class="product-ui-gallery" aria-label="Authier and Bitwarden web vault screenshots">
+    <figure class="product-ui-shot">
+      <div class="product-ui-image-frame">
+        <img
+          src="/blog/authier-web-vault-ui.webp"
+          alt="Authier web vault in dark mode showing the vault navigation, search, password and TOTP filters, and a list of sample credentials"
+          width="1162"
+          height="646"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        <strong>Authier web vault.</strong> Captured from the current Authier
+        application with fictional sample data; no real credentials are shown.
+      </figcaption>
+    </figure>
+
+    <figure class="product-ui-shot">
+      <div class="product-ui-image-frame">
+        <img
+          src="/blog/bitwarden-web-vault-ui.webp"
+          alt="Bitwarden Password Manager web vault showing the All vaults navigation, filters, item types, folders, and sample vault entries"
+          width="1162"
+          height="646"
+          loading="lazy"
+          decoding="async"
+        />
+      </div>
+      <figcaption>
+        <strong>Bitwarden web vault.</strong> Screenshot published in
+        <a href="https://bitwarden.com/help/getting-started-webvault/" target="_blank" rel="noreferrer">Bitwarden’s official web-vault documentation</a>.
+      </figcaption>
+    </figure>
+  </div>
+
+  <p>
+    Authier keeps its smaller feature set in a compact, dark workspace with
+    passwords, TOTP codes, devices, and security controls close together.
+    Bitwarden’s interface reflects its broader scope, with separate areas for
+    vaults, organizations, reports, imports, exports, and settings.
+  </p>
+
+  <p class="comparison-disclosure">
+    Bitwarden is a trademark of Bitwarden Inc. This independent comparison is
+    not affiliated with or endorsed by Bitwarden.
   </p>
 
   <h2>Where Bitwarden is clearly ahead</h2>
