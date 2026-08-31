@@ -1,0 +1,84 @@
+---
+import Breadcrumbs from './Breadcrumbs.astro'
+
+interface Props {
+  eyebrow: string
+  title: string
+  description: string
+  breadcrumbs?: readonly { label: string; href?: string }[]
+  compact?: boolean
+}
+
+const { eyebrow, title, description, breadcrumbs, compact = false } = Astro.props
+---
+
+<section class:list={['page-hero', { compact }]}>
+  <div class="shell">
+    {breadcrumbs && <Breadcrumbs items={breadcrumbs} />}
+    <p class="eyebrow">{eyebrow}</p>
+    <h1>{title}</h1>
+    <p class="page-description">{description}</p>
+    <slot />
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    overflow: hidden;
+    padding: 112px 0 90px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-hero::before {
+    position: absolute;
+    top: -260px;
+    left: 50%;
+    width: 800px;
+    height: 520px;
+    transform: translateX(-50%);
+    border-radius: 50%;
+    background: rgba(63, 218, 188, 0.08);
+    filter: blur(90px);
+    pointer-events: none;
+    content: '';
+  }
+
+  .page-hero.compact {
+    padding-bottom: 70px;
+  }
+
+  .shell {
+    position: relative;
+  }
+
+  h1 {
+    max-width: 900px;
+    margin: 0;
+    font-size: clamp(3.1rem, 7vw, 6.5rem);
+    font-weight: 670;
+    letter-spacing: -0.07em;
+    line-height: 0.98;
+    text-wrap: balance;
+  }
+
+  .compact h1 {
+    max-width: 820px;
+    font-size: clamp(2.8rem, 6vw, 5.6rem);
+  }
+
+  .page-description {
+    max-width: 720px;
+    margin: 28px 0 0;
+    color: var(--text-muted);
+    font-size: clamp(1.05rem, 1.8vw, 1.24rem);
+    line-height: 1.72;
+  }
+
+  @media (max-width: 700px) {
+    .page-hero,
+    .page-hero.compact {
+      padding: 76px 0 62px;
+    }
+  }
+</style>

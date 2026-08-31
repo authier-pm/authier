@@ -1,0 +1,143 @@
+---
+import { navigation, site } from '../config'
+---
+
+<footer class="site-footer">
+  <div class="shell footer-grid">
+    <div class="footer-intro">
+      <a class="footer-brand" href="/">authier</a>
+      <p>
+        Open-source password management with client-side encryption and
+        trusted-device approval.
+      </p>
+    </div>
+
+    <div>
+      <p class="footer-label">Product</p>
+      <nav aria-label="Product links">
+        {navigation.slice(0, 3).map((item) => <a href={item.href}>{item.label}</a>)}
+        <a href="/download">Download</a>
+      </nav>
+    </div>
+
+    <div>
+      <p class="footer-label">Resources</p>
+      <nav aria-label="Resource links">
+        <a href="/faq">FAQ</a>
+        <a href="/guides">Guides</a>
+        <a href="/blog">Blog</a>
+        <a href={site.githubUrl} target="_blank" rel="noreferrer">Source code</a>
+        <a href={site.statusUrl} target="_blank" rel="noreferrer">Service status</a>
+      </nav>
+    </div>
+
+    <div>
+      <p class="footer-label">Legal & community</p>
+      <nav aria-label="Legal and community links">
+        <a href="/privacy-policy">Privacy policy</a>
+        <a href="/security">Security</a>
+        <a href={site.twitterUrl} target="_blank" rel="noreferrer">X / Twitter</a>
+        <a href={site.discordUrl} target="_blank" rel="noreferrer">Discord</a>
+      </nav>
+    </div>
+  </div>
+  <div class="shell footer-bottom">
+    <p>© {new Date().getFullYear()} Authier contributors.</p>
+    <p>Open source under AGPL-3.0.</p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: 80px;
+    border-top: 1px solid var(--border);
+    background: rgba(10, 14, 14, 0.72);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(260px, 1.7fr) repeat(3, 1fr);
+    gap: 44px;
+    padding-top: 64px;
+    padding-bottom: 52px;
+  }
+
+  .footer-intro {
+    max-width: 340px;
+  }
+
+  .footer-brand {
+    color: var(--text);
+    font-size: 1.1rem;
+    font-weight: 740;
+    letter-spacing: -0.02em;
+    text-decoration: none;
+  }
+
+  .footer-intro p,
+  .footer-bottom {
+    color: var(--text-subtle);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .footer-label {
+    margin: 0 0 14px;
+    color: var(--text);
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  nav {
+    display: grid;
+    gap: 10px;
+  }
+
+  nav a {
+    color: var(--text-subtle);
+    font-size: 0.88rem;
+    text-decoration: none;
+    transition: color 180ms ease;
+  }
+
+  nav a:hover {
+    color: var(--accent);
+  }
+
+  .footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+    padding-top: 22px;
+    padding-bottom: 26px;
+    border-top: 1px solid var(--border);
+  }
+
+  .footer-bottom p {
+    margin: 0;
+  }
+
+  @media (max-width: 820px) {
+    .footer-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .footer-intro {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 520px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+      gap: 34px;
+    }
+
+    .footer-bottom {
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+</style>

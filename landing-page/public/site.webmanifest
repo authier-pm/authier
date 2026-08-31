@@ -1,0 +1,21 @@
+{
+  "name": "Authier",
+  "short_name": "Authier",
+  "description": "Open-source password manager with client-side encryption and trusted-device approval.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#070a0a",
+  "theme_color": "#070a0a",
+  "icons": [
+    {
+      "src": "/brand/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/brand/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

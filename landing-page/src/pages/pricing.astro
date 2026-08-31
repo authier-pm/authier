@@ -1,0 +1,531 @@
+---
+import Icon from '../components/Icon.astro'
+import PageHero from '../components/PageHero.astro'
+import { site } from '../config'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Password Manager Pricing'
+const description =
+  'Start Authier free with an encrypted password and TOTP vault. Add credential or TOTP capacity with simple monthly plans.'
+
+const plans = [
+  {
+    name: 'Free',
+    price: 0,
+    description: 'A practical personal vault to get started.',
+    features: ['40 login credentials', '3 TOTP secrets', 'Trusted-device approval', 'Browser autofill'],
+    productId: null,
+    featured: false
+  },
+  {
+    name: 'Credentials',
+    price: 1,
+    description: 'More space for usernames and passwords.',
+    features: ['250 additional login credentials', 'Everything in the free tier', 'Monthly subscription'],
+    productId: 'prod_O70NGKoIusmxwE',
+    featured: false
+  },
+  {
+    name: 'TOTP',
+    price: 1,
+    description: 'More space for one-time password seeds.',
+    features: ['100 additional TOTP secrets', 'Everything in the free tier', 'Monthly subscription'],
+    productId: 'prod_O70Pl3a3CW9XNZ',
+    featured: false
+  },
+  {
+    name: 'Credentials + TOTP',
+    price: 2,
+    description: 'Increase both limits together.',
+    features: ['250 additional login credentials', '100 additional TOTP secrets', 'Monthly subscription'],
+    productId: 'prod_O7KTrrFYqhOrJR',
+    featured: true
+  }
+] as const
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'Product',
+  name: 'Authier password manager',
+  description,
+  brand: {
+    '@type': 'Brand',
+    name: site.name
+  },
+  offers: plans.map((plan) => ({
+    '@type': 'Offer',
+    name: plan.name,
+    price: plan.price.toString(),
+    priceCurrency: 'USD',
+    availability: 'https://schema.org/InStock',
+    url: `${site.url}/pricing`
+  }))
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Pay per quantity"
+    title="Start free. Pay only when your vault grows."
+    description="Start small and pay only when you need to scale up. Monthly capacity packs increase the number of credentials or TOTP secrets you can keep."
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Pricing' }
+    ]}
+  />
+
+  <section class="section shell pricing-section">
+    <div id="billing-status" class="billing-status" role="status" hidden></div>
+
+    <div class="pricing-grid">
+      {plans.map((plan) => (
+        <article class:list={['plan-card', 'card', { featured: plan.featured }]}>
+          {plan.featured && <span class="popular-label">Most popular</span>}
+          <div class="plan-heading">
+            <h2>{plan.name}</h2>
+            <p>{plan.description}</p>
+          </div>
+          <div class="price">
+            <span>$</span>
+            <strong>{plan.price}</strong>
+            <small>/ month</small>
+          </div>
+          <ul>
+            {plan.features.map((feature) => (
+              <li><Icon name="check" size={15} /> {feature}</li>
+            ))}
+          </ul>
+          {plan.productId ? (
+            <button class:list={['button', { 'button-secondary': !plan.featured }]} data-product={plan.productId}>
+              Choose {plan.name}
+              <Icon name="arrow" size={17} />
+            </button>
+          ) : (
+            <a class="button button-secondary" href={site.vaultUrl}>
+              Create free vault
+              <Icon name="arrow" size={17} />
+            </a>
+          )}
+        </article>
+      ))}
+    </div>
+
+    <div class="billing-note">
+      <div>
+        <h2>Already subscribed?</h2>
+        <p>Open this page from Authier’s account limits screen to manage your subscription securely.</p>
+      </div>
+      <button id="manage-subscription" class="text-button" type="button">
+        Manage subscription
+        <Icon name="arrow" size={17} />
+      </button>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell pricing-faq">
+      <div>
+        <p class="eyebrow">Pricing details</p>
+        <h2 class="section-heading">No feature maze.</h2>
+      </div>
+      <div class="pricing-answers">
+        <article>
+          <h3>Does the free tier expire?</h3>
+          <p>No. The free capacity is available without a time limit.</p>
+        </article>
+        <article>
+          <h3>Do paid plans change the encryption model?</h3>
+          <p>No. Paid plans increase vault capacity; the core encryption and device-approval model stays the same.</p>
+        </article>
+        <article>
+          <h3>Where do I cancel?</h3>
+          <p>Open Account limits inside Authier and follow the subscription-management link back to this page.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <script is:inline src="https://js.stripe.com/v3/"></script>
+  <script>
+    interface GraphqlResult {
+      data?: {
+        me?: {
+          createCheckoutSession?: string
+          createPortalSession?: string
+        }
+      }
+      errors?: { message: string }[]
+    }
+
+    interface StripeRedirectResult {
+      error?: { message?: string }
+    }
+
+    interface StripeClient {
+      redirectToCheckout(options: { sessionId: string }): Promise<StripeRedirectResult>
+    }
+
+    declare global {
+      interface Window {
+        Stripe?: (publishableKey: string) => StripeClient
+      }
+    }
+
+    const apiUrl = 'https://api.authier.pm/graphql'
+    const publishableKey =
+      'pk_live_51L4LIKI3AGASZpOVQhKADlBLjb24X367X5DETHuDoncUUxS8iDe9vUDSe58uT7gkYJDcIo9mSNA95jub8lxd1dXa00LR8pamvA'
+    const statusElement = document.querySelector<HTMLDivElement>('#billing-status')
+    const manageButton = document.querySelector<HTMLButtonElement>('#manage-subscription')
+    const url = new URL(window.location.href)
+    const tokenFromUrl = url.searchParams.get('acToken')
+
+    if (tokenFromUrl) {
+      sessionStorage.setItem('authier-billing-access-token', tokenFromUrl)
+      url.searchParams.delete('acToken')
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`)
+    }
+
+    const accessToken =
+      tokenFromUrl ?? sessionStorage.getItem('authier-billing-access-token')
+
+    function setStatus(message: string, kind: 'error' | 'success' | 'loading') {
+      if (!statusElement) return
+      statusElement.hidden = false
+      statusElement.dataset.kind = kind
+      statusElement.textContent = message
+      statusElement.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
+
+    async function requestBilling(query: string, variables?: Record<string, string>) {
+      if (!accessToken) {
+        window.location.assign('https://vault.authier.pm')
+        return null
+      }
+
+      const response = await fetch(apiUrl, {
+        method: 'POST',
+        credentials: 'include',
+        headers: {
+          authorization: `bearer ${accessToken}`,
+          'content-type': 'application/json'
+        },
+        body: JSON.stringify({ query, variables })
+      })
+      const result = (await response.json()) as GraphqlResult
+      const errorMessage = result.errors?.[0]?.message
+
+      if (!response.ok || errorMessage) {
+        throw new Error(errorMessage ?? 'The billing request could not be completed.')
+      }
+
+      return result
+    }
+
+    async function startCheckout(product: string) {
+      setStatus('Preparing secure checkout…', 'loading')
+      const result = await requestBilling(
+        'mutation BillingCheckout($product: String!) { me { createCheckoutSession(product: $product) } }',
+        { product }
+      )
+      const sessionId = result?.data?.me?.createCheckoutSession
+
+      if (!sessionId || !window.Stripe) {
+        throw new Error('Secure checkout did not initialize. Please try again.')
+      }
+
+      const redirect = await window.Stripe(publishableKey).redirectToCheckout({
+        sessionId
+      })
+
+      if (redirect.error) {
+        throw new Error(redirect.error.message ?? 'Checkout could not be opened.')
+      }
+    }
+
+    async function openPortal() {
+      setStatus('Opening subscription management…', 'loading')
+      const result = await requestBilling(
+        'mutation BillingPortal { me { createPortalSession } }'
+      )
+      const portalUrl = result?.data?.me?.createPortalSession
+
+      if (!portalUrl) {
+        throw new Error('Subscription management could not be opened.')
+      }
+
+      window.location.assign(portalUrl)
+    }
+
+    document.querySelectorAll<HTMLButtonElement>('[data-product]').forEach((button) => {
+      button.addEventListener('click', () => {
+        const product = button.dataset.product
+        if (!product) return
+
+        void startCheckout(product).catch((error: unknown) => {
+          setStatus(
+            error instanceof Error ? error.message : 'Checkout could not be opened.',
+            'error'
+          )
+        })
+      })
+    })
+
+    manageButton?.addEventListener('click', () => {
+      void openPortal().catch((error: unknown) => {
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : 'Subscription management could not be opened.',
+          'error'
+        )
+      })
+    })
+
+    if (url.searchParams.has('success')) {
+      setStatus(
+        'Thank you for subscribing! You can close this tab and return to your vault. Refresh it to see your upgraded account limits.',
+        'success'
+      )
+    } else if (url.searchParams.has('canceled')) {
+      setStatus('Checkout was canceled. Your plan was not changed.', 'error')
+    } else if (url.searchParams.has('portal')) {
+      void openPortal().catch((error: unknown) => {
+        setStatus(
+          error instanceof Error
+            ? error.message
+            : 'Subscription management could not be opened.',
+          'error'
+        )
+      })
+    }
+  </script>
+</BaseLayout>
+
+<style>
+  .pricing-section {
+    padding-top: 74px;
+  }
+
+  .billing-status {
+    margin-bottom: 24px;
+    padding: 15px 18px;
+    border: 1px solid var(--border-strong);
+    border-radius: 12px;
+    background: rgba(105, 230, 204, 0.06);
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
+
+  .billing-status[data-kind='error'] {
+    border-color: rgba(255, 145, 124, 0.25);
+    background: rgba(255, 111, 89, 0.06);
+    color: #ffb4a5;
+  }
+
+  .billing-status[data-kind='success'] {
+    border-color: rgba(105, 230, 204, 0.25);
+    color: var(--accent);
+  }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+  }
+
+  .plan-card {
+    position: relative;
+    display: flex;
+    min-height: 510px;
+    padding: 28px;
+    flex-direction: column;
+  }
+
+  .plan-card.featured {
+    border-color: rgba(105, 230, 204, 0.32);
+    background:
+      radial-gradient(circle at 80% 0%, rgba(105, 230, 204, 0.1), transparent 34%),
+      linear-gradient(145deg, rgba(18, 25, 25, 0.9), rgba(10, 15, 15, 0.8));
+  }
+
+  .popular-label {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    padding: 4px 8px;
+    border-radius: 99px;
+    background: var(--accent);
+    color: #07110f;
+    font-size: 0.58rem;
+    font-weight: 760;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .plan-heading h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 660;
+    letter-spacing: -0.025em;
+  }
+
+  .plan-heading p {
+    min-height: 48px;
+    margin: 9px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.8rem;
+    line-height: 1.55;
+  }
+
+  .price {
+    display: flex;
+    align-items: baseline;
+    margin-top: 28px;
+  }
+
+  .price span {
+    color: var(--text-muted);
+    font-size: 1rem;
+  }
+
+  .price strong {
+    margin-left: 3px;
+    font-size: 3.5rem;
+    font-weight: 650;
+    letter-spacing: -0.07em;
+    line-height: 1;
+  }
+
+  .price small {
+    margin-left: 7px;
+    color: var(--text-subtle);
+    font-size: 0.7rem;
+  }
+
+  .plan-card ul {
+    display: grid;
+    gap: 12px;
+    margin: 30px 0;
+    padding: 24px 0 0;
+    border-top: 1px solid var(--border);
+    list-style: none;
+  }
+
+  .plan-card li {
+    display: flex;
+    align-items: start;
+    gap: 8px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.45;
+  }
+
+  .plan-card li :global(svg) {
+    margin-top: 2px;
+    color: var(--accent);
+  }
+
+  .plan-card .button {
+    width: 100%;
+    margin-top: auto;
+    padding-inline: 12px;
+    cursor: pointer;
+  }
+
+  .billing-note {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+    margin-top: 22px;
+    padding: 24px 28px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(13, 19, 19, 0.48);
+  }
+
+  .billing-note h2 {
+    margin: 0;
+    font-size: 0.94rem;
+    font-weight: 640;
+  }
+
+  .billing-note p {
+    margin: 6px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.76rem;
+  }
+
+  .text-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--accent);
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 680;
+  }
+
+  .pricing-faq {
+    display: grid;
+    grid-template-columns: 0.75fr 1.25fr;
+    gap: 80px;
+  }
+
+  .pricing-answers {
+    display: grid;
+  }
+
+  .pricing-answers article {
+    padding: 24px 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .pricing-answers article:first-child {
+    padding-top: 0;
+  }
+
+  .pricing-answers h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 640;
+  }
+
+  .pricing-answers p {
+    margin: 9px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.87rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1060px) {
+    .pricing-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .pricing-faq {
+      grid-template-columns: 1fr;
+      gap: 45px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .pricing-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .plan-card {
+      min-height: 460px;
+    }
+
+    .billing-note {
+      align-items: start;
+      flex-direction: column;
+    }
+  }
+</style>

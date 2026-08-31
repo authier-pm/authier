@@ -1,0 +1,207 @@
+---
+import CtaBand from '../components/CtaBand.astro'
+import Icon from '../components/Icon.astro'
+import PageHero from '../components/PageHero.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Password Manager FAQ'
+const description =
+  'Answers to common questions about Authier passwords, TOTP codes, encryption, trusted devices, browser support, pricing, and open-source development.'
+
+const questions = [
+  {
+    question: 'What is Authier?',
+    answer:
+      'Authier is an open-source password manager for login credentials and time-based one-time password (TOTP) codes. It runs through browser extensions and a web vault.'
+  },
+  {
+    question: 'Can I use Authier for my business?',
+    answer:
+      'Yes, you can use Authier for work accounts. Authier does not currently advertise the mature organization administration, policy enforcement, sharing, or enterprise support offered by larger password managers, so evaluate those requirements before adopting it for a team.'
+  },
+  {
+    question: 'Where is my vault encrypted?',
+    answer:
+      'Authier encrypts vault items in the client before synchronization. The API stores encrypted payloads rather than plaintext credentials or TOTP seeds.'
+  },
+  {
+    question: 'What encryption does Authier use?',
+    answer:
+      'The current shared cryptography implementation derives a key with PBKDF2 using SHA-512 and 600,000 iterations, then encrypts vault data with AES-256-GCM.'
+  },
+  {
+    question: 'How does a new device join my account?',
+    answer:
+      'The account policy can allow immediate enrollment, require approval from any trusted device, or require the master device. When approval is enabled, a new browser stays pending until the selected device accepts it before vault synchronization begins.'
+  },
+  {
+    question: 'Does keeping 2FA codes on the same device defeat two-factor authentication?',
+    answer:
+      'It reduces factor separation, but a TOTP code can still stop password-only attacks. Authier lets you disable TOTP synchronization on selected devices. For high-impact accounts, a separate authenticator, passkey, or hardware security key may better match your threat model.'
+  },
+  {
+    question: 'Is it safe to keep passwords and TOTP codes in the same vault?',
+    answer:
+      'It is a convenience-versus-separation decision, not an absolute yes or no. Authier encrypts both kinds of secret before synchronization and can require approval from an existing device for enrollment. A compromised unlocked client could still expose both, so keep independent recovery options and separate high-impact factors when appropriate.'
+  },
+  {
+    question: 'Which browsers are supported?',
+    answer:
+      'Authier has official listings for Google Chrome, Mozilla Firefox, and Microsoft Edge. The Firefox add-on is also available for Firefox on Android.'
+  },
+  {
+    question: 'Is Authier free?',
+    answer:
+      'Authier has a free tier. Optional monthly capacity packs add more credential or TOTP storage without changing the core encryption and device-approval features.'
+  },
+  {
+    question: 'Is Authier independently audited?',
+    answer:
+      'Authier has not yet published an independent third-party security audit. Its source is public, but open source is not a substitute for a professional audit or a long operational history.'
+  },
+  {
+    question: 'Can I use Authier with another password manager?',
+    answer:
+      'Yes. Splitting secrets can reduce the impact of one vault compromise, but it also adds operational complexity. Browser extensions can compete for the same fields, so you may need to disable autofill for one extension on specific sites.'
+  },
+  {
+    question: 'What happens on my other devices when I change the master password?',
+    answer:
+      'Change the vault password from the master device. Authier logs out the other devices, and you then sign in and approve them again; the change is not silently applied to every unlocked client.'
+  },
+  {
+    question: 'Can I remove the public autofill-field record for a website?',
+    answer:
+      'Yes. Authier uses a shared corpus of non-secret form metadata—such as the page URL without its query string, host, field type, and CSS selector—to improve autofill. The extension includes controls to remove matching records; newer free accounts wait one week before deletion is enabled. Password values and TOTP seeds are not part of that public record.'
+  },
+  {
+    question: 'Can I import or export my vault?',
+    answer:
+      'The browser vault can import login credentials from CSV and TOTP records from Authy-style JSON. It can export login credentials and TOTP records to CSV. Exported files are sensitive plaintext backups, so encrypt or delete them promptly.'
+  },
+  {
+    question: 'What happened to the native apps and Kiwi Browser?',
+    answer:
+      'The previous website listed native desktop and Android apps as a Q4 2023 roadmap item, linked an early iOS build, and recommended Kiwi Browser. Those statements are historical. Kiwi is now archived; the current public downloads are Chrome, Firefox, Edge, and Firefox for Android.'
+  },
+  {
+    question: 'Where can I report a security issue?',
+    answer:
+      'Use the responsible-disclosure instructions in the SECURITY.md file in the public Authier GitHub repository. It includes the project disclosure policy and PGP key fingerprint.'
+  }
+] as const
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: questions.map(({ question, answer }) => ({
+    '@type': 'Question',
+    name: question,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: answer
+    }
+  }))
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Frequently asked questions"
+    title="The short answers, without the hand-waving."
+    description={description}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'FAQ' }
+    ]}
+    compact
+  />
+
+  <section class="section narrow-shell faq-list">
+    {questions.map(({ question, answer }, index) => (
+      <details open={index === 0}>
+        <summary>
+          <span>{String(index + 1).padStart(2, '0')}</span>
+          <h2>{question}</h2>
+          <i><Icon name="chevron" size={20} /></i>
+        </summary>
+        <p>{answer}</p>
+      </details>
+    ))}
+  </section>
+
+  <CtaBand
+    title="Still deciding whether Authier fits?"
+    description="Read the security architecture, inspect the source, or install the extension and start with the free tier."
+    primaryLabel="Read security architecture"
+    primaryHref="/security"
+    secondaryLabel="View source on GitHub"
+    secondaryHref="https://github.com/authier-pm/authier"
+  />
+</BaseLayout>
+
+<style>
+  .faq-list {
+    display: grid;
+  }
+
+  details {
+    border-bottom: 1px solid var(--border);
+  }
+
+  summary {
+    display: grid;
+    min-height: 96px;
+    align-items: center;
+    cursor: pointer;
+    grid-template-columns: 42px 1fr 24px;
+    gap: 12px;
+    list-style: none;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  summary > span {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.65rem;
+  }
+
+  summary h2 {
+    margin: 0;
+    font-size: clamp(1rem, 2vw, 1.18rem);
+    font-weight: 630;
+    letter-spacing: -0.02em;
+  }
+
+  summary i {
+    color: var(--text-subtle);
+    font-style: normal;
+    transition: transform 180ms ease;
+  }
+
+  details[open] summary i {
+    transform: rotate(180deg);
+    color: var(--accent);
+  }
+
+  details > p {
+    max-width: 690px;
+    margin: -8px 0 32px 54px;
+    color: var(--text-muted);
+    font-size: 0.94rem;
+    line-height: 1.8;
+  }
+
+  @media (max-width: 560px) {
+    summary {
+      grid-template-columns: 32px 1fr 20px;
+    }
+
+    details > p {
+      margin-left: 44px;
+    }
+  }
+</style>

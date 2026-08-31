@@ -1,0 +1,7 @@
+Contact: mailto:authier.ml@google.com
+Contact: https://github.com/authier-pm/authier/security/policy
+Encryption: https://keys.openpgp.org/search?q=0xDE6887086F892325FEC04CC0D847525B6931381F
+Policy: https://github.com/authier-pm/authier/blob/main/SECURITY.md
+Canonical: https://www.authier.pm/.well-known/security.txt
+Expires: 2027-08-31T23:59:59Z
+Preferred-Languages: en

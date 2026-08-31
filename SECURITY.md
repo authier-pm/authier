@@ -17,8 +17,8 @@ notify us. We welcome working with you to resolve the issue promptly. Thanks in 
 # In-scope
 
 - Security issues in any current release of Authier. This includes the web vault, browser extension,
-  and mobile apps (iOS and Android). Product downloads are available at https://authier.ml. Source
-  code is available at https://github.com/authier-pm.
+  and mobile client code (iOS and Android). Current product downloads are available at
+  https://www.authier.pm/download. Source code is available at https://github.com/authier-pm/authier.
 
 # Exclusions
 

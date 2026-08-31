@@ -1,0 +1,505 @@
+---
+import CtaBand from '../components/CtaBand.astro'
+import Icon from '../components/Icon.astro'
+import PageHero from '../components/PageHero.astro'
+import { site } from '../config'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const title = 'Password Manager Features'
+const description =
+  'Explore Authier features for password storage, TOTP authentication, browser autofill, client-side encryption, and trusted-device management.'
+
+const featureGroups = [
+  {
+    icon: 'key',
+    title: 'Encrypted credential vault',
+    copy: 'Store usernames and passwords in an encrypted vault that synchronizes between your approved devices.'
+  },
+  {
+    icon: 'totp',
+    title: 'Built-in TOTP authenticator',
+    copy: 'Save time-based one-time password secrets alongside logins and fill six-digit codes from the browser extension.'
+  },
+  {
+    icon: 'spark',
+    title: 'Browser autofill',
+    copy: 'Fill usernames, passwords, and TOTP codes without moving secrets through your clipboard, including many multi-step login flows.'
+  },
+  {
+    icon: 'device',
+    title: 'Trusted-device controls',
+    copy: 'Review new-device requests, approve or reject them, promote a master device, and remove devices you no longer use.'
+  },
+  {
+    icon: 'lock',
+    title: 'Configurable vault locking',
+    copy: 'Choose how quickly an approved device locks again and require your master password before local decryption resumes.'
+  },
+  {
+    icon: 'device',
+    title: 'Per-device TOTP sync',
+    copy: 'Choose whether one-time-password secrets synchronize to a particular device while credentials continue to sync.'
+  },
+  {
+    icon: 'device',
+    title: 'Device activity context',
+    copy: 'Review device names, approval state, last synchronization, last IP address, and approximate network location.'
+  },
+  {
+    icon: 'lock',
+    title: 'Recovery cooldown',
+    copy: 'Configure a delay before a recovery-based master-device reset can complete, with confirmation and rejection controls.'
+  },
+  {
+    icon: 'spark',
+    title: 'QR-assisted TOTP setup',
+    copy: 'Read a visible TOTP QR code from the current page in the extension instead of retyping the shared secret.'
+  },
+  {
+    icon: 'key',
+    title: 'Password generator and history',
+    copy: 'Generate random passwords and keep a local history so a generated password is not lost before you save it.'
+  },
+  {
+    icon: 'key',
+    title: 'Import and export',
+    copy: 'Import credential CSV files or Authy-style JSON and export login credentials and TOTP records to CSV.'
+  },
+  {
+    icon: 'code',
+    title: 'Open-source codebase',
+    copy: 'The browser extension, web vault, mobile application, shared cryptography, and backend are developed in public.'
+  }
+] as const
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'SoftwareApplication',
+  name: site.name,
+  applicationCategory: 'SecurityApplication',
+  operatingSystem: 'Web browser',
+  url: site.url,
+  featureList: featureGroups.map(({ title: featureTitle }) => featureTitle),
+  license: 'https://www.gnu.org/licenses/agpl-3.0.html'
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <PageHero
+    eyebrow="Product features"
+    title="Passwords, 2FA, and devices—one coherent vault."
+    description={description}
+    breadcrumbs={[
+      { label: 'Home', href: '/' },
+      { label: 'Features' }
+    ]}
+  />
+
+  <section class="section shell">
+    <div class="page-grid">
+      {featureGroups.map((feature) => (
+        <article class="page-card feature-card">
+          <div class="icon-box"><Icon name={feature.icon} size={22} /></div>
+          <h2>{feature.title}</h2>
+          <p>{feature.copy}</p>
+        </article>
+      ))}
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell split-section">
+      <div>
+        <p class="eyebrow">The differentiator</p>
+        <h2 class="section-heading">A vault that knows which devices are yours.</h2>
+        <p class="section-copy">
+          Set the new-device policy to require approval from any trusted device
+          or specifically from the master device. With approval enabled, an
+          unfamiliar browser remains pending until the selected device accepts
+          it.
+        </p>
+        <a class="detail-link" href="/security">
+          How trusted-device approval works
+          <Icon name="arrow" size={18} />
+        </a>
+      </div>
+
+      <div class="device-panel card">
+        <div class="panel-heading">
+          <div>
+            <small>SECURITY CENTER</small>
+            <h3>Your devices</h3>
+          </div>
+          <span>3 trusted</span>
+        </div>
+        <div class="device-list">
+          <div class="device-row current">
+            <span class="device-icon"><Icon name="device" size={19} /></span>
+            <span><b>Firefox on Linux</b><small>Current · Master device</small></span>
+            <i>Active</i>
+          </div>
+          <div class="device-row">
+            <span class="device-icon"><Icon name="device" size={19} /></span>
+            <span><b>Chrome on macOS</b><small>Approved 2 days ago</small></span>
+            <i>Trusted</i>
+          </div>
+          <div class="device-row pending">
+            <span class="device-icon"><Icon name="device" size={19} /></span>
+            <span><b>New browser</b><small>Prague · Waiting for review</small></span>
+            <i>Pending</i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell legacy-comparison">
+      <div class="legacy-intro">
+        <p class="eyebrow">The old feature matrix, made current</p>
+        <h2 class="section-heading">Three areas, without stale checkmarks.</h2>
+        <p class="section-copy">
+          Authier’s previous website compared dozens of capabilities across
+          Bitwarden, 1Password, RoboForm, Authy, Google Authenticator, and the
+          Chrome password manager. Those products change too often for a static
+          table to remain reliable, so the useful Authier substance is preserved
+          here and competitor claims are retired.
+        </p>
+      </div>
+
+      <div class="capability-groups">
+        <article class="page-card">
+          <span>01</span>
+          <h3>Device management</h3>
+          <ul>
+            <li>Approve or reject a new device</li>
+            <li>Rename, sign out, or remove a device</li>
+            <li>Move the master-device role</li>
+            <li>Control TOTP sync per device</li>
+            <li>Review last sync, IP, and approximate location</li>
+            <li>Set a recovery cooldown and vault lock timeout</li>
+          </ul>
+        </article>
+        <article class="page-card">
+          <span>02</span>
+          <h3>Login credentials</h3>
+          <ul>
+            <li>Encrypted multi-device synchronization</li>
+            <li>Username and password autofill</li>
+            <li>Multi-page login support</li>
+            <li>Password generation and local generation history</li>
+            <li>CSV import, export, and duplicate detection</li>
+            <li>Removable autofill-field metadata</li>
+          </ul>
+        </article>
+        <article class="page-card">
+          <span>03</span>
+          <h3>TOTP / two-factor codes</h3>
+          <ul>
+            <li>Encrypted multi-device synchronization</li>
+            <li>Browser input autofill</li>
+            <li>QR extraction from the current page</li>
+            <li>QR scanning in the mobile source code</li>
+            <li>CSV export and Authy-style JSON import</li>
+            <li>Source-URL records for saved TOTP entries</li>
+          </ul>
+        </article>
+      </div>
+
+      <aside class="accuracy-note card">
+        <div>
+          <p class="eyebrow">Accuracy note</p>
+          <h2>Roadmap items are not features.</h2>
+        </div>
+        <p>
+          The old matrix marked Argon2 and emergency-contact access as planned
+          for Q1 2024, and listed IP locking, audit logs, and a breach-checking API.
+          Authier does not currently advertise those as supported user-facing
+          features. It also has not published an independent security audit.
+          Read the <a href="/security">security architecture</a> and the
+          <a href="/blog/authier-vs-bitwarden">updated Bitwarden comparison</a>
+          for the present-day limits.
+        </p>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell workflow">
+      <div class="workflow-copy">
+        <p class="eyebrow">Built for the login flow</p>
+        <h2 class="section-heading">Less copying. Fewer context switches.</h2>
+      </div>
+      <div class="workflow-steps">
+        <article>
+          <span>01</span>
+          <h3>Save</h3>
+          <p>Create a login or scan a TOTP QR code into the encrypted vault.</p>
+        </article>
+        <article>
+          <span>02</span>
+          <h3>Sync</h3>
+          <p>Encrypted data becomes available to devices you have approved.</p>
+        </article>
+        <article>
+          <span>03</span>
+          <h3>Fill</h3>
+          <p>Use the browser extension to complete credentials and one-time codes.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <CtaBand
+    title="Bring device-aware security to your browser."
+    description="Authier is available for Chrome, Firefox, Microsoft Edge, and Firefox for Android."
+  />
+</BaseLayout>
+
+<style>
+  .feature-card {
+    min-height: 270px;
+  }
+
+  .split-section {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 0.9fr 1fr;
+    gap: clamp(55px, 9vw, 120px);
+  }
+
+  .detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 30px;
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 680;
+    text-decoration: none;
+  }
+
+  .device-panel {
+    padding: 28px;
+  }
+
+  .panel-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+  }
+
+  .panel-heading small {
+    color: var(--text-subtle);
+    font-size: 0.58rem;
+    font-weight: 700;
+    letter-spacing: 0.15em;
+  }
+
+  .panel-heading h3 {
+    margin: 4px 0 0;
+    font-size: 1.25rem;
+    font-weight: 640;
+    letter-spacing: -0.03em;
+  }
+
+  .panel-heading > span {
+    padding: 5px 9px;
+    border: 1px solid rgba(105, 230, 204, 0.18);
+    border-radius: 99px;
+    background: rgba(105, 230, 204, 0.06);
+    color: var(--accent);
+    font-size: 0.66rem;
+  }
+
+  .device-list {
+    display: grid;
+    gap: 9px;
+  }
+
+  .device-row {
+    display: grid;
+    align-items: center;
+    padding: 13px;
+    grid-template-columns: 42px 1fr auto;
+    gap: 12px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(7, 11, 11, 0.45);
+  }
+
+  .device-row.current {
+    border-color: rgba(105, 230, 204, 0.17);
+    background: rgba(105, 230, 204, 0.035);
+  }
+
+  .device-icon {
+    display: grid;
+    width: 38px;
+    height: 38px;
+    place-items: center;
+    border-radius: 10px;
+    background: rgba(105, 230, 204, 0.08);
+    color: var(--accent);
+  }
+
+  .device-row b,
+  .device-row small {
+    display: block;
+  }
+
+  .device-row b {
+    font-size: 0.82rem;
+    font-weight: 620;
+  }
+
+  .device-row small {
+    margin-top: 2px;
+    color: var(--text-subtle);
+    font-size: 0.65rem;
+  }
+
+  .device-row i {
+    color: var(--text-subtle);
+    font-size: 0.65rem;
+    font-style: normal;
+  }
+
+  .device-row.pending i {
+    color: var(--warm);
+  }
+
+  .workflow {
+    display: grid;
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 70px;
+  }
+
+  .legacy-comparison {
+    display: grid;
+    gap: 58px;
+  }
+
+  .legacy-intro {
+    max-width: 850px;
+  }
+
+  .capability-groups {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+
+  .capability-groups article > span {
+    display: block;
+    margin-bottom: 20px;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.65rem;
+  }
+
+  .capability-groups ul {
+    display: grid;
+    gap: 10px;
+    margin: 22px 0 0;
+    padding: 20px 0 0 18px;
+    border-top: 1px solid var(--border);
+    color: var(--text-subtle);
+  }
+
+  .capability-groups li {
+    padding-left: 4px;
+    font-size: 0.82rem;
+    line-height: 1.55;
+  }
+
+  .accuracy-note {
+    display: grid;
+    align-items: start;
+    padding: clamp(28px, 5vw, 48px);
+    grid-template-columns: 0.7fr 1.3fr;
+    gap: 54px;
+  }
+
+  .accuracy-note h2 {
+    margin: 0;
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    font-weight: 660;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+  }
+
+  .accuracy-note > p {
+    margin: 0;
+    color: var(--text-muted);
+    line-height: 1.78;
+  }
+
+  .accuracy-note a {
+    color: var(--accent);
+    text-underline-offset: 4px;
+  }
+
+  .workflow-steps {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  .workflow-steps article {
+    padding: 24px;
+    border-left: 1px solid var(--border-strong);
+  }
+
+  .workflow-steps span {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.64rem;
+  }
+
+  .workflow-steps h3 {
+    margin: 26px 0 0;
+    font-size: 1rem;
+    font-weight: 650;
+  }
+
+  .workflow-steps p {
+    margin: 10px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.84rem;
+    line-height: 1.7;
+  }
+
+  @media (max-width: 900px) {
+    .split-section,
+    .workflow,
+    .accuracy-note {
+      grid-template-columns: 1fr;
+      gap: 45px;
+    }
+
+    .capability-groups {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .device-panel {
+      padding: 16px;
+    }
+
+    .device-row {
+      grid-template-columns: 38px 1fr;
+    }
+
+    .device-row i {
+      display: none;
+    }
+
+    .workflow-steps {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

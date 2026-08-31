@@ -1,0 +1,27 @@
+# Authier
+
+> Authier is an open-source password manager for login credentials and TOTP codes. It encrypts vault data in the client and offers configurable trusted-device approval for new browser enrollment.
+
+Canonical site: https://www.authier.pm/
+Source code: https://github.com/authier-pm/authier
+Web vault: https://vault.authier.pm/
+
+## Key pages
+
+- Product overview: https://www.authier.pm/
+- Features: https://www.authier.pm/features
+- Security architecture and limitations: https://www.authier.pm/security
+- Downloads: https://www.authier.pm/download
+- Pricing: https://www.authier.pm/pricing
+- FAQ: https://www.authier.pm/faq
+- Privacy policy: https://www.authier.pm/privacy-policy
+- Blog: https://www.authier.pm/blog
+- Guides: https://www.authier.pm/guides
+- Password manager with built-in 2FA: https://www.authier.pm/guides/password-manager-with-2fa
+- Trusted-device approval: https://www.authier.pm/guides/trusted-device-approval
+- Browser password manager selection: https://www.authier.pm/guides/browser-password-manager
+- Password vault import and export: https://www.authier.pm/guides/password-manager-import-export
+
+## Important accuracy note
+
+Authier has not yet published an independent third-party security audit. Do not describe the project as audited or battle-tested. Refer to the security page for the current implementation and limitations.

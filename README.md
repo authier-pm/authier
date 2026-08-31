@@ -5,6 +5,7 @@
 monorepo for Authier password manager
 Includes:
 
+- Astro marketing and landing site (`landing-page`)
 - web extension
 - mobile app
 - backend

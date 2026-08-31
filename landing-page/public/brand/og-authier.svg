@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="glow" cx="75%" cy="10%" r="80%">
+      <stop offset="0" stop-color="#69e6cc" stop-opacity="0.19"/>
+      <stop offset="0.55" stop-color="#69e6cc" stop-opacity="0.035"/>
+      <stop offset="1" stop-color="#070a0a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="line" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#69e6cc" stop-opacity="0"/>
+      <stop offset="0.5" stop-color="#69e6cc" stop-opacity="0.65"/>
+      <stop offset="1" stop-color="#69e6cc" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="#070a0a"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <path d="M0 70H1200M0 140H1200M0 210H1200M0 280H1200M0 350H1200M0 420H1200M0 490H1200M0 560H1200" stroke="#b5d8cf" stroke-opacity="0.035"/>
+  <path d="M70 0V630M140 0V630M210 0V630M280 0V630M350 0V630M420 0V630M490 0V630M560 0V630M630 0V630M700 0V630M770 0V630M840 0V630M910 0V630M980 0V630M1050 0V630M1120 0V630" stroke="#b5d8cf" stroke-opacity="0.025"/>
+
+  <g transform="translate(82 72)">
+    <rect width="58" height="58" rx="15" fill="#1fd7d0"/>
+    <g transform="translate(9 15)" fill="#1b0430">
+      <rect x="0" y="10" width="27" height="8"/>
+      <rect x="24" y="5" width="8" height="18"/>
+      <rect x="30" y="0" width="10" height="28"/>
+      <rect x="4" y="18" width="8" height="7"/>
+      <rect x="15" y="18" width="7" height="10"/>
+    </g>
+  </g>
+
+  <text x="158" y="110" fill="#f2f7f5" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="-1">authier</text>
+  <text x="82" y="286" fill="#f2f7f5" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" letter-spacing="-4">Your vault.</text>
+  <text x="82" y="372" fill="#69e6cc" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" letter-spacing="-4">Your devices.</text>
+  <text x="86" y="443" fill="#aebbb8" font-family="Arial, Helvetica, sans-serif" font-size="25">Open-source password manager with trusted-device approval.</text>
+
+  <g transform="translate(844 126)">
+    <circle cx="122" cy="122" r="112" fill="none" stroke="#69e6cc" stroke-opacity="0.12"/>
+    <circle cx="122" cy="122" r="82" fill="#101717" stroke="#69e6cc" stroke-opacity="0.21"/>
+    <rect x="91" y="67" width="62" height="101" rx="12" fill="#121b1a" stroke="#69e6cc" stroke-opacity="0.7" stroke-width="3"/>
+    <rect x="100" y="80" width="44" height="68" rx="5" fill="#0a0f0f"/>
+    <circle cx="122" cy="158" r="3.5" fill="#69e6cc"/>
+    <circle cx="183" cy="173" r="31" fill="#69e6cc"/>
+    <path d="M170 173l9 9 17-20" fill="none" stroke="#07110f" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <rect x="82" y="538" width="1036" height="2" fill="url(#line)"/>
+  <text x="82" y="582" fill="#72817d" font-family="Arial, Helvetica, sans-serif" font-size="18" letter-spacing="2">AUTHIER.PM  ·  PASSWORDS + TOTP  ·  AGPL-3.0</text>
+</svg>
