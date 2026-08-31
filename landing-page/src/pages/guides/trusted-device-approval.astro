@@ -1,0 +1,173 @@
+---
+import { guides } from '../../data/guides'
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+
+const guide = guides.find(
+  ({ href }) => href === '/guides/trusted-device-approval'
+)
+
+if (!guide) throw new Error('Missing trusted-device guide metadata')
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: [
+    {
+      '@type': 'Question',
+      name: 'What is trusted-device approval?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'It is an enrollment rule that keeps a new client pending until a device already associated with the account approves it.'
+      }
+    },
+    {
+      '@type': 'Question',
+      name: 'Does device approval replace a master password?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Device approval adds an enrollment decision; the vault still depends on its master password and client-side key derivation.'
+      }
+    },
+    {
+      '@type': 'Question',
+      name: 'Is trusted-device approval mandatory in Authier?',
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: 'No. Authier lets an account allow immediate enrollment, require any approved device, or require the master device.'
+      }
+    }
+  ]
+}
+---
+
+<ArticleLayout
+  title={guide.title}
+  description={guide.description}
+  publishedAt={guide.updatedAt}
+  readingTime={guide.readingTime}
+  collectionHref="/guides"
+  collectionLabel="Guides"
+  eyebrow="Security model guide"
+  schemaType="TechArticle"
+  extraSchema={[faqSchema]}
+>
+  <div class="article-callout">
+    <p><strong>Core idea:</strong> a master password answers “do you know the vault secret?” Trusted-device approval can add a separate question: “does a device already connected to this account accept this new client?”</p>
+  </div>
+
+  <h2>Why enrollment deserves its own control</h2>
+
+  <p>
+    A synchronized password manager has to decide when a new browser or phone may
+    receive encrypted vault data. If possession of an email address and master
+    password is the only requirement, an attacker who captures both can attempt
+    enrollment from a remote machine.
+  </p>
+
+  <p>
+    Trusted-device approval changes that path. The unfamiliar client first
+    creates a pending request with its identity, name, IP address, and available
+    network-location context. A device already associated with the account can
+    inspect and accept or reject the request before enrollment completes.
+  </p>
+
+  <h2>Authier’s three policy choices</h2>
+
+  <h3>Allow immediately</h3>
+
+  <p>
+    The new client can complete enrollment without another device approving it.
+    This is the least restrictive option and can be useful when one-device access
+    or simple recovery matters more than the extra check.
+  </p>
+
+  <h3>Require any approved device</h3>
+
+  <p>
+    A connected device must approve the pending request. This is convenient when
+    you own several trusted clients because any one of them can help enroll the
+    new browser.
+  </p>
+
+  <h3>Require the master device</h3>
+
+  <p>
+    The account’s designated master device controls the approval decision. This
+    creates a clearer security anchor, while increasing the importance of
+    protecting and recovering that device.
+  </p>
+
+  <p>
+    Authier exposes these as choices because no single recovery model is right for
+    everyone. The marketing site should not imply that device approval is active
+    when an account has selected immediate enrollment.
+  </p>
+
+  <h2>What approval can stop</h2>
+
+  <ul>
+    <li>A remote enrollment attempt using a captured account email and master password.</li>
+    <li>A silent new-device login when the configured policy requires explicit review.</li>
+    <li>Continued access from a device that you later sign out or remove.</li>
+    <li>Automatic TOTP synchronization to a device where you have switched that setting off.</li>
+  </ul>
+
+  <h2>What approval cannot stop</h2>
+
+  <ul>
+    <li>Malware or a malicious extension reading data from an already-unlocked client.</li>
+    <li>A user approving a convincing fraudulent request without checking its context.</li>
+    <li>Physical access to an unlocked device or compromise of its operating system.</li>
+    <li>Implementation flaws in the client, backend, cryptography, or recovery flow.</li>
+    <li>Phishing that captures credentials used directly at the target service.</li>
+  </ul>
+
+  <p>
+    Device approval is defense in depth, not a security guarantee. It should sit
+    beside local device security, a strong master password, encrypted vault
+    storage, careful recovery, and phishing-resistant authentication where
+    available.
+  </p>
+
+  <h2>Recovery is part of the threat model</h2>
+
+  <p>
+    Strict approval becomes dangerous if losing one device permanently locks out
+    the owner. Authier includes a recovery-based master-device reset flow with an
+    email confirmation and configurable cooldown. The delay gives an existing
+    owner time to notice and reject a fraudulent recovery attempt, but email
+    security becomes part of the recovery chain.
+  </p>
+
+  <p>
+    Recovery controls must balance two failures: unauthorized access and
+    permanent lockout. A longer cooldown gives more detection time; a shorter one
+    restores access sooner. Protect the email account, retain independent recovery
+    methods, and test the process before an emergency.
+  </p>
+
+  <h2>How to review an approval request</h2>
+
+  <ol>
+    <li>Initiate enrollment yourself and keep both devices visible.</li>
+    <li>Compare the displayed device name, time, IP address, and approximate location.</li>
+    <li>Reject any request you cannot explain, even when one detail looks familiar.</li>
+    <li>After approval, verify the new client and remove old devices you no longer control.</li>
+    <li>Review whether TOTP synchronization and lock timeout are appropriate for that device.</li>
+  </ol>
+
+  <h2>Evidence you can inspect</h2>
+
+  <p>
+    Authier’s request, approval, recovery, and device-management paths are public
+    in the <a href="https://github.com/authier-pm/authier">source repository</a>.
+    The current implementation records approval state, device history, sync state,
+    IP context, and recovery timing. Authier has not published an independent
+    third-party audit, so public code should be treated as inspectable evidence,
+    not proof that the design is flawless.
+  </p>
+
+  <div class="article-callout">
+    <p><strong>Continue evaluating:</strong> read the exact <a href="/security">encryption and security architecture</a>, then compare the broader selection criteria in <a href="/guides/browser-password-manager">the browser password manager guide</a>.</p>
+  </div>
+</ArticleLayout>

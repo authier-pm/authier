@@ -25,12 +25,14 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
   background: var(--background);
 }
 
 body {
   min-width: 320px;
   margin: 0;
+  overflow-x: clip;
   background:
     radial-gradient(
       circle at 50% -20%,

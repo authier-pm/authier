@@ -7,7 +7,7 @@ import BaseLayout from '../layouts/BaseLayout.astro'
 
 const title = 'Security Architecture'
 const description =
-  'Read how Authier encrypts vault data in the browser, derives keys, approves new devices, and communicates current security limitations.'
+  'Read how Authier encrypts vault data in the browser, derives keys, can require device approval, and communicates current security limitations.'
 
 const schema = {
   '@context': 'https://schema.org',
@@ -28,7 +28,7 @@ const schema = {
   <PageHero
     eyebrow="Security architecture"
     title="Security claims you can inspect."
-    description="Authier encrypts vault contents before they leave your browser and puts approved devices into the decision about who may join your account. This page explains both the design and its limits."
+    description="Authier encrypts vault contents before they leave your browser and can put approved devices into the decision about who may join your account. This page explains both the design and its limits."
     breadcrumbs={[
       { label: 'Home', href: '/' },
       { label: 'Security' }
@@ -86,11 +86,13 @@ const schema = {
   <section class="section section-border">
     <div class="shell">
       <p class="eyebrow">Device-aware access</p>
-      <h2 class="section-heading">A new device starts outside the vault.</h2>
+      <h2 class="section-heading">Approval can keep a new device outside the vault.</h2>
       <p class="section-copy">
-        Knowing an account email and master password is not intended to be enough
-        to silently enroll an unfamiliar client. The device must request access,
-        and an approved device reviews that request.
+        When the account policy requires approval, knowing an account email and
+        master password is not enough to silently enroll an unfamiliar client.
+        The device must request access, and an approved device reviews that
+        request. Accounts can also choose immediate enrollment, which trades this
+        extra check for convenience.
       </p>
 
       <div class="device-flow card" aria-label="Three-step new-device approval flow">

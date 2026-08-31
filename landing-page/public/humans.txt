@@ -3,5 +3,6 @@ Authier is an open-source password manager built by contributors.
 Source: https://github.com/authier-pm/authier
 License: GNU AGPL-3.0-or-later
 Community: https://discord.gg/PdGCMeXtFG
+Social: https://x.com/authierpm
 Site framework: Astro
 Hosting: Cloudflare

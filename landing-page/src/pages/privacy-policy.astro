@@ -1,13 +1,28 @@
 ---
 import PageHero from '../components/PageHero.astro'
+import { site } from '../config'
 import BaseLayout from '../layouts/BaseLayout.astro'
 
 const title = 'Privacy Policy'
 const description =
   'Authier privacy policy covering the public website, account data, encrypted vault content, payments, technical data, retention, and privacy rights.'
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  name: title,
+  description,
+  url: `${site.url}/privacy-policy`,
+  dateModified: '2026-08-31',
+  about: {
+    '@type': 'SoftwareApplication',
+    name: site.name,
+    applicationCategory: 'SecurityApplication'
+  }
+}
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout title={title} description={description} schema={schema}>
   <PageHero
     eyebrow="Privacy"
     title="Privacy policy"
@@ -21,12 +36,29 @@ const description =
 
   <article class="section narrow-shell policy">
     <p>
-      This policy explains how Authier (“we”, “us”, or “the service”) handles
-      information when you visit <strong>authier.pm</strong> or use Authier’s
-      applications, browser extensions, web vault, and related services.
+      This policy explains how the Authier project (“Authier”, “we”, or “us”)
+      collects, uses, shares, and protects information when you visit
+      <strong>authier.pm</strong> or use Authier’s browser extensions, web vault,
+      mobile clients, API, and related services. Authier operates from Czechia.
     </p>
 
-    <h2>1. The public website</h2>
+    <p>
+      By using the service, you acknowledge the practices described here. This
+      policy replaces the policy previously published for authier.ml.
+    </p>
+
+    <h2>1. Definitions</h2>
+
+    <ul>
+      <li><strong>Account</strong> means an account created to use Authier.</li>
+      <li><strong>Device</strong> means a browser, computer, phone, tablet, or other client that accesses the service.</li>
+      <li><strong>Personal data</strong> means information relating to an identified or identifiable person.</li>
+      <li><strong>Service</strong> means the Authier website, applications, extensions, vault, API, and related systems.</li>
+      <li><strong>Service provider</strong> means a third party that processes data to help us operate the service.</li>
+      <li><strong>Usage data</strong> means technical and activity information generated when the service is used.</li>
+    </ul>
+
+    <h2>2. The public website</h2>
 
     <p>
       The public marketing website does not use advertising trackers or
@@ -36,7 +68,25 @@ const description =
       the site and prevent abuse.
     </p>
 
-    <h2>2. Information used to provide Authier</h2>
+    <h2>3. Cookies and local storage</h2>
+
+    <p>
+      The marketing site does not set first-party analytics or advertising
+      cookies. Authier’s interactive products use browser storage, session
+      storage, and essential authentication tokens to keep you signed in, retain
+      encrypted local state, remember settings such as theme or language, and
+      complete billing flows. Refusing essential storage may prevent parts of the
+      service from working.
+    </p>
+
+    <p>
+      Authier does not use Flash cookies. We do not place marketing pixels in the
+      public website or use email beacons to build advertising profiles.
+      Infrastructure providers may set narrowly scoped security cookies or
+      process request signals under their own policies.
+    </p>
+
+    <h2>4. Information used to provide Authier</h2>
 
     <p>Depending on the feature you use, Authier may process:</p>
 
@@ -44,11 +94,13 @@ const description =
       <li><strong>Account information</strong>, such as your email address and account identifiers.</li>
       <li><strong>Encrypted vault payloads</strong>, containing credentials or TOTP data encrypted by your client before synchronization.</li>
       <li><strong>Device and security information</strong>, such as device identifiers, platform, approval state, recent IP address, approximate location derived from network data, and security-event timestamps.</li>
+      <li><strong>Autofill-field metadata</strong>, such as a page URL with its query string removed, hostname, field type, DOM selector, and the account that submitted the record.</li>
       <li><strong>Subscription information</strong>, such as the product selected, subscription state, and Stripe customer or checkout identifiers. Authier does not receive full payment-card numbers.</li>
       <li><strong>Support and diagnostic information</strong> that you submit or that applications generate when something fails.</li>
+      <li><strong>Usage data</strong>, which can include request time, IP address, browser or operating-system information, pages or API operations used, and diagnostic or abuse-prevention signals.</li>
     </ul>
 
-    <h2>3. Vault encryption</h2>
+    <h2>5. Vault encryption</h2>
 
     <p>
       Authier clients encrypt vault items before they are sent to the API. The
@@ -64,7 +116,24 @@ const description =
       processed as described in this policy.
     </p>
 
-    <h2>4. Why information is processed</h2>
+    <h2>6. Shared autofill metadata</h2>
+
+    <p>
+      Authier maintains a shared corpus of login and TOTP form selectors so the
+      extension can recognize fields on a site even when your account has not
+      used that form before. These records can be returned to other authenticated
+      Authier users for the same host. They contain page and field structure, not
+      the username, password, or TOTP secret entered into the field.
+    </p>
+
+    <p>
+      Query strings are removed before a page URL is stored because they can
+      contain sensitive values. The extension provides controls for removing
+      matching autofill records. Abuse-prevention limits may delay or rate-limit
+      deletion, including a one-week waiting period for newer free accounts.
+    </p>
+
+    <h2>7. Why information is processed</h2>
 
     <p>We use information to:</p>
 
@@ -73,12 +142,20 @@ const description =
       <li>synchronize encrypted vault data;</li>
       <li>authenticate users and approve, manage, or remove devices;</li>
       <li>process subscriptions and provide billing support;</li>
+      <li>learn reusable, non-secret form selectors and improve autofill;</li>
       <li>detect abuse, investigate security events, and protect the service;</li>
       <li>diagnose failures and improve reliability; and</li>
       <li>comply with legal obligations and respond to valid legal requests.</li>
     </ul>
 
-    <h2>5. Service providers</h2>
+    <p>
+      We may also contact you about account verification, device access,
+      security, subscriptions, support requests, or material service changes. If
+      optional promotional communication is introduced, it will include the
+      choices required by applicable law.
+    </p>
+
+    <h2>8. Service providers and disclosure</h2>
 
     <p>
       Authier relies on infrastructure and specialist providers where necessary to
@@ -90,10 +167,20 @@ const description =
 
     <p>
       We do not sell personal information and do not use vault content for
-      advertising.
+      advertising. We do not share personal data with business partners for
+      their independent promotions.
     </p>
 
-    <h2>6. Retention</h2>
+    <p>Information may also be disclosed:</p>
+
+    <ul>
+      <li>with your direction or consent;</li>
+      <li>to comply with a valid legal obligation, court order, or request from a competent public authority;</li>
+      <li>to investigate wrongdoing, protect users or the public, defend Authier’s rights or property, or address legal liability; and</li>
+      <li>in connection with a merger, financing, reorganization, asset transfer, or similar transaction, with notice where required.</li>
+    </ul>
+
+    <h2>9. Retention</h2>
 
     <p>
       Account information and encrypted vault data are retained while an account
@@ -103,14 +190,34 @@ const description =
       needed for reliability, abuse prevention, and incident investigation.
     </p>
 
-    <h2>7. International processing</h2>
+    <p>
+      Shared autofill-field metadata may remain useful after the contributing
+      account is closed unless it is removed, anonymized, or no longer needed.
+      Backups can retain deleted data for a limited period before routine
+      rotation. We may retain records longer when law, fraud prevention,
+      litigation, or enforcement of agreements requires it.
+    </p>
+
+    <h2>10. International processing</h2>
 
     <p>
       Providers may process data in countries outside your own. Where required,
       transfers are handled through applicable contractual or legal safeguards.
     </p>
 
-    <h2>8. Your choices and rights</h2>
+    <h2>11. Security</h2>
+
+    <p>
+      Authier uses technical and organizational measures intended to protect
+      information, including client-side encryption for vault contents,
+      authenticated transport, device controls, access restrictions, and
+      monitoring. No method of transmission or storage is completely secure, and
+      we cannot guarantee absolute security. A compromised master password,
+      unlocked client, endpoint, recovery channel, or implementation flaw can
+      still put data at risk.
+    </p>
+
+    <h2>12. Your choices and rights</h2>
 
     <p>
       Depending on where you live, you may have rights to access, correct, export,
@@ -119,7 +226,22 @@ const description =
       status through the product where those controls are available.
     </p>
 
-    <h2>9. Children</h2>
+    <p>
+      To exercise a privacy right, contact us using the address below. We may need
+      to verify your identity and account authority before responding. You may
+      also have the right to complain to your local data-protection authority.
+    </p>
+
+    <h2>13. Account and data deletion</h2>
+
+    <p>
+      Product controls can be used to remove vault items, devices, and supported
+      autofill records. Contact us if you need help deleting an account or making
+      a privacy request. Some billing, security, backup, and legal records may be
+      retained as described above.
+    </p>
+
+    <h2>14. Children</h2>
 
     <p>
       Authier is not directed to children under 13, and we do not knowingly
@@ -127,14 +249,25 @@ const description =
       age threshold.
     </p>
 
-    <h2>10. Changes to this policy</h2>
+    <h2>15. Links to other websites</h2>
+
+    <p>
+      The service links to extension stores, GitHub, Stripe, community services,
+      and other websites we do not operate. Their privacy practices are governed
+      by their own policies. Authier is not responsible for third-party content
+      or privacy practices.
+    </p>
+
+    <h2>16. Changes to this policy</h2>
 
     <p>
       We may update this policy when the product, providers, or legal requirements
       change. The date at the top of the page indicates the current version.
+      Material changes may also be announced in the service or by email when
+      appropriate.
     </p>
 
-    <h2>11. Contact</h2>
+    <h2>17. Contact</h2>
 
     <p>
       Privacy questions or requests can be sent to

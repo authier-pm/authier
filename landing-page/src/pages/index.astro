@@ -2,6 +2,7 @@
 import Icon from '../components/Icon.astro'
 import VaultPreview from '../components/VaultPreview.astro'
 import { site } from '../config'
+import { guides } from '../data/guides'
 import BaseLayout from '../layouts/BaseLayout.astro'
 
 const description =
@@ -14,14 +15,14 @@ const schema = [
     name: site.name,
     url: site.url,
     logo: `${site.url}/brand/authier-logo.png`,
-    sameAs: [site.githubUrl]
+    sameAs: [site.githubUrl, site.twitterUrl]
   },
   {
     '@context': 'https://schema.org',
     '@type': 'SoftwareApplication',
     name: site.name,
     applicationCategory: 'SecurityApplication',
-    operatingSystem: 'Web browser',
+    operatingSystem: 'Windows, macOS, Linux, Android',
     description,
     url: site.url,
     downloadUrl: `${site.url}/download`,
@@ -47,7 +48,7 @@ const features = [
   {
     icon: 'device',
     label: 'Trusted-device approval',
-    copy: 'A new browser waits until one of your approved devices lets it into the vault.'
+    copy: 'Enable approval to make a new browser wait until one of your trusted devices lets it into the vault.'
   },
   {
     icon: 'lock',
@@ -72,6 +73,14 @@ const features = [
   description={description}
   schema={schema}
 >
+  <div id="subscription-success" class="subscription-success shell" role="status" hidden>
+    <Icon name="check" size={18} />
+    <p>
+      <strong>Thank you for subscribing!</strong> You can close this tab and
+      return to your vault. Refresh it to see your upgraded account limits.
+    </p>
+  </div>
+
   <section class="hero shell">
     <div class="hero-copy">
       <div class="hero-kicker">
@@ -80,9 +89,9 @@ const features = [
       </div>
       <h1>Your vault.<br /><em>Your devices.</em></h1>
       <p>
-        Save passwords and 2FA codes in one encrypted vault. Authier adds a
-        second decision to new logins: a device you already trust has to approve
-        them.
+        Save once, use everywhere. Keep passwords and 2FA codes in one encrypted
+        vault, then choose whether a device you already trust must approve each
+        new browser before it can synchronize.
       </p>
       <div class="hero-actions">
         <a class="button" href="/download">
@@ -123,8 +132,9 @@ const features = [
       </div>
       <p class="section-copy">
         Traditional vaults often treat the right master password as the whole
-        decision. Authier also understands which devices belong to you, so an
-        unfamiliar browser stays pending until you approve it.
+        decision. Authier also understands which devices belong to you, and its
+        configurable approval policy can keep an unfamiliar browser pending
+        until you approve it.
       </p>
     </div>
 
@@ -145,6 +155,33 @@ const features = [
           )}
         </article>
       ))}
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell">
+      <div class="section-intro">
+        <div>
+          <p class="eyebrow">Practical security guides</p>
+          <h2 class="section-heading">Choose with the trade-offs visible.</h2>
+        </div>
+        <p class="section-copy">
+          Plain-language guides explain built-in 2FA, device approval, browser
+          password managers, and safe vault migration—whether or not you choose
+          Authier.
+        </p>
+      </div>
+
+      <div class="home-guides">
+        {guides.map((guide, index) => (
+          <a class:list={['home-guide', 'card', { featured: index === 0 }]} href={guide.href}>
+            <span>{String(index + 1).padStart(2, '0')} · {guide.category}</span>
+            <h3>{guide.title}</h3>
+            <p>{guide.description}</p>
+            <i>Read guide <Icon name="arrow" size={17} /></i>
+          </a>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -193,6 +230,10 @@ const features = [
             Inspect the source on GitHub
             <Icon name="arrow" size={18} />
           </a>
+          <a href={`${site.githubUrl}/pulls`} target="_blank" rel="noreferrer">
+            Improve Authier with a pull request
+            <Icon name="arrow" size={18} />
+          </a>
         </div>
       </div>
     </div>
@@ -204,8 +245,9 @@ const features = [
         <p class="eyebrow">Start with the browser you already use</p>
         <h2>Make safer logins feel simple.</h2>
         <p>
-          Install Authier, create your vault, and make your first browser a
-          trusted device in a few minutes.
+          Install the extension and sign up with your email in about a minute.
+          Your browser becomes the starting point for a vault you can use across
+          Windows, macOS, Linux, and Firefox for Android.
         </p>
       </div>
       <div class="cta-actions">
@@ -217,9 +259,49 @@ const features = [
       </div>
     </div>
   </section>
+
+  <script>
+    const subscriptionSuccess = document.querySelector<HTMLElement>(
+      '#subscription-success'
+    )
+
+    if (new URL(window.location.href).searchParams.has('success')) {
+      if (subscriptionSuccess) subscriptionSuccess.hidden = false
+    }
+  </script>
 </BaseLayout>
 
 <style>
+  .subscription-success {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+    padding: 14px 17px;
+    border: 1px solid rgba(105, 230, 204, 0.25);
+    border-radius: 12px;
+    background: rgba(105, 230, 204, 0.06);
+    color: var(--text-muted);
+  }
+
+  .subscription-success[hidden] {
+    display: none;
+  }
+
+  .subscription-success :global(svg) {
+    flex: none;
+    color: var(--accent);
+  }
+
+  .subscription-success p {
+    margin: 0;
+    font-size: 0.86rem;
+  }
+
+  .subscription-success strong {
+    color: var(--text);
+  }
+
   .hero {
     display: grid;
     min-height: calc(100vh - 72px);
@@ -405,6 +487,71 @@ const features = [
     background: linear-gradient(90deg, transparent, var(--accent), transparent);
     opacity: 0.4;
     content: '';
+  }
+
+  .home-guides {
+    display: grid;
+    margin-top: 58px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .home-guide {
+    display: flex;
+    min-height: 300px;
+    padding: 30px;
+    flex-direction: column;
+    text-decoration: none;
+    transition:
+      transform 220ms ease,
+      border-color 220ms ease;
+  }
+
+  .home-guide:hover {
+    transform: translateY(-4px);
+    border-color: rgba(105, 230, 204, 0.26);
+  }
+
+  .home-guide.featured {
+    background:
+      radial-gradient(circle at 90% 5%, rgba(105, 230, 204, 0.1), transparent 34%),
+      linear-gradient(145deg, rgba(18, 25, 25, 0.88), rgba(10, 15, 15, 0.78));
+  }
+
+  .home-guide > span {
+    color: var(--accent);
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+  }
+
+  .home-guide h3 {
+    max-width: 500px;
+    margin: 44px 0 0;
+    font-size: clamp(1.4rem, 3vw, 2.15rem);
+    font-weight: 650;
+    letter-spacing: -0.045em;
+    line-height: 1.1;
+  }
+
+  .home-guide p {
+    margin: 16px 0 0;
+    color: var(--text-subtle);
+    font-size: 0.84rem;
+    line-height: 1.65;
+  }
+
+  .home-guide i {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding-top: 28px;
+    color: var(--accent);
+    font-size: 0.78rem;
+    font-style: normal;
+    font-weight: 680;
   }
 
   .feature-icon {
@@ -747,6 +894,10 @@ const features = [
     }
 
     .feature-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .home-guides {
       grid-template-columns: 1fr;
     }
 

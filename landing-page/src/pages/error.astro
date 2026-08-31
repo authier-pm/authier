@@ -1,0 +1,79 @@
+---
+import Icon from '../components/Icon.astro'
+import BaseLayout from '../layouts/BaseLayout.astro'
+
+const description =
+  'Authier could not complete the requested action. Return to the website, reopen your vault, or check the service status before trying again.'
+---
+
+<BaseLayout title="Something Went Wrong" description={description} noindex>
+  <section class="error-page shell">
+    <span class="error-icon" aria-hidden="true">!</span>
+    <p class="eyebrow">Error</p>
+    <h1>That action did not complete.</h1>
+    <p id="error-message">There was an error.</p>
+    <div>
+      <a class="button" href="/">
+        Go to home
+        <Icon name="arrow" size={18} />
+      </a>
+      <a class="button button-secondary" href="https://authier.openstatus.dev">Check service status</a>
+    </div>
+  </section>
+
+  <script>
+    const message = new URL(window.location.href).searchParams.get('message')
+    const messageElement = document.querySelector<HTMLParagraphElement>(
+      '#error-message'
+    )
+
+    if (message && messageElement) messageElement.textContent = message
+  </script>
+</BaseLayout>
+
+<style>
+  .error-page {
+    display: grid;
+    min-height: 72vh;
+    align-content: center;
+    justify-items: start;
+    padding-block: 80px;
+  }
+
+  .error-icon {
+    display: grid;
+    width: 52px;
+    height: 52px;
+    margin-bottom: 24px;
+    place-items: center;
+    border: 1px solid rgba(255, 145, 124, 0.32);
+    border-radius: 50%;
+    background: rgba(255, 111, 89, 0.08);
+    color: #ffb4a5;
+    font-size: 1.35rem;
+    font-weight: 760;
+  }
+
+  h1 {
+    max-width: 800px;
+    margin: 0;
+    font-size: clamp(3rem, 8vw, 6.4rem);
+    font-weight: 670;
+    letter-spacing: -0.07em;
+    line-height: 0.98;
+  }
+
+  #error-message {
+    max-width: 680px;
+    margin: 28px 0 0;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .error-page > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 34px;
+  }
+</style>

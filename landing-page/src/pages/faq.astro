@@ -15,6 +15,11 @@ const questions = [
       'Authier is an open-source password manager for login credentials and time-based one-time password (TOTP) codes. It runs through browser extensions and a web vault.'
   },
   {
+    question: 'Can I use Authier for my business?',
+    answer:
+      'Yes, you can use Authier for work accounts. Authier does not currently advertise the mature organization administration, policy enforcement, sharing, or enterprise support offered by larger password managers, so evaluate those requirements before adopting it for a team.'
+  },
+  {
     question: 'Where is my vault encrypted?',
     answer:
       'Authier encrypts vault items in the client before synchronization. The API stores encrypted payloads rather than plaintext credentials or TOTP seeds.'
@@ -27,12 +32,17 @@ const questions = [
   {
     question: 'How does a new device join my account?',
     answer:
-      'A new browser creates a pending login request. An already-approved device reviews and approves that request before the new client completes enrollment and synchronizes the encrypted vault.'
+      'The account policy can allow immediate enrollment, require approval from any trusted device, or require the master device. When approval is enabled, a new browser stays pending until the selected device accepts it before vault synchronization begins.'
   },
   {
-    question: 'Can Authier store both passwords and 2FA codes?',
+    question: 'Does keeping 2FA codes on the same device defeat two-factor authentication?',
     answer:
-      'Yes. Authier supports login credentials and TOTP secrets in the same encrypted vault. You should decide whether keeping both factors together matches your personal threat model.'
+      'It reduces factor separation, but a TOTP code can still stop password-only attacks. Authier lets you disable TOTP synchronization on selected devices. For high-impact accounts, a separate authenticator, passkey, or hardware security key may better match your threat model.'
+  },
+  {
+    question: 'Is it safe to keep passwords and TOTP codes in the same vault?',
+    answer:
+      'It is a convenience-versus-separation decision, not an absolute yes or no. Authier encrypts both kinds of secret before synchronization and can require approval from an existing device for enrollment. A compromised unlocked client could still expose both, so keep independent recovery options and separate high-impact factors when appropriate.'
   },
   {
     question: 'Which browsers are supported?',
@@ -52,7 +62,27 @@ const questions = [
   {
     question: 'Can I use Authier with another password manager?',
     answer:
-      'Yes. Browser extensions can sometimes compete for the same login fields, so you may need to disable autofill for one extension on specific sites.'
+      'Yes. Splitting secrets can reduce the impact of one vault compromise, but it also adds operational complexity. Browser extensions can compete for the same fields, so you may need to disable autofill for one extension on specific sites.'
+  },
+  {
+    question: 'What happens on my other devices when I change the master password?',
+    answer:
+      'Change the vault password from the master device. Authier logs out the other devices, and you then sign in and approve them again; the change is not silently applied to every unlocked client.'
+  },
+  {
+    question: 'Can I remove the public autofill-field record for a website?',
+    answer:
+      'Yes. Authier uses a shared corpus of non-secret form metadata—such as the page URL without its query string, host, field type, and CSS selector—to improve autofill. The extension includes controls to remove matching records; newer free accounts wait one week before deletion is enabled. Password values and TOTP seeds are not part of that public record.'
+  },
+  {
+    question: 'Can I import or export my vault?',
+    answer:
+      'The browser vault can import login credentials from CSV and TOTP records from Authy-style JSON. It can export login credentials and TOTP records to CSV. Exported files are sensitive plaintext backups, so encrypt or delete them promptly.'
+  },
+  {
+    question: 'What happened to the native apps and Kiwi Browser?',
+    answer:
+      'The previous website listed native desktop and Android apps as a Q4 2023 roadmap item, linked an early iOS build, and recommended Kiwi Browser. Those statements are historical. Kiwi is now archived; the current public downloads are Chrome, Firefox, Edge, and Firefox for Android.'
   },
   {
     question: 'Where can I report a security issue?',

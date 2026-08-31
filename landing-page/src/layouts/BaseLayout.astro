@@ -11,6 +11,9 @@ interface Props {
   imagePath?: string
   noindex?: boolean
   schema?: Record<string, unknown> | readonly Record<string, unknown>[]
+  openGraphType?: 'website' | 'article'
+  publishedAt?: string
+  updatedAt?: string
 }
 
 const {
@@ -19,7 +22,10 @@ const {
   canonicalPath = Astro.url.pathname,
   imagePath = '/brand/og-authier.png',
   noindex = false,
-  schema = []
+  schema = [],
+  openGraphType = 'website',
+  publishedAt,
+  updatedAt
 } = Astro.props
 
 const canonicalUrl = getCanonicalUrl(canonicalPath)
@@ -57,8 +63,9 @@ const fullTitle = title === site.name ? title : `${title} | ${site.name}`
     <meta name="referrer" content="strict-origin-when-cross-origin" />
     <meta name="application-name" content="Authier" />
     <meta name="apple-mobile-web-app-title" content="Authier" />
+    <meta name="author" content="Authier contributors" />
 
-    <meta property="og:type" content="website" />
+    <meta property="og:type" content={openGraphType} />
     <meta property="og:site_name" content={site.name} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -68,12 +75,15 @@ const fullTitle = title === site.name ? title : `${title} | ${site.name}`
     <meta property="og:image:height" content="630" />
     <meta property="og:image:alt" content="Authier — your vault, your devices" />
     <meta property="og:locale" content="en_US" />
+    {publishedAt && <meta property="article:published_time" content={publishedAt} />}
+    {updatedAt && <meta property="article:modified_time" content={updatedAt} />}
 
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content={fullTitle} />
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={imageUrl} />
     <meta name="twitter:image:alt" content="Authier — your vault, your devices" />
+    <meta name="twitter:site" content="@authierpm" />
 
     <link rel="alternate" hreflang="en" href={canonicalUrl} />
     <link rel="alternate" hreflang="x-default" href={canonicalUrl} />

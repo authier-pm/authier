@@ -9,13 +9,29 @@ interface Props {
   publishedAt: string
   updatedAt?: string
   readingTime: string
+  collectionHref?: string
+  collectionLabel?: string
+  eyebrow?: string
+  schemaType?: 'Article' | 'TechArticle'
+  extraSchema?: readonly Record<string, unknown>[]
 }
 
-const { title, description, publishedAt, updatedAt = publishedAt, readingTime } = Astro.props
+const {
+  title,
+  description,
+  publishedAt,
+  updatedAt = publishedAt,
+  readingTime,
+  collectionHref = '/blog',
+  collectionLabel = 'Blog',
+  eyebrow = 'Authier journal',
+  schemaType = 'Article',
+  extraSchema
+} = Astro.props
 
-const schema = {
+const articleSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Article',
+  '@type': schemaType,
   headline: title,
   description,
   datePublished: publishedAt,
@@ -35,19 +51,28 @@ const schema = {
     }
   }
 }
+
+const schema = [articleSchema, ...(extraSchema ?? [])]
 ---
 
-<BaseLayout title={title} description={description} schema={schema}>
+<BaseLayout
+  title={title}
+  description={description}
+  schema={schema}
+  openGraphType="article"
+  publishedAt={publishedAt}
+  updatedAt={updatedAt}
+>
   <article>
     <header class="article-header narrow-shell">
       <Breadcrumbs
         items={[
           { label: 'Home', href: '/' },
-          { label: 'Blog', href: '/blog' },
+          { label: collectionLabel, href: collectionHref },
           { label: title }
         ]}
       />
-      <p class="eyebrow">Authier journal</p>
+      <p class="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
       <p class="dek">{description}</p>
       <div class="article-meta">

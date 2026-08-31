@@ -6,7 +6,7 @@ export default defineConfig({
   build: {
     format: 'file'
   },
-  integrations: [sitemap()],
+  integrations: [sitemap({ filter: (page) => !page.endsWith('/error') })],
   compressHTML: true,
   prefetch: true,
   trailingSlash: 'never'

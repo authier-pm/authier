@@ -65,9 +65,9 @@ const schema = {
 
 <BaseLayout title={title} description={description} schema={schema}>
   <PageHero
-    eyebrow="Simple capacity pricing"
+    eyebrow="Pay per quantity"
     title="Start free. Pay only when your vault grows."
-    description="Every Authier account starts with the core security model and browser experience. Monthly capacity packs increase the number of credentials or TOTP secrets you can keep."
+    description="Start small and pay only when you need to scale up. Monthly capacity packs increase the number of credentials or TOTP secrets you can keep."
     breadcrumbs={[
       { label: 'Home', href: '/' },
       { label: 'Pricing' }
@@ -80,7 +80,7 @@ const schema = {
     <div class="pricing-grid">
       {plans.map((plan) => (
         <article class:list={['plan-card', 'card', { featured: plan.featured }]}>
-          {plan.featured && <span class="popular-label">Best value</span>}
+          {plan.featured && <span class="popular-label">Most popular</span>}
           <div class="plan-heading">
             <h2>{plan.name}</h2>
             <p>{plan.description}</p>
@@ -282,7 +282,10 @@ const schema = {
     })
 
     if (url.searchParams.has('success')) {
-      setStatus('Subscription confirmed. Refresh Authier to see the new limits.', 'success')
+      setStatus(
+        'Thank you for subscribing! You can close this tab and return to your vault. Refresh it to see your upgraded account limits.',
+        'success'
+      )
     } else if (url.searchParams.has('canceled')) {
       setStatus('Checkout was canceled. Your plan was not changed.', 'error')
     } else if (url.searchParams.has('portal')) {

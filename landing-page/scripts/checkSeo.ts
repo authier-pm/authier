@@ -8,11 +8,11 @@ const distributionDirectory = join(projectDirectory, 'dist')
 function listHtmlFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((entry) => {
     const path = join(directory, entry)
-    return statSync(path).isDirectory()
-      ? listHtmlFiles(path)
-      : path.endsWith('.html')
-        ? [path]
-        : []
+
+    if (statSync(path).isDirectory()) return listHtmlFiles(path)
+    if (path.endsWith('.html')) return [path]
+
+    return []
   })
 }
 
@@ -144,6 +144,17 @@ for (const requiredFile of [
 ]) {
   if (!existsSync(join(distributionDirectory, requiredFile))) {
     throw new Error(`Missing SEO or platform file: ${requiredFile}`)
+  }
+}
+
+const sitemap = readFileSync(
+  join(distributionDirectory, 'sitemap-0.xml'),
+  'utf8'
+)
+
+for (const excludedRoute of ['/404', '/error']) {
+  if (sitemap.includes(`<loc>https://www.authier.pm${excludedRoute}</loc>`)) {
+    throw new Error(`Noindex route appears in the sitemap: ${excludedRoute}`)
   }
 }
 

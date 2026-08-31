@@ -52,7 +52,7 @@ const schema = {
   <PageHero
     eyebrow="Download Authier"
     title="Start with your browser."
-    description="Choose your browser extension, create a vault, and make that browser your first trusted device. Authier works on desktop and on Firefox for Android."
+    description="Choose your browser extension, create a vault, and make that browser your first device. Start on your phone if you want it to become the initial master device."
     breadcrumbs={[
       { label: 'Home', href: '/' },
       { label: 'Download' }
@@ -73,6 +73,11 @@ const schema = {
         </a>
       ))}
     </div>
+
+    <div class="platform-note">
+      <p><strong>Desktop:</strong> use Chrome, Firefox, or Edge on Windows, macOS, or Linux.</p>
+      <p><strong>Android:</strong> use the official Firefox add-on in Firefox for Android.</p>
+    </div>
   </section>
 
   <section class="section section-border">
@@ -81,8 +86,9 @@ const schema = {
         <p class="eyebrow">First-time setup</p>
         <h2 class="section-heading">Three steps to an encrypted vault.</h2>
         <p class="section-copy">
-          Your first browser becomes the trusted starting point for the account.
-          Keep access to it while you approve additional browsers and devices.
+          Your first browser becomes the trusted starting point and initial
+          master device for the account. You can move that role later, but
+          beginning on the device you expect to keep nearby saves that step.
         </p>
       </div>
 
@@ -100,6 +106,28 @@ const schema = {
           <div><h3>Add another device</h3><p>Request access there, then approve it from a device you already trust.</p></div>
         </li>
       </ol>
+    </div>
+  </section>
+
+  <section class="section section-border">
+    <div class="shell support-history card">
+      <div>
+        <p class="eyebrow">Current support versus the old roadmap</p>
+        <h2>Use the store links above as the source of truth.</h2>
+      </div>
+      <div>
+        <p>
+          The previous website recommended Kiwi Browser for Android and said
+          native Android, macOS, Windows, and Linux apps were coming in Q4 2023.
+          It also linked an early iOS build. Those statements are historical,
+          not the current download promise.
+        </p>
+        <p>
+          <a href="https://github.com/kiwibrowser/src.next/blob/kiwi/README.md" target="_blank" rel="noreferrer">Kiwi Browser is now archived</a>
+          and no longer maintained. Firefox for Android has an official Authier
+          listing, so it is the supported mobile browser path shown here.
+        </p>
+      </div>
     </div>
   </section>
 
@@ -124,6 +152,23 @@ const schema = {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 14px;
+  }
+
+  .platform-note {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 28px;
+    margin-top: 24px;
+    color: var(--text-subtle);
+    font-size: 0.82rem;
+  }
+
+  .platform-note p {
+    margin: 0;
+  }
+
+  .platform-note strong {
+    color: var(--text-muted);
   }
 
   .browser-card {
@@ -254,6 +299,39 @@ const schema = {
     gap: 26px;
   }
 
+  .support-history {
+    display: grid;
+    padding: clamp(30px, 5vw, 54px);
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(34px, 7vw, 90px);
+  }
+
+  .support-history h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    font-weight: 660;
+    letter-spacing: -0.05em;
+    line-height: 1.06;
+  }
+
+  .support-history > div:last-child {
+    color: var(--text-muted);
+  }
+
+  .support-history > div:last-child p {
+    margin: 0 0 18px;
+    line-height: 1.78;
+  }
+
+  .support-history > div:last-child p:last-child {
+    margin-bottom: 0;
+  }
+
+  .support-history a {
+    color: var(--accent);
+    text-underline-offset: 4px;
+  }
+
   .vault-icon {
     display: grid;
     width: 58px;
@@ -294,6 +372,10 @@ const schema = {
     .start-layout {
       grid-template-columns: 1fr;
       gap: 45px;
+    }
+
+    .support-history {
+      grid-template-columns: 1fr;
     }
 
     .vault-callout {

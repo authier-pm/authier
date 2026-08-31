@@ -7,6 +7,7 @@ export const site = {
   vaultUrl: 'https://vault.authier.pm',
   statusUrl: 'https://authier.openstatus.dev',
   discordUrl: 'https://discord.gg/PdGCMeXtFG',
+  twitterUrl: 'https://x.com/authierpm',
   chromeUrl:
     'https://chromewebstore.google.com/detail/authier/padmmdghcflnaellmmckicifafoenfdi',
   firefoxUrl: 'https://addons.mozilla.org/en-US/firefox/addon/authier/',
@@ -27,5 +28,6 @@ export const navigation = [
   { label: 'Features', href: '/features' },
   { label: 'Security', href: '/security' },
   { label: 'Pricing', href: '/pricing' },
+  { label: 'Guides', href: '/guides' },
   { label: 'Blog', href: '/blog' }
 ] as const

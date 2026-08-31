@@ -15,8 +15,10 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
   <p>
     We originally wrote this comparison in 2023, after using Bitwarden for years.
-    Both products have evolved since then, so this version removes outdated
-    feature claims and makes the trade-offs more explicit.
+    We were happy long-term Bitwarden users before Authier became usable enough
+    for us to use ourselves. Both products have evolved since then, so this
+    version removes outdated feature claims and makes the trade-offs more
+    explicit.
   </p>
 
   <h2>What both projects have in common</h2>
@@ -91,7 +93,8 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
   <p>
     Authier focuses on keeping credentials and TOTP codes close to the browser
-    login flow. If you mostly live in Firefox or Chromium and prefer a smaller,
+    login flow, including pages that ask for a username and password in separate
+    steps. If you mostly live in Firefox or Chromium and prefer a smaller,
     focused interface, that constraint may feel appealing. If you need native
     clients and a broad ecosystem, it will feel limiting.
   </p>
@@ -112,6 +115,13 @@ import ArticleLayout from '../../layouts/ArticleLayout.astro'
     support, depend on enterprise features, or consider published independent
     audits a requirement. That describes most people looking for a primary
     password manager.
+  </p>
+
+  <p>
+    That recommendation is especially important for banking, cryptocurrency
+    custody, administrative access, and other accounts where one compromise would
+    have an unusually high impact. Until Authier publishes a thorough independent
+    audit, Bitwarden or 1Password is the more conservative home for those secrets.
   </p>
 
   <p>
