@@ -10,6 +10,9 @@
       <stop offset="0.5" stop-color="#69e6cc" stop-opacity="0.65"/>
       <stop offset="1" stop-color="#69e6cc" stop-opacity="0"/>
     </linearGradient>
+    <clipPath id="logo-clip">
+      <rect width="58" height="58" rx="15"/>
+    </clipPath>
   </defs>
   <rect width="1200" height="630" fill="#070a0a"/>
   <rect width="1200" height="630" fill="url(#glow)"/>
@@ -17,14 +20,7 @@
   <path d="M70 0V630M140 0V630M210 0V630M280 0V630M350 0V630M420 0V630M490 0V630M560 0V630M630 0V630M700 0V630M770 0V630M840 0V630M910 0V630M980 0V630M1050 0V630M1120 0V630" stroke="#b5d8cf" stroke-opacity="0.025"/>
 
   <g transform="translate(82 72)">
-    <rect width="58" height="58" rx="15" fill="#1fd7d0"/>
-    <g transform="translate(9 15)" fill="#1b0430">
-      <rect x="0" y="10" width="27" height="8"/>
-      <rect x="24" y="5" width="8" height="18"/>
-      <rect x="30" y="0" width="10" height="28"/>
-      <rect x="4" y="18" width="8" height="7"/>
-      <rect x="15" y="18" width="7" height="10"/>
-    </g>
+    <image href="authier-logo.png" width="58" height="58" clip-path="url(#logo-clip)"/>
   </g>
 
   <text x="158" y="110" fill="#f2f7f5" font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="700" letter-spacing="-1">authier</text>
