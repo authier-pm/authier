@@ -14,24 +14,21 @@ const browsers = [
     label: 'Chrome Web Store',
     href: site.chromeUrl,
     note: 'For Chrome and Chromium-based desktop browsers.',
-    monogram: 'C',
-    color: 'chrome'
+    icon: '/browser/chrome.png'
   },
   {
     name: 'Mozilla Firefox',
     label: 'Firefox Add-ons',
     href: site.firefoxUrl,
     note: 'Available for Firefox desktop and Firefox for Android.',
-    monogram: 'F',
-    color: 'firefox'
+    icon: '/browser/firefox.png'
   },
   {
     name: 'Microsoft Edge',
     label: 'Microsoft Edge Add-ons',
     href: site.edgeUrl,
     note: 'Install directly from the Microsoft Edge Add-ons store.',
-    monogram: 'E',
-    color: 'edge'
+    icon: '/browser/edge.png'
   }
 ] as const
 
@@ -63,7 +60,14 @@ const schema = {
     <div class="browser-grid">
       {browsers.map((browser) => (
         <a class="browser-card card" href={browser.href} target="_blank" rel="noreferrer">
-          <span class:list={['browser-icon', browser.color]}>{browser.monogram}</span>
+          <img
+            class="browser-icon"
+            src={browser.icon}
+            alt=""
+            width="56"
+            height="56"
+            decoding="async"
+          />
           <div>
             <small>{browser.label}</small>
             <h2>{browser.name}</h2>
@@ -189,30 +193,12 @@ const schema = {
   }
 
   .browser-icon {
-    display: grid;
-    width: 54px;
-    height: 54px;
+    width: 56px;
+    height: 56px;
     margin-bottom: 58px;
     grid-column: 1;
-    place-items: center;
-    border-radius: 15px;
-    font-size: 1rem;
-    font-weight: 820;
-  }
-
-  .browser-icon.chrome {
-    background: linear-gradient(145deg, #f1cd50, #55ae7a 55%, #4d80d9);
-    color: #07110f;
-  }
-
-  .browser-icon.firefox {
-    background: linear-gradient(145deg, #f08d43, #8a4dd5);
-    color: white;
-  }
-
-  .browser-icon.edge {
-    background: linear-gradient(145deg, #2fc5b6, #2987d8);
-    color: white;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.3));
   }
 
   .external-arrow {
