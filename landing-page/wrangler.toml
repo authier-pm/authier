@@ -1,4 +1,3 @@
 name = "authier"
-account_id = "fbd16d9252980833034caa69e11aa064"
 compatibility_date = "2026-08-31"
 pages_build_output_dir = "./dist"
