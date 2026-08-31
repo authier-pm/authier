@@ -14,6 +14,15 @@ export const site = {
     'https://microsoftedge.microsoft.com/addons/detail/authier/jahkkkffomngonmmoopccjnhlngjjnll'
 } as const
 
+export const getCanonicalPath = (pathname: string) => {
+  if (pathname === '/index.html') return '/'
+
+  return pathname.endsWith('.html') ? pathname.slice(0, -5) : pathname
+}
+
+export const getCanonicalUrl = (pathname: string) =>
+  new URL(getCanonicalPath(pathname), site.url)
+
 export const navigation = [
   { label: 'Features', href: '/features' },
   { label: 'Security', href: '/security' },

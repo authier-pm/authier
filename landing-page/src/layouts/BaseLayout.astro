@@ -1,7 +1,7 @@
 ---
 import Footer from '../components/Footer.astro'
 import Header from '../components/Header.astro'
-import { site } from '../config'
+import { getCanonicalUrl, site } from '../config'
 import '../styles/global.css'
 
 interface Props {
@@ -22,7 +22,7 @@ const {
   schema = []
 } = Astro.props
 
-const canonicalUrl = new URL(canonicalPath, site.url)
+const canonicalUrl = getCanonicalUrl(canonicalPath)
 const imageUrl = new URL(imagePath, site.url)
 const schemas = Array.isArray(schema) ? schema : [schema]
 const fullTitle = title === site.name ? title : `${title} | ${site.name}`

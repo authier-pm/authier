@@ -92,6 +92,10 @@ for (const file of files) {
     throw new Error(`${route}: canonical URL is outside the canonical origin`)
   }
 
+  if (new URL(canonical).pathname !== route) {
+    throw new Error(`${route}: canonical URL does not match the page route`)
+  }
+
   if (route !== '/404') {
     if (titles.has(title)) throw new Error(`${route}: duplicate title ${title}`)
     if (descriptions.has(description)) {

@@ -1,7 +1,7 @@
 ---
 import BaseLayout from './BaseLayout.astro'
 import Breadcrumbs from '../components/Breadcrumbs.astro'
-import { site } from '../config'
+import { getCanonicalUrl, site } from '../config'
 
 interface Props {
   title: string
@@ -20,7 +20,7 @@ const schema = {
   description,
   datePublished: publishedAt,
   dateModified: updatedAt,
-  mainEntityOfPage: Astro.url.href,
+  mainEntityOfPage: getCanonicalUrl(Astro.url.pathname).href,
   author: {
     '@type': 'Organization',
     name: 'Authier contributors',

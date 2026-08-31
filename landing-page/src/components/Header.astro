@@ -1,8 +1,8 @@
 ---
-import { navigation, site } from '../config'
+import { getCanonicalPath, navigation, site } from '../config'
 import Icon from './Icon.astro'
 
-const currentPath = Astro.url.pathname
+const currentPath = getCanonicalPath(Astro.url.pathname)
 ---
 
 <header class="site-header">

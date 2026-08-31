@@ -1,5 +1,5 @@
 ---
-import { site } from '../config'
+import { getCanonicalUrl, site } from '../config'
 
 interface BreadcrumbItem {
   label: string
@@ -19,7 +19,7 @@ const schema = {
     '@type': 'ListItem',
     position: index + 1,
     name: item.label,
-    item: item.href ? new URL(item.href, site.url).href : Astro.url.href
+    item: item.href ? new URL(item.href, site.url).href : getCanonicalUrl(Astro.url.pathname).href
   }))
 }
 ---
