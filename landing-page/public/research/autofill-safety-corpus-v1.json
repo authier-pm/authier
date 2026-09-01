@@ -101,7 +101,9 @@
             "passwordKind": "none",
             "storedPasswordTargetId": null,
             "otpKind": "single",
-            "otpTargetIds": ["verification-code"]
+            "otpTargetIds": [
+              "verification-code"
+            ]
           }
         },
         {
@@ -252,7 +254,9 @@
             "passwordKind": "none",
             "storedPasswordTargetId": null,
             "otpKind": "single",
-            "otpTargetIds": ["session-otp"]
+            "otpTargetIds": [
+              "session-otp"
+            ]
           }
         }
       ]
