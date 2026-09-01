@@ -1,5 +1,7 @@
 import type { AutofillSafetyCorpus } from './schema'
 import {
+  OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE,
+  OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE_URL,
   OPEN_AUTOFILL_SAFETY_CORPUS_NAME,
   OPEN_AUTOFILL_SAFETY_CORPUS_VERSION
 } from './schema'
@@ -12,6 +14,8 @@ const standardDocument = {
 export const openAutofillSafetyCorpusV1 = {
   name: OPEN_AUTOFILL_SAFETY_CORPUS_NAME,
   version: OPEN_AUTOFILL_SAFETY_CORPUS_VERSION,
+  license: OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE,
+  licenseUrl: OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE_URL,
   limitations: [
     'All markup is synthetic and deliberately small; it is not copied from vendor pages.',
     'The corpus does not exercise a live browser, browser-extension permissions, cross-browser behavior, network requests, form submission, or real secrets.',

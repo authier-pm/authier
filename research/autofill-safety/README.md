@@ -31,6 +31,26 @@ Run that focused adapter check from the repository root:
 pnpm --dir web-extension exec vitest run src/content-script/autofillSafetyCorpus.spec.ts
 ```
 
+Generate the public, machine-readable corpus from the typed source:
+
+```sh
+bun research/autofill-safety/exportCorpus.ts
+```
+
+The generated JSON and its SHA-256 sidecar are written to
+`landing-page/public/research/autofill-safety-corpus-v1.json` and
+`landing-page/public/research/autofill-safety-corpus-v1.sha256`. The JSON
+contains the synthetic fixtures and expected observations, not a live-browser
+result set. The sidecar uses the standard `<digest>  <filename>` format so the
+download can be verified independently.
+
+## License
+
+The corpus, runner, adapter, and generated JSON are available under
+`AGPL-3.0-or-later`; see the repository root `LICENSE` file. The generated JSON
+also carries the SPDX identifier and license URL so that the terms remain clear
+when the file is downloaded separately.
+
 ## Limits
 
 This is a synthetic DOM classifier corpus, not a live-browser suite. It does not

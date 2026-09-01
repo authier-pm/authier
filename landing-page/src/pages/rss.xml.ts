@@ -1,5 +1,6 @@
 import { blogPosts } from '../data/blog'
 import { guides } from '../data/guides'
+import { researchArtifacts } from '../data/research'
 import { site } from '../config'
 
 export const prerender = true
@@ -13,7 +14,7 @@ const escapeXml = (value: string) =>
     .replaceAll("'", '&apos;')
 
 export function GET() {
-  const entries = [...blogPosts, ...guides].sort(
+  const entries = [...blogPosts, ...guides, ...researchArtifacts].sort(
     (left, right) =>
       new Date(right.publishedAt).getTime() -
       new Date(left.publishedAt).getTime()
@@ -38,7 +39,7 @@ export function GET() {
   const body = `<?xml version="1.0" encoding="UTF-8" ?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-  <title>Authier articles and guides</title>
+  <title>Authier articles, guides, and research</title>
   <link>${site.url}/</link>
   <atom:link href="${site.url}/rss.xml" rel="self" type="application/rss+xml" />
   <description>${escapeXml(site.description)}</description>

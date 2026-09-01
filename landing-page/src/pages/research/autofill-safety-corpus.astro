@@ -1,0 +1,366 @@
+---
+import { createHash } from 'node:crypto'
+import { readFileSync } from 'node:fs'
+import { site } from '../../config'
+import { researchArtifacts } from '../../data/research'
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+
+const [artifact] = researchArtifacts
+const corpusUrl = '/research/autofill-safety-corpus-v1.json'
+const checksumUrl = '/research/autofill-safety-corpus-v1.sha256'
+const sourceUrl = `${site.githubUrl}/tree/main/research/autofill-safety`
+const adapterUrl = `${site.githubUrl}/blob/main/web-extension/src/content-script/autofillSafetyCorpus.spec.ts`
+const corpusFileUrl = new URL(
+  '../../../public/research/autofill-safety-corpus-v1.json',
+  import.meta.url
+)
+const corpusSha256 = createHash('sha256')
+  .update(readFileSync(corpusFileUrl))
+  .digest('hex')
+
+const datasetSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Dataset',
+  name: artifact.title,
+  description: artifact.description,
+  url: `${site.url}${artifact.href}`,
+  version: '1.0.0',
+  datePublished: artifact.publishedAt,
+  dateModified: artifact.updatedAt,
+  creator: {
+    '@type': 'Organization',
+    name: 'Authier contributors',
+    url: site.githubUrl
+  },
+  license: 'https://spdx.org/licenses/AGPL-3.0-or-later.html',
+  measurementTechnique: 'Synthetic jsdom classifier adapter tests',
+  keywords: [
+    'password manager',
+    'autofill',
+    'TOTP',
+    'browser extension',
+    'form classification'
+  ],
+  distribution: {
+    '@type': 'DataDownload',
+    contentUrl: `${site.url}${corpusUrl}`,
+    encodingFormat: 'application/json',
+    sha256: corpusSha256
+  }
+}
+---
+
+<ArticleLayout
+  title={artifact.title}
+  description={artifact.description}
+  publishedAt={artifact.publishedAt}
+  updatedAt={artifact.updatedAt}
+  readingTime={artifact.readingTime}
+  collectionHref="/research"
+  collectionLabel="Research"
+  eyebrow="Open research artifact"
+  schemaType="TechArticle"
+  extraSchema={[datasetSchema]}
+>
+  <div class="article-callout">
+    <p><strong>Read the scope first:</strong> this is a synthetic jsdom classifier corpus. It is not a live-browser benchmark, a security audit, a compatibility guarantee, or a measured false-positive study.</p>
+  </div>
+
+  <p>
+    Password-manager autofill is a write decision involving a secret. A useful
+    test contract therefore needs to express not only where a credential may go,
+    but also when the safest answer is <strong>no target</strong>. Open Autofill
+    Safety Corpus v1 turns that narrow decision into typed, machine-readable
+    fixtures with exact expected element IDs.
+  </p>
+
+  <div class="corpus-metrics" aria-label="Corpus scope">
+    <div><strong>6</strong><span>synthetic fixtures</span></div>
+    <div><strong>12</strong><span>deterministic phases</span></div>
+    <div><strong>0</strong><span>real credentials</span></div>
+    <div><strong>v1</strong><span>classifier contract</span></div>
+  </div>
+
+  <p class="corpus-actions">
+    <a class="button" href={corpusUrl} download>Download corpus JSON</a>
+    <a class="button button-secondary" href={checksumUrl} download>Download SHA-256</a>
+    <a class="button button-secondary" href={sourceUrl} target="_blank" rel="noreferrer">Inspect typed source</a>
+  </p>
+
+  <p class="corpus-checksum">
+    <span>SHA-256</span>
+    <code>{corpusSha256}</code>
+  </p>
+
+  <h2>What version 1 contains</h2>
+
+  <p>
+    Every fixture uses small, hand-written markup on a reserved
+    <code>.invalid</code> hostname. No HTML is copied from a real vendor page.
+    A phase records the URL, document language, body markup, expected password
+    classification, optional stored-password target, OTP shape, and ordered OTP
+    targets.
+  </p>
+
+  <div
+    class="corpus-table-wrap"
+    tabindex="0"
+    aria-label="Scrollable corpus fixture summary"
+  >
+    <table>
+      <caption>Open Autofill Safety Corpus v1 fixture summary</caption>
+      <thead>
+        <tr>
+          <th scope="col">Fixture</th>
+          <th scope="col">Phases</th>
+          <th scope="col">Safety expectation</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Password-only login</td>
+          <td>1</td>
+          <td>Recognize an explicit current-password step after the identifier was collected elsewhere.</td>
+        </tr>
+        <tr>
+          <td>Signup no-fill</td>
+          <td>1</td>
+          <td>Classify new-password fields without selecting a stored-password target.</td>
+        </tr>
+        <tr>
+          <td>Change-password no-fill</td>
+          <td>1</td>
+          <td>Identify the form kind while withholding automatic stored-credential fill.</td>
+        </tr>
+        <tr>
+          <td>OTP versus code traps</td>
+          <td>4</td>
+          <td>Accept explicit single and segmented OTPs; reject recovery and card-security codes.</td>
+        </tr>
+        <tr>
+          <td>Ambiguity</td>
+          <td>2</td>
+          <td>Abstain on an unannotated password form and equally plausible OTP candidates.</td>
+        </tr>
+        <tr>
+          <td>Dynamic replacement</td>
+          <td>3</td>
+          <td>Re-query identifier, password, and OTP nodes as a synthetic multi-step flow changes shape.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>How the contract runs</h2>
+
+  <ol>
+    <li>The runner sorts fixtures and phases by stable identifiers.</li>
+    <li>An adapter mounts the synthetic document for one phase.</li>
+    <li>The adapter returns a normalized observation rather than performing a credential write.</li>
+    <li>The runner compares the password kind, password target, OTP kind, and ordered OTP targets exactly.</li>
+    <li>The report contains no clock time, random value, or environment-specific path, so identical observations serialize identically.</li>
+  </ol>
+
+  <p>
+    Authier’s repository adapter calls the production
+    <code>classifyPasswordForm</code>, <code>findSegmentedOtpInputs</code>, and
+    <code>findSingleOtpInput</code> functions, plus the same pure stored-password
+    target policy used by runtime autofill. The
+    <a href={adapterUrl} target="_blank" rel="noreferrer">adapter test</a>
+    asserts exact observations without writing a credential. Separate
+    production suites exercise runtime autofill behavior with synthetic values.
+    This page does not publish a dated run report, so it does not present a
+    versioned empirical result, browser-compatibility measurement, or current
+    pass count.
+  </p>
+
+  <h2>What a passing result does not establish</h2>
+
+  <ul>
+    <li>No real browser or packaged extension is launched.</li>
+    <li>No password or TOTP value is written, submitted, or sent over a network.</li>
+    <li>No extension permission, content-script isolation, or hostile page script is exercised.</li>
+    <li>No cross-browser, cross-origin frame, closed-shadow-root, localization, or visual-layout behavior is measured.</li>
+    <li>No inference can be made about Authier’s overall security, compatibility, or real-world false-positive rate.</li>
+  </ul>
+
+  <p>
+    Authier remains early-stage and has not published an independent security
+    audit. Its broader <a href="/security">security architecture and limitations</a>
+    should be evaluated separately from this classifier artifact.
+  </p>
+
+  <h2>How this differs from existing work</h2>
+
+  <p>
+    This is not the first autofill test collection or password-manager study.
+    Mozilla maintains
+    <a href="https://github.com/mozilla/form-fill-examples" target="_blank" rel="noreferrer">form-fill example pages</a>,
+    while Bitwarden’s
+    <a href="https://github.com/bitwarden/browser-interactions-testing" target="_blank" rel="noreferrer">Browser Interactions Testing</a>
+    runs static and selected live scenarios with a real extension build. The
+    2020 USENIX Security paper
+    <a href="https://www.usenix.org/conference/usenixsecurity20/presentation/oesch" target="_blank" rel="noreferrer">“That Was Then, This Is Now”</a>
+    evaluated generation, storage, and autofill across 13 password managers.
+    The ACSAC 2024
+    <a href="https://github.com/Leaky-Autofill/LeakyAutofill-Artifact" target="_blank" rel="noreferrer">Leaky Autofill artifact</a>
+    examines whether password managers fill data into concealed fields.
+  </p>
+
+  <p>
+    Version 1 is intentionally smaller: an adapter-friendly regression contract
+    for form-shape classification, ordered target selection, and explicit
+    abstention. Its value is the narrow boundary, not a claim to replace
+    browser-level or empirical security research.
+  </p>
+
+  <h2>Next evidence layers</h2>
+
+  <p>
+    The next useful addition is a packaged-extension integration adapter in a
+    real Chromium context, followed by focused open-shadow-root coverage and
+    synthetic cross-origin-frame cases. Browser engines, localization, hostile
+    scripts, and a measured sample of real form shapes should remain separate
+    result sets so their evidence is not blurred into the deterministic v1
+    classifier contract.
+  </p>
+
+  <div class="article-callout">
+    <p><strong>Reproduce it:</strong> download the JSON, inspect the typed runner and Authier adapter, and report mismatches with the smallest synthetic form that demonstrates them. Do not submit real credentials or captured private pages.</p>
+  </div>
+</ArticleLayout>
+
+<style>
+  .corpus-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 38px 0;
+  }
+
+  .corpus-metrics div {
+    display: grid;
+    gap: 8px;
+    padding: 20px;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    background: rgba(105, 230, 204, 0.035);
+  }
+
+  .corpus-metrics strong {
+    color: var(--text);
+    font-size: 1.75rem;
+    letter-spacing: -0.04em;
+  }
+
+  .corpus-metrics span {
+    color: var(--text-subtle);
+    font-size: 0.72rem;
+    line-height: 1.45;
+  }
+
+  .corpus-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .corpus-actions a {
+    text-decoration: none;
+  }
+
+  .corpus-actions .button {
+    color: #07110f;
+  }
+
+  .corpus-actions .button-secondary {
+    color: var(--text);
+  }
+
+  .corpus-checksum {
+    display: grid;
+    gap: 7px;
+    padding: 16px 18px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .corpus-checksum span {
+    color: var(--text-subtle);
+    font-size: 0.68rem;
+    font-weight: 650;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  .corpus-checksum code {
+    overflow-wrap: anywhere;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+  }
+
+  .corpus-table-wrap {
+    overflow-x: auto;
+    margin: 30px 0 42px;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+  }
+
+  .corpus-table-wrap:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.84rem;
+    line-height: 1.6;
+  }
+
+  caption {
+    padding: 14px 18px;
+    color: var(--text-muted);
+    font-size: 0.74rem;
+    font-weight: 640;
+    text-align: left;
+  }
+
+  th,
+  td {
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  th {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.025);
+    font-size: 0.68rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+  }
+
+  tbody tr:last-child td {
+    border-bottom: 0;
+  }
+
+  td:first-child {
+    min-width: 170px;
+    color: var(--text);
+    font-weight: 640;
+  }
+
+  td:nth-child(2) {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  }
+
+  @media (max-width: 720px) {
+    .corpus-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>

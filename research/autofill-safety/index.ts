@@ -6,6 +6,8 @@ export type {
   AutofillSafetyRunReport
 } from './runner'
 export {
+  OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE,
+  OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE_URL,
   OPEN_AUTOFILL_SAFETY_CORPUS_NAME,
   OPEN_AUTOFILL_SAFETY_CORPUS_VERSION
 } from './schema'

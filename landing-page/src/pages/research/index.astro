@@ -2,76 +2,60 @@
 import Icon from '../../components/Icon.astro'
 import PageHero from '../../components/PageHero.astro'
 import { site } from '../../config'
-import { blogPosts } from '../../data/blog'
 import { researchArtifacts } from '../../data/research'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
-const title = 'Password Manager Blog'
+const title = 'Password Manager Research'
 const description =
-  'Read Authier articles and research about password security, trusted devices, open-source development, TOTP authentication, and autofill safety.'
-
-const entries = [...researchArtifacts, ...blogPosts].sort(
-  (left, right) =>
-    new Date(right.updatedAt).getTime() - new Date(left.updatedAt).getTime()
-)
+  'Inspect Authier’s reproducible password-manager research artifacts, machine-readable test cases, methods, results, and explicit limitations.'
 
 const schema = {
   '@context': 'https://schema.org',
   '@type': 'CollectionPage',
-  name: 'Authier password manager blog',
+  name: 'Authier password manager research',
   description,
-  url: `${site.url}/blog`,
-  hasPart: [
-    ...researchArtifacts.map((artifact) => ({
-      '@type': 'Dataset',
-      name: artifact.title,
-      description: artifact.description,
-      url: `${site.url}${artifact.href}`,
-      datePublished: artifact.publishedAt,
-      dateModified: artifact.updatedAt
-    })),
-    ...blogPosts.map((post) => ({
-      '@type': 'Article',
-      headline: post.title,
-      description: post.description,
-      url: `${site.url}${post.href}`,
-      datePublished: post.publishedAt,
-      dateModified: post.updatedAt
-    }))
-  ]
+  url: `${site.url}/research`,
+  hasPart: researchArtifacts.map((artifact) => ({
+    '@type': 'Dataset',
+    name: artifact.title,
+    description: artifact.description,
+    url: `${site.url}${artifact.href}`,
+    datePublished: artifact.publishedAt,
+    dateModified: artifact.updatedAt
+  }))
 }
 ---
 
 <BaseLayout title={title} description={description} schema={schema}>
   <PageHero
-    eyebrow="Authier journal"
-    title="Security notes from an open project."
+    eyebrow="Open research"
+    title="Evidence you can rerun. Limits you can see."
     description={description}
     breadcrumbs={[
       { label: 'Home', href: '/' },
-      { label: 'Blog' }
+      { label: 'Research' }
     ]}
     compact
   />
 
-  <section class="section shell posts">
-    {entries.map((post, index) => (
-      <article class:list={['post-card', 'card', { featured: index === 0 }]}>
-        <div class="post-meta">
-          <span>{post.category}</span>
-          <time datetime={post.updatedAt}>
+  <section class="section shell research-list">
+    {researchArtifacts.map((artifact) => (
+      <article class="research-card card">
+        <div class="research-meta">
+          <span>{artifact.category}</span>
+          <time datetime={artifact.updatedAt}>
             {new Intl.DateTimeFormat('en', {
               month: 'short',
               day: 'numeric',
               year: 'numeric',
               timeZone: 'UTC'
-            }).format(new Date(post.updatedAt))}
+            }).format(new Date(artifact.updatedAt))}
           </time>
         </div>
-        <h2><a href={post.href}>{post.title}</a></h2>
-        <p>{post.description}</p>
-        <a class="read-link" href={post.href}>
-          Read article
+        <h2><a href={artifact.href}>{artifact.title}</a></h2>
+        <p>{artifact.description}</p>
+        <a class="read-link" href={artifact.href}>
+          Inspect artifact
           <Icon name="arrow" size={18} />
         </a>
       </article>
@@ -80,26 +64,22 @@ const schema = {
 </BaseLayout>
 
 <style>
-  .posts {
+  .research-list {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 14px;
+    grid-template-columns: minmax(0, 760px);
   }
 
-  .post-card {
+  .research-card {
     display: flex;
     min-height: 390px;
     padding: clamp(28px, 4vw, 46px);
     flex-direction: column;
-  }
-
-  .post-card.featured {
     background:
       radial-gradient(circle at 90% 5%, rgba(105, 230, 204, 0.11), transparent 34%),
       linear-gradient(145deg, rgba(18, 25, 25, 0.88), rgba(10, 15, 15, 0.78));
   }
 
-  .post-meta {
+  .research-meta {
     display: flex;
     justify-content: space-between;
     gap: 20px;
@@ -110,14 +90,14 @@ const schema = {
     text-transform: uppercase;
   }
 
-  .post-meta span {
+  .research-meta span {
     color: var(--accent);
   }
 
   h2 {
-    max-width: 520px;
+    max-width: 620px;
     margin: 62px 0 0;
-    font-size: clamp(1.8rem, 4vw, 3.1rem);
+    font-size: clamp(2rem, 5vw, 3.4rem);
     font-weight: 660;
     letter-spacing: -0.055em;
     line-height: 1.05;
@@ -131,8 +111,8 @@ const schema = {
     color: var(--accent);
   }
 
-  .post-card > p {
-    max-width: 560px;
+  .research-card > p {
+    max-width: 620px;
     margin: 20px 0 0;
     color: var(--text-muted);
     font-size: 0.9rem;
@@ -150,15 +130,5 @@ const schema = {
     font-size: 0.82rem;
     font-weight: 680;
     text-decoration: none;
-  }
-
-  @media (max-width: 780px) {
-    .posts {
-      grid-template-columns: 1fr;
-    }
-
-    .post-card {
-      min-height: 350px;
-    }
   }
 </style>

@@ -1,12 +1,6 @@
-export interface BlogPost {
-  title: string
-  description: string
-  href: string
-  publishedAt: string
-  updatedAt: string
-  readingTime: string
-  category: string
-}
+import type { ContentEntry } from './content'
+
+export type BlogPost = ContentEntry
 
 export const blogPosts = [
   {

@@ -3,6 +3,11 @@ export const OPEN_AUTOFILL_SAFETY_CORPUS_NAME =
 
 export const OPEN_AUTOFILL_SAFETY_CORPUS_VERSION = '1.0.0' as const
 
+export const OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE = 'AGPL-3.0-or-later' as const
+
+export const OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE_URL =
+  'https://spdx.org/licenses/AGPL-3.0-or-later.html' as const
+
 export type AutofillSafetyCategory =
   | 'password-only-login'
   | 'signup-no-fill'
@@ -55,6 +60,8 @@ export interface AutofillSafetyFixture {
 export interface AutofillSafetyCorpus {
   readonly name: typeof OPEN_AUTOFILL_SAFETY_CORPUS_NAME
   readonly version: typeof OPEN_AUTOFILL_SAFETY_CORPUS_VERSION
+  readonly license: typeof OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE
+  readonly licenseUrl: typeof OPEN_AUTOFILL_SAFETY_CORPUS_LICENSE_URL
   readonly limitations: readonly string[]
   readonly fixtures: readonly AutofillSafetyFixture[]
 }

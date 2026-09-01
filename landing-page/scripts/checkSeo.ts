@@ -1,9 +1,21 @@
+import { createHash } from 'node:crypto'
 import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
 import { dirname, join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const projectDirectory = resolve(dirname(fileURLToPath(import.meta.url)), '..')
 const distributionDirectory = join(projectDirectory, 'dist')
+const publicContactEmail = 'authier.ml@gmail.com'
+const obsoletePublicContactEmail = 'authier.ml@google.com'
+const encryptionKeyUrl =
+  'https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xDE6887086F892325FEC04CC0D847525B6931381F'
+const corpusFileName = 'autofill-safety-corpus-v1.json'
+const corpusAssetPath = join(distributionDirectory, 'research', corpusFileName)
+const corpusChecksumPath = join(
+  distributionDirectory,
+  'research',
+  'autofill-safety-corpus-v1.sha256'
+)
 
 function listHtmlFiles(directory: string): string[] {
   return readdirSync(directory).flatMap((entry) => {
@@ -69,6 +81,10 @@ for (const file of files) {
   )
   const h1Count = html.match(/<h1(?:\s|>)/gi)?.length ?? 0
 
+  if (html.includes(obsoletePublicContactEmail)) {
+    throw new Error(`${route}: contains the obsolete project contact address`)
+  }
+
   if (h1Count !== 1) {
     throw new Error(`${route}: expected exactly one h1, found ${h1Count}`)
   }
@@ -122,7 +138,9 @@ for (const file of files) {
     const target = href.split(/[?#]/, 1)[0]?.replace(/\/$/, '') || '/'
     internalLinks += 1
 
-    if (!routes.has(target)) {
+    const assetPath = join(distributionDirectory, target.slice(1))
+
+    if (!routes.has(target) && !existsSync(assetPath)) {
       throw new Error(`${route}: internal link target does not exist: ${href}`)
     }
   }
@@ -145,6 +163,47 @@ for (const requiredFile of [
   if (!existsSync(join(distributionDirectory, requiredFile))) {
     throw new Error(`Missing SEO or platform file: ${requiredFile}`)
   }
+}
+
+const securityContact = readFileSync(
+  join(distributionDirectory, '.well-known/security.txt'),
+  'utf8'
+)
+
+if (!securityContact.includes(`Contact: mailto:${publicContactEmail}`)) {
+  throw new Error('security.txt is missing the canonical project email contact')
+}
+
+if (!securityContact.includes(`Encryption: ${encryptionKeyUrl}`)) {
+  throw new Error('security.txt is missing the working public encryption key')
+}
+
+if (securityContact.includes(obsoletePublicContactEmail)) {
+  throw new Error('security.txt contains the obsolete project contact address')
+}
+
+const corpusContents = readFileSync(corpusAssetPath)
+const corpusSha256 = createHash('sha256').update(corpusContents).digest('hex')
+const checksumContents = readFileSync(corpusChecksumPath, 'utf8')
+const expectedChecksumContents = `${corpusSha256}  ${corpusFileName}\n`
+
+JSON.parse(corpusContents.toString('utf8'))
+
+if (checksumContents !== expectedChecksumContents) {
+  throw new Error('Autofill corpus SHA-256 sidecar is stale or malformed')
+}
+
+const corpusPage = readFileSync(
+  join(distributionDirectory, 'research', 'autofill-safety-corpus.html'),
+  'utf8'
+)
+
+if (!corpusPage.includes(corpusSha256)) {
+  throw new Error('Autofill corpus page does not publish the current SHA-256')
+}
+
+if (!corpusPage.includes('href="/research/autofill-safety-corpus-v1.sha256"')) {
+  throw new Error('Autofill corpus page does not link its SHA-256 sidecar')
 }
 
 const sitemap = readFileSync(

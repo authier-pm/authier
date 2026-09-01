@@ -29,5 +29,6 @@ export const navigation = [
   { label: 'Security', href: '/security' },
   { label: 'Pricing', href: '/pricing' },
   { label: 'Guides', href: '/guides' },
+  { label: 'Research', href: '/research' },
   { label: 'Blog', href: '/blog' }
 ] as const
