@@ -2,8 +2,20 @@
   "name": "authier",
   "private": true,
   "version": "1.0.0",
+  "description": "Open-source password manager and TOTP vault for browsers and the web",
+  "homepage": "https://www.authier.pm/",
   "main": "index.js",
-  "repository": "https://github.com/capaj/authier.git",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/authier-pm/authier.git"
+  },
+  "keywords": [
+    "password-manager",
+    "totp",
+    "browser-extension",
+    "security",
+    "typescript"
+  ],
   "authors": [
     "Petr <petrik.spac@gmail.com>",
     "Jiri Spac <capajj@gmail.com>"

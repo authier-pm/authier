@@ -48,7 +48,7 @@ keep in mind that a single package can be in multiple subfolders, so if you upda
 
 ## How to run locally
 
-Refer to the subproject readmes for client-specific setup. For the new web vault, use [vault-web/README.md](/home/capaj/work-repos/authier-repos/authier2/vault-web/README.md).
+Refer to the subproject readmes for client-specific setup. For the new web vault, use [vault-web/README.md](vault-web/README.md).
 
 # Contributor financial reward scheme
 
