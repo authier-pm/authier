@@ -2,7 +2,10 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { site } from '../../config'
-import { researchArtifacts } from '../../data/research'
+import {
+  createResearchDatasetSchema,
+  researchArtifacts
+} from '../../data/research'
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
 const [artifact] = researchArtifacts
@@ -20,19 +23,8 @@ const corpusSha256 = createHash('sha256')
 
 const datasetSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Dataset',
-  name: artifact.title,
-  description: artifact.description,
-  url: `${site.url}${artifact.href}`,
+  ...createResearchDatasetSchema(artifact),
   version: '1.0.0',
-  datePublished: artifact.publishedAt,
-  dateModified: artifact.updatedAt,
-  creator: {
-    '@type': 'Organization',
-    name: 'Authier contributors',
-    url: site.githubUrl
-  },
-  license: 'https://spdx.org/licenses/AGPL-3.0-or-later.html',
   measurementTechnique: 'Synthetic jsdom classifier adapter tests',
   keywords: [
     'password manager',

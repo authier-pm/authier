@@ -52,6 +52,38 @@ function requireMatch(
   return match
 }
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+function validateDatasetMetadata(value: unknown, route: string) {
+  if (Array.isArray(value)) {
+    for (const item of value) validateDatasetMetadata(item, route)
+    return
+  }
+
+  if (!isRecord(value)) return
+
+  const schemaType = value['@type']
+  const isDataset =
+    schemaType === 'Dataset' ||
+    (Array.isArray(schemaType) && schemaType.includes('Dataset'))
+
+  if (isDataset) {
+    if (typeof value.license !== 'string' || value.license.length === 0) {
+      throw new Error(`${route}: Dataset structured data is missing a license`)
+    }
+
+    if (!isRecord(value.creator) || typeof value.creator.name !== 'string') {
+      throw new Error(`${route}: Dataset structured data is missing a creator`)
+    }
+  }
+
+  for (const nestedValue of Object.values(value)) {
+    validateDatasetMetadata(nestedValue, route)
+  }
+}
+
 if (!existsSync(distributionDirectory)) {
   throw new Error('Build output is missing. Run the production build first.')
 }
@@ -126,7 +158,8 @@ for (const file of files) {
     /<script[^>]+type="application\/ld\+json"[^>]*>(.*?)<\/script>/gis
 
   for (const match of html.matchAll(jsonLdPattern)) {
-    JSON.parse(match[1] ?? '')
+    const structuredData: unknown = JSON.parse(match[1] ?? '')
+    validateDatasetMetadata(structuredData, route)
     structuredDataBlocks += 1
   }
 
