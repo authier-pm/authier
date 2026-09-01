@@ -15,6 +15,7 @@ import {
   resetLanguageCache
 } from './classifyPasswordForm'
 import { findSegmentedOtpInputs, findSingleOtpInput } from './findOtpInputs'
+import { selectStoredPasswordAutofillTarget } from './storedPasswordAutofillPolicy'
 
 const originalLocation = { ...window.location }
 
@@ -94,10 +95,8 @@ const inspectDocument = (
   if (passwordInput) {
     const classification = classifyPasswordForm(passwordInput)
     passwordKind = mapPasswordKind(classification.kind)
-
-    if (classification.kind === PasswordFormKind.LOGIN) {
-      storedPasswordTargetId = classification.currentPasswordInput?.id ?? null
-    }
+    storedPasswordTargetId =
+      selectStoredPasswordAutofillTarget(classification)?.id ?? null
   }
 
   const segmentedOtp = findSegmentedOtpInputs(
@@ -132,7 +131,7 @@ const inspectDocument = (
 }
 
 const authierAdapter: AutofillSafetyAdapter = {
-  name: 'Authier production classifiers',
+  name: 'Authier production classifiers and stored-password target policy',
   mountDocument,
   inspectDocument
 }

@@ -39,6 +39,10 @@ import {
   PasswordFormClassification,
   PasswordFormKind
 } from './classifyPasswordForm'
+import {
+  isStoredPasswordAutofillTarget,
+  selectStoredPasswordAutofillTarget
+} from './storedPasswordAutofillPolicy'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
 import {
   findSegmentedOtpInputs,
@@ -683,6 +687,8 @@ export const autofill = (initState: IInitStateRes) => {
      * silent fill.
      */
     const classification = classifyPageForAutofill(usefulInputs, body)
+    const storedPasswordTarget =
+      selectStoredPasswordAutofillTarget(classification)
 
     // arm this before any of the bail-outs below - even on a page we refuse to
     // autofill, the next form to appear may be a login form
@@ -714,17 +720,17 @@ export const autofill = (initState: IInitStateRes) => {
       if (inputEl) {
         // log('webInputGql was found')
 
-        foundInputsCount++
         log(`autofilled by domPath ${webInputGql.domPath}`)
         if (
           webInputGql.kind === WebInputType.PASSWORD &&
           firstLoginCred &&
           inputEl.type === 'password' && // we don't want to autofill password to any other type of input
-          // DOM paths are matched loosely by URL, so a path learned on the login
-          // page also gets served on the settings page - never let it land in a
-          // field meant to receive a brand new password
-          classification.newPasswordInputs.includes(inputEl) === false
+          // DOM paths are matched loosely by URL. Reuse the same production
+          // policy as classifier-based fill so a learned path cannot authorize
+          // a different password field.
+          isStoredPasswordAutofillTarget(classification, inputEl)
         ) {
+          foundInputsCount++
           const el = fillStringIntoInput({
             inputEl,
             loginCredential: firstLoginCred.loginCredentials,
@@ -740,6 +746,7 @@ export const autofill = (initState: IInitStateRes) => {
           ].includes(webInputGql.kind) &&
           firstLoginCred
         ) {
+          foundInputsCount++
           const el = autofillValueIntoInput(
             inputEl,
             firstLoginCred.loginCredentials.username
@@ -750,6 +757,7 @@ export const autofill = (initState: IInitStateRes) => {
             log('no totp secret')
             return
           }
+          foundInputsCount++
           const totpCode = safeGenerateTotpCode(totpSecret)
           if (!totpCode) {
             return
@@ -768,10 +776,17 @@ export const autofill = (initState: IInitStateRes) => {
     }
 
     //NOTE: Guess web inputs, if we have credentials without DOM PATHS
+    const mappedPasswordWasFilled =
+      storedPasswordTarget !== null &&
+      filledElements.has(storedPasswordTarget) &&
+      storedPasswordTarget.value !== ''
+    const shouldSearchForCredentialInputs =
+      foundInputsCount === 0 ||
+      (storedPasswordTarget !== null && !mappedPasswordWasFilled)
+
     if (
-      foundInputsCount === 0 &&
+      shouldSearchForCredentialInputs &&
       secretsForHost.loginCredentials.length > 0
-      // filledElements.length === 0
     ) {
       const autofillResult = await searchInputsAndAutofill(body, classification)
       if (autofillResult) {
@@ -967,6 +982,8 @@ export const autofill = (initState: IInitStateRes) => {
       formClassification: PasswordFormClassification
     ) {
       const newWebInputs: WebInputsArrayClientSide = []
+      const storedPasswordTarget =
+        selectStoredPasswordAutofillTarget(formClassification)
       // only look inside the credential form - a flat scan of the whole document
       // is how a site-wide search box ends up being treated as the username field
       const inputElsArray = (
@@ -975,7 +992,7 @@ export const autofill = (initState: IInitStateRes) => {
       log('inputElsArray', inputElsArray)
 
       if (inputElsArray.length === 1) {
-        if (inputElsArray[0].type === 'password') {
+        if (inputElsArray[0] === storedPasswordTarget) {
           // this branch handles multi step google login pages specifically. We might add more cases in the future
           const visibleText = getAllVisibleTextOnDocumentBody()
 
@@ -1016,6 +1033,10 @@ export const autofill = (initState: IInitStateRes) => {
         for (let index = 0; index < inputElsArray.length; index++) {
           const input = inputElsArray[index]
           if (input.type === 'password') {
+            if (input !== storedPasswordTarget) {
+              continue
+            }
+
             //Save password input, if we have more credentials with no DOM PATH
             if (
               webInputs.length === 0 &&

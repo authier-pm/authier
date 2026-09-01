@@ -282,6 +282,59 @@ describe('autofill on a login page', () => {
     expect(inputById('q').value).toBe('')
     expect(inputById('user').value).toBe(STORED_USERNAME)
   })
+
+  it('fills only the classifier-selected password target', async () => {
+    setPage(
+      `<form>
+        <input id="user" type="text" autocomplete="username" />
+        <input id="decoy" type="password" autocomplete="off" />
+        <input id="pw" type="password" autocomplete="current-password" />
+        <button type="submit">Sign in</button>
+      </form>`,
+      { url: '/login' }
+    )
+
+    await runAutofill()
+
+    expect(inputById('decoy').value).toBe('')
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+  })
+
+  it('falls back to the selected target when a learned path points at a decoy', async () => {
+    setPage(
+      `<form>
+        <input id="user" type="text" autocomplete="username" />
+        <input id="decoy" type="password" autocomplete="off" />
+        <input id="pw" type="password" autocomplete="current-password" />
+        <button type="submit">Sign in</button>
+      </form>`,
+      { url: '/login' }
+    )
+
+    await runAutofill(
+      initState([
+        {
+          domPath: '#user',
+          domOrdinal: 0,
+          kind: 'USERNAME',
+          url: 'https://example.com/login',
+          host: 'example.com',
+          createdAt: new Date().toString()
+        },
+        {
+          domPath: '#decoy',
+          domOrdinal: 0,
+          kind: 'PASSWORD',
+          url: 'https://example.com/login',
+          host: 'example.com',
+          createdAt: new Date().toString()
+        }
+      ] as unknown as IInitStateRes['webInputs'])
+    )
+
+    expect(inputById('decoy').value).toBe('')
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+  })
 })
 
 describe('autofill on a change-password page', () => {
