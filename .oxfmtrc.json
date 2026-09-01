@@ -10,6 +10,7 @@
     "node_modules/*",
     "*.snap",
     "**/*.codegen.*",
+    "landing-page/public/research/autofill-safety-corpus-v1.json",
     "pnpm-lock.yaml"
   ]
 }

@@ -1,5 +1,3 @@
-import { WebInputType } from '../../../shared/generated/graphqlBaseTypes'
-
 // this entire file is just for testing in a browser console
 
 const uselessInputTypes = [
@@ -93,7 +91,13 @@ export function mainWorldAutofillFunction(
 
   function isHidden(el) {
     const style = window.getComputedStyle(el)
-    return style.display === 'none'
+    return (
+      el.hidden ||
+      style.display === 'none' ||
+      style.visibility === 'hidden' ||
+      style.visibility === 'collapse' ||
+      style.opacity === '0'
+    )
   }
 
   function imitateKeyInput(el: HTMLInputElement, input: string) {
@@ -226,10 +230,41 @@ export function mainWorldAutofillFunction(
     return inputElsArray
   }
 
+  const allInputs = getAllInputsIncludingShadowDom(document.body)
   const inputs = filterUselessInputs(document.body)
 
+  // This function is serialized into the page's MAIN world, so it cannot call
+  // the imported content-script classifier. Keep its fallback deliberately
+  // narrower: only an explicit, unambiguous current-password field is eligible,
+  // and the presence of any new-password field makes the whole form ineligible.
+  const passwordInputs = allInputs.filter((input) => input.type === 'password')
+  const hasNewPasswordInput = passwordInputs.some((input) =>
+    input.autocomplete.toLowerCase().split(/\s+/).includes('new-password')
+  )
+  const currentPasswordInputs = passwordInputs.filter((input) =>
+    input.autocomplete.toLowerCase().split(/\s+/).includes('current-password')
+  )
+  let storedPasswordTarget: HTMLInputElement | null = null
+
+  const currentPasswordInput = currentPasswordInputs[0]
+  if (
+    !hasNewPasswordInput &&
+    currentPasswordInputs.length === 1 &&
+    inputs.includes(currentPasswordInput) &&
+    !currentPasswordInput.disabled &&
+    !currentPasswordInput.readOnly &&
+    !isHidden(currentPasswordInput) &&
+    isElementInViewport(currentPasswordInput)
+  ) {
+    storedPasswordTarget = currentPasswordInput
+  }
+
+  if (passwordInputs.length > 0 && storedPasswordTarget === null) {
+    return []
+  }
+
   const autofilledInputs: Array<{
-    webInputType: WebInputType | null
+    webInputType: 'USERNAME' | 'PASSWORD' | null
     username: string | null
   }> = []
 
@@ -253,16 +288,16 @@ export function mainWorldAutofillFunction(
         recentlyUsedLogin.username
       )
       autofilledInputs.push({
-        webInputType: WebInputType.USERNAME,
+        webInputType: 'USERNAME',
         username: recentlyUsedLogin.username
       })
-    } else if (input.type === 'password') {
+    } else if (input === storedPasswordTarget) {
       const autofilledElPassword = autofillValueIntoInput(
         input,
         recentlyUsedLogin.password
       )
       autofilledInputs.push({
-        webInputType: WebInputType.PASSWORD,
+        webInputType: 'PASSWORD',
         username: recentlyUsedLogin.username
       })
     }
