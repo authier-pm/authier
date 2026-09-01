@@ -23,6 +23,7 @@ function getFirefoxManifestV2(
     name: pkg.displayName,
     version: pkg.version,
     description: 'Authier password manager firefox extension',
+    homepage_url: pkg.homepage,
     browser_action: {
       default_icon: 'icon-16.png',
       default_popup: 'js/popup.html'
@@ -84,6 +85,7 @@ export async function getManifest() {
     name: pkg.displayName,
     version: pkg.version,
     description: pkg.description,
+    homepage_url: pkg.homepage,
     action: {
       default_icon: {
         16: 'icon-16.png',

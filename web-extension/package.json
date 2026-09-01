@@ -3,6 +3,7 @@
   "displayName": "Authier",
   "version": "1.2.9",
   "description": "Authier web Extension for all our supported browsers",
+  "homepage": "https://www.authier.pm/",
   "license": "AGPL-3.0-or-later",
   "webExt": {
     "sourceDir": "dist/"
