@@ -16,7 +16,7 @@ const getTotpTimeRemaining = () => {
 export const Home = () => {
   const [seconds, setRemainingSeconds] = useState(getTotpTimeRemaining())
   const [search, setSearch] = useState('')
-  const { currentURL, deviceState, setSecuritySettings, TOTPSecrets } =
+  const { currentURL, deviceState, TOTPSecrets } =
     useContext(DeviceStateContext)
 
   useEffect(() => {
@@ -40,32 +40,6 @@ export const Home = () => {
   return (
     <div className="px-2 pb-2">
       <div className="sticky top-0 z-10 mt-2 flex items-center gap-2 px-2">
-        {deviceState ? (
-          <label className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-[color:var(--color-foreground)]">
-            <span>Autofill</span>
-            <Switch
-              checked={deviceState.autofillCredentialsEnabled}
-              onCheckedChange={(checked) => {
-                const config = {
-                  autofillCredentialsEnabled: checked,
-                  autofillTOTPEnabled: deviceState.autofillTOTPEnabled,
-                  autofillForbiddenUrlPatterns:
-                    deviceState.autofillForbiddenUrlPatterns,
-                  notificationOnVaultUnlock:
-                    deviceState.notificationOnVaultUnlock,
-                  notificationOnWrongPasswordAttempts:
-                    deviceState.notificationOnWrongPasswordAttempts,
-                  syncTOTP: deviceState.syncTOTP,
-                  uiLanguage: deviceState.uiLanguage,
-                  vaultLockTimeoutSeconds: deviceState.vaultLockTimeoutSeconds
-                }
-
-                void setSecuritySettings(config)
-              }}
-            />
-          </label>
-        ) : null}
-
         <label className="flex shrink-0 items-center gap-1.5 text-sm font-medium text-[color:var(--color-foreground)]">
           <span className="inline-flex items-center gap-1.5 text-[color:var(--color-muted)]">
             <TbWorld className="size-4" />

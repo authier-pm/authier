@@ -8,6 +8,8 @@ import debug from 'debug'
 import { constructURL } from '@shared/urlUtils'
 import { isAutofillForbiddenForUrl } from '@shared/autofillForbiddenUrlPatterns'
 import { getWebInputsForUrl } from './getWebInputsForUrl'
+import { isAutofillPausedForPage } from './autofillPagePause'
+import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
 const log = debug('au:getContentScriptInitialState')
 
 export const getContentScriptInitialState = async (
@@ -65,6 +67,10 @@ export const getContentScriptInitialState = async (
   }
 
   let webInputs = getWebInputsForUrl(tabUrl)
+  const [isPausedForPage, autofillCredentialsEnabled] = await Promise.all([
+    isAutofillPausedForPage(currentTabId, tabUrl),
+    getAutofillCredentialsEnabled()
+  ])
 
   const loginCredentialsForHost = decrypted
     .filter(({ kind }) => kind === EncryptedSecretType.LOGIN_CREDENTIALS)
@@ -115,7 +121,8 @@ export const getContentScriptInitialState = async (
     extensionDeviceReady: !!device.state?.masterEncryptionKey,
     //TODO: Add autofill for TOTP
     autofillEnabled:
-      !!device.state?.autofillCredentialsEnabled &&
+      autofillCredentialsEnabled &&
+      !isPausedForPage &&
       !isAutofillForbiddenForUrl(
         tabUrl,
         device.state?.autofillForbiddenUrlPatterns ?? ''

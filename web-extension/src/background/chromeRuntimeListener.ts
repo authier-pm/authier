@@ -33,6 +33,14 @@ import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludi
 import { constructURL } from '@shared/urlUtils'
 import { loginSessionManager } from './loginSession'
 import { createLoginCredentialData } from './createLoginCredentialData'
+import {
+  AutofillPagePauseMessageKind,
+  clearAutofillPagePause,
+  isAutofillPagePauseGetMessage,
+  isAutofillPagePauseSetMessage,
+  isAutofillPausedForPage,
+  setAutofillPausedForPage
+} from './autofillPagePause'
 
 const log = debug('au:chListener')
 
@@ -333,13 +341,35 @@ createChromeHandler({
 
 console.log('background page loaded')
 
-browser.runtime.onMessage.addListener((request) => {
-  browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-    const firstTabId = tabs[0].id
+browser.tabs.onRemoved.addListener((tabId) => {
+  void clearAutofillPagePause(tabId)
+})
 
-    if (!firstTabId) {
-      return
-    }
-    browser.tabs.sendMessage(firstTabId, request)
-  })
+browser.runtime.onMessage.addListener((request: unknown) => {
+  if (isAutofillPagePauseGetMessage(request)) {
+    return isAutofillPausedForPage(request.tabId, request.url)
+  }
+
+  if (isAutofillPagePauseSetMessage(request)) {
+    return setAutofillPausedForPage(request).then(() => {
+      void browser.tabs
+        .sendMessage(request.tabId, {
+          kind: AutofillPagePauseMessageKind.REFRESH
+        })
+        .catch(() => undefined)
+
+      return request.paused
+    })
+  }
+
+  return browser.tabs
+    .query({ active: true, currentWindow: true })
+    .then((tabs) => {
+      const firstTabId = tabs[0].id
+
+      if (!firstTabId) {
+        return
+      }
+      browser.tabs.sendMessage(firstTabId, request)
+    })
 })

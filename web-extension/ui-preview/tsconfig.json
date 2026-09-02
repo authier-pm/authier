@@ -1,0 +1,14 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "paths": {
+      "@src/providers/DeviceStateProvider": ["./deviceStateProvider.tsx"],
+      "webextension-polyfill": ["./browserMock.ts"],
+      "@src/*": ["../src/*"],
+      "@util/*": ["../src/util/*"],
+      "@shared/*": ["../../shared/*"]
+    }
+  },
+  "include": ["./**/*.ts", "./**/*.tsx", "./**/*.mts"]
+}

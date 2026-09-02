@@ -6,14 +6,25 @@ import { WebInputForAutofill } from '../background/WebInputForAutofill'
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const nano = h
 
-export let promptOption: HTMLDivElement | null
+export let promptOption: HTMLDivElement | null = null
 
 export type PromptPasswordOptionProps = {
   loginCredentials: ILoginSecret[]
   webInputs: Array<Omit<WebInputForAutofill, '__typename' | 'id'>>
 }
 
+export function removeLoginCredOption() {
+  if (!promptOption) {
+    return
+  }
+
+  render(null, promptOption)
+  promptOption.remove()
+  promptOption = null
+}
+
 export function renderLoginCredOption(props: PromptPasswordOptionProps) {
+  removeLoginCredOption()
   promptOption = document.createElement('div')
   render(
     <PromptPasswordOption

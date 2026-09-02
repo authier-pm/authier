@@ -35,6 +35,8 @@ import browser from 'webextension-polyfill'
 import { PopupActionsEnum } from '../components/pages/PopupActionsEnum'
 import { getSelectorForElement } from './cssSelectorGenerators'
 import { WebInputsArrayClientSide } from '../background/WebInputForAutofill'
+import { isAutofillPagePauseRefreshMessage } from '../background/autofillPagePause'
+import { removeLoginCredOption } from './renderLoginCredOption'
 
 const log = debug('au:contentScript')
 localStorage.debug = localStorage.debug || 'au:*' // enable all debug messages, TODO remove this for production
@@ -70,6 +72,37 @@ export function getWebInputKind(targetElement: HTMLInputElement): WebInputType {
 
 export const domRecorder = new DOMEventsRecorder()
 
+type TotpFillOnClickMessage = {
+  kind: PopupActionsEnum.TOTP_FILL_ON_CLICK
+  event?: { otpCode: string; secretId: string }
+}
+
+const isTotpFillOnClickMessage = (
+  message: unknown
+): message is TotpFillOnClickMessage => {
+  if (
+    typeof message !== 'object' ||
+    message === null ||
+    !('kind' in message) ||
+    message.kind !== PopupActionsEnum.TOTP_FILL_ON_CLICK
+  ) {
+    return false
+  }
+
+  if (!('event' in message) || message.event === undefined) {
+    return true
+  }
+
+  return (
+    typeof message.event === 'object' &&
+    message.event !== null &&
+    'otpCode' in message.event &&
+    typeof message.event.otpCode === 'string' &&
+    'secretId' in message.event &&
+    typeof message.event.secretId === 'string'
+  )
+}
+
 const formsRegisteredForSubmitEvent = [] as HTMLFormElement[]
 export let stateInitRes: IInitStateRes | null = null
 
@@ -104,8 +137,16 @@ const persistCapturedInputs = () => {
   })
 }
 
-export async function initInputWatch() {
-  stateInitRes = await trpc.getContentScriptInitialState.query()
+export async function initInputWatch(
+  shouldStart: () => boolean = () => true
+) {
+  const nextState = await trpc.getContentScriptInitialState.query()
+
+  if (!shouldStart()) {
+    return
+  }
+
+  stateInitRes = nextState
 
   log('~ stateInitRes', stateInitRes)
 
@@ -114,8 +155,6 @@ export async function initInputWatch() {
     return
   }
 
-  document.addEventListener('keydown', recordInputs, true)
-
   const { extensionDeviceReady, secretsForHost, autofillEnabled } = stateInitRes
 
   if (!extensionDeviceReady || !autofillEnabled) {
@@ -123,7 +162,9 @@ export async function initInputWatch() {
     return
   }
 
-  startBodyInputChangeObserver()
+  document.addEventListener('keydown', recordInputs, true)
+
+  const bodyInputChangeObserver = startBodyInputChangeObserver()
   contentScriptRender(stateInitRes)
 
   const stopAutofillListener = autofill(stateInitRes)
@@ -242,20 +283,44 @@ export async function initInputWatch() {
   document.body.addEventListener('focusout', focusoutEventListener, true)
 
   return () => {
+    document.removeEventListener('keydown', recordInputs, true)
     document.body.removeEventListener(
       'input',
       debouncedInputEventListener,
       true
     )
     document.body.removeEventListener('focusout', focusoutEventListener, true)
+    debouncedInputEventListener.cancel()
+    debouncedAutofill.cancel()
 
     stopAutofillListener()
+    bodyInputChangeObserver.disconnect()
     bodyInputChangeEmitter.off('inputRemoved', onInputRemoved)
     bodyInputChangeEmitter.off('inputAdded', onInputAdded)
+    removeLoginCredOption()
   }
 }
 
-initInputWatch()
+let inputWatchCleanup: (() => void) | undefined
+let inputWatchGeneration = 0
+
+export const refreshInputWatch = async () => {
+  const generation = ++inputWatchGeneration
+
+  inputWatchCleanup?.()
+  inputWatchCleanup = undefined
+
+  const nextCleanup = await initInputWatch(
+    () => generation === inputWatchGeneration
+  )
+  if (generation !== inputWatchGeneration) {
+    return
+  }
+
+  inputWatchCleanup = nextCleanup
+}
+
+void refreshInputWatch()
 
 // For SPA websites https://stackoverflow.com/questions/2844565/is-there-a-javascript-jquery-dom-change-listener/39508954#39508954
 let lastUrl = location.href
@@ -263,17 +328,24 @@ new MutationObserver(() => {
   const url = location.href
   if (url !== lastUrl) {
     lastUrl = url
-    initInputWatch()
+    void refreshInputWatch()
   }
 }).observe(document, { subtree: true, childList: true })
 
 browser.runtime.onMessage.addListener(
-  // @ts-expect-error
-  (message: {
-    kind: PopupActionsEnum
-    event?: { otpCode: string; secretId: string }
-  }) => {
-    if (message.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
+  (message: unknown) => {
+    if (isAutofillPagePauseRefreshMessage(message)) {
+      void refreshInputWatch()
+      return
+    }
+
+    if (!isTotpFillOnClickMessage(message)) {
+      return
+    }
+
+    const totpMessage = message
+
+    if (totpMessage.kind === PopupActionsEnum.TOTP_FILL_ON_CLICK) {
       async function elementSelected(event) {
         event.preventDefault()
         event.stopPropagation() // Stop the event from propagating further
@@ -294,7 +366,7 @@ browser.runtime.onMessage.addListener(
           url: location.href
         }
         await trpc.addTOTPInput.mutate(webInput)
-        const messageEvent = message.event
+        const messageEvent = totpMessage.event
 
         if (messageEvent?.otpCode) {
           autofillValueIntoInput(selectedElement, messageEvent?.otpCode)

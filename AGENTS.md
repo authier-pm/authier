@@ -17,6 +17,7 @@
 - Avoid `useEffect` unless absolutely needed
 - keep props of components minimal, prefer context or other state management for any state/data
 - import { useState, useEffect, useCallback, useMemo } from 'react'. Avoid using `React.useState` etc
+- whenever adding a user-visible UI feature, add or update a checked-in scenario in `web-extension/ui-preview`, render the updated UI, and include a newly captured screenshot in the final response; do not create disposable screenshot harnesses in `/tmp`
 
 ## TypeScript
 

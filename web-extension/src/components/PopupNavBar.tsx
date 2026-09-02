@@ -8,6 +8,7 @@ import { UserNavMenu } from '@src/pages/UserNavMenu'
 import { Button } from '@src/components/ui/button'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { RefreshSecretsButton } from './RefreshSecretsButton'
+import { AutofillControl } from './AutofillControl'
 
 export const PopupNavBar: FunctionComponent = () => {
   const [isAddSecretNavMenuOpen, setIsAddSecretNavMenuOpen] = useState(false)
@@ -86,6 +87,8 @@ export const PopupNavBar: FunctionComponent = () => {
               <IoMdArchive className="size-4" />
             </Button>
           </Tooltip>
+
+          <AutofillControl />
         </div>
       </div>
 
