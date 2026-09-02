@@ -22,5 +22,11 @@ To cover a new user-visible feature:
 4. Run `pnpm preview:ui:check` and capture the rendered scenario into
    `docs/screenshots/`.
 
+Run the isolated Playwright suite for preview interactions with:
+
+```sh
+pnpm playwright:ui-preview
+```
+
 Keep reusable preview code and fixtures in this directory. Do not place them in
 `/tmp`.

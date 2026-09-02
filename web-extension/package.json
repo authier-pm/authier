@@ -28,6 +28,7 @@
     "test:ui": "node ./scripts/ensureWorkspaceNodeModules.mjs && vitest --ui",
     "preview:ui": "vite --config ui-preview/vite.config.mts",
     "preview:ui:check": "tsc -p ui-preview/tsconfig.json",
+    "playwright:ui-preview": "playwright test --config playwrightUiPreview.config.ts",
     "playwright:run": "npx playwright test",
     "gen": "cd .. && graphql-codegen",
     "test:run": "cd .. && cd backend && pnpm gen && pnpm dev",

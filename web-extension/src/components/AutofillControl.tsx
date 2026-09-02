@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useRef, useState } from 'react'
 import browser from 'webextension-polyfill'
 import { TbWand } from 'react-icons/tb'
 import {
@@ -41,6 +41,7 @@ export const AutofillControl = () => {
     useContext(DeviceStateContext)
   const [isOpen, setIsOpen] = useState(false)
   const [isPagePaused, setIsPagePaused] = useState<boolean | null>(null)
+  const isPointerDownWithinControl = useRef(false)
 
   const tabId = currentTab?.id
   const globallyEnabled = deviceState?.autofillCredentialsEnabled ?? false
@@ -128,6 +129,10 @@ export const AutofillControl = () => {
     <div
       className="relative shrink-0"
       onBlur={(event) => {
+        if (isPointerDownWithinControl.current) {
+          return
+        }
+
         if (
           !(event.relatedTarget instanceof Node) ||
           !event.currentTarget.contains(event.relatedTarget)
@@ -139,6 +144,12 @@ export const AutofillControl = () => {
         if (event.key === 'Escape') {
           setIsOpen(false)
         }
+      }}
+      onPointerDownCapture={() => {
+        isPointerDownWithinControl.current = true
+        window.setTimeout(() => {
+          isPointerDownWithinControl.current = false
+        }, 0)
       }}
     >
       <Button

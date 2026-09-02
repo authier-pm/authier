@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
@@ -42,9 +42,7 @@ describe('AutofillControl', () => {
     const user = userEvent.setup()
     renderControl()
 
-    await user.click(
-      await screen.findByRole('button', { name: /Autofill on/ })
-    )
+    await user.click(await screen.findByRole('button', { name: /Autofill on/ }))
     expect(
       screen.getByRole('dialog', { name: 'Autofill controls' })
     ).toBeTruthy()
@@ -67,13 +65,39 @@ describe('AutofillControl', () => {
     })
   })
 
+  it('keeps the popover open when a switch click has no blur target', async () => {
+    const user = userEvent.setup()
+    renderControl()
+
+    const trigger = await screen.findByRole('button', { name: /Autofill on/ })
+    await user.click(trigger)
+    const pageSwitch = screen.getByRole('switch', {
+      name: 'Autofill on this page'
+    })
+
+    fireEvent.pointerDown(pageSwitch)
+    fireEvent.blur(trigger, { relatedTarget: null })
+
+    expect(
+      screen.getByRole('dialog', { name: 'Autofill controls' })
+    ).toBeTruthy()
+
+    vi.mocked(browser.runtime.sendMessage).mockResolvedValueOnce(true)
+    await user.click(pageSwitch)
+
+    await waitFor(() => {
+      expect(pageSwitch.getAttribute('aria-checked')).toBe('false')
+      expect(
+        screen.getByRole('dialog', { name: 'Autofill controls' })
+      ).toBeTruthy()
+    })
+  })
+
   it('keeps the existing browser-wide autofill preference', async () => {
     const user = userEvent.setup()
     renderControl()
 
-    await user.click(
-      await screen.findByRole('button', { name: /Autofill on/ })
-    )
+    await user.click(await screen.findByRole('button', { name: /Autofill on/ }))
     await user.click(
       screen.getByRole('switch', { name: 'Autofill on all pages' })
     )
