@@ -24,7 +24,7 @@ patchedDependencies:
   '@graphql-codegen/typescript-react-apollo': patches/@graphql-codegen__typescript-react-apollo.patch
 
 minimumReleaseAgeExclude:
-  - '@types/chrome@0.2.0'
+  - '@types/chrome@0.2.0 || 0.2.8'
   - lint-staged@17.0.8
   - sql-formatter@15.8.2
   - '@orpc/client@1.14.14 || 1.14.15'
@@ -58,12 +58,21 @@ minimumReleaseAgeExclude:
   - '@oxfmt/binding-win32-ia32-msvc@0.62.0'
   - '@oxfmt/binding-win32-x64-msvc@0.62.0'
   - '@react-native-firebase/app@26.1.0'
-  - '@testing-library/user-event@14.6.3'
+  - '@testing-library/user-event@14.6.3 || 14.6.7'
   - oxfmt@0.62.0
   - unplugin-swc@1.5.10
   - postcss@8.5.26
   - tsx@4.23.10
   - vite@8.2.1
+  - '@mermaid-js/mermaid-cli@11.17.0'
+  - '@types/node@26.4.1'
+  - '@types/webextension-polyfill@0.12.6'
+  - framer-motion@13.2.0
+  - miniflare@5.20260831.0-alpha
+  - motion-dom@13.2.0
+  - stripe@22.6.1
+  - webpack@5.110.3
+  - wrangler@4.128.0
 
 allowBuilds:
   '@capaj/type-graphql': true
