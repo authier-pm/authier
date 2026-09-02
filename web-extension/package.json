@@ -70,7 +70,6 @@
     "@vitest/ui": "^4.1.11",
     "acorn": "^8.18.0",
     "ajv": "^8.20.0",
-    "babel-core": "^6.26.3",
     "babel-loader": "^10.1.1",
     "babel-plugin-import-graphql": "^2.8.1",
     "chrome-webstore-upload-cli": "^4.0.1",
