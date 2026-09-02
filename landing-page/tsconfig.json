@@ -3,7 +3,8 @@
   "compilerOptions": {
     "allowJs": false,
     "exactOptionalPropertyTypes": true,
-    "noUncheckedIndexedAccess": true
+    "noUncheckedIndexedAccess": true,
+    "types": ["bun"]
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
