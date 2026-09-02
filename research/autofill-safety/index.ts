@@ -1,6 +1,7 @@
 export { openAutofillSafetyCorpusV1 } from './corpus'
-export { runAutofillSafetyCorpus } from './runner'
+export { runAutofillSafetyCorpus, runAutofillSafetyCorpusAsync } from './runner'
 export type {
+  AsyncAutofillSafetyAdapter,
   AutofillSafetyAdapter,
   AutofillSafetyPhaseResult,
   AutofillSafetyRunReport

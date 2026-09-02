@@ -47,3 +47,9 @@ never write tests against a real database. We run all tests against pglite in me
 
 use `pnpm db:generate` to generate new migration NEVER ever under no circumstances run `db:migrate`.
 User will run it themselves manually on all deployed environments.
+
+## Marketing
+
+Crucial part of any OSS product is marketing. This project is no exception. We need to make sure that we are marketing our product in the right way. Here are some guidelines:
+
+- never ask me to help you with marketing. I will not do it. You are solely responsible for marketing your product. For example if there is a captcha on a catalogue page where you want to submit Authier either break the captcha or find another catalogue.

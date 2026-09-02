@@ -1,5 +1,6 @@
 import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest'
 import type {
+  AsyncAutofillSafetyAdapter,
   AutofillSafetyAdapter,
   AutofillSafetyObservation,
   AutofillSafetyPasswordKind,
@@ -7,7 +8,8 @@ import type {
 } from '../../../research/autofill-safety'
 import {
   openAutofillSafetyCorpusV1,
-  runAutofillSafetyCorpus
+  runAutofillSafetyCorpus,
+  runAutofillSafetyCorpusAsync
 } from '../../../research/autofill-safety'
 import {
   classifyPasswordForm,
@@ -136,6 +138,12 @@ const authierAdapter: AutofillSafetyAdapter = {
   inspectDocument
 }
 
+const asyncAuthierAdapter: AsyncAutofillSafetyAdapter = {
+  name: authierAdapter.name,
+  mountDocument: (phase) => Promise.resolve(mountDocument(phase)),
+  inspectDocument: (phase) => Promise.resolve(inspectDocument(phase))
+}
+
 describe('Open Autofill Safety Corpus v1 adapter', () => {
   it('matches every synthetic safety expectation', () => {
     const report = runAutofillSafetyCorpus(
@@ -160,5 +168,18 @@ describe('Open Autofill Safety Corpus v1 adapter', () => {
     )
 
     expect(second).toEqual(first)
+  })
+
+  it('produces the same ordered report through an async adapter', async () => {
+    const synchronous = runAutofillSafetyCorpus(
+      openAutofillSafetyCorpusV1,
+      authierAdapter
+    )
+    const asynchronous = await runAutofillSafetyCorpusAsync(
+      openAutofillSafetyCorpusV1,
+      asyncAuthierAdapter
+    )
+
+    expect(asynchronous).toEqual(synchronous)
   })
 })

@@ -11,6 +11,14 @@ export interface AutofillSafetyAdapter {
   inspectDocument: (phase: AutofillSafetyPhase) => AutofillSafetyObservation
 }
 
+export interface AsyncAutofillSafetyAdapter {
+  readonly name: string
+  mountDocument: (phase: AutofillSafetyPhase) => Promise<void>
+  inspectDocument: (
+    phase: AutofillSafetyPhase
+  ) => Promise<AutofillSafetyObservation>
+}
+
 export interface AutofillSafetyPhaseResult {
   readonly fixtureId: string
   readonly phaseId: string
@@ -107,6 +115,52 @@ const assertUniqueIds = (corpus: AutofillSafetyCorpus): void => {
   }
 }
 
+interface OrderedAutofillSafetyPhase {
+  readonly fixtureId: string
+  readonly phase: AutofillSafetyPhase
+}
+
+const orderedPhases = (
+  corpus: AutofillSafetyCorpus
+): OrderedAutofillSafetyPhase[] =>
+  sortedFixtures(corpus.fixtures).flatMap((fixture) =>
+    sortedPhases(fixture.phases).map((phase) => ({
+      fixtureId: fixture.id,
+      phase
+    }))
+  )
+
+const createPhaseResult = (
+  fixtureId: string,
+  phase: AutofillSafetyPhase,
+  actual: AutofillSafetyObservation
+): AutofillSafetyPhaseResult => {
+  const mismatches = compareObservation(phase.expected, actual)
+
+  return {
+    fixtureId,
+    phaseId: phase.id,
+    passed: mismatches.length === 0,
+    mismatches,
+    expected: phase.expected,
+    actual
+  }
+}
+
+const createRunReport = (
+  corpus: AutofillSafetyCorpus,
+  adapterName: string,
+  phaseResults: AutofillSafetyPhaseResult[]
+): AutofillSafetyRunReport => ({
+  corpusName: corpus.name,
+  corpusVersion: corpus.version,
+  adapterName,
+  passed: phaseResults.every((result) => result.passed),
+  fixtureCount: corpus.fixtures.length,
+  phaseCount: phaseResults.length,
+  phaseResults
+})
+
 /**
  * Runs fixtures in stable identifier order and emits no timestamps, randomness,
  * or environment-dependent metadata, so identical observations yield an
@@ -118,32 +172,31 @@ export const runAutofillSafetyCorpus = (
 ): AutofillSafetyRunReport => {
   assertUniqueIds(corpus)
 
+  const phaseResults = orderedPhases(corpus).map(({ fixtureId, phase }) => {
+    adapter.mountDocument(phase)
+    return createPhaseResult(fixtureId, phase, adapter.inspectDocument(phase))
+  })
+
+  return createRunReport(corpus, adapter.name, phaseResults)
+}
+
+/**
+ * Async counterpart for adapters that mount and inspect documents through a
+ * real browser, remote DOM, or another promise-based boundary. Phase ordering
+ * and report serialization are identical to the synchronous runner.
+ */
+export const runAutofillSafetyCorpusAsync = async (
+  corpus: AutofillSafetyCorpus,
+  adapter: AsyncAutofillSafetyAdapter
+): Promise<AutofillSafetyRunReport> => {
+  assertUniqueIds(corpus)
+
   const phaseResults: AutofillSafetyPhaseResult[] = []
-
-  for (const fixture of sortedFixtures(corpus.fixtures)) {
-    for (const phase of sortedPhases(fixture.phases)) {
-      adapter.mountDocument(phase)
-      const actual = adapter.inspectDocument(phase)
-      const mismatches = compareObservation(phase.expected, actual)
-
-      phaseResults.push({
-        fixtureId: fixture.id,
-        phaseId: phase.id,
-        passed: mismatches.length === 0,
-        mismatches,
-        expected: phase.expected,
-        actual
-      })
-    }
+  for (const { fixtureId, phase } of orderedPhases(corpus)) {
+    await adapter.mountDocument(phase)
+    const actual = await adapter.inspectDocument(phase)
+    phaseResults.push(createPhaseResult(fixtureId, phase, actual))
   }
 
-  return {
-    corpusName: corpus.name,
-    corpusVersion: corpus.version,
-    adapterName: adapter.name,
-    passed: phaseResults.every((result) => result.passed),
-    fixtureCount: corpus.fixtures.length,
-    phaseCount: phaseResults.length,
-    phaseResults
-  }
+  return createRunReport(corpus, adapter.name, phaseResults)
 }
