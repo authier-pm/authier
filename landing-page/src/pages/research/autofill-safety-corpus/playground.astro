@@ -1,0 +1,795 @@
+---
+import Breadcrumbs from '../../../components/Breadcrumbs.astro'
+import { site } from '../../../config'
+import { createAutofillPlaygroundPhases } from '../../../lib/autofillPlayground'
+import BaseLayout from '../../../layouts/BaseLayout.astro'
+import { openAutofillSafetyCorpusV1 } from '../../../../../research/autofill-safety'
+
+const title = 'Autofill Safety Playground'
+const description =
+  'Render the 12 synthetic Open Autofill Safety Corpus phases in a submission-blocked browser sandbox and inspect each exact expected target.'
+const corpusPageUrl = '/research/autofill-safety-corpus'
+const corpusDownloadUrl = '/research/autofill-safety-corpus-v1.json'
+const sourceUrl = `${site.githubUrl}/tree/main/research/autofill-safety`
+const phaseRecords = createAutofillPlaygroundPhases(openAutofillSafetyCorpusV1)
+const firstPhase = phaseRecords[0]
+
+if (!firstPhase) {
+  throw new Error('Open Autofill Safety Corpus has no playground phases')
+}
+
+const fixtureGroups = openAutofillSafetyCorpusV1.fixtures.map((fixture) => ({
+  fixture,
+  phases: phaseRecords.filter((record) => record.fixtureId === fixture.id)
+}))
+
+const displayTarget = (targetId: string | null) =>
+  targetId ?? 'None — abstain'
+
+const displayTargets = (targetIds: readonly string[]) => {
+  if (targetIds.length === 0) return 'None'
+
+  return targetIds.join(', ')
+}
+
+const schema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: title,
+  description,
+  url: `${site.url}/research/autofill-safety-corpus/playground`,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Web browser',
+  isAccessibleForFree: true,
+  license: openAutofillSafetyCorpusV1.licenseUrl,
+  author: {
+    '@type': 'Organization',
+    name: 'Authier contributors',
+    url: site.githubUrl
+  }
+}
+---
+
+<BaseLayout title={title} description={description} schema={schema}>
+  <section class="playground-hero shell">
+    <Breadcrumbs
+      items={[
+        { label: 'Home', href: '/' },
+        { label: 'Research', href: '/research' },
+        { label: openAutofillSafetyCorpusV1.name, href: corpusPageUrl },
+        { label: 'Playground' }
+      ]}
+    />
+    <p class="eyebrow">Live synthetic fixture renderer</p>
+    <div class="hero-grid">
+      <div>
+        <h1>Inspect the form.<br /><em>Then inspect the refusal.</em></h1>
+      </div>
+      <div class="hero-copy">
+        <p>
+          Move through all 12 deterministic phases in a real browser rendering
+          surface. Each phase keeps the corpus markup intact and shows the exact
+          password and OTP outcome an adapter is expected to report.
+        </p>
+        <p>
+          This is a manual renderer, not a password-manager benchmark or a
+          compatibility result.
+        </p>
+      </div>
+    </div>
+
+    <div class="scope-banner" role="note">
+      <strong>No real credentials. No submission. No network.</strong>
+      <span>
+        The fixture runs in an opaque iframe sandbox without script execution,
+        form submission, popups, downloads, or same-origin access. Its displayed
+        <code>synthetic.invalid</code> URL is corpus metadata; the iframe does not
+        adopt that origin.
+      </span>
+    </div>
+  </section>
+
+  <section class="playground-grid shell" aria-label="Autofill fixture playground">
+    <aside class="fixture-nav card" aria-label="Corpus phases">
+      <div class="panel-heading">
+        <p>Corpus phases</p>
+        <span>{phaseRecords.length} total</span>
+      </div>
+
+      <div class="fixture-groups">
+        {fixtureGroups.map(({ fixture, phases }) => (
+          <section class="fixture-group">
+            <p>{fixture.title}</p>
+            <div>
+              {phases.map((record) => {
+                const globalIndex = phaseRecords.findIndex(
+                  (phase) => phase.key === record.key
+                )
+
+                return (
+                  <button
+                    type="button"
+                    class="phase-button"
+                    data-phase-key={record.key}
+                    data-phase-title={record.fixtureTitle}
+                    data-phase-description={record.phase.description}
+                    data-phase-url={record.phase.document.url}
+                    data-phase-position={`Phase ${globalIndex + 1} of ${phaseRecords.length}`}
+                    data-frame-title={`${record.fixtureTitle}: ${record.phase.id}`}
+                    aria-pressed={globalIndex === 0 ? 'true' : 'false'}
+                  >
+                    <span>{String(record.phase.id.split('-')[0]).padStart(2, '0')}</span>
+                    <span>{record.phase.description}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </section>
+        ))}
+      </div>
+    </aside>
+
+    <div class="workspace card">
+      <header class="workspace-header">
+        <div>
+          <p id="phase-position">Phase 1 of {phaseRecords.length}</p>
+          <h2 id="phase-title">{firstPhase.fixtureTitle}</h2>
+          <p id="phase-description">{firstPhase.phase.description}</p>
+        </div>
+        <button id="reset-phase" type="button" class="button button-secondary button-small">
+          Reset phase
+        </button>
+      </header>
+
+      <div class="browser-frame">
+        <div class="browser-toolbar" aria-hidden="true">
+          <span class="window-dots"><i></i><i></i><i></i></span>
+          <code id="phase-url">{firstPhase.phase.document.url}</code>
+          <span>opaque sandbox</span>
+        </div>
+        <iframe
+          id="fixture-frame"
+          title={`${firstPhase.fixtureTitle}: ${firstPhase.phase.id}`}
+          sandbox=""
+          referrerpolicy="no-referrer"
+          aria-describedby="sandbox-explanation"
+        ></iframe>
+      </div>
+
+      <p id="playground-status" class="playground-status" role="status" aria-live="polite">
+        Rendered {firstPhase.phase.id}. Form submission is blocked by the iframe sandbox.
+      </p>
+
+      <div class="expectation-stack">
+        {phaseRecords.map((record, index) => (
+          <section
+            class="expectation-panel"
+            data-phase-details={record.key}
+            hidden={index !== 0}
+          >
+            <div class="expectation-heading">
+              <p>Expected observation</p>
+              <code>{record.fixtureCategory}</code>
+            </div>
+            <dl>
+              <div>
+                <dt>Password kind</dt>
+                <dd>{record.expected.passwordKind}</dd>
+              </div>
+              <div>
+                <dt>Stored-password target</dt>
+                <dd>{displayTarget(record.expected.storedPasswordTargetId)}</dd>
+              </div>
+              <div>
+                <dt>OTP kind</dt>
+                <dd>{record.expected.otpKind}</dd>
+              </div>
+              <div>
+                <dt>OTP targets</dt>
+                <dd>{displayTargets(record.expected.otpTargetIds)}</dd>
+              </div>
+            </dl>
+          </section>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="playground-notes shell" id="sandbox-explanation">
+    <article>
+      <p class="eyebrow">How to read it</p>
+      <h2>Rendering and evidence stay separate.</h2>
+      <p>
+        Use the phase list to inspect browser parsing, labels, autocomplete
+        tokens, field order, and DOM replacement. The expectation panel is the
+        machine-readable contract; the sandbox is only its visual companion.
+      </p>
+    </article>
+    <article class="limitations card">
+      <h3>Deliberate limits</h3>
+      <ul>
+        <li>No password-manager extension is launched or evaluated.</li>
+        <li>No saved credential or generated OTP is requested.</li>
+        <li>No top-level or synthetic origin is emulated.</li>
+        <li>No cross-origin frame, hostile script, or closed shadow root is covered.</li>
+      </ul>
+      <p class="notes-actions">
+        <a href={corpusPageUrl}>Read the corpus scope</a>
+        <a href={corpusDownloadUrl} download>Download JSON</a>
+        <a href={sourceUrl} target="_blank" rel="noreferrer">Inspect source</a>
+      </p>
+    </article>
+  </section>
+
+  {phaseRecords.map((record) => (
+    <template data-playground-document={record.key}>{record.frameDocument}</template>
+  ))}
+</BaseLayout>
+
+<script>
+  const phaseButtons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>('[data-phase-key]')
+  )
+  const phaseTemplates = Array.from(
+    document.querySelectorAll<HTMLTemplateElement>(
+      'template[data-playground-document]'
+    )
+  )
+  const phaseDetails = Array.from(
+    document.querySelectorAll<HTMLElement>('[data-phase-details]')
+  )
+  const fixtureFrame = document.querySelector<HTMLIFrameElement>('#fixture-frame')
+  const phaseTitle = document.querySelector<HTMLElement>('#phase-title')
+  const phaseDescription = document.querySelector<HTMLElement>('#phase-description')
+  const phasePosition = document.querySelector<HTMLElement>('#phase-position')
+  const phaseUrl = document.querySelector<HTMLElement>('#phase-url')
+  const playgroundStatus = document.querySelector<HTMLElement>('#playground-status')
+  const resetButton = document.querySelector<HTMLButtonElement>('#reset-phase')
+  let currentPhaseKey = ''
+
+  const renderPhase = (phaseKey: string, announce: boolean): void => {
+    const button = phaseButtons.find(
+      (candidate) => candidate.dataset.phaseKey === phaseKey
+    )
+    const template = phaseTemplates.find(
+      (candidate) => candidate.dataset.playgroundDocument === phaseKey
+    )
+    const frameDocument = template?.content.textContent
+
+    if (
+      !button ||
+      !frameDocument ||
+      !fixtureFrame ||
+      !phaseTitle ||
+      !phaseDescription ||
+      !phasePosition ||
+      !phaseUrl ||
+      !playgroundStatus
+    ) {
+      return
+    }
+
+    currentPhaseKey = phaseKey
+    fixtureFrame.srcdoc = frameDocument
+    fixtureFrame.title = button.dataset.frameTitle ?? 'Synthetic autofill fixture'
+    phaseTitle.textContent = button.dataset.phaseTitle ?? ''
+    phaseDescription.textContent = button.dataset.phaseDescription ?? ''
+    phasePosition.textContent = button.dataset.phasePosition ?? ''
+    phaseUrl.textContent = button.dataset.phaseUrl ?? ''
+
+    for (const candidate of phaseButtons) {
+      candidate.setAttribute(
+        'aria-pressed',
+        candidate.dataset.phaseKey === phaseKey ? 'true' : 'false'
+      )
+    }
+
+    for (const detail of phaseDetails) {
+      detail.hidden = detail.dataset.phaseDetails !== phaseKey
+    }
+
+    window.history.replaceState(null, '', `#${phaseKey}`)
+
+    if (announce) {
+      playgroundStatus.textContent = `${button.dataset.phasePosition ?? 'Phase'} rendered. Form submission remains blocked by the iframe sandbox.`
+    }
+  }
+
+  for (const button of phaseButtons) {
+    button.addEventListener('click', () => {
+      const phaseKey = button.dataset.phaseKey
+
+      if (phaseKey) renderPhase(phaseKey, true)
+    })
+  }
+
+  resetButton?.addEventListener('click', () => {
+    if (!currentPhaseKey || !playgroundStatus) return
+
+    renderPhase(currentPhaseKey, false)
+    playgroundStatus.textContent = 'The selected phase was reset inside a fresh sandbox.'
+  })
+
+  const requestedPhaseKey = window.location.hash.slice(1)
+  const requestedPhaseExists = phaseButtons.some(
+    (button) => button.dataset.phaseKey === requestedPhaseKey
+  )
+  const firstPhaseKey = phaseButtons[0]?.dataset.phaseKey
+
+  if (requestedPhaseExists) {
+    renderPhase(requestedPhaseKey, false)
+  } else if (firstPhaseKey) {
+    renderPhase(firstPhaseKey, false)
+  }
+</script>
+
+<style>
+  .playground-hero {
+    padding: 86px 0 42px;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+    gap: 56px;
+    align-items: end;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(3rem, 7vw, 5.7rem);
+    font-weight: 680;
+    letter-spacing: -0.068em;
+    line-height: 0.98;
+  }
+
+  h1 em {
+    color: var(--accent);
+    font-style: normal;
+  }
+
+  .hero-copy p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.04rem;
+    line-height: 1.75;
+  }
+
+  .hero-copy p + p {
+    margin-top: 12px;
+    color: var(--text-subtle);
+    font-size: 0.86rem;
+  }
+
+  .scope-banner {
+    display: grid;
+    grid-template-columns: minmax(230px, 0.34fr) minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 44px;
+    padding: 20px 22px;
+    border: 1px solid rgba(105, 230, 204, 0.22);
+    border-radius: 14px;
+    background: rgba(105, 230, 204, 0.045);
+  }
+
+  .scope-banner strong {
+    color: var(--text);
+    font-size: 0.88rem;
+  }
+
+  .scope-banner span {
+    color: var(--text-muted);
+    font-size: 0.82rem;
+    line-height: 1.65;
+  }
+
+  .scope-banner code {
+    color: var(--accent);
+  }
+
+  .playground-grid {
+    display: grid;
+    grid-template-columns: 310px minmax(0, 1fr);
+    gap: 18px;
+    align-items: start;
+    padding: 26px 0 86px;
+  }
+
+  .fixture-nav {
+    position: sticky;
+    top: 84px;
+    max-height: calc(100vh - 110px);
+    overflow: auto;
+    padding: 18px;
+  }
+
+  .panel-heading,
+  .expectation-heading {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+  }
+
+  .panel-heading {
+    padding: 4px 4px 15px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-heading p,
+  .expectation-heading p {
+    margin: 0;
+    color: var(--text);
+    font-size: 0.74rem;
+    font-weight: 740;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .panel-heading span {
+    color: var(--text-subtle);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+  }
+
+  .fixture-groups {
+    display: grid;
+    gap: 22px;
+    padding-top: 18px;
+  }
+
+  .fixture-group > p {
+    margin: 0 0 8px;
+    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 680;
+    line-height: 1.45;
+  }
+
+  .fixture-group > div {
+    display: grid;
+    gap: 6px;
+  }
+
+  .phase-button {
+    display: grid;
+    grid-template-columns: 30px minmax(0, 1fr);
+    gap: 9px;
+    width: 100%;
+    padding: 10px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    background: transparent;
+    color: var(--text-subtle);
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .phase-button:hover {
+    border-color: var(--border);
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--text-muted);
+  }
+
+  .phase-button[aria-pressed='true'] {
+    border-color: rgba(105, 230, 204, 0.24);
+    background: rgba(105, 230, 204, 0.075);
+    color: var(--text);
+  }
+
+  .phase-button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  .phase-button span:first-child {
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.68rem;
+    line-height: 1.6;
+  }
+
+  .phase-button span:last-child {
+    overflow: hidden;
+    font-size: 0.72rem;
+    line-height: 1.55;
+    text-overflow: ellipsis;
+  }
+
+  .workspace {
+    overflow: hidden;
+  }
+
+  .workspace-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 28px 30px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .workspace-header > div {
+    min-width: 0;
+  }
+
+  .workspace-header > div > p:first-child {
+    margin: 0 0 8px;
+    color: var(--accent);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .workspace-header h2 {
+    margin: 0;
+    font-size: clamp(1.5rem, 3vw, 2.35rem);
+    letter-spacing: -0.045em;
+    line-height: 1.12;
+  }
+
+  .workspace-header > div > p:last-child {
+    max-width: 700px;
+    margin: 13px 0 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+
+  .workspace-header .button {
+    flex: 0 0 auto;
+  }
+
+  .browser-frame {
+    margin: 26px 30px 0;
+    overflow: hidden;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    background: #f4f8f7;
+    box-shadow: var(--shadow-lg);
+  }
+
+  .browser-toolbar {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 14px;
+    align-items: center;
+    min-height: 42px;
+    padding: 0 14px;
+    border-bottom: 1px solid #ced9d6;
+    background: #e7eeec;
+    color: #53625f;
+  }
+
+  .window-dots {
+    display: flex;
+    gap: 5px;
+  }
+
+  .window-dots i {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #9aa9a5;
+  }
+
+  .browser-toolbar code {
+    overflow: hidden;
+    padding: 5px 10px;
+    border: 1px solid #c7d3d0;
+    border-radius: 7px;
+    background: rgba(255, 255, 255, 0.75);
+    color: #34413f;
+    font-size: 0.68rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .browser-toolbar > span:last-child {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  iframe {
+    display: block;
+    width: 100%;
+    height: 390px;
+    border: 0;
+    background: #f4f8f7;
+  }
+
+  .playground-status {
+    margin: 11px 30px 0;
+    color: var(--text-subtle);
+    font-size: 0.7rem;
+  }
+
+  .expectation-stack {
+    padding: 24px 30px 30px;
+  }
+
+  .expectation-panel {
+    padding: 20px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.018);
+  }
+
+  .expectation-heading code {
+    color: var(--accent);
+    font-size: 0.68rem;
+  }
+
+  dl {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1px;
+    margin: 18px 0 0;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--border);
+  }
+
+  dl div {
+    min-width: 0;
+    padding: 14px;
+    background: #0c1212;
+  }
+
+  dt {
+    color: var(--text-subtle);
+    font-size: 0.61rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  dd {
+    margin: 7px 0 0;
+    overflow-wrap: anywhere;
+    color: var(--text);
+    font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem;
+    line-height: 1.5;
+  }
+
+  .playground-notes {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(360px, 1.2fr);
+    gap: 54px;
+    align-items: start;
+    padding: 0 0 110px;
+  }
+
+  .playground-notes h2 {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.45rem);
+    letter-spacing: -0.055em;
+    line-height: 1.06;
+  }
+
+  .playground-notes article > p:last-child {
+    margin: 22px 0 0;
+    color: var(--text-muted);
+    line-height: 1.8;
+  }
+
+  .limitations {
+    padding: 30px;
+  }
+
+  .limitations h3 {
+    margin: 0;
+    font-size: 1.22rem;
+  }
+
+  .limitations ul {
+    display: grid;
+    gap: 9px;
+    margin: 20px 0 0;
+    padding-left: 20px;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+
+  .notes-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-bottom: 0 !important;
+  }
+
+  .notes-actions a {
+    color: var(--accent);
+    font-size: 0.82rem;
+    font-weight: 680;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 980px) {
+    .playground-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .fixture-nav {
+      position: static;
+      max-height: none;
+    }
+
+    .fixture-groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 720px) {
+    .playground-hero {
+      padding-top: 62px;
+    }
+
+    .hero-grid,
+    .scope-banner,
+    .playground-notes {
+      grid-template-columns: 1fr;
+    }
+
+    .hero-grid,
+    .playground-notes {
+      gap: 28px;
+    }
+
+    .fixture-groups {
+      grid-template-columns: 1fr;
+    }
+
+    .workspace-header {
+      display: grid;
+      padding: 22px;
+    }
+
+    .workspace-header .button {
+      width: 100%;
+    }
+
+    .browser-frame {
+      margin: 20px 14px 0;
+    }
+
+    .browser-toolbar {
+      grid-template-columns: auto minmax(0, 1fr);
+    }
+
+    .browser-toolbar > span:last-child {
+      display: none;
+    }
+
+    iframe {
+      height: 430px;
+    }
+
+    .playground-status {
+      margin-inline: 16px;
+    }
+
+    .expectation-stack {
+      padding: 20px 14px 22px;
+    }
+
+    dl {
+      grid-template-columns: 1fr;
+    }
+
+    .playground-notes {
+      padding-bottom: 80px;
+    }
+  }
+</style>
