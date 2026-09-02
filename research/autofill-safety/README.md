@@ -19,7 +19,11 @@ element IDs; “no target” is a first-class expected outcome.
 
 The public contract is in `schema.ts`, synthetic fixtures are in `corpus.ts`,
 and `runner.ts` produces a stable report in fixture/phase ID order. An adapter
-only has to mount a phase and return the normalized observation.
+only has to mount a phase and return the normalized observation. Use
+`runAutofillSafetyCorpus` for synchronous DOM adapters or
+`runAutofillSafetyCorpusAsync` for promise-based browser and remote-DOM
+adapters. The async runner awaits each mount and inspection in sequence, so it
+preserves the same deterministic phase ordering and report shape.
 
 Authier’s adapter test lives at
 `web-extension/src/content-script/autofillSafetyCorpus.spec.ts` and reuses the

@@ -64,7 +64,7 @@ module.exports = {
       <title>Authier Extension - Popup</title>
       ${mobileViewport}
     </head>
-      <body>
+      <body class="extension-popup">
         <div id="popup"></div>
         <script type="application/javascript" src="browser-polyfill.js"></script>
       </body>

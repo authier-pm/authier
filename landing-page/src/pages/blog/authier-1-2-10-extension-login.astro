@@ -1,0 +1,157 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="v1.2.10-extension source tag: popup login continuity"
+  description="Authier’s v1.2.10-extension source tag moves login into the popup, retains pending approval when it closes, and gives navigation controls clearer labels."
+  publishedAt="2026-09-01"
+  updatedAt="2026-09-01"
+  readingTime="5 min read"
+  imagePaths={['/blog/authier-login-session-flow.svg']}
+>
+  <div class="article-callout">
+    <p><strong>Scope of this source tag:</strong> <code>v1.2.10-extension</code> changes how the browser extension presents and retains a login attempt. It does not introduce a new encryption design, change Authier’s cryptographic parameters, or constitute a security audit.</p>
+  </div>
+
+  <p>
+    Authier’s
+    <a href="https://github.com/authier-pm/authier/releases/tag/v1.2.10-extension" target="_blank" rel="noreferrer"><code>v1.2.10-extension</code> GitHub release</a>
+    was published on August 14, 2026. Its bundled extension still identifies
+    itself as version 1.2.9, and the official stores do not currently offer a
+    1.2.10 build. This article documents the tagged source changes, not an
+    available 1.2.10 store rollout.
+  </p>
+
+  <p>
+    The two changes reorganize the extension login flow and refine popup
+    navigation. Most of the work is not a new feature in a checklist; it is
+    continuity around a browser-extension constraint: the popup disappears
+    whenever it loses focus.
+  </p>
+
+  <figure class="product-ui-shot">
+    <span class="product-ui-image-frame">
+      <img
+        src="/blog/authier-login-session-flow.svg"
+        alt="Flow diagram showing the popup reading and writing a login snapshot managed by the extension background context"
+        width="1200"
+        height="675"
+        loading="eager"
+      />
+    </span>
+    <figcaption>
+      <strong>Tagged flow.</strong> The temporary popup reads a session snapshot;
+      the extension background context owns challenge checks and completion.
+    </figcaption>
+  </figure>
+
+  <h2>Login now starts inside the extension popup</h2>
+
+  <p>
+    Previously, a signed-out popup directed the user to open the full vault to
+    log in or create an account. The tagged change renders a compact login form
+    in the popup itself. The full-page vault uses the same login component, so
+    both surfaces now share validation, error handling, password visibility
+    controls, and the transition to device approval.
+  </p>
+
+  <p>
+    Account creation remains a full-tab flow. Selecting the sign-up path from the
+    popup opens that tab in the foreground. This keeps the short returning-user
+    path in the extension while preserving the existing account setup route.
+  </p>
+
+  <h2>A login attempt can outlive the popup</h2>
+
+  <p>
+    A browser popup is temporary UI. If a login attempt lived only in its React
+    tree, closing the popup would tear down the form and approval polling. The
+    tagged change puts that work in a dedicated background login-session
+    manager. When the popup is opened again, it reads the current session
+    snapshot instead of starting from an empty screen.
+  </p>
+
+  <p>
+    The manager tracks three explicit states: editing, awaiting approval, and
+    completing. It stores the current draft and pending challenge in the
+    browser’s session-scoped extension storage when that API is available, with
+    the extension background context as the fallback. While that context is
+    active, the manager checks the pending challenge. After a background restart,
+    it restores a stored attempt and resumes checking. After approval, it
+    completes the existing device-login exchange and clears the login snapshot.
+    An explicit reset and detection of an already-authenticated device clear
+    stale state as well.
+  </p>
+
+  <div class="article-callout">
+    <p><strong>Password-retention trade-off:</strong> the saved draft includes the master password in plaintext. It remains in the extension’s session storage—or background memory where that API is unavailable—so the login can survive popup closure. It is not sent to Authier’s server, but it remains available to the extension until successful login, explicit reset, authenticated-device cleanup, or the browser or extension session ends. A failed login can return to editing with the draft still retained. This longer in-extension lifetime is a security-relevant trade-off of the continuity feature.</p>
+  </div>
+
+  <p>
+    That description is deliberately about state ownership and interface
+    behavior. The tagged change still uses Authier’s existing password-derived
+    key and trusted-device challenge. Moving code into a background manager
+    should not be read as evidence that the underlying security model became
+    stronger.
+  </p>
+
+  <h2>The approval screen is shared too</h2>
+
+  <p>
+    When an account policy requires device approval, both the compact popup and
+    full-page vault now render the same pending-login component. It identifies
+    the account and requesting device, reports whether push notifications were
+    sent, and shows the known status of a master-device reset. A user can also
+    abandon the attempt and choose a different account without waiting for the
+    challenge to finish.
+  </p>
+
+  <p>
+    Approval remains configurable. Accounts can allow immediate enrollment,
+    require an approved device, or require the designated master device. The
+    tagged change affects how a pending request is carried through the extension;
+    it does not make approval mandatory or remove the recovery trade-offs
+    described in the <a href="/guides/trusted-device-approval">trusted-device approval guide</a>.
+  </p>
+
+  <h2>Popup controls have clearer names</h2>
+
+  <p>
+    The other change is small but visible. Popup menu buttons now expose labels
+    that follow their current action, such as opening or closing a menu. The
+    vault button uses the translated “Open vault” label, and related navigation
+    controls are grouped together. The tab opened by the vault or sign-up action
+    is explicitly activated.
+  </p>
+
+  <p>
+    These changes make the controls easier to identify for assistive technology
+    and make the compact layout more predictable. They do not claim conformance
+    with a particular accessibility standard; the tagged change is limited to
+    labels, grouping, and navigation behavior.
+  </p>
+
+  <h2>What the tagged tests cover</h2>
+
+  <p>
+    The source tag adds <a href="https://github.com/authier-pm/authier/blob/v1.2.10-extension/web-extension/src/background/loginSession.spec.ts" target="_blank" rel="noreferrer">focused tests for the new session manager</a>. They cover
+    restoring saved form values into a new manager, resuming approval checks
+    from a stored attempt, discarding a stored attempt when the device is already
+    authenticated, and completing an in-progress login after approval arrives.
+    In a fresh test profile, the extension smoke test also checks that the popup
+    presents the login heading.
+  </p>
+
+  <p>
+    Tests document intended behavior and help catch regressions; they are not a
+    substitute for an independent assessment. Authier remains an early-stage
+    project and has not published an independent third-party security audit. The
+    <a href="/security">security architecture and limitations</a> page describes
+    the current encryption design and the evidence that is—and is not—available.
+  </p>
+
+  <div class="article-callout">
+    <p><strong>Review the change:</strong> inspect the <a href="https://github.com/authier-pm/authier/tree/v1.2.10-extension/web-extension" target="_blank" rel="noreferrer">tagged extension source</a> and read the <a href="/security">security limitations</a>. The official stores currently serve earlier builds, so they cannot yet be used to test these tagged changes.</p>
+  </div>
+</ArticleLayout>

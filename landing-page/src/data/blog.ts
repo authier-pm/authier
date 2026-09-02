@@ -4,6 +4,16 @@ export type BlogPost = ContentEntry
 
 export const blogPosts = [
   {
+    title: 'v1.2.10-extension source tag: popup login continuity',
+    description:
+      'Authier’s v1.2.10-extension source tag moves login into the popup, retains pending approval when it closes, and gives navigation controls clearer labels.',
+    href: '/blog/authier-1-2-10-extension-login',
+    publishedAt: '2026-09-01',
+    updatedAt: '2026-09-01',
+    readingTime: '5 min read',
+    category: 'Engineering note'
+  },
+  {
     title: 'Authier vs Bitwarden: an honest comparison',
     description:
       'A practical Authier vs Bitwarden comparison with UI screenshots, covering device approval, maturity, audits, encryption, and who each password manager suits.',
