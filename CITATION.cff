@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: 'If you use Authier in your work, please cite it using this metadata.'
+title: 'Authier'
+type: software
+authors:
+  - name: 'Authier contributors'
+abstract: 'Authier is an early-stage open-source password manager and TOTP vault for browsers and the web. The project has not undergone an independent security audit.'
+keywords:
+  - 'password manager'
+  - TOTP
+  - 'browser extension'
+  - autofill
+  - 'client-side encryption'
+license: AGPL-3.0-or-later
+repository-code: 'https://github.com/authier-pm/authier'
+url: 'https://www.authier.pm/'

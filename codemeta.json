@@ -1,0 +1,26 @@
+{
+  "@context": "https://w3id.org/codemeta/3.1",
+  "type": "SoftwareSourceCode",
+  "name": "Authier",
+  "description": "Authier is an early-stage open-source password manager and TOTP vault for browsers and the web. The project has not undergone an independent security audit.",
+  "codeRepository": "https://github.com/authier-pm/authier",
+  "issueTracker": "https://github.com/authier-pm/authier/issues",
+  "url": "https://www.authier.pm/",
+  "downloadUrl": "https://www.authier.pm/download",
+  "license": "https://spdx.org/licenses/AGPL-3.0-or-later.html",
+  "author": [
+    {
+      "type": "Organization",
+      "name": "Authier contributors",
+      "url": "https://github.com/authier-pm"
+    }
+  ],
+  "programmingLanguage": ["TypeScript", "JavaScript"],
+  "keywords": [
+    "password manager",
+    "TOTP",
+    "browser extension",
+    "autofill",
+    "client-side encryption"
+  ]
+}

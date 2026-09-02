@@ -3,7 +3,10 @@ import Icon from '../../components/Icon.astro'
 import PageHero from '../../components/PageHero.astro'
 import { site } from '../../config'
 import { blogPosts } from '../../data/blog'
-import { researchArtifacts } from '../../data/research'
+import {
+  createResearchDatasetSchema,
+  researchArtifacts
+} from '../../data/research'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
 const title = 'Password Manager Blog'
@@ -22,14 +25,7 @@ const schema = {
   description,
   url: `${site.url}/blog`,
   hasPart: [
-    ...researchArtifacts.map((artifact) => ({
-      '@type': 'Dataset',
-      name: artifact.title,
-      description: artifact.description,
-      url: `${site.url}${artifact.href}`,
-      datePublished: artifact.publishedAt,
-      dateModified: artifact.updatedAt
-    })),
+    ...researchArtifacts.map(createResearchDatasetSchema),
     ...blogPosts.map((post) => ({
       '@type': 'Article',
       headline: post.title,

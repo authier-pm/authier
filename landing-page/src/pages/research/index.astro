@@ -2,7 +2,10 @@
 import Icon from '../../components/Icon.astro'
 import PageHero from '../../components/PageHero.astro'
 import { site } from '../../config'
-import { researchArtifacts } from '../../data/research'
+import {
+  createResearchDatasetSchema,
+  researchArtifacts
+} from '../../data/research'
 import BaseLayout from '../../layouts/BaseLayout.astro'
 
 const title = 'Password Manager Research'
@@ -15,14 +18,7 @@ const schema = {
   name: 'Authier password manager research',
   description,
   url: `${site.url}/research`,
-  hasPart: researchArtifacts.map((artifact) => ({
-    '@type': 'Dataset',
-    name: artifact.title,
-    description: artifact.description,
-    url: `${site.url}${artifact.href}`,
-    datePublished: artifact.publishedAt,
-    dateModified: artifact.updatedAt
-  }))
+  hasPart: researchArtifacts.map(createResearchDatasetSchema)
 }
 ---
 

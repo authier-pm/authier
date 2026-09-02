@@ -2,7 +2,10 @@
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import { site } from '../../config'
-import { researchArtifacts } from '../../data/research'
+import {
+  createResearchDatasetSchema,
+  researchArtifacts
+} from '../../data/research'
 import ArticleLayout from '../../layouts/ArticleLayout.astro'
 
 const [artifact] = researchArtifacts
@@ -20,19 +23,8 @@ const corpusSha256 = createHash('sha256')
 
 const datasetSchema = {
   '@context': 'https://schema.org',
-  '@type': 'Dataset',
-  name: artifact.title,
-  description: artifact.description,
-  url: `${site.url}${artifact.href}`,
+  ...createResearchDatasetSchema(artifact),
   version: '1.0.0',
-  datePublished: artifact.publishedAt,
-  dateModified: artifact.updatedAt,
-  creator: {
-    '@type': 'Organization',
-    name: 'Authier contributors',
-    url: site.githubUrl
-  },
-  license: 'https://spdx.org/licenses/AGPL-3.0-or-later.html',
   measurementTechnique: 'Synthetic jsdom classifier adapter tests',
   keywords: [
     'password manager',
@@ -205,7 +197,12 @@ const datasetSchema = {
     evaluated generation, storage, and autofill across 13 password managers.
     The ACSAC 2024
     <a href="https://github.com/Leaky-Autofill/LeakyAutofill-Artifact" target="_blank" rel="noreferrer">Leaky Autofill artifact</a>
-    examines whether password managers fill data into concealed fields.
+    examines whether password managers fill data into concealed fields. The
+    USENIX Security 2026 paper
+    <a href="https://www.usenix.org/conference/usenixsecurity26/presentation/lamarca" target="_blank" rel="noreferrer">“AutoFail”</a>
+    studies the separate Android boundary where browsers translate web content
+    into the Autofill Framework and evaluates credential filling across browsers
+    and password managers.
   </p>
 
   <p>
