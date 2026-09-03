@@ -5054,3 +5054,72 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   contact address was transmitted, the CAPTCHA was not touched, and the form
   was not submitted without the required action-time confirmation. This is a
   staged high-authority opportunity, not a backlink or DR gain.
+
+## 2026-09-03
+
+### Verified Babel's independently merged followed placement at 09:12 CEST
+
+- A Babel maintainer merged
+  [babel/website#3242](https://github.com/babel/website/pull/3242) at 14:22 UTC
+  on September 2. The production
+  [Babel users page](https://babeljs.io/users) now includes Authier and links
+  directly to `https://www.authier.pm/`.
+- Verified the rendered DOM and the server response presented to AhrefsBot.
+  Both expose the canonical Authier URL with no `nofollow`, `ugc`, or
+  `sponsored` relation and no intermediate redirect. The page is self-canonical,
+  has no robots exclusion, and is included in Babel's sitemap.
+- The journal's prior official Ahrefs measurement placed `babeljs.io` at **DR
+  85**, with approximately 4.2 million backlinks and 12,000 linking websites.
+  This is therefore a new, legitimate, independently reviewed followed
+  backlink. It is not yet claimed as indexed by Ahrefs or credited to Authier's
+  score.
+
+### Audited open contribution and editorial queues at 09:12 CEST
+
+- A fresh GitHub CLI search returned 22 open Authier-titled external pull
+  requests. A separate check of
+  [VectorLogoZone/vectorlogozone#100](https://github.com/VectorLogoZone/vectorlogozone/pull/100)
+  found it open, mergeable, and without comments or reviews. The newest update
+  among the 22 occurred before the previous audit; there is no new human
+  feedback or action request, so no comment, commit, or CI rerun was warranted.
+- The open suggestions
+  [awesome-digital-escape-tools#11](https://github.com/abdomk1998/awesome-digital-escape-tools/issues/11)
+  and [THEHUB#36](https://github.com/Qutaifan/THEHUB/issues/36) remain unchanged
+  and have no comments. The closed
+  [FMHY suggestion](https://github.com/fmhy/edit/issues/6189) has no new response,
+  and an AhrefsBot-view of FMHY's live Internet Tools page contains no Authier
+  link. No duplicate or reopen attempt was made.
+- The connected inbox contains one new human reply: Jonathan Almeida thanked us
+  for sharing the autofill corpus and said he would keep it in mind for future
+  autofill-browser testing. It is a positive acknowledgement, but no inclusion
+  or backlink was promised or published; no follow-up pressure was applied.
+- No other new editorial acceptance, rejection, or request requiring a response
+  was found.
+
+### Verified the newly published extension-store records and link attributes
+
+- The live Chrome Web Store listing now shows Authier version 1.2.12, updated
+  September 2. Its privacy-policy and support-site anchors point to Authier but
+  both carry `ugc nofollow`, so they are not counted as followed backlinks.
+- The live Mozilla Add-ons listing also shows version 1.2.12, updated September
+  2. Its homepage and support-site links reach Authier through Mozilla's
+  outbound redirect and both carry `nofollow`.
+- Both store records are useful distribution surfaces, but neither is claimed
+  as a new DR-driving link. Their older unsupported marketing wording remains a
+  separate copy-maintenance issue; no external listing was edited in this pass.
+
+### Staged the official Ahrefs recheck and screened two additional routes
+
+- Opened Ahrefs' official Website Authority Checker with the exact
+  `www.authier.pm` host populated. Clicking **Check Authority** would submit that
+  domain to Ahrefs, so the action is waiting for the required action-time
+  confirmation. Ahrefs' documented free endpoint also requires an API v3 key,
+  and no existing key is available in the workspace.
+- Until that check is authorized and completed, the latest verified result
+  remains **DR 8**, **38 backlinks**, **28 linking websites**, and 29% dofollow
+  for both aggregates. The DR 13 completion threshold remains unmet.
+- Rejected [BrowserExtensions.io](https://browserextensions.io/) as a weak and
+  poorly matched directory dominated by unrelated adult/video-download tools.
+  Rejected Hall of Codes' publishing offer because it is not an editorial
+  listing: it would republish an already-live extension through a third party's
+  developer account and cede listing management. Neither route was contacted.
