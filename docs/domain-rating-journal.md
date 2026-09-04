@@ -5123,3 +5123,76 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   Rejected Hall of Codes' publishing offer because it is not an editorial
   listing: it would republish an already-live extension through a third party's
   developer account and cede listing management. Neither route was contacted.
+
+## 2026-09-04
+
+### Verified AlternativeTo's independent publication at 11:00 CEST
+
+- AlternativeTo has independently approved and published the submitted
+  [Authier profile](https://alternativeto.net/software/authier/about/). It is
+  visible to signed-out visitors, self-canonical, and marked `index, follow`.
+  The public profile accurately retains the early-stage, AGPL, freemium, and
+  no-independent-audit context, while its activity identifies `Jiri-Spac` as
+  the submitter.
+- Inspected the rendered DOM rather than inferring link treatment from the
+  visible labels. Both the developer and **Official Website** anchors point
+  directly to `https://www.authier.pm/`, but both carry
+  `rel="nofollow noopener"`. A direct AhrefsBot request currently receives a
+  Cloudflare challenge response. This is a legitimate public discovery and
+  comparison citation, not a followed backlink or dependable DR input.
+- SaaSHub's Authier route is also publicly reachable, but it still says
+  **Pending approval**. The page is self-canonical, carries `noindex, follow`,
+  and has no direct Authier homepage anchor; its only `authier.pm` occurrences
+  are nofollow links to third-party traffic/authority checks and Reddit search.
+  It is therefore still a review stub rather than a published backlink.
+
+### Audited every active contribution and selected directory queue at 11:00 CEST
+
+- GitHub currently returns 22 open Authier-titled external pull requests. A
+  separate check confirms
+  [VectorLogoZone/vectorlogozone#100](https://github.com/VectorLogoZone/vectorlogozone/pull/100)
+  is also open, clean, mergeable, and without comments or reviews. None of the
+  23 has been updated since the September 2 audit, and no new human review,
+  decision, conflict, or author-fixable failure appeared.
+- The open
+  [PrivacyTools.io proposal](https://github.com/privacytoolsIO/privacy-tools/discussions/62)
+  and [LFX Insights request](https://github.com/linuxfoundation/insights/discussions/2143)
+  remain open with no comments or updates. Rawsec's public
+  [work item #1258](https://gitlab.com/rawsec/rawsec-cybersecurity-list/-/work_items/1258)
+  also remains open, unassigned, and without notes or a merge request.
+- OpenAltFinder's expected `/tools/authier` route still returns its public 404.
+  appsec.fyi's current 177-item **Recently Added** feed contains neither Authier
+  nor the corpus. XWiki's exportable catalogue contains no Authier record, and
+  Cloudflare's live Small App Garden contains no Authier card. No duplicate,
+  reviewer ping, empty commit, or queue manipulation was created.
+
+### Completed Both.org's requested clarity revision at 11:00 CEST
+
+- Both.org editor David Both replied that the article's subject was interesting
+  but the first draft made a simple trusted-device idea difficult to understand.
+  He requested a quality revision before publication and highlighted the
+  existing concise explanation as the clearer model.
+- Rewrote
+  [`bothTrustedDeviceArticle.md`](./editorial-pitches/bothTrustedDeviceArticle.md)
+  around that explanation and a concrete new-phone flow. The revision drops
+  from 951 to 794 Markdown words; its prose averages 13.3 words per sentence
+  with no sentence above 25 words. It keeps the recovery tradeoffs, negative
+  capability boundaries, maintainer affiliation, early-stage status,
+  operational-maturity caveat, AGPL source, and lack of an independent audit.
+- Prepared a concise, non-defensive reply in
+  [`bothRevisionReply.md`](./editorial-pitches/bothRevisionReply.md). The reply
+  and revised attachment have not been emailed because sending them is a new
+  representational communication that requires action-time confirmation.
+- A read-only inbox search found no other new Authier, corpus, directory, or
+  editorial decision requiring a response.
+
+### Rechecked Ahrefs' official completion metric at 11:00 CEST
+
+- Loaded the exact `www.authier.pm` host through Ahrefs' official Website
+  Authority Checker. The completed result is **DR 8**, **41 backlinks**, and
+  **31 linking websites**, with 29% dofollow for both aggregates.
+- Backlinks increased by three and linking websites increased by three from the
+  last verified reading, but the free aggregate does not identify which sources
+  caused that movement. No attribution to Babel, AlternativeTo, extension
+  stores, or another placement is inferred without source-level evidence.
+- The DR 13 completion threshold remains unmet, so the initiative stays active.

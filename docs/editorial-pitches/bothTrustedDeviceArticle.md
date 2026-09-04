@@ -1,121 +1,105 @@
 # What I Learned Building Trusted-Device Approval
 
-When a password manager adds a new browser or phone, it is making two different
-decisions. The first is familiar: does this person know the secret that unlocks
-the vault? The second is easier to overlook: should this particular client be
-allowed to join the account at all?
+When an account requires device approval, knowing its email address and master
+password is not enough to add an unfamiliar browser or phone. The new device
+must request access, and a device that is already approved reviews the request.
+An account can also allow immediate enrollment, which trades this extra check
+for convenience.
 
-I encountered that distinction while working on
-[Authier](https://www.authier.pm/), an early-stage password manager released as
-[open source under the GNU Affero General Public License](https://github.com/authier-pm/authier).
-Authier is browser-first, stores passwords and time-based one-time password
-seeds, and encrypts vault items in the client before synchronization. Its
-device-approval design is not a security proof or a model every project should
-copy. It is an implementation that made several tradeoffs unusually visible.
+The basic idea is simple. Explaining what it does—and what it does not do—is
+where the useful security work begins.
 
-## Separate Unlocking From Enrollment
+I encountered this while working on
+[Authier](https://www.authier.pm/), an early-stage, open-source password manager.
+Authier stores passwords and time-based one-time password seeds and encrypts
+vault items in the client before synchronization. It has not published an
+independent third-party security audit and has far less operational history than
+established password managers. I maintain the project, so this article describes
+what we learned from one implementation; it is not a product recommendation.
 
-A master password normally participates in local key derivation. In that role,
-it answers a cryptographic question: can this client derive the key needed to
-decrypt the vault? A synchronized service also has an account-management
-question to answer: may an unfamiliar client receive the encrypted vault and
-become a recognized device?
+## What the approval check does
 
-If those questions are collapsed into one, anyone who captures the email
-address and master password can try to enroll remotely. Requiring a device that
-is already associated with the account to review the request adds a second
-decision point. The new client remains pending until the request is accepted or
-rejected.
+Imagine signing in to your vault on a new phone. The phone can prove that you
+know the master password. The account must still decide whether to recognize
+that phone.
 
-This is not the same as claiming that the approved device makes the master
-password stronger. It is an enrollment gate. Keeping that vocabulary precise
-helped us avoid presenting one control as a universal second factor.
+With approval enabled, the phone sends a request and waits. An existing device
+shows the request and lets you accept or reject it. Only an accepted phone joins
+the account.
 
-## Make Policy Choices Honest
+This does not make the master password stronger. It adds a separate enrollment
+check. Approval can block an unfamiliar device from joining silently. It does
+not solve every way an account or computer can be attacked.
 
-Authier currently exposes three policies: enroll a new client immediately,
-require any approved device, or require the designated master device. Each
-choice protects a different priority.
+## Let the account owner choose
 
-Immediate enrollment is the simplest path for a one-device user and the least
-likely to cause a recovery dead end. Approval by any recognized device is more
-resilient for someone who has several browsers or phones. Requiring one master
-device creates a clearer security anchor, but losing that device becomes much
-more consequential.
+Authier currently offers three enrollment policies. A new device can join
+immediately, any approved device can review it, or one designated master device
+can review it.
 
-The lesson was not that the strictest setting is automatically best. The
-lesson was to label the setting as a policy and expose its recovery cost. A
-product page should not imply that device approval protects every account when
-some users have deliberately selected immediate enrollment.
+Each option has a cost. Immediate enrollment is convenient and avoids an
+approval dead end, but it removes the extra check. Letting any approved device
+review a request works well when someone uses several browsers or phones.
+Relying on one master device creates a clear approval point, but losing that
+device is more serious.
 
-## Context Helps, But It Does Not Prove Identity
+The strictest setting is not automatically the best one for every person. The
+interface should say which policy is active and what happens if the approving
+device is unavailable.
 
-An approval screen can show a device name, request time, Internet Protocol
-address, and approximate network location. Those details can help a user match
-a request to an action they just initiated. They are not strong identity
-proofs.
+## Show clues without overstating them
 
-A device name can be copied. An address may belong to a shared network, a
-mobile carrier, or a virtual private network. Geolocation can be imprecise.
-Even accurate context is useless if a person reflexively accepts every prompt.
+An approval request can show a device name, the request time, an Internet
+Protocol address, and an approximate network location. Those details may help
+someone recognize a sign-in they just started. They do not prove who is making
+the request.
 
-That changes the interface requirement. The approval view should make rejection
-easy, avoid manufacturing certainty, and tell the user to reject requests they
-cannot explain. The safest successful flow is the boring one: start enrollment
-yourself, keep both devices visible, compare the displayed context, and remove
-old devices that are no longer under your control.
+Device names can be copied. Several people can share one address. Mobile
+networks and virtual private networks can make the location misleading. A user
+can also approve a fraudulent request by mistake.
 
-## Recovery Defines the Real Boundary
+The approval screen should therefore use plain language, make rejection easy,
+and tell people to reject requests they cannot explain. The safest normal flow
+is deliberately boring. Start the sign-in yourself, keep both devices nearby,
+review the request, and remove old devices you no longer control.
 
-Every strict enrollment rule creates a lockout question. What happens when the
-only approving device is lost, destroyed, or wiped?
+## Treat recovery as part of the design
 
-A recovery process that bypasses device approval is part of the security model,
-not an administrative footnote. If recovery depends on email, the email account
-becomes part of the trust chain. If recovery has a cooldown, a longer delay
-gives an owner more time to notice an unauthorized attempt, while a shorter
-delay restores legitimate access sooner.
+Device approval creates an obvious problem: what happens when the only device
+that can approve a request is lost or wiped?
 
-Projects should document that tension instead of advertising approval without
-describing escape paths. Users should protect the recovery channel, retain an
-independent way to regain access, and test the process before an emergency. A
-feature that prevents account takeover perfectly by also locking out the owner
-is not a useful feature.
+Any recovery route that bypasses approval becomes part of the security model.
+If recovery depends on email, the email account is part of the trust chain. A
+longer recovery delay gives the owner more time to notice an unwanted attempt.
+A shorter delay restores legitimate access sooner.
 
-## State What Approval Cannot Stop
+That tradeoff should be documented before anyone needs it. Users should protect
+the recovery channel, keep an independent recovery method, and test the process
+before an emergency.
 
-Trusted-device approval can obstruct a remote enrollment attempt made with a
-captured email address and master password. It can also prevent an unfamiliar
-client from joining silently when the configured policy requires review.
+## State the limits clearly
 
-It cannot stop malware or a malicious extension from reading data in an
-already-unlocked client. It cannot protect an operating system that has been
-compromised. It cannot stop a user from approving a convincing fraudulent
-request, and it does not prevent phishing that captures credentials used
-directly at another service. Finally, it cannot compensate for defects in the
-client, server, cryptography, or recovery flow.
+When the account policy requires it, trusted-device approval can stop someone
+with a captured email address and master password from silently adding a new
+client. It cannot protect data that is already open on an approved device. It
+cannot clean malware from an operating system, control a malicious browser
+extension, or prevent someone from accepting a convincing fake request. It also
+cannot compensate for a defect in the client, server, cryptography, or recovery
+process.
 
-Writing that negative list was valuable engineering work. It turned a broad
-security-sounding feature into a control with a testable boundary.
+Writing down that negative list was useful. It gave reviewers a clear boundary
+to test and stopped us from describing one enrollment check as broad account
+protection.
 
-## Publish Evidence, Not Assurance
+Authier's implementation, tests, and issue history are public in its
+[AGPL-licensed repository](https://github.com/authier-pm/authier). Its
+[security documentation](https://www.authier.pm/security) also records the
+current design and the lack of an independent audit. Public code is evidence
+that others can inspect; it is not proof that the software is flawless.
 
-The implementation, device-management paths, tests, and issue history are
-available in Authier's public repository. The project's
-[security architecture and current limitations](https://www.authier.pm/security)
-describe client-side encryption, enrollment policy, and the absence of an
-independent third-party security audit.
-
-That final limitation matters. Public code creates inspectable evidence, but it
-does not prove that the design is flawless. Authier also has a much shorter
-operational history than established password managers. For high-impact secrets,
-people should weigh that maturity gap and prefer an independently audited,
-well-established option when that is their safer choice.
-
-The broader open source lesson is simple: separate the questions your security
-flow answers, expose policy rather than hiding it, treat recovery as part of
-the threat model, and document what the control cannot do. Those habits make a
-feature easier to review—and harder to oversell.
+The larger lesson is straightforward: say what decision a security feature
+makes, show its recovery cost, and publish its limits. A control that people can
+understand is easier to review and harder to oversell.
 
 ---
 
