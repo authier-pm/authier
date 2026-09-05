@@ -5196,3 +5196,48 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   caused that movement. No attribution to Babel, AlternativeTo, extension
   stores, or another placement is inferred without source-level evidence.
 - The DR 13 completion threshold remains unmet, so the initiative stays active.
+
+## 2026-09-05
+
+### Recorded another referring-domain increase without a DR change at 09:07 CEST
+
+- Reopened Ahrefs' official Website Authority Checker for the exact
+  `www.authier.pm` host. It reports **DR 8**, **43 backlinks**, and **32 linking
+  websites**, with 30% dofollow backlinks and 28% dofollow linking websites.
+- Since the September 4 reading, the backlink aggregate increased by two and
+  the linking-website aggregate increased by one. The DR 13 completion
+  threshold remains unmet. Ahrefs' free authority result does not identify the
+  new source, and its source-level backlink form required another submission
+  behind Cloudflare verification, so no placement is credited without evidence.
+
+### Verified SaaSHub's advanced public record and remaining link limits
+
+- SaaSHub's [Authier page](https://www.saashub.com/authier) no longer displays
+  **Pending approval**. It now returns HTTP 200 to both a normal browser user
+  agent and AhrefsBot, is self-canonical, and exposes populated product copy
+  plus direct official pricing, homepage, and blog anchors.
+- The page still declares `noindex, follow`, and every direct Authier anchor,
+  including the canonical `https://www.authier.pm/` homepage button, carries
+  `rel="nofollow"`. This is a useful public discovery record but not a followed,
+  indexable placement or a defensible explanation for the DR metric.
+- OpenAlternative remains a preview-only record with `noindex, nofollow`;
+  OpenAltFinder's expected Authier route remains HTTP 404; appsec.fyi's current
+  Recently Added page and Cloudflare's Small App Garden still contain no Authier
+  entry. No duplicate or paid queue upgrade was attempted.
+
+### Audited active review queues and production health at 09:07 CEST
+
+- A fresh GitHub audit found the same 22 open Authier-titled external pull
+  requests plus the separately tracked VectorLogoZone logo PR. None has new
+  human feedback or an author-requested change. Several merge-state labels moved
+  with their base branches, but no maintainer asked for a rebase and no empty
+  update was pushed merely to refresh a queue.
+- The connected inbox contains no new directory or editorial decision. The
+  revised Both.org article and its concise reply remain staged locally and
+  unsent pending action-time confirmation for that representational email.
+- Vercel sent a warning that `authier.pm` and `www.authier.pm` need configuration
+  on its `authier` project. Direct DNS and HTTP checks show both production URLs
+  remain healthy: the apex redirects permanently to the canonical `www` host,
+  the canonical host returns HTTP 200, and both resolve through Cloudflare. The
+  warning therefore appears to concern an unused or stale Vercel mapping rather
+  than a live outage or backlink issue; no domain configuration was changed.
