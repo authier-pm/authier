@@ -16,19 +16,21 @@ describe('generatedPasswordHistory', () => {
       delete storageState[key]
     }
 
-    vi.mocked(browser.storage.local.get).mockImplementation(async (key) => {
+    vi.mocked(browser.storage.session.get).mockImplementation(async (key) => {
       if (typeof key === 'string') {
         return { [key]: storageState[key] }
       }
 
       return storageState
     })
-    vi.mocked(browser.storage.local.set).mockImplementation(async (value) => {
+    vi.mocked(browser.storage.session.set).mockImplementation(async (value) => {
       Object.assign(storageState, value)
     })
-    vi.mocked(browser.storage.local.remove).mockImplementation(async (key) => {
-      delete storageState[key]
-    })
+    vi.mocked(browser.storage.session.remove).mockImplementation(
+      async (key) => {
+        delete storageState[key]
+      }
+    )
   })
 
   it('appends, reads and clears generated password history in newest-first order', async () => {

@@ -1,3 +1,4 @@
+import { db } from './prisma/prismaClient'
 import { describe, expect, it, afterEach } from 'vitest'
 import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
@@ -38,7 +39,8 @@ const createAuthState = (): AuthState => ({
 
 const createVaultClient = (
   app: ReturnType<typeof buildApp>,
-  authState: AuthState
+  authState: AuthState,
+  cookie?: string
 ): VaultClient => {
   const link = new RPCLink({
     url: 'http://authier.test/rpc',
@@ -47,6 +49,7 @@ const createVaultClient = (
         'x-forwarded-for': '127.0.0.1'
       }
 
+      if (cookie) headers.cookie = cookie
       if (authState.accessToken) {
         headers.authorization = `Bearer ${authState.accessToken}`
       }
@@ -273,6 +276,24 @@ describe('oRPC handler', () => {
     expect(refreshedBootstrap.user.deviceRecoveryCooldownMinutes).toBe(90)
   })
 
+  it('renews a remembered browser session from an HttpOnly refresh cookie without a body token', async () => {
+    const app = buildApp()
+    const browser = await registerBrowser(
+      app,
+      `cookie-${crypto.randomUUID()}@test.com`,
+      'test password',
+      { id: crypto.randomUUID(), name: 'Remembered browser', platform: 'web' }
+    )
+    const restartedClient = createVaultClient(
+      app,
+      createAuthState(),
+      `refresh-token=${browser.session.refreshToken}`
+    )
+    const refreshed = await restartedClient.auth.refreshTokens({})
+    expect(refreshed.accessToken).toBeTruthy()
+    expect(refreshed.refreshToken).not.toBe(browser.session.refreshToken)
+  })
+
   it('creates pending device challenges, approves or rejects them, and completes approved logins', async () => {
     const app = buildApp()
     const masterBrowser = await registerBrowser(
@@ -312,6 +333,35 @@ describe('oRPC handler', () => {
     )
 
     expect(pendingRecord?.deviceName).toBe(secondaryDevice.name)
+
+    const storedUser = await db.query.user.findFirst({
+      where: { id: masterBrowser.session.session.user.id }
+    })
+    if (!storedUser) throw new Error('Missing registered user')
+    const enrollmentKey = await generateEncryptionKey(
+      masterBrowser.password,
+      base64ToBuffer(storedUser.encryptionSalt)
+    )
+    const exposedSecret = await decryptString(
+      enrollmentKey,
+      storedUser.addDeviceSecretEncrypted
+    )
+    await expect(
+      secondaryClient.auth.completeDeviceLogin({
+        challengeId: pendingChallenge.challengeId,
+        currentAddDeviceSecret: exposedSecret,
+        input: {
+          addDeviceSecret: crypto.randomUUID(),
+          addDeviceSecretEncrypted: 'replacement',
+          encryptionSalt: storedUser.encryptionSalt,
+          firebaseToken: null,
+          devicePlatform: 'web'
+        }
+      })
+    ).rejects.toMatchObject({ code: 'UNAUTHORIZED', message: 'Login failed' })
+    expect(
+      await db.query.device.findFirst({ where: { id: secondaryDevice.id } })
+    ).toBeUndefined()
 
     await masterBrowser.client.devices.approveChallenge({
       id: pendingChallenge.challengeId

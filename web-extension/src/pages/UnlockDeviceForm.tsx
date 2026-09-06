@@ -50,13 +50,14 @@ export function UnlockDeviceForm({ onUnlocked }: { onUnlocked: () => void }) {
       const { addDeviceSecret, masterEncryptionKey } =
         await decryptDeviceSecretWithPassword(values.password, lockedState)
 
-      if (addDeviceSecret !== lockedState.authSecret) {
+      if (!addDeviceSecret) {
         throw new Error(t`Incorrect password`)
       }
 
       setDeviceState({
         masterEncryptionKey: await cryptoKeyToString(masterEncryptionKey),
-        ...lockedState
+        ...lockedState,
+        authSecret: addDeviceSecret
       })
 
       if (lockedState.vaultLockTimeoutSeconds) {

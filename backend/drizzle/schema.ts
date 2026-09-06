@@ -381,7 +381,7 @@ export const user = pgTable(
     email: customType<{ data: string }>({ dataType: () => 'citext' })(),
     tokenVersion: integer().default(0).notNull(),
     username: text(),
-    addDeviceSecret: text().notNull(),
+    addDeviceSecret: text('addDeviceSecretHash').notNull(),
     addDeviceSecretEncrypted: text().notNull(),
     createdAt: timestamp({ precision: 3 })
       .default(sql`CURRENT_TIMESTAMP`)

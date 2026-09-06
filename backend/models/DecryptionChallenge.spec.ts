@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { db } from '../prisma/prismaClient'
 
 import { faker } from '@faker-js/faker'
@@ -45,7 +46,7 @@ describe('DecryptionChallenge', () => {
       .values({
         id: userId,
         email: input.email,
-        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         loginCredentialsLimit: 50,
@@ -54,6 +55,17 @@ describe('DecryptionChallenge', () => {
       })
       .returning()
     user = insertedUser
+    const [row] = await db
+      .insert(schema.decryptionChallenge)
+      .values({
+        deviceId: challenge.deviceId,
+        deviceName: challenge.deviceName,
+        userId,
+        ipAddress: '127.0.0.1',
+        approvedAt: new Date()
+      })
+      .returning()
+    Object.assign(challenge, row)
   })
 
   describe('addNewDeviceForUser', () => {
@@ -83,7 +95,7 @@ describe('DecryptionChallenge', () => {
       }).toMatchObject({ accessToken: expect.any(String), email: input.email })
     })
 
-    it("should show 'User not found'", async () => {
+    it('rejects a challenge with a forged user', async () => {
       const input: AddNewDeviceInput = makeAddNewDeviceInput()
       challenge.userId = crypto.randomUUID()
       await expect(async () => {
@@ -92,7 +104,7 @@ describe('DecryptionChallenge', () => {
           input.addDeviceSecret,
           fakeCtx
         )
-      }).rejects.toThrow('User not found')
+      }).rejects.toThrow('Login failed')
     })
 
     it("should show 'Wrong master password used'", async () => {
@@ -110,7 +122,18 @@ describe('DecryptionChallenge', () => {
         ...userSecurityProps
       })
 
-      expect(async () => {
+      const [row] = await db
+        .insert(schema.decryptionChallenge)
+        .values({
+          deviceId: challenge.deviceId,
+          deviceName: challenge.deviceName,
+          userId,
+          ipAddress: '127.0.0.1',
+          approvedAt: new Date()
+        })
+        .returning()
+      Object.assign(challenge, row)
+      await expect(async () => {
         await challenge.addNewDeviceForUser(
           input,
           input.addDeviceSecret,

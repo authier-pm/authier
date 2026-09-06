@@ -43,7 +43,7 @@ export const initiateMasterDeviceResetInputSchema =
   })
 
 export const refreshInputSchema = z.object({
-  refreshToken: z.string().min(1)
+  refreshToken: z.string().min(1).optional()
 })
 
 export const encryptedSecretPayloadSchema = z.object({

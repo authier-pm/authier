@@ -15,6 +15,10 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: '@shared',
+        replacement: fileURLToPath(new URL('../../shared', import.meta.url))
+      },
+      {
         find: '@src/providers/DeviceStateProvider',
         replacement: fileURLToPath(
           new URL('./deviceStateProvider.tsx', import.meta.url)

@@ -1,3 +1,7 @@
+import {
+  appendGeneratedPasswordHistoryEntry,
+  generatedPasswordHistoryEntrySchema
+} from '@src/util/generatedPasswordHistory'
 import debug from 'debug'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -75,11 +79,26 @@ void loginSessionManager.initialize().catch((error: unknown) => {
 })
 
 browser.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local' && changes.backgroundState?.newValue) {
+  if (areaName === 'session' && changes.backgroundState?.newValue) {
     void loginSessionManager.resetLogin().catch((error: unknown) => {
       console.error('Failed to clear the completed login session', error)
     })
   }
+})
+
+browser.runtime.onMessage.addListener((message: unknown, sender) => {
+  if (
+    typeof message !== 'object' ||
+    message === null ||
+    !('kind' in message) ||
+    message.kind !== 'appendGeneratedPasswordHistory' ||
+    !('entry' in message)
+  )
+    return
+  const parsed = generatedPasswordHistoryEntrySchema.safeParse(message.entry)
+  if (!parsed.success || !sender.url || sender.url !== parsed.data.pageUrl)
+    return
+  return appendGeneratedPasswordHistoryEntry(parsed.data).then(() => true)
 })
 
 const appRouter = tc.router({

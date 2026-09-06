@@ -1,16 +1,18 @@
-/**
- * Extracts the domain name and TLD from a URL
- *
- * @param url - The URL to extract the domain name and TLD from
- * @returns URL object or URL-like object with null values
- */
+import { getDomain } from 'tldts'
+
+/** Registrable domain, including private suffixes such as github.io. */
 export const getDomainNameAndTldFromUrl = (url: string) => {
   const host = constructURL(url).hostname
-  if (!host) {
-    return null
-  }
-  const parts = host.split('.')
-  return `${parts[parts.length - 2]}.${parts[parts.length - 1]}`
+  return host ? getDomain(host, { allowPrivateDomains: true }) : null
+}
+
+export const matchesCredentialHost = (host: string, credentialUrl: string) => {
+  const target = constructURL(host)
+  const credential = constructURL(credentialUrl)
+  if (!target.hostname || !credential.hostname) return false
+  const domain = getDomainNameAndTldFromUrl(credentialUrl)
+  if (!domain) return target.hostname === credential.hostname
+  return target.hostname === domain || target.hostname.endsWith(`.${domain}`)
 }
 
 export type ConstructURLReturnType =

@@ -1,25 +1,20 @@
-const ACCESS_TOKEN_STORAGE_KEY = 'authier-vault-access-token'
-
 let accessToken: string | null = null
 
-const readStoredAccessToken = () =>
-  typeof window === 'undefined'
-    ? null
-    : window.localStorage.getItem(ACCESS_TOKEN_STORAGE_KEY)
+// Remove credentials left by older releases; never restore them from disk.
+export const purgeLegacyVaultCredentials = () => {
+  if (typeof window === 'undefined') return
+  for (const key of [
+    'authier-vault-access-token',
+    'authier-vault-refresh-token',
+    'authier-vault-unlocked-state'
+  ]) {
+    window.localStorage.removeItem(key)
+  }
+}
 
-export const getAccessToken = () => accessToken ?? readStoredAccessToken()
+export const getAccessToken = () => accessToken
 
 export const setAccessToken = (token: string | null) => {
+  purgeLegacyVaultCredentials()
   accessToken = token
-
-  if (typeof window === 'undefined') {
-    return
-  }
-
-  if (token) {
-    window.localStorage.setItem(ACCESS_TOKEN_STORAGE_KEY, token)
-    return
-  }
-
-  window.localStorage.removeItem(ACCESS_TOKEN_STORAGE_KEY)
 }

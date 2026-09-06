@@ -46,6 +46,7 @@
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
     "@vitejs/plugin-react": "^6.0.1",
+    "fake-indexeddb": "^6.2.5",
     "jsdom": "^29.0.1",
     "react-grab": "^0.1.29",
     "tailwindcss": "^4.2.2",

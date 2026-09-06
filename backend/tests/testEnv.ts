@@ -1,7 +1,7 @@
 import 'reflect-metadata'
 import { faker } from '@faker-js/faker'
 import 'dotenv/config'
-import { beforeAll } from 'vitest'
+import { afterAll, beforeAll } from 'vitest'
 import debug from 'debug'
 
 faker.seed(1)
@@ -27,10 +27,6 @@ export async function setupTestDb(): Promise<PGlite> {
   })
   const db = drizzle({ client, schema: dbSchema, relations, logger: false })
 
-  db.transaction = async (cb: any) => {
-    return cb(db)
-  }
-
   testDb = db
   // @ts-expect-error
   testDb.__instance = db
@@ -41,8 +37,14 @@ export async function setupTestDb(): Promise<PGlite> {
   return client
 }
 
+let client: PGlite
+
 beforeAll(async () => {
   log('test environment initialized')
-  await setupTestDb()
+  client = await setupTestDb()
   setDb(testDb)
+})
+
+afterAll(async () => {
+  await client?.close()
 })

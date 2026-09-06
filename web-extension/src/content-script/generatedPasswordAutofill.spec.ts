@@ -78,18 +78,15 @@ describe('handleGeneratedPasswordAutofill', () => {
       showSavePrompt: true
     })
 
-    const history = await getGeneratedPasswordHistory()
-
-    expect(history).toHaveLength(1)
-    expect(history[0]).toMatchObject({
-      password: 'generated-password',
-      pageUrl: 'https://accounts.google.com/signup/v2/createpassword',
-      hostname: 'accounts.google.com',
-      createdAt: '2037-03-03T13:33:33.333Z'
+    expect(browser.runtime.sendMessage).toHaveBeenCalledWith({
+      kind: 'appendGeneratedPasswordHistory',
+      entry: expect.objectContaining({
+        password: 'generated-password',
+        pageUrl: 'https://accounts.google.com/signup/v2/createpassword',
+        hostname: 'accounts.google.com'
+      })
     })
-    expect(storageState[GENERATED_PASSWORD_HISTORY_STORAGE_KEY]).toEqual(
-      history
-    )
+    expect(storageState[GENERATED_PASSWORD_HISTORY_STORAGE_KEY]).toBeUndefined()
     expect(renderSaveCredentialsForm).toHaveBeenCalledWith(
       null,
       'generated-password'

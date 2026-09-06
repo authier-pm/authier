@@ -1,3 +1,8 @@
+vi.mock('@shared/rememberedVault', () => ({
+  rememberVault: vi.fn().mockResolvedValue(undefined),
+  readRememberedVault: vi.fn().mockResolvedValue(null),
+  forgetRememberedVault: vi.fn().mockResolvedValue(undefined)
+}))
 import { mockDate, unmockDate } from 'proxy-date'
 import { beforeAll, afterAll, vi } from 'vitest'
 // Import mockzilla dynamically to avoid ES module vs CommonJS conflicts
@@ -65,6 +70,12 @@ Object.defineProperty(globalThis, 'location', {
 const browserMock = {
   storage: {
     local: {
+      get: vi.fn().mockResolvedValue({}),
+      set: vi.fn().mockResolvedValue(undefined),
+      remove: vi.fn().mockResolvedValue(undefined),
+      clear: vi.fn().mockResolvedValue(undefined)
+    },
+    session: {
       get: vi.fn().mockResolvedValue({}),
       set: vi.fn().mockResolvedValue(undefined),
       remove: vi.fn().mockResolvedValue(undefined),

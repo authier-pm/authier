@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { db } from '../prisma/prismaClient'
 import type { RegisterNewAccountInput } from '../models/AuthInputs'
 import { makeRegisterAccountInput } from '../schemas/__test__/makeRegisterAccountInput'
@@ -44,7 +45,7 @@ describe('Device', () => {
       .values({
         id: userId,
         email: input.email,
-        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         loginCredentialsLimit,

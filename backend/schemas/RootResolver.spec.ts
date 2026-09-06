@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
 /* eslint-disable @typescript-eslint/no-empty-function */
 import { db } from '../prisma/prismaClient'
 import { RootResolver } from './RootResolver'
@@ -86,7 +87,7 @@ describe('RootResolver', () => {
       await db.insert(schema.user).values({
         id: newUserId,
         email: input.email,
-        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         ...userSecurityProps
@@ -105,7 +106,7 @@ describe('RootResolver', () => {
       await db.insert(schema.user).values({
         id: userId,
         email: `${crypto.randomUUID()}@test.com`,
-        addDeviceSecret: input.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
         addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
         encryptionSalt: input.encryptionSalt,
         ...userSecurityProps
@@ -142,7 +143,7 @@ describe('RootResolver', () => {
       await db.insert(schema.user).values({
         id: userId,
         email: fakeData.email,
-        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
         newDevicePolicy: 'REQUIRE_MASTER_DEVICE_APPROVAL',
         encryptionSalt: fakeData.encryptionSalt,
@@ -191,7 +192,7 @@ describe('RootResolver', () => {
       await db.insert(schema.user).values({
         id: userId,
         email: fakeData.email,
-        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
@@ -235,7 +236,7 @@ describe('RootResolver', () => {
       await db.insert(schema.user).values({
         id: userId,
         email: fakeData.email,
-        addDeviceSecret: fakeData.addDeviceSecret,
+        addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
         addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
         encryptionSalt: fakeData.encryptionSalt,
         ...userSecurityProps
