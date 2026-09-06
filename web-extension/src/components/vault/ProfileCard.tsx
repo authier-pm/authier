@@ -8,7 +8,7 @@ import {
   useColorModeValue
 } from '@src/components/ui/legacy'
 import { device } from '@src/background/ExtensionDevice'
-import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
+import { getAccessToken } from '@src/util/accessTokenExtension'
 import { MD5 } from 'crypto-js'
 import browser from 'webextension-polyfill'
 import { RefreshAccountLimits } from './RefreshAccountLimits'
@@ -65,7 +65,7 @@ export default function ProfileCard({
 
         <Button
           onClick={async () => {
-            const token = await getTokenFromLocalStorage()
+            const token = await getAccessToken()
             browser.tabs.create({
               url: `${page_url}/pricing?portal=true&acToken=${token}`
             })

@@ -1,8 +1,15 @@
 import {
+  forgetRememberedVault,
+  readRememberedVault,
+  rememberVault
+} from '@shared/rememberedVault'
+import { sessionBootstrapSchema } from '@shared/orpc/schemas'
+import { z } from 'zod'
+import {
   abToCryptoKey,
+  cryptoKeyToString,
   base64ToBuffer,
   bufferToBase64,
-  cryptoKeyToString,
   decryptDeviceSecretWithPassword,
   decryptString,
   generateEncryptionKey,
@@ -23,7 +30,7 @@ import {
   getOrCreateDeviceIdentity,
   type DeviceIdentity
 } from '@/lib/deviceIdentity'
-import { setAccessToken } from '@/lib/accessToken'
+import { purgeLegacyVaultCredentials, setAccessToken } from '@/lib/accessToken'
 import {
   decryptSecrets,
   encryptLoginSecret,
@@ -67,11 +74,6 @@ type PendingLoginState = {
   lastResult: PendingChallenge
 }
 
-type UnlockedVaultState = {
-  session: SessionBootstrap
-  masterKey: string
-}
-
 type VaultStatus = 'guest' | 'locked' | 'authenticated'
 
 type VaultSessionContextValue = {
@@ -102,14 +104,10 @@ type VaultSessionContextValue = {
   deleteSecret: (id: string) => Promise<void>
 }
 
-const REFRESH_TOKEN_STORAGE_KEY = 'authier-vault-refresh-token'
 const LOCKED_STATE_STORAGE_KEY = 'authier-vault-locked-state'
-const UNLOCKED_STATE_STORAGE_KEY = 'authier-vault-unlocked-state'
 const STALE_SYNC_THRESHOLD_MS = 48 * 60 * 60 * 1000
 
 const VaultSessionContext = createContext<VaultSessionContextValue | null>(null)
-
-const readStoredString = (key: string) => window.localStorage.getItem(key)
 
 const sortSessionSecrets = (secrets: SessionBootstrap['secrets']) =>
   [...secrets].sort((left, right) => {
@@ -174,35 +172,27 @@ const readStoredJson = <T,>(key: string): T | null => {
 
 export function VaultSessionProvider({ children }: { children: ReactNode }) {
   const [deviceIdentity] = useState(getOrCreateDeviceIdentity)
-  const [initialUnlockedState] = useState<UnlockedVaultState | null>(() =>
-    readStoredJson<UnlockedVaultState>(UNLOCKED_STATE_STORAGE_KEY)
-  )
-  const [refreshToken, setRefreshTokenState] = useState<string | null>(() =>
-    readStoredString(REFRESH_TOKEN_STORAGE_KEY)
-  )
+  const [refreshToken, setRefreshToken] = useState<string | null>(() => {
+    purgeLegacyVaultCredentials()
+    return null
+  })
   const [lockedState, setLockedStateState] = useState<LockedVaultState | null>(
     () => readStoredJson<LockedVaultState>(LOCKED_STATE_STORAGE_KEY)
   )
-  const [session, setSession] = useState<SessionBootstrap | null>(
-    () => initialUnlockedState?.session ?? null
-  )
+  const [session, setSession] = useState<SessionBootstrap | null>(null)
   const [masterKey, setMasterKey] = useState<CryptoKey | null>(null)
   const [decryptedSecrets, setDecryptedSecrets] = useState<
     DecryptedVaultSecret[]
   >([])
   const [skippedSecretsCount, setSkippedSecretsCount] = useState(0)
-  const [shouldRestoreUnlockedSession, setShouldRestoreUnlockedSession] =
-    useState(() => Boolean(initialUnlockedState))
   const [pendingLogin, setPendingLogin] = useState<PendingLoginState | null>(
     null
   )
   const [isBusy, setIsBusy] = useState(false)
   const [isSyncingVault, setIsSyncingVault] = useState(false)
+  const sessionEpochRef = useRef(0)
   const syncVaultPromiseRef = useRef<Promise<void> | null>(null)
-  const lastKnownSyncAtRef = useRef<string | null>(
-    initialUnlockedState?.session.currentDevice.lastSyncAt ?? null
-  )
-  const startupSyncHandledRef = useRef(false)
+  const lastKnownSyncAtRef = useRef<string | null>(null)
   const attemptedAutoSyncKeyRef = useRef<string | null>(null)
 
   const status: VaultStatus = session
@@ -212,13 +202,15 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       : 'guest'
 
   const clearUnlockedSession = () => {
+    sessionEpochRef.current += 1
+    void forgetRememberedVault()
     setAccessToken(null)
     setSession(null)
     setMasterKey(null)
     setPendingLogin(null)
     setDecryptedSecrets([])
     setSkippedSecretsCount(0)
-    setUnlockedState(null)
+    setRefreshToken(null)
   }
 
   const clearVaultSession = () => {
@@ -227,7 +219,13 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     setLockedState(null)
   }
 
-  useEffect(() => onUnauthorizedSession(clearVaultSession), [])
+  useEffect(() => {
+    const unsubscribe = onUnauthorizedSession(clearVaultSession)
+    return () => {
+      unsubscribe()
+      setAccessToken(null)
+    }
+  }, [])
 
   useEffect(() => {
     if (!session || !masterKey) {
@@ -297,17 +295,6 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     }
   }, [lockedState, session])
 
-  const setRefreshToken = (nextRefreshToken: string | null) => {
-    setRefreshTokenState(nextRefreshToken)
-
-    if (nextRefreshToken) {
-      window.localStorage.setItem(REFRESH_TOKEN_STORAGE_KEY, nextRefreshToken)
-      return
-    }
-
-    window.localStorage.removeItem(REFRESH_TOKEN_STORAGE_KEY)
-  }
-
   const setLockedState = (nextLockedState: LockedVaultState | null) => {
     setLockedStateState(nextLockedState)
 
@@ -320,18 +307,6 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     }
 
     window.localStorage.removeItem(LOCKED_STATE_STORAGE_KEY)
-  }
-
-  const setUnlockedState = (nextUnlockedState: UnlockedVaultState | null) => {
-    if (nextUnlockedState) {
-      window.localStorage.setItem(
-        UNLOCKED_STATE_STORAGE_KEY,
-        JSON.stringify(nextUnlockedState)
-      )
-      return
-    }
-
-    window.localStorage.removeItem(UNLOCKED_STATE_STORAGE_KEY)
   }
 
   const completeAuthenticatedSession = async (
@@ -354,17 +329,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     setPendingLogin(null)
   }
 
-  const resolveStoredMasterKey = async () => {
-    if (masterKey) {
-      return masterKey
-    }
-
-    if (!initialUnlockedState?.masterKey) {
-      return null
-    }
-
-    return abToCryptoKey(base64ToBuffer(initialUnlockedState.masterKey))
-  }
+  const resolveStoredMasterKey = async () => masterKey
 
   const applyRefreshedTokens = (tokens: RefreshedTokens) => {
     setAccessToken(tokens.accessToken)
@@ -372,12 +337,8 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const refreshAuthTokens = async (nextRefreshToken = refreshToken) => {
-    if (!nextRefreshToken) {
-      throw new Error('No refresh token available')
-    }
-
     const refreshedTokens = await orpcClient.auth.refreshTokens({
-      refreshToken: nextRefreshToken
+      refreshToken: nextRefreshToken ?? undefined
     })
 
     applyRefreshedTokens(refreshedTokens)
@@ -389,119 +350,71 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     options: SessionAuthOptions,
     nextRefreshToken = refreshToken
   ) => {
-    if (!nextRefreshToken) {
-      throw new Error('No refresh token available')
-    }
-
     const authenticatedSession = await orpcClient.auth.refresh({
-      refreshToken: nextRefreshToken
+      refreshToken: nextRefreshToken ?? undefined
     })
 
     await completeAuthenticatedSession(authenticatedSession, options)
   }
 
   useEffect(() => {
-    if (!initialUnlockedState?.masterKey) {
-      return
-    }
-
     let cancelled = false
-
-    void abToCryptoKey(base64ToBuffer(initialUnlockedState.masterKey)).then(
-      (restoredMasterKey) => {
-        if (!cancelled) {
-          setMasterKey(
-            (currentMasterKey) => currentMasterKey ?? restoredMasterKey
+    const epoch = sessionEpochRef.current
+    void readRememberedVault()
+      .then(async (stored) => {
+        const snapshot = z
+          .object({ session: sessionBootstrapSchema, masterKey: z.string() })
+          .safeParse(stored)
+        if (!snapshot.success || cancelled || epoch !== sessionEpochRef.current)
+          return
+        const restoredKey = await abToCryptoKey(
+          base64ToBuffer(snapshot.data.masterKey)
+        )
+        if (cancelled || epoch !== sessionEpochRef.current) return
+        const email = snapshot.data.session.user.email
+        if (!email) return
+        const challenge = await orpcClient.auth.requestDeviceChallenge({
+          email,
+          deviceInput: deviceIdentity
+        })
+        if (cancelled || epoch !== sessionEpochRef.current) return
+        if (challenge.status !== 'approved') {
+          clearVaultSession()
+          throw new Error(
+            'This device needs approval before its session can resume'
           )
         }
-      }
-    )
-
-    return () => {
-      cancelled = true
-    }
-  }, [initialUnlockedState])
-
-  useEffect(() => {
-    if (!shouldRestoreUnlockedSession) {
-      return
-    }
-
-    if (!initialUnlockedState || !refreshToken || !lockedState) {
-      setShouldRestoreUnlockedSession(false)
-      return
-    }
-
-    let cancelled = false
-
-    void resolveStoredMasterKey()
-      .then(async (restoredMasterKey) => {
-        if (!restoredMasterKey || cancelled) {
-          return
-        }
-
-        await refreshAuthTokens(refreshToken)
-      })
-      .then(() => {
-        if (cancelled) {
-          return
-        }
-
-        setShouldRestoreUnlockedSession(false)
-      })
-      .catch((error) => {
-        console.warn(
-          'Unable to refresh unlocked vault session after reload.',
-          error
+        // Prove possession of the remembered key, even if the refresh cookie
+        // expired while the browser was closed. Server approval still applies.
+        await completeApprovedLogin(
+          challenge,
+          email,
+          '',
+          restoredKey,
+          () => !cancelled && epoch === sessionEpochRef.current
         )
-        setShouldRestoreUnlockedSession(false)
       })
-
+      .catch((error: unknown) =>
+        console.warn('Unable to restore remembered vault session', error)
+      )
     return () => {
       cancelled = true
     }
-  }, [
-    initialUnlockedState,
-    lockedState,
-    refreshToken,
-    shouldRestoreUnlockedSession
-  ])
+  }, [])
 
   useEffect(() => {
-    if (
-      startupSyncHandledRef.current ||
-      !initialUnlockedState ||
-      status !== 'authenticated' ||
-      shouldRestoreUnlockedSession ||
-      !refreshToken ||
-      !lockedState ||
-      document.visibilityState === 'hidden' ||
-      syncVaultPromiseRef.current ||
-      !isSyncStale(lastKnownSyncAtRef.current)
-    ) {
-      return
-    }
-
-    startupSyncHandledRef.current = true
-
-    void syncVault().catch((error) => {
-      console.warn('Unable to sync stale vault session on startup.', error)
+    if (!session || !masterKey) return
+    let cancelled = false
+    void cryptoKeyToString(masterKey).then(async (serializedKey) => {
+      if (!cancelled) await rememberVault({ session, masterKey: serializedKey })
     })
-  }, [
-    initialUnlockedState,
-    lockedState,
-    refreshToken,
-    shouldRestoreUnlockedSession,
-    status
-  ])
+    return () => {
+      cancelled = true
+    }
+  }, [session, masterKey])
 
   useEffect(() => {
-    if (
-      status !== 'authenticated' ||
-      shouldRestoreUnlockedSession ||
-      !refreshToken ||
-      !lockedState
-    ) {
+    if (status !== 'authenticated' || !refreshToken || !lockedState) {
       return
     }
 
@@ -534,44 +447,21 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('focus', syncStaleVault)
       document.removeEventListener('visibilitychange', syncStaleVault)
     }
-  }, [
-    lockedState,
-    masterKey,
-    refreshToken,
-    shouldRestoreUnlockedSession,
-    status
-  ])
-
-  useEffect(() => {
-    if (!session || !masterKey) {
-      return
-    }
-
-    let cancelled = false
-
-    void cryptoKeyToString(masterKey).then((serializedMasterKey) => {
-      if (!cancelled) {
-        setUnlockedState({
-          session,
-          masterKey: serializedMasterKey
-        })
-      }
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [masterKey, session])
+  }, [lockedState, masterKey, refreshToken, status])
 
   const completeApprovedLogin = async (
     challenge: ApprovedChallenge,
     email: string,
-    password: string
+    password: string,
+    rememberedKey?: CryptoKey,
+    shouldComplete = () => true
   ) => {
-    const masterEncryptionKey = await generateEncryptionKey(
-      password,
-      base64ToBuffer(challenge.encryptionSalt)
-    )
+    const masterEncryptionKey =
+      rememberedKey ??
+      (await generateEncryptionKey(
+        password,
+        base64ToBuffer(challenge.encryptionSalt)
+      ))
 
     let currentAddDeviceSecret: string
 
@@ -600,6 +490,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       }
     })
 
+    if (!shouldComplete()) return
     await completeAuthenticatedSession(authenticatedSession, {
       email,
       encryptionSalt: challenge.encryptionSalt,
@@ -675,7 +566,8 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
   const reauthenticateLockedDevice = async (
     email: string,
-    password: string
+    password: string,
+    rememberedKey?: CryptoKey
   ) => {
     const result = await orpcClient.auth.requestDeviceChallenge({
       email,
@@ -691,7 +583,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       throw new Error('Session expired. Log in again to approve this device')
     }
 
-    await completeApprovedLogin(result, email, password)
+    await completeApprovedLogin(result, email, password, rememberedKey)
   }
 
   const register = async (email: string, password: string) => {
@@ -748,7 +640,11 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       }
 
       if (!refreshToken) {
-        await reauthenticateLockedDevice(lockedState.email, password)
+        await reauthenticateLockedDevice(
+          lockedState.email,
+          password,
+          decryptResult.masterEncryptionKey
+        )
         return
       }
 
@@ -760,7 +656,11 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
           masterEncryptionKey: decryptResult.masterEncryptionKey
         })
       } catch {
-        await reauthenticateLockedDevice(lockedState.email, password)
+        await reauthenticateLockedDevice(
+          lockedState.email,
+          password,
+          decryptResult.masterEncryptionKey
+        )
       }
     } finally {
       setIsBusy(false)

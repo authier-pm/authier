@@ -4,14 +4,14 @@ import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
 import { WebInputGQLScalars } from './generated/WebInputGQL'
 import { secretUsageEvent, encryptedSecret } from '../drizzle/schema'
-import { eq, desc, sql } from 'drizzle-orm'
+import { and, eq, desc, sql } from 'drizzle-orm'
 
 @ObjectType()
 export class EncryptedSecretQuery extends EncryptedSecretGQL {
   @Field(() => Date, { nullable: true })
   async lastUsedAt(@Ctx() ctx: IContextAuthenticated) {
     const lastUsed = await ctx.db.query.secretUsageEvent.findFirst({
-      where: { secretId: this.id },
+      where: { secretId: this.id, userId: ctx.jwtPayload.userId },
       orderBy: (s, { desc }) => [desc(s.timestamp)],
       columns: {
         timestamp: true
@@ -35,12 +35,18 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
       .update(encryptedSecret)
       .set({
         ...patch,
-        version: this.version + 1,
+        version: sql`${encryptedSecret.version} + 1`,
         updatedAt: sql`CURRENT_TIMESTAMP`
       })
-      .where(eq(encryptedSecret.id, this.id))
+      .where(
+        and(
+          eq(encryptedSecret.id, this.id),
+          eq(encryptedSecret.userId, ctx.jwtPayload.userId)
+        )
+      )
       .returning()
 
+    if (!res[0]) throw new Error('Secret not found')
     return res[0]
   }
 
@@ -53,9 +59,15 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
       .set({
         deletedAt: sql`CURRENT_TIMESTAMP`
       })
-      .where(eq(encryptedSecret.id, this.id))
+      .where(
+        and(
+          eq(encryptedSecret.id, this.id),
+          eq(encryptedSecret.userId, ctx.jwtPayload.userId)
+        )
+      )
       .returning()
 
+    if (!res[0]) throw new Error('Secret not found')
     return res[0]
   }
 }

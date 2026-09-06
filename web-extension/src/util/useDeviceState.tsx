@@ -88,9 +88,9 @@ export function useDeviceState() {
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ): Promise<void> => {
-    log('onStorageChange', areaName, changes)
+    log('onStorageChange', areaName)
     //WARNING: Not sure if this condition is correct
-    if (areaName === 'local' && changes.backgroundState) {
+    if (areaName === 'session' && changes.backgroundState) {
       setDeviceState(changes.backgroundState.newValue as DeviceState)
       if (changes.lockedState) {
         setLockedState(changes.lockedState.newValue as DeviceState)

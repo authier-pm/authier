@@ -49,7 +49,7 @@ export const UserProvider = ({ children }: PropsWithChildren) => {
       changes: Record<string, browser.Storage.StorageChange>,
       areaName: string
     ) => {
-      if (areaName === 'local' && changes['access-token']) {
+      if (areaName === 'session' && changes['access-token']) {
         void refreshUserId()
       }
     }

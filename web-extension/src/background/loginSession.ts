@@ -21,6 +21,7 @@ import {
 } from '@src/util/accessTokenExtension'
 import { getAutofillCredentialsEnabled } from '@src/util/autofillCredentialsPreference'
 import {
+  abToCryptoKey,
   base64ToBuffer,
   cryptoKeyToString,
   dec,
@@ -493,15 +494,20 @@ const requestChallenge: LoginSessionOperations['requestChallenge'] = (input) =>
       throw normalizeChallengeError(error)
     })
 
-const completeLogin = async (input: {
-  session: LoginSessionSnapshot
-  challenge: LoginApprovedChallenge
-  device: LoginDeviceInfo
-}) => {
-  const masterEncryptionKey = await generateEncryptionKey(
-    input.session.password,
-    base64ToBuffer(input.challenge.encryptionSalt)
-  )
+const completeLogin = async (
+  input: {
+    session: LoginSessionSnapshot
+    challenge: LoginApprovedChallenge
+    device: LoginDeviceInfo
+  },
+  rememberedKey?: CryptoKey
+) => {
+  const masterEncryptionKey =
+    rememberedKey ??
+    (await generateEncryptionKey(
+      input.session.password,
+      base64ToBuffer(input.challenge.encryptionSalt)
+    ))
   const encryptedData = base64ToBuffer(input.challenge.addDeviceSecretEncrypted)
   const iv = encryptedData.slice(16, 28)
   const data = encryptedData.slice(28)
@@ -545,10 +551,6 @@ const completeLogin = async (input: {
     throw new Error('Missing access token after login approval')
   }
 
-  await browser.storage.local.set({
-    addDeviceSecretEncrypted: input.challenge.addDeviceSecretEncrypted,
-    currentAddDeviceSecret
-  })
   await setAccessToken(loginResponse.accessToken)
   const decodedToken = await getUserFromToken()
 
@@ -578,7 +580,40 @@ const completeLogin = async (input: {
     theme: user.defaultDeviceSettings.theme
   }
 
+  if (input.session.password === '' && !device.state) return
   await device.save(deviceState)
+}
+
+export const resumeRememberedDevice = async () => {
+  const state = device.state
+  if (!state || !device.id)
+    throw new LoginSessionError('Vault is locked', false)
+  const deviceInfo = {
+    id: device.id,
+    name: state.deviceName,
+    platform: device.platform
+  }
+  const challenge = await requestChallenge({
+    email: state.email,
+    device: deviceInfo
+  })
+  if (challenge?.type !== 'approved' || challenge.userId !== state.userId) {
+    throw new LoginSessionError(
+      'This device needs approval before its session can resume',
+      false
+    )
+  }
+  const key = await abToCryptoKey(base64ToBuffer(state.masterEncryptionKey))
+  if (device.state !== state)
+    throw new LoginSessionError('Vault was locked', true)
+  await completeLogin(
+    {
+      session: { ...createEmptyLoginSession(), email: state.email },
+      challenge,
+      device: deviceInfo
+    },
+    key
+  )
 }
 
 const completeLoginWithUserFacingError: LoginSessionOperations['completeLogin'] =

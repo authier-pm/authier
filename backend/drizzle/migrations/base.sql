@@ -139,7 +139,7 @@ CREATE TABLE "User" (
 	"email" citext,
 	"tokenVersion" integer DEFAULT 0 NOT NULL,
 	"username" text,
-	"addDeviceSecret" text NOT NULL,
+	"addDeviceSecretHash" text NOT NULL,
 	"addDeviceSecretEncrypted" text NOT NULL,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"updatedAt" timestamp(3),

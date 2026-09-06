@@ -22,7 +22,7 @@ import {
   CardHeader,
   CardTitle
 } from '@src/components/ui/card'
-import { getTokenFromLocalStorage } from '@src/util/accessTokenExtension'
+import { getAccessToken } from '@src/util/accessTokenExtension'
 
 const page_url = process.env.PAGE_URL as string
 
@@ -50,7 +50,7 @@ export const AccountLimits = () => {
   const totpCount = secrets.filter((secret) => secret.kind === 'TOTP').length
 
   const openPricing = async (portal = false) => {
-    const token = await getTokenFromLocalStorage()
+    const token = await getAccessToken()
     await browser.tabs.create({
       url: `${page_url}/pricing?${portal ? 'portal=true&' : ''}acToken=${token}`
     })

@@ -44,6 +44,7 @@ export const getUnauthorizedSessionError = (value: unknown) => {
 }
 
 const link = new RPCLink({
+  fetch: (request, init) => fetch(request, { ...init, credentials: 'include' }),
   url: `${apiOrigin}/rpc`,
   headers: () => {
     const token = getAccessToken()

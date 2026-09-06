@@ -1,3 +1,4 @@
+import { hashDeviceSecret, verifyDeviceSecret } from '../utils/deviceSecretHash'
 import 'reflect-metadata'
 import {
   Arg,
@@ -108,105 +109,139 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
   ) {
     const { id, deviceId, userId } = this
 
-    const userData = await ctx.db.query.user.findFirst({
-      where: { id: userId },
-      with: {
-        encryptedSecrets: true,
-        defaultSettings: true
+    // Re-read persisted approval under a row lock; resolver objects may be stale
+    // or constructed directly by another transport.
+    const result = await ctx.db.transaction(async (tx) => {
+      const [challenge] = await tx
+        .select()
+        .from(decryptionChallenge)
+        .where(
+          and(
+            eq(decryptionChallenge.id, id),
+            eq(decryptionChallenge.deviceId, deviceId),
+            eq(decryptionChallenge.userId, userId)
+          )
+        )
+        .for('update')
+      if (!challenge?.approvedAt || challenge.rejectedAt || challenge.blockIp) {
+        throw new GraphqlError('Login failed')
       }
-    })
+      // Serialize enrollment-secret rotation across challenges for this user.
+      await tx
+        .select({ id: user.id })
+        .from(user)
+        .where(eq(user.id, userId))
+        .for('update')
 
-    if (!userData) {
-      throw new GraphqlError('User not found')
-    }
-
-    if (userData.addDeviceSecret !== currentAddDeviceSecret) {
-      throw new GraphqlError('Wrong master password used')
-    }
-
-    await ctx.db
-      .update(user)
-      .set({
-        addDeviceSecret: input.addDeviceSecret,
-        addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
+      const userData = await tx.query.user.findFirst({
+        where: { id: userId },
+        with: {
+          encryptedSecrets: true,
+          defaultSettings: true
+        }
       })
-      .where(eq(user.id, userData.id))
 
-    await ctx.db
-      .update(decryptionChallenge)
-      .set({
-        masterPasswordVerifiedAt: new Date()
-      })
-      .where(
-        and(
-          id != null ? eq(decryptionChallenge.id, id) : undefined,
-          eq(decryptionChallenge.deviceId, deviceId),
-          eq(decryptionChallenge.userId, userData.id)
-        )
-      )
-
-    const { firebaseToken } = input
-    const ipAddress = ctx.getIpAddress()
-
-    let deviceRec = await ctx.db.query.device.findFirst({
-      where: { id: deviceId }
-    })
-
-    const defaultSettings =
-      userData.defaultSettings ?? defaultDeviceSettingSystemValues
-
-    if (deviceRec) {
-      if (deviceRec.userId !== userData.id) {
-        const deviceOwner = await ctx.db.query.user.findFirst({
-          where: { id: deviceRec!.userId }
-        })
-        if (!deviceOwner) throw new Error('Device owner not found')
-        throw new GraphqlError(
-          `Device is already registered with user ${deviceOwner.email}`
-        )
+      if (!userData) {
+        throw new GraphqlError('User not found')
       }
 
-      const res = await ctx.db
-        .update(device)
-        .set({
-          logoutAt: null,
-          firebaseToken
-        })
-        .where(eq(device.id, deviceRec.id))
-        .returning()
-      deviceRec = res[0]!
-    } else {
-      const res = await ctx.db
-        .insert(device)
-        .values({
-          id: deviceId,
-          firstIpAddress: ipAddress,
-          lastIpAddress: ipAddress,
-          firebaseToken: firebaseToken,
-          name: this.deviceName,
-          userId: userData.id,
-          platform: input.devicePlatform,
-          syncTOTP: defaultSettings.syncTOTP,
-          autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
-          vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
-        })
-        .returning()
-      deviceRec = res[0]!
-    }
+      if (
+        !(await verifyDeviceSecret(
+          currentAddDeviceSecret,
+          userData.addDeviceSecret
+        ))
+      ) {
+        throw new GraphqlError('Wrong master password used')
+      }
 
-    if (!userData.masterDeviceId) {
-      await ctx.db
+      await tx
         .update(user)
         .set({
-          masterDeviceId: deviceRec.id
+          addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
+          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted
         })
         .where(eq(user.id, userData.id))
-      userData.masterDeviceId = deviceRec.id
-    }
 
-    return new UserMutation(
-      userData as any
-    ).setCookiesAndConstructLoginResponse(deviceRec as any, ctx)
+      await tx
+        .update(decryptionChallenge)
+        .set({
+          masterPasswordVerifiedAt: new Date()
+        })
+        .where(
+          and(
+            id != null ? eq(decryptionChallenge.id, id) : undefined,
+            eq(decryptionChallenge.deviceId, deviceId),
+            eq(decryptionChallenge.userId, userData.id)
+          )
+        )
+
+      const { firebaseToken } = input
+      const ipAddress = ctx.getIpAddress()
+
+      let deviceRec = await tx.query.device.findFirst({
+        where: { id: deviceId }
+      })
+
+      const defaultSettings =
+        userData.defaultSettings ?? defaultDeviceSettingSystemValues
+
+      if (deviceRec) {
+        if (deviceRec.userId !== userData.id) {
+          const deviceOwner = await tx.query.user.findFirst({
+            where: { id: deviceRec!.userId }
+          })
+          if (!deviceOwner) throw new Error('Device owner not found')
+          throw new GraphqlError(
+            `Device is already registered with user ${deviceOwner.email}`
+          )
+        }
+
+        const res = await tx
+          .update(device)
+          .set({
+            logoutAt: null,
+            firebaseToken
+          })
+          .where(eq(device.id, deviceRec.id))
+          .returning()
+        deviceRec = res[0]!
+      } else {
+        const res = await tx
+          .insert(device)
+          .values({
+            id: deviceId,
+            firstIpAddress: ipAddress,
+            lastIpAddress: ipAddress,
+            firebaseToken: firebaseToken,
+            name: this.deviceName,
+            userId: userData.id,
+            platform: input.devicePlatform,
+            syncTOTP: defaultSettings.syncTOTP,
+            autofillTOTPEnabled: defaultSettings.autofillTOTPEnabled,
+            vaultLockTimeoutSeconds: defaultSettings.vaultLockTimeoutSeconds
+          })
+          .returning()
+        deviceRec = res[0]!
+      }
+
+      if (!userData.masterDeviceId) {
+        await tx
+          .update(user)
+          .set({
+            masterDeviceId: deviceRec.id
+          })
+          .where(eq(user.id, userData.id))
+        userData.masterDeviceId = deviceRec.id
+      }
+
+      return { userData, deviceRec }
+    })
+    const { userData, deviceRec } = result
+
+    return new UserMutation(userData).setCookiesAndConstructLoginResponse(
+      deviceRec,
+      ctx
+    )
   }
 }
 

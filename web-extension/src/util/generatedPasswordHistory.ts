@@ -4,7 +4,7 @@ import { constructURL } from '@shared/urlUtils'
 
 export const GENERATED_PASSWORD_HISTORY_STORAGE_KEY = 'generatedPasswordHistory'
 
-const generatedPasswordHistoryEntrySchema = z.object({
+export const generatedPasswordHistoryEntrySchema = z.object({
   id: z.string().min(1),
   password: z.string().min(1),
   pageUrl: z.string().min(1),
@@ -59,7 +59,7 @@ export const createGeneratedPasswordHistoryEntry = ({
 }
 
 export const getGeneratedPasswordHistory = async () => {
-  const storage = await browser.storage.local.get(
+  const storage = await browser.storage.session.get(
     GENERATED_PASSWORD_HISTORY_STORAGE_KEY
   )
   const entries = generatedPasswordHistorySchema.parse(
@@ -72,10 +72,17 @@ export const getGeneratedPasswordHistory = async () => {
 export const appendGeneratedPasswordHistoryEntry = async (
   entry: GeneratedPasswordHistoryEntry
 ) => {
+  if (!location.href.startsWith(browser.runtime.getURL(''))) {
+    await browser.runtime.sendMessage({
+      kind: 'appendGeneratedPasswordHistory',
+      entry
+    })
+    return [entry]
+  }
   const currentHistory = await getGeneratedPasswordHistory()
   const nextHistory = sortGeneratedPasswordHistory([entry, ...currentHistory])
 
-  await browser.storage.local.set({
+  await browser.storage.session.set({
     [GENERATED_PASSWORD_HISTORY_STORAGE_KEY]: nextHistory
   })
 
@@ -83,5 +90,5 @@ export const appendGeneratedPasswordHistoryEntry = async (
 }
 
 export const clearGeneratedPasswordHistory = async () => {
-  await browser.storage.local.remove(GENERATED_PASSWORD_HISTORY_STORAGE_KEY)
+  await browser.storage.session.remove(GENERATED_PASSWORD_HISTORY_STORAGE_KEY)
 }

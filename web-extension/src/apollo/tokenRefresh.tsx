@@ -1,6 +1,10 @@
+import {
+  LoginSessionError,
+  resumeRememberedDevice
+} from '@src/background/loginSession'
 import { ApolloLink } from '@apollo/client'
 import { Observable } from 'rxjs'
-import { accessToken, setAccessToken } from '../util/accessTokenExtension'
+import { getAccessToken, setAccessToken } from '../util/accessTokenExtension'
 import { JwtPayload, jwtDecode } from 'jwt-decode'
 import { API_URL } from './API_URL'
 import { device } from '@src/background/ExtensionDevice'
@@ -11,6 +15,7 @@ let isRefreshing = false
 let pendingCallbacks: Array<() => void> = []
 
 const isTokenValid = async (): Promise<boolean> => {
+  const accessToken = await getAccessToken()
   if (!accessToken) return false
   try {
     const { exp } = jwtDecode<JwtPayload & { exp: number }>(accessToken)
@@ -25,7 +30,11 @@ const fetchAndApplyNewToken = async (): Promise<void> => {
   const url = `${tokenRefreshBaseUrl}/refresh_token`
   const response = await fetch(url, { method: 'POST', credentials: 'include' })
   const data = await response.json()
-  setAccessToken(data.accessToken)
+  if (response.ok && typeof data.accessToken === 'string') {
+    await setAccessToken(data.accessToken)
+    return
+  }
+  await resumeRememberedDevice()
 }
 
 export const tokenRefresh = new ApolloLink((operation, forward) => {
@@ -63,8 +72,8 @@ export const tokenRefresh = new ApolloLink((operation, forward) => {
           isRefreshing = false
           pendingCallbacks = []
           console.error('Error during token refresh:', err)
-          console.log('Your refresh token is likely invalid. Logging out.')
-          await device.clearAndReload()
+          if (err instanceof LoginSessionError && !err.retryable)
+            await device.clearAndReload()
           observer.error(err)
         })
     })

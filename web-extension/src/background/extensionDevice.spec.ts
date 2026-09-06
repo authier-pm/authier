@@ -1,3 +1,4 @@
+import { readRememberedVault } from '@shared/rememberedVault'
 import { device } from './ExtensionDevice'
 import browser from 'webextension-polyfill'
 import { vi } from 'vitest'
@@ -12,7 +13,14 @@ vi.mock('webextension-polyfill', () => ({
     storage: {
       local: {
         get: vi.fn().mockResolvedValue({}),
-        set: vi.fn().mockResolvedValue(undefined)
+        set: vi.fn().mockResolvedValue(undefined),
+        remove: vi.fn().mockResolvedValue(undefined)
+      },
+      session: {
+        get: vi.fn().mockResolvedValue({}),
+        set: vi.fn().mockResolvedValue(undefined),
+        remove: vi.fn().mockResolvedValue(undefined),
+        clear: vi.fn().mockResolvedValue(undefined)
       },
       onChanged: {
         addListener: vi.fn(),
@@ -51,6 +59,7 @@ describe('ExtensionDevice', () => {
   beforeEach(() => {
     location.href = 'chrome-extension://mock-extension-id/'
     vi.clearAllMocks()
+    vi.mocked(readRememberedVault).mockResolvedValue(null)
 
     // Reset device properties for each test
     device.id = null
@@ -101,20 +110,63 @@ describe('ExtensionDevice', () => {
   })
 
   describe('initialize', () => {
+    it('restores encrypted remembered state after browser session storage is cleared', async () => {
+      const remembered = {
+        deviceName: 'Remembered browser',
+        email: 'test@example.com',
+        userId: 'user',
+        encryptionSalt: 'salt',
+        authSecretEncrypted: 'ciphertext',
+        authSecret: 'enrollment',
+        masterEncryptionKey: 'remembered-key',
+        secrets: [],
+        vaultLockTimeoutSeconds: 3600,
+        syncTOTP: true,
+        autofillCredentialsEnabled: true,
+        autofillTOTPEnabled: true,
+        autofillForbiddenUrlPatterns: '',
+        uiLanguage: 'en',
+        theme: 'dark',
+        notificationOnVaultUnlock: false,
+        notificationOnWrongPasswordAttempts: 3
+      }
+      device.startLockInterval = vi.fn().mockResolvedValue(undefined)
+      vi.mocked(readRememberedVault).mockResolvedValue(remembered)
+      vi.mocked(browser.storage.session.get).mockResolvedValue({})
+      await device.initialize()
+      expect(device.state?.masterEncryptionKey).toBe('remembered-key')
+      expect(device.lockedState).toBeNull()
+      expect(browser.storage.local.set).not.toHaveBeenCalledWith(
+        expect.objectContaining({ backgroundState: expect.anything() })
+      )
+    })
+
     it('should initialize the device and start the lock interval if a device state is present in storage', async () => {
       // Mock getDeviceId
       const mockGetDeviceId = vi.fn().mockResolvedValue('mock-device-id')
       device.getDeviceId = mockGetDeviceId
 
-      // Mock browser.storage.local.get
+      // Mock browser.storage.session.get
       const mockStorageGet = vi.fn().mockResolvedValue({
         backgroundState: {
           deviceName: 'Mock device',
+          email: 'test@example.com',
+          userId: 'user',
+          encryptionSalt: 'salt',
+          authSecretEncrypted: 'ciphertext',
+          authSecret: 'test-enrollment-secret',
+          masterEncryptionKey: 'test-key',
+          syncTOTP: true,
+          autofillTOTPEnabled: true,
+          uiLanguage: 'en',
+          theme: 'dark',
+          notificationOnVaultUnlock: false,
+          notificationOnWrongPasswordAttempts: 3,
           vaultLockTimeoutSeconds: 1234,
           secrets: []
         }
       })
-      browser.storage.local.get = mockStorageGet
+      browser.storage.session.get = mockStorageGet
 
       // Mock startLockInterval
       const mockStartLockInterval = vi.fn().mockResolvedValue(undefined)
@@ -134,7 +186,7 @@ describe('ExtensionDevice', () => {
       const mockGetDeviceId = vi.fn().mockResolvedValue('mock-device-id')
       device.getDeviceId = mockGetDeviceId
 
-      // Mock browser.storage.local.get
+      // Mock browser.storage.session.get
       const mockLockedState = {
         id: 'Mock locked state ID',
         deviceName: 'Mock device',
@@ -143,7 +195,7 @@ describe('ExtensionDevice', () => {
       const mockStorageGet = vi.fn().mockResolvedValue({
         lockedState: mockLockedState
       })
-      browser.storage.local.get = mockStorageGet
+      browser.storage.session.get = mockStorageGet
 
       // Call initialize
       await device.initialize()

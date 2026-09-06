@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { throwIfNotAuthenticated } from '../lib/authMiddleware'
 import {
   Query,
@@ -128,21 +129,21 @@ const sendNewDeviceLoginPushNotifications = async (
   }
 }
 
-const getBackendOriginFromRequest = (ctx: IContext) => {
-  const forwardedProto = ctx.request.headers['x-forwarded-proto']
-  const host = ctx.request.headers['host']
-
-  if (host) {
-    let protocol = 'https'
-    if (forwardedProto === 'http' || forwardedProto === 'https') {
-      protocol = forwardedProto
-    } else if (process.env.NODE_ENV === 'development') {
-      protocol = 'http'
-    }
-    return `${protocol}://${host}`
+export const getBackendOrigin = () => {
+  const origin = new URL(process.env.BACKEND_URL ?? 'https://api.authier.pm')
+  if (
+    origin.username ||
+    origin.password ||
+    (origin.protocol !== 'https:' &&
+      !(
+        process.env.NODE_ENV !== 'production' &&
+        origin.protocol === 'http:' &&
+        ['localhost', '127.0.0.1'].includes(origin.hostname)
+      ))
+  ) {
+    throw new Error('BACKEND_URL must be a trusted HTTPS origin')
   }
-
-  return process.env.FRONTEND_URL ?? ''
+  return origin.origin
 }
 
 @Resolver()
@@ -246,7 +247,7 @@ export class RootResolver {
         .values({
           id: userId,
           email: email,
-          addDeviceSecret,
+          addDeviceSecret: await hashDeviceSecret(addDeviceSecret),
           addDeviceSecretEncrypted,
           encryptionSalt,
           deviceRecoveryCooldownMinutes: 16 * 60,
@@ -712,7 +713,7 @@ export class RootResolver {
     }
 
     if (user.email) {
-      const backendOrigin = getBackendOriginFromRequest(ctx)
+      const backendOrigin = getBackendOrigin()
       const confirmationLink = `${backendOrigin}/confirm-master-device-reset?token=${confirmationToken}`
       await sendEmail(user.email, {
         Subject: 'Confirm master device reset',

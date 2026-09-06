@@ -400,7 +400,7 @@ export const autofillValueIntoInput = (
   element: HTMLInputElement,
   value: string
 ) => {
-  log('autofillValueIntoInput:', value, element)
+  log('autofillValueIntoInput:', element)
 
   if (filledElements.has(element)) {
     if (element.value === value) {
@@ -423,10 +423,6 @@ export const autofillValueIntoInput = (
     return null // could be dangerous to autofill into a hidden element-if the website got hacked, someone could be using this: https://websecurity.dev/password-managers/autofill/
   }
 
-  browser.storage.local.set({
-    // used for multi-step password autofill later
-    lastAutofilledValue: value
-  })
   imitateKeyInput(element, value)
   filledElements.add(element)
 
@@ -1002,21 +998,6 @@ export const autofill = (initState: IInitStateRes) => {
               : secretsForHost.loginCredentials.find((login) => {
                   return visibleText.includes(login.loginCredentials.username)
                 })
-          if (!matchingLogin) {
-            // some pages obscure the email visible on the page, for example  https://accounts.binance.com/en/login-password
-            // for these we should autofill the login based on the last inputted username
-
-            const storedVal = await browser.storage.local.get(
-              'lastAutofilledValue'
-            )
-
-            matchingLogin = secretsForHost.loginCredentials.find((login) => {
-              return (
-                login.loginCredentials.username ===
-                storedVal.lastAutofilledValue
-              )
-            })
-          }
 
           if (matchingLogin) {
             const autofilledElPassword = fillStringIntoInput({

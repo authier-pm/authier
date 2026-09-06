@@ -29,7 +29,6 @@ export interface IBackgroundStateSerializableLocked {
   encryptionSalt: string
   deviceName: string
   authSecretEncrypted: string
-  authSecret: string
   vaultLockTimeoutSeconds: number | null
   syncTOTP: boolean | null
   autofillCredentialsEnabled: boolean | null
@@ -42,6 +41,7 @@ export interface IBackgroundStateSerializableLocked {
 }
 
 export interface IBackgroundStateSerializable extends IBackgroundStateSerializableLocked {
+  authSecret: string
   masterEncryptionKey: string
 }
 

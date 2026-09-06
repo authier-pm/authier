@@ -58,6 +58,7 @@ export const setNewRefreshToken = (
   const refreshToken = createRefreshToken(user, device)
 
   ctx.reply.setCookie('refresh-token', refreshToken, {
+    maxAge: device.vaultLockTimeoutSeconds,
     secure: isProd, // send cookie over HTTPS only
     httpOnly: true,
     sameSite: true // alternative CSRF protection

@@ -5,7 +5,7 @@ import {
   ApolloLink
 } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
-import { getTokenFromLocalStorage } from '../util/accessTokenExtension'
+import { getAccessToken } from '../util/accessTokenExtension'
 import { errorLink } from '@shared/errorLink'
 import { tokenRefresh } from './tokenRefresh'
 import { API_URL } from './API_URL'
@@ -19,7 +19,7 @@ const httpLink = createHttpLink({
 
 const authLink = setContext(async (_, { headers }) => {
   //get the authentication token
-  const accessToken = await getTokenFromLocalStorage()
+  const accessToken = await getAccessToken()
 
   //return the headers to the context so httpLink can read them
   return {

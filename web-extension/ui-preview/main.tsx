@@ -1,3 +1,4 @@
+import { RememberedSessionPreview } from './scenarios/RememberedSessionPreview'
 import { type ComponentType } from 'react'
 import ReactDOM from 'react-dom/client'
 import '@src/index.css'
@@ -5,7 +6,8 @@ import { AutofillControlsPreview } from './scenarios/AutofillControlsPreview'
 
 const DEFAULT_SCENARIO = 'autofill-controls'
 const scenarios: Record<string, ComponentType> = {
-  [DEFAULT_SCENARIO]: AutofillControlsPreview
+  [DEFAULT_SCENARIO]: AutofillControlsPreview,
+  'remembered-session': RememberedSessionPreview
 }
 const requestedScenario =
   new URLSearchParams(window.location.search).get('scenario') ??

@@ -15,7 +15,7 @@ import { UserMutation } from '../models/UserMutation'
 import { UserQuery } from '../models/UserQuery'
 import type { IContext } from '../models/types/ContextTypes'
 import type { jwtPayloadRefreshToken } from '../userAuth'
-import { createAuthTokens } from '../userAuth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { RootResolver } from '../schemas/RootResolver'
 import * as schema from '../drizzle/schema'
 import { GraphqlError, GraphqlErrorUnauthorized } from '../lib/GraphqlError'
@@ -265,16 +265,20 @@ const getAuthenticatedSession = async (
   }
 
   return {
-    ...createAuthTokens(user, device),
+    accessToken: setNewAccessTokenIntoCookie(user, device, ctx),
+    refreshToken: setNewRefreshToken(user, device, ctx),
     session: await getSessionBootstrap(ctx, userId, deviceId)
   }
 }
 
 const getRefreshSessionActor = async (
   ctx: OrpcContext['legacyCtx'],
-  refreshToken: string
+  refreshToken?: string
 ) => {
-  const payload = getRefreshPayload(refreshToken)
+  const token = refreshToken ?? ctx.request.cookies['refresh-token']
+  if (!token)
+    throw new ORPCError('UNAUTHORIZED', { message: 'not authenticated' })
+  const payload = getRefreshPayload(token)
 
   const user = await ctx.db.query.user.findFirst({
     where: { id: payload.userId },
@@ -472,9 +476,13 @@ export const vaultOrpcRouter = os.router({
               where: { id: input.challengeId }
             })
 
-          if (!challenge) {
-            throw new ORPCError('NOT_FOUND', {
-              message: 'challenge not found'
+          if (
+            !challenge?.approvedAt ||
+            challenge.rejectedAt ||
+            challenge.blockIp
+          ) {
+            throw new ORPCError('UNAUTHORIZED', {
+              message: 'Login failed'
             })
           }
 
@@ -544,7 +552,14 @@ export const vaultOrpcRouter = os.router({
         input.refreshToken
       )
 
-      return createAuthTokens(user, device)
+      return {
+        accessToken: setNewAccessTokenIntoCookie(
+          user,
+          device,
+          context.legacyCtx
+        ),
+        refreshToken: setNewRefreshToken(user, device, context.legacyCtx)
+      }
     }),
     refresh: os.auth.refresh.handler(async ({ input, context }) => {
       const { user, device } = await getRefreshSessionActor(

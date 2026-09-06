@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../../utils/deviceSecretHash'
 import { db } from '../../prisma/prismaClient'
 import { faker } from '@faker-js/faker'
 import type { RegisterNewAccountInput } from '../../models/AuthInputs'
@@ -21,7 +22,7 @@ export const fakeUserAndContext = async () => {
     .values({
       id: userId,
       email: fakeData.email,
-      addDeviceSecret: fakeData.addDeviceSecret,
+      addDeviceSecret: await hashDeviceSecret(fakeData.addDeviceSecret),
       addDeviceSecretEncrypted: fakeData.addDeviceSecretEncrypted,
       encryptionSalt: fakeData.encryptionSalt,
       TOTPlimit: 5,

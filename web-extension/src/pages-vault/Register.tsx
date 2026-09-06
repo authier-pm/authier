@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Formik, Form, Field, type FormikHelpers } from 'formik'
-import browser from 'webextension-polyfill'
 import { Link, useNavigate } from 'react-router-dom'
 import { IoEye, IoEyeOff } from 'react-icons/io5'
 import { Button } from '@src/components/ui/button'
@@ -134,10 +133,7 @@ export default function Register() {
             return
           }
 
-          await browser.storage.local.set({
-            'access-token': registerResult.accessToken
-          })
-          setAccessToken(registerResult.accessToken as string)
+          await setAccessToken(registerResult.accessToken)
           const stringKey = await cryptoKeyToString(masterEncryptionKey)
 
           const deviceState: IBackgroundStateSerializable = {

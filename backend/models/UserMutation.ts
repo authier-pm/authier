@@ -1,3 +1,4 @@
+import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import type { IContext, IContextAuthenticated } from './types/ContextTypes'
 import {
@@ -126,7 +127,7 @@ export class UserMutation extends UserBase {
     // Drizzle relations are nested via nested objects instead of Prisma `include`.
     // Returning basic data here and it may limit deep inclusions.
     return ctx.db.query.encryptedSecret.findFirst({
-      where: { id: id }
+      where: { id, userId: ctx.jwtPayload.userId }
     })
   }
 
@@ -136,6 +137,11 @@ export class UserMutation extends UserBase {
     event: SecretUsageEventInput,
     @Ctx() ctx: IContextAuthenticated
   ) {
+    const secret = await ctx.db.query.encryptedSecret.findFirst({
+      where: { id: event.secretId, userId: ctx.jwtPayload.userId }
+    })
+    if (!secret) throw new GraphqlError('Secret not found')
+
     const res = await ctx.db
       .insert(secretUsageEventSchema)
       .values({
@@ -163,7 +169,12 @@ export class UserMutation extends UserBase {
       .set({
         deletedAt: sql`CURRENT_TIMESTAMP`
       })
-      .where(inArray(encryptedSecretSchema.id, secrets))
+      .where(
+        and(
+          inArray(encryptedSecretSchema.id, secrets),
+          eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId)
+        )
+      )
       .returning()
 
     return res
@@ -364,20 +375,47 @@ export class UserMutation extends UserBase {
       throw new Error('You can only change password on a master device')
     }
 
-    let targetUser: any
-
-    await ctx.db.transaction(async (tx) => {
+    const targetUser = await ctx.db.transaction(async (tx) => {
+      const [challenge] = await tx
+        .select()
+        .from(decryptionChallengeSchema)
+        .where(
+          and(
+            eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
+            eq(decryptionChallengeSchema.deviceId, ctx.device.id),
+            eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+          )
+        )
+        .for('update')
+      if (
+        this.id !== ctx.jwtPayload.userId ||
+        !challenge ||
+        !challenge.approvedAt ||
+        challenge.rejectedAt ||
+        challenge.blockIp
+      ) {
+        throw new GraphqlError('Invalid password change challenge')
+      }
+      const ids = new Set(input.secrets.map((secret) => secret.id))
+      const ownedSecrets = await tx.query.encryptedSecret.findMany({
+        where: { userId: ctx.jwtPayload.userId, id: { in: [...ids] } },
+        columns: { id: true }
+      })
+      if (
+        ids.size !== input.secrets.length ||
+        ownedSecrets.length !== ids.size
+      ) {
+        throw new GraphqlError('Secret not found')
+      }
       const userRes = await tx
         .update(userSchema)
         .set({
-          addDeviceSecret: input.addDeviceSecret,
+          addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
           addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
           tokenVersion: sql`${userSchema.tokenVersion} + 1`
         })
         .where(eq(userSchema.id, this.id))
         .returning()
-
-      targetUser = userRes[0]
 
       await tx
         .update(decryptionChallengeSchema)
@@ -387,8 +425,8 @@ export class UserMutation extends UserBase {
         .where(
           and(
             eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
-            eq(decryptionChallengeSchema.deviceId, ctx.jwtPayload.deviceId),
-            eq(decryptionChallengeSchema.userId, this.id)
+            eq(decryptionChallengeSchema.deviceId, ctx.device.id),
+            eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
           )
         )
 
@@ -399,8 +437,14 @@ export class UserMutation extends UserBase {
             ...patch,
             updatedAt: sql`CURRENT_TIMESTAMP`
           })
-          .where(eq(encryptedSecretSchema.id, id))
+          .where(
+            and(
+              eq(encryptedSecretSchema.id, id),
+              eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId)
+            )
+          )
       }
+      return userRes[0]
     })
 
     // Bumping tokenVersion above invalidates every access token already in

@@ -1,3 +1,14 @@
+import {
+  forgetRememberedVault,
+  readRememberedVault,
+  rememberVault
+} from '@shared/rememberedVault'
+import { backgroundStateSerializableLockedSchema } from './backgroundSchemas'
+import {
+  lockedVaultSnapshotSchema,
+  readLockedVaultSnapshot,
+  saveLockedVaultSnapshot
+} from './lockedVaultStorage'
 import debug from 'debug'
 import browser from 'webextension-polyfill'
 import bowser from 'bowser'
@@ -48,7 +59,7 @@ import { toast } from '@src/ExtensionProviders'
 import { createTRPCProxyClient } from '@trpc/client'
 import type { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from '@capaj/trpc-browser/link'
-import { constructURL, getDomainNameAndTldFromUrl } from '@shared/urlUtils'
+import { constructURL, matchesCredentialHost } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
 import {
   WebInputsForHostsDocument,
@@ -67,12 +78,6 @@ const port = browser.runtime.connect()
 export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
   links: [chromeLink({ port })]
 })
-
-function getRandomInt(min: number, max: number) {
-  min = Math.ceil(min)
-  max = Math.floor(max)
-  return Math.floor(Math.random() * (max - min) + min) //The maximum is exclusive and the minimum is inclusive
-}
 
 const browserInfo = bowser.getParser(navigator.userAgent)
 export const isRunningInBgServiceWorker = typeof window === 'undefined'
@@ -142,10 +147,21 @@ export class DeviceState implements IBackgroundStateSerializable {
     changes: Record<string, browser.Storage.StorageChange>,
     areaName: string
   ) {
-    log('storage changed', changes, areaName)
-    if (areaName === 'local' && changes.backgroundState && device.state) {
-      Object.assign(device.state, changes.backgroundState.newValue)
+    if (areaName !== 'session' || !changes.backgroundState || !device.state)
+      return
+    if (!changes.backgroundState.newValue) {
+      device.state.masterEncryptionKey = ''
+      device.state.authSecret = ''
+      device.state.decryptedSecrets = []
+      device.state.destroy()
+      device.state = null
+      const lockedSnapshot = lockedVaultSnapshotSchema.safeParse(
+        changes.lockedState?.newValue
+      )
+      device.lockedState = lockedSnapshot.success ? lockedSnapshot.data : null
+      return
     }
+    Object.assign(device.state, changes.backgroundState.newValue)
   }
 
   async initialize() {
@@ -205,13 +221,17 @@ export class DeviceState implements IBackgroundStateSerializable {
     browser.storage.onChanged.removeListener(this.onStorageChange)
     device.lockedState = null
     //TODO: Fix perf
-    this.decryptedSecrets = await this.getAllSecretsDecrypted()
+    const decryptedSecrets = await this.getAllSecretsDecrypted()
+    if (device.state !== this) return
+    this.decryptedSecrets = decryptedSecrets
     await Promise.all([
-      browser.storage.local.set({
+      browser.storage.session.set({
         backgroundState: this,
         lockedState: null
       }),
-      setAutofillCredentialsEnabled(this.autofillCredentialsEnabled)
+      setAutofillCredentialsEnabled(this.autofillCredentialsEnabled),
+      saveLockedVaultSnapshot(this),
+      rememberVault(backgroundStateSerializableLockedSchema.parse(this))
     ])
     if (isRunningInBgServiceWorker) {
       const icon = browser.runtime.getURL('icon-48.png')
@@ -229,15 +249,14 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   /**
-   * here we want to get all secrets that are decrypted and match the hostname TLD. This is used for autofill in content script
-   * we only match by TLD because many services use many subdomains. For example account with mail.google.com is usable for account.google.com etc
+   * Only offer secrets within the same registrable domain, respecting public
+   * and private suffixes. Sibling service subdomains may share credentials.
    */
   async getSecretsDecryptedByTLD(host: string) {
     const secrets = this.decryptedSecrets.filter((secret) => {
       const url = getDecryptedSecretProp(secret, 'url')
 
-      const domainAndTLD = getDomainNameAndTldFromUrl(url)
-      return domainAndTLD && host.endsWith(domainAndTLD)
+      return matchesCredentialHost(host, url)
     })
     return Promise.all(
       secrets.map((secret) => {
@@ -440,7 +459,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecret(secretId: string) {
-    browser.storage.local.set({
+    browser.storage.session.set({
       backgroundState: {
         ...device.state,
         secrets: device.state?.secrets.filter((s) => s.id !== secretId)
@@ -451,7 +470,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   }
 
   async removeSecrets(secretIds: string[]) {
-    browser.storage.local.set({
+    browser.storage.session.set({
       backgroundState: {
         ...device.state,
         secrets: device.state?.secrets.filter((s) => !secretIds.includes(s.id))
@@ -468,7 +487,7 @@ export class DeviceState implements IBackgroundStateSerializable {
 
 /**
  * This class is used to manage the state of Authier extension. It is used in vault, popup and service worker.
- * Leverages local storage to store the state of the device and events to keep the state in sync between vault, popup and service worker
+ * Uses session storage to store the state of the device and events to keep the state in sync between vault, popup and service worker
  */
 class ExtensionDevice {
   state: DeviceState | null = null
@@ -500,32 +519,37 @@ class ExtensionDevice {
    */
   async initialize() {
     this.isInitialized = false
-    const [id, storage] = await Promise.all([
-      this.getDeviceId(),
-      browser.storage.local.get() as Promise<{
-        backgroundState: IBackgroundStateSerializable | null
-        lockedState: IBackgroundStateSerializableLocked | null
-      }>
-    ])
+    const [id, storage, persistedLockedState, rememberedSnapshot] =
+      await Promise.all([
+        this.getDeviceId(),
+        browser.storage.session.get() as Promise<{
+          backgroundState: IBackgroundStateSerializable | null
+          lockedState: IBackgroundStateSerializableLocked | null
+        }>,
+        readLockedVaultSnapshot(),
+        readRememberedVault()
+      ])
+    this.lockedState = storage.lockedState ?? persistedLockedState
     this.id = id
-    let storedState: IBackgroundStateSerializable | null = null
+    const remembered =
+      backgroundStateSerializableLockedSchema.safeParse(rememberedSnapshot)
+    let storedState: IBackgroundStateSerializable | null = remembered.success
+      ? remembered.data
+      : null
 
     if (storage.backgroundState) {
       storedState = storage.backgroundState
-
-      log('device state init from storage', storedState)
     } else if (storage.lockedState) {
       this.lockedState = storage.lockedState
-      log('device state locked', this.lockedState)
     }
 
     if (storedState) {
       this.state = new DeviceState(storedState)
       this.name = storedState.deviceName
-      this.state.save()
+      await this.state.save()
     } else {
       if (this.lockedState) {
-        await browser.storage.local.set({
+        await browser.storage.session.set({
           backgroundState: null,
           lockedState: this.lockedState
         })
@@ -558,18 +582,17 @@ class ExtensionDevice {
       changes: Record<string, browser.Storage.StorageChange>,
       areaName: string
     ) => {
-      log('storage change UL', changes, areaName)
       const nextBackgroundState = changes.backgroundState?.newValue
       const nextLockedState = changes.lockedState?.newValue
 
-      if (areaName === 'local' && nextBackgroundState) {
+      if (areaName === 'session' && nextBackgroundState) {
         if (!this.state) {
           this.state = new DeviceState(
             nextBackgroundState as IBackgroundStateSerializable
           )
         }
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
-      } else if (areaName === 'local' && nextLockedState) {
+      } else if (areaName === 'session' && nextLockedState) {
         this.lockedState = nextLockedState as IBackgroundStateSerializableLocked
         browser.storage.onChanged.removeListener(onStorageChangeLogin)
       }
@@ -586,7 +609,9 @@ class ExtensionDevice {
       getAutofillCredentialsEnabled()
     ])
     this.state?.destroy()
-    await browser.storage.local.clear()
+    await forgetRememberedVault()
+    await browser.storage.session.clear()
+    await browser.storage.local.remove('lockedState')
     this.state = null
 
     await Promise.all([
@@ -611,12 +636,9 @@ class ExtensionDevice {
   }
 
   generateBackendSecret() {
-    const lengthMultiplier = getRandomInt(1, 10)
-    let secret = ''
-    for (let i = 0; i < lengthMultiplier; i++) {
-      secret += Math.random().toString(36).substr(2, 20)
-    }
-    return secret
+    return Array.from(crypto.getRandomValues(new Uint8Array(32)), (byte) =>
+      byte.toString(16).padStart(2, '0')
+    ).join('')
   }
 
   /**
@@ -655,6 +677,7 @@ class ExtensionDevice {
       throw new Error('no state to lock')
     }
 
+    await forgetRememberedVault()
     this.clearLockInterval()
 
     if (isRunningInBgServiceWorker) {
@@ -676,7 +699,6 @@ class ExtensionDevice {
       autofillForbiddenUrlPatterns,
       uiLanguage,
       theme,
-      authSecret,
       authSecretEncrypted,
       notificationOnWrongPasswordAttempts,
       notificationOnVaultUnlock
@@ -690,7 +712,6 @@ class ExtensionDevice {
       secrets,
       deviceName: this.name,
       encryptionSalt,
-      authSecret,
       authSecretEncrypted,
       vaultLockTimeoutSeconds: lockTime,
       syncTOTP,
@@ -700,13 +721,22 @@ class ExtensionDevice {
       uiLanguage,
       theme
     }
-    await browser.storage.local.set({
+    await saveLockedVaultSnapshot(this.lockedState)
+    const stateToLock = this.state
+    stateToLock.destroy()
+    stateToLock.masterEncryptionKey = ''
+    stateToLock.authSecret = ''
+    stateToLock.decryptedSecrets = []
+    this.state = null
+    await browser.storage.session.set({
       lockedState: this.lockedState,
       backgroundState: null
     }) // restore deviceId so that we keep it even after logout
-    this.state.destroy()
-
-    this.state = null
+    await browser.storage.session.remove([
+      'currentAddDeviceSecret',
+      'addDeviceSecretEncrypted',
+      'generatedPasswordHistory'
+    ])
   }
   async clearAndReload() {
     await removeToken()
