@@ -5241,3 +5241,64 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   the canonical host returns HTTP 200, and both resolve through Cloudflare. The
   warning therefore appears to concern an unused or stale Vercel mapping rather
   than a live outage or backlink issue; no domain configuration was changed.
+
+## 2026-09-06
+
+### Verified Framalibre's accepted DR 73 followed placement at 09:09 CEST
+
+- Framasoft independently accepted the September 1 submission. Its generated
+  [Framagit merge request !1818](https://framagit.org/framasoft/framalibre/-/merge_requests/1818)
+  was merged on September 3 at 18:55 UTC, and the public
+  [Authier notice](https://framalibre.org/notices/authier.html) is now deployed.
+- The production notice returns HTTP 200 with identical content to a normal
+  browser user agent and AhrefsBot. It preserves the submitted AGPL scope,
+  supported browser/web clients, non-expiring free tier, early-stage status,
+  maintainer context, and explicit absence of an independent security audit.
+- Inspected the server-rendered HTML. Its **Voir le site** button and reusable
+  mini-site fragment both link literally to `https://www.authier.pm/` with no
+  `nofollow`, `ugc`, or `sponsored` relation and no intermediate redirect. The
+  page emits no page-level canonical tag but has no robots exclusion; the site's
+  missing `robots.txt` therefore adds no crawl prohibition. Framalibre does not
+  publish an XML sitemap, but its live `notices.json` search index lists Authier
+  with `draft: false`, the notice URL, and the canonical Authier homepage.
+- Ahrefs' official Website Authority Checker reports **DR 73** for
+  `framalibre.org`, with approximately **227,000 backlinks** and **3,200 linking
+  websites**; 84% of backlinks and 72% of linking websites are dofollow. This
+  is a new, relevant, editorially accepted followed placement. It is not yet in
+  Ahrefs' public Authier backlink sample, so no metric credit is claimed before
+  discovery.
+
+### Confirmed Ahrefs now sees two previously pending followed domains
+
+- Ahrefs' exact `www.authier.pm` result remains **DR 8**, but has increased to
+  **47 backlinks** and **34 linking websites**, with 36% dofollow backlinks and
+  32% dofollow linking websites. That is four more backlinks and two more
+  linking websites than the September 5 reading; the DR 13 threshold remains
+  unmet.
+- The public one-link-per-domain sample now explicitly includes the followed
+  [Black Duck Open Hub profile](https://openhub.net/p/authier) at DR 78 and the
+  followed [Open App Scout profile](https://openappscout.com/apps/authier/) at
+  DR 2. Both were absent from earlier Ahrefs samples despite already being live
+  and independently verified. Their appearance resolves the prior crawl-credit
+  uncertainty and is consistent with the exact two-domain aggregate increase;
+  Framalibre is the next high-authority followed placement awaiting discovery.
+
+### Audited contribution, submission, and reply queues at 09:09 CEST
+
+- The same 22 Authier-titled external pull requests remain open, plus the
+  separately tracked clean VectorLogoZone metadata-fix PR. None has been
+  updated since September 2 or received new human feedback, so no author-side
+  fix, rebase, review response, or queue manipulation is warranted.
+- The Digital Escape and THEHUB suggestions remain open without comments; the
+  FMHY issue retains its closed testing-queue handoff; PrivacyTools and LFX
+  discussions remain open without replies; and Rawsec's work item remains open,
+  unassigned, and without notes.
+- The only new matching inbox item is a contributor volunteering to implement
+  Authier issue #532's documentation refresh. It is not a directory decision or
+  backlink, and no assignment or public reply was made in this audit. No new
+  editorial response arrived; the requested Both.org revision remains staged
+  locally and unsent pending action-time confirmation.
+- SaaSHub remains a public but `noindex` profile with `nofollow` Authier links;
+  OpenAlternative remains a preview with `noindex, nofollow`; OpenAltFinder's
+  expected route remains HTTP 404; and appsec.fyi and Cloudflare's Small App
+  Garden still contain no Authier entry. No duplicate submission was created.
