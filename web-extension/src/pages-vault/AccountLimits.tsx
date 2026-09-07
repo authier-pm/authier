@@ -45,7 +45,7 @@ export const AccountLimits = () => {
   const email = device.state?.email ?? ''
   const secrets = data?.me.encryptedSecrets ?? []
   const credentialCount = secrets.filter(
-    (secret) => secret.kind === 'LOGIN_CREDENTIALS'
+    (secret) => secret.kind === 'LOGIN_CREDENTIALS' || secret.kind === 'PASSKEY'
   ).length
   const totpCount = secrets.filter((secret) => secret.kind === 'TOTP').length
 

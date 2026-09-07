@@ -4,6 +4,7 @@ import {
   totpSchema
 } from '@shared/loginCredentialsSchema'
 import type { VaultApiOutputs } from '@shared/orpc/contract'
+import { passkeySchema, type PasskeyData } from '@shared/passkeySchema'
 import { z } from 'zod'
 
 type SecretRecord = VaultApiOutputs['session']['bootstrap']['secrets'][number]
@@ -20,6 +21,10 @@ export type DecryptedVaultSecret =
   | (SecretRecord & {
       kind: 'TOTP'
       totp: TotpSecretValues
+    })
+  | (SecretRecord & {
+      kind: 'PASSKEY'
+      passkey: PasskeyData
     })
 
 export type DecryptSecretsResult = {
@@ -109,6 +114,14 @@ export const decryptSecretRecord = async (
     }
   }
 
+  if (secret.kind === 'PASSKEY') {
+    return {
+      ...secret,
+      kind: 'PASSKEY',
+      passkey: passkeySchema.parse(payload)
+    }
+  }
+
   return {
     ...secret,
     kind: 'TOTP',
@@ -151,3 +164,27 @@ export const encryptTotpSecret = (
   masterKey: CryptoKey,
   salt: Uint8Array
 ) => encryptString(masterKey, JSON.stringify(values), salt)
+
+export const getVaultSecretMetadata = (secret: DecryptedVaultSecret) => {
+  if (secret.kind === 'PASSKEY') {
+    const { label, url, iconUrl, userName } = secret.passkey
+    return { label, url, iconUrl, kindLabel: 'Passkey', username: userName }
+  }
+  if (secret.kind === 'LOGIN_CREDENTIALS') {
+    return {
+      ...secret.loginCredentials,
+      kindLabel: 'Credential',
+      username: secret.loginCredentials.username
+    }
+  }
+  return { ...secret.totp, kindLabel: 'TOTP', username: '' }
+}
+
+export const getVaultSecretSearchText = (secret: DecryptedVaultSecret) => {
+  const metadata = getVaultSecretMetadata(secret)
+  const text = `${metadata.label} ${metadata.url ?? ''} ${metadata.username}`
+  if (secret.kind === 'LOGIN_CREDENTIALS')
+    return `${text} ${secret.loginCredentials.password}`
+  if (secret.kind === 'TOTP') return `${text} ${secret.totp.secret}`
+  return `${text} ${secret.passkey.rpId} ${secret.passkey.userDisplayName}`
+}

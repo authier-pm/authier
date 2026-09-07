@@ -64,7 +64,7 @@ const raiseAsOrpcError = (error: unknown): never => {
 const mapSecretRecord = (secret: {
   id: string
   encrypted: string
-  kind: 'TOTP' | 'LOGIN_CREDENTIALS'
+  kind: 'TOTP' | 'LOGIN_CREDENTIALS' | 'PASSKEY'
   version: number
   createdAt: Date | string
   updatedAt: Date | string | null
@@ -80,7 +80,7 @@ const mapSecretRecord = (secret: {
 const mapSyncSecretRecord = (secret: {
   id: string
   encrypted: string
-  kind: 'TOTP' | 'LOGIN_CREDENTIALS'
+  kind: 'TOTP' | 'LOGIN_CREDENTIALS' | 'PASSKEY'
   version: number
   createdAt: Date | string
   updatedAt: Date | string | null
@@ -389,10 +389,9 @@ const getRefreshPayload = (refreshToken: string) => {
   }
 }
 
-const toEncryptedSecretType = (kind: 'TOTP' | 'LOGIN_CREDENTIALS') =>
-  kind === 'TOTP'
-    ? EncryptedSecretTypeGQL.TOTP
-    : EncryptedSecretTypeGQL.LOGIN_CREDENTIALS
+const toEncryptedSecretType = (
+  kind: 'TOTP' | 'LOGIN_CREDENTIALS' | 'PASSKEY'
+) => EncryptedSecretTypeGQL[kind]
 
 export const vaultOrpcRouter = os.router({
   auth: {

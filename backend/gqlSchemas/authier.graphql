@@ -186,6 +186,7 @@ type EncryptedSecretGQL {
 enum EncryptedSecretType {
   TOTP
   LOGIN_CREDENTIALS
+  PASSKEY
 }
 
 type WebInputGQL {

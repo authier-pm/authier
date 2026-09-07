@@ -3,11 +3,15 @@ import {
   type SecretTypeUnion
 } from '@src/background/ExtensionDevice'
 import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
-import type { ITOTPSecret } from '@src/util/useDeviceState'
+import type { ITOTPSecret, IPasskeySecret } from '@src/util/useDeviceState'
 import { generateTotpTokenSync } from '@shared/totp'
 
 export const isTotpSecret = (secret: SecretTypeUnion): secret is ITOTPSecret =>
   secret.kind === EncryptedSecretType.TOTP
+
+export const isPasskeySecret = (
+  secret: SecretTypeUnion
+): secret is IPasskeySecret => secret.kind === EncryptedSecretType.PASSKEY
 
 export const getSecretLabel = (secret: SecretTypeUnion) =>
   getDecryptedSecretProp(secret, 'label') || 'Untitled'
@@ -29,8 +33,10 @@ export const getSecretValue = (secret: SecretTypeUnion) =>
 export const getMaskedSecretValue = (secret: SecretTypeUnion) =>
   '*'.repeat(Math.max(getSecretValue(secret).length, 8))
 
-export const getSecretKindLabel = (secret: SecretTypeUnion) =>
-  isTotpSecret(secret) ? 'TOTP' : 'Credential'
+export const getSecretKindLabel = (secret: SecretTypeUnion) => {
+  if (isPasskeySecret(secret)) return 'Passkey'
+  return isTotpSecret(secret) ? 'TOTP' : 'Credential'
+}
 
 export const getSecretCopyValue = (secret: SecretTypeUnion) =>
   isTotpSecret(secret)

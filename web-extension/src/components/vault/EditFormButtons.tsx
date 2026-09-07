@@ -10,7 +10,11 @@ import { Tooltip } from '@src/components/ui/tooltip'
 import { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { DeleteSecretButton } from './DeleteSecretButton'
 
-export const EditFormButtons = ({ secret }: { secret?: SecretTypeUnion }) => {
+export const EditFormButtons = ({
+  secret
+}: {
+  secret?: Exclude<SecretTypeUnion, { kind: EncryptedSecretType.PASSKEY }>
+}) => {
   const navigate = useNavigate()
   const toast = useAppToast()
   const { dirty, isSubmitting } = useFormikContext<Record<string, unknown>>()

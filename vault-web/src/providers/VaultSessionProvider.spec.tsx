@@ -1,3 +1,4 @@
+import { getVaultSecretMetadata } from '@/lib/vaultSecrets'
 import { readRememberedVault, rememberVault } from '@shared/rememberedVault'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
@@ -201,11 +202,7 @@ function VaultSessionHarness() {
       </button>
       <ul>
         {decryptedSecrets.map((secret) => (
-          <li key={secret.id}>
-            {secret.kind === 'LOGIN_CREDENTIALS'
-              ? secret.loginCredentials.label
-              : secret.totp.label}
-          </li>
+          <li key={secret.id}>{getVaultSecretMetadata(secret).label}</li>
         ))}
       </ul>
     </div>

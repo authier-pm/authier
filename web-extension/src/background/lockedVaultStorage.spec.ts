@@ -62,3 +62,29 @@ it('does not restore malformed snapshots or tokens', async () => {
   expect(await readLockedVaultSnapshot()).toBeNull()
   expect(browser.storage.local.remove).toHaveBeenCalledWith('lockedState')
 })
+
+it('persists passkey ciphertext across restart without leaking the signing key', async () => {
+  const passkeyRecord = {
+    id: 'passkey',
+    kind: 'PASSKEY',
+    encrypted: 'encrypted-signing-key',
+    createdAt: '2026-09-08T10:00:00.000Z'
+  }
+  await saveLockedVaultSnapshot({
+    ...snapshot,
+    secrets: [
+      { ...passkeyRecord, passkey: { privateKeyJwk: { d: 'private-key' } } }
+    ],
+    decryptedSecrets: [
+      { ...passkeyRecord, passkey: { privateKeyJwk: { d: 'private-key' } } }
+    ]
+  })
+  const encryptedSnapshot = { ...snapshot, secrets: [passkeyRecord] }
+  expect(browser.storage.local.set).toHaveBeenCalledWith({
+    lockedState: encryptedSnapshot
+  })
+  vi.mocked(browser.storage.local.get).mockResolvedValue({
+    lockedState: encryptedSnapshot
+  })
+  expect(await readLockedVaultSnapshot()).toEqual(encryptedSnapshot)
+})

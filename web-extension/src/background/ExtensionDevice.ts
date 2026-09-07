@@ -42,6 +42,7 @@ import {
 import {
   ILoginSecret,
   ITOTPSecret,
+  IPasskeySecret,
   LoginCredentialsTypeWithMeta,
   TotpTypeWithMeta
 } from '@src/util/useDeviceState'
@@ -61,6 +62,7 @@ import type { AppRouter } from './chromeRuntimeListener'
 import { chromeLink } from '@capaj/trpc-browser/link'
 import { constructURL, matchesCredentialHost } from '@shared/urlUtils'
 import { loginCredentialsSchema } from '@shared/loginCredentialsSchema'
+import { passkeySchema, type PasskeyData } from '@shared/passkeySchema'
 import {
   WebInputsForHostsDocument,
   WebInputsForHostsQuery,
@@ -80,27 +82,41 @@ export const extensionDeviceTrpc = createTRPCProxyClient<AppRouter>({
 })
 
 const browserInfo = bowser.getParser(navigator.userAgent)
-export const isRunningInBgServiceWorker = typeof window === 'undefined'
+const toolbarAction = browser.action ?? browser.browserAction
+export const isRunningInBgServiceWorker =
+  typeof window === 'undefined' ||
+  location.pathname.endsWith('/backgroundPage.html')
 
 const isVault = location.href.includes('vault.html')
 const isPopup = location.href.includes('popup.html')
 
-export type SecretTypeUnion = ILoginSecret | ITOTPSecret
+export type SecretTypeUnion = ILoginSecret | ITOTPSecret | IPasskeySecret
 
 const isLoginSecret = (secret: SecretTypeUnion): secret is ILoginSecret =>
   'loginCredentials' in secret
 
 export type AddSecretInput = Array<
-  Omit<SecretSerializedType, 'id'> & {
-    totp?: TotpTypeWithMeta
-    loginCredentials?: LoginCredentialsTypeWithMeta
-  }
+  Omit<SecretSerializedType, 'id' | 'kind'> &
+    (
+      | { kind: EncryptedSecretType.TOTP; totp: TotpTypeWithMeta }
+      | {
+          kind: EncryptedSecretType.LOGIN_CREDENTIALS
+          loginCredentials: LoginCredentialsTypeWithMeta
+        }
+      | { kind: EncryptedSecretType.PASSKEY; passkey: PasskeyData }
+    )
 >
 
 export const getDecryptedSecretProp = (
   secret: SecretTypeUnion,
   prop: 'url' | 'label' | 'iconUrl' | 'username' | 'password' | 'totp'
 ) => {
+  if (secret.kind === EncryptedSecretType.PASSKEY) {
+    if (prop === 'username') return secret.passkey.userName
+    if (prop === 'url' || prop === 'label' || prop === 'iconUrl')
+      return secret.passkey[prop] ?? ''
+    return ''
+  }
   return (
     (secret.kind === EncryptedSecretType.TOTP
       ? secret.totp[prop]
@@ -109,7 +125,7 @@ export const getDecryptedSecretProp = (
 }
 
 export class DeviceState implements IBackgroundStateSerializable {
-  decryptedSecrets: (ILoginSecret | ITOTPSecret)[]
+  decryptedSecrets: (ILoginSecret | ITOTPSecret | IPasskeySecret)[]
   lockTimeEnd: number
   webInputs: WebInputForAutofill[]
   constructor(parameters: IBackgroundStateSerializable) {
@@ -235,7 +251,7 @@ export class DeviceState implements IBackgroundStateSerializable {
     ])
     if (isRunningInBgServiceWorker) {
       const icon = browser.runtime.getURL('icon-48.png')
-      browser.action.setIcon({ path: icon })
+      toolbarAction.setIcon({ path: icon })
     }
 
     browser.storage.onChanged.addListener(this.onStorageChange)
@@ -253,11 +269,14 @@ export class DeviceState implements IBackgroundStateSerializable {
    * and private suffixes. Sibling service subdomains may share credentials.
    */
   async getSecretsDecryptedByTLD(host: string) {
-    const secrets = this.decryptedSecrets.filter((secret) => {
-      const url = getDecryptedSecretProp(secret, 'url')
+    const secrets = this.decryptedSecrets.filter(
+      (secret): secret is ILoginSecret | ITOTPSecret => {
+        if (secret.kind === EncryptedSecretType.PASSKEY) return false
+        const url = getDecryptedSecretProp(secret, 'url')
 
-      return matchesCredentialHost(host, url)
-    })
+        return matchesCredentialHost(host, url)
+      }
+    )
     return Promise.all(
       secrets.map((secret) => {
         return this.decryptSecret(secret)
@@ -276,7 +295,7 @@ export class DeviceState implements IBackgroundStateSerializable {
   private async decryptSecret(secret: SecretSerializedType) {
     const decrypted = await this.decrypt(secret.encrypted)
 
-    let secretDecrypted: ILoginSecret | ITOTPSecret
+    let secretDecrypted: ILoginSecret | ITOTPSecret | IPasskeySecret
     if (secret.kind === EncryptedSecretType.TOTP) {
       secretDecrypted = {
         ...secret,
@@ -308,6 +327,12 @@ export class DeviceState implements IBackgroundStateSerializable {
             url: parsed.url
           }
         } as ILoginSecret
+      }
+    } else if (secret.kind === EncryptedSecretType.PASSKEY) {
+      secretDecrypted = {
+        ...secret,
+        kind: EncryptedSecretType.PASSKEY,
+        passkey: passkeySchema.parse(JSON.parse(decrypted))
       }
     } else {
       throw new Error('Unknown secret type')
@@ -398,10 +423,20 @@ export class DeviceState implements IBackgroundStateSerializable {
   async addSecrets(secrets: AddSecretInput) {
     const encryptedSecrets = await Promise.all(
       secrets.map(async (secret) => {
-        const stringToEncrypt =
-          secret.kind === EncryptedSecretType.TOTP
-            ? JSON.stringify(secret.totp)
-            : JSON.stringify(secret.loginCredentials)
+        let payload:
+          | TotpTypeWithMeta
+          | LoginCredentialsTypeWithMeta
+          | PasskeyData
+          | undefined
+        if (secret.kind === EncryptedSecretType.PASSKEY) {
+          payload = passkeySchema.parse(secret.passkey)
+        } else if (secret.kind === EncryptedSecretType.TOTP) {
+          payload = secret.totp
+        } else {
+          payload = secret.loginCredentials
+        }
+        if (!payload) throw new Error('Missing secret payload')
+        const stringToEncrypt = JSON.stringify(payload)
 
         const encrypted = await this.encrypt(stringToEncrypt)
 
@@ -438,6 +473,10 @@ export class DeviceState implements IBackgroundStateSerializable {
    */
   async getWebInputs() {
     const hostnames = this.decryptedSecrets
+      .filter(
+        (secret): secret is ILoginSecret | ITOTPSecret =>
+          secret.kind !== EncryptedSecretType.PASSKEY
+      )
       .map((s) =>
         s.kind === EncryptedSecretType.TOTP
           ? s.totp.url
@@ -682,7 +721,7 @@ class ExtensionDevice {
 
     if (isRunningInBgServiceWorker) {
       const lockIcon = browser.runtime.getURL('icon-lock-48.png')
-      browser.action.setIcon({ path: lockIcon })
+      toolbarAction.setIcon({ path: lockIcon })
     }
 
     log('locking device')
@@ -777,11 +816,9 @@ class ExtensionDevice {
       secrets.map(async (secret) => {
         const { id, encrypted, kind } = secret
         const decr = await state.decrypt(encrypted)
-        log('decrypted secret', decr)
         await state.setMasterEncryptionKey(newPsw)
         const enc = await state.encrypt(decr)
 
-        log('encrypted secret', enc, state.masterEncryptionKey)
         return {
           id,
           encrypted: enc,

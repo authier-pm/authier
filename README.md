@@ -12,6 +12,11 @@ Includes:
 
 If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
 
+## Passkeys
+
+Save website passkeys in Authier and sync them between Brave, Firefox and Edge.
+See [passkey setup, compatibility and rollout](docs/passkeys.md).
+
 ## Running the extension build on Ubuntu
 
 To build the browser extension follow these commands with a current LTS node version:

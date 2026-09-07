@@ -13,23 +13,22 @@ import { Tooltip } from '@src/components/ui/tooltip'
 import { DeleteSecretButton } from './DeleteSecretButton'
 import { useDebounce } from '@src/pages-vault/useDebounce'
 import { DeviceStateContext } from '@src/providers/DeviceStateProvider'
-import {
-  pathNameToTypes,
-  type ILoginSecret,
-  type ITOTPSecret
-} from '@src/util/useDeviceState'
+import { pathNameToTypes } from '@src/util/useDeviceState'
 import { useAppToast } from '@src/ExtensionProviders'
 import { cn } from '@src/lib/cn'
 import {
   getMaskedSecretValue,
   getSecretCopyValue,
   getSecretIconUrl,
+  getSecretKindLabel,
   getSecretLabel,
   getSecretUrl,
   getSecretValue,
-  isTotpSecret
+  isTotpSecret,
+  isPasskeySecret
 } from './secretUtils'
 import { SecretItemIcon } from '@src/components/SecretItemIcon'
+import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { useElementSize, useVirtualWindow } from './useVirtualWindow'
 
 const tableGridStyle = {
@@ -44,7 +43,7 @@ const TABLE_HEADER_HEIGHT = 56
 export function TableList({ filter }: { filter: string }) {
   const { selectedItems, setSelectedItems, searchSecrets } =
     useContext(DeviceStateContext)
-  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
+  const pathname = useLocation().pathname as keyof typeof pathNameToTypes
   const debouncedSearchTerm = useDebounce(filter, 400)
   const data = useMemo(
     () => searchSecrets(debouncedSearchTerm, pathNameToTypes[pathname]),
@@ -64,7 +63,7 @@ export function TableList({ filter }: { filter: string }) {
     viewportSize: bodyViewportHeight
   })
 
-  const handleSelect = (secret: ILoginSecret | ITOTPSecret) => {
+  const handleSelect = (secret: SecretTypeUnion) => {
     if (selectedItems.includes(secret)) {
       setSelectedItems(selectedItems.filter((item) => item !== secret))
       return
@@ -198,7 +197,7 @@ function SecretTableRow({
   showAllSecrets,
   isBulkMode
 }: {
-  row: ILoginSecret | ITOTPSecret
+  row: SecretTypeUnion
   isSelected: boolean
   onSelect: () => void
   showAllSecrets: boolean
@@ -240,7 +239,7 @@ function SecretTableRow({
             {getSecretLabel(row)}
           </div>
           <div className="mt-1 text-xs text-[color:var(--color-muted)]">
-            {isTotp ? 'TOTP' : 'Credential'}
+            {getSecretKindLabel(row)}
           </div>
         </div>
       </div>
@@ -250,58 +249,60 @@ function SecretTableRow({
       </div>
 
       <div className="truncate font-mono text-sm text-[color:var(--color-foreground)]">
-        {renderedSecret}
+        {isPasskeySecret(row) ? 'Stored in Authier' : renderedSecret}
       </div>
 
       <div className="flex items-center justify-end gap-1">
-        <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
-          <Button
-            aria-label={isTotp ? t`Copy token` : t`Copy`}
-            onClick={async () => {
-              await navigator.clipboard.writeText(getSecretCopyValue(row))
-              toast({
-                title: t`Copied to clipboard`,
-                status: 'success'
-              })
-            }}
-            size="icon"
-            variant="ghost"
-          >
-            <CopyIcon boxSize={16} />
-          </Button>
-        </Tooltip>
+        {!isPasskeySecret(row) && (
+          <>
+            <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
+              <Button
+                aria-label={isTotp ? t`Copy token` : t`Copy`}
+                onClick={async () => {
+                  await navigator.clipboard.writeText(getSecretCopyValue(row))
+                  toast({
+                    title: t`Copied to clipboard`,
+                    status: 'success'
+                  })
+                }}
+                size="icon"
+                variant="ghost"
+              >
+                <CopyIcon boxSize={16} />
+              </Button>
+            </Tooltip>
 
-        <Tooltip
-          content={
-            isSecretVisible || showAllSecrets ? t`Hide secret` : t`Show secret`
-          }
-        >
-          <Button
-            aria-label={
-              isSecretVisible || showAllSecrets
-                ? t`Hide secret`
-                : t`Show secret`
-            }
-            onClick={() => {
-              setIsSecretVisible((currentValue) => !currentValue)
-            }}
-            size="icon"
-            variant="ghost"
-          >
-            {isSecretVisible || showAllSecrets ? (
-              <ViewOffIcon boxSize={16} />
-            ) : (
-              <ViewIcon boxSize={16} />
-            )}
-          </Button>
-        </Tooltip>
-
-        <Tooltip content={t`Edit`}>
+            <Tooltip
+              content={
+                isSecretVisible || showAllSecrets
+                  ? t`Hide secret`
+                  : t`Show secret`
+              }
+            >
+              <Button
+                aria-label={
+                  isSecretVisible || showAllSecrets
+                    ? t`Hide secret`
+                    : t`Show secret`
+                }
+                onClick={() => {
+                  setIsSecretVisible((currentValue) => !currentValue)
+                }}
+                size="icon"
+                variant="ghost"
+              >
+                {isSecretVisible || showAllSecrets ? (
+                  <ViewOffIcon boxSize={16} />
+                ) : (
+                  <ViewIcon boxSize={16} />
+                )}
+              </Button>
+            </Tooltip>
+          </>
+        )}
+        <Tooltip content={isPasskeySecret(row) ? t`Details` : t`Edit`}>
           <Link
             className={buttonVariants({ size: 'icon', variant: 'ghost' })}
-            state={{
-              data: isTotp ? row.totp : row.loginCredentials
-            }}
             to={{
               pathname: `/secret/${row.id}`
             }}

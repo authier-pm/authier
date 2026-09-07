@@ -1,3 +1,4 @@
+import { handlePasskeyMessage } from '../passkeys/backgroundPasskeys'
 import {
   appendGeneratedPasswordHistoryEntry,
   generatedPasswordHistoryEntrySchema
@@ -364,7 +365,10 @@ browser.tabs.onRemoved.addListener((tabId) => {
   void clearAutofillPagePause(tabId)
 })
 
-browser.runtime.onMessage.addListener((request: unknown) => {
+browser.runtime.onMessage.addListener((request: unknown, sender) => {
+  const passkeyResponse = handlePasskeyMessage(request, sender)
+  if (passkeyResponse) return passkeyResponse
+
   if (isAutofillPagePauseGetMessage(request)) {
     return isAutofillPausedForPage(request.tabId, request.url)
   }

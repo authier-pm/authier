@@ -15,6 +15,8 @@ import {
 } from '@src/background/ExtensionDevice'
 
 import { z, ZodError } from 'zod'
+import type { PasskeyData } from '@shared/passkeySchema'
+import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { getCurrentTab } from './executeScriptInCurrentTab'
 
 import {
@@ -50,6 +52,11 @@ export interface ILoginSecret extends ISecret {
   kind: EncryptedSecretType.LOGIN_CREDENTIALS
 }
 
+export interface IPasskeySecret extends ISecret {
+  passkey: PasskeyData
+  kind: EncryptedSecretType.PASSKEY
+}
+
 export interface ISecuritySettings {
   vaultLockTime: string
   autofill: boolean
@@ -67,7 +74,12 @@ let storageOnchangeListenerRegistered = false // we need to only register once
 export const pathNameToTypes = {
   '/credentials': [EncryptedSecretType.LOGIN_CREDENTIALS],
   '/totps': [EncryptedSecretType.TOTP],
-  '/': [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+  '/passkeys': [EncryptedSecretType.PASSKEY],
+  '/': [
+    EncryptedSecretType.LOGIN_CREDENTIALS,
+    EncryptedSecretType.TOTP,
+    EncryptedSecretType.PASSKEY
+  ]
 }
 
 export function useDeviceState() {
@@ -80,9 +92,7 @@ export function useDeviceState() {
     device.state
   )
   const [isInitialized, setIsInitialized] = useState(device.isInitialized)
-  const [selectedItems, setSelectedItems] = useState<
-    (ILoginSecret | ITOTPSecret)[]
-  >([])
+  const [selectedItems, setSelectedItems] = useState<SecretTypeUnion[]>([])
 
   const onStorageChange = async (
     changes: Record<string, browser.Storage.StorageChange>,
@@ -138,6 +148,15 @@ export function useDeviceState() {
     [deviceState?.decryptedSecrets]
   )
 
+  const passkeys = useMemo(
+    () =>
+      deviceState?.decryptedSecrets.filter(
+        (secret): secret is IPasskeySecret =>
+          secret.kind === EncryptedSecretType.PASSKEY
+      ) ?? [],
+    [deviceState?.decryptedSecrets]
+  )
+
   const setSecuritySettings = useCallback(async (config: SecuritySettings) => {
     await device.setDeviceSettings(config)
   }, [])
@@ -152,9 +171,13 @@ export function useDeviceState() {
   const searchSecrets = useCallback(
     (
       filterBy: string,
-      types = [EncryptedSecretType.LOGIN_CREDENTIALS, EncryptedSecretType.TOTP]
+      types = [
+        EncryptedSecretType.LOGIN_CREDENTIALS,
+        EncryptedSecretType.TOTP,
+        EncryptedSecretType.PASSKEY
+      ]
     ) => {
-      let secrets = [] as (ILoginSecret | ITOTPSecret)[]
+      let secrets = [] as SecretTypeUnion[]
 
       if (types.includes(EncryptedSecretType.LOGIN_CREDENTIALS)) {
         secrets = secrets.concat(loginCredentials)
@@ -164,13 +187,14 @@ export function useDeviceState() {
         secrets = secrets.concat(TOTPSecrets)
       }
 
+      if (types.includes(EncryptedSecretType.PASSKEY)) {
+        secrets = secrets.concat(passkeys)
+      }
+
       const normalizedFilterBy = filterBy.toLowerCase()
 
       secrets = secrets.filter((item) => {
-        const label =
-          (item.kind === EncryptedSecretType.TOTP
-            ? item.totp.label
-            : item.loginCredentials.label) ?? ''
+        const label = getDecryptedSecretProp(item, 'label')
 
         const username = getDecryptedSecretProp(item, 'username')
         const url = getDecryptedSecretProp(item, 'url')
@@ -191,7 +215,7 @@ export function useDeviceState() {
         (a.lastUsedAt ?? a.createdAt) >= (b.lastUsedAt ?? b.createdAt) ? -1 : 1
       )
     },
-    [TOTPSecrets, loginCredentials]
+    [TOTPSecrets, loginCredentials, passkeys]
   )
 
   const backgroundStateContext = useMemo(
@@ -201,6 +225,7 @@ export function useDeviceState() {
       currentTab,
       loginCredentials,
       TOTPSecrets,
+      passkeys,
       setSecuritySettings,
       setDeviceState: saveDeviceState,
       lockedState,
@@ -213,6 +238,7 @@ export function useDeviceState() {
     }),
     [
       TOTPSecrets,
+      passkeys,
       currentTab,
       currentURL,
       deviceState,

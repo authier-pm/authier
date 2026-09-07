@@ -8,7 +8,11 @@ export const userNewDevicePolicySchema = z.enum([
   'REQUIRE_MASTER_DEVICE_APPROVAL'
 ])
 
-export const encryptedSecretTypeSchema = z.enum(['TOTP', 'LOGIN_CREDENTIALS'])
+export const encryptedSecretTypeSchema = z.enum([
+  'TOTP',
+  'LOGIN_CREDENTIALS',
+  'PASSKEY'
+])
 
 export const deviceIdentitySchema = z.object({
   id: z.string().min(1),

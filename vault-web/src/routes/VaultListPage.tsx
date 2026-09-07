@@ -1,3 +1,7 @@
+import {
+  getVaultSecretMetadata,
+  getVaultSecretSearchText
+} from '@/lib/vaultSecrets'
 import { File, Plus, RefreshCw, Search, X } from 'lucide-react'
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
@@ -7,7 +11,7 @@ import { Card, CardContent } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { useVaultSession } from '@/providers/VaultSessionProvider'
 
-type FilterMode = 'ALL' | 'LOGIN_CREDENTIALS' | 'TOTP'
+type FilterMode = 'ALL' | 'LOGIN_CREDENTIALS' | 'TOTP' | 'PASSKEY'
 
 type VaultListPageProps = {
   initialFilterMode?: FilterMode
@@ -20,7 +24,8 @@ const filterTabs: Array<{
 }> = [
   { label: 'All', path: '/vault', value: 'ALL' },
   { label: 'Passwords', path: '/vault/passwords', value: 'LOGIN_CREDENTIALS' },
-  { label: 'TOTP', path: '/vault/totp', value: 'TOTP' }
+  { label: 'TOTP', path: '/vault/totp', value: 'TOTP' },
+  { label: 'Passkeys', path: '/vault/passkeys', value: 'PASSKEY' }
 ]
 
 const formatLastSyncLabel = (lastSyncAt: string | null | undefined) => {
@@ -60,10 +65,7 @@ export function VaultListPage({
         return false
       }
 
-      const haystack =
-        secret.kind === 'LOGIN_CREDENTIALS'
-          ? `${secret.loginCredentials.label} ${secret.loginCredentials.url} ${secret.loginCredentials.username} ${secret.loginCredentials.password}`
-          : `${secret.totp.label} ${secret.totp.url ?? ''} ${secret.totp.secret}`
+      const haystack = getVaultSecretSearchText(secret)
 
       return haystack.toLowerCase().includes(normalizedQuery)
     })
@@ -289,23 +291,16 @@ type VaultSecretListItemProps = {
 }
 
 function VaultSecretListItem({ secret }: VaultSecretListItemProps) {
-  const title =
-    secret.kind === 'LOGIN_CREDENTIALS'
-      ? secret.loginCredentials.label
-      : secret.totp.label
-  const iconUrl =
-    secret.kind === 'LOGIN_CREDENTIALS'
-      ? secret.loginCredentials.iconUrl
-      : secret.totp.iconUrl
-  const url =
-    secret.kind === 'LOGIN_CREDENTIALS'
-      ? secret.loginCredentials.url
-      : secret.totp.url
-  const subtitle =
-    secret.kind === 'LOGIN_CREDENTIALS'
-      ? `${secret.loginCredentials.username} at ${secret.loginCredentials.url}`
-      : (secret.totp.url ?? 'No linked website')
-  const kindLabel = secret.kind === 'LOGIN_CREDENTIALS' ? 'Credential' : 'TOTP'
+  const {
+    label: title,
+    iconUrl,
+    url,
+    username,
+    kindLabel
+  } = getVaultSecretMetadata(secret)
+  const subtitle = username
+    ? `${username} at ${url}`
+    : (url ?? 'No linked website')
 
   return (
     <Link className="block w-full" to={`/vault/${secret.id}`}>

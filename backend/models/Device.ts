@@ -24,7 +24,7 @@ import {
   decryptionChallenge,
   secretUsageEvent
 } from '../drizzle/schema'
-import { eq, and, or, isNull, gte, count, sql } from 'drizzle-orm'
+import { inArray, eq, and, or, isNull, gte, count, sql } from 'drizzle-orm'
 
 @InputType()
 export class DeviceInput {
@@ -62,7 +62,10 @@ export const getEncryptedSecretsToSync = async (
     .where(
       and(
         eq(encryptedSecret.userId, ctx.jwtPayload.userId),
-        eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS),
+        inArray(encryptedSecret.kind, [
+          EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
+          EncryptedSecretTypeGQL.PASSKEY
+        ]),
         isNull(encryptedSecret.deletedAt)
       )
     )
@@ -93,7 +96,10 @@ export const getEncryptedSecretsToSync = async (
   const kindCondition =
     ctx.device.syncTOTP === true
       ? undefined
-      : eq(encryptedSecret.kind, EncryptedSecretTypeGQL.LOGIN_CREDENTIALS)
+      : inArray(encryptedSecret.kind, [
+          EncryptedSecretTypeGQL.LOGIN_CREDENTIALS,
+          EncryptedSecretTypeGQL.PASSKEY
+        ])
 
   const cAtCondition = deviceState.lastSyncAt
     ? gte(encryptedSecret.createdAt, deviceState.lastSyncAt)

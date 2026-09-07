@@ -93,6 +93,10 @@ export function VaultRouter() {
             element={<VaultList tableView={vaultTableView} />}
             path="/totps"
           />
+          <Route
+            element={<VaultList tableView={vaultTableView} />}
+            path="/passkeys"
+          />
           <Route element={<VaultItemSettings />} path="/secret/:secretId" />
           <Route element={<AccountLimits />} path="/account-limits" />
           <Route element={<VaultSettings />} path="/settings/*" />

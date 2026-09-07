@@ -34,6 +34,10 @@ function ProtectedArea() {
           element={<VaultListPage initialFilterMode="TOTP" />}
           path="/vault/totp"
         />
+        <Route
+          element={<VaultListPage initialFilterMode="PASSKEY" />}
+          path="/vault/passkeys"
+        />
         <Route element={<VaultEditPage />} path="/vault/new" />
         <Route element={<VaultEditPage />} path="/vault/:secretId" />
         <Route element={<DevicesPage />} path="/devices" />
