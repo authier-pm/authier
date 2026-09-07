@@ -781,6 +781,9 @@ If this was not you, ignore this email or reject the login request from your cur
   async webInputs(
     @Arg('hosts', () => [String], {
       nullable: true,
+      // GraphQL validates strings. class-validator treats each string as a
+      // schema name instead of an input object, even with forbidUnknownValues off.
+      validate: false,
       description: 'accepts strings like example.com and similar'
     })
     hosts: string[] | null,
