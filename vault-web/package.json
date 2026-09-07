@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "local": "vite",
-    "bump": "ncu -u",
     "build": "vite build",
     "wrdeploy": "wrangler deploy",
     "preview": "vite preview",

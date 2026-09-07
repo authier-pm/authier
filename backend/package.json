@@ -80,7 +80,7 @@
   "scripts": {
     "dev": "wrangler dev",
     "dev:worker": "wrangler dev",
-    "wrdeploy": "wrangler deploy",
+    "wrdeploy": "pnpm run db:migrate && wrangler deploy",
     "kill": "kill $(lsof -t -i:5051)",
     "local": "wrangler dev --port 5051",
     "db:generate": "drizzle-kit generate && bun tests/generateBaseSql.ts",

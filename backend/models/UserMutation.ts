@@ -158,7 +158,8 @@ export class UserMutation extends UserBase {
 
   @Field(() => [EncryptedSecretMutation])
   async removeEncryptedSecrets(
-    @Arg('secrets', () => [GraphQLUUID])
+    // GraphQLUUID validates each ID; class-validator expects class instances.
+    @Arg('secrets', () => [GraphQLUUID], { validate: false })
     secrets: string[],
     @Ctx() ctx: IContextAuthenticated
   ) {

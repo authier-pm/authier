@@ -8,7 +8,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    name: runs typescript, tests, and deploys
+    # Production deployments run separately in Cloudflare Workers Builds.
+    name: runs typescript and tests
     services:
       redis:
         image: redis

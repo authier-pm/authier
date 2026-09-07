@@ -45,8 +45,13 @@ never write tests against a real database. We run all tests against pglite in me
 
 ## Database Migrations
 
-use `pnpm db:generate` to generate new migration NEVER ever under no circumstances run `db:migrate`.
-User will run it themselves manually on all deployed environments.
+Use `pnpm db:generate` to generate new migrations.
+Run pending migrations before every backend production deployment; abort deployment if migration fails.
+Use `pnpm wrdeploy` from `backend` for local deployments; it runs migrations before Wrangler.
+Production CI deployments run in Cloudflare Workers Builds, independently of `.github/workflows/main.yml`.
+Keep its production deploy command set to `pnpm run db:migrate && npx wrangler deploy` with the production
+`DATABASE_URL` configured as a build secret. Runtime secrets are not available during builds.
+Keep preview version uploads separate from production migrations.
 
 ## Marketing
 
