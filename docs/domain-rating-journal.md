@@ -5054,3 +5054,251 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   contact address was transmitted, the CAPTCHA was not touched, and the form
   was not submitted without the required action-time confirmation. This is a
   staged high-authority opportunity, not a backlink or DR gain.
+
+## 2026-09-03
+
+### Verified Babel's independently merged followed placement at 09:12 CEST
+
+- A Babel maintainer merged
+  [babel/website#3242](https://github.com/babel/website/pull/3242) at 14:22 UTC
+  on September 2. The production
+  [Babel users page](https://babeljs.io/users) now includes Authier and links
+  directly to `https://www.authier.pm/`.
+- Verified the rendered DOM and the server response presented to AhrefsBot.
+  Both expose the canonical Authier URL with no `nofollow`, `ugc`, or
+  `sponsored` relation and no intermediate redirect. The page is self-canonical,
+  has no robots exclusion, and is included in Babel's sitemap.
+- The journal's prior official Ahrefs measurement placed `babeljs.io` at **DR
+  85**, with approximately 4.2 million backlinks and 12,000 linking websites.
+  This is therefore a new, legitimate, independently reviewed followed
+  backlink. It is not yet claimed as indexed by Ahrefs or credited to Authier's
+  score.
+
+### Audited open contribution and editorial queues at 09:12 CEST
+
+- A fresh GitHub CLI search returned 22 open Authier-titled external pull
+  requests. A separate check of
+  [VectorLogoZone/vectorlogozone#100](https://github.com/VectorLogoZone/vectorlogozone/pull/100)
+  found it open, mergeable, and without comments or reviews. The newest update
+  among the 22 occurred before the previous audit; there is no new human
+  feedback or action request, so no comment, commit, or CI rerun was warranted.
+- The open suggestions
+  [awesome-digital-escape-tools#11](https://github.com/abdomk1998/awesome-digital-escape-tools/issues/11)
+  and [THEHUB#36](https://github.com/Qutaifan/THEHUB/issues/36) remain unchanged
+  and have no comments. The closed
+  [FMHY suggestion](https://github.com/fmhy/edit/issues/6189) has no new response,
+  and an AhrefsBot-view of FMHY's live Internet Tools page contains no Authier
+  link. No duplicate or reopen attempt was made.
+- The connected inbox contains one new human reply: Jonathan Almeida thanked us
+  for sharing the autofill corpus and said he would keep it in mind for future
+  autofill-browser testing. It is a positive acknowledgement, but no inclusion
+  or backlink was promised or published; no follow-up pressure was applied.
+- No other new editorial acceptance, rejection, or request requiring a response
+  was found.
+
+### Verified the newly published extension-store records and link attributes
+
+- The live Chrome Web Store listing now shows Authier version 1.2.12, updated
+  September 2. Its privacy-policy and support-site anchors point to Authier but
+  both carry `ugc nofollow`, so they are not counted as followed backlinks.
+- The live Mozilla Add-ons listing also shows version 1.2.12, updated September
+  2. Its homepage and support-site links reach Authier through Mozilla's
+  outbound redirect and both carry `nofollow`.
+- Both store records are useful distribution surfaces, but neither is claimed
+  as a new DR-driving link. Their older unsupported marketing wording remains a
+  separate copy-maintenance issue; no external listing was edited in this pass.
+
+### Staged the official Ahrefs recheck and screened two additional routes
+
+- Opened Ahrefs' official Website Authority Checker with the exact
+  `www.authier.pm` host populated. Clicking **Check Authority** would submit that
+  domain to Ahrefs, so the action is waiting for the required action-time
+  confirmation. Ahrefs' documented free endpoint also requires an API v3 key,
+  and no existing key is available in the workspace.
+- Until that check is authorized and completed, the latest verified result
+  remains **DR 8**, **38 backlinks**, **28 linking websites**, and 29% dofollow
+  for both aggregates. The DR 13 completion threshold remains unmet.
+- Rejected [BrowserExtensions.io](https://browserextensions.io/) as a weak and
+  poorly matched directory dominated by unrelated adult/video-download tools.
+  Rejected Hall of Codes' publishing offer because it is not an editorial
+  listing: it would republish an already-live extension through a third party's
+  developer account and cede listing management. Neither route was contacted.
+
+## 2026-09-04
+
+### Verified AlternativeTo's independent publication at 11:00 CEST
+
+- AlternativeTo has independently approved and published the submitted
+  [Authier profile](https://alternativeto.net/software/authier/about/). It is
+  visible to signed-out visitors, self-canonical, and marked `index, follow`.
+  The public profile accurately retains the early-stage, AGPL, freemium, and
+  no-independent-audit context, while its activity identifies `Jiri-Spac` as
+  the submitter.
+- Inspected the rendered DOM rather than inferring link treatment from the
+  visible labels. Both the developer and **Official Website** anchors point
+  directly to `https://www.authier.pm/`, but both carry
+  `rel="nofollow noopener"`. A direct AhrefsBot request currently receives a
+  Cloudflare challenge response. This is a legitimate public discovery and
+  comparison citation, not a followed backlink or dependable DR input.
+- SaaSHub's Authier route is also publicly reachable, but it still says
+  **Pending approval**. The page is self-canonical, carries `noindex, follow`,
+  and has no direct Authier homepage anchor; its only `authier.pm` occurrences
+  are nofollow links to third-party traffic/authority checks and Reddit search.
+  It is therefore still a review stub rather than a published backlink.
+
+### Audited every active contribution and selected directory queue at 11:00 CEST
+
+- GitHub currently returns 22 open Authier-titled external pull requests. A
+  separate check confirms
+  [VectorLogoZone/vectorlogozone#100](https://github.com/VectorLogoZone/vectorlogozone/pull/100)
+  is also open, clean, mergeable, and without comments or reviews. None of the
+  23 has been updated since the September 2 audit, and no new human review,
+  decision, conflict, or author-fixable failure appeared.
+- The open
+  [PrivacyTools.io proposal](https://github.com/privacytoolsIO/privacy-tools/discussions/62)
+  and [LFX Insights request](https://github.com/linuxfoundation/insights/discussions/2143)
+  remain open with no comments or updates. Rawsec's public
+  [work item #1258](https://gitlab.com/rawsec/rawsec-cybersecurity-list/-/work_items/1258)
+  also remains open, unassigned, and without notes or a merge request.
+- OpenAltFinder's expected `/tools/authier` route still returns its public 404.
+  appsec.fyi's current 177-item **Recently Added** feed contains neither Authier
+  nor the corpus. XWiki's exportable catalogue contains no Authier record, and
+  Cloudflare's live Small App Garden contains no Authier card. No duplicate,
+  reviewer ping, empty commit, or queue manipulation was created.
+
+### Completed Both.org's requested clarity revision at 11:00 CEST
+
+- Both.org editor David Both replied that the article's subject was interesting
+  but the first draft made a simple trusted-device idea difficult to understand.
+  He requested a quality revision before publication and highlighted the
+  existing concise explanation as the clearer model.
+- Rewrote
+  [`bothTrustedDeviceArticle.md`](./editorial-pitches/bothTrustedDeviceArticle.md)
+  around that explanation and a concrete new-phone flow. The revision drops
+  from 951 to 794 Markdown words; its prose averages 13.3 words per sentence
+  with no sentence above 25 words. It keeps the recovery tradeoffs, negative
+  capability boundaries, maintainer affiliation, early-stage status,
+  operational-maturity caveat, AGPL source, and lack of an independent audit.
+- Prepared a concise, non-defensive reply in
+  [`bothRevisionReply.md`](./editorial-pitches/bothRevisionReply.md). The reply
+  and revised attachment have not been emailed because sending them is a new
+  representational communication that requires action-time confirmation.
+- A read-only inbox search found no other new Authier, corpus, directory, or
+  editorial decision requiring a response.
+
+### Rechecked Ahrefs' official completion metric at 11:00 CEST
+
+- Loaded the exact `www.authier.pm` host through Ahrefs' official Website
+  Authority Checker. The completed result is **DR 8**, **41 backlinks**, and
+  **31 linking websites**, with 29% dofollow for both aggregates.
+- Backlinks increased by three and linking websites increased by three from the
+  last verified reading, but the free aggregate does not identify which sources
+  caused that movement. No attribution to Babel, AlternativeTo, extension
+  stores, or another placement is inferred without source-level evidence.
+- The DR 13 completion threshold remains unmet, so the initiative stays active.
+
+## 2026-09-05
+
+### Recorded another referring-domain increase without a DR change at 09:07 CEST
+
+- Reopened Ahrefs' official Website Authority Checker for the exact
+  `www.authier.pm` host. It reports **DR 8**, **43 backlinks**, and **32 linking
+  websites**, with 30% dofollow backlinks and 28% dofollow linking websites.
+- Since the September 4 reading, the backlink aggregate increased by two and
+  the linking-website aggregate increased by one. The DR 13 completion
+  threshold remains unmet. Ahrefs' free authority result does not identify the
+  new source, and its source-level backlink form required another submission
+  behind Cloudflare verification, so no placement is credited without evidence.
+
+### Verified SaaSHub's advanced public record and remaining link limits
+
+- SaaSHub's [Authier page](https://www.saashub.com/authier) no longer displays
+  **Pending approval**. It now returns HTTP 200 to both a normal browser user
+  agent and AhrefsBot, is self-canonical, and exposes populated product copy
+  plus direct official pricing, homepage, and blog anchors.
+- The page still declares `noindex, follow`, and every direct Authier anchor,
+  including the canonical `https://www.authier.pm/` homepage button, carries
+  `rel="nofollow"`. This is a useful public discovery record but not a followed,
+  indexable placement or a defensible explanation for the DR metric.
+- OpenAlternative remains a preview-only record with `noindex, nofollow`;
+  OpenAltFinder's expected Authier route remains HTTP 404; appsec.fyi's current
+  Recently Added page and Cloudflare's Small App Garden still contain no Authier
+  entry. No duplicate or paid queue upgrade was attempted.
+
+### Audited active review queues and production health at 09:07 CEST
+
+- A fresh GitHub audit found the same 22 open Authier-titled external pull
+  requests plus the separately tracked VectorLogoZone logo PR. None has new
+  human feedback or an author-requested change. Several merge-state labels moved
+  with their base branches, but no maintainer asked for a rebase and no empty
+  update was pushed merely to refresh a queue.
+- The connected inbox contains no new directory or editorial decision. The
+  revised Both.org article and its concise reply remain staged locally and
+  unsent pending action-time confirmation for that representational email.
+- Vercel sent a warning that `authier.pm` and `www.authier.pm` need configuration
+  on its `authier` project. Direct DNS and HTTP checks show both production URLs
+  remain healthy: the apex redirects permanently to the canonical `www` host,
+  the canonical host returns HTTP 200, and both resolve through Cloudflare. The
+  warning therefore appears to concern an unused or stale Vercel mapping rather
+  than a live outage or backlink issue; no domain configuration was changed.
+
+## 2026-09-06
+
+### Verified Framalibre's accepted DR 73 followed placement at 09:09 CEST
+
+- Framasoft independently accepted the September 1 submission. Its generated
+  [Framagit merge request !1818](https://framagit.org/framasoft/framalibre/-/merge_requests/1818)
+  was merged on September 3 at 18:55 UTC, and the public
+  [Authier notice](https://framalibre.org/notices/authier.html) is now deployed.
+- The production notice returns HTTP 200 with identical content to a normal
+  browser user agent and AhrefsBot. It preserves the submitted AGPL scope,
+  supported browser/web clients, non-expiring free tier, early-stage status,
+  maintainer context, and explicit absence of an independent security audit.
+- Inspected the server-rendered HTML. Its **Voir le site** button and reusable
+  mini-site fragment both link literally to `https://www.authier.pm/` with no
+  `nofollow`, `ugc`, or `sponsored` relation and no intermediate redirect. The
+  page emits no page-level canonical tag but has no robots exclusion; the site's
+  missing `robots.txt` therefore adds no crawl prohibition. Framalibre does not
+  publish an XML sitemap, but its live `notices.json` search index lists Authier
+  with `draft: false`, the notice URL, and the canonical Authier homepage.
+- Ahrefs' official Website Authority Checker reports **DR 73** for
+  `framalibre.org`, with approximately **227,000 backlinks** and **3,200 linking
+  websites**; 84% of backlinks and 72% of linking websites are dofollow. This
+  is a new, relevant, editorially accepted followed placement. It is not yet in
+  Ahrefs' public Authier backlink sample, so no metric credit is claimed before
+  discovery.
+
+### Confirmed Ahrefs now sees two previously pending followed domains
+
+- Ahrefs' exact `www.authier.pm` result remains **DR 8**, but has increased to
+  **47 backlinks** and **34 linking websites**, with 36% dofollow backlinks and
+  32% dofollow linking websites. That is four more backlinks and two more
+  linking websites than the September 5 reading; the DR 13 threshold remains
+  unmet.
+- The public one-link-per-domain sample now explicitly includes the followed
+  [Black Duck Open Hub profile](https://openhub.net/p/authier) at DR 78 and the
+  followed [Open App Scout profile](https://openappscout.com/apps/authier/) at
+  DR 2. Both were absent from earlier Ahrefs samples despite already being live
+  and independently verified. Their appearance resolves the prior crawl-credit
+  uncertainty and is consistent with the exact two-domain aggregate increase;
+  Framalibre is the next high-authority followed placement awaiting discovery.
+
+### Audited contribution, submission, and reply queues at 09:09 CEST
+
+- The same 22 Authier-titled external pull requests remain open, plus the
+  separately tracked clean VectorLogoZone metadata-fix PR. None has been
+  updated since September 2 or received new human feedback, so no author-side
+  fix, rebase, review response, or queue manipulation is warranted.
+- The Digital Escape and THEHUB suggestions remain open without comments; the
+  FMHY issue retains its closed testing-queue handoff; PrivacyTools and LFX
+  discussions remain open without replies; and Rawsec's work item remains open,
+  unassigned, and without notes.
+- The only new matching inbox item is a contributor volunteering to implement
+  Authier issue #532's documentation refresh. It is not a directory decision or
+  backlink, and no assignment or public reply was made in this audit. No new
+  editorial response arrived; the requested Both.org revision remains staged
+  locally and unsent pending action-time confirmation.
+- SaaSHub remains a public but `noindex` profile with `nofollow` Authier links;
+  OpenAlternative remains a preview with `noindex, nofollow`; OpenAltFinder's
+  expected route remains HTTP 404; and appsec.fyi and Cloudflare's Small App
+  Garden still contain no Authier entry. No duplicate submission was created.
