@@ -6,6 +6,8 @@ import { createYoga } from 'graphql-yoga'
 import type { GraphQLError } from 'graphql'
 import { onError } from '@orpc/server'
 import { RPCHandler } from '@orpc/server/fetch'
+import { OpenAPIHandler } from '@orpc/openapi/fetch'
+import openApiDocument from '../shared/openapi/authier.json'
 import { gqlSchema } from './schemas/gqlSchema'
 import { createRequestDb } from './prisma/prismaClient'
 import { createStripeClientGetter } from './stripeClient'
@@ -100,6 +102,10 @@ const yoga = createYoga<YogaServerContext, IContext>({
   }
 })
 
+const openApiHandler = new OpenAPIHandler(vaultOrpcRouter, {
+  filter: ({ contract }) => Boolean(contract['~orpc'].route.path)
+})
+
 const orpcHandler = new RPCHandler(vaultOrpcRouter, {
   interceptors: [
     onError((error) => {
@@ -176,12 +182,13 @@ const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
   }
 }
 
-const handleOrpcRequest = async (ctx: LegacyElysiaContext) => {
+const handleOrpcRequest = async (ctx: LegacyElysiaContext, openApi = false) => {
   const requestContext = createOrpcRequestContext(ctx)
 
   try {
-    const result = await orpcHandler.handle(ctx.request, {
-      prefix: '/rpc',
+    const handler = openApi ? openApiHandler : orpcHandler
+    const result = await handler.handle(ctx.request, {
+      prefix: openApi ? '/api/v1' : '/rpc',
       context: requestContext.context
     })
 
@@ -304,10 +311,12 @@ export const buildApp = (app = new Elysia()) => {
       }
     })
     .get('/graphiql', ({ redirect }) => redirect('/graphql'))
-    .all('/rpc', handleOrpcRequest, {
+    .get('/api/v1/openapi.json', () => openApiDocument)
+    .all('/api/v1/*', (ctx) => handleOrpcRequest(ctx, true), { parse: 'none' })
+    .all('/rpc', (ctx) => handleOrpcRequest(ctx), {
       parse: 'none'
     })
-    .all('/rpc/*', handleOrpcRequest, {
+    .all('/rpc/*', (ctx) => handleOrpcRequest(ctx), {
       parse: 'none'
     })
     .get('/graphql', handleGraphqlRequest)

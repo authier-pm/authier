@@ -361,6 +361,7 @@ export class RootResolver {
         })
       : null
     const userHasNoMasterDevice = !user.masterDeviceId
+    const allowsAutomaticApproval = userHasNoMasterDevice || user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null
     const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
@@ -438,7 +439,7 @@ export class RootResolver {
       throw new GraphqlError('login failed')
     }
 
-    if (challenge && userHasNoMasterDevice && !challenge.approvedAt) {
+    if (challenge && allowsAutomaticApproval && !challenge.approvedAt) {
       const [updatedChallenge] = await ctx.db
         .update(schema.decryptionChallenge)
         .set({
@@ -457,7 +458,7 @@ export class RootResolver {
 
       let approvedAt: Date | undefined
 
-      if (userHasNoMasterDevice) {
+      if (allowsAutomaticApproval) {
         approvedAt = new Date()
       } else {
         // TODO: send email notifications

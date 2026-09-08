@@ -7,7 +7,8 @@ Includes:
 
 - Astro marketing and landing site (`landing-page`)
 - web extension
-- mobile app
+- native Kotlin Android app (`android-app`)
+- legacy React Native app (`mobile-app`)
 - backend
 
 If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
@@ -31,6 +32,25 @@ pnpm prodBuild
 ```
 
 ## Schema generation
+
+The Android app uses the versioned HTTP/JSON API, generated from shared
+Zod/oRPC contracts. GraphQL remains available for existing clients.
+
+```shell
+pnpm android:api       # generate OpenAPI and the Kotlin Retrofit client
+pnpm android:api:check # check both generated artifacts for drift
+pnpm android:build     # build the debug APK (JDK 17 + Android SDK 35)
+pnpm android:test      # WebCrypto vectors and native JVM tests
+```
+
+See [Android setup](android-app/README.md), the [API contract and rollout notes](backend/orpc/README.md),
+and the [encryption protocol](docs/androidCryptoProtocol.md). The Kotlin generator
+is pinned and checksum-verified; generated models handle challenge variants,
+nullable values, and arbitrary JSON error data. CI builds the APK and checks
+the generated contract. API changes require deploying the backend and its
+pending migration before the new app can connect to a production account.
+
+Existing GraphQL generation:
 
 ```shell
 pnpm gbs #backend

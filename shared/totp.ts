@@ -191,7 +191,7 @@ const generateLegacyTotpToken = ({
     return null
   }
 
-  const counter = Math.floor(Math.round(now / 1000.0) / period)
+  const counter = Math.floor(now / 1000 / period)
   const signature = hmacSha1(
     normalizeLegacyHmacKey(secretBytes),
     encodeCounter(counter)

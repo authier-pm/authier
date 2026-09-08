@@ -9,6 +9,7 @@ import { useDeviceDecryptionChallengeMutation } from '@shared/graphql/Login.code
 import { useDevicesRequestsQuery } from '@shared/graphql/AccountDevices.codegen'
 import { IBackgroundStateSerializable } from '@src/background/backgroundPage'
 import { device } from '@src/background/ExtensionDevice'
+import { applyPasswordRotation } from '@src/background/reencryptVaultSecrets'
 import { Button } from '@src/components/ui/button'
 import {
   Card,
@@ -95,19 +96,15 @@ export default function Account() {
       return
     }
 
+    const state = device.state
+    if (!state) return
+    const previousSecrets = state.secrets.map((secret) => ({ ...secret }))
     const { addDeviceSecret } = await decryptDeviceSecretWithPassword(
       data.currPassword,
-      device.state as IBackgroundStateSerializable
+      state
     )
 
-    if (addDeviceSecret !== device.state?.authSecret) {
-      toast({ status: 'error', title: t`Wrong password` })
-      return
-    }
-
-    const state = device.state
-
-    if (!state) {
+    if (addDeviceSecret !== state.authSecret) {
       toast({ status: 'error', title: t`Wrong password` })
       return
     }
@@ -132,25 +129,37 @@ export default function Account() {
       newEncryptionKey,
       base64ToBuffer(state.encryptionSalt)
     )
-
-    await changePassword({
-      variables: {
-        addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
-        addDeviceSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
-        decryptionChallengeId: decryptionChallenge.data
-          ?.deviceDecryptionChallenge?.id as number,
-        secrets: await device.serializeSecrets(state.secrets, data.newPassword)
-      }
-    })
-
+    const patches = await device.serializeSecrets(
+      previousSecrets,
+      newEncryptionKey
+    )
     const deviceState: IBackgroundStateSerializable = {
       ...state,
+      secrets: applyPasswordRotation(previousSecrets, patches),
       authSecret: newDeviceSecretsPair.addDeviceSecret,
       authSecretEncrypted: newDeviceSecretsPair.addDeviceSecretEncrypted,
       masterEncryptionKey: await cryptoKeyToString(newEncryptionKey)
     }
+    const challengeId =
+      decryptionChallenge.data?.deviceDecryptionChallenge?.id
+    if (!challengeId)
+      throw new Error('Password change challenge was not created')
+    if (device.state !== state)
+      throw new Error('Unlock the vault before changing the master password')
 
-    device.save(deviceState)
+    const result = await changePassword({
+      variables: {
+        addDeviceSecret: newDeviceSecretsPair.addDeviceSecret,
+        addDeviceSecretEncrypted:
+          newDeviceSecretsPair.addDeviceSecretEncrypted,
+        decryptionChallengeId: challengeId,
+        secrets: patches
+      }
+    })
+    if (result.data?.me.changeMasterPassword !== patches.length) {
+      throw new Error('The server did not confirm the password change')
+    }
+    await device.commitPasswordRotation(state, deviceState)
 
     toast({
       status: 'success',

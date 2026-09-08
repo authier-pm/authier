@@ -1,0 +1,50 @@
+# Native Android validation
+
+Validated on 2026-09-08 with an Android 15 / API 35 ARM64 emulator and an isolated, temporary PGlite backend. No production account or production database was used.
+
+## Automated checks
+
+```sh
+./gradlew :app:assembleDebug :app:testDebugUnitTest :app:lintDebug :app:assembleRelease :app:lintRelease
+```
+
+All 28 JVM tests passed. Debug and release APK builds passed; both Android lint variants reported zero errors. Tests exercise generated HTTP request/response serialization, nullable versus optional fields, cursor replay and tombstones, pending-write preservation, WebCrypto/JVM encryption vectors including Unicode, RFC TOTP vectors, imported payload normalization, and exact native-package autofill matching.
+
+The release manifest was inspected: backup and cleartext traffic are disabled, and the debug autofill preview activity is absent. Release signing and production deployment remain separate steps.
+
+## Passkey branch integration
+
+After integrating the passkeys branch, the debug APK and Android lint were rebuilt successfully and all 32 JVM tests passed. Additional coverage verifies generated-client mixed password/passkey responses, passkey tombstones, opaque passkey snapshot/outbox preservation, and rejection of passkey payloads by the native editor/decoder. Unsupported kinds are filtered before decryption so they do not prevent password/TOTP unlock or produce corruption warnings. This validates compatibility with encrypted passkey sync; it does not add an Android passkey provider.
+
+## Emulator checks
+
+- Created an account through the real generated Retrofit client and the local `/api/v1` HTTP handler.
+- Created and synchronized an encrypted password and a TOTP entry. Codes updated on screen.
+- Restarted the application and unlocked the remembered vault with its master password.
+- Removed the emulator's server connection. Offline unlock and local TOTP generation still worked.
+- Edited a password offline. The persisted snapshot contained ciphertext and a pending update, without the synthetic username, password, master password, or edited URL in plaintext.
+- Restarted/updated the application. The queued operation kept the same operation ID. Restoring connectivity uploaded it as revision 2 and emptied the outbox.
+- Simulated an interrupted atomic write by leaving only the synthetic snapshot's `.bak` file. Relaunch restored the remembered vault successfully.
+- Approved a second device from the native Devices screen. An independent TypeScript/WebCrypto client then decrypted the Android-created revision 2 and verified its fields. The TypeScript client wrote another encrypted item, which Android synchronized and displayed correctly.
+- Enabled Authier's real Android Autofill service in the test emulator. The separate `autofill-fixture` app requested credentials, Authier required the master password and explicit account selection, and the fixture confirmed both values were filled correctly. This also passed offline. An ambiguous form with two password fields received no Authier suggestion.
+- Repeated the complete Autofill flow after fixing an Android 15 lifecycle issue involving a duplicate `finish()` call. The fixture passed and the fresh Android runtime error log was empty.
+
+The HTTP smoke test exposed optional-null serialization and permissive-policy challenge-approval bugs, which were fixed and covered by regression tests. The temporary backend was stopped after cross-client verification. Its device geolocation metadata dependency was unavailable; the app displayed that error while keeping device approvals usable.
+
+Checked-in images in `docs/screenshots/android-vault.png`, `android-totp.png`, and `android-autofill.png` are fresh emulator captures of explicit debug-only synthetic scenarios. Real vault and real Autofill windows keep screenshot protection enabled.
+
+## Autofill app linking — September 8, 2026
+
+All 36 JVM tests pass, including new encrypted-association coverage for imported-field preservation, versioned outbox writes, pending-write protection, changed/deleted records, account/key changes, and invalid targets. Debug/release APK builds and both Android lint variants pass (zero errors). The UI-preview TypeScript check and Android gallery Playwright scenario pass.
+
+Using a synthetic encrypted vault and the separate native `autofill-fixture` app in the emulator:
+
+- A login without an Android association appeared in the picker after master-password unlock.
+- Selecting it displayed the target package and explicit confirmation. Canceling left the stored snapshot byte-for-byte unchanged.
+- Confirming saved an encrypted association and exactly one pending update, retaining an imported custom field. The fixture confirmed that username and password were filled immediately.
+- A fresh autofill request showed the login under “Linked to this app.” Selecting it filled successfully without another confirmation or a second disk write.
+- Synthetic vault data was removed and the emulator's previous autofill provider was restored afterward.
+
+The service now uses [dataset authentication](https://developer.android.com/reference/android/service/autofill/Dataset.Builder#setAuthentication(android.content.IntentSender)) so selecting a login in Authier fills the form directly. Snapshot revision checks prevent a background app operation from overwriting an association saved by the picker.
+
+Updated actual Compose captures: `docs/screenshots/android-autofill.png` and `android-autofill-association.png`. The checked-in `android-vault` preview includes both screens; its rendered gallery is `docs/screenshots/android-ui-preview.png`. No production API deployment or real-account sync was performed for this change.

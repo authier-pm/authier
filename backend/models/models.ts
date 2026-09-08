@@ -2,7 +2,7 @@ import { Field, ID, InputType, Int, ObjectType } from 'type-graphql'
 import { EncryptedSecretTypeGQL } from './types/EncryptedSecretType'
 
 import { UserMutation } from './UserMutation'
-import { GraphQLUUID } from 'graphql-scalars'
+import { GraphQLPositiveInt, GraphQLUUID } from 'graphql-scalars'
 
 @ObjectType()
 export class DecryptionChallengeResponse {
@@ -111,6 +111,13 @@ export class DefaultSettingsInput {
 
 @InputType()
 export class EncryptedSecretPatchInput extends EncryptedSecretInput {
+  @Field(() => GraphQLPositiveInt, {
+    nullable: true,
+    description:
+      'Version read before re-encryption; required when changing the master password.'
+  })
+  expectedVersion?: number
+
   @Field(() => GraphQLUUID)
   id: string
 }

@@ -1,10 +1,8 @@
+import { runVaultTransaction } from '../vault/vaultWrites'
 import { Arg, Ctx, Field, ObjectType } from 'type-graphql'
 import type { IContextAuthenticated } from './types/ContextTypes'
 import { EncryptedSecretGQL } from './generated/EncryptedSecretGQL'
 import { EncryptedSecretInput } from './models'
-import { WebInputGQLScalars } from './generated/WebInputGQL'
-import { secretUsageEvent, encryptedSecret } from '../drizzle/schema'
-import { and, eq, desc, sql } from 'drizzle-orm'
 
 @ObjectType()
 export class EncryptedSecretQuery extends EncryptedSecretGQL {
@@ -29,45 +27,23 @@ export class EncryptedSecretMutation extends EncryptedSecretQuery {
     @Ctx() ctx: IContextAuthenticated,
     @Arg('patch', () => EncryptedSecretInput) patch: EncryptedSecretInput
   ) {
-    console.log('update', this.id)
-
-    const res = await ctx.db
-      .update(encryptedSecret)
-      .set({
-        ...patch,
-        version: sql`${encryptedSecret.version} + 1`,
-        updatedAt: sql`CURRENT_TIMESTAMP`
-      })
-      .where(
-        and(
-          eq(encryptedSecret.id, this.id),
-          eq(encryptedSecret.userId, ctx.jwtPayload.userId)
-        )
-      )
-      .returning()
-
-    if (!res[0]) throw new Error('Secret not found')
-    return res[0]
+    const [updated] = await runVaultTransaction(
+      ctx.db,
+      ctx.jwtPayload,
+      (writer) => writer.update([this.id], patch)
+    )
+    if (!updated) throw new Error('Secret not found')
+    return updated
   }
 
   @Field(() => EncryptedSecretGQL)
   async delete(@Ctx() ctx: IContextAuthenticated) {
-    console.log('delete', this.id)
-
-    const res = await ctx.db
-      .update(encryptedSecret)
-      .set({
-        deletedAt: sql`CURRENT_TIMESTAMP`
-      })
-      .where(
-        and(
-          eq(encryptedSecret.id, this.id),
-          eq(encryptedSecret.userId, ctx.jwtPayload.userId)
-        )
-      )
-      .returning()
-
-    if (!res[0]) throw new Error('Secret not found')
-    return res[0]
+    const [deleted] = await runVaultTransaction(
+      ctx.db,
+      ctx.jwtPayload,
+      (writer) => writer.update([this.id], { deletedAt: new Date() })
+    )
+    if (!deleted) throw new Error('Secret not found')
+    return deleted
   }
 }

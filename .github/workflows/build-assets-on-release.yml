@@ -12,6 +12,7 @@ jobs:
   # Find out asset id of existing extension.zip asset in a release or
   # build and attach it to the release and use its asset id
   ensure-zip:
+    if: endsWith(github.event.release.tag_name, '-extension')
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:

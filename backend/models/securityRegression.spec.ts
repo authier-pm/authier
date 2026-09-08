@@ -250,6 +250,31 @@ describe('security boundaries', () => {
     ).rejects.toThrow('Invalid password change challenge')
   })
 
+  it('rechecks the current master device when the resolver has stale account data', async () => {
+    await db
+      .update(schema.user)
+      .set({ masterDeviceId: null })
+      .where(eq(schema.user.id, attackerId))
+    await expect(
+      actor.changeMasterPassword(
+        {
+          secrets: [],
+          addDeviceSecret: 'new-key',
+          addDeviceSecretEncrypted: 'new-ciphertext',
+          decryptionChallengeId: challenge.id
+        },
+        ctx
+      )
+    ).rejects.toThrow('You can only change password on a master device')
+    expect(
+      await db.query.user.findFirst({ where: { id: attackerId } })
+    ).toMatchObject({ tokenVersion: 0 })
+    await db
+      .update(schema.user)
+      .set({ masterDeviceId: deviceId })
+      .where(eq(schema.user.id, attackerId))
+  })
+
   it.each([
     { approvedAt: null, rejectedAt: null, blockIp: false },
     { approvedAt: new Date(), rejectedAt: new Date(), blockIp: false },
@@ -347,11 +372,24 @@ describe('security boundaries', () => {
     ).rejects.toThrow('Wrong master password used')
   })
   it('allows owner-only master-password rotation and stores a fresh verifier', async () => {
+    await db
+      .update(schema.encryptedSecret)
+      .set({ deletedAt: null })
+      .where(eq(schema.encryptedSecret.id, ownSecretId))
+    const currentSecret = await db.query.encryptedSecret.findFirst({
+      where: { id: ownSecretId }
+    })
     const nextSecret = crypto.randomUUID()
     expect(
       await actor.changeMasterPassword(
         {
-          secrets: [{ id: ownSecretId, ...patch }],
+          secrets: [
+            {
+              id: ownSecretId,
+              expectedVersion: currentSecret!.version,
+              ...patch
+            }
+          ],
           addDeviceSecret: nextSecret,
           addDeviceSecretEncrypted: 'new-ciphertext',
           decryptionChallengeId: challenge.id

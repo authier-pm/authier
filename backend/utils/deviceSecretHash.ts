@@ -35,7 +35,10 @@ export const verifyDeviceSecret = async (secret: string, verifier: string) => {
       'SHA-256',
       new TextEncoder().encode(secret)
     )
-    return timingSafeEqual(Buffer.from(digest), Buffer.from(verifier, 'hex'))
+    return timingSafeEqual(
+      new Uint8Array(digest),
+      new Uint8Array(Buffer.from(verifier, 'hex'))
+    )
   }
   const match = /^pbkdf2-sha256:600000:([a-f0-9]{32}):([a-f0-9]{64})$/.exec(
     verifier
@@ -45,5 +48,8 @@ export const verifyDeviceSecret = async (secret: string, verifier: string) => {
     secret,
     new Uint8Array(Buffer.from(match[1], 'hex'))
   )
-  return timingSafeEqual(digest, Buffer.from(match[2], 'hex'))
+  return timingSafeEqual(
+    new Uint8Array(digest),
+    new Uint8Array(Buffer.from(match[2], 'hex'))
+  )
 }

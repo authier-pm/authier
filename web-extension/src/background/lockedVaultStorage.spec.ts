@@ -1,5 +1,6 @@
 import { beforeEach, expect, it, vi } from 'vitest'
 import browser from 'webextension-polyfill'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import {
   readLockedVaultSnapshot,
   saveLockedVaultSnapshot
@@ -68,6 +69,7 @@ it('persists passkey ciphertext across restart without leaking the signing key',
     id: 'passkey',
     kind: 'PASSKEY',
     encrypted: 'encrypted-signing-key',
+    version: 8,
     createdAt: '2026-09-08T10:00:00.000Z'
   }
   await saveLockedVaultSnapshot({
@@ -87,4 +89,27 @@ it('persists passkey ciphertext across restart without leaking the signing key',
     lockedState: encryptedSnapshot
   })
   expect(await readLockedVaultSnapshot()).toEqual(encryptedSnapshot)
+})
+
+it('preserves record versions through locking so password rotation can detect stale ciphertext', async () => {
+  const versionedSnapshot = {
+    ...snapshot,
+    secrets: [
+      {
+        id: 'secret',
+        encrypted: 'ciphertext',
+        kind: EncryptedSecretType.LOGIN_CREDENTIALS,
+        version: 7,
+        createdAt: '2026-09-08T12:00:00.000Z'
+      }
+    ]
+  }
+  await saveLockedVaultSnapshot(versionedSnapshot)
+  expect(browser.storage.local.set).toHaveBeenCalledWith({
+    lockedState: versionedSnapshot
+  })
+  vi.mocked(browser.storage.local.get).mockResolvedValue({
+    lockedState: versionedSnapshot
+  })
+  expect(await readLockedVaultSnapshot()).toEqual(versionedSnapshot)
 })

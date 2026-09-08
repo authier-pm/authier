@@ -59,7 +59,12 @@ export const loadAuthenticatedContextByIds = async (
     where: { id: payload.deviceId }
   })
 
-  if (!currentDevice || currentDevice.logoutAt) {
+  if (
+    !currentDevice ||
+    currentDevice.logoutAt ||
+    currentDevice.deletedAt ||
+    currentDevice.userId !== payload.userId
+  ) {
     throw new ORPCError('UNAUTHORIZED', {
       message: 'not authenticated'
     })

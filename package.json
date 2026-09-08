@@ -76,7 +76,11 @@
     "preinstall": "npx only-allow pnpm",
     "release": "cd web-extension && pnpm run release",
     "fmt": "oxfmt",
-    "fmt:check": "oxfmt --check"
+    "fmt:check": "oxfmt --check",
+    "android:api": "pnpm --dir backend run api:generate && bun run scripts/generateAndroidApi.ts",
+    "android:build": "cd android-app && ./gradlew assembleDebug",
+    "android:test": "bun test shared/cryptoUtils.spec.ts && cd android-app && ./gradlew testDebugUnitTest",
+    "android:api:check": "pnpm --dir backend run api:check && bun run scripts/generateAndroidApi.ts --check"
   },
   "lint-staged": {
     "*": "oxfmt --no-error-on-unmatched-pattern"

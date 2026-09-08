@@ -138,6 +138,7 @@ CREATE TABLE "User" (
 	"id" uuid PRIMARY KEY,
 	"email" citext,
 	"tokenVersion" integer DEFAULT 0 NOT NULL,
+	"vaultRevision" bigint DEFAULT 0 NOT NULL,
 	"username" text,
 	"addDeviceSecretHash" text NOT NULL,
 	"addDeviceSecretEncrypted" text NOT NULL,
@@ -164,6 +165,28 @@ CREATE TABLE "UserPaidProducts" (
 	"productId" text NOT NULL,
 	"userId" uuid NOT NULL,
 	"checkoutSessionId" text NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE "VaultChange" (
+	"userId" uuid,
+	"revision" bigint,
+	"secretId" uuid NOT NULL,
+	"encrypted" text NOT NULL,
+	"kind" "EncryptedSecretType" NOT NULL,
+	"version" integer NOT NULL,
+	"createdAt" timestamp(3) NOT NULL,
+	"updatedAt" timestamp(3),
+	"deletedAt" timestamp(3),
+	CONSTRAINT "VaultChange_pkey" PRIMARY KEY("userId","revision")
+);
+--> statement-breakpoint
+CREATE TABLE "VaultOperation" (
+	"userId" uuid,
+	"operationId" uuid,
+	"requestHash" text NOT NULL,
+	"response" jsonb,
+	"createdAt" timestamp(3) DEFAULT now() NOT NULL,
+	CONSTRAINT "VaultOperation_pkey" PRIMARY KEY("userId","operationId")
 );
 --> statement-breakpoint
 CREATE TABLE "WebInput" (
@@ -213,6 +236,10 @@ ALTER TABLE "User" ADD CONSTRAINT "User_masterDeviceId_Device_id_fkey" FOREIGN K
 ALTER TABLE "User" ADD CONSTRAINT "User_recoveryDecryptionChallengeId_DecryptionChallenge_id_fkey" FOREIGN KEY ("recoveryDecryptionChallengeId") REFERENCES "DecryptionChallenge"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 --> statement-breakpoint
 ALTER TABLE "UserPaidProducts" ADD CONSTRAINT "UserPaidProducts_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "VaultChange" ADD CONSTRAINT "VaultChange_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE;
+--> statement-breakpoint
+ALTER TABLE "VaultOperation" ADD CONSTRAINT "VaultOperation_userId_User_id_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE;
 --> statement-breakpoint
 ALTER TABLE "WebInput" ADD CONSTRAINT "WebInput_addedByUserId_User_id_fkey" FOREIGN KEY ("addedByUserId") REFERENCES "User"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 --> statement-breakpoint

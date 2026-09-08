@@ -11,6 +11,11 @@ import {
   initLocalDeviceAuthSecret
 } from '@shared/cryptoUtils'
 import type { VaultApiOutputs } from '@shared/orpc/contract'
+import {
+  createVaultSecretInputSchema,
+  deleteVaultSecretInputSchema,
+  updateVaultSecretInputSchema
+} from '@shared/orpc/schemas'
 import { setAccessToken } from '@/lib/accessToken'
 import { notifyUnauthorizedSession } from '@/lib/authEvents'
 import { encryptLoginSecret } from '@/lib/vaultSecrets'
@@ -19,8 +24,7 @@ import { VaultSessionProvider, useVaultSession } from './VaultSessionProvider'
 const orpcMocks = vi.hoisted(() => ({
   refresh: vi.fn(),
   refreshTokens: vi.fn(),
-  markAsSynced: vi.fn(),
-  syncSecrets: vi.fn(),
+  sync: vi.fn(),
   register: vi.fn(),
   requestDeviceChallenge: vi.fn(),
   completeDeviceLogin: vi.fn(),
@@ -42,22 +46,20 @@ vi.mock('@/lib/orpc', () => ({
       initiateMasterDeviceReset: orpcMocks.initiateMasterDeviceReset,
       logout: orpcMocks.logout
     },
-    session: {
-      markAsSynced: orpcMocks.markAsSynced,
-      syncSecrets: orpcMocks.syncSecrets
-    },
-    vault: {
-      createSecret: orpcMocks.createSecret,
-      updateSecret: orpcMocks.updateSecret,
-      deleteSecret: orpcMocks.deleteSecret
+    mobile: {
+      sync: orpcMocks.sync,
+      create: orpcMocks.createSecret,
+      update: orpcMocks.updateSecret,
+      delete: orpcMocks.deleteSecret
     }
   }
 }))
 
 type SessionBootstrap = VaultApiOutputs['session']['bootstrap']
 type SecretRecord = SessionBootstrap['secrets'][number]
+type SyncPage = VaultApiOutputs['mobile']['sync']
 type SyncedSecretRecord =
-  VaultApiOutputs['session']['syncSecrets']['secrets'][number]
+  VaultApiOutputs['mobile']['sync']['changes'][number]['secret']
 
 const createSession = ({
   secrets,
@@ -132,6 +134,18 @@ const createSyncedSecret = (
   deletedAt
 })
 
+const createSyncPage = (
+  secrets: SyncedSecretRecord[],
+  nextCursor = 'cursor-1'
+): SyncPage => ({
+  changes: secrets.map((secret, index) => ({
+    cursor: `change-${index}`,
+    secret
+  })),
+  nextCursor,
+  hasMore: false
+})
+
 function VaultSessionHarness() {
   const {
     createLoginSecret,
@@ -183,7 +197,7 @@ function VaultSessionHarness() {
       </button>
       <button
         onClick={() =>
-          void updateLoginSecret('secret-1', {
+          void updateLoginSecret('11111111-1111-4111-8111-111111111111', {
             label: 'GitHub Updated',
             url: 'https://github.com',
             iconUrl: null,
@@ -197,7 +211,12 @@ function VaultSessionHarness() {
       >
         Update
       </button>
-      <button onClick={() => void deleteSecret('secret-1')} type="button">
+      <button
+        onClick={() =>
+          void deleteSecret('11111111-1111-4111-8111-111111111111')
+        }
+        type="button"
+      >
         Delete
       </button>
       <ul>
@@ -216,8 +235,7 @@ describe('VaultSessionProvider', () => {
     setAccessToken(null)
     orpcMocks.refresh.mockReset()
     orpcMocks.refreshTokens.mockReset()
-    orpcMocks.markAsSynced.mockReset()
-    orpcMocks.syncSecrets.mockReset()
+    orpcMocks.sync.mockReset()
     orpcMocks.register.mockReset()
     orpcMocks.requestDeviceChallenge.mockReset()
     orpcMocks.completeDeviceLogin.mockReset()
@@ -241,12 +259,7 @@ describe('VaultSessionProvider', () => {
       accessToken: 'access-token-sync',
       refreshToken: 'refresh-token-sync'
     })
-    orpcMocks.markAsSynced.mockResolvedValue({
-      lastSyncAt: new Date('2026-03-25T12:00:00.000Z').toISOString()
-    })
-    orpcMocks.syncSecrets.mockResolvedValue({
-      secrets: []
-    })
+    orpcMocks.sync.mockResolvedValue(createSyncPage([]))
   })
 
   it('unlocks local vault state and keeps secret CRUD encrypted client-side', async () => {
@@ -308,7 +321,7 @@ describe('VaultSessionProvider', () => {
         },
         secrets: [
           {
-            id: 'secret-1',
+            id: '11111111-1111-4111-8111-111111111111',
             encrypted: existingEncryptedSecret,
             kind: 'LOGIN_CREDENTIALS',
             version: 1,
@@ -344,25 +357,39 @@ describe('VaultSessionProvider', () => {
         pendingChallenges: []
       }
     })
-    orpcMocks.createSecret.mockImplementation(async ({ encrypted, kind }) => ({
-      id: 'secret-2',
-      encrypted,
-      kind,
-      version: 1,
-      createdAt: new Date('2026-03-25T10:02:00.000Z').toISOString(),
-      updatedAt: null
-    }))
-    orpcMocks.updateSecret.mockImplementation(async ({ id, patch }) => ({
-      id,
-      encrypted: patch.encrypted,
-      kind: patch.kind,
-      version: 2,
-      createdAt: new Date('2026-03-25T10:01:00.000Z').toISOString(),
-      updatedAt: new Date('2026-03-25T10:03:00.000Z').toISOString()
-    }))
-    orpcMocks.deleteSecret.mockResolvedValue({
-      id: 'secret-1'
-    })
+    orpcMocks.createSecret.mockImplementation(
+      async ({ id, encrypted, kind }) => ({
+        id,
+        encrypted,
+        kind,
+        version: 1,
+        createdAt: new Date('2026-03-25T10:02:00.000Z').toISOString(),
+        updatedAt: null
+      })
+    )
+    orpcMocks.updateSecret.mockImplementation(
+      async ({ id, encrypted, kind }) => ({
+        id,
+        encrypted,
+        kind,
+        version: 2,
+        createdAt: new Date('2026-03-25T10:01:00.000Z').toISOString(),
+        updatedAt: new Date('2026-03-25T10:03:00.000Z').toISOString()
+      })
+    )
+    orpcMocks.deleteSecret.mockResolvedValue(
+      createSyncedSecret(
+        {
+          id: '11111111-1111-4111-8111-111111111111',
+          kind: 'LOGIN_CREDENTIALS',
+          encrypted: '',
+          version: 3,
+          createdAt: '2026-03-25T10:01:00.000Z',
+          updatedAt: '2026-03-25T10:04:00.000Z'
+        },
+        '2026-03-25T10:04:00.000Z'
+      )
+    )
 
     const user = userEvent.setup()
 
@@ -388,9 +415,19 @@ describe('VaultSessionProvider', () => {
       expect(screen.getByText('Linear')).toBeInTheDocument()
     })
     expect(orpcMocks.createSecret).toHaveBeenCalledOnce()
+    expect(
+      createVaultSecretInputSchema.safeParse(
+        orpcMocks.createSecret.mock.calls[0]?.[0]
+      ).success
+    ).toBe(true)
     expect(orpcMocks.createSecret.mock.calls[0]?.[0].encrypted).not.toContain(
       'Linear'
     )
+
+    const inFlightSync = createDeferred<SyncPage>()
+    orpcMocks.sync.mockReturnValueOnce(inFlightSync.promise)
+    await user.click(screen.getByRole('button', { name: 'Sync' }))
+    expect(screen.getByTestId('sync-state')).toHaveTextContent('syncing')
 
     await user.click(screen.getByRole('button', { name: 'Update' }))
 
@@ -399,8 +436,20 @@ describe('VaultSessionProvider', () => {
     })
     expect(orpcMocks.updateSecret).toHaveBeenCalledOnce()
     expect(
-      orpcMocks.updateSecret.mock.calls[0]?.[0].patch.encrypted
-    ).not.toContain('rotated-password')
+      updateVaultSecretInputSchema.safeParse(
+        orpcMocks.updateSecret.mock.calls[0]?.[0]
+      ).success
+    ).toBe(true)
+    expect(orpcMocks.updateSecret).toHaveBeenCalledWith(
+      expect.objectContaining({
+        id: '11111111-1111-4111-8111-111111111111',
+        expectedVersion: 1,
+        kind: 'LOGIN_CREDENTIALS'
+      })
+    )
+    expect(orpcMocks.updateSecret.mock.calls[0]?.[0].encrypted).not.toContain(
+      'rotated-password'
+    )
 
     await user.click(screen.getByRole('button', { name: 'Delete' }))
 
@@ -408,8 +457,33 @@ describe('VaultSessionProvider', () => {
       expect(screen.queryByText('GitHub Updated')).not.toBeInTheDocument()
     })
     expect(orpcMocks.deleteSecret).toHaveBeenCalledWith({
-      id: 'secret-1'
+      id: '11111111-1111-4111-8111-111111111111',
+      operationId: expect.any(String),
+      expectedVersion: 2
     })
+    expect(
+      deleteVaultSecretInputSchema.safeParse(
+        orpcMocks.deleteSecret.mock.calls[0]?.[0]
+      ).success
+    ).toBe(true)
+    // The older response was requested before update/delete, and must not restore it.
+    inFlightSync.resolve(
+      createSyncPage([
+        createSyncedSecret({
+          id: '11111111-1111-4111-8111-111111111111',
+          kind: 'LOGIN_CREDENTIALS',
+          encrypted: existingEncryptedSecret,
+          version: 1,
+          createdAt: '2026-03-25T10:01:00.000Z',
+          updatedAt: null
+        })
+      ])
+    )
+    await waitFor(() =>
+      expect(screen.getByTestId('sync-state')).toHaveTextContent('idle')
+    )
+    expect(screen.queryByText('GitHub')).not.toBeInTheDocument()
+    expect(screen.queryByText('GitHub Updated')).not.toBeInTheDocument()
     for (const key of [
       'authier-vault-access-token',
       'authier-vault-refresh-token',
@@ -503,7 +577,7 @@ describe('VaultSessionProvider', () => {
       },
       secrets: [
         {
-          id: 'secret-1',
+          id: '11111111-1111-4111-8111-111111111111',
           encrypted: existingEncryptedSecret,
           kind: 'LOGIN_CREDENTIALS' as const,
           version: 1,
@@ -730,7 +804,7 @@ describe('VaultSessionProvider', () => {
     expect(orpcMocks.completeDeviceLogin).toHaveBeenCalledOnce()
   })
 
-  it('syncs the vault manually and updates the sync timestamp after the sync mutation completes', async () => {
+  it('syncs the vault manually and updates its local timestamp only after applying changes', async () => {
     const password = 'super secure password'
     const salt = crypto.getRandomValues(new Uint8Array(16))
     const encryptionSalt = bufferToBase64(salt)
@@ -779,7 +853,7 @@ describe('VaultSessionProvider', () => {
         lastSyncAt: new Date().toISOString(),
         secrets: [
           {
-            id: 'secret-1',
+            id: '11111111-1111-4111-8111-111111111111',
             encrypted: existingEncryptedSecret,
             kind: 'LOGIN_CREDENTIALS',
             version: 1,
@@ -805,38 +879,33 @@ describe('VaultSessionProvider', () => {
     })
 
     orpcMocks.refreshTokens.mockReset()
-    orpcMocks.syncSecrets.mockReset()
-    orpcMocks.markAsSynced.mockReset()
+    orpcMocks.sync.mockReset()
 
-    const deferredSync = createDeferred<{
-      secrets: SyncedSecretRecord[]
-    }>()
+    const deferredSync = createDeferred<SyncPage>()
 
     orpcMocks.refreshTokens.mockResolvedValueOnce({
       accessToken: 'access-token-3',
       refreshToken: 'refresh-token-3'
     })
-    orpcMocks.syncSecrets.mockReturnValueOnce(deferredSync.promise)
-    orpcMocks.markAsSynced.mockResolvedValueOnce({
-      lastSyncAt: new Date('2026-03-25T11:00:00.000Z').toISOString()
-    })
+    orpcMocks.sync.mockReturnValueOnce(deferredSync.promise)
 
     await user.click(screen.getByRole('button', { name: 'Sync' }))
 
     expect(screen.getByTestId('sync-state')).toHaveTextContent('syncing')
 
-    deferredSync.resolve({
-      secrets: [
+    const beforeSyncApplied = Date.now()
+    deferredSync.resolve(
+      createSyncPage([
         createSyncedSecret({
-          id: 'secret-2',
+          id: '22222222-2222-4222-8222-222222222222',
           encrypted: syncedEncryptedSecret,
           kind: 'LOGIN_CREDENTIALS',
           version: 1,
           createdAt: new Date('2026-03-25T10:30:00.000Z').toISOString(),
           updatedAt: null
         })
-      ]
-    })
+      ])
+    )
 
     await waitFor(() => {
       expect(screen.getByText('Linear')).toBeInTheDocument()
@@ -845,12 +914,14 @@ describe('VaultSessionProvider', () => {
     expect(orpcMocks.refreshTokens).toHaveBeenCalledWith({
       refreshToken: 'refresh-token-2'
     })
-    expect(orpcMocks.syncSecrets).toHaveBeenCalledWith({})
-    expect(orpcMocks.markAsSynced).toHaveBeenCalledWith({})
+    expect(orpcMocks.sync).toHaveBeenCalledWith({
+      cursor: undefined,
+      limit: 200
+    })
     expect(screen.getByTestId('sync-state')).toHaveTextContent('idle')
-    expect(screen.getByTestId('last-sync')).toHaveTextContent(
-      '2026-03-25T11:00:00.000Z'
-    )
+    const appliedAt = Date.parse(screen.getByTestId('last-sync').textContent!)
+    expect(appliedAt).toBeGreaterThanOrEqual(beforeSyncApplied)
+    expect(appliedAt).toBeLessThanOrEqual(Date.now())
   })
 
   it('does not use legacy persisted credentials to sync a stale vault before unlock', async () => {
@@ -891,7 +962,7 @@ describe('VaultSessionProvider', () => {
       lastSyncAt: staleLastSyncAt,
       secrets: [
         {
-          id: 'secret-1',
+          id: '11111111-1111-4111-8111-111111111111',
           encrypted: existingEncryptedSecret,
           kind: 'LOGIN_CREDENTIALS',
           version: 1,
@@ -926,21 +997,18 @@ describe('VaultSessionProvider', () => {
       accessToken: 'access-token-3',
       refreshToken: 'refresh-token-3'
     })
-    orpcMocks.syncSecrets.mockResolvedValueOnce({
-      secrets: [
+    orpcMocks.sync.mockResolvedValueOnce(
+      createSyncPage([
         createSyncedSecret({
-          id: 'secret-2',
+          id: '22222222-2222-4222-8222-222222222222',
           encrypted: syncedEncryptedSecret,
           kind: 'LOGIN_CREDENTIALS',
           version: 1,
           createdAt: new Date('2026-03-25T10:30:00.000Z').toISOString(),
           updatedAt: null
         })
-      ]
-    })
-    orpcMocks.markAsSynced.mockResolvedValueOnce({
-      lastSyncAt: new Date('2026-03-27T12:00:00.000Z').toISOString()
-    })
+      ])
+    )
 
     render(
       <VaultSessionProvider>
@@ -950,7 +1018,7 @@ describe('VaultSessionProvider', () => {
 
     expect(screen.getByTestId('status')).toHaveTextContent('locked')
     expect(orpcMocks.refreshTokens).not.toHaveBeenCalled()
-    expect(orpcMocks.syncSecrets).not.toHaveBeenCalled()
+    expect(orpcMocks.sync).not.toHaveBeenCalled()
   })
 
   it('syncs the vault when it returns to the foreground after more than 48 hours', async () => {
@@ -1007,7 +1075,7 @@ describe('VaultSessionProvider', () => {
         lastSyncAt: staleLastSyncAt,
         secrets: [
           {
-            id: 'secret-1',
+            id: '11111111-1111-4111-8111-111111111111',
             encrypted: existingEncryptedSecret,
             kind: 'LOGIN_CREDENTIALS',
             version: 1,
@@ -1037,8 +1105,7 @@ describe('VaultSessionProvider', () => {
 
     orpcMocks.refresh.mockReset()
     orpcMocks.refreshTokens.mockReset()
-    orpcMocks.syncSecrets.mockReset()
-    orpcMocks.markAsSynced.mockReset()
+    orpcMocks.sync.mockReset()
     Object.defineProperty(document, 'visibilityState', {
       configurable: true,
       value: 'visible'
@@ -1048,28 +1115,24 @@ describe('VaultSessionProvider', () => {
       accessToken: 'access-token-3',
       refreshToken: 'refresh-token-3'
     })
-    orpcMocks.syncSecrets.mockResolvedValueOnce({
-      secrets: [
+    orpcMocks.sync.mockResolvedValueOnce(
+      createSyncPage([
         createSyncedSecret({
-          id: 'secret-2',
+          id: '22222222-2222-4222-8222-222222222222',
           encrypted: syncedEncryptedSecret,
           kind: 'LOGIN_CREDENTIALS',
           version: 1,
           createdAt: new Date('2026-03-27T12:00:00.000Z').toISOString(),
           updatedAt: null
         })
-      ]
-    })
-    orpcMocks.markAsSynced.mockResolvedValueOnce({
-      lastSyncAt: new Date().toISOString()
-    })
+      ])
+    )
 
     document.dispatchEvent(new Event('visibilitychange'))
 
     await waitFor(() => {
       expect(orpcMocks.refreshTokens).toHaveBeenCalledTimes(1)
-      expect(orpcMocks.syncSecrets).toHaveBeenCalledTimes(1)
-      expect(orpcMocks.markAsSynced).toHaveBeenCalledTimes(1)
+      expect(orpcMocks.sync).toHaveBeenCalledTimes(1)
     })
     expect(await screen.findByText('Linear')).toBeInTheDocument()
   })
@@ -1110,7 +1173,7 @@ describe('VaultSessionProvider', () => {
         lastSyncAt: new Date().toISOString(),
         secrets: [
           {
-            id: 'secret-1',
+            id: '11111111-1111-4111-8111-111111111111',
             encrypted: existingEncryptedSecret,
             kind: 'LOGIN_CREDENTIALS',
             version: 1,
@@ -1137,14 +1200,12 @@ describe('VaultSessionProvider', () => {
 
     orpcMocks.refresh.mockReset()
     orpcMocks.refreshTokens.mockReset()
-    orpcMocks.syncSecrets.mockReset()
-    orpcMocks.markAsSynced.mockReset()
+    orpcMocks.sync.mockReset()
 
     window.dispatchEvent(new FocusEvent('focus'))
     document.dispatchEvent(new Event('visibilitychange'))
 
     expect(orpcMocks.refreshTokens).not.toHaveBeenCalled()
-    expect(orpcMocks.syncSecrets).not.toHaveBeenCalled()
-    expect(orpcMocks.markAsSynced).not.toHaveBeenCalled()
+    expect(orpcMocks.sync).not.toHaveBeenCalled()
   })
 })

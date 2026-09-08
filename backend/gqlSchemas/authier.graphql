@@ -300,7 +300,7 @@ type DeviceQuery {
   DeviceDecryptionChallengesApproved: [DecryptionChallengeGQL!]!
 
   """
-  Get all secrets that were change since last device sync
+  Compatibility snapshot including deletion records; use the HTTP cursor API for incremental synchronization
   """
   encryptedSecretsToSync: [EncryptedSecretQuery!]!
   lastGeoLocation: String!
@@ -643,6 +643,11 @@ input ChangeMasterPasswordInput {
 input EncryptedSecretPatchInput {
   kind: EncryptedSecretType!
   encrypted: String!
+
+  """
+  Version read before re-encryption; required when changing the master password.
+  """
+  expectedVersion: PositiveInt
   id: UUID!
 }
 

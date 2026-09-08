@@ -1,0 +1,51 @@
+{
+  "format": "authier-aes-gcm-v1",
+  "kdf": "PBKDF2-HMAC-SHA512",
+  "iterations": 600000,
+  "keyBytes": 32,
+  "saltBytes": 16,
+  "ivBytes": 12,
+  "tagBytes": 16,
+  "vectors": [
+    {
+      "id": "ascii-login",
+      "password": "correct horse battery staple",
+      "salt": "AAECAwQFBgcICQoLDA0ODw==",
+      "iv": "EBESExQVFhcYGRob",
+      "plaintext": "{\"label\":\"Example\",\"url\":\"https://example.com\",\"username\":\"alice@example.com\",\"password\":\"demo-only\",\"iconUrl\":null,\"androidUri\":null,\"iosUri\":null}",
+      "passwordUtf8": "Y29ycmVjdCBob3JzZSBiYXR0ZXJ5IHN0YXBsZQ==",
+      "key": "HPMKUYh49Erst1wODQ1poCrF+RgaU7UpIJLhCjwMu0E=",
+      "envelope": "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaG+cXBswakq0IXA9CcPhuc0k7XR1A9dh3qUB5xYkuzS+iwaISV2eqwNdc2m/VGe5aadD3cLqpOwVhCrJA4cL6E/fNYK8JwhMdCDqI/hghsolvvj9qAFD7o1W1gbDZMrgr8mGgSFiO9pdiD80W8ygcUEovAbccTIOvWNu/IU3vv6pDx59mJNrRXBmSk63h1d0RhCzEW5+Hs1QZX8JKH7woTCmqa8yz"
+    },
+    {
+      "id": "unicode-password-and-payload",
+      "password": "Příliš žluťoučký kůň 🔐 密碼",
+      "salt": "8PHy8/T19vf4+fr7/P3+/w==",
+      "iv": "ICEiIyQlJicoKSor",
+      "plaintext": "{\"label\":\"Osobní účet 🔐\",\"url\":null,\"secret\":\"GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ\",\"digits\":8,\"period\":30,\"iconUrl\":null}",
+      "passwordUtf8": "UMWZw61sacWhIMW+bHXFpW91xI1rw70ga8WvxYgg8J+UkCDlr4bnorw=",
+      "key": "UrtbxJSorBOxff09YpokWUPgBE4SbJcla2l0hZL8gG0=",
+      "envelope": "8PHy8/T19vf4+fr7/P3+/yAhIiMkJSYnKCkqK9e/ub0YZhxaBqS8ubl8E2bg1p5J4Y+X24nIvMSilxJdX+udZHulf5vJEPHIxYkxRFuqMYjqmwXHMcMUq7Whb2litH5P/SBxkdLG2PWfyfv0zKbCa6Gk7X4s6nrVbV9m6UIfpWuGQkrUCDIyidvnyTw5f1A2NyNJxZHFHItv1AUmIDENf+j5gkO7Bi+T"
+    },
+    {
+      "id": "composed-password-empty-plaintext",
+      "password": "café-master-password",
+      "salt": "AAECAwQFBgcICQoLDA0ODw==",
+      "iv": "MDEyMzQ1Njc4OTo7",
+      "plaintext": "",
+      "passwordUtf8": "Y2Fmw6ktbWFzdGVyLXBhc3N3b3Jk",
+      "key": "X9Rn8qOZ8rHeU9gxw52ckbrmRxAPAJvfUxOOWvKxGeQ=",
+      "envelope": "AAECAwQFBgcICQoLDA0ODzAxMjM0NTY3ODk6O5YZBKWPnTgTWQXqffMLr+w="
+    },
+    {
+      "id": "decomposed-password",
+      "password": "café-master-password",
+      "salt": "AAECAwQFBgcICQoLDA0ODw==",
+      "iv": "QEFCQ0RFRkdISUpL",
+      "plaintext": "Enrollment-secret-demo-only\n\u0000",
+      "passwordUtf8": "Y2FmZcyBLW1hc3Rlci1wYXNzd29yZA==",
+      "key": "1LWrlgT4mhWxQm8GI/qDwYFPKP2TLkacoiwaWg6rMek=",
+      "envelope": "AAECAwQFBgcICQoLDA0OD0BBQkNERUZHSElKSwTcZ/ijlDNRdWgdgFZUzoHMNtW46HnelivAIMLjhV/DoteIhrKJP/ALh5yoDw=="
+    }
+  ]
+}

@@ -614,6 +614,11 @@ input ChangeMasterPasswordInput {
 input EncryptedSecretPatchInput {
   kind: EncryptedSecretType!
   encrypted: String!
+
+  """
+  Version read before re-encryption; required when changing the master password.
+  """
+  expectedVersion: PositiveInt
   id: UUID!
 }
 

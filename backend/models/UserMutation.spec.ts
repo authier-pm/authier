@@ -96,7 +96,7 @@ describe("UserMutation", () => {
   describe("Secret manipulation", async () => {
     const testData: EncryptedSecretInput[] = [];
     const removeSecrets = (secrets: string[]) => {
-      const ctx = makeFakeCtx({ userId: userRaw.id });
+      const ctx = makeFakeCtx({ userId: userRaw.id, deviceId: masterDeviceId });
       ctx.request.cookies = {
         "access-token": sign(
           { userId: userRaw.id, deviceId: masterDeviceId, tokenVersion: 0 },
@@ -124,7 +124,7 @@ describe("UserMutation", () => {
 
       const data = await user.addEncryptedSecrets(
         testData,
-        makeFakeCtx({ userId: userRaw.id }),
+        makeFakeCtx({ userId: userRaw.id, deviceId: masterDeviceId }),
       );
 
       expect(Array.isArray(data)).toBe(true);
