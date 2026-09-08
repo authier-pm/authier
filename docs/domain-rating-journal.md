@@ -5302,3 +5302,83 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   OpenAlternative remains a preview with `noindex, nofollow`; OpenAltFinder's
   expected route remains HTTP 404; and appsec.fyi and Cloudflare's Small App
   Garden still contain no Authier entry. No duplicate submission was created.
+
+## 2026-09-08
+
+### Verified CyberSources' independently merged followed placement at 09:16 CEST
+
+- CyberSources maintainer `bst04` merged
+  [PR #116](https://github.com/bst04/CyberSources/pull/116) on September 7 at
+  09:50 UTC as commit `9d5af3c8b890fa9395ad6e38e36f3c383dfe945f`.
+  The accepted change is the reviewed one-row password-manager entry and keeps
+  Authier's early-stage status and lack of an independent audit explicit.
+- The canonical
+  [CyberSources GitHub Pages catalogue](https://bst04.github.io/CyberSources/#-52-password-managers)
+  deployed the merge two minutes later. It returns HTTP 200 with a
+  `Last-Modified` value of September 7 at 09:52 UTC and links literally to
+  `https://www.authier.pm/` from the Password Managers table. The anchor has no
+  `nofollow`, `ugc`, `sponsored`, or redirect restriction.
+- The catalogue is self-canonical, emits no page-level robots restriction, and
+  its host-level `robots.txt` permits all crawlers. A current AhrefsBot request
+  returns HTTP 200 with byte-identical content. The catalogue does not publish
+  a sitemap at its expected route, but the root page is crawlable and contains
+  the server-rendered link.
+- The maintainer's newer `cybersources.site` application is a separate surface.
+  Its live `/sources` feed currently has 693 records but no Authier record, so
+  only the verified GitHub Pages placement is counted. No Ahrefs discovery or
+  DR credit is claimed before source-level evidence appears.
+
+### Reconciled the September 7 Ahrefs expansion and staged today's refresh
+
+- The completed September 7 official checker result, captured before the
+  marketing-branch rebase interrupted journaling, reported **DR 8**, **54
+  backlinks**, and **37 linking websites**, with **43% dofollow backlinks** and
+  **35% dofollow linking websites**. Compared with September 6, that was seven
+  more backlinks and three more linking websites, but no DR change.
+- Opened Ahrefs' official Website Authority Checker today with the exact
+  `www.authier.pm` host. It presented the populated input but no completed
+  report; obtaining a new result now requires submitting the **Check
+  Authority** form through its CAPTCHA-backed request. That action was not
+  taken without action-time confirmation. Ahrefs' official free API is not an
+  unattended fallback because it requires an API v3 key.
+- The latest completed official reading therefore remains September 7's **DR
+  8** result. The DR 13 completion threshold is still unmet and the initiative
+  remains active.
+
+### Audited every active contribution and selected submission queue at 09:16 CEST
+
+- GitHub now has 20 open Authier-titled external pull requests plus the
+  separately tracked
+  [VectorLogoZone metadata-fix PR #100](https://github.com/VectorLogoZone/vectorlogozone/pull/100).
+  None of these 21 pull requests has been updated since September 2. There is no
+  new human review, requested change, conflict, or author-fixable failure;
+  VectorLogoZone #99's repository-level metadata failure and OSS Directory
+  #1213's external action-required result remain the already documented
+  upstream conditions.
+- Maintainer `iAnonymous3000` closed
+  [Pr0f3ss0r 1nc0gn1t0 PR #23](https://github.com/iAnonymous3000/Pr0f3ss0r-1nc0gn1t0/pull/23)
+  unmerged on September 6 without a comment or review. The Authier record is
+  absent from canonical `main`, so this is recorded as a silent rejection; no
+  reopen, duplicate, or reviewer ping was attempted.
+- The Digital Escape and THEHUB suggestions remain open without comments; the
+  FMHY suggestion remains closed in its testing handoff; the PrivacyTools and
+  LFX discussions remain open without replies; and Rawsec work item #1258
+  remains open, unassigned, and without notes or a merge request.
+- The connected inbox contains the CyberSources merge notification but no new
+  directory, editorial, corpus, or Both.org response requiring a reply. No
+  message was sent. Framalibre, Open App Scout, Fossies, and Babel remain live;
+  SaaSHub remains `noindex` with `nofollow` Authier links, OpenAlternative
+  remains `noindex, nofollow`, and OpenAltFinder's Authier route remains HTTP
+  404.
+
+### Screened fresh discovery results without manufacturing a placement
+
+- A new search result from GitExtract reproduces the already published Open App
+  Scout repository as a source-code transcript. Authier URLs appear only as
+  Markdown text inside the extraction, not as HTML anchors, so it is not a new
+  backlink and is not counted.
+- `listsopensource.com` exposes a submission route, but its backing repository
+  has no licence, stars, forks, pull-request history, or activity since its
+  July 2026 creation, while the catalogue presents unreliable project metadata.
+  It was rejected as a low-trust route rather than used to manufacture another
+  nominal referring domain.
