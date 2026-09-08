@@ -1,101 +1,132 @@
-name: Android Build ## name of the workflow
+name: Android release
 
 on:
   push:
-    tags:
-      - 'v*.*.*-android'
-  workflow_dispatch: # To trigger manual build
+    tags: ['v*.*.*-android']
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: 'Publish to GitHub Releases (select an existing Android tag)'
+        type: boolean
+        default: false
+      version:
+        description: 'Version for a signed branch test build; ignored on tags'
+        type: string
+        default: '0.1.0'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-release-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
-  android-build:
-    if: github.ref_type == 'tag'
-    name: Android Build
-    runs-on: ubuntu-latest # using ubuntu latest version / or you can use a specific version
-
+  prepare:
+    if: github.event_name != 'release' || endsWith(github.event.release.tag_name, '-android')
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
+      version_name: ${{ steps.version.outputs.version_name }}
+      version_code: ${{ steps.version.outputs.version_code }}
+      publish: ${{ steps.version.outputs.publish }}
+      source_ref: ${{ steps.version.outputs.source_ref }}
     steps:
-      - name: Check out Git repository # clone the repo to local ci workspace
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - id: version
+        name: Validate tag and derive Android version
+        env:
+          ANDROID_PUBLISH: ${{ github.event_name != 'workflow_dispatch' || inputs.publish }}
+          ANDROID_VERSION_NAME: ${{ inputs.version || '0.1.0' }}
+        run: bun scripts/androidRelease.ts prepare
 
-      - uses: pnpm/action-setup@v4
+  checks:
+    needs: prepare
+    uses: ./.github/workflows/android.yml
+    with:
+      source_ref: ${{ needs.prepare.outputs.source_ref }}
+      version_name: ${{ needs.prepare.outputs.version_name }}
+      version_code: ${{ needs.prepare.outputs.version_code }}
 
-      - name: Set up our JDK environment # setup JDK environment: mandatory as we need to build  android project
-        uses: actions/setup-java@v4
+  sign-and-publish:
+    needs: [prepare, checks]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+    env:
+      ANDROID_RELEASE_TAG: ${{ needs.prepare.outputs.tag }}
+      ANDROID_VERSION_NAME: ${{ needs.prepare.outputs.version_name }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.prepare.outputs.source_ref }}
+      - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: 17
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
         with:
-          node-version: 24
-          cache: 'pnpm'
-
-      - name: Install dependencies
-        run: |
-          pnpm i ts-node zx -g
-          pnpm i --frozen-lockfile --prefer-offline
-
-      - name: Create .env file
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - run: sdkmanager 'build-tools;35.0.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: authier-android-unsigned
+          path: unsigned-apk
+      - name: Verify production manifest and version
+        run: bun scripts/androidRelease.ts verify unsigned-apk/app-release-unsigned.apk
+      - name: Check production API before publication
+        if: needs.prepare.outputs.publish == 'true'
+        run: bun scripts/checkAndroidApi.ts
+      - name: Sign and verify release APK
         env:
-          API_URL: ${{ vars.API_URL }}
-          PAGE_URL: ${{ secrets.SENTRY_DSN }}
+          ANDROID_SIGNING_KEY: ${{ secrets.ANDROID_SIGNING_KEY }}
+          ANDROID_ALIAS: ${{ secrets.ANDROID_ALIAS }}
+          ANDROID_KEY_STORE_PASSWORD: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         shell: bash
-        working-directory: ./mobile-app
         run: |
-          touch .env
-          echo $API_URL >> .env
-          echo $SENTRY_DSN >> .env
-
-      ## configure cash for gradle : will help to reduce build time
-      - name: Cache Gradle Wrapper
-        uses: actions/cache@v2
+          set -euo pipefail
+          : "${ANDROID_SIGNING_KEY:?Missing ANDROID_SIGNING_KEY}"
+          : "${ANDROID_ALIAS:?Missing ANDROID_ALIAS}"
+          : "${ANDROID_KEY_STORE_PASSWORD:?Missing ANDROID_KEY_STORE_PASSWORD}"
+          : "${ANDROID_KEY_PASSWORD:?Missing ANDROID_KEY_PASSWORD}"
+          signing_dir=$(mktemp -d "$RUNNER_TEMP/authier-signing.XXXXXX")
+          trap 'rm -rf "$signing_dir"' EXIT
+          umask 077
+          printf '%s' "$ANDROID_SIGNING_KEY" | base64 --decode > "$signing_dir/release.keystore"
+          mkdir -p release-apk
+          apk="release-apk/authier-${ANDROID_VERSION_NAME}-android.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -P 16 4 unsigned-apk/app-release-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" sign \
+            --ks "$signing_dir/release.keystore" --ks-key-alias "$ANDROID_ALIAS" \
+            --ks-pass env:ANDROID_KEY_STORE_PASSWORD --key-pass env:ANDROID_KEY_PASSWORD \
+            --out "$apk" unsigned-apk/app-release-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$apk"
+          bun scripts/androidRelease.ts verify "$apk"
+          cd release-apk
+          sha256sum "authier-${ANDROID_VERSION_NAME}-android.apk" > SHA256SUMS
+      - uses: actions/upload-artifact@v4
         with:
-          path: ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-
-      - name: Cache Gradle Dependencies
-        uses: actions/cache@v2
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-caches-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-caches-
-
-      - name: Make Gradlew Executable
-        working-directory: ./mobile-app
-        run: cd android && chmod +x ./gradlew
-
-      # Building and signing App
-      - name: Build Android App Bundle
-        working-directory: ./mobile-app
-        run: |
-          cd android && ./gradlew bundleRelease --no-daemon
-
-      - name: Sign App Bundle
-        id: sign_app_bundle
-        uses: r0adkll/sign-android-release@v1
-        with:
-          releaseDirectory: mobile-app/android/app/build/outputs/bundle/release
-          signingKeyBase64: ${{ secrets.ANDROID_SIGNING_KEY }}
-          alias: ${{ secrets.ANDROID_ALIAS }}
-          keyStorePassword: ${{ secrets.ANDROID_KEY_STORE_PASSWORD }}
-          keyPassword: ${{ secrets.ANDROID_KEY_PASSWORD }}
-
-        ## Distribute  App to google play alpha track
-      - name: Upload App to Google Play
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.ANDROID_SERVICE_ACCOUNT_JSON_TEXT }}
-          packageName: com.authier
-          releaseFiles: mobile-app/android/app/build/outputs/bundle/release/*.aab
-          track: internal
-          status: completed
-          inAppUpdatePriority: 2
-
-      - name: Create mobile Sentry release
-        uses: getsentry/action-release@v1
+          name: authier-android-release-${{ needs.prepare.outputs.version_name }}
+          path: |
+            release-apk/*.apk
+            release-apk/SHA256SUMS
+          if-no-files-found: error
+          overwrite: true
+      - name: Publish installable APK to GitHub Releases
+        if: needs.prepare.outputs.publish == 'true'
         env:
-          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-          SENTRY_ORG: authier-ml
-          SENTRY_PROJECT: mobile-app
-        with:
-          environment: production
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          ANDROID_SOURCE_REF: ${{ needs.prepare.outputs.source_ref }}
+        shell: bash
+        run: bash scripts/publishAndroidRelease.sh

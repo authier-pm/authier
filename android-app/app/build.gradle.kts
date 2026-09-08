@@ -12,12 +12,19 @@ android {
         applicationId = "dev.authier.android"
         minSdk = 26
         targetSdk = 35
-        versionCode = 1
-        versionName = "0.1.0"
+        versionCode = providers.gradleProperty("authierVersionCode").orElse("1000").get().toInt()
+        versionName = providers.gradleProperty("authierVersionName").orElse("0.1.0").get()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
-        release { isMinifyEnabled = false }
+        debug {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
+        release {
+            isDebuggable = false
+            isMinifyEnabled = false
+        }
     }
     buildFeatures { compose = true; buildConfig = true }
     compileOptions {

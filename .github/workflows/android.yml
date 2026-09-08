@@ -1,6 +1,17 @@
 name: Native Android
 
 on:
+  workflow_call:
+    inputs:
+      source_ref:
+        type: string
+        default: ''
+      version_name:
+        type: string
+        default: '0.1.0'
+      version_code:
+        type: string
+        default: '1000'
   pull_request:
     paths:
       - 'android-app/**'
@@ -8,8 +19,12 @@ on:
       - 'shared/**'
       - 'vault-web/**'
       - 'scripts/generateAndroidApi.ts'
+      - 'scripts/androidRelease*'
+      - 'scripts/checkAndroidApi.ts'
+      - 'scripts/publishAndroidRelease.sh'
       - 'pnpm-lock.yaml'
       - '.github/workflows/android.yml'
+      - '.github/workflows/android_build.yml'
   push:
     branches: [main]
     paths:
@@ -18,8 +33,12 @@ on:
       - 'shared/**'
       - 'vault-web/**'
       - 'scripts/generateAndroidApi.ts'
+      - 'scripts/androidRelease*'
+      - 'scripts/checkAndroidApi.ts'
+      - 'scripts/publishAndroidRelease.sh'
       - 'pnpm-lock.yaml'
       - '.github/workflows/android.yml'
+      - '.github/workflows/android_build.yml'
 
 permissions:
   contents: read
@@ -29,6 +48,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.source_ref || github.sha }}
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
@@ -44,7 +65,7 @@ jobs:
       - name: Check API contract and generated Kotlin
         run: pnpm android:api:check
       - name: Verify WebCrypto interoperability fixtures
-        run: bun test shared/cryptoUtils.spec.ts
+        run: bun test shared/cryptoUtils.spec.ts scripts/androidRelease.spec.ts
       - name: Verify API and migration behavior with PGlite
         working-directory: backend
         env:
@@ -56,8 +77,21 @@ jobs:
         run: pnpm --dir vault-web test
       - name: Test and build the native app
         working-directory: android-app
-        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+        env:
+          ANDROID_VERSION_NAME: ${{ inputs.version_name || '0.1.0' }}
+          ANDROID_VERSION_CODE: ${{ inputs.version_code || '1000' }}
+        run: >-
+          ./gradlew --no-daemon :app:testDebugUnitTest :app:lintDebug :app:lintRelease
+          :app:assembleDebug :app:assembleRelease
+          "-PauthierVersionName=$ANDROID_VERSION_NAME" "-PauthierVersionCode=$ANDROID_VERSION_CODE"
       - uses: actions/upload-artifact@v4
         with:
           name: authier-android-debug
           path: android-app/app/build/outputs/apk/debug/app-debug.apk
+          overwrite: true
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authier-android-unsigned
+          path: android-app/app/build/outputs/apk/release/app-release-unsigned.apk
+          if-no-files-found: error
+          overwrite: true

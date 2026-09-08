@@ -10,10 +10,10 @@ Install JDK 17 and Android SDK 35 with build tools 35.0.0. On Apple Silicon, use
 cd android-app
 ./gradlew :app:assembleDebug :app:testDebugUnitTest
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell am start -n dev.authier.android/.MainActivity
+adb shell am start -n dev.authier.android.debug/dev.authier.android.MainActivity
 ```
 
-Open the project directory in Android Studio for regular development. Minimum supported Android version is 8.0 (API 26), target and compile SDK are 35. The debug APK is a debug-signed development build; production publishing requires a release signing key and store configuration.
+Open the project directory in Android Studio for regular development. Minimum supported Android version is 8.0 (API 26), target and compile SDK are 35. Debug builds use `dev.authier.android.debug` and can coexist with the signed production app, `dev.authier.android`. See [release publishing](releasing.md) for tag builds and GitHub Releases.
 
 The server defaults to `https://api.authier.pm`. It must have the new `/api/v1` HTTP API deployed before this application can sign in. The sign-in screen has Server settings for self-hosted instances. For a backend running on the emulator host, a debug build can use `http://10.0.2.2:3000` (substitute the backend port). Release builds require HTTPS.
 
@@ -46,10 +46,10 @@ Encrypted payloads are byte-compatible with Authier's browser client: PBKDF2-HMA
 Only debug builds accept the demo intent, which displays synthetic data and permits screenshots. The demo never talks to the API and never persists demo secrets. Real vault screenshots remain protected.
 
 ```sh
-adb shell am force-stop dev.authier.android
-adb shell am start -n dev.authier.android/.MainActivity --ez demo true
+adb shell am force-stop dev.authier.android.debug
+adb shell am start -n dev.authier.android.debug/dev.authier.android.MainActivity --ez demo true
 adb exec-out screencap -p > captures/vault.png
-adb shell am start -n dev.authier.android/.AutofillPreviewActivity
+adb shell am start -n dev.authier.android.debug/dev.authier.android.AutofillPreviewActivity
 adb exec-out screencap -p > captures/autofill.png
 ```
 
