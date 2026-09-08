@@ -65,7 +65,7 @@ jobs:
       - name: Check API contract and generated Kotlin
         run: pnpm android:api:check
       - name: Verify WebCrypto interoperability fixtures
-        run: bun test shared/cryptoUtils.spec.ts scripts/androidRelease.spec.ts
+        run: bun test shared/cryptoUtils.spec.ts scripts/androidRelease*.spec.ts
       - name: Verify API and migration behavior with PGlite
         working-directory: backend
         env:
