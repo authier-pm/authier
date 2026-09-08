@@ -5,6 +5,7 @@ import android.app.assist.AssistStructure
 import android.content.Intent
 import android.net.Uri
 import android.os.CancellationSignal
+import android.service.autofill.Dataset
 import android.service.autofill.AutofillService
 import android.service.autofill.FillCallback
 import android.service.autofill.FillRequest
@@ -38,7 +39,6 @@ class NativeAutofillService : AutofillService() {
         }
         val passwordId = requireNotNull(nodes[selection.passwordIndex].autofillId)
         val usernameId = selection.usernameIndex?.let { nodes[it].autofillId }
-        val ids = listOfNotNull(usernameId, passwordId).toTypedArray()
         val intent = Intent(this, AutofillUnlockActivity::class.java)
             .setData(Uri.parse("authier-autofill:${UUID.randomUUID()}"))
             .putExtra(AutofillUnlockActivity.EXTRA_PACKAGE, requestedPackage)
@@ -49,7 +49,11 @@ class NativeAutofillService : AutofillService() {
         val presentation = RemoteViews(packageName, android.R.layout.simple_list_item_1).apply {
             setTextViewText(android.R.id.text1, "Unlock Authier to fill this app")
         }
-        callback.onSuccess(FillResponse.Builder().setAuthentication(ids, authentication.intentSender, presentation).build())
+        // Dataset authentication fills immediately after our picker returns the selected login.
+        val dataset = Dataset.Builder(presentation).setValue(passwordId, null)
+            .setAuthentication(authentication.intentSender)
+        usernameId?.let { dataset.setValue(it, null) }
+        callback.onSuccess(FillResponse.Builder().addDataset(dataset.build()).build())
     }
 
     override fun onSaveRequest(request: SaveRequest, callback: SaveCallback) {

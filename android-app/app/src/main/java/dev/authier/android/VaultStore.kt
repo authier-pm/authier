@@ -31,16 +31,30 @@ class VaultStore(context: Context) {
         }
     }
 
-    fun write(snapshot: VaultSnapshot) = synchronized(storageLock) {
+    fun update(transform: (VaultSnapshot) -> VaultSnapshot): VaultSnapshot = synchronized(storageLock) {
+        write(transform(read()))
+    }
+
+    fun compareAndWrite(expected: VaultSnapshot, next: VaultSnapshot): VaultSnapshot = update { current ->
+        check(current.storageRevision == expected.storageRevision &&
+            current.authSecretEncrypted == expected.authSecretEncrypted) {
+            "Your vault changed while this action was running. Unlock Authier again to reload it."
+        }
+        next
+    }
+
+    private fun write(snapshot: VaultSnapshot): VaultSnapshot = synchronized(storageLock) {
+        val saved = snapshot.copy(storageRevision = java.util.UUID.randomUUID().toString())
         val stream = file.startWrite()
         // AtomicFile rollback is necessary to preserve the prior cursor and page on disk failure.
         try {
-            stream.write(vaultJson.encodeToString(snapshot).toByteArray())
+            stream.write(vaultJson.encodeToString(saved).toByteArray())
             file.finishWrite(stream)
         } catch (error: Exception) {
             file.failWrite(stream)
             throw error
         }
+        saved
     }
 
     private fun sessionKey(): SecretKey {

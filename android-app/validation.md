@@ -32,3 +32,19 @@ After integrating the passkeys branch, the debug APK and Android lint were rebui
 The HTTP smoke test exposed optional-null serialization and permissive-policy challenge-approval bugs, which were fixed and covered by regression tests. The temporary backend was stopped after cross-client verification. Its device geolocation metadata dependency was unavailable; the app displayed that error while keeping device approvals usable.
 
 Checked-in images in `docs/screenshots/android-vault.png`, `android-totp.png`, and `android-autofill.png` are fresh emulator captures of explicit debug-only synthetic scenarios. Real vault and real Autofill windows keep screenshot protection enabled.
+
+## Autofill app linking — September 8, 2026
+
+All 36 JVM tests pass, including new encrypted-association coverage for imported-field preservation, versioned outbox writes, pending-write protection, changed/deleted records, account/key changes, and invalid targets. Debug/release APK builds and both Android lint variants pass (zero errors). The UI-preview TypeScript check and Android gallery Playwright scenario pass.
+
+Using a synthetic encrypted vault and the separate native `autofill-fixture` app in the emulator:
+
+- A login without an Android association appeared in the picker after master-password unlock.
+- Selecting it displayed the target package and explicit confirmation. Canceling left the stored snapshot byte-for-byte unchanged.
+- Confirming saved an encrypted association and exactly one pending update, retaining an imported custom field. The fixture confirmed that username and password were filled immediately.
+- A fresh autofill request showed the login under “Linked to this app.” Selecting it filled successfully without another confirmation or a second disk write.
+- Synthetic vault data was removed and the emulator's previous autofill provider was restored afterward.
+
+The service now uses [dataset authentication](https://developer.android.com/reference/android/service/autofill/Dataset.Builder#setAuthentication(android.content.IntentSender)) so selecting a login in Authier fills the form directly. Snapshot revision checks prevent a background app operation from overwriting an association saved by the picker.
+
+Updated actual Compose captures: `docs/screenshots/android-autofill.png` and `android-autofill-association.png`. The checked-in `android-vault` preview includes both screens; its rendered gallery is `docs/screenshots/android-ui-preview.png`. No production API deployment or real-account sync was performed for this change.

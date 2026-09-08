@@ -28,6 +28,7 @@ data class PendingWrite(
 
 @Serializable
 data class VaultSnapshot(
+    val storageRevision: String = "",
     val email: String = "",
     val deviceId: String = UUID.randomUUID().toString(),
     val serverUrl: String = "https://api.authier.pm",

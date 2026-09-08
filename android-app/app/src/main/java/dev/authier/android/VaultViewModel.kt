@@ -90,8 +90,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
 
     private suspend fun persist(next: VaultSnapshot) {
         check(!state.value.demo) { "Demo mode never writes to a real vault." }
-        withContext(Dispatchers.IO) { store.write(next) }
-        snapshot = next
+        snapshot = withContext(Dispatchers.IO) { store.compareAndWrite(snapshot, next) }
         state.value = state.value.copy(pendingWrites = next.outbox.size, writes = next.outbox, lastSyncAt = next.lastSyncAt, lockTimeoutSeconds = next.lockTimeoutSeconds)
     }
 

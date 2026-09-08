@@ -12,11 +12,11 @@ class AutofillPreviewActivity : ComponentActivity() {
         val previewChoices = listOf(
             VaultItem(
                 SecretRecord("autofill-preview-personal", "synthetic", "LOGIN_CREDENTIALS", 1, "2026-09-08T00:00:00Z"),
-                SecretContent(label = "GitHub · Personal", username = "alexmorgan", password = "synthetic-only", androidUri = "com.github.android"),
+                SecretContent(label = "GitHub · Personal", username = "alexmorgan", password = "synthetic-only"),
             ),
             VaultItem(
                 SecretRecord("autofill-preview-work", "synthetic", "LOGIN_CREDENTIALS", 1, "2026-09-08T00:00:00Z"),
-                SecretContent(label = "GitHub · Studio", username = "alex@studio.design", password = "synthetic-only", androidUri = "com.github.android"),
+                SecretContent(label = "GitHub · Studio", username = "alex@studio.design", password = "synthetic-only"),
             ),
         )
         setContent {

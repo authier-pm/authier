@@ -1,6 +1,7 @@
 import vaultScreenshot from '../../../docs/screenshots/android-vault.png'
 import totpScreenshot from '../../../docs/screenshots/android-totp.png'
 import autofillScreenshot from '../../../docs/screenshots/android-autofill.png'
+import associationScreenshot from '../../../docs/screenshots/android-autofill-association.png'
 
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
@@ -18,7 +19,12 @@ const screens = [
   {
     title: 'Autofill',
     image: autofillScreenshot,
-    description: 'Explicit account selection for a matching native app.'
+    description: 'Search saved logins directly from another app’s autofill request.'
+  },
+  {
+    title: 'Link a login',
+    image: associationScreenshot,
+    description: 'Confirm the target app before saving its association and filling.'
   }
 ]
 

@@ -40,5 +40,6 @@ password, TOTP and native autofill screens. Compose cannot be imported into this
 the captures are the production native UI with debug-only synthetic data, not a
 second web implementation. Refresh `docs/screenshots/android-vault.png` and
 `android-totp.png` from the Android demo intent (see `android-app/README.md`) and
-`android-autofill.png` from its debug `AutofillPreviewActivity`, then run its
+`android-autofill.png` from its debug `AutofillPreviewActivity` and
+`android-autofill-association.png` after selecting a login in that preview, then run its
 Playwright test to render `docs/screenshots/android-ui-preview.png`.
