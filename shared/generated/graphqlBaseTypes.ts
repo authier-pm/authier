@@ -382,6 +382,8 @@ export type EncryptedSecretMutationUpdateArgs = {
 
 export type EncryptedSecretPatchInput = {
   encrypted: Scalars['String']['input']
+  /** Version read before re-encryption; required when changing the master password. */
+  expectedVersion?: InputMaybe<Scalars['PositiveInt']['input']>
   id: Scalars['UUID']['input']
   kind: EncryptedSecretType
 }

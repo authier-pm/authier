@@ -18,10 +18,8 @@ import type {
   IBackgroundStateSerializableLocked,
   SecretSerializedType
 } from './backgroundPage'
-import {
-  EncryptedSecretPatchInput,
-  EncryptedSecretType
-} from '../../../shared/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '../../../shared/generated/graphqlBaseTypes'
+import { reencryptVaultSecrets } from './reencryptVaultSecrets'
 import type { SecuritySettings } from './backgroundSchemas'
 import { apolloClient } from '@src/apollo/apolloClient'
 import {
@@ -175,6 +173,25 @@ export class DeviceState implements IBackgroundStateSerializable {
         changes.lockedState?.newValue
       )
       device.lockedState = lockedSnapshot.success ? lockedSnapshot.data : null
+      return
+    }
+    const nextSnapshot = backgroundStateSerializableLockedSchema.parse(
+      changes.backgroundState.newValue
+    )
+    if (
+      nextSnapshot.masterEncryptionKey !== device.state.masterEncryptionKey ||
+      nextSnapshot.authSecretEncrypted !== device.state.authSecretEncrypted ||
+      nextSnapshot.userId !== device.state.userId ||
+      nextSnapshot.encryptionSalt !== device.state.encryptionSalt
+    ) {
+      const previousState = device.state
+      previousState.destroy()
+      previousState.masterEncryptionKey = ''
+      previousState.authSecret = ''
+      previousState.decryptedSecrets = []
+      // Passkey approvals are bound to this exact session object. A rotation
+      // arriving from another extension window must invalidate that approval.
+      device.state = new DeviceState(nextSnapshot)
       return
     }
     Object.assign(device.state, changes.backgroundState.newValue)
@@ -345,6 +362,7 @@ export class DeviceState implements IBackgroundStateSerializable {
    * fetches newly added/deleted/updated secrets from the backend and updates the device state
    */
   async backendSync() {
+    const syncKey = this.masterEncryptionKey
     const { data } = await apolloClient.query<
       SyncEncryptedSecretsQuery,
       SyncEncryptedSecretsQueryVariables
@@ -352,6 +370,8 @@ export class DeviceState implements IBackgroundStateSerializable {
       query: SyncEncryptedSecretsDocument,
       fetchPolicy: 'network-only'
     })
+    // A lock, login, or password rotation invalidates this response's key.
+    if (device.state !== this || this.masterEncryptionKey !== syncKey) return
     if (data) {
       const deviceState = device.state
       if (data && deviceState) {
@@ -805,26 +825,18 @@ class ExtensionDevice {
   }
 
   async serializeSecrets(
-    secrets: SecretSerializedType[],
-    newPsw: string
-  ): Promise<EncryptedSecretPatchInput[]> {
+    secrets: readonly SecretSerializedType[],
+    newKey: CryptoKey
+  ) {
     const state = this.state
     if (!state) {
       throw new Error('device not initialized')
     }
-    return Promise.all(
-      secrets.map(async (secret) => {
-        const { id, encrypted, kind } = secret
-        const decr = await state.decrypt(encrypted)
-        await state.setMasterEncryptionKey(newPsw)
-        const enc = await state.encrypt(decr)
-
-        return {
-          id,
-          encrypted: enc,
-          kind
-        }
-      })
+    return reencryptVaultSecrets(
+      secrets,
+      state.masterEncryptionKey,
+      newKey,
+      state.encryptionSalt
     )
   }
 
@@ -853,6 +865,35 @@ class ExtensionDevice {
   async save(deviceState: IBackgroundStateSerializable) {
     this.state = new DeviceState(deviceState)
     await this.state.save()
+  }
+
+  async commitPasswordRotation(
+    previousState: DeviceState,
+    nextState: IBackgroundStateSerializable
+  ) {
+    if (this.state === previousState) {
+      await this.save(nextState)
+      return
+    }
+    const lockedState = this.lockedState
+    if (
+      this.state ||
+      !lockedState ||
+      lockedState.userId !== previousState.userId ||
+      lockedState.encryptionSalt !== previousState.encryptionSalt ||
+      lockedState.authSecretEncrypted !== previousState.authSecretEncrypted
+    ) {
+      return
+    }
+    // Completing the server request must not undo an automatic/manual lock.
+    // Keep its ciphertext and verifier current so the new password unlocks it.
+    const nextLockedState = lockedVaultSnapshotSchema.parse(nextState)
+    this.lockedState = nextLockedState
+    await saveLockedVaultSnapshot(nextLockedState)
+    await browser.storage.session.set({
+      backgroundState: null,
+      lockedState: nextLockedState
+    })
   }
 
   startVaultLockTimer() {

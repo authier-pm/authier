@@ -239,3 +239,41 @@ export const securityResponseSchema = z.object({
 export const secretsListSchema = z.object({
   secrets: z.array(encryptedSecretRecordSchema)
 })
+
+// Deletion records may redact ciphertext, including when a device has TOTP
+// synchronization disabled. Clients must apply deletedAt before decrypting.
+export const mobileSecretRecordSchema = syncEncryptedSecretRecordSchema.extend({
+  encrypted: z.string()
+})
+export type MobileSecretRecord = z.infer<typeof mobileSecretRecordSchema>
+
+export const vaultSyncInputSchema = z.object({
+  cursor: z.string().max(512).optional(),
+  limit: z.number().int().min(1).max(500).default(100)
+})
+export const vaultChangeSchema = z.object({
+  cursor: z.string(),
+  secret: mobileSecretRecordSchema
+})
+export const vaultSyncResultSchema = z.object({
+  changes: z.array(vaultChangeSchema),
+  nextCursor: z.string(),
+  hasMore: z.boolean()
+})
+export const createVaultSecretInputSchema = encryptedSecretPayloadSchema.extend(
+  {
+    encrypted: z.string().min(1).max(1048576),
+    operationId: z.string().uuid(),
+    id: z.string().uuid()
+  }
+)
+export const updateVaultSecretInputSchema = createVaultSecretInputSchema.extend(
+  {
+    expectedVersion: z.number().int().positive()
+  }
+)
+export const deleteVaultSecretInputSchema = z.object({
+  operationId: z.string().uuid(),
+  id: z.string().uuid(),
+  expectedVersion: z.number().int().positive()
+})

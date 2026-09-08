@@ -15,7 +15,9 @@
     "@electric-sql/pglite": "^0.5.8",
     "@elysiajs/cors": "^1.4.2",
     "@orpc/contract": "1.15.0",
+    "@orpc/openapi": "1.15.0",
     "@orpc/server": "1.15.0",
+    "@orpc/zod": "1.15.0",
     "@react-native-firebase/app": "^26.4.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@upstash/redis": "^1.38.4",
@@ -86,12 +88,16 @@
     "db:generate": "drizzle-kit generate && bun tests/generateBaseSql.ts",
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
-    "gbs": "ts-node-transpile-only scripts/generateGqlSchemas.ts",
+    "gbs": "bun scripts/generateGraphql.ts",
     "tsc": "tsc",
     "start": "node server.js",
     "docker:up": "docker-compose up -d",
     "docker:down": "docker-compose down",
     "test": "NODE_ENV=test pnpm vitest",
-    "removeTestAccounts": "pnpm ts-node scripts/removeTestAccounts"
+    "removeTestAccounts": "pnpm ts-node scripts/removeTestAccounts",
+    "api:generate": "bun scripts/generateOpenApi.ts",
+    "api:check": "bun scripts/generateOpenApi.ts --check",
+    "api:smoke": "NODE_ENV=test bun scripts/smokeRunner.ts",
+    "api:verify-native": "bun scripts/verifyNativeInterop.ts"
   }
 }

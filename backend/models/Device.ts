@@ -24,7 +24,7 @@ import {
   decryptionChallenge,
   secretUsageEvent
 } from '../drizzle/schema'
-import { inArray, eq, and, or, isNull, gte, count, sql } from 'drizzle-orm'
+import { inArray, eq, and, isNull, count, sql } from 'drizzle-orm'
 
 @InputType()
 export class DeviceInput {
@@ -101,37 +101,22 @@ export const getEncryptedSecretsToSync = async (
           EncryptedSecretTypeGQL.PASSKEY
         ])
 
-  const cAtCondition = deviceState.lastSyncAt
-    ? gte(encryptedSecret.createdAt, deviceState.lastSyncAt)
-    : undefined
-  const uAtCondition = deviceState.lastSyncAt
-    ? gte(encryptedSecret.updatedAt, deviceState.lastSyncAt)
-    : undefined
-  const dAtCondition = deviceState.lastSyncAt
-    ? gte(encryptedSecret.deletedAt, deviceState.lastSyncAt)
-    : undefined
-
-  const orConditions = [cAtCondition, uAtCondition, dAtCondition].filter(
-    (condition): condition is NonNullable<typeof condition> =>
-      condition !== undefined
-  )
+  // Old clients acknowledge sync in a separate request. A timestamp from that
+  // request can skip writes committed between fetch and acknowledgement (even
+  // transaction timestamps captured before fetch). Return a complete snapshot,
+  // including tombstones, until clients adopt the revision cursor API.
 
   return ctx.db
     .select()
     .from(encryptedSecret)
-    .where(
-      and(
-        eq(encryptedSecret.userId, deviceState.userId),
-        kindCondition,
-        orConditions.length > 0 ? or(...orConditions) : undefined
-      )
-    )
+    .where(and(eq(encryptedSecret.userId, deviceState.userId), kindCondition))
 }
 
 @ObjectType()
 export class DeviceQuery extends DeviceGQL {
   @Field(() => [EncryptedSecretQuery], {
-    description: 'Get all secrets that were change since last device sync'
+    description:
+      'Compatibility snapshot including deletion records; use the HTTP cursor API for incremental synchronization'
   })
   async encryptedSecretsToSync(@Ctx() ctx: IContextAuthenticated) {
     return getEncryptedSecretsToSync(ctx, {

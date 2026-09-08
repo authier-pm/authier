@@ -20,7 +20,10 @@ export type SecretSerializedType = Pick<
   | 'createdAt'
   | 'deletedAt'
   | 'updatedAt'
->
+> & {
+  // Older persisted snapshots predate optimistic concurrency versions.
+  version?: number
+}
 
 export interface IBackgroundStateSerializableLocked {
   email: string

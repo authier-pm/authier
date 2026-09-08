@@ -86,11 +86,12 @@ describe('passkey encrypted sync', () => {
       EncryptedSecretTypeGQL.PASSKEY,
       EncryptedSecretTypeGQL.LOGIN_CREDENTIALS
     ]) {
-      const result = await actor.addEncryptedSecrets(
-        [{ kind, encrypted: 'another-ciphertext' }],
-        makeFakeCtx({ userId, device: browserDevice })
-      )
-      expect(result).toBeInstanceOf(Error)
+      await expect(
+        actor.addEncryptedSecrets(
+          [{ kind, encrypted: 'another-ciphertext' }],
+          makeFakeCtx({ userId, device: browserDevice })
+        )
+      ).rejects.toMatchObject({ code: 'BAD_REQUEST' })
     }
   })
 

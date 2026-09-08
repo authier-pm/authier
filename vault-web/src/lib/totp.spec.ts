@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { generateTotpTokenSync } from '@shared/totp'
 import {
   formatTotpToken,
   generateTotpToken,
@@ -26,6 +27,24 @@ describe('totp helpers', () => {
     })
 
     expect(token).toBe('996554')
+  })
+
+  it('keeps short-secret codes stable until the exact boundary in both clients', async () => {
+    const secret = 'JBSWY3DPEHPK3PXP'
+    for (const now of [29_499, 29_500, 29_999]) {
+      expect(
+        await generateTotpToken({ secret, digits: 6, period: 30, now })
+      ).toBe('282760')
+      expect(
+        generateTotpTokenSync({ secret, digits: 6, period: 30, now })
+      ).toBe('282760')
+    }
+    expect(
+      await generateTotpToken({ secret, digits: 6, period: 30, now: 30_000 })
+    ).toBe('996554')
+    expect(
+      generateTotpTokenSync({ secret, digits: 6, period: 30, now: 30_000 })
+    ).toBe('996554')
   })
 
   it('formats tokens into readable groups', () => {

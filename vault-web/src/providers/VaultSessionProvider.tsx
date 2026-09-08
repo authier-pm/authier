@@ -26,6 +26,8 @@ import {
 } from 'react'
 import { onUnauthorizedSession } from '@/lib/authEvents'
 import { orpcClient } from '@/lib/orpc'
+import { collectVaultChanges, mergeVaultChanges } from '@/lib/vaultSync'
+import { ORPCError } from '@orpc/client'
 import {
   getOrCreateDeviceIdentity,
   type DeviceIdentity
@@ -51,7 +53,6 @@ type PendingChallenge = Extract<
 >
 type AuthenticatedSession = VaultApiOutputs['auth']['refresh']
 type RefreshedTokens = VaultApiOutputs['auth']['refreshTokens']
-type SyncSecretsResponse = VaultApiOutputs['session']['syncSecrets']
 type SessionAuthOptions = {
   email: string
   encryptionSalt: string
@@ -109,39 +110,6 @@ const STALE_SYNC_THRESHOLD_MS = 48 * 60 * 60 * 1000
 
 const VaultSessionContext = createContext<VaultSessionContextValue | null>(null)
 
-const sortSessionSecrets = (secrets: SessionBootstrap['secrets']) =>
-  [...secrets].sort((left, right) => {
-    const leftUpdatedAt = Date.parse(left.updatedAt ?? left.createdAt)
-    const rightUpdatedAt = Date.parse(right.updatedAt ?? right.createdAt)
-
-    if (rightUpdatedAt !== leftUpdatedAt) {
-      return rightUpdatedAt - leftUpdatedAt
-    }
-
-    return Date.parse(right.createdAt) - Date.parse(left.createdAt)
-  })
-
-const mergeSyncedSecrets = (
-  currentSecrets: SessionBootstrap['secrets'],
-  syncedSecrets: SyncSecretsResponse['secrets']
-) => {
-  const nextSecrets = new Map(
-    currentSecrets.map((secret) => [secret.id, secret])
-  )
-
-  syncedSecrets.forEach((secret) => {
-    if (secret.deletedAt) {
-      nextSecrets.delete(secret.id)
-      return
-    }
-
-    const { deletedAt: _deletedAt, ...activeSecret } = secret
-    nextSecrets.set(secret.id, activeSecret)
-  })
-
-  return sortSessionSecrets(Array.from(nextSecrets.values()))
-}
-
 const isSyncStale = (lastSyncAt: string | null) => {
   if (!lastSyncAt) {
     return true
@@ -191,18 +159,20 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   const [isBusy, setIsBusy] = useState(false)
   const [isSyncingVault, setIsSyncingVault] = useState(false)
   const sessionEpochRef = useRef(0)
+  const syncCursorRef = useRef<string | undefined>(undefined)
+  const deletedVersionsRef = useRef(new Map<string, number>())
   const syncVaultPromiseRef = useRef<Promise<void> | null>(null)
   const lastKnownSyncAtRef = useRef<string | null>(null)
   const attemptedAutoSyncKeyRef = useRef<string | null>(null)
 
-  const status: VaultStatus = session
-    ? 'authenticated'
-    : lockedState
-      ? 'locked'
-      : 'guest'
+  let status: VaultStatus = 'guest'
+  if (lockedState) status = 'locked'
+  if (session) status = 'authenticated'
 
   const clearUnlockedSession = () => {
     sessionEpochRef.current += 1
+    syncCursorRef.current = undefined
+    deletedVersionsRef.current.clear()
     void forgetRememberedVault()
     setAccessToken(null)
     setSession(null)
@@ -313,6 +283,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     authenticatedSession: AuthenticatedSession,
     options: SessionAuthOptions
   ) => {
+    sessionEpochRef.current += 1
+    syncCursorRef.current = undefined
+    deletedVersionsRef.current.clear()
     setAccessToken(authenticatedSession.accessToken)
     setRefreshToken(authenticatedSession.refreshToken)
     setMasterKey(options.masterEncryptionKey)
@@ -337,10 +310,13 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const refreshAuthTokens = async (nextRefreshToken = refreshToken) => {
+    const epoch = sessionEpochRef.current
     const refreshedTokens = await orpcClient.auth.refreshTokens({
       refreshToken: nextRefreshToken ?? undefined
     })
 
+    if (epoch !== sessionEpochRef.current)
+      throw new Error('Vault session changed')
     applyRefreshedTokens(refreshedTokens)
 
     return refreshedTokens
@@ -674,6 +650,7 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
     setIsSyncingVault(true)
 
+    const epoch = sessionEpochRef.current
     const syncPromise = (async () => {
       if (!lockedState) {
         throw new Error('Vault is locked')
@@ -687,28 +664,42 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
 
       await refreshAuthTokens()
 
-      const syncedSecrets = await orpcClient.session.syncSecrets({})
-
-      const syncedDevice = await orpcClient.session.markAsSynced({})
-      lastKnownSyncAtRef.current = syncedDevice.lastSyncAt
+      const synced = await collectVaultChanges(
+        orpcClient.mobile.sync,
+        syncCursorRef.current
+      ).catch((error: unknown) => {
+        if (
+          error instanceof ORPCError &&
+          error.code === 'CURSOR_INVALID' &&
+          syncCursorRef.current
+        ) {
+          return collectVaultChanges(orpcClient.mobile.sync)
+        }
+        throw error
+      })
+      if (epoch !== sessionEpochRef.current) return
+      const syncedAt = new Date().toISOString()
 
       setSession((currentSession) => {
-        if (!currentSession) {
+        if (!currentSession || epoch !== sessionEpochRef.current) {
           return currentSession
         }
 
         return {
           ...currentSession,
-          secrets: mergeSyncedSecrets(
+          secrets: mergeVaultChanges(
             currentSession.secrets,
-            syncedSecrets.secrets
+            synced.secrets,
+            deletedVersionsRef.current
           ),
           currentDevice: {
             ...currentSession.currentDevice,
-            lastSyncAt: syncedDevice.lastSyncAt
+            lastSyncAt: syncedAt
           }
         }
       })
+      syncCursorRef.current = synced.cursor
+      lastKnownSyncAtRef.current = syncedAt
     })().finally(() => {
       syncVaultPromiseRef.current = null
       setIsSyncingVault(false)
@@ -761,6 +752,15 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
     }
   }
 
+  const getSecretVersion = (id: string) => {
+    const secret = session?.secrets.find((item) => item.id === id)
+    if (!secret)
+      throw new Error(
+        'Vault item no longer exists. Sync the vault and try again.'
+      )
+    return secret.version
+  }
+
   const createLoginSecret = async (values: LoginSecretValues) => {
     const cryptoContext = ensureVaultCanWrite()
     const encrypted = await encryptLoginSecret(
@@ -768,7 +768,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       cryptoContext.masterKey,
       cryptoContext.salt
     )
-    const created = await orpcClient.vault.createSecret({
+    const created = await orpcClient.mobile.create({
+      id: crypto.randomUUID(),
+      operationId: crypto.randomUUID(),
       kind: 'LOGIN_CREDENTIALS',
       encrypted
     })
@@ -783,7 +785,9 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       cryptoContext.masterKey,
       cryptoContext.salt
     )
-    const created = await orpcClient.vault.createSecret({
+    const created = await orpcClient.mobile.create({
+      id: crypto.randomUUID(),
+      operationId: crypto.randomUUID(),
       kind: 'TOTP',
       encrypted
     })
@@ -798,12 +802,12 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       cryptoContext.masterKey,
       cryptoContext.salt
     )
-    const updated = await orpcClient.vault.updateSecret({
+    const updated = await orpcClient.mobile.update({
       id,
-      patch: {
-        kind: 'LOGIN_CREDENTIALS',
-        encrypted
-      }
+      operationId: crypto.randomUUID(),
+      expectedVersion: getSecretVersion(id),
+      kind: 'LOGIN_CREDENTIALS',
+      encrypted
     })
 
     updateSecretsState((currentSecrets) =>
@@ -818,12 +822,12 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
       cryptoContext.masterKey,
       cryptoContext.salt
     )
-    const updated = await orpcClient.vault.updateSecret({
+    const updated = await orpcClient.mobile.update({
       id,
-      patch: {
-        kind: 'TOTP',
-        encrypted
-      }
+      operationId: crypto.randomUUID(),
+      expectedVersion: getSecretVersion(id),
+      kind: 'TOTP',
+      encrypted
     })
 
     updateSecretsState((currentSecrets) =>
@@ -832,7 +836,12 @@ export function VaultSessionProvider({ children }: { children: ReactNode }) {
   }
 
   const deleteSecret = async (id: string) => {
-    await orpcClient.vault.deleteSecret({ id })
+    const deleted = await orpcClient.mobile.delete({
+      id,
+      operationId: crypto.randomUUID(),
+      expectedVersion: getSecretVersion(id)
+    })
+    deletedVersionsRef.current.set(id, deleted.version)
 
     updateSecretsState((currentSecrets) =>
       currentSecrets.filter((secret) => secret.id !== id)

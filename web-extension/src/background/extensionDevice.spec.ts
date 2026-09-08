@@ -1,7 +1,22 @@
 import { readRememberedVault } from '@shared/rememberedVault'
-import { device } from './ExtensionDevice'
+import { DeviceState, device } from './ExtensionDevice'
+import type { IBackgroundStateSerializable } from './backgroundPage'
 import browser from 'webextension-polyfill'
 import { vi } from 'vitest'
+
+const { queryMock } = vi.hoisted(() => ({ queryMock: vi.fn() }))
+vi.mock('@src/apollo/apolloClient', () => ({
+  apolloClient: { query: queryMock, mutate: vi.fn() }
+}))
+
+vi.mock('bowser', () => ({
+  default: {
+    getParser: vi.fn(() => ({
+      getOSName: () => 'Linux',
+      getBrowserName: () => 'Chrome'
+    }))
+  }
+}))
 
 // Mock browser.runtime.connect
 vi.mock('webextension-polyfill', () => ({
@@ -205,6 +220,128 @@ describe('ExtensionDevice', () => {
       expect(mockGetDeviceId).toHaveBeenCalled()
       expect(device.id).toBe('mock-device-id')
       expect(device.lockedState).toEqual(mockLockedState)
+    })
+  })
+
+  describe('commitPasswordRotation', () => {
+    const previousSnapshot: IBackgroundStateSerializable = {
+      deviceName: 'browser',
+      email: 'test@example.com',
+      userId: 'user',
+      encryptionSalt: 'salt',
+      authSecretEncrypted: 'old-verifier',
+      authSecret: 'old-enrollment',
+      masterEncryptionKey: 'old-key',
+      secrets: [],
+      vaultLockTimeoutSeconds: 3600,
+      syncTOTP: true,
+      autofillCredentialsEnabled: true,
+      autofillTOTPEnabled: true,
+      autofillForbiddenUrlPatterns: '',
+      uiLanguage: 'en',
+      theme: 'dark',
+      notificationOnVaultUnlock: false,
+      notificationOnWrongPasswordAttempts: 3
+    }
+    const nextSnapshot: IBackgroundStateSerializable = {
+      ...previousSnapshot,
+      masterEncryptionKey: 'new-key',
+      authSecret: 'new-enrollment',
+      authSecretEncrypted: 'new-verifier'
+    }
+    const previousState = () =>
+      Object.assign(
+        Object.create(DeviceState.prototype) as DeviceState,
+        previousSnapshot
+      )
+
+    it('awaits installing the new key and ciphertext together for the same unlocked session', async () => {
+      const previous = previousState()
+      device.state = previous
+      const save = vi.spyOn(device, 'save').mockResolvedValue(undefined)
+      await device.commitPasswordRotation(previous, nextSnapshot)
+      expect(save).toHaveBeenCalledExactlyOnceWith(nextSnapshot)
+      expect(previous.masterEncryptionKey).toBe('old-key')
+      save.mockRestore()
+    })
+
+    it('keeps a vault locked while updating the encrypted verifier after a request completes', async () => {
+      const previous = previousState()
+      const { masterEncryptionKey, authSecret, ...lockedSnapshot } =
+        previousSnapshot
+      device.state = null
+      device.lockedState = lockedSnapshot
+      await device.commitPasswordRotation(previous, nextSnapshot)
+      const expected = {
+        ...lockedSnapshot,
+        authSecretEncrypted: 'new-verifier'
+      }
+      expect(device.state).toBeNull()
+      expect(device.lockedState).toEqual(expected)
+      expect(browser.storage.local.set).toHaveBeenCalledWith({
+        lockedState: expected
+      })
+      expect(browser.storage.session.set).toHaveBeenCalledWith({
+        backgroundState: null,
+        lockedState: expected
+      })
+    })
+
+    it('does not replace a different account opened while the rotation request was running', async () => {
+      const previous = previousState()
+      const replacement = Object.assign(previousState(), {
+        userId: 'other-user'
+      })
+      device.state = replacement
+      await device.commitPasswordRotation(previous, nextSnapshot)
+      expect(device.state).toBe(replacement)
+      expect(browser.storage.local.set).not.toHaveBeenCalled()
+      expect(browser.storage.session.set).not.toHaveBeenCalled()
+    })
+
+    it('ignores an old sync response after the key and session have been replaced', async () => {
+      const previous = previousState()
+      device.state = previous
+      let resolveQuery!: (value: {
+        data: { currentDevice: { encryptedSecretsToSync: [] } }
+      }) => void
+      queryMock.mockReturnValue(
+        new Promise((resolve) => {
+          resolveQuery = resolve
+        })
+      )
+      const sync = previous.backendSync()
+      const replacement = Object.assign(previousState(), nextSnapshot)
+      device.state = replacement
+      resolveQuery({
+        data: { currentDevice: { encryptedSecretsToSync: [] } }
+      })
+      await sync
+      expect(device.state).toBe(replacement)
+      expect(browser.storage.session.set).not.toHaveBeenCalled()
+    })
+
+    it('invalidates a passkey approval session when another extension window rotates the key', async () => {
+      const previous = previousState()
+      device.state = previous
+      previous.onStorageChange({ backgroundState: { newValue: nextSnapshot } }, 'session')
+      const replacement = device.state
+      expect(replacement).not.toBe(previous)
+      expect(replacement?.masterEncryptionKey).toBe('new-key')
+      expect(previous.masterEncryptionKey).toBe('')
+      expect(previous.authSecret).toBe('')
+      expect(previous.decryptedSecrets).toEqual([])
+      await replacement?.initialize()
+      replacement?.destroy()
+    })
+
+    it('keeps the approval session identity for ordinary same-key synchronization', () => {
+      const previous = previousState()
+      device.state = previous
+      previous.onStorageChange({ backgroundState: { newValue: { ...previousSnapshot, theme: 'light' } } }, 'session')
+      expect(device.state).toBe(previous)
+      expect(device.state?.theme).toBe('light')
+      expect(previous.masterEncryptionKey).toBe('old-key')
     })
   })
 })

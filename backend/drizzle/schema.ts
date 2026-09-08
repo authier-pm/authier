@@ -5,6 +5,8 @@ import {
   varchar,
   serial,
   bigserial,
+  bigint,
+  jsonb,
   uuid,
   text,
   inet,
@@ -227,6 +229,42 @@ export const encryptedSecret = pgTable(
   ]
 )
 
+// The API allocates revisions while holding the account row lock until commit.
+// An ordinary sequence would allow a later transaction to commit first and
+// make a cursor skip an earlier, still uncommitted change.
+export const vaultChange = pgTable(
+  'VaultChange',
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    revision: bigint({ mode: 'bigint' }).notNull(),
+    secretId: uuid().notNull(),
+    encrypted: text().notNull(),
+    kind: encryptedSecretType().notNull(),
+    version: integer().notNull(),
+    createdAt: timestamp({ precision: 3 }).notNull(),
+    updatedAt: timestamp({ precision: 3 }),
+    deletedAt: timestamp({ precision: 3 })
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.revision] })]
+)
+
+export const vaultOperation = pgTable(
+  'VaultOperation',
+  {
+    userId: uuid()
+      .notNull()
+      .references(() => user.id, { onDelete: 'cascade' }),
+    operationId: uuid().notNull(),
+    requestHash: text().notNull(),
+    response:
+      jsonb().$type<import('../../shared/orpc/schemas').MobileSecretRecord>(),
+    createdAt: timestamp({ precision: 3 }).defaultNow().notNull()
+  },
+  (table) => [primaryKey({ columns: [table.userId, table.operationId] })]
+)
+
 export const masterDeviceChange = pgTable('MasterDeviceChange', {
   id: text().primaryKey(),
   createdAt: timestamp({ precision: 3 })
@@ -381,6 +419,7 @@ export const user = pgTable(
     id: uuid().primaryKey(),
     email: customType<{ data: string }>({ dataType: () => 'citext' })(),
     tokenVersion: integer().default(0).notNull(),
+    vaultRevision: bigint({ mode: 'bigint' }).default(0n).notNull(),
     username: text(),
     addDeviceSecret: text('addDeviceSecretHash').notNull(),
     addDeviceSecretEncrypted: text().notNull(),

@@ -1,3 +1,4 @@
+import { runVaultTransaction } from '../vault/vaultWrites'
 import { hashDeviceSecret } from '../utils/deviceSecretHash'
 import { Arg, Ctx, Field, ID, Info, Int, ObjectType } from 'type-graphql'
 import type { IContext, IContextAuthenticated } from './types/ContextTypes'
@@ -34,13 +35,11 @@ import debug from 'debug'
 import { setNewAccessTokenIntoCookie, setNewRefreshToken } from '../userAuth'
 import { DefaultDeviceSettingsMutation } from './DefaultDeviceSettings'
 import { defaultDeviceSettingSystemValues } from './defaultDeviceSettingSystemValues'
-import { defaultAccountLimits } from './accountLimits'
 import { UserNewDevicePolicyGQL } from './types/UserNewDevicePolicy'
-import { eq, and, sql, inArray, isNull, count } from 'drizzle-orm'
+import { eq, and, sql, isNull } from 'drizzle-orm'
 import {
   device as deviceSchema,
   defaultSettings as defaultSettingsSchema,
-  encryptedSecret as encryptedSecretSchema,
   secretUsageEvent as secretUsageEventSchema,
   user as userSchema,
   emailVerification as emailVerificationSchema,
@@ -163,22 +162,9 @@ export class UserMutation extends UserBase {
     secrets: string[],
     @Ctx() ctx: IContextAuthenticated
   ) {
-    if (secrets.length === 0) return []
-
-    const res = await ctx.db
-      .update(encryptedSecretSchema)
-      .set({
-        deletedAt: sql`CURRENT_TIMESTAMP`
-      })
-      .where(
-        and(
-          inArray(encryptedSecretSchema.id, secrets),
-          eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId)
-        )
-      )
-      .returning()
-
-    return res
+    return runVaultTransaction(ctx.db, ctx.jwtPayload, (writer) =>
+      writer.update(secrets, { deletedAt: new Date() })
+    )
   }
 
   @Field(() => [EncryptedSecretQuery])
@@ -187,71 +173,11 @@ export class UserMutation extends UserBase {
     secrets: EncryptedSecretInput[],
     @Ctx() ctx: IContextAuthenticated
   ) {
-    const userData = await ctx.db.query.user.findFirst({
-      where: { id: ctx.jwtPayload.userId }
-    })
-
-    const pswLimit =
-      userData?.loginCredentialsLimit ??
-      defaultAccountLimits.loginCredentialsLimit
-    const TOTPLimit = userData?.TOTPlimit ?? defaultAccountLimits.TOTPlimit
-
-    let [{ count: pswCount }] = await ctx.db
-      .select({ count: count() })
-      .from(encryptedSecretSchema)
-      .where(
-        and(
-          eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId),
-          inArray(encryptedSecretSchema.kind, ['LOGIN_CREDENTIALS', 'PASSKEY']),
-          isNull(encryptedSecretSchema.deletedAt)
-        )
+    return runVaultTransaction(ctx.db, ctx.jwtPayload, (writer) =>
+      writer.create(
+        secrets.map((secret) => ({ ...secret, id: crypto.randomUUID() }))
       )
-
-    let [{ count: TOTPCount }] = await ctx.db
-      .select({ count: count() })
-      .from(encryptedSecretSchema)
-      .where(
-        and(
-          eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId),
-          eq(encryptedSecretSchema.kind, 'TOTP'),
-          isNull(encryptedSecretSchema.deletedAt)
-        )
-      )
-
-    secrets.forEach((secret) => {
-      if (secret.kind === 'LOGIN_CREDENTIALS' || secret.kind === 'PASSKEY') {
-        pswCount++
-      } else if (secret.kind === 'TOTP') {
-        TOTPCount++
-      }
-    })
-
-    if (pswCount > pswLimit) {
-      console.log('psw exceeded')
-      return new GraphqlError(`Password limit exceeded.`)
-    }
-
-    if (TOTPCount > TOTPLimit) {
-      console.log('TOTP exceeded')
-      return new GraphqlError(`TOTP limit exceeded.`)
-    }
-
-    if (secrets.length === 0) return []
-
-    const res = await ctx.db
-      .insert(encryptedSecretSchema)
-      .values(
-        secrets.map((secret) => ({
-          id: crypto.randomUUID(),
-          version: 1,
-          userId: this.id,
-          encrypted: secret.encrypted,
-          kind: secret.kind
-        }))
-      )
-      .returning()
-
-    return res
+    )
   }
 
   @Field(() => DeviceGQL)
@@ -376,77 +302,106 @@ export class UserMutation extends UserBase {
       throw new Error('You can only change password on a master device')
     }
 
-    const targetUser = await ctx.db.transaction(async (tx) => {
-      const [challenge] = await tx
-        .select()
-        .from(decryptionChallengeSchema)
-        .where(
-          and(
-            eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
-            eq(decryptionChallengeSchema.deviceId, ctx.device.id),
-            eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+    const targetUser = await runVaultTransaction(
+      ctx.db,
+      ctx.jwtPayload,
+      async (writer, tx) => {
+        const [challenge] = await tx
+          .select()
+          .from(decryptionChallengeSchema)
+          .where(
+            and(
+              eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
+              eq(decryptionChallengeSchema.deviceId, ctx.device.id),
+              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+            )
           )
-        )
-        .for('update')
-      if (
-        this.id !== ctx.jwtPayload.userId ||
-        !challenge ||
-        !challenge.approvedAt ||
-        challenge.rejectedAt ||
-        challenge.blockIp
-      ) {
-        throw new GraphqlError('Invalid password change challenge')
-      }
-      const ids = new Set(input.secrets.map((secret) => secret.id))
-      const ownedSecrets = await tx.query.encryptedSecret.findMany({
-        where: { userId: ctx.jwtPayload.userId, id: { in: [...ids] } },
-        columns: { id: true }
-      })
-      if (
-        ids.size !== input.secrets.length ||
-        ownedSecrets.length !== ids.size
-      ) {
-        throw new GraphqlError('Secret not found')
-      }
-      const userRes = await tx
-        .update(userSchema)
-        .set({
-          addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
-          addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
-          tokenVersion: sql`${userSchema.tokenVersion} + 1`
+          .for('update')
+        if (
+          this.id !== ctx.jwtPayload.userId ||
+          !challenge ||
+          !challenge.approvedAt ||
+          challenge.rejectedAt ||
+          challenge.blockIp
+        ) {
+          throw new GraphqlError('Invalid password change challenge')
+        }
+        const persistedUser = await tx.query.user.findFirst({
+          where: { id: ctx.jwtPayload.userId },
+          columns: { masterDeviceId: true }
         })
-        .where(eq(userSchema.id, this.id))
-        .returning()
-
-      await tx
-        .update(decryptionChallengeSchema)
-        .set({
-          masterPasswordVerifiedAt: new Date()
-        })
-        .where(
-          and(
-            eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
-            eq(decryptionChallengeSchema.deviceId, ctx.device.id),
-            eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
+        if (persistedUser?.masterDeviceId !== ctx.device.id)
+          throw new GraphqlError(
+            'You can only change password on a master device'
           )
+        const ids = new Set(input.secrets.map((secret) => secret.id))
+        const ownedSecrets = await tx.query.encryptedSecret.findMany({
+          where: { userId: ctx.jwtPayload.userId },
+          columns: { id: true, version: true, deletedAt: true }
+        })
+        const ownedIds = new Set(ownedSecrets.map((secret) => secret.id))
+        if (
+          ids.size !== input.secrets.length ||
+          input.secrets.some((secret) => !ownedIds.has(secret.id))
         )
-
-      for (const { id, ...patch } of input.secrets) {
-        await tx
-          .update(encryptedSecretSchema)
+          throw new GraphqlError('Secret not found')
+        const activeSecrets = ownedSecrets.filter((secret) => !secret.deletedAt)
+        if (
+          activeSecrets.length !== ids.size ||
+          activeSecrets.some((secret) => !ids.has(secret.id))
+        ) {
+          throw new GraphqlError(
+            'Vault changed; synchronize the complete vault before changing the master password'
+          )
+        }
+        const versions = new Map(
+          activeSecrets.map((secret) => [secret.id, secret.version])
+        )
+        if (
+          input.secrets.some((secret) => secret.expectedVersion === undefined)
+        ) {
+          throw new GraphqlError(
+            'Update your Authier app and synchronize before changing the master password'
+          )
+        }
+        if (
+          input.secrets.some(
+            (secret) => secret.expectedVersion !== versions.get(secret.id)
+          )
+        ) {
+          throw new GraphqlError(
+            'Vault changed; synchronize before changing the master password'
+          )
+        }
+        const userRes = await tx
+          .update(userSchema)
           .set({
-            ...patch,
-            updatedAt: sql`CURRENT_TIMESTAMP`
+            addDeviceSecret: await hashDeviceSecret(input.addDeviceSecret),
+            addDeviceSecretEncrypted: input.addDeviceSecretEncrypted,
+            tokenVersion: sql`${userSchema.tokenVersion} + 1`
+          })
+          .where(eq(userSchema.id, this.id))
+          .returning()
+
+        await tx
+          .update(decryptionChallengeSchema)
+          .set({
+            masterPasswordVerifiedAt: new Date()
           })
           .where(
             and(
-              eq(encryptedSecretSchema.id, id),
-              eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId)
+              eq(decryptionChallengeSchema.id, input.decryptionChallengeId),
+              eq(decryptionChallengeSchema.deviceId, ctx.device.id),
+              eq(decryptionChallengeSchema.userId, ctx.jwtPayload.userId)
             )
           )
+
+        for (const { id, expectedVersion, ...patch } of input.secrets) {
+          await writer.update([id], patch, { expectedVersion })
+        }
+        return userRes[0]
       }
-      return userRes[0]
-    })
+    )
 
     // Bumping tokenVersion above invalidates every access token already in
     // flight (forcing other devices to re-login on next request). Re-issue

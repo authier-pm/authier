@@ -1,5 +1,5 @@
 import { db } from './prisma/prismaClient'
-import { describe, expect, it, afterEach } from 'vitest'
+import { describe, expect, it, afterEach, vi } from 'vitest'
 import { createORPCClient } from '@orpc/client'
 import { RPCLink } from '@orpc/client/fetch'
 import type { ContractRouterClient } from '@orpc/contract'
@@ -13,6 +13,11 @@ import {
   initLocalDeviceAuthSecret
 } from '@shared/cryptoUtils'
 import { vaultApiContract } from '@shared/orpc/contract'
+
+// Keep API integration tests independent of external geolocation/Redis.
+vi.mock('./lib/getGeoIpLocation', () => ({
+  getGeoIpLocation: { memoized: async () => null }
+}))
 
 type VaultClient = ContractRouterClient<typeof vaultApiContract>
 type AuthState = {
@@ -179,8 +184,9 @@ describe('oRPC handler', () => {
 
     await masterBrowser.client.session.markAsSynced({})
 
+    // Legacy acknowledgements are informational; snapshots cannot skip writes.
     expect(await masterBrowser.client.session.syncSecrets({})).toMatchObject({
-      secrets: []
+      secrets: [{ id: createdSecret.id }]
     })
 
     const updatedSecret = await masterBrowser.client.vault.updateSecret({
@@ -292,6 +298,33 @@ describe('oRPC handler', () => {
     const refreshed = await restartedClient.auth.refreshTokens({})
     expect(refreshed.accessToken).toBeTruthy()
     expect(refreshed.refreshToken).not.toBe(browser.session.refreshToken)
+  })
+
+  it('persists automatic approval before completing a login for default and ALLOW policies', async () => {
+    const app = buildApp()
+    const primary = await registerBrowser(app, `auto-approval-${crypto.randomUUID()}@test.com`, 'synthetic-auto-approval-password', {
+      id: crypto.randomUUID(), name: 'Primary browser', platform: 'web'
+    })
+    const secondary = createVaultClient(app, createAuthState())
+    for (const policy of [null, 'ALLOW'] as const) {
+      if (policy) await primary.client.security.updateNewDevicePolicy({ newDevicePolicy: policy })
+      const device = { id: crypto.randomUUID(), name: 'Automatically approved Android', platform: 'android' }
+      const challenge = await secondary.auth.requestDeviceChallenge({ email: primary.email, deviceInput: device })
+      expect(challenge.status).toBe('approved')
+      if (challenge.status !== 'approved') throw new Error('Expected automatic approval')
+      const stored = await db.query.decryptionChallenge.findFirst({ where: { id: challenge.challengeId } })
+      expect(stored?.approvedAt).toBeInstanceOf(Date)
+      const salt = base64ToBuffer(challenge.encryptionSalt)
+      const key = await generateEncryptionKey(primary.password, salt)
+      const currentAddDeviceSecret = await decryptString(key, challenge.addDeviceSecretEncrypted)
+      const secrets = await initLocalDeviceAuthSecret(key, salt)
+      const login = await secondary.auth.completeDeviceLogin({
+        challengeId: challenge.challengeId,
+        currentAddDeviceSecret,
+        input: { ...secrets, encryptionSalt: challenge.encryptionSalt, firebaseToken: null, devicePlatform: device.platform }
+      })
+      expect(login.session.currentDevice.id).toBe(device.id)
+    }
   })
 
   it('creates pending device challenges, approves or rejects them, and completes approved logins', async () => {

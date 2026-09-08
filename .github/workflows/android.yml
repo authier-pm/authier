@@ -1,0 +1,63 @@
+name: Native Android
+
+on:
+  pull_request:
+    paths:
+      - 'android-app/**'
+      - 'backend/**'
+      - 'shared/**'
+      - 'vault-web/**'
+      - 'scripts/generateAndroidApi.ts'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/android.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'android-app/**'
+      - 'backend/**'
+      - 'shared/**'
+      - 'vault-web/**'
+      - 'scripts/generateAndroidApi.ts'
+      - 'pnpm-lock.yaml'
+      - '.github/workflows/android.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: android-actions/setup-android@v3
+      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile --ignore-scripts
+      - name: Check API contract and generated Kotlin
+        run: pnpm android:api:check
+      - name: Verify WebCrypto interoperability fixtures
+        run: bun test shared/cryptoUtils.spec.ts
+      - name: Verify API and migration behavior with PGlite
+        working-directory: backend
+        env:
+          NODE_ENV: test
+        run: pnpm exec vitest run mobileApi.spec.ts orpcHandler.spec.ts drizzle/vaultChangeMigration.spec.ts models/securityRegression.spec.ts
+      - name: Verify web vault synchronization
+        env:
+          NODE_OPTIONS: --no-experimental-webstorage
+        run: pnpm --dir vault-web test
+      - name: Test and build the native app
+        working-directory: android-app
+        run: ./gradlew --no-daemon testDebugUnitTest lintDebug assembleDebug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: authier-android-debug
+          path: android-app/app/build/outputs/apk/debug/app-debug.apk

@@ -112,6 +112,13 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
     // Re-read persisted approval under a row lock; resolver objects may be stale
     // or constructed directly by another transport.
     const result = await ctx.db.transaction(async (tx) => {
+      // Serialize enrollment-secret rotation across challenges for this user.
+      await tx
+        .select({ id: user.id })
+        .from(user)
+        .where(eq(user.id, userId))
+        .for('update')
+
       const [challenge] = await tx
         .select()
         .from(decryptionChallenge)
@@ -126,12 +133,6 @@ export class DecryptionChallengeApproved extends DecryptionChallengeGQL {
       if (!challenge?.approvedAt || challenge.rejectedAt || challenge.blockIp) {
         throw new GraphqlError('Login failed')
       }
-      // Serialize enrollment-secret rotation across challenges for this user.
-      await tx
-        .select({ id: user.id })
-        .from(user)
-        .where(eq(user.id, userId))
-        .for('update')
 
       const userData = await tx.query.user.findFirst({
         where: { id: userId },

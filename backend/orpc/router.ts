@@ -24,6 +24,8 @@ import type { OrpcContext } from './context'
 import { requireAuthContext } from './context'
 import { EncryptedSecretTypeGQL } from '../models/types/EncryptedSecretType'
 import { UserNewDevicePolicyGQL } from '../models/types/UserNewDevicePolicy'
+import { runVaultTransaction } from '../vault/vaultWrites'
+import { syncVault, writeVaultSecret } from './mobileVault'
 
 const os = implement(vaultApiContract).$context<OrpcContext>()
 
@@ -638,6 +640,20 @@ export const vaultOrpcRouter = os.router({
       }
     )
   },
+  mobile: {
+    sync: protectedBase.mobile.sync.handler(({ input, context }) =>
+      syncVault(context.authCtx, input)
+    ),
+    create: protectedBase.mobile.create.handler(({ input, context }) =>
+      writeVaultSecret(context.authCtx, 'create', input)
+    ),
+    update: protectedBase.mobile.update.handler(({ input, context }) =>
+      writeVaultSecret(context.authCtx, 'update', input)
+    ),
+    delete: protectedBase.mobile.delete.handler(({ input, context }) =>
+      writeVaultSecret(context.authCtx, 'delete', input)
+    )
+  },
   vault: {
     listSecrets: protectedBase.vault.listSecrets.handler(
       async ({ context }) => {
@@ -708,16 +724,13 @@ export const vaultOrpcRouter = os.router({
             })
           }
 
-          const [updated] = await context.legacyCtx.db
-            .update(schema.encryptedSecret)
-            .set({
-              encrypted: input.patch.encrypted,
-              kind: input.patch.kind,
-              version: secret.version + 1,
-              updatedAt: sql`CURRENT_TIMESTAMP`
-            })
-            .where(eq(schema.encryptedSecret.id, secret.id))
-            .returning()
+          const [updated] = await runVaultTransaction(
+            context.legacyCtx.db,
+            context.authCtx.jwtPayload,
+            (writer) => writer.update([secret.id], input.patch)
+          )
+          if (!updated)
+            throw new ORPCError('NOT_FOUND', { message: 'Secret not found' })
 
           return mapSecretRecord(updated)
         } catch (error) {
@@ -742,13 +755,13 @@ export const vaultOrpcRouter = os.router({
             })
           }
 
-          const [deleted] = await context.legacyCtx.db
-            .update(schema.encryptedSecret)
-            .set({
-              deletedAt: sql`CURRENT_TIMESTAMP`
-            })
-            .where(eq(schema.encryptedSecret.id, secret.id))
-            .returning()
+          const [deleted] = await runVaultTransaction(
+            context.legacyCtx.db,
+            context.authCtx.jwtPayload,
+            (writer) => writer.update([secret.id], { deletedAt: new Date() })
+          )
+          if (!deleted)
+            throw new ORPCError('NOT_FOUND', { message: 'Secret not found' })
 
           return {
             id: deleted.id
