@@ -1,3 +1,4 @@
+import { PasskeyDetail } from '@/components/PasskeyDetail'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { KeyRound, ShieldCheck } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -49,7 +50,7 @@ export function VaultEditPage() {
     : null
 
   useEffect(() => {
-    if (currentSecret) {
+    if (currentSecret && currentSecret.kind !== 'PASSKEY') {
       setKind(currentSecret.kind)
     }
   }, [currentSecret])
@@ -124,6 +125,10 @@ export function VaultEditPage() {
 
   if (secretId && !currentSecret) {
     return <Navigate replace to="/vault" />
+  }
+
+  if (currentSecret?.kind === 'PASSKEY') {
+    return <PasskeyDetail secret={currentSecret} />
   }
 
   const isEditing = Boolean(currentSecret)

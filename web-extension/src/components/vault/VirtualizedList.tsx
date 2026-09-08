@@ -10,11 +10,7 @@ import { Button, buttonVariants } from '@src/components/ui/button'
 import { Card, CardContent } from '@src/components/ui/card'
 import { Tooltip } from '@src/components/ui/tooltip'
 import { useAppToast } from '@src/ExtensionProviders'
-import {
-  pathNameToTypes,
-  type ILoginSecret,
-  type ITOTPSecret
-} from '@src/util/useDeviceState'
+import { pathNameToTypes } from '@src/util/useDeviceState'
 import {
   CopyIcon,
   EditIcon,
@@ -25,12 +21,15 @@ import {
   getMaskedSecretValue,
   getSecretCopyValue,
   getSecretKindLabel,
+  getSecretIconUrl,
   getSecretLabel,
   getSecretUrl,
   getSecretUsername,
   getSecretValue,
-  isTotpSecret
+  isTotpSecret,
+  isPasskeySecret
 } from './secretUtils'
+import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { useElementSize, useVirtualWindow } from './useVirtualWindow'
 
 const CARD_GAP = 16
@@ -40,7 +39,7 @@ const CARD_ROW_HEIGHT = 280
 export const VirtualizedList = ({ filter }: { filter: string }) => {
   const debouncedSearchTerm = useDebounce(filter, 400)
   const { searchSecrets } = useContext(DeviceStateContext)
-  const pathname = useLocation().pathname as '/credentials' | '/totps' | '/'
+  const pathname = useLocation().pathname as keyof typeof pathNameToTypes
   const filteredItems = useMemo(
     () => searchSecrets(debouncedSearchTerm, pathNameToTypes[pathname]),
     [debouncedSearchTerm, pathname, searchSecrets]
@@ -136,7 +135,7 @@ export const VirtualizedList = ({ filter }: { filter: string }) => {
   )
 }
 
-function VaultListCard({ secret }: { secret: ILoginSecret | ITOTPSecret }) {
+function VaultListCard({ secret }: { secret: SecretTypeUnion }) {
   const [isSecretVisible, setIsSecretVisible] = useState(false)
   const toast = useAppToast()
   const secretUrl = getSecretUrl(secret)
@@ -152,9 +151,7 @@ function VaultListCard({ secret }: { secret: ILoginSecret | ITOTPSecret }) {
         <div className="flex items-center gap-3">
           <div className="flex size-12 items-center justify-center rounded-2xl bg-[color:var(--color-accent)]/70">
             <SecretItemIcon
-              iconUrl={
-                isTotp ? secret.totp.iconUrl : secret.loginCredentials.iconUrl
-              }
+              iconUrl={getSecretIconUrl(secret)}
               url={secretUrl}
             />
           </div>
@@ -179,61 +176,65 @@ function VaultListCard({ secret }: { secret: ILoginSecret | ITOTPSecret }) {
       <CardContent className="relative flex flex-1 flex-col gap-4 overflow-hidden p-4">
         <SecretMetaBlock label={t`Username`} value={username || '—'} />
         <SecretMetaBlock label={t`URL`} value={secretUrl || '—'} />
-        <SecretMetaBlock
-          label={isTotp ? t`Shared secret` : t`Password`}
-          mono
-          value={secretPreview}
-        />
+        {isPasskeySecret(secret) ? (
+          <SecretMetaBlock label="Passkey" value="Stored in Authier" />
+        ) : (
+          <SecretMetaBlock
+            label={isTotp ? t`Shared secret` : t`Password`}
+            mono
+            value={secretPreview}
+          />
+        )}
 
         <div className="pointer-events-none absolute inset-x-4 bottom-4 z-10 rounded-2xl bg-[linear-gradient(180deg,rgba(19,38,38,0)_0%,rgba(19,38,38,0.92)_28%,rgba(19,38,38,1)_100%)] px-1 pt-10 pb-1 opacity-0 transition duration-200 group-hover:pointer-events-auto group-hover:opacity-100 group-focus-within:pointer-events-auto group-focus-within:opacity-100">
           <div className="flex flex-wrap gap-2">
-            <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
-              <Button
-                aria-label={isTotp ? t`Copy token` : t`Copy`}
-                onClick={async () => {
-                  await navigator.clipboard.writeText(
-                    getSecretCopyValue(secret)
-                  )
-                  toast({
-                    title: t`Copied to clipboard`,
-                    status: 'success'
-                  })
-                }}
-                size="sm"
-                variant="outline"
-              >
-                <CopyIcon boxSize={16} />
-                <Trans>Copy</Trans>
-              </Button>
-            </Tooltip>
+            {!isPasskeySecret(secret) && (
+              <>
+                <Tooltip content={isTotp ? t`Copy token` : t`Copy`}>
+                  <Button
+                    aria-label={isTotp ? t`Copy token` : t`Copy`}
+                    onClick={async () => {
+                      await navigator.clipboard.writeText(
+                        getSecretCopyValue(secret)
+                      )
+                      toast({
+                        title: t`Copied to clipboard`,
+                        status: 'success'
+                      })
+                    }}
+                    size="sm"
+                    variant="outline"
+                  >
+                    <CopyIcon boxSize={16} />
+                    <Trans>Copy</Trans>
+                  </Button>
+                </Tooltip>
 
-            <Button
-              aria-label={isSecretVisible ? t`Hide secret` : t`Show secret`}
-              onClick={() => {
-                setIsSecretVisible((currentValue) => !currentValue)
-              }}
-              size="sm"
-              variant="ghost"
-            >
-              {isSecretVisible ? (
-                <ViewOffIcon boxSize={16} />
-              ) : (
-                <ViewIcon boxSize={16} />
-              )}
-              {isSecretVisible ? <Trans>Hide</Trans> : <Trans>Show</Trans>}
-            </Button>
-
+                <Button
+                  aria-label={isSecretVisible ? t`Hide secret` : t`Show secret`}
+                  onClick={() => {
+                    setIsSecretVisible((currentValue) => !currentValue)
+                  }}
+                  size="sm"
+                  variant="ghost"
+                >
+                  {isSecretVisible ? (
+                    <ViewOffIcon boxSize={16} />
+                  ) : (
+                    <ViewIcon boxSize={16} />
+                  )}
+                  {isSecretVisible ? <Trans>Hide</Trans> : <Trans>Show</Trans>}
+                </Button>
+              </>
+            )}
             <Link
               className={buttonVariants({ size: 'sm', variant: 'ghost' })}
-              state={{
-                data: isTotp ? secret.totp : secret.loginCredentials
-              }}
               to={{
                 pathname: `/secret/${secret.id}`
               }}
             >
               <EditIcon boxSize={16} />
-              <Trans>Edit</Trans>
+              {isPasskeySecret(secret) ? 'Details' : <Trans>Edit</Trans>}
             </Link>
           </div>
         </div>

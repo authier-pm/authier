@@ -323,7 +323,8 @@ export const VaultImportExport = () => {
               <CardTitle>Export backups</CardTitle>
               <CardDescription>
                 Download your credentials or one-time passwords as CSV whenever
-                you need an offline copy.
+                you need an offline copy. Passkeys sync through Authier and are
+                not included in CSV exports.
               </CardDescription>
             </CardHeader>
             <CardContent className="flex flex-col gap-3">

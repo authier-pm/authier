@@ -1,0 +1,1 @@
+ALTER TYPE "EncryptedSecretType" ADD VALUE 'PASSKEY';

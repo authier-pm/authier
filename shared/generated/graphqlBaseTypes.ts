@@ -403,6 +403,7 @@ export type EncryptedSecretQuery = {
 
 export enum EncryptedSecretType {
   LOGIN_CREDENTIALS = 'LOGIN_CREDENTIALS',
+  PASSKEY = 'PASSKEY',
   TOTP = 'TOTP'
 }
 

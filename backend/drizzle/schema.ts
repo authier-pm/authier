@@ -22,7 +22,8 @@ import { sql } from 'drizzle-orm'
 export const tokenType = pgEnum('TokenType', ['EMAIL', 'API'])
 export const encryptedSecretType = pgEnum('EncryptedSecretType', [
   'TOTP',
-  'LOGIN_CREDENTIALS'
+  'LOGIN_CREDENTIALS',
+  'PASSKEY'
 ])
 export const webInputType = pgEnum('WebInputType', [
   'TOTP',

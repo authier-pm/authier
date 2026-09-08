@@ -45,7 +45,8 @@ const primaryLinks: LinkItemProps[] = [
     title: <Trans>TOTPs</Trans>,
     icon: FiKey,
     path: '/totps'
-  }
+  },
+  { title: <Trans>Passkeys</Trans>, icon: FiKey, path: '/passkeys' }
 ]
 
 const secondaryLinks: LinkItemProps[] = [

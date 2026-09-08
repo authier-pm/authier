@@ -27,6 +27,9 @@ import { useAppToast } from '@src/ExtensionProviders'
 import { PasswordGenerator } from '@src/components/vault/PasswordGenerator'
 import { EditFormButtons } from './EditFormButtons'
 import { ILoginSecret, ITOTPSecret } from '@src/util/useDeviceState'
+import { PasskeyDetailCard } from './PasskeyDetailCard'
+import { DeleteSecretButton } from './DeleteSecretButton'
+import type { SecretTypeUnion } from '@src/background/ExtensionDevice'
 import { device } from '@src/background/ExtensionDevice'
 import {
   credentialValues,
@@ -338,9 +341,7 @@ function TotpSecret({ secretProps }: { secretProps: ITOTPSecret }) {
 }
 
 export const VaultItemSettings = () => {
-  const [secret, setSecret] = useState<
-    ITOTPSecret | ILoginSecret | undefined | null
-  >(null)
+  const [secret, setSecret] = useState<SecretTypeUnion | undefined | null>(null)
   const params = useParams()
 
   useEffect(() => {
@@ -384,6 +385,16 @@ export const VaultItemSettings = () => {
           </CardContent>
         </Card>
       </div>
+    )
+  }
+
+  if (secret.kind === EncryptedSecretType.PASSKEY) {
+    return (
+      <PasskeyDetailCard passkey={secret.passkey}>
+        <DeleteSecretButton secrets={[secret]}>
+          Delete passkey
+        </DeleteSecretButton>
+      </PasskeyDetailCard>
     )
   }
 

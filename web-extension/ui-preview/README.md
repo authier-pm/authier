@@ -32,3 +32,5 @@ Keep reusable preview code and fixtures in this directory. Do not place them in
 `/tmp`.
 
 The `remembered-session` scenario renders the unlocked popup using the shared encrypted IndexedDB snapshot store. Reloading restores it without a password prompt. Its Playwright test captures `docs/screenshots/remembered-session-restart.png`.
+
+The `passkey-vault` scenario renders the production passkey detail card, including the website and account without exposing key material. Its Playwright test captures `docs/screenshots/passkey-vault.png`. The `passkey-approval` scenario renders the extension's passkey approval dialog.

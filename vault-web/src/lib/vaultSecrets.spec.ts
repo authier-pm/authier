@@ -3,7 +3,9 @@ import {
   decryptSecretRecord,
   decryptSecrets,
   encryptLoginSecret,
-  encryptTotpSecret
+  encryptTotpSecret,
+  getVaultSecretSearchText,
+  getVaultSecretMetadata
 } from './vaultSecrets'
 import { encryptString, generateEncryptionKey } from '@shared/cryptoUtils'
 
@@ -124,5 +126,81 @@ describe('vaultSecrets', () => {
     }
     expect(result.secrets[0].loginCredentials.iconUrl).toBeNull()
     expect(result.secrets[0].loginCredentials.username).toBe('capaj')
+  })
+})
+
+describe('passkey vault persistence', () => {
+  it('round-trips a passkey with its signing key through encrypted sync records', async () => {
+    const salt = crypto.getRandomValues(new Uint8Array(16))
+    const masterKey = await generateEncryptionKey(
+      'passkey vault password',
+      salt
+    )
+    const signingKeys = await crypto.subtle.generateKey(
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      true,
+      ['sign', 'verify']
+    )
+    const privateKeyJwk = await crypto.subtle.exportKey(
+      'jwk',
+      signingKeys.privateKey
+    )
+    const passkey = {
+      credentialId: 'Y3JlZGVudGlhbA',
+      rpId: 'example.com',
+      rpName: 'Example',
+      userHandle: 'dXNlcg',
+      userName: 'alex@example.com',
+      userDisplayName: 'Alex',
+      privateKeyJwk,
+      createdAt: '2026-09-08T10:00:00.000Z',
+      url: 'https://example.com',
+      label: 'Example passkey',
+      iconUrl: null
+    }
+    const encrypted = await encryptString(
+      masterKey,
+      JSON.stringify(passkey),
+      salt
+    )
+    expect(encrypted).not.toContain(privateKeyJwk.d)
+    const restored = await decryptSecretRecord(
+      {
+        id: crypto.randomUUID(),
+        kind: 'PASSKEY',
+        encrypted,
+        version: 1,
+        createdAt: passkey.createdAt,
+        updatedAt: null
+      },
+      masterKey
+    )
+    expect(restored.kind).toBe('PASSKEY')
+    if (restored.kind !== 'PASSKEY') throw new Error('Expected passkey')
+    expect(restored.passkey).toEqual(passkey)
+    const restoredKey = await crypto.subtle.importKey(
+      'jwk',
+      restored.passkey.privateKeyJwk,
+      { name: 'ECDSA', namedCurve: 'P-256' },
+      false,
+      ['sign']
+    )
+    const challenge = new TextEncoder().encode('new browser sign-in')
+    const signature = await crypto.subtle.sign(
+      { name: 'ECDSA', hash: 'SHA-256' },
+      restoredKey,
+      challenge
+    )
+    expect(
+      await crypto.subtle.verify(
+        { name: 'ECDSA', hash: 'SHA-256' },
+        signingKeys.publicKey,
+        signature,
+        challenge
+      )
+    ).toBe(true)
+    expect(getVaultSecretSearchText(restored)).toContain('alex@example.com')
+    expect(getVaultSecretSearchText(restored)).not.toContain(privateKeyJwk.d)
+    expect(getVaultSecretMetadata(restored)).not.toHaveProperty('privateKeyJwk')
   })
 })

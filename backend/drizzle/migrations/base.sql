@@ -2,7 +2,7 @@ CREATE EXTENSION IF NOT EXISTS citext
 --> statement-breakpoint
 CREATE TYPE "EmailVerificationType" AS ENUM('PRIMARY', 'CONTACT');
 --> statement-breakpoint
-CREATE TYPE "EncryptedSecretType" AS ENUM('TOTP', 'LOGIN_CREDENTIALS');
+CREATE TYPE "EncryptedSecretType" AS ENUM('TOTP', 'LOGIN_CREDENTIALS', 'PASSKEY');
 --> statement-breakpoint
 CREATE TYPE "TokenType" AS ENUM('EMAIL', 'API');
 --> statement-breakpoint

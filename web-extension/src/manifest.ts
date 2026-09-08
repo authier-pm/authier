@@ -15,6 +15,22 @@ export const manifestVersion = Number(process.env.MANIFEST_VERSION ?? 3)
 
 const firefoxGeckoId = '{18c8ffa6-f17c-4d43-bfab-5dae503c8c31}'
 
+const passkeyContentScripts = [
+  {
+    matches: ['https://*/*', 'http://localhost/*', 'http://127.0.0.1/*'],
+    js: ['js/browser-polyfill.js', 'js/passkeyBridge.js'],
+    run_at: 'document_start' as const,
+    all_frames: false
+  },
+  {
+    matches: ['https://*/*', 'http://localhost/*', 'http://127.0.0.1/*'],
+    js: ['js/passkeyPage.js'],
+    run_at: 'document_start' as const,
+    world: 'MAIN' as const,
+    all_frames: false
+  }
+]
+
 function getFirefoxManifestV2(
   pkg: typeof PkgType
 ): Manifest.WebExtensionManifest {
@@ -33,6 +49,7 @@ function getFirefoxManifestV2(
       persistent: true
     },
     content_scripts: [
+      ...passkeyContentScripts,
       {
         matches: ['*://*/*'],
         js: ['js/browser-polyfill.js', 'js/contentScript.js'],
@@ -58,11 +75,12 @@ function getFirefoxManifestV2(
       // from https://blog.mozilla.org/addons/2023/10/05/changes-to-android-extension-signing/
       gecko: {
         id: firefoxGeckoId,
-        strict_min_version: '102.0'
+        // Firefox 128 introduced MAIN-world manifest content scripts.
+        strict_min_version: '128.0'
       },
       gecko_android: {
         id: firefoxGeckoId,
-        strict_min_version: '102.0'
+        strict_min_version: '128.0'
       }
     },
     web_accessible_resources: ['icon-16.png'],
@@ -82,6 +100,7 @@ export async function getManifest() {
   // can also be conditional based on your need
   const manifest: Manifest.WebExtensionManifest = {
     manifest_version: 3,
+    minimum_chrome_version: '111',
     name: pkg.displayName,
     version: pkg.version,
     description: pkg.description,
@@ -98,6 +117,7 @@ export async function getManifest() {
       service_worker: 'js/backgroundPage.js'
     },
     content_scripts: [
+      ...passkeyContentScripts,
       {
         matches: ['<all_urls>'],
         all_frames: true,

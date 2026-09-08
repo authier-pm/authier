@@ -35,7 +35,10 @@
     "uploadApp": "dotenv chrome-webstore-upload upload --source dist.zip --extension-id $EXTENSION_ID --client-id $CLIENT_ID --client-secret $CLIENT_SECRET --refresh-token $REFRESH_TOKEN",
     "publishApp:chrome": "dotenv chrome-webstore-upload publish --source dist.zip --extension-id padmmdghcflnaellmmckicifafoenfdi",
     "publishApp:firefox": "bash -c 'source .env && pnpm exec web-ext sign --source-dir=./dist --api-key=\"$FIREFOX_API_KEY\" --api-secret=\"$FIREFOX_API_SECRET\" --channel=listed'",
-    "release:firefox": "pnpm clean && pnpm generateManifest && pnpm prodBuild && pnpm publishApp:firefox"
+    "release:firefox": "pnpm clean && pnpm generateManifest && pnpm prodBuild && pnpm publishApp:firefox",
+    "test:passkeys": "bun --bun ./node_modules/vitest/vitest.mjs run src/passkeys src/background/passkeyPersistence.spec.ts src/background/lockedVaultStorage.spec.ts",
+    "playwright:passkeys": "playwright test --config playwrightPasskey.config.ts",
+    "playwright:passkeys:extension": "playwright test --config playwrightPasskeyFull.config.ts"
   },
   "keywords": [
     "react",

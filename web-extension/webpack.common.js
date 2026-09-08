@@ -24,6 +24,9 @@ const entries = {
   backgroundPage: path.join(__dirname, 'src/background/backgroundPage.ts'),
   popup: path.join(__dirname, 'src/index.tsx'),
   vault: path.join(__dirname, 'src/vault-index.tsx'),
+  passkey: path.join(__dirname, 'src/passkeys/passkeyIndex.tsx'),
+  passkeyPage: path.join(__dirname, 'src/passkeys/pageEntry.ts'),
+  passkeyBridge: path.join(__dirname, 'src/passkeys/bridgeEntry.ts'),
   contentScript: path.join(__dirname, 'src/content-script/contentScript.ts')
 }
 require('dotenv/config')
@@ -66,6 +69,22 @@ module.exports = {
     </head>
       <body class="extension-popup">
         <div id="popup"></div>
+        <script type="application/javascript" src="browser-polyfill.js"></script>
+      </body>
+    </html>`
+    }),
+    new HtmlWebpackPlugin({
+      scriptLoading: 'blocking',
+      chunks: ['passkey'],
+      filename: 'passkey.html',
+      templateContent: `
+    <html>
+    <head>
+      <title>Authier - Passkey approval</title>
+      ${mobileViewport}
+    </head>
+      <body>
+        <div id="passkey"></div>
         <script type="application/javascript" src="browser-polyfill.js"></script>
       </body>
     </html>`

@@ -202,7 +202,7 @@ export class UserMutation extends UserBase {
       .where(
         and(
           eq(encryptedSecretSchema.userId, ctx.jwtPayload.userId),
-          eq(encryptedSecretSchema.kind, 'LOGIN_CREDENTIALS'),
+          inArray(encryptedSecretSchema.kind, ['LOGIN_CREDENTIALS', 'PASSKEY']),
           isNull(encryptedSecretSchema.deletedAt)
         )
       )
@@ -219,7 +219,7 @@ export class UserMutation extends UserBase {
       )
 
     secrets.forEach((secret) => {
-      if (secret.kind === 'LOGIN_CREDENTIALS') {
+      if (secret.kind === 'LOGIN_CREDENTIALS' || secret.kind === 'PASSKEY') {
         pswCount++
       } else if (secret.kind === 'TOTP') {
         TOTPCount++

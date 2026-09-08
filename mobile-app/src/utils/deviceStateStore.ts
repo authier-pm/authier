@@ -146,9 +146,12 @@ export const useDeviceStateStore = create<DeviceStateActions>()(
       ...initialState,
       getAllSecretsDecrypted: async () => {
         return Promise.all(
-          get().secrets.map((secret) => {
-            return get().decryptSecret(secret)
-          })
+          get()
+            .secrets
+            // Preserve passkey ciphertext for sync and key rotation. The mobile
+            // app currently displays passwords and TOTP only.
+            .filter((secret) => secret.kind !== EncryptedSecretType.PASSKEY)
+            .map((secret) => get().decryptSecret(secret))
         )
       },
       save: async () => {

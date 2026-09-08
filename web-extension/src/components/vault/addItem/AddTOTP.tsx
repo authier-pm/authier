@@ -2,7 +2,7 @@ import { Formik, FormikHelpers, useField } from 'formik'
 import { useNavigate } from 'react-router-dom'
 
 import { device } from '@src/background/ExtensionDevice'
-import { EncryptedSecretsType } from '@src/generated/graphqlBaseTypes'
+import { EncryptedSecretType } from '@shared/generated/graphqlBaseTypes'
 import { TotpTypeWithMeta } from '@src/util/useDeviceState'
 import { TOTPSchema } from '@shared/formikSharedTypes'
 import { Input } from '@src/components/ui/input'
@@ -33,7 +33,7 @@ export const AddTOTP = () => {
         ) => {
           await device.state?.addSecrets([
             {
-              kind: EncryptedSecretsType.TOTP as any,
+              kind: EncryptedSecretType.TOTP,
               totp: values,
               encrypted: await device.state!.encrypt(JSON.stringify(values)),
               createdAt: new Date().toJSON()
