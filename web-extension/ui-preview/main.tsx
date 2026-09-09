@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import '@src/index.css'
 import { AutofillControlsPreview } from './scenarios/AutofillControlsPreview'
 import { AndroidVaultPreview } from './scenarios/AndroidVaultPreview'
+import { AndroidIconPreview } from './scenarios/AndroidIconPreview'
 import {
   AndroidLandingPreview,
   AndroidUpdatesPreview
@@ -20,6 +21,7 @@ const scenarios: Record<string, ComponentType> = {
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
   'android-vault': AndroidVaultPreview,
+  'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview

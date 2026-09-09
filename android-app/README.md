@@ -18,6 +18,11 @@ excludes prereleases and extension releases, and needs no GitHub account or toke
 
 ## Build and run
 
+The launcher icons in `app/src/main/res/mipmap-*` reuse the original golden-key
+artwork from `mobile-app/android/app/src/main/res` at all five Android densities,
+including the round variants. Obtainium displays the installed APK's launcher
+icon, so icon changes take effect when the updated APK is installed.
+
 Install JDK 17 and Android SDK 35 with build tools 35.0.0. On Apple Silicon, use an ARM64 JDK. Set `ANDROID_HOME` or create the ignored `local.properties` containing `sdk.dir=/absolute/path/to/Android/sdk`.
 
 ```sh

@@ -1,5 +1,9 @@
 # Extension UI preview
 
+The `android-icon` scenario imports the actual standard and round Android launcher
+resources. Run `pnpm playwright:ui-preview androidIcon.spec.ts` from `web-extension`
+to capture `docs/screenshots/android-icon-preview.png`.
+
 The `android-updates` scenario embeds the production Astro download page. Start
 `pnpm --dir landing-page dev` from the repository root alongside the preview, or
 run `pnpm exec playwright test --config playwrightAndroidUpdates.config.ts` from
