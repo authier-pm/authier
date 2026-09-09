@@ -1,85 +1,85 @@
-import "reflect-metadata";
+import 'reflect-metadata'
 
-import { Elysia, serializeCookie } from "elysia";
-import { cors } from "@elysiajs/cors";
-import { createYoga } from "graphql-yoga";
-import type { GraphQLError } from "graphql";
-import { onError } from "@orpc/server";
-import { RPCHandler } from "@orpc/server/fetch";
-import { OpenAPIHandler } from "@orpc/openapi/fetch";
-import openApiDocument from "../shared/openapi/authier.json";
-import { gqlSchema } from "./schemas/gqlSchema";
-import { createRequestDb } from "./prisma/prismaClient";
-import { createStripeClientGetter } from "./stripeClient";
-import type { jwtPayloadRefreshToken } from "./userAuth";
-import { setNewAccessTokenIntoCookie, setNewRefreshToken } from "./userAuth";
-import { verify } from "jsonwebtoken";
-import type { IContext } from "./models/types/ContextTypes";
-import debug from "debug";
-import { healthReportHandler } from "./healthReportRoute";
-import { webhookHandler } from "./stripeWebhook";
-import * as schema from "./drizzle/schema";
-import { and, eq, gt, isNull } from "drizzle-orm";
-import { hashMasterDeviceResetToken } from "./schemas/RootResolver";
+import { Elysia, serializeCookie } from 'elysia'
+import { cors } from '@elysiajs/cors'
+import { createYoga } from 'graphql-yoga'
+import type { GraphQLError } from 'graphql'
+import { onError } from '@orpc/server'
+import { RPCHandler } from '@orpc/server/fetch'
+import { OpenAPIHandler } from '@orpc/openapi/fetch'
+import openApiDocument from '../shared/openapi/authier.json'
+import { gqlSchema } from './schemas/gqlSchema'
+import { createRequestDb } from './prisma/prismaClient'
+import { createStripeClientGetter } from './stripeClient'
+import type { jwtPayloadRefreshToken } from './userAuth'
+import { setNewAccessTokenIntoCookie, setNewRefreshToken } from './userAuth'
+import { verify } from 'jsonwebtoken'
+import type { IContext } from './models/types/ContextTypes'
+import debug from 'debug'
+import { healthReportHandler } from './healthReportRoute'
+import { webhookHandler } from './stripeWebhook'
+import * as schema from './drizzle/schema'
+import { and, eq, gt, isNull } from 'drizzle-orm'
+import { hashMasterDeviceResetToken } from './schemas/RootResolver'
 import {
   type LegacyElysiaContext,
   createLegacyReplyAdapter,
-  createLegacyRequestFromElysia,
-} from "./lib/createLegacyHttpAdapters";
-import { createOrpcRequestContext } from "./orpc/context";
-import { vaultOrpcRouter } from "./orpc/router";
-import { describeApiError } from "./orpc/errorDiagnostics";
+  createLegacyRequestFromElysia
+} from './lib/createLegacyHttpAdapters'
+import { createOrpcRequestContext } from './orpc/context'
+import { vaultOrpcRouter } from './orpc/router'
+import { describeApiError } from './orpc/errorDiagnostics'
 
-const log = debug("au:app");
+const log = debug('au:app')
 
 type YogaServerContext = {
-  legacyRequest: IContext["request"];
-  legacyReply: IContext["reply"];
-  getIpAddress: () => string;
-  getStripeClient: IContext["getStripeClient"];
-  requestDb: IContext["db"];
-};
+  legacyRequest: IContext['request']
+  legacyReply: IContext['reply']
+  getIpAddress: () => string
+  getStripeClient: IContext['getStripeClient']
+  requestDb: IContext['db']
+}
 
 const isAsyncIterable = (value: unknown): value is AsyncIterable<unknown> =>
-  typeof value === "object" &&
+  typeof value === 'object' &&
   value !== null &&
   Symbol.asyncIterator in value &&
-  typeof (value as AsyncIterable<unknown>)[Symbol.asyncIterator] === "function";
+  typeof (value as AsyncIterable<unknown>)[Symbol.asyncIterator] === 'function'
 
 const attachGraphqlStacks = <T extends { errors?: readonly GraphQLError[] }>(
-  result: T,
+  result: T
 ) => {
-  if (!result.errors?.length) return result;
+  if (!result.errors?.length) return result
 
   for (const error of result.errors) {
     const maybeError = error as GraphQLError & {
-      originalError?: Error;
-      stack?: string;
-    };
-    const stack = maybeError.originalError?.stack ?? maybeError.stack;
-    if (!stack) continue;
+      originalError?: Error
+      stack?: string
+    }
+    const stack = maybeError.originalError?.stack ?? maybeError.stack
+    if (!stack) continue
 
-    const extensions = error.extensions as Record<string, unknown>;
+    const extensions = error.extensions as Record<string, unknown>
 
-    extensions.stacktrace = stack.split("\n");
+    extensions.stacktrace = stack.split('\n')
   }
 
-  return result;
-};
+  return result
+}
 
 const yoga = createYoga<YogaServerContext, IContext>({
   schema: gqlSchema,
   graphiql: true,
-  graphqlEndpoint: "/graphql",
+  graphqlEndpoint: '/graphql',
   cors: true,
   maskedErrors: false,
   plugins: [
     {
       onExecutionResult({ result, setResult }) {
-        if (!result || isAsyncIterable(result)) return;
-        setResult(attachGraphqlStacks(result));
-      },
-    },
+        if (!result || isAsyncIterable(result)) return
+        setResult(attachGraphqlStacks(result))
+      }
+    }
   ],
   context: ({
     params,
@@ -87,10 +87,10 @@ const yoga = createYoga<YogaServerContext, IContext>({
     legacyReply,
     getIpAddress,
     getStripeClient,
-    requestDb,
+    requestDb
   }) => {
     if (params.operationName) {
-      log(params.operationName, params.variables ?? "");
+      log(params.operationName, params.variables ?? '')
     }
 
     return {
@@ -98,83 +98,83 @@ const yoga = createYoga<YogaServerContext, IContext>({
       reply: legacyReply,
       getIpAddress,
       getStripeClient,
-      db: requestDb,
-    };
-  },
-});
+      db: requestDb
+    }
+  }
+})
 
 const openApiHandler = new OpenAPIHandler(vaultOrpcRouter, {
-  filter: ({ contract }) => Boolean(contract["~orpc"].route.path),
+  filter: ({ contract }) => Boolean(contract['~orpc'].route.path),
   interceptors: [
     onError((error, { context }) => {
-      console.error("Android API request failed", {
-        requestId: context.legacyCtx.request.headers["cf-ray"],
-        error: describeApiError(error),
-      });
-    }),
-  ],
-});
+      console.error('Android API request failed', {
+        requestId: context.legacyCtx.request.headers['cf-ray'],
+        error: describeApiError(error)
+      })
+    })
+  ]
+})
 
 const orpcHandler = new RPCHandler(vaultOrpcRouter, {
   interceptors: [
     onError((error) => {
-      console.error(error);
-    }),
-  ],
-});
+      console.error(error)
+    })
+  ]
+})
 
 const copyYogaResponseToElysia = async (
-  ctx: Pick<LegacyElysiaContext, "set">,
-  response: Response,
+  ctx: Pick<LegacyElysiaContext, 'set'>,
+  response: Response
 ) => {
-  const headers = new Headers(response.headers);
+  const headers = new Headers(response.headers)
 
   for (const [key, value] of Object.entries(ctx.set.headers)) {
-    if (value == null) continue;
-    if (key.toLowerCase() === "set-cookie") continue;
+    if (value == null) continue
+    if (key.toLowerCase() === 'set-cookie') continue
 
-    headers.set(key, String(value));
+    headers.set(key, String(value))
   }
 
-  const serializedCookies = serializeCookie(ctx.set.cookie);
+  const serializedCookies = serializeCookie(ctx.set.cookie)
   if (serializedCookies) {
     if (Array.isArray(serializedCookies)) {
       serializedCookies.forEach((cookie) =>
-        headers.append("Set-Cookie", cookie),
-      );
+        headers.append('Set-Cookie', cookie)
+      )
     } else {
-      headers.append("Set-Cookie", serializedCookies);
+      headers.append('Set-Cookie', serializedCookies)
     }
   }
 
-  headers.delete("content-length");
+  headers.delete('content-length')
 
-  const body = response.body === null ? null : await response.arrayBuffer();
+  const body = response.body === null ? null : await response.arrayBuffer()
   const status =
-    typeof ctx.set.status === "number" && response.status === 200
+    typeof ctx.set.status === 'number' && response.status === 200
       ? ctx.set.status
-      : response.status;
+      : response.status
 
   return new Response(body, {
     status,
-    headers,
-  });
-};
+    headers
+  })
+}
 
-const getIpAddressFromLegacyRequest = (request: IContext["request"]) => () => {
+const getIpAddressFromLegacyRequest = (request: IContext['request']) => () => {
   return (
-    request.headers["x-forwarded-for"] ??
-    request.headers["cf-connecting-ip"] ??
-    ""
-  );
-};
+    request.headers['x-forwarded-for'] ??
+    request.headers['cf-connecting-ip'] ??
+    ''
+  )
+}
 
 const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
-  const requestDb = createRequestDb();
-  const getStripeClient = createStripeClientGetter();
-  const legacyReply = createLegacyReplyAdapter(ctx);
-  const legacyRequest = createLegacyRequestFromElysia(ctx);
-  const getIpAddress = getIpAddressFromLegacyRequest(legacyRequest);
+  const requestDb = createRequestDb()
+  const getStripeClient = createStripeClientGetter()
+  const legacyReply = createLegacyReplyAdapter(ctx)
+  const legacyRequest = createLegacyRequestFromElysia(ctx)
+  const getIpAddress = getIpAddressFromLegacyRequest(legacyRequest)
 
   try {
     const response = await yoga.handle(ctx.request, {
@@ -182,129 +182,126 @@ const handleGraphqlRequest = async (ctx: LegacyElysiaContext) => {
       legacyReply,
       getIpAddress,
       getStripeClient,
-      requestDb: requestDb.db,
-    });
+      requestDb: requestDb.db
+    })
 
-    return await copyYogaResponseToElysia(ctx, response);
+    return await copyYogaResponseToElysia(ctx, response)
   } finally {
-    await requestDb.close();
+    await requestDb.close()
   }
-};
+}
 
 const handleOrpcRequest = async (ctx: LegacyElysiaContext, openApi = false) => {
-  const requestContext = createOrpcRequestContext(ctx);
+  const requestContext = createOrpcRequestContext(ctx)
 
   try {
-    const handler = openApi ? openApiHandler : orpcHandler;
+    const handler = openApi ? openApiHandler : orpcHandler
     const result = await handler.handle(ctx.request, {
-      prefix: openApi ? "/api/v1" : "/rpc",
-      context: requestContext.context,
-    });
+      prefix: openApi ? '/api/v1' : '/rpc',
+      context: requestContext.context
+    })
 
     if (!result.matched) {
-      return new Response("Not found", {
-        status: 404,
-      });
+      return new Response('Not found', {
+        status: 404
+      })
     }
 
-    return copyYogaResponseToElysia(ctx, result.response);
+    return copyYogaResponseToElysia(ctx, result.response)
   } finally {
-    await requestContext.close();
+    await requestContext.close()
   }
-};
+}
 
 export const buildApp = (app = new Elysia()) => {
   const allowedOrigins = [
-    "https://vault.authier.pm",
+    'https://vault.authier.pm',
     process.env.FRONTEND_URL,
-    "http://localhost:5173",
-    "http://127.0.0.1:5173",
-  ].filter((origin): origin is string => Boolean(origin));
+    'http://localhost:5173',
+    'http://127.0.0.1:5173'
+  ].filter((origin): origin is string => Boolean(origin))
 
   app
     .use(
       cors({
         origin: allowedOrigins,
         credentials: true,
-        allowedHeaders: ["Content-Type", "Authorization"],
-        methods: ["GET", "POST", "OPTIONS"],
-      }),
+        allowedHeaders: ['Content-Type', 'Authorization'],
+        methods: ['GET', 'POST', 'OPTIONS']
+      })
     )
     .onError(({ code, error, set }) => {
-      if (code === "NOT_FOUND") return;
+      if (code === 'NOT_FOUND') return
 
-      console.error(error);
-      set.status = 500;
-      return { error: "Something went wrong" };
+      console.error(error)
+      set.status = 500
+      return { error: 'Something went wrong' }
     })
-    .get("/health", () => ({ ok: true }))
-    .get("/health/report", async (ctx) => {
-      const reply = createLegacyReplyAdapter(ctx);
-      await healthReportHandler(undefined, reply);
-      return reply.getPayload();
+    .get('/health', () => ({ ok: true }))
+    .get('/health/report', async (ctx) => {
+      const reply = createLegacyReplyAdapter(ctx)
+      await healthReportHandler(undefined, reply)
+      return reply.getPayload()
     })
-    .get("/confirm-master-device-reset", async ({ query, redirect }) => {
+    .get('/confirm-master-device-reset', async ({ query, redirect }) => {
       const token =
-        typeof query?.token === "string" && query.token.length > 0
+        typeof query?.token === 'string' && query.token.length > 0
           ? query.token
-          : null;
+          : null
 
-      const frontendUrl = process.env.FRONTEND_URL ?? "/";
+      const frontendUrl = process.env.FRONTEND_URL ?? '/'
       const redirectWithStatus = (status: string) =>
         redirect(
-          `${frontendUrl}/confirm-master-device-reset?status=${encodeURIComponent(status)}`,
-        );
+          `${frontendUrl}/confirm-master-device-reset?status=${encodeURIComponent(status)}`
+        )
 
       if (!token) {
-        return redirectWithStatus("missing-token");
+        return redirectWithStatus('missing-token')
       }
 
-      const requestDb = createRequestDb();
+      const requestDb = createRequestDb()
       try {
         // Look up by hash, not by the plaintext token: the DB only stores
         // SHA-256(token) so a DB read alone cannot be used to confirm a
         // pending reset. The plaintext token is single-use leverage that
         // only exists in the user's email inbox.
-        const tokenHash = hashMasterDeviceResetToken(token);
-        const now = new Date();
+        const tokenHash = hashMasterDeviceResetToken(token)
+        const now = new Date()
         const [resetRequest] = await requestDb.db
           .select({
             id: schema.masterDeviceResetRequest.id,
             completedAt: schema.masterDeviceResetRequest.completedAt,
             confirmedAt: schema.masterDeviceResetRequest.confirmedAt,
             rejectedAt: schema.masterDeviceResetRequest.rejectedAt,
-            expiresAt: schema.masterDeviceResetRequest.expiresAt,
+            expiresAt: schema.masterDeviceResetRequest.expiresAt
           })
           .from(schema.masterDeviceResetRequest)
           .where(
-            eq(
-              schema.masterDeviceResetRequest.confirmationTokenHash,
-              tokenHash,
-            ),
+            eq(schema.masterDeviceResetRequest.confirmationTokenHash, tokenHash)
           )
-          .limit(1);
+          .limit(1)
 
         if (!resetRequest) {
-          return redirectWithStatus("not-found");
+          return redirectWithStatus('not-found')
         }
 
         if (resetRequest.completedAt) {
-          return redirectWithStatus("already-completed");
+          return redirectWithStatus('already-completed')
         }
 
         if (resetRequest.rejectedAt) {
-          return redirectWithStatus("rejected");
+          return redirectWithStatus('rejected')
         }
 
         if (resetRequest.expiresAt <= now) {
-          return redirectWithStatus("expired");
+          return redirectWithStatus('expired')
         }
 
         if (!resetRequest.confirmedAt) {
           await requestDb.db
             .update(schema.masterDeviceResetRequest)
             .set({
-              confirmedAt: now,
+              confirmedAt: now
             })
             .where(
               and(
@@ -312,123 +309,119 @@ export const buildApp = (app = new Elysia()) => {
                 isNull(schema.masterDeviceResetRequest.completedAt),
                 isNull(schema.masterDeviceResetRequest.rejectedAt),
                 isNull(schema.masterDeviceResetRequest.confirmedAt),
-                gt(schema.masterDeviceResetRequest.expiresAt, now),
-              ),
-            );
+                gt(schema.masterDeviceResetRequest.expiresAt, now)
+              )
+            )
         }
 
-        return redirectWithStatus("confirmed");
+        return redirectWithStatus('confirmed')
       } finally {
-        await requestDb.close();
+        await requestDb.close()
       }
     })
-    .get("/graphiql", ({ redirect }) => redirect("/graphql"))
-    .get("/api/v1/openapi.json", () => openApiDocument)
-    .all("/api/v1/*", (ctx) => handleOrpcRequest(ctx, true), { parse: "none" })
-    .all("/rpc", (ctx) => handleOrpcRequest(ctx), {
-      parse: "none",
+    .get('/graphiql', ({ redirect }) => redirect('/graphql'))
+    .get('/api/v1/openapi.json', () => openApiDocument)
+    .all('/api/v1/*', (ctx) => handleOrpcRequest(ctx, true), { parse: 'none' })
+    .all('/rpc', (ctx) => handleOrpcRequest(ctx), {
+      parse: 'none'
     })
-    .all("/rpc/*", (ctx) => handleOrpcRequest(ctx), {
-      parse: "none",
+    .all('/rpc/*', (ctx) => handleOrpcRequest(ctx), {
+      parse: 'none'
     })
-    .get("/graphql", handleGraphqlRequest)
-    .post("/graphql", handleGraphqlRequest, {
-      parse: "none",
+    .get('/graphql', handleGraphqlRequest)
+    .post('/graphql', handleGraphqlRequest, {
+      parse: 'none'
     })
     .post(
-      "/webhook",
+      '/webhook',
       async (ctx) => {
-        const rawBody = await ctx.request.text();
+        const rawBody = await ctx.request.text()
         const request = createLegacyRequestFromElysia(ctx, {
           body: {
-            raw: rawBody,
-          },
-        });
-        const reply = createLegacyReplyAdapter(ctx);
+            raw: rawBody
+          }
+        })
+        const reply = createLegacyReplyAdapter(ctx)
 
-        await webhookHandler(request, reply);
+        await webhookHandler(request, reply)
 
-        return reply.getPayload();
+        return reply.getPayload()
       },
       {
-        parse: "none",
-      },
+        parse: 'none'
+      }
     )
-    .post("/refresh_token", async (ctx) => {
-      const requestDb = createRequestDb();
-      const getStripeClient = createStripeClientGetter();
-      const request = createLegacyRequestFromElysia(ctx);
-      const reply = createLegacyReplyAdapter(ctx);
+    .post('/refresh_token', async (ctx) => {
+      const requestDb = createRequestDb()
+      const getStripeClient = createStripeClientGetter()
+      const request = createLegacyRequestFromElysia(ctx)
+      const reply = createLegacyReplyAdapter(ctx)
       try {
-        const refreshToken = request.cookies["refresh-token"];
+        const refreshToken = request.cookies['refresh-token']
 
         if (!refreshToken) {
           return reply
             .status(400)
-            .send({ ok: false, error: "no refresh token cookie" });
+            .send({ ok: false, error: 'no refresh token cookie' })
         }
 
-        let payload: jwtPayloadRefreshToken | null = null;
+        let payload: jwtPayloadRefreshToken | null = null
         try {
           payload = verify(
             refreshToken,
-            process.env.REFRESH_TOKEN_SECRET!,
-          ) as jwtPayloadRefreshToken;
+            process.env.REFRESH_TOKEN_SECRET!
+          ) as jwtPayloadRefreshToken
         } catch (error) {
-          console.log(error);
+          console.log(error)
 
           const message =
-            error instanceof Error ? error.message : "invalid token";
+            error instanceof Error ? error.message : 'invalid token'
 
           return reply
-            .clearCookie("refresh-token")
+            .clearCookie('refresh-token')
             .status(401)
-            .send({ ok: false, error: message });
+            .send({ ok: false, error: message })
         }
 
         const user = await requestDb.db.query.user.findFirst({
-          where: { id: payload.userId },
-        });
+          where: { id: payload.userId }
+        })
 
         if (!user) {
-          return reply.send({ ok: false, accessToken: null });
+          return reply.send({ ok: false, accessToken: null })
         }
 
         if (user.tokenVersion !== payload.tokenVersion) {
-          return reply.send({ ok: false, accessToken: null });
+          return reply.send({ ok: false, accessToken: null })
         }
 
         const device = await requestDb.db.query.device.findFirst({
-          where: { id: payload.deviceId },
-        });
-        if (!device) throw new Error("Device not found");
+          where: { id: payload.deviceId }
+        })
+        if (!device) throw new Error('Device not found')
 
         const legacyCtx: IContext = {
           request,
           reply,
           getIpAddress: getIpAddressFromLegacyRequest(request),
           getStripeClient,
-          db: requestDb.db,
-        };
+          db: requestDb.db
+        }
 
-        setNewRefreshToken(user, device, legacyCtx);
+        setNewRefreshToken(user, device, legacyCtx)
 
-        const accessToken = setNewAccessTokenIntoCookie(
-          user,
-          device,
-          legacyCtx,
-        );
+        const accessToken = setNewAccessTokenIntoCookie(user, device, legacyCtx)
 
         return reply.send({
           ok: true,
-          accessToken,
-        });
+          accessToken
+        })
       } finally {
-        await requestDb.close();
+        await requestDb.close()
       }
-    });
+    })
 
-  return app;
-};
+  return app
+}
 
-export const app = buildApp();
+export const app = buildApp()
