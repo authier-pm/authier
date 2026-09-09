@@ -13,6 +13,24 @@ The release also appears as an Actions artifact. The previous React Native/Googl
 
 ## Publish
 
+### Obtainium updates
+
+The download page and release notes offer a preconfigured Obtainium import link.
+`shared/androidDistribution.ts` owns the configuration; `scripts/androidObtainium.ts`
+prints the link used by the publisher. Keep release titles in the form
+`Authier Android <version>` and APK names `authier-<version>-android.apk`.
+Obtainium filters those titles/assets, skips prereleases, searches older releases
+when a newer extension release exists, and trims `v<version>-android` to match
+the installed Android version. Update and test the configuration if these conventions change.
+
+Users must install Authier through Obtainium and leave background updates enabled.
+Android 12+ can install eligible updates silently; earlier Android versions need
+confirmation. No Authier APK rebuild is needed to start using Obtainium.
+
+Validate with `bun test scripts/androidObtainium.spec.ts scripts/androidRelease*.spec.ts`.
+
+### Create a release tag
+
 The workflow and native app changes must be pushed to the commit you tag. To publish a version, choose a version higher than previous Android releases:
 
 ```sh

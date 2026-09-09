@@ -14,11 +14,18 @@ if [[ "$remote_commit" != "$ANDROID_SOURCE_REF" ]]; then
 fi
 
 apk="authier-${ANDROID_VERSION_NAME}-android.apk"
+obtainium_url=$(bun "$(dirname "$0")/androidObtainium.ts")
 notes=$(mktemp)
 existing_dir=$(mktemp -d)
 trap 'rm -f "$notes"; rm -rf "$existing_dir"' EXIT
 cat > "$notes" <<EOF
 Native Authier for Android ${ANDROID_VERSION_NAME}.
+
+**[Set up automatic updates with Obtainium](${obtainium_url})** (recommended).
+Install Obtainium, import this Authier configuration, then install or update Authier from Obtainium.
+Keep background updates enabled. On Android 12+, eligible updates can install automatically;
+on older Android versions, tap the update notification to install.
+If Authier is already installed, update or reinstall it in place through Obtainium. Do not uninstall Authier.
 
 Download **${apk}**, open it on Android 8 or newer, and allow installation from your browser when prompted.
 This is a signed release build. Later releases signed with the same key update this app in place.

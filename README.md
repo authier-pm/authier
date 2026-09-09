@@ -13,6 +13,9 @@ Includes:
 
 If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
 
+**Android:** [Install with Obtainium](https://www.authier.pm/download#android) to
+receive updates directly from signed GitHub Releases. See [Android installation](android-app/README.md#install-and-stay-up-to-date).
+
 ## Passkeys
 
 Save website passkeys in Authier and sync them between Brave, Firefox and Edge.

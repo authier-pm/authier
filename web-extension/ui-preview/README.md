@@ -1,5 +1,12 @@
 # Extension UI preview
 
+The `android-updates` scenario embeds the production Astro download page. Start
+`pnpm --dir landing-page dev` from the repository root alongside the preview, or
+run `pnpm exec playwright test --config playwrightAndroidUpdates.config.ts` from
+`web-extension`. This starts both servers, verifies the Obtainium link and mobile
+layout, and captures `docs/screenshots/android-updates.png` and
+`android-updates-mobile.png`.
+
 This checked-in harness renders extension UI against predictable mock browser
 and device state. Use it for visual development and screenshots instead of
 creating one-off harnesses outside the repository.
