@@ -5382,3 +5382,78 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   July 2026 creation, while the catalogue presents unreliable project metadata.
   It was rejected as a low-trust route rather than used to manufacture another
   nominal referring domain.
+
+## 2026-09-09
+
+### Verified Digital Escape Tools' accepted followed placement at 09:13 CEST
+
+- Maintainer `abdomk1998` applied the **Added to List** label to
+  [issue #11](https://github.com/abdomk1998/awesome-digital-escape-tools/issues/11)
+  and closed it on September 8 at 20:07 UTC. The repository's canonical branch
+  and generated Password Managers catalogue now contain Authier, so this is an
+  editorial acceptance rather than a silent rejection.
+- The live
+  [Authier tool page](https://digitalescapetools.com/tools/tool.html?id=authier)
+  returns HTTP 200 and renders two direct homepage anchors plus one direct
+  download-page anchor. Each uses only `rel="noopener"`; none has `nofollow`,
+  `ugc`, `sponsored`, or an intermediate redirect. The page emits neither a
+  canonical link nor a robots meta restriction, and the host permits ordinary
+  search crawling.
+- A current AhrefsBot request receives Cloudflare HTTP 403, and the expected
+  sitemap does not list this query-parameter page. The placement is legitimate
+  and discoverable through the repository and category navigation, but no
+  Ahrefs crawlability or metric credit is claimed before source-level evidence.
+- The generated page says official mobile builds are on Authier's download
+  page, but that page currently lists only the Chrome, Firefox, and Edge
+  extensions, including Firefox for Android. Authier now also has a signed
+  native Android 0.1.1 APK, published separately through GitHub Releases after
+  the directory suggestion was filed. The page also omitted the submitted
+  early-stage/no-independent-audit caveat.
+- Prepared a transparent correction in
+  [`digitalEscapeCorrection.md`](./editorial-pitches/digitalEscapeCorrection.md).
+  It discloses maintainer affiliation, AI drafting assistance, the supported
+  distribution scope, and the lack of an independent audit. It remains unsent
+  because posting a public issue comment requires action-time confirmation.
+
+### Verified LFX Insights' accepted, indexable profile at 09:13 CEST
+
+- Linux Foundation maintainer Joana Maia replied to and closed
+  [onboarding discussion #2143](https://github.com/linuxfoundation/insights/discussions/2143)
+  on September 8, saying onboarding had been triggered and data would appear in
+  24–48 hours.
+- LFX's public search API now returns an active **Authier** project and the
+  `authier-pm/authier` repository. The live
+  [Authier Insights profile](https://insights.linuxfoundation.org/project/authier)
+  returns HTTP 200, is self-canonical, declares `index, follow`, and is
+  accessible with an AhrefsBot user agent.
+- The rendered profile links directly to `https://www.authier.pm/` from the
+  visible **authier.pm** anchor with `rel="noopener noreferrer"` and no
+  `nofollow`, `ugc`, or `sponsored` token. It also links to the canonical GitHub
+  repository and accurately identifies the AGPL-3.0 licence and active project
+  lifecycle.
+- The project's sitemap has not yet added the new profile, so no Ahrefs
+  discovery or DR credit is claimed yet. The searchable, canonical, crawlable
+  profile and direct homepage anchor nevertheless constitute a newly verified
+  high-trust followed placement.
+
+### Audited active queues, inbox, and the official completion check at 09:13 CEST
+
+- All 20 open Authier-titled external pull requests plus VectorLogoZone's
+  separately tracked metadata-fix PR remain open. None has a conflict, requested
+  change, or new human feedback. The only existing failures remain
+  VectorLogoZone #99's upstream metadata check and OSS Directory #1213's
+  external action-required check. tRPC #7558 is behind its base branch but is
+  still mergeable with green checks and no maintainer rebase request, so no
+  queue-churning update was pushed.
+- THEHUB issue #36, FMHY issue #6189, PrivacyTools discussion #62, and Rawsec
+  work item #1258 have no new actionable decision. A read-only inbox search
+  found the Digital Escape acceptance, LFX onboarding response, and internal
+  Authier deployment notifications, but no other directory or editorial reply.
+  No message was sent.
+- Ahrefs' official Website Authority Checker remains prepared with the exact
+  `www.authier.pm` host, but running **Check Authority** submits a
+  CAPTCHA-backed request and still lacks action-time confirmation. The latest
+  completed official result therefore remains September 7's **DR 8**, **54
+  backlinks**, and **37 linking websites**, with **43% dofollow backlinks** and
+  **35% dofollow linking websites**. The DR 13 completion threshold remains
+  unmet and the initiative stays active.
