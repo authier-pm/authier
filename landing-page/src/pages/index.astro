@@ -4,6 +4,7 @@ import VaultPreview from '../components/VaultPreview.astro'
 import { site } from '../config'
 import { guides } from '../data/guides'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { androidObtainiumUrl } from '../../../shared/androidDistribution'
 
 const description =
   'Authier is an open-source password manager for credentials and TOTP codes, with client-side encryption and trusted-device approval.'
@@ -94,8 +95,12 @@ const features = [
         new browser before it can synchronize.
       </p>
       <div class="hero-actions">
-        <a class="button" href="/download">
-          Get Authier
+        <a class="button" href="/download#browsers">
+          Get browser extension
+          <Icon name="arrow" size={18} />
+        </a>
+        <a class="button button-secondary" href={androidObtainiumUrl}>
+          Android via Obtainium
           <Icon name="arrow" size={18} />
         </a>
         <a class="button button-secondary" href={site.vaultUrl}>
@@ -104,7 +109,7 @@ const features = [
       </div>
       <div class="hero-proof" aria-label="Product highlights">
         <span><Icon name="check" size={14} /> Free to start</span>
-        <span><Icon name="check" size={14} /> Browser-based</span>
+        <span><Icon name="check" size={14} /> Browsers + Android</span>
         <span><Icon name="check" size={14} /> AGPL-3.0</span>
       </div>
     </div>
@@ -118,6 +123,7 @@ const features = [
         <span>Chrome</span>
         <span>Firefox</span>
         <span>Edge</span>
+        <a href={androidObtainiumUrl}>Native Android</a>
         <span>Firefox for Android</span>
       </div>
       <a href="/download">View downloads <Icon name="arrow" size={16} /></a>
@@ -242,17 +248,20 @@ const features = [
   <section class="section section-border">
     <div class="shell cta-panel card">
       <div>
-        <p class="eyebrow">Start with the browser you already use</p>
+        <p class="eyebrow">In your browser and on Android</p>
         <h2>Make safer logins feel simple.</h2>
         <p>
-          Install the extension and sign up with your email in about a minute.
-          Your browser becomes the starting point for a vault you can use across
-          Windows, macOS, Linux, and Firefox for Android.
+          Install the browser extension or native Android app and create your vault.
+          Use Obtainium on Android to keep Authier up to date with new releases.
         </p>
       </div>
       <div class="cta-actions">
-        <a class="button" href="/download">
+        <a class="button" href="/download#browsers">
           Choose your browser
+          <Icon name="arrow" size={18} />
+        </a>
+        <a class="button button-secondary" href={androidObtainiumUrl}>
+          Android via Obtainium
           <Icon name="arrow" size={18} />
         </a>
         <a class="text-link" href="/faq">Read the FAQ</a>
@@ -411,6 +420,7 @@ const features = [
 
   .signal-inner div {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: center;
     gap: clamp(20px, 4vw, 52px);

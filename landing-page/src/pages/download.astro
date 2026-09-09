@@ -3,10 +3,12 @@ import Icon from '../components/Icon.astro'
 import PageHero from '../components/PageHero.astro'
 import { site } from '../config'
 import BaseLayout from '../layouts/BaseLayout.astro'
+import { androidObtainiumUrl, androidReleasesUrl } from '../../../shared/androidDistribution'
+import AndroidDownload from '../components/AndroidDownload.astro'
 
 const title = 'Download Authier'
 const description =
-  'Install the Authier password manager extension for Chrome, Firefox, Microsoft Edge, or Firefox for Android, then open the web vault.'
+  'Download Authier for Android with automatic updates through Obtainium, or install the password manager extension for Chrome, Firefox, and Microsoft Edge.'
 
 const browsers = [
   {
@@ -40,7 +42,7 @@ const schema = {
   operatingSystem: 'Chrome, Firefox, Microsoft Edge, Android',
   description,
   url: `${site.url}/download`,
-  downloadUrl: browsers.map(({ href }) => href),
+  downloadUrl: [androidObtainiumUrl, ...browsers.map(({ href }) => href)],
   isAccessibleForFree: true
 }
 ---
@@ -48,15 +50,19 @@ const schema = {
 <BaseLayout title={title} description={description} schema={schema}>
   <PageHero
     eyebrow="Download Authier"
-    title="Start with your browser."
-    description="Choose your browser extension, create a vault, and make that browser your first device. Start on your phone if you want it to become the initial master device."
+    title="Your vault. Every device."
+    description="Install Authier on Android or in your browser. Create a vault on your first device, then approve access from the devices you already trust."
     breadcrumbs={[
       { label: 'Home', href: '/' },
       { label: 'Download' }
     ]}
   />
 
-  <section class="section shell">
+  <section class="section shell" id="android">
+    <AndroidDownload />
+  </section>
+
+  <section class="section shell" id="browsers">
     <div class="browser-grid">
       {browsers.map((browser) => (
         <a class="browser-card card" href={browser.href} target="_blank" rel="noreferrer">
@@ -80,7 +86,7 @@ const schema = {
 
     <div class="platform-note">
       <p><strong>Desktop:</strong> use Chrome, Firefox, or Edge on Windows, macOS, or Linux.</p>
-      <p><strong>Android:</strong> use the official Firefox add-on in Firefox for Android.</p>
+      <p><strong>Android:</strong> <a href="#android">install the native app</a>, or use the Firefox add-on in Firefox for Android.</p>
     </div>
   </section>
 
@@ -117,14 +123,14 @@ const schema = {
     <div class="shell support-history card">
       <div>
         <p class="eyebrow">Current support versus the old roadmap</p>
-        <h2>Use the store links above as the source of truth.</h2>
+        <h2>Use the downloads above as the source of truth.</h2>
       </div>
       <div>
         <p>
           The previous website recommended Kiwi Browser for Android and said
           native Android, macOS, Windows, and Linux apps were coming in Q4 2023.
           It also linked an early iOS build. Those statements are historical,
-          not the current download promise.
+          not the current download promise. The native Android app is now available through <a href={androidReleasesUrl}>GitHub Releases</a>, with updates through Obtainium.
         </p>
         <p>
           <a href="https://github.com/kiwibrowser/src.next/blob/kiwi/README.md" target="_blank" rel="noreferrer">Kiwi Browser is now archived</a>

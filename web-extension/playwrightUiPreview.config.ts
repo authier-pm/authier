@@ -2,6 +2,7 @@ import { defineConfig, devices } from '@playwright/test'
 
 export default defineConfig({
   testDir: './tests/ui-preview',
+  testIgnore: 'androidUpdates.spec.ts',
   timeout: 30_000,
   expect: {
     timeout: 5_000

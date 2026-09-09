@@ -2,7 +2,26 @@
 
 A native Kotlin and Jetpack Compose client for Authier. This project is independent of the React Native application in `mobile-app`.
 
+## Install and stay up to date
+
+Use **[Set up with Obtainium](https://www.authier.pm/download#android)** for automatic
+updates from our signed GitHub Releases. Install Obtainium, open the setup link
+again, confirm the Authier configuration, then install Authier through Obtainium.
+Keep background updates enabled. Eligible updates install automatically on Android
+12+; older Android versions receive an update notification requiring confirmation.
+Checks run periodically, so publication does not instantly update every phone.
+
+Already installed the signed APK? Install/update it in place through Obtainium to
+let Obtainium handle subsequent updates. **Do not uninstall Authier**: uninstalling
+clears the local vault. The configuration selects only native Android release APKs,
+excludes prereleases and extension releases, and needs no GitHub account or token.
+
 ## Build and run
+
+The launcher icons in `app/src/main/res/mipmap-*` reuse the original golden-key
+artwork from `mobile-app/android/app/src/main/res` at all five Android densities,
+including the round variants. Obtainium displays the installed APK's launcher
+icon, so icon changes take effect when the updated APK is installed.
 
 Install JDK 17 and Android SDK 35 with build tools 35.0.0. On Apple Silicon, use an ARM64 JDK. Set `ANDROID_HOME` or create the ignored `local.properties` containing `sdk.dir=/absolute/path/to/Android/sdk`.
 

@@ -1,5 +1,20 @@
 # Extension UI preview
 
+The `android-icon` scenario imports the actual standard and round Android launcher
+resources. Run `pnpm playwright:ui-preview androidIcon.spec.ts` from `web-extension`
+to capture `docs/screenshots/android-icon-preview.png`.
+
+The `android-updates` scenario embeds the production Astro download page. Start
+`pnpm --dir landing-page dev` from the repository root alongside the preview, or
+run `pnpm exec playwright test --config playwrightAndroidUpdates.config.ts` from
+`web-extension`. This starts both servers, verifies the Obtainium link and mobile
+layout, and captures `docs/screenshots/android-updates.png` and
+`android-updates-mobile.png`.
+
+The same suite covers `android-landing`, which embeds the real homepage and verifies
+the configured Obtainium links in its hero, platform list, and closing call to action.
+It captures `docs/screenshots/android-landing.png` and `android-landing-mobile.png`.
+
 This checked-in harness renders extension UI against predictable mock browser
 and device state. Use it for visual development and screenshots instead of
 creating one-off harnesses outside the repository.
