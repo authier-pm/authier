@@ -20,6 +20,7 @@ import {
   primaryKey
 } from 'drizzle-orm/pg-core'
 import { sql } from 'drizzle-orm'
+import type { CachedPasswordFormClassification } from '../../shared/passwordFormClassification'
 
 export const tokenType = pgEnum('TokenType', ['EMAIL', 'API'])
 export const encryptedSecretType = pgEnum('EncryptedSecretType', [
@@ -486,6 +487,7 @@ export const webInput = pgTable(
   {
     id: serial().primaryKey(),
     layoutType: text(),
+    formClassification: jsonb().$type<CachedPasswordFormClassification>(),
     createdAt: timestamp({ precision: 3 })
       .default(sql`CURRENT_TIMESTAMP`)
       .notNull(),

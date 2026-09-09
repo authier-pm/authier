@@ -19,4 +19,5 @@ crons = ["*/15 * * * *"]
 # wrangler secret put ACCESS_TOKEN_SECRET
 # wrangler secret put REFRESH_TOKEN_SECRET
 # wrangler secret put COOKIE_SECRET
+# wrangler secret put OPENROUTER_API_KEY
 # ...and the rest of your backend env vars.

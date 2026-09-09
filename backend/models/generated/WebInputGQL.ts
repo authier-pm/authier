@@ -2,6 +2,8 @@ import { Field, ObjectType, Int, GraphQLISODateTime } from 'type-graphql'
 import { WebInputTypeGQL } from '../types/WebInputType'
 import { UserGQL } from './UserGQL'
 import { SecretUsageEventGQL } from './SecretUsageEventGQL'
+import { GraphQLJSON } from 'graphql-scalars'
+import type { CachedPasswordFormClassification } from '../../../shared/passwordFormClassification'
 
 @ObjectType()
 export class WebInputGQLScalars {
@@ -10,6 +12,9 @@ export class WebInputGQLScalars {
 
   @Field(() => String, { nullable: true })
   layoutType: string | null
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  formClassification: CachedPasswordFormClassification | null
 
   @Field(() => GraphQLISODateTime)
   createdAt: Date

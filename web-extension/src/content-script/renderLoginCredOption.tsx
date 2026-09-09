@@ -35,17 +35,20 @@ export function renderLoginCredOption(props: PromptPasswordOptionProps) {
       container={promptOption}
       onSelectLogin={(loginCredential) => {
         resetAutofillStateForThisPage()
-        autofill({
-          secretsForHost: {
-            loginCredentials: [loginCredential],
-            totpSecrets: []
+        autofill(
+          {
+            secretsForHost: {
+              loginCredentials: [loginCredential],
+              totpSecrets: []
+            },
+            autofillEnabled: true,
+            extensionDeviceReady: true,
+            passwordCount: 0,
+            saveLoginModalsState: undefined,
+            webInputs: props.webInputs
           },
-          autofillEnabled: true,
-          extensionDeviceReady: true,
-          passwordCount: 0,
-          saveLoginModalsState: undefined,
-          webInputs: props.webInputs
-        })
+          { userInitiated: true }
+        )
       }}
     />,
     promptOption

@@ -2,6 +2,20 @@ mutation addWebInputs($webInputs: [WebInputElement!]!) {
   addWebInputs(webInputs: $webInputs) {
     id
     createdAt
+    formClassification
+  }
+}
+
+mutation classifyPasswordForm($input: JSON!) {
+  classifyPasswordForm(input: $input) {
+    id
+    host
+    url
+    domPath
+    domOrdinal
+    kind
+    createdAt
+    formClassification
   }
 }
 
@@ -14,5 +28,6 @@ query webInputsForHosts($hosts: [String!]) {
     domOrdinal
     kind
     createdAt
+    formClassification
   }
 }

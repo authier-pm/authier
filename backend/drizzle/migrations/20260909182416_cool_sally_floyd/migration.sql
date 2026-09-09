@@ -1,0 +1,1 @@
+ALTER TABLE "WebInput" ADD COLUMN "formClassification" jsonb;

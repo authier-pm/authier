@@ -1,12 +1,28 @@
 import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 import browser from 'webextension-polyfill'
 import type { IInitStateRes } from './contentScript'
+import { kostkohratkyRegisterConfirmHtml } from '../../ui-preview/fixtures/kostkohratkyRegisterConfirm'
+import {
+  fingerprintPasswordForm,
+  type PasswordFormSnapshot
+} from '@shared/passwordFormClassification'
+import * as passwordFormClassification from './resolvePasswordFormClassification'
 
-const renderSaveCredentialsForm = vi.fn().mockResolvedValue(undefined)
-const renderLoginCredOption = vi.fn()
-const renderPasswordGenerator = vi.fn()
-const notyfSuccess = vi.fn()
-const isElementVisibleInViewport = vi.fn(() => true)
+const {
+  renderSaveCredentialsForm,
+  renderLoginCredOption,
+  renderPasswordGenerator,
+  classifyPasswordForm,
+  notyfSuccess,
+  isElementVisibleInViewport
+} = vi.hoisted(() => ({
+  renderSaveCredentialsForm: vi.fn().mockResolvedValue(undefined),
+  renderLoginCredOption: vi.fn(),
+  renderPasswordGenerator: vi.fn(),
+  classifyPasswordForm: vi.fn().mockResolvedValue(null),
+  notyfSuccess: vi.fn(),
+  isElementVisibleInViewport: vi.fn(() => true)
+}))
 
 vi.mock('./renderSaveCredentialsForm', () => ({ renderSaveCredentialsForm }))
 vi.mock('./renderLoginCredOption', () => ({ renderLoginCredOption }))
@@ -16,6 +32,7 @@ vi.mock('./notyf', () => ({
 }))
 vi.mock('./connectTRPC', () => ({
   trpc: {
+    classifyPasswordForm: { mutate: classifyPasswordForm },
     saveCapturedInputEvents: { mutate: vi.fn().mockResolvedValue(undefined) },
     executeMainWorldAutofillFunction: {
       mutate: vi.fn().mockResolvedValue([])
@@ -45,6 +62,10 @@ vi.mock('@shared/totp', () => ({
 const STORED_USERNAME = 'jiri@example.com'
 const STORED_PASSWORD = 'stored-password-42'
 const TOTP_CODE = '481502'
+const resolveClassification = vi.spyOn(
+  passwordFormClassification,
+  'resolvePasswordFormClassification'
+)
 
 const initState = (
   webInputs: IInitStateRes['webInputs'] = [],
@@ -87,14 +108,22 @@ const inputById = (id: string) =>
   document.getElementById(id) as HTMLInputElement
 
 /** runs autofill past its 150ms "let the page load" delay */
-const runAutofill = async (state = initState()) => {
+const runAutofill = async (
+  state = initState(),
+  { userInitiated = false } = {}
+) => {
   const { autofill, resetAutofillStateForThisPage, debouncedAutofill } =
     await import('./autofill')
   void debouncedAutofill
   resetAutofillStateForThisPage()
 
-  const teardown = autofill(state)
+  const teardown = autofill(state, { userInitiated })
   await vi.advanceTimersByTimeAsync(400)
+  // WebCrypto runs outside fake timers; await the actual classification work.
+  await Promise.all(
+    resolveClassification.mock.results.map((result) => result.value)
+  )
+  await vi.advanceTimersByTimeAsync(0)
   return teardown
 }
 
@@ -154,9 +183,12 @@ beforeAll(() => {
 })
 
 beforeEach(() => {
+  passwordFormClassification.resetPasswordFormClassificationRequests()
+  resolveClassification.mockClear()
   vi.useFakeTimers()
   renderLoginCredOption.mockClear()
   renderPasswordGenerator.mockClear()
+  classifyPasswordForm.mockReset().mockResolvedValue(null)
   renderSaveCredentialsForm.mockClear()
   notyfSuccess.mockClear()
   isElementVisibleInViewport.mockReset()
@@ -399,6 +431,55 @@ describe('autofill on a change-password page', () => {
 })
 
 describe('autofill on a signup page', () => {
+  it.each([false, true])(
+    'offers generation on the first registration password field (saved login: %s)',
+    async (hasSavedLogin) => {
+      setPage(kostkohratkyRegisterConfirmHtml, {
+        url: '/1669325656/e-register-confirm',
+        lang: 'cs'
+      })
+      classifyPasswordForm.mockImplementation(
+        async (snapshot: PasswordFormSnapshot) => ({
+          version: 1,
+          fingerprint: await fingerprintPasswordForm(snapshot),
+          result: {
+            kind: 'SIGNUP',
+            currentPasswordIndex: null,
+            newPasswordIndexes: [0, 1],
+            usernameIndex: null
+          }
+        })
+      )
+      const state = initState([
+        {
+          domPath: 'input[type="password"]',
+          domOrdinal: 0,
+          kind: WebInputType.PASSWORD,
+          url: 'https://example.com/login',
+          host: 'example.com',
+          createdAt: new Date().toString()
+        }
+      ])
+      if (!hasSavedLogin) state.secretsForHost.loginCredentials = []
+      const inputs = Array.from(
+        document.querySelectorAll<HTMLInputElement>('input[type="password"]')
+      )
+      const submit = vi.fn((event: Event) => event.preventDefault())
+      document.querySelector('form')!.addEventListener('submit', submit)
+
+      const teardown = await runAutofill(state)
+
+      expect(renderPasswordGenerator).toHaveBeenCalledExactlyOnceWith({
+        input: inputs[0]
+      })
+      expect(inputs.map((input) => input.value)).toEqual(['', ''])
+      expect(renderLoginCredOption).not.toHaveBeenCalled()
+      expect(renderSaveCredentialsForm).not.toHaveBeenCalled()
+      expect(submit).not.toHaveBeenCalled()
+      teardown()
+    }
+  )
+
   it('offers the generator and types nothing', async () => {
     setPage(
       `<form>
@@ -421,6 +502,35 @@ describe('autofill on a signup page', () => {
 })
 
 describe('autofill on an unclassifiable page', () => {
+  it('requires an explicit account selection for a model-classified login and never submits it', async () => {
+    setPage(
+      `<form><input id="user" type="email"><input id="pw" type="password"><button type="submit">Pokračovat</button></form>`,
+      { lang: 'cs', url: '/model-login' }
+    )
+    classifyPasswordForm.mockImplementation(
+      async (snapshot: PasswordFormSnapshot) => ({
+        version: 1,
+        fingerprint: await fingerprintPasswordForm(snapshot),
+        result: {
+          kind: 'LOGIN',
+          currentPasswordIndex: 1,
+          newPasswordIndexes: [],
+          usernameIndex: 0
+        }
+      })
+    )
+    const submit = vi.fn((event: Event) => event.preventDefault())
+    document.querySelector('form')!.addEventListener('submit', submit)
+    const teardown = await runAutofill()
+    expect(inputById('pw').value).toBe('')
+    expect(renderLoginCredOption).toHaveBeenCalledTimes(1)
+    teardown()
+    const stopManual = await runAutofill(initState(), { userInitiated: true })
+    expect(inputById('pw').value).toBe(STORED_PASSWORD)
+    expect(submit).not.toHaveBeenCalled()
+    stopManual()
+  })
+
   it('offers the picker instead of guessing', async () => {
     setPage(
       `<form>

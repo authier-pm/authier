@@ -38,6 +38,11 @@ import { mainWorldAutofillFunction } from '../content-script/getAllInputsIncludi
 import { constructURL } from '@shared/urlUtils'
 import { loginSessionManager } from './loginSession'
 import { createLoginCredentialData } from './createLoginCredentialData'
+import { classifyPasswordForm } from './classifyPasswordForm'
+import {
+  normalizePasswordFormUrl,
+  passwordFormSnapshotSchema
+} from '@shared/passwordFormClassification'
 import {
   AutofillPagePauseMessageKind,
   clearAutofillPagePause,
@@ -268,6 +273,21 @@ const appRouter = tc.router({
       }
 
       device.state?.webInputs.push(forDeviceState)
+    }),
+  classifyPasswordForm: tcProcedure
+    .input(passwordFormSnapshotSchema)
+    .mutation(async ({ ctx, input }) => {
+      const tabId = ctx.sender?.tab?.id
+      const senderUrl = ctx.sender?.url ?? ctx.sender?.tab?.url
+      if (
+        !tabId ||
+        !senderUrl ||
+        normalizePasswordFormUrl(senderUrl) !== input.url
+      )
+        return null
+      const state = await getContentScriptInitialState(senderUrl, tabId)
+      if (!state.extensionDeviceReady || !state.autofillEnabled) return null
+      return classifyPasswordForm(input)
     }),
   executeMainWorldAutofillFunction: tcProcedure
     .input(

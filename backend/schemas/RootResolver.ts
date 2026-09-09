@@ -24,6 +24,8 @@ import {
   GraphQLPositiveInt,
   GraphQLUUID
 } from 'graphql-scalars'
+import { GraphQLJSON } from 'graphql-scalars'
+import { classifyAndCachePasswordForm } from '../lib/classifyPasswordForm'
 
 import debug from 'debug'
 import { RegisterNewAccountInput } from '../models/AuthInputs'
@@ -361,7 +363,10 @@ export class RootResolver {
         })
       : null
     const userHasNoMasterDevice = !user.masterDeviceId
-    const allowsAutomaticApproval = userHasNoMasterDevice || user.newDevicePolicy === 'ALLOW' || user.newDevicePolicy === null
+    const allowsAutomaticApproval =
+      userHasNoMasterDevice ||
+      user.newDevicePolicy === 'ALLOW' ||
+      user.newDevicePolicy === null
     const isBlocked = await ctx.db.query.decryptionChallenge.findFirst({
       where: {
         userId: user.id,
@@ -828,6 +833,15 @@ If this was not you, ignore this email or reject the login request from your cur
   }
 
   @UseMiddleware(throwIfNotAuthenticated)
+  @Mutation(() => WebInputGQLScalars, { nullable: true })
+  async classifyPasswordForm(
+    @Arg('input', () => GraphQLJSON, { validate: false }) input: unknown,
+    @Ctx() ctx: IContextAuthenticated
+  ) {
+    return classifyAndCachePasswordForm(ctx.db, ctx.jwtPayload.userId, input)
+  }
+
+  @UseMiddleware(throwIfNotAuthenticated)
   @Mutation(() => WebInputMutation, {
     nullable: true
   })
@@ -870,11 +884,12 @@ If this was not you, ignore this email or reject the login request from your cur
           kind: forUpsert.kind
         },
         columns: {
-          id: true
+          id: true,
+          formClassification: true
         }
       })
 
-      if (existing) {
+      if (existing && !existing.formClassification) {
         // it can happen that website changes the input field, so we delete the old one and add the new one
         await ctx.db
           .delete(schema.webInput)

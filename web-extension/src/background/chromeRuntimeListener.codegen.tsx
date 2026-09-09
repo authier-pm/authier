@@ -1,22 +1,44 @@
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
 import * as Types from '@shared/generated/graphqlBaseTypes';
 
+import { WebInputType } from '@shared/generated/graphqlBaseTypes';
 import { gql } from '@apollo/client';
 import * as ApolloReactCommon from '@apollo/client/react';
 import * as ApolloReactHooks from '@apollo/client/react';
 const defaultOptions = {} as const;
-export type AddWebInputsMutationVariables = Types.Exact<{
+export type WebInputElement = {
+  /** The index of the input element on the page (0-based). We are not able to always generate a css selector which matches only one element. Here the domOrdinal comes in and saves the day. */
+  domOrdinal: number;
+  domPath: string;
+  kind: WebInputType;
+  url: string;
+};
+
+export { WebInputType };
+
+export type AddWebInputsMutationVariables = Exact<{
   webInputs: Array<Types.WebInputElement> | Types.WebInputElement;
 }>;
 
 
-export type AddWebInputsMutation = { __typename?: 'Mutation', addWebInputs: Array<{ __typename?: 'WebInputGQL', id: number, createdAt: string }> };
+export type AddWebInputsMutation = { addWebInputs: Array<{ id: number, createdAt: string, formClassification: unknown }> };
 
-export type WebInputsForHostsQueryVariables = Types.Exact<{
-  hosts?: Types.InputMaybe<Array<Types.Scalars['String']['input']> | Types.Scalars['String']['input']>;
+export type ClassifyPasswordFormMutationVariables = Exact<{
+  input: unknown;
 }>;
 
 
-export type WebInputsForHostsQuery = { __typename?: 'Query', webInputs: Array<{ __typename?: 'WebInputGQLScalars', id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string }> };
+export type ClassifyPasswordFormMutation = { classifyPasswordForm: { id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string, formClassification: unknown } | null };
+
+export type WebInputsForHostsQueryVariables = Exact<{
+  hosts?: Array<string> | string | null | undefined;
+}>;
+
+
+export type WebInputsForHostsQuery = { webInputs: Array<{ id: number, host: string, url: string, domPath: string, domOrdinal: number, kind: Types.WebInputType, createdAt: string, formClassification: unknown }> };
 
 
 export const AddWebInputsDocument = gql`
@@ -24,6 +46,7 @@ export const AddWebInputsDocument = gql`
   addWebInputs(webInputs: $webInputs) {
     id
     createdAt
+    formClassification
   }
 }
     `;
@@ -51,6 +74,44 @@ export function useAddWebInputsMutation(baseOptions?: ApolloReactHooks.MutationH
       }
 export type AddWebInputsMutationHookResult = ReturnType<typeof useAddWebInputsMutation>;
 export type AddWebInputsMutationResult = ApolloReactCommon.MutationResult<AddWebInputsMutation>;
+export const ClassifyPasswordFormDocument = gql`
+    mutation classifyPasswordForm($input: JSON!) {
+  classifyPasswordForm(input: $input) {
+    id
+    host
+    url
+    domPath
+    domOrdinal
+    kind
+    createdAt
+    formClassification
+  }
+}
+    `;
+
+/**
+ * __useClassifyPasswordFormMutation__
+ *
+ * To run a mutation, you first call `useClassifyPasswordFormMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useClassifyPasswordFormMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [classifyPasswordFormMutation, { data, loading, error }] = useClassifyPasswordFormMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useClassifyPasswordFormMutation(baseOptions?: ApolloReactHooks.MutationHookOptions<ClassifyPasswordFormMutation, ClassifyPasswordFormMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return ApolloReactHooks.useMutation<ClassifyPasswordFormMutation, ClassifyPasswordFormMutationVariables>(ClassifyPasswordFormDocument, options);
+      }
+export type ClassifyPasswordFormMutationHookResult = ReturnType<typeof useClassifyPasswordFormMutation>;
+export type ClassifyPasswordFormMutationResult = ApolloReactCommon.MutationResult<ClassifyPasswordFormMutation>;
 export const WebInputsForHostsDocument = gql`
     query webInputsForHosts($hosts: [String!]) {
   webInputs(hosts: $hosts) {
@@ -61,6 +122,7 @@ export const WebInputsForHostsDocument = gql`
     domOrdinal
     kind
     createdAt
+    formClassification
   }
 }
     `;

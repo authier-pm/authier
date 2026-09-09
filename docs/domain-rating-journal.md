@@ -5302,3 +5302,25 @@ Opened [Toolbox PR #13](https://github.com/Toolbox-List/Toolbox/pull/13).
   OpenAlternative remains a preview with `noindex, nofollow`; OpenAltFinder's
   expected route remains HTTP 404; and appsec.fyi and Cloudflare's Small App
   Garden still contain no Authier entry. No duplicate submission was created.
+
+## 2026-09-09 — Submitlist follow-up
+
+- Independently verified the official Ahrefs result for www.authier.pm in Brave:
+  **DR 9**, **58 backlinks** (43% dofollow), **39 linking websites** (36%
+  dofollow). The target above DR 12 remains unmet.
+- Reviewed the user-supplied awesome-submitlist against prior marketing notes
+  and first-party submission pages. Detailed evidence and exclusions are in
+  [submitlistReview.md](./submitlistReview.md).
+- Completed Landbook sign-in, profile setup, email verification, and a URL-only
+  recommendation of Authier. Its generated record is
+  https://land-book.com/websites/99798-open-source-password-manager-with-device-approval-authier.
+  The page is self-canonical but declares noindex, follow and its homepage
+  anchor uses noopener nofollow. Receipt and page generation are verified;
+  editorial acceptance and followed-link credit are not established.
+- Prepared [the Dark Mode Design suggestion](./editorial-pitches/darkModeDesignSubmission.md)
+  with maintainer and AI-assistance disclosures. Email remains unsent pending
+  explicit authorization. PeerPush has a verified followed example but its
+  sign-in explicitly accepts terms, so that step remains pending confirmation.
+- Dodo Index's Hanko provider links are nofollow. eBool's free queue is about
+  six months and sampled password-manager links are nofollow. Neither was
+  credited as a followed placement or submitted during this pass.

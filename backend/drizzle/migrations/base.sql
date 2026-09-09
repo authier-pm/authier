@@ -192,6 +192,7 @@ CREATE TABLE "VaultOperation" (
 CREATE TABLE "WebInput" (
 	"id" serial PRIMARY KEY,
 	"layoutType" text,
+	"formClassification" jsonb,
 	"createdAt" timestamp(3) DEFAULT CURRENT_TIMESTAMP NOT NULL,
 	"url" varchar(2048) NOT NULL,
 	"kind" "WebInputType" NOT NULL,

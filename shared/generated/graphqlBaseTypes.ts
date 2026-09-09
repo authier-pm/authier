@@ -1,23 +1,6 @@
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
-export type Exact<T extends { [key: string]: unknown }> = {
-  [K in keyof T]: T[K]
-}
-export type MakeOptional<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]?: Maybe<T[SubKey]>
-}
-export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & {
-  [SubKey in K]: Maybe<T[SubKey]>
-}
-export type MakeEmpty<
-  T extends { [key: string]: unknown },
-  K extends keyof T
-> = { [_ in K]?: never }
-export type Incremental<T> =
-  | T
-  | {
-      [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never
-    }
+export type Exact<T extends Record<string, unknown>> = { [K in keyof T]: T[K] }
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string }
@@ -26,21 +9,21 @@ export type Scalars = {
   Int: { input: number; output: number }
   Float: { input: number; output: number }
   /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
-  BigInt: { input: any; output: any }
+  BigInt: { input: number; output: number }
   /** The javascript `Date` as string. Type represents date and time as the ISO Date string. */
   DateTime: { input: string; output: string }
   /** A field whose value conforms to the standard internet email address format as specified in HTML Spec: https://html.spec.whatwg.org/multipage/input.html#valid-e-mail-address. */
-  EmailAddress: { input: any; output: any }
+  EmailAddress: { input: string; output: string }
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSON: { input: any; output: any }
+  JSON: { input: unknown; output: unknown }
   /** A string that cannot be passed as an empty value */
-  NonEmptyString: { input: any; output: any }
+  NonEmptyString: { input: string; output: string }
   /** Integers that will have a value of 0 or more. */
   NonNegativeInt: { input: number; output: number }
   /** Integers that will have a value greater than 0. */
   PositiveInt: { input: number; output: number }
   /** A field whose value is a generic Universally Unique Identifier: https://en.wikipedia.org/wiki/Universally_unique_identifier. */
-  UUID: { input: any; output: any }
+  UUID: { input: string; output: string }
 }
 
 export type AddNewDeviceInput = {
@@ -304,7 +287,7 @@ export type DeviceQuery = {
   autofillTOTPEnabled: Scalars['Boolean']['output']
   createdAt: Scalars['DateTime']['output']
   deletedAt?: Maybe<Scalars['DateTime']['output']>
-  /** Get all secrets that were change since last device sync */
+  /** Compatibility snapshot including deletion records; use the HTTP cursor API for incremental synchronization */
   encryptedSecretsToSync: Array<EncryptedSecretQuery>
   firebaseToken?: Maybe<Scalars['String']['output']>
   firstIpAddress: Scalars['String']['output']
@@ -437,6 +420,7 @@ export type MasterDeviceResetRequestResult = {
 export type Mutation = {
   __typename?: 'Mutation'
   addWebInputs: Array<WebInputGql>
+  classifyPasswordForm?: Maybe<WebInputGqlScalars>
   currentDevice: DeviceMutation
   /** returns a decryption challenge, used when logging in */
   deviceDecryptionChallenge?: Maybe<DecryptionChallenge>
@@ -455,6 +439,10 @@ export type Mutation = {
 
 export type MutationAddWebInputsArgs = {
   webInputs: Array<WebInputElement>
+}
+
+export type MutationClassifyPasswordFormArgs = {
+  input: Scalars['JSON']['input']
 }
 
 export type MutationDeviceDecryptionChallengeArgs = {
@@ -812,6 +800,7 @@ export type WebInputGql = {
   createdAt: Scalars['DateTime']['output']
   domOrdinal: Scalars['Int']['output']
   domPath: Scalars['String']['output']
+  formClassification?: Maybe<Scalars['JSON']['output']>
   host: Scalars['String']['output']
   id: Scalars['Int']['output']
   kind: WebInputType
@@ -825,6 +814,7 @@ export type WebInputGqlScalars = {
   createdAt: Scalars['DateTime']['output']
   domOrdinal: Scalars['Int']['output']
   domPath: Scalars['String']['output']
+  formClassification?: Maybe<Scalars['JSON']['output']>
   host: Scalars['String']['output']
   id: Scalars['Int']['output']
   kind: WebInputType
@@ -841,6 +831,7 @@ export type WebInputMutation = {
   delete?: Maybe<WebInputGqlScalars>
   domOrdinal: Scalars['Int']['output']
   domPath: Scalars['String']['output']
+  formClassification?: Maybe<Scalars['JSON']['output']>
   host: Scalars['String']['output']
   id: Scalars['Int']['output']
   kind: WebInputType
