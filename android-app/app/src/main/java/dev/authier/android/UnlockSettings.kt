@@ -5,13 +5,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.activity.compose.LocalActivity
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 
 @Composable
 internal fun UnlockSettings(state: VaultUiState, model: VaultViewModel) {
-    val activity = LocalContext.current as FragmentActivity
+    val activity = LocalActivity.current as FragmentActivity
     var expanded by remember { mutableStateOf(false) }
     val availability = if (state.demo) BiometricManager.BIOMETRIC_SUCCESS else BiometricUnlock.availability(activity)
     Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
