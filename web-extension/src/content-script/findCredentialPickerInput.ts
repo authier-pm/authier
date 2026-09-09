@@ -9,6 +9,8 @@ export const findCredentialPickerInput = (
   webInputs: WebInputsArrayClientSide
 ): HTMLInputElement | null => {
   for (const webInput of webInputs) {
+    // Model records are usable only after the live form fingerprint is checked.
+    if (webInput.formClassification) continue
     if (
       ![
         WebInputType.USERNAME,

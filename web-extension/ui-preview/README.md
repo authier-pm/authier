@@ -19,6 +19,28 @@ This checked-in harness renders extension UI against predictable mock browser
 and device state. Use it for visual development and screenshots instead of
 creating one-off harnesses outside the repository.
 
+The `kostkohratky-password` scenario reproduces the supplied Czech registration
+form without live tokens. It runs production detection, classification validation,
+the generator and password filling with a deterministic background classifier mock.
+Run `bun run playwright:ui-preview kostkohratkyPassword.spec.ts` to verify the
+first-field overlay, filling and cache reuse, and capture
+`docs/screenshots/kostkohratky-password-generator.png`. The test also writes its
+sanitized request to `web-extension/test-results/kostkohratky-classification-snapshot.json`.
+To verify the real free router and database cache, set `OPENROUTER_API_KEY` in
+`backend/.env`, then run from `backend`:
+
+```sh
+bun scripts/verifyPasswordFormClassification.ts ../web-extension/test-results/kostkohratky-classification-snapshot.json
+```
+
+The live check uses PGlite in memory. Production requires the generated database
+migration and the `OPENROUTER_API_KEY` Worker secret before deploying the backend.
+
+Add `&large-form=1` to the password scenario to include over a megabyte of terms
+inside the form. Its browser test verifies that the classifier receives a compact
+excerpt under 16,000 bytes of JSON-escaped HTML, preserves the password fields and
+captions, and captures `docs/screenshots/kostkohratky-large-form-generator.png`.
+
 Run it from `web-extension`:
 
 ```sh

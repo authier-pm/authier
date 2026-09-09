@@ -5,7 +5,12 @@ generates:
   shared/generated/graphqlBaseTypes.ts:
     plugins:
       - typescript
+      - add:
+          content: 'export type Exact<T extends Record<string, unknown>> = { [K in keyof T]: T[K] }'
   shared/generated:
+    config:
+      enumValues:
+        WebInputType: '@shared/generated/graphqlBaseTypes#WebInputType'
     plugins:
       - typescript-operations
       - typescript-react-apollo
@@ -34,6 +39,11 @@ config:
   apolloReactCommonImportFrom: '@apollo/client/react'
   apolloReactHooksImportFrom: '@apollo/client/react'
   scalars:
+    JSON: unknown
+    UUID: string
+    EmailAddress: string
+    NonEmptyString: string
+    BigInt: number
     EmailAddressWithTLD: string
     NonNegativeFloat: number
     NonNegativeInt: number

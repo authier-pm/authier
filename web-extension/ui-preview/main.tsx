@@ -10,6 +10,7 @@ import {
   AndroidUpdatesPreview
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
+import { KostkohratkyPasswordPreview } from './scenarios/KostkohratkyPasswordPreview'
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
@@ -24,7 +25,8 @@ const scenarios: Record<string, ComponentType> = {
   'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
   'android-landing': AndroidLandingPreview,
-  'bitfinex-totp': BitfinexTotpPreview
+  'bitfinex-totp': BitfinexTotpPreview,
+  'kostkohratky-password': KostkohratkyPasswordPreview
 }
 const requestedScenario =
   new URLSearchParams(window.location.search).get('scenario') ??
@@ -39,6 +41,7 @@ document.body.classList.toggle(
   'extension-popup',
   !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
+    requestedScenario !== 'kostkohratky-password' &&
     !requestedScenario.startsWith('passkey-')
 )
 

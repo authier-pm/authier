@@ -22,6 +22,11 @@
 
 ## Follow-up
 
+### PeerPush terms review — approval pending
+
+- Read current https://peerpush.com/terms and https://peerpush.com/privacy (both updated September 8). Submitters retain content ownership but license display/promotion; published content may persist after account deletion. Terms contain indemnification and binding arbitration with a 30-day opt-out provision. Privacy policy describes public profile/product data and indefinite retention of published submissions.
+- No acceptance or sign-in performed. User's prior yes authorized only the Dark Mode Design email; PeerPush terms and free submission approval remain separately pending. No paid plan, reciprocal review, automated engagement, or fabricated feedback is planned.
+
 ### Dark Mode Design — sent
 
 - September 9, 2026, 20:18 CEST: after explicit user approval, sent the prepared "Site submission: Authier" email from capajj@gmail.com to hello@darkmodedesign.com through signed-in Brave Gmail. Recipient, subject, and approved body verified before sending.

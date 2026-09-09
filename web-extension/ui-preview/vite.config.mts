@@ -15,6 +15,18 @@ export default defineConfig({
   resolve: {
     alias: [
       {
+        find: /^(?:\.\.?\/connectTRPC|.*\/src\/content-script\/connectTRPC)(?:\.ts)?$/,
+        replacement: fileURLToPath(
+          new URL('./contentScriptTrpcMock.ts', import.meta.url)
+        )
+      },
+      {
+        find: /^crypto$/,
+        replacement: fileURLToPath(
+          new URL('./cryptoBrowser.ts', import.meta.url)
+        )
+      },
+      {
         find: '@shared',
         replacement: fileURLToPath(new URL('../../shared', import.meta.url))
       },

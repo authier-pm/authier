@@ -8,6 +8,7 @@ const isBrowserMessage = (message: unknown): message is BrowserMessage =>
 
 const browser = {
   runtime: {
+    onMessage: { addListener: () => undefined },
     getURL: () => new URL('../../shared/imgs/logo.svg', import.meta.url).href,
     sendMessage: async (message: unknown) => {
       if (!isBrowserMessage(message)) {

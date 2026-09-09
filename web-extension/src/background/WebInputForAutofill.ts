@@ -9,6 +9,7 @@ export type WebInputForAutofill = {
   domOrdinal: number
   kind: WebInputType
   createdAt: string
+  formClassification?: unknown
 }
 
 export type WebInputsArrayClientSide = Array<

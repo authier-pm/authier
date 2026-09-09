@@ -45,6 +45,7 @@ import {
   selectStoredPasswordAutofillTarget
 } from './storedPasswordAutofillPolicy'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
+import { resolvePasswordFormClassification } from './resolvePasswordFormClassification'
 import { isLikelyOtpField } from './findOtpInputs'
 import { fillOtpInputs } from './fillOtpInputs'
 import {
@@ -453,7 +454,11 @@ export const resetAutofillStateForThisPage = () => {
   filledElements.clear()
 }
 
-export const autofill = (initState: IInitStateRes) => {
+export const autofill = (
+  initState: IInitStateRes,
+  { userInitiated = false }: { userInitiated?: boolean } = {}
+) => {
+  let stopped = false
   const { secretsForHost, webInputs } = initState
 
   log('init autofill', initState)
@@ -562,7 +567,12 @@ export const autofill = (initState: IInitStateRes) => {
      * a page we cannot confidently read gets the credential picker instead of a
      * silent fill.
      */
-    const classification = classifyPageForAutofill(usefulInputs, body)
+    const localClassification = classifyPageForAutofill(usefulInputs, body)
+    const classification = await resolvePasswordFormClassification(
+      localClassification,
+      webInputs
+    )
+    if (stopped || !classification.scope.isConnected) return
     const storedPasswordTarget =
       selectStoredPasswordAutofillTarget(classification)
 
@@ -577,7 +587,11 @@ export const autofill = (initState: IInitStateRes) => {
       return
     }
 
-    if (classification.kind === PasswordFormKind.UNKNOWN) {
+    if (
+      classification.kind === PasswordFormKind.UNKNOWN ||
+      (!userInitiated &&
+        classification.signals.includes('openrouter:classification'))
+    ) {
       log('page kind is unknown, offering the picker instead of autofilling')
       offerCredentialPicker(classification)
       return
@@ -586,6 +600,7 @@ export const autofill = (initState: IInitStateRes) => {
     // Fill known inputs
     let foundInputsCount = 0
     for (const webInputGql of webInputs) {
+      if (webInputGql.formClassification) continue
       const inputElList = body.querySelectorAll(
         webInputGql.domPath
       ) as NodeListOf<HTMLInputElement>
@@ -1040,6 +1055,7 @@ export const autofill = (initState: IInitStateRes) => {
   const initTimeout = setTimeout(initAutofill, 150) // let's wait a bit for the page to load
 
   return () => {
+    stopped = true
     bodyInputChangeEmitter.off('inputAdded', onInputAddedRelay)
     clearTimeout(initTimeout)
     inputTypesFilledForThisPage.clear()
