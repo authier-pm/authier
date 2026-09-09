@@ -48,3 +48,27 @@ Using a synthetic encrypted vault and the separate native `autofill-fixture` app
 The service now uses [dataset authentication](https://developer.android.com/reference/android/service/autofill/Dataset.Builder#setAuthentication(android.content.IntentSender)) so selecting a login in Authier fills the form directly. Snapshot revision checks prevent a background app operation from overwriting an association saved by the picker.
 
 Updated actual Compose captures: `docs/screenshots/android-autofill.png` and `android-autofill-association.png`. The checked-in `android-vault` preview includes both screens; its rendered gallery is `docs/screenshots/android-ui-preview.png`. No production API deployment or real-account sync was performed for this change.
+
+## Approved login failure and response diagnostics — September 9, 2026
+
+The JSON `completeDeviceLogin` integration test reproduces HTTP 500 when the hosted
+Workers PBKDF2 iteration ceiling is enforced. Both migration-era SHA-256 verifiers
+and existing 600,000-round salted verifiers are covered. With the portable fallback,
+approved login, secret rotation, bootstrap, and repeat login succeed under the same
+limit; incorrect enrollment secrets still fail. New verifier bytes match Node's
+independent PBKDF2 implementation. This fixes the reproduced runtime incompatibility;
+the production invocation log alone did not contain its underlying exception.
+
+Validation: 39 backend tests across mobile login, mobile API, oRPC, security boundaries,
+and error diagnostics; 38 Android JVM tests; debug/release builds and lint; backend
+TypeScript; Cloudflare Worker dry-run bundle; UI-preview TypeScript and Android
+gallery Playwright scenario. The error banner/dialog was exercised in the emulator.
+HTTP payload tests cover JSON, HTML, malformed/empty bodies, oversized responses,
+request correlation, and exclusion of outgoing secrets from diagnostic metadata.
+
+The new screenshot `docs/screenshots/android-api-error.png` contains only synthetic
+data from the debug-only `ApiErrorPreviewActivity`; release manifests exclude it.
+No database migration or client vault re-encryption is needed for this fix. Backend
+deployment is required for installed clients to benefit. The new APK adds tappable
+response details; the server still masks unexpected internal errors in HTTP responses,
+while recording error types, crypto-limit messages, and stack locations in Worker logs.

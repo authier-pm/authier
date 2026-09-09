@@ -109,4 +109,32 @@ class ApiFacadeTest {
         assertEquals("CURSOR_INVALID", error.code)
         assertNotNull(error.cause)
     }
+    @Test fun `retains failed response payload and request metadata for the banner`() = runTest {
+        val body = """{"code":"INTERNAL_SERVER_ERROR","message":"Internal server error","status":500,"data":{"trace":"synthetic"}}"""
+        server.enqueue(MockResponse().setResponseCode(500).setHeader("cf-ray", "synthetic-ray").setBody(body))
+        val failure = try { api.completeLogin(12, "private-request-secret", DeviceSecretInput("private-next-secret", "ciphertext", "salt")); error("Expected failure") }
+            catch (failure: ApiFailure) { failure }
+        val details = requireNotNull(failure.details)
+        assertEquals(body, details.responseBody)
+        assertEquals(500, details.status)
+        assertEquals("POST", details.method)
+        assertTrue(details.url.endsWith("/api/v1/auth/completeDeviceLogin"))
+        assertEquals("synthetic-ray", details.requestId)
+        assertFalse(details.toString().contains("private-request-secret"))
+        assertFalse(details.toString().contains("private-next-secret"))
+    }
+
+    @Test fun `handles HTML empty malformed and oversized error bodies without losing HTTP status`() = runTest {
+        for (body in listOf("<html>Gateway failed</html>", "", "{broken", """{"message":{"nested":"unexpected"},"code":[]}""", "x".repeat(70_000))) {
+            respond(body, 502)
+            val failure = try { api.bootstrap(); error("Expected failure") } catch (failure: ApiFailure) { failure }
+            assertEquals(502, failure.status)
+            val captured = requireNotNull(failure.details).responseBody
+            if (body.length > 65_536) {
+                assertTrue(captured.endsWith("[Response truncated after 64 KiB]"))
+                assertTrue(captured.length < 66_000)
+            } else assertEquals(body, captured)
+        }
+    }
+
 }

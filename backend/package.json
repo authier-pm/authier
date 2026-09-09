@@ -14,6 +14,7 @@
   "dependencies": {
     "@electric-sql/pglite": "^0.5.8",
     "@elysiajs/cors": "^1.4.2",
+    "@noble/hashes": "2.2.0",
     "@orpc/contract": "1.15.0",
     "@orpc/openapi": "1.15.0",
     "@orpc/server": "1.15.0",

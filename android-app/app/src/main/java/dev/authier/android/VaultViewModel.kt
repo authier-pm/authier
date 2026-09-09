@@ -27,6 +27,7 @@ data class VaultUiState(
     val demo: Boolean = false,
     val offline: Boolean = false,
     val error: String? = null,
+    val errorDetails: ApiErrorDetails? = null,
     val notice: String? = null,
     val pendingApproval: Boolean = false,
     val items: List<VaultItem> = emptyList(),
@@ -63,7 +64,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun touch() { lastInteraction = System.currentTimeMillis() }
-    fun clearMessage() { state.value = state.value.copy(error = null, notice = null) }
+    fun clearMessage() { state.value = state.value.copy(error = null, errorDetails = null, notice = null) }
 
     private fun action(work: suspend () -> Unit) {
         if (activeJob?.isActive == true) return
@@ -72,7 +73,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         activeJob = viewModelScope.launch {
             // A canceled disk write must finish before a fresh unlock reads its snapshot.
             predecessor?.join()
-            state.value = state.value.copy(busy = true, error = null, notice = null)
+            state.value = state.value.copy(busy = true, error = null, errorDetails = null, notice = null)
             // The UI boundary converts transport/crypto errors into visible, actionable feedback.
             try { work() }
             catch (cancelled: CancellationException) { throw cancelled }
@@ -82,7 +83,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
                     is java.net.UnknownHostException, is java.net.ConnectException, is java.net.SocketTimeoutException -> "You are offline or the server is unavailable. Your encrypted changes are saved on this device."
                     else -> error.message ?: "The operation could not be completed. Please try again."
                 }
-                if (generation == actionGeneration) state.value = state.value.copy(error = message,
+                if (generation == actionGeneration) state.value = state.value.copy(error = message, errorDetails = (error as? ApiFailure)?.details,
                     offline = error is java.net.UnknownHostException || error is java.net.ConnectException || error is java.net.SocketTimeoutException)
             } finally { if (generation == actionGeneration) state.value = state.value.copy(busy = false) }
         }
@@ -188,7 +189,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         actionGeneration++
         activeJob?.cancel()
         masterKey = null
-        state.value = state.value.copy(unlocked = false, items = emptyList(), devices = emptyList(), approvals = emptyList(), busy = false, error = null, notice = null, lockGeneration = state.value.lockGeneration + 1)
+        state.value = state.value.copy(unlocked = false, items = emptyList(), devices = emptyList(), approvals = emptyList(), busy = false, error = null, errorDetails = null, notice = null, lockGeneration = state.value.lockGeneration + 1)
     }
 
     fun reconnect() {

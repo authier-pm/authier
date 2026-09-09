@@ -9,7 +9,13 @@ test('renders captured native Android vault, authenticator and autofill screens'
     page.getByRole('heading', { name: 'Your vault, on Android.' })
   ).toBeVisible()
   await expect(page.locator('body')).not.toHaveClass(/extension-popup/)
-  for (const name of ['Passwords', 'Authenticator', 'Autofill', 'Link a login']) {
+  for (const name of [
+    'Server response',
+    'Passwords',
+    'Authenticator',
+    'Autofill',
+    'Link a login'
+  ]) {
     const screenshot = page.getByRole('img', {
       name: `Authier Android ${name} screen`
     })

@@ -1,3 +1,4 @@
+import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
 import vaultScreenshot from '../../../docs/screenshots/android-vault.png'
 import totpScreenshot from '../../../docs/screenshots/android-totp.png'
 import autofillScreenshot from '../../../docs/screenshots/android-autofill.png'
@@ -6,6 +7,12 @@ import associationScreenshot from '../../../docs/screenshots/android-autofill-as
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Server response',
+    image: errorScreenshot,
+    description:
+      'Tap a failed request banner to inspect the returned status, endpoint, request ID and payload.'
+  },
   {
     title: 'Passwords',
     image: vaultScreenshot,
@@ -19,12 +26,14 @@ const screens = [
   {
     title: 'Autofill',
     image: autofillScreenshot,
-    description: 'Search saved logins directly from another app’s autofill request.'
+    description:
+      'Search saved logins directly from another app’s autofill request.'
   },
   {
     title: 'Link a login',
     image: associationScreenshot,
-    description: 'Confirm the target app before saving its association and filling.'
+    description:
+      'Confirm the target app before saving its association and filling.'
   }
 ]
 

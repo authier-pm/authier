@@ -27,4 +27,13 @@ data class BootstrapInfo(val email: String, val secrets: List<SecretRecord>, val
 data class LoginChallenge(val status: String, val challengeId: Int, val encryptionSalt: String? = null, val addDeviceSecretEncrypted: String? = null)
 data class SyncPage(val changes: List<SecretRecord>, val nextCursor: String, val hasMore: Boolean)
 
-class ApiFailure(val status: Int, message: String, val code: String? = null, cause: Throwable? = null) : Exception(message, cause)
+class ApiFailure(val status: Int, message: String, val code: String? = null, cause: Throwable? = null, val details: ApiErrorDetails? = null) : Exception(message, cause)
+
+/** Only failed response diagnostics, kept in memory; never request bodies or authorization headers. */
+data class ApiErrorDetails(
+    val status: Int,
+    val method: String,
+    val url: String,
+    val responseBody: String,
+    val requestId: String? = null,
+)

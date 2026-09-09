@@ -28,6 +28,7 @@ import {
 } from './lib/createLegacyHttpAdapters'
 import { createOrpcRequestContext } from './orpc/context'
 import { vaultOrpcRouter } from './orpc/router'
+import { describeApiError } from './orpc/errorDiagnostics'
 
 const log = debug('au:app')
 
@@ -103,7 +104,15 @@ const yoga = createYoga<YogaServerContext, IContext>({
 })
 
 const openApiHandler = new OpenAPIHandler(vaultOrpcRouter, {
-  filter: ({ contract }) => Boolean(contract['~orpc'].route.path)
+  filter: ({ contract }) => Boolean(contract['~orpc'].route.path),
+  interceptors: [
+    onError((error, { context }) => {
+      console.error('Android API request failed', {
+        requestId: context.legacyCtx.request.headers['cf-ray'],
+        error: describeApiError(error)
+      })
+    })
+  ]
 })
 
 const orpcHandler = new RPCHandler(vaultOrpcRouter, {

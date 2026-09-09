@@ -70,7 +70,7 @@ jobs:
         working-directory: backend
         env:
           NODE_ENV: test
-        run: pnpm exec vitest run mobileApi.spec.ts orpcHandler.spec.ts drizzle/vaultChangeMigration.spec.ts models/securityRegression.spec.ts
+        run: pnpm exec vitest run mobileApi.spec.ts mobileLogin.spec.ts utils/deviceSecretHash.spec.ts orpc/errorDiagnostics.spec.ts orpcHandler.spec.ts drizzle/vaultChangeMigration.spec.ts models/securityRegression.spec.ts
       - name: Verify web vault synchronization
         env:
           NODE_OPTIONS: --no-experimental-webstorage
