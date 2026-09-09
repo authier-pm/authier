@@ -37,19 +37,16 @@ import {
   classifyPageForAutofill,
   classifyPasswordForm,
   PasswordFormClassification,
-  PasswordFormKind
+  PasswordFormKind,
+  isPlausibleUsernameInput
 } from './classifyPasswordForm'
 import {
   isStoredPasswordAutofillTarget,
   selectStoredPasswordAutofillTarget
 } from './storedPasswordAutofillPolicy'
 import { renderPasswordGenerator } from './renderPasswordGenerator'
-import {
-  findSegmentedOtpInputs,
-  findSingleOtpInput,
-  isLikelyOtpField,
-  pickWholeCodeEntryBox
-} from './findOtpInputs'
+import { isLikelyOtpField } from './findOtpInputs'
+import { fillOtpInputs } from './fillOtpInputs'
 import {
   appendGeneratedPasswordHistoryEntry,
   createGeneratedPasswordHistoryEntry
@@ -63,7 +60,7 @@ export type IDecryptedSecrets = {
   totpSecrets: ITOTPSecret[]
 }
 
-export const autofillEventsDispatched = new Set()
+export const autofillEventsDispatched = new Set<Event>()
 
 function safeGenerateTotpCode(totpSecret: ITOTPSecret) {
   const otpCode = generateTotpTokenSync({ secret: totpSecret.totp.secret })
@@ -81,138 +78,21 @@ const markTotpFilled = (inputs: HTMLInputElement[]) => {
   notyf.success('Autofilled 2FA code')
 }
 
-/**
- * Pastes the whole code into a code widget.
- *
- * Several widgets never look at their boxes' `input` events at all - Bitfinex
- * renders the boxes as pure display and accumulates the code from a `paste`
- * listener on `document` plus a `keydown` listener on `window`, and Coinbase
- * calls preventDefault() on every keydown except the paste chord. Both do
- * handle a paste carrying the full code, as does Revolut.
- *
- * A synthetic paste never inserts text by itself - the browser gives untrusted
- * paste events no default action - so this only does anything when the page has
- * its own paste handler. That is exactly the case we cannot reach otherwise.
- */
-const tryPasteWholeCode = (target: HTMLInputElement, totpCode: string) => {
-  if (
-    typeof DataTransfer === 'undefined' ||
-    typeof ClipboardEvent === 'undefined'
-  ) {
-    return false
-  }
-
-  try {
-    const clipboardData = new DataTransfer()
-    clipboardData.setData('text/plain', totpCode)
-    const pasteEvent = new ClipboardEvent('paste', {
-      clipboardData,
-      bubbles: true,
-      cancelable: true
-    })
-
-    target.focus()
-    autofillEventsDispatched.add(pasteEvent)
-    target.dispatchEvent(pasteEvent)
-    return true
-  } catch (error) {
-    log('could not dispatch a synthetic paste', error)
-    return false
-  }
-}
-
-/**
- * Fills a one-time code into whatever shape the page uses for it: a row of digit
- * boxes, or the single field that most sites - and every widget that paints fake
- * boxes over one real input - actually ship.
- */
+/** Use the same verified OTP fill for learned selectors and detected widgets. */
 async function fillTotpCode(
-  usefulInputs: HTMLInputElement[],
-  totpCode: string
-) {
-  const segmented = findSegmentedOtpInputs(usefulInputs, totpCode.length)
-  if (
-    segmented &&
-    (await fillSegmentedTotpInputs(segmented.inputs, totpCode))
-  ) {
-    return true
-  }
-
-  const single = findSingleOtpInput(usefulInputs, totpCode.length)
-  if (single && autofillValueIntoInput(single.input, totpCode)) {
-    markTotpFilled([single.input])
-    return true
-  }
-
-  return false
-}
-
-async function fillSegmentedTotpInputs(
   inputs: HTMLInputElement[],
-  totpCode: string
+  code: string,
+  knownInput?: HTMLInputElement
 ) {
-  // one box per digit, or we would leave the widget in a half filled state
-  if (inputs.length !== totpCode.length) {
-    return false
-  }
-
-  const isFullyFilled = () => inputs.every((el) => el.value !== '')
-
-  // when the widget designates a box for the whole code, one write there lets
-  // it spread the digits itself, which is far more reliable than racing it
-  const entryBox = pickWholeCodeEntryBox(inputs, totpCode.length)
-  if (entryBox && autofillValueIntoInput(entryBox, totpCode)) {
-    await Promise.resolve()
-
-    if (isFullyFilled()) {
-      log('widget distributed the code from its entry box')
-      markTotpFilled(inputs)
-      return true
-    }
-
-    log('entry box did not distribute, trying a paste')
-    filledElements.delete(entryBox)
-  }
-
-  // widgets that drive their boxes from a paste handler rather than from the
-  // boxes' own input events only respond to this
-  if (tryPasteWholeCode(inputs[0], totpCode)) {
-    await Promise.resolve()
-
-    if (isFullyFilled()) {
-      log('widget accepted the code as a paste')
-      markTotpFilled(inputs)
-      return true
-    }
-
-    log('paste did not take, falling back to one box at a time')
-  }
-
-  const digits = totpCode.split('')
-  let filledAny = false
-
-  for (let index = 0; index < inputs.length; index++) {
-    const box = inputs[index]
-    box.focus()
-    /**
-     * Widgets move focus to the next box as soon as one accepts a character.
-     * Writing the whole row synchronously races that, and every box ends up
-     * holding the same digit - see bitwarden/clients#11076.
-     */
-    await Promise.resolve()
-
-    const el = autofillValueIntoInput(box, digits[index])
-    if (el) {
-      filledElements.add(el)
-      filledAny = true
-    }
-  }
-
-  if (filledAny) {
-    markTotpFilled(inputs.filter((el) => el.value !== ''))
-  }
-
-  return filledAny
+  const filledInputs = await fillOtpInputs(
+    inputs,
+    code,
+    autofillEventsDispatched,
+    knownInput
+  )
+  if (!filledInputs) return false
+  markTotpFilled(filledInputs)
+  return true
 }
 
 /**
@@ -740,7 +620,8 @@ export const autofill = (initState: IInitStateRes) => {
             WebInputType.USERNAME,
             WebInputType.USERNAME_OR_EMAIL
           ].includes(webInputGql.kind) &&
-          firstLoginCred
+          firstLoginCred &&
+          isPlausibleUsernameInput(inputEl)
         ) {
           foundInputsCount++
           const el = autofillValueIntoInput(
@@ -758,8 +639,7 @@ export const autofill = (initState: IInitStateRes) => {
           if (!totpCode) {
             return
           }
-          const el = autofillValueIntoInput(inputEl, totpCode)
-          el && filledElements.add(el)
+          await fillTotpCode(usefulInputs, totpCode, inputEl)
         }
 
         if (filledElements.size >= 2) {

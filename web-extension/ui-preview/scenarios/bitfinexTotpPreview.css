@@ -1,0 +1,70 @@
+body:has(.bitfinex-preview) {
+  margin: 0;
+  background: #0b1e29;
+  color: #fff;
+}
+.bitfinex-preview {
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 44px 56px;
+  font-family: Arial, sans-serif;
+}
+.bitfinex-preview .preview-caption {
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: #82929c;
+  margin-bottom: 40px;
+}
+.bitfinex-preview h1 {
+  font-size: 42px;
+  font-weight: 700;
+  margin: 0 0 32px;
+}
+.bitfinex-preview p {
+  font-size: 22px;
+  color: #82929c;
+  margin-bottom: 55px;
+}
+.bitfinex-preview input {
+  border: 1px solid #6e808b;
+  border-radius: 7px;
+  background: #18313e;
+  color: white;
+  padding: 16px;
+  font-size: 24px;
+}
+.bitfinex-preview .login__otp-code {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 26px;
+}
+.bitfinex-preview .login__otp-code-digit {
+  box-sizing: border-box;
+  width: 88px;
+  height: 122px;
+  text-align: center;
+  font-size: 50px;
+  border-color: #00baa1;
+}
+.bitfinex-preview .recovery-link {
+  color: #00c5a6;
+  font-size: 20px;
+  margin-bottom: 42px;
+}
+.bitfinex-preview button {
+  display: block;
+  width: 100%;
+  margin-top: 32px;
+  padding: 20px;
+  border-radius: 6px;
+  background: #00a98f;
+  color: white;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.bitfinex-preview [role='status'] {
+  margin-top: 28px;
+  color: #76dec7;
+  font-size: 16px;
+}

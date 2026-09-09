@@ -4,6 +4,7 @@ import ReactDOM from 'react-dom/client'
 import '@src/index.css'
 import { AutofillControlsPreview } from './scenarios/AutofillControlsPreview'
 import { AndroidVaultPreview } from './scenarios/AndroidVaultPreview'
+import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
 import { PasskeyVaultPreview } from './scenarios/PasskeyVaultPreview'
@@ -14,7 +15,8 @@ const scenarios: Record<string, ComponentType> = {
   'remembered-session': RememberedSessionPreview,
   'passkey-vault': PasskeyVaultPreview,
   'passkey-approval': PasskeyApprovalPreview,
-  'android-vault': AndroidVaultPreview
+  'android-vault': AndroidVaultPreview,
+  'bitfinex-totp': BitfinexTotpPreview
 }
 const requestedScenario =
   new URLSearchParams(window.location.search).get('scenario') ??
@@ -28,6 +30,7 @@ if (!Scenario) {
 document.body.classList.toggle(
   'extension-popup',
   requestedScenario !== 'android-vault' &&
+    requestedScenario !== 'bitfinex-totp' &&
     !requestedScenario.startsWith('passkey-')
 )
 

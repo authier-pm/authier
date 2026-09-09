@@ -1,4 +1,5 @@
 import debug from 'debug'
+import { isLikelyOtpField } from './findOtpInputs'
 
 const log = debug('au:classifyPasswordForm')
 
@@ -113,7 +114,7 @@ export const isPlausibleUsernameInput = (el: HTMLInputElement) => {
     return false
   }
   // a single character box is an OTP digit or similar, never a username
-  if (el.maxLength === 1 || el.maxLength === 2) {
+  if (isLikelyOtpField(el)) {
     return false
   }
   const haystack = [

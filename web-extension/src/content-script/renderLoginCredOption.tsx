@@ -1,4 +1,6 @@
+/** @jsxImportSource preact */
 import { h, render } from 'preact'
+import { autofill, resetAutofillStateForThisPage } from './autofill'
 import { ILoginSecret } from '../util/useDeviceState'
 import { PromptPasswordOption } from './components/PromptPasswordOption'
 import { WebInputForAutofill } from '../background/WebInputForAutofill'
@@ -30,6 +32,21 @@ export function renderLoginCredOption(props: PromptPasswordOptionProps) {
     <PromptPasswordOption
       loginCredentials={props.loginCredentials}
       webInputs={props.webInputs}
+      container={promptOption}
+      onSelectLogin={(loginCredential) => {
+        resetAutofillStateForThisPage()
+        autofill({
+          secretsForHost: {
+            loginCredentials: [loginCredential],
+            totpSecrets: []
+          },
+          autofillEnabled: true,
+          extensionDeviceReady: true,
+          passwordCount: 0,
+          saveLoginModalsState: undefined,
+          webInputs: props.webInputs
+        })
+      }}
     />,
     promptOption
   )

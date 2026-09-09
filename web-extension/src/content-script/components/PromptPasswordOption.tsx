@@ -1,9 +1,8 @@
+/** @jsxImportSource preact */
 import { h } from 'preact'
+import { findCredentialPickerInput } from '../findCredentialPickerInput'
 import { useEffect, useState } from 'preact/hooks'
-import {
-  promptOption,
-  PromptPasswordOptionProps
-} from '../renderLoginCredOption'
+import type { PromptPasswordOptionProps } from '../renderLoginCredOption'
 import browser from 'webextension-polyfill'
 import { formatDistanceToNow } from 'date-fns'
 
@@ -12,7 +11,7 @@ import { formatDistanceToNow } from 'date-fns'
 const nano = h
 import './Option.css'
 import debug from 'debug'
-import { autofill, resetAutofillStateForThisPage } from '../autofill'
+import type { ILoginSecret } from '../../util/useDeviceState'
 
 const log = debug('au:PromptPasswordOption')
 const REFRESH_INTERVAL_MS = 100
@@ -30,23 +29,12 @@ function didRectChange(prev: DOMRect, next: DOMRect) {
   )
 }
 
-function findVisibleInputEl(webInputs: PromptPasswordOptionProps['webInputs']) {
-  for (const webInput of webInputs) {
-    const el = document.querySelector(webInput.domPath)
-    if (!(el instanceof HTMLInputElement)) {
-      continue
-    }
-
-    const bounds = el.getBoundingClientRect()
-    if (bounds.width > 0 && bounds.height > 0) {
-      return el
-    }
+export const PromptPasswordOption = (
+  props: PromptPasswordOptionProps & {
+    container: HTMLDivElement
+    onSelectLogin: (login: ILoginSecret) => void
   }
-
-  return null
-}
-
-export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
+) => {
   const { loginCredentials, webInputs } = props
 
   if (webInputs.length === 0) {
@@ -54,7 +42,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
     return null
   }
 
-  const inputEl = findVisibleInputEl(webInputs)
+  const inputEl = findCredentialPickerInput(webInputs)
 
   if (!inputEl) {
     log('No el in PromptPasswordOption')
@@ -72,7 +60,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       return
     }
 
-    const mountedPromptOption = promptOption
+    const mountedPromptOption = props.container
     let trackedInputEl: HTMLInputElement | null = inputEl
     let frameId: number | null = null
     let timeoutId: number | null = null
@@ -103,9 +91,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         return
       }
 
-      if (!trackedInputEl || !trackedInputEl.isConnected) {
-        observeTrackedInput(findVisibleInputEl(webInputs))
-      }
+      observeTrackedInput(findCredentialPickerInput(webInputs))
 
       if (!trackedInputEl) {
         removePrompt()
@@ -115,7 +101,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
       const bounds = trackedInputEl.getBoundingClientRect()
 
       if (bounds.width === 0 || bounds.height === 0) {
-        observeTrackedInput(findVisibleInputEl(webInputs))
+        observeTrackedInput(findCredentialPickerInput(webInputs))
         if (!trackedInputEl) {
           removePrompt()
           return
@@ -177,7 +163,22 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
         : null
     mutationObserver?.observe(document.body, {
       childList: true,
-      subtree: true
+      subtree: true,
+      attributes: true,
+      attributeFilter: [
+        'type',
+        'id',
+        'name',
+        'class',
+        'maxlength',
+        'autocomplete',
+        'inputmode',
+        'aria-label',
+        'disabled',
+        'readonly',
+        'style',
+        'hidden'
+      ]
     })
 
     window.addEventListener('scroll', queuePositionUpdate, true)
@@ -238,20 +239,7 @@ export const PromptPasswordOption = (props: PromptPasswordOptionProps) => {
           return (
             <a
               key={loginCredential.id}
-              onClick={async () => {
-                resetAutofillStateForThisPage()
-                autofill({
-                  secretsForHost: {
-                    loginCredentials: [loginCredential],
-                    totpSecrets: []
-                  },
-                  autofillEnabled: true,
-                  extensionDeviceReady: true,
-                  passwordCount: 0,
-                  saveLoginModalsState: undefined,
-                  webInputs: webInputs
-                })
-              }}
+              onClick={() => props.onSelectLogin(loginCredential)}
             >
               <div
                 style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}

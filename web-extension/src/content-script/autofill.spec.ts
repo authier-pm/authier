@@ -1,3 +1,4 @@
+import { WebInputType } from '@shared/generated/graphqlBaseTypes'
 import browser from 'webextension-polyfill'
 import type { IInitStateRes } from './contentScript'
 
@@ -93,7 +94,7 @@ const runAutofill = async (state = initState()) => {
   resetAutofillStateForThisPage()
 
   const teardown = autofill(state)
-  await vi.advanceTimersByTimeAsync(200)
+  await vi.advanceTimersByTimeAsync(400)
   return teardown
 }
 
@@ -324,7 +325,7 @@ describe('autofill on a login page', () => {
         {
           domPath: '#decoy',
           domOrdinal: 0,
-          kind: 'PASSWORD',
+          kind: WebInputType.PASSWORD,
           url: 'https://example.com/login',
           host: 'example.com',
           createdAt: new Date().toString()
@@ -385,7 +386,7 @@ describe('autofill on a change-password page', () => {
         {
           domPath: '#new',
           domOrdinal: 0,
-          kind: 'PASSWORD',
+          kind: WebInputType.PASSWORD,
           url: 'https://example.com/login',
           host: 'example.com',
           createdAt: new Date().toString()
@@ -528,6 +529,72 @@ describe('segmented 2FA widgets', () => {
     ).toBe('')
   })
 
+  it('ignores a learned username selector that now matches an OTP box', async () => {
+    setPage(BITFINEX_2FA, { url: '/login/' })
+    await runAutofill(
+      initState([
+        {
+          domPath: 'input[type="text"]',
+          domOrdinal: 0,
+          kind: WebInputType.USERNAME_OR_EMAIL,
+          host: 'example.com',
+          url: '/login/',
+          createdAt: '2026-01-01'
+        }
+      ])
+    )
+    expect(inputById('otp-0').value).toBe('')
+  })
+
+  it('waits for an asynchronous paste render without sending duplicate keystrokes', async () => {
+    setPage(BITFINEX_2FA, { url: '/login/' })
+    const boxes = [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`))
+    const keydown = vi.fn()
+    const paste = (event: ClipboardEvent) => {
+      event.preventDefault()
+      const code = event.clipboardData!.getData('text')
+      setTimeout(
+        () =>
+          boxes.forEach((box, i) => {
+            box.value = code[i]
+          }),
+        10
+      )
+    }
+    document.addEventListener('paste', paste)
+    window.addEventListener('keydown', keydown)
+    await runAutofill(initState([], { withTotp: true }))
+    document.removeEventListener('paste', paste)
+    window.removeEventListener('keydown', keydown)
+
+    expect(boxes.map((box) => box.value).join('')).toBe(TOTP_CODE)
+    expect(keydown).not.toHaveBeenCalled()
+    expect(notyfSuccess).toHaveBeenCalledWith('Autofilled 2FA code')
+  })
+
+  it('does not report success or fall back when a consumed paste renders a different code', async () => {
+    setPage(BITFINEX_2FA, { url: '/login/' })
+    const boxes = [0, 1, 2, 3, 4, 5].map((i) => inputById(`otp-${i}`))
+    const input = vi.fn()
+    const paste = (event: ClipboardEvent) => {
+      event.preventDefault()
+      setTimeout(
+        () =>
+          boxes.forEach((box) => {
+            box.value = '9'
+          }),
+        10
+      )
+    }
+    document.addEventListener('paste', paste)
+    boxes.forEach((box) => box.addEventListener('input', input))
+    await runAutofill(initState([], { withTotp: true }))
+    document.removeEventListener('paste', paste)
+
+    expect(input).not.toHaveBeenCalled()
+    expect(notyfSuccess).not.toHaveBeenCalledWith('Autofilled 2FA code')
+  })
+
   it('fills a widget whose boxes are pure display, driven by a paste listener', async () => {
     // this is Bitfinex's real behaviour: the boxes have no onChange at all, the
     // code is accumulated by a paste listener on document and a keydown
@@ -621,6 +688,26 @@ describe('segmented 2FA widgets', () => {
 })
 
 describe('single field 2FA', () => {
+  it('still fills a manually learned TOTP field with no recognizable attributes', async () => {
+    setPage('<input id="field" type="text">', { url: '/2fa' })
+    await runAutofill(
+      initState(
+        [
+          {
+            domPath: '#field',
+            domOrdinal: 0,
+            kind: WebInputType.TOTP,
+            host: 'example.com',
+            url: '/2fa',
+            createdAt: '2026-01-01'
+          }
+        ],
+        { withTotp: true }
+      )
+    )
+    expect(inputById('field').value).toBe(TOTP_CODE)
+  })
+
   it('fills a plain one-time-code input', async () => {
     setPage(
       `<form><input id="otp" type="text" inputmode="numeric" maxlength="6"
