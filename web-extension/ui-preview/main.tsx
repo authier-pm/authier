@@ -4,7 +4,10 @@ import ReactDOM from 'react-dom/client'
 import '@src/index.css'
 import { AutofillControlsPreview } from './scenarios/AutofillControlsPreview'
 import { AndroidVaultPreview } from './scenarios/AndroidVaultPreview'
-import { AndroidUpdatesPreview } from './scenarios/AndroidUpdatesPreview'
+import {
+  AndroidLandingPreview,
+  AndroidUpdatesPreview
+} from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
 
 import { PasskeyApprovalPreview } from './scenarios/PasskeyApprovalPreview'
@@ -18,6 +21,7 @@ const scenarios: Record<string, ComponentType> = {
   'passkey-approval': PasskeyApprovalPreview,
   'android-vault': AndroidVaultPreview,
   'android-updates': AndroidUpdatesPreview,
+  'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview
 }
 const requestedScenario =
@@ -31,8 +35,7 @@ if (!Scenario) {
 
 document.body.classList.toggle(
   'extension-popup',
-  requestedScenario !== 'android-vault' &&
-    requestedScenario !== 'android-updates' &&
+  !requestedScenario.startsWith('android-') &&
     requestedScenario !== 'bitfinex-totp' &&
     !requestedScenario.startsWith('passkey-')
 )
