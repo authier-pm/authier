@@ -2,6 +2,7 @@ package dev.authier.android
 
 import android.app.Application
 import android.os.Build
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import dev.authier.android.crypto.AuthierCrypto
@@ -39,15 +40,16 @@ data class VaultUiState(
     val lastSyncAt: Long? = null,
     val lockTimeoutSeconds: Int = 300,
     val lockGeneration: Int = 0,
+    val biometricEnabled: Boolean = false,
 )
 
 class VaultViewModel(application: Application) : AndroidViewModel(application) {
     private val store = VaultStore(application)
+    private val unlockStore = VaultUnlockStore(application)
     private var snapshot = store.read()
     private var masterKey: SecretKey? = null
     private var activeJob: Job? = null
     private var actionGeneration = 0
-    private var lastInteraction = System.currentTimeMillis()
     private val state = MutableStateFlow(VaultUiState(email = snapshot.email, serverUrl = snapshot.serverUrl,
         remembered = snapshot.authSecretEncrypted.isNotBlank(), pendingWrites = snapshot.outbox.size,
         lastSyncAt = snapshot.lastSyncAt, lockTimeoutSeconds = snapshot.lockTimeoutSeconds))
@@ -57,13 +59,71 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch {
             while (true) {
                 delay(1000)
-                val timeout = state.value.lockTimeoutSeconds
-                if (state.value.unlocked && !state.value.demo && timeout > 0 && System.currentTimeMillis() - lastInteraction >= timeout * 1000L) lock()
+                checkExpiry()
             }
         }
     }
 
-    fun touch() { lastInteraction = System.currentTimeMillis() }
+    fun touch() {
+        checkExpiry()
+        if (!state.value.unlocked || state.value.demo) return
+        masterKey?.let { unlockStore.remember(snapshot, it) }
+    }
+
+    private fun checkExpiry() {
+        if (state.value.unlocked && !state.value.demo && state.value.lockTimeoutSeconds > 0 &&
+            unlockStore.restore(snapshot) == null) lock()
+    }
+
+    fun background() {
+        if (state.value.lockTimeoutSeconds == 0) lock() else checkExpiry()
+    }
+
+    fun resume() {
+        checkExpiry()
+        if (state.value.demo) return
+        // Re-read the shared snapshot after autofill and restore without extending its deadline.
+        action {
+            snapshot = withContext(Dispatchers.IO) { store.read() }
+            state.value = state.value.copy(biometricEnabled = unlockStore.biometricEnabled(snapshot),
+                lockTimeoutSeconds = snapshot.lockTimeoutSeconds)
+            val key = masterKey ?: unlockStore.restore(snapshot) ?: return@action
+            AuthierCrypto.decrypt(key, snapshot.authSecretEncrypted)
+            masterKey = key
+            state.value = state.value.copy(unlocked = true)
+            rebuildItems()
+        }
+    }
+
+    fun enableBiometric(activity: FragmentActivity) = action {
+        if (state.value.demo) { state.value = state.value.copy(biometricEnabled = true); return@action }
+        val key = requireNotNull(masterKey) { "Unlock the vault first." }
+        val cipher = unlockStore.prepareBiometric(snapshot, enrolling = true)
+        val authenticated = BiometricUnlock.authenticate(activity, cipher, enrolling = true)
+        unlockStore.enableBiometric(snapshot, key, authenticated)
+        state.value = state.value.copy(biometricEnabled = true, notice = "Fingerprint unlock is enabled on this phone.")
+    }
+
+    fun disableBiometric() = action {
+        if (!state.value.demo) unlockStore.disableBiometric()
+        state.value = state.value.copy(biometricEnabled = false)
+    }
+
+    fun unlockBiometric(activity: FragmentActivity) = action {
+        snapshot = withContext(Dispatchers.IO) { store.read() }
+        val cipher = unlockStore.prepareBiometric(snapshot, enrolling = false)
+        val authenticated = BiometricUnlock.authenticate(activity, cipher, enrolling = false)
+        openVault(unlockStore.unlockBiometric(snapshot, authenticated))
+        syncNow()
+    }
+
+    private suspend fun openVault(key: SecretKey) {
+        AuthierCrypto.decrypt(key, snapshot.authSecretEncrypted)
+        unlockStore.remember(snapshot, key)
+        masterKey = key
+        state.value = state.value.copy(unlocked = true, biometricEnabled = unlockStore.biometricEnabled(snapshot))
+        rebuildItems()
+    }
     fun clearMessage() { state.value = state.value.copy(error = null, errorDetails = null, notice = null) }
 
     private fun action(work: suspend () -> Unit) {
@@ -78,7 +138,13 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             try { work() }
             catch (cancelled: CancellationException) { throw cancelled }
             catch (error: Exception) {
+                if (BuildConfig.DEBUG) android.util.Log.e("Authier", "Vault action failed", error)
                 val message = when (error) {
+                    is android.security.keystore.KeyPermanentlyInvalidatedException -> {
+                        unlockStore.disableBiometric()
+                        state.value = state.value.copy(biometricEnabled = false)
+                        "Your registered biometrics changed. Unlock with your master password and enable fingerprint unlock again."
+                    }
                     is javax.crypto.AEADBadTagException -> "That master password could not unlock this vault."
                     is java.net.UnknownHostException, is java.net.ConnectException, is java.net.SocketTimeoutException -> "You are offline or the server is unavailable. Your encrypted changes are saved on this device."
                     else -> error.message ?: "The operation could not be completed. Please try again."
@@ -159,12 +225,12 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         require(pending.isEmpty() || snapshot.encryptionSalt == salt) { "The account encryption key changed. This phone still has pending changes encrypted with the previous key." }
         val pendingIds = pending.map { it.id }.toSet()
         val records = session.bootstrap.secrets.filter { it.id !in pendingIds } + snapshot.secrets.filter { it.id in pendingIds }
+        val timeout = if (snapshot.email == normalizedEmail && snapshot.serverUrl == origin && snapshot.authSecretEncrypted.isNotBlank())
+            snapshot.lockTimeoutSeconds else session.bootstrap.lockTimeoutSeconds.coerceIn(0, 86400)
         persist(snapshot.copy(email = normalizedEmail, serverUrl = origin, encryptionSalt = salt, authSecretEncrypted = encryptedAuthSecret,
-            sealedTokens = sealed, cursor = null, secrets = records, outbox = pending, lockTimeoutSeconds = session.bootstrap.lockTimeoutSeconds))
-        masterKey = key
-        touch()
-        state.value = state.value.copy(email = normalizedEmail, serverUrl = origin, remembered = true, unlocked = true, pendingApproval = false, approvals = session.bootstrap.approvals)
-        rebuildItems()
+            sealedTokens = sealed, cursor = null, secrets = records, outbox = pending, lockTimeoutSeconds = timeout))
+        state.value = state.value.copy(email = normalizedEmail, serverUrl = origin, remembered = true, pendingApproval = false, approvals = session.bootstrap.approvals)
+        openVault(key)
         syncNow()
     }
 
@@ -176,11 +242,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
             return@action
         }
         val key = withContext(Dispatchers.Default) { AuthierCrypto.deriveMasterKey(password, snapshot.encryptionSalt) }
-        AuthierCrypto.decrypt(key, snapshot.authSecretEncrypted)
-        masterKey = key
-        touch()
-        state.value = state.value.copy(unlocked = true)
-        rebuildItems()
+        openVault(key)
         syncNow()
     }
 
@@ -189,6 +251,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         actionGeneration++
         activeJob?.cancel()
         masterKey = null
+        unlockStore.clearSession()
         state.value = state.value.copy(unlocked = false, items = emptyList(), devices = emptyList(), approvals = emptyList(), busy = false, error = null, errorDetails = null, notice = null, lockGeneration = state.value.lockGeneration + 1)
     }
 
@@ -315,9 +378,11 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun changeTimeout(seconds: Int) = action {
+        require(lockTimeoutOptions.any { it.first == seconds }) { "Choose a timeout up to one day." }
         if (!state.value.demo) {
-            authenticated { it.updateLockTimeout(seconds) }
+            // A local security preference must work offline, regardless of server availability.
             persist(snapshot.copy(lockTimeoutSeconds = seconds))
+            masterKey?.let { unlockStore.remember(snapshot, it) }
         } else state.value = state.value.copy(lockTimeoutSeconds = seconds)
     }
 
@@ -330,13 +395,13 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         require(snapshot.outbox.isEmpty()) { "Sync or resolve your pending changes before removing this vault from the device." }
         val revoked = runCatching { authenticated { it.logout() } }
         revoked.exceptionOrNull()?.let { if (it is CancellationException) throw it }
-        withContext(Dispatchers.IO) { store.clear() }
+        withContext(Dispatchers.IO) { unlockStore.clear(); store.clear() }
         snapshot = VaultSnapshot()
         masterKey = null
         state.value = VaultUiState(notice = if (revoked.isFailure) "Local vault removed. The server could not confirm sign-out; you can revoke this device from another Authier app." else null)
     }
 
-    fun demo() {
+    fun demo(locked: Boolean = false) {
         if (!BuildConfig.DEBUG) return
         actionGeneration++
         activeJob?.cancel()
@@ -345,7 +410,8 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         val passwords = names.mapIndexed { index, (label, username) -> VaultItem(SecretRecord("demo-$index", "demo", "LOGIN_CREDENTIALS", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, username = username, password = "demo-password-" + index, url = "https://${label.lowercase()}.com")) }
         val demoSeeds = listOf("JBSWY3DPEHPK3PXP", "KRUGS4ZANFZSAYJA", "MFRGGZDFMZTWQ2LK")
         val codes = listOf("GitHub", "Google", "Cloudflare").mapIndexed { index, label -> VaultItem(SecretRecord("totp-$index", "demo", "TOTP", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, secret = demoSeeds[index], url = "https://${label.lowercase()}.com")) }
-        state.value = VaultUiState(email = "alex@studio.design", unlocked = true, demo = true, items = passwords + codes, lastSyncAt = System.currentTimeMillis(),
+        state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,
+            lockTimeoutSeconds = 86400, biometricEnabled = locked, items = passwords + codes, lastSyncAt = System.currentTimeMillis(),
             devices = listOf(DeviceInfo("demo", "Pixel · this device", "Android", null, true), DeviceInfo("browser", "Chrome on MacBook", "Browser", null, false)))
     }
 }

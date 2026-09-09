@@ -12,9 +12,6 @@
     "tsc": {
       "outputs": ["dist/**"]
     },
-    "authier-mobile-app#tsc": {
-      "outputs": []
-    },
     "authier-web-extension#tsc": {
       "outputs": []
     },

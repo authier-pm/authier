@@ -3,11 +3,9 @@ package dev.authier.android
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
-import android.util.AtomicFile
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.io.File
-import java.io.FileNotFoundException
 import java.security.KeyStore
 import java.util.Base64
 import javax.crypto.Cipher
@@ -18,17 +16,11 @@ import javax.crypto.spec.GCMParameterSpec
 val vaultJson = Json { ignoreUnknownKeys = true; encodeDefaults = true }
 
 class VaultStore(context: Context) {
-    private val file = AtomicFile(File(context.noBackupFilesDir, "encrypted-vault.json"))
+    private val file = AtomicJsonFile(File(context.noBackupFilesDir, "encrypted-vault.json"), VaultSnapshot.serializer(), ::VaultSnapshot)
     private val keyAlias = "authier-session-v1"
 
     fun read(): VaultSnapshot = synchronized(storageLock) {
-        try {
-            // openRead restores the legacy .bak after an interrupted write, even if base is absent.
-            vaultJson.decodeFromString(file.openRead().bufferedReader().use { it.readText() })
-        } catch (error: FileNotFoundException) {
-            if (file.baseFile.exists() || File(file.baseFile.path + ".bak").exists()) throw error
-            VaultSnapshot()
-        }
+        file.read()
     }
 
     fun update(transform: (VaultSnapshot) -> VaultSnapshot): VaultSnapshot = synchronized(storageLock) {
@@ -45,15 +37,7 @@ class VaultStore(context: Context) {
 
     private fun write(snapshot: VaultSnapshot): VaultSnapshot = synchronized(storageLock) {
         val saved = snapshot.copy(storageRevision = java.util.UUID.randomUUID().toString())
-        val stream = file.startWrite()
-        // AtomicFile rollback is necessary to preserve the prior cursor and page on disk failure.
-        try {
-            stream.write(vaultJson.encodeToString(saved).toByteArray())
-            file.finishWrite(stream)
-        } catch (error: Exception) {
-            file.failWrite(stream)
-            throw error
-        }
+        file.write(saved)
         saved
     }
 

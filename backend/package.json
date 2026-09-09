@@ -19,7 +19,6 @@
     "@orpc/openapi": "1.15.0",
     "@orpc/server": "1.15.0",
     "@orpc/zod": "1.15.0",
-    "@react-native-firebase/app": "^26.4.0",
     "@types/jsonwebtoken": "^9.0.10",
     "@upstash/redis": "^1.38.4",
     "bytes": "^3.1.2",

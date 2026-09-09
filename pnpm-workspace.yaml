@@ -1,7 +1,6 @@
 packages:
   - 'backend/**'
   - 'landing-page/**'
-  - 'mobile-app/**'
   - 'shared'
   - 'vault-web/**'
   - 'web-extension/**'
@@ -32,8 +31,6 @@ overrides:
   'websocket-driver@<0.7.5': 0.7.5
 
 patchedDependencies:
-  '@react-native/gradle-plugin': patches/@react-native__gradle-plugin.patch
-  native-base@3.4.28: patches/native-base@3.4.28.patch
   '@graphql-codegen/typescript-react-apollo': patches/@graphql-codegen__typescript-react-apollo.patch
 
 minimumReleaseAgeExclude:
@@ -70,7 +67,6 @@ minimumReleaseAgeExclude:
   - '@oxfmt/binding-win32-arm64-msvc@0.62.0'
   - '@oxfmt/binding-win32-ia32-msvc@0.62.0'
   - '@oxfmt/binding-win32-x64-msvc@0.62.0'
-  - '@react-native-firebase/app@26.1.0'
   - '@testing-library/user-event@14.6.3 || 14.6.7'
   - oxfmt@0.62.0
   - unplugin-swc@1.5.10 || 1.6.0

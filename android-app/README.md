@@ -1,6 +1,6 @@
 # Authier for Android
 
-A native Kotlin and Jetpack Compose client for Authier. This project is independent of the React Native application in `mobile-app`.
+A native Kotlin and Jetpack Compose client for Authier. This is the current mobile client; the legacy React Native project has been removed.
 
 ## Install and stay up to date
 
@@ -18,9 +18,8 @@ excludes prereleases and extension releases, and needs no GitHub account or toke
 
 ## Build and run
 
-The launcher icons in `app/src/main/res/mipmap-*` reuse the original golden-key
-artwork from `mobile-app/android/app/src/main/res` at all five Android densities,
-including the round variants. Obtainium displays the installed APK's launcher
+The launcher icons in `app/src/main/res/mipmap-*` contain the original golden-key
+artwork at all five Android densities, including the round variants. Obtainium displays the installed APK's launcher
 icon, so icon changes take effect when the updated APK is installed.
 
 Install JDK 17 and Android SDK 35 with build tools 35.0.0. On Apple Silicon, use an ARM64 JDK. Set `ANDROID_HOME` or create the ignored `local.properties` containing `sdk.dir=/absolute/path/to/Android/sdk`.
@@ -41,20 +40,41 @@ The HTTP client and wire models are generated from the monorepo OpenAPI contract
 ## Implemented flows
 
 - Create an account, request device approval, and sign in using the approved encrypted challenge. Existing installations can approve or reject new device requests.
-- Unlock the local vault with the master password, including while offline. The password, derived key, and plaintext vault items are never written to disk.
+- Unlock the local vault with the master password, including while offline. The password and plaintext vault items are never written to disk. Saved unlock keys are encrypted by Android Keystore.
 - Create, edit, delete and search passwords and TOTP entries. Generate random passwords and copy passwords or current verification codes.
 - Keep an encrypted outbox while offline. Sync reuses each operation ID, detects stale writes, applies opaque cursor pages atomically, and retains deletion tombstones to avoid resurrecting records during history replay.
 - Resolve conflicts by preserving/copying the local value, then discarding the pending change and loading the server version. Pending deletions can also be resolved from Settings.
-- View/remove other devices, configure device-approval policy, and select the idle lock timeout. The vault locks immediately when the activity enters the background.
+- View/remove other devices, configure device-approval policy, and select a per-phone idle lock timeout from 1 minute to 1 day, or lock on background. Timed unlock survives backgrounding, process death, force-stop and reboot until expiry. Changing the timeout works offline. Manual locking immediately clears the saved timed session.
 - Refresh expired access tokens, reconnect a revoked/expired server session without dropping pending ciphertext, and sign out after pending changes are synchronized or discarded.
 
-Android Autofill supports native app login forms with exact package associations, explicit master-password unlock, and account selection. Enable Authier from Settings. In another app, unlock Authier, choose or search for a saved login, and confirm “Use login and fill” to remember the app automatically. Linked accounts appear first on future requests; “Choose another saved login” links a different account. Each login currently supports one Android app; the confirmation explicitly identifies any link being replaced. Associations are encrypted and queued locally, then synced when Authier is next opened and unlocked. Items with pending writes must be synced or resolved before linking. Manual package entry remains available in the password editor. WebViews and ambiguous forms are deliberately excluded from matching.
+Android Autofill supports native app login forms with exact package associations, timed session recovery, password or fingerprint unlock, and account selection. Enable Authier from Settings. In another app, unlock Authier, choose or search for a saved login, and confirm “Use login and fill” to remember the app automatically. Linked accounts appear first on future requests; “Choose another saved login” links a different account. Each login currently supports one Android app; the confirmation explicitly identifies any link being replaced. Associations are encrypted and queued locally, then synced when Authier is next opened and unlocked. Items with pending writes must be synced or resolved before linking. Manual package entry remains available in the password editor. WebViews and ambiguous forms are deliberately excluded from matching.
 
 Passkeys created by the browser extension remain encrypted in Android's synchronized snapshot, including deletion records. They are excluded from the password/TOTP editor, native Autofill, and unsupported-payload error reporting. This Android version does not list, edit, create, or authenticate with passkeys; manage them in the browser extension. Native sync preserves passkey ciphertext without decoding or reencoding it.
 
-This initial native application does not yet implement Android Credential Provider, biometrics, camera QR scanning, push notifications, or encrypted import/export. TOTP setup keys can be entered manually. Device approval checks are explicit through the sign-in button; device requests refresh on the Devices tab.
+This initial native application does not yet implement Android Credential Provider, camera QR scanning, push notifications, or encrypted import/export. TOTP setup keys can be entered manually. Device approval checks are explicit through the sign-in button; device requests refresh on the Devices tab.
+
+## Fingerprint unlock
+
+Unlock once with your master password, then open Settings → Fingerprint unlock.
+If no biometric is enrolled, **Register fingerprint in Android** opens system
+settings; return to Authier and enable the feature. Confirm the biometric prompt
+to wrap the vault key with an authentication-per-use Android Keystore key.
+The lock screen and Autofill then offer **Unlock with fingerprint**. Android can
+also accept another Class 3 biometric. Cancellation, lockout or unavailable hardware
+leave the master-password option available. Changing biometric enrollment invalidates
+the biometric key; unlock with the password and set it up again.
 
 ## Local security
+
+Timed sessions and biometric unlock keys live in `noBackupFilesDir/vault-unlock.json`
+under separate AES-256-GCM Keystore keys, bound to the local account and device.
+Only wrapped keys are persisted. Timed sessions include authenticated timestamps;
+expiry is checked before revealing the vault or accepting an interaction, using
+both wall time and elapsed time during the same boot. Reboot uses the original
+wall-clock deadline. Backgrounding and restarting never renew the timeout by
+themselves. Touch activity renews it. Sign-out clears both keys; manual lock clears
+only the timed key, leaving fingerprint unlock available. Clearing app data or
+losing Keystore keys requires a password again.
 
 The atomic snapshot lives in the app's `noBackupFilesDir`. It contains ciphertext, metadata, sync state, and encrypted pending operations. Android Keystore protects persisted access/refresh tokens using AES-256-GCM. Android backup is disabled, and `FLAG_SECURE` prevents screenshots and recent-task previews for real vaults. Password/code clipboard entries are marked sensitive on Android 13+ and expire after 30 seconds. Cleanup runs when clipboard access is available; Android may defer this until Authier regains focus. Authier only clears its own expired clip.
 
@@ -83,3 +103,23 @@ request body or authorization headers. Responses over 64 KiB are explicitly trun
 
 For a synthetic screenshot, launch the debug-only `ApiErrorPreviewActivity` and tap
 the banner. This preview reads no vault data and makes no network requests.
+
+## Unlock regression checks
+
+Run `./gradlew :app:testDebugUnitTest :app:connectedDebugAndroidTest` with a clean
+debug emulator. Instrumentation covers encrypted key recovery, expiry, account
+isolation, offline timeout changes, backgrounding, activity recreation and manual
+locking. The opt-in `UnlockRestartFixture` seeds an offline synthetic vault for
+host-driven force-stop/reboot checks (`-e unlockFixture seed`, or `clear` to remove it).
+
+For the real biometric crypto round trip, enroll a fingerprint on the emulator,
+install the debug app and its androidTest APK, and run:
+
+```sh
+adb shell am instrument -w -e class dev.authier.android.BiometricUnlockTest \
+  -e biometricTest true dev.authier.android.debug.test/androidx.test.runner.AndroidJUnitRunner
+```
+
+Run `adb emu finger touch 1` from another terminal for both the enable and unlock
+prompts. This test uses authentication-per-use Keystore encryption and decryption
+with the production prompt and clears its synthetic vault afterward.

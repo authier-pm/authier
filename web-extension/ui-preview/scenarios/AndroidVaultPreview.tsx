@@ -1,3 +1,5 @@
+import unlockSettingsScreenshot from '../../../docs/screenshots/android-unlock-settings.png'
+import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint-unlock.png'
 import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
 import vaultScreenshot from '../../../docs/screenshots/android-vault.png'
 import totpScreenshot from '../../../docs/screenshots/android-totp.png'
@@ -7,6 +9,18 @@ import associationScreenshot from '../../../docs/screenshots/android-autofill-as
 // Compose runs in Android, so this scenario displays captures from the actual
 // debug app instead of maintaining a second implementation of its UI in React.
 const screens = [
+  {
+    title: 'Unlock settings',
+    image: unlockSettingsScreenshot,
+    description:
+      'Choose an idle timeout up to one day that survives backgrounding and app restarts, and enable fingerprint unlock.'
+  },
+  {
+    title: 'Fingerprint unlock',
+    image: fingerprintScreenshot,
+    description:
+      'Use Android biometrics after your timeout expires, with the master password available as a fallback.'
+  },
   {
     title: 'Server response',
     image: errorScreenshot,

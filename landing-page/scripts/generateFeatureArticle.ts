@@ -40,7 +40,6 @@ const scriptRelativePath = normalizePath(
 )
 const productPaths = [
   'backend',
-  'mobile-app',
   'shared',
   'vault-web',
   'web-extension'

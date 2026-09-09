@@ -1,7 +1,0 @@
-mutation deleteAccount {
-  me {
-    delete {
-      id
-    }
-  }
-}

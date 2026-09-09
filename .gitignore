@@ -108,7 +108,6 @@ dist/js
 authier-api.tar.gz
 backend/dist
 package-lock.json
-mobile-app/android/*.hprof
 dist.crx
 dist.pem
 authier.zip
@@ -121,3 +120,6 @@ web-extension/stats.json
 vault-web/dist
 landing-page/.astro
 landing-page/dist
+
+# Ignored build remnants of the removed React Native project
+/mobile-app/

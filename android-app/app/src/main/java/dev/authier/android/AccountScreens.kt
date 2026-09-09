@@ -63,7 +63,7 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
     LazyColumn(Modifier.fillMaxSize(), contentPadding = PaddingValues(24.dp), verticalArrangement = Arrangement.spacedBy(20.dp)) {
         item { ScreenHeading("Vault settings", state.email) }
         item {
-            SettingSection("ANDROID AUTOFILL", "Fill passwords in Android apps you explicitly associate with a vault item. Each request asks you to unlock and choose the account.") {
+            SettingSection("ANDROID AUTOFILL", "Fill passwords in Android apps you explicitly associate with a vault item. Choose an account to fill. Unlock is only needed after your timeout expires.") {
                 OutlinedButton({ context.startActivity(Intent(Settings.ACTION_REQUEST_SET_AUTOFILL_SERVICE, Uri.parse("package:${context.packageName}"))) }, enabled = !state.demo, modifier = Modifier.fillMaxWidth()) { Text("Set up Android Autofill") }
             }
         }
@@ -78,15 +78,9 @@ fun SettingsScreen(state: VaultUiState, model: VaultViewModel) {
             }
         }
         item {
-            SettingSection("AUTOMATIC LOCK", "The vault always locks when Authier goes into the background.") {
-                listOf(60 to "After 1 minute", 300 to "After 5 minutes", 900 to "After 15 minutes", 0 to "When app enters background").forEach { (seconds, label) ->
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        RadioButton(selected = state.lockTimeoutSeconds == seconds, onClick = { model.changeTimeout(seconds) }, enabled = !state.busy)
-                        Text(label, style = MaterialTheme.typography.bodyMedium)
-                    }
-                }
-            }
+            UnlockSettings(state, model)
         }
+
         item {
             SettingSection("NEW DEVICE ACCESS", "Protect new sign-ins with approval from a trusted device.") {
                 listOf("REQUIRE_ANY_DEVICE_APPROVAL" to "Approval from any device", "REQUIRE_MASTER_DEVICE_APPROVAL" to "Approval from master device", "ALLOW" to "Allow with master password").forEach { (policy, label) ->
@@ -125,7 +119,7 @@ private fun ScreenHeading(title: String, description: String, refresh: (() -> Un
 }
 
 @Composable
-private fun SettingSection(title: String, description: String, content: @Composable ColumnScope.() -> Unit) {
+internal fun SettingSection(title: String, description: String, content: @Composable ColumnScope.() -> Unit) {
     Surface(color = Panel, contentColor = MaterialTheme.colorScheme.onSurface, shape = RoundedCornerShape(16.dp)) {
         Column(Modifier.fillMaxWidth().padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             Text(title, color = Mint, fontSize = 10.sp, letterSpacing = 1.sp, fontWeight = FontWeight.SemiBold)

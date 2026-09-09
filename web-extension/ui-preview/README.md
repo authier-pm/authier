@@ -90,3 +90,9 @@ Playwright test to render `docs/screenshots/android-ui-preview.png`.
 The Android gallery also includes `android-api-error.png`, captured from the debug-only
 `ApiErrorPreviewActivity` after tapping its error banner. It uses the production
 response dialog with a synthetic HTTP 500 payload and makes no network requests.
+
+The Android gallery includes `android-unlock-settings.png` and
+`android-fingerprint-unlock.png`. Capture the production Compose screens with the
+debug demo intent and `--ei tab 2` (settings) or `--ez locked true` (unlock),
+force-stopping the debug app before each launch. These scenarios cover a one-day
+idle timeout that survives app restarts and the biometric unlock alternative.

@@ -8,7 +8,9 @@ import android.view.autofill.AutofillManager
 import android.view.autofill.AutofillValue
 import android.service.autofill.Dataset
 import android.widget.RemoteViews
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
+import android.view.MotionEvent
+import kotlinx.coroutines.delay
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -27,7 +29,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 /** Nonexported, launched solely through an immutable service-created PendingIntent. */
-class AutofillUnlockActivity : ComponentActivity() {
+class AutofillUnlockActivity : FragmentActivity() {
+    private val unlockStore by lazy { VaultUnlockStore(this) }
+    private var biometricEnabled by mutableStateOf(false)
     private var choices by mutableStateOf<List<VaultItem>>(emptyList())
     private var busy by mutableStateOf(false)
     private var unlocked by mutableStateOf(false)
@@ -57,12 +61,36 @@ class AutofillUnlockActivity : ComponentActivity() {
         usernameId = usernameTarget
         setContent {
             AuthierTheme {
-                AutofillUnlockScreen(requestedPackage, choices, unlocked, busy, error, ::unlock, ::fill, ::finish)
+                AutofillUnlockScreen(requestedPackage, choices, unlocked, busy, error, { unlock(password = it) }, ::fill, ::finish,
+                    if (biometricEnabled) { { unlock(biometric = true) } } else null)
+            }
+        }
+        unlock()
+        lifecycleScope.launch {
+            while (true) {
+                delay(1000)
+                val snapshot = unlockedSnapshot
+                if (unlocked && snapshot != null && snapshot.lockTimeoutSeconds > 0 && unlockStore.restore(snapshot) == null) finish()
             }
         }
     }
 
-    private fun unlock(password: String) {
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean {
+        if (event.actionMasked == MotionEvent.ACTION_DOWN && unlocked) {
+            val snapshot = unlockedSnapshot
+            val key = masterKey
+            if (snapshot != null && key != null) {
+                if (snapshot.lockTimeoutSeconds > 0 && unlockStore.restore(snapshot) == null) {
+                    finish()
+                    return true
+                }
+                unlockStore.remember(snapshot, key)
+            }
+        }
+        return super.dispatchTouchEvent(event)
+    }
+
+    private fun unlock(password: String? = null, biometric: Boolean = false) {
         if (busy) return
         busy = true
         error = null
@@ -70,7 +98,16 @@ class AutofillUnlockActivity : ComponentActivity() {
             try {
                 val snapshot = withContext(Dispatchers.IO) { VaultStore(this@AutofillUnlockActivity).read() }
                 require(snapshot.authSecretEncrypted.isNotBlank()) { "Open Authier and sign in before using autofill." }
-                val key = withContext(Dispatchers.Default) { AuthierCrypto.deriveMasterKey(password, snapshot.encryptionSalt) }
+                biometricEnabled = unlockStore.biometricEnabled(snapshot)
+                val key = when {
+                    password != null -> withContext(Dispatchers.Default) { AuthierCrypto.deriveMasterKey(password, snapshot.encryptionSalt) }
+                    biometric -> {
+                        val cipher = unlockStore.prepareBiometric(snapshot, enrolling = false)
+                        val authenticated = BiometricUnlock.authenticate(this@AutofillUnlockActivity, cipher, enrolling = false)
+                        unlockStore.unlockBiometric(snapshot, authenticated)
+                    }
+                    else -> unlockStore.restore(snapshot) ?: return@launch
+                }
                 val matching = withContext(Dispatchers.Default) {
                     AuthierCrypto.decrypt(key, snapshot.authSecretEncrypted)
                     snapshot.secrets.filter { it.deletedAt == null && it.kind == "LOGIN_CREDENTIALS" }.mapNotNull { record ->
@@ -79,6 +116,7 @@ class AutofillUnlockActivity : ComponentActivity() {
                         if (content != null && content.password.isNotEmpty()) VaultItem(record, content) else null
                     }
                 }
+                if (password != null || biometric) unlockStore.remember(snapshot, key)
                 masterKey = key
                 unlockedSnapshot = snapshot
                 choices = matching.sortedBy { it.content.label.lowercase() }
@@ -86,6 +124,10 @@ class AutofillUnlockActivity : ComponentActivity() {
             } catch (cancelled: CancellationException) {
                 throw cancelled
             } catch (failure: Exception) {
+                if (failure is android.security.keystore.KeyPermanentlyInvalidatedException) {
+                    unlockStore.disableBiometric()
+                    biometricEnabled = false
+                }
                 error = if (failure is javax.crypto.AEADBadTagException) "That master password could not unlock this vault." else failure.message ?: "Unable to unlock Authier."
             } finally {
                 busy = false
@@ -97,6 +139,7 @@ class AutofillUnlockActivity : ComponentActivity() {
         if (busy || !unlocked || item !in choices) return
         val key = masterKey ?: return
         val unlockedVault = unlockedSnapshot ?: return
+        if (unlockedVault.lockTimeoutSeconds > 0 && unlockStore.restore(unlockedVault) == null) { finish(); return }
         busy = true
         error = null
         activeJob = lifecycleScope.launch {
@@ -161,6 +204,7 @@ internal fun AutofillUnlockScreen(
     onUnlock: (String) -> Unit,
     onSelect: (VaultItem) -> Unit,
     onCancel: () -> Unit,
+    onBiometricUnlock: (() -> Unit)? = null,
 ) {
     var password by remember { mutableStateOf("") }
     var selected by remember { mutableStateOf<VaultItem?>(null) }
@@ -182,6 +226,7 @@ internal fun AutofillUnlockScreen(
                 Text(requestedPackage, color = Mint)
             }
             if (!unlocked) item {
+                if (onBiometricUnlock != null) Button(onBiometricUnlock, enabled = !busy, modifier = Modifier.fillMaxWidth()) { Text("Unlock with fingerprint") }
                 PasswordField(password, { password = it }, "Master password")
                 Spacer(Modifier.height(18.dp))
                 Button({ onUnlock(password); password = "" }, enabled = !busy && password.isNotEmpty(), modifier = Modifier.fillMaxWidth()) {

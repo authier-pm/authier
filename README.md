@@ -8,7 +8,6 @@ Includes:
 - Astro marketing and landing site (`landing-page`)
 - web extension
 - native Kotlin Android app (`android-app`)
-- legacy React Native app (`mobile-app`)
 - backend
 
 If you are looking for the download links to use on your devices, use the official download page: https://www.authier.pm/download
@@ -27,7 +26,6 @@ To build the browser extension follow these commands with a current LTS node ver
 
 ```bash
 curl -fsSL https://get.pnpm.io/install.sh | sh -
-pnpm i zx -g #needed for a postinstall script in mobile-app
 pnpm install
 cd web-extension
 cp .env.example .env

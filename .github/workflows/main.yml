@@ -72,10 +72,6 @@ jobs:
               - 'web-extension/**'
               - '.github/**'
               - 'pnpm-lock.yaml'
-            mobileApp:
-              - 'mobile-app/**'
-              - '.github/**'
-              - 'pnpm-lock.yaml'
 
       - name: backend tests
         working-directory: ./backend
@@ -118,8 +114,3 @@ jobs:
       #     name: test-results
       #     path: web-extension/test-results
       #     retention-days: 30
-
-      - name: mobile-app tests
-        working-directory: ./mobile-app
-        if: steps.changes.outputs.mobileApp == 'true'
-        run: pnpm test

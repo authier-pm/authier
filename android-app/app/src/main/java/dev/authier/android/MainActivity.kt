@@ -3,7 +3,7 @@ package dev.authier.android
 import android.os.Bundle
 import android.view.MotionEvent
 import android.view.WindowManager
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -17,19 +17,20 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
-class MainActivity : ComponentActivity() {
+class MainActivity : FragmentActivity() {
     private val model: VaultViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge(statusBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT), navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT))
         if (!(BuildConfig.DEBUG && intent.getBooleanExtra("demo", false))) window.addFlags(WindowManager.LayoutParams.FLAG_SECURE)
-        if (BuildConfig.DEBUG && intent.getBooleanExtra("demo", false)) model.demo()
-        setContent { AuthierTheme { AuthierApp(model) } }
+        if (BuildConfig.DEBUG && intent.getBooleanExtra("demo", false)) model.demo(intent.getBooleanExtra("locked", false))
+        setContent { AuthierTheme { AuthierApp(model, intent.getIntExtra("tab", 0).takeIf { BuildConfig.DEBUG && intent.getBooleanExtra("demo", false) } ?: 0) } }
     }
 
-    override fun onPause() { model.lock(); super.onPause() }
-    override fun dispatchTouchEvent(event: MotionEvent): Boolean { model.touch(); return super.dispatchTouchEvent(event) }
+    override fun onResume() { super.onResume(); model.resume() }
+    override fun onStop() { model.background(); super.onStop() }
+    override fun dispatchTouchEvent(event: MotionEvent): Boolean { if (event.actionMasked == MotionEvent.ACTION_DOWN) model.touch(); return super.dispatchTouchEvent(event) }
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
         if (hasFocus) clearExpiredClipboard(this)
@@ -37,9 +38,9 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun AuthierApp(model: VaultViewModel) {
+fun AuthierApp(model: VaultViewModel, initialTab: Int = 0) {
     val state by model.ui.collectAsStateWithLifecycle()
-    var tab by remember { mutableIntStateOf(0) }
+    var tab by remember { mutableIntStateOf(initialTab) }
     Scaffold(containerColor = Canvas, bottomBar = {
         if (state.unlocked) NavigationBar(containerColor = Canvas, tonalElevation = 0.dp) {
             listOf("Vault" to Icons.Outlined.GridView, "Devices" to Icons.Outlined.Devices, "Settings" to Icons.Outlined.Tune).forEachIndexed { index, (label, icon) ->
