@@ -96,3 +96,8 @@ The Android gallery includes `android-unlock-settings.png` and
 debug demo intent and `--ei tab 2` (settings) or `--ez locked true` (unlock),
 force-stopping the debug app before each launch. These scenarios cover a one-day
 idle timeout that survives app restarts and the biometric unlock alternative.
+
+The `android-blog` scenario embeds the production native Android launch article.
+Run the `Android launch article` test in `playwrightAndroidUpdates.config.ts` to
+verify desktop/mobile layout, screenshot assets and download links, and capture
+`docs/screenshots/android-blog-desktop.png` and `android-blog-mobile.png`.

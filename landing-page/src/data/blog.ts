@@ -4,6 +4,16 @@ export type BlogPost = ContentEntry
 
 export const blogPosts = [
   {
+    title: 'Meet the new Authier for Android',
+    description:
+      'Your passwords and authenticator codes, now in a native Android app—with fingerprint unlock, Autofill, and a lock timer that respects your choice.',
+    href: '/blog/native-android-app',
+    publishedAt: '2026-09-10',
+    updatedAt: '2026-09-10',
+    readingTime: '4 min read',
+    category: 'Product update'
+  },
+  {
     title: 'v1.2.10-extension source tag: popup login continuity',
     description:
       'Authier’s v1.2.10-extension source tag moves login into the popup, retains pending approval when it closes, and gives navigation controls clearer labels.',

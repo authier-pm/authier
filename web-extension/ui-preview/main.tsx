@@ -7,6 +7,7 @@ import { AndroidVaultPreview } from './scenarios/AndroidVaultPreview'
 import { AndroidIconPreview } from './scenarios/AndroidIconPreview'
 import {
   AndroidLandingPreview,
+  AndroidBlogPreview,
   AndroidUpdatesPreview
 } from './scenarios/AndroidUpdatesPreview'
 import { BitfinexTotpPreview } from './scenarios/BitfinexTotpPreview'
@@ -24,6 +25,7 @@ const scenarios: Record<string, ComponentType> = {
   'android-vault': AndroidVaultPreview,
   'android-icon': AndroidIconPreview,
   'android-updates': AndroidUpdatesPreview,
+  'android-blog': AndroidBlogPreview,
   'android-landing': AndroidLandingPreview,
   'bitfinex-totp': BitfinexTotpPreview,
   'kostkohratky-password': KostkohratkyPasswordPreview

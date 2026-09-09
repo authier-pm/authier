@@ -69,3 +69,40 @@ test('offers the configured Obtainium setup on desktop and mobile', async ({
     path: '../docs/screenshots/android-updates-mobile.png'
   })
 })
+
+test('renders the Android launch article with working screenshots and download links', async ({
+  page
+}) => {
+  await page.setViewportSize({ width: 1440, height: 1800 })
+  await page.goto('/?scenario=android-blog')
+  const article = page.frameLocator('iframe')
+  await expect(
+    article.getByRole('heading', {
+      level: 1,
+      name: 'Meet the new Authier for Android'
+    })
+  ).toBeVisible()
+  const screenshots = article.locator('.android-gallery img')
+  await expect(screenshots).toHaveCount(3)
+  for (const screenshot of await screenshots.all()) {
+    await expect(screenshot).toHaveJSProperty('naturalWidth', 1080)
+  }
+  await expect(
+    article.getByRole('link', { name: 'get Authier for Android', exact: true })
+  ).toHaveAttribute('href', '/download#android')
+  await page.goto('http://127.0.0.1:4321/blog/native-android-app')
+  await page.screenshot({
+    fullPage: true,
+    style: 'astro-dev-toolbar { visibility: hidden; }',
+    path: '../docs/screenshots/android-blog-desktop.png'
+  })
+  await page.goto('/?scenario=android-blog')
+  await page.setViewportSize({ width: 390, height: 1100 })
+  expect(
+    await article.locator('body').evaluate((element) => element.scrollWidth)
+  ).toBeLessThanOrEqual(390)
+  await article.locator('.article-header').screenshot({
+    style: 'astro-dev-toolbar { visibility: hidden; }',
+    path: '../docs/screenshots/android-blog-mobile.png'
+  })
+})

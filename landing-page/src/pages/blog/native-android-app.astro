@@ -1,0 +1,146 @@
+---
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+---
+
+<ArticleLayout
+  title="Meet the new Authier for Android"
+  description="Your passwords and authenticator codes, now in a native Android app—with fingerprint unlock, Autofill, and a lock timer that respects your choice."
+  publishedAt="2026-09-10"
+  readingTime="4 min read"
+  imagePaths={['/blog/android/android-vault.png', '/blog/android/android-unlock-settings.png']}
+>
+  <p>
+    Your password manager should be ready when you need it. Open a login form,
+    find your password, switch back to the other app, grab a verification code.
+    That ordinary sequence should not mean typing your master password over and over.
+  </p>
+  <p>
+    The new <strong>Authier for Android</strong> brings your passwords and
+    authenticator codes to a native app built for your phone. It supports offline
+    vault access, Android Autofill, trusted-device approval, and fingerprint unlock.
+    You can install the signed <a href="https://github.com/authier-pm/authier/releases/tag/v0.1.3-android">Android 0.1.3 release</a>
+    today on Android 8 or newer.
+  </p>
+
+  <div class="android-gallery" aria-label="Authier Android app screenshots">
+    <figure>
+      <img src="/blog/android/android-vault.png" alt="Authier Android vault showing saved passwords for synthetic demo accounts" width="1080" height="2400" loading="eager" />
+      <figcaption>Your passwords, ready on your phone.</figcaption>
+    </figure>
+    <figure>
+      <img src="/blog/android/android-unlock-settings.png" alt="Android vault settings with a one-day automatic lock timeout and fingerprint setup" width="1080" height="2400" loading="eager" />
+      <figcaption>Choose your timeout and enable fingerprint unlock.</figcaption>
+    </figure>
+    <figure>
+      <img src="/blog/android/android-fingerprint-unlock.png" alt="Authier unlock screen offering fingerprint unlock or a master password" width="1080" height="2400" loading="eager" />
+      <figcaption>A fingerprint gets you back into your vault.</figcaption>
+    </figure>
+  </div>
+  <p class="screenshot-note">Screenshots show the native app with synthetic demo accounts.</p>
+
+  <h2>A lock timer that does what you choose</h2>
+  <p>
+    Set the timeout to 15 minutes, leave Authier to use another app, and come back:
+    your vault stays unlocked while that inactivity window is still open.
+    Closing the app, force-stopping it, or restarting your phone does not reset
+    your choice or force an early vault lock.
+  </p>
+  <p>
+    In <strong>Settings → Automatic lock</strong>, choose 1, 5, 15, or 30 minutes;
+    1, 4, 8, or 12 hours; or a full day. The choice saves on your phone and works
+    offline. Activity in the app renews the timer; reopening it by itself does not.
+    Once the selected period without activity has passed, the vault locks.
+  </p>
+  <p>
+    Prefer to lock whenever you leave? That option is still there. You can also
+    tap <strong>Lock vault</strong> at any time to lock immediately, regardless
+    of the timeout.
+  </p>
+
+  <h2>Unlock with your fingerprint</h2>
+  <p>
+    After unlocking your vault, open <strong>Settings → Fingerprint unlock</strong>
+    and enable it. Android asks you to confirm with an enrolled fingerprint or
+    another supported strong biometric. If you have not registered one yet,
+    Authier takes you to Android’s enrollment settings; return to the app afterward
+    to finish enabling the feature.
+  </p>
+  <p>
+    The next time your vault locks, tap <strong>Unlock with fingerprint</strong>.
+    Your master password remains available as a fallback. Android performs the
+    biometric check—Authier never receives or stores your fingerprint data.
+    Changing the fingerprints registered on your phone requires setting up
+    Authier’s biometric unlock again with your master password.
+  </p>
+
+  <h2>Passwords and codes, even offline</h2>
+  <p>
+    Search your saved logins, create and edit passwords, generate a new password,
+    and copy a verification code from the authenticator tab. Once your vault is
+    on the phone, you can unlock and use it without an internet connection.
+  </p>
+  <p>
+    Edits made offline stay encrypted on the device and sync when you reconnect
+    and sync the vault. If another device changed the same item, Authier lets you
+    review the conflict and preserve the value you need before discarding a local
+    change. Your phone also joins the same <a href="/guides/trusted-device-approval">trusted-device approval flow</a>
+    as the browser extension.
+  </p>
+
+  <h2>Fill a login without copying it around</h2>
+  <p>
+    Enable <strong>Android Autofill</strong> in Authier’s settings. In a supported
+    native app’s login form, choose a saved account and confirm
+    <strong>Use login and fill</strong>. Authier remembers the app association
+    so linked logins appear first next time.
+  </p>
+  <p>
+    Autofill uses the same timed unlock session. While the session is valid,
+    you can go straight to choosing an account. After it expires, unlock with
+    your fingerprint or master password. You still choose which login to fill.
+    This release supports native app forms; embedded browser forms and Android
+    passkey authentication are not supported yet.
+  </p>
+
+  <h2>Native Android, the same encrypted vault</h2>
+  <p>
+    We built this app with Kotlin and Jetpack Compose and retired the old React
+    Native mobile project. The new client uses Authier’s existing encrypted vault
+    format, so your passwords and codes can travel between your browser and phone.
+  </p>
+  <p>
+    Your master password and decrypted vault items are not saved to disk. To make
+    timed and fingerprint unlock possible, the app saves an encrypted copy of the
+    vault key protected by Android Keystore. Fingerprint unlock uses a separate key
+    that requires biometric authentication. Manual locking removes the saved timed
+    session, and signing out removes both saved unlock methods. Read more about
+    the design on our <a href="/security">security page</a> or inspect the
+    <a href="https://github.com/authier-pm/authier/tree/v0.1.3-android/android-app">Android source</a>.
+  </p>
+
+  <h2>Get Authier on your phone</h2>
+  <p>
+    Head to the <a href="/download#android">Android download page</a> and select
+    <strong>Set up with Obtainium</strong>. Install Obtainium if you need it,
+    open the setup link again, and confirm the Authier configuration. Obtainium
+    installs Authier from our signed GitHub releases and checks for future updates.
+    A manual APK download is available on the same page.
+  </p>
+  <p>
+    Already using the native Android app? Update it in place so your local vault
+    stays intact. Then pick a lock timeout that suits your day and turn on
+    fingerprint unlock. Your vault is ready to come with you.
+  </p>
+  <div class="article-callout">
+    <p><strong>Try it today:</strong> <a href="/download#android">get Authier for Android</a>, or <a href="https://github.com/authier-pm/authier/issues">tell us what would make it work better for you</a>.</p>
+  </div>
+</ArticleLayout>
+
+<style>
+  .android-gallery { position: relative; left: 50%; transform: translateX(-50%); width: min(1040px, calc(100vw - 40px)); display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 40px 0 20px; }
+  figure { margin: 0; min-width: 0; }
+  img { display: block; width: 100%; height: auto; border: 1px solid var(--border-strong); border-radius: 18px; }
+  figcaption { margin-top: 14px; color: var(--text-muted); font-size: 0.8rem; line-height: 1.6; }
+  .screenshot-note { color: var(--text-subtle); font-size: 0.8rem; }
+  @media (max-width: 600px) { .android-gallery { grid-template-columns: 1fr; max-width: 300px; gap: 30px; } }
+</style>
