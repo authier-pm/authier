@@ -49,23 +49,13 @@ fun AuthierApp(model: VaultViewModel) {
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (state.busy) LinearProgressIndicator(Modifier.fillMaxWidth(), color = Mint, trackColor = Panel)
-            if (state.error != null || state.notice != null) MessageBanner(state.error ?: state.notice.orEmpty(), state.error != null, model::clearMessage)
+            if (state.error != null || state.notice != null) MessageBanner(state.error ?: state.notice.orEmpty(), state.error != null, model::clearMessage, state.errorDetails)
             if (!state.unlocked) key(state.lockGeneration) { AuthScreen(state, model) }
             else when (tab) {
                 0 -> VaultScreen(state, model)
                 1 -> DevicesScreen(state, model)
                 else -> SettingsScreen(state, model)
             }
-        }
-    }
-}
-
-@Composable
-fun MessageBanner(message: String, error: Boolean, dismiss: () -> Unit) {
-    Surface(color = if (error) MaterialTheme.colorScheme.errorContainer else Panel) {
-        Row(Modifier.fillMaxWidth().padding(start = 16.dp), verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-            Text(message, Modifier.weight(1f).padding(vertical = 12.dp), style = MaterialTheme.typography.bodySmall)
-            IconButton(dismiss) { Icon(Icons.Outlined.Close, "Dismiss message") }
         }
     }
 }

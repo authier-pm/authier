@@ -43,3 +43,7 @@ second web implementation. Refresh `docs/screenshots/android-vault.png` and
 `android-autofill.png` from its debug `AutofillPreviewActivity` and
 `android-autofill-association.png` after selecting a login in that preview, then run its
 Playwright test to render `docs/screenshots/android-ui-preview.png`.
+
+The Android gallery also includes `android-api-error.png`, captured from the debug-only
+`ApiErrorPreviewActivity` after tapping its error banner. It uses the production
+response dialog with a synthetic HTTP 500 payload and makes no network requests.

@@ -54,3 +54,13 @@ adb exec-out screencap -p > captures/autofill.png
 ```
 
 Create `captures/` before capturing. A matching checked-in scenario is maintained in `web-extension/ui-preview` for the monorepo's UI review workflow. Native screenshots should be taken from this app, not substituted with that web scenario.
+
+## Failed request details
+
+Tap an API error banner to inspect its HTTP status, endpoint, response body, and
+Cloudflare request ID (when available). The response text is selectable. Diagnostics
+stay in memory, clear when dismissed or the vault locks, and contain no outgoing
+request body or authorization headers. Responses over 64 KiB are explicitly truncated.
+
+For a synthetic screenshot, launch the debug-only `ApiErrorPreviewActivity` and tap
+the banner. This preview reads no vault data and makes no network requests.

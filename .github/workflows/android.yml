@@ -5,40 +5,40 @@ on:
     inputs:
       source_ref:
         type: string
-        default: ''
+        default: ""
       version_name:
         type: string
-        default: '0.1.0'
+        default: "0.1.0"
       version_code:
         type: string
-        default: '1000'
+        default: "1000"
   pull_request:
     paths:
-      - 'android-app/**'
-      - 'backend/**'
-      - 'shared/**'
-      - 'vault-web/**'
-      - 'scripts/generateAndroidApi.ts'
-      - 'scripts/androidRelease*'
-      - 'scripts/checkAndroidApi.ts'
-      - 'scripts/publishAndroidRelease.sh'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/android.yml'
-      - '.github/workflows/android_build.yml'
+      - "android-app/**"
+      - "backend/**"
+      - "shared/**"
+      - "vault-web/**"
+      - "scripts/generateAndroidApi.ts"
+      - "scripts/androidRelease*"
+      - "scripts/checkAndroidApi.ts"
+      - "scripts/publishAndroidRelease.sh"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/android.yml"
+      - ".github/workflows/android_build.yml"
   push:
     branches: [main]
     paths:
-      - 'android-app/**'
-      - 'backend/**'
-      - 'shared/**'
-      - 'vault-web/**'
-      - 'scripts/generateAndroidApi.ts'
-      - 'scripts/androidRelease*'
-      - 'scripts/checkAndroidApi.ts'
-      - 'scripts/publishAndroidRelease.sh'
-      - 'pnpm-lock.yaml'
-      - '.github/workflows/android.yml'
-      - '.github/workflows/android_build.yml'
+      - "android-app/**"
+      - "backend/**"
+      - "shared/**"
+      - "vault-web/**"
+      - "scripts/generateAndroidApi.ts"
+      - "scripts/androidRelease*"
+      - "scripts/checkAndroidApi.ts"
+      - "scripts/publishAndroidRelease.sh"
+      - "pnpm-lock.yaml"
+      - ".github/workflows/android.yml"
+      - ".github/workflows/android_build.yml"
 
 permissions:
   contents: read
@@ -53,13 +53,13 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
-          java-version: '17'
+          java-version: "17"
       - uses: android-actions/setup-android@v3
       - uses: oven-sh/setup-bun@v2
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: "24"
           cache: pnpm
       - run: pnpm install --frozen-lockfile --ignore-scripts
       - name: Check API contract and generated Kotlin
@@ -70,7 +70,7 @@ jobs:
         working-directory: backend
         env:
           NODE_ENV: test
-        run: pnpm exec vitest run mobileApi.spec.ts orpcHandler.spec.ts drizzle/vaultChangeMigration.spec.ts models/securityRegression.spec.ts
+        run: pnpm exec vitest run mobileApi.spec.ts mobileLogin.spec.ts utils/deviceSecretHash.spec.ts orpc/errorDiagnostics.spec.ts orpcHandler.spec.ts drizzle/vaultChangeMigration.spec.ts models/securityRegression.spec.ts
       - name: Verify web vault synchronization
         env:
           NODE_OPTIONS: --no-experimental-webstorage

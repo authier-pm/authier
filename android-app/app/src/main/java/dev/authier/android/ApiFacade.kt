@@ -30,7 +30,7 @@ import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.contentOrNull
-import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.JsonPrimitive
 import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -155,10 +155,20 @@ class ApiFacade(serverUrl: String, private var currentDeviceId: String? = null) 
         try {
             return block()
         } catch (error: HttpException) {
-            val body = error.response()?.errorBody()?.string()
-            val details = parseError(body)
-            throw ApiFailure(error.code(), details?.get("message")?.jsonPrimitive?.contentOrNull ?: "API request failed (${error.code()})",
-                details?.get("code")?.jsonPrimitive?.contentOrNull, error)
+            val response = error.response()
+            val raw = response?.raw()
+            val source = response?.errorBody()?.source()
+            // Bound diagnostic memory even if a proxy returns a huge HTML error page.
+            val truncated = source?.request(65_537) == true
+            val body = source?.readUtf8(minOf(source.buffer.size, 65_536))
+            response?.errorBody()?.close()
+            val parsed = parseError(body)
+            val details = ApiErrorDetails(error.code(), raw?.request?.method.orEmpty(),
+                raw?.request?.url?.newBuilder()?.query(null)?.fragment(null)?.build()?.toString().orEmpty(),
+                body.orEmpty() + if (truncated) "\n[Response truncated after 64 KiB]" else "",
+                response?.headers()?.get("cf-ray") ?: response?.headers()?.get("x-request-id"))
+            throw ApiFailure(error.code(), (parsed?.get("message") as? JsonPrimitive)?.contentOrNull ?: "API request failed (${error.code()})",
+                (parsed?.get("code") as? JsonPrimitive)?.contentOrNull, error, details)
         }
     }
 
