@@ -7,6 +7,13 @@ test('links the homepage hero, platform list and final call to action to Obtaini
   await page.setViewportSize({ width: 1440, height: 1100 })
   await page.goto('/?scenario=android-landing')
   const landing = page.frameLocator('iframe')
+  for (const selector of ['.hero-actions', '.header-actions']) {
+    await expect(
+      landing
+        .locator(selector)
+        .getByRole('link', { name: 'Get browser extension' })
+    ).toHaveAttribute('href', '/download#browsers')
+  }
   for (const selector of ['.hero-actions', '.signal-inner', '.cta-actions']) {
     await expect(
       landing.locator(selector).getByRole('link', { name: /Android/ })
@@ -39,6 +46,7 @@ test('offers the configured Obtainium setup on desktop and mobile', async ({
   await page.setViewportSize({ width: 1440, height: 1000 })
   await page.goto('/?scenario=android-updates')
   const download = page.frameLocator('iframe')
+  await expect(download.locator('#browsers .browser-card')).toHaveCount(3)
   await expect(
     download.getByRole('heading', { name: 'Your vault, kept up to date.' })
   ).toBeVisible()
