@@ -41,7 +41,7 @@ The HTTP client and wire models are generated from the monorepo OpenAPI contract
 
 - Create an account, request device approval, and sign in using the approved encrypted challenge. Existing installations can approve or reject new device requests.
 - Unlock the local vault with the master password, including while offline. The password and plaintext vault items are never written to disk. Saved unlock keys are encrypted by Android Keystore.
-- Create, edit, delete and search passwords and TOTP entries. Generate random passwords and copy passwords or current verification codes.
+- Create, edit, delete and search passwords and TOTP entries. Scan authenticator setup QR codes with the camera or enter a setup key manually. Generate random passwords and copy passwords or current verification codes.
 - Keep an encrypted outbox while offline. Sync reuses each operation ID, detects stale writes, applies opaque cursor pages atomically, and retains deletion tombstones to avoid resurrecting records during history replay.
 - Resolve conflicts by preserving/copying the local value, then discarding the pending change and loading the server version. Pending deletions can also be resolved from Settings.
 - View/remove other devices, configure device-approval policy, and select a per-phone idle lock timeout from 1 minute to 1 day, or lock on background. Timed unlock survives backgrounding, process death, force-stop and reboot until expiry. Changing the timeout works offline. Manual locking immediately clears the saved timed session.
@@ -51,7 +51,7 @@ Android Autofill supports native app login forms with exact package associations
 
 Passkeys created by the browser extension remain encrypted in Android's synchronized snapshot, including deletion records. They are excluded from the password/TOTP editor, native Autofill, and unsupported-payload error reporting. This Android version does not list, edit, create, or authenticate with passkeys; manage them in the browser extension. Native sync preserves passkey ciphertext without decoding or reencoding it.
 
-This initial native application does not yet implement Android Credential Provider, camera QR scanning, push notifications, or encrypted import/export. TOTP setup keys can be entered manually. Device approval checks are explicit through the sign-in button; device requests refresh on the Devices tab.
+This initial native application does not yet implement Android Credential Provider, push notifications, or encrypted import/export. Device approval checks are explicit through the sign-in button; device requests refresh on the Devices tab.
 
 ## Fingerprint unlock
 
@@ -134,3 +134,27 @@ One shared Coil loader downsamples icons to their display size, reuses a 4 MiB
 memory cache, and limits network concurrency to four requests (two per host).
 It has no disk cache or vault API credentials. SVG and embedded browser icons
 are supported. The debug vault uses public icons for its synthetic accounts.
+
+## Camera TOTP setup
+
+Open **Vault → 2FA codes → Add item → Scan QR code** and allow camera access.
+Point the camera at the service’s authenticator setup QR code, review the account,
+and tap **Save encrypted item**. The scanner also works while editing an entry.
+Cancel, Android Back, and **Enter setup key manually** return to the draft without
+saving or changing it. Permission denial offers a retry and Android app settings.
+
+QR decoding uses bundled ZXing on the device, without Play Services or a network
+request. The camera pauses on backgrounding and closes when scanning ends or the
+vault locks. Setup keys stay in memory until the existing encrypted save flow runs;
+real vault windows retain screenshot protection.
+
+Supported QR payloads are single-account `otpauth://totp` links with a Base32 key,
+SHA1, 6–8 digits, and a positive period (defaults: 6 digits / 30 seconds). Imported
+custom periods and digit counts are preserved and displayed. SHA256/SHA512, HOTP,
+and bulk migration QR codes show errors; the existing shared Authier generator
+supports SHA1. Scanning never silently substitutes a different algorithm.
+
+`TotpProvisioningTest` decodes generated QR pixels, checks RFC code output and
+rejects malformed or unsupported setup data. `TotpEditorTest` covers cancellation,
+Android Back, draft preservation, and explicit save. The `android-vault` UI preview
+includes actual emulator captures of the camera entry and scanned-account review.

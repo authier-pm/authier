@@ -3,6 +3,8 @@ import fingerprintScreenshot from '../../../docs/screenshots/android-fingerprint
 import errorScreenshot from '../../../docs/screenshots/android-api-error.png'
 import vaultScreenshot from '../../../docs/screenshots/android-vault.png'
 import totpScreenshot from '../../../docs/screenshots/android-totp.png'
+import totpCameraEntryScreenshot from '../../../docs/screenshots/android-totp-camera-entry.png'
+import totpCameraReviewScreenshot from '../../../docs/screenshots/android-totp-camera-review.png'
 import autofillScreenshot from '../../../docs/screenshots/android-autofill.png'
 import associationScreenshot from '../../../docs/screenshots/android-autofill-association.png'
 
@@ -38,6 +40,18 @@ const screens = [
     image: totpScreenshot,
     description:
       'TOTP codes generated locally on Android, with lazy-loaded website icons.'
+  },
+  {
+    title: 'Scan a setup code',
+    image: totpCameraEntryScreenshot,
+    description:
+      'Add a 2FA account with the Android camera, with manual setup keys available as a fallback.'
+  },
+  {
+    title: 'Review scanned account',
+    image: totpCameraReviewScreenshot,
+    description:
+      'An actual emulator camera scan fills the account and code settings. Review before saving to the encrypted vault.'
   },
   {
     title: 'Autofill',

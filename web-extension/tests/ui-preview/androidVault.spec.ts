@@ -15,6 +15,8 @@ test('renders captured native Android vault, authenticator and autofill screens'
     'Server response',
     'Passwords',
     'Authenticator',
+    'Scan a setup code',
+    'Review scanned account',
     'Autofill',
     'Link a login'
   ]) {

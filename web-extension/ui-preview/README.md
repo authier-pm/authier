@@ -106,3 +106,9 @@ The `android-vault` password and authenticator captures show the production
 lazy-loading favicon component. Refresh both native screenshots after icon changes.
 `FaviconLoadingTest` uses a local HTTP server and 1,000 synthetic rows to verify
 that off-screen entries do not bulk-fetch and returning to a row uses memory cache.
+
+The Android gallery also includes `android-totp-camera-entry.png` and
+`android-totp-camera-review.png`. Capture these from the debug demo vault’s
+**2FA codes → Add item → Scan QR code** flow. The review capture must follow an
+actual camera scan of a synthetic `otpauth://totp` QR code, with the setup key
+hidden. Run `pnpm playwright:ui-preview androidVault.spec.ts` to render the gallery.
