@@ -38,7 +38,7 @@ describe('AutofillControl', () => {
     vi.mocked(browser.runtime.sendMessage).mockResolvedValue(false)
   })
 
-  it('pauses autofill for the current page from the popover', async () => {
+  it('pauses autofill for the current domain from the popover', async () => {
     const user = userEvent.setup()
     renderControl()
 
@@ -49,7 +49,7 @@ describe('AutofillControl', () => {
 
     vi.mocked(browser.runtime.sendMessage).mockResolvedValueOnce(true)
     await user.click(
-      screen.getByRole('switch', { name: 'Autofill on this page' })
+      screen.getByRole('switch', { name: 'Autofill on this domain' })
     )
 
     expect(browser.runtime.sendMessage).toHaveBeenLastCalledWith({
@@ -72,7 +72,7 @@ describe('AutofillControl', () => {
     const trigger = await screen.findByRole('button', { name: /Autofill on/ })
     await user.click(trigger)
     const pageSwitch = screen.getByRole('switch', {
-      name: 'Autofill on this page'
+      name: 'Autofill on this domain'
     })
 
     fireEvent.pointerDown(pageSwitch)

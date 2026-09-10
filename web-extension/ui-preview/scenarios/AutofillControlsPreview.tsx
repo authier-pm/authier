@@ -24,7 +24,9 @@ export const AutofillControlsPreview = () => (
               A
             </div>
             <div>
-              <div className="text-sm font-semibold">Example account</div>
+              <div className="text-sm font-semibold">
+                Example domain account
+              </div>
               <div className="text-sm text-[color:var(--color-muted)]">
                 user@example.com
               </div>

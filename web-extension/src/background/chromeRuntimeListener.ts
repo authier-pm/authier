@@ -44,8 +44,7 @@ import {
   passwordFormSnapshotSchema
 } from '@shared/passwordFormClassification'
 import {
-  AutofillPagePauseMessageKind,
-  clearAutofillPagePause,
+  refreshAutofillForDomain,
   isAutofillPagePauseGetMessage,
   isAutofillPagePauseSetMessage,
   isAutofillPausedForPage,
@@ -381,10 +380,6 @@ createChromeHandler({
 
 console.log('background page loaded')
 
-browser.tabs.onRemoved.addListener((tabId) => {
-  void clearAutofillPagePause(tabId)
-})
-
 browser.runtime.onMessage.addListener((request: unknown, sender) => {
   const passkeyResponse = handlePasskeyMessage(request, sender)
   if (passkeyResponse) return passkeyResponse
@@ -394,13 +389,8 @@ browser.runtime.onMessage.addListener((request: unknown, sender) => {
   }
 
   if (isAutofillPagePauseSetMessage(request)) {
-    return setAutofillPausedForPage(request).then(() => {
-      void browser.tabs
-        .sendMessage(request.tabId, {
-          kind: AutofillPagePauseMessageKind.REFRESH
-        })
-        .catch(() => undefined)
-
+    return setAutofillPausedForPage(request).then(async () => {
+      await refreshAutofillForDomain(request.url)
       return request.paused
     })
   }

@@ -183,7 +183,7 @@ export const AutofillControl = () => {
               Autofill controls
             </div>
             <div className="text-xs text-[color:var(--color-muted)]">
-              Pause autofill for this page or the whole browser.
+              Pause autofill for this domain or the whole browser.
             </div>
           </div>
 
@@ -191,16 +191,16 @@ export const AutofillControl = () => {
             <div className="flex items-center justify-between gap-3">
               <div>
                 <div className="text-sm font-medium text-[color:var(--color-foreground)]">
-                  This page
+                  This domain
                 </div>
                 <div className="text-xs text-[color:var(--color-muted)]">
                   {pageControlAvailable
-                    ? 'The pause clears when you navigate away.'
+                    ? 'All paths, until you enable it again.'
                     : 'Unavailable on this browser page.'}
                 </div>
               </div>
               <Switch
-                aria-label="Autofill on this page"
+                aria-label="Autofill on this domain"
                 checked={autofillEnabledForPage}
                 disabled={
                   !globallyEnabled ||

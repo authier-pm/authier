@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('pauses autofill for this page without closing the popover', async ({
+test('pauses autofill for this domain without closing the popover', async ({
   page
 }) => {
   await page.goto('/?scenario=autofill-controls')
@@ -10,7 +10,7 @@ test('pauses autofill for this page without closing the popover', async ({
 
   const dialog = page.getByRole('dialog', { name: 'Autofill controls' })
   const pageSwitch = page.getByRole('switch', {
-    name: 'Autofill on this page'
+    name: 'Autofill on this domain'
   })
   const allPagesSwitch = page.getByRole('switch', {
     name: 'Autofill on all pages'
@@ -46,6 +46,13 @@ test('pauses autofill for this page without closing the popover', async ({
     'button[aria-controls="autofill-control-popover"]'
   )
   await expect(autofillTrigger).toHaveAttribute('aria-label', 'Autofill paused')
+
+  await expect(dialog).toContainText('All paths, until you enable it again.')
+  await page.screenshot({
+    path: '../docs/screenshots/autofill-domain-paused-popover.png',
+    scale: 'css',
+    animations: 'disabled'
+  })
 
   await pageSwitch.click()
 

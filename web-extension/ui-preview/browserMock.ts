@@ -1,6 +1,6 @@
 type BrowserMessage = Record<string, unknown>
 
-let isPagePaused = false
+const pausedDomains = new Set<string>()
 const sessionStorage: Record<string, unknown> = {}
 
 const isBrowserMessage = (message: unknown): message is BrowserMessage =>
@@ -15,11 +15,17 @@ const browser = {
         return undefined
       }
 
+      const hostname =
+        typeof message.url === 'string' ? new URL(message.url).hostname : ''
       if (message.kind === 'AUTOFILL_PAGE_PAUSE_SET') {
-        isPagePaused = message.paused === true
+        if (message.paused === true) {
+          pausedDomains.add(hostname)
+        } else {
+          pausedDomains.delete(hostname)
+        }
       }
 
-      return isPagePaused
+      return pausedDomains.has(hostname)
     }
   },
   storage: {

@@ -1,9 +1,5 @@
 import browser from 'webextension-polyfill'
 
-const AUTOFILL_PAUSED_PAGE_STORAGE_KEY_PREFIX = 'autofillPausedPage:'
-
-const pausedPagesInMemory = new Map<number, string>()
-
 export const AutofillPagePauseMessageKind = {
   GET: 'AUTOFILL_PAGE_PAUSE_GET',
   SET: 'AUTOFILL_PAGE_PAUSE_SET',
@@ -27,67 +23,75 @@ export type AutofillPagePauseRefreshMessage = {
   kind: typeof AutofillPagePauseMessageKind.REFRESH
 }
 
-const getStorageKey = (tabId: number) =>
-  `${AUTOFILL_PAUSED_PAGE_STORAGE_KEY_PREFIX}${tabId}`
-
-const getPausedPageUrl = async (tabId: number): Promise<string | null> => {
-  const sessionStorage = browser.storage.session
-
-  if (!sessionStorage) {
-    return pausedPagesInMemory.get(tabId) ?? null
+// Keep the message protocol stable; pauses now belong to a hostname, not a tab.
+export const getAutofillPauseHostname = (url: string): string | null => {
+  if (!URL.canParse(url)) {
+    return null
   }
 
-  const storageKey = getStorageKey(tabId)
-  const stored = await sessionStorage.get(storageKey)
-  const pausedPageUrl = stored[storageKey]
+  const parsed = new URL(url)
+  if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') {
+    return null
+  }
 
-  return typeof pausedPageUrl === 'string' ? pausedPageUrl : null
+  return parsed.hostname
 }
 
-export const clearAutofillPagePause = async (tabId: number): Promise<void> => {
-  pausedPagesInMemory.delete(tabId)
-
-  const sessionStorage = browser.storage.session
-  if (sessionStorage) {
-    await sessionStorage.remove(getStorageKey(tabId))
-  }
+const getStorageKey = (url: string): string | null => {
+  const hostname = getAutofillPauseHostname(url)
+  return hostname ? `autofillPausedDomain:${hostname}` : null
 }
 
 export const setAutofillPausedForPage = async ({
   paused,
-  tabId,
   url
 }: Omit<AutofillPagePauseSetMessage, 'kind'>): Promise<void> => {
-  if (!paused) {
-    await clearAutofillPagePause(tabId)
+  const storageKey = getStorageKey(url)
+  if (!storageKey) {
     return
   }
 
-  const sessionStorage = browser.storage.session
-  if (sessionStorage) {
-    await sessionStorage.set({ [getStorageKey(tabId)]: url })
-    return
+  if (paused) {
+    await browser.storage.local.set({ [storageKey]: true })
+  } else {
+    await browser.storage.local.remove(storageKey)
   }
-
-  pausedPagesInMemory.set(tabId, url)
 }
 
 export const isAutofillPausedForPage = async (
-  tabId: number,
+  _tabId: number,
   url: string
 ): Promise<boolean> => {
-  const pausedPageUrl = await getPausedPageUrl(tabId)
-
-  if (!pausedPageUrl) {
+  const storageKey = getStorageKey(url)
+  if (!storageKey) {
     return false
   }
 
-  if (pausedPageUrl === url) {
-    return true
+  const stored = await browser.storage.local.get(storageKey)
+  return stored[storageKey] === true
+}
+
+export const refreshAutofillForDomain = async (url: string): Promise<void> => {
+  const hostname = getAutofillPauseHostname(url)
+  if (!hostname) {
+    return
   }
 
-  await clearAutofillPagePause(tabId)
-  return false
+  const tabs = await browser.tabs.query({})
+  await Promise.all(
+    tabs
+      .filter((tab) => getAutofillPauseHostname(tab.url ?? '') === hostname)
+      .map((tab) => {
+        if (typeof tab.id !== 'number') {
+          return
+        }
+
+        // Tabs without a content script (or closed during the query) cannot receive it.
+        return browser.tabs
+          .sendMessage(tab.id, { kind: AutofillPagePauseMessageKind.REFRESH })
+          .catch(() => undefined)
+      })
+  )
 }
 
 const isMessageWithKind = (message: unknown): message is { kind: unknown } =>
