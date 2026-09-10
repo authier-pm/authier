@@ -19,6 +19,83 @@ test.beforeEach(async ({ page }) => {
   })
 })
 
+for (const direction of ['below', 'above'] as const) {
+  test(`keeps the ${direction} popup open while crossing the trigger gap`, async ({
+    page
+  }) => {
+    const query = direction === 'above' ? '&open-above=1' : ''
+    await page.goto(`/?scenario=kostkohratky-password${query}`)
+    const trigger = page.getByRole('button', {
+      name: 'Open Authier password generator'
+    })
+    await trigger.hover()
+    const dialog = page.getByRole('dialog', {
+      name: 'Authier password generator',
+      exact: true
+    })
+    await expect(dialog).toBeVisible()
+    await expect(dialog).toHaveClass(new RegExp(`popover--${direction}`))
+    const triggerBox = await trigger.boundingBox()
+    const dialogBox = await dialog.boundingBox()
+    if (!triggerBox || !dialogBox)
+      throw new Error('Missing generator bounds')
+    // Take a shallow diagonal straight to the far corner, without first
+    // moving vertically through the gap. Check every point along the path.
+    const startX = triggerBox.x + triggerBox.width / 2
+    const startY = triggerBox.y + triggerBox.height / 2
+    for (const cornerY of [dialogBox.y + 2, dialogBox.y + dialogBox.height - 2]) {
+      await trigger.hover()
+      for (let step = 1; step <= 20; step++) {
+        const progress = step / 20
+        await page.mouse.move(
+          startX + (dialogBox.x + 2 - startX) * progress,
+          startY + (cornerY - startY) * progress
+        )
+        await expect(dialog).toBeVisible()
+      }
+    }
+    await trigger.hover()
+    // The expanded bridge must not intercept the trigger's clicks.
+    await trigger.click()
+    const gapY =
+      direction === 'above'
+        ? (dialogBox.y + dialogBox.height + triggerBox.y) / 2
+        : (triggerBox.y + triggerBox.height + dialogBox.y) / 2
+    await page.mouse.move(triggerBox.x + triggerBox.width / 2, gapY, {
+      steps: 12
+    })
+    // Pause inside the gap: even a slow pointer must keep the popup open.
+    await page.waitForTimeout(350)
+    await expect(dialog).toBeVisible()
+    const next = dialog.getByRole('button', { name: 'Next', exact: true })
+    await next.hover()
+    await expect(dialog).toBeVisible()
+    const previousPassword = await dialog.locator('code').innerText()
+    await next.click()
+    await expect(dialog.locator('code')).not.toHaveText(previousPassword)
+    await page.screenshot({
+      path: `../docs/screenshots/password-generator-hover-${direction}.png`
+    })
+    // Crossing back to the trigger works too, and leaving the whole UI closes it.
+    await page.mouse.move(triggerBox.x + triggerBox.width / 2, gapY, {
+      steps: 12
+    })
+    await trigger.hover()
+    await expect(dialog).toBeVisible()
+    await page.mouse.move(10, 10)
+    await expect(dialog).toBeHidden()
+    await trigger.hover()
+    await page.mouse.move(triggerBox.x + triggerBox.width / 2, gapY, {
+      steps: 12
+    })
+    const password = await dialog.locator('code').innerText()
+    await dialog.getByRole('button', { name: 'Fill', exact: true }).click()
+    await expect(
+      page.locator('input[type="password"]').first()
+    ).toHaveValue(password)
+  })
+}
+
 test('offers password generation on the first field and reuses the classification', async ({
   page
 }) => {

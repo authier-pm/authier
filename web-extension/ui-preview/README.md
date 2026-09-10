@@ -101,3 +101,8 @@ The `android-blog` scenario embeds the production native Android launch article.
 Run the `Android launch article` test in `playwrightAndroidUpdates.config.ts` to
 verify desktop/mobile layout, screenshot assets and download links, and capture
 `docs/screenshots/android-blog-desktop.png` and `android-blog-mobile.png`.
+
+The `android-vault` password and authenticator captures show the production
+lazy-loading favicon component. Refresh both native screenshots after icon changes.
+`FaviconLoadingTest` uses a local HTTP server and 1,000 synthetic rows to verify
+that off-screen entries do not bulk-fetch and returning to a row uses memory cache.

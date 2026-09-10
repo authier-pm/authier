@@ -27,23 +27,25 @@ const passwordGeneratorStyles = `
   .authier-generator__trigger {
     all: unset;
     align-items: center;
-    background: #0f73ff;
-    border: 2px solid rgba(255, 255, 255, 0.92);
-    border-radius: 999px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    background: transparent;
+    border-radius: 10px;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.18);
     box-sizing: border-box;
     cursor: pointer;
     display: flex;
     height: 36px;
     justify-content: center;
+    overflow: hidden;
+    position: relative;
     transition:
-      background-color 120ms ease,
+      box-shadow 120ms ease,
       transform 120ms ease;
     width: 36px;
+    z-index: 1;
   }
 
   .authier-generator__trigger:hover {
-    background: #0866e5;
+    box-shadow: 0 3px 9px rgba(15, 23, 42, 0.24);
     transform: scale(1.04);
   }
 
@@ -54,12 +56,13 @@ const passwordGeneratorStyles = `
 
   .authier-generator__logo {
     display: block;
-    height: 22px;
+    height: 36px;
     object-fit: contain;
-    width: 22px;
+    width: 36px;
   }
 
   .authier-generator__popover {
+    isolation: isolate;
     background: #111827;
     border: 1px solid #334155;
     border-radius: 16px;
@@ -80,6 +83,23 @@ const passwordGeneratorStyles = `
 
   .authier-generator__popover--above {
     bottom: 44px;
+  }
+
+  /* Cover diagonal paths from the whole trigger and add 12px around the
+     panel, including its rounded corners. Keep controls above this area. */
+  .authier-generator__popover::before {
+    content: '';
+    inset: -12px;
+    position: absolute;
+    z-index: -1;
+  }
+
+  .authier-generator__popover--below::before {
+    top: -44px;
+  }
+
+  .authier-generator__popover--above::before {
+    bottom: -44px;
   }
 
   .authier-generator__eyebrow {

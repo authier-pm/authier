@@ -407,7 +407,7 @@ class VaultViewModel(application: Application) : AndroidViewModel(application) {
         activeJob?.cancel()
         masterKey = null
         val names = listOf("Linear" to "alex@studio.design", "GitHub" to "alexmorgan", "Figma" to "alex@studio.design", "Google" to "alex.morgan@gmail.com")
-        val passwords = names.mapIndexed { index, (label, username) -> VaultItem(SecretRecord("demo-$index", "demo", "LOGIN_CREDENTIALS", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, username = username, password = "demo-password-" + index, url = "https://${label.lowercase()}.com")) }
+        val passwords = names.mapIndexed { index, (label, username) -> VaultItem(SecretRecord("demo-$index", "demo", "LOGIN_CREDENTIALS", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, username = username, password = "demo-password-" + index, url = if (label == "Linear") "https://linear.app" else "https://${label.lowercase()}.com")) }
         val demoSeeds = listOf("JBSWY3DPEHPK3PXP", "KRUGS4ZANFZSAYJA", "MFRGGZDFMZTWQ2LK")
         val codes = listOf("GitHub", "Google", "Cloudflare").mapIndexed { index, label -> VaultItem(SecretRecord("totp-$index", "demo", "TOTP", 1, "2026-09-01T12:00:00Z"), SecretContent(label = label, secret = demoSeeds[index], url = "https://${label.lowercase()}.com")) }
         state.value = VaultUiState(email = "alex@studio.design", unlocked = !locked, remembered = true, demo = true,

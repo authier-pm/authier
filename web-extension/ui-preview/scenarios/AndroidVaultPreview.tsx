@@ -30,12 +30,14 @@ const screens = [
   {
     title: 'Passwords',
     image: vaultScreenshot,
-    description: 'The native vault with synthetic demo accounts.'
+    description:
+      'Lazy-loaded website favicons with the same saved-icon and hostname lookup as the browser extension.'
   },
   {
     title: 'Authenticator',
     image: totpScreenshot,
-    description: 'TOTP codes generated locally on Android.'
+    description:
+      'TOTP codes generated locally on Android, with lazy-loaded website icons.'
   },
   {
     title: 'Autofill',

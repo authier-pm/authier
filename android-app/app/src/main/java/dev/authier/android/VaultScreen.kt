@@ -110,13 +110,10 @@ private fun VaultCategory(label: String, count: Int, selected: Boolean, modifier
 
 @Composable
 private fun SecretCard(item: VaultItem, onClick: () -> Unit) {
-    val tint = when (item.content.label.lowercase()) { "linear" -> Color(0xFFBBB8FF); "github" -> Color(0xFFE4E9EF); "figma" -> Color(0xFFFFB79E); "google" -> Color(0xFFA9CBFF); else -> Mint }
     Surface(onClick = onClick, shape = RoundedCornerShape(17.dp), color = Panel, contentColor = MaterialTheme.colorScheme.onSurface, border = androidx.compose.foundation.BorderStroke(1.dp, Border.copy(alpha = .55f))) {
         Column(Modifier.padding(16.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(14.dp)) {
-                Box(Modifier.size(44.dp).background(tint.copy(alpha = .11f), RoundedCornerShape(12.dp)), contentAlignment = Alignment.Center) {
-                    Text(item.content.label.take(1).uppercase(), color = tint, fontSize = 22.sp, fontWeight = FontWeight.Bold)
-                }
+                SecretItemIcon(item.content)
                 Column(Modifier.weight(1f), verticalArrangement = Arrangement.spacedBy(5.dp)) {
                     Text(item.content.label, fontWeight = FontWeight.SemiBold, fontSize = 16.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     Text(if (item.record.kind == "TOTP") item.content.url.orEmpty().removePrefix("https://") else item.content.username, color = Muted, fontSize = 12.sp, maxLines = 1, overflow = TextOverflow.Ellipsis)

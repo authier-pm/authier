@@ -123,3 +123,14 @@ adb shell am instrument -w -e class dev.authier.android.BiometricUnlockTest \
 Run `adb emu finger touch 1` from another terminal for both the enable and unlock
 prompts. This test uses authentication-per-use Keystore encryption and decryption
 with the production prompt and clears its synthetic vault afterward.
+
+## Website icons
+
+Password and TOTP rows use the same icon lookup as the browser extension: the
+saved `iconUrl` first, otherwise DuckDuckGo’s favicon endpoint for the website’s
+hostname. Missing or failed icons show a document placeholder. Only composed
+rows in the lazy list start requests; leaving composition cancels unfinished work.
+One shared Coil loader downsamples icons to their display size, reuses a 4 MiB
+memory cache, and limits network concurrency to four requests (two per host).
+It has no disk cache or vault API credentials. SVG and embedded browser icons
+are supported. The debug vault uses public icons for its synthetic accounts.

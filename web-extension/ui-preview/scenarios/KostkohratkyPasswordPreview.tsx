@@ -11,6 +11,7 @@ export const KostkohratkyPasswordPreview = () => {
   const html = new URLSearchParams(location.search).has('large-form')
     ? createLargeKostkohratkyFormHtml()
     : kostkohratkyRegisterConfirmHtml
+  const openAbove = new URLSearchParams(location.search).has('open-above')
   useEffect(() => {
     const previousLanguage = document.documentElement.lang
     document.documentElement.lang = 'cs'
@@ -32,7 +33,9 @@ export const KostkohratkyPasswordPreview = () => {
   }, [])
 
   return (
-    <main className="kostkohratky-preview">
+    <main
+      className={`kostkohratky-preview${openAbove ? ' kostkohratky-preview--open-above' : ''}`}
+    >
       <header>
         <span className="kostkohratky-preview__brand">Kostkohrátky</span>
         <span>Dokončení registrace</span>
@@ -42,7 +45,8 @@ export const KostkohratkyPasswordPreview = () => {
       </div>
       <section dangerouslySetInnerHTML={{ __html: html }} />
       <p className="kostkohratky-preview__note">
-        Zvolte si nové heslo pro svůj účet.
+        Zvolte si nové heslo pro svůj účet. Z ikony můžete přejít přímo do
+        levého rohu nabídky.
       </p>
     </main>
   )
