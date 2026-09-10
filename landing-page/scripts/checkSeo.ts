@@ -113,6 +113,53 @@ for (const file of files) {
   )
   const h1Count = html.match(/<h1(?:\s|>)/gi)?.length ?? 0
 
+  const socialImage = requireMatch(
+    html,
+    /<meta\s+property="og:image"\s+content="([^"]+)"/i,
+    'Open Graph image',
+    route
+  )
+  const twitterImage = requireMatch(
+    html,
+    /<meta\s+name="twitter:image"\s+content="([^"]+)"/i,
+    'Twitter image',
+    route
+  )
+  const socialImageUrl = new URL(socialImage)
+
+  if (socialImage !== twitterImage) {
+    throw new Error(`${route}: Open Graph and Twitter images differ`)
+  }
+
+  if (
+    socialImageUrl.origin !== 'https://www.authier.pm' ||
+    !existsSync(join(distributionDirectory, socialImageUrl.pathname))
+  ) {
+    throw new Error(`${route}: social image must be a published site asset`)
+  }
+
+  if (
+    route === '/blog/native-android-app' &&
+    socialImageUrl.pathname !== '/blog/android/android-vault.png'
+  ) {
+    throw new Error(`${route}: social preview must show the Android vault`)
+  }
+
+  if (socialImageUrl.pathname.endsWith('.png')) {
+    const image = readFileSync(join(distributionDirectory, socialImageUrl.pathname))
+    for (const [dimension, offset] of [['width', 16], ['height', 20]] as const) {
+      const declared = requireMatch(
+        html,
+        new RegExp(`<meta\\s+property="og:image:${dimension}"\\s+content="([^"]+)"`, 'i'),
+        `social image ${dimension}`,
+        route
+      )
+      if (Number(declared) !== image.readUInt32BE(offset)) {
+        throw new Error(`${route}: social image ${dimension} does not match the PNG`)
+      }
+    }
+  }
+
   if (html.includes(obsoletePublicContactEmail)) {
     throw new Error(`${route}: contains the obsolete project contact address`)
   }
